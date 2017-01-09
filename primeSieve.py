@@ -351,7 +351,7 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 	Arguments:
 		lo (:int) - the lower bound of the interval
 		hi (:int) - the upper bound of the interval
-        segment (:bool) - indicates whether to segment or not. Is False unless specified.
+ 		segment (:bool) - indicates whether to segment or not. Is False unless specified.
 		seg_size (:int) - optional argument to indicate the size of the segment to be used. 
 
 	Returns:
@@ -377,7 +377,7 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 		else:
 			delta = seg_size
 	else:
-        delta = hi - lo
+		delta = hi - lo
 
 	l1 = len(base_primes)
 	l = (delta >> 4) + 1
