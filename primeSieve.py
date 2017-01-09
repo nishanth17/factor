@@ -3,10 +3,10 @@
 This module has a bunch of prime sieves.
 
 -> WHEELED SIEVE OF ERATOSTHENES
-This module implements a sieve of Eratosthenes with a wheel mod 6.
+A sieve of Eratosthenes with a wheel mod 6.
 
 -> SIEVE OF ATKIN
-This module implements a segmented version of the sieve of Atkin as described in [1].
+A segmented version of the sieve of Atkin as described in [1].
 This works until the limit of 32-bit integers (~3.3 x 10^9) and is not configured to 
 work beyond that. Doing stuff beyond that would require tweaking some constants (like 
 the 5's, 31's etc.) and isn't too hard but my computer's memory limitations make it 
@@ -16,9 +16,8 @@ NOTE: This would probably be a lot more efficient with NumPy arrays but PyPy doe
 support NumPy as of yet. 
 
 -> SEGMENTED SIEVE OF ERATOSTHENES
-This module implements a segmented sieve of Eratosthenes with a wheel mod 2. The  
-wheel mod 6 version of this is annoying as hell to implement and might be included in 
-the future. 
+A segmented sieve of Eratosthenes with a wheel mod 2. The wheel mod 6 version of this is 
+annoying as hell to implement and might be included in the future. 
 
 
 BENCHMARKS:
