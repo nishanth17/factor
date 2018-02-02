@@ -13,18 +13,6 @@ MAX_B2 = 2 * 10**9
 MAX_CURVES = 5000
 MAX_RND = (1 << 32) - 1
 
-def compute_bounds(n):
-	"""
-	Computes Stage 1 and Stage 2 bounds.
-	"""
-	log_q = math.log(pow(10, (len(str(n)) - 2) >> 1))
-	t = int(math.ceil(math.exp(math.sqrt(0.5 * log_q * \
-								math.log(log_q))) / 10) * 10)
-	B1 = min(t, MAX_B1)
-	B2 = min(B1 * 100, MAX_B2)
-	return B1, B2
-
-
 def point_add(px, pz, qx, qz, rx, rz, n):
 	"""
 	Adds three specified points (in Montgomery form) in E(Z\nZ).
@@ -59,7 +47,7 @@ def scalar_multiply(k, px, pz, n, a24):
 	rx, rz = point_double(px, pz, n, a24)
 
 	for i in xrange(3, lk):
-		if sk[i] == 1:
+		if sk[i] == '1':
 			qx, qz = point_add(rx, rz, qx, qz, px, pz, n)
 			rx, rz = point_double(rx, rz, n, a24)
 		else:
@@ -71,9 +59,9 @@ def scalar_multiply(k, px, pz, n, a24):
 
 def factorize_ecm(n, verbose = False):
 	"""
-	ECM stuff.
+	ECM algorithm
 	"""
-	B1, B2 = compute_bounds(n)
+	B1, B2 = utils.compute_bounds(n)
 	if verbose:
 		print "Bounds:", B1, B2
 
@@ -134,13 +122,11 @@ def factorize_ecm(n, verbose = False):
 		q, step = idx_B1, 2*D
 		for r in xrange(B, B2, step):
 			alpha, limit = (rx * rz) % n, r + step
-			
 			while q < num_primes and primes[q] <= limit:
 				d = (primes[q] - r) / 2
 				f = (rx - S[2*d-1]) * (rz + S[2*d]) - alpha + beta[d]
 				g = (g * f) % n
 				q += 1
-
 			trx, trz = rx, rz
 			rx, rz = point_add(rx, rz, S[2*D-1], S[2*D], tx, tz, n)
 			tx, tz = trx, trz
@@ -149,6 +135,10 @@ def factorize_ecm(n, verbose = False):
 
 	# No non-trivial factor found, return 0
 	if curves > MAX_CURVES:
-		return 0
+		return -1
 	else:
 		return g
+
+n = 34747575467581863011
+factor = factorize_ecm(n, True)
+print n, factor

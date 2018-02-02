@@ -2,7 +2,6 @@ import utils
 import random
 import primeSieve
 
-
 """
 This module contains an implementation of Brent's improvement to Pollard's Rho
 alogrithm. 
@@ -16,7 +15,7 @@ small_primes = primeSieve.prime_sieve(THRESHOLD)
 
 def factorize_rho(n):
     # Try ~500 times with varying 'c' offsets. 
-    # If no factor is found, return False
+    # If no factor is found, return -1
     for i in range(len(small_primes) - 1, -1, -1):
         r, c, y = 1, small_primes[i], randint(1, n-1)
         m, g, q, ys = randint(1, n-1), 1, 1, y
@@ -45,4 +44,4 @@ def factorize_rho(n):
                 break
         if g != n:
             return g
-    return 0
+    return -1

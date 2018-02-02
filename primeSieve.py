@@ -41,6 +41,9 @@ import utils
 SMALL_THRESHOLD = 60
 SIEVE_THRESHOLD = 3500000
 
+LOWER_SEG_SIZE = 65536
+UPPER_SEG_SIZE = 2097152
+
 # Sieve bits
 segs = [[] for _ in xrange(60)]
 
@@ -254,7 +257,7 @@ def enum3(d, f, g, L, B, segs):
 
 def sieve_of_atkin(n):
 	"""
-	Returns the primes under a specified number with a modified sieve of Atkin.
+	Returns the primes under a specified number with a segmented sieve of Atkin.
 
 	Arguments:
 		n (:int) - the number to list primes under
@@ -338,20 +341,18 @@ def prime_sieve(n):
 		return sieve_of_atkin(n)
 
 
-def segmented_sieve(lo, hi, segment = False, seg_size = -1):
+def segmented_sieve(lo, hi):
 	"""
 	Returns the primes between two specified numbers using a segmented sieve of Eratosthenes. 
 	Optionally, one may specify the size of the segment to be used. If not specified, the segment 
 	size used defaults to the square root of the difference between the two specified numbers.
 
 	NOTE: A small segment size results in low memory usage but results in a large computation time.
-	There seems to be an potimal segment size but I can't really figure out what it is. 
+	There seems to be an optimal segment size but I can't really figure out what it is.
 
 	Arguments:
 		lo (:int) - the lower bound of the interval
 		hi (:int) - the upper bound of the interval
- 		segment (:bool) - indicates whether to segment or not. Is False unless specified.
-		seg_size (:int) - optional argument to indicate the size of the segment to be used. 
 
 	Returns:
 		the primes in the interval [lo, hi] in a list
@@ -359,7 +360,7 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 	if hi < lo: return []
 	max_prime, pos = int(math.sqrt(hi)), 0
 	base_primes = prime_sieve(max_prime)
-	primes = [0] * int(math.ceil(1.5 * hi/math.log(hi)) - math.ceil(1.5 * lo/math.log(lo)))
+	primes = [0] * int(math.ceil(1.5 * hi/math.log(hi)) - math.floor(1.5 * lo/math.log(lo)))
 
 	# Include primes below √hi if necessary
 	if lo < max_prime:
@@ -369,21 +370,14 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 			pos += 1
 		lo = max_prime
 
-	# Compute segment size if required
-	if segment:
-		if seg_size == -1:
-			delta = int(math.sqrt(hi - lo))
-		else:
-			delta = seg_size
-	else:
-		delta = hi - lo
+	# Compute segment size 
+	delta = UPPER_SEG_SIZE if hi - lo >= UPPER_SEG_SIZE else LOWER_SEG_SIZE
 
-	l1 = len(base_primes)
-	l = (delta >> 4) + 1
+	l1, l = len(base_primes), (delta >> 4) + 1
 	int_size = l << 3
 	sieve = bytearray([0x0] * l)
-
 	lo_1, hi_1 = lo, lo + delta
+	
 	# Compute stuff in segments
 	while lo_1 <= hi:
 		# Re-zero sieve bits if necessary
@@ -398,7 +392,8 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 		for i in xrange(1, l1):
 			p = base_primes[i]
 			k = (p - (lo_1 % p)) % p
-			if (k & 1) == 1: k += p
+			if (k & 1) == 1: 
+				k += p
 			k >>= 1
 			while k < int_size:
 				sieve[k >> 3] |= 1 << (k & 7)
@@ -417,4 +412,26 @@ def segmented_sieve(lo, hi, segment = False, seg_size = -1):
 		hi_1 = lo_1 + delta
 
 	return primes[:pos]
+
+if __name__ == '__main__':
+	n = 10**9
+	print "n =", n, "...\n"
+
+	# t = time.time()
+	# s = small_sieve(n)
+	# t1 = time.time()
+	# print "Eratosthenes:", len(s) 
+	# print "Time:", (t1-t), "s\n"
+
+	t = time.time()
+	s = sieve_of_atkin(n)
+	t1 = time.time()
+	print "Atkin:", len(s) 
+	print "Time:", (t1-t), "s\n"
+
+	t = time.time()
+	s = segmented_sieve(lo = 2, hi = n)
+	t1 = time.time()
+	print "Segmented:", len(s) 
+	print "Time:", (t1-t), "s\n"
 

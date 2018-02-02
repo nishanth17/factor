@@ -158,7 +158,8 @@ def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
 		logn = log(n)
 		if not is_probabilistic: 
 			w = xrange(2, 2 * int(logn*log(logn)/log(2))) 
-		else: w = xrange(tolerance)
+		else: 
+			w = xrange(tolerance)
 	elif n >= 1543267864443420616877677640751301: w = firstPrime[:20]
 	elif n >= 564132928021909221014087501701: w = firstPrime[:18]
 	elif n >= 59276361075595573263446330101: w = firstPrime[:16]
@@ -268,5 +269,18 @@ def is_prime(n, is_probabilistic = False, tolerance = 30):
 				return is_prime_fast(n)
 			else:
 				return is_prime_fast(n, True, 40)
+
+
+
+def compute_bounds(n):
+	"""
+	Computes Stage 1 and Stage 2 bounds for both ECM and Pollard p-1
+	"""
+	log_q = math.log(pow(10, (len(str(n)) - 2) >> 1))
+	t = int(math.ceil(math.exp(math.sqrt(0.5 * log_q * \
+								math.log(log_q))) / 10) * 10)
+	B1 = min(t, MAX_B1)
+	B2 = min(B1 * 100, MAX_B2)
+	return B1, B2
 		
 

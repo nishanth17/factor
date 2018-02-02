@@ -13,20 +13,8 @@ MAX_B1 = 10**6
 MAX_B2 = 10**8
 
 
-def compute_bounds(n):
-	"""
-	Computes Stage 1 and Stage 2 bounds
-	"""
-	log_q = math.log(pow(10, (len(str(n)) - 2) >> 1))
-	t = int(math.ceil(math.exp(math.sqrt(0.5 * log_q * \
-								math.log(log_q))) / 10) * 10)
-	B1 = min(t, MAX_B1)
-	B2 = min(B1 * 100, MAX_B2)
-	return B1, B2
-
-
 def factorize_pm1(n, verbose = False):
-	B1, B2 = compute_bounds(n)
+	B1, B2 = utils.compute_bounds(n)
 	if verbose:
 		print "Bounds:", B1, B2
 	
@@ -82,4 +70,4 @@ def factorize_pm1(n, verbose = False):
 	if g != 1 and g != n:
 		return g
 	else:
-		return 0
+		return -1
