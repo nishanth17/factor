@@ -1,3 +1,4 @@
+# coding=utf-8
 
 """ 
 This module has a bunch of prime sieves.
@@ -7,11 +8,6 @@ A sieve of Eratosthenes with a wheel mod 6.
 
 -> SIEVE OF ATKIN
 A segmented version of the sieve of Atkin as described in [1].
-This works until the limit of 32-bit integers (~3.3 x 10^9) and is not configured to 
-work beyond that. Doing stuff beyond that would require tweaking some constants (like 
-the 5's, 31's etc.) and isn't too hard but my computer's memory limitations make it 
-infeasible.
-
 NOTE: This would probably be a lot more efficient with NumPy arrays but PyPy doesn't  
 support NumPy as of yet. 
 
@@ -39,7 +35,8 @@ import time
 import utils
 
 SMALL_THRESHOLD = 60
-SIEVE_THRESHOLD = 3500000
+ERAT_THRESHOLD = 3500000
+ATKIN_THERSHOLD = 10000000000
 
 LOWER_SEG_SIZE = 65536
 UPPER_SEG_SIZE = 2097152
@@ -335,10 +332,12 @@ def prime_sieve(n):
 	"""
 	if n <= SMALL_THRESHOLD:
 		return under60[:utils.binary_search(n, under60)]
-	elif n <= SIEVE_THRESHOLD:
+	elif n <= ERAT_THRESHOLD:
 		return small_sieve(n)
-	else:
+	elif n <= ATKIN_THERSHOLD:
 		return sieve_of_atkin(n)
+	else:
+		return segmented_sieve(2, n)
 
 
 def segmented_sieve(lo, hi):
@@ -412,26 +411,4 @@ def segmented_sieve(lo, hi):
 		hi_1 = lo_1 + delta
 
 	return primes[:pos]
-
-if __name__ == '__main__':
-	n = 10**9
-	print "n =", n, "...\n"
-
-	# t = time.time()
-	# s = small_sieve(n)
-	# t1 = time.time()
-	# print "Eratosthenes:", len(s) 
-	# print "Time:", (t1-t), "s\n"
-
-	t = time.time()
-	s = sieve_of_atkin(n)
-	t1 = time.time()
-	print "Atkin:", len(s) 
-	print "Time:", (t1-t), "s\n"
-
-	t = time.time()
-	s = segmented_sieve(lo = 2, hi = n)
-	t1 = time.time()
-	print "Segmented:", len(s) 
-	print "Time:", (t1-t), "s\n"
 

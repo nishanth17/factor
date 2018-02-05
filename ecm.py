@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import math
 import utils
 import random
@@ -6,12 +8,42 @@ import primeSieve
 """
 This module contains an implementation of a two-stage version Lenstra's elliptical 
 curve factorization method (ECM) with the usual stage 1 and stage 2 optimizations. 
+This implementation uses Suyama's paramterization to generate curves in Montgomery
+form and is inversionless.
 """
 
-MAX_B1 = 2 * 10**7
-MAX_B2 = 2 * 10**9
-MAX_CURVES = 5000
+MAX_CURVES = 10000
 MAX_RND = (1 << 32) - 1
+
+MAX_B1 = 430000000
+MAX_B2 = 20000000000
+
+def compute_bounds(n):
+	"""
+	Computes Stage 1 and Stage 2 bounds for both ECM. This almost  coincides with GMP-ECM's 
+	bounds for the same but are clipped because of prime sieve limitations. 
+
+	Reference:
+	http://www.mersennewiki.org/index.php/Elliptic_Curve_Method	
+	"""
+	log_n = len(str(n))
+	if log_n <= 30: 
+		B1, B2 = 2000, 147396
+	elif log_n <= 40: 
+		B1, B2 = 11000, 1873422
+	elif log_n <= 50: 
+		B1, B2 = 50000, 12746592
+	elif log_n <= 60: 
+		B1, B2 = 250000, 128992510
+	elif log_n <= 70: 
+		B1, B2 = 1000000, 1045563762
+	elif log_n <= 80:
+		B1, B2 = 3000000, 5706890290
+	else: 
+		# Anything greater and my computer runs out of memory -- prolly need to fix this
+		B1, B2 = MAX_B1, MAX_B2
+	return B1, B2
+
 
 def point_add(px, pz, qx, qz, rx, rz, n):
 	"""
@@ -61,9 +93,12 @@ def factorize_ecm(n, verbose = False):
 	"""
 	ECM algorithm
 	"""
-	B1, B2 = utils.compute_bounds(n)
+	B1, B2 = compute_bounds(n)
 	if verbose:
+		print "Number of digits:", len(str(n))
 		print "Bounds:", B1, B2
+	if utils.is_prime(n):
+		return n
 
 	D = int(math.sqrt(B2))
 	beta = [0] * (D+1)
@@ -71,7 +106,11 @@ def factorize_ecm(n, verbose = False):
 
 	# ----- Stage 1 and Stage 2 precomputations -----
 	curves, log_B1 = 0, math.log(B1)
+
+	if verbose:
+		print "Sieving primes..."
 	primes = primeSieve.prime_sieve(B2)
+
 	num_primes = len(primes)
 	idx_B1 = utils.binary_search(B1, primes)
 	
@@ -118,7 +157,6 @@ def factorize_ecm(n, verbose = False):
 		g, B = 1, B1 - 1
 		rx, rz = scalar_multiply(B, qx, qz, n, a24)
 		tx, tz = scalar_multiply(B - 2*D, qx, qz, n, a24)
-		
 		q, step = idx_B1, 2*D
 		for r in xrange(B, B2, step):
 			alpha, limit = (rx * rz) % n, r + step
@@ -139,6 +177,7 @@ def factorize_ecm(n, verbose = False):
 	else:
 		return g
 
-n = 34747575467581863011
-factor = factorize_ecm(n, True)
-print n, factor
+if __name__ == "__main__":
+	n = 25453696417026973446068862667423246835667930108683182033
+	factor = factorize_ecm(n, True)
+	print n, factor, n / factor

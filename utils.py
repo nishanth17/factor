@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import math
 import random
 import fractions
@@ -122,7 +124,7 @@ def is_prime_bf(n):
 	return True
 
 
-def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
+def is_prime_fast(n, use_probabilistic = False, tolerance = 30):
 	"""
 	Tests whether a number is prime using a deterministic version of the Miller-
 	Rabin primality test. Optionally tests whether the specified number is a 
@@ -135,7 +137,7 @@ def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
 
 	Arguments:
 		n (:int) - the integer to be tested
-		is_probabilistic (:bool) - flag to indicate whether to use the regular 
+		use_probabilistic (:bool) - flag to indicate whether to use the regular 
 		                		   version of the Miller-Rabin primality test
 		tolerance (:int) - number of trials to be used to test primality
 
@@ -155,8 +157,8 @@ def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
     
     # Determine bases for deterministic Miller-Rabin test
 	if n >= MR_THRESHOLD: 
-		logn = log(n)
-		if not is_probabilistic: 
+		logn = math.log(n)
+		if not use_probabilistic: 
 			w = xrange(2, 2 * int(logn*log(logn)/log(2))) 
 		else: 
 			w = xrange(tolerance)
@@ -221,7 +223,7 @@ def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
 		s += 1
 	for k in w:
 		# Pick a random witness if probabilistic
-		if is_probabilistic: 
+		if use_probabilistic: 
 			p = random.randint(2, n-2)
 		else:
 			p = k
@@ -234,7 +236,7 @@ def is_prime_fast(n, is_probabilistic = False, tolerance = 30):
 	return True
 
 
-def is_prime(n, is_probabilistic = False, tolerance = 30):
+def is_prime(n, use_probabilistic = False, tolerance = 30):
 	"""
 	Tests whether a number is prime. The choice of test used depeneds on the size of 
 	the specified number. Optionally tests whether the specified number is probably 
@@ -242,7 +244,7 @@ def is_prime(n, is_probabilistic = False, tolerance = 30):
 
 	Arguments:
 		n (:int) - the integer to be tested
-		is_probabilistic (:bool) - flag to indicate whether to use the regular 
+		use_probabilistic (:bool) - flag to indicate whether to use the regular 
 		                		   version of the Miller-Rabin primality test
 		tolerance (:int) - number of trials to be used to test primality
 
@@ -262,25 +264,11 @@ def is_prime(n, is_probabilistic = False, tolerance = 30):
 	if n < PRIME_THRESHOLD: 
 		return is_prime_bf(n)
 	else: 
-		if is_probabilistic:
-			return is_prime_fast(n, is_probabilistic, tolerance)
+		if use_probabilistic:
+			return is_prime_fast(n, use_probabilistic, tolerance)
 		else:
 			if n < MR_THRESHOLD:
 				return is_prime_fast(n)
 			else:
 				return is_prime_fast(n, True, 40)
-
-
-
-def compute_bounds(n):
-	"""
-	Computes Stage 1 and Stage 2 bounds for both ECM and Pollard p-1
-	"""
-	log_q = math.log(pow(10, (len(str(n)) - 2) >> 1))
-	t = int(math.ceil(math.exp(math.sqrt(0.5 * log_q * \
-								math.log(log_q))) / 10) * 10)
-	B1 = min(t, MAX_B1)
-	B2 = min(B1 * 100, MAX_B2)
-	return B1, B2
-		
 
