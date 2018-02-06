@@ -4,7 +4,6 @@ import constants
 import utils, primeSieve
 import pollardRho, pollardPm1, ecm
 
-
 small_primes = primeSieve.prime_sieve(constants.PRIME_THRESHOLD_BF)
 
 
@@ -69,6 +68,9 @@ def print_factoring_routine(n, routine_name):
 
 # TODO: Incorporate Pollard (p-1) into this - ignoring it for now
 def factorize(n, verbose = False, level = 3):
+	"""
+	Factorizes a specified integer or returns -1 if no factors can be found.
+	"""
 	if verbose: 
 		if n != 1: print "Factoring", str(n) + "..."
 	if n == 1:
@@ -120,6 +122,8 @@ def factorize(n, verbose = False, level = 3):
 					else:
 						f = -1
 		return f
+
+
 
 if __name__ == "__main__":
 	while True:
