@@ -88,12 +88,13 @@ def factorize_ecm(n, verbose = False):
 	"""
 	ECM algorithm
 	"""
+	if n == 1 or utils.is_prime(n):
+		return n
+        
 	B1, B2 = compute_bounds(n)
 	if verbose:
 		print "Number of digits:", len(str(n))
 		print "Bounds:", B1, B2
-	if utils.is_prime(n):
-		return n
 
 	D = int(math.sqrt(B2))
 	beta = [0] * (D+1)
@@ -169,8 +170,3 @@ def factorize_ecm(n, verbose = False):
 		return -1
 	else:
 		return g
-
-if __name__ == "__main__":
-	n = 25453696417026973446068862667423246835667930108683182033
-	factor = factorize_ecm(n, True)
-	print n, factor, n / factor

@@ -1,7 +1,5 @@
 # coding=utf-8
 
-import primeSieve
-
 """
 File that contains constants tuned specifically for the factoring algorithms 
 and the prime sieves. Tweakable if required. 
@@ -15,7 +13,8 @@ LOWER_SEG_SIZE = 65536
 UPPER_SEG_SIZE = 2097152
 
 # Pollard rho constants
-PRIME_THRESHOLD_RHO = 1500
+PRIME_THRESHOLD_RHO = 500
+SIZE_THRESHOLD_RHO = 10**20
 
 # Pollard (p-1) constants
 MAX_B1_PM1 = 10**8
@@ -30,3 +29,8 @@ MAX_B2_ECM = 20000000000
 
 # General factorization constants
 PRIME_THRESHOLD_BF = 25000
+
+# Names of factoring routines for displaying purposes
+NAME_ECM = "ECM"
+NAME_RHO = "Pollard Rho"
+NAME_PM1 = "Pollard p-1"

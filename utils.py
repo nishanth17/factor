@@ -118,7 +118,7 @@ def is_prime_bf(n):
 	if not n & 1: return False
 	if not n % 3: return False
 	if n < 9: return True
-	sqrt_n = int(sqrt(n)) + 1
+	sqrt_n = int(math.sqrt(n)) + 1
 	for i in range(5, sqrt_n, 6):
 		if not n % i or not n % (i + 2): return False
 	return True

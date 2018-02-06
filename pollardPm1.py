@@ -31,6 +31,9 @@ def compute_bounds(n):
 
 
 def factorize_pm1(n, verbose = False):
+	if n == 1 or utils.is_prime(n):
+		return n
+
 	B1, B2 = compute_bounds(n)
 	if verbose: 
 		print "Number of digits:", len(str(n))
@@ -99,9 +102,3 @@ def factorize_pm1(n, verbose = False):
 		return g
 	else:
 		return -1
-
-
-if __name__ == "__main__":
-	n = 39732897892
-	x = factorize_pm1(n, True)
-	print n, x, n/x

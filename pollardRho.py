@@ -12,10 +12,16 @@ TODO: Include explanation of algorithm.
 
 small_primes = primeSieve.prime_sieve(constants.PRIME_THRESHOLD_RHO)
 
-def factorize_rho(n):
+def factorize_rho(n, verbose = False):
+    if n == 1 or utils.is_prime(n):
+        return n
+
     # If no factor is found, return -1
     for i in range(len(small_primes) - 1, -1, -1):
         r, c, y = 1, small_primes[i], random.randint(1, n-1)
+        if verbose:
+            print "Trying offset:", c
+
         m, g, q, ys = random.randint(1, n-1), 1, 1, y
         min_val, k = 0, 0
         while g == 1:
@@ -47,6 +53,3 @@ def factorize_rho(n):
             return g
         else:
             return -1
-
-if __name__ == "__main__":
-    print factorize_rho(23980484209842098423098432)
