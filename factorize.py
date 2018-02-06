@@ -115,8 +115,8 @@ def factorize(n, verbose = False, level = 3):
 			if g != -1:
 				if verbose:
 					print "Found factor", str(g)
-					f1 = merge_factorizations(factorize(g, verbose = verbose, level = 1), \
-									factorize(n/g, verbose = verbose, level = 1))
+					f1 = merge_factorizations(factorize(g, verbose = verbose, level = 2), \
+									factorize(n/g, verbose = verbose, level = 2))
 					if f1 != -1:
 						f.extend(f1)
 					else:
@@ -128,6 +128,7 @@ def factorize(n, verbose = False, level = 3):
 if __name__ == "__main__":
 	while True:
 		n = int(input("Enter number:"))
+		print ""
 		t = time.time()
 		f = factorize(n, verbose = True)
 		t1 = time.time()
