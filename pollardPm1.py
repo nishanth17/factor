@@ -3,6 +3,7 @@
 import math
 import utils
 import primeSieve
+import constants
 
 """
 This module contains an implementation of the two-stage variant of Pollard's 
@@ -17,10 +18,6 @@ TODO:
 Include explanation of algorithm. 
 """
 
-MAX_B1 = 10**7
-MAX_B2 = 10**9
-MAX_D = 500
-
 def compute_bounds(n):
 	"""
 	Computes Stage 1 and Stage 2 bounds for both Pollard p-1.
@@ -28,19 +25,23 @@ def compute_bounds(n):
 	log_q = math.log(pow(10, (len(str(n)) - 2) >> 1))
 	t = int(math.ceil(math.exp(math.sqrt(0.5 * log_q * \
 								math.log(log_q))) / 10) * 10)
-	B1 = min(t, MAX_B1)
-	B2 = min(B1 * 100, MAX_B2)
+	B1 = min(t, constants.MAX_B1_PM1)
+	B2 = min(B1 * 100, constants.MAX_B2_PM1)
 	return B1, B2
 
 
 def factorize_pm1(n, verbose = False):
 	B1, B2 = compute_bounds(n)
-	if verbose:
+	if verbose: 
+		print "Number of digits:", len(str(n))
 		print "Bounds:", B1, B2
-	
-	primes_below_b1 = primeSieve.prime_sieve(B1)
 
 	# ----- Stage 1 -----
+	if verbose: 
+		print "Stage 1..."
+		print "Sieveing primes below", str(B1)
+
+	primes_below_b1 = primeSieve.prime_sieve(B1)
 
 	# Compute a large number which is B1-power-smooth. As in this implementation,
 	# a usual choice for this number is the LCM of the integers below B1. 
@@ -60,8 +61,12 @@ def factorize_pm1(n, verbose = False):
 	# ----- Stage 2 -----
 	# NOTE: This stage only works if 'n' has exactly one prime factor between B1 and 
 	# B2 (hence the name 'large-prime variant'). 
-	d_cache = [-1] * (MAX_D+1)
+	if verbose: 
+		print "Stage 2..."
+		print "Sieveing primes between", str(B1), "and", str(B2) 
+
 	primes = primeSieve.segmented_sieve(B1+1, B2)
+	d_cache = [-1] * (constants.MAX_D_PM1 + 1)
 	p, temp_c = primes[0], c
 	c, count = pow(c, p, n), 0
 
@@ -69,7 +74,7 @@ def factorize_pm1(n, verbose = False):
 		q = primes[pos]
 		# Use differences between successive primes and cache them
 		d = q - p
-		if d <= MAX_D:
+		if d <= constants.MAX_D_PM1:
 			if d_cache[d] == -1:
 				x = pow(temp_c, d, n)
 				d_cache[d] = x
@@ -97,6 +102,6 @@ def factorize_pm1(n, verbose = False):
 
 
 if __name__ == "__main__":
-	n = 3837523
+	n = 39732897892
 	x = factorize_pm1(n, True)
 	print n, x, n/x

@@ -33,13 +33,7 @@ REFRENCES:
 import math
 import time
 import utils
-
-SMALL_THRESHOLD = 60
-ERAT_THRESHOLD = 3500000
-ATKIN_THERSHOLD = 10000000000
-
-LOWER_SEG_SIZE = 65536
-UPPER_SEG_SIZE = 2097152
+import constants
 
 # Sieve bits
 segs = [[] for _ in xrange(60)]
@@ -330,11 +324,11 @@ def prime_sieve(n):
 		>>> len(prime_sieve(10**9))
 		>>> 50847534
 	"""
-	if n <= SMALL_THRESHOLD:
+	if n <= constants.SMALL_THRESHOLD:
 		return under60[:utils.binary_search(n, under60)]
-	elif n <= ERAT_THRESHOLD:
+	elif n <= constants.ERAT_THRESHOLD:
 		return small_sieve(n)
-	elif n <= ATKIN_THERSHOLD:
+	elif n <= constants.ATKIN_THERSHOLD:
 		return sieve_of_atkin(n)
 	else:
 		return segmented_sieve(2, n)
@@ -370,7 +364,7 @@ def segmented_sieve(lo, hi):
 		lo = max_prime
 
 	# Compute segment size 
-	delta = UPPER_SEG_SIZE if hi - lo >= UPPER_SEG_SIZE else LOWER_SEG_SIZE
+	delta = constants.UPPER_SEG_SIZE if hi - lo >= constants.UPPER_SEG_SIZE else constants.LOWER_SEG_SIZE
 
 	l1, l = len(base_primes), (delta >> 4) + 1
 	int_size = l << 3

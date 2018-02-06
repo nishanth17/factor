@@ -4,6 +4,7 @@ import math
 import utils
 import random
 import primeSieve
+import constants
 
 """
 This module contains an implementation of a two-stage version Lenstra's elliptical 
@@ -11,12 +12,6 @@ curve factorization method (ECM) with the usual stage 1 and stage 2 optimization
 This implementation uses Suyama's paramterization to generate curves in Montgomery
 form and is inversionless.
 """
-
-MAX_CURVES = 10000
-MAX_RND = (1 << 32) - 1
-
-MAX_B1 = 430000000
-MAX_B2 = 20000000000
 
 def compute_bounds(n):
 	"""
@@ -41,7 +36,7 @@ def compute_bounds(n):
 		B1, B2 = 3000000, 5706890290
 	else: 
 		# Anything greater and my computer runs out of memory -- prolly need to fix this
-		B1, B2 = MAX_B1, MAX_B2
+		B1, B2 = constants.MAX_B1_ECM, constants.MAX_B2_ECM
 	return B1, B2
 
 
@@ -107,8 +102,7 @@ def factorize_ecm(n, verbose = False):
 	# ----- Stage 1 and Stage 2 precomputations -----
 	curves, log_B1 = 0, math.log(B1)
 
-	if verbose:
-		print "Sieving primes..."
+	if verbose: print "Sieving primes..."
 	primes = primeSieve.prime_sieve(B2)
 
 	num_primes = len(primes)
@@ -121,11 +115,10 @@ def factorize_ecm(n, verbose = False):
 		k = k * pow(p, int(log_B1/math.log(p)))
 
 	g = 1
-	while (g == 1 or g == n) and curves <= MAX_CURVES:
+	while (g == 1 or g == n) and curves <= constants.MAX_CURVES_ECM:
 		curves += 1
-		sigma = random.randint(6, MAX_RND)
-		if verbose:
-			print "Curve", str(curves) + ":", sigma
+		sigma = random.randint(6, constants.MAX_RND_ECM)
+		if verbose: print "Curve", str(curves) + ":", sigma
 
 		# Generate a new random curve in Montgomery form with Suyama's parametrization
 		u = ((sigma * sigma) - 5) % n
@@ -172,7 +165,7 @@ def factorize_ecm(n, verbose = False):
 		g = utils.gcd(n, g)
 
 	# No non-trivial factor found, return 0
-	if curves > MAX_CURVES:
+	if curves > constants.MAX_CURVES_ECM:
 		return -1
 	else:
 		return g

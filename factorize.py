@@ -2,10 +2,12 @@ import math
 import utils
 import primeSieve
 import pollardRho
+import constants
 
-SMALL_PRIME_THRESHOLD = 25000
-SMALL_PRIMES = primeSieve.prime_sieve(SMALL_PRIME_THRESHOLD)
+# Please don't change this
+small_primes = primeSieve.prime_sieve(constants.PRIME_THRESHOLD_BF)
 
+# Merges factorizations
 def merge_factorizations(f1, f2):
 	f = []
 	i = j = 0
@@ -25,6 +27,25 @@ def merge_factorizations(f1, f2):
 	elif j < len(f2):
 		f.extend(f2[j:])
 	return f
+
+# Returns divisors
+def divisors_from_prime_factorization(f, sort = False):
+    d = 1; r = []
+    p = [0] * len(f)
+    while True:
+        r.append(d)
+        i = 0
+        while i < len(f) and p[i] == f[i][1]:
+            p[i] = 0
+            d //= f[i][0] ** f[i][1]
+            i += 1
+        if i >= len(f): break
+        p[i] += 1
+        d *= f[i][0]
+    if sort: 
+        return list(sorted(r))
+    else:
+        return r
 
 
 def factorize(n):

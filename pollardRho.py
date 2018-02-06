@@ -1,6 +1,7 @@
 import utils
 import random
 import primeSieve
+import constants
 
 """
 This module contains an implementation of Brent's improvement to Pollard's Rho
@@ -9,16 +10,13 @@ alogrithm.
 TODO: Include explanation of algorithm. 
 """
 
-# TODO: Tweak this bound if necessary.
-THRESHOLD = 3600
-small_primes = primeSieve.prime_sieve(THRESHOLD)
+small_primes = primeSieve.prime_sieve(constants.PRIME_THRESHOLD_RHO)
 
 def factorize_rho(n):
-    # Try ~500 times with varying 'c' offsets. 
     # If no factor is found, return -1
     for i in range(len(small_primes) - 1, -1, -1):
-        r, c, y = 1, small_primes[i], randint(1, n-1)
-        m, g, q, ys = randint(1, n-1), 1, 1, y
+        r, c, y = 1, small_primes[i], random.randint(1, n-1)
+        m, g, q, ys = random.randint(1, n-1), 1, 1, y
         min_val, k = 0, 0
         while g == 1:
             x, k = y, 0
@@ -35,13 +33,20 @@ def factorize_rho(n):
                 g = utils.gcd(q, n)
                 k += m
             r <<= 1
+        
         if g == n:
-           while True:
+            # If no factor found, try again.
+            while True:
                ys = ys*ys + c
                if ys > n: ys %= n
-               g = utils.gcd(abs(x - ys), n)
+               g = utils.gcd(abs(x-ys), n)
                if g > 1: 
                 break
+        
         if g != n:
             return g
-    return -1
+        else:
+            return -1
+
+if __name__ == "__main__":
+    print factorize_rho(23980484209842098423098432)
