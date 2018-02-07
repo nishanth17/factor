@@ -6,7 +6,6 @@ import pollardRho, pollardPm1, ecm
 
 small_primes = primeSieve.prime_sieve(constants.PRIME_THRESHOLD_BF)
 
-
 def merge_factorizations(f1, f2):
 	"""
 	Merges prime factorizations of two numbers which are sorted in increasing order of 
@@ -127,7 +126,7 @@ def factorize(n, verbose = False, level = 3):
 
 if __name__ == "__main__":
 	while True:
-		n = int(input("Enter number:"))
+		n = int(input("Enter number: "))
 		print ""
 		t = time.time()
 		f = factorize(n, verbose = True)

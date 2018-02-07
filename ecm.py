@@ -5,6 +5,7 @@ import utils
 import random
 import primeSieve
 import constants
+from decimal import Decimal
 
 """
 This module contains an implementation of a two-stage version Lenstra's elliptical 
@@ -12,6 +13,9 @@ curve factorization method (ECM) with the usual stage 1 and stage 2 optimization
 This implementation uses Suyama's paramterization to generate curves in Montgomery
 form and is inversionless.
 """
+
+ADD_COST = 6
+DUP_COST = 5
 
 def compute_bounds(n):
 	"""
@@ -42,31 +46,39 @@ def compute_bounds(n):
 
 def point_add(px, pz, qx, qz, rx, rz, n):
 	"""
-	Adds three specified points (in Montgomery form) in E(Z\nZ).
+	Adds two specified P and Q points (in Montgomery form) in E(Z\nZ). Assumes R = P - Q.
 	"""
 	u = (px-pz) * (qx+qz)
 	v = (px+pz) * (qx-qz)
 	upv, umv = u+v, u-v
-	x = (rz * upv * upv) % n
-	z = (rx * umv * umv) % n
+	x = (rz * upv * upv)
+	if x >= n:
+		x %= n
+	z = rx * umv * umv
+	if z >= n:
+		z %= n
 	return x, z
 
 
 def point_double(px, pz, n, a24):
 	"""
-	Doubles a point (in Montgomery form) in E(Z\nZ).
+	Doubles a point P (in Montgomery form) in E(Z\nZ).
 	"""
 	u, v = px+pz, px-pz
 	u2, v2 = u*u, v*v
 	t = u2 - v2
-	x = (u2 * v2) % n
-	z = (t * (v2 + a24*t)) % n
+	x = (u2 * v2) 
+	if x >= n:
+		x %= n
+	z = (t * (v2 + a24*t))
+	if z >= n:
+		z %= n
 	return x, z
 
 
 def scalar_multiply(k, px, pz, n, a24):
 	"""
-	Multiplies a specified point (in Montgomery form) by a specified scalar in E(Z\nZ).
+	Multiplies a specified point P (in Montgomery form) by a specified scalar in E(Z\nZ).
 	"""
 	sk = bin(k)
 	lk = len(sk)
@@ -82,6 +94,154 @@ def scalar_multiply(k, px, pz, n, a24):
 			qx, qz = point_double(qx, qz, n, a24)	
 
 	return qx, qz
+
+###########################################################
+
+def lucas_cost(k, v):
+	d = k
+	r = int(Decimal(d)/Decimal(v) + Decimal(0.5))
+	if r >= k:
+		return ADD_COST * k
+
+	d, e, c = k - r, 2*r - k, DUP_COST + ADD_COST
+	while d != e:
+		# Want d >= e so swap if d < e
+		if d < e:
+			d, e = e, d
+
+		# Condition 1
+		if 4*d <= 5*e and (d + e) % 3 == 0:
+			d, e = (2*d - e) / 3, (2*e - d) / 3
+			c += 3 * ADD_COST
+		# Condition 2
+		elif 4*d <= 5*e and (d - e) % 6  == 0:
+			d = (d - e) / 2
+			c += ADD_COST + DUP_COST
+		# Condition 3
+		elif d <= 4*e:
+			d -= e
+			c += ADD_COST
+		# Condition 4
+		elif (d + e) % 2 == 0:
+			d = (d - e) / 2
+			c += ADD_COST + DUP_COST
+		# Condition 5
+		elif d % 2 == 0:
+			d /= 2
+			c += ADD_COST + DUP_COST
+		# Condition 6
+		elif d % 3 == 0:
+			d = d/3 - e
+			c += 3*ADD_COST + DUP_COST
+		# Condition 7
+		elif (d + e) % 3 == 0:
+			d = (d - 2*e) / 3
+			c += 3*ADD_COST + DUP_COST
+		# Condition 8
+		elif (d - e) % 3 == 0:
+			d = (d - e) / 3
+			c += 3*ADD_COST + DUP_COST
+		# Condition 9
+		elif e % 2 == 0:
+			e /= 2
+			c += ADD_COST + DUP_COST
+
+	return c
+
+
+def multiply_prac(k, px, pz, n, a24):
+	d = k
+	ax, bx, cx, tx, t2x = px, 0, 0, 0, 0
+	az, bz, cz, tz, t2z = pz, 0, 0, 0, 0
+	v = [1.61803398875, 1.72360679775, 1.618347119656, 1.617914406529, 1.612429949509,\
+		1.632839806089, 1.620181980807, 1.580178728295, 1.617214616534, 1.38196601125]
+
+	# Find best value of v
+	r, i = lucas_cost(k, v[0]), 0
+	for d in xrange(10):
+		e = lucas_cost(k, v[d])
+		if e < r:
+			r, i = e, d
+
+	d = k
+	r = int(Decimal(d)/Decimal(v[i]) + Decimal(0.5))
+	d, e,  = k - r, 2*r - k
+	
+	bx, bz, cx, cz = ax, az, ax, az
+	ax, az = point_double(ax, az, n, a24)
+	
+	while d != e:
+		# Want d >= e so swap if d < e
+		if d < e:
+			d, e = e, d
+			ax, az, bx, bz = bx, bz, ax, az
+
+		# Condition 1
+		if 4*d <= 5*e and (d + e) % 3 == 0:
+			d, e = (2*d - e) / 3, (2*e - d) / 3
+			tx, tz = point_add(ax, az, bx, bz, cx, cz, n)
+			t2x, t2z = point_add(tx, tz, ax, az, bx, bz, n)
+			bx, bz = point_add(bx, bz, tx, tz, ax, az, n)
+			ax, az, t2x, t2z = t2x, t2z, ax, az
+		# Condition 2
+		elif 4*d <= 5*e and (d - e) % 6  == 0:
+			d = (d - e) / 2
+			bx, bz = point_add(ax, az, bx, bz, cx, cz, n)
+			ax, az = point_double(ax, az, n, a24)
+		# Condition 3
+		elif d <= 4*e:
+			d -= e
+			tx, tz = point_add(bx, bz, ax, az, cx, cz, n)
+			bx, tx, cx = tx, cx, bx
+			bz, tz, cz = tz, cz, bz
+		# Condition 4
+		elif (d + e) % 2 == 0:
+			d = (d - e) / 2
+			bx, bz = point_add(bx, bz, ax, az, cx, cz, n)
+			ax, az = point_double(ax, az, n, a24)
+		# Condition 5
+		elif d % 2 == 0:
+			d /= 2
+			cx, cz = point_add(cx, cz, ax, az, bx, bz, n)
+			ax, az = point_double(ax, az, n, a24)
+		# Condition 6
+		elif d % 3 == 0:
+			d = d/3 - e
+			tx, tz = point_double(ax, az, n, a24)
+			t2x, t2z = point_add(ax, az, bx, bz, cx, cz, n)
+			ax, az = point_add(tx, tz, ax, az, ax, az, n)
+			tx, tz = point_add(tx, tz, t2x, t2z, cx, cz, n)
+			cx, bx, tx = bx, tx, cx
+			cz, bz, tz = bz, tz, cz
+		# Condition 7
+		elif (d + e) % 3 == 0:
+			d = (d - 2*e) / 3
+			tx, tz = point_add(ax, az, bx, bz, cx, cz, n)
+			bx, bz = point_add(tx, tz, ax, az, bx, bz, n)
+			tx, tz = point_double(ax, az, n, a24)
+			# TODO: Check order of a and t here
+			ax, az = point_add(ax, az, tx, tz, ax, az, n)
+		# Condition 8
+		elif (d - e) % 3 == 0:
+			d = (d - e) / 3
+			tx, tz = point_add(ax, az, bx, bz, cx, cz, n)
+			# TODO: Check whether c = f(a, c, b) or c = f(c, a, b)
+			cx, cz = point_add(cx, cz, ax, az, bx, bz, n)
+			bx, bz, tx, tz = tx, tz, bx, bz
+			tx, tz = point_double(ax, az, n, a24)
+			# TODO: Check order of a and t here
+			ax, az = point_add(ax, az, tx, tz, ax, az, n)
+		# Condition 9
+		elif e % 2 == 0:
+			e /= 2
+			cx, cz = point_add(cx, cz, bx, bz, ax, az, n)
+			bx, bz = point_double(bx, bz, n, a24)
+	
+	x, z = point_add(ax, az, bx, bz, cx, cz, n)
+	return x, z
+
+
+###########################################################
 
 
 def factorize_ecm(n, verbose = False):
@@ -165,8 +325,12 @@ def factorize_ecm(n, verbose = False):
 
 		g = utils.gcd(n, g)
 
-	# No non-trivial factor found, return 0
+	# No non-trivial factor found, return -1
 	if curves > constants.MAX_CURVES_ECM:
 		return -1
 	else:
 		return g
+
+# if __name__ == "__main__":
+# 	n = 38973978338982739723983279827982379832789
+# 	print factorize_ecm(n, verbose = True)
