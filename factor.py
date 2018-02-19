@@ -71,7 +71,9 @@ def factorize(n, verbose = False, level = 3):
 	Factorizes a specified integer or returns -1 if no factors can be found.
 	"""
 	if verbose: 
-		if n != 1: print "Factoring", str(n) + "..."
+		if n != 1: 
+			print "Factoring", str(n) + "..."
+			print "Number of digits:", len(str(n))
 	if n == 1:
 		return []
 	if utils.is_prime(n):
@@ -90,6 +92,7 @@ def factorize(n, verbose = False, level = 3):
 					print "Found no small prime factors... :("
 				else:
 					print "Prime factors found:", reduce(lambda x, y: x + y, [str(i[0]) + ", " for i in f])[:-2]
+
 		
 		if level > 1 and n <= constants.SIZE_THRESHOLD_RHO and n > 1:
 			# Try Pollard rho
@@ -123,6 +126,25 @@ def factorize(n, verbose = False, level = 3):
 		return f
 
 
+def print_factorization(n, f):
+	"""
+	Prints a number as a product of the respective primes (and their exponents) in its prime 
+	factorization.
+
+	EXAMPLE:
+	56 = 2^3 * 7^1
+	"""
+	if n == 1:
+		return 1
+
+	s = str(n) + " = "
+	for i in xrange(len(f)-1):
+		pf, exp = f[i][0], f[i][1]
+		s += str(pf) + "^" + str(exp) + " * "
+	
+	s += str(f[-1][0]) + "^" + str(f[-1][1])
+	return s
+
 
 if __name__ == "__main__":
 	while True:
@@ -134,8 +156,8 @@ if __name__ == "__main__":
 		if f == -1:
 			print "\n", n, "couldn't be factored :(\n"
 		else:
-			print "\nFactorization:", f
-			print "Time:", t1 - t, "s\n"
+			print "\n", print_factorization(n, f)
+			print "\nTime:", t1 - t, "s\n"
 
 
 		

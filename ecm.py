@@ -14,8 +14,7 @@ This implementation uses Suyama's paramterization to generate curves in Montgome
 form and is inversionless.
 """
 
-ADD_COST = 6
-DUP_COST = 5
+RESOLUTION = 100
 
 def compute_bounds(n):
 	"""
@@ -97,9 +96,12 @@ def scalar_multiply(k, px, pz, n, a24):
 
 ###########################################################
 
+ADD_COST = 6
+DUP_COST = 5
+
 def lucas_cost(k, v):
 	d = k
-	r = int(Decimal(d)/Decimal(v) + Decimal(0.5))
+	r = int(Decimal(d) * Decimal(v) + Decimal(0.5))
 	if r >= k:
 		return ADD_COST * k
 
@@ -142,7 +144,7 @@ def lucas_cost(k, v):
 			d = (d - e) / 3
 			c += 3*ADD_COST + DUP_COST
 		# Condition 9
-		elif e % 2 == 0:
+		else:
 			e /= 2
 			c += ADD_COST + DUP_COST
 
@@ -150,27 +152,23 @@ def lucas_cost(k, v):
 
 
 def multiply_prac(k, px, pz, n, a24):
-	d = k
 	ax, bx, cx, tx, t2x = px, 0, 0, 0, 0
 	az, bz, cz, tz, t2z = pz, 0, 0, 0, 0
-	v = [1.61803398875, 1.72360679775, 1.618347119656, 1.617914406529, 1.612429949509,\
-		1.632839806089, 1.620181980807, 1.580178728295, 1.617214616534, 1.38196601125]
+	v = [0.61803398874989485, 0.5801787282954641, 0.6179144065288179 , 0.6180796684698958]
 
 	# Find best value of v
 	r, i = lucas_cost(k, v[0]), 0
-	for d in xrange(10):
+	for d in xrange(len(v)):
 		e = lucas_cost(k, v[d])
 		if e < r:
 			r, i = e, d
 
-	d = k
-	r = int(Decimal(d)/Decimal(v[i]) + Decimal(0.5))
-	d, e,  = k - r, 2*r - k
-	
+	r = int(Decimal(k) * Decimal(v[i]) + Decimal(0.5))
+	d, e = k - r, 2*r - k
 	bx, bz, cx, cz = ax, az, ax, az
 	ax, az = point_double(ax, az, n, a24)
 	
-	while d != e:
+	while d != 1 and e != 0:
 		# Want d >= e so swap if d < e
 		if d < e:
 			d, e = e, d
@@ -188,12 +186,14 @@ def multiply_prac(k, px, pz, n, a24):
 			d = (d - e) / 2
 			bx, bz = point_add(ax, az, bx, bz, cx, cz, n)
 			ax, az = point_double(ax, az, n, a24)
-		# Condition 3
+		# Condition 3 
 		elif d <= 4*e:
 			d -= e
-			tx, tz = point_add(bx, bz, ax, az, cx, cz, n)
-			bx, tx, cx = tx, cx, bx
-			bz, tz, cz = tz, cz, bz
+			# tx, tz = point_add(bx, bz, ax, az, cx, cz, n)
+			# bx, tx, cx = tx, cx, bx
+			# bz, tz, cz = tz, cz, bz
+			cx, cz = point_add(bx, bz, ax, az, cx, cz, n)
+			bx, bz, cx, cz = cx, cz, bx, bz
 		# Condition 4
 		elif (d + e) % 2 == 0:
 			d = (d - e) / 2
@@ -210,9 +210,11 @@ def multiply_prac(k, px, pz, n, a24):
 			tx, tz = point_double(ax, az, n, a24)
 			t2x, t2z = point_add(ax, az, bx, bz, cx, cz, n)
 			ax, az = point_add(tx, tz, ax, az, ax, az, n)
-			tx, tz = point_add(tx, tz, t2x, t2z, cx, cz, n)
-			cx, bx, tx = bx, tx, cx
-			cz, bz, tz = bz, tz, cz
+			# tx, tz = point_add(tx, tz, t2x, t2z, cx, cz, n)
+			# cx, bx, tx = bx, tx, cx
+			# cz, bz, tz = bz, tz, cz
+			cx, cz = point_add(tx, tz, t2x, t2z, cx, cz, n)
+			bx, bz, cx, cz = cx, cz, bx, bz
 		# Condition 7
 		elif (d + e) % 3 == 0:
 			d = (d - 2*e) / 3
@@ -232,7 +234,7 @@ def multiply_prac(k, px, pz, n, a24):
 			# TODO: Check order of a and t here
 			ax, az = point_add(ax, az, tx, tz, ax, az, n)
 		# Condition 9
-		elif e % 2 == 0:
+		else:
 			e /= 2
 			cx, cz = point_add(cx, cz, bx, bz, ax, az, n)
 			bx, bz = point_double(bx, bz, n, a24)
@@ -279,7 +281,8 @@ def factorize_ecm(n, verbose = False):
 	while (g == 1 or g == n) and curves <= constants.MAX_CURVES_ECM:
 		curves += 1
 		sigma = random.randint(6, constants.MAX_RND_ECM)
-		if verbose: print "Curve", str(curves) + ":", sigma
+		if verbose and curves % RESOLUTION == 0: 
+			print "Tried", curves, "random curves..."
 
 		# Generate a new random curve in Montgomery form with Suyama's parametrization
 		u = ((sigma * sigma) - 5) % n
@@ -296,6 +299,7 @@ def factorize_ecm(n, verbose = False):
 		# If stage 1 is successful, return a non-trivial factor else
 		# move on to stage 2
 		if g != 1 and g != n:
+			print "Stage 1 found factor!"
 			return g
 
 		# ----- Stage 2 -----
@@ -309,9 +313,11 @@ def factorize_ecm(n, verbose = False):
 			beta[d] = (S[d2-1] * S[d2]) % n
 
 		g, B = 1, B1 - 1
+
 		rx, rz = scalar_multiply(B, qx, qz, n, a24)
 		tx, tz = scalar_multiply(B - 2*D, qx, qz, n, a24)
 		q, step = idx_B1, 2*D
+
 		for r in xrange(B, B2, step):
 			alpha, limit = (rx * rz) % n, r + step
 			while q < num_primes and primes[q] <= limit:
@@ -329,8 +335,7 @@ def factorize_ecm(n, verbose = False):
 	if curves > constants.MAX_CURVES_ECM:
 		return -1
 	else:
+		print "Stage 2 found factor!"
 		return g
 
-# if __name__ == "__main__":
-# 	n = 38973978338982739723983279827982379832789
-# 	print factorize_ecm(n, verbose = True)
+
