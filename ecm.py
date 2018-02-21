@@ -14,13 +14,12 @@ This implementation uses Suyama's paramterization to generate curves in Montgome
 form and is inversionless.
 """
 
-RESOLUTION = 100
+RESOLUTION = 40
 
 def compute_bounds(n):
 	"""
 	Computes Stage 1 and Stage 2 bounds for both ECM. This almost  coincides with GMP-ECM's 
 	bounds for the same but are clipped because of prime sieve limitations. 
-
 	Reference:
 	http://www.mersennewiki.org/index.php/Elliptic_Curve_Method	
 	"""
@@ -75,18 +74,16 @@ def point_double(px, pz, n, a24):
 	return x, z
 
 
-def scalar_multiply(k, px, pz, n, a24, sk = None):
+def scalar_multiply(k, px, pz, n, a24):
 	"""
 	Multiplies a specified point P (in Montgomery form) by a specified scalar in E(Z\nZ).
-	This is the classic double-and-add algorithm.
 	"""
-	if sk is None:
-		sk = bin(k)
-
+	sk = bin(k)
+	lk = len(sk)
 	qx, qz = px, pz
 	rx, rz = point_double(px, pz, n, a24)
 
-	for i in xrange(3, len(sk)):
+	for i in xrange(3, lk):
 		if sk[i] == '1':
 			qx, qz = point_add(rx, rz, qx, qz, px, pz, n)
 			rx, rz = point_double(rx, rz, n, a24)
@@ -154,10 +151,6 @@ def lucas_cost(k, v):
 
 
 def multiply_prac(k, px, pz, n, a24):
-	"""
-	Multiplies a specified point P (in Montgomery form) by a specified scalar in E(Z\nZ).
-	This implements Montgomery's PRAC algorithm 
-	"""
 	ax, bx, cx, tx, t2x = px, 0, 0, 0, 0
 	az, bz, cz, tz, t2z = pz, 0, 0, 0, 0
 	v = [0.61803398874989485, 0.5801787282954641, 0.6179144065288179 , 0.6180796684698958]
@@ -174,7 +167,7 @@ def multiply_prac(k, px, pz, n, a24):
 	bx, bz, cx, cz = ax, az, ax, az
 	ax, az = point_double(ax, az, n, a24)
 	
-	while d != e:
+	while d != 1 and e != 0:
 		# Want d >= e so swap if d < e
 		if d < e:
 			d, e = e, d
@@ -227,14 +220,17 @@ def multiply_prac(k, px, pz, n, a24):
 			tx, tz = point_add(ax, az, bx, bz, cx, cz, n)
 			bx, bz = point_add(tx, tz, ax, az, bx, bz, n)
 			tx, tz = point_double(ax, az, n, a24)
+			# TODO: Check order of a and t here
 			ax, az = point_add(ax, az, tx, tz, ax, az, n)
 		# Condition 8
 		elif (d - e) % 3 == 0:
 			d = (d - e) / 3
 			tx, tz = point_add(ax, az, bx, bz, cx, cz, n)
+			# TODO: Check whether c = f(a, c, b) or c = f(c, a, b)
 			cx, cz = point_add(cx, cz, ax, az, bx, bz, n)
 			bx, bz, tx, tz = tx, tz, bx, bz
 			tx, tz = point_double(ax, az, n, a24)
+			# TODO: Check order of a and t here
 			ax, az = point_add(ax, az, tx, tz, ax, az, n)
 		# Condition 9
 		else:
@@ -267,11 +263,19 @@ def factorize_ecm(n, verbose = False):
 
 	# ----- Stage 1 and Stage 2 precomputations -----
 	curves, log_B1 = 0, math.log(B1)
+
 	if verbose: print "Sieving primes..."
 	primes = primeSieve.prime_sieve(B2)
+
 	num_primes = len(primes)
 	idx_B1 = utils.binary_search(B1, primes)
 	
+	# Compute a B1-powersmooth integer 'k'
+	k = 1
+	for i in xrange(idx_B1):
+		p = primes[i]
+		k = k * pow(p, int(log_B1/math.log(p)))
+
 	g = 1
 	while (g == 1 or g == n) and curves <= constants.MAX_CURVES_ECM:
 		curves += 1
@@ -287,31 +291,13 @@ def factorize_ecm(n, verbose = False):
 		a24 = (A+2) / 4
 
 		# ----- Stage 1 -----
-		px, pz = ((u*u*u) / (v*v*v)) % n, 1 
-		# Compute 2 and 3 manually because why not
-		p = 2
-		while p <= B1:
-			p <<= 1
-			px, pz = point_double(px, pz, n, a24)
-
-		p = 3
-		while p <= B1:
-			p *= 3
-			qx, qz = point_double(px, pz, n, a24)
-			px, pz = point_add(px, pz, qx, qz, px, pz, n)
-
-		# Primes ≥ 5
-		for i in xrange(2, idx_B1):
-			p = primes[i]
-			pp = p
-			while pp <= B1:
-				pp *= p
-				px, pz = multiply_prac(p, px, pz, n, a24)
-
-		qx, qz = px, pz
+		px, pz = ((u*u*u) / (v*v*v)) % n, 1
+		qx, qz = scalar_multiply(k, px, pz, n, a24)
 		g = utils.gcd(n, qz)
+
+		# If stage 1 is successful, return a non-trivial factor else
+		# move on to stage 2
 		if g != 1 and g != n:
-			# If stage 1 is successful, return a non-trivial factor 
 			print "Stage 1 found factor!"
 			return g
 
@@ -326,9 +312,11 @@ def factorize_ecm(n, verbose = False):
 			beta[d] = (S[d2-1] * S[d2]) % n
 
 		g, B = 1, B1 - 1
-		rx, rz = multiply_prac(B, qx, qz, n, a24)
-		tx, tz = multiply_prac(B - 2*D, qx, qz, n, a24)
+
+		rx, rz = scalar_multiply(B, qx, qz, n, a24)
+		tx, tz = scalar_multiply(B - 2*D, qx, qz, n, a24)
 		q, step = idx_B1, 2*D
+
 		for r in xrange(B, B2, step):
 			alpha, limit = (rx * rz) % n, r + step
 			while q < num_primes and primes[q] <= limit:
@@ -348,4 +336,3 @@ def factorize_ecm(n, verbose = False):
 	else:
 		print "Stage 2 found factor!"
 		return g
-
