@@ -33,6 +33,8 @@ def compute_bounds(n):
 def factorize_pm1(n, verbose = False):
 	if n == 1 or utils.is_prime(n):
 		return n
+	elif n % 2 == 0:
+		return 2
 
 	B1, B2 = compute_bounds(n)
 	if verbose: 
@@ -92,7 +94,7 @@ def factorize_pm1(n, verbose = False):
 
 		# Accumulate products and compute GCD's periodically 
 		if (count & 127) == 0:
-			g = utils.gcd(c-1, n)
+			g = utils.gcd(c - 1, n)
 			# Return non-trivial factor if successful
 			if g != 1 and g != n:
 				return g
