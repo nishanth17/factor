@@ -167,7 +167,7 @@ def multiply_prac(k, px, pz, n, a24):
 	bx, bz, cx, cz = ax, az, ax, az
 	ax, az = point_double(ax, az, n, a24)
 	
-	while d != 1 and e != 0:
+	while d != e:
 		# Want d >= e so swap if d < e
 		if d < e:
 			d, e = e, d

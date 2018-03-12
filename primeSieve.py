@@ -23,7 +23,7 @@ processor and 8 GB RAM.
     BENCHMARKS |    10^6    |   10^7    |    10^8    |    10^9
     -------------------------------------------------------------
    Eratosthenes|    0.02s   |   0.32s   |    3.81s   |   93.99s
-          Atkin|    0.06s   |   0.13s   |    0.72s   |    6.32s
+          Atkin|    0.06s   |   0.13s   |    0.72s   |    5.4s
 
 REFRENCES:
 [1] A.O.L Atkin, D.J.Bernstein; Prime Sieves using Binary Quadratic Forms; Mathematics  
@@ -367,8 +367,7 @@ def segmented_sieve(lo, hi):
 	delta = constants.UPPER_SEG_SIZE if hi - lo >= constants.UPPER_SEG_SIZE else constants.LOWER_SEG_SIZE
 
 	l1, l = len(base_primes), (delta >> 4) + 1
-	int_size = l << 3
-	sieve = bytearray([0x0] * l)
+	int_size, sieve = l << 3, bytearray([0x0] * l)
 	lo_1, hi_1 = lo, lo + delta
 	
 	# Compute stuff in segments
@@ -405,4 +404,12 @@ def segmented_sieve(lo, hi):
 		hi_1 = lo_1 + delta
 
 	return primes[:pos]
+
+if __name__ == "__main__":
+	N = 10**8
+	t1 = time.time()
+	x = segmented_sieve(2, N)
+	t2 = time.time()
+	print "Num primes:", len(x)
+	print "Time:", (t2-t1), "s"
 
