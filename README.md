@@ -26,7 +26,7 @@ All you have to do is run the file `factor.py`, enter a number, and hit Enter. H
 # References
 * A.O.L Atkin, D.J.Bernstein; [Prime Sieves using Binary Quadratic Forms](http://www.ams.org/journals/mcom/2004-73-246/S0025-5718-03-01501-1/S0025-5718-03-01501-1.pdf); *Mathematics of Computation*, 73-246: 1023-30
 * Peter L Montgomery; [Speeding the Pollard and Elliptical Methods of Factorization](http://modular.math.washington.edu/edu/124/misc/montgomery.pdf); *Mathematics of Computation* (Jan 1987), Issue 177: 243-264
-* Montgomery, P.L.; [Evaluating Recurrences of the form <it>X<sub>m+n</sub></it> = <it>f(X<sub>m</sub>m, X<sub>n</sub>, X<sub>m-n</sub>)</it> via Lucas Chains](http://cr.yp.to/bib/1992/montgomery-lucas.ps); Unpublished manuscript (Jan 1992)
+* Montgomery, P.L.; [Evaluating Recurrences of the form <i>X<sub>m+n</sub></i> = <i>f(X<sub>m</sub>, X<sub>n</sub>, X<sub>m-n</sub>)</i> via Lucas Chains](http://cr.yp.to/bib/1992/montgomery-lucas.ps); Unpublished manuscript (Jan 1992)
 
 
 
