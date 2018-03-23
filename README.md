@@ -4,8 +4,8 @@ Fast prime factorization in Python. Factors most 50-60 digit numbers within a mi
 The algorithm used depends on the size of the input
 
 * `pollardPm1.py` contains an implementation of the large prime (two stage) variant of Pollard's _p-1_ algorithm.
-* `pollardRho.py` contains an implementation of Pollard's _p-1_ algorithm with Brent's improvements. 
-* `ecm.py` contains an implementation of Lenstra's elliptic curve factorization algorithm. It is inversionless (since it uses Montgomery coordinates), uses two stages, and uses Suyama's parametrization to generate elliptic curves. It also contains an implementation of Montgomery's PRAC algorithm for scalar multiplication (thanks Paul Zimmerman!) but this turned out to be slower than the usual double-and-add algorithm weirdly.
+* `pollardRho.py` contains an implementation of Pollard's Rho algorithm with Brent's improvements. 
+* `ecm.py` contains an implementation of Lenstra's elliptic curve factorization algorithm. It is inversionless (since it uses Montgomery coordinates), uses two stages, and uses Suyama's parametrization to generate random elliptic curves. It also contains an implementation of Montgomery's PRAC algorithm for scalar multiplication (thanks Paul Zimmerman!) but this turned out to be slower than the usual double-and-add algorithm weirdly.
 * `primeSieve.py` contains a bunch of prime sieves (Atkin, Eratosthenes, segmented Eratosthenes). Look at the [file](https://github.com/nishanth17/factor/blob/master/primeSieve.py) for specific benchmarks.
 
 # Usage
