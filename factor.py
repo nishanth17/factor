@@ -103,10 +103,10 @@ def factorize(n, verbose = False, level = 3):
 			if g != -1:
 				if verbose:
 					print "Found factor", str(g)
-					f1 = merge_factorizations(factorize(g, verbose = verbose, level = 2), \
-									factorize(n/g, verbose = verbose, level = 2))
-					if f1 != -1:
-						f.extend(f1)
+				f1 = merge_factorizations(factorize(g, verbose = verbose, level = 2), \
+								factorize(n/g, verbose = verbose, level = 2))
+				if f1 != -1:
+					f.extend(f1)
 		
 		if level > 0 and (f1 == -1 or n > constants.SIZE_THRESHOLD_RHO) and n > 1:
 			# If Pollard rho fails try ECM
@@ -117,12 +117,12 @@ def factorize(n, verbose = False, level = 3):
 			if g != -1:
 				if verbose:
 					print "Found factor", str(g)
-					f1 = merge_factorizations(factorize(g, verbose = verbose, level = 2), \
-									factorize(n/g, verbose = verbose, level = 2))
-					if f1 != -1:
-						f.extend(f1)
-					else:
-						f = -1
+				f1 = merge_factorizations(factorize(g, verbose = verbose, level = 2), \
+								factorize(n/g, verbose = verbose, level = 2))
+				if f1 != -1:
+					f.extend(f1)
+				else:
+					f = -1
 		return f
 
 
