@@ -404,12 +404,3 @@ def segmented_sieve(lo, hi):
 		hi_1 = lo_1 + delta
 
 	return primes[:pos]
-
-if __name__ == "__main__":
-	N = 10**8
-	t1 = time.time()
-	x = segmented_sieve(2, N)
-	t2 = time.time()
-	print "Num primes:", len(x)
-	print "Time:", (t2-t1), "s"
-
