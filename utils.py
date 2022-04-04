@@ -173,7 +173,7 @@ def is_prime_fast(n, use_probabilistic = False, tolerance = 30):
 	elif n >= 341550071728321: w = firstPrime[:9]
 	#[2, 3, 5, 7, 11, 13, 17]
 	elif n >= 3474749660383: w = firstPrime[:7]
-	elif n >= 2152302898749: w = firstPrime[:6]
+	elif n >= 2152302898747: w = firstPrime[:6]
 	#[2, 3, 5, 7, 11, 13]
 	elif n >= 4759123141: w = firstPrime[:5]
 	#[2, 3, 5, 7, 11]
