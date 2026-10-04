@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "reorganized_on": "2026-10-03",
+  "source_commit": "1272e033f889a105792cbb924bf8a12a46ac88ae",
+  "original_repository_path": "/Users/nishanthmohan/code/factor",
+  "baseline_directory": "v1",
+  "development_directory": "v2",
+  "audit_directory": "v2/audit",
+  "original_source_sha256": {
+    "README.md": "34664779935ba631aa5e289519df716c4eabdbf8ae0b6dcf230cf1bbf4fe9f1b",
+    "constants.py": "5acea18294d3f52a90a4405f5a5a9511b7048489817080c5e8fc92f7c2664131",
+    "ecm.py": "d7838bfe6a9f40aa89786c75f5d0168fb8470d9da4c2872efc0c070a7f8d5f79",
+    "factor.py": "50305509479a010c9f798f1d0eaa6ac169072edd039712049dc7d18f4c58e757",
+    "pollardPm1.py": "07f96f0ed0047a20dda21b978b17f262bb0eada7d7b1b336b4b00425630841d1",
+    "pollardRho.py": "30b35dbbdaba5f245a9af0bd393cf3c8ab7fce3b0099312ab1ccc4a82e26afbb",
+    "primeSieve.py": "2e090bdbbfebb9427123273eef1cf8a3232e09633e02426988d0f6456a50620c",
+    "utils.py": "97ad8d4cf00f4433329a528e5fc7455f8dd87809652a62f905c1d1f1ed1b6ea3"
+  },
+  "original_audit_sha256": {
+    "extra-validation.json": "925a2ed2a9da69b20b3b9fe4a55064b6c04e85843970f94397dc16e4e7058ea4",
+    "end_to_end_checks.py": "3dfadec51dd2e74c1f13f1017de88813b7284e7bb94c9ad60dfec93bb1f0238c",
+    "reduction-validation.json": "77222598416265cf9fd19051318cfa2a728084ba2fce1688d79e3f60d2a2d8b5",
+    "test_prac_reference.py": "81d1f3581da448c6eb1590e6c65eb4fdfe6704f3a03a101ca13d887b7f0f017c",
+    "prac_reference.py": "09fdb806f4970008694c621b0c375ff85f5f50cdf3c787883959ace4d24df628",
+    "validate.py": "eddc7061ec9d71fb08580a6bbd7f6f94cb9e0f082a5c9ab91fcfa90d3225aacc",
+    "TODOS.md": "6654abca80b104c7614a078102c07b18d729c20906e0b5ce30255ade669aa595",
+    "report.txt": "fe180e128933902f6810304747518d556ad62867e39944a1a30bd85ebc74b857",
+    "validation.json": "baf7059bc132efd53bc9eb58067c43a36e8406357104a6203c679956ad8d10aa",
+    "extra_checks.py": "5e03e1f64044250ce14f7d54da31216bbf75f8058c35e1945ed3eb8edd29c344",
+    "reduction_bench.py": "027ca142f3dcf0f0b10edf6f7d75b014555ec649ab9b659df3ce1f69726ebd98",
+    "prac-validation.json": "689dcc80590d5bfef4f8568754e8834e49b1307aaa8280ddc8212706bf357579",
+    "end-to-end-validation.json": "93cc72282fd07f7280eb9e919e484a6175e311f9eb7d29e05902808ee1aaeec2",
+    "report.html": "76085c0e34facf6753ad55cd2c2d354d2197aca0def01822e90612ab6c41e202",
+    "build_prac_reference.py": "55476ddd7a0ec1815902d51e7561fbb393dc36f7b3f331323cb6949c3630a91f"
+  },
+  "audit_adjustments": {
+    "validate.py": {
+      "reason": "Resolve the relocated preserved v1 source relative to the script",
+      "original_sha256": "eddc7061ec9d71fb08580a6bbd7f6f94cb9e0f082a5c9ab91fcfa90d3225aacc",
+      "relocated_sha256": "001b8e16588104d4f84bb0a3ebd292087d47345b3d478f8a1e491aff639c151a"
+    }
+  }
+}

@@ -1,0 +1,816 @@
+{
+  "milestone": "M25",
+  "retrieved_date_local": "2026-10-03",
+  "kind": "Documentation-only primary-source research; no upstream import, install, compilation or execution.",
+  "reviewed_papers": 11,
+  "reviewed_comparison_slide_decks": 1,
+  "reviewed_direct_implementer_blog_posts": 3,
+  "pinned_implementations": 7,
+  "successful_retrievals": 74,
+  "repository_pins": [
+    {
+      "repository": "https://github.com/malb/m4ri",
+      "revision": "35f06e132363d12592cdd94c98473d36e736cef9",
+      "commit_date": "2026-08-25T15:10:33Z",
+      "pin_provenance": "GitHub default-branch commit API for M25"
+    },
+    {
+      "repository": "https://github.com/SebWouters/blanczos",
+      "revision": "232a57090e07e95a436ae03f4e6536e30d6f727d",
+      "commit_date": "2025-07-15T19:24:17Z",
+      "pin_provenance": "GitHub default-branch commit API for M25"
+    },
+    {
+      "repository": "https://github.com/drjanosch42/block-wiedemann",
+      "revision": "509fb79bdeb231bce4d0e22c36b814d8d3bbd390",
+      "commit_date": "2026-07-27T10:58:05Z",
+      "pin_provenance": "GitHub default-branch commit API for M25"
+    },
+    {
+      "repository": "https://github.com/cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "commit_date": "2026-10-02T20:39:07Z",
+      "pin_provenance": "GitHub default-branch commit API for M25",
+      "upstream_confirmation": "Same Inria GitLab API head revision"
+    },
+    {
+      "repository": "https://github.com/radii/msieve",
+      "revision": "c8727d91305bdbe0972d160ef0ce61dd02ce9193",
+      "pin_provenance": "Reused immutable M19 pin; matrix ",
+      "commit_date": "2011-02-21T05:58:28Z"
+    },
+    {
+      "repository": "https://github.com/remyoudompheng/yamaquasi",
+      "revision": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "pin_provenance": "Reused immutable M19 pin; matrix ",
+      "commit_date": "2025-11-23T14:29:50Z"
+    },
+    {
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "commit_date": "2026-10-02T20:22:18Z",
+      "pin_provenance": "Reused immutable M21 pin; matrix files freshly fetched for M25"
+    }
+  ],
+  "sources": [
+    {
+      "name": "m4ri_commit.json",
+      "url": "https://api.github.com/repos/malb/m4ri/commits/HEAD",
+      "resolved_url": "https://api.github.com/repos/malb/m4ri/commits/HEAD",
+      "bytes": 434312,
+      "sha256": "280fd1b6ffe63e3e562f919448621a0bd5117bb8d0fc1dde72a397868946f47a",
+      "revision": "35f06e132363d12592cdd94c98473d36e736cef9",
+      "committer_date": "2026-08-25T15:10:33Z",
+      "upstream_code_executed": false,
+      "review_scope": "Revision and committer-date metadata "
+    },
+    {
+      "name": "blanczos_commit.json",
+      "url": "https://api.github.com/repos/SebWouters/blanczos/commits/HEAD",
+      "resolved_url": "https://api.github.com/repos/SebWouters/blanczos/commits/HEAD",
+      "bytes": 4143,
+      "sha256": "8cb25f457d64cda6f688f3a935ebdd4d75dbd0b2a132cac5d0ccda022a6c3c7f",
+      "revision": "232a57090e07e95a436ae03f4e6536e30d6f727d",
+      "committer_date": "2025-07-15T19:24:17Z",
+      "upstream_code_executed": false,
+      "review_scope": "Revision and committer-date metadata "
+    },
+    {
+      "name": "gpu_commit.json",
+      "url": "https://api.github.com/repos/drjanosch42/block-wiedemann/commits/HEAD",
+      "resolved_url": "https://api.github.com/repos/drjanosch42/block-wiedemann/commits/HEAD",
+      "bytes": 5479,
+      "sha256": "4d23204de66f3744f0bac70ae9f635df93984d15555c2d6164dc8f87bd1715a5",
+      "revision": "509fb79bdeb231bce4d0e22c36b814d8d3bbd390",
+      "committer_date": "2026-07-27T10:58:05Z",
+      "upstream_code_executed": false,
+      "review_scope": "Revision and committer-date metadata "
+    },
+    {
+      "name": "cado_commit.json",
+      "url": "https://api.github.com/repos/cado-nfs/cado-nfs/commits/HEAD",
+      "resolved_url": "https://api.github.com/repos/cado-nfs/cado-nfs/commits/HEAD",
+      "bytes": 8325,
+      "sha256": "9676dd5ff5bfed8459aa3b7831f2702a7bd674386704115d32e203103336f2a0",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "committer_date": "2026-10-02T20:39:07Z",
+      "upstream_code_executed": false,
+      "review_scope": "Revision and committer-date metadata "
+    },
+    {
+      "name": "cado_gitlab_commit.json",
+      "url": "https://gitlab.inria.fr/api/v4/projects/cado-nfs%2Fcado-nfs/repository/commits?per_page=1",
+      "resolved_url": "https://gitlab.inria.fr/api/v4/projects/cado-nfs%2Fcado-nfs/repository/commits?per_page=1",
+      "bytes": 624,
+      "sha256": "3e16f3c37fb561d399f5cbc3aa3c621ec26853a2b9e29a6032624d9fce701060",
+      "upstream_code_executed": false,
+      "review_scope": "Revision and committer-date metadata "
+    },
+    {
+      "name": "m4ri_tree.json",
+      "url": "https://api.github.com/repos/malb/m4ri/git/trees/35f06e132363d12592cdd94c98473d36e736cef9?recursive=1",
+      "resolved_url": "https://api.github.com/repos/malb/m4ri/git/trees/35f06e132363d12592cdd94c98473d36e736cef9?recursive=1",
+      "bytes": 41488,
+      "sha256": "be8abb1cb4e2630ed12640379395e2e5c8bb6490264587d108ebd8b5bd07172b",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "blanczos_tree.json",
+      "url": "https://api.github.com/repos/SebWouters/blanczos/git/trees/232a57090e07e95a436ae03f4e6536e30d6f727d?recursive=1",
+      "resolved_url": "https://api.github.com/repos/SebWouters/blanczos/git/trees/232a57090e07e95a436ae03f4e6536e30d6f727d?recursive=1",
+      "bytes": 3489,
+      "sha256": "5845e70ccef0978e041e8dc2dca8418cdf6aee52da3ea4373cd8ee54efd5ef6d",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "gpu_tree.json",
+      "url": "https://api.github.com/repos/drjanosch42/block-wiedemann/git/trees/509fb79bdeb231bce4d0e22c36b814d8d3bbd390?recursive=1",
+      "resolved_url": "https://api.github.com/repos/drjanosch42/block-wiedemann/git/trees/509fb79bdeb231bce4d0e22c36b814d8d3bbd390?recursive=1",
+      "bytes": 28015,
+      "sha256": "71afcaed598d6aa6e4a9e9d93b583e036193dfc96d28c668849573abe0acd2c6",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "cado_tree.json",
+      "url": "https://api.github.com/repos/cado-nfs/cado-nfs/git/trees/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b?recursive=1",
+      "resolved_url": "https://api.github.com/repos/cado-nfs/cado-nfs/git/trees/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b?recursive=1",
+      "bytes": 510332,
+      "sha256": "3a88b183dc804e45a67ecc67a1fb46375ddb4f4dec3f5db5a60e7e10a807cc26",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "coppersmith.pdf",
+      "url": "https://www.ams.org/journals/mcom/1994-62-205/S0025-5718-1994-1192970-7/S0025-5718-1994-1192970-7.pdf",
+      "resolved_url": "https://www.ams.org/journals/mcom/1994-62-205/S0025-5718-1994-1192970-7/S0025-5718-1994-1192970-7.pdf",
+      "bytes": 1825126,
+      "sha256": "29316c47ebd1cff86631c8b06c1f95b08768151e1d0607dd9d83f348cddf7fea",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Sections 1-3: block packing, sequence and generator; randomized failure caveats. Historical native timings not adopted."
+    },
+    {
+      "name": "montgomery.pdf",
+      "url": "https://link.springer.com/content/pdf/10.1007%2F3-540-49264-X_9.pdf",
+      "resolved_url": "https://link.springer.com/content/pdf/10.1007/3-540-49264-X_9.pdf?error=cookies_not_supported&code=ff7065c7-a6fc-47a6-9db9-7ae25c0b1a02",
+      "bytes": 753957,
+      "sha256": "d8d5bbd2b161e0f3c688254462d13f78b2ca95ff8875f52cd846f6d866328e90",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Finite-field block recurrence, nonsingular subblock selection and final correction; no proof audit or execution."
+    },
+    {
+      "name": "thome.pdf",
+      "url": "https://members.loria.fr/EThome/files/jsc.pdf",
+      "resolved_url": "https://members.loria.fr/EThome/files/jsc.pdf",
+      "bytes": 241870,
+      "sha256": "fa9e43dd2f86fb67ed282487b82669947e2444f0a684da56a6f150f28b1a3e57",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Matrix-sequence generators and their cost; experiments use large-characteristic fields, not a PyPy GF(2) crossover."
+    },
+    {
+      "name": "wiedemann.pdf",
+      "url": "https://www.csd.uwo.ca/~mmorenom/CS424/Ressources/WIEDEMANN-IEEE-1986.pdf",
+      "resolved_url": "https://www.csd.uwo.ca/~mmorenom/CS424/Ressources/WIEDEMANN-IEEE-1986.pdf",
+      "bytes": 1612720,
+      "sha256": "8ec0b8a8b35c02bd4a84236129ab991fdbcca4b4feb8332c22b08dbdefc1218a",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Scalar projected-sequence/minimal-polynomial reference and sparse storage contracts."
+    },
+    {
+      "name": "kruppa.pdf",
+      "url": "https://event.cwi.nl/wcnt2011/slides/kruppa.pdf",
+      "resolved_url": "https://event.cwi.nl/wcnt2011/slides/kruppa.pdf",
+      "bytes": 182611,
+      "sha256": "f888d04281b8c576ac3efa8f259830e3b6eb390e370d3f992acc44741ad76815",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Slides 18-22, 26-28 and 31-34: block work, homogeneous recurrence, low-rank updates and hardware/topology qualifications."
+    },
+    {
+      "name": "valenta.pdf",
+      "url": "https://ifca.ai/fc16/preproceedings/19_Valenta.pdf",
+      "resolved_url": "https://ifca.ai/fc16/preproceedings/19_Valenta.pdf",
+      "bytes": 421135,
+      "sha256": "56bc91e8d2e1469d664f64f845ad8b0946a8bff1010323553b6e3eabf1f419a3",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Sections 3.3 and 4: historical solver-stack comparison, filtering/density/oversieving trade-offs; no new SOTA ranking."
+    },
+    {
+      "name": "ple.pdf",
+      "url": "https://arxiv.org/pdf/1111.6549",
+      "resolved_url": "https://arxiv.org/pdf/1111.6549",
+      "bytes": 420951,
+      "sha256": "a3b0b4ed1cb4cebee1f10f0114d9f87d9f6521fdc5081b3e1bc4bfe6585f06a8",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Sections 2-5 and appendix: PLE, Gray-code Four Russians tables, rank deficiency, cache effects and pivot costs."
+    },
+    {
+      "name": "m4rm.pdf",
+      "url": "https://arxiv.org/pdf/0811.1714",
+      "resolved_url": "https://arxiv.org/pdf/0811.1714",
+      "bytes": 177777,
+      "sha256": "957b8042030002e434e42a6a9884db50506ac28dca162187e58d1977eb500bb1",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Dense multiplication hierarchy and memory locality; arXiv identifier 2008, manuscript includes a 2013 revision date."
+    },
+    {
+      "name": "bouvier.pdf",
+      "url": "https://hal.science/hal-00734654/document",
+      "resolved_url": "https://inria.hal.science/hal-00734654/document",
+      "bytes": 578298,
+      "sha256": "dc851eb88a419b6ac46ffb22a7cfd355b0a24d25ef6c26952ef9aa062ea091f0",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "HAL v3, sections 2-3: purge versus exact merge, minimum-weight spanning trees and pruning weight functions."
+    },
+    {
+      "name": "bouvier_slides.pdf",
+      "url": "https://bouvier.lirmm.net/thesis/Bouvier.thesis.slides.pdf",
+      "resolved_url": "https://bouvier.lirmm.net/thesis/Bouvier.thesis.slides.pdf",
+      "bytes": 738122,
+      "sha256": "d47e913086db972b9e40b91fc98159d154bc309f6a14d8990b6c78e757b79d50",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Author context/discovery source only; not relied on for a new claim or counted as a reviewed paper."
+    },
+    {
+      "name": "m4ri_blog.html",
+      "url": "https://martinralbrecht.wordpress.com/category/m4ri/",
+      "resolved_url": "https://martinralbrecht.wordpress.com/category/m4ri/",
+      "bytes": 144656,
+      "sha256": "1e88535433024ba4bd059fd2c0d6cf6a7861c099c0462b475dd08f230ae88e26",
+      "content_type": "text/html; charset=UTF-8",
+      "upstream_code_executed": false,
+      "review_scope": "Category used to discover three direct posts; category excerpts not a separate performance claim."
+    },
+    {
+      "name": "kaltofen_saunders.pdf",
+      "url": "https://users.cs.duke.edu/~elk27/bibliography/91/KaSa91.pdf",
+      "resolved_url": "https://users.cs.duke.edu/~elk27/bibliography/91/KaSa91.pdf",
+      "bytes": 143531,
+      "sha256": "8c5579a1ebdc9e24b21cdfa0cdd0173a5b302c6a5fb022f0977ed2160cd3677c",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Black-box task/preconditioner hypotheses; kernel output is not an exact-rank certificate."
+    },
+    {
+      "name": "m4ri_README.md",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/README.md",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/README.md",
+      "bytes": 19341,
+      "sha256": "ed06da0e96dbea3ed80ebdb79db9e6340eaad337757ae1bf76e417c82c945e5c",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_COPYING",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/COPYING",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/COPYING",
+      "bytes": 18008,
+      "sha256": "98193898c663001eff2fdcfb676e210c13042bc1a05e8d570c363efa396f8e24",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_m4ri_echelonform.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/echelonform.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/echelonform.c",
+      "bytes": 3631,
+      "sha256": "73b323a48e84c777bdfae733e93e96e5c8d1d217c02a276bec76d6488d495b48",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_m4ri_ple.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple.c",
+      "bytes": 7818,
+      "sha256": "ad0ddb064089fad04e423e1b5440702076a9711c57d3c6aab326c54da524ec3b",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_m4ri_ple_russian.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple_russian.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple_russian.c",
+      "bytes": 19418,
+      "sha256": "5924d5a7765037fcce086eded72f015971816cf326c761c363cdb8e171cd1dd5",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_m4ri_graycode.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/graycode.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/graycode.c",
+      "bytes": 2417,
+      "sha256": "867d1a19d858e52450be4a9dd4c383e3beaf5dbcc24a7f40eeb68e1be5541436",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_m4ri_solve.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/solve.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/solve.c",
+      "bytes": 5783,
+      "sha256": "17d2e0c740361912a46e1a35e0e5d9206acea3d2986bbe75bcab3ec791700ff0",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "blanczos_README.md",
+      "url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/README.md",
+      "resolved_url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/README.md",
+      "bytes": 1379,
+      "sha256": "6a53d31b53c6ccb054fe87e73cffe8b78330fb43a58e7562ddacf43ae5aac507",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Recurrence/output contract, density-dependent blocks, regular/transpose products and file-license notices. README says per-block CSR; active sparse.hpp uses relative-coordinate pairs."
+    },
+    {
+      "name": "blanczos_LICENSE",
+      "url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/LICENSE",
+      "resolved_url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/LICENSE",
+      "bytes": 1517,
+      "sha256": "6ecf068d88dbdffbf38d98d1bd3c6f228318aba3f566cc37aa614f6f05d73929",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Recurrence/output contract, density-dependent blocks, regular/transpose products and file-license notices. README says per-block CSR; active sparse.hpp uses relative-coordinate pairs."
+    },
+    {
+      "name": "blanczos_src_blanczos.cpp",
+      "url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/blanczos.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/blanczos.cpp",
+      "bytes": 19197,
+      "sha256": "be3f7a605d4a7d420c1ebbdcf59ad2af3ee0bfe6b715f64395c2ab6f9735667d",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Recurrence/output contract, density-dependent blocks, regular/transpose products and file-license notices. README says per-block CSR; active sparse.hpp uses relative-coordinate pairs."
+    },
+    {
+      "name": "blanczos_src_csr.hpp",
+      "url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/csr.hpp",
+      "resolved_url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/csr.hpp",
+      "bytes": 4342,
+      "sha256": "c84499a4dd4dd82db4a10e44f6511912cd20fd86b257bcf598a4e8eb3933c243",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Recurrence/output contract, density-dependent blocks, regular/transpose products and file-license notices. README says per-block CSR; active sparse.hpp uses relative-coordinate pairs."
+    },
+    {
+      "name": "blanczos_src_sparse.hpp",
+      "url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/sparse.hpp",
+      "resolved_url": "https://raw.githubusercontent.com/SebWouters/blanczos/232a57090e07e95a436ae03f4e6536e30d6f727d/src/sparse.hpp",
+      "bytes": 8732,
+      "sha256": "3ec2aa4179b175b47075bce40ef7dd2c6353879011f7a766c86e18428804634f",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Recurrence/output contract, density-dependent blocks, regular/transpose products and file-license notices. README says per-block CSR; active sparse.hpp uses relative-coordinate pairs."
+    },
+    {
+      "name": "gpu_README.md",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/README.md",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/README.md",
+      "bytes": 5829,
+      "sha256": "9bb49f1983f6ce74c808ad9a1e27ab819891626d553985edde2858d857759e8d",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_LICENSE",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/LICENSE",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/LICENSE",
+      "bytes": 8578,
+      "sha256": "ea3b581a677c3bbf52b3a5dba33766e7944f50fe17fa4d5b7b7664ce293fd597",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_USAGE.md",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/USAGE.md",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/USAGE.md",
+      "bytes": 13405,
+      "sha256": "a13f8c1567b45b5863836a44a08fd99311a0e677dea80c9d90319982656e041a",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_include_bw_solver.h",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/include/bw_solver.h",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/include/bw_solver.h",
+      "bytes": 35769,
+      "sha256": "5e503c99bc417d0383eec7f51ae2cb667f0572d37f9308c13198a9a2fb982d64",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_python_block_wiedemann_lingen_v5.py",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/python/block_wiedemann_lingen_v5.py",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/python/block_wiedemann_lingen_v5.py",
+      "bytes": 40670,
+      "sha256": "57e820706fb0a72c2d57bd7093f9a732a2ee4150993b42462e4b5dbe21c6d39f",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_python_verify_bw_pipeline.py",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/python/verify_bw_pipeline.py",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/python/verify_bw_pipeline.py",
+      "bytes": 18486,
+      "sha256": "27201375bd57abf4fb4d17b32be08055dce3440ca113c6d77aa30d5f98a5af54",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "cado_README.md",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/README.md",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/README.md",
+      "bytes": 26211,
+      "sha256": "ab16c079e2b3f109287349bf4cfb725f79493b32ed88383cd0a0338de2bb7fbf",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_COPYING",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/COPYING",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/COPYING",
+      "bytes": 26437,
+      "sha256": "d878b79d5ff41186e865c5147907a543b2eae6d6e98fbc43bcd151a5d4b8390d",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_linalg_bwc_README",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/README",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/README",
+      "bytes": 40079,
+      "sha256": "afb368ae572f610a4606d5da4b709f5d6287fee7fd2cbc375cb4b20b49bacf62",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_linalg_bwc_matmul-bucket.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/matmul-bucket.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/matmul-bucket.cpp",
+      "bytes": 137113,
+      "sha256": "7d4f902550c26feb3f78eafe0571378327b14a8a68176516927f9823d6ed3db6",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_linalg_bwc_matmul-sliced.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/matmul-sliced.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/linalg/bwc/matmul-sliced.cpp",
+      "bytes": 15420,
+      "sha256": "69e14267f4e09f799772e84615fd84e9b2c6eb3124091820560870f6188a6cc8",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_filter_purge.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/purge.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/purge.cpp",
+      "bytes": 16290,
+      "sha256": "bfa75c650eca399524ca17fcec48c1862dba32ff07fdbce2e8f11de5b8e91bdf",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_filter_merge.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge.cpp",
+      "bytes": 58722,
+      "sha256": "c20738f72309be535273054666948bc3d08d17cfcf83630478fd3eec7a11e68f",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_filter_replay.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/replay.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/replay.cpp",
+      "bytes": 32002,
+      "sha256": "c27bd3e79ed504cd84e2ddf5f2bfef9536e8fbb8f6d2c6225f6d1eb0feb6e199",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "yama_gf2.rs",
+      "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/matrix/gf2.rs",
+      "resolved_url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/matrix/gf2.rs",
+      "bytes": 31713,
+      "sha256": "dbc004bd64d919efae77ec3adbe40be8b673e7a579211588e4db5877fed9912b",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense Gaussian control, packed Lanczos, QS heavy-row/tiled layout and MY small-kernel correction; system randomness not adopted."
+    },
+    {
+      "name": "yama_tree.json",
+      "url": "https://api.github.com/repos/remyoudompheng/yamaquasi/git/trees/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad?recursive=1",
+      "resolved_url": "https://api.github.com/repos/remyoudompheng/yamaquasi/git/trees/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad?recursive=1",
+      "bytes": 21337,
+      "sha256": "bd53265a9c6cbd5d3c11cefd633ca8d39f3df42f10f01e73e3ffa30677999585",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "msieve_tree.json",
+      "url": "https://api.github.com/repos/radii/msieve/git/trees/c8727d91305bdbe0972d160ef0ce61dd02ce9193?recursive=1",
+      "resolved_url": "https://api.github.com/repos/radii/msieve/git/trees/c8727d91305bdbe0972d160ef0ce61dd02ce9193?recursive=1",
+      "bytes": 44981,
+      "sha256": "316237f42b82baafaa7d21171e43a8a8a5b25c9215373c35c73771e91e211999",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "flint_tree.json",
+      "url": "https://api.github.com/repos/flintlib/flint/git/trees/00cc19b350b5302876b4fa8c877df5a676c2061c?recursive=1",
+      "resolved_url": "https://api.github.com/repos/flintlib/flint/git/trees/00cc19b350b5302876b4fa8c877df5a676c2061c?recursive=1",
+      "bytes": 2557258,
+      "sha256": "3aaea4a9afd137357eefeb7fd7cc2235ef6d973c9f4c24c934675fa647c1306e",
+      "content_type": "application/json; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "File inventory and pin only; tree is "
+    },
+    {
+      "name": "bertolazzi.pdf",
+      "url": "https://arxiv.org/pdf/1209.5198",
+      "resolved_url": "https://arxiv.org/pdf/1209.5198",
+      "bytes": 261671,
+      "sha256": "221aeb2ea108ec4391d9cdd3a6374764aff583f84dc018c89b75642a05c7fe42",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Dense rectangular decomposition and column-swap avoidance; paired with maintainer retuning commentary."
+    },
+    {
+      "name": "msieve_common_lanczos_lanczos.c",
+      "url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos.c",
+      "resolved_url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos.c",
+      "bytes": 39768,
+      "sha256": "53987a217992c1826bb31e31664e65f438bdb489f7f77b13df012f7afecce530",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Lanczos preprocessing/reordering/products, post-correction and original verification. Outer retry policy is not adopted."
+    },
+    {
+      "name": "msieve_common_lanczos_lanczos_pre.c",
+      "url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_pre.c",
+      "resolved_url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_pre.c",
+      "bytes": 11584,
+      "sha256": "eee8e8ac92894aaf4959c220dcc15941d5249c285a20e1cd22fc5def073f8ce6",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Lanczos preprocessing/reordering/products, post-correction and original verification. Outer retry policy is not adopted."
+    },
+    {
+      "name": "msieve_common_lanczos_lanczos_matmul1.c",
+      "url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_matmul1.c",
+      "resolved_url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_matmul1.c",
+      "bytes": 8891,
+      "sha256": "c7abb83dbe2c0e835d42cc61e13bb5c3377e3e8448bd2f09fec288fab8ad63bf",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Lanczos preprocessing/reordering/products, post-correction and original verification. Outer retry policy is not adopted."
+    },
+    {
+      "name": "msieve_common_lanczos_lanczos_reorder.c",
+      "url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_reorder.c",
+      "resolved_url": "https://raw.githubusercontent.com/radii/msieve/c8727d91305bdbe0972d160ef0ce61dd02ce9193/common/lanczos/lanczos_reorder.c",
+      "bytes": 18135,
+      "sha256": "6ff31931c66a0afda75d24d8675af397e91e400ee4a831747aae261fa0ce4561",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Lanczos preprocessing/reordering/products, post-correction and original verification. Outer retry policy is not adopted."
+    },
+    {
+      "name": "flint_src_qsieve_block_lanczos.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/block_lanczos.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/block_lanczos.c",
+      "bytes": 24138,
+      "sha256": "65a17f4c52c2e897c58d6010c7e5ca8e23299c7fa3bc891c0be551ada8e0df16",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "QS block Lanczos, sparse reduction and original operator verification; existing QS review pin reused."
+    },
+    {
+      "name": "flint_src_qsieve_linalg.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/linalg.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/linalg.c",
+      "bytes": 5376,
+      "sha256": "3663128aa6abf201eaf8f8517578b6c77c7e8afa065b44ec29346ba5c2453901",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "QS block Lanczos, sparse reduction and original operator verification; existing QS review pin reused."
+    },
+    {
+      "name": "cado_filter_README.fileformat",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/README.fileformat",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/README.fileformat",
+      "bytes": 9638,
+      "sha256": "2bcb4282812e84bfbf178a01febe62028fe098daab8fe96bfcfd52adeaf6c0e5",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_filter_merge_heap.c",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge_heap.c",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge_heap.c",
+      "bytes": 11040,
+      "sha256": "8095a0169b890509610b360c414138c3a34fe1966da719abc8f35668ddce4a34",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "cado_filter_merge_replay_matrix.c",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge_replay_matrix.c",
+      "resolved_url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/merge_replay_matrix.c",
+      "bytes": 3373,
+      "sha256": "62d0c30bc2d16b69de71d31668d5e2559efbee1f41a3fee62045ecafe560c355",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "BWC stage/checkpoint/padding contracts; density-dependent bucket/sliced products, purge/merge/replay and exact file notices."
+    },
+    {
+      "name": "gpu_src_lingen_io_bw_io.h",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/src/lingen/io/bw_io.h",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/src/lingen/io/bw_io.h",
+      "bytes": 6546,
+      "sha256": "f968f46259231717bd348cca4168662b64a38fb99bdd1f12662c88d9959c36e6",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_src_lingen_io_hash.h",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/src/lingen/io/hash.h",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/src/lingen/io/hash.h",
+      "bytes": 1278,
+      "sha256": "5c46d32d3231ea4d0dc19fe1f70c345beb4a1ffa3542c1cb36a91d087bbe520e",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "gpu_cuda_spmm_src_autotuner.cpp",
+      "url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/cuda_spmm/src/autotuner.cpp",
+      "resolved_url": "https://raw.githubusercontent.com/drjanosch42/block-wiedemann/509fb79bdeb231bce4d0e22c36b814d8d3bbd390/cuda_spmm/src/autotuner.cpp",
+      "bytes": 14516,
+      "sha256": "03967bcdd5c6baaf6f03f7c6bb6b13e805778c89bfdeb75d2fca612bca36314c",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Stage contracts, saved sequence/hash formats, base-case generator, NumPy reference and per-block autotuner; CUDA remains reference evidence, not a supported Factor backend."
+    },
+    {
+      "name": "blog_tuning.html",
+      "url": "https://martinralbrecht.wordpress.com/2012/12/21/m4ri-20121224/",
+      "resolved_url": "https://martinralbrecht.wordpress.com/2012/12/21/m4ri-20121224/",
+      "bytes": 125257,
+      "sha256": "3abc7894ccc53c590d4bde95dff4fb351890321cb7f696b250896c11b6fa97f4",
+      "content_type": "text/html; charset=UTF-8",
+      "upstream_code_executed": false,
+      "review_scope": "Direct maintainer post: retuned base cases and profiled bottlenecks; historical native results only."
+    },
+    {
+      "name": "blog_hybrid.html",
+      "url": "https://martinralbrecht.wordpress.com/2012/06/24/linear-algebra-for-grobner-bases-over-gf2-m4ri/",
+      "resolved_url": "https://martinralbrecht.wordpress.com/2012/06/24/linear-algebra-for-grobner-bases-over-gf2-m4ri/",
+      "bytes": 122996,
+      "sha256": "9bd0639f23b16e2052db8780e18ef8a889f1bd0906ecec235dd236fb900b9b91",
+      "content_type": "text/html; charset=UTF-8",
+      "upstream_code_executed": false,
+      "review_scope": "Direct maintainer post: structure-specific sparse/dense elimination; Groebner matrices differ from QS."
+    },
+    {
+      "name": "blog_lu.html",
+      "url": "https://martinralbrecht.wordpress.com/2013/08/17/enrico-bertolazzis-linear-algebra-code-over-gf2-available/",
+      "resolved_url": "https://martinralbrecht.wordpress.com/2013/08/17/enrico-bertolazzis-linear-algebra-code-over-gf2-available/",
+      "bytes": 113467,
+      "sha256": "13aa1c1694bf68e3653d8e9786b96df7517f6e716729b5f3688a09aed5ed5343",
+      "content_type": "text/html; charset=UTF-8",
+      "upstream_code_executed": false,
+      "review_scope": "Direct implementer follow-up on competing dense LU code; historical software comparisons not transferred."
+    },
+    {
+      "name": "ibm_coppersmith.html",
+      "url": "https://research.ibm.com/publications/solving-homogeneous-linear-equations-over-gf2-via-block-wiedemann-algorithm",
+      "resolved_url": "https://research.ibm.com/publications/solving-homogeneous-linear-equations-over-gf2-via-block-wiedemann-algorithm",
+      "bytes": 31492,
+      "sha256": "6d0835009d294ab0678a0dd6ed020a212ff423e1bed80f5601845bc65decbf2b",
+      "content_type": "text/html; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Author institution landing page and publisher-paper link; full paper obtained separately."
+    },
+    {
+      "name": "cado_site.html",
+      "url": "https://cado-nfs.gitlabpages.inria.fr/",
+      "resolved_url": "https://cado-nfs.gitlabpages.inria.fr/",
+      "bytes": 8383,
+      "sha256": "3ed2155eb650930bceff991a9dcdc8efbc803e9461c4244bcbe4df7a51de4977",
+      "content_type": "text/html; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Official project provenance/features. Historical version feature list not presented as a current-version benchmark."
+    },
+    {
+      "name": "paderborn_software.html",
+      "url": "https://math.uni-paderborn.de/ag/arbeitsgruppe-algebra-und-zahlentheorie/forschung/software",
+      "resolved_url": "https://math.uni-paderborn.de/ag/arbeitsgruppe-algebra-und-zahlentheorie/forschung/software",
+      "bytes": 47345,
+      "sha256": "54a2052e59d6cb1487dc622d9f77db255cc5797ced10b91a5fbac8d3fa723c0a",
+      "content_type": "text/html; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Author institution provenance for recent GPU solver; SOTA/hardware claims not independently reproduced."
+    },
+    {
+      "name": "parallel_sge.pdf",
+      "url": "https://journals.flvc.org/mathcryptology/article/download/126033/127787",
+      "resolved_url": "https://journals.flvc.org/mathcryptology/article/download/126033/127787",
+      "bytes": 909837,
+      "sha256": "81f0cef065be3ecb162ff6a7ce74818f027b52d1d0d5361ad3798ea8fc21cd7d",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Published 2021 SGE paper: independent low-cost pivot batches and fill control, cross-checked with CADO source. Font extraction degrades some glyphs; no numeric timings adopted."
+    },
+    {
+      "name": "bouvier_v3.pdf",
+      "url": "https://inria.hal.science/hal-00734654v3/document",
+      "resolved_url": "https://inria.hal.science/hal-00734654v3/document",
+      "bytes": 578298,
+      "sha256": "dc851eb88a419b6ac46ffb22a7cfd355b0a24d25ef6c26952ef9aa062ea091f0",
+      "content_type": "application/pdf",
+      "upstream_code_executed": false,
+      "review_scope": "Versioned URL confirms identical bytes to retrieved HAL v3; duplicate temporary copy removed after verification."
+    },
+    {
+      "name": "m4ri_brilliantrussian.c",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/brilliantrussian.c",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/brilliantrussian.c",
+      "bytes": 40199,
+      "sha256": "bd5a33e40ec1235f848aa3960901593b72114bc92698b181cdc105889addab33",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    },
+    {
+      "name": "m4ri_ple_russian_template.h",
+      "url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple_russian_template.h",
+      "resolved_url": "https://raw.githubusercontent.com/malb/m4ri/35f06e132363d12592cdd94c98473d36e736cef9/m4ri/ple_russian_template.h",
+      "bytes": 6638,
+      "sha256": "c97d487655080db501f63b166aedd2ab0ba659968b3b6d599d1cf6d63998b1ad",
+      "content_type": "text/plain; charset=utf-8",
+      "upstream_code_executed": false,
+      "review_scope": "Dense echelon/PLE/PLUQ, Gray-code tables, free-variable triangular recovery and file-license notices; text-only inspection."
+    }
+  ],
+  "unavailable_requests": [
+    {
+      "name": "cado_filter_README",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/README",
+      "error": "HTTP Error 404: Not Found",
+      "fallback": "Inventory identified filter/README.fileformat, "
+    }
+  ],
+  "extraction": "Pure-Python pypdf 6.10.0 read on PyPy 7.3.23 implementing Python 3.11.15; HTML text read without execution.",
+  "limits": [
+    "Relevant algorithm/contracts reviewed, not complete proof audits.",
+    "No upstream timings or SOTA ranking independently reproduced.",
+    "No Factor runtime/performance evidence generated by this review.",
+    "Algorithm selections and experiment priorities are inferences."
+  ],
+  "retention": "Retain this metadata and content verification only. Task-owned source downloads/extractions are hash-checked and removed after review; no source cache, raw duplicate or new large result capture is retained."
+}

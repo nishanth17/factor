@@ -1,74 +1,45 @@
-# factor
+# Factor
 
-Fast prime factorization in Python. Factors most 50-60 digit numbers within a minute or so (with PyPy).  
-The algorithm used depends on the size of the input
+Integer factorization in Python, targeting **PyPy with Python 3.11**.
 
-* `pollardPm1.py` contains an implementation of the large prime (two stage) variant of Pollard's _p-1_ algorithm.
-* `pollardRho.py` contains an implementation of Pollard's Rho algorithm with Brent's improvements. 
-* `ecm.py` contains an implementation of Lenstra's elliptic curve factorization algorithm. It is inversionless (since it uses Montgomery coordinates), uses two stages, and uses Suyama's parametrization to generate random elliptic curves. It also contains an implementation of Montgomery's PRAC algorithm for scalar multiplication (thanks Paul Zimmerman!) but this turned out to be slower than the usual double-and-add algorithm weirdly.
-* `primeSieve.py` contains a bunch of prime sieves (optimized versions of Atkin, Eratosthenes, segmented Eratosthenes). Look at the [file](https://github.com/nishanth17/factor/blob/master/primeSieve.py) for specific benchmarks.
+The active implementation is [v2](v2/). It combines exact preprocessing,
+Brent rho, Pollard p−1 and ECM in a bounded, resumable portfolio. Results
+preserve signs, multiplicities and unresolved cofactors, and distinguish
+probable primes from proven primes.
 
-# Usage
-All you have to do is run the file `factor.py`, enter a number, and hit Enter. Here's an example in terminal:
+An experimental QS/MPQS package supplies verified relation collection,
+filtering, GF(2) dependencies and factor extraction. SIQS self-initialization
+and production dispatch are the next milestone.
 
-    python factor.py
-    Enter a number: 15
+## Quick start
 
-    Factoring 15...
-    Number of digits: 2
-    Finding small prime factors...
-    Prime factors found: 3, 5
+Install PyPy with Python 3.11; on macOS, `brew install pypy3`. From the
+repository root:
 
-    15 = 3^1 * 5^1
+```sh
+make -C v2 run N=626100403 SEED=7
+make -C v2 run-bounded N=626100403 SEED=7
+make -C v2 test
+```
 
-    Time: 5.00679016113e-05 s
+See [usage and API contracts](v2/README.md) for library calls, resource limits,
+checkpoints and development setup.
 
-and another...
+## Repository
 
-	Enter number: 37897387397398739739826929827929827927927762729872987928
+| Path | Purpose |
+| --- | --- |
+| [v2/](v2/) | Active implementation and tests |
+| [v1/](v1/) | Preserved original Python 2 baseline |
+| [Roadmap](v2/audit/TODOS.md) | Accepted phases and remaining work |
+| [Benchmarks](v2/benchmarks/README.md) | Runners and retained inputs |
+| [Research](v2/audit/README.md) | Algorithm notes and reference prototypes |
+| [CHANGELOG.md](CHANGELOG.md) | Public development summary |
 
-	Factoring 37897387397398739739826929827929827927927762729872987928...
-	Number of digits: 56
-	Finding small prime factors...
-	Prime factors found: 2, 3
-	Factoring 1579057808224947489159455409497076163663656780411374497 with ECM...
-	Number of digits: 55
-	Bounds: 250000 128992510
-	Sieving primes...
-	Stage 2 found factor!
-	Found factor 67246307
-	Factoring 67246307...
-	Number of digits: 8
-	67246307 is prime!
-	Factoring 23481702991138940747474138758238071923617408171...
-	Number of digits: 47
-	Factoring 23481702991138940747474138758238071923617408171 with ECM...
-	Number of digits: 47
-	Bounds: 50000 12746592
-	Sieving primes...
-	Tried 40 random curves...
-	Tried 80 random curves...
-	Tried 120 random curves...
-	Tried 160 random curves...
-	Stage 2 found factor!
-	Found factor 4788272261623351
-	Factoring 4788272261623351...
-	Number of digits: 16
-	4788272261623351 is prime!
-	Factoring 4904003303934522319753958187821...
-	Number of digits: 31
-	4904003303934522319753958187821 is prime!
+Generated run captures, profiler output, transcripts and detailed local
+journals are excluded from Git. Benchmark code, independent corpora and
+required source baselines remain versioned. See
+[contributor guidance](AGENTS.md).
 
-	37897387397398739739826929827929827927927762729872987928 = 2^3 * 3^1 * 67246307^1 * 4788272261623351^1 * 4904003303934522319753958187821^1
-
-	Time: 24.7774269581 s
-
-# References
-* A.O.L Atkin, D.J.Bernstein; [Prime Sieves using Binary Quadratic Forms](http://www.ams.org/journals/mcom/2004-73-246/S0025-5718-03-01501-1/S0025-5718-03-01501-1.pdf); *Mathematics of Computation*, 73-246: 1023-30
-* Peter L Montgomery; [Speeding the Pollard and Elliptical Methods of Factorization](http://modular.math.washington.edu/edu/124/misc/montgomery.pdf); *Mathematics of Computation* (Jan 1987), Issue 177: 243-264
-* Montgomery, P.L.; [Evaluating Recurrences of the form <i>X<sub>m+n</sub></i> = <i>f(X<sub>m</sub>, X<sub>n</sub>, X<sub>m-n</sub>)</i> via Lucas Chains](http://cr.yp.to/bib/1992/montgomery-lucas.ps); Unpublished manuscript (Jan 1992)
-
-
-
-
-    
+CPython is unsupported. The original baseline is retained for comparisons,
+not as a supported runtime or production implementation.

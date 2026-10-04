@@ -1,0 +1,265 @@
+{
+  "milestone": "M21",
+  "retrieved_date": "2026-10-03",
+  "kind": "Documentation/source review; no competitor execution.",
+  "repository": {
+    "url": "https://github.com/flintlib/flint",
+    "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+    "commit_date": "2026-10-02T20:22:18Z",
+    "pin_provenance": "GitHub default-branch commit API, fetched for M21."
+  },
+  "sources": [
+    {
+      "name": "flint_commit.json",
+      "url": "https://api.github.com/repos/flintlib/flint/commits/main",
+      "resolved_url": "https://api.github.com/repos/flintlib/flint/commits/main",
+      "bytes": 26109,
+      "sha256": "b4aa883153f210edb02e64decc53ad65a821675c958f1b6e7033f0ea10abf5f7",
+      "review_scope": "Discovery: default-branch revision and commit date.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "hart_archive.html",
+      "url": "https://wbhart.blogspot.com/2017/02/",
+      "resolved_url": "https://wbhart.blogspot.com/2017/02/",
+      "bytes": 76861,
+      "sha256": "bce889c97bd06439858f0b97447f6a5fe1baf947709807f2ae1a01d977c8bc3c",
+      "review_scope": "Discovery only: article permalink.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "bernstein_notes.pdf",
+      "url": "https://cr.yp.to/2006-aws/notes-20060309.pdf",
+      "resolved_url": "https://cr.yp.to/2006-aws/notes-20060309.pdf",
+      "bytes": 316306,
+      "sha256": "df52d5ff5d877f1a29b871df966c956aac381e50b452aacf98acd2bdd985da02",
+      "review_scope": "Sections 14.2-14.5, product/remainder trees.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "flint_docs.html",
+      "url": "https://flintlib.org/doc/qsieve.html",
+      "resolved_url": "https://flintlib.org/doc/qsieve.html",
+      "bytes": 36982,
+      "sha256": "3f5e3a2bada9a2204a3c3a57612fbaa0240e5f52186cb75bc0aae1f6e774284f",
+      "review_scope": "QS API and native relation serialization description.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "flint_directory.json",
+      "url": "https://api.github.com/repos/flintlib/flint/contents/src/qsieve?ref=00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "resolved_url": "https://api.github.com/repos/flintlib/flint/contents/src/qsieve?ref=00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "bytes": 13392,
+      "sha256": "c6648779b06dd28992156322851037997ca6af69842e3e591138b316279e452e",
+      "executed": false,
+      "review_scope": "Discovery: paths at the pinned revision.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "flint_collect_relations.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/collect_relations.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/collect_relations.c",
+      "bytes": 21062,
+      "sha256": "587a79b3d793591c55ebef84d0a0ca351260b4255cea91e700313c3deb421d36",
+      "executed": false,
+      "review_scope": "qsieve_sieve, qsieve_evaluate_candidate, qsieve_evaluate_sieve.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_factor.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/factor.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/factor.c",
+      "bytes": 15640,
+      "sha256": "f1e5395e736b26fea79ad1943851b581d7b65ed6d61f55c9e36c87907747aeb7",
+      "executed": false,
+      "review_scope": "Collection target, filtered solving, retry and factor-base growth.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_knuth_schroeppel.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/knuth_schroeppel.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/knuth_schroeppel.c",
+      "bytes": 3910,
+      "sha256": "d5c490d235888a80420dfc51c2cdbad6a7fa7b6f7ff85aa861c41d99bbde16f2",
+      "executed": false,
+      "review_scope": "Multiplier score, exact residue tests and multiplier-size penalty.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_large_prime_variant.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/large_prime_variant.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/large_prime_variant.c",
+      "bytes": 16083,
+      "sha256": "ce107686acac68c25c0ffb1a6bcccb64fdc1e09ebccdf262675262507cc08d71",
+      "executed": false,
+      "review_scope": "Partial storage, pairing, provenance and relation processing.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "hart.html",
+      "url": "https://wbhart.blogspot.com/2017/02/integer-factorisation-in-flint.html",
+      "resolved_url": "https://wbhart.blogspot.com/2017/02/integer-factorisation-in-flint.html",
+      "bytes": 57239,
+      "sha256": "f25a104699a548f36c975566715dee593c3d151d6853cd3d079daaa5c0aa471b",
+      "executed": false,
+      "review_scope": "Author implementation account; historical, not timing proof.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "bernstein_smoothparts.pdf",
+      "url": "https://cr.yp.to/factorization/smoothparts-20040510.pdf",
+      "resolved_url": "https://cr.yp.to/factorization/smoothparts-20040510.pdf",
+      "bytes": 129464,
+      "sha256": "2ef7aa60f8133ec1125bac4a39498285b626c0f553571fb00385822377facda7",
+      "executed": false,
+      "review_scope": "Abstract and sections 1-3; author draft.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "bradford_monagan_percival.pdf",
+      "url": "https://www.cecm.sfu.ca/~pborwein/MITACS/papers/percival.pdf",
+      "resolved_url": "https://www.cecm.sfu.ca/~pborwein/MITACS/papers/percival.pdf",
+      "bytes": 188771,
+      "sha256": "3025473b53215abd64104942d62111abd55db11d61efbf9d988a0d1f872db234",
+      "executed": false,
+      "review_scope": "Sections 2.3-2.6; historical Maple/C QS.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "cavallar.pdf",
+      "url": "https://ir.cwi.nl/pub/2078/2078D.pdf",
+      "resolved_url": "https://ir.cwi.nl/pub/2078/2078D.pdf",
+      "bytes": 3673099,
+      "sha256": "f612bcaef988228861c852b357e23579bca0e954517256f1c41aaf63962abc66",
+      "executed": false,
+      "review_scope": "Alternate published version, sections 2-3; NFS filtering.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "flint_poly.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/poly.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/poly.c",
+      "bytes": 3631,
+      "sha256": "fa09b9d4adff805f0c67154c0fb50f27281f298d1fc89a738c43ca231b36bba7",
+      "executed": false,
+      "review_scope": "Per-family and per-worker root/cache allocation.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_compute_poly_data.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/compute_poly_data.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/compute_poly_data.c",
+      "bytes": 24576,
+      "sha256": "54b91ff047c63e2f817b59008ef5f1bbf06ef2c0d5401953f6c647ef6245f49e",
+      "executed": false,
+      "review_scope": "Distinct A-set selection, target bounds and schedule exhaustion.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_linalg.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/linalg.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/linalg.c",
+      "bytes": 5376,
+      "sha256": "3663128aa6abf201eaf8f8517578b6c77c7e8afa065b44ec29346ba5c2453901",
+      "executed": false,
+      "review_scope": "Matrix workspace initialization and cleanup.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "flint_primes_init.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/primes_init.c",
+      "resolved_url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/primes_init.c",
+      "bytes": 4746,
+      "sha256": "16f6740724b59058059ab761f49a63f337eefb90db6413fc8cfb39f624181b10",
+      "executed": false,
+      "review_scope": "Factor-base growth and cached residue roots.",
+      "upstream_code_executed": false,
+      "repository": "https://github.com/flintlib/flint",
+      "revision": "00cc19b350b5302876b4fa8c877df5a676c2061c",
+      "license_evidence": "LGPL-3.0-or-later file header."
+    },
+    {
+      "name": "cavallar_report.pdf",
+      "url": "https://ir.cwi.nl/pub/4456/04456D.pdf",
+      "resolved_url": "https://ir.cwi.nl/pub/4456/04456D.pdf",
+      "bytes": 314552,
+      "sha256": "2e511f1130d420143161357d50aaae129ebd51554270e3d09a61265e0c102dc5",
+      "executed": false,
+      "review_scope": "Primary CWI report, sections 2-3; NFS filtering.",
+      "upstream_code_executed": false
+    },
+    {
+      "name": "praxis.html",
+      "url": "https://programmingpraxis.com/2013/03/19/quadratic-sieve/",
+      "resolved_url": "https://programmingpraxis.com/2013/03/19/quadratic-sieve/",
+      "bytes": 120498,
+      "sha256": "3133120ad6c08bbd0e9af415d2f81771ae1c539415f84bb27b86a711f7c6b018",
+      "executed": false,
+      "review_scope": "Author exercise and thesis pointer; no speed evidence.",
+      "upstream_code_executed": false
+    }
+  ],
+  "unavailable_requests": [
+    {
+      "name": "contini.pdf",
+      "url": "https://www.crypto-world.com/documents/contini_siqs.pdf",
+      "error": "Remote end closed connection without response"
+    },
+    {
+      "name": "flint_init_A.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/init_A.c",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "name": "flint_next_A.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/next_A.c",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "name": "flint_next_B.c",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/src/qsieve/next_B.c",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "name": "flint_license.txt",
+      "url": "https://raw.githubusercontent.com/flintlib/flint/00cc19b350b5302876b4fa8c877df5a676c2061c/LICENSE",
+      "error": "HTTP Error 404: Not Found"
+    }
+  ],
+  "pdf_text_extraction": {
+    "runtime": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]",
+    "library": "pypdf 6.10.0",
+    "method": "Pure Python bundled pypdf imported on PyPy Python 3.11.",
+    "package_path": "/Users/nishanthmohan/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/pypdf",
+    "scope": "Text only; no new dependency installed for Factor."
+  },
+  "evidence_limits": [
+    "Targeted source review, not a full upstream correctness audit.",
+    "No native executable, upstream Python collector or benchmark ran.",
+    "Historical speedups and native thresholds are not Factor results.",
+    "Contini thesis request failed; no unread text supports findings.",
+    "GF(2) filtering transfer from NFS to QS is an engineering inference."
+  ],
+  "retention": "Only URLs, revision, sizes, digests and review scopes retained. Task-owned downloads and extracted text removed after verification."
+}

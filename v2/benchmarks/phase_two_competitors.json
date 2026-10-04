@@ -1,0 +1,47 @@
+{
+  "retrieved_date": "2026-10-03",
+  "competitors": [
+    {
+      "repository": "https://github.com/sympy/sympy",
+      "revision": "06fdc356176f6ae82c865a365701f64c5ee67aa9",
+      "commit_date": "2026-10-03T17:27:38Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    },
+    {
+      "repository": "https://github.com/lucasaugustus/primefac",
+      "revision": "2401341d8689ea2ab517ef311f4f91ecd33d14d0",
+      "commit_date": "2023-06-23T05:50:23Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    },
+    {
+      "repository": "https://github.com/lucasaugustus/labmath3",
+      "revision": "6b5195b1417e1165f7ea746d4e037f3e99dc4ffd",
+      "commit_date": "2025-06-27T09:30:00Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    },
+    {
+      "repository": "https://github.com/skollmann/PyFactorise",
+      "revision": "e96079fea53bb279fe520b3e530c368333ac548f",
+      "commit_date": "2026-08-26T22:28:33Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    },
+    {
+      "repository": "https://github.com/ini/numthy",
+      "revision": "1496df97faec010c909e54e14d6bf9cc4399e5fe",
+      "commit_date": "2026-07-18T16:44:47Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    },
+    {
+      "repository": "https://github.com/sbaresearch/smoothsubsumsearch",
+      "revision": "8dbaf6d39ab88a40380965d25ec2c363d7f27358",
+      "commit_date": "2024-06-06T10:55:49Z",
+      "executed": false,
+      "status": "pinned; competitor execution is a separate comparison arm"
+    }
+  ]
+}

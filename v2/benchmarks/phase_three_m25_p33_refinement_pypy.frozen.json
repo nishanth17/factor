@@ -1,0 +1,29 @@
+{
+  "training_seed": 329,
+  "held_out_seed": 334,
+  "held_out_count": 16,
+  "config": {
+    "block_width": 256,
+    "metadata_chunk": 64,
+    "score_backend": "list",
+    "marking": "sparse",
+    "division": "bucket",
+    "small_prime_cutoff": 0,
+    "threshold_extra": 0,
+    "score_policy": "adaptive",
+    "residual_bound": 1,
+    "max_partials": 4096,
+    "max_relations": 4096,
+    "max_atoms": 4096,
+    "memory_bytes": 33554432
+  },
+  "winner": "training_adaptive_bucket",
+  "controls": {
+    "weight_two": true,
+    "pivot": "highest",
+    "row_excess": 2,
+    "batch_width": 256
+  },
+  "filter_winner": "filter_True_highest_2_256",
+  "freeze_unix": 1791089535.021489
+}

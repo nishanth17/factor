@@ -1,0 +1,130 @@
+{
+  "milestone": "M17",
+  "status": "core exit passed; baseline frozen; P2.1-P2.7 experiment gates remain open",
+  "runtime": "PyPy implementing Python 3.11",
+  "production_defaults": {
+    "trial_bound": 25000,
+    "rho_attempts": 4,
+    "rho_evaluations": 5000,
+    "rho_batch": 64,
+    "recovery_limit": 128,
+    "pm1_attempts": 1,
+    "pm1_b1": 2000,
+    "pm1_b2": 200000,
+    "ecm_tiers": [
+      [
+        2000,
+        147396,
+        32
+      ]
+    ],
+    "chunk_size": 16,
+    "gcd_batch": 128,
+    "primality_rounds": 30,
+    "fermat_steps": 0,
+    "memory_bytes": 8388608,
+    "segment_size": 1024,
+    "trial_chunk": 64,
+    "schedule_cache_bytes": 0,
+    "max_input_bits": 4096,
+    "trace_limit": 256,
+    "rolling": false
+  },
+  "evaluation_config": {
+    "trial_bound": 25000,
+    "rho_attempts": 4,
+    "rho_evaluations": 5000,
+    "rho_batch": 64,
+    "recovery_limit": 128,
+    "pm1_attempts": 1,
+    "pm1_b1": 2000,
+    "pm1_b2": 200000,
+    "ecm_tiers": [
+      [
+        2000,
+        147396,
+        2
+      ]
+    ],
+    "chunk_size": 16,
+    "gcd_batch": 128,
+    "primality_rounds": 30,
+    "fermat_steps": 0,
+    "memory_bytes": 8388608,
+    "segment_size": 1024,
+    "trial_chunk": 64,
+    "schedule_cache_bytes": 0,
+    "max_input_bits": 512,
+    "trace_limit": 256,
+    "rolling": false
+  },
+  "decisions": {
+    "trial_bound": "retain 25000; no held-out cutoff promotion",
+    "rho_batch": "retain 64; small training differences are inconclusive",
+    "ecm_tiers": "retain 2000/147396; larger training tiers are not promoted",
+    "chunk_size": "retain 16; validate recovery/resume, no retuning",
+    "cache": "off; warm utility gain did not improve training factoring",
+    "rolling": "off; training factoring regressed",
+    "sieve": "retain wheel-6/bytearray; alternatives lack broad end-to-end evidence",
+    "parallel": "serial; throughput gains do not establish first-factor benefit",
+    "bounded_api": "opt-in; no API default switch"
+  },
+  "production_source_sha256": {
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/budget.py": "eb8732955b53fba2fd048da8dd6d3b65a34c1953cc1649c61ecc242bab1baa4e",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm.py": "fa7f65a7feaf6d938d44505a18bc37e479e2226cc9ca7144a72d0e567e756de4",
+    "v2/factor.py": "b455b48185de9a102388b0de265f239c5eb5ef48c7de749ab6f35dcb3f35fcbe",
+    "v2/pollard_pm1.py": "23ae23b248e8817e4d60ea27c267b6972ed1380193e0a490ec5272e65bda5772",
+    "v2/pollard_rho.py": "a7223faf77f9fca48e2bff8b09040e40401dea0a6533e89e75eb4c536052f396",
+    "v2/portfolio.py": "193a46eec9855608cba58ba5421de0db234a0afb59b2a2a860b8b8bf162175b8",
+    "v2/preprocessing.py": "984ce0bb52b89b8391b76308c19d0dff6f068792151b01d5a0e935187365b378",
+    "v2/prime_sieve.py": "23cdc061a3c85987ac21f29ce7d01d9a07945801aa107b442ffb70d685777769",
+    "v2/schedules.py": "3d9b324565d6879af4a405b1cf6fab618abb1968f7397b529d6fbf75ef751fa7",
+    "v2/stage_jobs.py": "0c66eb30fa09285fab24c2c2841bcf9b1fd253c196dad624e49d7e0d9c987a4e",
+    "v2/utils.py": "6d6f7afe11efedd12a27c52cf82cbe5dbd6133b08a8fbc4336576c5cc58cbb53"
+  },
+  "fresh_corpus_sha256": "95093ba39f86ced719b3f44e936a6cd879701c3cf902a8babf7c6674a2d20ffe",
+  "fresh_input_count": 120,
+  "fresh_overlap_previous_inputs": 0,
+  "acceptance_evidence": "v2/audit/phase_two_m17_final_validation_pypy.json",
+  "confirmation_evidence": "v2/audit/phase_two_m17_final_independent_summary.json",
+  "control_evidence": "v2/audit/phase_two_m17_controls_summary.json",
+  "retained_utility_evidence": "v2/benchmarks/phase_two_m13_final_batch_controls_pypy.json",
+  "historical_training_evidence": "v2/benchmarks/phase_two_m12_infrastructure_pypy.json",
+  "parallel_decision_evidence": "v2/benchmarks/phase_two_m14_final_parallel_pypy.json.gz",
+  "measurement_runner_sha256": "f75935ba5bd8916f2149f779122a337ec4bdaf65306c1d030bf855a7a7ad7e43",
+  "runner_snapshot": "v2/audit/phase_two_m17_runner_snapshot.json",
+  "scope": {
+    "no_parameter_or_api_default_change": true,
+    "core_exit_distinct_from_remaining_tuning_gates": true,
+    "production_curve_default": 32,
+    "evaluation_curves": 2,
+    "modest_power_timing_gain_not_promoted_due_to_early_drift": true,
+    "competitors_pinned_not_executed": true
+  },
+  "commands": [
+    "make -C v2 validate MILESTONE=phase_two_m17_final VALIDATION_OUTPUT=audit/phase_two_m17_final_validation_pypy.json",
+    "make -C v2 lint",
+    "PYTHONDONTWRITEBYTECODE=1 pypy3 -u -m v2.benchmarks.phase_two --corpus v2/benchmarks/phase_two_m15_independent_corpus.json --engines m12,bounded --modes complete,factor_one --seeds 5 --repetitions 9 --warmup-seconds 10 --warmup-scope corpus --seconds 0.05 --cpu-seconds 0.05 --curves 2 --output v2/benchmarks/phase_two_m17_final_independent_pypy.json",
+    "PYTHONDONTWRITEBYTECODE=1 pypy3 -u -m v2.benchmarks.phase_two --engines m12,bounded --modes complete,factor_one --bands primes,close_small,pm1_boundaries,pp1_boundaries,pseudoprimes --seeds 5 --repetitions 9 --warmup-seconds 10 --warmup-scope corpus --seconds 0.05 --cpu-seconds 0.05 --curves 2 --output v2/benchmarks/phase_two_m17_controls_pypy.json",
+    "PYTHONDONTWRITEBYTECODE=1 pypy3 -u -m v2.benchmarks.phase_two --engines bounded --modes complete,factor_one --bands balanced_20d,balanced_30d,balanced_40d,balanced_50d,balanced_60d,balanced_70d,balanced_80d,unbalanced_60d_small_5d,unbalanced_60d_small_10d,unbalanced_60d_small_20d,unbalanced_60d_small_30d,unbalanced_100d_small_5d,unbalanced_100d_small_10d,unbalanced_100d_small_20d,unbalanced_100d_small_30d --seeds 5 --repetitions 1 --warmup-seconds 10 --warmup-scope corpus --seconds 0.05 --cpu-seconds 0.05 --curves 2 --output v2/benchmarks/phase_two_m17_feasibility_pypy.json",
+    "PYTHONDONTWRITEBYTECODE=1 pypy3 -m v2.audit.phase_two_m17_analysis v2/benchmarks/phase_two_m17_final_independent_pypy.json.gz --output v2/audit/phase_two_m17_final_independent_summary.json",
+    "PYTHONDONTWRITEBYTECODE=1 pypy3 -m v2.audit.phase_two_m17_analysis v2/benchmarks/phase_two_m17_controls_pypy.json.gz --output v2/audit/phase_two_m17_controls_summary.json"
+  ],
+  "feasibility_evidence": "v2/audit/phase_two_m17_feasibility_summary.json",
+  "final_sample_count": 32470,
+  "remaining_gates": {
+    "P2.1": "held-out cutoff tuning and preprocessing-cost optimization",
+    "P2.2": "held-out rho/ECM tier/B2/curve calibration",
+    "P2.3": "broad cold/warm cache/RSS/disk promotion evidence",
+    "P2.4": "checkpoint/replay frequency and cost tuning",
+    "P2.5": "broad repeated evaluation and external competitor runs",
+    "P2.6": "broader rolling/context promotion evidence",
+    "P2.7": "broader wheel/pre-sieve/packing promotion evidence"
+  },
+  "completed_probe": "P2.8 early feasibility passed; retain serial",
+  "reconstruction_failures": 0,
+  "measured_memory_failures": 0,
+  "maximum_process_rss_bytes": 119783424
+}
