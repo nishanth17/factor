@@ -24,7 +24,12 @@ def peek_prime(cursor, context, budget):
             return None
         right = min(cursor["hi"], left + 2 * context.segment_size)
         budget.consume(context.segment_size + len(context.base_primes))
-        values = list(context.primes(left, right))
+        segment = getattr(context, "prime_segment", None)
+        values = (
+            list(context.primes(left, right))
+            if segment is None
+            else segment(left, right)
+        )
         cursor.update(left=left, next=right, values=values, index=0)
     return cursor["values"][cursor["index"]]
 

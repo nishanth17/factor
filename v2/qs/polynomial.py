@@ -26,6 +26,7 @@ class Polynomial:
 
     A is positive; B may be negative. C is derived only after checking
     divisibility. Immutable identities encode n,h,A,B in hexadecimal.
+    square_coefficient records a known square factor of A, defaulting to 1.
     No floating-point approximation or primality assertion is made.
     """
 
@@ -33,6 +34,7 @@ class Polynomial:
     multiplier: int
     a: int
     b: int
+    square_coefficient: int = 1
     c: int = field(init=False)
     identity: str = field(init=False)
 
@@ -45,6 +47,11 @@ class Polynomial:
             MAX_COEFFICIENT_BITS
         ):
             raise ValueError("polynomial coefficient exceeds the bit limit")
+        utils.require_integer(self.square_coefficient, "square_coefficient", 1)
+        if self.square_coefficient.bit_length() > MAX_COEFFICIENT_BITS:
+            raise ValueError("square coefficient exceeds the bit limit")
+        if self.a % (self.square_coefficient * self.square_coefficient):
+            raise ValueError("square coefficient squared must divide A")
         quotient, remainder = divmod(self.b * self.b - target, self.a)
         if remainder:
             raise ValueError("B*B-h*n must be divisible by A")
@@ -52,6 +59,8 @@ class Polynomial:
         encoded = ":".join(
             hex(value) for value in (self.n, self.multiplier, self.a, self.b)
         )
+        if self.square_coefficient != 1:
+            encoded += ":square:" + hex(self.square_coefficient)
         object.__setattr__(
             self, "identity", hashlib.sha256(encoded.encode()).hexdigest()
         )
@@ -60,6 +69,11 @@ class Polynomial:
     def n_prime(self):
         """Return h*n as an exact integer."""
         return self.n * self.multiplier
+
+    @property
+    def supported_a(self):
+        """A after removing the explicitly represented square coefficient."""
+        return self.a // (self.square_coefficient * self.square_coefficient)
 
     def value(self, position):
         """Evaluate normalized F at a signed integer position."""
@@ -95,7 +109,7 @@ def qs_polynomial(factor_base):
     return Polynomial(factor_base.n, factor_base.multiplier, 1, center)
 
 
-def mpqs_polynomial(factor_base, half_width, *, budget=None):
+def mpqs_polynomial(factor_base, half_width, *, budget=None, prime=None):
     """Choose A=q squared nearest the integer target and lift B modulo A.
 
     q is an odd factor-base prime not dividing h*n. Lift a cached root r
@@ -114,10 +128,16 @@ def mpqs_polynomial(factor_base, half_width, *, budget=None):
     ]
     if not eligible:
         raise ValueError("MPQS requires an odd nonsingular factor-base prime")
-    entry = min(
-        eligible,
-        key=lambda item: (abs(item.prime**2 - target), item.prime),
-    )
+    if prime is None:
+        entry = min(
+            eligible,
+            key=lambda item: (abs(item.prime**2 - target), item.prime),
+        )
+    else:
+        utils.require_integer(prime, "MPQS prime", 3)
+        entry = next((item for item in eligible if item.prime == prime), None)
+        if entry is None:
+            raise ValueError("MPQS prime must be a nonsingular base member")
     prime, root = entry.prime, entry.square_roots[0]
     budget.consume(factor_base.n_prime.bit_length() + prime.bit_length() ** 2)
     inverse = utils.modular_inverse(2 * root, prime)

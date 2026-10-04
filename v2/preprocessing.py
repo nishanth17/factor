@@ -4,6 +4,32 @@ from math import isqrt
 
 from . import utils
 
+# For prime exponent k, each listed prime q has k | q-1. Nonzero kth
+# powers modulo q lie in the kernel of z -> z**((q-1)//k). Passing is
+# only a necessary condition; the exact integer-root test remains decisive.
+_POWER_MODULI = {
+    2: 5,
+    3: 7,
+    5: 11,
+    7: 29,
+    11: 23,
+    13: 53,
+    17: 103,
+    19: 191,
+    23: 47,
+    29: 59,
+    31: 311,
+    37: 149,
+}
+
+
+def power_residue_possible(n, exponent):
+    """Reject impossible powers with a fixed, exact small-prime screen."""
+    modulus = _POWER_MODULI.get(exponent)
+    return modulus is None or pow(
+        n % modulus, (modulus - 1) // exponent, modulus
+    ) in (0, 1)
+
 
 def integer_root(n, exponent):
     """Return floor(n**(1/exponent)) by integer Newton iteration."""
@@ -11,6 +37,8 @@ def integer_root(n, exponent):
     utils.require_integer(exponent, "exponent", 1)
     if n < 2 or exponent == 1:
         return n
+    if exponent == 2:
+        return isqrt(n)
     if exponent >= n.bit_length():
         return 1
     estimate = 1 << ((n.bit_length() + exponent - 1) // exponent)

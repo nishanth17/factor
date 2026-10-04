@@ -1,0 +1,4421 @@
+{
+  "schema": 1,
+  "seed": 30342026,
+  "fixtures": [
+    {
+      "id": "small_training_0",
+      "split": "training",
+      "band": "small",
+      "n": 27388217,
+      "factors": [
+        3881,
+        7057
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_training_1",
+      "split": "training",
+      "band": "small",
+      "n": 47410241,
+      "factors": [
+        6221,
+        7621
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_training_2",
+      "split": "training",
+      "band": "small",
+      "n": 34873183,
+      "factors": [
+        5237,
+        6659
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_training_3",
+      "split": "training",
+      "band": "small",
+      "n": 26573959,
+      "factors": [
+        3457,
+        7687
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_training_4",
+      "split": "training",
+      "band": "small",
+      "n": 30021419,
+      "factors": [
+        4733,
+        6343
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_training_5",
+      "split": "training",
+      "band": "small",
+      "n": 31224181,
+      "factors": [
+        5167,
+        6043
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_training_6",
+      "split": "training",
+      "band": "small",
+      "n": 21315839,
+      "factors": [
+        4451,
+        4789
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_training_7",
+      "split": "training",
+      "band": "small",
+      "n": 21763367,
+      "factors": [
+        3307,
+        6581
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_training_8",
+      "split": "training",
+      "band": "small",
+      "n": 49371457,
+      "factors": [
+        6779,
+        7283
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_training_9",
+      "split": "training",
+      "band": "small",
+      "n": 24662333,
+      "factors": [
+        3929,
+        6277
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_training_10",
+      "split": "training",
+      "band": "small",
+      "n": 28620497,
+      "factors": [
+        4289,
+        6673
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_training_11",
+      "split": "training",
+      "band": "small",
+      "n": 25205701,
+      "factors": [
+        3727,
+        6763
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_0",
+      "split": "held_out",
+      "band": "small",
+      "n": 39512791,
+      "factors": [
+        5197,
+        7603
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_1",
+      "split": "held_out",
+      "band": "small",
+      "n": 45104693,
+      "factors": [
+        6101,
+        7393
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_2",
+      "split": "held_out",
+      "band": "small",
+      "n": 24685273,
+      "factors": [
+        3803,
+        6491
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_3",
+      "split": "held_out",
+      "band": "small",
+      "n": 32473307,
+      "factors": [
+        4957,
+        6551
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_held_out_4",
+      "split": "held_out",
+      "band": "small",
+      "n": 49439573,
+      "factors": [
+        6229,
+        7937
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_5",
+      "split": "held_out",
+      "band": "small",
+      "n": 29344657,
+      "factors": [
+        4339,
+        6763
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_6",
+      "split": "held_out",
+      "band": "small",
+      "n": 14982823,
+      "factors": [
+        2657,
+        5639
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_7",
+      "split": "held_out",
+      "band": "small",
+      "n": 15085349,
+      "factors": [
+        2131,
+        7079
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_8",
+      "split": "held_out",
+      "band": "small",
+      "n": 35578481,
+      "factors": [
+        5431,
+        6551
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_9",
+      "split": "held_out",
+      "band": "small",
+      "n": 11175271,
+      "factors": [
+        2063,
+        5417
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_10",
+      "split": "held_out",
+      "band": "small",
+      "n": 59488433,
+      "factors": [
+        7669,
+        7757
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_11",
+      "split": "held_out",
+      "band": "small",
+      "n": 18914657,
+      "factors": [
+        3583,
+        5279
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_12",
+      "split": "held_out",
+      "band": "small",
+      "n": 28518037,
+      "factors": [
+        3889,
+        7333
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_13",
+      "split": "held_out",
+      "band": "small",
+      "n": 17965859,
+      "factors": [
+        2339,
+        7681
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_held_out_14",
+      "split": "held_out",
+      "band": "small",
+      "n": 40290161,
+      "factors": [
+        5783,
+        6967
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_15",
+      "split": "held_out",
+      "band": "small",
+      "n": 17230303,
+      "factors": [
+        2719,
+        6337
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_16",
+      "split": "held_out",
+      "band": "small",
+      "n": 47941417,
+      "factors": [
+        6619,
+        7243
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_17",
+      "split": "held_out",
+      "band": "small",
+      "n": 11347337,
+      "factors": [
+        2243,
+        5059
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_18",
+      "split": "held_out",
+      "band": "small",
+      "n": 14402263,
+      "factors": [
+        3301,
+        4363
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_19",
+      "split": "held_out",
+      "band": "small",
+      "n": 19935827,
+      "factors": [
+        2467,
+        8081
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_held_out_20",
+      "split": "held_out",
+      "band": "small",
+      "n": 33565583,
+      "factors": [
+        5399,
+        6217
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_21",
+      "split": "held_out",
+      "band": "small",
+      "n": 33734321,
+      "factors": [
+        4211,
+        8011
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "small_held_out_22",
+      "split": "held_out",
+      "band": "small",
+      "n": 38520773,
+      "factors": [
+        5569,
+        6917
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_23",
+      "split": "held_out",
+      "band": "small",
+      "n": 49691909,
+      "factors": [
+        6823,
+        7283
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_24",
+      "split": "held_out",
+      "band": "small",
+      "n": 17293279,
+      "factors": [
+        4049,
+        4271
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_25",
+      "split": "held_out",
+      "band": "small",
+      "n": 39377669,
+      "factors": [
+        5197,
+        7577
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "small_held_out_26",
+      "split": "held_out",
+      "band": "small",
+      "n": 18931667,
+      "factors": [
+        2341,
+        8087
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_held_out_27",
+      "split": "held_out",
+      "band": "small",
+      "n": 16530167,
+      "factors": [
+        2131,
+        7757
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_28",
+      "split": "held_out",
+      "band": "small",
+      "n": 38245303,
+      "factors": [
+        4987,
+        7669
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_29",
+      "split": "held_out",
+      "band": "small",
+      "n": 11671487,
+      "factors": [
+        2131,
+        5477
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "small_held_out_30",
+      "split": "held_out",
+      "band": "small",
+      "n": 27714611,
+      "factors": [
+        4219,
+        6569
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "small_held_out_31",
+      "split": "held_out",
+      "band": "small",
+      "n": 28696069,
+      "factors": [
+        4507,
+        6367
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced30_training_r1",
+      "split": "training",
+      "band": "balanced_30d",
+      "n": 814547750255196213531886088089,
+      "factors": [
+        872118279962179,
+        933987704386291
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced40_training_r1",
+      "split": "training",
+      "band": "balanced_40d",
+      "n": 3988175796602531480961795163067217268321,
+      "factors": [
+        60137433590684755961,
+        66317691967824462761
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced50_training_r1",
+      "split": "training",
+      "band": "balanced_50d",
+      "n": 69309456689516870146466858381857210827449518352713,
+      "factors": [
+        7846483287463018432094153,
+        8833187321033153384283521
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced60_training_r1",
+      "split": "training",
+      "band": "balanced_60d",
+      "n": 804665604806514465652119444060368994918651177518055112231393,
+      "factors": [
+        880598158563144359901484578467,
+        913771618736373886808290097579
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced70_training_r1",
+      "split": "training",
+      "band": "balanced_70d",
+      "n": 3915758828450604783255300717132894557215756502493283480359842170109737,
+      "factors": [
+        50281553795654690874878677060589467,
+        77876647256453775086254867185756811
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced80_training_r1",
+      "split": "training",
+      "band": "balanced_80d",
+      "n": 54948131857155902357447537562898438243086081998864826210403273781038313798556073,
+      "factors": [
+        6696347143332826314276742714761837678713,
+        8205687471245370834605504497091742508721
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced30_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_30d",
+      "n": 738102721882856532495332348593,
+      "factors": [
+        673558376212811,
+        1095825911976563
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced30_held_out_r3",
+      "split": "held_out",
+      "band": "balanced_30d",
+      "n": 633525052265093391550333470763,
+      "factors": [
+        620646347614001,
+        1020750471988763
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "balanced30_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_30d",
+      "n": 755730369309180147070843927141,
+      "factors": [
+        701256947659519,
+        1077679689066139
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced30_held_out_r7",
+      "split": "held_out",
+      "band": "balanced_30d",
+      "n": 989966137883360246241030038519,
+      "factors": [
+        959381322777607,
+        1031879727465617
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "balanced40_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_40d",
+      "n": 3200690967662350840618124246768146703497,
+      "factors": [
+        45460161956501198609,
+        70406501646979376633
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced40_held_out_r3",
+      "split": "held_out",
+      "band": "balanced_40d",
+      "n": 3480997009118181342747450391841479688267,
+      "factors": [
+        53573361775008361423,
+        64976266073002809029
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "balanced40_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_40d",
+      "n": 3187506454328144992406036033152778635141,
+      "factors": [
+        45165247345649866847,
+        70574316352883931803
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced40_held_out_r7",
+      "split": "held_out",
+      "band": "balanced_40d",
+      "n": 1769409551548108585028283965973803111359,
+      "factors": [
+        38753172860000533307,
+        45658443450301897037
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "balanced50_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_50d",
+      "n": 33734694456026528804535308118687760465466444581609,
+      "factors": [
+        4968474454594665231680681,
+        6789748999278823934721089
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced50_held_out_r3",
+      "split": "held_out",
+      "band": "balanced_50d",
+      "n": 72980563913358761025556172051909711338614231998467,
+      "factors": [
+        8119491074343131924151283,
+        8988317524477714862563249
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "balanced50_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_50d",
+      "n": 50582627409922335509697442146781344118339631062013,
+      "factors": [
+        6006433426979417026932377,
+        8421408149255039287864069
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced50_held_out_r7",
+      "split": "held_out",
+      "band": "balanced_50d",
+      "n": 58635241869967531616951193446124106180462444202407,
+      "factors": [
+        7118001925615226556596237,
+        8237598483776687411777411
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "balanced60_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_60d",
+      "n": 927472221712649895745662982348779415003758443313759877810993,
+      "factors": [
+        819157623922430034346562187871,
+        1132226807914659279723073948783
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced60_held_out_r3",
+      "split": "held_out",
+      "band": "balanced_60d",
+      "n": 867005594358110622406432613654435734898377879275390329972867,
+      "factors": [
+        764694834519702525911563540637,
+        1133792926563533675723380517791
+      ],
+      "residue8": 3
+    },
+    {
+      "id": "balanced60_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_60d",
+      "n": 656165217841226659246426398566994516047210277673278222223861,
+      "factors": [
+        636877875053341547061672499337,
+        1030284209176319252126241207053
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced60_held_out_r7",
+      "split": "held_out",
+      "band": "balanced_60d",
+      "n": 579188511344666609425806075909141429019340895792947641166047,
+      "factors": [
+        709943904428321299378301262353,
+        815822923095670774212133282799
+      ],
+      "residue8": 7
+    },
+    {
+      "id": "balanced70_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_70d",
+      "n": 4228480482704680361035654452936854035285922496333138030748790832748537,
+      "factors": [
+        53573169105029492548355123389995667,
+        78929071274742027258767281080188611
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced70_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_70d",
+      "n": 3763978109020143200831404952129991986472422420059883443776190994169149,
+      "factors": [
+        50487587012391760024480688071010323,
+        74552545125523744131832785718775663
+      ],
+      "residue8": 5
+    },
+    {
+      "id": "balanced80_held_out_r1",
+      "split": "held_out",
+      "band": "balanced_80d",
+      "n": 56352277273606739022847424353525899157108383496695141556871780388393576647286833,
+      "factors": [
+        6490989941186578994793310008291332372653,
+        8681615251941881260104981471276614935061
+      ],
+      "residue8": 1
+    },
+    {
+      "id": "balanced80_held_out_r5",
+      "split": "held_out",
+      "band": "balanced_80d",
+      "n": 75524395986798797355525989598213543648723397691482515344987878092396020950945381,
+      "factors": [
+        8638964065604755333599479933249875508779,
+        8742297735383836924449338979081868357039
+      ],
+      "residue8": 5
+    }
+  ],
+  "certificates": {
+    "3881": {
+      "kind": "trial"
+    },
+    "7057": {
+      "kind": "trial"
+    },
+    "6221": {
+      "kind": "trial"
+    },
+    "7621": {
+      "kind": "trial"
+    },
+    "5237": {
+      "kind": "trial"
+    },
+    "6659": {
+      "kind": "trial"
+    },
+    "3457": {
+      "kind": "trial"
+    },
+    "7687": {
+      "kind": "trial"
+    },
+    "4733": {
+      "kind": "trial"
+    },
+    "6343": {
+      "kind": "trial"
+    },
+    "5167": {
+      "kind": "trial"
+    },
+    "6043": {
+      "kind": "trial"
+    },
+    "4789": {
+      "kind": "trial"
+    },
+    "4451": {
+      "kind": "trial"
+    },
+    "3307": {
+      "kind": "trial"
+    },
+    "6581": {
+      "kind": "trial"
+    },
+    "6779": {
+      "kind": "trial"
+    },
+    "7283": {
+      "kind": "trial"
+    },
+    "3929": {
+      "kind": "trial"
+    },
+    "6277": {
+      "kind": "trial"
+    },
+    "6673": {
+      "kind": "trial"
+    },
+    "4289": {
+      "kind": "trial"
+    },
+    "3727": {
+      "kind": "trial"
+    },
+    "6763": {
+      "kind": "trial"
+    },
+    "5197": {
+      "kind": "trial"
+    },
+    "7603": {
+      "kind": "trial"
+    },
+    "7393": {
+      "kind": "trial"
+    },
+    "6101": {
+      "kind": "trial"
+    },
+    "3803": {
+      "kind": "trial"
+    },
+    "6491": {
+      "kind": "trial"
+    },
+    "6551": {
+      "kind": "trial"
+    },
+    "4957": {
+      "kind": "trial"
+    },
+    "7937": {
+      "kind": "trial"
+    },
+    "6229": {
+      "kind": "trial"
+    },
+    "4339": {
+      "kind": "trial"
+    },
+    "2657": {
+      "kind": "trial"
+    },
+    "5639": {
+      "kind": "trial"
+    },
+    "2131": {
+      "kind": "trial"
+    },
+    "7079": {
+      "kind": "trial"
+    },
+    "5431": {
+      "kind": "trial"
+    },
+    "2063": {
+      "kind": "trial"
+    },
+    "5417": {
+      "kind": "trial"
+    },
+    "7757": {
+      "kind": "trial"
+    },
+    "7669": {
+      "kind": "trial"
+    },
+    "3583": {
+      "kind": "trial"
+    },
+    "5279": {
+      "kind": "trial"
+    },
+    "3889": {
+      "kind": "trial"
+    },
+    "7333": {
+      "kind": "trial"
+    },
+    "2339": {
+      "kind": "trial"
+    },
+    "7681": {
+      "kind": "trial"
+    },
+    "6967": {
+      "kind": "trial"
+    },
+    "5783": {
+      "kind": "trial"
+    },
+    "2719": {
+      "kind": "trial"
+    },
+    "6337": {
+      "kind": "trial"
+    },
+    "6619": {
+      "kind": "trial"
+    },
+    "7243": {
+      "kind": "trial"
+    },
+    "2243": {
+      "kind": "trial"
+    },
+    "5059": {
+      "kind": "trial"
+    },
+    "3301": {
+      "kind": "trial"
+    },
+    "4363": {
+      "kind": "trial"
+    },
+    "2467": {
+      "kind": "trial"
+    },
+    "8081": {
+      "kind": "trial"
+    },
+    "5399": {
+      "kind": "trial"
+    },
+    "6217": {
+      "kind": "trial"
+    },
+    "8011": {
+      "kind": "trial"
+    },
+    "4211": {
+      "kind": "trial"
+    },
+    "5569": {
+      "kind": "trial"
+    },
+    "6917": {
+      "kind": "trial"
+    },
+    "6823": {
+      "kind": "trial"
+    },
+    "4049": {
+      "kind": "trial"
+    },
+    "4271": {
+      "kind": "trial"
+    },
+    "7577": {
+      "kind": "trial"
+    },
+    "2341": {
+      "kind": "trial"
+    },
+    "8087": {
+      "kind": "trial"
+    },
+    "4987": {
+      "kind": "trial"
+    },
+    "5477": {
+      "kind": "trial"
+    },
+    "6569": {
+      "kind": "trial"
+    },
+    "4219": {
+      "kind": "trial"
+    },
+    "6367": {
+      "kind": "trial"
+    },
+    "4507": {
+      "kind": "trial"
+    },
+    "22541": {
+      "kind": "trial"
+    },
+    "134028787": {
+      "kind": "pocklington",
+      "q": 22541,
+      "witness": 2
+    },
+    "589360496153917": {
+      "kind": "pocklington",
+      "q": 134028787,
+      "witness": 2
+    },
+    "31741": {
+      "kind": "trial"
+    },
+    "118076521": {
+      "kind": "pocklington",
+      "q": 31741,
+      "witness": 2
+    },
+    "597672413253499": {
+      "kind": "pocklington",
+      "q": 118076521,
+      "witness": 2
+    },
+    "16703": {
+      "kind": "trial"
+    },
+    "128512883": {
+      "kind": "pocklington",
+      "q": 16703,
+      "witness": 2
+    },
+    "1080383646958997": {
+      "kind": "pocklington",
+      "q": 128512883,
+      "witness": 2
+    },
+    "26267": {
+      "kind": "trial"
+    },
+    "118569239": {
+      "kind": "pocklington",
+      "q": 26267,
+      "witness": 2
+    },
+    "642365689114439": {
+      "kind": "pocklington",
+      "q": 118569239,
+      "witness": 2
+    },
+    "17231": {
+      "kind": "trial"
+    },
+    "112725203": {
+      "kind": "pocklington",
+      "q": 17231,
+      "witness": 2
+    },
+    "608723536063399": {
+      "kind": "pocklington",
+      "q": 112725203,
+      "witness": 2
+    },
+    "30271": {
+      "kind": "trial"
+    },
+    "119873161": {
+      "kind": "pocklington",
+      "q": 30271,
+      "witness": 2
+    },
+    "750369546419057": {
+      "kind": "pocklington",
+      "q": 119873161,
+      "witness": 2
+    },
+    "22343": {
+      "kind": "trial"
+    },
+    "118507273": {
+      "kind": "pocklington",
+      "q": 22343,
+      "witness": 2
+    },
+    "1057923432623749": {
+      "kind": "pocklington",
+      "q": 118507273,
+      "witness": 2
+    },
+    "19991": {
+      "kind": "trial"
+    },
+    "71008033": {
+      "kind": "pocklington",
+      "q": 19991,
+      "witness": 2
+    },
+    "1046490117381791": {
+      "kind": "pocklington",
+      "q": 71008033,
+      "witness": 2
+    },
+    "27367": {
+      "kind": "trial"
+    },
+    "128077561": {
+      "kind": "pocklington",
+      "q": 27367,
+      "witness": 2
+    },
+    "872118279962179": {
+      "kind": "pocklington",
+      "q": 128077561,
+      "witness": 2
+    },
+    "30119": {
+      "kind": "trial"
+    },
+    "87706529": {
+      "kind": "pocklington",
+      "q": 30119,
+      "witness": 2
+    },
+    "933987704386291": {
+      "kind": "pocklington",
+      "q": 87706529,
+      "witness": 2
+    },
+    "1913": {
+      "kind": "trial"
+    },
+    "505033": {
+      "kind": "pocklington",
+      "q": 1913,
+      "witness": 2
+    },
+    "27752573417": {
+      "kind": "pocklington",
+      "q": 505033,
+      "witness": 2
+    },
+    "46891147071863789627": {
+      "kind": "pocklington",
+      "q": 27752573417,
+      "witness": 2
+    },
+    "1487": {
+      "kind": "trial"
+    },
+    "279557": {
+      "kind": "pocklington",
+      "q": 1487,
+      "witness": 2
+    },
+    "21450408611": {
+      "kind": "pocklington",
+      "q": 279557,
+      "witness": 2
+    },
+    "67227250715688452461": {
+      "kind": "pocklington",
+      "q": 21450408611,
+      "witness": 2
+    },
+    "1223": {
+      "kind": "trial"
+    },
+    "403591": {
+      "kind": "pocklington",
+      "q": 1223,
+      "witness": 2
+    },
+    "24384968221": {
+      "kind": "pocklington",
+      "q": 403591,
+      "witness": 2
+    },
+    "51874747448665435033": {
+      "kind": "pocklington",
+      "q": 24384968221,
+      "witness": 2
+    },
+    "2017": {
+      "kind": "trial"
+    },
+    "363061": {
+      "kind": "pocklington",
+      "q": 2017,
+      "witness": 2
+    },
+    "21822144467": {
+      "kind": "pocklington",
+      "q": 363061,
+      "witness": 2
+    },
+    "48223096348785072367": {
+      "kind": "pocklington",
+      "q": 21822144467,
+      "witness": 2
+    },
+    "1873": {
+      "kind": "trial"
+    },
+    "423299": {
+      "kind": "pocklington",
+      "q": 1873,
+      "witness": 2
+    },
+    "22554217319": {
+      "kind": "pocklington",
+      "q": 423299,
+      "witness": 2
+    },
+    "73747260862234124449": {
+      "kind": "pocklington",
+      "q": 22554217319,
+      "witness": 2
+    },
+    "1103": {
+      "kind": "trial"
+    },
+    "410317": {
+      "kind": "pocklington",
+      "q": 1103,
+      "witness": 2
+    },
+    "31356425141": {
+      "kind": "pocklington",
+      "q": 410317,
+      "witness": 2
+    },
+    "40646748109543815839": {
+      "kind": "pocklington",
+      "q": 31356425141,
+      "witness": 2
+    },
+    "1907": {
+      "kind": "trial"
+    },
+    "389029": {
+      "kind": "pocklington",
+      "q": 1907,
+      "witness": 2
+    },
+    "25244091811": {
+      "kind": "pocklington",
+      "q": 389029,
+      "witness": 2
+    },
+    "50994169786260364007": {
+      "kind": "pocklington",
+      "q": 25244091811,
+      "witness": 2
+    },
+    "1979": {
+      "kind": "trial"
+    },
+    "455171": {
+      "kind": "pocklington",
+      "q": 1979,
+      "witness": 2
+    },
+    "30573836071": {
+      "kind": "pocklington",
+      "q": 455171,
+      "witness": 2
+    },
+    "71090282042449724309": {
+      "kind": "pocklington",
+      "q": 30573836071,
+      "witness": 2
+    },
+    "1327": {
+      "kind": "trial"
+    },
+    "451181": {
+      "kind": "pocklington",
+      "q": 1327,
+      "witness": 2
+    },
+    "24345726761": {
+      "kind": "pocklington",
+      "q": 451181,
+      "witness": 2
+    },
+    "69753472236327222191": {
+      "kind": "pocklington",
+      "q": 24345726761,
+      "witness": 2
+    },
+    "1867": {
+      "kind": "trial"
+    },
+    "421943": {
+      "kind": "pocklington",
+      "q": 1867,
+      "witness": 2
+    },
+    "26815321537": {
+      "kind": "pocklington",
+      "q": 421943,
+      "witness": 2
+    },
+    "65522248368510926257": {
+      "kind": "pocklington",
+      "q": 26815321537,
+      "witness": 2
+    },
+    "1483": {
+      "kind": "trial"
+    },
+    "444901": {
+      "kind": "pocklington",
+      "q": 1483,
+      "witness": 2
+    },
+    "30754226527": {
+      "kind": "pocklington",
+      "q": 444901,
+      "witness": 2
+    },
+    "64127611968265374239": {
+      "kind": "pocklington",
+      "q": 30754226527,
+      "witness": 2
+    },
+    "1823": {
+      "kind": "trial"
+    },
+    "426583": {
+      "kind": "pocklington",
+      "q": 1823,
+      "witness": 2
+    },
+    "20298525473": {
+      "kind": "pocklington",
+      "q": 426583,
+      "witness": 2
+    },
+    "69529660633811079467": {
+      "kind": "pocklington",
+      "q": 20298525473,
+      "witness": 2
+    },
+    "1307": {
+      "kind": "trial"
+    },
+    "431311": {
+      "kind": "pocklington",
+      "q": 1307,
+      "witness": 2
+    },
+    "25079009407": {
+      "kind": "pocklington",
+      "q": 431311,
+      "witness": 2
+    },
+    "54284453766245302987": {
+      "kind": "pocklington",
+      "q": 25079009407,
+      "witness": 2
+    },
+    "1129": {
+      "kind": "trial"
+    },
+    "399667": {
+      "kind": "pocklington",
+      "q": 1129,
+      "witness": 2
+    },
+    "30597706187": {
+      "kind": "pocklington",
+      "q": 399667,
+      "witness": 2
+    },
+    "68634413905646072951": {
+      "kind": "pocklington",
+      "q": 30597706187,
+      "witness": 2
+    },
+    "1453": {
+      "kind": "trial"
+    },
+    "441713": {
+      "kind": "pocklington",
+      "q": 1453,
+      "witness": 2
+    },
+    "25332240551": {
+      "kind": "pocklington",
+      "q": 441713,
+      "witness": 2
+    },
+    "63376778150859428147": {
+      "kind": "pocklington",
+      "q": 25332240551,
+      "witness": 2
+    },
+    "1901": {
+      "kind": "trial"
+    },
+    "364993": {
+      "kind": "pocklington",
+      "q": 1901,
+      "witness": 2
+    },
+    "20837450371": {
+      "kind": "pocklington",
+      "q": 364993,
+      "witness": 2
+    },
+    "54549617054188548623": {
+      "kind": "pocklington",
+      "q": 20837450371,
+      "witness": 2
+    },
+    "1699": {
+      "kind": "trial"
+    },
+    "305821": {
+      "kind": "pocklington",
+      "q": 1699,
+      "witness": 2
+    },
+    "21644787097": {
+      "kind": "pocklington",
+      "q": 305821,
+      "witness": 2
+    },
+    "60339990946811295631": {
+      "kind": "pocklington",
+      "q": 21644787097,
+      "witness": 2
+    },
+    "2039": {
+      "kind": "trial"
+    },
+    "342553": {
+      "kind": "pocklington",
+      "q": 2039,
+      "witness": 2
+    },
+    "26436870329": {
+      "kind": "pocklington",
+      "q": 342553,
+      "witness": 2
+    },
+    "67671658325402790419": {
+      "kind": "pocklington",
+      "q": 26436870329,
+      "witness": 2
+    },
+    "1723": {
+      "kind": "trial"
+    },
+    "523793": {
+      "kind": "pocklington",
+      "q": 1723,
+      "witness": 2
+    },
+    "23734108417": {
+      "kind": "pocklington",
+      "q": 523793,
+      "witness": 2
+    },
+    "60137433590684755961": {
+      "kind": "pocklington",
+      "q": 23734108417,
+      "witness": 2
+    },
+    "475841": {
+      "kind": "pocklington",
+      "q": 1487,
+      "witness": 2
+    },
+    "22273165529": {
+      "kind": "pocklington",
+      "q": 475841,
+      "witness": 2
+    },
+    "66317691967824462761": {
+      "kind": "pocklington",
+      "q": 22273165529,
+      "witness": 2
+    },
+    "4933": {
+      "kind": "trial"
+    },
+    "5090857": {
+      "kind": "pocklington",
+      "q": 4933,
+      "witness": 2
+    },
+    "7780509478811": {
+      "kind": "pocklington",
+      "q": 5090857,
+      "witness": 2
+    },
+    "8881514152201723842337951": {
+      "kind": "pocklington",
+      "q": 7780509478811,
+      "witness": 2
+    },
+    "4447": {
+      "kind": "trial"
+    },
+    "5176309": {
+      "kind": "pocklington",
+      "q": 4447,
+      "witness": 2
+    },
+    "8032617011437": {
+      "kind": "pocklington",
+      "q": 5176309,
+      "witness": 2
+    },
+    "9201355804409398648616491": {
+      "kind": "pocklington",
+      "q": 8032617011437,
+      "witness": 2
+    },
+    "4937": {
+      "kind": "trial"
+    },
+    "6052763": {
+      "kind": "pocklington",
+      "q": 4937,
+      "witness": 2
+    },
+    "6611433024901": {
+      "kind": "pocklington",
+      "q": 6052763,
+      "witness": 2
+    },
+    "7846483287463018432094153": {
+      "kind": "pocklington",
+      "q": 6611433024901,
+      "witness": 2
+    },
+    "4993": {
+      "kind": "trial"
+    },
+    "4973029": {
+      "kind": "pocklington",
+      "q": 4993,
+      "witness": 2
+    },
+    "7089450681821": {
+      "kind": "pocklington",
+      "q": 4973029,
+      "witness": 2
+    },
+    "8833187321033153384283521": {
+      "kind": "pocklington",
+      "q": 7089450681821,
+      "witness": 2
+    },
+    "35201": {
+      "kind": "trial"
+    },
+    "199800877": {
+      "kind": "pocklington",
+      "q": 35201,
+      "witness": 2
+    },
+    "2934662893721627": {
+      "kind": "pocklington",
+      "q": 199800877,
+      "witness": 2
+    },
+    "803700281112495868682016241133": {
+      "kind": "pocklington",
+      "q": 2934662893721627,
+      "witness": 2
+    },
+    "37699": {
+      "kind": "trial"
+    },
+    "215336689": {
+      "kind": "pocklington",
+      "q": 37699,
+      "witness": 2
+    },
+    "3051014674358243": {
+      "kind": "pocklington",
+      "q": 215336689,
+      "witness": 2
+    },
+    "1225926088549914986852882873023": {
+      "kind": "pocklington",
+      "q": 3051014674358243,
+      "witness": 2
+    },
+    "40849": {
+      "kind": "trial"
+    },
+    "266090387": {
+      "kind": "pocklington",
+      "q": 40849,
+      "witness": 2
+    },
+    "2526991221838381": {
+      "kind": "pocklington",
+      "q": 266090387,
+      "witness": 2
+    },
+    "1170004830674078270798898389629": {
+      "kind": "pocklington",
+      "q": 2526991221838381,
+      "witness": 2
+    },
+    "58147": {
+      "kind": "trial"
+    },
+    "229099181": {
+      "kind": "pocklington",
+      "q": 58147,
+      "witness": 2
+    },
+    "4300157262492851": {
+      "kind": "pocklington",
+      "q": 229099181,
+      "witness": 2
+    },
+    "771042262958114973397707967103": {
+      "kind": "pocklington",
+      "q": 4300157262492851,
+      "witness": 2
+    },
+    "49921": {
+      "kind": "trial"
+    },
+    "247608161": {
+      "kind": "pocklington",
+      "q": 49921,
+      "witness": 2
+    },
+    "2860163961098371": {
+      "kind": "pocklington",
+      "q": 247608161,
+      "witness": 2
+    },
+    "880598158563144359901484578467": {
+      "kind": "pocklington",
+      "q": 2860163961098371,
+      "witness": 2
+    },
+    "35353": {
+      "kind": "trial"
+    },
+    "252632539": {
+      "kind": "pocklington",
+      "q": 35353,
+      "witness": 2
+    },
+    "3154203144478261": {
+      "kind": "pocklington",
+      "q": 252632539,
+      "witness": 2
+    },
+    "913771618736373886808290097579": {
+      "kind": "pocklington",
+      "q": 3154203144478261,
+      "witness": 2
+    },
+    "1571": {
+      "kind": "trial"
+    },
+    "160243": {
+      "kind": "pocklington",
+      "q": 1571,
+      "witness": 2
+    },
+    "2269681853": {
+      "kind": "pocklington",
+      "q": 160243,
+      "witness": 2
+    },
+    "1118272757381835073": {
+      "kind": "pocklington",
+      "q": 2269681853,
+      "witness": 2
+    },
+    "77876647256453775086254867185756811": {
+      "kind": "pocklington",
+      "q": 1118272757381835073,
+      "witness": 2
+    },
+    "1319": {
+      "kind": "trial"
+    },
+    "142453": {
+      "kind": "pocklington",
+      "q": 1319,
+      "witness": 2
+    },
+    "3705202531": {
+      "kind": "pocklington",
+      "q": 142453,
+      "witness": 2
+    },
+    "968238893897756251": {
+      "kind": "pocklington",
+      "q": 3705202531,
+      "witness": 2
+    },
+    "50281553795654690874878677060589467": {
+      "kind": "pocklington",
+      "q": 968238893897756251,
+      "witness": 2
+    },
+    "2309": {
+      "kind": "trial"
+    },
+    "623431": {
+      "kind": "pocklington",
+      "q": 2309,
+      "witness": 2
+    },
+    "44632672153": {
+      "kind": "pocklington",
+      "q": 623431,
+      "witness": 2
+    },
+    "243125509771468160929": {
+      "kind": "pocklington",
+      "q": 44632672153,
+      "witness": 2
+    },
+    "6696347143332826314276742714761837678713": {
+      "kind": "pocklington",
+      "q": 243125509771468160929,
+      "witness": 2
+    },
+    "2693": {
+      "kind": "trial"
+    },
+    "780971": {
+      "kind": "pocklington",
+      "q": 2693,
+      "witness": 2
+    },
+    "44552833609": {
+      "kind": "pocklington",
+      "q": 780971,
+      "witness": 2
+    },
+    "154057780577928049313": {
+      "kind": "pocklington",
+      "q": 44552833609,
+      "witness": 2
+    },
+    "8205687471245370834605504497091742508721": {
+      "kind": "pocklington",
+      "q": 154057780577928049313,
+      "witness": 2
+    },
+    "21157": {
+      "kind": "trial"
+    },
+    "83231639": {
+      "kind": "pocklington",
+      "q": 21157,
+      "witness": 2
+    },
+    "984058820936627": {
+      "kind": "pocklington",
+      "q": 83231639,
+      "witness": 2
+    },
+    "26959": {
+      "kind": "trial"
+    },
+    "125844613": {
+      "kind": "pocklington",
+      "q": 26959,
+      "witness": 2
+    },
+    "1070297610928283": {
+      "kind": "pocklington",
+      "q": 125844613,
+      "witness": 2
+    },
+    "19489": {
+      "kind": "trial"
+    },
+    "131550751": {
+      "kind": "pocklington",
+      "q": 19489,
+      "witness": 2
+    },
+    "1095825911976563": {
+      "kind": "pocklington",
+      "q": 131550751,
+      "witness": 2
+    },
+    "25237": {
+      "kind": "trial"
+    },
+    "98070983": {
+      "kind": "pocklington",
+      "q": 25237,
+      "witness": 2
+    },
+    "673558376212811": {
+      "kind": "pocklington",
+      "q": 98070983,
+      "witness": 2
+    },
+    "18793": {
+      "kind": "trial"
+    },
+    "114637301": {
+      "kind": "pocklington",
+      "q": 18793,
+      "witness": 2
+    },
+    "620646347614001": {
+      "kind": "pocklington",
+      "q": 114637301,
+      "witness": 2
+    },
+    "26417": {
+      "kind": "trial"
+    },
+    "92406667": {
+      "kind": "pocklington",
+      "q": 26417,
+      "witness": 2
+    },
+    "1020750471988763": {
+      "kind": "pocklington",
+      "q": 92406667,
+      "witness": 2
+    },
+    "20939": {
+      "kind": "trial"
+    },
+    "75631669": {
+      "kind": "pocklington",
+      "q": 20939,
+      "witness": 2
+    },
+    "824197474297543": {
+      "kind": "pocklington",
+      "q": 75631669,
+      "witness": 2
+    },
+    "32401": {
+      "kind": "trial"
+    },
+    "96943793": {
+      "kind": "pocklington",
+      "q": 32401,
+      "witness": 2
+    },
+    "817292596277527": {
+      "kind": "pocklington",
+      "q": 96943793,
+      "witness": 2
+    },
+    "26713": {
+      "kind": "trial"
+    },
+    "104608109": {
+      "kind": "pocklington",
+      "q": 26713,
+      "witness": 2
+    },
+    "831159336518923": {
+      "kind": "pocklington",
+      "q": 104608109,
+      "witness": 2
+    },
+    "25013": {
+      "kind": "trial"
+    },
+    "99651793": {
+      "kind": "pocklington",
+      "q": 25013,
+      "witness": 2
+    },
+    "768464004505157": {
+      "kind": "pocklington",
+      "q": 99651793,
+      "witness": 2
+    },
+    "32251": {
+      "kind": "trial"
+    },
+    "107008819": {
+      "kind": "pocklington",
+      "q": 32251,
+      "witness": 2
+    },
+    "696484019872541": {
+      "kind": "pocklington",
+      "q": 107008819,
+      "witness": 2
+    },
+    "19949": {
+      "kind": "trial"
+    },
+    "108083683": {
+      "kind": "pocklington",
+      "q": 19949,
+      "witness": 2
+    },
+    "1013535498436927": {
+      "kind": "pocklington",
+      "q": 108083683,
+      "witness": 2
+    },
+    "20327": {
+      "kind": "trial"
+    },
+    "79193993": {
+      "kind": "pocklington",
+      "q": 20327,
+      "witness": 2
+    },
+    "701256947659519": {
+      "kind": "pocklington",
+      "q": 79193993,
+      "witness": 2
+    },
+    "27773": {
+      "kind": "trial"
+    },
+    "109314529": {
+      "kind": "pocklington",
+      "q": 27773,
+      "witness": 2
+    },
+    "1077679689066139": {
+      "kind": "pocklington",
+      "q": 109314529,
+      "witness": 2
+    },
+    "27011": {
+      "kind": "trial"
+    },
+    "113770333": {
+      "kind": "pocklington",
+      "q": 27011,
+      "witness": 2
+    },
+    "1109552226343147": {
+      "kind": "pocklington",
+      "q": 113770333,
+      "witness": 2
+    },
+    "24967": {
+      "kind": "trial"
+    },
+    "76249219": {
+      "kind": "pocklington",
+      "q": 24967,
+      "witness": 2
+    },
+    "851537400434143": {
+      "kind": "pocklington",
+      "q": 76249219,
+      "witness": 2
+    },
+    "27241": {
+      "kind": "trial"
+    },
+    "110652943": {
+      "kind": "pocklington",
+      "q": 27241,
+      "witness": 2
+    },
+    "763636541090399": {
+      "kind": "pocklington",
+      "q": 110652943,
+      "witness": 2
+    },
+    "20789": {
+      "kind": "trial"
+    },
+    "93176299": {
+      "kind": "pocklington",
+      "q": 20789,
+      "witness": 2
+    },
+    "665281942854167": {
+      "kind": "pocklington",
+      "q": 93176299,
+      "witness": 2
+    },
+    "27919": {
+      "kind": "trial"
+    },
+    "73203619": {
+      "kind": "pocklington",
+      "q": 27919,
+      "witness": 2
+    },
+    "1061499179408923": {
+      "kind": "pocklington",
+      "q": 73203619,
+      "witness": 2
+    },
+    "17551": {
+      "kind": "trial"
+    },
+    "128578627": {
+      "kind": "pocklington",
+      "q": 17551,
+      "witness": 2
+    },
+    "1085124407445769": {
+      "kind": "pocklington",
+      "q": 128578627,
+      "witness": 2
+    },
+    "23087": {
+      "kind": "trial"
+    },
+    "113310997": {
+      "kind": "pocklington",
+      "q": 23087,
+      "witness": 2
+    },
+    "959381322777607": {
+      "kind": "pocklington",
+      "q": 113310997,
+      "witness": 2
+    },
+    "23623": {
+      "kind": "trial"
+    },
+    "104886121": {
+      "kind": "pocklington",
+      "q": 23623,
+      "witness": 2
+    },
+    "1031879727465617": {
+      "kind": "pocklington",
+      "q": 104886121,
+      "witness": 2
+    },
+    "1619": {
+      "kind": "trial"
+    },
+    "508367": {
+      "kind": "pocklington",
+      "q": 1619,
+      "witness": 2
+    },
+    "24488038391": {
+      "kind": "pocklington",
+      "q": 508367,
+      "witness": 2
+    },
+    "68033888643757453877": {
+      "kind": "pocklington",
+      "q": 24488038391,
+      "witness": 2
+    },
+    "1033": {
+      "kind": "trial"
+    },
+    "384277": {
+      "kind": "pocklington",
+      "q": 1033,
+      "witness": 2
+    },
+    "19704187453": {
+      "kind": "pocklington",
+      "q": 384277,
+      "witness": 2
+    },
+    "47128118194941752393": {
+      "kind": "pocklington",
+      "q": 19704187453,
+      "witness": 2
+    },
+    "1831": {
+      "kind": "trial"
+    },
+    "439441": {
+      "kind": "pocklington",
+      "q": 1831,
+      "witness": 2
+    },
+    "33980214767": {
+      "kind": "pocklington",
+      "q": 439441,
+      "witness": 2
+    },
+    "54151232345859757153": {
+      "kind": "pocklington",
+      "q": 33980214767,
+      "witness": 2
+    },
+    "523667": {
+      "kind": "pocklington",
+      "q": 1831,
+      "witness": 2
+    },
+    "28607928211": {
+      "kind": "pocklington",
+      "q": 523667,
+      "witness": 2
+    },
+    "59301772210431602167": {
+      "kind": "pocklington",
+      "q": 28607928211,
+      "witness": 2
+    },
+    "1291": {
+      "kind": "trial"
+    },
+    "384719": {
+      "kind": "pocklington",
+      "q": 1291,
+      "witness": 2
+    },
+    "24796678427": {
+      "kind": "pocklington",
+      "q": 384719,
+      "witness": 2
+    },
+    "67802465778123383033": {
+      "kind": "pocklington",
+      "q": 24796678427,
+      "witness": 2
+    },
+    "443407": {
+      "kind": "pocklington",
+      "q": 1103,
+      "witness": 2
+    },
+    "23097070631": {
+      "kind": "pocklington",
+      "q": 443407,
+      "witness": 2
+    },
+    "71452307368498748443": {
+      "kind": "pocklington",
+      "q": 23097070631,
+      "witness": 2
+    },
+    "424687": {
+      "kind": "pocklington",
+      "q": 1913,
+      "witness": 2
+    },
+    "30630125189": {
+      "kind": "pocklington",
+      "q": 424687,
+      "witness": 2
+    },
+    "45460161956501198609": {
+      "kind": "pocklington",
+      "q": 30630125189,
+      "witness": 2
+    },
+    "1721": {
+      "kind": "trial"
+    },
+    "330433": {
+      "kind": "pocklington",
+      "q": 1721,
+      "witness": 2
+    },
+    "20394324761": {
+      "kind": "pocklington",
+      "q": 330433,
+      "witness": 2
+    },
+    "70406501646979376633": {
+      "kind": "pocklington",
+      "q": 20394324761,
+      "witness": 2
+    },
+    "423859": {
+      "kind": "pocklington",
+      "q": 1723,
+      "witness": 2
+    },
+    "31429992569": {
+      "kind": "pocklington",
+      "q": 423859,
+      "witness": 2
+    },
+    "64704354555975336133": {
+      "kind": "pocklington",
+      "q": 31429992569,
+      "witness": 2
+    },
+    "1091": {
+      "kind": "trial"
+    },
+    "490951": {
+      "kind": "pocklington",
+      "q": 1091,
+      "witness": 2
+    },
+    "22356926639": {
+      "kind": "pocklington",
+      "q": 490951,
+      "witness": 2
+    },
+    "62027787668034896131": {
+      "kind": "pocklington",
+      "q": 22356926639,
+      "witness": 2
+    },
+    "2029": {
+      "kind": "trial"
+    },
+    "324641": {
+      "kind": "pocklington",
+      "q": 2029,
+      "witness": 2
+    },
+    "22026242569": {
+      "kind": "pocklington",
+      "q": 324641,
+      "witness": 2
+    },
+    "64976266073002809029": {
+      "kind": "pocklington",
+      "q": 22026242569,
+      "witness": 2
+    },
+    "1193": {
+      "kind": "trial"
+    },
+    "431867": {
+      "kind": "pocklington",
+      "q": 1193,
+      "witness": 2
+    },
+    "25358366507": {
+      "kind": "pocklington",
+      "q": 431867,
+      "witness": 2
+    },
+    "53573361775008361423": {
+      "kind": "pocklington",
+      "q": 25358366507,
+      "witness": 2
+    },
+    "1459": {
+      "kind": "trial"
+    },
+    "303473": {
+      "kind": "pocklington",
+      "q": 1459,
+      "witness": 2
+    },
+    "23405051653": {
+      "kind": "pocklington",
+      "q": 303473,
+      "witness": 2
+    },
+    "45165247345649866847": {
+      "kind": "pocklington",
+      "q": 23405051653,
+      "witness": 2
+    },
+    "266159": {
+      "kind": "pocklington",
+      "q": 1823,
+      "witness": 2
+    },
+    "30487981133": {
+      "kind": "pocklington",
+      "q": 266159,
+      "witness": 2
+    },
+    "70574316352883931803": {
+      "kind": "pocklington",
+      "q": 30487981133,
+      "witness": 2
+    },
+    "1783": {
+      "kind": "trial"
+    },
+    "467147": {
+      "kind": "pocklington",
+      "q": 1783,
+      "witness": 2
+    },
+    "19164238529": {
+      "kind": "pocklington",
+      "q": 467147,
+      "witness": 2
+    },
+    "45658443450301897037": {
+      "kind": "pocklington",
+      "q": 19164238529,
+      "witness": 2
+    },
+    "1997": {
+      "kind": "trial"
+    },
+    "311533": {
+      "kind": "pocklington",
+      "q": 1997,
+      "witness": 2
+    },
+    "26098988609": {
+      "kind": "pocklington",
+      "q": 311533,
+      "witness": 2
+    },
+    "38753172860000533307": {
+      "kind": "pocklington",
+      "q": 26098988609,
+      "witness": 2
+    },
+    "4813": {
+      "kind": "trial"
+    },
+    "5506073": {
+      "kind": "pocklington",
+      "q": 4813,
+      "witness": 2
+    },
+    "7266838060379": {
+      "kind": "pocklington",
+      "q": 5506073,
+      "witness": 2
+    },
+    "6940392922211345562325511": {
+      "kind": "pocklington",
+      "q": 7266838060379,
+      "witness": 2
+    },
+    "4813477": {
+      "kind": "pocklington",
+      "q": 4507,
+      "witness": 2
+    },
+    "8696200833373": {
+      "kind": "pocklington",
+      "q": 4813477,
+      "witness": 2
+    },
+    "9478095751288441645618057": {
+      "kind": "pocklington",
+      "q": 8696200833373,
+      "witness": 2
+    },
+    "6469": {
+      "kind": "trial"
+    },
+    "5123449": {
+      "kind": "pocklington",
+      "q": 6469,
+      "witness": 2
+    },
+    "6389084359573": {
+      "kind": "pocklington",
+      "q": 5123449,
+      "witness": 2
+    },
+    "9044542751896061327037881": {
+      "kind": "pocklington",
+      "q": 6389084359573,
+      "witness": 2
+    },
+    "6199": {
+      "kind": "trial"
+    },
+    "4785629": {
+      "kind": "pocklington",
+      "q": 6199,
+      "witness": 2
+    },
+    "7257808371337": {
+      "kind": "pocklington",
+      "q": 4785629,
+      "witness": 2
+    },
+    "5762238817238182169131789": {
+      "kind": "pocklington",
+      "q": 7257808371337,
+      "witness": 2
+    },
+    "7127899": {
+      "kind": "pocklington",
+      "q": 4733,
+      "witness": 2
+    },
+    "7790679560617": {
+      "kind": "pocklington",
+      "q": 7127899,
+      "witness": 2
+    },
+    "5479665010087592882043709": {
+      "kind": "pocklington",
+      "q": 7790679560617,
+      "witness": 2
+    },
+    "7993": {
+      "kind": "trial"
+    },
+    "5834891": {
+      "kind": "pocklington",
+      "q": 7993,
+      "witness": 2
+    },
+    "6082173680581": {
+      "kind": "pocklington",
+      "q": 5834891,
+      "witness": 2
+    },
+    "9460144338642205992026099": {
+      "kind": "pocklington",
+      "q": 6082173680581,
+      "witness": 2
+    },
+    "5209": {
+      "kind": "trial"
+    },
+    "4646429": {
+      "kind": "pocklington",
+      "q": 5209,
+      "witness": 2
+    },
+    "5054673544799": {
+      "kind": "pocklington",
+      "q": 4646429,
+      "witness": 2
+    },
+    "4968474454594665231680681": {
+      "kind": "pocklington",
+      "q": 5054673544799,
+      "witness": 2
+    },
+    "5743": {
+      "kind": "trial"
+    },
+    "5857861": {
+      "kind": "pocklington",
+      "q": 5743,
+      "witness": 2
+    },
+    "6517503011489": {
+      "kind": "pocklington",
+      "q": 5857861,
+      "witness": 2
+    },
+    "6789748999278823934721089": {
+      "kind": "pocklington",
+      "q": 6517503011489,
+      "witness": 2
+    },
+    "6481": {
+      "kind": "trial"
+    },
+    "8114213": {
+      "kind": "pocklington",
+      "q": 6481,
+      "witness": 2
+    },
+    "6882199583359": {
+      "kind": "pocklington",
+      "q": 8114213,
+      "witness": 2
+    },
+    "6284637745823661155418847": {
+      "kind": "pocklington",
+      "q": 6882199583359,
+      "witness": 2
+    },
+    "5717": {
+      "kind": "trial"
+    },
+    "4390657": {
+      "kind": "pocklington",
+      "q": 5717,
+      "witness": 2
+    },
+    "4657494788519": {
+      "kind": "pocklington",
+      "q": 4390657,
+      "witness": 2
+    },
+    "8439305126982314821351123": {
+      "kind": "pocklington",
+      "q": 4657494788519,
+      "witness": 2
+    },
+    "5659": {
+      "kind": "trial"
+    },
+    "5602411": {
+      "kind": "pocklington",
+      "q": 5659,
+      "witness": 2
+    },
+    "5361832266839": {
+      "kind": "pocklington",
+      "q": 5602411,
+      "witness": 2
+    },
+    "7530210719557461705683051": {
+      "kind": "pocklington",
+      "q": 5361832266839,
+      "witness": 2
+    },
+    "8107133": {
+      "kind": "pocklington",
+      "q": 8011,
+      "witness": 2
+    },
+    "4972364097157": {
+      "kind": "pocklington",
+      "q": 8107133,
+      "witness": 2
+    },
+    "9463079925806936603722157": {
+      "kind": "pocklington",
+      "q": 4972364097157,
+      "witness": 2
+    },
+    "4283": {
+      "kind": "trial"
+    },
+    "4754131": {
+      "kind": "pocklington",
+      "q": 4283,
+      "witness": 2
+    },
+    "5169689590711": {
+      "kind": "pocklington",
+      "q": 4754131,
+      "witness": 2
+    },
+    "7233955473387966691688461": {
+      "kind": "pocklington",
+      "q": 5169689590711,
+      "witness": 2
+    },
+    "6449": {
+      "kind": "trial"
+    },
+    "7945169": {
+      "kind": "pocklington",
+      "q": 6449,
+      "witness": 2
+    },
+    "4859599057499": {
+      "kind": "pocklington",
+      "q": 7945169,
+      "witness": 2
+    },
+    "6091409690677262459010281": {
+      "kind": "pocklington",
+      "q": 4859599057499,
+      "witness": 2
+    },
+    "7951": {
+      "kind": "trial"
+    },
+    "7139999": {
+      "kind": "pocklington",
+      "q": 7951,
+      "witness": 2
+    },
+    "5612467613941": {
+      "kind": "pocklington",
+      "q": 7139999,
+      "witness": 2
+    },
+    "9420966883248716187858527": {
+      "kind": "pocklington",
+      "q": 5612467613941,
+      "witness": 2
+    },
+    "4253": {
+      "kind": "trial"
+    },
+    "7740461": {
+      "kind": "pocklington",
+      "q": 4253,
+      "witness": 2
+    },
+    "5001328585009": {
+      "kind": "pocklington",
+      "q": 7740461,
+      "witness": 2
+    },
+    "5050834240418883398477939": {
+      "kind": "pocklington",
+      "q": 5001328585009,
+      "witness": 2
+    },
+    "5077": {
+      "kind": "trial"
+    },
+    "7097647": {
+      "kind": "pocklington",
+      "q": 5077,
+      "witness": 2
+    },
+    "5209147672123": {
+      "kind": "pocklington",
+      "q": 7097647,
+      "witness": 2
+    },
+    "7581554009544523626361171": {
+      "kind": "pocklington",
+      "q": 5209147672123,
+      "witness": 2
+    },
+    "5867": {
+      "kind": "trial"
+    },
+    "8202067": {
+      "kind": "pocklington",
+      "q": 5867,
+      "witness": 2
+    },
+    "8510677972943": {
+      "kind": "pocklington",
+      "q": 8202067,
+      "witness": 2
+    },
+    "5207871304619817468745547": {
+      "kind": "pocklington",
+      "q": 8510677972943,
+      "witness": 2
+    },
+    "5987": {
+      "kind": "trial"
+    },
+    "6645571": {
+      "kind": "pocklington",
+      "q": 5987,
+      "witness": 2
+    },
+    "7468997120327": {
+      "kind": "pocklington",
+      "q": 6645571,
+      "witness": 2
+    },
+    "9216634505941306492817477": {
+      "kind": "pocklington",
+      "q": 7468997120327,
+      "witness": 2
+    },
+    "4931": {
+      "kind": "trial"
+    },
+    "7544431": {
+      "kind": "pocklington",
+      "q": 4931,
+      "witness": 2
+    },
+    "6960009197017": {
+      "kind": "pocklington",
+      "q": 7544431,
+      "witness": 2
+    },
+    "8266777656219626259896723": {
+      "kind": "pocklington",
+      "q": 6960009197017,
+      "witness": 2
+    },
+    "5003": {
+      "kind": "trial"
+    },
+    "4802881": {
+      "kind": "pocklington",
+      "q": 5003,
+      "witness": 2
+    },
+    "8256325342717": {
+      "kind": "pocklington",
+      "q": 4802881,
+      "witness": 2
+    },
+    "5358742626249928202249117": {
+      "kind": "pocklington",
+      "q": 8256325342717,
+      "witness": 2
+    },
+    "4831": {
+      "kind": "trial"
+    },
+    "5797201": {
+      "kind": "pocklington",
+      "q": 4831,
+      "witness": 2
+    },
+    "6826482443149": {
+      "kind": "pocklington",
+      "q": 5797201,
+      "witness": 2
+    },
+    "8789851669010878554653833": {
+      "kind": "pocklington",
+      "q": 6826482443149,
+      "witness": 2
+    },
+    "6867529": {
+      "kind": "pocklington",
+      "q": 5399,
+      "witness": 2
+    },
+    "7328367666017": {
+      "kind": "pocklington",
+      "q": 6867529,
+      "witness": 2
+    },
+    "5919591792261636685793851": {
+      "kind": "pocklington",
+      "q": 7328367666017,
+      "witness": 2
+    },
+    "7219": {
+      "kind": "trial"
+    },
+    "6569291": {
+      "kind": "pocklington",
+      "q": 7219,
+      "witness": 2
+    },
+    "7207379373413": {
+      "kind": "pocklington",
+      "q": 6569291,
+      "witness": 2
+    },
+    "8771119495744708458010691": {
+      "kind": "pocklington",
+      "q": 7207379373413,
+      "witness": 2
+    },
+    "7717": {
+      "kind": "trial"
+    },
+    "8365229": {
+      "kind": "pocklington",
+      "q": 7717,
+      "witness": 2
+    },
+    "8133411773953": {
+      "kind": "pocklington",
+      "q": 8365229,
+      "witness": 2
+    },
+    "6940555660756099127921647": {
+      "kind": "pocklington",
+      "q": 8133411773953,
+      "witness": 2
+    },
+    "5309": {
+      "kind": "trial"
+    },
+    "5967317": {
+      "kind": "pocklington",
+      "q": 5309,
+      "witness": 2
+    },
+    "5870336164117": {
+      "kind": "pocklington",
+      "q": 5967317,
+      "witness": 2
+    },
+    "9331127449243189398074657": {
+      "kind": "pocklington",
+      "q": 5870336164117,
+      "witness": 2
+    },
+    "7256257": {
+      "kind": "pocklington",
+      "q": 5399,
+      "witness": 2
+    },
+    "5890266619751": {
+      "kind": "pocklington",
+      "q": 7256257,
+      "witness": 2
+    },
+    "8119491074343131924151283": {
+      "kind": "pocklington",
+      "q": 5890266619751,
+      "witness": 2
+    },
+    "4133": {
+      "kind": "trial"
+    },
+    "7274081": {
+      "kind": "pocklington",
+      "q": 4133,
+      "witness": 2
+    },
+    "6105267116759": {
+      "kind": "pocklington",
+      "q": 7274081,
+      "witness": 2
+    },
+    "8988317524477714862563249": {
+      "kind": "pocklington",
+      "q": 6105267116759,
+      "witness": 2
+    },
+    "5351": {
+      "kind": "trial"
+    },
+    "5714869": {
+      "kind": "pocklington",
+      "q": 5351,
+      "witness": 2
+    },
+    "5131346585887": {
+      "kind": "pocklington",
+      "q": 5714869,
+      "witness": 2
+    },
+    "6006433426979417026932377": {
+      "kind": "pocklington",
+      "q": 5131346585887,
+      "witness": 2
+    },
+    "7559": {
+      "kind": "trial"
+    },
+    "8088131": {
+      "kind": "pocklington",
+      "q": 7559,
+      "witness": 2
+    },
+    "6360926801213": {
+      "kind": "pocklington",
+      "q": 8088131,
+      "witness": 2
+    },
+    "8421408149255039287864069": {
+      "kind": "pocklington",
+      "q": 6360926801213,
+      "witness": 2
+    },
+    "4816277": {
+      "kind": "pocklington",
+      "q": 8081,
+      "witness": 2
+    },
+    "6113704963369": {
+      "kind": "pocklington",
+      "q": 4816277,
+      "witness": 2
+    },
+    "5887781047059986238786367": {
+      "kind": "pocklington",
+      "q": 6113704963369,
+      "witness": 2
+    },
+    "4259": {
+      "kind": "trial"
+    },
+    "6618487": {
+      "kind": "pocklington",
+      "q": 4259,
+      "witness": 2
+    },
+    "5244608231567": {
+      "kind": "pocklington",
+      "q": 6618487,
+      "witness": 2
+    },
+    "6143442167834769493889419": {
+      "kind": "pocklington",
+      "q": 5244608231567,
+      "witness": 2
+    },
+    "6863": {
+      "kind": "trial"
+    },
+    "6176701": {
+      "kind": "pocklington",
+      "q": 6863,
+      "witness": 2
+    },
+    "4703162502637": {
+      "kind": "pocklington",
+      "q": 6176701,
+      "witness": 2
+    },
+    "7118001925615226556596237": {
+      "kind": "pocklington",
+      "q": 4703162502637,
+      "witness": 2
+    },
+    "7949": {
+      "kind": "trial"
+    },
+    "5119157": {
+      "kind": "pocklington",
+      "q": 7949,
+      "witness": 2
+    },
+    "6909326202901": {
+      "kind": "pocklington",
+      "q": 5119157,
+      "witness": 2
+    },
+    "8237598483776687411777411": {
+      "kind": "pocklington",
+      "q": 6909326202901,
+      "witness": 2
+    },
+    "42611": {
+      "kind": "trial"
+    },
+    "183312523": {
+      "kind": "pocklington",
+      "q": 42611,
+      "witness": 2
+    },
+    "4285197128158489": {
+      "kind": "pocklington",
+      "q": 183312523,
+      "witness": 2
+    },
+    "962636760567659402009532200477": {
+      "kind": "pocklington",
+      "q": 4285197128158489,
+      "witness": 2
+    },
+    "40471": {
+      "kind": "trial"
+    },
+    "223885573": {
+      "kind": "pocklington",
+      "q": 40471,
+      "witness": 2
+    },
+    "3809037344603507": {
+      "kind": "pocklington",
+      "q": 223885573,
+      "witness": 2
+    },
+    "1091956484334979751071745575399": {
+      "kind": "pocklington",
+      "q": 3809037344603507,
+      "witness": 2
+    },
+    "64231": {
+      "kind": "trial"
+    },
+    "248060123": {
+      "kind": "pocklington",
+      "q": 64231,
+      "witness": 2
+    },
+    "2862773074018967": {
+      "kind": "pocklington",
+      "q": 248060123,
+      "witness": 2
+    },
+    "634718039755162301531019883097": {
+      "kind": "pocklington",
+      "q": 2862773074018967,
+      "witness": 2
+    },
+    "47797": {
+      "kind": "trial"
+    },
+    "190423249": {
+      "kind": "pocklington",
+      "q": 47797,
+      "witness": 2
+    },
+    "3898915642428503": {
+      "kind": "pocklington",
+      "q": 190423249,
+      "witness": 2
+    },
+    "1062074480342456176425853059763": {
+      "kind": "pocklington",
+      "q": 3898915642428503,
+      "witness": 2
+    },
+    "50069": {
+      "kind": "trial"
+    },
+    "166128943": {
+      "kind": "pocklington",
+      "q": 50069,
+      "witness": 2
+    },
+    "2735974239688141": {
+      "kind": "pocklington",
+      "q": 166128943,
+      "witness": 2
+    },
+    "662653881531564077505377692727": {
+      "kind": "pocklington",
+      "q": 2735974239688141,
+      "witness": 2
+    },
+    "50849": {
+      "kind": "trial"
+    },
+    "255668773": {
+      "kind": "pocklington",
+      "q": 50849,
+      "witness": 2
+    },
+    "2410602172470623": {
+      "kind": "pocklington",
+      "q": 255668773,
+      "witness": 2
+    },
+    "944714163440429711686525048219": {
+      "kind": "pocklington",
+      "q": 2410602172470623,
+      "witness": 2
+    },
+    "63311": {
+      "kind": "trial"
+    },
+    "146248411": {
+      "kind": "pocklington",
+      "q": 63311,
+      "witness": 2
+    },
+    "3873188220018287": {
+      "kind": "pocklington",
+      "q": 146248411,
+      "witness": 2
+    },
+    "999306055758579412076167376003": {
+      "kind": "pocklington",
+      "q": 3873188220018287,
+      "witness": 2
+    },
+    "45341": {
+      "kind": "trial"
+    },
+    "226342273": {
+      "kind": "pocklington",
+      "q": 45341,
+      "witness": 2
+    },
+    "3705529023763097": {
+      "kind": "pocklington",
+      "q": 226342273,
+      "witness": 2
+    },
+    "1079023692463893296778465618931": {
+      "kind": "pocklington",
+      "q": 3705529023763097,
+      "witness": 2
+    },
+    "33119": {
+      "kind": "trial"
+    },
+    "257599583": {
+      "kind": "pocklington",
+      "q": 33119,
+      "witness": 2
+    },
+    "2523503217374593": {
+      "kind": "pocklington",
+      "q": 257599583,
+      "witness": 2
+    },
+    "1026709636256159988882827307239": {
+      "kind": "pocklington",
+      "q": 2523503217374593,
+      "witness": 2
+    },
+    "62213": {
+      "kind": "trial"
+    },
+    "196095377": {
+      "kind": "pocklington",
+      "q": 62213,
+      "witness": 2
+    },
+    "3157470892794671": {
+      "kind": "pocklington",
+      "q": 196095377,
+      "witness": 2
+    },
+    "1076853486818171237344327987783": {
+      "kind": "pocklington",
+      "q": 3157470892794671,
+      "witness": 2
+    },
+    "44279": {
+      "kind": "trial"
+    },
+    "179949857": {
+      "kind": "pocklington",
+      "q": 44279,
+      "witness": 2
+    },
+    "2824783754440913": {
+      "kind": "pocklington",
+      "q": 179949857,
+      "witness": 2
+    },
+    "785887100215241178075852422281": {
+      "kind": "pocklington",
+      "q": 2824783754440913,
+      "witness": 2
+    },
+    "64591": {
+      "kind": "trial"
+    },
+    "250613081": {
+      "kind": "pocklington",
+      "q": 64591,
+      "witness": 2
+    },
+    "2629619904436589": {
+      "kind": "pocklington",
+      "q": 250613081,
+      "witness": 2
+    },
+    "1097608222413737414504042204359": {
+      "kind": "pocklington",
+      "q": 2629619904436589,
+      "witness": 2
+    },
+    "47857": {
+      "kind": "trial"
+    },
+    "156779533": {
+      "kind": "pocklington",
+      "q": 47857,
+      "witness": 2
+    },
+    "2998098772267793": {
+      "kind": "pocklington",
+      "q": 156779533,
+      "witness": 2
+    },
+    "693834599224682547350170472651": {
+      "kind": "pocklington",
+      "q": 2998098772267793,
+      "witness": 2
+    },
+    "58937": {
+      "kind": "trial"
+    },
+    "183294071": {
+      "kind": "pocklington",
+      "q": 58937,
+      "witness": 2
+    },
+    "2859893765824103": {
+      "kind": "pocklington",
+      "q": 183294071,
+      "witness": 2
+    },
+    "648790844543930460688376815789": {
+      "kind": "pocklington",
+      "q": 2859893765824103,
+      "witness": 2
+    },
+    "50291": {
+      "kind": "trial"
+    },
+    "208204741": {
+      "kind": "pocklington",
+      "q": 50291,
+      "witness": 2
+    },
+    "3280387702433227": {
+      "kind": "pocklington",
+      "q": 208204741,
+      "witness": 2
+    },
+    "1061911228563053852136492526379": {
+      "kind": "pocklington",
+      "q": 3280387702433227,
+      "witness": 2
+    },
+    "64879": {
+      "kind": "trial"
+    },
+    "145977751": {
+      "kind": "pocklington",
+      "q": 64879,
+      "witness": 2
+    },
+    "4093254092255261": {
+      "kind": "pocklington",
+      "q": 145977751,
+      "witness": 2
+    },
+    "748286687218515795048515504543": {
+      "kind": "pocklington",
+      "q": 4093254092255261,
+      "witness": 2
+    },
+    "64627": {
+      "kind": "trial"
+    },
+    "213269101": {
+      "kind": "pocklington",
+      "q": 64627,
+      "witness": 2
+    },
+    "3413764376650841": {
+      "kind": "pocklington",
+      "q": 213269101,
+      "witness": 2
+    },
+    "955398801927608171478219961433": {
+      "kind": "pocklington",
+      "q": 3413764376650841,
+      "witness": 2
+    },
+    "54371": {
+      "kind": "trial"
+    },
+    "144626861": {
+      "kind": "pocklington",
+      "q": 54371,
+      "witness": 2
+    },
+    "3410465678494097": {
+      "kind": "pocklington",
+      "q": 144626861,
+      "witness": 2
+    },
+    "751141156513372395876890033747": {
+      "kind": "pocklington",
+      "q": 3410465678494097,
+      "witness": 2
+    },
+    "41981": {
+      "kind": "trial"
+    },
+    "266243503": {
+      "kind": "pocklington",
+      "q": 41981,
+      "witness": 2
+    },
+    "2960095266354001": {
+      "kind": "pocklington",
+      "q": 266243503,
+      "witness": 2
+    },
+    "1076463687994604870343689032567": {
+      "kind": "pocklington",
+      "q": 2960095266354001,
+      "witness": 2
+    },
+    "55733": {
+      "kind": "trial"
+    },
+    "206323567": {
+      "kind": "pocklington",
+      "q": 55733,
+      "witness": 2
+    },
+    "2514640273413817": {
+      "kind": "pocklington",
+      "q": 206323567,
+      "witness": 2
+    },
+    "1201014566236660651736539716383": {
+      "kind": "pocklington",
+      "q": 2514640273413817,
+      "witness": 2
+    },
+    "41953": {
+      "kind": "trial"
+    },
+    "251466283": {
+      "kind": "pocklington",
+      "q": 41953,
+      "witness": 2
+    },
+    "2455808152328983": {
+      "kind": "pocklington",
+      "q": 251466283,
+      "witness": 2
+    },
+    "1255044294435532355876786097149": {
+      "kind": "pocklington",
+      "q": 2455808152328983,
+      "witness": 2
+    },
+    "51229": {
+      "kind": "trial"
+    },
+    "135244561": {
+      "kind": "pocklington",
+      "q": 51229,
+      "witness": 2
+    },
+    "3194956378522429": {
+      "kind": "pocklington",
+      "q": 135244561,
+      "witness": 2
+    },
+    "825884628439004885067051219619": {
+      "kind": "pocklington",
+      "q": 3194956378522429,
+      "witness": 2
+    },
+    "56299": {
+      "kind": "trial"
+    },
+    "172950529": {
+      "kind": "pocklington",
+      "q": 56299,
+      "witness": 2
+    },
+    "3033307034809879": {
+      "kind": "pocklington",
+      "q": 172950529,
+      "witness": 2
+    },
+    "644677716484426216661448341069": {
+      "kind": "pocklington",
+      "q": 3033307034809879,
+      "witness": 2
+    },
+    "39511": {
+      "kind": "trial"
+    },
+    "182777887": {
+      "kind": "pocklington",
+      "q": 39511,
+      "witness": 2
+    },
+    "2696066318860823": {
+      "kind": "pocklington",
+      "q": 182777887,
+      "witness": 2
+    },
+    "923307139969779724605449740459": {
+      "kind": "pocklington",
+      "q": 2696066318860823,
+      "witness": 2
+    },
+    "39397": {
+      "kind": "trial"
+    },
+    "257892763": {
+      "kind": "pocklington",
+      "q": 39397,
+      "witness": 2
+    },
+    "4466322521227339": {
+      "kind": "pocklington",
+      "q": 257892763,
+      "witness": 2
+    },
+    "1128023635464019017072990488117": {
+      "kind": "pocklington",
+      "q": 4466322521227339,
+      "witness": 2
+    },
+    "32999": {
+      "kind": "trial"
+    },
+    "242938639": {
+      "kind": "pocklington",
+      "q": 32999,
+      "witness": 2
+    },
+    "3190236681815819": {
+      "kind": "pocklington",
+      "q": 242938639,
+      "witness": 2
+    },
+    "968169459909671220794818109569": {
+      "kind": "pocklington",
+      "q": 3190236681815819,
+      "witness": 2
+    },
+    "46771": {
+      "kind": "trial"
+    },
+    "171743113": {
+      "kind": "pocklington",
+      "q": 46771,
+      "witness": 2
+    },
+    "3891771072687461": {
+      "kind": "pocklington",
+      "q": 171743113,
+      "witness": 2
+    },
+    "1146168156396156335112175138063": {
+      "kind": "pocklington",
+      "q": 3891771072687461,
+      "witness": 2
+    },
+    "51511": {
+      "kind": "trial"
+    },
+    "240453349": {
+      "kind": "pocklington",
+      "q": 51511,
+      "witness": 2
+    },
+    "4265530359999367": {
+      "kind": "pocklington",
+      "q": 240453349,
+      "witness": 2
+    },
+    "678028907690528623219811069573": {
+      "kind": "pocklington",
+      "q": 4265530359999367,
+      "witness": 2
+    },
+    "50551": {
+      "kind": "trial"
+    },
+    "141947209": {
+      "kind": "pocklington",
+      "q": 50551,
+      "witness": 2
+    },
+    "2584820066249153": {
+      "kind": "pocklington",
+      "q": 141947209,
+      "witness": 2
+    },
+    "1167313028748322354546476727541": {
+      "kind": "pocklington",
+      "q": 2584820066249153,
+      "witness": 2
+    },
+    "48383": {
+      "kind": "trial"
+    },
+    "149793769": {
+      "kind": "pocklington",
+      "q": 48383,
+      "witness": 2
+    },
+    "3745392470194541": {
+      "kind": "pocklington",
+      "q": 149793769,
+      "witness": 2
+    },
+    "1186853619645658312591116002119": {
+      "kind": "pocklington",
+      "q": 3745392470194541,
+      "witness": 2
+    },
+    "53189": {
+      "kind": "trial"
+    },
+    "163502987": {
+      "kind": "pocklington",
+      "q": 53189,
+      "witness": 2
+    },
+    "2721961756918861": {
+      "kind": "pocklington",
+      "q": 163502987,
+      "witness": 2
+    },
+    "976217216349188184976054447033": {
+      "kind": "pocklington",
+      "q": 2721961756918861,
+      "witness": 2
+    },
+    "53089": {
+      "kind": "trial"
+    },
+    "203437049": {
+      "kind": "pocklington",
+      "q": 53089,
+      "witness": 2
+    },
+    "3579018771291143": {
+      "kind": "pocklington",
+      "q": 203437049,
+      "witness": 2
+    },
+    "678273137874647475956490839371": {
+      "kind": "pocklington",
+      "q": 3579018771291143,
+      "witness": 2
+    },
+    "46901": {
+      "kind": "trial"
+    },
+    "238163279": {
+      "kind": "pocklington",
+      "q": 46901,
+      "witness": 2
+    },
+    "2801630874557153": {
+      "kind": "pocklington",
+      "q": 238163279,
+      "witness": 2
+    },
+    "1132226807914659279723073948783": {
+      "kind": "pocklington",
+      "q": 2801630874557153,
+      "witness": 2
+    },
+    "41543": {
+      "kind": "trial"
+    },
+    "205720937": {
+      "kind": "pocklington",
+      "q": 41543,
+      "witness": 2
+    },
+    "2902682511208223": {
+      "kind": "pocklington",
+      "q": 205720937,
+      "witness": 2
+    },
+    "819157623922430034346562187871": {
+      "kind": "pocklington",
+      "q": 2902682511208223,
+      "witness": 2
+    },
+    "43579": {
+      "kind": "trial"
+    },
+    "233670599": {
+      "kind": "pocklington",
+      "q": 43579,
+      "witness": 2
+    },
+    "3306042203172899": {
+      "kind": "pocklington",
+      "q": 233670599,
+      "witness": 2
+    },
+    "1085773290935160627819477813907": {
+      "kind": "pocklington",
+      "q": 3306042203172899,
+      "witness": 2
+    },
+    "59407": {
+      "kind": "trial"
+    },
+    "261628429": {
+      "kind": "pocklington",
+      "q": 59407,
+      "witness": 2
+    },
+    "3795161584056539": {
+      "kind": "pocklington",
+      "q": 261628429,
+      "witness": 2
+    },
+    "976745643496589534007004191271": {
+      "kind": "pocklington",
+      "q": 3795161584056539,
+      "witness": 2
+    },
+    "50329": {
+      "kind": "trial"
+    },
+    "149376473": {
+      "kind": "pocklington",
+      "q": 50329,
+      "witness": 2
+    },
+    "3935531113235417": {
+      "kind": "pocklington",
+      "q": 149376473,
+      "witness": 2
+    },
+    "832877498329385431068557480551": {
+      "kind": "pocklington",
+      "q": 3935531113235417,
+      "witness": 2
+    },
+    "48541": {
+      "kind": "trial"
+    },
+    "134749817": {
+      "kind": "pocklington",
+      "q": 48541,
+      "witness": 2
+    },
+    "4013913265315399": {
+      "kind": "pocklington",
+      "q": 134749817,
+      "witness": 2
+    },
+    "922647416698320345613476417551": {
+      "kind": "pocklington",
+      "q": 4013913265315399,
+      "witness": 2
+    },
+    "46877": {
+      "kind": "trial"
+    },
+    "251260721": {
+      "kind": "pocklington",
+      "q": 46877,
+      "witness": 2
+    },
+    "2660759576487557": {
+      "kind": "pocklington",
+      "q": 251260721,
+      "witness": 2
+    },
+    "1051370078893463307611013463871": {
+      "kind": "pocklington",
+      "q": 2660759576487557,
+      "witness": 2
+    },
+    "45841": {
+      "kind": "trial"
+    },
+    "187489691": {
+      "kind": "pocklington",
+      "q": 45841,
+      "witness": 2
+    },
+    "3364215645767771": {
+      "kind": "pocklington",
+      "q": 187489691,
+      "witness": 2
+    },
+    "929543366140580293551279590531": {
+      "kind": "pocklington",
+      "q": 3364215645767771,
+      "witness": 2
+    },
+    "44983": {
+      "kind": "trial"
+    },
+    "222665851": {
+      "kind": "pocklington",
+      "q": 44983,
+      "witness": 2
+    },
+    "2773117916216969": {
+      "kind": "pocklington",
+      "q": 222665851,
+      "witness": 2
+    },
+    "962006608099612794604327567753": {
+      "kind": "pocklington",
+      "q": 2773117916216969,
+      "witness": 2
+    },
+    "39581": {
+      "kind": "trial"
+    },
+    "264796891": {
+      "kind": "pocklington",
+      "q": 39581,
+      "witness": 2
+    },
+    "2377004369814829": {
+      "kind": "pocklington",
+      "q": 264796891,
+      "witness": 2
+    },
+    "1206055166793082684824250404619": {
+      "kind": "pocklington",
+      "q": 2377004369814829,
+      "witness": 2
+    },
+    "37511": {
+      "kind": "trial"
+    },
+    "255749999": {
+      "kind": "pocklington",
+      "q": 37511,
+      "witness": 2
+    },
+    "3541179446653747": {
+      "kind": "pocklington",
+      "q": 255749999,
+      "witness": 2
+    },
+    "1187584082497983394072496901577": {
+      "kind": "pocklington",
+      "q": 3541179446653747,
+      "witness": 2
+    },
+    "53233": {
+      "kind": "trial"
+    },
+    "238590307": {
+      "kind": "pocklington",
+      "q": 53233,
+      "witness": 2
+    },
+    "2575458297105361": {
+      "kind": "pocklington",
+      "q": 238590307,
+      "witness": 2
+    },
+    "891866818614144664751692769477": {
+      "kind": "pocklington",
+      "q": 2575458297105361,
+      "witness": 2
+    },
+    "34297": {
+      "kind": "trial"
+    },
+    "134992993": {
+      "kind": "pocklington",
+      "q": 34297,
+      "witness": 2
+    },
+    "3792161602551193": {
+      "kind": "pocklington",
+      "q": 134992993,
+      "witness": 2
+    },
+    "764694834519702525911563540637": {
+      "kind": "pocklington",
+      "q": 3792161602551193,
+      "witness": 2
+    },
+    "36563": {
+      "kind": "trial"
+    },
+    "228006869": {
+      "kind": "pocklington",
+      "q": 36563,
+      "witness": 2
+    },
+    "2854177217757337": {
+      "kind": "pocklington",
+      "q": 228006869,
+      "witness": 2
+    },
+    "1133792926563533675723380517791": {
+      "kind": "pocklington",
+      "q": 2854177217757337,
+      "witness": 2
+    },
+    "51787": {
+      "kind": "trial"
+    },
+    "206630131": {
+      "kind": "pocklington",
+      "q": 51787,
+      "witness": 2
+    },
+    "3435167244917797": {
+      "kind": "pocklington",
+      "q": 206630131,
+      "witness": 2
+    },
+    "636877875053341547061672499337": {
+      "kind": "pocklington",
+      "q": 3435167244917797,
+      "witness": 2
+    },
+    "60961": {
+      "kind": "trial"
+    },
+    "159717821": {
+      "kind": "pocklington",
+      "q": 60961,
+      "witness": 2
+    },
+    "3815030413782187": {
+      "kind": "pocklington",
+      "q": 159717821,
+      "witness": 2
+    },
+    "1030284209176319252126241207053": {
+      "kind": "pocklington",
+      "q": 3815030413782187,
+      "witness": 2
+    },
+    "62189": {
+      "kind": "trial"
+    },
+    "196765997": {
+      "kind": "pocklington",
+      "q": 62189,
+      "witness": 2
+    },
+    "4227865327827697": {
+      "kind": "pocklington",
+      "q": 196765997,
+      "witness": 2
+    },
+    "649614902336925312716825161049": {
+      "kind": "pocklington",
+      "q": 4227865327827697,
+      "witness": 2
+    },
+    "47599": {
+      "kind": "trial"
+    },
+    "155077543": {
+      "kind": "pocklington",
+      "q": 47599,
+      "witness": 2
+    },
+    "3394896160648973": {
+      "kind": "pocklington",
+      "q": 155077543,
+      "witness": 2
+    },
+    "754383561473769661688915299957": {
+      "kind": "pocklington",
+      "q": 3394896160648973,
+      "witness": 2
+    },
+    "57139": {
+      "kind": "trial"
+    },
+    "164446043": {
+      "kind": "pocklington",
+      "q": 57139,
+      "witness": 2
+    },
+    "4470659067501569": {
+      "kind": "pocklington",
+      "q": 164446043,
+      "witness": 2
+    },
+    "867215462288331341953541771609": {
+      "kind": "pocklington",
+      "q": 4470659067501569,
+      "witness": 2
+    },
+    "45989": {
+      "kind": "trial"
+    },
+    "162893039": {
+      "kind": "pocklington",
+      "q": 45989,
+      "witness": 2
+    },
+    "3837351137312111": {
+      "kind": "pocklington",
+      "q": 162893039,
+      "witness": 2
+    },
+    "1022081568972273573832050073571": {
+      "kind": "pocklington",
+      "q": 3837351137312111,
+      "witness": 2
+    },
+    "41203": {
+      "kind": "trial"
+    },
+    "169014707": {
+      "kind": "pocklington",
+      "q": 41203,
+      "witness": 2
+    },
+    "3799453993654141": {
+      "kind": "pocklington",
+      "q": 169014707,
+      "witness": 2
+    },
+    "1248711788114791885352644685053": {
+      "kind": "pocklington",
+      "q": 3799453993654141,
+      "witness": 2
+    },
+    "54623": {
+      "kind": "trial"
+    },
+    "164633723": {
+      "kind": "pocklington",
+      "q": 54623,
+      "witness": 2
+    },
+    "3133547076499459": {
+      "kind": "pocklington",
+      "q": 164633723,
+      "witness": 2
+    },
+    "1226010350509933589658225537091": {
+      "kind": "pocklington",
+      "q": 3133547076499459,
+      "witness": 2
+    },
+    "58049": {
+      "kind": "trial"
+    },
+    "176933353": {
+      "kind": "pocklington",
+      "q": 58049,
+      "witness": 2
+    },
+    "2379373898874463": {
+      "kind": "pocklington",
+      "q": 176933353,
+      "witness": 2
+    },
+    "1155884944082890978565559201431": {
+      "kind": "pocklington",
+      "q": 2379373898874463,
+      "witness": 2
+    },
+    "41201": {
+      "kind": "trial"
+    },
+    "152278897": {
+      "kind": "pocklington",
+      "q": 41201,
+      "witness": 2
+    },
+    "3174488726581969": {
+      "kind": "pocklington",
+      "q": 152278897,
+      "witness": 2
+    },
+    "990355220063213320357952902351": {
+      "kind": "pocklington",
+      "q": 3174488726581969,
+      "witness": 2
+    },
+    "36451": {
+      "kind": "trial"
+    },
+    "257198257": {
+      "kind": "pocklington",
+      "q": 36451,
+      "witness": 2
+    },
+    "2938227744002861": {
+      "kind": "pocklington",
+      "q": 257198257,
+      "witness": 2
+    },
+    "954856230343595062281179282639": {
+      "kind": "pocklington",
+      "q": 2938227744002861,
+      "witness": 2
+    },
+    "57667": {
+      "kind": "trial"
+    },
+    "136670791": {
+      "kind": "pocklington",
+      "q": 57667,
+      "witness": 2
+    },
+    "3737387970339557": {
+      "kind": "pocklington",
+      "q": 136670791,
+      "witness": 2
+    },
+    "1187120753712423241095256207267": {
+      "kind": "pocklington",
+      "q": 3737387970339557,
+      "witness": 2
+    },
+    "64793": {
+      "kind": "trial"
+    },
+    "256580281": {
+      "kind": "pocklington",
+      "q": 64793,
+      "witness": 2
+    },
+    "2960295505198063": {
+      "kind": "pocklington",
+      "q": 256580281,
+      "witness": 2
+    },
+    "815822923095670774212133282799": {
+      "kind": "pocklington",
+      "q": 2960295505198063,
+      "witness": 2
+    },
+    "60887": {
+      "kind": "trial"
+    },
+    "267781027": {
+      "kind": "pocklington",
+      "q": 60887,
+      "witness": 2
+    },
+    "2313973510804831": {
+      "kind": "pocklington",
+      "q": 267781027,
+      "witness": 2
+    },
+    "709943904428321299378301262353": {
+      "kind": "pocklington",
+      "q": 2313973510804831,
+      "witness": 2
+    },
+    "1627": {
+      "kind": "trial"
+    },
+    "152939": {
+      "kind": "pocklington",
+      "q": 1627,
+      "witness": 2
+    },
+    "2934899411": {
+      "kind": "pocklington",
+      "q": 152939,
+      "witness": 2
+    },
+    "975806391391065361": {
+      "kind": "pocklington",
+      "q": 2934899411,
+      "witness": 2
+    },
+    "79654804024075229962730101718699459": {
+      "kind": "pocklington",
+      "q": 975806391391065361,
+      "witness": 2
+    },
+    "1181": {
+      "kind": "trial"
+    },
+    "255097": {
+      "kind": "pocklington",
+      "q": 1181,
+      "witness": 2
+    },
+    "3267792571": {
+      "kind": "pocklington",
+      "q": 255097,
+      "witness": 2
+    },
+    "614694977396768959": {
+      "kind": "pocklington",
+      "q": 3267792571,
+      "witness": 2
+    },
+    "53804886172640988937483640565647837": {
+      "kind": "pocklington",
+      "q": 614694977396768959,
+      "witness": 2
+    },
+    "201701": {
+      "kind": "pocklington",
+      "q": 2017,
+      "witness": 2
+    },
+    "3097320557": {
+      "kind": "pocklington",
+      "q": 201701,
+      "witness": 2
+    },
+    "715670976363555241": {
+      "kind": "pocklington",
+      "q": 3097320557,
+      "witness": 2
+    },
+    "77783825029807890442970384510973853": {
+      "kind": "pocklington",
+      "q": 715670976363555241,
+      "witness": 2
+    },
+    "1231": {
+      "kind": "trial"
+    },
+    "256049": {
+      "kind": "pocklington",
+      "q": 1231,
+      "witness": 2
+    },
+    "3480218009": {
+      "kind": "pocklington",
+      "q": 256049,
+      "witness": 2
+    },
+    "762873824521537957": {
+      "kind": "pocklington",
+      "q": 3480218009,
+      "witness": 2
+    },
+    "54184161170979807014146364419085311": {
+      "kind": "pocklington",
+      "q": 762873824521537957,
+      "witness": 2
+    },
+    "1877": {
+      "kind": "trial"
+    },
+    "138899": {
+      "kind": "pocklington",
+      "q": 1877,
+      "witness": 2
+    },
+    "3011052523": {
+      "kind": "pocklington",
+      "q": 138899,
+      "witness": 2
+    },
+    "684885112232427059": {
+      "kind": "pocklington",
+      "q": 3011052523,
+      "witness": 2
+    },
+    "53573169105029492548355123389995667": {
+      "kind": "pocklington",
+      "q": 684885112232427059,
+      "witness": 2
+    },
+    "1523": {
+      "kind": "trial"
+    },
+    "228451": {
+      "kind": "pocklington",
+      "q": 1523,
+      "witness": 2
+    },
+    "3566577013": {
+      "kind": "pocklington",
+      "q": 228451,
+      "witness": 2
+    },
+    "603221361786384569": {
+      "kind": "pocklington",
+      "q": 3566577013,
+      "witness": 2
+    },
+    "78929071274742027258767281080188611": {
+      "kind": "pocklington",
+      "q": 603221361786384569,
+      "witness": 2
+    },
+    "252823": {
+      "kind": "pocklington",
+      "q": 1453,
+      "witness": 2
+    },
+    "3793356293": {
+      "kind": "pocklington",
+      "q": 252823,
+      "witness": 2
+    },
+    "1011989133751662137": {
+      "kind": "pocklington",
+      "q": 3793356293,
+      "witness": 2
+    },
+    "50487587012391760024480688071010323": {
+      "kind": "pocklington",
+      "q": 1011989133751662137,
+      "witness": 2
+    },
+    "1667": {
+      "kind": "trial"
+    },
+    "160033": {
+      "kind": "pocklington",
+      "q": 1667,
+      "witness": 2
+    },
+    "4223590937": {
+      "kind": "pocklington",
+      "q": 160033,
+      "witness": 2
+    },
+    "896198464538995003": {
+      "kind": "pocklington",
+      "q": 4223590937,
+      "witness": 2
+    },
+    "74552545125523744131832785718775663": {
+      "kind": "pocklington",
+      "q": 896198464538995003,
+      "witness": 2
+    },
+    "2239": {
+      "kind": "trial"
+    },
+    "653789": {
+      "kind": "pocklington",
+      "q": 2239,
+      "witness": 2
+    },
+    "55704130379": {
+      "kind": "pocklington",
+      "q": 653789,
+      "witness": 2
+    },
+    "284460775362982377403": {
+      "kind": "pocklington",
+      "q": 55704130379,
+      "witness": 2
+    },
+    "7586504064402921279506732341713287275187": {
+      "kind": "pocklington",
+      "q": 284460775362982377403,
+      "witness": 2
+    },
+    "2213": {
+      "kind": "trial"
+    },
+    "801107": {
+      "kind": "pocklington",
+      "q": 2213,
+      "witness": 2
+    },
+    "49647805219": {
+      "kind": "pocklington",
+      "q": 801107,
+      "witness": 2
+    },
+    "158126256432870023789": {
+      "kind": "pocklington",
+      "q": 49647805219,
+      "witness": 2
+    },
+    "6087128912120882149523886561110442430261": {
+      "kind": "pocklington",
+      "q": 158126256432870023789,
+      "witness": 2
+    },
+    "2153": {
+      "kind": "trial"
+    },
+    "805223": {
+      "kind": "pocklington",
+      "q": 2153,
+      "witness": 2
+    },
+    "45068331311": {
+      "kind": "pocklington",
+      "q": 805223,
+      "witness": 2
+    },
+    "275301299832880767221": {
+      "kind": "pocklington",
+      "q": 45068331311,
+      "witness": 2
+    },
+    "8208139703143819455484270260502499381527": {
+      "kind": "pocklington",
+      "q": 275301299832880767221,
+      "witness": 2
+    },
+    "3631": {
+      "kind": "trial"
+    },
+    "1023943": {
+      "kind": "pocklington",
+      "q": 3631,
+      "witness": 2
+    },
+    "47586726983": {
+      "kind": "pocklington",
+      "q": 1023943,
+      "witness": 2
+    },
+    "207652131940695148991": {
+      "kind": "pocklington",
+      "q": 47586726983,
+      "witness": 2
+    },
+    "7369973762837970524912862792097738811977": {
+      "kind": "pocklington",
+      "q": 207652131940695148991,
+      "witness": 2
+    },
+    "2633": {
+      "kind": "trial"
+    },
+    "1016339": {
+      "kind": "pocklington",
+      "q": 2633,
+      "witness": 2
+    },
+    "43466786353": {
+      "kind": "pocklington",
+      "q": 1016339,
+      "witness": 2
+    },
+    "227849410286433379757": {
+      "kind": "pocklington",
+      "q": 43466786353,
+      "witness": 2
+    },
+    "6490989941186578994793310008291332372653": {
+      "kind": "pocklington",
+      "q": 227849410286433379757,
+      "witness": 2
+    },
+    "2789": {
+      "kind": "trial"
+    },
+    "624737": {
+      "kind": "pocklington",
+      "q": 2789,
+      "witness": 2
+    },
+    "53265076621": {
+      "kind": "pocklington",
+      "q": 624737,
+      "witness": 2
+    },
+    "166263278213928863237": {
+      "kind": "pocklington",
+      "q": 53265076621,
+      "witness": 2
+    },
+    "8681615251941881260104981471276614935061": {
+      "kind": "pocklington",
+      "q": 166263278213928863237,
+      "witness": 2
+    },
+    "524863": {
+      "kind": "pocklington",
+      "q": 2243,
+      "witness": 2
+    },
+    "64554999823": {
+      "kind": "pocklington",
+      "q": 524863,
+      "witness": 2
+    },
+    "196510437966898240021": {
+      "kind": "pocklington",
+      "q": 64554999823,
+      "witness": 2
+    },
+    "8844422466067727704198965433020284437283": {
+      "kind": "pocklington",
+      "q": 196510437966898240021,
+      "witness": 2
+    },
+    "653623": {
+      "kind": "pocklington",
+      "q": 2657,
+      "witness": 2
+    },
+    "47557609481": {
+      "kind": "pocklington",
+      "q": 653623,
+      "witness": 2
+    },
+    "182678609125552912321": {
+      "kind": "pocklington",
+      "q": 47557609481,
+      "witness": 2
+    },
+    "10857862373754710804508244105867760773283": {
+      "kind": "pocklington",
+      "q": 182678609125552912321,
+      "witness": 2
+    },
+    "2459": {
+      "kind": "trial"
+    },
+    "772127": {
+      "kind": "pocklington",
+      "q": 2459,
+      "witness": 2
+    },
+    "43813574489": {
+      "kind": "pocklington",
+      "q": 772127,
+      "witness": 2
+    },
+    "252328986862914241123": {
+      "kind": "pocklington",
+      "q": 43813574489,
+      "witness": 2
+    },
+    "8638964065604755333599479933249875508779": {
+      "kind": "pocklington",
+      "q": 252328986862914241123,
+      "witness": 2
+    },
+    "2927": {
+      "kind": "trial"
+    },
+    "790291": {
+      "kind": "pocklington",
+      "q": 2927,
+      "witness": 2
+    },
+    "54605946937": {
+      "kind": "pocklington",
+      "q": 790291,
+      "witness": 2
+    },
+    "279232057245610413361": {
+      "kind": "pocklington",
+      "q": 54605946937,
+      "witness": 2
+    },
+    "8742297735383836924449338979081868357039": {
+      "kind": "pocklington",
+      "q": 279232057245610413361,
+      "witness": 2
+    }
+  },
+  "seeds": [
+    7,
+    29
+  ],
+  "notes": [
+    "Pocklington proofs; exact trial leaves.",
+    "No known factors or certificates are supplied to algorithms.",
+    "Four residue classes per main band; 70/80 are capped exploration."
+  ]
+}

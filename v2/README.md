@@ -88,8 +88,8 @@ inclusive and callers translate them explicitly with `bound + 1`.
 ## Phase 3.1 reference relation API
 
 `v2.qs` provides exact reference collection and verification. P3.3 adds the
-filtering, GF(2) and factor-extraction pipeline described below. SIQS families
-and dispatcher integration follow in P3.4.
+filtering, GF(2) and factor-extraction pipeline described below. P3.4 provides
+complete bounded SIQS jobs, checkpoints and optional dispatcher integration.
 
 ```python
 from v2.budget import Budget
@@ -138,7 +138,7 @@ boundary is not yet a serialized Phase 3 checkpoint.
 
 Reference limits are 4096 bits for n, A, B, and signed positions, multiplier
 at most 1,000,000, factor-base bound at most 100,000, block width and retained
-atoms at most 4096, residual at most 1,000,000 (within the deterministic `r < 2**64`
+atoms at most 4096, residual at most 1,000,000,000,000 (within `r < 2**64`
 domain), and at most 256 distinct atoms per combination. The default owned
 workspace reservation is 8 MiB, including referenced combination provenance;
 it is not an RSS guarantee. Setup/combination memory failure raises
@@ -157,8 +157,9 @@ make -C v2 benchmark-phase-three-reference WARMUP_SECONDS=3 REPETITIONS=9 \
 
 This runner validates independent small-window/root oracles, records cold
 startup separately, and measures an unchanged complete-factorization control.
-It establishes reference costs; complete SIQS promotion still needs P3.4.
-The [M20 acceptance summary and
+It establishes reference costs. The bounded P3.4 comparisons are below;
+broader portfolio promotion remains separate.
+The M20 acceptance summary and
 [public changelog](../CHANGELOG.md) record the passed P3.1 gates and measured limits.
 
 ## Phase 3.2 bounded single-large-prime collection
@@ -166,8 +167,8 @@ The [M20 acceptance summary and
 `SieveCollector` caches normalized polynomial roots and integer log bounds,
 reuses working buffers, and retains checked full relations and matching
 single-large-prime partials. It collects a supplied QS/MPQS polynomial;
-P3.3 supplies postprocessing. SIQS families and dispatcher integration remain
-P3.4 work.
+P3.3 supplies postprocessing. P3.4 adds shared
+family jobs and optional dispatcher integration below.
 
 ```python
 from v2.budget import Budget
@@ -227,6 +228,17 @@ thresholds consistently. The scores still upper-bound all valuations, so
 zero-extra refinement cannot discard an admissible norm. It adds marking
 and per-candidate work; use complete-run measurements to choose a policy.
 
+`score_policy="powers"` is an optional tighter sieve. Exact Hensel lifting
+marks each prime power separately; a root class with no position in the
+current block needs no higher lifts. Singular branches are capped at 64
+roots, then receive a proved conservative allowance. This can admit extra
+candidates but preserves every admissible norm at zero extra threshold.
+Candidate refinement and byte saturation obey the same coverage contract.
+Lifting work and both bounded root lists are reserved before use; configure
+sufficient memory (64 MiB is suitable for the standalone test controls).
+Independent checks cover signed windows, repeated prime powers, singular
+roots, all division paths and score buffers. The default remains adaptive.
+
 `division="full"` tries every factor-base prime. `"roots"` excludes primes
 only using exact cached congruences; `"bucket"` uses complete hit bitsets.
 `"resieve"` makes a separate prime/root pass over selected candidate values,
@@ -237,7 +249,7 @@ omitted small primes, and add A's cached exponents. Scores never justify a
 division early exit. A must factor entirely over the supplied base; otherwise
 construction raises `ValueError`. Accepted atoms pass `verify_atomic()`;
 nonunit residuals must be proven primes at most the configured bound, which
-is at most 1,000,000 and strictly within `r < 2**64`. Residual GCDs return
+is at most 1,000,000,000,000 and strictly within `r < 2**64`. Residual GCDs return
 only checked proper divisors. Combinations retain square corrections and
 pass the existing provenance/congruence verifier; no inversion is needed.
 
@@ -245,7 +257,8 @@ An unmatched residual retains one atom. A match consumes the pending entry
 and pins both source atoms with its combined relation. At the partial cap,
 FIFO eviction removes only the oldest unmatched atom. Accepted combinations
 and their source atoms are never evicted. Full/combined relations and all
-retained atoms have separate caps, each at most 4096. A zero partial cap
+retained atoms have separate caps, each at most 65,536. Defaults remain
+small; increasing a count cap also requires sufficient owned memory. A zero partial cap
 drops unmatched atoms and counts the loss; eviction affects later match
 yield, independently of score coverage. Duplicate retained positions cannot
 be admitted twice.
@@ -266,7 +279,7 @@ scores, buckets, bounded slices, bigint/combination scratch and retained
 provenance. It is conservative workspace accounting, not a process RSS cap.
 Release earlier result snapshots before resuming to exclude their retained
 references from this accounting. The collector is serial and in-memory;
-serialized family/checkpoint state belongs to P3.4. Do not change buffer or
+serialized full-job state is provided by SIQSJob. Do not change buffer or
 marking configuration after construction.
 
 ```sh
@@ -311,7 +324,10 @@ is retained. Prepared rows pin their checked source atoms.
 `filter_matrix()` uses relation rows and sign/prime columns;
 iterative singleton removal preserves the kernel. Optional `weight_two=True`
 XORs the two rows constrained by a weight-two column and XORs their original
-row masks. Zero rows retain their dependencies. `DependencySolver` supports
+row masks. Column incidence uses bounded row-index bitsets and updates only
+affected columns after removals/merges. Singleton queues and a bounded heap
+preserve the previous row/mask order, including serialized solver prefixes.
+Zero rows retain their dependencies. `DependencySolver` supports
 highest/lowest pivots and lifts every dependency back to prepared input rows.
 
 `extract_dependency()` independently checks original-row parity, even signed
@@ -321,7 +337,7 @@ does not certify either child prime. Complete balanced benchmark fixtures
 separately prove both factors and reconstruct the input. Invalid provenance
 or arithmetic raises `ValueError`; it never signals successful factoring.
 
-Matrices, provenance and dependency trials have caps of 4096 rows/masks;
+Matrices, provenance and dependency trials have caps of 65,536 rows/masks;
 column indices are below 100001. Conservative reservations include incidence,
 dense fill-in, lift masks, pivots and extraction temporaries, not just input
 nonzeros. They share the configured memory allowance with the collector.
@@ -336,8 +352,8 @@ extraction progress and the first uncommitted collection position. Extend
 the allowance through `job.budget`, preserving used work and prior active
 wall/CPU; the next `run()` resumes in memory. Storage/window exhaustion keeps
 the unresolved n explicit. A successful result satisfies
-`result.divisor * result.cofactor == n`. Serialized checkpoints, new families
-and bounded parameter growth remain P3.4 work.
+`result.divisor * result.cofactor == n`. Full relation-job checkpoints and
+bounded width recovery are supplied by SIQSJob below.
 
 ```sh
 make -C v2 benchmark-phase-three-pipeline WARMUP_SECONDS=3 REPETITIONS=9 \
@@ -358,7 +374,392 @@ collector controls still trail exhaustive enumeration. Resieving and tighter
 candidate scoring remain optional; root division and singleton filtering
 remain API defaults. See [public changelog](../CHANGELOG.md) for decisions and limits.
 
+P3.3 follow-up audit (M28) fixes storage-cap completion: relation, atom or
+collector-memory exhaustion triggers one final extraction attempt from the
+retained checked rows. Budget refusal preserves that attempt for resume;
+unchanged unsuccessful storage stops return without repeating work. Combined
+memory reservations include live collector buffers, preparation scratch and
+matrix workspace, counting shared atoms/base once. Matched partials reserve their sparse exponent
+lists as retained storage; dense combination scratch is temporary and
+shares the live-store allowance. Checkpoint reconstruction applies the same
+accounting and refuses before exceeding that allowance. A matrix memory refusal
+keeps the unresolved cofactor explicit. The audit passes 157 PyPy tests and
+lint, plus 214 root, 648 collector and 320 matrix-oracle comparisons.
+See [benchmark scope and correction costs](benchmarks/README.md).
+
+## Phase 3.4 bounded SIQS and complete checkpoints
+
+`SIQSJob` shares verified full relations and single-prime partial matches
+across exact CRT/Gray polynomial families. One budget covers multiplier/base
+setup, roots, marking, exact recovery, filtering, elimination and extraction.
+`mode="qs"` retains the fixed-polynomial control; `mode="mpqs"` visits a finite
+schedule of lifted q-squared polynomials. The production portfolio uses SIQS
+when explicitly configured after its ECM schedule.
+
+```python
+from v2.budget import Budget
+from v2.qs import SIQSConfig, SIQSJob
+
+config = SIQSConfig(base_bound=200, half_width=256)
+job = SIQSJob(
+    4001 * 5003, seed=7, config=config,
+    budget=Budget(work_limit=200_000_000, seconds=10, cpu_seconds=10),
+)
+paused = job.run(max_blocks=1)
+checkpoint = job.checkpoint()
+resumed = SIQSJob.from_checkpoint(
+    checkpoint, config=config,
+    budget=Budget(work_limit=200_000_000, seconds=20, cpu_seconds=20),
+)
+result = resumed.run()
+assert result.divisor * result.cofactor == 4001 * 5003
+```
+
+`run()` returns a proper split or the explicit unresolved n. `max_blocks`
+pauses at collection boundaries. Work/time/cancellation refusal keeps the
+first unpublished position and pending elimination/extraction state. Successful
+and terminal local outcomes are idempotent. Limits include 1–8 A factors,
+1–64 families, at most 128 polynomials per family, bounded block/row/atom
+counts and an explicit total owned-memory allowance (32 MiB by default).
+Reservations describe owned workspace, rather than process RSS.
+
+`max_stalled` and `max_trivial` bound unproductive polynomials and repeated
+trivial dependencies. `growth_steps` permits at most four finite width epochs,
+bounded by `max_half_width`. Growth preserves the exact factor base and
+verified store, charges assignments/roots again and retains consumed resources.
+Base enlargement and disk spill are disabled; the disk allowance is zero.
+Exhausted schedules, store limits or memory refusals retain an unfinished
+cofactor. `diverse=False` and `shared_relations=False` expose simple/fresh-store
+controls. Polynomial reflection/translation keys and checked atomic IDs track
+duplicates; parity equality between distinct relations remains valid data.
+
+`multiplier=1` is the fixed control; zero selects a finite integer
+Knuth–Schroeppel-style score. Exact small-prime residues and the class modulo
+8 contribute to the score, with a half-log multiplier-size penalty.
+Integer-scaled logarithms apply only to bounded small integers. A multiplier
+GCD can return a proper split. This independently implemented heuristic has
+its own matched controls; it imports no native digit table or optimality claim.
+
+Full checkpoints retain configuration, seed/assignment identity, width epoch,
+family/Gray index, block position, checked-store identity, pending polynomial,
+compact solver/extraction progress and consumed work/wall/CPU. Polynomial
+provenance is stored once per polynomial; atoms and matches reference it.
+New solver-prefix digests stream binary rows/masks as hexadecimal text,
+with an explicit encoding tag. Earlier decimal digests remain readable; wide
+masks avoid Python's decimal integer-string limit.
+The matrix is reconstructed and the verified elimination prefix replayed;
+completed trivial extraction trials are replayed too. Reconstruction costs
+are charged to the resumed allowance. This bounds checkpoint size without
+serializing duplicate matrices. A fresh resume Budget automatically receives
+prior consumption; a used Budget must already retain those resources.
+
+Checkpoint envelopes have a version, integrity markers and a default 1 MiB
+cap, configurable from 4 KiB to 16 MiB. Larger envelopes reserve their
+encoding workspace before a job begins; the default remains 1 MiB.
+Retained roots/store/matrix and encoding scratch share the overall memory allowance. Incompatible configurations,
+corrupt provenance, invalid prefixes and resource resets are rejected.
+If a deliberately small checkpoint cap is insufficient, `checkpoint()` raises
+`MemoryError` and leaves the checked in-memory state resumable. Integrity
+markers detect corruption; they are not authentication signatures.
+
+`PolynomialFamily`, `family_assignments()` and independently certified
+`SieveCollector(..., precomputed_roots=...)` remain available as lower-level
+interfaces. Gray transitions use the actual recentered B difference; 2 and
+primes dividing A use exact complete branches. Family-only checkpoints remain
+separate from full-job checkpoints. Caller-retained family state must share
+memory with collection/postprocessing; `SIQSJob` performs that partition.
+
+```python
+from v2.portfolio import PortfolioConfig, factorize_bounded
+
+portfolio = PortfolioConfig(
+    memory_bytes=64 * 1024 * 1024,
+    siqs=SIQSConfig(base_bound=200, half_width=256),
+)
+run = factorize_bounded(
+    4001 * 5003, seed=7, config=portfolio,
+    budget=Budget(work_limit=200_000_000, seconds=20, cpu_seconds=20),
+)
+assert run.result.reconstruct() == 4001 * 5003
+```
+
+The portfolio reserves its own retained state/context alongside SIQS and
+keeps one allowance across methods and recursive children. It includes full
+SIQS progress in its normal checkpoint. Version 3 adds SIQS state; version 4
+adds opt-in SSS state. Version-2/3 checkpoints remain readable and upgrade on
+save when their configuration matches. Runtime probable
+prime labels remain distinct from proven labels and external corpus proofs.
+
+The bounded P3.4 implementation and its declared large-number evaluation are
+complete at M31. A repaired, explicitly configured SIQS job factors one
+balanced 50-digit semiprime from an empty store in 1,183.355 seconds
+(19 min 43 s); a separately resumed job preserves cumulative consumption.
+The 30–80-digit comparison and varied-input study retain censored outcomes
+and finite schedule/storage stops. The larger 60–80-digit bands establish
+bounded exploration, with practical complete-factor scaling still open.
+ECM remains the automatic default and SIQS is opt-in; no broad crossover or
+general large-number timing guarantee is established. The current checkout
+passes 230 PyPy tests and lint, including exact roots/store/matrix oracles,
+cooperative filter cancellation, wide-mask and legacy checkpoint tests,
+charged resume and recursive dispatch. See the
+[completed results and limitations](benchmarks/README.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
+Earlier M29/M30 family/small-input measurements retain their historical scope.
+
+## Phase 3.5 experimental Smooth Subsum Search
+
+`SSSJob` is an optional serial SSS/SSSf challenger. It constructs signed
+CRT/collision candidates for the exact A=1 polynomial, detects smooth parts
+with capped product/remainder trees, recovers every prime exponent and uses
+the same checked single-prime store, filtering, dependency solver and modular
+extraction as QS/SIQS. It is available through an explicit CLI method or an
+optional portfolio configuration. `auto` dispatch keeps its existing default.
+
+```sh
+pypy3 -m v2.factor 10002200057 --method sss --sss-base-bound 400 --seed 7
+pypy3 -m v2.factor 10002200057 --method sssf --sss-base-bound 400 --seed 7
+```
+
+`--method sss` / `sssf` implies bounded execution. After sign/twos, primality,
+trial division, exact powers and optional Fermat preprocessing, the selected
+collector replaces rho/p−1/ECM. It returns full recursive factorization with
+normal certainty labels and unresolved cofactors. `--sss-base-bound` defaults
+to 1000 and `--sss-rounds` to 256. Selected methods default to 200 million work
+units, 30 wall/CPU seconds and 80 MiB total owned memory; existing `auto`
+limits stay unchanged. Explicit budget arguments always take precedence.
+The CLI reserves 16 MiB for portfolio/context coexistence and gives the rest
+to SSS. SSSf's two-stage processing has no lossy cutoff by default; a positive
+cutoff remains an API configuration choice.
+
+Save and resume with the same method, base, rounds, memory and Fermat options:
+
+```sh
+pypy3 -m v2.factor 10002200057 --method sss --sss-base-bound 400 \
+  --work-limit 100000 --checkpoint v2/audit/sss_checkpoint_LOCAL.json
+pypy3 -m v2.factor --method sss --sss-base-bound 400 \
+  --resume v2/audit/sss_checkpoint_LOCAL.json --work-limit 200000000
+```
+
+For an SSS fallback after the existing bounded rho/p−1/ECM schedule, use:
+
+```python
+from v2.budget import Budget
+from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.qs.sss import SSSConfig
+
+config = PortfolioConfig(memory_bytes=80 * 1024 * 1024,
+                         sss=SSSConfig(base_bound=400))
+run = factorize_bounded(10002200057, seed=7, config=config,
+                       budget=Budget(work_limit=200_000_000))
+```
+
+`sss=None` is the default. Choose either `sss` or `siqs` as the relation
+fallback. Set rho/p−1 attempt counts to zero and `ecm_tiers=()` to reach SSS
+directly after preprocessing, as the selected CLI methods do. All stages and
+recursive children share the same allowance. Opt-in availability is separate
+from automatic performance promotion; larger crossover evidence remains open.
+
+```python
+from v2.budget import Budget
+from v2.qs.sss import SSSConfig, SSSJob
+
+budget = Budget(work_limit=200_000_000, seconds=10, cpu_seconds=10)
+job = SSSJob(4001 * 4003, seed=7,
+             config=SSSConfig(base_bound=400), budget=budget)
+result = job.run(batch_limit=1)
+if result.reason == "paused":
+    result = job.run()
+assert result.divisor is None or result.divisor * result.cofactor == job.n
+```
+
+The input is an odd positive integer with at most 4096 bits; callers retain
+normal preprocessing and primality classification. `divisor` is either a
+validated proper split or `None`, never a primality claim. Unfinished results
+retain the complete input as `cofactor`. `next_position` counts completed
+search assignments, rather than polynomial positions. The unfinished
+assignment and its first uncommitted candidate remain in memory. To resume
+a budget refusal, extend that same `Budget` in place; replacing it is rejected.
+Consumption never resets. `checkpoint()` and
+`SSSJob.from_checkpoint(snapshot, budget=...)` serialize the checked store,
+completed assignment index, pending candidate cursor and solver/extraction
+prefix. Resume regenerates the seeded pending assignment, verifies every
+retained relation and rebuilds the matrix/prefix with charged work. It retains
+consumed work/wall/CPU and requires matching configuration. `checkpoint_bytes`
+defaults to 256 KiB and is capped at 1 MiB; checkpoint overflow raises
+`MemoryError` while leaving the live job intact. Encoding/decoding coexistence
+is reserved alongside the collector. An unchanged setup-memory or accepted-
+store refusal is idempotent; other setup refusals
+may repeat charged private work. Recreate the job to change its parameters.
+
+`SSSConfig` bounds base size, assignments, selection size, collision count,
+candidate batches, tree nodes/bits and owned memory. Its `collector` controls
+residual bounds, full/partial/atom storage and deterministic eviction. A
+candidate or tree overflow refuses the entire unpublished assignment; a
+full store triggers the shared final extraction attempt. Setup, collision
+counters, candidate/tree coexistence and stored provenance are reserved
+together. The workspace reservation is distinct from observed process RSS.
+
+`mode="sssf"` adds two-stage smoothness processing. `filter_divisor` controls
+the first subset; positive `filter_bound` intentionally rejects candidates
+whose remaining part is at least that bound, except values already smooth
+over the subset. Zero disables this yield-losing cutoff. Both modes detect
+all base-prime powers; the upstream finite prime-power shortcut is not used.
+Exact division and the independent relation verifier still decide admission.
+Assignments use local seeds and sorted indices; library calls stay quiet.
+
+The adapter needs no third-party arithmetic packages. The separate,
+hash-checked upstream reproduction runner uses optional SymPy 1.14.0,
+mpmath 1.3.0 and gmpy2 2.3.1 in the project-local PyPy development environment.
+It preserves the upstream source and separately records its floating-point
+setup, raw-prime-count parameter table, global random seed and matrix helper.
+Those settings are not the adapter's defaults. See the
+[comparison commands and decisions](benchmarks/README.md).
+
+## Phase 3.6 experimental SIQS workers
+
+`v2.qs.parallel.ParallelSIQSJob` evaluates independent SIQS polynomial
+families in serial, threads or spawned PyPy processes. It is a standalone
+experimental API. The factoring CLI and automatic portfolio retain serial
+collection. Use PyPy implementing Python 3.11 and a guarded entry point when
+spawning processes:
+
+```python
+from v2.budget import Budget
+from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
+
+
+def main():
+    allowance = Budget(work_limit=200_000_000, seconds=10, cpu_seconds=10)
+    config = ParallelConfig(base_bound=200, family_count=16)
+    with CollectionPool("process", 2) as pool:
+        job = ParallelSIQSJob(4001 * 5003, seed=7,
+                              config=config, budget=allowance)
+        result = job.run(pool=pool)
+    assert result.divisor is None or result.divisor * result.cofactor == job.n
+
+
+if __name__ == "__main__":
+    main()
+```
+
+`CollectionPool` accepts `serial` with one worker or `thread`/`process`
+with one to four workers. It can be reused sequentially across jobs and must
+be closed. Threads run under PyPy's GIL; no native bigint backend is assumed
+to release it. The fixed family schedule depends on the input, configuration
+and seed, independently of worker count. Completed batches merge in assignment
+order, with exact re-verification and central single-prime matching, filtering,
+GF(2) solving and extraction. Only verified atomic relations cross the worker
+boundary. The result is a proper split or the original unresolved cofactor;
+this API does not classify or recursively factor the split's children.
+
+The parent charges each finite `assignment_work` lease before submission,
+then refunds only reported unspent work. Cancelled private work is charged.
+Aggregate CPU includes parent CPU, live worker publications and a final
+post-transfer snapshot; threads are counted through the parent process.
+Workers use the parent's remaining wall deadline. Limits are cooperative:
+CPU publications are throttled to one millisecond and parent waits poll every
+ten milliseconds. Running atomic integer operations and worker startup before
+the first CPU publication can overshoot an allowance.
+`ParallelConfig.poll_interval` defaults to 64 and accepts 1–64. Work
+reservations are checked on every action; the first action, every polling
+boundary, and publication of a completed batch check clocks/cancellation.
+At most 63 additional bounded atomic actions can run between external polls.
+This is an action bound, not a hard millisecond deadline: native integer work,
+the one-millisecond CPU publication throttle, the ten-millisecond parent
+wait, and process startup also contribute to cooperative overshoot. Setting
+the interval to one provides the strict-polling comparison control.
+Pool creation/teardown outside `run` is a caller lifecycle cost; the benchmark
+reports cold startup and shutdown separately.
+
+`memory_bytes` caps conservative aggregate owned reservations: parent storage,
+worker workspace, duplicated bases and three bounded result/IPC copies per
+slot. `parent_memory_bytes` and `worker_memory_bytes` also impose local caps.
+This is separate from process RSS, whose observed high-water marks include
+the interpreter/JIT and allocator. Result batches are capped by
+`max_batch_atoms`; cap refusal publishes no incomplete worker prefix. There
+are no spill files or nested backend threads.
+
+`ParallelConfig.batch_width=0` preserves complete-family assignments.
+Widths 1–4096 instead publish contiguous position blocks within each Gray
+polynomial. Assignment IDs encode family, Gray index and block in that order;
+the final block can be shorter. Smaller batches allow earlier extraction and
+avoid overflowing a whole-family atom cap, at the cost of repeated setup and
+transport. Reservations use the smaller of the atom cap and the maximum
+number of positions in an assignment. Every returned atom is still checked
+against its exact polynomial/window and independently verified centrally.
+The per-atom exponent reservation uses an integer upper bound on the
+polynomial norm and the product of the smallest factor-base primes; a relation
+cannot contain the entire base when that product exceeds its norm.
+
+`run(max_assignments=1)` pauses after one committed assignment and drains workers
+before returning. In-memory resume extends the original `Budget` in place.
+Completed pending batches and their admission cursor survive interruption;
+incomplete private assignments replay from their beginning with the same ID and
+newly charged work. A worker's `work_limit` refusal can require a larger
+`assignment_work` lease in addition to a larger aggregate allowance.
+`job.checkpoint()` returns byte-capped JSON-compatible state.
+`ParallelSIQSJob.from_checkpoint(checkpoint, budget=new_allowance)` restores
+cumulative work/wall/CPU, verifies retained and pending provenance, and charges
+setup/store reconstruction. Worker count may change after restoration.
+Solver caches rebuild from verified rows; they are not serialized. Checkpoint
+creation requires quiescent workers. Checksums detect corruption rather than
+authenticate history supplied by another party.
+Worker checkpoints now use version 2. Version-1 complete-family checkpoints
+remain readable with `batch_width=0`; new checkpoints bind chunk settings and
+validate admitted prefixes against their saved pending atoms. Changing batch
+width changes assignment identity and requires a new job.
+In-memory resume rejects changes to assignment geometry or storage settings.
+It permits changes to the work lease and polling interval, and a reduction of
+the checkpoint byte cap. Drained jobs release pool adapters held by paused
+solvers and extractors before returning.
+
+`run(fixed_work=True)` defers extraction until all scheduled families commit
+for the fixed-work experiment, recording direct residual splits while still
+scanning the complete schedule. `result.stats["schedule_complete"]` distinguishes
+complete scheduled work from an interrupted/refused attempt. Preserve this
+flag on resume. Normal runs try
+extraction after each assignment and cancel remaining work after a checked split.
+Finite family/window/store limits may exhaust without a split. Measurements
+and the adoption decision are in the [benchmark guide](benchmarks/README.md).
+
 ## Measured regression fixes
+
+The P3.6.1 audit adds exact small-prime screens before higher-power roots and
+an `isqrt` square fast path. `SieveContext.prime_segment(lo, hi)` materializes
+one half-open range of at most twice its segment size, sharing the existing
+single-consumer buffer. Budgeted prime cursors use this bounded path; prime
+streams and cached schedules keep their existing interfaces.
+
+Bucket division visits hit primes and the support of A; resieving recovers
+exponents only at actual hits. Prime-power marking shares its first pass with
+hit collection and caches bounded derivative inverses per polynomial.
+Skipped small primes contribute their exact valuations to candidate refinement,
+preserving the conservative acceptance test. Sparse matrix column labels are
+compacted when fewer than half the labeled positions are used, with original
+rows retained for dependency verification and included in memory reservations.
+`filter_matrix().stats` adds `working_columns`; `input_columns` keeps the
+original highest-label width. Extraction visits selected dependency bits.
+
+The common QS pipeline reserves at most 2 MiB for verified preparation
+records, bounded further by the relation cap. Reuse requires the identical
+immutable base and relation objects and, for combined rows, the identical
+referenced atoms still present in the current store. New or changed inputs
+receive full exact verification. The collector owns the cache reservation
+alongside matrix scratch and clears it before releasing pinned relations;
+checkpoints rebuild it. Public `prepare_relations()` continues to verify all
+inputs. Cache saturation falls back to full verification.
+
+Native QS/SIQS/SSS collection and solving use the same maximum 64-action
+polling interval as worker execution. Every work reservation remains exact;
+stage transitions and publication force external-limit checks. Calls restore
+the caller's original budget object on both success and failure. These
+cooperative checks retain the atomic-operation and startup caveats above.
+
+SSS collision counters count distinct primes directly and reserve unchanged
+logical work in chunks of at most 64. Candidate order and seeded assignments
+match the frozen control. SSSf removes the first subset completely before
+testing the disjoint remaining base, avoiding repeated smoothness work. Its
+optional lossy filter and experimental status remain unchanged. See the
+[performance audit](benchmarks/README.md) for matched controls and decisions.
 
 The M9 dispatcher classifies the input before trial division and reuses
 classifications within each call. Trial division refreshes an exact square-root
@@ -432,8 +833,9 @@ complete factorization under the same configuration.
 
 The M13 batch loops keep rho and stage-two arithmetic in local variables, then
 commit the same state at the reserved boundary. They preserve M12 work counts,
-candidate assignments, and checkpoint version 2; existing checkpoints remain
-compatible. This reduces measured overhead without changing portfolio bounds.
+candidate assignments, and the then-current version-2 checkpoints. M30 adds
+version 3 with compatible reading of those earlier checkpoints. This reduces
+measured overhead without changing portfolio bounds.
 
 M17 confirmed the loop change on an independent corpus and froze the
 [Phase 2 core baseline](audit/phase_two_m17_frozen_baseline.json). With five
@@ -448,7 +850,8 @@ The core exit passed; broader parameter and competitor gates remain open.
 The single-pass large-band screen
 completed 4% of balanced 30-digit inputs and none of the balanced 40–80-digit
 inputs under those operation caps. This does not establish universal size
-limits. Larger balanced coverage remains Phase 3 SIQS/SSS work.
+limits. M30 also reports capped SIQS results above; broader balanced
+coverage remains unestablished.
 
 The default 8 MiB memory allowance covers conservative owned scheduling,
 cursor, point/batch, result, and checkpoint reserves. `SieveContext` reuses
@@ -491,13 +894,14 @@ The compatibility interface has no shared deadline or resumable schedule.
 Its original segmented sieve APIs still materialize full output. The bounded
 API above supplies streamed scheduling, shared limits, and p−1 integration.
 
-The old “50–60 digits within a minute” claim is withdrawn. Balanced-composite
-coverage needs the later SIQS/SSS work, and no Phase 1 microbenchmark establishes
-such a performance guarantee. See [public changelog](../CHANGELOG.md) for measured changes,
+The old “50–60 digits within a minute” claim is withdrawn. M31 records one
+balanced 50-digit success at 19 min 43 s; it does not
+establish a general one-minute promise, and no Phase 1 microbenchmark
+establishes that guarantee. See [public changelog](../CHANGELOG.md) for measured changes,
 including regressions, and [`audit/TODOS.md`](audit/TODOS.md) for the gated plan.
 
-GNFS is committed roadmap work. Sequence: finish the Phase 3 SIQS relation
-pipeline, bring P4.3's PyPy/GMP arithmetic assessment forward, then build the
+GNFS is committed roadmap work. With the bounded P3.4 SIQS pipeline complete,
+bring P4.3's PyPy/GMP arithmetic assessment forward, then build the
 Phase 7 GNFS reference through polynomial selection, rational/algebraic
 relations, filtering, dependencies and both square roots. Scale and measure
 its SIQS crossover after that. Phase numbers preserve existing task IDs;
@@ -602,3 +1006,97 @@ make -C v2 lint
 The lint configuration excludes historical audit sources so provenance
 artifacts retain their original contents. Existing copied production code,
 new tests, and benchmark code are all formatted, spaced, and commented.
+
+### P3.8 R1: bounded capacity and extendable SIQS jobs
+
+The existing finite reference schedules remain the default. Opt-in
+`SIQSConfig(assignment_policy="nearest")` streams unique A assignments from
+an integer cursor; `"flyer"` chooses a final prime by the actual product's
+distance from the integer target. Flyer primes come from outside the core
+pool, so each assignment has a unique core without retaining a search history.
+Both policies support 1–32 A factors and a pool of at most 4,096 primes.
+`family_count` is a cumulative allowance (at most `2**31 - 1`), while only one
+family and its root cache are resident. `polynomials_per_family=0` visits the
+whole Gray family; a positive value limits Gray reuse independently of the
+number of assignments. An s-prime family has `2**(s-1)` possible polynomials.
+Streaming jobs require a fixed width, `growth_steps=0`, and `diverse=True`.
+Their width and factor base cannot change on resume. The actual assignment
+count and total combination space are reported separately from the requested
+quota. Exhausting the pool's combination space reports
+`assignment_space_exhausted`; a larger quota cannot create new subsets.
+
+The factor-base implementation ceiling is 1,000,000. A job still has an
+explicit finite bound, work/time allowances and memory checks before allocation.
+Streaming jobs permit up to 4 GiB of owned workspace and 64 MiB of encoded
+checkpoints. Checkpoint coexistence reserves eight times the configured byte
+cap; raising that cap reduces the workspace available for collection. These
+are implementation ceilings, not recommended parameters or process RSS limits.
+The reference assignment API retains its eight-factor/64-family restrictions.
+
+`SIQSConfig(mode="mpqs", external_coefficients=True)` searches coefficients
+q near the square root of the integer A target, independently of the factor
+base. The bounded search (`coefficient_trials`, default 4,096) checks q congruent
+to 3 modulo 4, verifies a root, performs exact Hensel lifting and checks the
+resulting polynomial identity. Its cursor advances only with a completed
+polynomial/root preparation. A failed search reports `coefficient_limit`; extending `coefficient_trials`
+replays that bounded search from the same cursor and retains prior charges.
+Small coefficient primes are proven by the deterministic classifier; larger
+ones remain labelled probable primes. Accepted root/inverse identities and
+all relations are verified independently of that label. Coefficient certainty
+never changes the certainty of an output factor.
+
+`Polynomial(..., square_coefficient=q)` represents an explicit known square
+factor of A. The constructor requires `q*q` to divide A. For an atomic relation,
+`U² - h*n = sign * product(p**e) * residual * square_coefficient**2` exactly.
+`Polynomial.supported_a` is A after removing that square. Collection recovers
+all factor-base exponents of `supported_a * F(x)`; parity ignores the known
+square and extraction multiplies its root. Combined relations and checkpoints
+preserve the correction. The default correction is 1 and legacy polynomial
+identities/checkpoints remain readable. No primality assumption is needed to
+validate this representation.
+
+Resume with the same configuration works as before. An explicit monotone
+extension is available through `SIQSJob.from_checkpoint(...,
+allow_extension=True, config=extended_config)`. It may increase streamed
+`family_count`, external `coefficient_trials`, `max_stalled`, `max_trivial`,
+collector atom/partial/relation
+caps, memory and checkpoint space. Every other configuration field must match;
+limits cannot decrease, and checkpoint/cache growth cannot reduce live
+workspace. Increasing a relation cap below 1,024 also grows the reserved
+verification cache (2,048 bytes per relation, up to 2 MiB); increase the memory
+allowance to cover that growth.
+The checked relation store, assignment/Gray/block position and consumed work,
+wall and CPU resources are retained. Rebuilding roots, verifying restored
+relations and replaying solver state consume the extended allowance. Raising a
+timer alone does not enlarge a search schedule. The containing portfolio's
+configuration-match contract is unchanged; this extension API is for a direct
+SIQS job.
+
+```python
+from dataclasses import replace
+from v2.budget import Budget
+from v2.qs import SIQSConfig, SIQSJob
+
+config = SIQSConfig(assignment_policy="nearest", family_count=128)
+job = SIQSJob(n, config=config, budget=Budget(work_limit=10**10))
+result = job.run()
+checkpoint = job.checkpoint()
+extended = replace(config, family_count=1024, max_stalled=256)
+resumed = SIQSJob.from_checkpoint(
+    checkpoint,
+    config=extended,
+    allow_extension=True,
+    budget=Budget(work_limit=2 * 10**10, seconds=60, cpu_seconds=60),
+)
+result = resumed.run()
+```
+
+`v2.qs.capacity.capacity_report(base, config)` reports actual base cardinality,
+exact attainable A-product bounds, search quotas and separate base, metadata
+cache and matrix reservations. A target inside the product envelope does not prove
+that a particular selected pool reaches it; observed A bounds appear in job
+statistics. `matrix_alone_fits` is only a necessary capacity check: collector,
+provenance and matrix objects coexist. The filter's initial incidence work now
+scales with nonzeros and bounded 64-bit-word operations, while its conservative
+fill-in/provenance storage reservation is unchanged. Reported work units are
+algorithmic allowances, not measured CPU instructions.

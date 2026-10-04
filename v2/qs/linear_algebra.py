@@ -1,12 +1,13 @@
 """Bounded row-oriented GF(2) filtering with original-row provenance."""
 
 from dataclasses import dataclass
+from heapq import heapify, heappop, heappush
 
 from .. import utils
 from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 
-MAX_MATRIX_ROWS = 4096
+MAX_MATRIX_ROWS = 65536
 MAX_MATRIX_COLUMNS = 100_001
 
 
@@ -61,66 +62,152 @@ def filter_matrix(
         if row.bit_length() > MAX_MATRIX_COLUMNS:
             raise ValueError("matrix column cap exceeded")
     utils.require_integer(memory_bytes, "memory_bytes", 0)
-    columns = max((row.bit_length() for row in rows), default=0)
+    union = 0
+    for row in rows:
+        union |= row
+    original_columns = union.bit_length()
+    columns = original_columns
+    compact = columns > 2 * union.bit_count()
+    if compact:
+        columns = union.bit_count()
     reserve = matrix_workspace(len(rows), columns)
+    if compact:
+        # The original wide bitsets coexist with remapped rows and the
+        # index map. Reserve them explicitly, without dense wide fill-in.
+        reserve += 256 * columns + 16 * ((original_columns + 7) // 8)
+        reserve += sum(128 + 8 * ((row.bit_length() + 7) // 8) for row in rows)
     if reserve > memory_bytes:
         raise MemoryError("matrix fill-in/provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
-    active = {index: (row, 1 << index) for index, row in enumerate(rows)}
+    working_rows = rows
+    if compact:
+        nonzeros = sum(row.bit_count() for row in rows)
+        source_words = (original_columns + 63) // 64
+        target_words = (columns + 63) // 64
+        budget.consume(
+            (source_words + 1) * (columns + nonzeros)
+            + target_words * nonzeros
+            + len(rows)
+        )
+        indices, bits = {}, union
+        while bits:
+            bit = bits & -bits
+            indices[bit.bit_length() - 1] = len(indices)
+            bits ^= bit
+            if len(indices) % 64 == 0:
+                budget.consume(0)
+        working_rows = []
+        for row in rows:
+            budget.consume(0)
+            remapped, bits = 0, row
+            while bits:
+                bit = bits & -bits
+                remapped |= 1 << indices[bit.bit_length() - 1]
+                bits ^= bit
+            working_rows.append(remapped)
+        del indices
+    active = {
+        index: (row, 1 << index) for index, row in enumerate(working_rows)
+    }
     zero, singletons, merges, rounds = [], 0, 0, 0
     input_nonzeros = sum(row.bit_count() for row in rows)
     peak_nonzeros = input_nonzeros
+    # Column incidence uses row-index bitsets. The existing worst-case
+    # matrix reservation covers these masks and the bounded queues.
+    # Charge initial incidence by actual nonzeros and bounded 64-bit words.
+    # Each nonzero removes a column bit and updates a row-index bitset.
+    # Dense worst-case storage remains reserved; sparse work need not be dense.
+    word_cost = 1 + (columns + 63) // 64 + (len(rows) + 63) // 64
+    budget.consume(len(rows) + input_nonzeros * word_cost)
+    incidence = {}
+    for index, (row, _) in active.items():
+        budget.consume(0)
+        bits = row
+        while bits:
+            bit = bits & -bits
+            column = bit.bit_length() - 1
+            incidence[column] = incidence.get(column, 0) | (1 << index)
+            bits ^= bit
+    single_columns = {
+        column for column, mask in incidence.items() if mask.bit_count() == 1
+    }
+    pair_columns = [
+        column
+        for column, mask in incidence.items()
+        if weight_two and mask.bit_count() == 2
+    ]
+    heapify(pair_columns)
+    queued_pairs = set(pair_columns)
+    pending_zeros = [index for index, (row, _) in active.items() if not row]
+    nonzeros = input_nonzeros
+
+    def toggle(index, bits):
+        """Update affected columns; queues contain at most one copy each."""
+        row_bit = 1 << index
+        while bits:
+            bit = bits & -bits
+            column = bit.bit_length() - 1
+            budget.consume(word_cost)
+            mask = incidence.get(column, 0) ^ row_bit
+            if mask:
+                incidence[column] = mask
+            else:
+                incidence.pop(column, None)
+            count = mask.bit_count()
+            if count == 1:
+                single_columns.add(column)
+            else:
+                single_columns.discard(column)
+            if weight_two and count == 2 and column not in queued_pairs:
+                heappush(pair_columns, column)
+                queued_pairs.add(column)
+            bits ^= bit
+
     while active:
-        budget.consume(len(active) * (columns + len(rows) + 1))
+        budget.consume(0)
         rounds += 1
-        incidence = {}
-        for index, (row, mask) in tuple(active.items()):
-            if row == 0:
-                zero.append(mask)
-                del active[index]
-                continue
-            bits = row
-            while bits:
-                bit = bits & -bits
-                column = bit.bit_length() - 1
-                previous = incidence.get(column)
-                if previous is None:
-                    incidence[column] = [1, index, None]
-                else:
-                    previous[0] += 1
-                    if previous[0] == 2:
-                        previous[2] = index
-                bits ^= bit
+        for index in pending_zeros:
+            zero.append(active.pop(index)[1])
+        pending_zeros = []
         forced = {
-            first for count, first, _ in incidence.values() if count == 1
+            incidence[column].bit_length() - 1 for column in single_columns
         }
         if forced:
             for index in forced:
-                del active[index]
+                row, _ = active.pop(index)
+                toggle(index, row)
+                nonzeros -= row.bit_count()
             singletons += len(forced)
             continue
-        pair = (
-            next(
-                (
-                    (first, second)
-                    for _, (count, first, second) in sorted(incidence.items())
-                    if count == 2
-                ),
-                None,
-            )
-            if weight_two
-            else None
-        )
+        pair = None
+        while pair_columns:
+            column = heappop(pair_columns)
+            queued_pairs.remove(column)
+            mask = incidence.get(column, 0)
+            if mask.bit_count() == 2:
+                first_bit = mask & -mask
+                pair = (
+                    first_bit.bit_length() - 1,
+                    (mask ^ first_bit).bit_length() - 1,
+                )
+                break
         if pair is None:
             break
         first, second = pair
         left, left_mask = active[first]
         right, right_mask = active.pop(second)
-        active[first] = left ^ right, left_mask ^ right_mask
+        budget.consume(word_cost)
+        merged = left ^ right
+        # Removing the right row and XORing it into the left row changes
+        # precisely the right row's columns, twice.
+        toggle(second, right)
+        toggle(first, right)
+        active[first] = merged, left_mask ^ right_mask
+        nonzeros += merged.bit_count() - left.bit_count() - right.bit_count()
         merges += 1
-        peak_nonzeros = max(
-            peak_nonzeros, sum(row.bit_count() for row, _ in active.values())
-        )
+        peak_nonzeros = max(peak_nonzeros, nonzeros)
+        if not merged:
+            pending_zeros.append(first)
     remaining = tuple(active.values())
     output_rows = tuple(row for row, _ in remaining)
     union = 0
@@ -128,7 +215,8 @@ def filter_matrix(
         union |= row
     stats = {
         "input_rows": len(rows),
-        "input_columns": columns,
+        "input_columns": original_columns,
+        "working_columns": columns,
         "input_nonzeros": input_nonzeros,
         "output_rows": len(output_rows),
         "output_columns": union.bit_count(),
@@ -155,9 +243,11 @@ def verify_dependency(mask, original_rows):
     if mask.bit_length() > len(original_rows):
         raise ValueError("dependency mask refers outside original rows")
     parity = 0
-    for index, row in enumerate(original_rows):
-        if mask & (1 << index):
-            parity ^= row
+    bits = mask
+    while bits:
+        bit = bits & -bits
+        parity ^= original_rows[bit.bit_length() - 1]
+        bits ^= bit
     if parity:
         raise ValueError("dependency is not in the original-row kernel")
     return True
@@ -186,39 +276,43 @@ class DependencySolver:
         self.xors = 0
         self.peak_nonzeros = 0
 
+    def step(self):
+        """Commit one elimination action; keep the pending row on refusal."""
+        if self.next_row >= len(self.matrix.rows):
+            return
+        if self.pending is None:
+            self.pending = (
+                self.matrix.rows[self.next_row],
+                self.matrix.masks[self.next_row],
+            )
+        row, mask = self.pending
+        self.budget.consume(row.bit_length() + mask.bit_length() + 1)
+        if row == 0:
+            verify_dependency(mask, self.matrix.original_rows)
+            self.dependencies.append(mask)
+            self.pending = None
+            self.next_row += 1
+            return
+        bit = (
+            1 << (row.bit_length() - 1)
+            if self.pivot == "highest"
+            else row & -row
+        )
+        previous = self.pivots.get(bit)
+        if previous is None:
+            self.pivots[bit] = row, mask
+            self.peak_nonzeros = max(
+                self.peak_nonzeros,
+                sum(value.bit_count() for value, _ in self.pivots.values()),
+            )
+            self.pending = None
+            self.next_row += 1
+        else:
+            self.pending = row ^ previous[0], mask ^ previous[1]
+            self.xors += 1
+
     def run(self):
         """Finish elimination or raise with resumable state."""
         while self.next_row < len(self.matrix.rows):
-            if self.pending is None:
-                self.pending = (
-                    self.matrix.rows[self.next_row],
-                    self.matrix.masks[self.next_row],
-                )
-            row, mask = self.pending
-            self.budget.consume(row.bit_length() + mask.bit_length() + 1)
-            if row == 0:
-                verify_dependency(mask, self.matrix.original_rows)
-                self.dependencies.append(mask)
-                self.pending = None
-                self.next_row += 1
-                continue
-            bit = (
-                1 << (row.bit_length() - 1)
-                if self.pivot == "highest"
-                else row & -row
-            )
-            previous = self.pivots.get(bit)
-            if previous is None:
-                self.pivots[bit] = row, mask
-                self.peak_nonzeros = max(
-                    self.peak_nonzeros,
-                    sum(
-                        value.bit_count() for value, _ in self.pivots.values()
-                    ),
-                )
-                self.pending = None
-                self.next_row += 1
-            else:
-                self.pending = row ^ previous[0], mask ^ previous[1]
-                self.xors += 1
+            self.step()
         return tuple(self.dependencies)

@@ -11,7 +11,14 @@ from math import isqrt
 from . import constants, prime_sieve, utils
 from .budget import Budget, BudgetExhaustedError
 from .factor import FactorizationResult, PrimeFactor
-from .preprocessing import fermat_step, integer_root, strip_twos
+from .preprocessing import (
+    fermat_step,
+    integer_root,
+    power_residue_possible,
+    strip_twos,
+)
+from .qs import SIQSConfig, SIQSJob
+from .qs.sss import SSSConfig, SSSJob
 from .schedules import ScheduleCache, SieveContext
 from .stage_jobs import (
     advance_job,
@@ -21,7 +28,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 2
+CHECKPOINT_VERSION = 4
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -54,6 +61,8 @@ class PortfolioConfig:
     max_input_bits: int = 4096
     trace_limit: int = 256
     rolling: bool = False
+    siqs: SIQSConfig | None = None
+    sss: SSSConfig | None = None
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -103,6 +112,28 @@ class PortfolioConfig:
             utils.require_integer(b2, "B2", b1)
             utils.require_integer(curves, "curves", 0)
         object.__setattr__(self, "ecm_tiers", tiers)
+        if self.siqs is not None and self.sss is not None:
+            raise ValueError("choose one relation fallback: siqs or sss")
+        if self.sss is not None:
+            if not isinstance(self.sss, SSSConfig):
+                raise TypeError("sss must be an SSSConfig or None")
+            if (
+                self.sss.memory_bytes + self.workspace_reserve + 8192
+                > self.memory_bytes
+            ):
+                raise MemoryError(
+                    "portfolio/SSS coexistence exceeds memory cap"
+                )
+        if self.siqs is not None:
+            if not isinstance(self.siqs, SIQSConfig):
+                raise TypeError("siqs must be a SIQSConfig or None")
+            if (
+                self.siqs.memory_bytes + self.workspace_reserve + 8192
+                > self.memory_bytes
+            ):
+                raise MemoryError(
+                    "portfolio/SIQS coexistence exceeds memory cap"
+                )
         if self.memory_bytes - self.workspace_reserve < 8192:
             raise MemoryError(
                 "candidate/checkpoint reserve exceeds memory cap"
@@ -270,7 +301,7 @@ def _classify_step(current, config, budget, generator):
     return None
 
 
-def _advance(state, config, budget, context, generator):
+def _advance(state, config, budget, context, generator, siqs_runtime):
     """Commit one portfolio transition or one resumable candidate action."""
     if state["current"] is None:
         if not state["pending"]:
@@ -366,6 +397,9 @@ def _advance(state, config, budget, context, generator):
             return
         exponent = exponents[position]
         budget.consume(n.bit_length())
+        if not power_residue_possible(n, exponent):
+            current["power_index"] += 1
+            return
         base = integer_root(n, exponent)
         current["power_index"] += 1
         if base**exponent == n:
@@ -384,6 +418,98 @@ def _advance(state, config, budget, context, generator):
         if divisor is not None:
             _split(state, divisor)
         return
+    if current["stage"] == "sss":
+        job = siqs_runtime.get("job")
+        if job is None:
+            if current.get("sss_checkpoint") is not None:
+                job = SSSJob.from_checkpoint(
+                    current["sss_checkpoint"], budget=budget, config=config.sss
+                )
+            else:
+                if "sss_seed" not in current:
+                    budget.consume()
+                    current["sss_seed"] = generator.getrandbits(63)
+                job = SSSJob(
+                    n,
+                    seed=current["sss_seed"],
+                    config=config.sss,
+                    budget=budget,
+                )
+            if job.n != n or job.seed != current["sss_seed"]:
+                raise ValueError("SSS checkpoint differs from its parent")
+            siqs_runtime["job"] = job
+        result = job.run(batch_limit=1)
+        if result.divisor is not None or result.reason in (
+            "search_exhausted",
+            "relation_limit",
+            "atom_limit",
+            "memory_limit",
+        ):
+            _event(
+                state,
+                config,
+                stage=config.sss.mode,
+                n=n,
+                seed=job.seed,
+                work=budget.used - current["sss_start_work"],
+                outcome="factor" if result.divisor else result.reason,
+                stats=result.stats,
+            )
+            siqs_runtime.clear()
+            if result.divisor is not None:
+                _split(state, result.divisor)
+            else:
+                state["remaining"].extend([n] * current["mult"])
+                state["current"] = None
+        elif result.reason != "paused":
+            raise BudgetExhaustedError(result.reason)
+        return
+    if current["stage"] == "siqs":
+        job = siqs_runtime.get("job")
+        if job is None:
+            if current.get("siqs_checkpoint") is not None:
+                job = SIQSJob.from_checkpoint(
+                    current["siqs_checkpoint"],
+                    budget=budget,
+                    config=config.siqs,
+                )
+            else:
+                if "siqs_seed" not in current:
+                    budget.consume()
+                    current["siqs_seed"] = generator.getrandbits(63)
+                job = SIQSJob(
+                    n,
+                    seed=current["siqs_seed"],
+                    config=config.siqs,
+                    budget=budget,
+                )
+            if job.n != n or job.seed != current["siqs_seed"]:
+                raise ValueError(
+                    "SIQS checkpoint differs from its parent assignment"
+                )
+            siqs_runtime["job"] = job
+        job.budget = budget
+        result = job.run(max_blocks=1)
+        if result.divisor is not None or job.finished_reason is not None:
+            _event(
+                state,
+                config,
+                stage="siqs",
+                n=n,
+                seed=job.seed,
+                work=budget.used - current["siqs_start_work"],
+                outcome="factor" if result.divisor else result.reason,
+                stats=result.stats,
+            )
+            siqs_runtime.clear()
+            if result.divisor is not None:
+                _split(state, result.divisor)
+            else:
+                state["remaining"].extend([n] * current["mult"])
+                state["current"] = None
+        elif result.reason != "paused":
+            raise BudgetExhaustedError(result.reason)
+        return
     kind = current["stage"]
     if kind == "rho":
         attempts, b1, b2 = config.rho_attempts, 0, 0
@@ -392,8 +518,13 @@ def _advance(state, config, budget, context, generator):
     elif current["tier"] < len(config.ecm_tiers):
         b1, b2, attempts = config.ecm_tiers[current["tier"]]
     else:
-        state["remaining"].extend([n] * current["mult"])
-        state["current"] = None
+        if config.siqs is not None:
+            current.update(stage="siqs", job=None, siqs_start_work=budget.used)
+        elif config.sss is not None:
+            current.update(stage="sss", job=None, sss_start_work=budget.used)
+        else:
+            state["remaining"].extend([n] * current["mult"])
+            state["current"] = None
         return
     if current["attempt"] >= attempts:
         current["attempt"] = 0
@@ -575,11 +706,22 @@ def _unpack(checkpoint, config):
             != checkpoint["sha256"]
         ):
             raise ValueError("checkpoint checksum mismatch")
+        expected_config = json.loads(_canonical(asdict(config)))
+        legacy = config.sss is None and (
+            payload["version"] == 3
+            or (payload["version"] == 2 and config.siqs is None)
+        )
+        if legacy and "sss" not in payload["config"]:
+            expected_config.pop("sss")
+        if payload["version"] == 2 and legacy:
+            expected_config.pop("siqs")
         if (
-            payload["version"] != CHECKPOINT_VERSION
+            type(payload["version"]) is not int
+            or payload["version"] not in (2, 3, CHECKPOINT_VERSION)
+            or (payload["version"] in (2, 3) and not legacy)
             or payload["schedule"] != SCHEDULE_VERSION
             or payload["backend"] != "python-int"
-            or payload["config"] != json.loads(_canonical(asdict(config)))
+            or payload["config"] != expected_config
         ):
             raise ValueError("incompatible checkpoint metadata")
         state = payload["state"]
@@ -675,12 +817,27 @@ def _unpack(checkpoint, config):
                 "rho",
                 "pm1",
                 "ecm",
+                "siqs",
+                "sss",
             ):
                 raise ValueError("invalid current-cofactor metadata")
         if current and current["job"] and current["job"]["n"] != current["n"]:
             raise ValueError("candidate modulus disagrees with parent")
         if current:
-            _verify_progress(current, config)
+            if current["stage"] == "siqs":
+                if config.siqs is None or current["job"] is not None:
+                    raise ValueError("incompatible SIQS dispatcher progress")
+                utils.require_integer(
+                    current["siqs_start_work"], "SIQS work start", 0
+                )
+            elif current["stage"] == "sss":
+                if config.sss is None or current["job"] is not None:
+                    raise ValueError("incompatible SSS dispatcher progress")
+                utils.require_integer(
+                    current["sss_start_work"], "SSS work start", 0
+                )
+            else:
+                _verify_progress(current, config)
         # Validate reconstruction after checking integer exponent bounds.
         _result(state)
         generator = random.Random()
@@ -704,8 +861,8 @@ def factorize_bounded(
 
     Resume with the same config and a Budget whose total allowances include
     consumed resources. Increasing an allowance explicitly grants extra work.
-    Cancellation never removes a cofactor. Exhausted local candidates progress
-    to the next method; no SIQS implementation is implied by this portfolio.
+    Cancellation never removes a cofactor. Exhausted ECM schedules reach
+    optional SIQS/SSS under the same allowance when configured.
     stop_after_split stops when a proper divisor is exposed, retaining children
     for a later full-factorization resume under the identical configuration.
     """
@@ -745,13 +902,20 @@ def factorize_bounded(
         budget.prior_wall = payload["wall_used"]
         budget.prior_cpu = payload["cpu_used"]
     reason = "exhausted"
+    siqs_runtime = {}
     try:
         budget.consume(0)
         if not state.get("context_ready"):
             budget.consume((isqrt(config.max_hi - 1) + 1) // 2)
         context = SieveContext(
             config.max_hi,
-            memory_bytes=config.memory_bytes - (config.workspace_reserve),
+            memory_bytes=config.memory_bytes
+            - config.workspace_reserve
+            - (
+                (config.siqs or config.sss).memory_bytes
+                if (config.siqs or config.sss)
+                else 0
+            ),
             segment_size=config.segment_size,
             rolling=config.rolling,
         )
@@ -765,7 +929,7 @@ def factorize_bounded(
                 state["current"]["stage"] if state["current"] else "dispatch"
             )
             started = time.perf_counter()
-            _advance(state, config, budget, context, generator)
+            _advance(state, config, budget, context, generator, siqs_runtime)
             state["stage_seconds"][stage] = (
                 state["stage_seconds"].get(stage, 0)
                 + time.perf_counter()
@@ -783,6 +947,11 @@ def factorize_bounded(
     result = _result(state)
     if result.complete:
         reason = "complete"
+    if siqs_runtime.get("job") is not None:
+        stage = state["current"]["stage"]
+        state["current"][stage + "_checkpoint"] = siqs_runtime[
+            "job"
+        ].checkpoint()
     snapshot = _pack(state, config, budget, generator)
     return PortfolioRun(
         result,

@@ -37,6 +37,7 @@ htmlcov/
 !/v2/audit/quadratic_sieve_research.md
 !/v2/audit/phase_two_optimization_research.md
 !/v2/audit/gf2_matrix_research.md
+!/v2/audit/phases_three_plus_research.md
 !/v2/audit/provenance.json
 !/v2/audit/m8_source_snapshot.json
 !/v2/audit/m12_source_snapshot.json
@@ -56,7 +57,23 @@ htmlcov/
 !/v2/benchmarks/phase_two_complete_corpus.json
 !/v2/benchmarks/phase_two_m15_independent_corpus.json
 !/v2/benchmarks/phase_two_competitors.json
+!/v2/benchmarks/phase_three_p34_corpus.json
+!/v2/benchmarks/phase_three_p34_large_v3_corpus.json
+!/v2/benchmarks/phase_three_p36_corpus.json
 !/v2/benchmarks/phase_three_m25_p33_refinement_pypy.frozen.json
 
 # Run outputs (JSON/gzip captures, logs, profiles, verification dumps and
 # scratch directories) stay local. Add a specific exception for a new input.
+
+# Required immutable source input for matched QS correction benchmarks.
+!/v2/benchmarks/qs_m26_baseline.json
+!/v2/benchmarks/performance_audit_baseline.json
+!/v2/benchmarks/performance_audit_corpus.json
+!/v2/benchmarks/performance_audit_training_shapes.json
+
+# Immutable P3.8 R1 corpora, controls and reproducible source snapshots.
+!/v2/benchmarks/p38_r1_training_corpus.json
+!/v2/benchmarks/p38_r1_confirmation_corpus.json
+!/v2/benchmarks/p38_r1_frozen.json
+!/v2/benchmarks/p38_r1_baseline.json
+!/v2/benchmarks/p38_r1_measured_sources.json

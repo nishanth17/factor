@@ -18,7 +18,11 @@ export PYTHONDONTWRITEBYTECODE := 1
 
 .PHONY: help runtime run run-bounded test validate benchmark benchmark-phase-two lint
 .PHONY: benchmark-phase-three-reference benchmark-phase-three-collector
-.PHONY: benchmark-phase-three-pipeline
+.PHONY: benchmark-phase-three-pipeline benchmark-phase-three-families
+.PHONY: benchmark-phase-three-siqs benchmark-phase-three-large
+.PHONY: benchmark-phase-three-sss
+.PHONY: benchmark-phase-three-parallel
+LARGE_PHASE ?= all
 
 help:
 	@echo "Default runtime: $(PYTHON)"
@@ -67,6 +71,30 @@ benchmark-phase-three-pipeline:
 	$(PYTHON) -u -m v2.benchmarks.phase_three_pipeline \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-families:
+	$(PYTHON) -u -m v2.benchmarks.phase_three_families \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-siqs:
+	$(PYTHON) -u -m v2.benchmarks.phase_three_siqs \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-large:
+	$(PYTHON) -u -m v2.benchmarks.phase_three_large \
+	  --phase $(LARGE_PHASE) --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-sss:
+	$(PYTHON) -u -m v2.benchmarks.phase_three_sss \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-parallel:
+	$(PYTHON) -u -m v2.benchmarks.phase_three_parallel \
+	  --phase all --repetitions $(REPETITIONS) \
+	  --warmup-seconds $(WARMUP_SECONDS) --output "$(BENCHMARK_OUTPUT)"
 
 # Tools are installed in the ignored, project-local PyPy development venv.
 lint:

@@ -104,7 +104,8 @@ def collect_block(
                     break
                 continue
 
-            remaining, exponents = abs(value), []
+            remaining = abs(value) // (polynomial.square_coefficient**2)
+            exponents = []
             for prime in primes:
                 exponent = 0
                 while remaining % prime == 0:

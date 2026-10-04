@@ -2,13 +2,14 @@
 
 from dataclasses import dataclass, field
 from math import gcd
+from types import MappingProxyType
 
 from .. import prime_sieve, utils
 from ..budget import Budget
 
 MAX_INPUT_BITS = 4096
 MAX_MULTIPLIER = 1_000_000
-MAX_FACTOR_BASE_BOUND = 100_000
+MAX_FACTOR_BASE_BOUND = 1_000_000
 DEFAULT_MEMORY_BYTES = 8 * 1024 * 1024
 
 
@@ -101,6 +102,7 @@ class FactorBase:
     bound: int
     entries: tuple[FactorBaseEntry, ...]
     _primes: tuple = field(init=False, repr=False, compare=False)
+    _columns: object = field(init=False, repr=False, compare=False)
 
     def __post_init__(self):
         """Reject mutable, unordered, composite, or incorrect root data."""
@@ -142,6 +144,13 @@ class FactorBase:
             if len(roots) != expected_count:
                 raise ValueError("factor-base roots are incomplete")
             previous = prime
+        object.__setattr__(
+            self,
+            "_columns",
+            MappingProxyType(
+                {entry.prime: i + 1 for i, entry in enumerate(self.entries)}
+            ),
+        )
         object.__setattr__(
             self, "_primes", tuple(entry.prime for entry in self.entries)
         )
