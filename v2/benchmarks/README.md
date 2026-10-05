@@ -1214,3 +1214,20 @@ claimed. The acceptance suite covers corrupted/rehashed payloads, missing or
 invalid mixed permutations, frozen legacy pending checkpoints, skipped-trial
 allowances, cache saturation/refusal, exact brute-force kernels, inverse maps,
 solver refusal and terminal/resumed opt-in behavior.
+
+
+R3 integration acceptance preserves the repair/R1 shared budget, capacity,
+known-square, portfolio and full-base SSSf interfaces. The final combined tree
+passes **273 PyPy tests**, full lint and imports of **all 44 benchmark modules**
+from a temporary committed-files-only snapshot. The isolated R3 commit also
+passes 272 tests/lint and 42 clean imports. Raw evidence and temporary acceptance
+snapshots remain local; required loaders use only explicitly retained inputs.
+
+A serial matched integration bridge on the already inspected two-input,
+two-seed 30-digit training cohort completes 36/36 in each arm after at least
+three seconds of validated warmup and nine stable samples. Cohort medians are
+1.995 seconds frozen control, 2.008 seconds R3 cadence 1 and 1.428 seconds
+cadence 32. All 35 final runtime hashes match the bridge capture; the only
+runtime difference from the isolated R3 source is the preserved repair SSSf
+rollback, which SIQS does not exercise. This is integration verification on
+inspected inputs, not a new held-out result or a change to the frozen policy.

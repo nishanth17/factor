@@ -1082,6 +1082,11 @@ Public/checkpoint preparation fully reverifies all atoms and combinations.
   matrix scales. Existing dense quadratic reservations are unchanged; no
   reduced constant is used to bypass a capacity refusal.
 
+Final combined integration passes 273 PyPy tests, full lint and all 44
+benchmark imports from a committed-files-only candidate. The stable matched
+integration bridge completes 36/36 per arm and preserves repair/R1 shared
+interfaces and the full-base SSSf rollback. Raw captures remain local.
+
 Detailed commands, uncertainty intervals, source inputs and adopt/defer/reject
 scope are in [the benchmark guide](../benchmarks/README.md). All outcomes,
 including unresolved cofactors, reconstruct the input. The conditional root

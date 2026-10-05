@@ -140,3 +140,7 @@ the safe Montgomery ladder.
   38.7% lower complete-cohort median than R3 cadence 1, 54/54 complete per arm.
   Keep cadence 8 and tested-dependency cache promotions deferred; neither this
   experiment nor passing recovery tests changes automatic dispatch defaults.
+
+- Integrate only the R3 delta with the repair/R1 work. The combined candidate
+  passes 273 PyPy tests, lint and all 44 benchmark imports from committed inputs;
+  a stable matched bridge validates 36 complete outcomes in every arm.
