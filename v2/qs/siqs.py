@@ -406,6 +406,10 @@ class SIQSJob:
             self.engine.lo = self.engine.next_position = -self.half_width
             self.engine.hi = self.half_width + 1
             self.engine.final_solve_done = False
+            if self.config.collector.power_plan_bytes:
+                self.engine.collector._set_plan_interval(
+                    -self.half_width, self.half_width + 1
+                )
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
         if not self.config.streaming:

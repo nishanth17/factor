@@ -1,7 +1,7 @@
 """Bounded conservative score sieving and single-large-prime matching."""
 
 from array import array
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import gcd
 
 from .. import utils
@@ -23,6 +23,7 @@ from .relations import (
     combined_storage_reserve,
     verify_atomic,
 )
+from .score import log_bounds
 
 MAX_BLOCK_WIDTH = 4096
 MAX_WINDOW_WIDTH = 1_000_000
@@ -49,6 +50,7 @@ class SieveConfig:
     small_prime_cutoff: int = 0
     threshold_extra: int = 0
     score_policy: str = "adaptive"
+    power_plan_bytes: int = field(default=0, kw_only=True)
     residual_bound: int = 500
     max_partials: int = 256
     max_relations: int = 1024
@@ -65,6 +67,7 @@ class SieveConfig:
             "max_partials": (0, MAX_STORED_ATOMS),
             "max_relations": (0, MAX_STORED_ATOMS),
             "max_atoms": (0, MAX_STORED_ATOMS),
+            "power_plan_bytes": (0, 16 * 1024 * 1024),
         }
         for name, (minimum, maximum) in limits.items():
             value = getattr(self, name)
@@ -84,6 +87,7 @@ class SieveConfig:
             "conservative",
             "candidate",
             "powers",
+            "fixed",
         ):
             raise ValueError("unknown score policy")
 
@@ -147,7 +151,8 @@ class SieveCollector:
             # sparse exponent lists. Reserve the dense worst case as well.
             self._workspace += self.config.block_width * (512 + 128 * count)
         self._workspace += 128 * (polynomial.n_prime.bit_length() + 16384)
-        if self.config.score_policy == "powers":
+        self._workspace += self.config.power_plan_bytes
+        if self.config.score_policy in ("powers", "fixed"):
             # Two capped root lists coexist while lifting; coefficients and
             # positions have finite bit bounds even far from zero.
             self._workspace += 128 * (
@@ -181,7 +186,11 @@ class SieveCollector:
                 )
             )
             # ceil(log2 p) uses exact bit lengths, with 2 exactly one bit.
-            logs.append((entry.prime - 1).bit_length())
+            logs.append(
+                log_bounds(entry.prime)[1]
+                if self.config.score_policy == "fixed"
+                else (entry.prime - 1).bit_length()
+            )
         if remaining != 1:
             raise ValueError("A must factor completely over the factor base")
         self._roots, self._logs = tuple(roots), tuple(logs)
@@ -207,6 +216,10 @@ class SieveCollector:
         self._scratch_peak_bytes = 0
         self._omitted_allowance = 0
         self._lift_inverses = {}
+        self._power_plans = {}
+        self._plan_refused = set()
+        self._plan_bytes = 0
+        self._plan_window = None
         self._atoms, self._pending = {}, {}
         self._full, self._combined, self._rows = [], [], []
         self._atom_bytes = {}
@@ -260,7 +273,103 @@ class SieveCollector:
             i for i, value in enumerate(exponents) if value
         )
         self._lift_inverses.clear()
+        self._power_plans.clear()
+        self._plan_refused.clear()
+        self._plan_bytes = 0
+        self._plan_window = None
         self._resieved.clear()
+
+    def _power_marks(self, index, maximum, lo, hi, stats):
+        """Reuse a charged, capped plan bound to this polynomial/window.
+
+        The whole collect interval bounds valuations; each replay intersects
+        marks with its working block. A refusal falls back to block streaming.
+        Construction scratch retains the existing two-root-list reservation;
+        each retained tuple/list entry is checked before allocation.
+        """
+        roots, weight = self._roots[index], self._logs[index]
+        cap = self.config.power_plan_bytes
+        if cap and index not in self._plan_refused:
+            if index not in self._power_plans:
+                window_lo, window_hi, window_maximum = self._plan_window
+                plan, reserve = [], 256
+                for mark in prime_power_roots(
+                    self.polynomial,
+                    roots,
+                    window_maximum,
+                    weight,
+                    self.budget,
+                    lo=window_lo,
+                    hi=window_hi,
+                    inverses=self._lift_inverses,
+                ):
+                    modulus, residues, _ = mark
+                    words = (modulus.bit_length() + 7) // 8
+                    size = 384 + (4 + len(residues)) * (96 + 8 * words)
+                    if self._plan_bytes + reserve + size > cap:
+                        self._plan_refused.add(index)
+                        stats["plan_refusals"] += 1
+                        break
+                    self.budget.consume(len(residues) + words + 1)
+                    reserve += size
+                    plan.append(mark)
+                else:
+                    if self._plan_bytes + reserve <= cap:
+                        self.budget.consume(len(plan) + 1)
+                        self._power_plans[index] = tuple(plan)
+                        self._plan_bytes += reserve
+                        stats["plan_builds"] += 1
+                    else:
+                        self._plan_refused.add(index)
+                        stats["plan_refusals"] += 1
+            if index in self._power_plans:
+                plan = self._power_plans[index]
+                self.budget.consume(len(plan) + 1)
+                stats["plan_replays"] += 1
+                return plan
+        return prime_power_roots(
+            self.polynomial,
+            roots,
+            maximum,
+            weight,
+            self.budget,
+            lo=lo,
+            hi=hi,
+            inverses=self._lift_inverses,
+        )
+
+    def _set_plan_interval(self, lo, hi):
+        """Bind reusable plans to a verified whole polynomial interval."""
+        bits = max(abs(lo).bit_length(), abs(hi).bit_length())
+        coefficient_bits = max(
+            self.polynomial.a.bit_length(),
+            abs(self.polynomial.b).bit_length(),
+            abs(self.polynomial.c).bit_length(),
+        )
+        self.budget.consume(4 * (coefficient_bits + 2 * bits + 3))
+        key = lo, hi, self._bounds(lo, hi)[1]
+        if key != self._plan_window:
+            self._power_plans.clear()
+            self._plan_refused.clear()
+            self._plan_bytes = 0
+            self._plan_window = key
+
+    def _lower_score(self, value):
+        if self.config.score_policy == "fixed" and value:
+            return log_bounds(value)[0]
+        return max(0, value.bit_length() - 1)
+
+    def _residual_score(self):
+        if self.config.score_policy == "fixed":
+            return log_bounds(self.config.residual_bound)[1]
+        return (self.config.residual_bound - 1).bit_length()
+
+    def _clip_threshold(self, threshold):
+        if self.config.score_backend == "bytearray":
+            return min(255, threshold)
+        if self.config.score_backend == "array":
+            return min(2**32 - 1, threshold)
+        return threshold
 
     def _bounds(self, lo, hi):
         """Bound |F| with endpoints and the two integer vertex neighbors.
@@ -311,6 +420,11 @@ class SieveCollector:
                     self._scores[index] = min(
                         255, self._scores[index] + weight
                     )
+        elif self.config.score_backend == "array":
+            for index in indices:
+                self._scores[index] = min(
+                    2**32 - 1, self._scores[index] + weight
+                )
         else:
             for index in indices:
                 self._scores[index] += weight
@@ -342,7 +456,7 @@ class SieveCollector:
                 stats.get("skipped_score_blocks", 0) + 1
             )
             return 0
-        powers = self.config.score_policy == "powers"
+        powers = self.config.score_policy in ("powers", "fixed")
         weights = self._logs if powers else self._weights(maximum)
         omitted = 0
         buckets = (
@@ -363,16 +477,21 @@ class SieveCollector:
                     )
                 if powers and not skipped:
                     first_level = True
-                    for modulus, lifted, power_weight in prime_power_roots(
-                        self.polynomial,
-                        roots,
-                        maximum,
-                        weight,
-                        self.budget,
-                        lo=lo,
-                        hi=hi,
-                        inverses=self._lift_inverses,
-                    ):
+                    marks = (
+                        self._power_marks(index, maximum, lo, hi, stats)
+                        if self.config.power_plan_bytes
+                        else prime_power_roots(
+                            self.polynomial,
+                            roots,
+                            maximum,
+                            weight,
+                            self.budget,
+                            lo=lo,
+                            hi=hi,
+                            inverses=self._lift_inverses,
+                        )
+                    )
+                    for modulus, lifted, power_weight in marks:
                         for root in lifted:
                             hits = range((root - lo) % modulus, width, modulus)
                             self.budget.consume(len(hits) + 1)
@@ -415,12 +534,20 @@ class SieveCollector:
         # log2 |F| - log2 residual <= log2 factor-base part. Lower-bound
         # the first term and upper-bound the second; omitted primes get a
         # proved universal allowance. Positive extra deliberately loses it.
-        threshold = max(0, lower.bit_length() - 1)
+        threshold = (
+            self._lower_score(lower)
+            if self.config.score_policy == "fixed"
+            else max(0, lower.bit_length() - 1)
+        )
         self._omitted_allowance = omitted
-        threshold -= (self.config.residual_bound - 1).bit_length() + omitted
+        threshold -= (
+            self._residual_score()
+            if self.config.score_policy == "fixed"
+            else (self.config.residual_bound - 1).bit_length()
+        ) + omitted
         threshold = max(0, threshold + self.config.threshold_extra)
-        if self.config.score_backend == "bytearray":
-            threshold = min(255, threshold)
+        if self.config.score_backend != "list":
+            threshold = self._clip_threshold(threshold)
         stats["blocks"] += 1
         stats["threshold_min"] = min(stats["threshold_min"], threshold)
         stats["threshold_max"] = max(stats["threshold_max"], threshold)
@@ -434,11 +561,14 @@ class SieveCollector:
         their full allowance. Thus zero-extra refinement cannot reject an
         admissible norm. Clip both sides for byte scores as in block scoring.
         """
-        if self.config.score_policy not in ("candidate", "powers"):
+        if self.config.score_policy not in ("candidate", "powers", "fixed"):
             return True
-        threshold = abs(value).bit_length() - 1
-        threshold -= (self.config.residual_bound - 1).bit_length()
-        if self.config.score_policy == "powers" and self._skipped:
+        if self.config.score_policy == "fixed":
+            threshold = self._lower_score(abs(value)) - self._residual_score()
+        else:
+            threshold = abs(value).bit_length() - 1
+            threshold -= (self.config.residual_bound - 1).bit_length()
+        if self.config.score_policy in ("powers", "fixed") and self._skipped:
             remaining, allowance = abs(value), 0
             for index in self._skipped:
                 self.budget.consume(remaining.bit_length() + 1)
@@ -450,8 +580,8 @@ class SieveCollector:
         else:
             threshold -= self._omitted_allowance
         threshold = max(0, threshold + self.config.threshold_extra)
-        if self.config.score_backend == "bytearray":
-            threshold = min(255, threshold)
+        if self.config.score_backend != "list":
+            threshold = self._clip_threshold(threshold)
         return self._scores[offset] >= threshold
 
     def _resieve(self, lo, hi, threshold, stats):
@@ -737,12 +867,25 @@ class SieveCollector:
                 "slice_bytes",
                 "slice_allocations",
                 "threshold_max",
+                "plan_builds",
+                "plan_replays",
+                "plan_refusals",
             ),
             0,
         )
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
         try:
+            if (
+                self.config.power_plan_bytes
+                and lo < hi
+                and (
+                    self._plan_window is None
+                    or lo < self._plan_window[0]
+                    or hi > self._plan_window[1]
+                )
+            ):
+                self._set_plan_interval(lo, hi)
             while position < hi:
                 block_lo = position
                 block_hi = min(hi, block_lo + self.config.block_width)
@@ -780,6 +923,7 @@ class SieveCollector:
             stats["threshold_min"] = 0
         self._resieved.clear()
         self._scratch_bytes = 0
+        stats["plan_bytes"] = self._plan_bytes
         return SieveResult(
             tuple(self._atoms.values()),
             tuple(self._full),

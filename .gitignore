@@ -85,3 +85,9 @@ htmlcov/
 !/v2/benchmarks/p38_r3_frozen.json
 !/v2/benchmarks/p38_r3_measured_sources.json
 !/v2/benchmarks/p38_r3_final_sources.json
+
+# Immutable R2 controls, certified corpora and selected policy.
+!/v2/benchmarks/p38_r2_baseline.json
+!/v2/benchmarks/p38_r2_training_corpus.json
+!/v2/benchmarks/p38_r2_held_out_corpus.json
+!/v2/benchmarks/p38_r2_frozen.json

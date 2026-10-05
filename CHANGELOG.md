@@ -144,3 +144,25 @@ the safe Montgomery ladder.
 - Integrate only the R3 delta with the repair/R1 work. The combined candidate
   passes 273 PyPy tests, lint and all 44 benchmark imports from committed inputs;
   a stable matched bridge validates 36 complete outcomes in every arm.
+
+## P3.8 R2 isolated collector evaluation — 4 October 2026
+
+- Add opt-in integer fixed-point prime-power scoring with conservative rounding
+  and saturating array scores, retaining exact relation verification.
+- Add keyword-only `power_plan_bytes` with an upfront finite reservation,
+  capped per-polynomial plan reuse, streamed fallback and charged checkpoint
+  rebuilding. Preserve existing positional configuration arguments and
+  first-uncommitted-position resume behavior.
+- Evaluate sparse recovery, scoring, bounded batch/tiny-prime/grouped-charge
+  challengers and whole-interval CRT eligibility against an immutable
+  repair/R1/R3 control with independent certified training and held-out inputs.
+  All complete-factor confirmation attempts finish; complete collector arms
+  preserve atomic signatures and post-filter results.
+- Retain defaults: fixed scoring/plans remain experimental, and no candidate
+  passes the declared causal training promotion gate. Family-wide CRT and
+  wide-block resieve capacity remain deferred. See the
+  [R2 measurements](v2/benchmarks/README.md#p38-r2-bounded-collector-evaluation--4-october-2026)
+  for commands, uncertainty, censored outcomes and cold/profile separation.
+- Verify the isolated committed-files-only snapshot with 282 PyPy tests,
+  full lint, all 45 benchmark imports and frozen-source/corpus checks.
+  Integration with the concurrent repair branch remains separate.
