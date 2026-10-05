@@ -5,6 +5,40 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## SIQS CLI access (4 October 2026)
+
+The initial SIQS comparison below is retained. The P3.4 usability follow-up
+now also exposes `--method qs` and `--method mpqs`, with shared finite
+`--qs-*` controls and checked resume for all three modes. Nine CLI test methods
+cover extraction, recursive composite children, sign/multiplicity, fallback
+order, mode constraints, help, interruption/resume and unchanged defaults.
+
+Each selector was compared with its matching existing library mode on
+`10002200057`, seed 7 and base bound 400, using the same allowances below.
+Every mode received at least three seconds of validated PyPy warmup and nine
+samples per arm; the unstable QS cohort was extended with five more warmup
+seconds and 31 samples per arm. CLI/library factors, stage seeds, outcomes
+and consumed work matched: QS 601,427, MPQS 944,027 and SIQS 1,524,681 units.
+Both arms included formatting and checkpoint writes; startup was excluded
+from these warmed samples. Local records are in `p34_cli_20261004` under
+audit results. This verifies entry-point exposure, with no method ranking or
+automatic-dispatch/default promotion claim.
+
+`pypy3 -m v2.factor N --method siqs` selects SIQS after preprocessing;
+`--siqs` enables the existing recursive rho/p−1/ECM → SIQS portfolio. CLI
+regressions cover actual extraction, composite children, sign/multiplicity,
+fallback order and checked resume: `pypy3 -m unittest v2.tests.test_siqs_cli`.
+
+A plumbing comparison on `10002200057`, seed 7 and base bound 400 used the
+same 200-million-unit, 30-second wall/CPU and 80-MiB portfolio allowances.
+After 3.009 seconds of validated warmup, all nine warmed samples per arm
+returned the exact factors with identical 1,524,681 consumed work units and
+SIQS seeds. Both arms included output formatting and checkpoint writes.
+Nine CLI cold-start checks were separate. Local runner/raw records are in
+`siqs_cli_20261004` under audit results. This small library/CLI comparison
+validates exposure; it establishes no method ranking, larger-input speedup
+or automatic-default promotion.
+
 ## Run and interpret
 
 From the repository root:

@@ -2,6 +2,15 @@
 
 ## Current development
 
+- Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
+  or `--siqs`
+  as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,
+  shared resource accounting and checked resume. Add finite `--qs-*` search
+  flags (with `--siqs-*` aliases), help, examples
+  and CLI regression coverage; retain existing automatic defaults pending
+  measured dispatcher calibration. Track explicit CLI usability under P3.4,
+  independently of automatic-dispatch performance gates.
+
 - Condense benchmark history into dated README sections and add a QS guide.
   Organize required corpora, baselines and controls; preserve optional historical
   snapshots locally. Add explicit experiment-manifest selection and repair R3

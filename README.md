@@ -19,8 +19,17 @@ make -C v2 runtime
 make -C v2 run N=626100403 SEED=7
 pypy3 -m v2.factor 626100403 --bounded --seed 7 \
   --work-limit 2000000 --seconds 30 --cpu-seconds 30
+pypy3 -m v2.factor 10002200057 --method siqs --seed 7
+pypy3 -m v2.factor 10002200057 --method qs --qs-base-bound 400 --seed 7
+pypy3 -m v2.factor 10002200057 --method mpqs --qs-base-bound 400 --seed 7
+pypy3 -m v2.factor 10002200057 --siqs --ecm-curves 2 --seed 7
 make -C v2 test
 ```
+
+Omit the number for an interactive prompt. `--method qs|mpqs|siqs` selects
+that engine after exact preprocessing; `--siqs` adds SIQS after rho/p−1/ECM.
+These selections use shared limits and recursive factoring of the returned
+children.
 
 The factoring library uses standard-library integers and needs no third-party
 runtime packages. Development lint tools have a separate local environment.

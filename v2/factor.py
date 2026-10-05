@@ -4,7 +4,7 @@
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from math import prod
 from pathlib import Path
@@ -253,9 +253,55 @@ def main():
     parser.add_argument("--bounded", action="store_true")
     parser.add_argument(
         "--method",
-        choices=("auto", "sss", "sssf"),
+        choices=("auto", "qs", "mpqs", "siqs", "sss", "sssf"),
         default="auto",
-        help="select SSS after exact preprocessing, or keep auto dispatch",
+        help="select a named engine after preprocessing, or auto dispatch",
+    )
+    qs_options = parser.add_argument_group(
+        "QS / MPQS / SIQS search and fallback"
+    )
+    qs_options.add_argument(
+        "--siqs",
+        action="store_true",
+        help="enable SIQS after rho/p-1/ECM in the bounded auto portfolio",
+    )
+    qs_options.add_argument(
+        "--qs-base-bound",
+        "--siqs-base-bound",
+        type=int,
+        help="factor-base prime bound (default: 1000)",
+    )
+    qs_options.add_argument(
+        "--qs-half-width",
+        "--siqs-half-width",
+        type=int,
+        help="half-width of each polynomial interval (default: 512)",
+    )
+    qs_options.add_argument(
+        "--qs-max-half-width", "--siqs-max-half-width", type=int
+    )
+    qs_options.add_argument(
+        "--qs-factor-count", "--siqs-factor-count", type=int
+    )
+    qs_options.add_argument(
+        "--qs-family-count",
+        "--siqs-family-count",
+        type=int,
+        help="finite MPQS/SIQS family allowance; QS uses one polynomial",
+    )
+    qs_options.add_argument("--qs-pool-size", "--siqs-pool-size", type=int)
+    qs_options.add_argument(
+        "--qs-assignment-policy",
+        "--siqs-assignment-policy",
+        choices=("reference", "nearest", "flyer"),
+    )
+    qs_options.add_argument(
+        "--qs-polynomials-per-family",
+        "--siqs-polynomials-per-family",
+        type=int,
+    )
+    qs_options.add_argument(
+        "--qs-residual-bound", "--siqs-residual-bound", type=int
     )
     parser.add_argument("--sss-base-bound", type=int, default=1000)
     parser.add_argument("--sss-rounds", type=int, default=256)
@@ -271,10 +317,30 @@ def main():
     )
     args = parser.parse_args()
     use_sss = args.method in ("sss", "sssf")
+    use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
+    if args.siqs and args.method != "auto":
+        parser.error("--siqs is an auto fallback; use --method siqs alone")
+    qs_parameters = {
+        name: getattr(args, "qs_" + name)
+        for name in (
+            "base_bound",
+            "half_width",
+            "max_half_width",
+            "factor_count",
+            "family_count",
+            "pool_size",
+            "assignment_policy",
+            "polynomials_per_family",
+        )
+        if getattr(args, "qs_" + name) is not None
+    }
+    if not use_qs and (qs_parameters or args.qs_residual_bound is not None):
+        parser.error("QS parameters require --siqs or --method qs/mpqs/siqs")
+
     if args.memory_mib is None:
-        args.memory_mib = 80 if use_sss else 8
+        args.memory_mib = 80 if use_sss or use_qs else 8
     if args.work_limit is None:
-        args.work_limit = 200_000_000 if use_sss else 2_000_000
+        args.work_limit = 200_000_000 if use_sss or use_qs else 2_000_000
     try:
         checkpoint = None
         if args.resume:
@@ -289,7 +355,7 @@ def main():
                 else int(input("Enter number: "))
             )
 
-        if args.bounded or args.resume or args.checkpoint or use_sss:
+        if args.bounded or args.resume or args.checkpoint or use_sss or use_qs:
             from .budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
             from .qs.sss import SSSConfig
@@ -301,6 +367,32 @@ def main():
                 memory_bytes=args.memory_mib * 1024 * 1024,
                 fermat_steps=args.fermat_steps,
             )
+            if use_qs:
+                from .qs import SIQSConfig
+
+                # Leave headroom for the parent, schedules and packed resume
+                # state; the portfolio validates simultaneous ownership.
+                qs_parameters["memory_bytes"] = max(
+                    0, args.memory_mib * 1024 * 1024 - 16 * 1024 * 1024
+                )
+                qs_parameters["mode"] = (
+                    "siqs" if args.method == "auto" else args.method
+                )
+                qs_config = SIQSConfig(**qs_parameters)
+                if args.qs_residual_bound is not None:
+                    qs_config = replace(
+                        qs_config,
+                        collector=replace(
+                            qs_config.collector,
+                            residual_bound=args.qs_residual_bound,
+                        ),
+                    )
+                parameters["siqs"] = qs_config
+                if args.method in ("qs", "mpqs", "siqs"):
+                    parameters.update(
+                        rho_attempts=0, pm1_attempts=0, ecm_tiers=()
+                    )
+
             if use_sss:
                 parameters.update(
                     rho_attempts=0,
@@ -336,6 +428,10 @@ def main():
             if args.verbose:
                 print(f"Portfolio: {run.reason}, work={run.work_used}")
                 for event in run.events:
+                    # The checkpoint stage names the shared job implementation;
+                    # CLI diagnostics identify the selected polynomial engine.
+                    if event["stage"] == "siqs":
+                        event = dict(event, stage=config.siqs.mode)
                     print(event)
         else:
             result = factorize(

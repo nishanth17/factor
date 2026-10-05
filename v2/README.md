@@ -13,11 +13,11 @@ and adds bounded, resumable execution and experimental relation-based engines.
 | Pollard p−1 | Two-stage smoothness search with saturation replay; integrated into the bounded portfolio |
 | Montgomery ECM | Suyama curves, binary ladder and recoverable stage-two batches; the default portfolio's final search stage |
 | QS / MPQS | Reference polynomials and verified relation pipeline, useful as comparison controls |
-| SIQS | Shared relations across CRT/Gray polynomial families, incremental roots, filtering, GF(2) dependencies and exact extraction; optional library fallback |
+| SIQS | Shared relations across CRT/Gray polynomial families, incremental roots, filtering, GF(2) dependencies and exact extraction; selectable CLI engine or optional portfolio fallback |
 | SSS / SSSf | Experimental Smooth Subsum Search; SSSf adds an optional lossy candidate filter; explicitly selectable through the CLI |
 
 The bounded default runs preprocessing, rho, p−1 and ECM serially. SIQS and SSS
-require explicit configuration; thread/process SIQS workers are experimental.
+require explicit selection; thread/process SIQS workers are experimental.
 The compatibility `factorize()` interface remains available but has no shared
 global deadline or resumable schedule.
 
@@ -54,6 +54,48 @@ Omit the integer for an interactive prompt. `--verbose` shows diagnostics;
 library calls remain quiet. Exit status is **0** for complete results, **1**
 for unresolved composites and **2** for invalid input. Zero is rejected, one
 has an empty factorization, and negative inputs retain their sign.
+
+Select QS, MPQS or SIQS directly, or enable SIQS as the portfolio's final fallback:
+
+```sh
+pypy3 -m v2.factor 10002200057 --method siqs --seed 7
+pypy3 -m v2.factor 10002200057 --method qs --qs-base-bound 400 --seed 7
+pypy3 -m v2.factor 10002200057 --method mpqs --qs-base-bound 400 --seed 7
+pypy3 -m v2.factor 10002200057 --siqs --ecm-curves 2 --seed 7
+```
+
+`--method qs|mpqs|siqs` runs exact preprocessing followed by the selected
+engine, disabling rho, p−1 and ECM. `--siqs` runs preprocessing → rho →
+p−1 → ECM → SIQS. These selections
+use the existing recursive portfolio: a validated split sends both children
+back through classification and factoring until only terminal factors or
+explicit unresolved cofactors remain. Omit the integer for `Enter number:`.
+Neither selection requires an additional `--bounded` flag.
+
+QS/MPQS/SIQS selections default to 200 million work units, 30 wall/CPU seconds
+and 80 MiB owned workspace; 16 MiB is reserved outside the sieve job for parent
+and schedule/checkpoint coexistence. These are finite starting allowances,
+not a calibrated general-number policy. For a longer attempt:
+
+```sh
+pypy3 -m v2.factor YOUR_INTEGER --siqs --ecm-curves 2 \
+  --seconds 300 --cpu-seconds 300 --work-limit 1000000000
+```
+
+SIQS runs only if the earlier stages finish with work and time remaining.
+Increasing the deadline does not extend an exhausted polynomial schedule.
+Search controls include `--qs-base-bound`, `--qs-half-width`,
+`--qs-max-half-width`, `--qs-factor-count`, `--qs-family-count`,
+`--qs-pool-size`, `--qs-assignment-policy`, `--qs-polynomials-per-family`
+and `--qs-residual-bound`; each also accepts its `--siqs-*` alias. They retain
+the corresponding `SIQSConfig` defaults when omitted. QS uses one polynomial;
+MPQS/SIQS use finite family schedules. Wider intervals need a compatible
+maximum width. Streaming assignment (`nearest` or `flyer`) and Gray quotas
+apply only to SIQS; extended quotas require a streaming policy. Invalid
+mode/configuration combinations are rejected. These settings remain experimental.
+Use `--verbose` to inspect method outcomes and work use. Measured automatic
+handoff/default selection is open in the [roadmap](ROADMAP.md); explicit CLI
+usability is tracked separately under P3.4.
 
 Select an experimental SSS engine explicitly:
 
@@ -131,6 +173,18 @@ previously consumed resources. Paused time is excluded. Resuming an exhausted
 local candidate schedule does not reset it; use different allowances in a new
 run when that schedule has no remaining work. Checkpoints verify configuration,
 checksums, reconstruction and arithmetic; checksums are not authentication.
+
+For QS/MPQS/SIQS, repeat the same `--method` (or `--siqs` fallback) and search
+options when resuming. For example, replace `siqs` with `qs` or `mpqs` in both
+commands to resume that engine:
+
+```sh
+pypy3 -m v2.factor 10002200057 --method siqs --qs-base-bound 400 \
+  --seed 7 --work-limit 130000 \
+  --checkpoint v2/audit/results/siqs-checkpoint.json
+pypy3 -m v2.factor --method siqs --qs-base-bound 400 \
+  --resume v2/audit/results/siqs-checkpoint.json --work-limit 200000000
+```
 
 Time and cancellation checks are cooperative: an in-progress bigint operation
 finishes before the next check. Workspace caps cover conservative owned storage,
