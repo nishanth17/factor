@@ -28,8 +28,10 @@ its acceptance and experiment gates pass. Summarize accepted behavior in
 ## GitHub contents
 
 Commit code, tests, documentation, independent corpora and immutable baselines
-required by test/benchmark loaders. Retained audit and benchmark inputs live
-in their versioned `inputs/` folders; generated evidence belongs in folder-ignored `results/` trees.
+required by test/benchmark loaders. Required inputs live in versioned
+`v2/benchmarks/inputs/`; generated evidence belongs in folder-ignored
+`results/` trees. The `v2/audit/` directory is local and Git-ignored; maintain
+the public acceptance plan in `v2/ROADMAP.md`.
 
 Keep generated captures, stdout transcripts, profiles, verification dumps,
 scratch output and the detailed `v2/LOG.md` journal local. Do not add those

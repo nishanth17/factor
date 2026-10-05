@@ -647,7 +647,7 @@ class FactorizationTests(unittest.TestCase):
     def test_preserved_baseline_hashes(self):
         root = Path(__file__).resolve().parents[2]
         manifest = json.loads(
-            (root / "v2/audit/inputs/provenance.json").read_text()
+            (root / "v2/benchmarks/inputs/provenance.json").read_text()
         )
         for name, expected in manifest["original_source_sha256"].items():
             self.assertEqual(

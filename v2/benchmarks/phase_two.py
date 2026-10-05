@@ -444,7 +444,7 @@ def run(args):
         "corpus": str(corpus_path),
         "m12_snapshot_sha256": hashlib.sha256(
             CORPUS.parents[1]
-            .joinpath("audit/inputs/m12_source_snapshot.json")
+            .joinpath("benchmarks/inputs/m12_source_snapshot.json")
             .read_bytes()
         ).hexdigest()
         if "m12" in engines

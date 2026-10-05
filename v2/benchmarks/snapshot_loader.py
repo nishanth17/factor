@@ -14,7 +14,7 @@ def load_snapshot(path=None):
     Python files are created. Call only with the known project-owned snapshot.
     """
     if path is None:
-        path = Path(__file__).resolve().parents[1] / "audit"
+        path = Path(__file__).resolve().parents[1] / "benchmarks"
         path /= "inputs/m8_source_snapshot.json"
     data = json.loads(Path(path).read_text())
     name = "_factor_m8"
@@ -58,7 +58,7 @@ def load_stage_jobs():
     the current implementation without replacing immutable baseline code.
     """
     root = Path(__file__).resolve().parents[1]
-    path = root / "audit/inputs/m12_source_snapshot.json"
+    path = root / "benchmarks/inputs/m12_source_snapshot.json"
     data = json.loads(path.read_text())
     for name, source in data["sources"].items():
         expected = data["source_sha256"][name]

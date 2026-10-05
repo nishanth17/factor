@@ -18,7 +18,7 @@ from .qs_snapshot import ROOT, load_qs_arm
 FREEZE = (
     ROOT / "benchmarks/inputs/phase_three_m25_p33_refinement_pypy.frozen.json"
 )
-OLD_PIPELINE = ROOT / "audit/inputs/m25_pre_ownership_pipeline.json"
+OLD_PIPELINE = ROOT / "benchmarks/inputs/m25_pre_ownership_pipeline.json"
 HELD_OUT_SEED = 335
 
 

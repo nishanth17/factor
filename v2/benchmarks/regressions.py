@@ -238,7 +238,7 @@ def run(repetitions, warmup_seconds, include_legacy):
             lambda answers, cases=cases: _valid_factorizations(answers, cases),
         )
 
-    snapshot = Path(__file__).resolve().parents[1] / "audit"
+    snapshot = Path(__file__).resolve().parents[1] / "benchmarks"
     snapshot /= "inputs/m8_source_snapshot.json"
     return {
         "milestone": "m9",

@@ -2,20 +2,18 @@
 
 ## File layout and retention
 
-- Python tools and Markdown documentation remain in this directory.
-- `inputs/` contains versioned corpora, source/citation manifests, immutable
-  baselines and frozen controls required for reproducible comparisons.
-- `results/` contains local captures, generated freezes, stdout, profiles,
-  verification dumps and scratch subdirectories. Git ignores the whole tree;
-  new runs need no filename exceptions. Choose a unique output path per run.
+- Python runners and documentation remain in this directory.
+- `inputs/` contains versioned corpora, immutable baselines, frozen controls
+  and provenance manifests required by tests and benchmark loaders.
+- `results/` holds ignored captures, generated freezes, stdout, profiles,
+  checkpoints and scratch subdirectories. Use a unique output name per run.
 
-The October 2026 cleanup moved 42 retained JSON inputs across audit and
-benchmarks without changing their contents. Historical generated evidence
-was removed from these source directories and preserved under the ignored
-`.local-evidence/cleanup-20261004/` archive. Bytecode caches were deleted.
-Keep new raw evidence in `results/`; publish useful conclusions and rerun
-commands here. Do not remove an input merely because it is historical: loaders
-may require its exact bytes. Keep source snapshots immutable.
+The entire `../audit/` tree is local and Git-ignored. Research notes, citation
+manifests and historical diagnostic scripts stay there; required loader inputs
+have moved here without changing their bytes. The public roadmap is
+[`../ROADMAP.md`](../ROADMAP.md). Historical raw captures remain in the ignored
+`.local-evidence/` archive. Publish concise findings here and accepted behavior
+in the changelog; retain exact baseline bytes for reproducible comparisons.
 
 Run from the repository root on PyPy implementing Python 3.11. Make creates
 output folders automatically; for direct runner commands, create them first:
@@ -36,10 +34,41 @@ generated freeze files and validation/verification dumps. They are useful
 working evidence, rather than source files to publish for every run.
 
 Committed inputs include the independent Phase 2 corpora, competitor metadata,
-exact old-source baselines in audit/inputs/, and the frozen P3.3 configuration used
+exact old-source baselines in inputs/, and the frozen P3.3 configuration used
 by `phase_three_ownership.py`. Those snapshots are hash-checked before use.
 The preserved v1 comparison is emulated Python 2 through `lib2to3`, not a
 native Python 2 measurement.
+
+## Historical v1 comparison (M9, 3 October 2026)
+
+These are historical repaired-v2 measurements, not a fresh run of the current
+implementation. PyPy 7.3.23 / Python 3.11.15 on macOS arm64, one serial process,
+at least three seconds of validated warmup per arm and 15 rotated-order samples:
+
+| Complete-factorization batch | Emulated v1 median | Repaired v2 median | Less elapsed time |
+| --- | ---: | ---: | ---: |
+| Original: five inputs, five seeds | 1.155 ms | 1.078 ms | 6.6% |
+| Independent control: 56 inputs, five seeds | 21.091 ms | 16.994 ms | 19.4% |
+
+The control contains 30 balanced small semiprimes, ten unbalanced composites,
+thirteen primes and three squares. Generation seed is 20261005; factorization
+seeds are 0–4. All timed answers have exact expected factors, multiplicities
+and reconstruction; native answers also require proven terminal factors.
+v1 runs through the syntax/integer-division compatibility adapter with
+`math.gcd` on the same PyPy. This is not a native Python 2 timing comparison,
+and changed defaults mean the full-run ratio does not isolate a single repair.
+Invalid outputs receive no timing ratio. No large-number claim follows.
+
+The archived M9 report and full captures remain in local historical evidence;
+the M8 sources are retained in `inputs/m8_source_snapshot.json`.
+Run a new comparison of the current source, without expecting the old timings:
+
+```sh
+mkdir -p v2/benchmarks/results
+pypy3 -m v2.benchmarks.regressions --legacy \
+  --warmup-seconds 3 --repetitions 15 \
+  --output v2/benchmarks/results/v1_comparison_UNIQUE.json
+```
 
 ## Recorded P3.3 result
 
@@ -857,7 +886,7 @@ semantics and bounded cooperative overshoot. Tune capacities and batch sizes on
 training inputs, and evaluate each change independently on fresh held-out inputs.
 SSS collision arithmetic/counter construction, SSSf useful yield, and worker
 accounting, granularity and stopping are owned by
-[P3.6.1](../audit/TODOS.md#p361--immediate-diagnosis-and-improvement-of-p35p36).
+[P3.6.1](../ROADMAP.md#p361--immediate-diagnosis-and-improvement-of-p35p36).
 That milestone can start now, before P3.8/P6.3, and records reasons, concrete
 TODOs and acceptance/performance gates. Broader matrix/array reconciliation
 and ECM/portfolio parallelism reuse its results later. Matrix or tree rewrites

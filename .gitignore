@@ -30,7 +30,9 @@ htmlcov/
 
 # Reproducible sources, docs and inputs are versioned by default.
 # Put generated captures, logs, profiles and scratch work in these folders.
-/v2/audit/results/
+# Research notes and diagnostic scripts are local; required inputs live
+# under v2/benchmarks/inputs and the public plan is v2/ROADMAP.md.
+/v2/audit/
 /v2/benchmarks/results/
 
 # Historical raw evidence remains local and recoverable.

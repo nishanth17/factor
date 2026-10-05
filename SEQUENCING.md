@@ -257,9 +257,9 @@ timings. Integrate changes sequentially and compare the exact combined source.
    in a committed-files-only checkout. Update API docs, accepted behavior and
    measured summaries only after the corresponding gates pass.
 6. **Use the new evidence layout.** Required immutable corpora, baselines and
-   loader source snapshots belong in versioned `v2/audit/inputs/` or
-   `v2/benchmarks/inputs/`. New generated captures, profiles and scratch
-   evidence go under their ignored `results/` trees. Keep historical archives
+   loader source snapshots belong in versioned `v2/benchmarks/inputs/`.
+   New generated captures, profiles and scratch evidence go under ignored
+   `results/` trees. The entire `v2/audit/` tree is local. Keep historical archives
    at their recorded restoration locations; do not recreate obsolete loose
    `_LOCAL` files or force-add generated outputs.
 7. **Re-rank after each meaningful result.** If collection dominates, prefer
@@ -275,9 +275,9 @@ P4.3 forward before GNFS scaling.
 
 ## Sources and verification scope
 
-- [Canonical task IDs and acceptance gates](v2/audit/TODOS.md).
-- [Phase 3+ research and below-100-digit priorities](v2/audit/phases_three_plus_research.md), especially ECM schedule/backend priorities and R4/P5.4 ownership.
-- [Matrix research](v2/audit/gf2_matrix_research.md) and [benchmark results](v2/benchmarks/README.md).
+- [Canonical task IDs and acceptance gates](v2/ROADMAP.md).
+- Phase 3+ research and below-100-digit priorities (local audit material), especially ECM schedule/backend priorities and R4/P5.4 ownership.
+- Matrix research (local audit material) and [benchmark results](v2/benchmarks/README.md).
 - [Accepted implementation record](CHANGELOG.md), [ECM control](v2/ecm.py), [bounded stage execution](v2/stage_jobs.py), [schedules](v2/schedules.py) and [portfolio configuration](v2/portfolio.py).
 
 Current roadmap, code and recent repair/R2 task reports were inspected for this

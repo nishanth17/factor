@@ -7,7 +7,7 @@ import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SNAPSHOT = ROOT / "audit/inputs/m25_p33_before_sources.json"
+SNAPSHOT = ROOT / "benchmarks/inputs/m25_p33_before_sources.json"
 
 
 def load_qs_arm(name, changes=()):

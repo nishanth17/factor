@@ -2,15 +2,15 @@
 
 Generated run captures and detailed milestone journals are local records,
 excluded from GitHub. Historical evidence references below appear as
-plain labels; retained inputs and public research remain linked. See the
-[benchmark guide](../benchmarks/README.md) for rerun commands and
-[public changelog](../../CHANGELOG.md) for accepted behavior.
+plain labels; retained inputs remain linked; research notes and diagnostic tools are local. See the
+[benchmark guide](benchmarks/README.md) for rerun commands and
+[public changelog](../CHANGELOG.md) for accepted behavior.
 
 Date: 3 October 2026  
 Source: codebase audit, reviewed commit `1272e033f889a105792cbb924bf8a12a46ac88ae`.
 
 Research reconciliation: 4 October 2026. The
-[Phases 3+ research pass](phases_three_plus_research.md) compares the active
+Phases 3+ research pass (local audit material) compares the active
 worktree, accepted evidence and current primary literature/source code.
 All new Phase 3 research findings live in P3.8; this pass edits none of
 P3.1–P3.7's milestone records.
@@ -35,11 +35,11 @@ Large result captures are losslessly compressed; original paths and hashes
 are recorded in the archive manifest.
 Source filenames in the original report refer to v1;
 the production modules now use snake_case. Maintain milestone evidence and
-measured improvements/regressions in [public changelog](../../CHANGELOG.md).
+measured improvements/regressions in [public changelog](../CHANGELOG.md).
 
 Your C sieve versions were inspected at commit
 `5b4afb8f344ad5f6fbd20a186cd57b36182ea710`. The
-[C-to-Python transfer review](sieve_port_review.md) maps useful ideas to the
+C-to-Python transfer review (local audit material) maps useful ideas to the
 phases below. C thresholds and OpenMP speedups are reference evidence, not
 Python defaults or measured Python improvements.
 
@@ -99,7 +99,7 @@ including the 1–20,000 reconstruction sweep and independent arithmetic/sieve
 oracles. See the fresh PyPy evidence,
 Python 3.9 evidence,
 Python 3.14 evidence, and
-[public changelog](../../CHANGELOG.md) for seeded benchmarks, regressions, limits,
+[public changelog](../CHANGELOG.md) for seeded benchmarks, regressions, limits,
 and provenance. Subsequent Phase 2 implementation changed source hashes and
 expanded the suite to 94 tests. All pass on the same three interpreters in
 the M12 captures: PyPy,
@@ -195,7 +195,7 @@ unchanged baseline do not imply that every optional tuning gate is complete.
 - [x] Fresh confirmation of the M13 loops without retuning parameters.
 - [x] Freeze baseline configuration/source hashes and document larger limits.
 
-The [frozen baseline](phase_two_m17_frozen_baseline.json) records production
+The frozen baseline (local audit material) records production
 and evaluation configurations, source hashes, exact commands, and decisions.
 The large-band screen is one warm
 repetition under five seeds: balanced 30-digit complete factoring succeeds
@@ -215,7 +215,7 @@ is claimed. The original full items below remain unchecked wherever their
 declared experiment gate still needs work.
 
 **Research reconciliation (M23):** the
-[Phase 2 optimization report](phase_two_optimization_research.md) reviews
+Phase 2 optimization report (local audit material) reviews
 pinned GMP-ECM, YAFU, FLINT, SymPy and primefac, Brent/Bernstein/ECM papers,
 author errata and implementer blogs. The core remains accepted; M13 loops
 and M14 parallel feasibility are not new TODOs. Remaining execution is
@@ -359,17 +359,17 @@ claiming complete tuning or promoting unmeasured alternatives.
 **Prerequisite:** Phase 2 schedules, contracts, and corpus. **Goal:** a correct Python QS/MPQS milestone followed by SIQS and a fair SSS challenger. Source: MPQS/SIQS design.
 
 **Research gate (M19): complete; implementation gates remain open.** The
-[quadratic sieve research report](quadratic_sieve_research.md) reviews eight
+quadratic sieve research report (local audit material) reviews eight
 pinned implementations, distinguishes source findings from performance
 claims, and maps concrete decisions to the tasks below. The
-[source manifest](quadratic_sieve_research_sources.json) records retrieved
+source manifest (local audit material) records retrieved
 files and hashes; no competitor was installed or executed.
 
 **Optimization follow-up (M21): complete as research.** The
-[literature/blog follow-up](quadratic_sieve_research.md#optimization-follow-up-m21)
+literature/blog follow-up (local audit material)
 adds pinned FLINT source, Hart's implementation blog, polynomial-selection
 research, sparse filtering and batch smoothness references. The
-[supplement](m21_quadratic_sieve_optimization_sources.json) preserves fetched
+supplement (local audit material) preserves fetched
 hashes separately from M19. Fold the experiments into P3.2–P3.4, P5.4 and
 P6.2; no implementation checkbox or performance gate is closed by research.
 
@@ -377,7 +377,7 @@ P6.2; no implementation checkbox or performance gate is closed by research.
 collector, independent root/factorization oracles, and provenance/cap fault
 injection passed 120 PyPy tests and lint. Reference costs, raw measurements,
 and source hashes are in the acceptance summary
-and [public changelog](../../CHANGELOG.md). M20 did not supply complete extraction;
+and [public changelog](../CHANGELOG.md). M20 did not supply complete extraction;
 M26 accepts P3.3 below; M31 accepts P3.4's bounded integration and declared
 large-band evaluation. Broader SIQS scaling and P3.7–P3.8 remain open;
 P3.5/P3.6's bounded evaluations retain experimental arms.
@@ -555,7 +555,7 @@ baseline, keep ECM automatic and SIQS opt-in, and retain general crossover,
 arithmetic/matrix scaling and fresh promotion evidence as separate gates.
 The checkout passes 230 PyPy tests and lint. Useful raw evidence and exact
 measured source remain locally archived with hash verification; v1 is unchanged.
-See [full results, commands and limits](../benchmarks/README.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
+See [full results, commands and limits](benchmarks/README.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
 
 The large-state audit repairs exact prime-power coverage, sparse partial-store
 accounting, finite capacity, incidence filtering/cancellation and wide-mask
@@ -598,7 +598,7 @@ as the default and add no digit cutoff: whole-portfolio promotion/scaling is
 not declared complete. Scored multipliers and width recovery remain optional;
 the extended recovery comparison uses five-second warmup and 31 stable
 samples, with no meaningful benefit. All factoring outputs reconstruct,
-including unresolved cofactors. See [commands, costs and limits](../benchmarks/README.md).
+including unresolved cofactors. See [commands, costs and limits](benchmarks/README.md).
 
 Snapshots retain checked-store, seed/family/Gray/block/resource identity,
 compact pending elimination/extraction progress and integrity markers.
@@ -652,7 +652,7 @@ large-band experiment gates below remain open. No whole-SIQS promotion.
 **2026-10-04 bounded challenger evaluation:** the independent adapter and
 unchanged upstream reproduction are implemented and verified under PyPy
 Python 3.11. Repeated held-out small/30-digit comparisons and capped 40–60-digit
-diagnostics are recorded in the [benchmark guide](../benchmarks/README.md).
+diagnostics are recorded in the [benchmark guide](benchmarks/README.md).
 Keep SSS/SSSf experimental: neither broad benefit nor a dispatcher policy is
 established. Explicit `--method sss` / `sssf` and `PortfolioConfig(sss=...)`
 provide opt-in use with shared allowances and checked full checkpoints;
@@ -693,7 +693,7 @@ restart, cap and budget refusals, pending admission, cleanup failures, and direc
 residual splits without shortening fixed-work collection. The shared checkout
 passes 226 PyPy tests and lint. Forty-two trained/held-out configurations provide
 3,144 stored timed attempts with reconstruction and resource checks; source hashes
-remain unchanged. See the [benchmark guide](../benchmarks/README.md#p36-coarse-siqs-workers-4-october-2026).
+remain unchanged. See the [benchmark guide](benchmarks/README.md#p36-coarse-siqs-workers-4-october-2026).
 No worker arm passes the end-to-end gate. Small complete-factor cohorts are slower
 with workers; the 13-digit challenger also has declared batch-cap refusals and
 lower completion than native serial SIQS. This closes the bounded evaluator,
@@ -719,7 +719,7 @@ finishing P3.8 or P6.3. P3.8 retains broader matrix/array reconciliation;
 P6.3 retains general ECM/portfolio parallel execution and reuses this work.
 P3.5/P3.6's historical acceptance and experimental/default decisions stand.
 
-**Why now:** the [cost diagnosis](../benchmarks/README.md#p35p36-cost-diagnosis-4-october-2026)
+**Why now:** the [cost diagnosis](benchmarks/README.md#p35p36-cost-diagnosis-4-october-2026)
 finds concrete overhead in working code. Selected 30-digit SSS/SSSf stage
 timers put about 79%/81% in collision generation and only 3%/5% in smoothness
 trees. SSSf's accepted small cohort rejects 4,403 of 8,084 generated candidates
@@ -826,7 +826,7 @@ SIQS 23.324→6.840 s, SSS 6.181→1.412 s and filtered SSSf 9.460→2.020 s per
 cohort. Completion does not regress in any declared class. Timing and paired
 input uncertainty, causal reversions, cooperative wall/CPU limits, cold pools,
 exact fixed-work equivalence, and the historical batch-cap repair are in the
-[final performance record](../benchmarks/README.md#fresh-confirmation-and-decisions).
+[final performance record](benchmarks/README.md#fresh-confirmation-and-decisions).
 
 **Decisions:** adopt bounded accounting/collision/recovery/preparation and
 reservation repairs; retain P2 batching and strict clocks, native serial
@@ -848,7 +848,7 @@ four-input/two-seed cohorts confirm 12.3–12.7% lower serial-worker complete
 time and 32.2% lower B=10000 chunked time. Declared restrictive-capacity cases
 improve from no completed factors to 8/8, except the 1M medium class at 6/8;
 wide resieving separately completes 8/8 collection runs within its cap.
-See [the follow-up record](../benchmarks/README.md#follow-up-restrictive-allowances-and-repeated-setup)
+See [the follow-up record](benchmarks/README.md#follow-up-restrictive-allowances-and-repeated-setup)
 for uncertainty, unstable threaded controls, exact fixed-work equivalence,
 kernel-only cache scope and rejected experiments. This is a bounded follow-up,
 not an assertion that all larger-scale or backend optimizations are complete.
@@ -890,7 +890,7 @@ and [NumPy object dtypes](https://numpy.org/doc/stable/reference/arrays.dtypes.h
 ### P3.8 — Evaluate GF(2) matrix and filtering optimizations
 
 **2026-10-04 reconciliation and Phase 3 carry-over.** The
-[new research report](phases_three_plus_research.md#phase-3-carry-over-owned-by-p38)
+new research report (local audit material)
 extends this section to own the broader Phase 3 reconciliation, including
 collector and workload issues that determine whether matrix optimization is
 useful. Immediate diagnosed P3.5/P3.6 cost improvements now belong to P3.6.1.
@@ -909,7 +909,7 @@ factoring below 100 decimal digits on the user's Apple M4, 24 GiB, 10-core
 machine, with MPQS/SIQS and ECM.** Do not use a 50-digit cohort as the benchmark
 or tune the portfolio to that size. Historical milestone records and the
 already collected 50-digit exploratory traces remain provenance only. The
-[sub-100-digit reconciliation](phases_three_plus_research.md#below-100-digit-optimization-target)
+sub-100-digit reconciliation (local audit material)
 sets the new workload and implementation priorities. All fresh Phase 3 tasks
 stay here; P4/P5 own ECM arithmetic and continuation changes.
 
@@ -978,7 +978,7 @@ post-capture acceptance changes are recorded in the benchmark README.
   collector capacities; 32,768 rows/5,000 columns reserve about 1,198.7 MiB
   for matrix work alone. Preserve proved bounds when changing representations.
   Details and the distinction from performance evidence are in the
-  [budget follow-up](phases_three_plus_research.md#budget-follow-up-large-job-capacity).
+  budget follow-up (local audit material).
 - [x] Separate resident family-batch size from cumulative search allowance.
   Evaluate deterministic streaming/extension of assignments with a stable
   cursor, bounded duplicate tracking and checkpoint growth, preserving the
@@ -1125,7 +1125,7 @@ integration bridge completes 36/36 per arm and preserves repair/R1 shared
 interfaces and the full-base SSSf rollback. Raw captures remain local.
 
 Detailed commands, uncertainty intervals, source inputs and adopt/defer/reject
-scope are in [the benchmark guide](../benchmarks/README.md). All outcomes,
+scope are in [the benchmark guide](benchmarks/README.md). All outcomes,
 including unresolved cofactors, reconstruct the input. The conditional root
 and packed-exponent item below stays deferred: the profile did not establish
 extraction as the dominant cost and supplies no safe packing/capacity proof.
@@ -1191,10 +1191,10 @@ that evidence for broader interface/array reconciliation.
   automatic dispatch superiority or larger-band completion.
 
 **Distinct milestone (M25 research; implementation open).** The
-[matrix research report](gf2_matrix_research.md) reviews block Wiedemann,
+matrix research report (local audit material) reviews block Wiedemann,
 block Lanczos, dense Four Russians/PLE, packed sparse products and stronger
 filtering against papers, implementer blogs and seven pinned implementations.
-[Source provenance](m25_gf2_matrix_sources.json) and
+Source provenance (local audit material) and
 documentation verification preserve the
 review evidence. Existing P3.1–P3.7, M24 carry-over, P5.4, P6.2 and P7.6 text
 and acceptance gates remain unchanged; no earlier milestone is reopened.
@@ -1510,7 +1510,7 @@ comparison track; it does not close backend implementation or performance gates.
 
 **Sequence (M19):** eligible to move forward after working P3.4 SIQS when
 profiling/yield justifies it; not a GNFS prerequisite. See the
-[research report](quadratic_sieve_research.md#prioritized-experiments).
+research report (local audit material).
 
 - [ ] Store residual pairs under explicit factorization/storage budgets;
   combine graph cycles with atomic provenance. Include repeated primes,
@@ -1855,11 +1855,11 @@ does not postpone GNFS correctness or scaling and does not require every
 optional P4–P6 optimization. **Goal:** resolve remaining Phase 2 tuning with
 new evidence, retaining completed core work and earlier adopt/defer/reject
 decisions. Sources and transfer limits are in the
-[research report](phase_two_optimization_research.md).
+research report (local audit material).
 
 Brent batches, prime-exponent power detection, streamed stages, chunk replay,
 bounded caches, JSON checkpoints, M13 local loops and M14 worker feasibility
-already exist. Preserve the [M17 baseline](phase_two_m17_frozen_baseline.json).
+already exist. Preserve the M17 baseline (local audit material).
 Keep historical P2 gates open until their declared experiments pass; P8 IDs
 identify future execution and do not certify those gates by renumbering them.
 
@@ -1975,7 +1975,7 @@ identify future execution and do not certify those gates by renumbering them.
   factoring in cold and amortized regimes, with cache hit/miss and bounded
   RAM/disk costs. Include process/JIT RSS separately from owned workspace.
   Keep wheel-6/bytearray, cache off and rolling off without full-run promotion;
-  use the [C transfer review](sieve_port_review.md), not its native cutoffs.
+  use the C transfer review (local audit material), not its native cutoffs.
 
 ### P8.7 — Integrate accepted winners and close the reconciliation
 
@@ -2020,10 +2020,10 @@ experiments and future Phase 8 calibration do not postpone the GNFS pipeline.
 
 Read the scripts before running them: the compatibility scripts load the original Python 2 modules and print diagnostic observations; they are not acceptance tests for a finished Python 3 port. Some depend on `lib2to3` and the original absolute source path. Build native assertions for Phase 1 and store new results separately.
 
-- [validate.py](validate.py) and validation.json: setup, sieve, splitter, API, and injected-failure counterexamples.
-- [extra_checks.py](extra_checks.py) and extra-validation.json: endpoints, independent affine oracle, PRAC failures/timeouts.
-- [end_to_end_checks.py](end_to_end_checks.py) and end-to-end-validation.json: small reconstruction sweep, seed search, point timing diagnostics.
-- [prac_reference.py](prac_reference.py), [test_prac_reference.py](test_prac_reference.py), and prac-validation.json: guarded chain prototype and separately counted exceptional projective pairs.
-- [reduction_bench.py](reduction_bench.py) and reduction-validation.json: arithmetic checks and kernel measurements with disclosed exclusions.
+- validate.py (local audit material) and validation.json: setup, sieve, splitter, API, and injected-failure counterexamples.
+- extra_checks.py (local audit material) and extra-validation.json: endpoints, independent affine oracle, PRAC failures/timeouts.
+- end_to_end_checks.py (local audit material) and end-to-end-validation.json: small reconstruction sweep, seed search, point timing diagnostics.
+- prac_reference.py (local audit material), test_prac_reference.py (local audit material), and prac-validation.json: guarded chain prototype and separately counted exceptional projective pairs.
+- reduction_bench.py (local audit material) and reduction-validation.json: arithmetic checks and kernel measurements with disclosed exclusions.
 
 The full audit report supplies research references and their limitations. Pin any external implementation before benchmarking it; re-check its contracts before adapting code.

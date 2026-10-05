@@ -632,7 +632,7 @@ def main():
                     owned_bytes=32 * 1024 * 1024,
                 ),
                 "baseline_snapshot": str(
-                    ROOT / "audit/inputs/m25_p33_before_sources.json"
+                    ROOT / "benchmarks/inputs/m25_p33_before_sources.json"
                 ),
                 "scope": "fixed QS; no SIQS or dispatcher promotion",
             },

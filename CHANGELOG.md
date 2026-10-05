@@ -2,6 +2,14 @@
 
 ## Current development
 
+- Keep research notes and diagnostic tools in the ignored local audit tree.
+  Move six required source/provenance inputs into benchmark inputs and retain
+  the public acceptance plan as `v2/ROADMAP.md`.
+
+- Rewrite the repository and v2 guides around current methods, usage, result
+  and resume contracts, measured comparisons and remaining work. Keep detailed
+  experiments in the benchmark guide and label the historical emulated-v1 data.
+
 - Organize required audit/benchmark JSON inputs under `inputs/` and ignore
   generated `results/` folders. Preserve historical raw evidence locally,
   remove disposable caches and update loaders and default output paths.
@@ -97,7 +105,7 @@
   digests and retain legacy checkpoint prefixes. A fresh balanced 50-digit
   SIQS run completes in 1,183.355 s; continuation time is recorded separately.
 
-[P3.4](v2/audit/TODOS.md)'s bounded implementation/evaluation is complete;
+[P3.4](v2/ROADMAP.md)'s bounded implementation/evaluation is complete;
 ECM remains the default and SIQS stays opt-in. A general SIQS crossover and
 practical 60–80-digit scaling remain unestablished. The earlier M30 completion
 claim was corrected because 0.2-second probes and 24–26-bit fixtures were
@@ -105,7 +113,7 @@ insufficient; M31 supplies the declared longer experiment and its explicit
 retain-baseline decision. See [measurements](v2/benchmarks/README.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
 P4.3 arithmetic assessment and bounded GNFS remain roadmap work.
 
-PRAC optimization remains [P4.1](v2/audit/TODOS.md); production currently uses
+PRAC optimization remains [P4.1](v2/ROADMAP.md); production currently uses
 the safe Montgomery ladder.
 
 ## P3.8 R1 isolated capacity implementation — 4 October 2026
