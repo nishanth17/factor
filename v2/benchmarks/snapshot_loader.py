@@ -15,7 +15,7 @@ def load_snapshot(path=None):
     """
     if path is None:
         path = Path(__file__).resolve().parents[1] / "audit"
-        path /= "m8_source_snapshot.json"
+        path /= "inputs/m8_source_snapshot.json"
     data = json.loads(Path(path).read_text())
     name = "_factor_m8"
     package = types.ModuleType(name)
@@ -51,30 +51,43 @@ def load_snapshot(path=None):
 
 
 def load_stage_jobs():
-    """Load owned M12 candidate code in memory with unchanged dependencies.
+    """Load owned M12 candidates and their frozen arithmetic dependencies.
 
-    This control isolates batch-loop changes without another checkout. Reject
-    modified dependency modules rather than attributing their effects to the
-    stage-job implementation. Snapshot hashes identify executable evidence.
+    Every source byte is hash-checked. Supplied cursor/budget objects remain
+    explicit caller controls, allowing committed-boundary comparisons with
+    the current implementation without replacing immutable baseline code.
     """
     root = Path(__file__).resolve().parents[1]
-    path = root / "audit/m12_source_snapshot.json"
+    path = root / "audit/inputs/m12_source_snapshot.json"
     data = json.loads(path.read_text())
     for name, source in data["sources"].items():
         expected = data["source_sha256"][name]
         if hashlib.sha256(source.encode()).hexdigest() != expected:
             raise ValueError(f"corrupt M12 snapshot: {name}")
-        if (
-            name != "stage_jobs"
-            and hashlib.sha256((root / f"{name}.py").read_bytes()).hexdigest()
-            != expected
-        ):
-            raise ValueError(f"M12 dependency changed: {name}")
-    module = types.ModuleType("_factor_m12_stage_jobs")
-    module.__package__ = "v2"
-    module.__file__ = str(path.parent / "M12:stage_jobs.py")
-    exec(
-        compile(data["sources"]["stage_jobs"], module.__file__, "exec"),
-        module.__dict__,
-    )
-    return module
+    # Freeze the dependencies too. Current additive schedule APIs must not
+    # silently alter an immutable candidate control or make it unloadable.
+    package_name = "_factor_m12"
+    package = types.ModuleType(package_name)
+    package.__path__ = []
+    package.__package__ = package_name
+    sys.modules[package_name] = package
+    for name in (
+        "constants",
+        "utils",
+        "prime_sieve",
+        "ecm",
+        "budget",
+        "schedules",
+        "stage_jobs",
+    ):
+        qualified = package_name + "." + name
+        module = types.ModuleType(qualified)
+        module.__package__ = package_name
+        module.__file__ = str(path.parent / f"M12:{name}.py")
+        sys.modules[qualified] = module
+        setattr(package, name, module)
+        exec(
+            compile(data["sources"][name], module.__file__, "exec"),
+            module.__dict__,
+        )
+    return package.stage_jobs

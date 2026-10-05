@@ -241,10 +241,18 @@ def main():
     parser.add_argument("--seed", type=int)
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--bounded", action="store_true")
-    parser.add_argument("--work-limit", type=int, default=2_000_000)
+    parser.add_argument(
+        "--method",
+        choices=("auto", "sss", "sssf"),
+        default="auto",
+        help="select SSS after exact preprocessing, or keep auto dispatch",
+    )
+    parser.add_argument("--sss-base-bound", type=int, default=1000)
+    parser.add_argument("--sss-rounds", type=int, default=256)
+    parser.add_argument("--work-limit", type=int)
     parser.add_argument("--seconds", type=float, default=30)
     parser.add_argument("--cpu-seconds", type=float, default=30)
-    parser.add_argument("--memory-mib", type=int, default=8)
+    parser.add_argument("--memory-mib", type=int)
     parser.add_argument("--fermat-steps", type=int, default=0)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--resume", type=Path)
@@ -252,6 +260,11 @@ def main():
         "--ecm-curves", type=int, default=constants.MAX_CURVES_ECM
     )
     args = parser.parse_args()
+    use_sss = args.method in ("sss", "sssf")
+    if args.memory_mib is None:
+        args.memory_mib = 80 if use_sss else 8
+    if args.work_limit is None:
+        args.work_limit = 200_000_000 if use_sss else 2_000_000
     try:
         checkpoint = None
         if args.resume:
@@ -265,17 +278,33 @@ def main():
                 if checkpoint
                 else int(input("Enter number: "))
             )
-        if args.bounded or args.resume or args.checkpoint:
+        if args.bounded or args.resume or args.checkpoint or use_sss:
             from .budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
+            from .qs.sss import SSSConfig
 
-            config = PortfolioConfig(
+            parameters = dict(
                 ecm_tiers=(
                     (constants.ECM_B1, constants.ECM_B2, args.ecm_curves),
                 ),
                 memory_bytes=args.memory_mib * 1024 * 1024,
                 fermat_steps=args.fermat_steps,
             )
+            if use_sss:
+                parameters.update(
+                    rho_attempts=0,
+                    pm1_attempts=0,
+                    ecm_tiers=(),
+                    sss=SSSConfig(
+                        mode=args.method,
+                        base_bound=args.sss_base_bound,
+                        search_rounds=args.sss_rounds,
+                        memory_bytes=max(
+                            0, args.memory_mib * 1024 * 1024 - 16 * 1024 * 1024
+                        ),
+                    ),
+                )
+            config = PortfolioConfig(**parameters)
             run = factorize_bounded(
                 number,
                 seed=args.seed,

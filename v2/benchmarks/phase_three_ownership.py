@@ -15,8 +15,10 @@ from .phase_three_pipeline import CHANGES, _complete, _config, _corpus, _record
 from .phase_three_reference import _rss_bytes
 from .qs_snapshot import ROOT, load_qs_arm
 
-FREEZE = ROOT / "benchmarks/phase_three_m25_p33_refinement_pypy.frozen.json"
-OLD_PIPELINE = ROOT / "audit/m25_pre_ownership_pipeline.json"
+FREEZE = (
+    ROOT / "benchmarks/inputs/phase_three_m25_p33_refinement_pypy.frozen.json"
+)
+OLD_PIPELINE = ROOT / "audit/inputs/m25_pre_ownership_pipeline.json"
 HELD_OUT_SEED = 335
 
 

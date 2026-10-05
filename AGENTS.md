@@ -28,8 +28,8 @@ its acceptance and experiment gates pass. Summarize accepted behavior in
 ## GitHub contents
 
 Commit code, tests, documentation, independent corpora and immutable baselines
-required by test/benchmark loaders. The .gitignore lists retained audit and
-benchmark inputs explicitly.
+required by test/benchmark loaders. Retained audit and benchmark inputs live
+in their versioned `inputs/` folders; generated evidence belongs in folder-ignored `results/` trees.
 
 Keep generated captures, stdout transcripts, profiles, verification dumps,
 scratch output and the detailed `v2/LOG.md` journal local. Do not add those

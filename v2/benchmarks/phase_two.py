@@ -24,7 +24,7 @@ from .build_phase_two_corpus import verify_certificates
 from .phase_one import environment
 from .snapshot_loader import load_stage_jobs
 
-CORPUS = Path(__file__).with_name("phase_two_complete_corpus.json")
+CORPUS = Path(__file__).parent / "inputs/phase_two_complete_corpus.json"
 
 
 class SampleTimeoutError(Exception):
@@ -444,7 +444,7 @@ def run(args):
         "corpus": str(corpus_path),
         "m12_snapshot_sha256": hashlib.sha256(
             CORPUS.parents[1]
-            .joinpath("audit/m12_source_snapshot.json")
+            .joinpath("audit/inputs/m12_source_snapshot.json")
             .read_bytes()
         ).hexdigest()
         if "m12" in engines

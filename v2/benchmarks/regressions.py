@@ -239,7 +239,7 @@ def run(repetitions, warmup_seconds, include_legacy):
         )
 
     snapshot = Path(__file__).resolve().parents[1] / "audit"
-    snapshot /= "m8_source_snapshot.json"
+    snapshot /= "inputs/m8_source_snapshot.json"
     return {
         "milestone": "m9",
         "environment": environment(),

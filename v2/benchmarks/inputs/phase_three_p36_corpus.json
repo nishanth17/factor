@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "seed": 36042026,
+  "fixtures": [
+    {
+      "id": "small_training_0",
+      "band": "small",
+      "split": "training",
+      "n": 37247549,
+      "factors": [
+        4999,
+        7451
+      ]
+    },
+    {
+      "id": "small_training_1",
+      "band": "small",
+      "split": "training",
+      "n": 32174959,
+      "factors": [
+        4861,
+        6619
+      ]
+    },
+    {
+      "id": "small_training_2",
+      "band": "small",
+      "split": "training",
+      "n": 34833571,
+      "factors": [
+        4967,
+        7013
+      ]
+    },
+    {
+      "id": "small_training_3",
+      "band": "small",
+      "split": "training",
+      "n": 44834747,
+      "factors": [
+        6221,
+        7207
+      ]
+    },
+    {
+      "id": "small_held_out_0",
+      "band": "small",
+      "split": "held_out",
+      "n": 32435989,
+      "factors": [
+        4871,
+        6659
+      ]
+    },
+    {
+      "id": "small_held_out_1",
+      "band": "small",
+      "split": "held_out",
+      "n": 47332469,
+      "factors": [
+        6619,
+        7151
+      ]
+    },
+    {
+      "id": "small_held_out_2",
+      "band": "small",
+      "split": "held_out",
+      "n": 34826821,
+      "factors": [
+        4513,
+        7717
+      ]
+    },
+    {
+      "id": "small_held_out_3",
+      "band": "small",
+      "split": "held_out",
+      "n": 24181237,
+      "factors": [
+        4391,
+        5507
+      ]
+    },
+    {
+      "id": "medium_training_0",
+      "band": "medium",
+      "split": "training",
+      "n": 3725486523043,
+      "factors": [
+        1644283,
+        2265721
+      ]
+    },
+    {
+      "id": "medium_training_1",
+      "band": "medium",
+      "split": "training",
+      "n": 5082556870229,
+      "factors": [
+        1474769,
+        3446341
+      ]
+    },
+    {
+      "id": "medium_training_2",
+      "band": "medium",
+      "split": "training",
+      "n": 9264141051371,
+      "factors": [
+        2949487,
+        3140933
+      ]
+    },
+    {
+      "id": "medium_training_3",
+      "band": "medium",
+      "split": "training",
+      "n": 5647210116979,
+      "factors": [
+        1554451,
+        3632929
+      ]
+    },
+    {
+      "id": "medium_held_out_0",
+      "band": "medium",
+      "split": "held_out",
+      "n": 3508352088001,
+      "factors": [
+        1266091,
+        2771011
+      ]
+    },
+    {
+      "id": "medium_held_out_1",
+      "band": "medium",
+      "split": "held_out",
+      "n": 3459060309031,
+      "factors": [
+        1267727,
+        2728553
+      ]
+    },
+    {
+      "id": "medium_held_out_2",
+      "band": "medium",
+      "split": "held_out",
+      "n": 7436644813321,
+      "factors": [
+        2182991,
+        3406631
+      ]
+    },
+    {
+      "id": "medium_held_out_3",
+      "band": "medium",
+      "split": "held_out",
+      "n": 6540960639319,
+      "factors": [
+        2155511,
+        3034529
+      ]
+    }
+  ]
+}

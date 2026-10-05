@@ -10,7 +10,7 @@ from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import Polynomial, checked_position
 
-MAX_RESIDUAL = 1_000_000
+MAX_RESIDUAL = 1_000_000_000_000
 MAX_COMBINED_ATOMS = 256
 
 
@@ -40,7 +40,7 @@ def _check_exponents(exponents):
 
 @dataclass(frozen=True)
 class AtomicRelation:
-    """Signed factorization of A*F(x), with an optional proven residual.
+    """Factorization of A*F(x), including a known square and proven residual.
 
     relation_id identifies the polynomial/position, not untrusted exponent
     content. Construction validates shape; verify_atomic validates the math
@@ -76,11 +76,16 @@ class AtomicRelation:
         """Return the original A*x+B without storing duplicate state."""
         return self.polynomial.u_value(self.position)
 
+    @property
+    def square_correction(self):
+        """Known square coefficient; exact verification checks its identity."""
+        return self.polynomial.square_coefficient
+
 
 def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
     """Return True for an exact relation; reject invalid math with ValueError.
 
-    Verify the full integer identity and division, including A and sign.
+    Verify the full integer identity, including A, sign and known square.
     Nonunit residuals must be proven primes <= residual_bound < 2**64.
     Exponent bounds are checked before powers to avoid unbounded allocation.
     BudgetExhaustedError propagates; no partially checked atom is admitted.
@@ -103,8 +108,8 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         raise ValueError("zero is not a factorable relation")
     if relation.sign != (-1 if value < 0 else 1):
         raise ValueError("relation sign is incorrect")
-    remaining = abs(value)
-    primes = factor_base.primes
+    remaining = abs(value) // (relation.square_correction**2)
+    primes = factor_base._columns
     for prime, exponent in relation.exponents:
         if prime not in primes:
             raise ValueError("exponent prime is outside the factor base")
@@ -134,9 +139,7 @@ def parity_bits(relation, factor_base):
     exponents and square corrections remain stored for later extraction.
     """
     bits = int(relation.sign < 0)
-    columns = {
-        prime: index + 1 for index, prime in enumerate(factor_base.primes)
-    }
+    columns = factor_base._columns
     for prime, exponent in relation.exponents:
         if prime not in columns:
             raise ValueError("exponent prime is outside the factor base")
@@ -189,20 +192,25 @@ class CombinationResult:
 def _combined_values(atoms, modulus):
     """Accumulate exact exponents and bounded modular square corrections."""
     exponents, residuals = Counter(), Counter()
-    u, sign = 1, 1
+    u, sign, correction = 1, 1, 1
     for atom in atoms:
         u = u * atom.u % modulus
         sign *= atom.sign
+        correction = correction * atom.square_correction % modulus
         for prime, exponent in atom.exponents:
             exponents[prime] += exponent
         if atom.residual != 1:
             residuals[atom.residual] += 1
-    correction = 1
     for residual, count in sorted(residuals.items()):
         if count % 2:
             raise ValueError("combined residual multiplicities must be even")
         correction = correction * pow(residual, count // 2, modulus) % modulus
     return u, sign, tuple(sorted(exponents.items())), correction
+
+
+def combined_storage_reserve(exponent_count, modulus_bits):
+    """Bound a retained sparse pair, including IDs and modular values."""
+    return 4096 + 256 * exponent_count + 16 * modulus_bits
 
 
 def _combination_workspace(atoms, factor_base, memory_bytes):
@@ -223,6 +231,7 @@ def _combination_workspace(atoms, factor_base, memory_bytes):
         raise MemoryError(
             "combination/provenance workspace exceeds memory_bytes"
         )
+    return reserve
 
 
 def combine_relations(

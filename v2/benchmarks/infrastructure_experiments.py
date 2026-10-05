@@ -70,8 +70,8 @@ def run(args):
             or utils.valid_divisor(value, 1000000000039 * 1000000000061),
         )
     corpus_bytes = (
-        Path(__file__).with_name("phase_two_corpus.json").read_bytes()
-    )
+        Path(__file__).parent / "inputs/phase_two_corpus.json"
+    ).read_bytes()
     corpus = json.loads(corpus_bytes)
     fixtures = [
         fixture

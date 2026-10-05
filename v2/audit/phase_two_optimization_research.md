@@ -74,7 +74,7 @@ remains opt-in.
 
 GMP-ECM's pin is a public GitHub mirror, not a certification of the latest
 official distribution. Reuse the existing
-[competitor pins](../benchmarks/phase_two_competitors.json); they remain
+[competitor pins](../benchmarks/inputs/phase_two_competitors.json); they remain
 unexecuted. This is a design comparison across mature implementations, not a
 current fastest-implementation ranking. Imported code would also require
 license review; no upstream code was executed or copied into Factor.

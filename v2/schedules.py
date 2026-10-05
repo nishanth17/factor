@@ -56,6 +56,45 @@ class SieveContext:
         self._flags = bytearray(segment_size)
         self.payload_cap = required
 
+    def prime_segment(self, lo, hi):
+        """Materialize one bounded segment without per-prime resumptions.
+
+        This shares the context's private marking buffer with primes(); the
+        same single-consumer rule and half-open endpoints apply. The caller
+        reserves generation work before invoking this cursor-oriented path.
+        """
+        utils.require_integer(lo, "lo")
+        utils.require_integer(hi, "hi")
+        if hi > self.max_hi or hi - lo > 2 * self.segment_size:
+            raise ValueError("segment exceeds context bounds")
+        if self.active:
+            raise RuntimeError("context already has an active iterator")
+        self.active = True
+        try:
+            if hi <= max(lo, 2):
+                return []
+            left = max(lo, 3) | 1
+            size = max(0, (hi - left + 1) // 2)
+            self._flags[:size] = b"\x01" * size
+            for prime in self.base_primes:
+                if prime * prime >= hi:
+                    break
+                first = max(
+                    prime * prime, ((left + prime - 1) // prime) * prime
+                )
+                if first % 2 == 0:
+                    first += prime
+                index = (first - left) // 2
+                if index < size:
+                    count = (size - 1 - index) // prime + 1
+                    self._flags[index:size:prime] = b"\x00" * count
+            values = [left + 2 * i for i in range(size) if self._flags[i]]
+            if lo <= 2 < hi:
+                values.insert(0, 2)
+            return values
+        finally:
+            self.active = False
+
     def primes(self, lo, hi, *, budget=None):
         """Yield lo <= p < hi; release ownership on exhaustion or close.
 

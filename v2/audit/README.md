@@ -1,5 +1,23 @@
 # Roadmap, research and reference tools
 
+## File layout and retention
+
+- Python tools and Markdown documentation remain in this directory.
+- `inputs/` contains versioned corpora, source/citation manifests, immutable
+  baselines and frozen controls required for reproducible comparisons.
+- `results/` contains local captures, generated freezes, stdout, profiles,
+  verification dumps and scratch subdirectories. Git ignores the whole tree;
+  new runs need no filename exceptions. Choose a unique output path per run.
+
+The October 2026 cleanup moved 42 retained JSON inputs across audit and
+benchmarks without changing their contents. Historical generated evidence
+was removed from these source directories and preserved under the ignored
+`.local-evidence/cleanup-20261004/` archive. Bytecode caches were deleted.
+Keep new raw evidence in `results/`; publish useful conclusions and rerun
+commands here. Do not remove an input merely because it is historical: loaders
+may require its exact bytes. Keep source snapshots immutable.
+
+
 [TODOs](TODOS.md) records phased work and acceptance/experiment gates.
 Research notes cover [QS/SIQS](quadratic_sieve_research.md),
 [matrix algorithms](gf2_matrix_research.md),

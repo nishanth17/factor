@@ -7,7 +7,7 @@ import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SNAPSHOT = ROOT / "audit/m25_p33_before_sources.json"
+SNAPSHOT = ROOT / "audit/inputs/m25_p33_before_sources.json"
 
 
 def load_qs_arm(name, changes=()):
@@ -17,6 +17,11 @@ def load_qs_arm(name, changes=()):
     Every old source hash is checked before execution. New postprocessing
     uses each arm's own relation classes, avoiding type/conversion asymmetry.
     """
+    changes = set(changes)
+    if "qs.sieve_collector" in changes:
+        # The current collector's sparse storage helper uses the current
+        # relation/base pair. Keep the unchanged historic arm intact.
+        changes.update(("qs.factor_base", "qs.polynomial", "qs.relations"))
     data = json.loads(SNAPSHOT.read_text())
     sources = data["sources"]
     for module_name, source in sources.items():
@@ -35,6 +40,9 @@ def load_qs_arm(name, changes=()):
     sys.modules[qs.__name__] = qs
     package.qs = qs
     names = [key for key in sources if key != "qs.__init__"]
+    names.insert(names.index("budget") + 1, "work_budget")
+    names.insert(names.index("qs.sieve_collector"), "qs.families")
+    names.insert(names.index("qs.sieve_collector"), "qs.power_sieve")
     names += ["qs.linear_algebra", "qs.extraction", "qs.pipeline"]
     for module_name in names:
         current = module_name in changes or module_name not in sources

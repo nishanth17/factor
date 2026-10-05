@@ -63,7 +63,7 @@ def main():
     parser.add_argument(
         "--source",
         type=Path,
-        default=Path(__file__).with_name("phase_two_corpus.json"),
+        default=(Path(__file__).parent / "inputs/phase_two_corpus.json"),
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

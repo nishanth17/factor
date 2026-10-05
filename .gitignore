@@ -28,35 +28,10 @@ htmlcov/
 # The detailed development journal is local; publish CHANGELOG.md instead.
 /v2/LOG.md
 
-# Audit: publish plans/research/tools and required immutable inputs.
-/v2/audit/*
-!/v2/audit/*.py
-!/v2/audit/README.md
-!/v2/audit/TODOS.md
-!/v2/audit/sieve_port_review.md
-!/v2/audit/quadratic_sieve_research.md
-!/v2/audit/phase_two_optimization_research.md
-!/v2/audit/gf2_matrix_research.md
-!/v2/audit/provenance.json
-!/v2/audit/m8_source_snapshot.json
-!/v2/audit/m12_source_snapshot.json
-!/v2/audit/m25_p33_before_sources.json
-!/v2/audit/m25_pre_ownership_pipeline.json
-!/v2/audit/phase_two_m17_frozen_baseline.json
-!/v2/audit/quadratic_sieve_research_sources.json
-!/v2/audit/m21_quadratic_sieve_optimization_sources.json
-!/v2/audit/m23_phase_two_optimization_sources.json
-!/v2/audit/m25_gf2_matrix_sources.json
+# Reproducible sources, docs and inputs are versioned by default.
+# Put generated captures, logs, profiles and scratch work in these folders.
+/v2/audit/results/
+/v2/benchmarks/results/
 
-# Benchmarks: publish runners, documentation, corpora and frozen controls.
-/v2/benchmarks/*
-!/v2/benchmarks/*.py
-!/v2/benchmarks/README.md
-!/v2/benchmarks/phase_two_corpus.json
-!/v2/benchmarks/phase_two_complete_corpus.json
-!/v2/benchmarks/phase_two_m15_independent_corpus.json
-!/v2/benchmarks/phase_two_competitors.json
-!/v2/benchmarks/phase_three_m25_p33_refinement_pypy.frozen.json
-
-# Run outputs (JSON/gzip captures, logs, profiles, verification dumps and
-# scratch directories) stay local. Add a specific exception for a new input.
+# Historical raw evidence remains local and recoverable.
+/.local-evidence/

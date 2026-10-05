@@ -30,7 +30,7 @@ from .phase_one import environment
 
 CORPUS_SEED = 20261003
 ROOT = Path(__file__).resolve().parents[2]
-BASELINE = ROOT / "v2/audit/phase_two_m17_frozen_baseline.json"
+BASELINE = ROOT / "v2/audit/inputs/phase_two_m17_frozen_baseline.json"
 
 
 def _rss_bytes():

@@ -1,4 +1,4 @@
-"""Exact QS/MPQS contracts and bounded collection; SIQS comes in P3.4."""
+"""Exact QS/MPQS contracts, bounded collection and SIQS family primitives."""
 
 from .extraction import (
     CongruenceResult,
@@ -14,6 +14,7 @@ from .factor_base import (
     build_factor_base,
     modular_square_roots,
 )
+from .families import FamilyStep, PolynomialFamily, family_assignments
 from .linear_algebra import (
     DependencySolver,
     FilteredMatrix,
@@ -40,6 +41,7 @@ from .relations import (
     verify_combined,
 )
 from .sieve_collector import SieveCollector, SieveConfig, SieveResult
+from .siqs import SIQSConfig, SIQSJob
 
 __all__ = [
     "AtomicRelation",
@@ -52,12 +54,16 @@ __all__ = [
     "FactorBase",
     "FactorBaseBuild",
     "FactorBaseEntry",
+    "FamilyStep",
     "FilteredMatrix",
     "Polynomial",
+    "PolynomialFamily",
     "PolynomialRoots",
     "PreparedRelations",
     "QSJob",
     "QSResult",
+    "SIQSConfig",
+    "SIQSJob",
     "SieveCollector",
     "SieveConfig",
     "SieveResult",
@@ -66,6 +72,7 @@ __all__ = [
     "collect_block",
     "combine_relations",
     "extract_dependency",
+    "family_assignments",
     "filter_matrix",
     "modular_square_roots",
     "mpqs_polynomial",

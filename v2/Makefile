@@ -7,8 +7,8 @@ WARMUP_SECONDS ?= 3
 MILESTONE ?= phase_1
 RUN_ID := $(shell date +%Y%m%dT%H%M%S)
 RUNTIME_NAME := $(notdir $(PYTHON))
-VALIDATION_OUTPUT ?= audit/validation_$(RUN_ID)_$(RUNTIME_NAME).json
-BENCHMARK_OUTPUT ?= benchmarks/runtime_$(RUN_ID)_$(RUNTIME_NAME).json
+VALIDATION_OUTPUT ?= audit/results/validation_$(RUN_ID)_$(RUNTIME_NAME).json
+BENCHMARK_OUTPUT ?= benchmarks/results/runtime_$(RUN_ID)_$(RUNTIME_NAME).json
 
 # Resolve v2 imports even when make is invoked with -C from another directory.
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -18,7 +18,11 @@ export PYTHONDONTWRITEBYTECODE := 1
 
 .PHONY: help runtime run run-bounded test validate benchmark benchmark-phase-two lint
 .PHONY: benchmark-phase-three-reference benchmark-phase-three-collector
-.PHONY: benchmark-phase-three-pipeline
+.PHONY: benchmark-phase-three-pipeline benchmark-phase-three-families
+.PHONY: benchmark-phase-three-siqs benchmark-phase-three-large
+.PHONY: benchmark-phase-three-sss
+.PHONY: benchmark-phase-three-parallel
+LARGE_PHASE ?= all
 
 help:
 	@echo "Default runtime: $(PYTHON)"
@@ -39,34 +43,69 @@ test:
 	$(PYTHON) -m unittest discover -s tests -v
 
 validate:
+	@mkdir -p "$(dir $(VALIDATION_OUTPUT))"
 	$(PYTHON) -m v2.benchmarks.validate_phase_one \
 	  --milestone "$(MILESTONE)" \
 	  --output "$(VALIDATION_OUTPUT)"
 
 benchmark:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
 	$(PYTHON) -u -m v2.benchmarks.phase_one \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-two:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
 	$(PYTHON) -u -m v2.benchmarks.phase_two \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-reference:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
 	$(PYTHON) -u -m v2.benchmarks.phase_three_reference \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-collector:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
 	$(PYTHON) -u -m v2.benchmarks.phase_three_collector \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-pipeline:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
 	$(PYTHON) -u -m v2.benchmarks.phase_three_pipeline \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-families:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.phase_three_families \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-siqs:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.phase_three_siqs \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-large:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.phase_three_large \
+	  --phase $(LARGE_PHASE) --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-sss:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.phase_three_sss \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-phase-three-parallel:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.phase_three_parallel \
+	  --phase all --repetitions $(REPETITIONS) \
+	  --warmup-seconds $(WARMUP_SECONDS) --output "$(BENCHMARK_OUTPUT)"
 
 # Tools are installed in the ignored, project-local PyPy development venv.
 lint:
