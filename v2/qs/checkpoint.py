@@ -27,7 +27,7 @@ from .relations import (
 )
 from .sieve_collector import SieveCollector, SieveConfig
 
-VERSION = 1
+VERSION = 2
 MAX_BLOB_BYTES = 64 * 1024 * 1024
 
 
@@ -95,7 +95,10 @@ def _store(collector):
         ]
         for item in collector._combined
     ]
+    rows = collector._full + collector._combined
+    row_indices = {id(row): index for index, row in enumerate(rows)}
     return dict(
+        row_order=[row_indices[id(row)] for row in collector._rows],
         polynomials=polynomials,
         atoms=encoded,
         full=[indices[item.relation_id] for item in collector._full],
@@ -199,7 +202,7 @@ def pack_job(job):
 
 def _restore_store(payload, collector, budget):
     """Reserve decoded provenance and verify every atom/combination afresh."""
-    if not isinstance(payload, dict) or set(payload) != {
+    if not isinstance(payload, dict) or set(payload) - {"row_order"} != {
         "polynomials",
         "atoms",
         "full",
@@ -219,6 +222,20 @@ def _restore_store(payload, collector, budget):
             raise ValueError("SIQS checkpoint store exceeds its cap")
     if len(payload["full"]) + len(payload["combined"]) > config.max_relations:
         raise ValueError("SIQS checkpoint relation cap exceeded")
+    row_count = len(payload["full"]) + len(payload["combined"])
+    order = (
+        payload["row_order"]
+        if "row_order" in payload
+        else list(range(row_count))
+    )
+    if not isinstance(order, list) or len(order) != row_count:
+        raise ValueError("invalid checkpoint mixed row order")
+    for index in order:
+        utils.require_integer(index, "matrix row index", 0)
+        if index >= row_count:
+            raise ValueError("checkpoint row order refers outside store")
+    if len(set(order)) != row_count:
+        raise ValueError("checkpoint row order repeats a row")
     reserves = []
     for record in payload["atoms"]:
         if not isinstance(record, list) or len(record) != 5:
@@ -341,6 +358,8 @@ def _restore_store(payload, collector, budget):
         collector._pending[residual] = atom.relation_id
     if len(used) != len(atoms):
         raise ValueError("checkpoint has unreferenced atomic provenance")
+    rows = collector._full + collector._combined
+    collector._rows.extend(rows[index] for index in order)
     collector._workspace += sum(collector._atom_bytes.values())
 
 
@@ -357,9 +376,9 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     }:
         raise ValueError("invalid full SIQS checkpoint envelope")
     blob = checkpoint["blob"]
-    if (
-        type(checkpoint["version"]) is not int
-        or checkpoint["version"] != VERSION
+    if type(checkpoint["version"]) is not int or checkpoint["version"] not in (
+        1,
+        VERSION,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
     if (
@@ -374,8 +393,15 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     if _checksum(resources) != checkpoint["resources_sha256"]:
         raise ValueError("SIQS checkpoint resource integrity mismatch")
     payload = json.loads(blob)
-    if payload["version"] != VERSION:
+    if type(payload["version"]) is not int or (
+        payload["version"] != checkpoint["version"]
+    ):
         raise ValueError("invalid SIQS checkpoint payload version")
+    if payload["version"] >= 2 and payload["store"] is not None:
+        if not isinstance(payload["store"], dict) or (
+            "row_order" not in payload["store"]
+        ):
+            raise ValueError("mixed-order checkpoint lacks row_order")
     values = dict(payload["config"])
     values["collector"] = SieveConfig(**values["collector"])
     saved_config = SIQSConfig(**values)
@@ -567,6 +593,8 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             weight_two=config.weight_two,
             row_excess=config.row_excess,
             batch_width=config.batch_width,
+            filter_row_growth=config.filter_row_growth,
+            tested_dependencies=config.tested_dependencies,
             collector_class=partial(SieveCollector, precomputed_roots=roots),
         )
         engine = job.engine
@@ -614,9 +642,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         engine.stats = saved["stats"]
         prefix = saved["solver"]
         if prefix is not None:
-            relations = tuple(
-                engine.collector._full + engine.collector._combined
-            )
+            relations = engine.collector.matrix_relations
             prepared = prepare_relations(
                 relations,
                 job.base,

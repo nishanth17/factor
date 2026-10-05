@@ -53,6 +53,8 @@ class SIQSConfig:
     weight_two: bool = True
     row_excess: int = 2
     batch_width: int = 256
+    filter_row_growth: int = 1
+    tested_dependencies: bool = False
     memory_bytes: int = 32 * 1024 * 1024
     checkpoint_bytes: int = 1024 * 1024
     collector: SieveConfig = field(
@@ -84,6 +86,7 @@ class SIQSConfig:
             "max_trivial": (1, 2**31 - 1),
             "row_excess": (0, 4096),
             "batch_width": (1, 4096),
+            "filter_row_growth": (1, 4096),
             "checkpoint_bytes": (
                 4096,
                 (64 if self.streaming else 16) * 1024 * 1024,
@@ -99,6 +102,7 @@ class SIQSConfig:
             "shared_relations",
             "weight_two",
             "external_coefficients",
+            "tested_dependencies",
         ):
             if type(getattr(self, name)) is not bool:
                 raise TypeError(f"{name} must be Boolean")
@@ -386,6 +390,8 @@ class SIQSJob:
                 weight_two=self.config.weight_two,
                 row_excess=self.config.row_excess,
                 batch_width=self.config.batch_width,
+                filter_row_growth=self.config.filter_row_growth,
+                tested_dependencies=self.config.tested_dependencies,
                 collector_class=partial(
                     SieveCollector, precomputed_roots=roots
                 ),

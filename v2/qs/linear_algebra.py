@@ -275,6 +275,7 @@ class DependencySolver:
         self.pending = None
         self.xors = 0
         self.peak_nonzeros = 0
+        self.pivot_nonzeros = 0
 
     def step(self):
         """Commit one elimination action; keep the pending row on refusal."""
@@ -301,10 +302,8 @@ class DependencySolver:
         previous = self.pivots.get(bit)
         if previous is None:
             self.pivots[bit] = row, mask
-            self.peak_nonzeros = max(
-                self.peak_nonzeros,
-                sum(value.bit_count() for value, _ in self.pivots.values()),
-            )
+            self.pivot_nonzeros += row.bit_count()
+            self.peak_nonzeros = max(self.peak_nonzeros, self.pivot_nonzeros)
             self.pending = None
             self.next_row += 1
         else:

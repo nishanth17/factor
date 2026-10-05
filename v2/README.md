@@ -1100,3 +1100,47 @@ provenance and matrix objects coexist. The filter's initial incidence work now
 scales with nonzeros and bounded 64-bit-word operations, while its conservative
 fill-in/provenance storage reservation is unchanged. Reported work units are
 algorithmic allowances, not measured CPU instructions.
+
+
+## P3.8-R3 stable relations and exact recovery
+
+`SieveCollector.matrix_relations` returns an immutable tuple in mixed full and
+matched admission order. Later full rows preserve every existing row index.
+`PreparedRelations.row_identities` aligns with its deduplicated rows and binds
+an immutable factor base, complete relation payload and referenced atomic
+payloads. Atomic position IDs alone do not certify exponent content.
+
+`QSJob(..., tested_dependencies=False)` and
+`SIQSConfig(tested_dependencies=False)` control a bounded experimental cache.
+It uses selected payload identities, so an index shift cannot turn an old tested mask into a different selection.
+It shares the existing verification-cache reservation, retains only checked
+trivial trials, and falls back when that reservation fills. Ordinary jobs keep
+this experiment disabled pending its complete-factor gate. Public preparation
+verifies all inputs; restored jobs discard attestations and reverify data.
+`PreparedRelations` identities share the pinned payloads; preparation reserves
+additional combined-atom references. The mixed collector sequence is bounded
+by `max_relations` and fits the existing conservative per-row storage padding.
+
+SIQS and SSS checkpoints now emit version 2, and parallel checkpoints emit
+version 3. Their stores retain one bounded `row_order` permutation referencing
+the existing full/matched records. New versions require that field; preceding
+supported versions reconstruct the old full-then-matched ordering before
+replaying pending solver and extraction progress. Restores check every atom
+and combination again under the retained allowance. Worker atom merge order,
+resource leases and width/base identities keep their existing contracts.
+
+Solver pivot nonzeros are counted at insertion, removing a repeated scan of
+all pivots. Original parity rows and dense lift-mask/fill reservations remain
+available for independent dependency checks. The experiment decisions and
+measurement scope are recorded in [the benchmark guide](benchmarks/README.md).
+
+
+`QSJob(..., filter_row_growth=1)` and `SIQSConfig(filter_row_growth=1)`
+retain the every-change preparation cadence. Opt-in values from 2 through
+4096 wait for that many newly admitted rows before the next ordinary filter.
+Pending work resumes immediately; final windows and storage exhaustion always
+force the remaining checked rows through extraction. The setting is retained
+in SIQS checkpoints, with a default of 1 for preceding configurations, and
+cannot change through allowance-only resume extension. Both new settings
+are experimental opt-ins; measured scoped decisions do not change dispatch
+defaults or enlarge a work/time/storage allowance.

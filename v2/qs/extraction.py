@@ -34,6 +34,7 @@ class PreparedRelations:
     atoms: tuple
     workspace_bytes: int
     shared_workspace_bytes: int = 0
+    row_identities: tuple = ()
 
 
 class _VerificationCache:
@@ -47,10 +48,12 @@ class _VerificationCache:
     def __init__(self, memory_bytes):
         self.memory_bytes = memory_bytes
         self.records = {}
+        self.tested_dependencies = set()
         self.used = self.hits = self.misses = 0
 
     def clear(self):
         self.records.clear()
+        self.tested_dependencies.clear()
         self.used = 0
 
     def check(self, relation, base, store, budget, memory_bytes):
@@ -77,6 +80,36 @@ class _VerificationCache:
             self.records[id(relation)] = (relation, base, atoms, row)
             self.used += reserve
         return row
+
+    def dependency_key(self, prepared, mask, budget):
+        """Bind a tested selection to complete immutable row/base payloads."""
+        verify_dependency(mask, prepared.rows)
+        budget.consume(
+            mask.bit_count() * (len(prepared.factor_base.entries) + 1) + 1
+        )
+        if len(prepared.row_identities) != len(prepared.rows):
+            raise ValueError("prepared row identities are missing")
+        identities, bits = [], mask
+        while bits:
+            bit = bits & -bits
+            index = bit.bit_length() - 1
+            identity = prepared.row_identities[index]
+            if identity[0] is not prepared.factor_base or (
+                identity[1] is not prepared.relations[index]
+            ):
+                raise ValueError("prepared row identity differs from payload")
+            identities.append(identity)
+            bits ^= bit
+        return frozenset(identities)
+
+    def remember_dependency(self, key):
+        """Retain only checked trivial trials inside the shared cache cap."""
+        reserve = 2048 + sum(512 + 128 * len(identity[2]) for identity in key)
+        if key not in self.tested_dependencies and (
+            self.used + reserve <= self.memory_bytes
+        ):
+            self.tested_dependencies.add(key)
+            self.used += reserve
 
 
 def _verify_row(relation, base, store, budget, memory_bytes):
@@ -150,11 +183,14 @@ def _prepare_relations(
         if not isinstance(relation, (AtomicRelation, CombinedRelation)):
             raise TypeError("matrix relation must be atomic or combined")
         reserve += 2048 + 256 * len(relation.exponents)
+        if isinstance(relation, CombinedRelation):
+            reserve += 128 * len(relation.atom_ids)
     simultaneous = retained_workspace_bytes + reserve - shared_reserve
     if max(reserve, simultaneous) > memory_bytes:
         raise MemoryError("relation provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
     unique, indices, duplicates, seen, rows = [], [], [], set(), []
+    identities = []
     for index, relation in enumerate(relations):
         if verification_cache is None:
             _verify_row(
@@ -188,6 +224,14 @@ def _prepare_relations(
             unique.append(relation)
             indices.append(index)
             rows.append(row)
+            atoms = (
+                tuple(atom_store[i] for i in relation.atom_ids)
+                if isinstance(relation, CombinedRelation)
+                else ()
+            )
+            # Native equality includes every immutable polynomial, exponent,
+            # sign, residual, square correction and factor-base/root payload.
+            identities.append((factor_base, relation, atoms))
     return PreparedRelations(
         tuple(unique),
         tuple(rows),
@@ -197,6 +241,7 @@ def _prepare_relations(
         tuple(atom_store.values()),
         reserve,
         shared_reserve,
+        tuple(identities),
     )
 
 
@@ -262,7 +307,9 @@ def extract_dependency(prepared, mask, *, budget=None):
 class DependencyExtractor:
     """Try finite dependencies, retaining position after trivial GCDs."""
 
-    def __init__(self, prepared, dependencies, *, budget=None):
+    def __init__(
+        self, prepared, dependencies, *, budget=None, tested_cache=None
+    ):
         """Accept at most 65536 masks; validate each during its trial."""
         if not isinstance(dependencies, tuple):
             raise TypeError("dependencies must be an immutable tuple")
@@ -272,15 +319,30 @@ class DependencyExtractor:
         self.budget = budget if budget is not None else Budget()
         self.next_dependency = 0
         self.trials = []
+        self.tested_cache = tested_cache
+        self.cache_skips = 0
 
     def run(self):
         """Return a proper divisor or None; refusal preserves the trial."""
         while self.next_dependency < len(self.dependencies):
+            key = None
+            if self.tested_cache is not None:
+                key = self.tested_cache.dependency_key(
+                    self.prepared,
+                    self.dependencies[self.next_dependency],
+                    self.budget,
+                )
+                if key in self.tested_cache.tested_dependencies:
+                    self.cache_skips += 1
+                    self.next_dependency += 1
+                    continue
             result = extract_dependency(
                 self.prepared,
                 self.dependencies[self.next_dependency],
                 budget=self.budget,
             )
+            if key is not None and result.divisor is None:
+                self.tested_cache.remember_dependency(key)
             self.trials.append(result)
             self.next_dependency += 1
             if result.divisor is not None:

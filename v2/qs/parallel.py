@@ -940,7 +940,7 @@ class ParallelSIQSJob:
             ]
 
         payload = dict(
-            version=2,
+            version=3,
             n=self.n,
             seed=self.seed,
             config=asdict(self.config),
@@ -999,8 +999,14 @@ class ParallelSIQSJob:
         if type(payload["version"]) is not int or payload["version"] not in (
             1,
             2,
+            3,
         ):
             raise ValueError("unknown parallel checkpoint version")
+        if payload["version"] >= 3 and payload["store"] is not None:
+            if not isinstance(payload["store"], dict) or (
+                "row_order" not in payload["store"]
+            ):
+                raise ValueError("mixed-order checkpoint lacks row_order")
         options = payload["config"]
         options["collector"] = SieveConfig(**options["collector"])
         config = ParallelConfig(**options)

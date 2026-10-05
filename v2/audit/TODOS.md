@@ -1020,7 +1020,7 @@ post-capture acceptance changes are recorded in the benchmark README.
 
 **P3.8-R3 — Reduce preparation/filtering/provenance cost first**
 
-- [ ] Profile whole-store preparation on changed relation counts. Concurrent
+- [x] Profile whole-store preparation on changed relation counts. Concurrent
   work now implements touched-column incidence updates and degree queues;
   evaluate these against the frozen repeated-rebuild control before claiming
   a full-pipeline gain. Compare bounded batches with disjoint incident
@@ -1028,7 +1028,7 @@ post-capture acceptance changes are recorded in the benchmark README.
   compaction with an inverse map, and immutable merge histories with deferred
   lifting against dense original-relation masks. Evaluate verified immutable
   preparation caches and a trained re-filter/solve cadence separately.
-- [ ] Give admitted full and combined rows stable mixed-sequence identities
+- [x] Give admitted full and combined rows stable mixed-sequence identities
   before introducing incremental preparation/dependency caches: the current
   `_full + _combined` ordering shifts old combined indices when a full row
   arrives. Atomic IDs alone exclude exponent payloads; bind caches to the
@@ -1048,6 +1048,45 @@ post-capture acceptance changes are recorded in the benchmark README.
   batches are conflict-free merges, not a claim of independent dependencies.
   Native/GPU sparse layouts support experiments; their timings do not choose
   Factor's solver or justify disabling its verification.
+
+**R3 bounded evaluation (4 October 2026):** the two completed items above
+cover the declared finite implementation and comparison study, not a larger
+matrix-capacity or broad default promotion. The isolated control freezes the
+integrated R1/repair sources before R3 changes. Independent certified training
+and fresh post-freeze held-out fixtures use matched seeds, shared work/wall/CPU
+and storage caps, validated PyPy warmup and nine samples (extended when noisy).
+Every synthetic lift is checked against original parity with an independent
+rank/kernel oracle; actual full/matched payloads also pass modular extraction.
+Public/checkpoint preparation fully reverifies all atoms and combinations.
+
+- [x] Adopt stable mixed admission order, complete immutable payload identities,
+  versioned legacy-compatible checked recovery and incremental pivot counters.
+  Tested-dependency storage shares the existing verification-cache cap; cache
+  refusal falls back, and skipped trivial trials retain logical retry limits.
+- [x] Retain touched-column queues and R1 initial sparse-label mapping after
+  fresh repeated-rebuild comparisons. Reject live compaction, conflict-free
+  batches and immutable histories as defaults: no consistent complete-pipeline
+  gain; prototype histories reserve dense workspace plus bounded nodes/copies.
+- [x] Evaluate preparation and tested-dependency caches separately. Retain the
+  existing bounded preparation cache on the repair pass's larger causal
+  evidence; the R3 small prefix/extraction pipeline finds no new cache gain.
+  Keep tested-dependency caching off after matched native full-call regressions.
+- [x] Confirm opt-in cadence 32 only for the declared feasible nominal 30-digit
+  SIQS configuration: independent complete-cohort gains are 26.9% training and
+  38.7% fresh held-out, all 54 held-out attempts complete in each compared arm.
+  Default cadence 1 and automatic dispatch remain unchanged.
+- [ ] Promote cadence 8 independently or establish a general filtering policy:
+  joint identity/cadence gains pass scoped comparisons, but isolated training
+  gains miss the 10% time / 10-point completion threshold. No held-out retuning.
+- [ ] Prove and benchmark a reduced provenance/fill storage bound at larger
+  matrix scales. Existing dense quadratic reservations are unchanged; no
+  reduced constant is used to bypass a capacity refusal.
+
+Detailed commands, uncertainty intervals, source inputs and adopt/defer/reject
+scope are in [the benchmark guide](../benchmarks/README.md). All outcomes,
+including unresolved cofactors, reconstruct the input. The conditional root
+and packed-exponent item below stays deferred: the profile did not establish
+extraction as the dominant cost and supplies no safe packing/capacity proof.
 
 **Concurrent implementation note:** the initial sparse-cycle rebuild probe
 describes the frozen pre-queue source. Its 512 full rounds/134,611,200 units

@@ -208,8 +208,13 @@ class SieveCollector:
         self._omitted_allowance = 0
         self._lift_inverses = {}
         self._atoms, self._pending = {}, {}
-        self._full, self._combined = [], []
+        self._full, self._combined, self._rows = [], [], []
         self._atom_bytes = {}
+
+    @property
+    def matrix_relations(self):
+        """Return an immutable prefix in mixed full/matched admission order."""
+        return tuple(self._rows)
 
     def set_polynomial(self, polynomial, roots, *, retain_relations=True):
         """Switch metadata atomically; retain verified cross-family rows.
@@ -248,6 +253,7 @@ class SieveCollector:
             self._atom_bytes.clear()
             self._full.clear()
             self._combined.clear()
+            self._rows.clear()
         self.polynomial, self._roots = polynomial, roots
         self._a_exponents = tuple(exponents)
         self._a_support = tuple(
@@ -691,9 +697,11 @@ class SieveCollector:
         stats["admitted_atoms"] += 1
         if atom.residual == 1:
             self._full.append(atom)
+            self._rows.append(atom)
         elif partner is not None:
             del self._pending[atom.residual]
             self._combined.append(combination.relation)
+            self._rows.append(combination.relation)
             stats["matches"] += 1
         else:
             self._pending[atom.residual] = atom.relation_id

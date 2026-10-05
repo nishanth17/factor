@@ -115,3 +115,28 @@ the safe Montgomery ladder.
 - Integrate R1 with the P2/P3.6.1 repairs under a single writer. The combined
   candidate passes 258 tests and full lint; broad upper-band feasibility and
   crossover work remain open, with no automatic parameter promotion.
+
+
+## P3.8 R3 isolated preparation and provenance work — 4 October 2026
+
+- Preserve full and matched relations in one stable admission sequence; bind
+  prepared identities to complete immutable base, polynomial and atom payloads.
+- Retain mixed row order in SIQS/SSS version-2 and parallel version-3
+  checkpoints. Read preceding supported formats with their original grouped
+  order and fully reverify every relation before charged solver replay.
+- Count pivot nonzeros incrementally. Preserve exact original-row dependency
+  lifting and conservative fill/provenance workspace reservations.
+- Add opt-in `filter_row_growth` and `tested_dependencies` SIQS/QS settings,
+  retaining every-change filtering and disabled tested-dependency caching as
+  defaults. Pending work resumes immediately; terminal windows/storage limits
+  force the remaining extraction. Skipped checked trials still count against
+  the existing trivial-dependency allowance.
+- Add independent certified fixtures, immutable controls and bounded matrix,
+  compaction, history, cache and complete-factor experiments. Decisions and
+  confirmation scope are recorded in the benchmark guide; matrix scaling and
+  conditional packed-exponent/root work remain open.
+
+- Confirm the scoped opt-in cadence-32 setting on fresh 30-digit fixtures:
+  38.7% lower complete-cohort median than R3 cadence 1, 54/54 complete per arm.
+  Keep cadence 8 and tested-dependency cache promotions deferred; neither this
+  experiment nor passing recovery tests changes automatic dispatch defaults.

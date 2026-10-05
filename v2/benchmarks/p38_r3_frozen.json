@@ -1,0 +1,785 @@
+{
+  "schema": 1,
+  "selected_cadence": {
+    "small": 1,
+    "medium": 8,
+    "20d": 8,
+    "30d": 32
+  },
+  "tested_dependencies": false,
+  "production_default_cadence": 1,
+  "scope": "Class-specific direct SIQS experiments only; no auto dispatch or default promotion.",
+  "selection": "Cadence 8 has stable medium time and 20d completion training gains; 32 has a stable complete-run 30d gain. Unstable 20d cadence-32 timing cannot promote it globally.",
+  "gates": {
+    "errors": 0,
+    "complete_median_reduction": 0.1,
+    "completion_increase": 0.1,
+    "maximum_other_class_completion_loss": 0.05,
+    "warmup_seconds": 3,
+    "minimum_samples": 9,
+    "uncertainty": "Report paired fixed-cohort intervals; censored time is not successful time."
+  },
+  "training_sha256": "6dadb99e2fea8cc0af28ce5e7151f227dbd57bbe5b8ce727169dfb6a48eb3c38",
+  "training_source_sha256": {
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/budget.py": "eb8732955b53fba2fd048da8dd6d3b65a34c1953cc1649c61ecc242bab1baa4e",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm.py": "fa7f65a7feaf6d938d44505a18bc37e479e2226cc9ca7144a72d0e567e756de4",
+    "v2/factor.py": "5d5b7ea318534126ca15481ce583fe73b17647b8a4d7e522ac4755a7c25a03de",
+    "v2/pollard_pm1.py": "23ae23b248e8817e4d60ea27c267b6972ed1380193e0a490ec5272e65bda5772",
+    "v2/pollard_rho.py": "a7223faf77f9fca48e2bff8b09040e40401dea0a6533e89e75eb4c536052f396",
+    "v2/portfolio.py": "766fc0e209fb3143e98ce96a2b406644882e72eb437d0a1ba67d9b4f02e1c4df",
+    "v2/preprocessing.py": "806956139f7ebca2e9f538c4f462221756075fd25534eeb5a73b6e20d1d14fa5",
+    "v2/prime_sieve.py": "23cdc061a3c85987ac21f29ce7d01d9a07945801aa107b442ffb70d685777769",
+    "v2/schedules.py": "3225d0f5bd334f36b14ff20690d62c5903b5808f45f8715fc20e188cf4d46e6b",
+    "v2/stage_jobs.py": "ebffb93233cc918d914a5b5365d4cacb339a21867d370db8b4fd4eff2428d759",
+    "v2/utils.py": "6d6f7afe11efedd12a27c52cf82cbe5dbd6133b08a8fbc4336576c5cc58cbb53",
+    "v2/work_budget.py": "7a5b5c43cddbf2cb055ae9f8d6274ae7452b3e96d1d45f851c151ce8a8ddb8ad",
+    "v2/qs/__init__.py": "7e9d7e9bbf94fa6e6b26b1cc7b99fae8633e59003c0318cb673d64c2f032e6fa",
+    "v2/qs/assignment_stream.py": "27cfff7fb2c4969b112dc06256464dcaac9255b5ffc9f3c3b1c5a0bdce3615d1",
+    "v2/qs/capacity.py": "b15dad537fc283aec8e44f6140e5d716574414f4aaf5ef3e75299d98b2613de8",
+    "v2/qs/checkpoint.py": "1615c9b74a9ce172200fc9369bbf0948dba9baa32981dd2a7c07b2380201e8fe",
+    "v2/qs/external_square.py": "c7dec35e5984d3327501069e5b3ecab7fa232a8043ce6fe76c8cc69e9a219a1d",
+    "v2/qs/extraction.py": "66686e2b7d1c002f61c0d9bc32651bde9052a2e9f0ba933d83a8ce6eea923bf8",
+    "v2/qs/factor_base.py": "aaa8101776b64b9799269e938a06c233fb0c0e05219a4e6fea3954aada441550",
+    "v2/qs/families.py": "8f7f0ded17d5305a7a87608fcd9d09cd4f5340b66bd1abf8cf0a8d9aed4539f2",
+    "v2/qs/linear_algebra.py": "fe139910bfadd3639ffc656d13eb647337e158f7345259e1cf35dd5db01c35fe",
+    "v2/qs/multiplier.py": "d7e7645aca3df26987d0a3d443182a2ebf41bf0f8be9b39bfc7c85f4349f63de",
+    "v2/qs/parallel.py": "d6574eda747d05f02839641c025293a431914d6b58177d831a9335c7da3741ee",
+    "v2/qs/pipeline.py": "9dfd85f031032db2a411757083a9af3e7d6a478eecaa46b96d4d8efa0342b1f7",
+    "v2/qs/polynomial.py": "b43f08db25611ac9f6de2eb032230339606a65b2226210118b06e809a72b3fff",
+    "v2/qs/power_sieve.py": "a3526981ad8dc583050b12f6cf2af47a6f4a3800dfb8125e5a60bd0db549d35b",
+    "v2/qs/reference_collector.py": "14f15834fec582ce2d1aafaaf0e757c87a2dd771912580ed36ef6b690a406e62",
+    "v2/qs/relations.py": "2434f179dd27507af86733fe269a0bf40148c008dde86ed7eb90ac6285c471de",
+    "v2/qs/sieve_collector.py": "9e97c66edae01d1be30bc744b3332eeb2e85b712a1434a7a98e10ab66daa299b",
+    "v2/qs/siqs.py": "801d066d54f0644a9bd5cef6d393b2eb36fc3c42b9be3a21e05f4f3fb4bae67c",
+    "v2/qs/smooth_batch.py": "0764bffa429794aadd053540cdc010d4fc1fba6798de76e85d8397c254cc2e52",
+    "v2/qs/sss.py": "92f514d51246ad477cdf157d6a0475d23b7ad257ec0d3b220a3cd533fc4a0ddf",
+    "v2/qs/sss_checkpoint.py": "b305ebd4f748bc70c3f4ae38205628500fcca28bd37902d7c0f228592e10d51c"
+  },
+  "training_driver_sha256": {
+    "p38_r3.py": "8f57272e3d9d62a3e0a1aca7b109f776face19aea448eb5779980fd209511d50",
+    "p38_r3_experiments.py": "cf2f7d3d7b2e50879688061e5363a6bb9bce6fbdd750ada5509aadbd904d8321"
+  },
+  "training_summary": {
+    "small": {
+      "control": {
+        "median_seconds": 0.03294733399525285,
+        "stable": true,
+        "complete": 300,
+        "total": 300,
+        "control_comparison": null,
+        "current_comparison": null
+      },
+      "current": {
+        "median_seconds": 0.032862916006706655,
+        "stable": true,
+        "complete": 300,
+        "total": 300,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.002562209997274967,
+          "ci95": [
+            -0.02962280750359292,
+            0.06093944662977824
+          ],
+          "stable": true
+        },
+        "current_comparison": null
+      },
+      "dependencies": {
+        "median_seconds": 0.033423000015318394,
+        "stable": true,
+        "complete": 300,
+        "total": 300,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.014437162658868852,
+          "ci95": [
+            -0.04274477375492847,
+            0.04025691163655265
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.017043040504909346,
+          "ci95": [
+            -0.05002238263149783,
+            -0.00588553887906107
+          ],
+          "stable": true
+        }
+      },
+      "cadence8": {
+        "median_seconds": 0.03177483403123915,
+        "stable": true,
+        "complete": 300,
+        "total": 300,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.03558709679461869,
+          "ci95": [
+            -0.009452430120137079,
+            0.09517852593987497
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.03310972085512576,
+          "ci95": [
+            -0.01044719323366361,
+            0.05093287161679494
+          ],
+          "stable": true
+        }
+      },
+      "cadence32": {
+        "median_seconds": 0.0316273330245167,
+        "stable": true,
+        "complete": 300,
+        "total": 300,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.04006396908855614,
+          "ci95": [
+            -0.0018694001434382823,
+            0.1002326641873228
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.037598093301817626,
+          "ci95": [
+            -0.013850083341887531,
+            0.056016566183023975
+          ],
+          "stable": true
+        }
+      }
+    },
+    "medium": {
+      "control": {
+        "median_seconds": 0.036228999961167574,
+        "stable": true,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": null,
+        "current_comparison": null
+      },
+      "current": {
+        "median_seconds": 0.033957542036660016,
+        "stable": true,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.06269722948307277,
+          "ci95": [
+            0.02744211046004874,
+            0.09890043970152762
+          ],
+          "stable": true
+        },
+        "current_comparison": null
+      },
+      "dependencies": {
+        "median_seconds": 0.03591295797377825,
+        "stable": true,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.008723453248173585,
+          "ci95": [
+            -0.01405813354539931,
+            0.053381598395962904
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.0575841424272463,
+          "ci95": [
+            -0.09612301053767114,
+            -0.01515966047601025
+          ],
+          "stable": true
+        }
+      },
+      "cadence8": {
+        "median_seconds": 0.03204187494702637,
+        "stable": true,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.11557385019264166,
+          "ci95": [
+            0.07677865042112031,
+            0.14805030172552514
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.05641359694307435,
+          "ci95": [
+            -0.0059914402446874515,
+            0.09178975409884294
+          ],
+          "stable": true
+        }
+      },
+      "cadence32": {
+        "median_seconds": 0.03416683303657919,
+        "stable": true,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.05692033803855301,
+          "ci95": [
+            0.01601172949191576,
+            0.08715721321411829
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.006163314167239475,
+          "ci95": [
+            -0.06379817798741927,
+            0.029859393562803205
+          ],
+          "stable": true
+        }
+      }
+    },
+    "20d": {
+      "control": {
+        "median_seconds": 0.6724759589415044,
+        "stable": true,
+        "complete": 47,
+        "total": 60,
+        "control_comparison": null,
+        "current_comparison": null
+      },
+      "current": {
+        "median_seconds": 0.6371282499749213,
+        "stable": true,
+        "complete": 51,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.06666666666666667,
+          "completion_ci95": [
+            -0.05,
+            0.18333333333333332
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.05256352810325182,
+          "ci95": [
+            0.01810030785614769,
+            0.13749941840988944
+          ],
+          "stable": true
+        },
+        "current_comparison": null
+      },
+      "dependencies": {
+        "median_seconds": 0.6276859999634326,
+        "stable": true,
+        "complete": 52,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.08333333333333333,
+          "completion_ci95": [
+            -0.016666666666666666,
+            0.16666666666666666
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.06660455051593583,
+          "ci95": [
+            0.031017052848113957,
+            0.11855771114321689
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.016666666666666666,
+          "completion_ci95": [
+            -0.11666666666666667,
+            0.13333333333333333
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.0148200146702967,
+          "ci95": [
+            -0.13335267175654497,
+            0.07901416955876894
+          ],
+          "stable": true
+        }
+      },
+      "cadence8": {
+        "median_seconds": 0.47586029197555035,
+        "stable": true,
+        "complete": 56,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.15,
+          "completion_ci95": [
+            0.08333333333333333,
+            0.23333333333333334
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.2923757561168915,
+          "ci95": [
+            0.2734053838726589,
+            0.42503836897551606
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.08333333333333333,
+          "completion_ci95": [
+            0.0,
+            0.15
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.25311694781344074,
+          "ci95": [
+            0.21549286339809348,
+            0.3814191522739384
+          ],
+          "stable": true
+        }
+      },
+      "cadence32": {
+        "median_seconds": 0.3518687499454245,
+        "stable": false,
+        "complete": 60,
+        "total": 60,
+        "control_comparison": {
+          "completion_difference": 0.21666666666666667,
+          "completion_ci95": [
+            0.15,
+            0.2833333333333333
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.47675638769410345,
+          "ci95": [
+            0.352333724074975,
+            0.48715279114802124
+          ],
+          "stable": false
+        },
+        "current_comparison": {
+          "completion_difference": 0.15,
+          "completion_ci95": [
+            0.08333333333333333,
+            0.21666666666666667
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.44772696869229267,
+          "ci95": [
+            0.25917274188490924,
+            0.45748993447130737
+          ],
+          "stable": false
+        }
+      }
+    },
+    "30d": {
+      "control": {
+        "median_seconds": 1.9904542089207098,
+        "stable": true,
+        "complete": 36,
+        "total": 36,
+        "control_comparison": null,
+        "current_comparison": null
+      },
+      "current": {
+        "median_seconds": 1.9971301249461249,
+        "stable": true,
+        "complete": 36,
+        "total": 36,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.0033539661427504086,
+          "ci95": [
+            -0.026449596027675604,
+            0.029684076726366637
+          ],
+          "stable": true
+        },
+        "current_comparison": null
+      },
+      "dependencies": {
+        "median_seconds": 2.0810298749711365,
+        "stable": true,
+        "complete": 36,
+        "total": 36,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.04550502375010157,
+          "ci95": [
+            -0.08858094329474042,
+            -0.020006592832496173
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": -0.04201015696324495,
+          "ci95": [
+            -0.06930554009353429,
+            -0.010977161664240898
+          ],
+          "stable": true
+        }
+      },
+      "cadence8": {
+        "median_seconds": 1.794728499953635,
+        "stable": true,
+        "complete": 36,
+        "total": 36,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.09833218372464025,
+          "ci95": [
+            0.09419930161442625,
+            0.12257743043045888
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.10134623801638853,
+          "ci95": [
+            0.0814063428258085,
+            0.12528694003930596
+          ],
+          "stable": true
+        }
+      },
+      "cadence32": {
+        "median_seconds": 1.4600384579971433,
+        "stable": true,
+        "complete": 36,
+        "total": 36,
+        "control_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.26647975549820635,
+          "ci95": [
+            0.2638010146355221,
+            0.3218106466554048
+          ],
+          "stable": true
+        },
+        "current_comparison": {
+          "completion_difference": 0.0,
+          "completion_ci95": [
+            0.0,
+            0.0
+          ],
+          "uncertainty_scope": "Paired repeats conditional on this fixed cohort.",
+          "median_reduction": 0.2689317337113777,
+          "ci95": [
+            0.25301374850021974,
+            0.33002381409938386
+          ],
+          "stable": true
+        }
+      }
+    }
+  },
+  "configuration": {
+    "small": {
+      "mode": "siqs",
+      "base_bound": 200,
+      "multiplier": 1,
+      "half_width": 256,
+      "factor_count": 1,
+      "family_count": 64,
+      "pool_size": 32,
+      "assignment_policy": "reference",
+      "external_coefficients": false,
+      "coefficient_trials": 4096,
+      "polynomials_per_family": 0,
+      "diverse": true,
+      "shared_relations": true,
+      "growth_steps": 0,
+      "max_half_width": 256,
+      "max_stalled": 4096,
+      "max_trivial": 4096,
+      "weight_two": true,
+      "row_excess": 2,
+      "batch_width": 256,
+      "filter_row_growth": 1,
+      "tested_dependencies": false,
+      "memory_bytes": 134217728,
+      "checkpoint_bytes": 1048576,
+      "collector": {
+        "block_width": 256,
+        "metadata_chunk": 64,
+        "score_backend": "list",
+        "marking": "sparse",
+        "division": "bucket",
+        "small_prime_cutoff": 0,
+        "threshold_extra": 0,
+        "score_policy": "powers",
+        "residual_bound": 40000,
+        "max_partials": 2048,
+        "max_relations": 4096,
+        "max_atoms": 8192,
+        "memory_bytes": 8388608
+      }
+    },
+    "medium": {
+      "mode": "siqs",
+      "base_bound": 1000,
+      "multiplier": 1,
+      "half_width": 512,
+      "factor_count": 3,
+      "family_count": 64,
+      "pool_size": 32,
+      "assignment_policy": "reference",
+      "external_coefficients": false,
+      "coefficient_trials": 4096,
+      "polynomials_per_family": 0,
+      "diverse": true,
+      "shared_relations": true,
+      "growth_steps": 0,
+      "max_half_width": 512,
+      "max_stalled": 4096,
+      "max_trivial": 4096,
+      "weight_two": true,
+      "row_excess": 2,
+      "batch_width": 256,
+      "filter_row_growth": 1,
+      "tested_dependencies": false,
+      "memory_bytes": 134217728,
+      "checkpoint_bytes": 1048576,
+      "collector": {
+        "block_width": 256,
+        "metadata_chunk": 64,
+        "score_backend": "list",
+        "marking": "sparse",
+        "division": "bucket",
+        "small_prime_cutoff": 0,
+        "threshold_extra": 0,
+        "score_policy": "powers",
+        "residual_bound": 1000000,
+        "max_partials": 2048,
+        "max_relations": 4096,
+        "max_atoms": 8192,
+        "memory_bytes": 8388608
+      }
+    },
+    "20d": {
+      "mode": "siqs",
+      "base_bound": 3000,
+      "multiplier": 1,
+      "half_width": 2048,
+      "factor_count": 3,
+      "family_count": 64,
+      "pool_size": 32,
+      "assignment_policy": "reference",
+      "external_coefficients": false,
+      "coefficient_trials": 4096,
+      "polynomials_per_family": 0,
+      "diverse": true,
+      "shared_relations": true,
+      "growth_steps": 0,
+      "max_half_width": 2048,
+      "max_stalled": 4096,
+      "max_trivial": 4096,
+      "weight_two": true,
+      "row_excess": 2,
+      "batch_width": 256,
+      "filter_row_growth": 1,
+      "tested_dependencies": false,
+      "memory_bytes": 134217728,
+      "checkpoint_bytes": 1048576,
+      "collector": {
+        "block_width": 256,
+        "metadata_chunk": 64,
+        "score_backend": "list",
+        "marking": "sparse",
+        "division": "bucket",
+        "small_prime_cutoff": 0,
+        "threshold_extra": 0,
+        "score_policy": "powers",
+        "residual_bound": 9000000,
+        "max_partials": 2048,
+        "max_relations": 4096,
+        "max_atoms": 8192,
+        "memory_bytes": 8388608
+      }
+    },
+    "30d": {
+      "mode": "siqs",
+      "base_bound": 10000,
+      "multiplier": 1,
+      "half_width": 8192,
+      "factor_count": 4,
+      "family_count": 64,
+      "pool_size": 32,
+      "assignment_policy": "reference",
+      "external_coefficients": false,
+      "coefficient_trials": 4096,
+      "polynomials_per_family": 0,
+      "diverse": true,
+      "shared_relations": true,
+      "growth_steps": 0,
+      "max_half_width": 8192,
+      "max_stalled": 8192,
+      "max_trivial": 4096,
+      "weight_two": true,
+      "row_excess": 32,
+      "batch_width": 4096,
+      "filter_row_growth": 1,
+      "tested_dependencies": false,
+      "memory_bytes": 134217728,
+      "checkpoint_bytes": 1048576,
+      "collector": {
+        "block_width": 4096,
+        "metadata_chunk": 64,
+        "score_backend": "list",
+        "marking": "sparse",
+        "division": "bucket",
+        "small_prime_cutoff": 0,
+        "threshold_extra": 0,
+        "score_policy": "powers",
+        "residual_bound": 10000000,
+        "max_partials": 32768,
+        "max_relations": 32768,
+        "max_atoms": 65536,
+        "memory_bytes": 8388608
+      }
+    }
+  },
+  "decisions": {
+    "identity": "adopt",
+    "pivot_counter": "adopt",
+    "touched_queues": "retain repair implementation",
+    "live_compaction": "reject default",
+    "disjoint_batches": "reject default",
+    "merge_history": "reject default",
+    "tested_dependencies": "reject default; opt-in only",
+    "quadratic_reserve_reduction": "defer",
+    "packed_exponents_accumulated_roots": "defer conditional"
+  },
+  "source": {
+    "p38_r3.py": "\"\"\"R3 preparation, matrix and complete-factor experiments on PyPy.\"\"\"\n\nimport argparse\nimport ast\nimport cProfile\nimport hashlib\nimport importlib\nimport json\nimport platform\nimport random\nimport statistics\nimport subprocess\nimport sys\nimport tempfile\nimport time\nimport types\nfrom dataclasses import asdict, replace\nfrom functools import lru_cache\nfrom pathlib import Path\n\nfrom .build_phase_two_corpus import certified_prime, verify_certificates\nfrom .p38_r3_experiments import history_filter, live_compaction\nfrom .performance_audit import checked_baseline, fingerprint, verify_corpus\n\nROOT = Path(__file__).resolve().parents[2]\nHERE = Path(__file__).parent\nMEMORY = 128 * 2**20\nWORK = 10**10\nSECONDS = 0.2\n\n\ndef allowance(module, *, timed=False):\n    return module.Budget(\n        work_limit=WORK,\n        seconds=SECONDS if timed else 30,\n        cpu_seconds=SECONDS if timed else 30,\n    )\n\n\ndef build_corpus(split):\n    \"\"\"Generate proof-backed inputs independently after freezing policies.\"\"\"\n    generator = random.Random(3803042026 + (split == \"held_out\"))\n    certificates, fixtures, seen = {}, [], set()\n    for band, bits in (\n        (\"small\", 13),\n        (\"medium\", 21),\n        (\"20d\", 34),\n        (\"30d\", 50),\n    ):\n        for index in range(2 if split == \"training\" else 3):\n            for _ in range(10000):\n                p = certified_prime(bits, generator, certificates)\n                q = certified_prime(bits, generator, certificates)\n                if p != q and p * q not in seen:\n                    break\n            else:\n                raise RuntimeError(\"fixture generation cap exceeded\")\n            seen.add(p * q)\n            fixtures.append(\n                dict(\n                    id=f\"r3_{band}_{split}_{index}\",\n                    band=band,\n                    split=split,\n                    n=p * q,\n                    factors=sorted((p, q)),\n                )\n            )\n    verify_certificates(certificates)\n    return dict(\n        schema=1,\n        split=split,\n        fixtures=fixtures,\n        certificates=certificates,\n        seeds=[7, 29],\n        sampling=\"Certified Pocklington primes have a large p-1 \"\n        \"factor; these bounded cohorts are not RSA samples.\",\n    )\n\n\ndef load_control(directory):\n    \"\"\"Materialize only hash-checked owned source bytes in a temporary root.\"\"\"\n    data = checked_baseline(HERE / \"p38_r3_baseline.json\")\n    for name, source in data[\"source\"].items():\n        path = Path(directory) / name\n        path.parent.mkdir(parents=True, exist_ok=True)\n        path.write_text(source)\n    package = types.ModuleType(\"_p38_r3_control\")\n    package.__path__ = [str(Path(directory) / \"v2\")]\n    package.__package__ = package.__name__\n    sys.modules[package.__name__] = package\n    importlib.import_module(package.__name__ + \".qs\")\n    return package\n\n\ndef modules(package):\n    return {\n        name: importlib.import_module(package.__name__ + \".\" + name)\n        for name in (\n            \"budget\",\n            \"qs.pipeline\",\n            \"qs.extraction\",\n            \"qs.linear_algebra\",\n            \"qs.siqs\",\n            \"qs.factor_base\",\n            \"qs.polynomial\",\n            \"qs.sieve_collector\",\n        )\n    }\n\n\n@lru_cache(maxsize=2)\ndef rebuilt_filter(module):\n    \"\"\"Load only the old repeated-rebuild function, retaining exact lifting.\"\"\"\n    path = HERE / \"qs_m26_baseline.json\"\n    data = json.loads(path.read_text())\n    key = \"v2/qs/linear_algebra.py\"\n    source = data[\"source\"][key]\n    if (\n        hashlib.sha256(source.encode()).hexdigest()\n        != data[\"source_sha256\"][key]\n    ):\n        raise ValueError(\"corrupt repeated-rebuild control\")\n    node = next(\n        n\n        for n in ast.parse(source).body\n        if isinstance(n, ast.FunctionDef) and n.name == \"filter_matrix\"\n    )\n    namespace = {}\n    exec(\n        compile(ast.Module(body=[node], type_ignores=[]), str(path), \"exec\"),\n        module.__dict__,\n        namespace,\n    )\n    return namespace[\"filter_matrix\"]\n\n\ndef row_fixture(kind, count, seed):\n    \"\"\"Freeze graph/rank shapes without deriving rows from known factors.\"\"\"\n    if kind in (\"cycle\", \"wide_cycle\"):\n        stride = 97 if kind == \"wide_cycle\" else 1\n        return tuple(\n            (1 << (i * stride)) | (1 << (((i + 1) % count) * stride))\n            for i in range(count)\n        )\n    if kind == \"pivots\":\n        return tuple(1 << i for i in range(count) for _ in range(3))\n    if kind == \"cascade\":\n        return tuple((1 << i) | (1 << (i + 1)) for i in range(count - 1)) + (\n            1 << (count - 1),\n        )\n    generator = random.Random(seed)\n    if kind == \"live_gaps\":\n        live = tuple(\n            sum(1 << (32 * i) for i in generator.sample(range(16), 4))\n            for _ in range(count // 2)\n        )\n        # The initial union is dense; singleton elimination leaves wide gaps.\n        return live + tuple(1 << i for i in range(512) if i % 32)\n    return tuple(\n        sum(1 << i for i in generator.sample(range(count // 2), 8))\n        for _ in range(count)\n    )\n\n\ndef rank_oracle(rows):\n    \"\"\"Independent set-valued column elimination gives expected nullity.\"\"\"\n    pivots = {}\n    for row in rows:\n        columns = set()\n        bits = row\n        while bits:\n            bit = bits & -bits\n            columns.add(bit.bit_length() - 1)\n            bits ^= bit\n        while columns:\n            column = min(columns)\n            if column not in pivots:\n                pivots[column] = columns\n                break\n            columns = columns.symmetric_difference(pivots[column])\n    return len(pivots)\n\n\ndef stable(samples):\n    times = [s[\"seconds\"] for s in samples]\n    median = statistics.median(times)\n    q1, _, q3 = statistics.quantiles(times, n=4)\n    drift = abs(\n        statistics.median(times[:3]) / statistics.median(times[-3:]) - 1\n    )\n    spread = (q3 - q1) / median\n    return dict(\n        median_seconds=median,\n        drift=drift,\n        relative_iqr=spread,\n        stable=drift <= 0.15 and spread <= 0.2,\n        samples=samples,\n    )\n\n\ndef paired_measure(calls):\n    \"\"\"Interleave arms, validate every warmup/sample and extend noisy sets.\"\"\"\n    attempts = []\n    for attempt in range(3):\n        warmups = {}\n        for name, call in calls.items():\n            started, count = time.perf_counter(), 0\n            while time.perf_counter() - started < (3 if not attempt else 5):\n                call()\n                count += 1\n            warmups[name] = dict(\n                seconds=time.perf_counter() - started, validated_calls=count\n            )\n        samples = {name: [] for name in calls}\n        for index in range(9 if not attempt else 15):\n            names = list(calls)\n            if index % 2:\n                names.reverse()\n            for name in names:\n                started = time.perf_counter()\n                result = calls[name]()\n                samples[name].append(\n                    dict(seconds=time.perf_counter() - started, result=result)\n                )\n        summaries = {name: stable(values) for name, values in samples.items()}\n        attempts.append(dict(warmups=warmups, arms=summaries))\n        print(\n            \"sample gate\",\n            attempt + 1,\n            {\n                name: (round(s[\"median_seconds\"], 6), s[\"stable\"])\n                for name, s in summaries.items()\n            },\n            flush=True,\n        )\n        if all(s[\"stable\"] for s in summaries.values()):\n            break\n    return dict(\n        stable=all(s[\"stable\"] for s in summaries.values()), attempts=attempts\n    )\n\n\ndef comparison(measurement, control, candidate):\n    arms = measurement[\"attempts\"][-1][\"arms\"]\n    a, b = arms[control][\"samples\"], arms[candidate][\"samples\"]\n    generator = random.Random(380303)\n    gains = []\n    for _ in range(999):\n        indices = [generator.randrange(len(a)) for _ in a]\n        gains.append(\n            1\n            - statistics.median(b[i][\"seconds\"] for i in indices)\n            / statistics.median(a[i][\"seconds\"] for i in indices)\n        )\n    gains.sort()\n    deltas = [\n        sum(row[\"complete\"] for row in second[\"result\"])\n        / len(second[\"result\"])\n        - sum(row[\"complete\"] for row in first[\"result\"])\n        / len(first[\"result\"])\n        for first, second in zip(a, b)\n    ]\n    completion = sorted(\n        statistics.mean(generator.choice(deltas) for _ in deltas)\n        for _ in range(999)\n    )\n    return dict(\n        completion_difference=statistics.mean(deltas),\n        completion_ci95=[completion[24], completion[974]],\n        uncertainty_scope=\"Paired repeats conditional on this fixed cohort.\",\n        median_reduction=1\n        - arms[candidate][\"median_seconds\"] / arms[control][\"median_seconds\"],\n        ci95=[gains[24], gains[974]],\n        stable=arms[control][\"stable\"] and arms[candidate][\"stable\"],\n    )\n\n\ndef matrix_run(module, rows, variant, expected_rank, prepared=None):\n    budget = allowance(\n        sys.modules[module.__package__.rsplit(\".\", 1)[0] + \".budget\"]\n    )\n    retained = prepared.workspace_bytes if prepared is not None else 0\n    remaining = MEMORY - retained\n    if variant == \"rebuild\":\n        matrix = rebuilt_filter(module)(\n            rows, weight_two=True, budget=budget, memory_bytes=remaining\n        )\n    elif variant.startswith((\"history\", \"dense_batch\")):\n        matrix = history_filter(\n            rows,\n            module,\n            budget,\n            remaining,\n            batch_size=32 if variant.endswith(\"32\") else 1,\n            use_history=variant.startswith(\"history\"),\n        )\n    else:\n        matrix = module.filter_matrix(\n            rows, weight_two=True, budget=budget, memory_bytes=remaining\n        )\n        if variant == \"live\":\n            matrix = live_compaction(matrix, budget, remaining)\n    solver = module.DependencySolver(matrix, budget=budget)\n    dependencies = solver.run()\n    for mask in dependencies:\n        module.verify_dependency(mask, rows)\n    if len(dependencies) != len(rows) - expected_rank:\n        raise AssertionError(\"filtered kernel dimension differs from oracle\")\n    congruences = []\n    if prepared is not None:\n        from ..qs.extraction import extract_dependency\n\n        congruences = [\n            extract_dependency(prepared, mask, budget=budget)\n            for mask in dependencies\n        ]\n    if budget.used > WORK or retained + matrix.workspace_bytes > MEMORY:\n        raise AssertionError(\"matrix allowance exceeded\")\n    return dict(\n        dependencies=len(dependencies),\n        work=budget.used,\n        workspace=matrix.workspace_bytes,\n        simultaneous_workspace=retained + matrix.workspace_bytes,\n        stats=matrix.stats,\n        xors=solver.xors,\n        pivot_nonzeros=solver.peak_nonzeros,\n        extracted_dependencies=len(congruences),\n    )\n\n\ndef config(module, band):\n    if band == \"30d\":\n        return module.SIQSConfig(\n            base_bound=10000,\n            half_width=8192,\n            max_half_width=8192,\n            factor_count=4,\n            family_count=64,\n            pool_size=32,\n            max_stalled=8192,\n            max_trivial=4096,\n            row_excess=32,\n            batch_width=4096,\n            memory_bytes=MEMORY,\n            checkpoint_bytes=2**20,\n            collector=module.SieveConfig(\n                block_width=4096,\n                score_policy=\"powers\",\n                division=\"bucket\",\n                residual_bound=10000000,\n                max_atoms=65536,\n                max_relations=32768,\n                max_partials=32768,\n            ),\n        )\n    bound, width, count = {\n        \"small\": (200, 256, 1),\n        \"medium\": (1000, 512, 3),\n        \"20d\": (3000, 2048, 3),\n        \"30d\": (3000, 4096, 5),\n    }[band]\n    return module.SIQSConfig(\n        base_bound=bound,\n        half_width=width,\n        max_half_width=width,\n        factor_count=count,\n        family_count=64,\n        pool_size=32,\n        max_stalled=4096,\n        max_trivial=4096,\n        memory_bytes=MEMORY,\n        collector=module.SieveConfig(\n            score_policy=\"powers\",\n            division=\"bucket\",\n            residual_bound=bound**2,\n            max_atoms=8192,\n            max_relations=4096,\n            max_partials=2048,\n        ),\n    )\n\n\ndef factor_run(mods, fixture, seed, variant):\n    module = mods[\"qs.siqs\"]\n    seconds = 2 if fixture[\"band\"] == \"30d\" else 0.2\n    budget = mods[\"budget\"].Budget(\n        work_limit=WORK, seconds=seconds, cpu_seconds=seconds\n    )\n    selected = config(module, fixture[\"band\"])\n    if variant.startswith(\"cadence\"):\n        selected = replace(selected, filter_row_growth=int(variant[7:]))\n    if variant == \"dependencies\":\n        selected = replace(selected, tested_dependencies=True)\n    job = module.SIQSJob(\n        fixture[\"n\"], seed=seed, config=selected, budget=budget\n    )\n    result = job.run()\n    if (result.divisor or 1) * result.cofactor != fixture[\"n\"]:\n        raise AssertionError(\"factor/cofactor reconstruction failed\")\n    if result.divisor is not None and (\n        result.divisor not in fixture[\"factors\"]\n        or not 1 < result.divisor < fixture[\"n\"]\n    ):\n        raise AssertionError(\"improper divisor or independent proof mismatch\")\n    if budget.used > WORK or result.stats.get(\"workspace_bytes\", 0) > MEMORY:\n        raise AssertionError(\"factor allowance exceeded\")\n    labels, reason = [], result.reason\n    if result.divisor:\n        try:\n            budget.consume(\n                sum(\n                    p.bit_length() ** 2\n                    for p in (result.divisor, result.cofactor)\n                )\n            )\n            labels = [\n                module.utils.classify_prime(p).value\n                for p in (result.divisor, result.cofactor)\n            ]\n            budget.consume(0)\n        except mods[\"budget\"].BudgetExhaustedError:\n            labels = []\n            reason = \"classification_\" + budget.reason\n    return dict(\n        id=fixture[\"id\"],\n        seed=seed,\n        complete=bool(labels),\n        reason=reason,\n        divisor=result.divisor,\n        cofactor=result.cofactor,\n        certainty=labels,\n        work=budget.used,\n        wall=budget.wall_used,\n        cpu=budget.cpu_used,\n        stats=result.stats,\n    )\n\n\ndef prepare_fixture(mods, fixture):\n    budget = allowance(mods[\"budget\"])\n    base = (\n        mods[\"qs.factor_base\"]\n        .build_factor_base(fixture[\"n\"], bound=400, budget=budget)\n        .factor_base\n    )\n    if base is None:\n        raise ValueError(\"profile input split during base setup\")\n    polynomial = mods[\"qs.polynomial\"].qs_polynomial(base)\n    collector = mods[\"qs.sieve_collector\"].SieveCollector(\n        polynomial,\n        base,\n        budget=budget,\n        config=mods[\"qs.sieve_collector\"].SieveConfig(\n            residual_bound=1000,\n            max_atoms=8192,\n            max_relations=4096,\n            max_partials=2048,\n            memory_bytes=MEMORY,\n        ),\n    )\n    result = collector.collect(-2048, 2048)\n    return (\n        base,\n        result.full_relations + result.combined_relations,\n        {atom.relation_id: atom for atom in result.atoms},\n    )\n\n\ndef prepare_run(mods, fixture_data, cached):\n    base, relations, atoms = fixture_data\n    extraction = mods[\"qs.extraction\"]\n    cache = extraction._VerificationCache(2 * 2**20) if cached else None\n    costs, last = [], None\n    budget = allowance(mods[\"budget\"])\n    cache_reserve = cache.memory_bytes if cache else 0\n    for count in sorted(\n        set(min(len(relations), n) for n in (8, 16, 32, 64, 128))\n    ):\n        last = None\n        last = extraction._prepare_relations(\n            relations[:count],\n            base,\n            atoms,\n            budget=budget,\n            memory_bytes=MEMORY - cache_reserve,\n            verification_cache=cache,\n        )\n        costs.append(\n            dict(count=count, work=budget.used, workspace=last.workspace_bytes)\n        )\n    matrix = mods[\"qs.linear_algebra\"].filter_matrix(\n        last.rows,\n        budget=budget,\n        memory_bytes=MEMORY - last.workspace_bytes - cache_reserve,\n    )\n    dependencies = (\n        mods[\"qs.linear_algebra\"].DependencySolver(matrix, budget=budget).run()\n    )\n    for mask in dependencies:\n        extraction.extract_dependency(last, mask, budget=budget)\n    if budget.used > WORK:\n        raise AssertionError(\"preparation pipeline work cap exceeded\")\n    return dict(\n        total_work=budget.used,\n        simultaneous_workspace=(\n            last.workspace_bytes + cache_reserve + matrix.workspace_bytes\n        ),\n        costs=costs,\n        dependencies=len(dependencies),\n        cache_hits=cache.hits if cache else 0,\n        cache_used=cache.used if cache else 0,\n    )\n\n\ndef cold_run(root, mods, fixture):\n    \"\"\"Measure new PyPy startup, imports, setup and factoring separately.\"\"\"\n    code = \"\"\"\nimport json, sys\nsys.path.insert(0, sys.argv[1])\nfrom v2.budget import Budget\nfrom v2.qs.siqs import SIQSConfig, SIQSJob\nfrom v2.qs.sieve_collector import SieveConfig\nvalues=json.loads(sys.argv[2])\nvalues['collector']=SieveConfig(**values['collector'])\nbudget=Budget(work_limit=10**10, seconds=.2, cpu_seconds=.2)\njob=SIQSJob(int(sys.argv[3]), seed=7,\n            config=SIQSConfig(**values), budget=budget)\nresult=job.run()\nprint(json.dumps(dict(divisor=result.divisor, cofactor=result.cofactor,\n                      reason=result.reason, work=budget.used)))\n\"\"\"\n    samples = []\n    for _ in range(9):\n        started = time.perf_counter()\n        process = subprocess.run(\n            [\n                sys.executable,\n                \"-B\",\n                \"-c\",\n                code,\n                str(root),\n                json.dumps(asdict(config(mods[\"qs.siqs\"], fixture[\"band\"]))),\n                str(fixture[\"n\"]),\n            ],\n            check=True,\n            capture_output=True,\n            text=True,\n            timeout=30,\n        )\n        row = json.loads(process.stdout)\n        if (row[\"divisor\"] or 1) * row[\"cofactor\"] != fixture[\"n\"]:\n            raise AssertionError(\"cold result reconstruction\")\n        if row[\"divisor\"] and row[\"divisor\"] not in fixture[\"factors\"]:\n            raise AssertionError(\"cold split disagrees with proof\")\n        samples.append(dict(seconds=time.perf_counter() - started, result=row))\n    return dict(\n        scope=\"Cold first-split process/import/setup, without a warm claim.\",\n        samples=samples,\n        median_seconds=statistics.median(row[\"seconds\"] for row in samples),\n    )\n\n\ndef main():\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument(\n        \"--phase\",\n        choices=(\n            \"build\",\n            \"profile\",\n            \"matrix\",\n            \"prepare\",\n            \"cold\",\n            \"training\",\n            \"confirmation\",\n        ),\n        required=True,\n    )\n    parser.add_argument(\n        \"--split\", choices=(\"training\", \"held_out\"), default=\"training\"\n    )\n    parser.add_argument(\"--output\", type=Path, required=True)\n    parser.add_argument(\n        \"--variants\", default=\"control,current,dependencies,cadence8,cadence32\"\n    )\n    parser.add_argument(\"--bands\", default=\"small,medium,20d,30d\")\n    parser.add_argument(\"--short-repeats\", type=int, default=5)\n    args = parser.parse_args()\n    if not 1 <= args.short_repeats <= 20:\n        parser.error(\"short repeats must be between 1 and 20\")\n    if sys.implementation.name != \"pypy\" or sys.version_info[:2] != (3, 11):\n        parser.error(\"PyPy implementing Python 3.11 is required\")\n    if args.output.exists():\n        parser.error(\"preserve captures; choose a new output path\")\n    if args.phase == \"build\":\n        corpus = build_corpus(args.split)\n        if args.split == \"held_out\":\n            corpus[\"frozen_sha256\"] = hashlib.sha256(\n                (HERE / \"p38_r3_frozen.json\").read_bytes()\n            ).hexdigest()\n        args.output.write_text(json.dumps(corpus, indent=2) + \"\\n\")\n        return\n    corpus_path = HERE / (\"p38_r3_\" + args.split + \"_corpus.json\")\n    corpus = json.loads(corpus_path.read_text())\n    verify_corpus(corpus)\n    if (\n        args.split == \"held_out\"\n        and corpus[\"frozen_sha256\"]\n        != hashlib.sha256(\n            (HERE / \"p38_r3_frozen.json\").read_bytes()\n        ).hexdigest()\n    ):\n        raise ValueError(\"held-out corpus does not match frozen policies\")\n    before = fingerprint(ROOT)\n    with tempfile.TemporaryDirectory(prefix=\"factor-r3-\") as directory:\n        control = modules(load_control(directory))\n        current = modules(importlib.import_module(\"v2\"))\n        results = {}\n        if args.phase == \"profile\":\n            profile_fixtures = corpus[\"fixtures\"][:4] + [\n                next(f for f in corpus[\"fixtures\"] if f[\"band\"] == band)\n                for band in (\"20d\", \"30d\")\n            ]\n            for fixture in profile_fixtures:\n                data = prepare_fixture(control, fixture)\n                profiler = cProfile.Profile()\n                profiler.runcall(prepare_run, control, data, True)\n                profiler.dump_stats(\n                    str(args.output) + \".\" + fixture[\"id\"] + \".prof\"\n                )\n                results[fixture[\"id\"] + \"/prepare\"] = prepare_run(\n                    control, data, True\n                )\n                profiler = cProfile.Profile()\n                results[fixture[\"id\"] + \"/factor\"] = profiler.runcall(\n                    factor_run, control, fixture, 7, \"current\"\n                )\n                profiler.dump_stats(\n                    str(args.output) + \".\" + fixture[\"id\"] + \".factor.prof\"\n                )\n        elif args.phase == \"cold\":\n            for fixture in corpus[\"fixtures\"][:2]:\n                results[fixture[\"id\"]] = {\n                    \"control\": cold_run(directory, control, fixture),\n                    \"current\": cold_run(ROOT, current, fixture),\n                }\n        elif args.phase == \"matrix\":\n            kinds = (\n                \"cycle\",\n                \"cascade\",\n                \"dense\",\n                \"pivots\",\n                \"live_gaps\",\n                \"wide_cycle\",\n                \"verified_store\",\n            )\n            for kind in kinds:\n                prepared = None\n                if kind == \"verified_store\":\n                    base, relations, atoms = prepare_fixture(\n                        current, corpus[\"fixtures\"][0]\n                    )\n                    prepared = current[\"qs.extraction\"].prepare_relations(\n                        relations[:128],\n                        base,\n                        atoms,\n                        budget=allowance(current[\"budget\"]),\n                        memory_bytes=MEMORY,\n                    )\n                    rows = prepared.rows\n                else:\n                    rows = row_fixture(kind, 512, 3803)\n                expected_rank = rank_oracle(rows)\n                variants = [\"rebuild\", \"control\", \"current\", \"live\"]\n                if kind != \"wide_cycle\":\n                    variants += [\n                        \"dense_batch1\",\n                        \"dense_batch32\",\n                        \"history1\",\n                        \"history32\",\n                    ]\n                calls = {}\n                for variant in variants:\n                    module = (\n                        control[\"qs.linear_algebra\"]\n                        if variant == \"control\"\n                        else current[\"qs.linear_algebra\"]\n                    )\n                    calls[variant] = (\n                        lambda variant=variant, module=module: matrix_run(\n                            module, rows, variant, expected_rank, prepared\n                        )\n                    )\n                results[kind] = paired_measure(calls)\n        elif args.phase == \"prepare\":\n            for fixture in corpus[\"fixtures\"][:2]:\n                fixtures = {\n                    \"control\": prepare_fixture(control, fixture),\n                    \"current\": prepare_fixture(current, fixture),\n                }\n                calls = {\n                    \"uncached\": lambda: prepare_run(\n                        control, fixtures[\"control\"], False\n                    ),\n                    \"control\": lambda: prepare_run(\n                        control, fixtures[\"control\"], True\n                    ),\n                    \"current\": lambda: prepare_run(\n                        current, fixtures[\"current\"], True\n                    ),\n                }\n                results[fixture[\"id\"]] = paired_measure(calls)\n        else:\n            for band in args.bands.split(\",\"):\n                cohort = [f for f in corpus[\"fixtures\"] if f[\"band\"] == band]\n                calls = {}\n                for variant in args.variants.split(\",\"):\n                    mods = control if variant == \"control\" else current\n                    calls[variant] = lambda variant=variant, mods=mods: [\n                        factor_run(mods, fixture, seed, variant)\n                        for _ in range(\n                            args.short_repeats if band == \"small\" else 1\n                        )\n                        for fixture in cohort\n                        for seed in corpus[\"seeds\"]\n                    ]\n                results[band] = paired_measure(calls)\n                results[band][\"comparisons\"] = {\n                    candidate: comparison(results[band], \"control\", candidate)\n                    for candidate in calls\n                    if candidate != \"control\"\n                }\n        if fingerprint(ROOT) != before:\n            raise AssertionError(\"runtime changed during capture\")\n        args.output.write_text(\n            json.dumps(\n                dict(\n                    phase=args.phase,\n                    split=args.split,\n                    python=platform.python_version(),\n                    implementation=platform.python_implementation(),\n                    source_sha256=before,\n                    driver_sha256={\n                        name: hashlib.sha256(\n                            (HERE / name).read_bytes()\n                        ).hexdigest()\n                        for name in (\"p38_r3.py\", \"p38_r3_experiments.py\")\n                    },\n                    control_sha256=hashlib.sha256(\n                        (HERE / \"p38_r3_baseline.json\").read_bytes()\n                    ).hexdigest(),\n                    corpus_sha256=hashlib.sha256(\n                        corpus_path.read_bytes()\n                    ).hexdigest(),\n                    budgets=dict(\n                        work=WORK,\n                        wall=SECONDS,\n                        cpu=SECONDS,\n                        larger_wall_cpu=2,\n                        matrix_preparation_wall_cpu=30,\n                        owned_bytes=MEMORY,\n                    ),\n                    short_repeats=args.short_repeats,\n                    scope=\"Profiles diagnose costs. Warmed samples include \"\n                    \"complete calls and validation. Censored times are not \"\n                    \"successful-factorization speedups. No worker overlap.\",\n                    results=results,\n                ),\n                indent=2,\n            )\n            + \"\\n\"\n        )\n\n\nif __name__ == \"__main__\":\n    main()\n",
+    "p38_r3_experiments.py": "\"\"\"Bounded filtering challengers, including conversion and exact lifting.\"\"\"\n\nfrom dataclasses import replace\n\n\ndef live_compaction(matrix, budget, memory_bytes):\n    \"\"\"Remap surviving columns and retain their original-label inverse map.\"\"\"\n    union = 0\n    for row in matrix.rows:\n        union |= row\n    labels, bits = [], union\n    while bits:\n        bit = bits & -bits\n        labels.append(bit.bit_length() - 1)\n        bits ^= bit\n    reserve = matrix.workspace_bytes + 32768 + 256 * len(labels)\n    reserve += sum(\n        128 + 8 * ((row.bit_length() + 7) // 8) for row in matrix.rows\n    )\n    if reserve > memory_bytes:\n        raise MemoryError(\"live compaction coexistence exceeds memory cap\")\n    budget.consume(\n        (union.bit_length() // 64 + 1)\n        * (len(labels) + sum(r.bit_count() for r in matrix.rows))\n    )\n    lookup = {column: index for index, column in enumerate(labels)}\n    remapped = []\n    for row in matrix.rows:\n        budget.consume(0)\n        bits, value = row, 0\n        while bits:\n            bit = bits & -bits\n            value |= 1 << lookup[bit.bit_length() - 1]\n            bits ^= bit\n        remapped.append(value)\n    original_union = 0\n    for row in matrix.original_rows:\n        original_union |= row\n    initial_labels, bits = [], original_union\n    if original_union.bit_length() > 2 * original_union.bit_count():\n        while bits:\n            bit = bits & -bits\n            initial_labels.append(bit.bit_length() - 1)\n            bits ^= bit\n    inverse = tuple(initial_labels[i] if initial_labels else i for i in labels)\n    stats = dict(matrix.stats, inverse_columns=inverse)\n    return replace(\n        matrix, rows=tuple(remapped), stats=stats, workspace_bytes=reserve\n    )\n\n\ndef history_filter(\n    rows, module, budget, memory_bytes, batch_size=1, use_history=True\n):\n    \"\"\"Evaluate disjoint pivot batches and immutable trees with deferred lift.\n\n    This bounded prototype deliberately reserves the existing dense workspace\n    plus tree storage. It provides no claim of lower solver capacity. A batch\n    uses disjoint incident rows from one incidence snapshot; every merge still\n    updates touched columns. Lifting is iterative and independently checked.\n    \"\"\"\n    if (\n        len(rows) > 4096\n        or max((r.bit_length() for r in rows), default=0) > 4096\n    ):\n        raise ValueError(\"history prototype is limited to 4096 rows/columns\")\n    columns = max((r.bit_length() for r in rows), default=0)\n    reserve = module.matrix_workspace(len(rows), columns)\n    reserve += 65536\n    if use_history:\n        reserve += 1024 * (2 * len(rows))\n    if reserve > memory_bytes:\n        raise MemoryError(\"merge history coexistence exceeds memory cap\")\n    active = {\n        index: (row, index if use_history else 1 << index)\n        for index, row in enumerate(rows)\n    }\n    history = [(index,) for index in range(len(rows))] if use_history else []\n    zeros, incidence = [], {}\n    words = 1 + (columns + 63) // 64 + (len(rows) + 63) // 64\n    budget.consume(len(rows) + sum(r.bit_count() for r in rows) * words)\n    for index, row in enumerate(rows):\n        bits = row\n        while bits:\n            bit = bits & -bits\n            incidence[bit] = incidence.get(bit, 0) | (1 << index)\n            bits ^= bit\n\n    def toggle(index, bits):\n        while bits:\n            bit = bits & -bits\n            budget.consume(words)\n            value = incidence.get(bit, 0) ^ (1 << index)\n            if value:\n                incidence[bit] = value\n            else:\n                incidence.pop(bit, None)\n            bits ^= bit\n\n    merges = rounds = 0\n    while active:\n        budget.consume(0)\n        rounds += 1\n        empty = [i for i, (row, _) in active.items() if row == 0]\n        for index in empty:\n            zeros.append(active.pop(index)[1])\n        forced = {\n            mask.bit_length() - 1\n            for mask in incidence.values()\n            if mask.bit_count() == 1\n        }\n        if forced:\n            for index in forced:\n                toggle(index, active.pop(index)[0])\n            continue\n        selected, used = [], set()\n        budget.consume(len(incidence) * words)\n        for _, mask in sorted(incidence.items()):\n            if mask.bit_count() != 2:\n                continue\n            bit = mask & -mask\n            first, second = bit.bit_length() - 1, (mask ^ bit).bit_length() - 1\n            if first in used or second in used:\n                continue\n            selected.append((first, second))\n            used.update((first, second))\n            if len(selected) == batch_size:\n                break\n        if not selected:\n            break\n        for first, second in selected:\n            left, left_node = active[first]\n            right, right_node = active.pop(second)\n            budget.consume(words)\n            toggle(second, right)\n            toggle(first, right)\n            if use_history:\n                history.append((left_node, right_node))\n                if len(history) > 2 * len(rows):\n                    raise AssertionError(\"history node bound\")\n                node = len(history) - 1\n            else:\n                node = left_node ^ right_node\n            active[first] = left ^ right, node\n            merges += 1\n\n    def lift(node):\n        if not use_history:\n            return node\n        stack, mask = [node], 0\n        while stack:\n            budget.consume(words)\n            value = history[stack.pop()]\n            if len(value) == 1:\n                mask ^= 1 << value[0]\n            else:\n                stack.extend(value)\n        return mask\n\n    masks = tuple(lift(node) for _, node in active.values())\n    kernels = tuple(lift(node) for node in zeros)\n    for mask in kernels:\n        module.verify_dependency(mask, rows)\n    out = tuple(row for row, _ in active.values())\n    union = 0\n    for row in out:\n        union |= row\n    return module.FilteredMatrix(\n        rows,\n        out,\n        masks,\n        kernels,\n        dict(\n            input_rows=len(rows),\n            output_rows=len(out),\n            output_columns=union.bit_count(),\n            rounds=rounds,\n            weight_two_merges=merges,\n            history_nodes=len(history),\n        ),\n        reserve,\n    )\n",
+    "p38_r3_mixed.py": "\"\"\"Supplement R3 with mixed full/matched payloads and live coexistence caps.\"\"\"\n\nimport argparse\nimport hashlib\nimport importlib\nimport json\nimport platform\nimport sys\nfrom pathlib import Path\n\nfrom .p38_r3 import (\n    HERE,\n    MEMORY,\n    ROOT,\n    WORK,\n    allowance,\n    history_filter,\n    live_compaction,\n    modules,\n    paired_measure,\n    prepare_fixture,\n    rank_oracle,\n    rebuilt_filter,\n)\nfrom .performance_audit import fingerprint, verify_corpus\n\n\ndef run(mods, prepared, variant, rank):\n    \"\"\"Include incidence, fill, lifting and every exact modular extraction.\"\"\"\n    algebra = mods[\"qs.linear_algebra\"]\n    budget = allowance(mods[\"budget\"])\n    remaining = MEMORY - prepared.workspace_bytes\n    if variant == \"rebuild\":\n        matrix = rebuilt_filter(algebra)(\n            prepared.rows,\n            weight_two=True,\n            budget=budget,\n            memory_bytes=remaining,\n        )\n    elif variant.startswith((\"history\", \"dense_batch\")):\n        matrix = history_filter(\n            prepared.rows,\n            algebra,\n            budget,\n            remaining,\n            batch_size=32 if variant.endswith(\"32\") else 1,\n            use_history=variant.startswith(\"history\"),\n        )\n    else:\n        matrix = algebra.filter_matrix(\n            prepared.rows,\n            weight_two=True,\n            budget=budget,\n            memory_bytes=remaining,\n        )\n        if variant == \"live\":\n            matrix = live_compaction(matrix, budget, remaining)\n    dependencies = algebra.DependencySolver(matrix, budget=budget).run()\n    if len(dependencies) != len(prepared.rows) - rank:\n        raise AssertionError(\"mixed kernel dimension differs from oracle\")\n    congruences = []\n    for mask in dependencies:\n        algebra.verify_dependency(mask, prepared.rows)\n        congruences.append(\n            mods[\"qs.extraction\"].extract_dependency(\n                prepared,\n                mask,\n                budget=budget,\n            )\n        )\n    owned = prepared.workspace_bytes + matrix.workspace_bytes\n    if owned > MEMORY or budget.used > WORK:\n        raise AssertionError(\"mixed provenance/matrix allowance exceeded\")\n    return dict(\n        dependencies=len(dependencies),\n        extracted=len(congruences),\n        proper_divisors=sum(c.divisor is not None for c in congruences),\n        work=budget.used,\n        owned_bytes=owned,\n        matrix_stats=matrix.stats,\n    )\n\n\ndef main():\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument(\"--output\", type=Path, required=True)\n    args = parser.parse_args()\n    if sys.implementation.name != \"pypy\" or sys.version_info[:2] != (3, 11):\n        parser.error(\"PyPy implementing Python 3.11 is required\")\n    if args.output.exists():\n        parser.error(\"preserve captures; choose a new output path\")\n    corpus = json.loads((HERE / \"p38_r3_training_corpus.json\").read_text())\n    verify_corpus(corpus)\n    mods = modules(importlib.import_module(\"v2\"))\n    before = fingerprint(ROOT)\n    results = {}\n    for fixture in corpus[\"fixtures\"][:2]:\n        base, relations, atoms = prepare_fixture(mods, fixture)\n        from ..qs.relations import AtomicRelation, CombinedRelation\n\n        full = [r for r in relations if isinstance(r, AtomicRelation)][:64]\n        combined = [r for r in relations if isinstance(r, CombinedRelation)][\n            :64\n        ]\n        if len(full) != 64 or len(combined) != 64:\n            raise AssertionError(\"mixed trace requires 64 full and 64 matched\")\n        mixed = tuple(r for pair in zip(full, combined) for r in pair)\n        prepared = mods[\"qs.extraction\"].prepare_relations(\n            mixed,\n            base,\n            atoms,\n            budget=allowance(mods[\"budget\"]),\n            memory_bytes=MEMORY,\n        )\n        rank = rank_oracle(prepared.rows)\n        variants = (\n            \"rebuild\",\n            \"current\",\n            \"live\",\n            \"dense_batch1\",\n            \"dense_batch32\",\n            \"history1\",\n            \"history32\",\n        )\n        results[fixture[\"id\"]] = paired_measure(\n            {\n                name: lambda name=name: run(mods, prepared, name, rank)\n                for name in variants\n            }\n        )\n    if before != fingerprint(ROOT):\n        raise AssertionError(\"runtime changed during mixed capture\")\n    args.output.write_text(\n        json.dumps(\n            dict(\n                source_sha256=before,\n                driver_sha256=hashlib.sha256(\n                    Path(__file__).read_bytes()\n                ).hexdigest(),\n                python=platform.python_version(),\n                implementation=\"PyPy\",\n                trace=\"64 full and 64 matched rows interleaved; \"\n                \"every mask extracted\",\n                budgets=dict(work=WORK, wall_cpu=30, owned_bytes=MEMORY),\n                results=results,\n            ),\n            indent=2,\n        )\n        + \"\\n\"\n    )\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  "source_sha256": {
+    "p38_r3.py": "a0bb688e835c4ee07e2d18975b2b0373cb75d940ad5de5fbc97b59f408be8320",
+    "p38_r3_experiments.py": "cf2f7d3d7b2e50879688061e5363a6bb9bce6fbdd750ada5509aadbd904d8321",
+    "p38_r3_mixed.py": "a2ed3c0592c1e54ac98877e449bb1c866b55da17fd5be6f24289481934d79f59"
+  }
+}

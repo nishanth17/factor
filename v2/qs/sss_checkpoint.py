@@ -16,7 +16,7 @@ from .families import _checked_resources, _checksum, _identity
 from .linear_algebra import MAX_MATRIX_ROWS, DependencySolver, filter_matrix
 from .sieve_collector import SieveConfig
 
-VERSION = 1
+VERSION = 2
 MAX_BLOB_BYTES = 1024 * 1024
 
 
@@ -97,7 +97,7 @@ def pack_job(job):
 def _restore_solver(engine, prefix, resources):
     """Rebuild the verified matrix and replay only its retained prefix."""
     budget, collector = engine.budget, engine.collector
-    relations = tuple(collector._full + collector._combined)
+    relations = collector.matrix_relations
     prepared = prepare_relations(
         relations,
         collector.factor_base,
@@ -173,7 +173,7 @@ def restore_job(checkpoint, *, budget, config=None):
     }:
         raise ValueError("invalid SSS checkpoint envelope")
     if type(checkpoint["version"]) is not int or (
-        checkpoint["version"] != VERSION
+        checkpoint["version"] not in (1, VERSION)
     ):
         raise ValueError("unsupported SSS checkpoint version")
     blob = checkpoint["blob"]
@@ -189,8 +189,16 @@ def restore_job(checkpoint, *, budget, config=None):
     if _checksum(resources) != checkpoint["resources_sha256"]:
         raise ValueError("SSS checkpoint resource integrity mismatch")
     payload = json.loads(blob)
-    if type(payload["version"]) is not int or payload["version"] != VERSION:
+    if (
+        type(payload["version"]) is not int
+        or payload["version"] != checkpoint["version"]
+    ):
         raise ValueError("invalid SSS checkpoint payload version")
+    if payload["version"] >= 2 and payload["store"] is not None:
+        if not isinstance(payload["store"], dict) or (
+            "row_order" not in payload["store"]
+        ):
+            raise ValueError("mixed-order checkpoint lacks row_order")
     values = dict(payload["config"])
     values["collector"] = SieveConfig(**values["collector"])
     saved_config = SSSConfig(**values)

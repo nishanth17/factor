@@ -77,3 +77,11 @@ htmlcov/
 !/v2/benchmarks/p38_r1_frozen.json
 !/v2/benchmarks/p38_r1_baseline.json
 !/v2/benchmarks/p38_r1_measured_sources.json
+
+# Immutable R3 inputs and exact measured sources.
+!/v2/benchmarks/p38_r3_baseline.json
+!/v2/benchmarks/p38_r3_training_corpus.json
+!/v2/benchmarks/p38_r3_held_out_corpus.json
+!/v2/benchmarks/p38_r3_frozen.json
+!/v2/benchmarks/p38_r3_measured_sources.json
+!/v2/benchmarks/p38_r3_final_sources.json

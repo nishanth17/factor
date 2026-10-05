@@ -49,6 +49,8 @@ class QSJob:
         pivot="highest",
         row_excess=2,
         batch_width=256,
+        filter_row_growth=1,
+        tested_dependencies=False,
         collector_class=SieveCollector,
     ):
         """Build collection state; propagate setup failures."""
@@ -58,6 +60,11 @@ class QSJob:
         utils.require_integer(row_excess, "row_excess", 0)
         if row_excess > 4096:
             raise ValueError("row_excess exceeds 4096")
+        utils.require_integer(filter_row_growth, "filter_row_growth", 1)
+        if filter_row_growth > 4096:
+            raise ValueError("filter_row_growth exceeds 4096")
+        if type(tested_dependencies) is not bool:
+            raise TypeError("tested_dependencies must be Boolean")
         checked_position(lo)
         checked_position(hi)
         if not 0 <= hi - lo <= 1_000_000:
@@ -80,6 +87,8 @@ class QSJob:
         self.lo, self.hi, self.next_position = lo, hi, lo
         self.weight_two, self.pivot = weight_two, pivot
         self.row_excess, self.batch_width = row_excess, batch_width
+        self.filter_row_growth = filter_row_growth
+        self.tested_dependencies = tested_dependencies
         self.solver, self.extractor, self.prepared = None, None, None
         self.last_count = -1
         self.last_solved_count = -1
@@ -108,11 +117,17 @@ class QSJob:
 
     def _solve(self, final):
         """Prepare changed stores; preserve pending solve/extraction state."""
-        relations = tuple(self.collector._full + self.collector._combined)
+        relations = self.collector.matrix_relations
         count = len(relations)
         if self.solver is None and self.extractor is None:
             if count == self.last_count and (
                 not final or count == self.last_solved_count
+            ):
+                return None
+            if (
+                not final
+                and self.last_count >= 0
+                and count - self.last_count < self.filter_row_growth
             ):
                 return None
             store = dict(self.collector._atoms)
@@ -175,12 +190,21 @@ class QSJob:
                 self.prepared,
                 dependencies,
                 budget=self.budget,
+                tested_cache=(
+                    self.collector._preparation_cache
+                    if self.tested_dependencies
+                    else None
+                ),
             )
         self.extractor.budget = self.budget
         self.budget.consume(0)
         divisor = self._timed("extraction", self.extractor.run)
-        self.stats["trivial_dependencies"] += sum(
+        skipped = getattr(self.extractor, "cache_skips", 0)
+        self.stats["trivial_dependencies"] += skipped + sum(
             trial.divisor is None for trial in self.extractor.trials
+        )
+        self.stats["tested_dependency_skips"] = (
+            self.stats.get("tested_dependency_skips", 0) + skipped
         )
         self.stats["last_solver"] = {
             "xors": self.solver.xors,

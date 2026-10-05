@@ -1030,3 +1030,187 @@ still includes ECM and JIT memory. Integration added the repair task's worker
 memory/resume guards and the R1 cache-extension validation correction; those
 changes pass combined acceptance and are distinct from the immutable timed
 snapshot. No runtime or benchmark-driver writes overlap frozen captures.
+
+
+### P3.8-R3 stable rows, preparation and provenance experiments
+
+R3 froze the already integrated R1/repair source before changing identities or
+adding caches. `p38_r3_baseline.json` contains all 35 hash-checked runtime
+modules, rather than a moving import of the control. The subsequent repair
+rollback affects only SSSf, which these SIQS comparisons do not exercise.
+`p38_r3_measured_sources.json` preserves the first matrix/preparation capture;
+`p38_r3_final_sources.json` preserves the native opt-in policy capture.
+The frozen policy file also retains the final drivers with shared-pipeline
+budget and coexistence checks. The profile driver and raw captures remain
+local. Snapshots are data; restore
+only their hash-checked source bytes into a temporary directory when replaying
+that revision. Required inputs and runners are retained by explicit ignore
+exceptions.
+
+Training has two independent certified semiprimes in each of four classes,
+with seeds 7 and 29. Fresh confirmation has three per class, generated only
+after the policy freeze. The `20d` and `30d` labels denote nominal 20–21 and
+30–31-digit ranges; actual lengths are stored in the fixtures' integers.
+Pocklington generation biases p−1 toward a large certified factor. These tiny
+cohorts establish scoped experiments, not a population ranking or a general
+SIQS crossover. Known factors/certificates validate outputs and never enter
+algorithm configuration. Full-call measurements include independent split
+validation and budgeted certainty classification; every censored cofactor also
+reconstructs the input.
+
+Use PyPy implementing Python 3.11. All arms share 10^10 work units and 128 MiB
+owned storage; wall and CPU caps are 0.2 seconds per smaller attempt and two
+seconds per nominal 30-digit attempt. Matrix/preparation calls allow 30 seconds.
+The 30-digit configuration uses base bound 10,000, width 8,192, four A factors,
+32 candidates, 64 families and 4,096-position blocks. Smaller configurations
+use bounds 200/1,000/3,000 and widths 256/512/2,048. The runner prints the sample
+stability gate, validates at least three seconds of warmup for every arm and
+interleaves nine samples; unstable sets extend to five seconds and 15 samples,
+up to three attempts. The revised short comparison repeats the same two-input,
+two-seed cohort five times within each sample, revalidating all 20 results.
+Bootstrap intervals describe repeat uncertainty conditional on these fixed
+inputs; they are not population confidence intervals. Censored cohort elapsed
+time is never reported as time-to-factor improvement. Cold process launches
+include startup/import/setup and first split, and are labelled separately from
+warm complete-factor results. CPU-heavy phases ran serially with the other
+sessions; profiles do not supply performance evidence.
+
+The initial separately instrumented feasible 30-digit profile recorded 22
+collection calls (1.450 seconds inclusive), 21 preparations (0.095 seconds) and
+21 filters (0.205 seconds). Small extraction calls totalled about 0.8 ms.
+Changed-prefix preparation covered 8/16/32/64/128 rows (or all available rows),
+with 120 checked-cache hits on the first three stores. The sparse large stores
+had one or zero admitted rows. This profile does not establish extraction as
+the dominant cost or practical large-matrix capacity.
+
+| Matrix/complete-solver fixture | Repeated rebuild | Frozen queues | R3 counters | Decision |
+| --- | ---: | ---: | ---: | --- |
+| 512-row cycle | 51.979 ms | 2.998 ms | 2.937 ms | Retain existing touched queues |
+| 512-row cascade | 32.850 ms | 1.673 ms | 1.690 ms | Retain existing touched queues |
+| 512-row dense | 34.489 ms | 35.849 ms | 34.555 ms | No broad queue win |
+| 1,536 rows / 512 pivots | 3.518 ms | 10.434 ms | 4.344 ms | Adopt incremental pivot count |
+| 512 sparse-label cycle | 776.203 ms | 8.563 ms | 8.531 ms | Retain R1 initial gap mapping |
+| 128 verified full rows, all kernels extracted | 1.575 ms | 1.629 ms | 1.493 ms | No representation promotion |
+
+The rebuild arm loads only the frozen M26 filtering function into otherwise
+matched current limits; it is a function control, not a whole old-source
+factoring claim. Synthetic rows use an independent set-based rank oracle; every
+lifted mask is checked against original rows. Actual relation matrices also
+extract every dependency through the original modular verifier. The separate
+mixed runner interleaves 64 full and 64 matched rows and reserves preparation,
+matrix and compaction/history storage simultaneously. Conversion, incidence,
+fill, solver and deferred lifting all count in timing. The initial prefix comparison refreshed the budget at each stage; its
+2.046/2.187 ms uncached and 2.040/2.219 ms R3 medians are diagnostic only. The
+subsequent single-ledger preparation/filter/solve/extract repeat measured
+1.821/2.076 ms uncached, 1.954/2.137 ms for the frozen cache and
+1.863/2.085 ms for R3. Its peak owned reservations were 8.23/4.84 MiB including
+the full reserved cache. It showed no cache win; the existing bounded preparation cache is retained on the repair pass's
+separately documented larger repeated-call evidence.
+
+- **Adopt:** stable mixed admission indices, complete payload identities,
+  fully verified versioned checkpoint replay and the incremental pivot counter.
+- **Reject as defaults:** live-column compaction, disjoint pivot batching and
+  immutable merge histories. No consistent end-to-end benefit appeared;
+  batching is conflict-free merging and supplies no independent-dependency
+  claim. Dense masks remain the production provenance representation.
+- **Defer:** replacing dense quadratic reservations, larger-matrix scaling,
+  accumulated modular roots and packed exponents. The history prototype caps
+  rows/columns at 4,096, nodes at twice its row count, and reserves the existing
+  dense workspace plus history/scratch. No constant was reduced to admit an
+  otherwise refused workload. Original parity/provenance remain independently
+  checkable; incremental residues cannot attest their own history.
+
+```sh
+pypy3 -u -m v2.benchmarks.p38_r3 --phase matrix \
+  --output v2/benchmarks/p38_r3_matrix_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3 --phase prepare \
+  --output v2/benchmarks/p38_r3_prepare_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3_mixed \
+  --output v2/benchmarks/p38_r3_mixed_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3 --phase training \
+  --output v2/benchmarks/p38_r3_training_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3 --phase confirmation --split held_out \
+  --bands small,medium,20d --variants control,current,cadence8 \
+  --output v2/benchmarks/p38_r3_confirmation_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3 --phase confirmation --split held_out \
+  --bands 30d --variants control,current,cadence32 \
+  --output v2/benchmarks/p38_r3_confirmation30_NEW_LOCAL.json
+pypy3 -u -m v2.benchmarks.p38_r3 --phase cold \
+  --output v2/benchmarks/p38_r3_cold_NEW_LOCAL.json
+```
+
+The committed training/held-out corpora are immutable. `--phase build` creates
+new fixtures at a new path; it never overwrites retained corpora. Held-out
+creation requires the frozen policy file and embeds its SHA-256. Captures
+refuse overwrite and record runtime, control, driver, corpus and source hashes.
+
+
+The mixed supplement found 83/92 verified kernels and 44/32 proper divisors
+respectively, with identical results in every arm. Current medians were
+1.472/1.787 ms, live compaction 1.592/1.876 ms, dense batch-32
+1.435/1.752 ms and history-32 1.501/1.835 ms. Reservations including the
+retained full provenance were 6.26/2.87 MiB for dense masks and
+6.57/3.18 MiB for histories. The small batching changes do not meet a consistent
+10% gate and history adds storage. Equal parity alone never deduplicates rows.
+
+Native training froze cadence 8 for medium and nominal 20-digit experiments,
+and cadence 32 for nominal 30-digit experiments. The production default stays
+1. Training medium complete-cohort time was 36.229 → 32.042 ms (11.6%; paired
+95% repeat interval 7.7–14.8%). The 20-digit completion rate changed from
+47/60 to 56/60 (+15 percentage points; conditional interval +8.3–23.3).
+Its elapsed-time reduction is censored and is not a successful time-to-factor
+claim. The 30-digit complete-cohort comparison was 1.990 → 1.460 seconds
+(26.6%; interval 26.4–32.2%), 36/36 complete in both arms. The small cohort
+showed no qualifying gain; no class lost completion. Cadence-32 20-digit timing
+remained unstable after extensions, so it was not selected for that class.
+Pair stability requires both compared arms to pass; an unstable rejected arm
+does not close or invalidate a different candidate's gate.
+
+Tested-dependency caching stays off. Against R3 with caching off, the cache arm
+adds roughly 1.7% on small, 5.8% on medium and 4.2% on the complete 30-digit
+training cohort; it does not pass the 10% time or 10-point completion gate.
+Full payload hashing/lookup costs are included. Its capped implementation is
+available explicitly for future reuse experiments, and it shares the original
+2 MiB verification-cache reservation. Cache refusal falls back to full trials;
+checked trivial skips still count against the same finite logical retry limit.
+Public and checkpoint preparation always reverify untrusted data.
+
+
+Fresh held-out confirmation passed the stability and zero-error gates in every
+compared arm. All short outcomes were complete (450/450 per arm, 15 samples of
+30 attempts); medium and 30-digit outcomes were 54/54 per arm (nine six-attempt
+cohorts). Every warmup was validated, including the extended short runs.
+
+| Held-out class | Frozen control | R3 cadence 1 | Frozen candidate | Complete outcomes: control / R3 / candidate |
+| --- | ---: | ---: | ---: | --- |
+| Small, five repeated cohorts | 42.450 ms | 42.205 ms | cadence 8: 41.560 ms | 450 / 450 / 450 |
+| Medium | 81.620 ms | 71.483 ms | cadence 8: 64.570 ms | 54 / 54 / 54 |
+| Nominal 20-digit | 810.340 ms | 739.495 ms | cadence 8: 575.072 ms | 36 / 47 / 54 of 54 |
+| Nominal 30-digit | 7.745 s | 7.526 s | cadence 32: 4.611 s | 54 / 54 / 54 |
+
+Against the frozen control, the joint R3/cadence-8 medium arm reduces complete
+cohort time 20.9% (conditional 95% interval 16.1–23.0%); the nominal 20-digit
+completion gain is 33.3 points. Against R3 with cadence 1, cadence 8 changes
+medium time by 9.7% and held-out 20-digit completion by 13.0 points. Its isolated
+training gains were only 5.6% medium time and 8.3 points 20-digit completion.
+Thus **defer a standalone cadence-8 promotion** despite the joint R3 option's
+training/confirmation gains; do not attribute identity/order gains to cadence.
+The small class has no qualifying gain and retains cadence 1.
+
+Cadence 32 independently passes the declared nominal 30-digit gate: against
+R3 cadence 1 it reduces complete-cohort median time **26.9% in training and
+38.7% held out** (held-out interval 38.0–39.0%), with no completion loss. Against
+the original frozen control the held-out reduction is 40.5% (39.7–40.8%).
+**Adopt it only as an opt-in setting for this explicit feasible configuration.**
+All other classes retain the production setting unless the caller explicitly
+requests a candidate. This is no automatic size rule or parameter optimum.
+Censored 20-digit elapsed times support no successful time-to-factor claim.
+
+Cold first-split process medians for the two short training fixtures were
+179.270/167.900 ms control and 179.490/167.281 ms R3, nine fresh PyPy processes
+per cell. They reconstruct all outputs and validate proper splits against
+certificates; they exclude complete-factor classification. No cold gain is
+claimed. The acceptance suite covers corrupted/rehashed payloads, missing or
+invalid mixed permutations, frozen legacy pending checkpoints, skipped-trial
+allowances, cache saturation/refusal, exact brute-force kernels, inverse maps,
+solver refusal and terminal/resumed opt-in behavior.
