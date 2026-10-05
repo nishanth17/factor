@@ -18,7 +18,7 @@ from .phase_three_pipeline import _complete, _config, _corpus, _record
 from .phase_three_reference import _rss_bytes
 
 ROOT = Path(__file__).resolve().parents[2]
-SNAPSHOT = ROOT / "v2/benchmarks/inputs/qs_m26_baseline.json"
+SNAPSHOT = ROOT / "v2/benchmarks/inputs/baselines/qs_m26_baseline.json"
 MODULES = (
     "factor_base",
     "polynomial",
@@ -51,6 +51,7 @@ def load_arm(name, current=False):
     qs.__package__ = qs.__name__
     package.qs = qs
     sys.modules[qs.__name__] = qs
+
     for child in MODULES:
         key = "v2/qs/" + child + ".py"
         if not current and key not in snapshot["source"]:
@@ -64,12 +65,14 @@ def load_arm(name, current=False):
             != (snapshot["source_sha256"][key])
         ):
             raise ValueError("corrupt M26 source snapshot")
+
         module = types.ModuleType(qs.__name__ + "." + child)
         module.__package__ = qs.__name__
         module.__file__ = str(ROOT / key) if current else str(SNAPSHOT)
         setattr(qs, child, module)
         sys.modules[module.__name__] = module
         exec(compile(source, module.__file__, "exec"), module.__dict__)
+
     return package
 
 
@@ -80,6 +83,7 @@ def oracle_audit(arm):
 
     qs = arm.qs
     counters = {"root_sets": 0, "collection_windows": 0, "kernels": 0}
+
     for n in (101 * 137, 211 * 307, 307 * 401):
         for h in (1, 3, 9):
             base = qs.factor_base.build_factor_base(
@@ -91,6 +95,7 @@ def oracle_audit(arm):
                     base, 31, budget=unlimited_budget()
                 ),
             )
+
             for polynomial in polynomials:
                 for entry in base.entries:
                     roots = qs.polynomial.polynomial_roots(
@@ -108,7 +113,9 @@ def oracle_audit(arm):
                     )
                     assert actual == expected
                     counters["root_sets"] += 1
+
                 expected = reference_positions(polynomial, base, -31, 34, 97)
+
                 for backend in ("list", "bytearray", "array"):
                     for division in ("full", "roots", "bucket", "resieve"):
                         for policy in (
@@ -134,6 +141,7 @@ def oracle_audit(arm):
                                 config=config,
                                 budget=unlimited_budget(),
                             )
+
                             result = worker.collect(-31, 34)
                             assert result.reason == "complete"
                             actual = {
@@ -146,23 +154,28 @@ def oracle_audit(arm):
                             }
                             assert actual == expected
                             counters["collection_windows"] += 1
+
     generator = random.Random(2733)
+
     for _ in range(80):
         rows = tuple(
             generator.randrange(1 << 12)
             for _ in range(generator.randrange(1, 11))
         )
         expected = dense_kernel(rows)
+
         for weight_two in (False, True):
             matrix = qs.linear_algebra.filter_matrix(
                 rows, weight_two=weight_two, budget=unlimited_budget()
             )
+
             for pivot in ("highest", "lowest"):
                 solver = qs.linear_algebra.DependencySolver(
                     matrix, pivot=pivot, budget=unlimited_budget()
                 )
                 assert span(solver.run()) == expected
                 counters["kernels"] += 1
+
     return {"passed": True, "seed": 2733, **counters}
 
 
@@ -201,6 +214,7 @@ def main():
             )
         )
         return
+
     if args.output.exists() or args.warmup_seconds < 3 or args.repetitions < 9:
         parser.error("use a new capture, three-second warmup and nine samples")
     measured_environment = environment()
@@ -212,6 +226,7 @@ def main():
     print("independent audit", audit, flush=True)
     expected = [case["factors"] for case in _corpus(2735, 16)]
     results = []
+
     for division in ("roots", "bucket"):
         for name, arm in arms.items():
             results.append(
@@ -222,8 +237,10 @@ def main():
                     args,
                 )
             )
+
     rows = tuple((index * 37) % 256 for index in range(64))
     expected_kernel = None
+
     for name, arm in arms.items():
 
         def matrix_call(arm=arm):
@@ -242,11 +259,14 @@ def main():
             expected_kernel = value
         assert value == expected_kernel
         results.append(_record(name + "_matrix", matrix_call, value, args))
+
     cold = []
+
     for name in arms:
         for _ in range(9):
             start = time.perf_counter()
             prior = resource.getrusage(resource.RUSAGE_CHILDREN)
+
             child = subprocess.run(
                 [
                     sys.executable,
@@ -276,6 +296,7 @@ def main():
                 ),
             )
             cold.append(sample)
+
     assert (
         environment()["source_sha256"]
         == (measured_environment["source_sha256"])

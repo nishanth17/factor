@@ -16,6 +16,7 @@ def _tree_reservation(values, max_bits, max_nodes, memory_bytes):
         ("memory_bytes", memory_bytes),
     ):
         utils.require_integer(value, name, 0)
+
     if max_bits > 1048576 or max_nodes > 8192:
         raise ValueError("tree configuration exceeds the finite hard limits")
     if len(values) > max_nodes:
@@ -26,12 +27,14 @@ def _tree_reservation(values, max_bits, max_nodes, memory_bytes):
         bits += value.bit_length()
         if bits > max_bits:
             raise MemoryError("product tree exceeds its bit limit")
+
     nodes, width = 0, len(values)
     while width:
         nodes += width
         if width == 1:
             break
         width = (width + 1) // 2
+
     if bits > max_bits or nodes > max_nodes:
         raise MemoryError("product tree exceeds bit/node limits")
     reserve = 4096 + 192 * nodes
@@ -54,6 +57,7 @@ def product_tree(
     budget = budget if budget is not None else Budget()
     budget.consume(len(values) + 1)
     levels, level = [], values
+
     while level:
         levels.append(level)
         if len(level) == 1:
@@ -64,7 +68,9 @@ def product_tree(
             right = level[index + 1] if index + 1 < len(level) else 1
             budget.consume(left.bit_length() + right.bit_length())
             next_level.append(left * right)
+
         level = tuple(next_level)
+
     return tuple(levels)
 
 
@@ -93,6 +99,7 @@ class SmoothBatch:
             raise TypeError("primes must be a tuple")
         _tree_reservation(primes, max_bits, max_nodes, memory_bytes)
         previous = 1
+
         for prime in primes:
             self.budget.consume(prime.bit_length() ** 2)
             if prime <= previous or prime > 100000:
@@ -100,6 +107,7 @@ class SmoothBatch:
             if utils.classify_prime(prime) is not utils.Primality.PROVEN:
                 raise ValueError("smoothness base contains a composite")
             previous = prime
+
         tree = product_tree(
             primes,
             budget=self.budget,
@@ -129,6 +137,9 @@ class SmoothBatch:
             self.radical.bit_length() + tree[-1][0].bit_length()
         )
         remainders = (self.radical % tree[-1][0],)
+
+        # Each child divides its parent: reduce the shared remainder down
+        # the tree instead of dividing the full radical at every leaf.
         for level in reversed(tree[:-1]):
             children = []
             for index, modulus in enumerate(level):
@@ -136,11 +147,14 @@ class SmoothBatch:
                 self.budget.consume(parent.bit_length() + modulus.bit_length())
                 children.append(parent % modulus)
             remainders = tuple(children)
+
         output = []
+
         for value, remainder in zip(values, remainders):
             for _ in range((value.bit_length() - 1).bit_length()):
                 self.budget.consume(2 * value.bit_length())
                 remainder = remainder * remainder % value
             self.budget.consume(value.bit_length())
             output.append(value // gcd(value, remainder))
+
         return tuple(output)

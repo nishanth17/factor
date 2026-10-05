@@ -52,6 +52,7 @@ def _binary_search_jit(value, array, include_equal=False):
         return size
 
     low, high = 0, size - 1
+
     while low <= high:
         middle = (low + high) >> 1
         item = array[middle]
@@ -69,6 +70,7 @@ def _binary_search_jit(value, array, include_equal=False):
             low = middle + 1
         else:
             high = middle - 1
+
     return low
 
 
@@ -90,6 +92,7 @@ def extended_gcd(a, b):
         old_r, remainder = remainder, old_r - quotient * remainder
         old_x, x = x, old_x - quotient * x
         old_y, y = y, old_y - quotient * y
+
     if old_r < 0:
         return -old_r, -old_x, -old_y
     return old_r, old_x, old_y
@@ -113,6 +116,7 @@ def modular_inverse(value, modulus):
     # work; computing both Bezout coefficients is unnecessary for an inverse.
     a, b = modulus, value % modulus
     coefficient, next_coefficient = 0, 1
+
     while b:
         quotient, remainder = divmod(a, b)
         a, b = b, remainder
@@ -120,6 +124,7 @@ def modular_inverse(value, modulus):
             next_coefficient,
             coefficient - quotient * next_coefficient,
         )
+
     if a != 1:
         raise ValueError("value is not invertible modulo modulus")
     return coefficient % modulus
@@ -226,6 +231,7 @@ def classify_prime(
             return Primality.PROVEN
         if n % prime == 0:
             return Primality.COMPOSITE
+
     if not use_probabilistic and n < 41 * 41:
         return Primality.PROVEN
     odd_part = n - 1
@@ -244,6 +250,7 @@ def classify_prime(
     else:
         generator = rng if rng is not None else random.SystemRandom()
         bases = (generator.randint(2, n - 2) for _ in range(tolerance))
+
     for base in bases:
         if not _strong_probable_prime(n, base, odd_part, shifts):
             return Primality.COMPOSITE

@@ -35,6 +35,7 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
         small_digits = smaller or (digits + 1) // 2
         # Odd balanced bands need two ceil(d/2)-digit factors.
         large_digits = digits - smaller if smaller else (digits + 1) // 2
+
         for _ in range(100000):
             # Vary bit length to cover the low end of a decimal band.
             bits = (digits * 3322 // 1000 + 1) // 2
@@ -55,10 +56,12 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                 and (smaller or 100 * abs(p - q) > min(p, q))
             ):
                 return p, q
+
         raise RuntimeError("pair generation allowance exhausted")
 
     def add(kind, digits, index, factors, **metadata):
         n = prod(factors)
+
         if n in seen or len(str(n)) != digits:
             raise AssertionError("duplicate or incorrectly sized fixture")
         seen.add(n)
@@ -84,6 +87,7 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                 continue
             for index in range(count):
                 add(f"uneven_{smaller}", digits, index, pair(digits, smaller))
+
         for kind, p, smooth in (
             ("pm1_smooth", 65521, [[2, 4], [3, 2], [5, 1], [7, 1], [13, 1]]),
             ("pp1_smooth", 65519, [[2, 4], [3, 2], [5, 1], [7, 1], [13, 1]]),
@@ -99,9 +103,12 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                     raise RuntimeError(
                         "smooth-control generation allowance exhausted"
                     )
+
                 add(kind, digits, index, (p, q), smooth_neighbor=smooth)
+
         for index in range(count):
             bits = (digits * 3322 // 1000 + 1) // 2
+
             for _ in range(10000):
                 p = certified_prime(bits, generator, certificates)
                 if len(str(p * p)) == digits and p * p not in seen:
@@ -109,10 +116,12 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                     break
             else:
                 raise RuntimeError("power generation allowance exhausted")
+
             for _ in range(10000):
                 p = certified_prime(bits, generator, certificates)
                 common = certificates[str(p)]["q"]
                 found = None
+
                 for step in range(1, 257):
                     q = p + 2 * common * step
                     if (
@@ -122,6 +131,7 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                         or not utils.is_prime(q, rng=generator)
                     ):
                         continue
+
                     for witness in range(2, 100):
                         if (
                             pow(witness, q - 1, q) == 1
@@ -133,8 +143,10 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                             )
                             found = q
                             break
+
                     if found:
                         break
+
                 if found:
                     start = isqrt(p * found)
                     start += start * start < p * found
@@ -150,7 +162,9 @@ def build(seed, *, split="training", count=2, frozen_sha256=None):
                 raise RuntimeError(
                     "close-control generation allowance exhausted"
                 )
+
         print("certified", split, digits, flush=True)
+
     verify_certificates(certificates)
     return dict(
         schema=1,

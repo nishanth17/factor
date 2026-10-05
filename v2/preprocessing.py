@@ -41,7 +41,9 @@ def integer_root(n, exponent):
         return isqrt(n)
     if exponent >= n.bit_length():
         return 1
+    # Start above the root so integer Newton steps descend to its floor.
     estimate = 1 << ((n.bit_length() + exponent - 1) // exponent)
+
     while True:
         following = (
             (exponent - 1) * estimate + n // estimate ** (exponent - 1)

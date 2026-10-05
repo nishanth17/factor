@@ -24,9 +24,11 @@ def certified_prime(bits, generator, certificates):
             if all(candidate % d for d in range(2, isqrt(candidate) + 1)):
                 certificates[str(candidate)] = {"kind": "trial"}
                 return candidate
+
     q = certified_prime(bits // 2 + 2, generator, certificates)
     lower = ((2 ** (bits - 1) - 1) // q + 2) // 2
     upper = (2**bits - 2) // (2 * q)
+
     while True:
         k = 2 * generator.randint(lower, upper)
         candidate = k * q + 1
@@ -72,6 +74,7 @@ def verify_certificates(certificates):
                 and gcd(pow(witness, (n - 1) // q, n) - 1, n) == 1
             ):
                 raise AssertionError("invalid Pocklington certificate")
+
         verified.add(n)
 
     for n in certificates:
@@ -108,14 +111,18 @@ def build(count=40):
                 q = certified_prime(bits, generator, certificates)
                 if p != q and len(str(p * q)) == digits:
                     break
+
             add(f"balanced_{digits}d", [(p, 1), (q, 1)], index)
+
         print("generated", digits, "digit balanced band", flush=True)
+
     for digits in (60, 100):
         for small_digits in (5, 10, 20, 30):
             for index in range(count):
                 p = certified_prime(
                     small_digits * 3322 // 1000, generator, certificates
                 )
+
                 while True:
                     q = certified_prime(
                         (digits - small_digits) * 3322 // 1000 + 1,
@@ -124,11 +131,13 @@ def build(count=40):
                     )
                     if len(str(p * q)) == digits:
                         break
+
                 add(
                     f"unbalanced_{digits}d_small_{small_digits}d",
                     [(p, 1), (q, 1)],
                     index,
                 )
+
     for index in range(count):
         p = certified_prime(24 + index % 8, generator, certificates)
         q = certified_prime(28 + index % 8, generator, certificates)
@@ -154,6 +163,7 @@ def build(count=40):
         plus = (11, 23, 59, 107, 179)[index % 5]
         certificates[str(plus)] = {"kind": "trial"}
         add("pp1_boundaries", [(plus, 1), (other, 1)], index)
+
     for index, factors in enumerate(
         (
             [(151, 1), (751, 1), (28351, 1)],
@@ -178,6 +188,7 @@ def build(count=40):
                 "digits": len(str(n)),
             }
         )
+
     verify_certificates(certificates)
     return {
         "schema": 1,

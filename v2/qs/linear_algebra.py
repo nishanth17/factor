@@ -76,6 +76,7 @@ def filter_matrix(
         # index map. Reserve them explicitly, without dense wide fill-in.
         reserve += 256 * columns + 16 * ((original_columns + 7) // 8)
         reserve += sum(128 + 8 * ((row.bit_length() + 7) // 8) for row in rows)
+
     if reserve > memory_bytes:
         raise MemoryError("matrix fill-in/provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
@@ -90,13 +91,16 @@ def filter_matrix(
             + len(rows)
         )
         indices, bits = {}, union
+
         while bits:
             bit = bits & -bits
             indices[bit.bit_length() - 1] = len(indices)
             bits ^= bit
             if len(indices) % 64 == 0:
                 budget.consume(0)
+
         working_rows = []
+
         for row in rows:
             budget.consume(0)
             remapped, bits = 0, row
@@ -105,7 +109,9 @@ def filter_matrix(
                 remapped |= 1 << indices[bit.bit_length() - 1]
                 bits ^= bit
             working_rows.append(remapped)
+
         del indices
+
     active = {
         index: (row, 1 << index) for index, row in enumerate(working_rows)
     }
@@ -120,6 +126,7 @@ def filter_matrix(
     word_cost = 1 + (columns + 63) // 64 + (len(rows) + 63) // 64
     budget.consume(len(rows) + input_nonzeros * word_cost)
     incidence = {}
+
     for index, (row, _) in active.items():
         budget.consume(0)
         bits = row
@@ -128,6 +135,7 @@ def filter_matrix(
             column = bit.bit_length() - 1
             incidence[column] = incidence.get(column, 0) | (1 << index)
             bits ^= bit
+
     single_columns = {
         column for column, mask in incidence.items() if mask.bit_count() == 1
     }
@@ -144,6 +152,7 @@ def filter_matrix(
     def toggle(index, bits):
         """Update affected columns; queues contain at most one copy each."""
         row_bit = 1 << index
+
         while bits:
             bit = bits & -bits
             column = bit.bit_length() - 1
@@ -179,7 +188,9 @@ def filter_matrix(
                 nonzeros -= row.bit_count()
             singletons += len(forced)
             continue
+
         pair = None
+
         while pair_columns:
             column = heappop(pair_columns)
             queued_pairs.remove(column)
@@ -191,6 +202,7 @@ def filter_matrix(
                     (mask ^ first_bit).bit_length() - 1,
                 )
                 break
+
         if pair is None:
             break
         first, second = pair
@@ -208,6 +220,7 @@ def filter_matrix(
         peak_nonzeros = max(peak_nonzeros, nonzeros)
         if not merged:
             pending_zeros.append(first)
+
     remaining = tuple(active.values())
     output_rows = tuple(row for row, _ in remaining)
     union = 0
@@ -286,6 +299,7 @@ class DependencySolver:
                 self.matrix.rows[self.next_row],
                 self.matrix.masks[self.next_row],
             )
+
         row, mask = self.pending
         self.budget.consume(row.bit_length() + mask.bit_length() + 1)
         if row == 0:
@@ -294,6 +308,7 @@ class DependencySolver:
             self.pending = None
             self.next_row += 1
             return
+
         bit = (
             1 << (row.bit_length() - 1)
             if self.pivot == "highest"
@@ -307,6 +322,8 @@ class DependencySolver:
             self.pending = None
             self.next_row += 1
         else:
+            # Carry the XOR through provenance so a reduced zero row still
+            # selects a kernel of the original, unfiltered matrix.
             self.pending = row ^ previous[0], mask ^ previous[1]
             self.xors += 1
 

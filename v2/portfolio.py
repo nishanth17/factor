@@ -104,6 +104,7 @@ class PortfolioConfig:
             > 256
         ):
             raise ValueError("limit tiers to 64 and arithmetic chunks to 256")
+
         for tier in tiers:
             if len(tier) != 3:
                 raise ValueError("ECM tiers need B1, B2, and curves")
@@ -111,6 +112,7 @@ class PortfolioConfig:
             utils.require_integer(b1, "B1", 2)
             utils.require_integer(b2, "B2", b1)
             utils.require_integer(curves, "curves", 0)
+
         object.__setattr__(self, "ecm_tiers", tiers)
         if self.siqs is not None and self.sss is not None:
             raise ValueError("choose one relation fallback: siqs or sss")
@@ -124,6 +126,7 @@ class PortfolioConfig:
                 raise MemoryError(
                     "portfolio/SSS coexistence exceeds memory cap"
                 )
+
         if self.siqs is not None:
             if not isinstance(self.siqs, SIQSConfig):
                 raise TypeError("siqs must be a SIQSConfig or None")
@@ -134,6 +137,7 @@ class PortfolioConfig:
                 raise MemoryError(
                     "portfolio/SIQS coexistence exceeds memory cap"
                 )
+
         if self.memory_bytes - self.workspace_reserve < 8192:
             raise MemoryError(
                 "candidate/checkpoint reserve exceeds memory cap"
@@ -264,6 +268,7 @@ def _classify_step(current, config, budget, generator):
                 return utils.Primality.PROVEN.value
             if n % prime == 0:
                 return utils.Primality.COMPOSITE.value
+
         if n < 41 * 41:
             return utils.Primality.PROVEN.value
         shifts = ((n - 1) & -(n - 1)).bit_length() - 1
@@ -276,6 +281,7 @@ def _classify_step(current, config, budget, generator):
             bases = [2, 7, 61]
         else:
             bases = list(utils.DETERMINISTIC_BASES)
+
         current["prime_job"] = {
             "d": (n - 1) >> shifts,
             "s": shifts,
@@ -284,9 +290,11 @@ def _classify_step(current, config, budget, generator):
             "tested": [],
         }
         return None
+
     bases = witness_state["bases"]
     index = witness_state["index"]
     rounds = len(bases) if bases else config.primality_rounds
+    # Refusal precedes the random draw so resume sees the same witness.
     budget.consume(n.bit_length() + witness_state["s"])
     base = bases[index] if bases else generator.randrange(2, n - 1)
     survives = utils._strong_probable_prime(
@@ -322,6 +330,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
             "fermat": 0,
             "power_index": 0,
         }
+
     current = state["current"]
     n = current["n"]
     if current["stage"] == "twos":
@@ -335,6 +344,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         if odd == 1:
             state["current"] = None
         return
+
     if current["stage"] == "classify":
         key = str(n)
         certainty = state["classifications"].get(key)
@@ -343,6 +353,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
             if certainty is None:
                 return
             state["classifications"][key] = certainty
+
         current.pop("prime_job", None)
         if certainty != utils.Primality.COMPOSITE.value:
             _add_factor(state, n, current["mult"], utils.Primality(certainty))
@@ -352,6 +363,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
                 stage="trial", cursor=prime_cursor(3, config.trial_bound + 1)
             )
         return
+
     if current["stage"] == "trial":
         prime = peek_prime(current["cursor"], context, budget)
         if prime is None:
@@ -365,6 +377,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         # division. Resume therefore consumes exactly the same reservations.
         budget.consume(count * n.bit_length())
         root = isqrt(n)
+
         for _ in range(count):
             prime = cursor["values"][cursor["index"]]
             if prime > root:
@@ -387,13 +400,16 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
                 if n == 1:
                     state["current"] = None
                 return
+
         return
+
     if current["stage"] == "powers":
         if "power_exponents" not in current:
             budget.consume(n.bit_length())
             current["power_exponents"] = prime_sieve.small_sieve(
                 n.bit_length()
             )
+
         exponents = current["power_exponents"]
         position = current["power_index"]
         if position == len(exponents):
@@ -407,9 +423,12 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         base = integer_root(n, exponent)
         current["power_index"] += 1
         if base**exponent == n:
+            # Folding the exponent into multiplicity preserves every later
+            # split without expanding repeated pending work.
             state["pending"].append([base, current["mult"] * exponent])
             state["current"] = None
         return
+
     if current["stage"] == "fermat":
         if current["fermat"] >= config.fermat_steps:
             current["stage"] = "rho"
@@ -422,6 +441,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         if divisor is not None:
             _split(state, divisor)
         return
+
     if current["stage"] == "sss":
         job = siqs_runtime.get("job")
         if job is None:
@@ -439,9 +459,11 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
                     config=config.sss,
                     budget=budget,
                 )
+
             if job.n != n or job.seed != current["sss_seed"]:
                 raise ValueError("SSS checkpoint differs from its parent")
             siqs_runtime["job"] = job
+
         result = job.run(batch_limit=1)
         if result.divisor is not None or result.reason in (
             "search_exhausted",
@@ -468,6 +490,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         elif result.reason != "paused":
             raise BudgetExhaustedError(result.reason)
         return
+
     if current["stage"] == "siqs":
         job = siqs_runtime.get("job")
         if job is None:
@@ -487,11 +510,13 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
                     config=config.siqs,
                     budget=budget,
                 )
+
             if job.n != n or job.seed != current["siqs_seed"]:
                 raise ValueError(
                     "SIQS checkpoint differs from its parent assignment"
                 )
             siqs_runtime["job"] = job
+
         job.budget = budget
         result = job.run(max_blocks=1)
         if result.divisor is not None or job.finished_reason is not None:
@@ -514,6 +539,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         elif result.reason != "paused":
             raise BudgetExhaustedError(result.reason)
         return
+
     kind = current["stage"]
     if kind == "rho":
         attempts, b1, b2 = config.rho_attempts, 0, 0
@@ -530,6 +556,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
             state["remaining"].extend([n] * current["mult"])
             state["current"] = None
         return
+
     if current["attempt"] >= attempts:
         current["attempt"] = 0
         if kind == "rho":
@@ -539,6 +566,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         else:
             current["tier"] += 1
         return
+
     if current["job"] is None:
         budget.consume()
         seed = (
@@ -546,6 +574,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
         )
         current["job"] = new_job(kind, n, seed, b1, b2)
         current["job"]["start_work"] = budget.used
+
     job = current["job"]
     started = time.perf_counter()
     advance_job(job, budget, context, config)
@@ -612,6 +641,7 @@ def _pack(state, config, budget, generator):
         "sha256": hashlib.sha256(encoded.encode()).hexdigest(),
     }
     overhead = [budget.wall_used - wall_used, budget.cpu_used - cpu_used]
+    # Charge encoding on resume too; repeated pauses cannot reset its cost.
     checkpoint["serialization_overhead"] = overhead
     checkpoint["overhead_sha256"] = hashlib.sha256(
         _canonical(overhead).encode()
@@ -633,6 +663,7 @@ def _verify_progress(current, config):
                 expected_bases = [2, 7, 61]
             else:
                 expected_bases = list(utils.DETERMINISTIC_BASES)
+
         rounds = (
             len(expected_bases) if expected_bases else config.primality_rounds
         )
@@ -647,6 +678,7 @@ def _verify_progress(current, config):
             or len(witness["tested"]) != witness["index"]
         ):
             raise ValueError("invalid primality progress metadata")
+
         for index, base in enumerate(witness["tested"]):
             utils.require_integer(base, "witness", 2)
             if expected_bases and base != expected_bases[index]:
@@ -657,6 +689,7 @@ def _verify_progress(current, config):
                 n, base, witness["d"], witness["s"]
             ):
                 raise ValueError("checkpoint retained a failed witness")
+
     cursors = [current.get("cursor")]
     if current["job"]:
         if current["job"]["kind"] != current["stage"]:
@@ -665,6 +698,7 @@ def _verify_progress(current, config):
     if not any(cursor is not None for cursor in cursors):
         return
     verifier = SieveContext(config.max_hi, segment_size=config.segment_size)
+
     for cursor in cursors:
         if cursor is None:
             continue
@@ -679,6 +713,7 @@ def _verify_progress(current, config):
             <= config.segment_size
         ):
             raise ValueError("invalid buffered prime metadata")
+
         expected = list(verifier.primes(cursor["left"], cursor["next"]))
         if expected != cursor["values"]:
             raise ValueError("corrupt buffered prime values")
@@ -698,11 +733,13 @@ def _unpack(checkpoint, config):
             for value in overhead
         ):
             raise ValueError("invalid serialization resource metadata")
+
         if (
             hashlib.sha256(_canonical(overhead).encode()).hexdigest()
             != (checkpoint["overhead_sha256"])
         ):
             raise ValueError("serialization overhead checksum mismatch")
+
         if len(encoded.encode()) > config.memory_bytes // 2:
             raise ValueError("checkpoint exceeds configured cap")
         if (
@@ -710,6 +747,7 @@ def _unpack(checkpoint, config):
             != checkpoint["sha256"]
         ):
             raise ValueError("checkpoint checksum mismatch")
+
         expected_config = json.loads(_canonical(asdict(config)))
         legacy = config.sss is None and (
             payload["version"] == 3
@@ -728,6 +766,7 @@ def _unpack(checkpoint, config):
             or payload["config"] != expected_config
         ):
             raise ValueError("incompatible checkpoint metadata")
+
         state = payload["state"]
         utils.require_integer(payload["work_used"], "work_used", 0)
         for name in ("wall_used", "cpu_used"):
@@ -736,6 +775,7 @@ def _unpack(checkpoint, config):
                 raise ValueError("invalid checkpoint resource metadata")
             if not math.isfinite(value) or value < 0:
                 raise ValueError("invalid checkpoint resource metadata")
+
         payload["wall_used"] += overhead[0]
         payload["cpu_used"] += overhead[1]
         utils.require_integer(state["original"])
@@ -756,6 +796,7 @@ def _unpack(checkpoint, config):
             > config.max_input_bits
         ):
             raise ValueError("checkpoint exceeds input-derived storage limit")
+
         for value, certainty in state["classifications"].items():
             n = int(value)
             utils.require_integer(n, "classified cofactor", 2)
@@ -771,6 +812,7 @@ def _unpack(checkpoint, config):
                     and actual is not utils.Primality.PROVEN
                 ):
                     raise ValueError("invalid cached primality evidence")
+
         for value, (multiplicity, certainty) in state["factors"].items():
             utils.require_integer(int(value), "factor", 2)
             utils.require_integer(multiplicity, "multiplicity", 1)
@@ -792,6 +834,7 @@ def _unpack(checkpoint, config):
                 raise ValueError(
                     "checkpoint contains invalid primality evidence"
                 )
+
         for value, multiplicity in state["pending"]:
             utils.require_integer(value, "cofactor", 2)
             utils.require_integer(multiplicity, "multiplicity", 1)
@@ -800,6 +843,7 @@ def _unpack(checkpoint, config):
                 or multiplicity > config.max_input_bits
             ):
                 raise ValueError("checkpoint multiplicity exceeds input cap")
+
         for value in state["remaining"]:
             utils.require_integer(value, "cofactor", 2)
             if value > abs(state["original"]):
@@ -825,6 +869,7 @@ def _unpack(checkpoint, config):
                 "sss",
             ):
                 raise ValueError("invalid current-cofactor metadata")
+
         if current and current["job"] and current["job"]["n"] != current["n"]:
             raise ValueError("candidate modulus disagrees with parent")
         if current:
@@ -842,6 +887,7 @@ def _unpack(checkpoint, config):
                 )
             else:
                 _verify_progress(current, config)
+
         # Validate reconstruction after checking integer exponent bounds.
         _result(state)
         generator = random.Random()
@@ -849,6 +895,7 @@ def _unpack(checkpoint, config):
             generator.setstate(_tuples(payload["rng"]))
     except (KeyError, TypeError, AttributeError, IndexError) as error:
         raise ValueError("malformed checkpoint") from error
+
     return payload, generator
 
 
@@ -905,8 +952,10 @@ def factorize_bounded(
         budget.used = payload["work_used"]
         budget.prior_wall = payload["wall_used"]
         budget.prior_cpu = payload["cpu_used"]
+
     reason = "exhausted"
     siqs_runtime = {}
+
     try:
         budget.consume(0)
         if not state.get("context_ready"):
@@ -948,14 +997,17 @@ def factorize_bounded(
                     break
     except BudgetExhaustedError as error:
         reason = str(error)
+
     result = _result(state)
     if result.complete:
         reason = "complete"
+    # Live fallback state must reach the parent snapshot before packing.
     if siqs_runtime.get("job") is not None:
         stage = state["current"]["stage"]
         state["current"][stage + "_checkpoint"] = siqs_runtime[
             "job"
         ].checkpoint()
+
     snapshot = _pack(state, config, budget, generator)
     return PortfolioRun(
         result,

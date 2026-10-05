@@ -12,8 +12,10 @@ SEED = 30342026
 
 def build():
     certificates, fixtures, seen = {}, [], set()
+
     for split, offset, count in (("training", 0, 12), ("held_out", 1, 32)):
         generator = random.Random(SEED + offset)
+
         for i in range(count):
             while True:
                 p = certified_prime(
@@ -22,6 +24,7 @@ def build():
                 q = certified_prime(13, generator, certificates)
                 if p != q and p * q not in seen:
                     break
+
             seen.add(p * q)
             fixtures.append(
                 dict(
@@ -33,14 +36,17 @@ def build():
                     residue8=p * q % 8,
                 )
             )
+
     for split, offset in (("training", 2), ("held_out", 3)):
         generator = random.Random(SEED + offset)
+
         for digits in (30, 40, 50, 60, 70, 80):
             residues = (
                 (1,)
                 if split == "training"
                 else ((1, 3, 5, 7) if digits <= 60 else (1, 5))
             )
+
             for residue in residues:
                 while True:
                     bits = (digits * 3322 // 1000 + 1) // 2
@@ -54,6 +60,7 @@ def build():
                         and n % 8 == residue
                     ):
                         break
+
                 seen.add(n)
                 fixtures.append(
                     dict(
@@ -66,6 +73,7 @@ def build():
                     )
                 )
                 print("certified", split, digits, residue, flush=True)
+
     verify_certificates(certificates)
     return dict(
         schema=1,

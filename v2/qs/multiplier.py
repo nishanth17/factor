@@ -43,11 +43,13 @@ def select_multiplier(n, *, candidates=DEFAULT_MULTIPLIERS, budget=None):
             raise ValueError("scored multipliers must be odd and <=255")
         if any(value % (p * p) == 0 for p in (3, 5, 7, 11, 13)):
             raise ValueError("scored multipliers must be squarefree")
+
     budget = budget if budget is not None else Budget()
     budget.consume(len(candidates) * (n.bit_length() + 8192))
     primes = prime_sieve.small_sieve(97)
     weights = {prime: _log_weight(prime) for prime in primes}
     scores = []
+
     for multiplier in candidates:
         divisor = gcd(n, multiplier)
         if utils.valid_divisor(divisor, n):
@@ -67,7 +69,9 @@ def select_multiplier(n, *, candidates=DEFAULT_MULTIPLIERS, budget=None):
                 score += Fraction(weights[prime], prime)
             elif pow(residue, (prime - 1) // 2, prime) == 1:
                 score += Fraction(2 * weights[prime], prime - 1)
+
         scores.append((multiplier, score.numerator // score.denominator))
+
     if not scores:
         raise ValueError("no nonsingular scored multiplier")
     chosen = max(scores, key=lambda item: (item[1], -item[0]))[0]

@@ -138,6 +138,7 @@ def mpqs_polynomial(factor_base, half_width, *, budget=None, prime=None):
         entry = next((item for item in eligible if item.prime == prime), None)
         if entry is None:
             raise ValueError("MPQS prime must be a nonsingular base member")
+
     prime, root = entry.prime, entry.square_roots[0]
     budget.consume(factor_base.n_prime.bit_length() + prime.bit_length() ** 2)
     inverse = utils.modular_inverse(2 * root, prime)
@@ -175,6 +176,7 @@ def polynomial_roots(polynomial, factor_base, entry, *, budget=None):
         factor_base.multiplier,
     ) or entry not in factor_base.entries:
         raise ValueError("polynomial and factor-base identity mismatch")
+
     budget = budget if budget is not None else Budget()
     prime = entry.prime
     budget.consume(prime.bit_length() ** 2)
@@ -183,6 +185,7 @@ def polynomial_roots(polynomial, factor_base, entry, *, budget=None):
         if len(roots) == 2:
             return PolynomialRoots(2, (), True)
         return PolynomialRoots(2, roots)
+
     if polynomial.a % prime == 0:
         coefficient = 2 * polynomial.b % prime
         constant = polynomial.c % prime

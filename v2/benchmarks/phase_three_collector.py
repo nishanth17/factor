@@ -112,11 +112,13 @@ def _run(fixture, config, *, reuse=False, reference=False):
                 residual_bound=fixture["residual"],
                 budget=budget,
             )
+
             if (
                 exhaustive.reason != "complete"
                 or exhaustive.divisor is not None
             ):
                 raise AssertionError("reference failed collection")
+
             worker = SieveCollector(
                 local_polynomial, local_base, config=config, budget=budget
             )
@@ -127,12 +129,15 @@ def _run(fixture, config, *, reuse=False, reference=False):
                 admitted_atoms=0,
                 matches=0,
             )
+
             for atom in exhaustive.relations:
                 refusal = worker._admit(atom, admission_stats)
+
                 if refusal is not None:
                     raise AssertionError(
                         "matched reference store refused atom"
                     )
+
             # The baseline keeps the exhaustive output alive during transfer;
             # charge this extra reservation instead of hiding peak workspace.
             workspace = worker._workspace + exhaustive.workspace_bytes
@@ -165,6 +170,7 @@ def _run(fixture, config, *, reuse=False, reference=False):
             worker._full.clear()
             worker._combined.clear()
             worker.budget = budget
+
         if not reference:
             result = worker.collect(LO, HI)
         if result.reason != "complete" or result.divisor is not None:
@@ -175,6 +181,7 @@ def _run(fixture, config, *, reuse=False, reference=False):
         for relation in result.combined_relations:
             verify_combined(relation, local_base, store, budget=budget)
         counts = Counter(atom.residual for atom in result.atoms)
+
         if len(result.full_relations) != counts[1] or (
             len(result.combined_relations)
             != sum(
@@ -184,6 +191,7 @@ def _run(fixture, config, *, reuse=False, reference=False):
             )
         ):
             raise AssertionError("bounded store lost a full relation or match")
+
         info = {
             **result.stats,
             "full": len(result.full_relations),
@@ -207,15 +215,18 @@ def _coverage(fixture, config):
     )
     call = _run(fixture, config)
     signature, info = call()
+
     if any(expected.get(x) != payload for x, payload in signature.items()):
         raise AssertionError("collector admitted invalid payload")
     missed = sorted(set(expected) - set(signature))
+
     if missed and config.threshold_extra == 0:
         raise AssertionError("safe score missed admissible positions")
     # Independently enumerate which values at each candidate stage are useful;
     # Factorizations come from the generic norm oracle.
     worker = SieveCollector(polynomial, base, config=config, budget=_budget())
     selected = set()
+
     for lo in range(LO, HI, config.block_width):
         hi = min(HI, lo + config.block_width)
         threshold = worker._sieve(
@@ -235,6 +246,7 @@ def _coverage(fixture, config):
             for offset in range(hi - lo)
             if worker._scores[offset] >= threshold
         )
+
     return (
         call,
         signature,
@@ -271,6 +283,7 @@ def _capture(
         call = _run(fixture, config, reference=reference, reuse=reuse)
     if reference:
         payload, reference_info = call()
+
         if payload != expected:
             raise AssertionError("matched baseline differs from exact oracle")
         coverage = {
@@ -279,6 +292,7 @@ def _capture(
             "verified_atoms": len(payload),
             **reference_info,
         }
+
     measured = _measure(
         lambda: call()[0], expected, 10, args.repetitions, args.warmup_seconds
     )
@@ -320,6 +334,7 @@ def _division_utilities(args):
         polynomial, base, LO, HI, fixture["residual"]
     )
     rows = []
+
     for mode in ("full", "roots", "bucket"):
         config = _config(fixture, block_width=512, division=mode)
         worker = SieveCollector(
@@ -346,12 +361,15 @@ def _division_utilities(args):
                 division_steps=0,
                 composite_residuals=0,
             )
+
             for position in range(LO, HI):
                 atom, divisor = worker._divide(position, position - LO, stats)
+
                 if divisor is not None:
                     raise AssertionError("unexpected divisor in utility")
                 if atom is not None:
                     atoms.append(atom)
+
             return _signature(atoms)
 
         measured = _measure(
@@ -371,6 +389,7 @@ def _division_utilities(args):
                 "expected_atoms": len(expected),
             }
         )
+
     return rows
 
 
@@ -393,6 +412,7 @@ def main():
         or args.repetitions < 9
     ):
         parser.error("require at least three seconds warmup and nine samples")
+
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         parser.error("supported runtime is PyPy Python 3.11")
     measured_environment = environment()
@@ -401,11 +421,13 @@ def main():
         hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
         for path, digest in frozen["production_source_sha256"].items()
     )
+
     if not unchanged:
         raise AssertionError("M17 production control changed")
     rows, tuning, coverage_sweeps = [], [], []
     fixture = TRAINING[2]
     options = [("base", {})]
+
     for key, values in (
         ("score_backend", ("bytearray", "array")),
         ("marking", ("dense", "bucket")),
@@ -416,12 +438,14 @@ def main():
         ("threshold_extra", (4, 16, 64)),
     ):
         options.extend((f"{key}_{v}", {key: v}) for v in values)
+
     for name, overrides in options:
         for coverage_fixture in TRAINING:
             _, _, coverage = _coverage(
                 coverage_fixture, _config(coverage_fixture, **overrides)
             )
             coverage_sweeps.append({"configuration": name, **coverage})
+
         row = _capture(
             "training_" + name,
             "training",
@@ -434,6 +458,7 @@ def main():
             "threshold_extra"
         ):
             tuning.append(row)
+
     # Choose a measured complete-coverage configuration from training only.
     winner = min(tuning, key=lambda row: row["measurement"]["median_seconds"])
     selected = SieveConfig(**winner["config"])
@@ -462,6 +487,7 @@ def main():
                 reference=True,
             )
         )
+
     rows.append(
         _capture(
             "cached_metadata_and_buffers",
@@ -487,6 +513,7 @@ def main():
     # Diagnostic profiling is separate from timing whenever sieve cost exceeds
     # the exhaustive cost; profiler overhead is never a speed ratio.
     profiles = []
+
     for fixture in TRAINING + HELD_OUT:
         pair = [
             row
@@ -511,10 +538,13 @@ def main():
             )
             profile.dump_stats(str(profile_path))
             profiles.append(str(profile_path))
+
     cold = []
     expected_cold = _cold_worker()["signature"]
+
     for _ in range(args.repetitions):
         started = time.perf_counter()
+
         completed = subprocess.run(
             [
                 sys.executable,
@@ -529,6 +559,7 @@ def main():
         )
         elapsed = time.perf_counter() - started
         response = json.loads(completed.stdout)
+
         if response["signature"] != json.loads(json.dumps(expected_cold)):
             raise AssertionError("invalid cold collection")
         # Payloads were consumed and verified. Avoid copying duplicate outputs
@@ -537,6 +568,7 @@ def main():
         cold.append(
             {"lifecycle_seconds": elapsed, "correct": True, **response}
         )
+
     if environment()["source_sha256"] != measured_environment["source_sha256"]:
         raise AssertionError("measured source changed during capture")
     args.output.write_text(

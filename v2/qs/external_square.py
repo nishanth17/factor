@@ -56,6 +56,8 @@ def external_square(base, half_width, *, budget, cursor=0, trials=4096):
             continue
         if gcd(2 * root, candidate) != 1:
             continue
+        # Lift B=root+q*t: 2*root*t == (N'-root²)/q (mod q), making
+        # B²-N' divisible by q² without relying on coefficient primality.
         lift = (
             (base.n_prime - root * root)
             // candidate
@@ -67,4 +69,5 @@ def external_square(base, half_width, *, budget, cursor=0, trials=4096):
             base.n, base.multiplier, a, min(b, a - b), candidate
         )
         return polynomial, candidate + 4, certainty.value
+
     raise CoefficientExhaustedError("coefficient candidate limit")

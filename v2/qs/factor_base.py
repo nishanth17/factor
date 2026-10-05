@@ -65,6 +65,9 @@ def modular_square_roots(value, prime, *, budget=None):
     root = pow(value, (odd_part + 1) // 2, prime)
     remainder = pow(value, odd_part, prime)
     correction = pow(nonresidue, odd_part, prime)
+
+    # root² == value*remainder (mod prime); each correction preserves that
+    # identity while lowering the power-of-two order of the remainder.
     while remainder != 1:
         budget.consume(shifts)
         index, squared = 0, remainder
@@ -78,6 +81,7 @@ def modular_square_roots(value, prime, *, budget=None):
         correction = step * step % prime
         remainder = remainder * correction % prime
         shifts = index
+
     return tuple(sorted((root, prime - root)))
 
 
@@ -120,6 +124,7 @@ class FactorBase:
         if not self.entries or self.entries[0].prime != 2:
             raise ValueError("factor base must include 2")
         previous = 1
+
         for entry in self.entries:
             prime = entry.prime
             utils.require_integer(prime, "prime", 2)
@@ -140,6 +145,7 @@ class FactorBase:
                 for root in roots
             ):
                 raise ValueError("invalid factor-base square roots")
+
             if prime == 2 or residue == 0:
                 expected_count = 1
             else:
@@ -147,6 +153,7 @@ class FactorBase:
             if len(roots) != expected_count:
                 raise ValueError("factor-base roots are incomplete")
             previous = prime
+
         object.__setattr__(
             self,
             "_columns",
@@ -213,6 +220,7 @@ def build_factor_base(
         raise MemoryError("factor-base workspace exceeds memory_bytes")
     budget.consume(bound)
     entries = []
+
     for prime in prime_sieve.prime_sieve(bound):
         budget.consume(n.bit_length())
         divisor = gcd(prime, n)
@@ -221,6 +229,7 @@ def build_factor_base(
         roots = modular_square_roots(target, prime, budget=budget)
         if roots:
             entries.append(FactorBaseEntry(prime, roots))
+
     budget.consume(len(entries) * bound.bit_length() ** 2)
     base = FactorBase(n, multiplier, bound, tuple(entries))
     return FactorBaseBuild(base, None)

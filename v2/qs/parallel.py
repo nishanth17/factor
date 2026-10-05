@@ -83,6 +83,7 @@ class ParallelConfig:
             value = utils.require_integer(getattr(self, name), name, low)
             if value > high:
                 raise ValueError(f"{name} exceeds the parallel limit")
+
         if not isinstance(self.collector, SieveConfig):
             raise TypeError("collector must be a SieveConfig")
         if 8 * self.checkpoint_bytes >= self.parent_memory_bytes:
@@ -202,6 +203,7 @@ def _collect(task, state=None):
     )
     collector, divisor, reason, scanned = None, None, "complete", 0
     peak = 0
+
     try:
         # Same-process jobs already own this checked immutable instance.
         # Serialized process records still require complete ingress checks.
@@ -217,6 +219,7 @@ def _collect(task, state=None):
                 len(base_record[3]) * base_record[2].bit_length() ** 2
             )
             base = FactorBase(*base_record)
+
         family = PolynomialFamily(
             base,
             primes,
@@ -246,6 +249,7 @@ def _collect(task, state=None):
         else:
             steps = iter(family.next, None)
             lo, hi = -config.half_width, config.half_width + 1
+
         for step in steps:
             if collector is None:
                 constructor = (
@@ -260,6 +264,7 @@ def _collect(task, state=None):
                 )
             else:
                 collector.set_polynomial(step.polynomial, step.roots)
+
             result = collector.collect(lo, hi)
             scanned += result.stats["scanned"]
             peak = max(
@@ -271,6 +276,7 @@ def _collect(task, state=None):
             if result.reason != "complete":
                 reason, divisor = result.reason, result.divisor
                 break
+
         budget.consume(0)
     except BudgetExhaustedError:
         reason = budget.reason
@@ -280,6 +286,7 @@ def _collect(task, state=None):
         if process:
             state["cpu"][slot] = time.process_time()
             state["rss"][slot] = _rss()
+
     # Incomplete private prefixes are intentionally discarded and retried
     # under the same assignment ID. Their consumed work remains charged.
     atoms = (
@@ -324,6 +331,7 @@ class CollectionPool:
             11,
         ):
             raise RuntimeError("parallel collection requires PyPy Python 3.11")
+
         self.mode, self.workers = mode, workers
         context = None
         if mode == "process":
@@ -349,6 +357,7 @@ class CollectionPool:
                 slot=SimpleNamespace(value=0),
                 barrier=None,
             )
+
         self.executor = None
         if mode == "process":
             self.executor = ProcessPoolExecutor(
@@ -359,6 +368,7 @@ class CollectionPool:
             )
         elif mode == "thread":
             self.executor = ThreadPoolExecutor(max_workers=workers)
+
         self.lock, self.closed = threading.Lock(), False
 
     def __enter__(self):
@@ -397,6 +407,7 @@ class CollectionPool:
             ]
             for future in futures:
                 future.result()
+
         self.poll(budget)
 
     def poll(self, budget):
@@ -408,6 +419,7 @@ class CollectionPool:
             )
             budget.prior_cpu += max(0, current - self.accounted_cpu)
             self.accounted_cpu = current
+
         self.state["parent_cpu"].value = budget.cpu_used - self.accounted_cpu
         budget.consume(0)
 
@@ -469,6 +481,7 @@ class ParallelSIQSJob:
             self.base, self.divisor = result.factor_base, result.divisor
             if self.divisor:
                 return
+
         if self.assignments is None:
             self.assignments = family_assignments(
                 self.base,
@@ -480,6 +493,7 @@ class ParallelSIQSJob:
                 budget=self.budget,
                 memory_bytes=memory,
             )
+
         if self.engine is None:
             self.engine = QSJob(
                 qs_polynomial(self.base),
@@ -531,6 +545,7 @@ class ParallelSIQSJob:
             if product.bit_length() > norm_bits:
                 break
             support += 1
+
         atom_bytes = 4096 + 256 * support
         atom_bytes += 128 * (
             self.n.bit_length()
@@ -569,6 +584,7 @@ class ParallelSIQSJob:
                 return
             if self.deferred_divisor is None:
                 self.deferred_divisor = result["divisor"]
+
         atoms = result["atoms"]
         if len(atoms) > self.config.max_batch_atoms:
             raise ValueError("oversized worker batch")
@@ -582,6 +598,7 @@ class ParallelSIQSJob:
             ),
             0,
         )
+
         while self.cursor < len(atoms):
             atom = atoms[self.cursor]
             self._check_atom_assignment(atom, self.next_assignment)
@@ -595,6 +612,7 @@ class ParallelSIQSJob:
             if refusal:
                 raise MemoryError(refusal)
             self.cursor += 1
+
         # A pending solve is finished before additional rows are admitted.
         if not self.fixed_work:
             self.divisor = self.engine._solve(False)
@@ -611,6 +629,7 @@ class ParallelSIQSJob:
             return self._assignment_specs[key]
         a = 1
         roots = []
+
         for prime in primes:
             a *= prime
             roots.append(
@@ -620,6 +639,7 @@ class ParallelSIQSJob:
                     if e.prime == prime
                 )
             )
+
         b = None
         lo, hi = -self.config.half_width, self.config.half_width + 1
         if self.config.batch_width:
@@ -636,6 +656,7 @@ class ParallelSIQSJob:
             b = (raw + a // 2) % a - a // 2
             lo += block * self.config.batch_width
             hi = min(hi, lo + self.config.batch_width)
+
         if len(self._assignment_specs) == 8:
             del self._assignment_specs[next(iter(self._assignment_specs))]
         spec = a, roots[0], b, lo, hi
@@ -662,6 +683,7 @@ class ParallelSIQSJob:
             raise ValueError("store includes an unknown family")
         primes = self.assignments[family_index]
         gray = 0
+
         for offset, prime in enumerate(primes[1:]):
             root = next(
                 e.square_roots[0]
@@ -673,6 +695,7 @@ class ParallelSIQSJob:
                 gray |= 1 << offset
             elif residue != root:
                 raise ValueError("store includes an unknown Gray polynomial")
+
         index, shifted = gray, gray >> 1
         while shifted:
             index ^= shifted
@@ -710,6 +733,7 @@ class ParallelSIQSJob:
             raise ValueError(
                 "changed assignment/storage settings require a new job"
             )
+
         self._checked_config = self.config
 
     def run(self, *, pool=None, max_assignments=None, fixed_work=False):
@@ -738,6 +762,7 @@ class ParallelSIQSJob:
         inflight, reason, merged = {}, "families_exhausted", 0
         begun = False
         self._running = True
+
         try:
             pool.begin(self.budget)
             begun = True
@@ -756,6 +781,7 @@ class ParallelSIQSJob:
                 self.engine.budget = self.engine.collector.budget = (
                     parent_budget
                 )
+
             while (
                 not self.divisor
                 and self.next_assignment < self.assignment_count
@@ -769,6 +795,7 @@ class ParallelSIQSJob:
                         self.divisor = self.engine._solve(False)
                         if self.divisor:
                             break
+
                     if self.next_assignment in self.pending:
                         self._merge(self.pending[self.next_assignment])
                         merged += 1
@@ -778,10 +805,12 @@ class ParallelSIQSJob:
                         ):
                             reason = "paused"
                             break
+
                         continue
                 except BudgetExhaustedError:
                     if self.budget.reason != "work_limit" or not inflight:
                         raise
+
                     # Running leases can refund unused work. Keep admission
                     # and solver cursors, then receive before trying again.
                 if not inflight:
@@ -794,7 +823,9 @@ class ParallelSIQSJob:
                             stop,
                             self.next_assignment + max_assignments - merged,
                         )
+
                     started = time.perf_counter()
+
                     for index in range(self.next_assignment, stop):
                         if index in self.pending:
                             continue
@@ -804,6 +835,8 @@ class ParallelSIQSJob:
                         lease = min(self.config.assignment_work, available)
                         if lease == 0:
                             self.budget.consume(1)
+                        # Reserve before dispatch so simultaneous workers
+                        # cannot each spend the same remaining allowance.
                         self.budget.consume(lease)
                         self.stats["attempts"] += 1
                         seconds = self.budget.seconds
@@ -844,7 +877,9 @@ class ParallelSIQSJob:
                             except BaseException:
                                 self.budget.used -= lease
                                 raise
+
                             inflight[future] = lease
+
                     self.stats["startup_and_collection_seconds"] += (
                         time.perf_counter() - started
                     )
@@ -854,6 +889,7 @@ class ParallelSIQSJob:
                     ):
                         reason = result["reason"]
                         break
+
                 if inflight:
                     started = time.perf_counter()
                     done, _ = wait(inflight, timeout=0.01)
@@ -871,6 +907,7 @@ class ParallelSIQSJob:
                             self.next_assignment, "cancelled"
                         )
                         break
+
             if (
                 not self.divisor
                 and self.next_assignment == self.assignment_count
@@ -889,6 +926,7 @@ class ParallelSIQSJob:
                     started = time.perf_counter()
                     pool.state["stop"].set()
                     errors = []
+
                     for future, lease in list(inflight.items()):
                         if future.cancel():
                             self.budget.used -= lease
@@ -898,6 +936,7 @@ class ParallelSIQSJob:
                             except Exception as error:
                                 self.stats["cancelled_work"] += lease
                                 errors.append(error)
+
                     self.stats["drain_seconds"] += (
                         time.perf_counter() - started
                     )
@@ -908,6 +947,7 @@ class ParallelSIQSJob:
                             reason = self.budget.reason
                     except Exception as error:
                         errors.append(error)
+
                     if errors:
                         raise errors[0]
             finally:
@@ -917,6 +957,7 @@ class ParallelSIQSJob:
                         self.engine.budget = self.engine.collector.budget = (
                             self.budget
                         )
+
                         # A paused solver/extractor must not pin the old pool
                         # through a parent polling callback after draining it.
                         for pending in (
@@ -925,17 +966,20 @@ class ParallelSIQSJob:
                         ):
                             if pending is not None:
                                 pending.budget = self.budget
+
                 try:
                     if own_pool:
                         pool.close()
                 finally:
                     self._running = False
+
         return self._result("factor_found" if self.divisor else reason)
 
     def _receive(self, result, lease):
         work = utils.require_integer(result["work"], "worker work", 0)
         if work > lease:
             raise ValueError("worker exceeded its work lease")
+        # Return only unused reservations; interrupted work remains charged.
         self.budget.used -= lease - work
         self.stats["worker_work"] += work
         self.stats["worker_cpu_seconds"] += result["cpu_seconds"]
@@ -1012,6 +1056,7 @@ class ParallelSIQSJob:
             ],
         )
         parts, size = [], 0
+
         for part in json.JSONEncoder(
             sort_keys=True, separators=(",", ":")
         ).iterencode(payload):
@@ -1021,6 +1066,7 @@ class ParallelSIQSJob:
                     "parallel checkpoint exceeds checkpoint_bytes"
                 )
             parts.append(part)
+
         blob = "".join(parts)
         resources = dict(
             work_used=self.budget.used,
@@ -1052,11 +1098,13 @@ class ParallelSIQSJob:
             3,
         ):
             raise ValueError("unknown parallel checkpoint version")
+
         if payload["version"] >= 3 and payload["store"] is not None:
             if not isinstance(payload["store"], dict) or (
                 "row_order" not in payload["store"]
             ):
                 raise ValueError("mixed-order checkpoint lacks row_order")
+
         options = payload["config"]
         options["collector"] = SieveConfig(**options["collector"])
         config = ParallelConfig(**options)
@@ -1097,16 +1145,19 @@ class ParallelSIQSJob:
                     or index in job.pending
                 ):
                     raise ValueError("invalid pending assignment")
+
                 if (
                     record["reason"] not in ("complete", "factor_found")
                     or len(record["atoms"]) > config.max_batch_atoms
                 ):
                     raise ValueError("invalid pending batch")
+
                 if record["divisor"] is not None and not utils.valid_divisor(
                     record["divisor"], job.n
                 ):
                     raise ValueError("invalid pending checkpoint divisor")
                 atoms = []
+
                 for a, b, x, sign, exponents, residual in record["atoms"]:
                     atom = AtomicRelation(
                         Polynomial(job.n, 1, a, b),
@@ -1123,7 +1174,9 @@ class ParallelSIQSJob:
                     )
                     job._check_atom_assignment(atom, index)
                     atoms.append(atom)
+
                 job.pending[index] = dict(record, atoms=tuple(atoms))
+
         job.next_assignment = next_index
         job.cursor = utils.require_integer(
             payload["cursor"], "admission cursor", 0
@@ -1139,12 +1192,14 @@ class ParallelSIQSJob:
                     for prime in primes:
                         a *= prime
                     products[a] = index
+
             prefix = {
                 a.relation_id: a
                 for a in job.pending.get(next_index, {}).get("atoms", ())[
                     : job.cursor
                 ]
             }
+
             for atom in job.engine.collector._atoms.values():
                 if config.batch_width:
                     index = job._atom_chunk(atom, products)
@@ -1153,7 +1208,9 @@ class ParallelSIQSJob:
                         and prefix.get(atom.relation_id) != atom
                     ):
                         raise ValueError("store includes an uncommitted chunk")
+
                     continue
+
                 for index in range(next_index + bool(job.cursor)):
                     try:
                         job._check_atom_assignment(atom, index)
@@ -1164,11 +1221,13 @@ class ParallelSIQSJob:
                             raise ValueError(
                                 "store includes an uncommitted atom"
                             )
+
                         break
                     except ValueError:
                         continue
                 else:
                     raise ValueError("store includes an uncommitted family")
+
         job.divisor = payload["divisor"]
         job.deferred_divisor = payload["deferred_divisor"]
         if job.deferred_divisor is not None and not utils.valid_divisor(
@@ -1193,6 +1252,7 @@ class ParallelSIQSJob:
                 or not 0 <= value < float("inf")
             ):
                 raise ValueError("invalid parallel timing")
+
         if payload["stats"]["assignments"] != next_index:
             raise ValueError("assignment progress disagrees with statistics")
         job.stats = payload["stats"]

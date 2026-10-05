@@ -36,5 +36,6 @@ class PollingBudget:
             self.budget.consume(amount)
             self._remaining = self.interval - 1
         else:
+            # Skip only the external poll; the reservation still costs work.
             self.budget.used += amount
             self._remaining -= 1

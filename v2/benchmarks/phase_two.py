@@ -24,7 +24,9 @@ from .build_phase_two_corpus import verify_certificates
 from .phase_one import environment
 from .snapshot_loader import load_stage_jobs
 
-CORPUS = Path(__file__).parent / "inputs/phase_two_complete_corpus.json"
+CORPUS = (
+    Path(__file__).parent / "inputs/corpora/phase_two_complete_corpus.json"
+)
 
 
 class SampleTimeoutError(Exception):
@@ -65,12 +67,14 @@ def _baseline_one(n, seed, config):
             b2=config.pm1_b2,
             max_attempts=config.pm1_attempts,
         )
+
     for b1, b2, curves in config.ecm_tiers:
         if divisor is not None:
             break
         divisor = ecm.factorize_ecm(
             n, seed=seed, b1=b1, b2=b2, max_curves=curves
         )
+
     return [], [divisor, n // divisor] if divisor else [n]
 
 
@@ -99,6 +103,7 @@ def _sample(request):
     stage_seconds = {}
     events = []
     work_used = None
+
     try:
         if request["engine"] in ("bounded", "m12"):
             run = factorize_bounded(
@@ -135,6 +140,7 @@ def _sample(request):
             b1, b2, curves = (
                 config.ecm_tiers[0] if config.ecm_tiers else (2, 2, 0)
             )
+
             answer = factorize(
                 n,
                 seed=seed,
@@ -157,6 +163,7 @@ def _sample(request):
         watchdog_active = False
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.setitimer(signal.ITIMER_PROF, 0)
+
     elapsed = time.perf_counter() - started
     cpu = time.process_time() - cpu_started
     reconstructed = 1
@@ -194,6 +201,7 @@ def _sample(request):
 def _worker():
     """Process requests sequentially so warmed measurements reuse the JIT."""
     baseline_ready = False
+
     for line in sys.stdin:
         request = json.loads(line)
         candidates = request.get("requests", [request])
@@ -204,18 +212,22 @@ def _worker():
             # Cold lifecycle samples still include verification/compilation.
             portfolio.advance_job = load_stage_jobs().advance_job
             baseline_ready = True
+
         if "warmup" in request:
             start = time.perf_counter()
             calls = 0
+
             while time.perf_counter() - start < request["warmup"]:
                 for item, fixture in zip(
                     request["requests"], request["fixtures"]
                 ):
                     _validate(_sample(item), fixture)
                     calls += 1
+
             result = {"seconds": time.perf_counter() - start, "calls": calls}
         else:
             result = _sample(request)
+
         print(json.dumps(result), flush=True)
 
 
@@ -259,6 +271,7 @@ class Worker:
 def _validate(row, fixture):
     """Verify complete and partial answers against hidden certificates."""
     expected = dict(fixture["factors"])
+
     if not row["reconstructs"]:
         raise AssertionError("invalid reconstruction")
     for prime, exponent in row["factors"]:
@@ -281,6 +294,7 @@ def summarize(rows):
         key = (row["engine"], row["mode"], row["temperature"], row["band"])
         groups.setdefault(key, []).append(row)
     summaries = []
+
     for key, samples in groups.items():
         times = [sample["total_seconds"] for sample in samples]
         successes = sum(sample["success"] for sample in samples)
@@ -316,6 +330,7 @@ def summarize(rows):
                 else "some completions; no promotion inference",
             }
         )
+
     return summaries
 
 
@@ -332,6 +347,7 @@ def run(args):
                 prime % d for d in range(2, isqrt_integer(prime) + 1)
             ):
                 raise AssertionError("uncertified oracle factor")
+
     fixtures = [
         fixture
         for fixture in corpus["fixtures"]
@@ -348,6 +364,7 @@ def run(args):
             max_input_bits=512,
             ecm_tiers=((2000, 147396, args.curves),),
         )
+
     rows, warmups = [], []
     seeds = corpus["seeds"][: args.seeds]
     engines = args.engines.split(",")
@@ -377,6 +394,7 @@ def run(args):
     )
     with ExitStack() as cleanup:
         workers = {}
+
         for engine in engines:
             worker = Worker()
             cleanup.callback(worker.close)
@@ -396,12 +414,16 @@ def run(args):
                 }
             )
             warmups.append({"engine": engine, **warmup})
+
+        # Startup and validated warmup precede the retained execution samples.
         # Only one worker executes at a time. Rotate comparison order while
         # preserving each interpreter's warmed process and JIT traces.
         for repetition in range(args.repetitions):
             offset = repetition % len(engines)
+
             for engine in engines[offset:] + engines[:offset]:
                 worker = workers[engine]
+
                 for mode in modes:
                     for fixture in fixtures:
                         for seed in seeds:
@@ -422,7 +444,9 @@ def run(args):
                                 total_seconds=total_seconds,
                             )
                             rows.append(row)
+
                     print(engine, mode, repetition, "done", flush=True)
+
     # Cold startup includes imports, one operation, output, and shutdown.
     # Each band/mode has one representative under all declared seeds.
     for engine in engines:
@@ -434,7 +458,9 @@ def run(args):
                             request(engine, fixture, seed, mode), fixture
                         )
                     )
+
         print(engine, "cold samples done", flush=True)
+
     if environment()["source_sha256"] != measured_environment["source_sha256"]:
         raise RuntimeError("source changed during measurements")
     return {
@@ -444,7 +470,7 @@ def run(args):
         "corpus": str(corpus_path),
         "m12_snapshot_sha256": hashlib.sha256(
             CORPUS.parents[1]
-            .joinpath("benchmarks/inputs/m12_source_snapshot.json")
+            .joinpath("benchmarks/inputs/baselines/m12_source_snapshot.json")
             .read_bytes()
         ).hexdigest()
         if "m12" in engines
@@ -460,7 +486,9 @@ def run(args):
         "warmups": warmups,
         "warmup_scope": args.warmup_scope,
         "competitors": json.loads(
-            CORPUS.with_name("phase_two_competitors.json").read_text()
+            (
+                CORPUS.parent.parent / "controls/phase_two_competitors.json"
+            ).read_text()
         ),
         "limitations": [
             "RSS cap is a measured acceptance gate, not a hard OS limit",
@@ -492,6 +520,7 @@ def _cold_sample(request, fixture):
         _validate(row, fixture)
     finally:
         cold.close()
+
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     row["operation_cpu_seconds"] = row["cpu_seconds"]
     row["cpu_seconds"] = (
@@ -560,6 +589,7 @@ def main():
         for value in (args.seconds, args.cpu_seconds, args.warmup_seconds)
     ):
         parser.error("time caps and warmup must be finite and positive")
+
     if not 1 <= args.seeds <= 5 or args.repetitions < 1 or args.rss_mib < 1:
         parser.error("invalid seeds, repetitions, or RSS cap")
     if not set(args.engines.split(",")) <= {"phase_one", "bounded", "m12"}:

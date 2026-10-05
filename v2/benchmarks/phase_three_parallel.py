@@ -20,7 +20,7 @@ from ..qs.sieve_collector import SieveConfig
 from ..qs.siqs import SIQSConfig, SIQSJob
 from .phase_three_sss import sources
 
-CORPUS = Path(__file__).parent / "inputs/phase_three_p36_corpus.json"
+CORPUS = Path(__file__).parent / "inputs/corpora/phase_three_p36_corpus.json"
 SEEDS = (7, 29)
 WORK = 2_000_000_000
 SECONDS = 5
@@ -86,31 +86,38 @@ def run_one(
                 config=reference_config(config),
                 budget=budget,
             )
+
             result = job.run()
         else:
             job = ParallelSIQSJob(
                 fixture["n"], seed=seed, config=config, budget=budget
             )
+
             result = job.run(pool=pool, fixed_work=fixed)
+
         remaining, factors, labels = [fixture["n"]], [], []
         reason = result.reason
         if result.divisor is not None:
             if not utils.valid_divisor(result.divisor, fixture["n"]):
                 raise AssertionError("invalid proper split")
             children = sorted((result.divisor, result.cofactor))
+
             try:
                 for child in children:
                     budget.consume(child.bit_length() * 32)
                     label = utils.classify_prime(
                         child, rng=random.Random(seed)
                     )
+
                     if label is utils.Primality.COMPOSITE:
                         raise AssertionError("composite terminal factor")
                     labels.append(label.value)
+
                 factors, remaining = children, []
             except BudgetExhaustedError:
                 labels = []
                 reason = "classification_" + budget.reason
+
         if prod(factors) * prod(remaining) != fixture["n"]:
             raise AssertionError("unfinished result does not reconstruct")
         if factors and factors != fixture["factors"]:
@@ -118,6 +125,7 @@ def run_one(
     finally:
         if own_pool is not None:
             own_pool.close()
+
     peak = _rss() + (
         sum(pool.state["rss"]) if pool and pool.mode == "process" else 0
     )
@@ -182,14 +190,17 @@ def measure(
             ):
                 cohort()
                 calls += 1
+
             warm_seconds = time.perf_counter() - warm_start
             samples = []
+
             for _ in range(max(9 if attempt == 0 else 15, args.repetitions)):
                 started = time.perf_counter()
                 rows = cohort()
                 samples.append(
                     dict(seconds=time.perf_counter() - started, rows=rows)
                 )
+
             times = [s["seconds"] for s in samples]
             median = statistics.median(times)
             q1, _, q3 = statistics.quantiles(times, n=4)
@@ -212,6 +223,7 @@ def measure(
             )
             if stable:
                 break
+
     return dict(
         attempts=attempts,
         median_seconds=median,
@@ -237,12 +249,14 @@ def ratio_interval(reference, challenger):
     size = min(len(a), len(b))
     generator = random.Random(3604)
     ratios = []
+
     for _ in range(2000):
         indices = [generator.randrange(size) for _ in range(size)]
         ratios.append(
             statistics.median(b[i] for i in indices)
             / statistics.median(a[i] for i in indices)
         )
+
     ratios.sort()
     return [ratios[50], ratios[1949]]
 
@@ -263,12 +277,14 @@ def main():
     parser.add_argument("--warmup-seconds", type=float, default=3)
     args = parser.parse_args()
     corpus = json.loads(CORPUS.read_text())
+
     for fixture in corpus["fixtures"]:
         if prod(fixture["factors"]) != fixture["n"] or any(
             utils.classify_prime(p) != utils.Primality.PROVEN
             for p in fixture["factors"]
         ):
             raise AssertionError("invalid independent corpus")
+
     before = sources()
     before["qs/parallel.py"] = hashlib.sha256(
         Path(__file__).parents[1].joinpath("qs/parallel.py").read_bytes()
@@ -300,6 +316,7 @@ def main():
         if loaded["corpus_sha256"] != output["corpus_sha256"]:
             raise ValueError("training corpus mismatch")
         output["training"] = loaded["training"]
+
     bands = ("small", "medium") if args.band == "all" else (args.band,)
 
     def save():
@@ -318,6 +335,7 @@ def main():
                 candidates[str(bound)] = measure(
                     fixtures, configuration(band, bound), "serial", 1, args
                 )
+
             selected = min(
                 candidates,
                 key=lambda b: (
@@ -334,6 +352,7 @@ def main():
                 ),
             )
             save()
+
         if args.phase == "train":
             continue
         if band not in output["training"]:
@@ -356,6 +375,7 @@ def main():
                     comparisons["native_serial"] = measure(
                         fixtures, config, "serial", 1, args, native=True
                     )
+
                 for mode, workers in ARMS:
                     print(f"{band} {group} {mode}/{workers}", flush=True)
                     comparisons[f"{mode}_{workers}"] = measure(
@@ -363,6 +383,7 @@ def main():
                     )
                     output["results"][band][group] = comparisons
                     save()
+
                 baseline = comparisons[
                     "serial_1" if fixed else "native_serial"
                 ]
@@ -371,9 +392,12 @@ def main():
                         capture["median_seconds"] / baseline["median_seconds"]
                     )
                     capture["ratio_ci95"] = ratio_interval(baseline, capture)
+
                 save()
+
         if args.phase in ("cold", "all"):
             comparisons = {}
+
             for mode, workers in ARMS:
                 print(f"{band} cold {mode}/{workers}", flush=True)
                 comparisons[f"{mode}_{workers}"] = measure(
@@ -381,6 +405,7 @@ def main():
                 )
                 output["results"][band]["cold_first_factor"] = comparisons
                 save()
+
     after = sources()
     after["qs/parallel.py"] = hashlib.sha256(
         Path(__file__).parents[1].joinpath("qs/parallel.py").read_bytes()

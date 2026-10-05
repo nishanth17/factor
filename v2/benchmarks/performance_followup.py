@@ -25,6 +25,7 @@ def main():
     )
     parser.add_argument("--baseline-json", type=Path)
     parser.add_argument("--variant", default="none")
+    parser.add_argument("--experiments", type=Path)
     parser.add_argument("--corpus", type=Path)
     parser.add_argument(
         "--split", choices=("training", "held_out"), default="training"
@@ -45,9 +46,11 @@ def main():
     bench = args.root / "v2/benchmarks"
     baseline = (
         args.baseline_json
-        or bench / "inputs/performance_followup_baseline.json"
+        or bench / "inputs/baselines/performance_followup_baseline.json"
     )
-    corpus = args.corpus or bench / "inputs/performance_audit_corpus.json"
+    corpus = (
+        args.corpus or bench / "inputs/corpora/performance_audit_corpus.json"
+    )
     specification = importlib.util.spec_from_file_location(
         "followup_audit", bench / "performance_audit.py"
     )
@@ -104,7 +107,8 @@ def main():
         if args.variant != "none":
             experiments = json.loads(
                 (
-                    bench / "inputs" / "performance_followup_experiments.json"
+                    args.experiments
+                    or bench / "history/performance_followup_experiments.json"
                 ).read_text()
             )
             if (
@@ -114,8 +118,10 @@ def main():
                 raise ValueError(
                     "variant belongs to a different frozen baseline"
                 )
+
             variant = experiments["variants"][args.variant]
             original = audit.checked_baseline(baseline)["source"]
+
             for name, source in variant["source"].items():
                 if (
                     name not in original
@@ -123,7 +129,9 @@ def main():
                     != variant["source_sha256"][name]
                 ):
                     raise ValueError("invalid variant source")
+
                 (runtime / name).write_text(source)
+
         audit.run(
             SimpleNamespace(
                 runtime_root=runtime,
@@ -140,6 +148,7 @@ def main():
                 polynomial_order="generated",
             )
         )
+
     data = json.loads(args.output.read_text())
     data["followup"] = dict(
         variant=args.variant,
@@ -177,21 +186,25 @@ def family_setup(fixture, seed, config, modules):
         budget=budget,
     )
     identities = []
+
     for _ in range(config["repetitions"]):
         for primes in assignments:
             family = parallel.PolynomialFamily(
                 base, primes, budget=budget, memory_bytes=32 * 2**20
             )
+
             for entry, inverse in zip(base.entries, family.inverses):
                 if (
                     inverse is not None
                     and family.a * inverse % entry.prime != 1
                 ):
                     raise AssertionError("invalid cached family inverse")
+
             b = sum(family.terms) % family.a
             if (b * b - base.n_prime) % family.a:
                 raise AssertionError("invalid family CRT output")
             identities.append(family.identity)
+
     return dict(
         id=fixture["id"],
         seed=seed,
@@ -224,6 +237,7 @@ def resieve_capacity(fixture, seed, config, modules):
     if base.divisor:
         raise ValueError("capacity fixture must not split during base setup")
     polynomial = modules["polynomial"].qs_polynomial(base.factor_base)
+
     try:
         collector = modules["sieve_collector"].SieveCollector(
             polynomial,
@@ -237,9 +251,11 @@ def resieve_capacity(fixture, seed, config, modules):
                 residual_bound=10000,
             ),
         )
+
         result = collector.collect(-2048, 2048)
         reason, stats, divisor = result.reason, result.stats, result.divisor
         stats = dict(stats, workspace_bytes=result.workspace_bytes)
+
         for atom in result.atoms:
             expected = abs(
                 atom.polynomial.a * atom.polynomial.value(atom.position)
@@ -249,6 +265,7 @@ def resieve_capacity(fixture, seed, config, modules):
                 actual *= prime**exponent
             if actual != expected:
                 raise AssertionError("invalid recovered exact exponents")
+
         signature = hashlib.sha256(
             repr(
                 sorted(
@@ -258,6 +275,7 @@ def resieve_capacity(fixture, seed, config, modules):
         ).hexdigest()
     except MemoryError:
         reason = "memory_limit"
+
     if divisor is not None and not modules["utils"].valid_divisor(
         divisor, fixture["n"]
     ):

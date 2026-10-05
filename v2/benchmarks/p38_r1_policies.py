@@ -49,6 +49,7 @@ def main():
         "share streamed quotas. All arms share resource caps.",
         policies={},
     )
+
     for policy in POLICIES:
         if policy == "reference":
             # Construct directly: a reference config cannot temporarily carry
@@ -61,6 +62,7 @@ def main():
             )
         else:
             arm = replace(config, assignment_policy=policy)
+
         results["policies"][policy] = measure(
             fixtures,
             arm,

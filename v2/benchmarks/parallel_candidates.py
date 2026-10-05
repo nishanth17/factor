@@ -90,12 +90,14 @@ def _job(assignment):
         cancelled=_STOP.is_set if assignment["early"] else None,
     )
     reason = "exhausted"
+
     try:
         context = SieveContext(config.max_hi, segment_size=config.segment_size)
         while not candidate["done"]:
             advance_job(candidate, budget, context, config)
     except BudgetExhaustedError as error:
         reason = str(error)
+
     divisor = candidate["factor"]
     if divisor is not None:
         if not utils.valid_divisor(divisor, assignment["n"]):
@@ -106,6 +108,7 @@ def _job(assignment):
                 if not _FOUND_AT.value:
                     _FOUND_AT.value = time.monotonic()
             _STOP.set()
+
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return {
         "id": assignment["id"],
@@ -150,6 +153,7 @@ class RssObserver:
                     except RuntimeError:
                         snapshot = []
                     pids.extend(process.pid for process in snapshot)
+
             result = subprocess.run(
                 ["ps", "-o", "rss=", "-p", ",".join(map(str, pids))],
                 capture_output=True,
@@ -234,7 +238,9 @@ def _configuration(mode, workers, warm, assignments, args):
             execute(executor, jobs)
             warmup["calls"] += len(jobs)
         warmup["seconds"] = time.perf_counter() - started
+
     samples = []
+
     try:
         for _ in range(args.repetitions):
             stop.clear()
@@ -259,6 +265,7 @@ def _configuration(mode, workers, warm, assignments, args):
                 observer.close()
                 if not warm and current is not None:
                     current.shutdown()
+
             wall = time.perf_counter() - started
             cpu = _cpu_usage() - cpu_started
             if warm and mode == "processes":
@@ -273,6 +280,7 @@ def _configuration(mode, workers, warm, assignments, args):
                         for pid, value in cpu_before.items()
                     )
                 )
+
             results.sort(key=lambda result: result["id"])
             if [row["id"] for row in results] != [
                 job["id"] for job in assignments
@@ -280,12 +288,14 @@ def _configuration(mode, workers, warm, assignments, args):
                 raise AssertionError(
                     "lost or duplicated candidate assignments"
                 )
+
             while True:
                 try:
                     pid, rss = reports.get_nowait()
                 except queue.Empty:
                     break
                 initializer_rss[pid] = rss
+
             active_pids = {result["pid"] for result in results}
             # Include late-starting workers even if another worker found the
             # factor before they received a candidate assignment.
@@ -296,6 +306,7 @@ def _configuration(mode, workers, warm, assignments, args):
                 rss_by_pid[pid] = max(
                     rss_by_pid.get(pid, 0), result["peak_rss_bytes"]
                 )
+
             parent_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
             if sys.platform != "darwin":
                 parent_rss *= 1024
@@ -341,6 +352,7 @@ def _configuration(mode, workers, warm, assignments, args):
             executor.shutdown()
         reports.close()
         reports.join_thread()
+
     return {
         "mode": mode,
         "core_budget": workers if mode == "processes" else 1,
@@ -373,6 +385,7 @@ def main():
     rows = []
     measured_environment = environment()
     measured_environment["core_budget"] = 4
+
     for kind, n, b1, b2 in (
         ("ecm", 1000000000039 * 1000000000061, 200, 5000),
         ("ecm", 1000000000039 * 1000000000061, 2000, 147396),
@@ -393,6 +406,7 @@ def main():
                 for index in range(args.jobs)
             ]
             baseline = None
+
             for mode, workers, warm in (
                 ("serial", 1, True),
                 ("threads", 4, True),
@@ -402,6 +416,7 @@ def main():
                 ("processes", 4, True),
             ):
                 row = _configuration(mode, workers, warm, assignments, args)
+
                 if not early:
                     signatures = [
                         [result["factor"] for result in sample["results"]]
@@ -413,9 +428,11 @@ def main():
                         raise AssertionError(
                             "execution mode changed fixed candidate results"
                         )
+
                 row.update(kind=kind, n=n, b1=b1, b2=b2, early=early)
                 rows.append(row)
                 print(kind, b1, early, mode, workers, warm, "done", flush=True)
+
     if environment()["source_sha256"] != measured_environment["source_sha256"]:
         raise RuntimeError("source changed during measurements")
     args.output.write_text(

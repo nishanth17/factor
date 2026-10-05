@@ -19,6 +19,7 @@ class OptimizationTests(unittest.TestCase):
                 with patch.object(pollard_rho, "factorize_rho") as rho:
                     with patch.object(ecm, "factorize_ecm") as curves:
                         result = factorize(n, seed=4)
+
             self.assertTrue(result.complete)
             self.assertEqual(result.reconstruct(), n)
             self.assertEqual(result.proven, n < 2**64)
@@ -30,6 +31,7 @@ class OptimizationTests(unittest.TestCase):
         """The loop computes one bound unless successful division shrinks n."""
         with patch.object(utils, "isqrt", wraps=utils.isqrt) as root:
             factors, remainder = factorize_bf(25013 * 25031)
+
         self.assertEqual(factors, [])
         self.assertEqual(remainder, 25013 * 25031)
         self.assertEqual(root.call_count, 1)
@@ -43,7 +45,9 @@ class OptimizationTests(unittest.TestCase):
         ) as classify:
             with patch.object(pollard_rho, "factorize_rho", return_value=1009):
                 result = factorize(1009**2, level=2, seed=3)
+
         values = [call.args[0] for call in classify.call_args_list]
+
         self.assertEqual(values.count(1009**2), 1)
         self.assertEqual(values.count(1009), 1)
         self.assertEqual(result.factors[0].exponent, 2)
@@ -57,7 +61,9 @@ class OptimizationTests(unittest.TestCase):
         ) as classify:
             with patch.object(ecm, "factorize_ecm", return_value=prime):
                 result = factorize(prime**2, level=1, seed=8)
+
         values = [call.args[0] for call in classify.call_args_list]
+
         self.assertEqual(values.count(prime), 1)
         self.assertEqual(result.factors[0].exponent, 2)
         self.assertEqual(result.factors[0].certainty, utils.Primality.PROBABLE)
@@ -79,6 +85,7 @@ class OptimizationTests(unittest.TestCase):
         with patch.object(utils, "resolve_rng") as generator:
             for n in (1, -1, 2147483647, 2**16 * 3**6 * 101):
                 self.assertTrue(factorize(n, seed=7).proven)
+
         generator.assert_not_called()
         for n in (1, 2147483647, 35):
             with self.assertRaises(TypeError):
@@ -95,14 +102,18 @@ class OptimizationTests(unittest.TestCase):
                 self.assertEqual(
                     utils.classify_prime(n), utils.Primality.PROVEN
                 )
+
             self.assertEqual(witness.call_count, rounds)
+
         for boundary in (9080191, 4759123141):
             for n in range(boundary - 3, boundary + 4):
                 self.assertEqual(utils.is_prime(n), utils.is_prime_bf(n), n)
+
             self.assertFalse(utils.is_prime(boundary))
         generator = random.Random(991)
         for _ in range(500):
             n = generator.randrange(1681, 4759123141)
+
             self.assertEqual(utils.is_prime(n), utils.is_prime_bf(n), n)
 
     def test_dispatch_does_not_repeat_splitter_prime_checks(self):
@@ -112,6 +123,7 @@ class OptimizationTests(unittest.TestCase):
             utils, "classify_prime", wraps=utils.classify_prime
         ) as classify:
             result = factorize(n, seed=7)
+
         self.assertTrue(result.proven)
         self.assertEqual(
             [call.args[0] for call in classify.call_args_list].count(n), 1
@@ -119,16 +131,19 @@ class OptimizationTests(unittest.TestCase):
         for splitter in (pollard_rho.factorize_rho, ecm.factorize_ecm):
             with patch.object(utils, "is_prime", wraps=utils.is_prime) as test:
                 self.assertIsNone(splitter(1009, seed=1))
+
             test.assert_called_once()
 
     def test_inverse_backends_match_and_reject_nonunits(self):
         """Exercise both implementations on signed values and large moduli."""
         generator = random.Random(106)
+
         for backend in (False, True):
             with patch.object(utils, "_USE_PYPY_INVERSE", backend):
                 for modulus in (7, 60, 101, 2**192 - 237, 2**512 - 159):
                     for _ in range(30):
                         value = generator.randrange(-2 * modulus, 2 * modulus)
+
                         try:
                             expected = pow(value, -1, modulus)
                         except ValueError:
@@ -145,6 +160,7 @@ class OptimizationTests(unittest.TestCase):
         with patch.object(pollard_rho, "factorize_rho") as rho:
             with patch.object(ecm, "factorize_ecm") as curves:
                 result = factorize(prime**2, level=2, seed=9)
+
         self.assertTrue(result.proven)
         self.assertEqual(result.factors[0].exponent, 2)
         rho.assert_not_called()
@@ -152,12 +168,14 @@ class OptimizationTests(unittest.TestCase):
         with patch.object(pollard_rho, "factorize_rho", return_value=None):
             with patch.object(ecm, "factorize_ecm", return_value=None):
                 result = factorize(prime**2 + 1, level=2, seed=9)
+
         self.assertEqual(result.remaining, (prime**2 + 1,))
         self.assertEqual(result.reconstruct(), prime**2 + 1)
 
     def test_search_backends_match_duplicate_boundaries(self):
         """Both backends match stdlib searches on random duplicate arrays."""
         generator = random.Random(108)
+
         for backend in (False, True):
             implementation = (
                 utils._binary_search_jit
@@ -167,6 +185,7 @@ class OptimizationTests(unittest.TestCase):
             with patch.object(utils, "binary_search", implementation):
                 for _ in range(200):
                     array = sorted(generator.choices(range(-10, 11), k=50))
+
                     for value in range(-12, 13):
                         self.assertEqual(
                             utils.binary_search(value, array),
@@ -176,6 +195,7 @@ class OptimizationTests(unittest.TestCase):
                             utils.binary_search(value, array, True),
                             bisect_left(array, value),
                         )
+
                 for value in (0, float("inf"), float("nan")):
                     self.assertEqual(utils.binary_search(value, []), 0)
 

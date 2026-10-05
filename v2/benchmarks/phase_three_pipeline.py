@@ -34,6 +34,7 @@ def _corpus(seed, count):
     """Generate known prime products; factors only validate outputs."""
     generator = random.Random(seed)
     fixtures = []
+
     while len(fixtures) < count:
         primes = []
         for lo, hi in ((1200, 4500), (4600, 9000)):
@@ -41,8 +42,10 @@ def _corpus(seed, count):
             while utils.classify_prime(candidate) != utils.Primality.PROVEN:
                 candidate += 2
             primes.append(candidate)
+
         p, q = primes
         fixtures.append({"n": p * q, "factors": sorted(primes)})
+
     return fixtures
 
 
@@ -90,6 +93,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
         config=config,
         budget=budget,
     )
+
     if exhaustive:
         result = arm.qs.reference_collector.collect_block(
             polynomial,
@@ -100,6 +104,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
             budget=budget,
             memory_bytes=config.memory_bytes,
         )
+
         if result.reason != "complete":
             raise AssertionError("exhaustive control exhausted")
         stats = dict(
@@ -119,6 +124,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
         )
     else:
         result = worker.collect(-128, 129)
+
         if result.reason != "complete":
             raise AssertionError("sieve exhausted")
         atoms, full, combined = (
@@ -126,6 +132,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
             result.full_relations,
             result.combined_relations,
         )
+
     store = {atom.relation_id: atom for atom in atoms}
     for relation in full:
         arm.qs.relations.verify_atomic(relation, base, budget=budget)
@@ -137,6 +144,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
             budget=budget,
             memory_bytes=config.memory_bytes,
         )
+
     return _signature(atoms), len(full), len(combined)
 
 
@@ -154,6 +162,7 @@ def _complete(
 ):
     """Complete each balanced QS fixture and prove both factors prime."""
     signatures, metadata = [], []
+
     for fixture in corpus:
         budget = _budget()
         n = fixture["n"]
@@ -163,6 +172,7 @@ def _complete(
             budget=budget,
             memory_bytes=config.memory_bytes,
         )
+
         if setup.divisor:
             raise AssertionError("fixture bypasses the relation pipeline")
         base = setup.factor_base
@@ -183,10 +193,13 @@ def _complete(
                 else arm.qs.sieve_collector.SieveCollector
             ),
         )
+
         result = job.run()
+
         if result.reason != "factor_found":
             raise AssertionError(f"QS did not complete: {n} {result}")
         factors = sorted((result.divisor, result.cofactor))
+
         if factors != fixture["factors"] or factors[0] * factors[1] != n:
             raise AssertionError("complete QS reconstruction failed")
         if any(
@@ -194,8 +207,10 @@ def _complete(
             for value in factors
         ):
             raise AssertionError("QS leaves an unresolved cofactor")
+
         signatures.append(factors)
         metadata.append(result.stats)
+
     return metadata if details else signatures
 
 
@@ -220,6 +235,7 @@ def _exhaustive_collector(arm):
                 budget=self.budget,
                 memory_bytes=self.config.memory_bytes,
             )
+
             if raw.reason != "complete":
                 raise AssertionError("exhaustive pipeline control refused")
             stats = dict(
@@ -230,6 +246,7 @@ def _exhaustive_collector(arm):
                 admitted_atoms=0,
                 matches=0,
             )
+
             for atom in raw.relations:
                 if (
                     self._workspace + raw.workspace_bytes
@@ -238,8 +255,10 @@ def _exhaustive_collector(arm):
                     raise AssertionError(
                         "exhaustive transfer memory exhausted"
                     )
+
                 if self._admit(atom, stats):
                     raise AssertionError("exhaustive pipeline store refused")
+
             return arm.qs.sieve_collector.SieveResult(
                 tuple(self._atoms.values()),
                 tuple(self._full),
@@ -296,18 +315,22 @@ def _recovery(arm, config):
             division_steps=0,
             composite_residuals=0,
         )
+
         if config.division == "resieve":
             if not worker._resieve(-128, 129, 0, stats):
                 raise AssertionError("resieve utility memory refused")
         atoms = []
+
         for position in range(-128, 129):
             atom, divisor = worker._divide(position, position + 128, stats)
+
             if divisor:
                 raise AssertionError(
                     "recovery utility found an unexpected GCD"
                 )
             if atom:
                 atoms.append(atom)
+
         return _signature(atoms)
 
     return call, reference_positions(polynomial, base, -128, 129, 500)
@@ -371,17 +394,20 @@ def main():
             )
         )
         return
+
     if (
         not math.isfinite(args.warmup_seconds)
         or args.warmup_seconds < 3
         or args.repetitions < 9
     ):
         parser.error("require three seconds warmup and nine samples")
+
     if (
         args.output.exists()
         or args.output.with_suffix(".frozen.json").exists()
     ):
         parser.error("use a unique capture filename")
+
     frozen_production = json.loads(BASELINE.read_text())
     production_unchanged = all(
         hashlib.sha256((ROOT.parent / name).read_bytes()).hexdigest() == digest
@@ -389,6 +415,7 @@ def main():
             "production_source_sha256"
         ].items()
     )
+
     if not production_unchanged:
         raise AssertionError("M17 production sources changed")
     arms = {
@@ -402,6 +429,7 @@ def main():
         )
     }
     rows = []
+
     for fixture in TRAINING:
         # The independent generic oracle factors complete norms, not score
         # or root metadata. Exact full/combined yields are matched as well.
@@ -431,6 +459,7 @@ def main():
                     residual_bound=fixture["residual"],
                     score_policy="conservative",
                 )
+
             rows.append(
                 _record(
                     fixture["name"] + "_" + name,
@@ -441,6 +470,7 @@ def main():
                     config=asdict(config),
                 )
             )
+
         arm = arms["after"]
         config = _config(arm, residual_bound=fixture["residual"])
         rows.append(
@@ -452,6 +482,7 @@ def main():
                 scope="matched_collection",
             )
         )
+
     for division in ("full", "roots", "bucket", "resieve"):
         arm = arms["after"]
         config = _config(arm, division=division, block_width=512)
@@ -467,9 +498,11 @@ def main():
                 config=asdict(config),
             )
         )
+
     training = _corpus(329, 4)
     expected = [fixture["factors"] for fixture in training]
     tuning = []
+
     for policy, division in (
         (policy, division)
         for policy in ("adaptive", "candidate")
@@ -491,12 +524,14 @@ def main():
         rows.append(row)
         if row["measurement"]["stable"]:
             tuning.append(row)
+
     winner = min(tuning, key=lambda row: row["measurement"]["median_seconds"])
     # Filter/pivot/stopping experiments use training only. Their kernels are
     # separately checked with the independent dense oracle in acceptance.
     arm = arms["after"]
     config = _config(arm, **winner["config"])
     filter_choices = []
+
     for weight_two, pivot, excess, batch in (
         (False, "highest", 2, 256),
         (False, "highest", 0, 64),
@@ -523,6 +558,7 @@ def main():
         rows.append(row)
         if row["measurement"]["stable"]:
             filter_choices.append(row)
+
     chosen = min(
         filter_choices, key=lambda row: row["measurement"]["median_seconds"]
     )
@@ -541,6 +577,7 @@ def main():
     )
     held_out = _corpus(frozen["held_out_seed"], frozen["held_out_count"])
     expected = [fixture["factors"] for fixture in held_out]
+
     for name in ("before", "after", "after_roots", "exhaustive"):
         arm = arms["before"] if name == "before" else arms["after"]
         values = dict(frozen["config"])
@@ -562,10 +599,13 @@ def main():
                 ),
             )
         )
+
     cold = []
+
     for name in ("before", "after"):
         for _ in range(9):
             started = time.perf_counter()
+
             result = subprocess.run(
                 [
                     sys.executable,
@@ -587,6 +627,7 @@ def main():
             sample["arm"] = name
             sample["lifecycle_seconds"] = time.perf_counter() - started
             cold.append(sample)
+
     profile = args.output.with_suffix(".prof")
     profiler = cProfile.Profile()
     profiler.runcall(
@@ -632,7 +673,8 @@ def main():
                     owned_bytes=32 * 1024 * 1024,
                 ),
                 "baseline_snapshot": str(
-                    ROOT / "benchmarks/inputs/m25_p33_before_sources.json"
+                    ROOT
+                    / "benchmarks/inputs/baselines/m25_p33_before_sources.json"
                 ),
                 "scope": "fixed QS; no SIQS or dispatcher promotion",
             },

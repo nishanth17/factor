@@ -46,7 +46,9 @@ class SIQSTests(unittest.TestCase):
     def test_shared_families_complete_previously_exhausted_inputs(self):
         for n in (13643477, 16187767, 18513647, 4001 * 5003):
             job = SIQSJob(n, config=configuration(), budget=allowance())
+
             result = job.run()
+
             self.assertEqual(result.reason, "factor_found")
             self.assertGreater(result.divisor, 1)
             self.assertEqual(result.divisor * result.cofactor, n)
@@ -55,11 +57,13 @@ class SIQSTests(unittest.TestCase):
                 a.polynomial.identity
                 for a in job.engine.collector._atoms.values()
             }
+
             self.assertGreater(len(polynomials), 1)
             self.assertLessEqual(
                 result.stats["workspace_bytes"], job.config.memory_bytes
             )
             used = job.budget.used
+
             self.assertEqual(job.run().divisor, result.divisor)
             self.assertEqual(job.budget.used, used)
 
@@ -70,15 +74,20 @@ class SIQSTests(unittest.TestCase):
         original = SIQSJob(
             4001 * 5003, seed=73, config=config, budget=allowance()
         )
+
         paused = original.run(max_blocks=1)
+
         self.assertEqual(paused.reason, "paused")
         checkpoint = json.loads(json.dumps(original.checkpoint()))
+
         self.assertLess(
             len(checkpoint["blob"]) + 1024, config.checkpoint_bytes
         )
+
         restored = SIQSJob.from_checkpoint(
             checkpoint, budget=allowance(), config=config
         )
+
         self.assertEqual(restored.seed, original.seed)
         self.assertEqual(
             restored.engine.next_position, original.engine.next_position
@@ -98,25 +107,32 @@ class SIQSTests(unittest.TestCase):
         job = SIQSJob(
             18513647, seed=81, config=configuration(), budget=allowance()
         )
+
         for _ in range(64):
             result = job.run(max_blocks=1)
             if result.divisor:
                 self.assertEqual(result.divisor * result.cofactor, job.n)
                 break
             prior = job.budget.used
+
             job = SIQSJob.from_checkpoint(job.checkpoint(), budget=allowance())
+
             self.assertGreaterEqual(job.budget.used, prior)
         else:
             self.fail("bounded small fixture did not complete through resumes")
 
     def test_work_refusal_is_reported_and_resumable(self):
         job = SIQSJob(4001 * 5003, config=configuration(), budget=allowance(0))
+
         result = job.run(max_blocks=1)
+
         self.assertEqual(result.reason, "work_limit")
         self.assertEqual(result.cofactor, job.n)
+
         restored = SIQSJob.from_checkpoint(
             job.checkpoint(), budget=allowance()
         )
+
         self.assertEqual(restored.run().reason, "factor_found")
 
     def test_cancelled_and_deadline_jobs_keep_checked_cofactor(self):
@@ -126,14 +142,18 @@ class SIQSTests(unittest.TestCase):
             Budget(cpu_seconds=0),
         ):
             job = SIQSJob(4001 * 5003, config=configuration(), budget=budget)
+
             result = job.run(max_blocks=1)
+
             self.assertIn(
                 result.reason, ("cancelled", "wall_limit", "cpu_limit")
             )
             self.assertEqual(result.cofactor, job.n)
+
             restored = SIQSJob.from_checkpoint(
                 job.checkpoint(), budget=allowance()
             )
+
             self.assertEqual(restored.run().reason, "factor_found")
 
     def test_compact_checkpoint_replays_pending_solver_and_extraction(self):
@@ -152,11 +172,15 @@ class SIQSTests(unittest.TestCase):
 
             with patch.object(cls, "run", refuse):
                 result = job.run()
+
             self.assertEqual(result.reason, "work_limit")
             self.assertIsNotNone(job.engine.solver)
             checkpoint = job.checkpoint()
+
             self.assertNotIn('"pivots"', checkpoint["blob"])
+
             restored = SIQSJob.from_checkpoint(checkpoint, budget=allowance())
+
             self.assertIsNotNone(restored.engine.solver)
             self.assertEqual(restored.run().reason, "factor_found")
             self.assertEqual(restored.stats["matrix_reconstructions"], 1)
@@ -170,6 +194,7 @@ class SIQSTests(unittest.TestCase):
             corrupt[field] += "x"
             with self.assertRaises(ValueError):
                 SIQSJob.from_checkpoint(corrupt, budget=allowance())
+
         cases = (
             lambda p: p.update(seed=-1),
             lambda p: p.update(epoch=999),
@@ -210,6 +235,7 @@ class SIQSTests(unittest.TestCase):
                 budget=allowance(),
                 config=configuration(base_bound=300),
             )
+
         with self.assertRaises(ValueError):
             SIQSJob.from_checkpoint(
                 checkpoint, budget=Budget(work_limit=200_000_000, used=1)
@@ -226,7 +252,9 @@ class SIQSTests(unittest.TestCase):
             growth_steps=1,
         )
         job = SIQSJob(1000003, config=config, budget=allowance())
+
         result = job.run()
+
         self.assertIsNone(result.divisor)
         self.assertEqual(result.cofactor, job.n)
         self.assertIn(
@@ -239,11 +267,14 @@ class SIQSTests(unittest.TestCase):
         )
         self.assertEqual(result.stats["recoveries"], 1)
         used = job.budget.used
+
         self.assertEqual(job.run().reason, result.reason)
         self.assertEqual(used, job.budget.used)
+
         restored = SIQSJob.from_checkpoint(
             job.checkpoint(), budget=allowance()
         )
+
         self.assertEqual(restored.run().cofactor, job.n)
 
     def test_storage_caps_attempt_final_extraction(self):
@@ -253,15 +284,19 @@ class SIQSTests(unittest.TestCase):
             collector=SieveConfig(residual_bound=1, max_relations=8),
         )
         job = SIQSJob(4001 * 5003, config=config, budget=allowance())
+
         result = job.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.divisor * result.cofactor, job.n)
 
     def test_multiplier_control_gcd_and_exact_score_order(self):
         choice = select_multiplier(15, candidates=(1, 3), budget=allowance())
+
         self.assertEqual(choice.divisor, 3)
         for n in (4001 * 5003, 2003 * 8353, 10403):
             choice = select_multiplier(n, budget=allowance())
+
             self.assertIsNone(choice.divisor)
             self.assertIn(
                 (1, next(s for h, s in choice.scores if h == 1)), choice.scores
@@ -273,9 +308,12 @@ class SIQSTests(unittest.TestCase):
             job = SIQSJob(
                 n, config=configuration(multiplier=0), budget=allowance()
             )
+
             result = job.run()
+
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual(result.divisor * result.cofactor, n)
+
         for candidates in ((2,), (9,), (1, 1), (), (257,)):
             with self.assertRaises(ValueError):
                 select_multiplier(10403, candidates=candidates)
@@ -292,6 +330,7 @@ class SIQSTests(unittest.TestCase):
         config = PortfolioConfig(
             trial_bound=2, rho_attempts=0, pm1_attempts=0, ecm_tiers=()
         )
+
         first = factorize_bounded(
             4001 * 5003, config=config, budget=allowance(0)
         )
@@ -299,12 +338,14 @@ class SIQSTests(unittest.TestCase):
         checkpoint["payload"]["version"] = 2
         checkpoint["payload"]["config"].pop("siqs")
         checkpoint["sha256"] = _checksum(checkpoint["payload"])
+
         result = factorize_bounded(
             4001 * 5003,
             config=config,
             checkpoint=checkpoint,
             budget=allowance(),
         )
+
         self.assertEqual(result.result.reconstruct(), 4001 * 5003)
         self.assertEqual(result.checkpoint["payload"]["version"], 4)
 
@@ -326,12 +367,14 @@ class SIQSTests(unittest.TestCase):
         )
         with self.assertRaises(BudgetExhaustedError):
             collector.set_polynomial(step.polynomial, step.roots)
+
         self.assertEqual(
             (collector.polynomial, collector._atoms, collector._pending),
             before,
         )
         collector.budget = allowance()
         collector.set_polynomial(step.polynomial, step.roots)
+
         self.assertEqual(collector._atoms, before[1])
         self.assertEqual(collector._pending, before[2])
 
@@ -345,6 +388,7 @@ class SIQSTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 configuration(**options)
+
         with self.assertRaises(MemoryError):
             configuration(memory_bytes=4 * 1024 * 1024)
         job = SIQSJob(
@@ -355,6 +399,7 @@ class SIQSTests(unittest.TestCase):
         job.run(max_blocks=1)
         with self.assertRaises(MemoryError):
             job.checkpoint()
+
         self.assertEqual(job.run().reason, "factor_found")
         fresh = SIQSJob(
             4001 * 5003, config=configuration(), budget=allowance()
@@ -375,15 +420,18 @@ class SIQSTests(unittest.TestCase):
             memory_bytes=64 * 1024 * 1024,
             siqs=configuration(),
         )
+
         for n in (4001 * 5003, -4001 * 5003, (4001 * 5003) ** 2):
             result = factorize_bounded(
                 n, config=config, seed=31, budget=allowance()
             )
+
             self.assertTrue(result.result.complete)
             self.assertEqual(result.result.reconstruct(), n)
             stages = [event["stage"] for event in result.events]
             if "siqs" in stages:
                 self.assertLess(stages.index("ecm"), stages.index("siqs"))
+
         self.assertIsNone(PortfolioConfig().siqs)
 
     def test_dispatch_checkpoint_restores_siqs_under_same_budget(self):
@@ -396,15 +444,19 @@ class SIQSTests(unittest.TestCase):
             siqs=configuration(),
         )
         n = 4001 * 5003
+
         first = factorize_bounded(n, config=config, budget=allowance(150000))
+
         self.assertFalse(first.result.complete)
         self.assertEqual(first.result.reconstruct(), n)
         self.assertEqual(
             first.checkpoint["payload"]["state"]["current"]["stage"], "siqs"
         )
+
         resumed = factorize_bounded(
             n, config=config, checkpoint=first.checkpoint, budget=allowance()
         )
+
         self.assertTrue(resumed.result.complete)
         self.assertEqual(resumed.result.reconstruct(), n)
         self.assertGreater(resumed.work_used, first.work_used)

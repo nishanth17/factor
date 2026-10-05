@@ -50,6 +50,7 @@ class SieveContext:
                 start = prime * prime // 2
                 count = (size - 1 - start) // prime + 1
                 flags[start::prime] = b"\x00" * count
+
         self.base_primes = array(
             "Q", (2 * i + 1 for i in range(1, size) if flags[i])
         )
@@ -70,12 +71,14 @@ class SieveContext:
         if self.active:
             raise RuntimeError("context already has an active iterator")
         self.active = True
+
         try:
             if hi <= max(lo, 2):
                 return []
             left = max(lo, 3) | 1
             size = max(0, (hi - left + 1) // 2)
             self._flags[:size] = b"\x01" * size
+
             for prime in self.base_primes:
                 if prime * prime >= hi:
                     break
@@ -88,6 +91,7 @@ class SieveContext:
                 if index < size:
                     count = (size - 1 - index) // prime + 1
                     self._flags[index:size:prime] = b"\x00" * count
+
             values = [left + 2 * i for i in range(size) if self._flags[i]]
             if lo <= 2 < hi:
                 values.insert(0, 2)
@@ -108,6 +112,7 @@ class SieveContext:
         if self.active:
             raise RuntimeError("context already has an active iterator")
         self.active = True
+
         try:
             if hi <= max(lo, 2):
                 return
@@ -127,12 +132,14 @@ class SieveContext:
                     # Absolute strikes may exceed 64 bits on high intervals.
                     # Store relative offsets instead, bounded by 2*p.
                     strikes.append((first - start) // 2)
+
             for left in range(start, hi, 2 * self.segment_size):
                 right = min(hi, left + 2 * self.segment_size)
                 size = (right - left + 1) // 2
                 if budget is not None:
                     budget.consume(size + len(self.base_primes))
                 self._flags[:size] = b"\x01" * size
+
                 for position, prime in enumerate(self.base_primes):
                     if prime * prime >= right and not self.rolling:
                         break
@@ -146,13 +153,16 @@ class SieveContext:
                         if first % 2 == 0:
                             first += prime
                         index = (first - left) // 2
+
                     if index < size:
                         count = (size - 1 - index) // prime + 1
                         stop = index + count * prime
                         self._flags[index:size:prime] = b"\x00" * count
                         index = stop
+
                     if self.rolling:
                         strikes[position] = index - size
+
                 for index in range(size):
                     if self._flags[index]:
                         yield left + 2 * index
@@ -230,12 +240,14 @@ class ScheduleCache:
             raise RuntimeError("cache already has an active consumer")
         self.active = True
         key = (lo, hi, "half-open", kind, bound)
+
         try:
             if key in self.entries:
                 self.hits += 1
                 self.entries.move_to_end(key)
                 yield from self.entries[key]
                 return
+
             self.misses += 1
             # Worst-case packed size, with capacity-growth/header allowance.
             reserve = 1024 + 16 * max(0, (hi - max(lo, 2) + 1) // 2 + 1)
@@ -251,9 +263,11 @@ class ScheduleCache:
                 ):
                     _, removed = self.entries.popitem(last=False)
                     self.used_bytes -= 1024 + 16 * len(removed)
+
             values = array("Q") if retain else None
             previous = lo
             stream = self.context.primes(lo, hi)
+
             try:
                 for prime in stream:
                     if kind == "gaps":
@@ -262,11 +276,15 @@ class ScheduleCache:
                         value = utils.prime_power(prime, bound)
                     else:
                         value = prime
+
                     if values is not None:
                         values.append(value)
                     yield value
             finally:
                 stream.close()
+
+            # Publish only after exhaustion. Closing at an earlier yield
+            # must not cache a schedule prefix as a complete entry.
             if values is not None:
                 self.entries[key] = values
                 self.used_bytes += 1024 + 16 * len(values)

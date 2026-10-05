@@ -34,8 +34,10 @@ class StableRowTests(unittest.TestCase):
         prefix = ()
         prior_full = 0
         combined_seen = grew_after_combined = False
+
         for position in range(-128, 129):
             result = run.collect(position, position + 1)
+
             self.assertEqual(run.matrix_relations[: len(prefix)], prefix)
             if combined_seen and len(run._full) > prior_full:
                 grew_after_combined = True
@@ -43,15 +45,18 @@ class StableRowTests(unittest.TestCase):
             prior_full = len(run._full)
             prefix = run.matrix_relations
             del result
+
         self.assertTrue(combined_seen and grew_after_combined)
         payload = json.loads(json.dumps(_store(run)))
         restored = collector(f.polynomial, f.base)
         _restore_store(payload, restored, unlimited_budget())
+
         self.assertEqual(restored.matrix_relations, run.matrix_relations)
         legacy = dict(payload)
         del legacy["row_order"]
         restored = collector(f.polynomial, f.base)
         _restore_store(legacy, restored, unlimited_budget())
+
         self.assertEqual(
             restored.matrix_relations, tuple(run._full + run._combined)
         )
@@ -61,6 +66,7 @@ class StableRowTests(unittest.TestCase):
         run = collector(f.polynomial, f.base)
         run.collect(-128, 129)
         payload = json.loads(json.dumps(_store(run)))
+
         for order in (
             [0] * len(payload["row_order"]),
             payload["row_order"][:-1],
@@ -72,6 +78,7 @@ class StableRowTests(unittest.TestCase):
                     collector(f.polynomial, f.base),
                     unlimited_budget(),
                 )
+
         payload["atoms"][0][2] *= -1
         with self.assertRaises(ValueError):
             _restore_store(
@@ -85,6 +92,7 @@ class StableRowTests(unittest.TestCase):
         run._preparation_cache = _VerificationCache(2**20)
         run._preparation_cache.tested_dependencies.add(frozenset({1}))
         run.set_polynomial(run.polynomial, run._roots, retain_relations=False)
+
         self.assertEqual(run.matrix_relations, ())
         self.assertFalse(run._preparation_cache.tested_dependencies)
 
@@ -118,12 +126,17 @@ class StableRowTests(unittest.TestCase):
                 ),
             ):
                 self.assertEqual(job.run().reason, "work_limit")
+
             checkpoint = job.checkpoint()
+
             self.assertEqual(checkpoint["version"], 1)
+
             restored = SIQSJob.from_checkpoint(
                 checkpoint, budget=unlimited_budget()
             )
+
             result = restored.run()
+
             self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
 
     def test_new_version_requires_the_mixed_order_field(self):
@@ -133,8 +146,10 @@ class StableRowTests(unittest.TestCase):
         job = SIQSJob(
             4001 * 5003, config=configuration(), budget=unlimited_budget()
         )
+
         self.assertEqual(job.run(max_blocks=1).reason, "paused")
         checkpoint = job.checkpoint()
+
         self.assertEqual(checkpoint["version"], 2)
         damaged = mutate(
             checkpoint, lambda payload: payload["store"].pop("row_order")
@@ -155,6 +170,7 @@ class StableRowTests(unittest.TestCase):
         )
         job._setup()
         checkpoint = job.checkpoint()
+
         self.assertEqual(checkpoint["version"], 2)
         payload = json.loads(checkpoint["blob"])
         del payload["store"]["row_order"]
@@ -167,6 +183,7 @@ class StableRowTests(unittest.TestCase):
         )
         job._setup()
         checkpoint = job.checkpoint()
+
         self.assertEqual(json.loads(checkpoint["blob"])["version"], 3)
         damaged = mutate(
             checkpoint, lambda payload: payload["store"].pop("row_order")
@@ -182,12 +199,16 @@ class StableRowTests(unittest.TestCase):
         job = SIQSJob(4001 * 5003, config=config, budget=unlimited_budget())
         job.run(max_blocks=1)
         checkpoint = job.checkpoint()
+
         restored = SIQSJob.from_checkpoint(
             checkpoint, budget=unlimited_budget()
         )
+
         self.assertEqual(restored.engine.filter_row_growth, 32)
         self.assertTrue(restored.engine.tested_dependencies)
+
         result = restored.run()
+
         self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
         for growth in (0, True, 4097):
             with self.assertRaises((TypeError, ValueError)):
@@ -204,6 +225,7 @@ class TestedDependencyTests(unittest.TestCase):
         self.prepared = prepare_relations(
             f.relations, f.base, f.store, budget=unlimited_budget()
         )
+
         dependencies = DependencySolver(
             filter_matrix(self.prepared.rows), budget=unlimited_budget()
         ).run()
@@ -224,6 +246,7 @@ class TestedDependencyTests(unittest.TestCase):
             budget=unlimited_budget(),
             tested_cache=cache,
         )
+
         self.assertIsNone(first.run())
         self.assertEqual(len(first.trials), 1)
         f = self.fixture
@@ -238,6 +261,7 @@ class TestedDependencyTests(unittest.TestCase):
         second = DependencyExtractor(
             prepared, (mask,), budget=unlimited_budget(), tested_cache=cache
         )
+
         self.assertIsNone(second.run())
         self.assertEqual(second.cache_skips, 1)
         self.assertFalse(second.trials)
@@ -249,10 +273,12 @@ class TestedDependencyTests(unittest.TestCase):
             (base, changed if row == relation else row, source)
             for base, row, source in key
         )
+
         self.assertNotEqual(altered, key)
         self.assertNotIn(altered, cache.tested_dependencies)
         if atoms:
             altered_atom = replace(atoms[0], sign=-atoms[0].sign)
+
             self.assertEqual(altered_atom.relation_id, atoms[0].relation_id)
             self.assertNotEqual(
                 (base, relation, (altered_atom,) + atoms[1:]),
@@ -268,6 +294,7 @@ class TestedDependencyTests(unittest.TestCase):
             tested_cache=cache,
         )
         extractor.run()
+
         self.assertFalse(cache.tested_dependencies)
         cache = _VerificationCache(2**20)
         budget = unlimited_budget()
@@ -277,9 +304,11 @@ class TestedDependencyTests(unittest.TestCase):
         )
         with self.assertRaises(BudgetExhaustedError):
             extractor.run()
+
         self.assertEqual(extractor.next_dependency, 0)
         self.assertFalse(cache.tested_dependencies)
         extractor.budget = unlimited_budget()
+
         self.assertIsNone(extractor.run())
         self.assertEqual(extractor.next_dependency, 1)
 
@@ -329,8 +358,10 @@ class PivotCounterTests(unittest.TestCase):
         while solver.next_row < len(solver.matrix.rows):
             solver.step()
             actual = sum(row.bit_count() for row, _ in solver.pivots.values())
+
             self.assertEqual(solver.pivot_nonzeros, actual)
             self.assertEqual(solver.peak_nonzeros, actual)
+
         self.assertEqual(span(solver.run()), dense_kernel(rows))
         refused = DependencySolver(
             filter_matrix(rows), budget=unlimited_budget()
@@ -338,8 +369,10 @@ class PivotCounterTests(unittest.TestCase):
         refused.budget.work_limit = 0
         with self.assertRaises(BudgetExhaustedError):
             refused.step()
+
         self.assertEqual(refused.pivot_nonzeros, 0)
         refused.budget = unlimited_budget()
+
         self.assertEqual(span(refused.run()), dense_kernel(rows))
 
 
@@ -357,8 +390,10 @@ class MatrixChallengerTests(unittest.TestCase):
         ] + [
             tuple(generator.randrange(64) for _ in range(8)) for _ in range(20)
         ]
+
         for rows in fixtures:
             expected = dense_kernel(rows)
+
             for size, use_history in (
                 (1, True),
                 (32, True),
@@ -377,16 +412,21 @@ class MatrixChallengerTests(unittest.TestCase):
                     solver = DependencySolver(
                         matrix, pivot=pivot, budget=unlimited_budget()
                     )
+
                     self.assertEqual(span(solver.run()), expected)
+
             matrix = filter_matrix(rows, weight_two=True)
             compact = live_compaction(matrix, unlimited_budget(), 8 * 2**20)
+
             self.assertEqual(span(DependencySolver(compact).run()), expected)
             inverse = compact.stats["inverse_columns"]
+
             for remapped, mask in zip(compact.rows, compact.masks):
                 original = 0
                 for index, row in enumerate(rows):
                     if mask & (1 << index):
                         original ^= row
+
                 self.assertEqual(
                     sum(
                         1 << column

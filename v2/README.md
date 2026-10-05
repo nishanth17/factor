@@ -194,8 +194,8 @@ separate cold startup from warmed execution.
 
 ## Files and next work
 
-`tests/` contains acceptance and arithmetic regressions; `qs/` contains relation
-engines. [Benchmark documentation](benchmarks/README.md) holds detailed results;
+`tests/` contains acceptance and arithmetic regressions; the
+[QS guide](qs/README.md) covers relation engines. [Benchmark documentation](benchmarks/README.md) holds detailed results;
 the [roadmap](ROADMAP.md) records acceptance gates. Benchmark `inputs/`
 retain independent corpora, immutable sources, provenance and frozen controls.
 The entire `audit/` tree is Git-ignored local research and diagnostic material;

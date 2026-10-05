@@ -27,6 +27,7 @@ def _check_exponents(exponents):
     if not isinstance(exponents, tuple):
         raise TypeError("exponents must be a tuple")
     previous = 1
+
     for pair in exponents:
         if not isinstance(pair, tuple) or len(pair) != 2:
             raise TypeError("exponent entries must be pairs in tuples")
@@ -97,6 +98,7 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         factor_base.multiplier,
     ):
         raise ValueError("relation target differs from the factor base")
+
     if len(relation.exponents) > len(factor_base.entries):
         raise ValueError("relation has too many factor-base exponents")
     budget = budget if budget is not None else Budget()
@@ -110,6 +112,7 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         raise ValueError("relation sign is incorrect")
     remaining = abs(value) // (relation.square_correction**2)
     primes = factor_base._columns
+
     for prime, exponent in relation.exponents:
         if prime not in primes:
             raise ValueError("exponent prime is outside the factor base")
@@ -119,6 +122,7 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         remaining, remainder = divmod(remaining, power)
         if remainder:
             raise ValueError("relation exponents do not divide its value")
+
     if remaining != relation.residual:
         raise ValueError("relation factorization is incomplete or incorrect")
     if relation.residual > residual_bound:
@@ -145,6 +149,7 @@ def parity_bits(relation, factor_base):
             raise ValueError("exponent prime is outside the factor base")
         if exponent % 2:
             bits |= 1 << columns[prime]
+
     return bits
 
 
@@ -193,6 +198,7 @@ def _combined_values(atoms, modulus):
     """Accumulate exact exponents and bounded modular square corrections."""
     exponents, residuals = Counter(), Counter()
     u, sign, correction = 1, 1, 1
+
     for atom in atoms:
         u = u * atom.u % modulus
         sign *= atom.sign
@@ -201,9 +207,11 @@ def _combined_values(atoms, modulus):
             exponents[prime] += exponent
         if atom.residual != 1:
             residuals[atom.residual] += 1
+
     for residual, count in sorted(residuals.items()):
         if count % 2:
             raise ValueError("combined residual multiplicities must be even")
+        # Paired residuals enter the square root, not factor-base parity.
         correction = correction * pow(residual, count // 2, modulus) % modulus
     return u, sign, tuple(sorted(exponents.items())), correction
 
@@ -227,6 +235,7 @@ def _combination_workspace(atoms, factor_base, memory_bytes):
             + factor_base.n_prime.bit_length()
         )
         reserve += 2048 + 128 * len(atom.exponents) + 4 * numeric_bits
+
     if reserve > memory_bytes:
         raise MemoryError(
             "combination/provenance workspace exceeds memory_bytes"
@@ -266,6 +275,7 @@ def combine_relations(
                 return CombinationResult(None, divisor)
             if divisor != 1:
                 raise ValueError("residual is a nonunit with no proper split")
+
     budget.consume(len(atoms) * (len(factor_base.entries) + 1))
     values = _combined_values(atoms, factor_base.n)
     combined = CombinedRelation(identities, *values)
@@ -297,6 +307,7 @@ def verify_combined(
         if atom is None or atom.relation_id != identity:
             raise ValueError("missing or mismatched atomic provenance")
         atoms.append(atom)
+
     _combination_workspace(atoms, factor_base, memory_bytes)
     for atom in atoms:
         verify_atomic(
@@ -311,6 +322,7 @@ def verify_combined(
         relation.square_correction,
     ):
         raise ValueError("combined fields differ from checked provenance")
+
     right = relation.sign % factor_base.n
     for prime, exponent in relation.exponents:
         right = right * pow(prime, exponent, factor_base.n) % factor_base.n

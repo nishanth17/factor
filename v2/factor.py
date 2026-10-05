@@ -76,12 +76,15 @@ def factorize_bf(n, *, bound=constants.TRIAL_BOUND):
         return factors, n
     # Refresh the exact bound only when division reduces n.
     root = utils.isqrt(n)
+
     for prime in _trial_primes(bound):
+        # Every smaller prime was exhausted, so this remainder is prime.
         if prime > root:
             if n > 1:
                 factors.append((n, 1))
                 n = 1
             break
+
         exponent = 0
         while n % prime == 0:
             n //= prime
@@ -89,6 +92,7 @@ def factorize_bf(n, *, bound=constants.TRIAL_BOUND):
         if exponent:
             factors.append((prime, exponent))
             root = utils.isqrt(n)
+
     return factors, n
 
 
@@ -134,6 +138,7 @@ def factorize(
         raise TypeError(
             "seed must be None, int, float, str, bytes or bytearray"
         )
+
     original = n
     sign = -1 if n < 0 else 1
     n = abs(n)
@@ -162,6 +167,7 @@ def factorize(
             classifications[prime] = utils.Primality.PROVEN
 
     pending = [n] if n > 1 else []
+
     while pending:
         cofactor = pending.pop()
         classification = classifications.get(cofactor)
@@ -170,6 +176,7 @@ def factorize(
                 cofactor, tolerance=primality_rounds, rng=generator
             )
             classifications[cofactor] = classification
+
         if classification is not utils.Primality.COMPOSITE:
             counts[cofactor] = counts.get(cofactor, 0) + 1
             continue
@@ -194,6 +201,7 @@ def factorize(
                 max_evaluations=rho_evaluations,
                 _known_composite=True,
             )
+
         if level >= 1 and not utils.valid_divisor(divisor, cofactor):
             divisor = ecm.factorize_ecm(
                 cofactor,
@@ -209,6 +217,7 @@ def factorize(
             # Both children remain pending until independently classified.
             pending.extend((divisor, cofactor // divisor))
         else:
+            # Failure preserves the cofactor for result reconstruction.
             remaining.append(cofactor)
 
     factors = tuple(
@@ -230,6 +239,7 @@ def print_factorization(n, result):
         if factor.certainty is utils.Primality.PROBABLE:
             term += " (probable prime)"
         terms.append(term)
+
     terms.extend(f"{cofactor} (unresolved)" for cofactor in result.remaining)
     expression = " * ".join(terms) if terms else "1"
     return f"{n} = {expression}"
@@ -278,6 +288,7 @@ def main():
                 if checkpoint
                 else int(input("Enter number: "))
             )
+
         if args.bounded or args.resume or args.checkpoint or use_sss:
             from .budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
@@ -304,6 +315,7 @@ def main():
                         ),
                     ),
                 )
+
             config = PortfolioConfig(**parameters)
             run = factorize_bounded(
                 number,
@@ -334,6 +346,7 @@ def main():
             )
     except (TypeError, ValueError, OSError, KeyError, MemoryError) as error:
         parser.error(str(error))
+
     print(print_factorization(number, result))
     return 0 if result.complete else 1
 

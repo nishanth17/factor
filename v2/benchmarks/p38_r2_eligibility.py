@@ -37,6 +37,7 @@ def probe(mods, fixture, seed):
         all_marks=0,
         all_hits=0,
     )
+
     for root in roots:
         count["primes"] += root.prime > hi - lo
         for modulus, residues, weight in powers.prime_power_roots(
@@ -59,6 +60,7 @@ def probe(mods, fixture, seed):
             elif modulus > max(root.prime, hi - lo):
                 count["power_moduli"] += 1
                 count["power_hits"] += hits
+
     return dict(
         id=fixture["id"],
         seed=seed,

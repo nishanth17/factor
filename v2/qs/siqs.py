@@ -106,6 +106,7 @@ class SIQSConfig:
         ):
             if type(getattr(self, name)) is not bool:
                 raise TypeError(f"{name} must be Boolean")
+
         if self.assignment_policy not in ("reference", "nearest", "flyer"):
             raise ValueError("unknown assignment policy")
         if self.assignment_policy != "reference" and self.mode != "siqs":
@@ -192,6 +193,7 @@ class SIQSJob:
 
     def _timed(self, stage, call):
         started = time.perf_counter()
+
         try:
             return call()
         finally:
@@ -216,6 +218,7 @@ class SIQSJob:
                 self.stats["multiplier_scores"] = choice.scores
                 if self.divisor is not None:
                     return
+
         if self.base is None:
             setup = self._timed(
                 "base",
@@ -231,6 +234,7 @@ class SIQSJob:
             self.base, self.divisor = setup.factor_base, setup.divisor
             if self.divisor is not None:
                 return
+
         if "capacity" not in self.stats:
             from .capacity import capacity_report
 
@@ -286,6 +290,7 @@ class SIQSJob:
                 )
             else:
                 self.assignments = ((),)
+
             self.stats["assignment_count"] = len(self.assignments)
             if isinstance(self.assignments, AssignmentStream):
                 self.stats["assignment_space"] = self.assignments.total
@@ -313,6 +318,7 @@ class SIQSJob:
                 self.coefficient_cursor = cursor
                 self.stats["coefficient_certainty"] = certainty
                 return polynomial, roots
+
             polynomial = (
                 qs_polynomial(self.base)
                 if self.config.mode == "qs"
@@ -330,6 +336,7 @@ class SIQSJob:
                 for entry in self.base.entries
             )
             return polynomial, roots
+
         while self.family_index < len(self.assignments):
             if self.family is None:
                 self.family = PolynomialFamily(
@@ -339,6 +346,7 @@ class SIQSJob:
                     memory_bytes=self.config.memory_bytes
                     - self.config.metadata_reserve,
                 )
+
             self.family.budget = self.budget
             step = (
                 self.family.next()
@@ -349,6 +357,7 @@ class SIQSJob:
                 return step.polynomial, step.roots
             self.family_index += 1
             self.family = None
+
         return None
 
     def _activate(self):
@@ -368,6 +377,7 @@ class SIQSJob:
             if self.config.mode != "siqs":
                 self.family_index += 1
             return True
+
         extra = (
             self.config.metadata_reserve + 65536 + 640 * len(self.base.entries)
         )
@@ -412,6 +422,7 @@ class SIQSJob:
                 )
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
+
         if not self.config.streaming:
             self.seen.add(key)
         self.stats["polynomials"] += 1
@@ -456,6 +467,7 @@ class SIQSJob:
             utils.require_integer(max_blocks, "max_blocks", 0)
         blocks = 0
         reason = self.finished_reason or "paused"
+
         try:
             while self.finished_reason is None and self.divisor is None:
                 if max_blocks is not None and blocks >= max_blocks:
@@ -473,8 +485,11 @@ class SIQSJob:
                             < self.config.family_count
                         ):
                             exhausted = "assignment_space_exhausted"
+
                         self._recover(exhausted)
+
                     continue
+
                 self.engine.budget = self.budget
                 result = self._timed(
                     "collection_to_extraction",
@@ -517,6 +532,7 @@ class SIQSJob:
             reason = self.budget.reason
         except MemoryError:
             self.finished_reason = reason = "memory_limit"
+
         if self.divisor is not None:
             if not utils.valid_divisor(self.divisor, self.n):
                 raise ArithmeticError("SIQS returned an invalid split")
@@ -529,6 +545,7 @@ class SIQSJob:
             and reason in ("paused", "window_exhausted")
         ):
             reason = "paused"
+
         if self.engine is not None:
             self.stats["engine"] = dict(self.engine.stats)
             self.stats["relations"] = len(self.engine.collector._full) + len(
@@ -544,6 +561,7 @@ class SIQSJob:
                     getattr(self.engine.collector, "_switch_peak", 0),
                 )
             )
+
         self.stats["work_used"] = self.budget.used
         return QSResult(
             self.divisor,

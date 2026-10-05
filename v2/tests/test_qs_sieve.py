@@ -35,9 +35,11 @@ class SieveCoverageTests(unittest.TestCase):
     def test_all_modes_signed_windows_and_tails(self):
         """All buffer/mark/division modes retain identical verified atoms."""
         base = build_factor_base(10403, bound=100).factor_base
+
         for a, b in ((1, 102), (7, 1), (49, 8)):
             polynomial = Polynomial(10403, 1, a, b)
             expected = reference_positions(polynomial, base, -71, 80, 97)
+
             for backend in ("list", "bytearray", "array"):
                 for marking in ("dense", "sparse", "bucket"):
                     for division in ("full", "roots", "bucket", "resieve"):
@@ -56,9 +58,11 @@ class SieveCoverageTests(unittest.TestCase):
                                 block_width=17,
                                 metadata_chunk=3,
                             ).collect(-71, 80)
+
                             self.assertEqual(run.reason, "complete")
                             self.assertEqual(signature(run), expected)
                             store = {a.relation_id: a for a in run.atoms}
+
                             for relation in run.combined_relations:
                                 self.assertTrue(
                                     verify_combined(
@@ -75,6 +79,7 @@ class SieveCoverageTests(unittest.TestCase):
             base = build_factor_base(n, multiplier=h, bound=100).factor_base
             polynomial = qs_polynomial(base)
             expected = reference_positions(polynomial, base, -111, 146, 97)
+
             for width in (1, 8, 64, 257):
                 for cutoff in (0, 3, 8, 100):
                     run = collector(
@@ -83,7 +88,9 @@ class SieveCoverageTests(unittest.TestCase):
                         block_width=width,
                         small_prime_cutoff=cutoff,
                     ).collect(-111, 146)
+
                     self.assertEqual(signature(run), expected)
+
         # N is a square only for this arithmetic diagnostic. F(2)=2**40
         # when B=2**38-1; byte scores must saturate conservatively.
         b = 2**38 - 1
@@ -93,6 +100,7 @@ class SieveCoverageTests(unittest.TestCase):
             run = collector(polynomial, base, score_backend=backend).collect(
                 2, 3
             )
+
             self.assertEqual(run.atoms[0].exponents, ((2, 40),))
 
     def test_saturation_large_threshold(self):
@@ -100,9 +108,11 @@ class SieveCoverageTests(unittest.TestCase):
         b = 2**298 - 1
         polynomial = Polynomial(b * b, 1, 1, b)
         base = build_factor_base(b * b, bound=3).factor_base
+
         run = collector(polynomial, base, score_backend="bytearray").collect(
             2, 3
         )
+
         self.assertEqual(run.stats["threshold_max"], 255)
         self.assertEqual(run.atoms[0].exponents, ((2, 300),))
 
@@ -111,6 +121,7 @@ class SieveCoverageTests(unittest.TestCase):
         base = build_factor_base(1022117, bound=100).factor_base
         polynomial = qs_polynomial(base)
         expected = reference_positions(polynomial, base, -128, 129, 500)
+
         for policy in ("adaptive", "conservative", "candidate"):
             for cutoff in (0, 8, 100):
                 worker = collector(
@@ -122,19 +133,26 @@ class SieveCoverageTests(unittest.TestCase):
                     small_prime_cutoff=cutoff,
                     block_width=17,
                 )
+
                 run = worker.collect(-128, 129)
+
                 self.assertEqual(signature(run), expected)
                 self.assertFalse(worker._resieved)
                 if policy == "adaptive":
                     self.assertGreater(run.stats["skipped_score_blocks"], 0)
+
         worker = collector(polynomial, base, division="resieve")
         worker.budget = Budget(work_limit=0)
+
         stopped = worker.collect(-128, 129)
+
         self.assertEqual(stopped.next_position, -128)
         self.assertFalse(stopped.atoms)
         worker.budget = unlimited_budget()
+
         resumed = worker.collect(stopped.next_position, 129)
         expected_small = reference_positions(polynomial, base, -128, 129, 97)
+
         self.assertEqual(signature(resumed), expected_small)
 
     def test_refined_thresholds_against_independent_oracle(self):
@@ -142,6 +160,7 @@ class SieveCoverageTests(unittest.TestCase):
         base = build_factor_base(10403, bound=40).factor_base
         polynomial = qs_polynomial(base)
         expected = reference_positions(polynomial, base, -128, 129, 97)
+
         for backend in ("list", "bytearray", "array"):
             for division in ("full", "roots", "bucket", "resieve"):
                 for cutoff in (0, 8, 100):
@@ -153,6 +172,7 @@ class SieveCoverageTests(unittest.TestCase):
                         division=division,
                         small_prime_cutoff=cutoff,
                     ).collect(-128, 129)
+
                     self.assertEqual(signature(result), expected)
                     if cutoff == 0:
                         self.assertGreater(
@@ -162,8 +182,10 @@ class SieveCoverageTests(unittest.TestCase):
     def test_roots_against_independent_enumeration(self):
         """Hit exclusion includes singular A, 2 and degenerate roots."""
         base = build_factor_base(10403, multiplier=9, bound=100).factor_base
+
         for polynomial in (qs_polynomial(base), Polynomial(10403, 9, 9, 0)):
             worker = collector(polynomial, base)
+
             for roots in worker._roots:
                 expected = {
                     x
@@ -181,6 +203,7 @@ class SieveCoverageTests(unittest.TestCase):
                     if roots.all_positions
                     else (set(roots.roots))
                 )
+
                 self.assertEqual(actual, expected)
 
     def test_resieving_powers_singular_roots_and_scratch_refusal(self):
@@ -188,6 +211,7 @@ class SieveCoverageTests(unittest.TestCase):
         b = 2**298 - 1
         polynomial = Polynomial(b * b, 1, 1, b)
         base = build_factor_base(b * b, bound=3).factor_base
+
         for policy in ("adaptive", "candidate"):
             run = collector(
                 polynomial,
@@ -196,17 +220,23 @@ class SieveCoverageTests(unittest.TestCase):
                 score_backend="bytearray",
                 score_policy=policy,
             ).collect(2, 3)
+
             self.assertEqual(run.atoms[0].exponents, ((2, 300),))
+
         base = build_factor_base(10403, multiplier=9, bound=100).factor_base
         polynomial = Polynomial(10403, 9, 9, 0)
         expected = reference_positions(polynomial, base, -71, 80, 97)
         worker = collector(polynomial, base, division="resieve")
+
         result = worker.collect(-71, 80)
+
         self.assertEqual(signature(result), expected)
         worker = collector(polynomial, base, division="resieve")
         # Fault-inject a nearly occupied reservation before candidate scratch.
         worker._workspace = worker.config.memory_bytes - 1
+
         result = worker.collect(-71, 80)
+
         self.assertEqual(result.reason, "memory_limit")
         self.assertEqual(result.next_position, -71)
         self.assertFalse(result.atoms)
@@ -216,6 +246,7 @@ class SieveCoverageTests(unittest.TestCase):
         base = build_factor_base(1022117, bound=100).factor_base
         polynomial = qs_polynomial(base)
         expected = reference_positions(polynomial, base, 0, 4097, 500)
+
         run = collector(
             polynomial,
             base,
@@ -223,6 +254,7 @@ class SieveCoverageTests(unittest.TestCase):
             residual_bound=500,
             memory_bytes=32 * 1024 * 1024,
         ).collect(0, 4097)
+
         self.assertEqual(run.reason, "complete")
         self.assertEqual(run.stats["blocks"], 17)
         self.assertEqual(run.next_position, 4097)
@@ -233,30 +265,41 @@ class SieveCoverageTests(unittest.TestCase):
         base = build_factor_base(101**2, bound=40).factor_base
         polynomial = qs_polynomial(base)
         worker = collector(polynomial, base)
+
         empty = worker.collect(-3, -3)
+
         self.assertEqual(empty.stats["scanned"], 0)
+
         zero = worker.collect(0, 1)
+
         self.assertEqual(zero.divisor, 101)
         self.assertEqual(zero.next_position, 1)
         self.assertEqual(zero.reason, "factor_found")
         base = build_factor_base(101 * 103, bound=40).factor_base
         worker = collector(qs_polynomial(base), base, residual_bound=500)
+
         run = worker.collect(-1, 0)
+
         self.assertEqual(run.divisor, 101)
 
     def test_composite_residual_and_lossy_threshold(self):
         """Extra thresholds lose yield only in explicitly lossy mode."""
         base = build_factor_base(10403, bound=100).factor_base
         polynomial = qs_polynomial(base)
+
         safe = collector(polynomial, base).collect(-128, 129)
+
         lossy = collector(polynomial, base, threshold_extra=1000).collect(
             -128, 129
         )
+
         self.assertGreater(len(safe.atoms), len(lossy.atoms))
         small_base = build_factor_base(9471, bound=3).factor_base
+
         composite = collector(
             Polynomial(9471, 1, 1, 100), small_base, residual_bound=1000
         ).collect(0, 1)
+
         self.assertGreater(composite.stats["composite_residuals"], 0)
 
 
@@ -276,7 +319,9 @@ class SieveStoreTests(unittest.TestCase):
             config=SieveConfig(max_partials=2, residual_bound=97),
             budget=unlimited_budget(),
         )
+
         run = worker.collect(-128, 129)
+
         self.assertEqual(run.reason, "complete")
         self.assertGreater(run.stats["evictions"], 0)
         self.assertGreater(len(run.combined_relations), 0)
@@ -292,6 +337,7 @@ class SieveStoreTests(unittest.TestCase):
             config=SieveConfig(max_partials=2, residual_bound=97),
             budget=unlimited_budget(),
         ).collect(-128, 129)
+
         self.assertEqual(run.atoms, other.atoms)
         self.assertEqual(run.stats, other.stats)
 
@@ -307,37 +353,47 @@ class SieveStoreTests(unittest.TestCase):
                 config=config,
                 budget=unlimited_budget(),
             )
+
             run = worker.collect(-128, 129)
+
             self.assertEqual(run.reason, reason)
             self.assertFalse(run.atoms)
             worker.config = replace(config, max_atoms=2048, max_relations=1024)
+
             resumed = worker.collect(run.next_position, 129)
+
             expected = collector(
                 self.polynomial,
                 self.base,
                 residual_bound=config.residual_bound,
             ).collect(run.next_position, 129)
+
             self.assertEqual(resumed.atoms, expected.atoms)
 
     def test_memory_refusal_and_zero_partial_cap(self):
         """Check storage before mutation and count dropped partials."""
         worker = collector(self.polynomial, self.base)
         worker.config = replace(worker.config, memory_bytes=worker._workspace)
+
         run = worker.collect(-128, 129)
+
         self.assertEqual(run.reason, "memory_limit")
         self.assertFalse(run.atoms)
+
         run = SieveCollector(
             self.polynomial,
             self.base,
             config=SieveConfig(max_partials=0, residual_bound=97),
             budget=unlimited_budget(),
         ).collect(-128, 129)
+
         self.assertGreater(run.stats["dropped_partials"], 0)
         self.assertTrue(all(atom.residual == 1 for atom in run.atoms))
 
     def test_budget_refusal_combination_and_resume(self):
         """Fault injection at combination leaves partner intact on retry."""
         worker = collector(self.polynomial, self.base)
+
         expected = collector(self.polynomial, self.base).collect(-128, 129)
         worker.budget.reason = "work_limit"
         with patch(
@@ -345,10 +401,13 @@ class SieveStoreTests(unittest.TestCase):
             side_effect=BudgetExhaustedError,
         ):
             run = worker.collect(-128, 129)
+
         self.assertEqual(run.reason, "work_limit")
         self.assertTrue(run.partial_ids)
         worker.budget = unlimited_budget()
+
         resumed = worker.collect(run.next_position, 129)
+
         self.assertEqual(resumed.atoms, expected.atoms)
         self.assertEqual(
             resumed.combined_relations, expected.combined_relations
@@ -364,7 +423,9 @@ class SieveStoreTests(unittest.TestCase):
         ):
             worker = collector(self.polynomial, self.base)
             worker.budget = budget
+
             run = worker.collect(-128, 129)
+
             self.assertEqual(run.reason, reason)
             self.assertEqual(run.next_position, -128)
             self.assertFalse(run.atoms)
@@ -378,6 +439,7 @@ class SieveStoreTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 worker.collect(-128, 129)
+
         self.assertFalse(worker._atoms)
         self.assertFalse(worker._pending)
         self.assertFalse(worker._combined)
@@ -385,8 +447,11 @@ class SieveStoreTests(unittest.TestCase):
     def test_duplicate_and_invalid_inputs(self):
         """Rescans cannot admit or combine a pinned atom twice."""
         worker = collector(self.polynomial, self.base)
+
         first = worker.collect(-128, 129)
+
         second = worker.collect(-128, 129)
+
         self.assertEqual(first.atoms, second.atoms)
         self.assertEqual(first.combined_relations, second.combined_relations)
         self.assertGreater(second.stats["duplicates"], 0)
@@ -398,6 +463,7 @@ class SieveStoreTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 SieveConfig(**options)
+
         with self.assertRaises(MemoryError):
             SieveCollector(
                 self.polynomial, self.base, config=SieveConfig(memory_bytes=0)

@@ -41,6 +41,7 @@ def affine_add(point, other, modulus, curve_a):
         denominator = 2 * y
     else:
         numerator, denominator = v - y, u - x
+
     slope = numerator * pow(denominator, -1, modulus) % modulus
     result_x = (slope * slope - curve_a - x - u) % modulus
     result_y = (slope * (x - result_x) - y) % modulus
@@ -67,6 +68,7 @@ class UtilityTests(unittest.TestCase):
         for prime in (2, 3, 5, 7, 11, 13, 17, 19):
             for exponent in range(1, 15):
                 bound = prime**exponent
+
                 self.assertEqual(utils.prime_power(prime, bound), bound)
                 if exponent > 1:
                     self.assertEqual(
@@ -83,9 +85,11 @@ class UtilityTests(unittest.TestCase):
         for a in range(-12, 13):
             for b in range(-12, 13):
                 divisor, x, y = utils.extended_gcd(a, b)
+
                 self.assertEqual(divisor, gcd(a, b))
                 self.assertEqual(a * x + b * y, divisor)
                 self.assertEqual(utils.xgcd(a, b), x)
+
         for modulus in (7, 60, 101, 1009):
             for value in range(1, 100):
                 if gcd(value, modulus) == 1:
@@ -132,6 +136,7 @@ class UtilityTests(unittest.TestCase):
             self.assertEqual(
                 utils.classify_prime(n), utils.Primality.COMPOSITE
             )
+
         self.assertEqual(
             utils.classify_prime(2**64 - 59), utils.Primality.PROVEN
         )
@@ -147,12 +152,15 @@ class UtilityTests(unittest.TestCase):
                 result = utils.classify_prime(
                     n, use_probabilistic=True, tolerance=rounds, rng=rng
                 )
+
                 self.assertEqual(result, utils.Primality.PROBABLE)
                 self.assertEqual(rng.calls, rounds)
+
         self.assertEqual(utils.classify_prime(29), utils.Primality.PROVEN)
 
     def test_primality_witness_stops_early(self):
         rng = SequenceRandom([2])
+
         self.assertEqual(
             utils.classify_prime(
                 1009 * 1013, use_probabilistic=True, tolerance=8, rng=rng
@@ -174,6 +182,7 @@ class SieveTests(unittest.TestCase):
     def test_small_endpoints_and_tiny_atkin(self):
         for hi in range(-3, 501):
             expected = reference_primes(hi)
+
             for sieve in (
                 prime_sieve.small_sieve,
                 prime_sieve.prime_sieve,
@@ -200,6 +209,7 @@ class SieveTests(unittest.TestCase):
     def test_random_intervals_and_tiny_segments(self):
         primes = reference_primes(2_000_001)
         generator = random.Random(7301)
+
         for index in range(300):
             lo = generator.randrange(0, 1_990_000)
             hi = lo + generator.randrange(0, 5000)
@@ -207,6 +217,7 @@ class SieveTests(unittest.TestCase):
             last = bisect_left(primes, hi)
             expected = primes[first:last]
             size = (1, 3, 16, 128, 65536)[index % 5]
+
             self.assertEqual(
                 prime_sieve.segmented_sieve(lo, hi, segment_size=size),
                 expected,
@@ -216,8 +227,10 @@ class SieveTests(unittest.TestCase):
         reference = reference_primes(3_500_002)
         for hi in (3_499_999, 3_500_000, 3_500_001, 3_500_002):
             expected = reference[: bisect_left(reference, hi)]
+
             self.assertEqual(prime_sieve.prime_sieve(hi), expected)
         actual = prime_sieve.sieve_of_atkin(3_500_001)
+
         self.assertEqual(
             actual, reference[: bisect_left(reference, 3_500_001)]
         )
@@ -245,6 +258,7 @@ class RhoTests(unittest.TestCase):
             max_evaluations=200,
             stats=stats,
         )
+
         self.assertTrue(utils.valid_divisor(divisor, 35))
         self.assertEqual(stats.attempts, 2)
         self.assertEqual(rng.calls, 4)
@@ -259,10 +273,12 @@ class RhoTests(unittest.TestCase):
             batch_size=34,
             stats=stats,
         )
+
         self.assertIsNone(result)
         self.assertEqual(stats.attempts, 3)
         self.assertLessEqual(stats.evaluations, 15)
         stats = pollard_rho.RhoStats()
+
         self.assertIsNone(
             pollard_rho.factorize_rho(
                 1009 * 1013,
@@ -291,6 +307,7 @@ class RhoTests(unittest.TestCase):
             recovery_limit=0,
             stats=stats,
         )
+
         self.assertIsNone(result)
         self.assertEqual(stats.saturated_batches, 1)
         self.assertEqual(stats.evaluations, 2)
@@ -326,6 +343,7 @@ class Pm1Tests(unittest.TestCase):
         primes = [p for p in primes if p > 10]
         residue = pow(2, 2520, n)
         expected = [(pow(residue, p, n) - 1) % n for p in primes]
+
         self.assertEqual(
             list(pollard_pm1._stage_two_terms(residue, n, primes)), expected
         )
@@ -364,6 +382,7 @@ class Pm1Tests(unittest.TestCase):
     def test_bounds_and_explicit_failure(self):
         for n in (1, 2, 3, 101):
             self.assertIsNone(pollard_pm1.factorize_pm1(n))
+
         self.assertIsNone(pollard_pm1.factorize_pm1(35, max_attempts=0))
         self.assertIsNone(
             pollard_pm1.factorize_pm1(1019 * 1237, b1=2, b2=2, max_attempts=1)
@@ -382,6 +401,7 @@ class EcmTests(unittest.TestCase):
 
     def test_setup_nonunit_and_singularity_branches(self):
         seen = set()
+
         for n in (9, 15, 21, 35, 77, 143, 1009 * 1013):
             for sigma in range(6, 60):
                 curve = ecm.setup_curve(n, sigma)
@@ -392,11 +412,14 @@ class EcmTests(unittest.TestCase):
                     seen.add("retry")
                 else:
                     x, z = curve.point
+
                     self.assertNotEqual((x, z), (0, 0))
                     self.assertEqual(gcd(z, n), 1)
                     curve_a = (4 * curve.a24 - 2) % n
+
                     self.assertEqual(gcd(curve_a * curve_a - 4, n), 1)
                     seen.add("curve")
+
         self.assertEqual(seen, {"factor", "retry", "curve"})
 
     def test_ladder_and_prac_fallback_against_affine_oracle(self):
@@ -404,10 +427,12 @@ class EcmTests(unittest.TestCase):
         point = (3, 293)
         a24 = (curve_a + 2) * pow(4, -1, modulus) % modulus
         expected = None
+
         for scalar in range(200):
             if scalar:
                 expected = affine_add(expected, point, modulus, curve_a)
             actual = ecm.scalar_multiply(scalar, point[0], 1, modulus, a24)
+
             self.assertNotEqual(actual, (0, 0), scalar)
             if expected is None:
                 self.assertEqual(actual[1], 0)
@@ -415,6 +440,7 @@ class EcmTests(unittest.TestCase):
                 self.assertEqual(
                     (actual[0] - expected[0] * actual[1]) % modulus, 0, scalar
                 )
+
             self.assertEqual(
                 ecm.multiply_prac(scalar, point[0], 1, modulus, a24), actual
             )
@@ -454,6 +480,7 @@ class EcmTests(unittest.TestCase):
             with patch.object(ecm, "scalar_multiply", return_value=(1, 10403)):
                 with patch.object(ecm, "stage_two") as continuation:
                     stats = ecm.EcmStats()
+
                     self.assertIsNone(
                         ecm.factorize_ecm(
                             10403, b1=10, b2=100, max_curves=2, stats=stats
@@ -471,6 +498,7 @@ class EcmTests(unittest.TestCase):
                     ecm, "stage_two", side_effect=[(None, True), (101, False)]
                 ):
                     stats = ecm.EcmStats()
+
                     self.assertEqual(
                         ecm.factorize_ecm(
                             10403, b1=10, b2=100, max_curves=2, stats=stats
@@ -511,15 +539,18 @@ class EcmTests(unittest.TestCase):
         point = ecm.scalar_multiply(
             ecm.stage_one_scalar(10), *setup.point, n, setup.a24
         )
+
         self.assertEqual(gcd(point[1], n), 1)
         primes = reference_primes(501)
         primes = [prime for prime in primes if prime > 10]
         divisor, _ = ecm.stage_two(point, n, setup.a24, 10, primes)
+
         self.assertEqual(divisor, 1013)
         direct = [
             gcd(ecm.scalar_multiply(prime, *point, n, setup.a24)[1], n)
             for prime in primes
         ]
+
         self.assertIn(1013, direct)
 
     def test_stage_two_terms_against_independent_field_oracle(self):
@@ -538,11 +569,13 @@ class EcmTests(unittest.TestCase):
             center = b1 if b1 % 2 else b1 - 1
             distance = min(isqrt(primes[-1]), (center - 1) // 2)
             step = 2 * distance
+
             for prime, term in zip(primes, terms):
                 while prime > center + step:
                     center += step
                 difference = prime - center
                 expected = multiples[center][0] == multiples[difference][0]
+
                 self.assertEqual(term == 0, expected, (b1, prime))
 
 
@@ -562,8 +595,10 @@ class FactorizationTests(unittest.TestCase):
                 factorize(n)
         for n in (1, -1, -15):
             result = factorize(n)
+
             self.assertEqual(result.reconstruct(), n)
             self.assertTrue(print_factorization(n, result))
+
         self.assertEqual(print_factorization(1, factorize(1)), "1 = 1")
 
     def test_huge_trial_division_no_float(self):
@@ -577,6 +612,7 @@ class FactorizationTests(unittest.TestCase):
             with patch("v2.factor.pollard_rho.factorize_rho", return_value=-1):
                 with patch("v2.factor.ecm.factorize_ecm", return_value=None):
                     result = factorize(n)
+
                     self.assertFalse(result.complete)
                     self.assertEqual(result.remaining, (cofactor,))
                     self.assertEqual(result.reconstruct(), n)
@@ -589,6 +625,7 @@ class FactorizationTests(unittest.TestCase):
                 "v2.factor.ecm.factorize_ecm", return_value=25013
             ) as call:
                 result = factorize(n)
+
                 call.assert_called_once()
                 self.assertTrue(result.complete)
                 self.assertEqual(result.reconstruct(), n)
@@ -600,6 +637,7 @@ class FactorizationTests(unittest.TestCase):
             ):
                 with patch("v2.factor.ecm.factorize_ecm", return_value=value):
                     result = factorize(10403, level=2)
+
                     self.assertEqual(result.remaining, (10403,))
                     self.assertEqual(result.reconstruct(), 10403)
 
@@ -610,12 +648,14 @@ class FactorizationTests(unittest.TestCase):
         ):
             with patch("v2.factor.ecm.factorize_ecm", return_value=None):
                 result = factorize(n, level=2)
+
                 self.assertEqual(result.remaining, (1013 * 1019,))
                 self.assertEqual(result.factors[0].value, 1009)
                 self.assertEqual(result.reconstruct(), n)
 
     def test_repeated_factor_multiplicities(self):
         n = 1009**3 * 1013**2
+
         result = factorize(n, seed=3)
         self.assertEqual(
             [(f.value, f.exponent) for f in result.factors],
@@ -625,6 +665,7 @@ class FactorizationTests(unittest.TestCase):
 
     def test_probable_is_not_proven(self):
         n = 2**127 - 1
+
         result = factorize(n, seed=1)
         self.assertTrue(result.complete)
         self.assertFalse(result.proven)
@@ -647,8 +688,11 @@ class FactorizationTests(unittest.TestCase):
     def test_preserved_baseline_hashes(self):
         root = Path(__file__).resolve().parents[2]
         manifest = json.loads(
-            (root / "v2/benchmarks/inputs/provenance.json").read_text()
+            (
+                root / "v2/benchmarks/inputs/controls/provenance.json"
+            ).read_text()
         )
+
         for name, expected in manifest["original_source_sha256"].items():
             self.assertEqual(
                 hashlib.sha256((root / "v1" / name).read_bytes()).hexdigest(),

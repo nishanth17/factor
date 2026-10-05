@@ -59,6 +59,7 @@ def pack_job(job):
                 else engine.extractor.next_dependency,
             ),
         )
+
     payload = dict(
         version=VERSION,
         n=job.n,
@@ -77,6 +78,7 @@ def pack_job(job):
         if size + 1024 > job.config.checkpoint_bytes:
             raise MemoryError("SSS checkpoint exceeds checkpoint_bytes")
         parts.append(part)
+
     blob = "".join(parts)
     resources = _checked_resources(
         dict(
@@ -135,6 +137,7 @@ def _restore_solver(engine, prefix, resources):
             matrix.rows[solver.next_row],
             matrix.masks[solver.next_row],
         )
+
     if _solver_digest(solver) != prefix["digest"]:
         raise ValueError("SSS elimination prefix mismatch")
     engine.prepared, engine.solver = prepared, solver
@@ -149,12 +152,15 @@ def _restore_solver(engine, prefix, resources):
             prepared, tuple(solver.dependencies), budget=budget
         )
         for mask in solver.dependencies[:index]:
+            # Recheck skipped trials so a forged cursor cannot hide a factor.
             trial = extract_dependency(prepared, mask, budget=budget)
             if trial.divisor is not None:
                 raise ValueError("SSS checkpoint skipped a proper factor")
             extractor.trials.append(trial)
+
         extractor.next_dependency = index
         engine.extractor = extractor
+
     engine._workspace_peak = max(
         engine._workspace_peak, live + matrix.workspace_bytes
     )
@@ -172,6 +178,7 @@ def restore_job(checkpoint, *, budget, config=None):
         "resources_sha256",
     }:
         raise ValueError("invalid SSS checkpoint envelope")
+
     if type(checkpoint["version"]) is not int or (
         checkpoint["version"] not in (1, VERSION)
     ):
@@ -183,6 +190,7 @@ def restore_job(checkpoint, *, budget, config=None):
         or (len(blob.encode()) > MAX_BLOB_BYTES)
     ):
         raise ValueError("SSS checkpoint exceeds its hard byte cap")
+
     if hashlib.sha256(blob.encode()).hexdigest() != checkpoint["sha256"]:
         raise ValueError("SSS checkpoint integrity mismatch")
     resources = _checked_resources(checkpoint["resources"])
@@ -194,11 +202,13 @@ def restore_job(checkpoint, *, budget, config=None):
         or payload["version"] != checkpoint["version"]
     ):
         raise ValueError("invalid SSS checkpoint payload version")
+
     if payload["version"] >= 2 and payload["store"] is not None:
         if not isinstance(payload["store"], dict) or (
             "row_order" not in payload["store"]
         ):
             raise ValueError("mixed-order checkpoint lacks row_order")
+
     values = dict(payload["config"])
     values["collector"] = SieveConfig(**values["collector"])
     saved_config = SSSConfig(**values)
@@ -219,6 +229,7 @@ def restore_job(checkpoint, *, budget, config=None):
         or budget.cpu_used < resources["cpu_used"]
     ):
         raise ValueError("resume must retain consumed resources")
+
     budget.consume(0)
     job = SSSJob(
         payload["n"], seed=payload["seed"], config=config, budget=budget
@@ -237,6 +248,7 @@ def restore_job(checkpoint, *, budget, config=None):
         ):
             raise ValueError("SSS checkpoint store has no engine")
         return job
+
     if job.divisor is not None or job._setup_memory_refused:
         raise ValueError("finished SSS checkpoint retains an active engine")
     job._setup()
@@ -256,6 +268,7 @@ def restore_job(checkpoint, *, budget, config=None):
         if value > limit:
             raise ValueError("SSS checkpoint progress exceeds its bound")
         setattr(engine, name, value)
+
     collector._last_stop = engine.next_position
     for name in ("final_solve_done", "storage_solve_done"):
         if type(saved[name]) is not bool:
@@ -271,6 +284,7 @@ def restore_job(checkpoint, *, budget, config=None):
         "memory_limit",
     ) or (engine.storage_solve_done and engine.storage_reason is None):
         raise ValueError("invalid SSS storage stop")
+
     stats = saved["stats"]
     required = {
         "filter_calls",
@@ -300,6 +314,7 @@ def restore_job(checkpoint, *, budget, config=None):
                 or value < 0
             ):
                 raise ValueError("invalid SSS stage duration")
+
     engine.stats = stats
     peak = utils.require_integer(saved["workspace_peak"], "workspace peak", 0)
     if peak > engine.config.memory_bytes:
@@ -320,6 +335,7 @@ def restore_job(checkpoint, *, budget, config=None):
         if cursor > len(collector._assignment):
             raise ValueError("SSS candidate cursor exceeds its assignment")
         collector._cursor = cursor
+
     if saved["solver"] is not None:
         _restore_solver(engine, saved["solver"], resources)
     return job

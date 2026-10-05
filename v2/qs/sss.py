@@ -109,6 +109,7 @@ def collision_candidates(
     position %= modulus
     remaining_roots = roots[small_count:]
     inverses = []
+
     # Each unpublished metadata chunk has at most 64 primes. Reserve the
     # identical logical work once, then keep invariant arithmetic in locals.
     for start in range(0, len(remaining_roots), 64):
@@ -120,7 +121,9 @@ def collision_candidates(
             )
         )
         inverses.extend(pow(modulus, -1, r.prime) for r in chunk)
+
     candidates, seen = [], set()
+
     for changed in selected:
         entry = roots[changed]
         if len(entry.roots) != 2:
@@ -131,6 +134,7 @@ def collision_candidates(
             + coefficients[changed] * (entry.roots[1] - entry.roots[0])
         ) % modulus
         affine = []
+
         for start in range(0, len(remaining_roots), 64):
             end = start + 64
             chunk = remaining_roots[start:end]
@@ -150,12 +154,14 @@ def collision_candidates(
                 elif len(shifts) > 2:
                     shifts = tuple(dict.fromkeys(shifts))
                 affine.append(shifts)
+
         for dropped in (None,) + selected:
             if dropped == changed:
                 continue
             prime = 1 if dropped is None else roots[dropped].prime
             step = modulus // prime
             counts = {}
+
             for start in range(0, len(remaining_roots), 64):
                 end = start + 64
                 chunk = remaining_roots[start:end]
@@ -169,7 +175,9 @@ def collision_candidates(
                         counts[residue] = counts.get(residue, 0) + 1
                         negative = residue - entry.prime
                         counts[negative] = counts.get(negative, 0) + 1
+
             shifts = sorted(counts)
+
             for start in range(0, len(shifts), 64):
                 end = start + 64
                 chunk = shifts[start:end]
@@ -190,6 +198,7 @@ def collision_candidates(
                         )
                     candidates.append((argument, abs(value) // step))
                     seen.add(argument)
+
     return tuple(candidates)
 
 
@@ -262,12 +271,15 @@ class SSSCollector(SieveCollector):
         small_primes = tuple(r.prime for r in self._roots[: self.small_count])
         small_product = prod(small_primes)
         coefficients = []
+
         for prime in small_primes:
             self.budget.consume(
                 small_product.bit_length() + prime.bit_length() ** 2
             )
             quotient = small_product // prime
+            # The CRT coefficient is one at this prime and zero at the rest.
             coefficients.append(quotient * pow(quotient, -1, prime))
+
         self.coefficients = tuple(coefficients)
         cut = max(1, count // self.search.filter_divisor)
         self.batch = self._batch(factor_base.primes)
@@ -337,9 +349,11 @@ class SSSCollector(SieveCollector):
             second = self.batch.residuals(tuple(first[i] for i in eligible))
             residuals = dict(zip(eligible, second))
             stats["filter_rejections"] += len(values) - len(eligible)
+
         if residuals is None:
             residuals = dict(enumerate(self.batch.residuals(values)))
         admissible, value_index = [], 0
+
         for position, value in candidates:
             if value == 0:
                 admissible.append(position)
@@ -349,6 +363,7 @@ class SSSCollector(SieveCollector):
             ):
                 admissible.append(position)
             value_index += 1
+
         stats["generated_candidates"] += len(candidates)
         stats["tree_rejections"] += len(candidates) - len(admissible)
         self._assignment, self._cursor, self._round = (
@@ -386,6 +401,7 @@ class SSSCollector(SieveCollector):
             0,
         )
         index, divisor, reason = lo, None, "complete"
+
         try:
             while index < hi:
                 if self._assignment is None:
@@ -398,11 +414,13 @@ class SSSCollector(SieveCollector):
                         if refusal:
                             reason = refusal
                             break
+
                     self._cursor += 1
                     stats["scanned"] += 1
                     if divisor is not None:
                         reason = "factor_found"
                         break
+
                 if reason != "complete":
                     break
                 self._assignment, self._round = None, None
@@ -412,6 +430,7 @@ class SSSCollector(SieveCollector):
             reason = self.budget.reason
         except MemoryError:
             reason = "memory_limit"
+
         self._last_stop = index
         return SieveResult(
             tuple(self._atoms.values()),
@@ -521,6 +540,7 @@ class SSSJob:
                     0,
                     {"work_used": self.budget.used},
                 )
+
             if self.pipeline is None and self.divisor is None:
                 self._setup()
             if self.divisor is not None:
@@ -531,6 +551,7 @@ class SSSJob:
                     0,
                     {"work_used": self.budget.used},
                 )
+
             self.pipeline.budget = self.budget
             result = self.pipeline.run(batch_limit=batch_limit)
             result.stats["workspace_bytes"] = (
@@ -544,6 +565,7 @@ class SSSJob:
         except MemoryError:
             reason = "memory_limit"
             self._setup_memory_refused = self.pipeline is None
+
         position = self.pipeline.next_position if self.pipeline else 0
         stats = dict(self.pipeline.stats) if self.pipeline else {}
         stats["work_used"] = self.budget.used

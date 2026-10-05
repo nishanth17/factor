@@ -69,8 +69,9 @@ def run(args):
             lambda value: value is None
             or utils.valid_divisor(value, 1000000000039 * 1000000000061),
         )
+
     corpus_bytes = (
-        Path(__file__).parent / "inputs/phase_two_corpus.json"
+        Path(__file__).parent / "inputs/corpora/phase_two_corpus.json"
     ).read_bytes()
     corpus = json.loads(corpus_bytes)
     fixtures = [
@@ -107,6 +108,7 @@ def run(args):
                 factor.value: factor.exponent for factor in run.result.factors
             } != dict(fixture["factors"]):
                 return False
+
         return len(runs) == len(fixtures) * len(seeds)
 
     candidates = {"v2_native": lambda: portfolio_runs(config)}
@@ -173,6 +175,7 @@ def run(args):
                 for value in values
             ),
         )
+
     for hi in (1000, 10000, 200000):
         expected = _reference_primes(hi)
         plain = SieveContext(hi, segment_size=4096)
@@ -196,6 +199,7 @@ def run(args):
             },
             lambda values, expected=expected: list(values) == expected,
         )
+
     expected = _reference_primes(10000)
     context = SieveContext(10000, segment_size=4096)
     cache = ScheduleCache(context, cache_bytes=100000)
@@ -234,6 +238,7 @@ def run(args):
         )
     finally:
         cache_path.unlink()
+
     # Full factoring control: useful primes are consumed by actual ECM stages.
     factor_cases = [1009 * 1013, 1009 * 1000003, 1019 * 10007]
 

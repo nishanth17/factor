@@ -27,12 +27,16 @@ class CheckpointMaskTests(unittest.TestCase):
             workspace_bytes=8 * 1024**2,
         )
         solver = DependencySolver(matrix, budget=allowance())
+
         dependencies = solver.run()
+
         self.assertEqual(dependencies, ((3 << (count - 2)),))
         digest = _solver_digest(solver, encoding="hex-v1")
+
         self.assertEqual(len(digest), 64)
         self.assertEqual(digest, _solver_digest(solver, encoding="hex-v1"))
         solver.xors += 1
+
         self.assertNotEqual(digest, _solver_digest(solver, encoding="hex-v1"))
         with self.assertRaises(ValueError):
             _solver_digest(solver, encoding="unknown")
@@ -68,6 +72,7 @@ class CheckpointMaskTests(unittest.TestCase):
                 encode(state), sort_keys=True, separators=(",", ":")
             ).encode()
         ).hexdigest()
+
         self.assertEqual(_solver_digest(solver, encoding="hex-v1"), expected)
 
     def test_legacy_decimal_solver_prefix_remains_readable(self):
@@ -77,19 +82,24 @@ class CheckpointMaskTests(unittest.TestCase):
             side_effect=BudgetExhaustedError("work_limit"),
         ):
             job.budget.reason = "work_limit"
+
             self.assertEqual(job.run().reason, "work_limit")
+
         checkpoint = job.checkpoint()
         legacy_digest = _solver_digest(job.engine.solver)
 
         def legacy(payload):
             prefix = payload["engine"]["solver"]
+
             self.assertEqual(prefix.pop("digest_encoding"), "hex-v1")
             prefix["digest"] = legacy_digest
 
         restored = SIQSJob.from_checkpoint(
             mutate(checkpoint, legacy), budget=allowance()
         )
+
         result = restored.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
         with self.assertRaises(ValueError):

@@ -26,6 +26,7 @@ def prime_power_roots(
         initial = tuple(range(prime))
 
     modulus, current = prime, initial
+
     while current and modulus <= maximum:
         if lo is not None:
             budget.consume(len(current) * (modulus.bit_length() + 1))
@@ -36,10 +37,12 @@ def prime_power_roots(
             )
             if not current:
                 break
+
         yield modulus, current, log
         if modulus > maximum // prime:
             break
         lifted = []
+
         for root in current:
             budget.consume(
                 polynomial.n_prime.bit_length() + 4 * modulus.bit_length() + 1
@@ -71,6 +74,7 @@ def prime_power_roots(
                     # This universal remaining allowance can overestimate.
                     yield prime, initial, maximum.bit_length() * log
                     return
+
                 lifted.extend(
                     root + modulus * offset for offset in range(prime)
                 )

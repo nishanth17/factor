@@ -7,10 +7,12 @@ MANTISSA_UNIT = 1 << MANTISSA_BITS
 
 def _exact_bounds(value):
     """Bound 32*log2(value) using a finite integer power."""
+    # Only powers of two have an integral score and need no upward rounding.
     lower = (value**SCORE_SCALE).bit_length() - 1
     return lower, lower + bool(value & (value - 1))
 
 
+# Pay for small mantissa powers once; large candidate norms use table lookups.
 _MANTISSA = tuple(
     _exact_bounds(value)
     for value in range(MANTISSA_UNIT, 2 * MANTISSA_UNIT + 1)
@@ -31,6 +33,7 @@ def log_bounds(value):
         return _exact_bounds(value)
     mantissa = value >> shift
     lower, upper = _MANTISSA[mantissa - MANTISSA_UNIT]
+    # Discarded bits put the value inside the bin, below its next endpoint.
     if value != mantissa << shift:
         upper = _MANTISSA[mantissa + 1 - MANTISSA_UNIT][1]
     return SCORE_SCALE * shift + lower, SCORE_SCALE * shift + upper

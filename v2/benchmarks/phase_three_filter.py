@@ -93,6 +93,7 @@ def main():
                     )
                 )
                 samples = []
+
                 for index in range(9):
                     row = run_one(
                         fixture,
@@ -105,11 +106,13 @@ def main():
                     record(row)
                     samples.append(row)
                     rows.append(row)
+
                 if not stability(samples)["stable"]:
                     began = time.perf_counter()
                     while time.perf_counter() - began < 5:
                         run_one(fixture, 7, config, "siqs")
                     samples = []
+
                     for index in range(15):
                         row = run_one(
                             fixture,
@@ -122,7 +125,9 @@ def main():
                         record(row)
                         samples.append(row)
                         rows.append(row)
+
                 repeats[label] = stability(samples)
+
         fixture = next(
             row
             for row in corpus["fixtures"]
@@ -132,6 +137,7 @@ def main():
         encoded = args.checkpoint.read_bytes()
         checkpoint = json.loads(encoded)
         parent_sha = hashlib.sha256(encoded).hexdigest()
+
         for ceiling in (2400, 3600):
             row = run_one(
                 fixture,
@@ -154,11 +160,13 @@ def main():
                 "work_limit",
             ):
                 break
+
             metadata = row["checkpoint"]
             encoded = (args.output.parent / metadata["path"]).read_bytes()
             parent_sha = hashlib.sha256(encoded).hexdigest()
             assert parent_sha == metadata["sha256"]
             checkpoint = json.loads(encoded)
+
         result = dict(
             corpus_sha256=frozen["corpus_sha256"],
             frozen_sha256=hashlib.sha256(args.frozen.read_bytes()).hexdigest(),
@@ -182,6 +190,7 @@ def main():
         assert environment()["source_sha256"] == source["source_sha256"]
         with args.output.open("x") as stream:
             json.dump(result, stream, indent=2)
+
     print("Filtering acceptance complete", flush=True)
 
 

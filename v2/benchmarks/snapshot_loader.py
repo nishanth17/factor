@@ -15,13 +15,14 @@ def load_snapshot(path=None):
     """
     if path is None:
         path = Path(__file__).resolve().parents[1] / "benchmarks"
-        path /= "inputs/m8_source_snapshot.json"
+        path /= "inputs/baselines/m8_source_snapshot.json"
     data = json.loads(Path(path).read_text())
     name = "_factor_m8"
     package = types.ModuleType(name)
     package.__path__ = []
     package.__package__ = name
     sys.modules[name] = package
+
     for module_name in (
         "__init__",
         "constants",
@@ -44,9 +45,11 @@ def load_snapshot(path=None):
             module.__package__ = name
             sys.modules[qualified] = module
             setattr(package, module_name, module)
+
         # The virtual filename identifies the captured source in tracebacks.
         module.__file__ = str(Path(path).parent / f"M8:{module_name}.py")
         exec(compile(source, module.__file__, "exec"), module.__dict__)
+
     return package
 
 
@@ -58,7 +61,7 @@ def load_stage_jobs():
     the current implementation without replacing immutable baseline code.
     """
     root = Path(__file__).resolve().parents[1]
-    path = root / "benchmarks/inputs/m12_source_snapshot.json"
+    path = root / "benchmarks/inputs/baselines/m12_source_snapshot.json"
     data = json.loads(path.read_text())
     for name, source in data["sources"].items():
         expected = data["source_sha256"][name]
@@ -71,6 +74,7 @@ def load_stage_jobs():
     package.__path__ = []
     package.__package__ = package_name
     sys.modules[package_name] = package
+
     for name in (
         "constants",
         "utils",
@@ -90,4 +94,5 @@ def load_stage_jobs():
             compile(data["sources"][name], module.__file__, "exec"),
             module.__dict__,
         )
+
     return package.stage_jobs

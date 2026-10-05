@@ -47,6 +47,7 @@ def supervise(args):
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
     failure = None
+
     try:
         while process.poll() is None:
             if time.monotonic() - started >= args.wall_limit:
@@ -63,6 +64,7 @@ def supervise(args):
                     break
                 failure = "cannot enforce the upstream RSS limit"
                 break
+
             peak = max(peak, int(reading.stdout.strip()) * 1024)
             if peak > args.rss_limit_mib * 1024 * 1024:
                 failure = "upstream child exceeds the external RSS limit"
@@ -72,6 +74,7 @@ def supervise(args):
         if process.poll() is None:
             process.kill()
         stdout, stderr = process.communicate()
+
     if failure or process.returncode:
         raise RuntimeError(
             failure or f"upstream child failed: {stderr[-2048:]}"
@@ -99,11 +102,14 @@ class OutputCheck(io.TextIOBase):
         matches = re.findall(
             r"Proper factors found: (\d+) \| (\d+)", self.tail
         )
+
         if matches:
             left, right = map(int, matches[-1])
+
             if not 1 < left < self.n or left * right != self.n:
                 raise AssertionError("upstream output is not a proper split")
             self.divisor = left
+
         matches = re.findall(r"SSS finished: (\d+) relations found", self.tail)
         if matches:
             self.relations = int(matches[-1])
@@ -125,6 +131,7 @@ def run_one(module, fixture, seed, filtered):
         except SystemExit as error:
             reason = "upstream_exit"
             output.write(str(error))
+
     factors = (
         sorted((output.divisor, fixture["n"] // output.divisor))
         if (output.divisor is not None)
@@ -153,6 +160,7 @@ def main():
         11,
     ):
         raise RuntimeError("upstream comparison requires PyPy Python 3.11")
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -178,6 +186,7 @@ def main():
         or args.limit_inputs <= 0
     ):
         parser.error("require validated samples and positive finite limits")
+
     if not args.worker:
         supervise(args)
         return
@@ -190,10 +199,13 @@ def main():
             != expected
         ):
             raise ValueError("modified upstream source: " + name)
+
     import gmpy2
     import sympy
 
-    corpus_path = Path(__file__).parent / "inputs/phase_three_p34_corpus.json"
+    corpus_path = (
+        Path(__file__).parent / "inputs/corpora/phase_three_p34_corpus.json"
+    )
     corpus = json.loads(corpus_path.read_text())
     verify_certificates(corpus["certificates"])
     fixtures = [
@@ -217,6 +229,7 @@ def main():
         ]
 
     attempts = []
+
     for attempt in range(3):
         started, calls = time.perf_counter(), 0
         while time.perf_counter() - started < max(
@@ -224,8 +237,10 @@ def main():
         ):
             cohort()
             calls += 1
+
         warmup = time.perf_counter() - started
         samples = []
+
         for _ in range(max(args.repetitions, 9 if attempt == 0 else 15)):
             wall, cpu = time.perf_counter(), time.process_time()
             rows = cohort()
@@ -236,6 +251,7 @@ def main():
                     rows=rows,
                 )
             )
+
         times = [sample["seconds"] for sample in samples]
         median = statistics.median(times)
         q1, _, q3 = statistics.quantiles(times, n=4)
@@ -257,6 +273,7 @@ def main():
         )
         if stable:
             break
+
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     peak = int(peak if sys.platform == "darwin" else peak * 1024)
     result = dict(

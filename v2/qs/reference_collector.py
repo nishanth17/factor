@@ -64,6 +64,7 @@ def collect_block(
         factor_base.multiplier,
     ):
         raise ValueError("polynomial and factor-base identity mismatch")
+
     budget = budget if budget is not None else Budget()
     relations, zero_positions = [], []
     position, reason, divisor = lo, "complete", None
@@ -78,6 +79,7 @@ def collect_block(
     )
     workspace = factor_base.workspace_bytes + 8192 + 8 * value_bits
     primes = factor_base.primes
+
     try:
         while position < hi:
             if len(relations) >= max_relations:
@@ -106,6 +108,7 @@ def collect_block(
 
             remaining = abs(value) // (polynomial.square_coefficient**2)
             exponents = []
+
             for prime in primes:
                 exponent = 0
                 while remaining % prime == 0:
@@ -141,10 +144,12 @@ def collect_block(
                     break
                 relations.append(atom)
                 workspace += reserve
+
             position += 1
 
     except BudgetExhaustedError:
         reason = budget.reason
+
     return CollectionResult(
         tuple(relations),
         divisor,

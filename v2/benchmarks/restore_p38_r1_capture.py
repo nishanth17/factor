@@ -19,7 +19,7 @@ def main():
     if args.destination.exists():
         parser.error("destination must not already exist")
     data = json.loads(
-        (HERE / "inputs/p38_r1_measured_sources.json").read_text()
+        (HERE / "inputs/baselines/p38_r1_measured_sources.json").read_text()
     )
     if data["schema"] != 1 or len(data["source"]) > 128:
         raise ValueError("invalid measured-source manifest")
@@ -36,11 +36,13 @@ def main():
             or not parts[-1].endswith(".py")
         ):
             raise ValueError("invalid measured-source path")
+
         if (
             hashlib.sha256(content.encode()).hexdigest()
             != data["source_sha256"][name]
         ):
             raise ValueError("corrupt measured source")
+
     for name, content in data["source"].items():
         output = args.destination / name
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -52,7 +54,16 @@ def main():
         "p38_r1_baseline.json",
     ):
         shutil.copyfile(
-            HERE / "inputs" / name,
+            HERE
+            / "inputs"
+            / (
+                "corpora"
+                if "corpus" in name
+                else "controls"
+                if "frozen" in name
+                else "baselines"
+            )
+            / name,
             args.destination / "v2/benchmarks" / name,
         )
 

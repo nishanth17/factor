@@ -117,6 +117,7 @@ def scalar_multiply(scalar, px, pz, n, a24):
     # Q and R remain adjacent multiples, so their difference is always P.
     qx, qz = px, pz
     rx, rz = point_double(px, pz, n, a24)
+
     for bit in bin(scalar)[3:]:
         if bit == "1":
             qx, qz = point_add(rx, rz, qx, qz, px, pz, n)
@@ -124,6 +125,7 @@ def scalar_multiply(scalar, px, pz, n, a24):
         else:
             rx, rz = point_add(qx, qz, rx, rz, px, pz, n)
             qx, qz = point_double(qx, qz, n, a24)
+
     return qx, qz
 
 
@@ -173,6 +175,7 @@ def _stage_two_terms(point, n, a24, b1, primes):
     step = 2 * distance
     giant = scalar_multiply(center, px, pz, n, a24)
     previous = scalar_multiply(center - step, px, pz, n, a24)
+
     for prime in primes:
         while prime > center + step:
             previous, giant = (
@@ -180,6 +183,7 @@ def _stage_two_terms(point, n, a24, b1, primes):
                 point_add(*giant, *baby_steps[distance], *previous, n),
             )
             center += step
+
         index = (prime - center) // 2
         bx, bz = baby_steps[index]
         # Cross multiplication avoids affine conversion or another inversion.
@@ -191,6 +195,7 @@ def stage_two(point, n, a24, b1, primes, batch_size=constants.GCD_BATCH_SIZE):
     if not primes:
         return None, False
     terms = []
+
     for term in _stage_two_terms(point, n, a24, b1, primes):
         terms.append(term)
         if len(terms) == batch_size:
@@ -198,6 +203,8 @@ def stage_two(point, n, a24, b1, primes, batch_size=constants.GCD_BATCH_SIZE):
             if divisor is not None or saturated:
                 return divisor, saturated
             terms.clear()
+
+    # The trailing partial batch still belongs to the inclusive B2 schedule.
     return utils.batch_factor(terms, n) if terms else (None, False)
 
 
@@ -239,6 +246,7 @@ def factorize_ecm(
     scalar = stage_one_scalar(b1)
     work = stats if stats is not None else EcmStats()
     stage_two_primes = None
+
     for _ in range(max_curves):
         work.curves += 1
         sigma = generator.randint(6, constants.MAX_RANDOM_ECM)
@@ -271,4 +279,5 @@ def factorize_ecm(
             work.stage_two_saturations += 1
         if utils.valid_divisor(divisor, n):
             return divisor
+
     return None

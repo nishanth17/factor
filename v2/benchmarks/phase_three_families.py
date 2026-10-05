@@ -41,6 +41,7 @@ def full_steps(base, primes, budget):
     a = prod(primes)
     entries = {entry.prime: entry for entry in base.entries}
     terms = []
+
     for prime in primes:
         budget.consume(a.bit_length() + prime.bit_length() ** 2)
         quotient = a // prime
@@ -50,6 +51,7 @@ def full_steps(base, primes, budget):
             * entries[prime].square_roots[0]
             % a
         )
+
     for index in range(1 << (len(primes) - 1)):
         budget.consume(
             (len(base.entries) + len(terms) + 1)
@@ -113,6 +115,7 @@ def attempt_cohort(cached):
     polynomials, serialize full jobs, or integrate the production dispatcher.
     """
     output = []
+
     for fixture in _corpus(SEED, 16):
         budget = _budget()
         n = fixture["n"]
@@ -127,8 +130,10 @@ def attempt_cohort(cached):
             memory_bytes=MEMORY_BYTES,
         )
         found = None
+
         for primes in assignments:
             steps = cached_steps if cached else full_steps
+
             for polynomial, roots in steps(base, primes, budget):
                 collector = partial(SieveCollector, precomputed_roots=roots)
                 # Both arms supply independently validated roots to the same
@@ -152,6 +157,7 @@ def attempt_cohort(cached):
                     collector_class=collector,
                     weight_two=True,
                 )
+
                 result = job.run()
                 if result.divisor is not None:
                     found = sorted((result.divisor, result.cofactor))
@@ -161,8 +167,10 @@ def attempt_cohort(cached):
                         for p in found
                     )
                     break
+
             if found is not None:
                 break
+
         output.append(
             {
                 "n": n,
@@ -176,6 +184,7 @@ def attempt_cohort(cached):
             }
         )
         assert prod(output[-1]["factors"]) * output[-1]["remaining"] == n
+
     return output
 
 
@@ -200,6 +209,7 @@ def main():
             )
         )
         return
+
     if (
         args.output.exists()
         or not math.isfinite(args.warmup_seconds)
@@ -207,12 +217,14 @@ def main():
         or args.repetitions < 9
     ):
         parser.error("use a new capture, three-second warmup and nine samples")
+
     measured_environment = environment()
     expected_roots = root_utility(False)
     assert root_utility(True) == expected_roots
     expected_attempts = attempt_cohort(False)
     assert attempt_cohort(True) == expected_attempts
     results = []
+
     for cached in (False, True):
         name = "cached" if cached else "full"
         results.append(
@@ -231,11 +243,14 @@ def main():
                 args,
             )
         )
+
     cold = []
+
     for name in ("full", "cached"):
         for _ in range(9):
             start = time.perf_counter()
             prior = resource.getrusage(resource.RUSAGE_CHILDREN)
+
             child = subprocess.run(
                 [
                     sys.executable,
@@ -263,6 +278,7 @@ def main():
                 - prior.ru_stime,
             )
             cold.append(value)
+
     assert (
         measured_environment["source_sha256"] == environment()["source_sha256"]
     )

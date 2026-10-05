@@ -30,6 +30,7 @@ class R2CollectorTests(unittest.TestCase):
             4096,
             64 * 2**20,
         )
+
         self.assertEqual(config.residual_bound, 97)
         self.assertEqual(config.max_atoms, 4096)
         self.assertEqual(config.memory_bytes, 64 * 2**20)
@@ -53,6 +54,7 @@ class R2CollectorTests(unittest.TestCase):
         with patch.object(Polynomial, "value", side_effect=AssertionError):
             with self.assertRaises(BudgetExhaustedError):
                 worker._set_plan_interval(0, 1)
+
         self.assertIsNone(worker._plan_window)
 
     def test_experimental_tiny_batch_and_chunks_preserve_exact_coverage(self):
@@ -63,6 +65,7 @@ class R2CollectorTests(unittest.TestCase):
         polynomial = Polynomial(10403, 1, 49, 8)
         expected = reference_positions(polynomial, base, -71, 80, 97)
         work = {}
+
         for variant in ("current", "tiny", "batch", "chunks"):
             budget = unlimited_budget()
             cls = experiment_collector(sieve_collector, variant)
@@ -81,7 +84,9 @@ class R2CollectorTests(unittest.TestCase):
                 ),
                 budget=budget,
             )
+
             result = worker.collect(-71, 80)
+
             self.assertEqual(result.reason, "complete")
             self.assertEqual(signature(result), expected)
             if variant == "tiny":
@@ -89,6 +94,7 @@ class R2CollectorTests(unittest.TestCase):
             if variant == "batch":
                 self.assertGreater(result.stats["tree_calls"], 0)
             work[variant] = budget.used
+
         self.assertEqual(work["current"], work["chunks"])
 
     def test_fixed_score_bounds_against_independent_integer_powers(self):
@@ -99,9 +105,11 @@ class R2CollectorTests(unittest.TestCase):
         for value in values:
             lower, upper = log_bounds(value)
             powered = value**SCORE_SCALE
+
             self.assertLessEqual(1 << lower, powered)
             self.assertLessEqual(powered, 1 << upper)
             self.assertLessEqual(upper - lower, 2)
+
         with self.assertRaises(ValueError):
             log_bounds(0)
 
@@ -121,6 +129,7 @@ class R2CollectorTests(unittest.TestCase):
         )
         polynomial = Polynomial(3**12, 1, 1, 0)
         expected = reference_positions(polynomial, base, -512, 513, 97)
+
         for backend in ("list", "array", "bytearray"):
             worker = SieveCollector(
                 polynomial,
@@ -139,16 +148,20 @@ class R2CollectorTests(unittest.TestCase):
                 ),
                 budget=unlimited_budget(),
             )
+
             result = worker.collect(-512, 513)
+
             self.assertEqual(result.reason, "complete")
             self.assertEqual(signature(result), expected)
             self.assertGreater(result.stats["plan_replays"], 0)
 
     def test_independent_full_division_coverage_all_backends_and_tails(self):
         base = build_factor_base(10403, bound=100).factor_base
+
         for a, b in ((1, 102), (7, 1), (49, 8)):
             polynomial = Polynomial(10403, 1, a, b)
             expected = reference_positions(polynomial, base, -71, 80, 97)
+
             for policy in ("powers", "fixed"):
                 for cap in (0, 256, 2**20):
                     for backend in ("list", "array", "bytearray"):
@@ -172,7 +185,9 @@ class R2CollectorTests(unittest.TestCase):
                                     ),
                                     budget=unlimited_budget(),
                                 )
+
                                 result = worker.collect(-71, 80)
+
                                 self.assertEqual(result.reason, "complete")
                                 self.assertEqual(signature(result), expected)
                                 self.assertLessEqual(
@@ -197,9 +212,12 @@ class R2CollectorTests(unittest.TestCase):
             ),
             budget=unlimited_budget(),
         )
+
         first = worker.collect(-20, 20)
+
         self.assertGreater(first.stats["plan_replays"], 0)
         worker.collect(47, 81)
+
         self.assertEqual(worker._plan_window[:2], (47, 81))
         polynomial = Polynomial(10403, 1, 7, 1)
         roots = tuple(
@@ -209,12 +227,14 @@ class R2CollectorTests(unittest.TestCase):
             for entry in base.entries
         )
         worker.set_polynomial(polynomial, roots)
+
         self.assertEqual(worker._power_plans, {})
         self.assertIsNone(worker._plan_window)
 
     def test_work_and_cancellation_preserve_uncommitted_position(self):
         base = build_factor_base(10403, bound=100).factor_base
         polynomial = Polynomial(10403, 1, 7, 1)
+
         for policy in ("powers", "fixed"):
             budget = unlimited_budget()
             worker = SieveCollector(
@@ -232,18 +252,24 @@ class R2CollectorTests(unittest.TestCase):
                 budget=budget,
             )
             budget.work_limit = budget.used
+
             paused = worker.collect(-71, 80)
+
             self.assertEqual(paused.reason, "work_limit")
             self.assertEqual(paused.next_position, -71)
             self.assertEqual(paused.atoms, ())
             self.assertLessEqual(budget.used, budget.work_limit)
             budget.work_limit = 10**12
             budget.cancelled = lambda: True
+
             cancelled = worker.collect(paused.next_position, 80)
+
             self.assertEqual(cancelled.reason, "cancelled")
             self.assertEqual(cancelled.next_position, -71)
             budget.cancelled = None
+
             complete = worker.collect(cancelled.next_position, 80)
+
             self.assertEqual(
                 signature(complete),
                 reference_positions(polynomial, base, -71, 80, 97),
@@ -263,6 +289,7 @@ class R2CollectorTests(unittest.TestCase):
             budget=unlimited_budget(),
         )
         worker._add((0,), 2**40, {})
+
         self.assertEqual(worker._scores[0], 2**32 - 1)
         self.assertEqual(worker._clip_threshold(2**40), 2**32 - 1)
         with self.assertRaises(MemoryError):
@@ -276,6 +303,7 @@ class R2CollectorTests(unittest.TestCase):
                 ),
                 budget=unlimited_budget(),
             )
+
         with self.assertRaises(ValueError):
             replace(config, power_plan_bytes=16 * 2**20 + 1)
 
@@ -299,18 +327,24 @@ class R2CollectorTests(unittest.TestCase):
             ),
         )
         job = SIQSJob(n, config=config, budget=unlimited_budget())
+
         paused = job.run(max_blocks=1)
+
         self.assertIsNone(paused.divisor)
         self.assertTrue(job.engine.collector._power_plans)
         saved = job.checkpoint()
+
         restored = SIQSJob.from_checkpoint(saved, budget=unlimited_budget())
+
         self.assertEqual(restored.engine.collector._power_plans, {})
         self.assertEqual(restored.config.collector.power_plan_bytes, 2**20)
         self.assertEqual(
             restored.engine.next_position, job.engine.next_position
         )
         used = restored.budget.used
+
         result = restored.run()
+
         self.assertGreater(restored.budget.used, used)
         self.assertIsNotNone(result.divisor)
         self.assertEqual(result.divisor * result.cofactor, n)

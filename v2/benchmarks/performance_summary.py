@@ -36,8 +36,10 @@ def summarize(before, after):
     identities = sorted({key[0] for key in old_rows})
     by_input = {}
     complete = True
+
     for identity in identities:
         pairs = []
+
         for source in (old_rows, new_rows):
             groups = [v for k, v in source.items() if k[0] == identity]
             complete &= all(r["completed"] for g in groups for r in g)
@@ -53,7 +55,9 @@ def summarize(before, after):
                     ),
                 )
             )
+
         by_input[identity] = pairs
+
     rng = random.Random(361042026)
     cohorts = (
         itertools.product(identities, repeat=len(identities))
@@ -61,6 +65,7 @@ def summarize(before, after):
         else (rng.choices(identities, k=len(identities)) for _ in range(10000))
     )
     ratios, deltas = [], []
+
     for cohort in cohorts:
         deltas.append(
             statistics.mean(
@@ -73,6 +78,7 @@ def summarize(before, after):
                 sum(by_input[i][1]["seconds"] for i in cohort)
                 / sum(by_input[i][0]["seconds"] for i in cohort)
             )
+
     timing_ratios = []
     if complete:
         for _ in range(10000):

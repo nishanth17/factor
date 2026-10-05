@@ -32,12 +32,14 @@ class PollingTests(unittest.TestCase):
         budget.consume(2)
         with self.assertRaises(BudgetExhaustedError):
             budget.consume(2)
+
         self.assertEqual(original.used, 2)
         original.work_limit = 10
         budget.consume()
         original.cancelled = lambda: True
         with self.assertRaises(BudgetExhaustedError):
             budget.consume(0)
+
         self.assertEqual(original.used, 3)
         self.assertEqual(original.reason, "cancelled")
 
@@ -56,6 +58,7 @@ class PollingTests(unittest.TestCase):
             budget.consume(7)
         with self.assertRaises(BudgetExhaustedError):
             budget.consume(7)
+
         self.assertEqual(original.used, 64 * 7)
         self.assertEqual(calls, 2)
         for value in (True, -1, 1.5):
@@ -68,6 +71,7 @@ class PollingTests(unittest.TestCase):
 class PreprocessingRepairTests(unittest.TestCase):
     def test_small_prime_screens_never_reject_actual_powers(self):
         generator = random.Random(36102026)
+
         for exponent, modulus in _POWER_MODULI.items():
             self.assertTrue(
                 all(modulus % d for d in range(2, isqrt(modulus) + 1))
@@ -80,14 +84,17 @@ class PreprocessingRepairTests(unittest.TestCase):
             for _ in range(20):
                 base = generator.getrandbits(128)
                 value = base**exponent
+
                 self.assertTrue(power_residue_possible(value, exponent))
                 for neighbor in (value - 1, value + 1):
                     if not power_residue_possible(neighbor, exponent):
                         root = integer_root(neighbor, exponent)
+
                         self.assertNotEqual(root**exponent, neighbor)
 
     def test_cursor_segments_match_independent_trial_division(self):
         context = SieveContext(300, segment_size=16)
+
         for lo in range(-3, 250):
             for width in (0, 1, 2, 15, 32):
                 hi = lo + width
@@ -96,12 +103,16 @@ class PreprocessingRepairTests(unittest.TestCase):
                     for n in range(max(lo, 2), hi)
                     if all(n % p for p in range(2, isqrt(n) + 1))
                 ]
+
                 self.assertEqual(context.prime_segment(lo, hi), expected)
+
         iterator = context.primes(2, 100)
+
         self.assertEqual(next(iterator), 2)
         with self.assertRaises(RuntimeError):
             context.prime_segment(2, 10)
         iterator.close()
+
         self.assertEqual(context.prime_segment(2, 10), [2, 3, 5, 7])
 
     def test_cursor_segments_preserve_wide_endpoints(self):
@@ -117,6 +128,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
     def test_wide_labels_fit_without_changing_lifted_kernels(self):
         high = 1 << 99999
         rows = high, high, 1, 1
+
         for weight_two in (False, True):
             matrix = filter_matrix(
                 rows,
@@ -124,6 +136,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
                 budget=allowance(),
                 memory_bytes=2**20,
             )
+
             self.assertIs(matrix.original_rows, rows)
             self.assertEqual(matrix.stats["working_columns"], 2)
             for pivot in ("highest", "lowest"):
@@ -133,10 +146,13 @@ class SparseMatrixRepairTests(unittest.TestCase):
                 span = {0}
                 for mask in masks:
                     span |= {value ^ mask for value in tuple(span)}
+
                 self.assertEqual(span, {0, 3, 12, 15})
+
         budget = allowance()
         with self.assertRaises(MemoryError):
             filter_matrix(rows, budget=budget, memory_bytes=1)
+
         self.assertEqual(budget.used, 0)
 
 
@@ -162,10 +178,12 @@ class PreparationReuseTests(unittest.TestCase):
 
         first, first_work = prepare()
         second, second_work = prepare()
+
         self.assertEqual(first, second)
         self.assertEqual(cache.hits, len(first.relations))
         self.assertLess(second_work, first_work)
         hits = cache.hits
+
         self.assertEqual(prepare(base=replace(fixture.base))[0], first)
         self.assertEqual(cache.hits, hits)
 
@@ -179,8 +197,10 @@ class PreparationReuseTests(unittest.TestCase):
         del altered[identity]
         with self.assertRaises(ValueError):
             prepare(store=altered)
+
         self.assertLessEqual(cache.used, cache.memory_bytes)
         cache.clear()
+
         self.assertFalse(cache.records)
         self.assertEqual(cache.used, 0)
 
@@ -193,6 +213,7 @@ class PreparationReuseTests(unittest.TestCase):
         fixture = ExtractionTests()
         fixture.setUp()
         relation = fixture.run.full_relations[0]
+
         for cap in (0, 4096):
             cache = _VerificationCache(cap)
             with self.assertRaises(ValueError):
@@ -203,14 +224,17 @@ class PreparationReuseTests(unittest.TestCase):
                     allowance(),
                     2**20,
                 )
+
             with self.assertRaises(BudgetExhaustedError):
                 cache.check(
                     relation, fixture.base, fixture.store, allowance(0), 2**20
                 )
+
             self.assertFalse(cache.records)
             cache.check(
                 relation, fixture.base, fixture.store, allowance(), 2**20
             )
+
             self.assertLessEqual(cache.used, cap)
 
 
@@ -221,9 +245,11 @@ class CollisionRepairTests(unittest.TestCase):
         from v2.tests.test_sss import search_collector
 
         original = SSSCollector.__init__
+
         try:
             apply_revert("sssf_trees")
             collector = search_collector(mode="sssf", filter_divisor=2)
+
             self.assertEqual(
                 collector.batch.radical, prod(collector.factor_base.primes)
             )
@@ -240,9 +266,11 @@ class CollisionRepairTests(unittest.TestCase):
             )
             primes = collector.factor_base.primes
             cut = max(1, len(primes) // divisor)
+
             for index in range(8):
                 candidates = collector.assignment(index)
                 expected = []
+
                 for position, value in candidates:
                     if not value:
                         expected.append(position)
@@ -253,12 +281,14 @@ class CollisionRepairTests(unittest.TestCase):
                         collector.config.residual_bound
                     ):
                         expected.append(position)
+
                 stats = dict(
                     filter_rejections=0,
                     generated_candidates=0,
                     tree_rejections=0,
                 )
                 collector._prepare(index, stats)
+
                 self.assertEqual(collector._assignment, tuple(expected))
 
     def test_assignment_order_and_work_match_the_immutable_control(self):
@@ -282,6 +312,7 @@ class CollisionRepairTests(unittest.TestCase):
         )
         control = namespace["collision_candidates"]
         collector = search_collector()
+
         for index in range(32):
             collector.budget = allowance()
             current = collector.assignment(index)
@@ -289,8 +320,10 @@ class CollisionRepairTests(unittest.TestCase):
             collector.budget = allowance()
             with patch.object(sss, "collision_candidates", control):
                 expected = collector.assignment(index)
+
             self.assertEqual(current, expected)
             self.assertEqual(work, collector.budget.used)
+
         roots = list(collector._roots)
         entry = roots[collector.small_count]
         roots[collector.small_count] = replace(
@@ -303,6 +336,7 @@ class CollisionRepairTests(unittest.TestCase):
             (0, 1, 2),
             collector.coefficients,
         )
+
         self.assertEqual(
             sss.collision_candidates(*arguments, budget=allowance()),
             control(*arguments, budget=allowance()),
@@ -316,6 +350,7 @@ class ChunkedWorkerTests(unittest.TestCase):
         )
         job.run(max_assignments=1, fixed_work=True)
         original = job.config
+
         for changes in (
             dict(batch_width=64),
             dict(max_batch_atoms=64),
@@ -325,9 +360,11 @@ class ChunkedWorkerTests(unittest.TestCase):
             for action in (job.checkpoint, job.run):
                 with self.assertRaises(ValueError):
                     action()
+
         job.config = replace(
             original, assignment_work=20_000_000, poll_interval=1
         )
+
         self.assertEqual(
             job.run(max_assignments=1, fixed_work=True).reason, "paused"
         )
@@ -347,6 +384,7 @@ class ChunkedWorkerTests(unittest.TestCase):
         )
         job._setup()
         job._memory(4)
+
         self.assertLess(job.stats["peak_owned_bytes"], config.memory_bytes)
         dense_atom = 4096 + 256 * len(job.base.entries)
         dense_atom += 128 * (
@@ -359,8 +397,11 @@ class ChunkedWorkerTests(unittest.TestCase):
             + 3 * 256 * dense_atom
             + job.base.workspace_bytes
         )
+
         self.assertGreater(dense_owned, config.memory_bytes)
+
         result = job.run(max_assignments=1, fixed_work=True)
+
         self.assertEqual(result.reason, "paused")
         from v2.qs.relations import verify_atomic
 
@@ -385,10 +426,12 @@ class ChunkedWorkerTests(unittest.TestCase):
 
         with patch.object(DependencySolver, "run", pause):
             result = job.run(fixed_work=True)
+
         self.assertEqual(result.reason, "work_limit")
         self.assertIsNotNone(job.engine.solver)
         self.assertIs(job.engine.solver.budget, job.budget)
         job.budget.work_limit = 10**12
+
         self.assertEqual(job.run(fixed_work=True).reason, "factor_found")
 
     def configuration(self, **options):
@@ -408,12 +451,15 @@ class ChunkedWorkerTests(unittest.TestCase):
             config=replace(config, batch_width=0),
             budget=allowance(),
         )
+
         self.assertEqual(coarse.run(fixed_work=True).reason, "batch_limit")
         expected = None
+
         for mode, workers in (("serial", 1), ("thread", 2), ("process", 2)):
             job = ParallelSIQSJob(coarse.n, config=config, budget=allowance())
             with CollectionPool(mode, workers) as pool:
                 result = job.run(pool=pool, fixed_work=True)
+
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual(result.divisor * result.cofactor, job.n)
             self.assertEqual(
@@ -433,6 +479,7 @@ class ChunkedWorkerTests(unittest.TestCase):
                 job.run(pool=pool, max_assignments=3, fixed_work=True).reason,
                 "paused",
             )
+
         restored = ParallelSIQSJob.from_checkpoint(
             json.loads(json.dumps(job.checkpoint())), budget=allowance()
         )
@@ -442,6 +489,7 @@ class ChunkedWorkerTests(unittest.TestCase):
             job.n, config=config, budget=allowance()
         )
         uninterrupted.run(fixed_work=True)
+
         self.assertTrue(result.stats["schedule_complete"])
         self.assertEqual(
             restored.engine.collector._atoms,
@@ -465,11 +513,13 @@ class ChunkedWorkerTests(unittest.TestCase):
         ]
         for job in jobs:
             job.run(max_assignments=2, fixed_work=True)
+
         self.assertEqual(jobs[0].budget.used, jobs[1].budget.used)
         self.assertEqual(
             jobs[0].engine.collector._atoms, jobs[1].engine.collector._atoms
         )
         checkpoint = jobs[0].checkpoint()
+
         for change in (
             lambda p: p.update(version=True),
             lambda p: p.update(next_assignment=0),
@@ -478,12 +528,16 @@ class ChunkedWorkerTests(unittest.TestCase):
                 ParallelSIQSJob.from_checkpoint(
                     mutate(checkpoint, change), budget=allowance()
                 )
+
         original = jobs[0].budget
         original.work_limit = original.used
+
         result = jobs[0].run(fixed_work=True)
+
         self.assertEqual(result.reason, "work_limit")
         self.assertEqual(result.cofactor, jobs[0].n)
         original.work_limit = 10**12
+
         self.assertEqual(jobs[0].run(fixed_work=True).reason, "factor_found")
 
 

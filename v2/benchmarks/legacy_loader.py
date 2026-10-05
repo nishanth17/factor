@@ -52,6 +52,7 @@ def load_legacy(root=None):
         root = Path(__file__).resolve().parents[2] / "v1"
     fixer = RefactoringTool(get_fixers_from_package("lib2to3.fixes"))
     modules = {}
+
     for name in (
         "constants",
         "utils",
@@ -74,4 +75,5 @@ def load_legacy(root=None):
         if name == "utils":
             module.gcd = math.gcd
         modules[name] = module
+
     return modules

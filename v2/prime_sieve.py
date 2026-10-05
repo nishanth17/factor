@@ -308,6 +308,7 @@ def small_sieve(hi):
     size = 2 * (hi // 6) + int(hi % 6 > 1)
     flags = bytearray(b"\x01") * size
     flags[0] = 0  # The first wheel slot is 1, not a prime.
+
     for index in range(1, isqrt(hi - 1) // 3 + 1):
         if flags[index]:
             prime = (3 * index + 1) | 1
@@ -321,6 +322,7 @@ def small_sieve(hi):
                 if start < size:
                     count = (size - 1 - start) // step + 1
                     flags[start::step] = b"\x00" * count
+
     return [2, 3] + [
         (3 * index + 1) | 1 for index in range(1, size) if flags[index]
     ]
@@ -342,10 +344,12 @@ def segmented_sieve(lo, hi, *, segment_size=constants.LOWER_SEGMENT_SIZE):
     result = [2] if lo <= 2 < hi else []
     # Index i represents left+2*i. A stride of p skips even multiples.
     start = max(lo, 3) | 1
+
     for left in range(start, hi, 2 * segment_size):
         right = min(hi, left + 2 * segment_size)
         size = (right - left + 1) // 2
         flags = bytearray(b"\x01") * size
+
         for prime in base_primes[1:]:
             if prime * prime >= right:
                 break
@@ -356,7 +360,9 @@ def segmented_sieve(lo, hi, *, segment_size=constants.LOWER_SEGMENT_SIZE):
             if index < size:
                 count = (size - 1 - index) // prime + 1
                 flags[index::prime] = b"\x00" * count
+
         result.extend(left + 2 * i for i in range(size) if flags[i])
+
     return result
 
 
@@ -408,12 +414,14 @@ def _enumerate_quadratic_3(residue, f, g, start, width, rows):
     """Toggle 3*x²-y²=60*k+d; preserve signed k seeds and require y<x."""
     x, y0, end = f, g, start + width
     k0 = (3 * f * f - g * g - residue) // 60
+
     while True:
         while k0 >= end:
             if x <= y0:
                 return
             k0 -= y0 + 15
             y0 += 30
+
         k, y = k0, y0
         while k >= start and y < x:
             rows[residue][(k - start) >> 5] ^= 1 << ((k - start) & 31)
@@ -433,11 +441,13 @@ def sieve_of_atkin(hi):
     base_primes = small_sieve(root + 1)
     block_size = 60 * root
     last_k = (hi - 1) // 60
+
     for start in range(1, last_k + 1, block_size):
         width = min(block_size, last_k - start + 1)
         rows = {
             residue: [0] * ((width + 31) // 32) for residue in ATKIN_RESIDUES
         }
+
         for table, enumerate_points in (
             (DFG_1, _enumerate_quadratic_1),
             (DFG_2, _enumerate_quadratic_2),
@@ -445,6 +455,7 @@ def sieve_of_atkin(hi):
         ):
             for residue, f, g in table:
                 enumerate_points(residue, f, g, start, width, rows)
+
         for prime in base_primes:
             if prime < 7:
                 continue
@@ -455,14 +466,17 @@ def sieve_of_atkin(hi):
                 offset = -(60 * start + residue) * inverse % square
                 for index in range(offset, width, square):
                     rows[residue][index >> 5] &= ~(1 << (index & 31))
+
         for index in range(width):
             scaled = 60 * (start + index)
+
             for residue in ATKIN_RESIDUES:
                 candidate = scaled + residue
                 if candidate >= hi:
                     return result
                 if rows[residue][index >> 5] & (1 << (index & 31)):
                     result.append(candidate)
+
     return result
 
 

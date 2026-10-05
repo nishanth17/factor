@@ -74,6 +74,7 @@ class SieveConfig:
             utils.require_integer(value, name, minimum)
             if value > maximum:
                 raise ValueError(f"{name} exceeds the collector limit")
+
         utils.require_integer(self.memory_bytes, "memory_bytes", 0)
         checked_residual_bound(self.residual_bound)
         if self.score_backend not in ("list", "bytearray", "array"):
@@ -140,6 +141,7 @@ class SieveCollector:
             factor_base.multiplier,
         ):
             raise ValueError("polynomial and factor-base identity mismatch")
+
         count = len(factor_base.entries)
         # Include roots, Python object overhead, score integers, hit bitsets,
         # candidate temporaries, and two bounded translation slices. Account
@@ -155,6 +157,7 @@ class SieveCollector:
                 128 + 4 * (MAX_COEFFICIENT_BITS + 2 * MAX_POSITION_BITS + 4)
             )
             self._workspace += 512 * count
+
         if self._workspace > self.config.memory_bytes:
             raise MemoryError("collector setup exceeds memory_bytes")
         if precomputed_roots is not None:
@@ -167,6 +170,7 @@ class SieveCollector:
             [],
             [],
         )
+
         for index, entry in enumerate(factor_base.entries):
             self.budget.consume(polynomial.a.bit_length() + 1)
             exponent = 0
@@ -187,6 +191,7 @@ class SieveCollector:
                 if self.config.score_policy == "fixed"
                 else (entry.prime - 1).bit_length()
             )
+
         if remaining != 1:
             raise ValueError("A must factor completely over the factor base")
         self._roots, self._logs = tuple(roots), tuple(logs)
@@ -206,6 +211,7 @@ class SieveCollector:
             self._scores = array("I", [0]) * width
         else:
             self._scores = [0] * width
+
         self._hits = [0] * width
         self._resieved = {}
         self._scratch_bytes = 0
@@ -240,6 +246,7 @@ class SieveCollector:
             polynomial, self.factor_base, roots, budget=self.budget
         )
         remaining, exponents = polynomial.supported_a, []
+
         for entry in self.factor_base.entries:
             self.budget.consume(polynomial.a.bit_length() + 1)
             exponent = 0
@@ -247,6 +254,7 @@ class SieveCollector:
                 remaining //= entry.prime
                 exponent += 1
             exponents.append(exponent)
+
         if remaining != 1:
             raise ValueError("A must factor completely over the factor base")
         self._switch_peak = max(
@@ -263,6 +271,7 @@ class SieveCollector:
             self._full.clear()
             self._combined.clear()
             self._rows.clear()
+
         self.polynomial, self._roots = polynomial, roots
         self._a_exponents = tuple(exponents)
         self._a_support = tuple(
@@ -289,6 +298,7 @@ class SieveCollector:
             if index not in self._power_plans:
                 window_lo, window_hi, window_maximum = self._plan_window
                 plan, reserve = [], 256
+
                 for mark in prime_power_roots(
                     self.polynomial,
                     roots,
@@ -312,17 +322,21 @@ class SieveCollector:
                 else:
                     if self._plan_bytes + reserve <= cap:
                         self.budget.consume(len(plan) + 1)
+                        # Only a complete lift sequence may enter the cache;
+                        # a truncated prefix could miss higher valuations.
                         self._power_plans[index] = tuple(plan)
                         self._plan_bytes += reserve
                         stats["plan_builds"] += 1
                     else:
                         self._plan_refused.add(index)
                         stats["plan_refusals"] += 1
+
             if index in self._power_plans:
                 plan = self._power_plans[index]
                 self.budget.consume(len(plan) + 1)
                 stats["plan_replays"] += 1
                 return plan
+
         return prime_power_roots(
             self.polynomial,
             roots,
@@ -344,6 +358,8 @@ class SieveCollector:
         )
         self.budget.consume(4 * (coefficient_bits + 2 * bits + 3))
         key = lo, hi, self._bounds(lo, hi)[1]
+        # Lift depth and hit coverage depend on the whole interval. Reusing
+        # a narrower window's plan could drop newly eligible prime powers.
         if key != self._plan_window:
             self._power_plans.clear()
             self._plan_refused.clear()
@@ -392,6 +408,7 @@ class SieveCollector:
         smooth contribution. No Hensel depth cutoff can lose high powers.
         """
         weights = []
+
         for entry, log in zip(self.factor_base.entries, self._logs):
             self.budget.consume(maximum.bit_length() + 1)
             exponent, power = 0, entry.prime
@@ -399,6 +416,7 @@ class SieveCollector:
                 exponent += 1
                 power *= entry.prime
             weights.append(exponent * log)
+
         return weights
 
     def _add(self, indices, weight, stats):
@@ -452,6 +470,7 @@ class SieveCollector:
                 stats.get("skipped_score_blocks", 0) + 1
             )
             return 0
+
         powers = self.config.score_policy in ("powers", "fixed")
         weights = self._logs if powers else self._weights(maximum)
         omitted = 0
@@ -459,6 +478,7 @@ class SieveCollector:
             self.config.marking == "bucket" or self.config.division == "bucket"
         )
         chunk = self.config.metadata_chunk
+
         for start in range(0, len(self._roots), chunk):
             for index in range(start, min(start + chunk, len(self._roots))):
                 roots, weight = self._roots[index], weights[index]
@@ -471,6 +491,7 @@ class SieveCollector:
                     omitted += (
                         weight * maximum.bit_length() if powers else weight
                     )
+
                 if powers and not skipped:
                     first_level = True
                     marks = (
@@ -487,6 +508,7 @@ class SieveCollector:
                             inverses=self._lift_inverses,
                         )
                     )
+
                     for modulus, lifted, power_weight in marks:
                         for root in lifted:
                             hits = range((root - lo) % modulus, width, modulus)
@@ -496,12 +518,17 @@ class SieveCollector:
                                 if buckets:
                                     for hit in hits:
                                         self._hits[hit] |= 1 << index
+
                             stats["power_hits"] += len(hits)
                             self._add(hits, power_weight, stats)
+
                         first_level = False
+
                     continue
+
                 residues = (0,) if roots.all_positions else roots.roots
                 step = 1 if roots.all_positions else prime
+
                 for root in residues:
                     offset = (root - lo) % step
                     hits = range(offset, width, step)
@@ -515,9 +542,11 @@ class SieveCollector:
                     if self.config.marking == "sparse" and step >= width:
                         hits = (offset,) if offset < width else ()
                     self._add(hits, weight, stats)
+
         if not powers and self.config.marking == "bucket":
             for offset in range(width):
                 bits = self._hits[offset]
+
                 while bits:
                     bit = bits & -bits
                     index = bit.bit_length() - 1
@@ -526,7 +555,9 @@ class SieveCollector:
                         >= self.config.small_prime_cutoff
                     ):
                         self._add((offset,), weights[index], stats)
+
                     bits ^= bit
+
         # log2 |F| - log2 residual <= log2 factor-base part. Lower-bound
         # the first term and upper-bound the second; omitted primes get a
         # proved universal allowance. Positive extra deliberately loses it.
@@ -564,17 +595,21 @@ class SieveCollector:
         else:
             threshold = abs(value).bit_length() - 1
             threshold -= (self.config.residual_bound - 1).bit_length()
+
         if self.config.score_policy in ("powers", "fixed") and self._skipped:
             remaining, allowance = abs(value), 0
+
             for index in self._skipped:
                 self.budget.consume(remaining.bit_length() + 1)
                 prime, log = self._roots[index].prime, self._logs[index]
                 while remaining and remaining % prime == 0:
                     remaining //= prime
                     allowance += log
+
             threshold -= allowance
         else:
             threshold -= self._omitted_allowance
+
         threshold = max(0, threshold + self.config.threshold_extra)
         if self.config.score_backend != "list":
             threshold = self._clip_threshold(threshold)
@@ -599,6 +634,7 @@ class SieveCollector:
             + max(1, maximum).bit_length()
         )
         product, support = 1, 0
+
         for entry in self.factor_base.entries:
             self.budget.consume(
                 product.bit_length() + entry.prime.bit_length()
@@ -607,6 +643,7 @@ class SieveCollector:
             if product.bit_length() > bits:
                 break
             support += 1
+
         scratch = (hi - lo) * (1024 + 128 * support + 4 * maximum.bit_length())
         if self._workspace + scratch > self.config.memory_bytes:
             return False
@@ -614,6 +651,7 @@ class SieveCollector:
         self._scratch_peak_bytes = max(self._scratch_peak_bytes, scratch)
 
         values, remaining, recovered = {}, {}, {}
+
         for offset in range(hi - lo):
             if self._scores[offset] >= threshold:
                 self.budget.consume(self.polynomial.n_prime.bit_length() + 1)
@@ -632,6 +670,7 @@ class SieveCollector:
             prime = roots.prime
             residues = (0,) if roots.all_positions else roots.roots
             step = 1 if roots.all_positions else prime
+
             for root in residues:
                 for offset in range((root - lo) % step, hi - lo, step):
                     if offset not in values or remaining[offset] == 0:
@@ -673,10 +712,12 @@ class SieveCollector:
                     stats.get("refined_rejections", 0) + 1
                 )
                 return None, None
+
             value, remaining, exponents = self._resieved[offset]
         else:
             value = self.polynomial.value(position)
             remaining, exponents = abs(value), []
+
         self.budget.consume(abs(value).bit_length() + 2)
         stats["candidates"] += 1
         if value == 0:
@@ -687,11 +728,13 @@ class SieveCollector:
             return None, divisor if utils.valid_divisor(
                 divisor, self.factor_base.n
             ) else None
+
         if not self._candidate_passes(value, offset):
             stats["refined_rejections"] = (
                 stats.get("refined_rejections", 0) + 1
             )
             return None, None
+
         if self.config.division == "resieve":
             indices = ()
         elif self.config.division == "bucket":
@@ -705,8 +748,10 @@ class SieveCollector:
                 bits ^= bit
         else:
             indices = range(len(self._roots))
+
         self.budget.consume(len(indices) * (abs(value).bit_length() + 1))
         roots_to_divide = ((index, self._roots[index]) for index in indices)
+
         for index, roots in roots_to_divide:
             prime = roots.prime
             if self.config.division == "full":
@@ -715,6 +760,7 @@ class SieveCollector:
                 hit = bool(self._hits[offset] & (1 << index))
             else:
                 hit = roots.all_positions or position % prime in roots.roots
+
             exponent = self._a_exponents[index]
             if hit:
                 stats["division_primes"] += 1
@@ -722,8 +768,10 @@ class SieveCollector:
                     remaining //= prime
                     exponent += 1
                     stats["division_steps"] += 1
+
             if exponent:
                 exponents.append((prime, exponent))
+
         if remaining > self.config.residual_bound:
             return None, None
         self.budget.consume(remaining.bit_length() ** 2)
@@ -732,6 +780,7 @@ class SieveCollector:
         ):
             stats["composite_residuals"] += 1
             return None, None
+
         atom = AtomicRelation(
             self.polynomial,
             position,
@@ -752,6 +801,7 @@ class SieveCollector:
                 return atom, divisor
             if divisor != 1:
                 raise ValueError("nonunit residual has no proper split")
+
         return atom, None
 
     def _admit(self, atom, stats):
@@ -778,12 +828,14 @@ class SieveCollector:
                 return None
             if len(self._pending) >= self.config.max_partials:
                 evicted = next(iter(self._pending.values()))
+
         released = self._atom_bytes[evicted] if evicted else 0
         if (
             len(self._atoms) + 1 - int(evicted is not None)
             > self.config.max_atoms
         ):
             return "atom_limit"
+
         reserve = 4096 + 256 * len(atom.exponents)
         reserve += 16 * (
             abs(atom.position).bit_length()
@@ -804,6 +856,7 @@ class SieveCollector:
                 )
                 - self.factor_base.workspace_bytes
             )
+
         if (
             self._workspace
             + self._scratch_bytes
@@ -813,6 +866,7 @@ class SieveCollector:
             > self.config.memory_bytes
         ):
             return "memory_limit"
+
         combination = None
         if partner is not None:
             self._scratch_peak_bytes = max(
@@ -828,12 +882,14 @@ class SieveCollector:
                 raise ArithmeticError(
                     "previously checked unit residual changed"
                 )
+
         self.budget.consume(len(atom.exponents) + 1)
         if evicted:
             del self._pending[self._atoms[evicted].residual]
             del self._atoms[evicted]
             del self._atom_bytes[evicted]
             stats["evictions"] += 1
+
         self._atoms[atom.relation_id] = atom
         self._atom_bytes[atom.relation_id] = reserve
         self._workspace += reserve - released
@@ -848,6 +904,7 @@ class SieveCollector:
             stats["matches"] += 1
         else:
             self._pending[atom.residual] = atom.relation_id
+
         return None
 
     def collect(self, lo, hi):
@@ -888,6 +945,7 @@ class SieveCollector:
         )
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
+
         try:
             if (
                 self.config.power_plan_bytes
@@ -899,6 +957,7 @@ class SieveCollector:
                 )
             ):
                 self._set_plan_interval(lo, hi)
+
             while position < hi:
                 block_lo = position
                 block_hi = min(hi, block_lo + self.config.block_width)
@@ -919,6 +978,7 @@ class SieveCollector:
                             stats["scanned"] += 1
                             reason = "factor_found"
                             break
+
                         if atom is not None:
                             refusal = self._admit(atom, stats)
                             if refusal:
@@ -926,12 +986,15 @@ class SieveCollector:
                                 break
                     else:
                         self.budget.consume()
+
                     position += 1
                     stats["scanned"] += 1
+
                 if reason != "complete":
                     break
         except BudgetExhaustedError:
             reason = self.budget.reason
+
         if stats["blocks"] == 0:
             stats["threshold_min"] = 0
         self._resieved.clear()

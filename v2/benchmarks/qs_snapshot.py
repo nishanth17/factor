@@ -7,7 +7,7 @@ import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SNAPSHOT = ROOT / "benchmarks/inputs/m25_p33_before_sources.json"
+SNAPSHOT = ROOT / "benchmarks/inputs/baselines/m25_p33_before_sources.json"
 
 
 def load_qs_arm(name, changes=()):
@@ -24,12 +24,14 @@ def load_qs_arm(name, changes=()):
         changes.update(("qs.factor_base", "qs.polynomial", "qs.relations"))
     data = json.loads(SNAPSHOT.read_text())
     sources = data["sources"]
+
     for module_name, source in sources.items():
         if (
             hashlib.sha256(source.encode()).hexdigest()
             != (data["source_sha256"][module_name])
         ):
             raise ValueError("corrupt owned QS source snapshot")
+
     package = types.ModuleType(name)
     package.__path__ = []
     package.__package__ = name
@@ -58,8 +60,10 @@ def load_qs_arm(name, changes=()):
             sys.modules[qualified] = module
             parent_name, _, child_name = qualified.rpartition(".")
             setattr(sys.modules[parent_name], child_name, module)
+
         module.__file__ = (
             str(path if current else SNAPSHOT) + ":" + module_name
         )
         exec(compile(source, module.__file__, "exec"), module.__dict__)
+
     return package

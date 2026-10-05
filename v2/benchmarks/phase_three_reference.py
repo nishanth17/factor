@@ -30,7 +30,9 @@ from .phase_one import environment
 
 CORPUS_SEED = 20261003
 ROOT = Path(__file__).resolve().parents[2]
-BASELINE = ROOT / "v2/benchmarks/inputs/phase_two_m17_frozen_baseline.json"
+BASELINE = (
+    ROOT / "v2/benchmarks/inputs/controls/phase_two_m17_frozen_baseline.json"
+)
 
 
 def _rss_bytes():
@@ -59,6 +61,7 @@ def _collect(n, multiplier, a, b, residual_bound):
         residual_bound=residual_bound,
         budget=budget,
     )
+
     if result.reason != "complete" or result.divisor is not None:
         raise AssertionError("reference collection did not complete")
     signature = {
@@ -102,20 +105,25 @@ def _cases():
     def reference_bases():
         """Enumerate every prime/root directly for the same setup inputs."""
         answer = []
+
         for n, h in setup_inputs:
             entries = []
+
             for prime in reference_primes(100):
                 roots = tuple(
                     x for x in range(prime) if x * x % prime == n * h % prime
                 )
                 if roots:
                     entries.append((prime, roots))
+
             answer.append(tuple(entries))
+
         return answer
 
     def native_bases():
         """Include primality/root validation and factor-base construction."""
         answer = []
+
         for n, h in setup_inputs:
             base = build_factor_base(
                 n, multiplier=h, bound=100, budget=_budget()
@@ -123,6 +131,7 @@ def _cases():
             answer.append(
                 tuple((e.prime, e.square_roots) for e in base.entries)
             )
+
         return answer
 
     cases.append(
@@ -158,6 +167,7 @@ def _cases():
     def native_polynomial_roots():
         """Use cached target roots and exceptional normalized branches."""
         answers = []
+
         for polynomial in polynomials:
             for entry in base.entries:
                 answer = polynomial_roots(polynomial, base, entry)
@@ -166,6 +176,7 @@ def _cases():
                     if answer.all_positions
                     else answer.roots
                 )
+
         return answers
 
     cases.append(
@@ -181,6 +192,7 @@ def _cases():
     )
     widths = (1, 16, 128)
     expected_lifts = []
+
     for width in widths:
         target = max(1, math.isqrt(2 * base.n_prime) // width)
         prime = min(
@@ -214,6 +226,7 @@ def _cases():
         )
     )
     fixtures = []
+
     for name, n, h, a, b, residual in (
         ("qs_full", 10403, 1, 1, 102, 1),
         ("mpqs_full", 10403, 1, 49, 8, 1),
@@ -224,6 +237,7 @@ def _cases():
         expected = reference_positions(
             polynomial, local_base, -128, 129, residual
         )
+
         if not expected:
             raise AssertionError("diagnostic corpus must produce useful atoms")
         fixtures.append(
@@ -275,12 +289,14 @@ def _cases():
         )
     )
     pairs, seen = [], {}
+
     for atom in atoms:
         if atom.residual > 1 and math.gcd(atom.residual, base.n) == 1:
             if atom.residual in seen:
                 pairs.append((seen.pop(atom.residual), atom))
             else:
                 seen[atom.residual] = atom
+
     if not pairs:
         raise AssertionError("combination corpus must contain matched atoms")
 
@@ -292,6 +308,7 @@ def _cases():
         ]
 
     expected_combinations = combinations()
+
     for relation, pair in zip(expected_combinations, pairs):
         actual = math.prod(atom.u**2 - base.n_prime for atom in pair)
         reconstructed = relation.sign * pair[0].residual ** 2
@@ -301,6 +318,7 @@ def _cases():
             raise AssertionError(
                 "independent two-norm combination check failed"
             )
+
     cases.append(
         (
             "checked_partial_combination",
@@ -324,9 +342,11 @@ def _cases():
         answers = []
         for n in control_inputs:
             run = factorize_bounded(n, seed=7, config=config, budget=_budget())
+
             if not run.result.complete or run.result.reconstruct() != n:
                 raise AssertionError("complete control failed reconstruction")
             answers.append(run.result.reconstruct())
+
         return answers
 
     cases.append(
@@ -356,6 +376,7 @@ def _cases():
 def _measure(function, expected, iterations, repetitions, warmup_seconds):
     """Validate warmups/samples and retain adaptive stabilization attempts."""
     attempts = []
+
     for attempt in range(2):
         started, calls = time.perf_counter(), 0
         duration = warmup_seconds if attempt == 0 else max(5, warmup_seconds)
@@ -366,6 +387,7 @@ def _measure(function, expected, iterations, repetitions, warmup_seconds):
         warmup = time.perf_counter() - started
         samples = []
         count = repetitions if attempt == 0 else max(15, repetitions)
+
         for _ in range(count):
             started, cpu_started = time.perf_counter(), time.process_time()
             for _ in range(iterations):
@@ -381,6 +403,7 @@ def _measure(function, expected, iterations, repetitions, warmup_seconds):
                     "correct": True,
                 }
             )
+
         times = [sample["seconds_per_call"] for sample in samples]
         median = statistics.median(times)
         quartiles = statistics.quantiles(times, n=4)
@@ -404,6 +427,7 @@ def _measure(function, expected, iterations, repetitions, warmup_seconds):
         )
         if stable:
             break
+
     return {
         "iterations_per_sample": iterations,
         "attempts": attempts,
@@ -442,6 +466,7 @@ def main():
         or args.repetitions < 9
     ):
         parser.error("use at least three seconds warmup and nine samples")
+
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         parser.error("supported runtime is PyPy Python 3.11")
     measured_environment = environment()
@@ -450,12 +475,15 @@ def main():
         hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest
         for path, digest in frozen["production_source_sha256"].items()
     )
+
     if not unchanged:
         raise AssertionError("M17 production control changed")
     cases, corpus = _cases()
     rows = []
+
     for name, candidates, expected, iterations in cases:
         results = {}
+
         for label, function in candidates.items():
             results[label] = _measure(
                 function,
@@ -471,7 +499,9 @@ def main():
                 f"stable={results[label]['stable']}",
                 flush=True,
             )
+
         rows.append({"name": name, "candidates": results})
+
     cold = []
     expected_signature = json.loads(
         json.dumps(
@@ -482,9 +512,11 @@ def main():
             )
         )
     )
+
     for _ in range(args.repetitions):
         started = time.perf_counter()
         cpu_started = resource.getrusage(resource.RUSAGE_CHILDREN)
+
         completed = subprocess.run(
             [
                 sys.executable,
@@ -500,6 +532,7 @@ def main():
         response = json.loads(completed.stdout)
         elapsed = time.perf_counter() - started
         cpu_finished = resource.getrusage(resource.RUSAGE_CHILDREN)
+
         if response["signature"] != expected_signature:
             raise AssertionError("cold worker returned an invalid signature")
         cold.append(
@@ -513,6 +546,7 @@ def main():
                 **response,
             }
         )
+
     if environment()["source_sha256"] != measured_environment["source_sha256"]:
         raise AssertionError("measured source changed during capture")
     encoded_corpus = json.dumps(corpus, sort_keys=True).encode()

@@ -47,6 +47,7 @@ class SmoothBatchTests(unittest.TestCase):
         values = (1, 2**257 * 3**81, 2**257 * 13, 17**32, 45, 45)
         values += tuple(generator.randrange(1, 10**12) for _ in range(128))
         detector = SmoothBatch(primes, budget=allowance())
+
         self.assertEqual(
             detector.residuals(values),
             tuple(trial_residual(v, primes) for v in values),
@@ -63,7 +64,9 @@ class SmoothBatchTests(unittest.TestCase):
                 self.assertEqual(tree[-1], (prod(values),))
             else:
                 self.assertEqual(tree, ())
+
         detector = SmoothBatch((2, 3), budget=allowance())
+
         self.assertEqual(detector.residuals((1, 2, 3, 6, 12, 36)), (1,) * 6)
 
     def test_tree_limits_refuse_before_work_and_invalid_bases(self):
@@ -75,7 +78,9 @@ class SmoothBatchTests(unittest.TestCase):
             budget = allowance()
             with self.assertRaises(MemoryError):
                 product_tree((2, 3, 5), budget=budget, **options)
+
             self.assertEqual(budget.used, 0)
+
         for primes in ((2, 4), (3, 2), (2, 2), (100003,)):
             with self.assertRaises(ValueError):
                 SmoothBatch(primes, budget=allowance())
@@ -94,6 +99,7 @@ class CollisionTests(unittest.TestCase):
         modulus = prod(roots[i].prime for i in selected)
         choices = {i: roots[i].roots[0] for i in selected}
         expected = set()
+
         for changed in selected:
             if len(roots[changed].roots) != 2:
                 continue
@@ -103,11 +109,13 @@ class CollisionTests(unittest.TestCase):
                 for x in range(modulus)
                 if all(x % roots[i].prime == choices[i] for i in selected)
             )
+
             for dropped in (None,) + selected:
                 if dropped == changed:
                     continue
                 divisor = 1 if dropped is None else roots[dropped].prime
                 step = modulus // divisor
+
                 for shift in range(-roots[-1].prime, roots[-1].prime):
                     argument = position + shift * step
                     count = sum(
@@ -124,6 +132,7 @@ class CollisionTests(unittest.TestCase):
                                 // step,
                             )
                         )
+
         from v2.qs.sss import collision_candidates
 
         actual = collision_candidates(
@@ -134,6 +143,7 @@ class CollisionTests(unittest.TestCase):
             collector.coefficients,
             budget=allowance(),
         )
+
         self.assertEqual(set(actual), expected)
         self.assertTrue(any(position < 0 for position, _ in actual))
 
@@ -158,20 +168,27 @@ class SSSJobTests(unittest.TestCase):
                         config=SSSConfig(mode=mode, base_bound=400),
                         budget=allowance(),
                     )
+
                     result = job.run()
+
                     self.assertTrue(utils.valid_divisor(result.divisor, n))
                     self.assertEqual(result.divisor * result.cofactor, n)
                     self.assertEqual(result.reason, "factor_found")
+
                     again = job.run()
+
                     self.assertEqual(again.divisor, result.divisor)
                     self.assertEqual(
                         again.stats["work_used"], result.stats["work_used"]
                     )
+
         self.assertEqual(output.getvalue(), "")
 
     def test_candidate_refusal_resume_retains_the_exact_store(self):
         reference = search_collector(n=4001 * 4003)
+
         expected = reference.collect(0, 3)
+
         for cut in (1, 20, 100, 300, 600):
             collector = search_collector(n=4001 * 4003)
             polls = [0]
@@ -181,11 +198,15 @@ class SSSJobTests(unittest.TestCase):
                 return polls[0] >= cut
 
             collector.budget.cancelled = cancel
+
             refused = collector.collect(0, 3)
+
             self.assertEqual(refused.reason, "cancelled")
             spent = collector.budget.used
             collector.budget.cancelled = None
+
             resumed = collector.collect(refused.next_position, 3)
+
             self.assertEqual(resumed.atoms, expected.atoms)
             self.assertEqual(
                 resumed.combined_relations, expected.combined_relations
@@ -198,6 +219,7 @@ class SSSJobTests(unittest.TestCase):
                     residual_bound=10000,
                     budget=allowance(),
                 )
+
             for relation in resumed.combined_relations:
                 verify_combined(
                     relation,
@@ -208,16 +230,22 @@ class SSSJobTests(unittest.TestCase):
 
     def test_pause_and_budget_extension_match_uninterrupted_factor(self):
         config = SSSConfig(base_bound=400)
+
         baseline = SSSJob(4001 * 4003, config=config, budget=allowance()).run()
         budget = allowance()
         job = SSSJob(4001 * 4003, config=config, budget=budget)
+
         first = job.run(batch_limit=1)
+
         self.assertEqual(first.reason, "paused")
         spent = budget.used
         budget.work_limit = spent
+
         refused = job.run()
+
         self.assertEqual(refused.reason, "work_limit")
         budget.work_limit = 10**10
+
         self.assertEqual(job.run().divisor, baseline.divisor)
         self.assertGreater(budget.used, spent)
         job.budget = allowance()
@@ -233,14 +261,18 @@ class SSSJobTests(unittest.TestCase):
             ),
         )
         job = SSSJob(4001 * 4003, config=config, budget=allowance())
+
         result = job.run()
+
         self.assertEqual(result.reason, "relation_limit")
         self.assertIsNone(result.divisor)
         self.assertEqual(
             job.run().stats["work_used"], result.stats["work_used"]
         )
         filtered = search_collector(mode="sssf", filter_bound=1)
+
         result = filtered.collect(0, 3)
+
         self.assertGreater(result.stats["filter_rejections"], 0)
         self.assertLessEqual(
             result.workspace_bytes, filtered.config.memory_bytes
@@ -254,7 +286,9 @@ class SSSJobTests(unittest.TestCase):
             config=SSSConfig(base_bound=200, search_rounds=1),
             budget=allowance(),
         )
+
         result = job.run()
+
         self.assertEqual(result.reason, "search_exhausted")
         self.assertEqual(result.cofactor, job.n)
         self.assertEqual(
@@ -270,7 +304,9 @@ class SSSJobTests(unittest.TestCase):
             "memory_limit",
         )
         refused = SSSJob(1009 * 1013, config=SSSConfig(memory_bytes=100000))
+
         result = refused.run()
+
         self.assertEqual(result.reason, "memory_limit")
         self.assertEqual(
             refused.run().stats["work_used"], result.stats["work_used"]
@@ -283,6 +319,7 @@ class SSSJobTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 SSSConfig(**changes)
+
         job = SSSJob(4001 * 4003, budget=allowance())
         with patch(
             "v2.qs.sss.collision_candidates", side_effect=ArithmeticError

@@ -55,10 +55,13 @@ def run(mods, prepared, variant, rank):
         )
         if variant == "live":
             matrix = live_compaction(matrix, budget, remaining)
+
     dependencies = algebra.DependencySolver(matrix, budget=budget).run()
+
     if len(dependencies) != len(prepared.rows) - rank:
         raise AssertionError("mixed kernel dimension differs from oracle")
     congruences = []
+
     for mask in dependencies:
         algebra.verify_dependency(mask, prepared.rows)
         congruences.append(
@@ -68,6 +71,7 @@ def run(mods, prepared, variant, rank):
                 budget=budget,
             )
         )
+
     owned = prepared.workspace_bytes + matrix.workspace_bytes
     if owned > MEMORY or budget.used > WORK:
         raise AssertionError("mixed provenance/matrix allowance exceeded")
@@ -90,12 +94,13 @@ def main():
     if args.output.exists():
         parser.error("preserve captures; choose a new output path")
     corpus = json.loads(
-        (HERE / "inputs/p38_r3_training_corpus.json").read_text()
+        (HERE / "inputs/corpora/p38_r3_training_corpus.json").read_text()
     )
     verify_corpus(corpus)
     mods = modules(importlib.import_module("v2"))
     before = fingerprint(ROOT)
     results = {}
+
     for fixture in corpus["fixtures"][:2]:
         base, relations, atoms = prepare_fixture(mods, fixture)
         from ..qs.relations import AtomicRelation, CombinedRelation
@@ -130,6 +135,7 @@ def main():
                 for name in variants
             }
         )
+
     if before != fingerprint(ROOT):
         raise AssertionError("runtime changed during mixed capture")
     args.output.write_text(

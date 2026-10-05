@@ -51,6 +51,7 @@ def main():
     )
     runner = unittest.TextTestRunner(verbosity=2, resultclass=RecordedResult)
     start = time.perf_counter()
+
     result = runner.run(suite)
     args.output.write_text(
         json.dumps(

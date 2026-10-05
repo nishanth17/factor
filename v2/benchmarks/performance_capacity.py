@@ -16,12 +16,14 @@ from . import performance_audit as audit
 def verify_trial(corpus):
     """Independently prove every small prime in the historical P3.6 set."""
     seen = set()
+
     for fixture in corpus["fixtures"]:
         for factor in fixture["factors"]:
             if not 2 <= factor < 2**24 or any(
                 factor % d == 0 for d in range(2, isqrt(factor) + 1)
             ):
                 raise AssertionError("invalid historical trial proof")
+
         if prod(fixture["factors"]) != fixture["n"] or fixture["n"] in seen:
             raise AssertionError("invalid historical reconstruction")
         seen.add(fixture["n"])
@@ -39,7 +41,9 @@ def main():
         raise RuntimeError("PyPy implementing Python 3.11 is required")
     root = Path(__file__).resolve().parents[2]
     before = audit.fingerprint(root)
-    corpus = Path(__file__).parent / "inputs/phase_three_p36_corpus.json"
+    corpus = (
+        Path(__file__).parent / "inputs/corpora/phase_three_p36_corpus.json"
+    )
     audit.verify_corpus = verify_trial
     audit.run(
         SimpleNamespace(
@@ -68,7 +72,9 @@ def main():
     # reservation being compared; workers still execute the current code.
     snapshot = json.loads(
         (
-            Path(__file__).parent / "inputs" / "p38_r1_measured_sources.json"
+            Path(__file__).parent
+            / "inputs/baselines"
+            / "p38_r1_measured_sources.json"
         ).read_text()
     )
     source = snapshot["source"]["v2/qs/parallel.py"]
@@ -107,6 +113,7 @@ def main():
     )
     data["reservation_control_sha256"] = expected
     data["reservations"] = {}
+
     try:
         with parallel.CollectionPool("process", 4) as pool:
             for name, method in (
@@ -122,9 +129,11 @@ def main():
                     job = parallel.ParallelSIQSJob(
                         fixture["n"], config=config, budget=budget
                     )
+
                     result = job.run(
                         pool=pool, max_assignments=1, fixed_work=True
                     )
+
                     if (result.divisor or 1) * result.cofactor != job.n:
                         raise AssertionError("capacity reconstruction failed")
                     for atom in job.engine.collector._atoms.values():
@@ -136,6 +145,7 @@ def main():
                 )
     finally:
         parallel.ParallelSIQSJob._memory = current
+
     if before != audit.fingerprint(root):
         raise AssertionError("source changed during measurement")
     args.output.write_text(json.dumps(data, indent=2) + "\n")

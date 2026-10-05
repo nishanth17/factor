@@ -41,6 +41,7 @@ def build_corpus(split):
     """Generate proof-backed inputs independently after freezing policies."""
     generator = random.Random(3803042026 + (split == "held_out"))
     certificates, fixtures, seen = {}, [], set()
+
     for band, bits in (
         ("small", 13),
         ("medium", 21),
@@ -55,6 +56,7 @@ def build_corpus(split):
                     break
             else:
                 raise RuntimeError("fixture generation cap exceeded")
+
             seen.add(p * q)
             fixtures.append(
                 dict(
@@ -65,6 +67,7 @@ def build_corpus(split):
                     factors=sorted((p, q)),
                 )
             )
+
     verify_certificates(certificates)
     return dict(
         schema=1,
@@ -79,7 +82,7 @@ def build_corpus(split):
 
 def load_control(directory):
     """Materialize only hash-checked owned source bytes in a temporary root."""
-    data = checked_baseline(HERE / "inputs/p38_r3_baseline.json")
+    data = checked_baseline(HERE / "inputs/baselines/p38_r3_baseline.json")
     for name, source in data["source"].items():
         path = Path(directory) / name
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -111,7 +114,7 @@ def modules(package):
 @lru_cache(maxsize=2)
 def rebuilt_filter(module):
     """Load only the old repeated-rebuild function, retaining exact lifting."""
-    path = HERE / "inputs/qs_m26_baseline.json"
+    path = HERE / "inputs/baselines/qs_m26_baseline.json"
     data = json.loads(path.read_text())
     key = "v2/qs/linear_algebra.py"
     source = data["source"][key]
@@ -120,6 +123,7 @@ def rebuilt_filter(module):
         != data["source_sha256"][key]
     ):
         raise ValueError("corrupt repeated-rebuild control")
+
     node = next(
         n
         for n in ast.parse(source).body
@@ -142,6 +146,7 @@ def row_fixture(kind, count, seed):
             (1 << (i * stride)) | (1 << (((i + 1) % count) * stride))
             for i in range(count)
         )
+
     if kind == "pivots":
         return tuple(1 << i for i in range(count) for _ in range(3))
     if kind == "cascade":
@@ -165,6 +170,7 @@ def row_fixture(kind, count, seed):
 def rank_oracle(rows):
     """Independent set-valued column elimination gives expected nullity."""
     pivots = {}
+
     for row in rows:
         columns = set()
         bits = row
@@ -178,6 +184,7 @@ def rank_oracle(rows):
                 pivots[column] = columns
                 break
             columns = columns.symmetric_difference(pivots[column])
+
     return len(pivots)
 
 
@@ -201,8 +208,10 @@ def stable(samples):
 def paired_measure(calls):
     """Interleave arms, validate every warmup/sample and extend noisy sets."""
     attempts = []
+
     for attempt in range(3):
         warmups = {}
+
         for name, call in calls.items():
             started, count = time.perf_counter(), 0
             while time.perf_counter() - started < (3 if not attempt else 5):
@@ -211,7 +220,9 @@ def paired_measure(calls):
             warmups[name] = dict(
                 seconds=time.perf_counter() - started, validated_calls=count
             )
+
         samples = {name: [] for name in calls}
+
         for index in range(9 if not attempt else 15):
             names = list(calls)
             if index % 2:
@@ -222,6 +233,7 @@ def paired_measure(calls):
                 samples[name].append(
                     dict(seconds=time.perf_counter() - started, result=result)
                 )
+
         summaries = {name: stable(values) for name, values in samples.items()}
         attempts.append(dict(warmups=warmups, arms=summaries))
         print(
@@ -235,6 +247,7 @@ def paired_measure(calls):
         )
         if all(s["stable"] for s in summaries.values()):
             break
+
     return dict(
         stable=all(s["stable"] for s in summaries.values()), attempts=attempts
     )
@@ -245,6 +258,7 @@ def comparison(measurement, control, candidate):
     a, b = arms[control]["samples"], arms[candidate]["samples"]
     generator = random.Random(380303)
     gains = []
+
     for _ in range(999):
         indices = [generator.randrange(len(a)) for _ in a]
         gains.append(
@@ -252,6 +266,7 @@ def comparison(measurement, control, candidate):
             - statistics.median(b[i]["seconds"] for i in indices)
             / statistics.median(a[i]["seconds"] for i in indices)
         )
+
     gains.sort()
     deltas = [
         sum(row["complete"] for row in second["result"])
@@ -300,7 +315,9 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
         )
         if variant == "live":
             matrix = live_compaction(matrix, budget, remaining)
+
     solver = module.DependencySolver(matrix, budget=budget)
+
     dependencies = solver.run()
     for mask in dependencies:
         module.verify_dependency(mask, rows)
@@ -314,6 +331,7 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
             extract_dependency(prepared, mask, budget=budget)
             for mask in dependencies
         ]
+
     if budget.used > WORK or retained + matrix.workspace_bytes > MEMORY:
         raise AssertionError("matrix allowance exceeded")
     return dict(
@@ -353,6 +371,7 @@ def config(module, band):
                 max_partials=32768,
             ),
         )
+
     bound, width, count = {
         "small": (200, 256, 1),
         "medium": (1000, 512, 3),
@@ -394,7 +413,9 @@ def factor_run(mods, fixture, seed, variant):
     job = module.SIQSJob(
         fixture["n"], seed=seed, config=selected, budget=budget
     )
+
     result = job.run()
+
     if (result.divisor or 1) * result.cofactor != fixture["n"]:
         raise AssertionError("factor/cofactor reconstruction failed")
     if result.divisor is not None and (
@@ -402,6 +423,7 @@ def factor_run(mods, fixture, seed, variant):
         or not 1 < result.divisor < fixture["n"]
     ):
         raise AssertionError("improper divisor or independent proof mismatch")
+
     if budget.used > WORK or result.stats.get("workspace_bytes", 0) > MEMORY:
         raise AssertionError("factor allowance exceeded")
     labels, reason = [], result.reason
@@ -458,6 +480,7 @@ def prepare_fixture(mods, fixture):
             memory_bytes=MEMORY,
         ),
     )
+
     result = collector.collect(-2048, 2048)
     return (
         base,
@@ -473,6 +496,7 @@ def prepare_run(mods, fixture_data, cached):
     costs, last = [], None
     budget = allowance(mods["budget"])
     cache_reserve = cache.memory_bytes if cache else 0
+
     for count in sorted(
         set(min(len(relations), n) for n in (8, 16, 32, 64, 128))
     ):
@@ -488,11 +512,13 @@ def prepare_run(mods, fixture_data, cached):
         costs.append(
             dict(count=count, work=budget.used, workspace=last.workspace_bytes)
         )
+
     matrix = mods["qs.linear_algebra"].filter_matrix(
         last.rows,
         budget=budget,
         memory_bytes=MEMORY - last.workspace_bytes - cache_reserve,
     )
+
     dependencies = (
         mods["qs.linear_algebra"].DependencySolver(matrix, budget=budget).run()
     )
@@ -530,8 +556,10 @@ print(json.dumps(dict(divisor=result.divisor, cofactor=result.cofactor,
                       reason=result.reason, work=budget.used)))
 """
     samples = []
+
     for _ in range(9):
         started = time.perf_counter()
+
         process = subprocess.run(
             [
                 sys.executable,
@@ -548,11 +576,13 @@ print(json.dumps(dict(divisor=result.divisor, cofactor=result.cofactor,
             timeout=30,
         )
         row = json.loads(process.stdout)
+
         if (row["divisor"] or 1) * row["cofactor"] != fixture["n"]:
             raise AssertionError("cold result reconstruction")
         if row["divisor"] and row["divisor"] not in fixture["factors"]:
             raise AssertionError("cold split disagrees with proof")
         samples.append(dict(seconds=time.perf_counter() - started, result=row))
+
     return dict(
         scope="Cold first-split process/import/setup, without a warm claim.",
         samples=samples,
@@ -595,21 +625,25 @@ def main():
         corpus = build_corpus(args.split)
         if args.split == "held_out":
             corpus["frozen_sha256"] = hashlib.sha256(
-                (HERE / "inputs/p38_r3_frozen.json").read_bytes()
+                (HERE / "inputs/controls/p38_r3_frozen.json").read_bytes()
             ).hexdigest()
         args.output.write_text(json.dumps(corpus, indent=2) + "\n")
         return
-    corpus_path = HERE / "inputs" / ("p38_r3_" + args.split + "_corpus.json")
+
+    corpus_path = (
+        HERE / "inputs/corpora" / ("p38_r3_" + args.split + "_corpus.json")
+    )
     corpus = json.loads(corpus_path.read_text())
     verify_corpus(corpus)
     if (
         args.split == "held_out"
         and corpus["frozen_sha256"]
         != hashlib.sha256(
-            (HERE / "inputs/p38_r3_frozen.json").read_bytes()
+            (HERE / "inputs/controls/p38_r3_frozen.json").read_bytes()
         ).hexdigest()
     ):
         raise ValueError("held-out corpus does not match frozen policies")
+
     before = fingerprint(ROOT)
     with tempfile.TemporaryDirectory(prefix="factor-r3-") as directory:
         control = modules(load_control(directory))
@@ -620,6 +654,7 @@ def main():
                 next(f for f in corpus["fixtures"] if f["band"] == band)
                 for band in ("20d", "30d")
             ]
+
             for fixture in profile_fixtures:
                 data = prepare_fixture(control, fixture)
                 profiler = cProfile.Profile()
@@ -653,6 +688,7 @@ def main():
                 "wide_cycle",
                 "verified_store",
             )
+
             for kind in kinds:
                 prepared = None
                 if kind == "verified_store":
@@ -669,6 +705,7 @@ def main():
                     rows = prepared.rows
                 else:
                     rows = row_fixture(kind, 512, 3803)
+
                 expected_rank = rank_oracle(rows)
                 variants = ["rebuild", "control", "current", "live"]
                 if kind != "wide_cycle":
@@ -678,7 +715,9 @@ def main():
                         "history1",
                         "history32",
                     ]
+
                 calls = {}
+
                 for variant in variants:
                     module = (
                         control["qs.linear_algebra"]
@@ -690,6 +729,7 @@ def main():
                             module, rows, variant, expected_rank, prepared
                         )
                     )
+
                 results[kind] = paired_measure(calls)
         elif args.phase == "prepare":
             for fixture in corpus["fixtures"][:2]:
@@ -713,6 +753,7 @@ def main():
             for band in args.bands.split(","):
                 cohort = [f for f in corpus["fixtures"] if f["band"] == band]
                 calls = {}
+
                 for variant in args.variants.split(","):
                     mods = control if variant == "control" else current
                     calls[variant] = lambda variant=variant, mods=mods: [
@@ -723,12 +764,14 @@ def main():
                         for fixture in cohort
                         for seed in corpus["seeds"]
                     ]
+
                 results[band] = paired_measure(calls)
                 results[band]["comparisons"] = {
                     candidate: comparison(results[band], "control", candidate)
                     for candidate in calls
                     if candidate != "control"
                 }
+
         if fingerprint(ROOT) != before:
             raise AssertionError("runtime changed during capture")
         args.output.write_text(
@@ -741,12 +784,14 @@ def main():
                     source_sha256=before,
                     driver_sha256={
                         name: hashlib.sha256(
-                            (HERE / "inputs" / name).read_bytes()
+                            (HERE / name).read_bytes()
                         ).hexdigest()
                         for name in ("p38_r3.py", "p38_r3_experiments.py")
                     },
                     control_sha256=hashlib.sha256(
-                        (HERE / "inputs/p38_r3_baseline.json").read_bytes()
+                        (
+                            HERE / "inputs/baselines/p38_r3_baseline.json"
+                        ).read_bytes()
                     ).hexdigest(),
                     corpus_sha256=hashlib.sha256(
                         corpus_path.read_bytes()

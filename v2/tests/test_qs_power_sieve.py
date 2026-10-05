@@ -26,6 +26,7 @@ class PrimePowerSieveTests(unittest.TestCase):
     def test_lifted_roots_against_exhaustive_modular_enumeration(self):
         for n in (9, 25, 101, 10403):
             polynomial = Polynomial(n, 1, 1, 0)
+
             for prime in (2, 3, 5, 7, 11):
                 values = tuple(
                     x for x in range(prime) if polynomial.value(x) % prime == 0
@@ -36,6 +37,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                         polynomial, roots, 2048, 1, unlimited_budget()
                     )
                 )
+
                 for modulus, lifted, weight in marks:
                     self.assertEqual(weight, 1)
                     expected = {
@@ -43,11 +45,13 @@ class PrimePowerSieveTests(unittest.TestCase):
                         for x in range(modulus)
                         if polynomial.value(x) % modulus == 0
                     }
+
                     self.assertEqual(set(lifted), expected)
 
     def test_window_pruning_matches_direct_valuations(self):
         for n in (9, 25, 101, 10403, 3**12):
             polynomial = Polynomial(n, 1, 1, 0)
+
             for prime in (2, 3, 5, 7, 11):
                 roots = PolynomialRoots(
                     prime,
@@ -58,6 +62,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                     ),
                     False,
                 )
+
                 for lo, hi in ((-105, -92), (-7, 9), (47, 48), (513, 540)):
                     maximum = max(
                         abs(polynomial.value(x)) for x in range(lo, hi)
@@ -73,6 +78,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                             hi=hi,
                         )
                     )
+
                     for position in range(lo, hi):
                         value = abs(polynomial.value(position))
                         if not value:
@@ -86,11 +92,14 @@ class PrimePowerSieveTests(unittest.TestCase):
                             for modulus, residues, weight in marks
                             if position % modulus in residues
                         )
+
                         self.assertGreaterEqual(score, exponent)
                         if not any(weight > 1 for _, _, weight in marks):
                             self.assertEqual(score, exponent)
+
         empty = PolynomialRoots(11, (3,), False)
         budget = unlimited_budget()
+
         self.assertEqual(
             list(
                 prime_power_roots(
@@ -116,6 +125,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                 polynomial, roots, maximum, 2, unlimited_budget()
             )
         )
+
         self.assertTrue(any(weight > 2 for _, _, weight in marks))
         for position in range(-512, 513):
             value = abs(polynomial.value(position))
@@ -130,13 +140,16 @@ class PrimePowerSieveTests(unittest.TestCase):
                 for modulus, residues, weight in marks
                 if position % modulus in residues
             )
+
             self.assertGreaterEqual(score, 2 * exponent)
 
     def test_power_scoring_preserves_independent_signed_window_coverage(self):
         base = build_factor_base(10403, bound=100).factor_base
+
         for a, b in ((1, 102), (7, 1), (49, 8)):
             polynomial = Polynomial(10403, 1, a, b)
             expected = reference_positions(polynomial, base, -71, 80, 97)
+
             for backend in ("list", "array", "bytearray"):
                 for division in ("full", "roots", "bucket", "resieve"):
                     for cutoff in (0, 5):
@@ -152,12 +165,14 @@ class PrimePowerSieveTests(unittest.TestCase):
                             max_relations=4096,
                             memory_bytes=64 * 1024 * 1024,
                         )
+
                         result = SieveCollector(
                             polynomial,
                             base,
                             config=config,
                             budget=unlimited_budget(),
                         ).collect(-71, 80)
+
                         self.assertEqual(result.reason, "complete")
                         self.assertEqual(signature(result), expected)
 
@@ -166,6 +181,7 @@ class PrimePowerSieveTests(unittest.TestCase):
 
         small = build_factor_base(10403, bound=40).factor_base
         polynomial = Polynomial(10403, 1, 1, 102)
+
         initial = SieveCollector(
             polynomial,
             small,
@@ -175,6 +191,7 @@ class PrimePowerSieveTests(unittest.TestCase):
         store = {a.relation_id: a for a in initial.atoms}
         pair = tuple(store[i] for i in initial.combined_relations[0].atom_ids)
         entries = list(small.entries)
+
         for prime in prime_sieve(100000):
             if prime < 50000:
                 continue
@@ -185,6 +202,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                 entries.append(FactorBaseEntry(prime, roots))
             if len(entries) >= 1200:
                 break
+
         base = FactorBase(10403, 1, 100000, tuple(entries))
         worker = SieveCollector(
             polynomial,
@@ -195,6 +213,7 @@ class PrimePowerSieveTests(unittest.TestCase):
             budget=unlimited_budget(),
         )
         stats = dict(duplicates=0, admitted_atoms=0, matches=0)
+
         for index in range(200):
             shift = 1000 * index
             translated = tuple(
@@ -207,17 +226,21 @@ class PrimePowerSieveTests(unittest.TestCase):
                 )
                 for a in pair
             )
+
             self.assertIsNone(worker._admit(translated[0], stats))
             if index == 199:
                 prior = dict(worker._atoms)
                 config = worker.config
                 worker.config = replace(config, memory_bytes=worker._workspace)
+
                 self.assertEqual(
                     worker._admit(translated[1], stats), "memory_limit"
                 )
                 self.assertEqual(worker._atoms, prior)
                 worker.config = config
+
             self.assertIsNone(worker._admit(translated[1], stats))
+
         self.assertEqual(len(worker._combined), 200)
         self.assertLess(
             worker._workspace + worker._scratch_peak_bytes, 32 * 1024 * 1024
@@ -252,12 +275,15 @@ class PrimePowerSieveTests(unittest.TestCase):
             budget=unlimited_budget(),
             memory_bytes=128 * 1024 * 1024,
         )
+
         dependencies = DependencySolver(
             matrix, budget=unlimited_budget()
         ).run()
+
         result = DependencyExtractor(
             prepared, dependencies, budget=unlimited_budget()
         ).run()
+
         self.assertIn(result, (101, 103))
         with self.assertRaises(TypeError):
             base._columns[2] = 99
@@ -270,11 +296,14 @@ class PrimePowerSieveTests(unittest.TestCase):
             residual_bound=10**10,
             memory_bytes=64 * 1024 * 1024,
         )
+
         result = SieveCollector(
             polynomial, base, config=config, budget=unlimited_budget()
         ).collect(0, 1)
+
         self.assertEqual(len(result.atoms), 1)
         atom = result.atoms[0]
+
         self.assertEqual(atom.residual, 1000003)
         self.assertTrue(all(atom.residual % d for d in range(2, 1001)))
         self.assertTrue(verify_atomic(atom, base, residual_bound=10**10))
@@ -295,9 +324,11 @@ class PrimePowerSieveTests(unittest.TestCase):
             max_partials=4096,
             max_relations=4096,
         )
+
         result = arm.qs.sieve_collector.SieveCollector(
             polynomial, base, config=config, budget=unlimited_budget()
         ).collect(-71, 80)
+
         self.assertEqual(
             signature(result),
             reference_positions(polynomial, base, -71, 80, 97),
@@ -314,6 +345,7 @@ class PrimePowerSieveTests(unittest.TestCase):
             factors=[101, 103],
         )
         config = configuration(10403, 100, 32, 1000)
+
         self.assertEqual(config.checkpoint_bytes, 16 * 1024 * 1024)
         from dataclasses import replace
 
@@ -332,6 +364,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                 )
                 metadata = paused["checkpoint"]
                 encoded = (Path(directory) / metadata["path"]).read_bytes()
+
                 self.assertEqual(
                     hashlib.sha256(encoded).hexdigest(), metadata["sha256"]
                 )
@@ -344,6 +377,7 @@ class PrimePowerSieveTests(unittest.TestCase):
                     checkpoint=json.loads(encoded),
                     checkpoint_dir=checkpoints,
                 )
+
             self.assertFalse(paused["complete"])
             self.assertTrue(resumed["complete"])
             self.assertTrue(resumed["resumed"])

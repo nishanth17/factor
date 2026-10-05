@@ -20,7 +20,7 @@ from ..qs.polynomial import a_target
 from ..qs.sss import SSSConfig, SSSJob
 from .build_phase_two_corpus import verify_certificates
 
-CORPUS = Path(__file__).parent / "inputs/phase_three_p34_corpus.json"
+CORPUS = Path(__file__).parent / "inputs/corpora/phase_three_p34_corpus.json"
 MEMORY = 64 * 1024 * 1024
 RSS_LIMIT = 512 * 1024 * 1024
 WORK = 2_000_000_000
@@ -51,6 +51,7 @@ def run_one(fixture, seed, config, seconds):
     started, cpu = time.perf_counter(), time.process_time()
     job_type = SSSJob if isinstance(config, SSSConfig) else SIQSJob
     job = job_type(fixture["n"], seed=seed, config=config, budget=budget)
+
     result = job.run()
     n, split = fixture["n"], result.divisor
     factors, remaining, labels = [], [n], []
@@ -59,17 +60,21 @@ def run_one(fixture, seed, config, seconds):
         if not utils.valid_divisor(split, n):
             raise AssertionError("invalid proper divisor")
         children = sorted((split, n // split))
+
         try:
             for child in children:
                 budget.consume(child.bit_length() * 32)
                 label = utils.classify_prime(child, rng=random.Random(seed))
+
                 if label is utils.Primality.COMPOSITE:
                     raise AssertionError("semiprime child is composite")
                 labels.append(label.value)
+
             factors, remaining = children, []
         except BudgetExhaustedError:
             labels = []
             reason = "classification_" + budget.reason
+
     if prod(factors) * prod(remaining) != n:
         raise AssertionError("result does not reconstruct")
     if factors and factors != fixture["factors"]:
@@ -102,6 +107,7 @@ def measure(fixtures, seeds, config, seconds, args):
         ]
 
     attempts = []
+
     for attempt in range(3):
         started = time.perf_counter()
         warmup = max(args.warmup_seconds, 3 if attempt == 0 else 5)
@@ -112,6 +118,7 @@ def measure(fixtures, seeds, config, seconds, args):
         warm_elapsed = time.perf_counter() - started
         samples = []
         repetitions = max(args.repetitions, 9 if attempt == 0 else 15)
+
         for _ in range(repetitions):
             wall, cpu = time.perf_counter(), time.process_time()
             rows = cohort()
@@ -128,6 +135,7 @@ def measure(fixtures, seeds, config, seconds, args):
                     rows=rows,
                 )
             )
+
         times = [sample["seconds"] for sample in samples]
         median = statistics.median(times)
         q1, _, q3 = statistics.quantiles(times, n=4)
@@ -149,6 +157,7 @@ def measure(fixtures, seeds, config, seconds, args):
         )
         if stable:
             break
+
     return dict(
         attempts=attempts,
         stable=stable,
@@ -177,6 +186,7 @@ def train(corpus, args):
         if (f["split"] == "training" and f["band"] == "small")
     ]
     candidates = []
+
     for bound in (400, 1000):
         for size in (3, 6):
             config = SSSConfig(
@@ -190,6 +200,7 @@ def train(corpus, args):
             print(
                 "training", bound, size, result["median_seconds"], flush=True
             )
+
     eligible = [
         c
         for c in candidates
@@ -236,6 +247,7 @@ def train_siqs(corpus, band, args):
             if f["split"] == "training" and f["band"] == band
         ]
         candidates = []
+
         for bound in (200, 400):
             for count in (1, 3):
                 config = SIQSConfig(
@@ -263,6 +275,7 @@ def train_siqs(corpus, band, args):
                     measurement["median_seconds"],
                     flush=True,
                 )
+
         best = min(
             candidates,
             key=lambda c: (
@@ -277,6 +290,7 @@ def train_siqs(corpus, band, args):
             source_sha256=sources(),
             policy="repeated small training; no held-out tuning",
         )
+
     fixture = next(
         f
         for f in corpus["fixtures"]
@@ -287,6 +301,7 @@ def train_siqs(corpus, band, args):
     minimum = next((i for i in range(1, 9) if bound**i >= target), 8)
     counts = sorted({max(1, minimum - 1), minimum, min(8, minimum + 1)})
     rows = []
+
     for count in counts:
         for width in (512, 4096):
             config = SIQSConfig(
@@ -315,6 +330,7 @@ def train_siqs(corpus, band, args):
                 row["seconds"],
                 flush=True,
             )
+
     best = min(
         rows,
         key=lambda r: (
@@ -356,6 +372,7 @@ def main():
         11,
     ):
         raise RuntimeError("benchmark requires PyPy implementing Python 3.11")
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--training", type=Path)
@@ -379,6 +396,7 @@ def main():
         or args.limit_inputs < 0
     ):
         parser.error("need >=9 repetitions, >=3s warmup and positive budgets")
+
     corpus = json.loads(CORPUS.read_text())
     verify_certificates(corpus["certificates"])
     for fixture in corpus["fixtures"]:
@@ -409,6 +427,7 @@ def main():
             + "\n"
         )
         return
+
     if args.training:
         training = json.loads(args.training.read_text())["training"]
     else:
@@ -463,6 +482,7 @@ def main():
             if name.startswith("qs/") and manifest.get(name) != digest:
                 raise ValueError("SIQS training and evaluation sources differ")
         output["siqs_training"] = control_training
+
     if args.arms:
         configs = {name: configs[name] for name in args.arms}
     output.update(
@@ -501,6 +521,7 @@ def main():
                 flush=True,
             )
             continue
+
         result = measure(fixtures, corpus["seeds"], config, seconds, args)
         output["comparisons"][name] = result
         args.output.write_text(json.dumps(output, indent=2) + "\n")
@@ -513,6 +534,7 @@ def main():
             result["stable"],
             flush=True,
         )
+
     if "siqs" in output["comparisons"] and not args.diagnostic_only:
         output["relative_to_siqs"] = {
             name: confidence(
@@ -521,6 +543,7 @@ def main():
             for name in ("sss", "sssf")
             if name in output["comparisons"]
         }
+
     output["sources_changed_during_run"] = sources() != manifest
     output["promotion"] = (
         "retain challenger; evaluate all declared classes before promotion"

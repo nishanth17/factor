@@ -47,6 +47,7 @@ def build_corpus(split):
     """Generate independent proof-backed cohorts, after freeze for held-out."""
     generator = random.Random(3802042026 + (split == "held_out"))
     certificates, fixtures, seen = {}, [], set()
+
     for band, bits in (
         ("small", 13),
         ("medium", 21),
@@ -61,6 +62,7 @@ def build_corpus(split):
                     break
             else:
                 raise RuntimeError("fixture generation cap exceeded")
+
             seen.add(p * q)
             fixtures.append(
                 dict(
@@ -71,6 +73,7 @@ def build_corpus(split):
                     split=split,
                 )
             )
+
     verify_certificates(certificates)
     corpus = dict(
         schema=1,
@@ -148,9 +151,11 @@ def factor_run(mods, fixture, seed, variant):
             config=selected_config(module, fixture["band"], variant),
             budget=budget,
         )
+
         result = job.run()
     finally:
         module.SieveCollector = collector
+
     if (result.divisor or 1) * result.cofactor != fixture["n"]:
         raise AssertionError("unresolved input reconstruction failed")
     if result.divisor is not None and (
@@ -158,6 +163,7 @@ def factor_run(mods, fixture, seed, variant):
         or not 1 < result.divisor < fixture["n"]
     ):
         raise AssertionError("proper divisor/proof mismatch")
+
     if budget.used > WORK or result.stats.get("workspace_bytes", 0) > MEMORY:
         raise AssertionError("shared finite allowance exceeded")
     labels = []
@@ -178,6 +184,7 @@ def factor_run(mods, fixture, seed, variant):
         except mods["budget"].BudgetExhaustedError:
             labels = []
             reason = "classification_" + budget.reason
+
     return dict(
         id=fixture["id"],
         seed=seed,
@@ -227,10 +234,13 @@ def collector_run(mods, fixture, seed, variant):
             rows=0,
             setup_refused=True,
         )
+
     # Several blocks exercise reuse; complete polynomial interval decides
     # eligibility for a future family-wide CRT arm, never block width.
     lo, hi = -selected.half_width, selected.half_width + 1
+
     result = worker.collect(lo, hi)
+
     if result.divisor is not None and result.divisor not in fixture["factors"]:
         raise AssertionError("collector returned an improper divisor")
     atoms = {a.relation_id: a for a in result.atoms}
@@ -294,8 +304,10 @@ print(json.dumps(dict(seconds=time.perf_counter()-started,reason=r.reason,
 divisor=r.divisor,cofactor=r.cofactor)))
 """
     samples = []
+
     for _ in range(9):
         started = time.perf_counter()
+
         output = subprocess.run(
             [
                 sys.executable,
@@ -318,6 +330,7 @@ divisor=r.divisor,cofactor=r.cofactor)))
         if result["divisor"] and result["divisor"] not in fixture["factors"]:
             raise AssertionError("cold divisor proof mismatch")
         samples.append(result)
+
     return samples
 
 
@@ -354,6 +367,7 @@ def main():
             json.dumps(build_corpus(args.split), indent=2) + "\n"
         )
         return
+
     variants = args.variants.split(",")
     if set(variants) - set(VARIANTS):
         parser.error("unknown variant")
@@ -387,27 +401,32 @@ def main():
             raise ValueError(
                 "comparison control differs from its frozen input"
             )
+
         if args.integration and frozen["corpus_sha256"][args.split] != digest(
             corpus_path
         ):
             raise ValueError(
                 "integration corpus differs from its frozen input"
             )
+
         if frozen["source_sha256"] != before:
             raise ValueError("confirmation runtime differs from frozen source")
         if frozen["driver_sha256"] != driver_hashes:
             raise ValueError("confirmation driver differs from frozen source")
+
     results = {}
     with tempfile.TemporaryDirectory(prefix="factor-r2-") as directory:
         control = modules(
             load_control(directory, integration=args.integration)
         )
         current = modules(importlib.import_module("v2"))
+
         for band in args.bands.split(","):
             fixtures = [f for f in corpus["fixtures"] if f["band"] == band]
             if not fixtures:
                 parser.error("unknown or empty band")
             calls = {}
+
             for variant in variants:
                 mods = control if variant == "control" else current
                 runner = (
@@ -418,6 +437,7 @@ def main():
                     for fixture in fixtures
                     for seed in corpus["seeds"]
                 ]
+
             print("START", band, variants, flush=True)
             if args.phase == "cold":
                 results[band] = {
@@ -441,6 +461,7 @@ def main():
                         for name in calls
                         if name != "control"
                     }
+
             print("DONE", band, flush=True)
             # Preserve each completed band even if a later phase is refused.
             partial = args.output.with_suffix(".partial.json")
@@ -456,6 +477,7 @@ def main():
                 )
                 + "\n"
             )
+
     if fingerprint(ROOT) != before:
         raise RuntimeError("runtime changed during capture")
     data = dict(

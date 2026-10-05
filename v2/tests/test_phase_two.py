@@ -63,9 +63,11 @@ class BudgetTests(unittest.TestCase):
     def test_exact_charge_and_no_overshoot(self):
         """An exhausted reservation preserves the already-consumed count."""
         budget = Budget(work_limit=3, seconds=None, cpu_seconds=None)
+
         budget.consume(3)
         with self.assertRaises(BudgetExhaustedError):
             budget.consume()
+
         self.assertEqual(budget.used, 3)
 
     def test_expired_and_cancelled(self):
@@ -77,6 +79,7 @@ class BudgetTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(BudgetExhaustedError, reason):
                 budget.consume(0)
+
             self.assertEqual(budget.used, 0)
 
     def test_invalid_limits(self):
@@ -98,9 +101,11 @@ class ScheduleTests(unittest.TestCase):
                 context = SieveContext(
                     503, segment_size=width, rolling=rolling
                 )
+
                 for lo in range(-2, 120, 3):
                     for span in (0, 1, 2, 15, 60):
                         hi = lo + span
+
                         self.assertEqual(
                             list(context.primes(lo, hi)),
                             reference_primes(lo, hi),
@@ -120,10 +125,12 @@ class ScheduleTests(unittest.TestCase):
         """Abandoned streams must close; caps fail before allocating."""
         context = SieveContext(1000)
         first = context.primes(2, 100)
+
         self.assertEqual(next(first), 2)
         with self.assertRaises(RuntimeError):
             next(context.primes(2, 100))
         first.close()
+
         self.assertEqual(list(context.primes(2, 5)), [2, 3])
         with self.assertRaises(ValueError):
             list(context.primes(2, 1001))
@@ -143,6 +150,7 @@ class ScheduleTests(unittest.TestCase):
         """Keep representations distinct and avoid caching partial streams."""
         context = SieveContext(10000, segment_size=11)
         cache = ScheduleCache(context, cache_bytes=4096, max_entries=2)
+
         self.assertEqual(list(cache.values(2, 30)), reference_primes(2, 30))
         self.assertEqual(list(cache.values(2, 30)), reference_primes(2, 30))
         self.assertEqual(cache.hits, 1)
@@ -151,6 +159,7 @@ class ScheduleTests(unittest.TestCase):
         for gap in gaps:
             previous += gap
             reconstructed.append(previous)
+
         self.assertEqual(reconstructed, reference_primes(2, 30))
         self.assertEqual(
             list(cache.values(2, 11, kind="powers", bound=10)), [8, 9, 5, 7]
@@ -159,6 +168,7 @@ class ScheduleTests(unittest.TestCase):
         stream = cache.values(5000, 10000)
         next(stream)
         stream.close()
+
         self.assertFalse(context.active)
         self.assertFalse(cache.active)
         self.assertNotIn(
@@ -181,6 +191,7 @@ class ScheduleTests(unittest.TestCase):
                         function(lo, lo + span),
                         reference_primes(lo, lo + span),
                     )
+
             self.assertEqual(function(3700, 3722), [3701, 3709, 3719])
 
 
@@ -190,18 +201,22 @@ class PreprocessingTests(unittest.TestCase):
     def test_roots_and_twos(self):
         """Use inequalities rather than the implementation's iteration."""
         generator = random.Random(20261003)
+
         for bits in (8, 64, 256, 1024):
             for exponent in (2, 3, 5, 7, 11, 31):
                 n = generator.getrandbits(bits)
                 root = integer_root(n, exponent)
+
                 self.assertLessEqual(root**exponent, n)
                 self.assertGreater((root + 1) ** exponent, n)
+
         for exponent in (0, 1, 400, 1000):
             self.assertEqual(strip_twos(15 << exponent), (15, exponent))
 
     def test_fermat_bound_and_exact_factor(self):
         """One exact close-factor step succeeds; wrong starts are rejected."""
         n = 1009 * 1013
+
         self.assertEqual(fermat_step(n, 1011), 1009)
         with self.assertRaises(ValueError):
             fermat_step(n, isqrt(n))
@@ -215,8 +230,10 @@ class CandidateTests(unittest.TestCase):
         from v2.benchmarks.snapshot_loader import load_stage_jobs
 
         baseline = load_stage_jobs()
+
         for chunk in (1, 16):
             config = small_config(chunk_size=chunk)
+
             for kind, n, b1, b2 in (
                 ("rho", 35, 0, 0),
                 ("rho", 25013 * 25031, 0, 0),
@@ -233,6 +250,7 @@ class CandidateTests(unittest.TestCase):
                 budgets = [
                     Budget(seconds=None, cpu_seconds=None) for _ in range(2)
                 ]
+
                 while not jobs[0]["done"]:
                     for action, job, budget, context in zip(
                         (advance_job, baseline.advance_job),
@@ -241,8 +259,10 @@ class CandidateTests(unittest.TestCase):
                         contexts,
                     ):
                         action(job, budget, context, config)
+
                     self.assertEqual(jobs[0], jobs[1])
                     self.assertEqual(budgets[0].used, budgets[1].used)
+
                 divisor = jobs[0]["factor"]
                 if divisor is not None:
                     self.assertTrue(utils.valid_divisor(divisor, n))
@@ -262,11 +282,13 @@ class CandidateTests(unittest.TestCase):
                 scalar = 2520  # Independent lcm(1,...,10).
                 if kind == "pm1":
                     expected = pow(start, scalar, job["n"])
+
                     self.assertEqual(job["value"], expected)
                 else:
                     expected = ecm.scalar_multiply(
                         scalar, *start, job["n"], job["a24"]
                     )
+
                     self.assertEqual(
                         (job["value"][0] * expected[1]) % job["n"],
                         (expected[0] * job["value"][1]) % job["n"],
@@ -275,6 +297,7 @@ class CandidateTests(unittest.TestCase):
     def test_every_candidate_action_can_resume(self):
         """JSON-roundtripping between actions preserves output and work."""
         config = small_config()
+
         for kind, n, b1, b2 in (
             ("rho", 25013 * 25031, 0, 0),
             ("pm1", 607 * 1019, 10, 200),
@@ -288,6 +311,7 @@ class CandidateTests(unittest.TestCase):
             while not job["done"]:
                 advance_job(job, budget, context, config)
                 job = json.loads(json.dumps(job))
+
             self.assertEqual(job, expected)
             self.assertEqual(budget.used, used)
             if job["factor"] is not None:
@@ -306,11 +330,13 @@ class CandidateTests(unittest.TestCase):
         first.update(phase="stage_one", value=2, powers=[[2, 8]])
         budget = Budget(work_limit=5, seconds=None, cpu_seconds=None)
         advance_job(first, budget, None, config)
+
         self.assertEqual(first["factor"], 5)
         second = new_job("pm1", 35, 0, 10, 200)
         second.update(phase="stage_two", terms=[5], product=5)
         budget = Budget(work_limit=1, seconds=None, cpu_seconds=None)
         advance_job(second, budget, None, config)
+
         self.assertEqual(second["factor"], 5)
 
     def test_ecm_early_middle_tail_saturation_is_bounded(self):
@@ -318,6 +344,7 @@ class CandidateTests(unittest.TestCase):
         from v2 import stage_jobs
 
         original = stage_jobs._apply
+
         for position in (1, 2, 4):
             calls = []
 
@@ -332,6 +359,7 @@ class CandidateTests(unittest.TestCase):
                     new_job("ecm", 1000003, 6, 10, 200),
                     small_config(chunk_size=1),
                 )
+
             self.assertTrue(job["done"])
             self.assertIsNone(job["factor"])
             self.assertLess(work, 10000)
@@ -343,8 +371,10 @@ class PortfolioTests(unittest.TestCase):
     def test_complete_small_sweep(self):
         """Verify terminal factors with an independent trial oracle."""
         config = small_config(trial_bound=100)
+
         for n in range(1, 501):
             run = factorize_bounded(n, config=config)
+
             self.assertTrue(run.result.proven, n)
             self.assertEqual(run.result.reconstruct(), n)
             self.assertTrue(
@@ -357,11 +387,13 @@ class PortfolioTests(unittest.TestCase):
     def test_powers_signs_and_certainty(self):
         """Higher powers preserve multiplicities and probable-prime labels."""
         config = small_config(rho_attempts=0, pm1_attempts=0, ecm_tiers=())
+
         for n, expected in (
             (-(2**100) * 1009**7, [(2, 100), (1009, 7)]),
             ((2**127 - 1) ** 3, [(2**127 - 1, 3)]),
         ):
             run = factorize_bounded(n, config=config)
+
             self.assertEqual(run.result.reconstruct(), n)
             self.assertTrue(run.result.complete)
             self.assertEqual(
@@ -377,8 +409,10 @@ class PortfolioTests(unittest.TestCase):
         """Small resumed grants consume the same work as uninterrupted work."""
         config = small_config()
         n = -(2**9) * 1009 * 1013 * 1019
+
         full = factorize_bounded(n, seed=91, config=config)
         checkpoint = None
+
         for allowance in range(0, full.work_used + 1000, 97):
             run = factorize_bounded(
                 n,
@@ -389,11 +423,13 @@ class PortfolioTests(unittest.TestCase):
                     work_limit=allowance, seconds=None, cpu_seconds=None
                 ),
             )
+
             self.assertLessEqual(run.work_used, allowance)
             self.assertEqual(run.result.reconstruct(), n)
             checkpoint = json.loads(json.dumps(run.checkpoint))
             if run.reason == "complete":
                 break
+
         self.assertEqual(run.result, full.result)
         self.assertEqual(run.work_used, full.work_used)
         self.assertEqual(run.events, full.events)
@@ -402,12 +438,16 @@ class PortfolioTests(unittest.TestCase):
         """Expired work preserves inputs and incompatible snapshots reject."""
         config = small_config()
         n = 1009 * 1013
+
         run = factorize_bounded(n, config=config, budget=Budget(seconds=0))
+
         self.assertEqual(run.reason, "wall_limit")
         self.assertEqual(run.result.remaining, (n,))
+
         cancelled = factorize_bounded(
             n, config=config, budget=Budget(cancelled=lambda: True)
         )
+
         self.assertEqual(cancelled.reason, "cancelled")
         checkpoint = copy.deepcopy(run.checkpoint)
         checkpoint["payload"]["state"]["original"] += 1
@@ -425,7 +465,9 @@ class PortfolioTests(unittest.TestCase):
         config = small_config(
             rho_evaluations=1, pm1_attempts=0, ecm_tiers=(), trace_limit=1
         )
+
         run = factorize_bounded(1009 * 1013, config=config)
+
         self.assertEqual(run.reason, "exhausted")
         self.assertEqual(run.result.remaining, (1009 * 1013,))
         self.assertEqual(len(run.events), 1)
@@ -435,15 +477,20 @@ class PortfolioTests(unittest.TestCase):
         """Preserve children, RNG, and work when stopping at a split."""
         config = small_config()
         n = 1009 * 1013 * 1019
+
         full = factorize_bounded(n, seed=81, config=config)
+
         split = factorize_bounded(
             n, seed=81, config=config, stop_after_split=True
         )
+
         self.assertEqual(split.reason, "factor_found")
         self.assertFalse(split.result.complete)
+
         resumed = factorize_bounded(
             n, config=config, checkpoint=split.checkpoint
         )
+
         self.assertEqual(resumed.result, full.result)
         self.assertEqual(resumed.work_used, full.work_used)
         self.assertEqual(resumed.events, full.events)
@@ -452,6 +499,7 @@ class PortfolioTests(unittest.TestCase):
         """Validate resealed cached claims, witnesses, and prime buffers."""
         config = small_config(trial_bound=100)
         n = 1009 * 1013
+
         run = factorize_bounded(n, config=config, budget=Budget(work_limit=0))
         checkpoint = copy.deepcopy(run.checkpoint)
         checkpoint["payload"]["state"]["classifications"][str(n)] = (
@@ -464,11 +512,13 @@ class PortfolioTests(unittest.TestCase):
         )
         checkpoint = copy.deepcopy(run.checkpoint)
         cursor = checkpoint["payload"]["state"]["current"]["cursor"]
+
         self.assertTrue(cursor["values"])
         cursor["values"][0] = 9
         with self.assertRaisesRegex(ValueError, "prime values"):
             factorize_bounded(n, config=config, checkpoint=reseal(checkpoint))
         prime = 2147483647
+
         run = factorize_bounded(
             prime, config=config, budget=Budget(work_limit=100)
         )

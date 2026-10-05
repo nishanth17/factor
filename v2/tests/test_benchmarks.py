@@ -26,6 +26,7 @@ class BenchmarkTests(unittest.TestCase):
             future.result.return_value = reading
         executor = MagicMock()
         executor.submit.side_effect = futures
+
         self.assertEqual(
             parallel_candidates._worker_cpu(executor, 2),
             {17: 1.5, 23: 2.75},
@@ -64,6 +65,7 @@ class BenchmarkTests(unittest.TestCase):
             patch.object(phase_two, "factorize_bounded", side_effect=expire),
         ):
             row = phase_two._sample(request)
+
         self.assertEqual(row["reason"], "wall_limit")
         self.assertEqual(row["remaining"], [15])
         self.assertTrue(row["reconstructs"])
@@ -101,8 +103,10 @@ class BenchmarkTests(unittest.TestCase):
         with patch.object(phase_two, "Worker") as factory:
             factory.return_value.call.return_value = row
             measured = phase_two._cold_sample(request, fixture)
+
             factory.return_value.call.assert_called_once_with(request)
             factory.return_value.close.assert_called_once_with()
+
         self.assertEqual(measured["mode"], "factor_one")
         self.assertEqual(measured["temperature"], "cold")
         self.assertGreaterEqual(measured["total_seconds"], 0)
@@ -129,6 +133,7 @@ class BenchmarkTests(unittest.TestCase):
             )
         ]
         summary = phase_two.summarize(rows)[0]
+
         self.assertEqual(summary["median_seconds"], 9)
         self.assertEqual(summary["p95_seconds"], 10)
         self.assertEqual(summary["completion_fraction"], 1 / 3)
@@ -159,6 +164,7 @@ class BenchmarkTests(unittest.TestCase):
             redirect_stdout(output),
         ):
             phase_two._worker()
+
         self.assertEqual(sample.call_count, 2)
         self.assertEqual(
             json.loads(output.getvalue()), {"seconds": 4, "calls": 2}

@@ -30,6 +30,7 @@ class IncrementalFilterTests(unittest.TestCase):
         matrix = filter_matrix(
             rows, weight_two=True, budget=budget, memory_bytes=8 * 1024**2
         )
+
         self.assertIs(matrix.original_rows, rows)
         self.assertEqual(matrix.rows, ())
         self.assertEqual(matrix.zero_dependencies, ((1 << count) - 1,))
@@ -45,6 +46,7 @@ class IncrementalFilterTests(unittest.TestCase):
         ]
         for rows in fixtures:
             expected = dense_kernel(rows)
+
             for weight_two in (False, True):
                 matrix = filter_matrix(
                     rows, weight_two=weight_two, budget=allowance()
@@ -53,6 +55,7 @@ class IncrementalFilterTests(unittest.TestCase):
                     solver = DependencySolver(
                         matrix, pivot=pivot, budget=allowance()
                     )
+
                     self.assertEqual(span(solver.run()), expected)
 
     def test_refused_private_filter_preserves_input_and_can_retry(self):
@@ -62,8 +65,10 @@ class IncrementalFilterTests(unittest.TestCase):
         for work in (0, completed.used // 2, completed.used - 1):
             with self.assertRaises(BudgetExhaustedError):
                 filter_matrix(rows, weight_two=True, budget=allowance(work))
+
             self.assertEqual(rows, (3, 5, 6, 24, 40, 48))
         matrix = filter_matrix(rows, weight_two=True, budget=allowance())
+
         self.assertEqual(span(matrix.zero_dependencies), dense_kernel(rows))
 
     def test_cancellation_during_incidence_build_preserves_input(self):
@@ -83,6 +88,7 @@ class IncrementalFilterTests(unittest.TestCase):
         )
         with self.assertRaises(BudgetExhaustedError):
             filter_matrix(rows, weight_two=True, budget=budget)
+
         self.assertEqual(budget.reason, "cancelled")
         self.assertEqual(calls, 3)
         self.assertEqual(rows, (3,) * 1000)

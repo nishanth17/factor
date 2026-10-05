@@ -95,6 +95,7 @@ def _run_configuration(mode, workers, warm, assignments, repetitions):
                 # Cold samples include pool construction and full shutdown.
                 with make_executor() as cold_executor:
                     results = list(cold_executor.map(_curve_job, assignments))
+
             samples.append(time.perf_counter() - start)
             _check(results, assignments)
             rounds.append(results)
@@ -125,9 +126,11 @@ def main():
         parser.error("at least four jobs and one repetition are required")
 
     configurations = []
+
     for b1, b2 in ((200, 5000), (2000, 147396)):
         assignments = [(seed, b1, b2) for seed in range(args.jobs)]
         baseline = None
+
         for mode, workers, warm in (
             ("serial", 1, False),
             ("threads", 4, False),

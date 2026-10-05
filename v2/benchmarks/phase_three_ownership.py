@@ -16,9 +16,13 @@ from .phase_three_reference import _rss_bytes
 from .qs_snapshot import ROOT, load_qs_arm
 
 FREEZE = (
-    ROOT / "benchmarks/inputs/phase_three_m25_p33_refinement_pypy.frozen.json"
+    ROOT
+    / "benchmarks/inputs/controls"
+    / "phase_three_m25_p33_refinement_pypy.frozen.json"
 )
-OLD_PIPELINE = ROOT / "benchmarks/inputs/m25_pre_ownership_pipeline.json"
+OLD_PIPELINE = (
+    ROOT / "benchmarks/inputs/baselines/m25_pre_ownership_pipeline.json"
+)
 HELD_OUT_SEED = 335
 
 
@@ -62,18 +66,21 @@ def main():
             )
         )
         return
+
     if (
         not math.isfinite(args.warmup_seconds)
         or args.warmup_seconds < 3
         or args.repetitions < 9
     ):
         parser.error("require three seconds warmup and nine samples")
+
     if args.output.exists():
         parser.error("use a unique output capture")
     measured_environment = environment()
     corpus = _corpus(HELD_OUT_SEED, 16)
     expected = [fixture["factors"] for fixture in corpus]
     rows = []
+
     for name in ("m22", "owner_before", "after"):
         arm = _arm(name)
         config = _config(arm, **frozen["config"])
@@ -88,11 +95,14 @@ def main():
                 ),
             )
         )
+
     cold = []
+
     for name in ("m22", "after"):
         for _ in range(9):
             started = time.perf_counter()
             prior = resource.getrusage(resource.RUSAGE_CHILDREN)
+
             child = subprocess.run(
                 [
                     sys.executable,
@@ -122,6 +132,7 @@ def main():
                 ),
             )
             cold.append(result)
+
     assert (
         environment()["source_sha256"]
         == (measured_environment["source_sha256"])

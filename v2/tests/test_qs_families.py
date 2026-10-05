@@ -50,6 +50,7 @@ class FamilyTests(unittest.TestCase):
         base = self.base()
         options = dict(factor_count=3, family_count=16, pool_size=8, seed=29)
         first = family_assignments(base, 64, **options)
+
         self.assertEqual(first, family_assignments(base, 64, **options))
         self.assertEqual(len(first), len(set(first)))
         self.assertEqual(len(first), 16)
@@ -59,12 +60,15 @@ class FamilyTests(unittest.TestCase):
         one = family_assignments(
             base, 64, factor_count=3, family_count=64, pool_size=3
         )
+
         self.assertEqual(len(one), 1)
 
     def test_crt_gray_roots_against_full_and_exhaustive_oracles(self):
         saw_recenter = False
+
         for h in (1, 2, 3, 9):
             base = self.base(h)
+
             for count in (1, 2, 3, 4):
                 values = family_assignments(
                     base,
@@ -77,9 +81,11 @@ class FamilyTests(unittest.TestCase):
                     base, values, budget=unlimited_budget()
                 )
                 seen, prior = set(), None
+
                 for index in range(family.count):
                     step = family.next()
                     polynomial = step.polynomial
+
                     self.assertEqual(step.gray_index, index)
                     self.assertEqual(polynomial.a, prod(values))
                     self.assertEqual(
@@ -94,15 +100,18 @@ class FamilyTests(unittest.TestCase):
                         )
                         gray = index ^ (index >> 1)
                         old_gray = (index - 1) ^ ((index - 1) >> 1)
+
                         self.assertEqual((gray ^ old_gray).bit_count(), 1)
                         bit = (gray ^ old_gray).bit_length() - 1
                         old_sign = -1 if old_gray & (1 << bit) else 1
                         raw_delta = -2 * old_sign * family.terms[bit + 1]
                         saw_recenter |= raw_delta != step.delta_b
+
                     for entry, roots in zip(base.entries, step.roots):
                         expected = polynomial_roots(
                             polynomial, base, entry, budget=unlimited_budget()
                         )
+
                         self.assertEqual(roots, expected)
                         exhaustive = tuple(
                             x
@@ -114,17 +123,23 @@ class FamilyTests(unittest.TestCase):
                             if (roots.all_positions)
                             else roots.roots
                         )
+
                         self.assertEqual(actual, exhaustive)
+
                     for x in (-64, -1, 0, 1, 64):
                         self.assertEqual(
                             polynomial.u_value(x) ** 2 - base.n_prime,
                             polynomial.a * polynomial.value(x),
                         )
+
                     prior = step
+
                 used = family.budget.used
+
                 self.assertIsNone(family.next())
                 self.assertIsNone(family.next())
                 self.assertEqual(family.budget.used, used)
+
         self.assertTrue(saw_recenter)
 
     def test_refused_next_keeps_gray_and_root_state(self):
@@ -138,12 +153,14 @@ class FamilyTests(unittest.TestCase):
         )
         with self.assertRaises(BudgetExhaustedError):
             family.next()
+
         self.assertEqual(family.next_index, 1)
         self.assertIs(family.current, first)
         family.budget = Budget(
             work_limit=200_000_000, used=used, seconds=None, cpu_seconds=None
         )
         second = family.next()
+
         self.assertEqual(second.gray_index, 1)
 
     def test_checkpoint_roundtrip_and_charged_root_reconstruction(self):
@@ -156,15 +173,18 @@ class FamilyTests(unittest.TestCase):
             family.next()
         checkpoint = json.loads(json.dumps(family.checkpoint()))
         budget = resumed_budget(checkpoint)
+
         restored = PolynomialFamily.from_checkpoint(
             base, checkpoint, budget=budget
         )
+
         self.assertGreater(
             budget.used, checkpoint["payload"]["resources"]["work_used"]
         )
         self.assertEqual(restored.current, family.current)
         while family.next_index < family.count:
             self.assertEqual(restored.next(), family.next())
+
         self.assertIsNone(restored.next())
         with self.assertRaises(ValueError):
             PolynomialFamily.from_checkpoint(
@@ -202,6 +222,7 @@ class FamilyTests(unittest.TestCase):
         primes = family_assignments(base, 64, family_count=1)[0]
         family = PolynomialFamily(base, primes, budget=unlimited_budget())
         original = family.checkpoint()
+
         for key, value in (
             ("a_primes", [7] * 4097),
             ("base_identity", "x" * 4097),
@@ -221,6 +242,7 @@ class FamilyTests(unittest.TestCase):
                 PolynomialFamily.from_checkpoint(
                     base, corrupt, budget=unlimited_budget()
                 )
+
         family.budget = Budget(work_limit=1 << 200, used=1 << 199)
         with self.assertRaises(ValueError):
             family.checkpoint()
@@ -256,6 +278,7 @@ class FamilyTests(unittest.TestCase):
         ]
         family = PolynomialFamily(base, primes, budget=budget)
         splits = []
+
         while (step := family.next()) is not None:
             job = QSJob(
                 step.polynomial,
@@ -268,6 +291,7 @@ class FamilyTests(unittest.TestCase):
                     SieveCollector, precomputed_roots=step.roots
                 ),
             )
+
             result = job.run()
             if result.divisor is not None:
                 self.assertEqual(result.divisor * result.cofactor, n)
@@ -275,6 +299,7 @@ class FamilyTests(unittest.TestCase):
                     {result.divisor, result.cofactor}, {2003, 8353}
                 )
                 splits.append(result.divisor)
+
         self.assertTrue(splits)
 
     def test_cached_collector_against_exhaustive_payloads(self):
@@ -283,6 +308,7 @@ class FamilyTests(unittest.TestCase):
             0
         ]
         family = PolynomialFamily(base, primes, budget=unlimited_budget())
+
         while (step := family.next()) is not None:
             reference = collect_block(
                 step.polynomial,
@@ -300,6 +326,7 @@ class FamilyTests(unittest.TestCase):
                 budget=unlimited_budget(),
                 config=SieveConfig(residual_bound=97, memory_bytes=33554432),
             )
+
             run = worker.collect(-31, 34)
 
             def payload(atoms):
@@ -324,6 +351,7 @@ class FamilyTests(unittest.TestCase):
         changed[index] = replace(
             changed[index], roots=changed[index].roots[:1]
         )
+
         for roots in (tuple(changed), step.roots[:-1], list(step.roots)):
             with self.assertRaises(ValueError):
                 SieveCollector(

@@ -40,6 +40,7 @@ def main():
         assignment_work=50_000_000,
     )
     results = {}
+
     for mode, workers in (
         ("serial", 1),
         ("thread", 1),
@@ -62,6 +63,7 @@ def main():
                     job = ParallelSIQSJob(
                         fixture["n"], seed=7, config=config, budget=budget
                     )
+
                     result = job.run(pool=pool, fixed_work=True)
                     elapsed = time.perf_counter() - start
                     if (result.divisor or 1) * result.cofactor != fixture["n"]:
@@ -83,6 +85,7 @@ def main():
                 results[f"{mode}_{workers}/{resource}"] = measure(
                     run, SimpleNamespace(warmup_seconds=3, repetitions=9)
                 )
+
     if fingerprint(root) != before:
         raise AssertionError("source changed during measurement")
     args.output.write_text(

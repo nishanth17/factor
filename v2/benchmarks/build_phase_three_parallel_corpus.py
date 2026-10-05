@@ -9,12 +9,13 @@ from pathlib import Path
 
 from .. import utils
 
-OUTPUT = Path(__file__).parent / "inputs/phase_three_p36_corpus.json"
+OUTPUT = Path(__file__).parent / "inputs/corpora/phase_three_p36_corpus.json"
 
 
 def build():
     generator = random.Random(36042026)
     fixtures = []
+
     for band, low, high in (
         ("small", 4000, 8000),
         ("medium", 1_000_000, 4_000_000),
@@ -22,6 +23,7 @@ def build():
         for split, count in (("training", 4), ("held_out", 4)):
             for index in range(count):
                 primes = []
+
                 while len(primes) < 2:
                     value = generator.randrange(low, high) | 1
                     while (
@@ -30,6 +32,7 @@ def build():
                         value += 2
                     if value not in primes:
                         primes.append(value)
+
                 primes.sort()
                 for prime in primes:
                     if any(
@@ -39,6 +42,7 @@ def build():
                         raise AssertionError(
                             "independent prime certification failed"
                         )
+
                 fixtures.append(
                     dict(
                         id=f"{band}_{split}_{index}",
@@ -48,6 +52,7 @@ def build():
                         factors=primes,
                     )
                 )
+
     return dict(schema=1, seed=36042026, fixtures=fixtures)
 
 

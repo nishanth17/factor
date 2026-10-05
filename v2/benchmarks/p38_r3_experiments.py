@@ -25,6 +25,7 @@ def live_compaction(matrix, budget, memory_bytes):
     )
     lookup = {column: index for index, column in enumerate(labels)}
     remapped = []
+
     for row in matrix.rows:
         budget.consume(0)
         bits, value = row, 0
@@ -33,6 +34,7 @@ def live_compaction(matrix, budget, memory_bytes):
             value |= 1 << lookup[bit.bit_length() - 1]
             bits ^= bit
         remapped.append(value)
+
     original_union = 0
     for row in matrix.original_rows:
         original_union |= row
@@ -42,6 +44,7 @@ def live_compaction(matrix, budget, memory_bytes):
             bit = bits & -bits
             initial_labels.append(bit.bit_length() - 1)
             bits ^= bit
+
     inverse = tuple(initial_labels[i] if initial_labels else i for i in labels)
     stats = dict(matrix.stats, inverse_columns=inverse)
     return replace(
@@ -64,6 +67,7 @@ def history_filter(
         or max((r.bit_length() for r in rows), default=0) > 4096
     ):
         raise ValueError("history prototype is limited to 4096 rows/columns")
+
     columns = max((r.bit_length() for r in rows), default=0)
     reserve = module.matrix_workspace(len(rows), columns)
     reserve += 65536
@@ -98,6 +102,7 @@ def history_filter(
             bits ^= bit
 
     merges = rounds = 0
+
     while active:
         budget.consume(0)
         rounds += 1
@@ -126,6 +131,7 @@ def history_filter(
             used.update((first, second))
             if len(selected) == batch_size:
                 break
+
         if not selected:
             break
         for first, second in selected:
@@ -141,6 +147,7 @@ def history_filter(
                 node = len(history) - 1
             else:
                 node = left_node ^ right_node
+
             active[first] = left ^ right, node
             merges += 1
 
@@ -148,6 +155,7 @@ def history_filter(
         if not use_history:
             return node
         stack, mask = [node], 0
+
         while stack:
             budget.consume(words)
             value = history[stack.pop()]
@@ -155,6 +163,7 @@ def history_filter(
                 mask ^= 1 << value[0]
             else:
                 stack.extend(value)
+
         return mask
 
     masks = tuple(lift(node) for _, node in active.values())

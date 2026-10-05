@@ -22,6 +22,7 @@ def _brent_attempt(
     y = start % n
     cycle_length = 1
     used = 0
+
     while used < max_evaluations:
         # Brent doubles the cycle length; x anchors the next comparison run.
         x = y
@@ -31,6 +32,7 @@ def _brent_attempt(
         used += advance
         stats.evaluations += advance
         position = 0
+
         while position < cycle_length and used < max_evaluations:
             # Save the batch start so saturation can replay the same walk.
             saved = y
@@ -52,6 +54,7 @@ def _brent_attempt(
                 stats.saturated_batches += 1
                 # Recovery evaluations also consume this attempt's allowance.
                 recover = min(count, recovery_limit, max_evaluations - used)
+
                 for _ in range(recover):
                     saved = (saved * saved + offset) % n
                     used += 1
@@ -60,9 +63,13 @@ def _brent_attempt(
                     stats.gcd_calls += 1
                     if 1 < divisor < n:
                         return divisor
+
                 return None
+
             position += count
+
         cycle_length <<= 1
+
     return None
 
 
@@ -97,6 +104,7 @@ def factorize_rho(
     if not _known_composite and utils.is_prime(n, rng=generator):
         return None
     work = stats if stats is not None else RhoStats()
+
     for _ in range(max_attempts):
         start = generator.randint(1, n - 1)
         offset = generator.randint(1, n - 1)
@@ -108,4 +116,5 @@ def factorize_rho(
         )
         if utils.valid_divisor(divisor, n):
             return divisor
+
     return None

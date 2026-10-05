@@ -34,30 +34,39 @@ class FollowupTests(unittest.TestCase):
             polynomial, base, config=cfg, budget=allowance()
         )
         dense = 4096 * (512 + 128 * len(base.entries))
+
         self.assertGreater(worker._workspace + dense, cfg.memory_bytes)
+
         expected = SieveCollector(
             polynomial,
             base,
             config=replace(cfg, division="bucket"),
             budget=allowance(),
         ).collect(-50, 51)
+
         actual = worker.collect(-50, 51)
+
         self.assertEqual(signature(actual), signature(expected))
         self.assertLessEqual(actual.workspace_bytes, cfg.memory_bytes)
         self.assertFalse(worker._resieved)
         self.assertEqual(worker._scratch_bytes, 0)
         worker.config = replace(cfg, memory_bytes=worker._workspace + 1)
+
         refused = worker.collect(100, 151)
+
         self.assertEqual(refused.reason, "memory_limit")
         self.assertEqual(refused.stats["scanned"], 0)
         worker.config = cfg
+
         recovered = worker.collect(100, 151)
+
         expected = SieveCollector(
             polynomial,
             base,
             config=replace(cfg, division="bucket"),
             budget=allowance(),
         ).collect(100, 151)
+
         self.assertEqual(
             {k: v for k, v in signature(recovered).items() if 100 <= k < 151},
             signature(expected),
@@ -67,18 +76,23 @@ class FollowupTests(unittest.TestCase):
         cfg = PortfolioConfig(
             pm1_attempts=0, pm1_b2=10**12, ecm_tiers=((10**6, 10**12, 0),)
         )
+
         self.assertEqual(
             cfg.max_hi, 1 + max(cfg.trial_bound, cfg.max_input_bits)
         )
+
         run = factorize_bounded(4001 * 5003, config=cfg, budget=allowance())
+
         self.assertTrue(run.result.complete)
         self.assertEqual(run.result.reconstruct(), 4001 * 5003)
+
         restored = factorize_bounded(
             4001 * 5003,
             config=cfg,
             checkpoint=run.checkpoint,
             budget=allowance(),
         )
+
         self.assertEqual(restored.result, run.result)
         with self.assertRaises(MemoryError):
             replace(cfg, ecm_tiers=((10**6, 10**12, 1),))
@@ -93,6 +107,7 @@ class FollowupTests(unittest.TestCase):
                     result = ParallelSIQSJob(
                         4001 * 5003, budget=allowance()
                     ).run(pool=pool)
+
                     self.assertEqual(
                         result.divisor * result.cofactor, 4001 * 5003
                     )
@@ -110,10 +125,12 @@ class FollowupTests(unittest.TestCase):
             ):
                 with CollectionPool(mode, workers) as pool:
                     result = job.run(pool=pool)
+
             self.assertEqual(result.divisor * result.cofactor, job.n)
 
     def test_lease_ceiling_is_not_a_minimum_allowance(self):
         cfg = ParallelConfig(family_count=4, pool_size=8)
+
         for mode, workers, work in (
             ("serial", 1, 1000000),
             ("thread", 4, 15000000),
@@ -123,6 +140,7 @@ class FollowupTests(unittest.TestCase):
             )
             with CollectionPool(mode, workers) as pool:
                 result = job.run(pool=pool)
+
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual(result.divisor * result.cofactor, job.n)
             self.assertLessEqual(job.budget.used, work)
@@ -161,6 +179,7 @@ class FollowupTests(unittest.TestCase):
                 except BudgetExhaustedError:
                     released.set()
                     raise
+
             original_merge(result)
 
         with CollectionPool("thread", 2) as pool:
@@ -170,7 +189,9 @@ class FollowupTests(unittest.TestCase):
                 patch("v2.qs.parallel._collect", side_effect=collect),
             ):
                 result = job.run(pool=pool, fixed_work=True, max_assignments=2)
+
             self.assertFalse(pool.lock.locked())
+
         self.assertTrue(released.is_set())
         self.assertEqual(result.reason, "families_exhausted")
         self.assertEqual(job.next_assignment, 2)
@@ -188,6 +209,7 @@ class FollowupTests(unittest.TestCase):
             if finished[0]:
                 return None
             job.engine.solver = object()
+
             try:
                 job.budget.consume(2)
             except BudgetExhaustedError:
@@ -195,6 +217,7 @@ class FollowupTests(unittest.TestCase):
                 if failures[0] >= 2:
                     released.set()
                 raise
+
             finished[0] = True
             job.engine.solver = None
             return None
@@ -234,6 +257,7 @@ class FollowupTests(unittest.TestCase):
                 patch("v2.qs.parallel._collect", side_effect=collect),
             ):
                 result = job.run(pool=pool, fixed_work=True, max_assignments=2)
+
         self.assertGreaterEqual(failures[0], 2)
         self.assertEqual(result.reason, "families_exhausted")
         self.assertEqual(job.next_assignment, 2)
@@ -260,10 +284,12 @@ class FollowupTests(unittest.TestCase):
                 separators=(",", ":"),
             ).encode()
         ).hexdigest()
+
         self.assertEqual(_identity(base), expected)
         with patch("v2.qs.families.json.dumps", side_effect=AssertionError):
             self.assertEqual(_identity(base), expected)
         changed = replace(base, bound=1001)
+
         self.assertIsNone(changed._family_identity)
         self.assertNotEqual(_identity(changed), expected)
 
@@ -311,6 +337,7 @@ class FollowupTests(unittest.TestCase):
             - base.workspace_bytes
             + 65536
         )
+
         self.assertLess(cap, family.workspace_bytes + collector._workspace)
         cfg = replace(cfg, worker_memory_bytes=cap)
         task = (
@@ -324,6 +351,7 @@ class FollowupTests(unittest.TestCase):
         )
         with CollectionPool() as pool:
             result = _collect(task, pool.state)
+
         self.assertEqual(result["reason"], "complete")
         self.assertLessEqual(result["workspace_bytes"], cap)
 

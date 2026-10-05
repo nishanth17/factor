@@ -2,6 +2,11 @@
 
 ## Current development
 
+- Condense benchmark history into dated README sections and add a QS guide.
+  Organize required corpora, baselines and controls; preserve optional historical
+  snapshots locally. Add explicit experiment-manifest selection and repair R3
+  driver hash paths after the input relocation.
+
 - Keep research notes and diagnostic tools in the ignored local audit tree.
   Move six required source/provenance inputs into benchmark inputs and retain
   the public acceptance plan as `v2/ROADMAP.md`.

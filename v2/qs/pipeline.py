@@ -132,6 +132,7 @@ class QSJob:
                 and count - self.last_count < self.filter_row_growth
             ):
                 return None
+
             store = dict(self.collector._atoms)
             prepared = self._timed(
                 "preparation",
@@ -175,8 +176,11 @@ class QSJob:
                 and not matrix.zero_dependencies
                 and (excess < self.row_excess)
             ):
+                # Defer only a growing store; final/storage-cap attempts must
+                # still test kernels when no further collection is possible.
                 self.last_count = count
                 return None
+
             self.prepared = prepared
             self.solver = DependencySolver(
                 matrix,
@@ -184,6 +188,7 @@ class QSJob:
                 budget=self.budget,
             )
             self.stats["solve_calls"] += 1
+
         if self.extractor is None:
             self.solver.budget = self.budget
             self.budget.consume(0)
@@ -198,6 +203,7 @@ class QSJob:
                     else None
                 ),
             )
+
         self.extractor.budget = self.budget
         self.budget.consume(0)
         divisor = self._timed("extraction", self.extractor.run)
@@ -231,6 +237,7 @@ class QSJob:
             except MemoryError:
                 self.storage_reason = "memory_limit"
             self.storage_solve_done = True
+
         return self.storage_reason
 
     def run(self, *, batch_limit=None):
@@ -256,6 +263,7 @@ class QSJob:
             utils.require_integer(batch_limit, "batch_limit", 1)
         batches = 0
         reason = "window_exhausted"
+
         try:
             while self.divisor is None:
                 if self.storage_reason is not None:
@@ -307,7 +315,9 @@ class QSJob:
                         ):
                             self.storage_reason = reason
                             reason = self._finish_storage()
+
                         break
+
                 final = self.next_position >= self.hi
                 self.divisor = self._solve(final)
                 if final:
@@ -315,15 +325,18 @@ class QSJob:
                 elif batch_limit is not None and batches >= batch_limit:
                     reason = "paused"
                     break
+
             self.budget.consume(0)
         except BudgetExhaustedError:
             reason = self.budget.reason
+
         if self.divisor is not None:
             if not utils.valid_divisor(
                 self.divisor, self.collector.factor_base.n
             ):
                 raise ArithmeticError("extraction returned an invalid divisor")
             reason = "factor_found"
+
         self.stats["work_used"] = self.budget.used
         self.stats["workspace_bytes"] = self._workspace_peak
         return QSResult(

@@ -23,7 +23,7 @@ from .build_phase_two_corpus import verify_certificates
 from .phase_one import environment
 from .phase_three_reference import _rss_bytes
 
-CORPUS = Path(__file__).parent / "inputs/phase_three_p34_corpus.json"
+CORPUS = Path(__file__).parent / "inputs/corpora/phase_three_p34_corpus.json"
 MEMORY = 64 * 1024 * 1024
 SMALL_SECONDS = 10
 LARGE_SECONDS = 0.2
@@ -74,6 +74,7 @@ def run_one(fixture, seed, config, *, ecm=False, seconds=None):
             ecm_tiers=((2000, 147396, 2),),
             memory_bytes=MEMORY,
         )
+
         result = factorize_bounded(
             n, seed=seed, config=portfolio, budget=budget
         )
@@ -93,6 +94,7 @@ def run_one(fixture, seed, config, *, ecm=False, seconds=None):
         split = next((v for v in values if utils.valid_divisor(v, n)), None)
     else:
         job = SIQSJob(n, seed=seed, config=config, budget=budget)
+
         result = job.run()
         split = result.divisor
         factors, remaining, labels = [], [n], []
@@ -100,19 +102,23 @@ def run_one(fixture, seed, config, *, ecm=False, seconds=None):
         stats = result.stats
         if split is not None:
             children = sorted((split, n // split))
+
             try:
                 for child in children:
                     budget.consume(child.bit_length() * 32)
                     label = utils.classify_prime(
                         child, rng=random.Random(seed)
                     )
+
                     if label is utils.Primality.COMPOSITE:
                         raise AssertionError("semiprime child was composite")
                     labels.append(label.value)
+
                 factors, remaining = children, []
             except BudgetExhaustedError:
                 labels = []
                 reason = "classification_" + budget.reason
+
     row = dict(
         id=fixture["id"],
         band=fixture["band"],
@@ -141,6 +147,7 @@ def cohort(fixtures, seed, config, *, ecm=False, seconds=None):
 
 def _measure(fixtures, seed, config, args, *, ecm=False, seconds=None):
     attempts = []
+
     for attempt in range(2):
         began = time.perf_counter()
         warmup = (
@@ -154,6 +161,7 @@ def _measure(fixtures, seed, config, args, *, ecm=False, seconds=None):
             warm_calls += 1
         warm_elapsed = time.perf_counter() - began
         samples = []
+
         for _ in range(
             args.repetitions if attempt == 0 else max(15, args.repetitions)
         ):
@@ -167,6 +175,7 @@ def _measure(fixtures, seed, config, args, *, ecm=False, seconds=None):
                     rows=rows,
                 )
             )
+
         times = [s["seconds"] for s in samples]
         median = statistics.median(times)
         quartiles = statistics.quantiles(times, n=4)
@@ -188,6 +197,7 @@ def _measure(fixtures, seed, config, args, *, ecm=False, seconds=None):
         )
         if stable:
             break
+
     return dict(
         attempts=attempts,
         median_seconds=median,
@@ -209,6 +219,7 @@ def training(corpus, args):
     ]
     base = base_config()
     choices = [("baseline", base)]
+
     for field, values in (
         ("base_bound", (100, 500)),
         ("factor_count", (1, 2, 4)),
@@ -221,6 +232,7 @@ def training(corpus, args):
         choices.extend(
             (f"{field}_{v}", replace(base, **{field: v})) for v in values
         )
+
     for field, values in (
         ("block_width", (128, 512)),
         ("residual_bound", (500, 10000)),
@@ -234,7 +246,9 @@ def training(corpus, args):
             )
             for v in values
         )
+
     records = []
+
     for name, config in choices:
         measurement = _measure(small, 7, config, args)
         repetitions = [
@@ -257,6 +271,7 @@ def training(corpus, args):
                 measurement=measurement,
             )
         )
+
     selected = max(
         records, key=lambda r: (r["completion_rate"], -r["median_seconds"])
     )
@@ -297,6 +312,7 @@ def training(corpus, args):
         ),
     ]
     large_records = []
+
     for name, config in large_choices:
         measurement = _measure(large, 7, config, args, seconds=0.08)
         rows = [
@@ -319,6 +335,7 @@ def training(corpus, args):
                 seconds=sum(r["seconds"] for r in rows),
             )
         )
+
     selected_large = max(
         large_records,
         key=lambda r: (
@@ -351,8 +368,10 @@ def _config(values):
 
 def bootstrap(records, before, after):
     values = {}
+
     for label in (before, after):
         by_input = {}
+
         for record in records:
             if record["arm"] == label:
                 for sample in record["measurement"]["attempts"][-1]["samples"]:
@@ -360,14 +379,18 @@ def bootstrap(records, before, after):
                         by_input.setdefault(
                             (row["id"], row["seed"]), []
                         ).append(row)
+
         values[label] = by_input
+
     keys = sorted(set(values[before]) & set(values[after]))
     generator = random.Random(3034)
     ratios, differences = [], []
+
     for _ in range(2000):
         picked = [generator.choice(keys) for _ in keys]
         totals = {}
         completions = {}
+
         for label in (before, after):
             totals[label] = sum(
                 statistics.median(r["seconds"] for r in values[label][k])
@@ -377,8 +400,10 @@ def bootstrap(records, before, after):
                 statistics.mean(r["completed"] for r in values[label][k])
                 for k in picked
             ) / len(picked)
+
         ratios.append(totals[after] / totals[before])
         differences.append(completions[after] - completions[before])
+
     ratios.sort()
     differences.sort()
     return dict(
@@ -414,6 +439,7 @@ def main():
         ]
         started = time.perf_counter()
         rows = []
+
         for f in representatives:
             config = _config(
                 frozen["small"] if f["band"] == "small" else frozen["large"]
@@ -422,6 +448,7 @@ def main():
                 config, mode=args.cold if args.cold != "ecm" else "siqs"
             )
             rows.append(run_one(f, 7, config, ecm=args.cold == "ecm"))
+
         usage = resource.getrusage(resource.RUSAGE_SELF)
         print(
             json.dumps(
@@ -434,6 +461,7 @@ def main():
             )
         )
         return
+
     if (
         args.output.exists()
         or frozen_path.exists()
@@ -444,6 +472,7 @@ def main():
         parser.error(
             "new output, three-second warmup and nine samples required"
         )
+
     verify_certificates(corpus["certificates"])
     measured = environment()
     small_config, large_config, tuning = training(corpus, args)
@@ -470,6 +499,7 @@ def main():
     )
     held = [f for f in corpus["fixtures"] if f["split"] == "held_out"]
     records = []
+
     for cohort_name in ("small", "large"):
         fixtures = [
             f
@@ -512,6 +542,7 @@ def main():
                 frozen.setdefault("large_controls", []).append(
                     dict(arm=label, rows=rows)
                 )
+
         for seed in corpus["seeds"]:
             for arm, config in arms:
                 measurement = _measure(
@@ -543,10 +574,13 @@ def main():
                     measurement["stable"],
                     flush=True,
                 )
+
     cold = []
+
     for arm in ("qs", "mpqs", "siqs", "ecm"):
         for _ in range(9):
             started = time.perf_counter()
+
             child = subprocess.run(
                 [
                     sys.executable,
@@ -567,6 +601,7 @@ def main():
                 arm=arm, lifecycle_seconds=time.perf_counter() - started
             )
             cold.append(value)
+
     checkpoint_samples = []
     fixture = next(f for f in held if f["band"] == "small")
     warm_started = time.perf_counter()
@@ -581,11 +616,14 @@ def main():
         job.run(max_blocks=1)
         snapshot = job.checkpoint()
         before = snapshot["resources"]["work_used"]
+
         resumed = SIQSJob.from_checkpoint(
             snapshot,
             budget=Budget(work_limit=WORK, seconds=10, cpu_seconds=10),
         )
+
         result = resumed.run()
+
         if result.divisor is None or result.divisor not in fixture["factors"]:
             raise AssertionError("checkpoint roundtrip failed factoring")
         return dict(
@@ -603,7 +641,9 @@ def main():
         value = roundtrip()
         value["seconds"] = time.perf_counter() - started
         checkpoint_samples.append(value)
+
     profiles = []
+
     for label, config in (
         ("qs", replace(small_config, mode="qs")),
         ("siqs", small_config),
@@ -653,6 +693,7 @@ def main():
                 ],
             )
         )
+
     assert measured["source_sha256"] == environment()["source_sha256"]
     small_records = [r for r in records if r["cohort"] == "small"]
     intervals = {

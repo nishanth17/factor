@@ -49,6 +49,7 @@ def _checked_resources(resources):
         "cpu_used",
     }:
         raise ValueError("invalid family checkpoint resource record")
+
     work = utils.require_integer(resources["work_used"], "work_used", 0)
     if work.bit_length() > 64:
         raise ValueError("family checkpoint work exceeds 64 bits")
@@ -62,6 +63,7 @@ def _checked_resources(resources):
             or value < 0
         ):
             raise ValueError("invalid family checkpoint time record")
+
     return resources
 
 
@@ -92,6 +94,7 @@ def family_assignments(
         utils.require_integer(value, name, minimum)
         if value > maximum:
             raise ValueError(f"{name} exceeds the family limit")
+
     utils.require_integer(memory_bytes, "memory_bytes", 0)
     reserve = base.workspace_bytes + 32768 + 256 * len(base.entries)
     reserve += family_count * factor_count * 256
@@ -114,6 +117,7 @@ def family_assignments(
     first = tuple(sorted(pool[:factor_count]))
     assignments, seen = [first], {first}
     generator = random.Random(seed)
+
     for _ in range(MAX_FAMILIES * 64):
         if len(assignments) == wanted:
             break
@@ -122,6 +126,7 @@ def family_assignments(
         if values not in seen:
             assignments.append(values)
             seen.add(values)
+
     return tuple(assignments)
 
 
@@ -137,6 +142,7 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
     if (polynomial.n, polynomial.multiplier) != (base.n, base.multiplier):
         raise ValueError("cached roots belong to a different target")
     budget = budget if budget is not None else Budget()
+
     for entry, item in zip(base.entries, roots):
         prime = entry.prime
         budget.consume(prime.bit_length() ** 2)
@@ -171,17 +177,20 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
                     "cached characteristic-two roots are incomplete"
                 )
             continue
+
         if a == 0 and 2 * b % prime == 0:
             if item.roots or item.all_positions != (c == 0):
                 raise ValueError(
                     "cached constant-polynomial roots are incomplete"
                 )
             continue
+
         count = 1 if a == 0 else len(entry.square_roots)
         if item.all_positions or len(item.roots) != count:
             raise ValueError("cached root cardinality is incomplete")
         if any((a * x * x + 2 * b * x + c) % prime for x in item.roots):
             raise ValueError("cached value is not a polynomial root")
+
     return True
 
 
@@ -244,6 +253,7 @@ class PolynomialFamily:
             if entry.prime in a_primes
         }
         terms = []
+
         for prime in a_primes:
             self.budget.consume(a.bit_length() + prime.bit_length() ** 2)
             quotient = a // prime
@@ -251,7 +261,9 @@ class PolynomialFamily:
             terms.append(
                 quotient * inverse * entries[prime].square_roots[0] % a
             )
+
         inverses = []
+
         for entry in base.entries:
             prime = entry.prime
             self.budget.consume(prime.bit_length() ** 2)
@@ -260,6 +272,7 @@ class PolynomialFamily:
                 if prime == 2 or a % prime == 0
                 else utils.modular_inverse(a, prime)
             )
+
         self.terms, self.inverses = tuple(terms), tuple(inverses)
         self.base_identity = _identity(base)
         self.identity = _checksum(
@@ -282,14 +295,19 @@ class PolynomialFamily:
                 raw += -term if gray & (1 << bit) else term
         else:
             old_gray = previous.gray_index ^ (previous.gray_index >> 1)
+            # Adjacent Gray codes flip one CRT sign, so only its term moves B.
             bit = (gray ^ old_gray).bit_length() - 1
             old_sign = -1 if old_gray & (1 << bit) else 1
             raw = previous.polynomial.b - 2 * old_sign * self.terms[bit + 1]
             changed = self.a_primes[bit + 1]
+
         b = (raw + self.a // 2) % self.a - self.a // 2
         polynomial = Polynomial(self.base.n, self.base.multiplier, self.a, b)
+        # Use the centered B difference, including any reduction modulo A,
+        # so cached roots shift by exactly -delta/A at nonsingular primes.
         delta = 0 if previous is None else b - previous.polynomial.b
         roots = []
+
         for offset, (entry, inverse) in enumerate(
             zip(self.base.entries, self.inverses)
         ):
@@ -300,6 +318,7 @@ class PolynomialFamily:
                     )
                 )
                 continue
+
             residues = (
                 tuple(
                     (root - b) * inverse % entry.prime
@@ -312,6 +331,7 @@ class PolynomialFamily:
                 )
             )
             roots.append(PolynomialRoots(entry.prime, tuple(sorted(residues))))
+
         return FamilyStep(
             self.identity, index, polynomial, tuple(roots), delta, changed
         )
@@ -366,6 +386,7 @@ class PolynomialFamily:
             "sha256",
         }:
             raise ValueError("invalid family checkpoint envelope")
+
         payload = checkpoint["payload"]
         if not isinstance(payload, dict) or set(payload) != {
             "version",
@@ -375,6 +396,7 @@ class PolynomialFamily:
             "resources",
         }:
             raise ValueError("invalid family checkpoint payload")
+
         utils.require_integer(payload["version"], "checkpoint version", 1)
         if payload["version"] != FAMILY_CHECKPOINT_VERSION:
             raise ValueError("unsupported family checkpoint version")
@@ -385,6 +407,7 @@ class PolynomialFamily:
             or len(checkpoint["sha256"]) != 64
         ):
             raise ValueError("invalid family checkpoint identity shape")
+
         if payload["base_identity"] != _identity(base):
             raise ValueError("family checkpoint factor-base identity mismatch")
         primes = payload["a_primes"]
@@ -393,6 +416,7 @@ class PolynomialFamily:
             or not 1 <= len(primes) <= MAX_A_FACTORS
         ):
             raise ValueError("invalid family checkpoint A factors")
+
         for prime in primes:
             utils.require_integer(prime, "checkpoint A prime", 3)
             if prime not in base.primes:
@@ -417,6 +441,7 @@ class PolynomialFamily:
             or budget.cpu_used < prior.prior_cpu
         ):
             raise ValueError("resume budget must retain consumed resources")
+
         family = cls(
             base, tuple(primes), budget=budget, memory_bytes=memory_bytes
         )
@@ -425,5 +450,6 @@ class PolynomialFamily:
                 family._make_step(index - 2, None) if index > 1 else None
             )
             family.current = family._make_step(index - 1, previous)
+
         family.next_index = index
         return family

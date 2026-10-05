@@ -18,6 +18,7 @@ def build():
 
     def add(kind, digits, split, index, factors, **metadata):
         n = prod(factors)
+
         if n in seen:
             raise AssertionError("duplicate independent fixture")
         seen.add(n)
@@ -56,6 +57,7 @@ def build():
                 or len(str(q)) != digits - smaller_digits
             ):
                 continue
+
             if (
                 p == q
                 or len(str(n)) != digits
@@ -63,6 +65,7 @@ def build():
                 or n in seen
             ):
                 continue
+
             if smaller_digits is None and 100 * abs(p - q) <= min(p, q):
                 continue
             return p, q
@@ -82,7 +85,9 @@ def build():
                     performance_representative=split == "held_out"
                     and index == 0,
                 )
+
         print("certified balanced", digits, flush=True)
+
     for digits in (60, 80):
         for smaller in (5, 10, 20):
             for split, count in (("training", 1), ("held_out", 2)):
@@ -94,14 +99,17 @@ def build():
                         index,
                         pair(digits, smaller_digits=smaller),
                     )
+
     for digits in (50, 60, 80):
         bits = (digits * 3322 // 1000 + 1) // 2
+
         for index in range(2):
             while True:
                 p = certified_prime(bits, generator, certificates)
                 proof = certificates[str(p)]
                 common = proof["q"]
                 found = None
+
                 for step in range(1, 257):
                     q = p + 2 * common * step
                     if (
@@ -110,6 +118,7 @@ def build():
                         or not utils.is_prime(q, rng=generator)
                     ):
                         continue
+
                     for witness in range(2, 100):
                         if (
                             pow(witness, q - 1, q) == 1
@@ -127,10 +136,13 @@ def build():
                             if distance <= 100000:
                                 found = (q, distance)
                             break
+
                     if found:
                         break
+
                 if found and p * found[0] not in seen:
                     break
+
             add(
                 "close",
                 digits,
@@ -150,18 +162,22 @@ def build():
                 )
                 if len(str(p)) == digits:
                     break
+
             add("prime", digits, "held_out", index, (p,))
+
     for index in range(4):
         factors = tuple(
             certified_prime(55 + index % 2, generator, certificates)
             for _ in range(3)
         )
         add("three_prime", len(str(prod(factors))), "held_out", index, factors)
+
     for kind, p in (("smooth_pm1", 65521), ("smooth_pp1", 65519)):
         certificates[str(p)] = {"kind": "trial"}
         for index in range(2):
             _, q = pair(60, smaller_digits=5)
             add(kind, len(str(p * q)), "held_out", index, (p, q))
+
     verify_certificates(certificates)
     return dict(
         schema=1,

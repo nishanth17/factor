@@ -44,6 +44,7 @@ def verify_fixture(fixture, certificates):
                 raise ValueError("invalid Pocklington proof")
         else:
             raise ValueError("unknown proof kind")
+
         verified.add(n)
 
     if prod(fixture["factors"]) != fixture["n"]:
@@ -67,14 +68,17 @@ def materialize(path, destination):
             or any(part in ("", ".", "..") for part in parts)
         ):
             raise ValueError("invalid baseline source path")
+
         if (
             hashlib.sha256(source.encode()).hexdigest()
             != data["source_sha256"][name]
         ):
             raise ValueError("corrupt baseline source")
+
         output = destination / name
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(source)
+
     return data["source_sha256"]
 
 
@@ -103,6 +107,7 @@ def main():
                 ).hexdigest()
                 for p in files
             }
+
         sys.path.insert(0, str(runtime))
         budget_module = importlib.import_module("v2.budget")
         qs = importlib.import_module("v2.qs")
@@ -140,11 +145,13 @@ def main():
 
         def cohort():
             rows = []
+
             for seed in corpus["seeds"]:
                 allowance = budget_module.Budget(
                     work_limit=10**13, seconds=30, cpu_seconds=30
                 )
                 started = time.perf_counter()
+
                 result = qs.SIQSJob(
                     fixture["n"], seed=seed, config=config, budget=allowance
                 ).run()
@@ -157,6 +164,7 @@ def main():
                         for child in (result.divisor, result.cofactor):
                             allowance.consume(32 * child.bit_length())
                             label = utils.classify_prime(child)
+
                             if label is utils.Primality.COMPOSITE:
                                 raise AssertionError(
                                     "certified child classified composite"
@@ -165,6 +173,7 @@ def main():
                     except budget_module.BudgetExhaustedError:
                         labels = []
                         reason = "classification_" + allowance.reason
+
                     if (
                         sorted((result.divisor, result.cofactor))
                         != fixture["factors"]
@@ -172,6 +181,7 @@ def main():
                         raise AssertionError(
                             "split disagrees with certified factors"
                         )
+
                 if (result.divisor or 1) * result.cofactor != fixture["n"]:
                     raise AssertionError(
                         "unresolved outcome lost its cofactor"
@@ -189,9 +199,11 @@ def main():
                         stats=result.stats,
                     )
                 )
+
             return rows
 
         attempts = []
+
         for attempt in range(3):
             start, warm_calls = time.perf_counter(), 0
             while time.perf_counter() - start < (3 if attempt == 0 else 5):
@@ -218,12 +230,14 @@ def main():
             )
             if stable:
                 break
+
         for name, digest in hashes.items():
             if (
                 hashlib.sha256((runtime / name).read_bytes()).hexdigest()
                 != digest
             ):
                 raise RuntimeError("runtime source changed during capture")
+
         result = dict(
             source_sha256=hashes,
             driver_sha256=hashlib.sha256(

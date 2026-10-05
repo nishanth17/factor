@@ -12,10 +12,12 @@ from .build_phase_two_corpus import certified_prime, verify_certificates
 def build(seed=361042026, selected_split="all", p2_shapes=False):
     """Build independently certified inputs for a declared split."""
     certificates, fixtures, seen = {}, [], set()
+
     for split, offset, count in (("training", 0, 3), ("held_out", 1, 4)):
         if selected_split not in ("all", split):
             continue
         generator = random.Random(seed + offset)
+
         for band, bits, digits in (
             ("small", 13, None),
             ("medium", 21, None),
@@ -35,6 +37,7 @@ def build(seed=361042026, selected_split="all", p2_shapes=False):
                         and (digits is None or len(str(n)) == digits)
                     ):
                         break
+
                 seen.add(n)
                 fixtures.append(
                     dict(
@@ -45,14 +48,17 @@ def build(seed=361042026, selected_split="all", p2_shapes=False):
                         factors=sorted((p, q)),
                     )
                 )
+
         if p2_shapes:
             # Deliberate regression classes, separate from balanced search.
             # 65521-1 = 2**4 * 3**2 * 5 * 7 * 13; trial proof is independent.
             certificates["65521"] = {"kind": "trial"}
+
             for index in range(count):
                 small = certified_prime(21, generator, certificates)
                 large = certified_prime(100, generator, certificates)
                 third = certified_prime(23, generator, certificates)
+
                 for shape, factors in (
                     ("power", [small] * (2, 3, 5, 7)[index]),
                     ("uneven", [small, large]),
@@ -61,6 +67,7 @@ def build(seed=361042026, selected_split="all", p2_shapes=False):
                     ("smooth", [65521, large]),
                 ):
                     n = prod(factors)
+
                     if n in seen:
                         raise AssertionError("repeated constructed input")
                     seen.add(n)
@@ -73,6 +80,7 @@ def build(seed=361042026, selected_split="all", p2_shapes=False):
                             factors=sorted(factors),
                         )
                     )
+
     verify_certificates(certificates)
     return dict(
         schema=1,

@@ -34,6 +34,8 @@ htmlcov/
 # under v2/benchmarks/inputs and the public plan is v2/ROADMAP.md.
 /v2/audit/
 /v2/benchmarks/results/
+# Optional historical candidate and measured-source evidence stays local.
+/v2/benchmarks/history/
 
 # Historical raw evidence remains local and recoverable.
 /.local-evidence/

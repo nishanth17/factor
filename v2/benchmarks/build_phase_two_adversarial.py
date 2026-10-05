@@ -13,6 +13,7 @@ def supplement(source):
     """Append forty Chernick triples with shuffled train/test allocation."""
     corpus = json.loads(source.read_text())
     additions = []
+
     for parameter in range(1, 3641):
         primes = [6 * parameter + 1, 12 * parameter + 1, 18 * parameter + 1]
         if not all(
@@ -20,7 +21,9 @@ def supplement(source):
             for prime in primes
         ):
             continue
+
         n = prod(primes)
+
         # Korselt's criterion: odd, square-free, and each p-1 divides n-1.
         # Also verify the actual base-2 pseudoprime relation independently.
         if (
@@ -28,6 +31,7 @@ def supplement(source):
             or pow(2, n - 1, n) != 1
         ):
             raise AssertionError("invalid Carmichael construction")
+
         for prime in primes:
             corpus["certificates"].setdefault(str(prime), {"kind": "trial"})
         additions.append(
@@ -42,6 +46,7 @@ def supplement(source):
         )
         if len(additions) == 40:
             break
+
     if len(additions) != 40:
         raise AssertionError("insufficient independently verified fixtures")
     random.Random(GENERATION_SEED + 1).shuffle(additions)
@@ -63,7 +68,9 @@ def main():
     parser.add_argument(
         "--source",
         type=Path,
-        default=(Path(__file__).parent / "inputs/phase_two_corpus.json"),
+        default=(
+            Path(__file__).parent / "inputs/corpora/phase_two_corpus.json"
+        ),
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

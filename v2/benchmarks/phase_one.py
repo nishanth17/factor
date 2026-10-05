@@ -90,8 +90,10 @@ def _measure_case(name, candidates, validate, repetitions, warmup_seconds):
     """Warm and time validated outputs; refuse invalid native candidates."""
     row = {"name": name, "candidates": {}}
     usable = {}
+
     for label, function in candidates.items():
         start = time.perf_counter()
+
         try:
             value = function()
             correct = bool(validate(value))
@@ -102,6 +104,7 @@ def _measure_case(name, candidates, validate, repetitions, warmup_seconds):
                     if not validate(function()):
                         raise AssertionError("invalid result during warmup")
                     warmup_calls += 1
+
             elapsed = time.perf_counter() - start
             row["candidates"][label] = {
                 "correct": correct,
@@ -123,13 +126,17 @@ def _measure_case(name, candidates, validate, repetitions, warmup_seconds):
 
     # Rotate order to reduce systematic thermal/cache-order bias.
     labels = list(usable)
+
     for round_index in range(repetitions):
         offset = round_index % len(labels) if labels else 0
         order = labels[offset:] + labels[:offset]
+
         for label in order:
             start = time.perf_counter()
             value = usable[label]()
             elapsed = time.perf_counter() - start
+
+            # Check every timed output, keeping oracle cost outside timing.
             if not validate(value):
                 raise AssertionError(
                     f"invalid measured result: {name}/{label}"
@@ -142,6 +149,7 @@ def _measure_case(name, candidates, validate, repetitions, warmup_seconds):
             result["median_seconds"] = statistics.median(samples)
             result["min_seconds"] = min(samples)
             result["max_seconds"] = max(samples)
+
     if "v1_compat" in usable and "v2_native" in usable:
         previous = row["candidates"]["v1_compat"]["median_seconds"]
         current = row["candidates"]["v2_native"]["median_seconds"]
@@ -311,6 +319,7 @@ def run_benchmarks(repetitions=5, include_legacy=False, warmup_seconds=3.0):
                 for n in inputs:
                     random.seed(seed)
                     answers.append(legacy["factor"].factorize(n))
+
         return answers
 
     def validate_factorizations(answers):
@@ -321,6 +330,7 @@ def run_benchmarks(repetitions=5, include_legacy=False, warmup_seconds=3.0):
                     return False
             elif answer == -1 or math.prod(p**e for p, e in answer) != n:
                 return False
+
         return len(answers) == 25
 
     measure(
@@ -339,6 +349,7 @@ def run_benchmarks(repetitions=5, include_legacy=False, warmup_seconds=3.0):
     if legacy is not None:
         previous_bounds = legacy["pollardPm1"].compute_bounds
         legacy["pollardPm1"].compute_bounds = lambda n: (10, 200)
+
         try:
             correctness["legacy_p_minus_one_fixture"] = legacy[
                 "pollardPm1"

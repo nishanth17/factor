@@ -47,6 +47,7 @@ class CapacityTests(unittest.TestCase):
         for size in range(1, 9):
             for count in range(1, size + 1):
                 expected = tuple(itertools.combinations(range(size), count))
+
                 self.assertEqual(
                     tuple(
                         unrank_combination(size, count, i)
@@ -54,15 +55,18 @@ class CapacityTests(unittest.TestCase):
                     ),
                     expected,
                 )
+
         for policy in ("nearest", "flyer"):
             short = self.stream(policy, 5)
             longer = self.stream(policy, 1000)
+
             self.assertEqual(short.identity, longer.identity)
             self.assertEqual(short.workspace_bytes, longer.workspace_bytes)
             self.assertEqual(
                 [short[i] for i in range(5)], [longer[i] for i in range(5)]
             )
             values = [longer[i] for i in range(len(longer))]
+
             self.assertEqual(len(values), len(set(values)))
             self.assertEqual(len(values), len(set(map(prod, values))))
             for values in values:
@@ -71,10 +75,12 @@ class CapacityTests(unittest.TestCase):
 
     def test_flyer_is_exact_best_product_in_its_disjoint_domain(self):
         stream = self.stream("flyer")
+
         for i in range(len(stream)):
             values = stream[i]
             core = prod(p for p in values if p in stream.pool)
             flyer = next(p for p in values if p not in stream.pool)
+
             self.assertEqual(
                 flyer,
                 min(
@@ -86,6 +92,7 @@ class CapacityTests(unittest.TestCase):
     def test_larger_families_stream_gray_roots_without_history(self):
         primes = tuple(p for p in self.base.primes if p != 2)[:12]
         family = PolynomialFamily(self.base, primes, budget=budget())
+
         self.assertEqual(family.count, 2048)
         for _ in range(5):
             step = family.next()
@@ -95,10 +102,13 @@ class CapacityTests(unittest.TestCase):
                 )
                 for e in self.base.entries
             )
+
             self.assertEqual(step.roots, expected)
+
         restored = PolynomialFamily.from_checkpoint(
             self.base, family.checkpoint(), budget=family.budget
         )
+
         self.assertEqual(restored.next().polynomial, family.next().polynomial)
         self.assertLess(len(json.dumps(family.checkpoint())), 4096)
 
@@ -111,9 +121,11 @@ class CapacityTests(unittest.TestCase):
             polynomials_per_family=16,
         )
         large = replace(small, family_count=1000000)
+
         self.assertEqual(small.metadata_reserve, large.metadata_reserve)
         self.assertEqual(large.polynomial_limit, 16000000)
         report = capacity_report(self.base, large)
+
         self.assertEqual(report["base_cardinality"], len(self.base.entries))
         self.assertEqual(report["a_maximum"], prod(self.base.primes[-12:]))
 
@@ -121,6 +133,7 @@ class CapacityTests(unittest.TestCase):
         polynomial, cursor, certainty = external_square(
             self.base, 8, budget=budget(), cursor=307
         )
+
         self.assertGreater(polynomial.square_coefficient, self.base.bound)
         self.assertEqual(cursor, polynomial.square_coefficient + 4)
         self.assertEqual(certainty, "proven_prime")
@@ -145,8 +158,10 @@ class CapacityTests(unittest.TestCase):
         collector = SieveCollector(
             polynomial, self.base, config=config, budget=budget()
         )
+
         result = collector.collect(-64, 65)
         expected = {a.position: a for a in reference.relations}
+
         self.assertTrue(expected)
         self.assertEqual({a.position: a for a in result.atoms}, expected)
         for atom in result.atoms:
@@ -162,6 +177,7 @@ class CapacityTests(unittest.TestCase):
                 * atom.residual
                 * atom.square_correction**2,
             )
+
         for combined in result.combined_relations:
             self.assertTrue(
                 verify_combined(
@@ -172,6 +188,7 @@ class CapacityTests(unittest.TestCase):
                     memory_bytes=64 * 2**20,
                 )
             )
+
         with self.assertRaises(ValueError):
             Polynomial(self.base.n, 1, polynomial.a, polynomial.b, 2)
         with self.assertRaises(BudgetExhaustedError):
@@ -198,12 +215,16 @@ class CapacityTests(unittest.TestCase):
         )
         job = SIQSJob(self.base.n, config=cfg, budget=budget())
         job.run(max_blocks=1)
+
         restored = SIQSJob.from_checkpoint(job.checkpoint(), budget=budget())
+
         self.assertEqual(restored.coefficient_cursor, job.coefficient_cursor)
         self.assertEqual(
             restored.engine.collector._atoms, job.engine.collector._atoms
         )
+
         result = restored.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.divisor * result.cofactor, self.base.n)
 
@@ -220,6 +241,7 @@ class CapacityTests(unittest.TestCase):
             max_trivial=100000,
         )
         job = SIQSJob(1000003, config=cfg, budget=budget())
+
         self.assertEqual(job.run().reason, "families_exhausted")
         checkpoint = job.checkpoint()
         extended = replace(cfg, family_count=4)
@@ -230,6 +252,7 @@ class CapacityTests(unittest.TestCase):
         resumed = SIQSJob.from_checkpoint(
             checkpoint, budget=budget(), config=extended, allow_extension=True
         )
+
         self.assertEqual(resumed.family_index, job.family_index)
         self.assertEqual(
             resumed.engine.collector._atoms, job.engine.collector._atoms
@@ -237,6 +260,7 @@ class CapacityTests(unittest.TestCase):
         self.assertGreater(resumed.budget.used, job.budget.used)
         self.assertEqual(resumed.run().reason, "families_exhausted")
         full = SIQSJob(job.n, config=extended, budget=budget())
+
         self.assertEqual(full.run().cofactor, job.n)
         self.assertEqual(
             resumed.engine.collector._atoms, full.engine.collector._atoms
@@ -269,6 +293,7 @@ class CapacityTests(unittest.TestCase):
         )
         validate_extension(original, enlarged)
         report = capacity_report(self.base, enlarged)
+
         self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)
         saturated = replace(
             enlarged,
@@ -290,9 +315,11 @@ class CapacityTests(unittest.TestCase):
         filtered = filter_matrix(
             rows, budget=allowance, memory_bytes=32 * 2**20, weight_two=True
         )
+
         self.assertLess(allowance.used, 2_000_000)
         for mask in filtered.zero_dependencies:
             self.assertTrue(verify_dependency(mask, rows))
+
         self.assertEqual(filtered.original_rows, rows)
         wide = (1 << 99999,) * 32
         compact = filter_matrix(
@@ -301,6 +328,7 @@ class CapacityTests(unittest.TestCase):
             memory_bytes=8 * 2**20,
             weight_two=True,
         )
+
         self.assertEqual(compact.stats["working_columns"], 1)
         for mask in compact.zero_dependencies:
             self.assertTrue(verify_dependency(mask, wide))
@@ -324,11 +352,14 @@ class CapacityTests(unittest.TestCase):
             polynomials_per_family=16,
         )
         report = capacity_report(base, cfg)
+
         self.assertTrue(report["target_in_product_envelope"])
         polynomial, _, certainty = external_square(base, 8192, budget=budget())
+
         self.assertEqual(certainty, "probable_prime")
         self.assertGreater(polynomial.square_coefficient, 2**64)
         target = report["a_target"]
+
         self.assertLess(abs(polynomial.a - target) * 1000, target)
         for x in (-100, 0, 731):
             self.assertEqual(
@@ -344,6 +375,7 @@ class CapacityTests(unittest.TestCase):
             half_width=256,
         )
         lengths = []
+
         for count in (100, 1000000):
             job = SIQSJob(
                 self.base.n,
@@ -352,7 +384,9 @@ class CapacityTests(unittest.TestCase):
             )
             job.run(max_blocks=1)
             lengths.append(len(job.checkpoint()["blob"]))
+
             self.assertEqual(job.seen, set())
+
         self.assertLess(abs(lengths[0] - lengths[1]), 128)
 
     def test_external_candidate_allowance_can_extend_after_refusal(self):
@@ -364,14 +398,17 @@ class CapacityTests(unittest.TestCase):
             coefficient_trials=1,
         )
         job = SIQSJob(1000003 * 1000033, config=cfg, budget=budget())
+
         self.assertEqual(job.run().reason, "coefficient_limit")
         used = job.budget.used
+
         resumed = SIQSJob.from_checkpoint(
             job.checkpoint(),
             budget=budget(),
             allow_extension=True,
             config=replace(cfg, coefficient_trials=4096),
         )
+
         self.assertGreaterEqual(resumed.budget.used, used)
         self.assertIn(
             resumed.run(max_blocks=1).reason, ("paused", "factor_found")

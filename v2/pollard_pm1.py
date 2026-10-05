@@ -13,6 +13,7 @@ def compute_bounds(n):
 
 def _stage_one(n, base, primes, b1):
     residue = base % n
+
     for prime in primes:
         previous = residue
         residue = pow(residue, utils.prime_power(prime, b1), n)
@@ -20,6 +21,7 @@ def _stage_one(n, base, primes, b1):
         if divisor == n:
             # Replay only this prime's exponent units to recover a lost split.
             power = prime
+
             while power <= b1:
                 previous = pow(previous, prime, n)
                 found = gcd(previous - 1, n)
@@ -28,9 +30,12 @@ def _stage_one(n, base, primes, b1):
                 if found == n:
                     break
                 power *= prime
+
             return residue, n
+
         if utils.valid_divisor(divisor, n):
             return residue, divisor
+
     return residue, 1
 
 
@@ -39,6 +44,7 @@ def _stage_two_terms(residue, n, primes):
     previous_prime = 0
     value = 1
     gap_cache = {}
+
     for prime in primes:
         gap = prime - previous_prime
         if gap not in gap_cache:
@@ -104,6 +110,7 @@ def factorize_pm1(
 
         terms = []
         saturated = False
+
         for term in _stage_two_terms(residue, n, stage_two_primes):
             terms.append(term)
             if len(terms) == batch_size:

@@ -64,18 +64,21 @@ class MatrixTests(unittest.TestCase):
         ]
         for rows in fixtures:
             expected = dense_kernel(rows)
+
             for weight_two in (False, True):
                 matrix = filter_matrix(
                     rows,
                     weight_two=weight_two,
                     budget=unlimited_budget(),
                 )
+
                 for pivot in ("highest", "lowest"):
                     solver = DependencySolver(
                         matrix,
                         pivot=pivot,
                         budget=unlimited_budget(),
                     )
+
                     self.assertEqual(span(solver.run()), expected)
 
     def test_weight_two_zero_rows_and_singleton_cascade(self):
@@ -92,8 +95,10 @@ class MatrixTests(unittest.TestCase):
         solver = DependencySolver(matrix, budget=Budget(work_limit=0))
         with self.assertRaises(BudgetExhaustedError):
             solver.run()
+
         self.assertEqual(solver.next_row, 0)
         solver.budget = unlimited_budget()
+
         self.assertEqual(
             span(solver.run()), dense_kernel(matrix.original_rows)
         )
@@ -117,6 +122,7 @@ class ExtractionTests(unittest.TestCase):
     def setUp(self):
         self.base = build_factor_base(10403, bound=40).factor_base
         self.polynomial = qs_polynomial(self.base)
+
         self.run = collector(self.polynomial, self.base).collect(-128, 129)
         self.store = {atom.relation_id: atom for atom in self.run.atoms}
         self.relations = self.run.full_relations + self.run.combined_relations
@@ -128,6 +134,7 @@ class ExtractionTests(unittest.TestCase):
             self.store,
             budget=unlimited_budget(),
         )
+
         self.assertEqual(prepared.duplicate_indices, (len(self.relations),))
         self.assertEqual(len(prepared.relations), len(self.relations))
         groups = {}
@@ -137,9 +144,11 @@ class ExtractionTests(unittest.TestCase):
             indices[:2] for indices in groups.values() if len(indices) >= 2
         )
         mask = sum(1 << index for index in equal)
+
         congruence = extract_dependency(
             prepared, mask, budget=unlimited_budget()
         )
+
         self.assertEqual(
             congruence.x**2 % self.base.n, congruence.y**2 % self.base.n
         )
@@ -151,9 +160,12 @@ class ExtractionTests(unittest.TestCase):
         solver = DependencySolver(
             filter_matrix(prepared.rows), budget=unlimited_budget()
         )
+
         masks = solver.run()
+
         self.assertTrue(masks)
         divisors = []
+
         for mask in masks:
             result = extract_dependency(
                 prepared, mask, budget=unlimited_budget()
@@ -174,10 +186,12 @@ class ExtractionTests(unittest.TestCase):
                 for row in selected
             )
             square = isqrt(product)
+
             self.assertEqual(square * square, product)
             self.assertEqual(square % self.base.n, result.y)
             if result.divisor:
                 divisors.append(result.divisor)
+
         self.assertTrue(divisors)
 
     def test_corrupted_provenance_and_fields(self):
@@ -202,6 +216,7 @@ class ExtractionTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 prepare_relations((relation,), self.base, store)
+
         partial = next(atom for atom in self.run.atoms if atom.residual != 1)
         with self.assertRaises(ValueError):
             prepare_relations((partial,), self.base, self.store)
@@ -222,6 +237,7 @@ class ExtractionTests(unittest.TestCase):
         prepared = prepare_relations(
             self.relations, self.base, self.store, budget=unlimited_budget()
         )
+
         masks = DependencySolver(
             filter_matrix(prepared.rows), budget=unlimited_budget()
         ).run()
@@ -246,9 +262,12 @@ class ExtractionTests(unittest.TestCase):
         )
         with self.assertRaises(BudgetExhaustedError):
             extractor.run()
+
         self.assertEqual(extractor.next_dependency, 0)
         extractor.budget = unlimited_budget()
+
         divisor = extractor.run()
+
         self.assertEqual(extractor.next_dependency, 2)
         self.assertEqual(self.base.n % divisor, 0)
         self.assertGreater(divisor, 1)
@@ -262,6 +281,7 @@ class PipelineTests(unittest.TestCase):
         for p, q in ((101, 137), (211, 307), (1009, 1237), (4001, 5003)):
             n = p * q
             base = build_factor_base(n, bound=100).factor_base
+
             for weight_two in (False, True):
                 for row_excess in (0, 2):
                     job = QSJob(
@@ -275,7 +295,9 @@ class PipelineTests(unittest.TestCase):
                         budget=unlimited_budget(),
                         config=SieveConfig(memory_bytes=32 * 1024 * 1024),
                     )
+
                     result = job.run()
+
                     self.assertEqual(result.reason, "factor_found", result)
                     self.assertEqual(result.divisor * result.cofactor, n)
                     self.assertEqual({result.divisor, result.cofactor}, {p, q})
@@ -292,7 +314,9 @@ class PipelineTests(unittest.TestCase):
             config=SieveConfig(residual_bound=1),
         )
         job.budget = Budget(work_limit=0)
+
         stopped = job.run()
+
         self.assertEqual(stopped.reason, "work_limit")
         self.assertEqual(stopped.cofactor, base.n)
         self.assertEqual(stopped.next_position, -128)
@@ -302,24 +326,31 @@ class PipelineTests(unittest.TestCase):
             side_effect=BudgetExhaustedError,
         ):
             job.budget.reason = "work_limit"
+
             stopped = job.run()
+
         self.assertEqual(stopped.reason, "work_limit")
         self.assertIsNotNone(job.solver)
         consumed = job.budget.used
         job.budget = Budget(
             work_limit=100000000, used=consumed, seconds=None, cpu_seconds=None
         )
+
         result = job.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.divisor * result.cofactor, base.n)
 
     def test_empty_and_finite_unsuccessful_window(self):
         base = build_factor_base(101 * 137, bound=40).factor_base
+
         for lo, hi in ((0, 0), (999, 1000)):
             job = QSJob(
                 qs_polynomial(base), base, lo, hi, budget=unlimited_budget()
             )
+
             result = job.run()
+
             self.assertEqual(result.reason, "window_exhausted")
             self.assertEqual(result.cofactor, base.n)
             self.assertEqual(job.run(), result)
@@ -328,6 +359,7 @@ class PipelineTests(unittest.TestCase):
         """Window exhaustion still solves a store deferred for low excess."""
         base = build_factor_base(10403, bound=40).factor_base
         polynomial = qs_polynomial(base)
+
         run = collector(polynomial, base).collect(-128, 129)
         prepared = prepare_relations(
             run.full_relations + run.combined_relations,
@@ -347,9 +379,11 @@ class PipelineTests(unittest.TestCase):
         )
         job.collector._atoms = {atom.relation_id: atom for atom in run.atoms}
         job.collector._full = [prepared.relations[index] for index in indices]
+
         self.assertIsNone(job._solve(False))
         self.assertEqual(job.stats["solve_calls"], 0)
         job._solve(True)
+
         self.assertEqual(job.stats["solve_calls"], 1)
 
     def test_batch_snapshots_released_before_more_collection(self):
@@ -382,7 +416,9 @@ class PipelineTests(unittest.TestCase):
             collector_class=ObservedCollector,
             budget=unlimited_budget(),
         )
+
         result = job.run()
+
         self.assertEqual(result.reason, "window_exhausted")
 
 
@@ -409,7 +445,9 @@ class StorageCompletionTests(unittest.TestCase):
     def test_relation_and_atom_caps_extract_existing_rows(self):
         for limits in ({"max_relations": 8}, {"max_atoms": 8}):
             job = self.make_job(**limits)
+
             result = job.run()
+
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
             self.assertEqual(result.divisor * result.cofactor, 20_017_003)
@@ -430,6 +468,7 @@ class StorageCompletionTests(unittest.TestCase):
 
         with patch.object(job.collector, "collect", side_effect=memory_stop):
             result = job.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.divisor * result.cofactor, 20_017_003)
 
@@ -441,6 +480,7 @@ class StorageCompletionTests(unittest.TestCase):
 
         with patch.object(DependencySolver, "run", refuse):
             stopped = job.run()
+
         self.assertEqual(stopped.reason, "work_limit")
         self.assertEqual(job.storage_reason, "relation_limit")
         self.assertIsNotNone(job.solver)
@@ -455,12 +495,14 @@ class StorageCompletionTests(unittest.TestCase):
             job.collector, "collect", side_effect=AssertionError
         ):
             result = job.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.divisor * result.cofactor, 20_017_003)
         self.assertEqual(tuple(job.collector._atoms), before)
 
     def test_unsuccessful_storage_stop_is_idempotent(self):
         job = self.make_job(n=104729, max_relations=8)
+
         result = job.run()
         self.assertEqual(result.reason, "relation_limit")
         self.assertIsNone(result.divisor)
@@ -480,13 +522,16 @@ class StorageCompletionTests(unittest.TestCase):
             "v2.qs.pipeline.filter_matrix", side_effect=refuse_storage_matrix
         ):
             result = job.run()
+
             again = job.run()
+
         self.assertEqual(result.reason, "memory_limit")
         self.assertEqual(result.cofactor, 20_017_003)
         self.assertEqual(result, again)
 
     def test_simultaneous_preparation_workspace_is_reserved(self):
         job = self.make_job(max_relations=8)
+
         collected = job.collector.collect(-256, 513)
         prepared = prepare_relations(
             collected.full_relations + collected.combined_relations,
@@ -505,13 +550,18 @@ class StorageCompletionTests(unittest.TestCase):
         old_maximum = max(
             job.collector._workspace, prepared.workspace_bytes
         ) + matrix_workspace(len(prepared.rows), columns)
+
         self.assertGreater(expected, old_maximum)
         capped = self.make_job(max_relations=8, memory_bytes=expected - 1)
+
         result = capped.run()
+
         self.assertEqual(result.reason, "memory_limit")
         self.assertIsNone(result.divisor)
         self.assertEqual(result.cofactor, 20_017_003)
         enough = self.make_job(max_relations=8, memory_bytes=expected)
+
         result = enough.run()
+
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.stats["workspace_bytes"], expected)

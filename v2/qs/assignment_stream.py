@@ -14,6 +14,7 @@ def unrank_combination(size, count, rank):
     if not 0 <= count <= size or not 0 <= rank < comb(size, count):
         raise ValueError("combination rank is out of range")
     selected, start = [], 0
+
     for left in range(count, 0, -1):
         for index in range(start, size - left + 1):
             block = comb(size - index - 1, left - 1)
@@ -22,6 +23,7 @@ def unrank_combination(size, count, rank):
                 start = index + 1
                 break
             rank -= block
+
     return tuple(selected)
 
 
@@ -55,6 +57,7 @@ class AssignmentStream:
             utils.require_integer(value, name, low)
             if value > high:
                 raise ValueError(f"{name} exceeds the stream limit")
+
         if policy not in ("nearest", "flyer"):
             raise ValueError("unknown streaming A policy")
         self.workspace_bytes = (
@@ -82,6 +85,7 @@ class AssignmentStream:
                 raise ValueError(
                     "flyer policy needs primes outside the core pool"
                 )
+
         if len(self.pool) < self.core_count:
             raise ValueError("too few nonsingular primes for the requested A")
         self.total = comb(len(self.pool), self.core_count)
@@ -91,12 +95,14 @@ class AssignmentStream:
         modulus = max(1, self.total - 1)
         self.offset = generator.randrange(modulus)
         self.stride = 1
+
         for _ in range(128):
             budget.consume(1)
             candidate = generator.randrange(1, modulus + 1)
             if gcd(candidate, modulus) == 1:
                 self.stride = candidate
                 break
+
         self.identity = _checksum(
             [
                 "assignment-stream-v1",

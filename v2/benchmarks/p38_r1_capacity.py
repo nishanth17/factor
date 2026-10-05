@@ -126,6 +126,7 @@ def run_one(fixture, seed, config, arm, seconds):
             factor_count=1,
             polynomials_per_family=1,
         )
+
     portfolio = PortfolioConfig(
         trial_bound=1000,
         rho_attempts=0,
@@ -141,6 +142,7 @@ def run_one(fixture, seed, config, arm, seconds):
     )
     allowance = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
     start, cpu = time.perf_counter(), time.process_time()
+
     result = factorize_bounded(
         fixture["n"], seed=seed, config=portfolio, budget=allowance
     )
@@ -218,6 +220,7 @@ def summarize(rows):
 def measure(fixtures, config, arm, seconds, seeds, repetitions=9, warmup=3):
     """Warm validated calls; extend noisy cohorts to fifteen samples."""
     attempts = []
+
     for attempt in range(3):
         started, warm_calls = time.perf_counter(), 0
         target_warm = warmup if attempt == 0 else max(5, warmup)
@@ -226,8 +229,10 @@ def measure(fixtures, config, arm, seconds, seeds, repetitions=9, warmup=3):
                 for seed in seeds:
                     run_one(fixture, seed, config, arm, seconds)
                     warm_calls += 1
+
         warm_seconds = time.perf_counter() - started
         samples = []
+
         for _ in range(repetitions if attempt == 0 else max(15, repetitions)):
             samples.append(
                 [
@@ -236,6 +241,7 @@ def measure(fixtures, config, arm, seconds, seeds, repetitions=9, warmup=3):
                     for seed in seeds
                 ]
             )
+
         totals = [sum(r["seconds"] for r in sample) for sample in samples]
         median = statistics.median(totals)
         mad = statistics.median(abs(t - median) for t in totals)
@@ -255,6 +261,7 @@ def measure(fixtures, config, arm, seconds, seeds, repetitions=9, warmup=3):
         )
         if stable:
             break
+
     return dict(
         attempts=attempts,
         accepted=attempts[-1],
@@ -304,6 +311,7 @@ def main():
         parser.error(
             "positive time, three seconds warmup and nine samples are required"
         )
+
     if args.output.exists():
         parser.error("preserve existing output bytes")
     corpus = json.loads(args.corpus.read_text())
@@ -315,6 +323,7 @@ def main():
             str(p) not in corpus["certificates"] for p in fixture["factors"]
         ):
             raise ValueError("missing independent prime proof")
+
     hashes = source_hashes()
     data = dict(
         schema=1,
@@ -354,7 +363,9 @@ def main():
             parser.error(
                 "training requires a training corpus and a fresh --frozen path"
             )
+
         selected = {}
+
         for digits in args.bands:
             group = [
                 f
@@ -362,6 +373,7 @@ def main():
                 if f["digits"] == digits and f["kind"] == "balanced"
             ]
             choices = []
+
             for preset in range(len(PRESETS)):
                 for policy in ("nearest", "flyer"):
                     config = configuration(digits, preset, policy)
@@ -390,8 +402,10 @@ def main():
                     )
                     print(digits, preset, policy, summary, flush=True)
                     save()
+
             winner = max(choices, key=lambda row: row[:3])
             selected[str(digits)] = asdict(winner[-1])
+
         frozen = dict(
             schema=1,
             source_sha256=hashes,
@@ -417,6 +431,7 @@ def main():
             json.dump(frozen, stream, indent=2)
             stream.write("\n")
         return
+
     if args.frozen is None:
         parser.error("this phase requires frozen configurations")
     frozen_bytes = args.frozen.read_bytes()
@@ -429,10 +444,12 @@ def main():
         != hashlib.sha256(frozen_bytes).hexdigest()
     ):
         parser.error("confirmation corpus was not generated from this freeze")
+
     if corpus["seeds"] != frozen["seeds"]:
         parser.error("confirmation seeds differ from the frozen control")
     data["frozen_sha256"] = hashlib.sha256(frozen_bytes).hexdigest()
     data["confirmation_seconds"] = frozen["confirmation_seconds"]
+
     for digits in args.bands:
         config = decode_config(frozen["configs"][str(digits)])
         seconds = (
@@ -478,6 +495,7 @@ def main():
                 result = dict(row=row, timing_evidence=False)
             else:
                 times, outcomes = [], []
+
                 for _ in range(args.repetitions):
                     with tempfile.TemporaryDirectory() as directory:
                         output = Path(directory) / "child.json"
@@ -510,12 +528,14 @@ def main():
                         outcomes.append(
                             json.loads(output.read_text())["results"][key]
                         )
+
                 result = dict(
                     seconds=times,
                     median_seconds=statistics.median(times),
                     outcomes=outcomes,
                     scope="Cold process including import and output.",
                 )
+
             data["results"][key] = result
             print(key, "finished", flush=True)
             save()

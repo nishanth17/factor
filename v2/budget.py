@@ -46,6 +46,7 @@ class Budget:
                 or value < 0
             ):
                 raise ValueError(f"{name} must be finite and nonnegative")
+
         if self.used > self.work_limit:
             raise ValueError("work_limit is below work already consumed")
 
@@ -73,7 +74,10 @@ class Budget:
             reason = "cpu_limit"
         elif amount > self.work_limit - self.used:
             reason = "work_limit"
+
         if reason is not None:
             self.reason = reason
             raise BudgetExhaustedError(reason)
+
+        # Refused actions leave the ledger unchanged for an exact retry.
         self.used += amount

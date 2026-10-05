@@ -45,6 +45,7 @@ def experiment_collector(module, variant):
                 residues = (0,) if roots.all_positions else roots.roots
                 step = 1 if roots.all_positions else prime
                 modulus = hi - lo + 1
+
                 for root in residues:
                     for position in range(lo + (root - lo) % step, hi, step):
                         self.budget.consume(
@@ -100,6 +101,7 @@ def experiment_collector(module, variant):
                 offsets.append(offset)
                 if len(leaves) == 64:
                     flush()
+
             if leaves:
                 flush()
             return threshold
@@ -112,6 +114,7 @@ def experiment_collector(module, variant):
                     stats.get("batch_rejections", 0) + 1
                 )
                 return None, None
+
             atom, divisor = super()._divide(position, offset, stats)
             if variant == "batch" and atom is not None:
                 if atom.residual != self._batch_values[offset]:
@@ -132,10 +135,13 @@ def experiment_collector(module, variant):
             namespace,
         )
         ExperimentCollector._sieve = namespace["_sieve"]
+
     if variant == "chunks":
         source = textwrap.dedent(
             inspect.getsource(module.SieveCollector._sieve)
         )
+        # These literal fragments select the charged mark loop exactly;
+        # preserve their spelling and spacing when formatting the runner.
         old = """for root in lifted:
                         hits = range((root - lo) % modulus, width, modulus)
                         self.budget.consume(len(hits) + 1)"""
@@ -157,4 +163,5 @@ def experiment_collector(module, variant):
             namespace,
         )
         ExperimentCollector._sieve = namespace["_sieve"]
+
     return ExperimentCollector

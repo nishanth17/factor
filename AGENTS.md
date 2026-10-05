@@ -6,12 +6,35 @@ in `v2/`; preserve `v1/` as the original baseline.
 ## Code and arithmetic
 
 - Target PyPy implementing Python 3.11. Do not silently fall back to CPython.
-- Use PEP 8, descriptive names, relative imports and concise docstrings.
 - Keep factoring arithmetic exact with integers, integer roots and inversion.
 - Validate proper divisors and reconstruct every result, including unresolved
   cofactors. Keep probable-prime and proven-prime labels distinct.
 - Preserve finite work/time/storage allowances and documented resume behavior.
 - Keep library calls quiet unless explicit verbosity is requested.
+
+## Readability and style
+
+- Use PEP 8, descriptive names, relative imports and concise docstrings.
+- Separate logical stages with blank lines: setup, validation, computation,
+  recovery and result construction. Within functions, space distinct branches
+  and loops when they represent separate steps; avoid blank lines after every
+  statement or inside a tightly related operation.
+- Keep expressions readable through sensible wrapping and clear intermediate
+  names. Prefer small, focused changes over restructuring working algorithms.
+- Comment nontrivial reasoning: arithmetic invariants, budget reservations,
+  checkpoint/resume rules, recovery paths and deliberate performance choices.
+  Explain why a step is necessary or what must remain true; do not narrate
+  obvious assignments, conditions or loops.
+- Use conventional mathematical names when they make formulas clearer, and
+  explain their meaning near the formula when it is not already evident.
+- Make tests and benchmark runners easy to scan by separating setup, execution
+  and validation. Keep comments focused on the case or experiment being tested.
+- Keep readability-only passes separate from behavior changes. Preserve APIs,
+  algorithms, defaults, seeds, work accounting and serialized formats; leave
+  immutable source snapshots and historical evidence unchanged.
+- Verify readability-only changes with tests, lint and an AST comparison that
+  ignores source locations. Review any intentional AST differences explicitly;
+  a passing test suite alone does not establish unchanged behavior.
 
 ## Checks and measurements
 

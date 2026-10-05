@@ -64,6 +64,7 @@ class _VerificationCache:
             else ()
         )
         budget.consume(len(atoms) + 1)
+        # An object ID alone may be reused; pinned payloads must also match.
         if record is not None and (
             record[0] is relation
             and record[1] is base
@@ -72,6 +73,7 @@ class _VerificationCache:
         ):
             self.hits += 1
             return record[3]
+
         self.misses += 1
         _verify_row(relation, base, store, budget, memory_bytes)
         row = parity_bits(relation, base)
@@ -90,6 +92,7 @@ class _VerificationCache:
         if len(prepared.row_identities) != len(prepared.rows):
             raise ValueError("prepared row identities are missing")
         identities, bits = [], mask
+
         while bits:
             bit = bits & -bits
             index = bit.bit_length() - 1
@@ -100,6 +103,7 @@ class _VerificationCache:
                 raise ValueError("prepared row identity differs from payload")
             identities.append(identity)
             bits ^= bit
+
         return frozenset(identities)
 
     def remember_dependency(self, key):
@@ -170,6 +174,7 @@ def _prepare_relations(
         retained_workspace_bytes, "retained_workspace_bytes", 0
     )
     shared_reserve = factor_base.workspace_bytes
+
     for atom in atom_store.values():
         if not isinstance(atom, AtomicRelation):
             raise TypeError("atom store must contain atomic relations")
@@ -178,19 +183,24 @@ def _prepare_relations(
             atom.polynomial.n_prime.bit_length()
             + abs(atom.position).bit_length()
         )
+
     reserve = shared_reserve + 32768
+
     for relation in relations:
         if not isinstance(relation, (AtomicRelation, CombinedRelation)):
             raise TypeError("matrix relation must be atomic or combined")
         reserve += 2048 + 256 * len(relation.exponents)
         if isinstance(relation, CombinedRelation):
             reserve += 128 * len(relation.atom_ids)
+
+    # Shared atoms/base stay pinned once; private scratch must coexist.
     simultaneous = retained_workspace_bytes + reserve - shared_reserve
     if max(reserve, simultaneous) > memory_bytes:
         raise MemoryError("relation provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
     unique, indices, duplicates, seen, rows = [], [], [], set(), []
     identities = []
+
     for index, relation in enumerate(relations):
         if verification_cache is None:
             _verify_row(
@@ -201,6 +211,7 @@ def _prepare_relations(
             row = verification_cache.check(
                 relation, factor_base, atom_store, budget, memory_bytes
             )
+
         if isinstance(relation, AtomicRelation):
             identity = (
                 "atomic",
@@ -217,6 +228,7 @@ def _prepare_relations(
                 relation.exponents,
                 relation.square_correction,
             )
+
         if identity in seen:
             duplicates.append(index)
         else:
@@ -232,6 +244,7 @@ def _prepare_relations(
             # Native equality includes every immutable polynomial, exponent,
             # sign, residual, square correction and factor-base/root payload.
             identities.append((factor_base, relation, atoms))
+
     return PreparedRelations(
         tuple(unique),
         tuple(rows),
@@ -277,6 +290,7 @@ def extract_dependency(prepared, mask, *, budget=None):
     )
     totals = Counter()
     x, correction, sign = 1, 1, 1
+
     for relation in selected:
         x = x * relation.u % base.n
         sign *= relation.sign
@@ -285,6 +299,7 @@ def extract_dependency(prepared, mask, *, budget=None):
         )
         for prime, exponent in relation.exponents:
             totals[prime] += exponent
+
     if sign != 1 or any(exponent % 2 for exponent in totals.values()):
         raise ValueError("dependency exponent totals are not all even")
     y = correction
@@ -292,6 +307,7 @@ def extract_dependency(prepared, mask, *, budget=None):
         y = y * pow(prime, exponent // 2, base.n) % base.n
     if x * x % base.n != y * y % base.n:
         raise ValueError("dependency square congruence failed")
+    # Either sign can expose a split when the other GCD is trivial.
     minus, plus = gcd(x - y, base.n), gcd(x + y, base.n)
     divisor = next(
         (
@@ -336,6 +352,7 @@ class DependencyExtractor:
                     self.cache_skips += 1
                     self.next_dependency += 1
                     continue
+
             result = extract_dependency(
                 self.prepared,
                 self.dependencies[self.next_dependency],
@@ -347,4 +364,5 @@ class DependencyExtractor:
             self.next_dependency += 1
             if result.divisor is not None:
                 return result.divisor
+
         return None

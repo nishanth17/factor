@@ -63,6 +63,7 @@ def main():
         pool_size=16,
         max_batch_atoms=1024,
     )
+
     for width, interval in ((0, 1), (0, 64), (256, 64)):
         config = replace(control, batch_width=width, poll_interval=interval)
         job = parallel.ParallelSIQSJob(
@@ -107,7 +108,9 @@ def main():
             if width == 256:
                 payload = result
                 base = job.base
+
     settings = SimpleNamespace(warmup_seconds=3, repetitions=9)
+
     for mode, workers in (
         ("serial", 1),
         ("thread", 1),
@@ -130,16 +133,19 @@ def main():
                         pool.executor.submit(echo, payload) for _ in range(4)
                     ]
                     results = [future.result() for future in futures]
+
                 for result in results:
                     # Equality checks the full payload; separate verification
                     # follows timings to avoid attributing it to transport.
                     if result != payload:
                         raise AssertionError("transport corrupted the batch")
+
                 return []
 
             data["transport"][f"{mode}_{workers}"] = measure(
                 roundtrip, settings
             )
+
     validate(payload, base)
     if data["source_sha256"] != fingerprint(root):
         raise AssertionError("source changed during diagnostic capture")

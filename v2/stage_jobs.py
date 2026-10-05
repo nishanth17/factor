@@ -31,6 +31,7 @@ def peek_prime(cursor, context, budget):
             else segment(left, right)
         )
         cursor.update(left=left, next=right, values=values, index=0)
+
     return cursor["values"][cursor["index"]]
 
 
@@ -80,6 +81,7 @@ def _rho_step(job, budget, config):
             position=0,
             phase="advance",
         )
+
     allowance = config.rho_evaluations - job["used"]
     if allowance <= 0:
         _finish(job)
@@ -96,6 +98,7 @@ def _rho_step(job, budget, config):
         if utils.valid_divisor(divisor, n):
             _finish(job, divisor)
         return
+
     if job["phase"] == "advance":
         count = min(
             config.rho_batch, job["length"] - job["advance"], allowance
@@ -114,6 +117,7 @@ def _rho_step(job, budget, config):
         if job["advance"] == job["length"]:
             job["phase"] = "batch"
         return
+
     count = min(config.rho_batch, job["length"] - job["position"], allowance)
     budget.consume(count + 1)
     job["saved"] = job["y"]
@@ -168,6 +172,7 @@ def _stage_one(job, budget, context, config):
         elif job["replay_power"] == power:
             job.update(replay_index=position + 1, replay_power=1)
         return
+
     prime = (
         None
         if len(job["powers"]) >= config.chunk_size
@@ -185,14 +190,17 @@ def _stage_one(job, budget, context, config):
             job["powers"].append([prime, utils.prime_power(prime, job["b1"])])
             take_prime(cursor)
         return
+
     if not job["powers"]:
         job.update(
             phase="stage_two_setup",
             cursor=prime_cursor(job["b1"] + 1, job["b2"] + 1),
         )
         return
+
     scalar = prod(power for _, power in job["powers"])
     budget.consume(scalar.bit_length() + 1)
+    # Keep the pre-chunk value until the GCD decides whether replay is needed.
     start = job["value"]
     value = _apply(job, start, scalar)
     divisor = _state_gcd(job, value)
@@ -223,6 +231,7 @@ def _batch_check(job, budget):
         if utils.valid_divisor(divisor, job["n"]):
             _finish(job, divisor)
         return
+
     budget.consume()
     divisor = gcd(job["product"], job["n"])
     if utils.valid_divisor(divisor, job["n"]):
@@ -248,6 +257,7 @@ def _stage_two(job, budget, context, config):
         if prime is None and not job["terms"] and not job["done"]:
             _finish(job)
         return
+
     if job["kind"] == "pm1":
         cursor = job["cursor"]
         count = min(
@@ -262,10 +272,13 @@ def _stage_two(job, budget, context, config):
         for candidate in primes:
             gaps.append(candidate - previous)
             previous = candidate
+        # Cache hits save arithmetic, not reservations: warm and resumed
+        # execution must traverse the same work ledger as a cold chunk.
         budget.consume(sum(gap.bit_length() + 1 for gap in gaps))
         cache = job.setdefault("gap_powers", {})
         value, residue = job["value"], job["stage_two_value"]
         product, terms = job["product"], job["terms"]
+
         for candidate, gap in zip(primes, gaps):
             key = str(gap)  # String keys survive a JSON roundtrip unchanged.
             if key not in cache:
@@ -276,6 +289,7 @@ def _stage_two(job, budget, context, config):
             term = (residue - 1) % n
             terms.append(term)
             product = product * term % n
+
         cursor["index"] = stop
         job.update(
             stage_two_value=residue, product=product, previous_prime=previous
@@ -299,6 +313,7 @@ def _stage_two(job, budget, context, config):
                 center=job["center"] + step,
             )
             return
+
         cursor = job["cursor"]
         end = min(
             cursor["index"] + config.gcd_batch - len(job["terms"]),
@@ -307,6 +322,7 @@ def _stage_two(job, budget, context, config):
         budget.consume(2 * (end - cursor["index"]))
         giant_x, giant_z = job["giant"]
         baby, terms, product = job["baby"], job["terms"], job["product"]
+
         for position in range(cursor["index"], end):
             candidate = cursor["values"][position]
             index = (candidate - job["center"]) // 2
@@ -314,9 +330,11 @@ def _stage_two(job, budget, context, config):
             term = (giant_x * bz - bx * giant_z) % n
             terms.append(term)
             product = product * term % n
+
         cursor["index"] = end
         job["product"] = product
         return
+
     job["terms"].append(term)
     job["product"] = job["product"] * term % n
     take_prime(job["cursor"])
@@ -347,8 +365,10 @@ def advance_job(job, budget, context, config):
                 _finish(job, setup.factor)
                 return
             job.update(value=list(setup.point), a24=setup.a24)
+
         job["phase"] = "stage_one"
         return
+
     if job["phase"] in ("stage_one", "replay"):
         _stage_one(job, budget, context, config)
         return
@@ -374,6 +394,7 @@ def advance_job(job, budget, context, config):
             phase="baby_steps",
         )
         return
+
     if job["phase"] == "baby_steps":
         index = len(job["baby"])
         budget.consume(2)
@@ -386,10 +407,12 @@ def advance_job(job, budget, context, config):
                 *job["baby"][-2],
                 job["n"],
             )
+
         job["baby"].append(list(point))
         if index == job["distance"]:
             job["phase"] = "giant_setup"
         return
+
     if job["phase"] == "giant_setup":
         budget.consume(2 * job["center"].bit_length())
         job.update(
@@ -409,4 +432,5 @@ def advance_job(job, budget, context, config):
             phase="stage_two",
         )
         return
+
     _stage_two(job, budget, context, config)

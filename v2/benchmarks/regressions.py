@@ -55,7 +55,9 @@ def _factor_calls(function, cases, legacy=False):
                     answer = function(n)
                 else:
                     answer = function(n, seed=seed)
+
                 answers.append(answer)
+
     return answers
 
 
@@ -74,8 +76,10 @@ def _valid_factorizations(answers, cases):
             actual = tuple(sorted(answer))
         else:
             return False
+
         if actual != expected:
             return False
+
     return True
 
 
@@ -97,6 +101,7 @@ def run(repetitions, warmup_seconds, include_legacy):
         row = _measure_case(
             name, candidates, validate, repetitions, warmup_seconds
         )
+
         for baseline in ("v2_before", "v1_compat"):
             result = row["candidates"].get(baseline)
             if result is not None and result["correct"]:
@@ -106,6 +111,7 @@ def run(repetitions, warmup_seconds, include_legacy):
                 row[f"v2_time_change_vs_{baseline}_percent"] = (
                     new / old - 1
                 ) * 100
+
         rows.append(row)
         print(
             name,
@@ -224,6 +230,7 @@ def run(repetitions, warmup_seconds, include_legacy):
         )
 
     original, broader = _cases()
+
     for name, cases in (
         ("complete_original_5inputs_5seeds", original),
         ("complete_control_56inputs_5seeds", broader),
@@ -239,7 +246,7 @@ def run(repetitions, warmup_seconds, include_legacy):
         )
 
     snapshot = Path(__file__).resolve().parents[1] / "benchmarks"
-    snapshot /= "inputs/m8_source_snapshot.json"
+    snapshot /= "inputs/baselines/m8_source_snapshot.json"
     return {
         "milestone": "m9",
         "environment": environment(),

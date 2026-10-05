@@ -49,6 +49,7 @@ def reference_factors(value):
         if exponent:
             factors.append((divisor, exponent))
         divisor += 1
+
     if remaining > 1:
         factors.append((remaining, 1))
     return tuple(factors)
@@ -57,6 +58,7 @@ def reference_factors(value):
 def reference_positions(polynomial, base, lo, hi, residual_bound=1):
     """Enumerate admissible values from U squared and independent factors."""
     positions = {}
+
     for position in range(lo, hi):
         u = polynomial.a * position + polynomial.b
         value = u * u - base.n * base.multiplier
@@ -70,9 +72,11 @@ def reference_positions(polynomial, base, lo, hi, residual_bound=1):
             and outside[0][0] <= residual_bound
         ):
             continue
+
         residual = outside[0][0] if outside else 1
         exponents = tuple((p, e) for p, e in factors if p in base.primes)
         positions[position] = (-1 if value < 0 else 1, exponents, residual)
+
     return positions
 
 
@@ -101,6 +105,7 @@ class FactorBaseTests(unittest.TestCase):
                     101 * 103, multiplier=multiplier, bound=bound
                 ).factor_base
                 expected = []
+
                 for prime in reference_primes(bound):
                     roots = tuple(
                         x
@@ -109,6 +114,7 @@ class FactorBaseTests(unittest.TestCase):
                     )
                     if roots:
                         expected.append((prime, roots))
+
                 self.assertEqual(
                     [
                         (entry.prime, entry.square_roots)
@@ -124,9 +130,11 @@ class FactorBaseTests(unittest.TestCase):
             ({"bound": 20}, 7),
         ):
             result = build_factor_base(77, **kwargs)
+
             self.assertIsNone(result.factor_base)
             self.assertEqual(result.divisor, expected)
             self.assertEqual(77 % result.divisor, 0)
+
         with self.assertRaises(ValueError):
             build_factor_base(77, multiplier=77)
 
@@ -153,6 +161,7 @@ class FactorBaseTests(unittest.TestCase):
                 7,
                 (FactorBaseEntry(2, (1,)), FactorBaseEntry(3, (1,))),
             )
+
         with self.assertRaises(TypeError):
             FactorBase(10403, 1, 7, [FactorBaseEntry(2, (1,))])
 
@@ -167,13 +176,16 @@ class PolynomialTests(unittest.TestCase):
             value = a_target(target, width)
             if value > 1:
                 self.assertLessEqual((value * width) ** 2, 2 * target)
+
             self.assertGreater(((value + 1) * width) ** 2, 2 * target)
+
         polynomial = Polynomial(target, 1, 1, isqrt(target) + 1)
         for position in (-(2**200), -1, 0, 2**200):
             self.assertEqual(
                 polynomial.u_value(position) ** 2 - target,
                 polynomial.a * polynomial.value(position),
             )
+
         with self.assertRaises(ValueError):
             Polynomial(10403, 1, 7, 2)
         with self.assertRaises(ValueError):
@@ -189,6 +201,7 @@ class PolynomialTests(unittest.TestCase):
             base = build_factor_base(
                 10403, multiplier=multiplier, bound=40
             ).factor_base
+
             for a in range(1, 33):
                 for b in range(a):
                     if (b * b - base.n_prime) % a:
@@ -197,6 +210,7 @@ class PolynomialTests(unittest.TestCase):
                         polynomial = Polynomial(
                             10403, multiplier, a, b + offset * a
                         )
+
                         for entry in base.entries:
                             answer = polynomial_roots(polynomial, base, entry)
                             expected = tuple(
@@ -209,22 +223,26 @@ class PolynomialTests(unittest.TestCase):
                                 if answer.all_positions
                                 else answer.roots
                             )
+
                             self.assertEqual(actual, expected)
 
     def test_degenerate_and_linear_roots(self):
         """Distinguish all/none/one roots rather than skipping primes in A."""
         base = build_factor_base(10403, multiplier=9, bound=40).factor_base
         entry = next(entry for entry in base.entries if entry.prime == 3)
+
         self.assertTrue(
             polynomial_roots(
                 Polynomial(10403, 9, 3, 0), base, entry
             ).all_positions
         )
         answer = polynomial_roots(Polynomial(10403, 9, 9, 0), base, entry)
+
         self.assertEqual(answer.roots, ())
         self.assertFalse(answer.all_positions)
         base = build_factor_base(10403, bound=40).factor_base
         entry = next(entry for entry in base.entries if entry.prime == 7)
+
         self.assertEqual(
             len(
                 polynomial_roots(Polynomial(10403, 1, 7, 1), base, entry).roots
@@ -243,6 +261,7 @@ class PolynomialTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(ValueError, "nonunit"):
                 polynomial_roots(polynomial, base, entry)
+
         other = build_factor_base(10403, multiplier=3, bound=40).factor_base
         with self.assertRaises(ValueError):
             polynomial_roots(polynomial, other, other.entries[0])
@@ -253,6 +272,7 @@ class PolynomialTests(unittest.TestCase):
             base = build_factor_base(
                 n, multiplier=multiplier, bound=40
             ).factor_base
+
             for width in (1, 7, 16, 128):
                 polynomial = mpqs_polynomial(base, width)
                 target = a_target(base.n_prime, width)
@@ -264,14 +284,17 @@ class PolynomialTests(unittest.TestCase):
                     and any(x * x % p == base.n_prime % p for x in range(p))
                 ]
                 prime = min(eligible, key=lambda p: (abs(p * p - target), p))
+
                 self.assertEqual(polynomial.a, prime * prime)
                 roots = [
                     b
                     for b in range(polynomial.a)
                     if (b * b - base.n_prime) % polynomial.a == 0
                 ]
+
                 self.assertEqual(polynomial.b, min(roots))
                 result = collect_block(polynomial, base, -17, 20)
+
                 self.assertEqual(
                     {
                         atom.position: (
@@ -283,6 +306,7 @@ class PolynomialTests(unittest.TestCase):
                     },
                     reference_positions(polynomial, base, -17, 20),
                 )
+
         base = build_factor_base(10403, bound=3).factor_base
         with self.assertRaises(ValueError):
             mpqs_polynomial(base, 16)
@@ -308,6 +332,7 @@ class CollectorTests(unittest.TestCase):
                     if (b * b - base.n_prime) % a == 0:
                         polynomials.append(Polynomial(10403, multiplier, a, b))
                         break
+
             for polynomial in polynomials:
                 for bound in (1, 500):
                     result = collect_block(
@@ -318,6 +343,7 @@ class CollectorTests(unittest.TestCase):
                         residual_bound=bound,
                         budget=unlimited_budget(),
                     )
+
                     self.assertEqual(result.reason, "complete")
                     actual = {
                         atom.position: (
@@ -327,6 +353,7 @@ class CollectorTests(unittest.TestCase):
                         )
                         for atom in result.relations
                     }
+
                     self.assertEqual(
                         actual,
                         reference_positions(polynomial, base, -43, 58, bound),
@@ -336,6 +363,7 @@ class CollectorTests(unittest.TestCase):
         """Split blocks preserve the complete sequence and stable atom IDs."""
         full = collect_block(self.polynomial, self.base, -13, 28)
         pieces = []
+
         for lo, hi in (
             (-13, -6),
             (-6, 1),
@@ -347,11 +375,13 @@ class CollectorTests(unittest.TestCase):
             pieces.extend(
                 collect_block(self.polynomial, self.base, lo, hi).relations
             )
+
         self.assertEqual(tuple(pieces), full.relations)
         for position in (-13, 0, 28):
             result = collect_block(
                 self.polynomial, self.base, position, position
             )
+
             self.assertEqual(result.relations, ())
             self.assertEqual(result.next_position, position)
             self.assertEqual(result.scanned, 0)
@@ -361,6 +391,7 @@ class CollectorTests(unittest.TestCase):
         """A square target splits; an injected improper GCD can only skip."""
         base = build_factor_base(121, bound=7).factor_base
         result = collect_block(qs_polynomial(base), base, 0, 1)
+
         self.assertEqual(result.divisor, 11)
         self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.zero_positions, (0,))
@@ -368,6 +399,7 @@ class CollectorTests(unittest.TestCase):
         # coprime multiplier contract to manufacture an invalid target.
         with patch("v2.qs.reference_collector.gcd", return_value=121):
             result = collect_block(qs_polynomial(base), base, 0, 1)
+
         self.assertIsNone(result.divisor)
         self.assertEqual(result.reason, "complete")
         self.assertEqual(result.zero_positions, (0,))
@@ -383,9 +415,11 @@ class CollectorTests(unittest.TestCase):
             result = collect_block(
                 self.polynomial, self.base, -10, 10, budget=budget
             )
+
             self.assertEqual(result.reason, reason)
             self.assertEqual(result.next_position, -10)
             self.assertEqual(result.relations, ())
+
         for changes, reason in (
             ({"max_relations": 0}, "relation_limit"),
             ({"memory_bytes": 0}, "memory_limit"),
@@ -393,21 +427,26 @@ class CollectorTests(unittest.TestCase):
             result = collect_block(
                 self.polynomial, self.base, -10, 10, **changes
             )
+
             self.assertEqual(result.reason, reason)
             self.assertEqual(result.next_position, -10)
+
         prefix = collect_block(
             self.polynomial, self.base, -50, 50, max_relations=2
         )
+
         self.assertEqual(prefix.reason, "relation_limit")
         suffix = collect_block(
             self.polynomial, self.base, prefix.next_position, 50
         )
         full = collect_block(self.polynomial, self.base, -50, 50)
+
         self.assertEqual(prefix.relations + suffix.relations, full.relations)
         cap = prefix.workspace_bytes
         limited = collect_block(
             self.polynomial, self.base, -50, 50, memory_bytes=cap
         )
+
         self.assertEqual(limited.reason, "memory_limit")
         self.assertLessEqual(limited.workspace_bytes, cap)
         for atom in limited.relations:
@@ -428,11 +467,13 @@ class CollectorTests(unittest.TestCase):
         with redirect_stdout(stream):
             build_factor_base(10403, bound=40)
             collect_block(self.polynomial, self.base, -10, 10)
+
         self.assertEqual(stream.getvalue(), "")
 
     def test_work_refusals_preserve_the_exact_prefix(self):
         """Interrupt division/verification and continue at the refused x."""
         full = collect_block(self.polynomial, self.base, -20, 21)
+
         for work in range(0, 20000, 997):
             budget = Budget(work_limit=work, seconds=None, cpu_seconds=None)
             prefix = collect_block(
@@ -441,6 +482,7 @@ class CollectorTests(unittest.TestCase):
             suffix = collect_block(
                 self.polynomial, self.base, prefix.next_position, 21
             )
+
             self.assertEqual(
                 prefix.relations + suffix.relations, full.relations
             )
@@ -464,6 +506,7 @@ class RelationTests(unittest.TestCase):
         result = collect_block(
             polynomial, self.base, -20, 21, residual_bound=500
         )
+
         self.assertTrue(result.relations)
         for atom in result.relations:
             self.assertGreaterEqual(dict(atom.exponents)[7], 2)
@@ -475,6 +518,7 @@ class RelationTests(unittest.TestCase):
     def test_atomic_corruption_and_bounded_power(self):
         """Reject wrong signs, missing factors, and oversized exponents."""
         atom = next(atom for atom in self.atoms if atom.exponents)
+
         for corrupted in (
             replace(atom, sign=-atom.sign),
             replace(atom, exponents=()),
@@ -484,6 +528,7 @@ class RelationTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 verify_atomic(corrupted, self.base, residual_bound=500)
+
         partial = next(atom for atom in self.atoms if atom.residual > 1)
         with self.assertRaises(ValueError):
             verify_atomic(partial, self.base)
@@ -505,6 +550,7 @@ class RelationTests(unittest.TestCase):
                     and left.residual == right.residual
                 ):
                     return left, right
+
         self.fail("fixture has no matching residual pair")
 
     def test_combination_square_correction_and_full_provenance(self):
@@ -512,6 +558,7 @@ class RelationTests(unittest.TestCase):
         pair = self.matching_pair()
         combined = combine_relations(pair, self.base).relation
         store = {atom.relation_id: atom for atom in pair}
+
         self.assertTrue(verify_combined(combined, self.base, store))
         left_value = pair[0].u ** 2 - self.base.n_prime
         right_value = pair[1].u ** 2 - self.base.n_prime
@@ -519,6 +566,7 @@ class RelationTests(unittest.TestCase):
         expected = combined.sign * combined.square_correction**2
         for prime, exponent in combined.exponents:
             expected *= prime**exponent
+
         self.assertEqual(expected, product)
         self.assertEqual(combined.square_correction, pair[0].residual)
         self.assertEqual(combined.u, pair[0].u * pair[1].u % 10403)
@@ -532,6 +580,7 @@ class RelationTests(unittest.TestCase):
         pair = self.matching_pair()
         combined = combine_relations(pair, self.base).relation
         store = {atom.relation_id: atom for atom in pair}
+
         for corrupted in (
             replace(combined, u=(combined.u + 1) % 10403),
             replace(combined, square_correction=1),
@@ -541,6 +590,7 @@ class RelationTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 verify_combined(corrupted, self.base, store)
+
         store[pair[0].relation_id] = replace(pair[0], sign=-pair[0].sign)
         with self.assertRaises(ValueError):
             verify_combined(combined, self.base, store)
@@ -557,6 +607,7 @@ class RelationTests(unittest.TestCase):
         """A matching residual that splits n surfaces a proper divisor."""
         atom = AtomicRelation(self.polynomial, 1, 1, ((2, 1),), 103)
         result = combine_relations((atom,), self.base)
+
         self.assertEqual(result.divisor, 103)
         self.assertIsNone(result.relation)
         base = build_factor_base(101, bound=20).factor_base
@@ -569,6 +620,7 @@ class RelationTests(unittest.TestCase):
         """A full atom keeps correction one; verification is chargeable."""
         atom = next(atom for atom in self.atoms if atom.residual == 1)
         result = combine_relations((atom,), self.base)
+
         self.assertEqual(result.relation.square_correction, 1)
         self.assertEqual(result.relation.exponents, atom.exponents)
         with self.assertRaises(BudgetExhaustedError):
@@ -609,6 +661,7 @@ class RelationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "proven prime"):
                     verify_atomic(atom, self.base, residual_bound=1_000_000)
                 return
+
         self.fail("fixture has no exact composite residual")
 
     def test_multiple_partial_pairs_use_modular_corrections(self):
@@ -627,6 +680,7 @@ class RelationTests(unittest.TestCase):
         )
         atoms = pair + extras
         result = combine_relations(atoms, self.base).relation
+
         self.assertEqual(
             result.square_correction, pair[0].residual ** 2 % 10403
         )

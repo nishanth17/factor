@@ -58,6 +58,7 @@ def _solver_digest(solver, *, encoding="decimal-v1"):
 
         feed(state)
         return digest.hexdigest()
+
     if encoding != "decimal-v1":
         raise ValueError("unknown SIQS solver digest encoding")
     return _checksum(state)
@@ -67,6 +68,7 @@ def _store(collector):
     atoms = list(collector._atoms.values())
     indices = {atom.relation_id: i for i, atom in enumerate(atoms)}
     polynomials, lookup, encoded = [], {}, []
+
     for atom in atoms:
         key = (
             atom.polynomial.a,
@@ -85,6 +87,7 @@ def _store(collector):
                 atom.residual,
             ]
         )
+
     combined = [
         [
             tuple(indices[i] for i in item.atom_ids),
@@ -96,6 +99,8 @@ def _store(collector):
         for item in collector._combined
     ]
     rows = collector._full + collector._combined
+    # Solver masks use mixed admission order, while storage encodes full
+    # and combined payloads separately. Retain the mapping between them.
     row_indices = {id(row): index for index, row in enumerate(rows)}
     return dict(
         row_order=[row_indices[id(row)] for row in collector._rows],
@@ -142,6 +147,7 @@ def pack_job(job):
                 else engine.extractor.next_dependency,
             ),
         )
+
     payload = dict(
         version=VERSION,
         n=job.n,
@@ -182,6 +188,7 @@ def pack_job(job):
         if size + 1024 > job.config.checkpoint_bytes:
             raise MemoryError("full SIQS checkpoint exceeds checkpoint_bytes")
         parts.append(part)
+
     blob = "".join(parts)
     digest = hashlib.sha256(blob.encode()).hexdigest()
     resources = _checked_resources(
@@ -210,7 +217,9 @@ def _restore_store(payload, collector, budget):
         "pending",
     }:
         raise ValueError("invalid SIQS relation store shape")
+
     config, base = collector.config, collector.factor_base
+
     for name, limit in (
         ("polynomials", config.max_atoms),
         ("atoms", config.max_atoms),
@@ -220,6 +229,7 @@ def _restore_store(payload, collector, budget):
     ):
         if not isinstance(payload[name], list) or len(payload[name]) > limit:
             raise ValueError("SIQS checkpoint store exceeds its cap")
+
     if len(payload["full"]) + len(payload["combined"]) > config.max_relations:
         raise ValueError("SIQS checkpoint relation cap exceeded")
     row_count = len(payload["full"]) + len(payload["combined"])
@@ -237,6 +247,7 @@ def _restore_store(payload, collector, budget):
     if len(set(order)) != row_count:
         raise ValueError("checkpoint row order repeats a row")
     reserves = []
+
     for record in payload["atoms"]:
         if not isinstance(record, list) or len(record) != 5:
             raise ValueError("invalid SIQS checkpoint atom")
@@ -248,12 +259,15 @@ def _restore_store(payload, collector, budget):
             or len(exponents) > len(base.entries)
         ):
             raise ValueError("checkpoint atom size exceeds its bound")
+
         reserves.append(
             4096
             + 256 * len(exponents)
             + 16 * (abs(position).bit_length() + base.n_prime.bit_length())
         )
+
     combined_reserve = 0
+
     for record in payload["combined"]:
         if not isinstance(record, list) or len(record) != 5:
             raise ValueError("invalid checkpoint match")
@@ -268,6 +282,7 @@ def _restore_store(payload, collector, budget):
             sum(len(payload["atoms"][i][3]) for i in indices),
             base.n.bit_length(),
         )
+
     retained_workspace = (
         collector._workspace + sum(reserves) + combined_reserve
     )
@@ -280,6 +295,7 @@ def _restore_store(payload, collector, budget):
     if len(set(p.identity for p in polynomials)) != len(polynomials):
         raise ValueError("duplicate checkpoint polynomial")
     atoms = []
+
     for index, (poly_index, position, sign, exponents, residual) in enumerate(
         payload["atoms"]
     ):
@@ -301,6 +317,7 @@ def _restore_store(payload, collector, budget):
         collector._atoms[atom.relation_id] = atom
         collector._atom_bytes[atom.relation_id] = reserves[index]
         atoms.append(atom)
+
     used = set()
 
     def take(index):
@@ -315,6 +332,7 @@ def _restore_store(payload, collector, budget):
         if atom.residual != 1:
             raise ValueError("partial checkpoint atom is marked full")
         collector._full.append(atom)
+
     for indices, u, sign, exponents, correction in payload["combined"]:
         if len(indices) != 2:
             raise ValueError("checkpoint match needs two atoms")
@@ -347,6 +365,7 @@ def _restore_store(payload, collector, budget):
         collector._atom_bytes[last] += combined_storage_reserve(
             sum(len(a.exponents) for a in selected), base.n.bit_length()
         )
+
     for residual, index in payload["pending"]:
         atom = take(index)
         if (
@@ -355,7 +374,9 @@ def _restore_store(payload, collector, budget):
             or residual in collector._pending
         ):
             raise ValueError("invalid checkpoint partial matching state")
+
         collector._pending[residual] = atom.relation_id
+
     if len(used) != len(atoms):
         raise ValueError("checkpoint has unreferenced atomic provenance")
     rows = collector._full + collector._combined
@@ -375,18 +396,21 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "resources_sha256",
     }:
         raise ValueError("invalid full SIQS checkpoint envelope")
+
     blob = checkpoint["blob"]
     if type(checkpoint["version"]) is not int or checkpoint["version"] not in (
         1,
         VERSION,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
+
     if (
         not isinstance(blob, str)
         or len(blob) > MAX_BLOB_BYTES
         or len(blob.encode()) > MAX_BLOB_BYTES
     ):
         raise ValueError("SIQS checkpoint blob exceeds its cap")
+
     if hashlib.sha256(blob.encode()).hexdigest() != checkpoint["sha256"]:
         raise ValueError("SIQS checkpoint integrity mismatch")
     resources = _checked_resources(checkpoint["resources"])
@@ -402,6 +426,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             "row_order" not in payload["store"]
         ):
             raise ValueError("mixed-order checkpoint lacks row_order")
+
     values = dict(payload["config"])
     values["collector"] = SieveConfig(**values["collector"])
     saved_config = SIQSConfig(**values)
@@ -416,6 +441,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         validate_extension(saved_config, config)
     else:
         config = saved_config
+
     if len(blob.encode()) + 1024 > config.checkpoint_bytes:
         raise ValueError("SIQS checkpoint exceeds configured byte cap")
     if budget.work_limit < resources["work_used"]:
@@ -430,10 +456,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         or budget.cpu_used < resources["cpu_used"]
     ):
         raise ValueError("resume must retain consumed resources")
+
     budget.consume(0)
     job = SIQSJob(
         payload["n"], seed=payload["seed"], config=config, budget=budget
     )
+
     for name, limit in (
         ("epoch", config.growth_steps),
         ("family_index", config.family_count),
@@ -444,6 +472,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         if value > limit:
             raise ValueError("SIQS checkpoint progress exceeds its bound")
         setattr(job, name, value)
+
     expected_width = min(
         config.max_half_width, config.half_width * (2**job.epoch)
     )
@@ -475,6 +504,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError(
                 "external coefficient cursor disagrees with progress"
             )
+
     if config.streaming and payload["seen"]:
         raise ValueError(
             "streaming checkpoint must not contain a history registry"
@@ -494,6 +524,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             or width > config.max_half_width
         ):
             raise ValueError("invalid SIQS checkpoint polynomial registry")
+
     job.stats = payload["stats"]
     job.divisor = payload["divisor"]
     if job.divisor is not None and not utils.valid_divisor(job.divisor, job.n):
@@ -521,6 +552,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError(
                 "SIQS checkpoint multiplier differs from configuration"
             )
+
     if payload["base_identity"] is not None:
         job._setup()
         if job.base is None or _identity(job.base) != payload["base_identity"]:
@@ -531,10 +563,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             != payload["assignment_identity"]
         ):
             raise ValueError("SIQS checkpoint assignment identity mismatch")
+
         if payload["assignment_identity"] is None:
             job.assignments = None
     elif payload["engine"] is not None or payload["store"] is not None:
         raise ValueError("SIQS checkpoint store has no factor base")
+
     gray = payload["gray_index"]
     if gray is not None:
         if job.assignments is None or job.family_index >= len(job.assignments):
@@ -552,6 +586,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             job.family.current = job.family._make_step(gray - 1, None)
         job.family.next_index = gray
         job.stats["root_reconstructions"] += 1
+
     if payload["pending"] is not None:
         polynomial = Polynomial(job.n, job.multiplier, *payload["pending"])
         if job.family is not None and (
@@ -561,11 +596,13 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError(
                 "SIQS checkpoint pending polynomial disagrees with family"
             )
+
         roots = tuple(
             polynomial_roots(polynomial, job.base, e, budget=budget)
             for e in job.base.entries
         )
         job.pending_step = (polynomial, roots)
+
     saved = payload["engine"]
     if saved is not None:
         polynomial = Polynomial(job.n, job.multiplier, *saved["polynomial"])
@@ -627,6 +664,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "_workspace_peak" if name == "workspace_peak" else name,
                 value,
             )
+
         for name in ("final_solve_done", "storage_solve_done"):
             if type(saved[name]) is not bool:
                 raise ValueError("invalid SIQS engine completion flag")
@@ -639,6 +677,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             "memory_limit",
         ):
             raise ValueError("invalid SIQS checkpoint storage reason")
+
         engine.stats = saved["stats"]
         prefix = saved["solver"]
         if prefix is not None:
@@ -673,12 +712,16 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 raise ValueError(
                     "SIQS checkpoint solver prefix exceeds consumed work"
                 )
+
+            # Rebuild from checked rows rather than trusting saved pivots.
+            # Replay consumes the resumed allowance and verifies its digest.
             for _ in range(actions):
                 if solver.next_row == len(matrix.rows):
                     raise ValueError(
                         "SIQS checkpoint solver prefix exceeds matrix"
                     )
                 solver.step()
+
             if (
                 prefix["pending"]
                 and solver.pending is None
@@ -688,6 +731,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                     matrix.rows[solver.next_row],
                     matrix.masks[solver.next_row],
                 )
+
             if (
                 _solver_digest(
                     solver,
@@ -696,6 +740,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 != prefix["digest"]
             ):
                 raise ValueError("SIQS checkpoint elimination prefix mismatch")
+
             engine.prepared, engine.solver = prepared, solver
             if prefix["extract_index"] is not None:
                 if solver.next_row != len(matrix.rows):
@@ -722,8 +767,11 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                             "checkpoint skipped a successful dependency"
                         )
                     engine.extractor.trials.append(trial)
+
                 engine.extractor.next_dependency = index
+
             job.stats["matrix_reconstructions"] += 1
+
     if job.active and job.engine is None:
         raise ValueError("active SIQS checkpoint has no collector")
     if extended and job.base is not None:

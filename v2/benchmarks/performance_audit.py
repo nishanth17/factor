@@ -25,13 +25,16 @@ from math import gcd, isqrt, prod
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS = Path(__file__).parent / "inputs/performance_audit_corpus.json"
-BASELINE = Path(__file__).parent / "inputs/performance_audit_baseline.json"
+CORPUS = Path(__file__).parent / "inputs/corpora/performance_audit_corpus.json"
+BASELINE = (
+    Path(__file__).parent / "inputs/baselines/performance_audit_baseline.json"
+)
 
 
 def checked_baseline(path):
     """Validate owned immutable source bytes before loading a control."""
     data = json.loads(path.read_text())
+
     for name, source in data["source"].items():
         parts = Path(name).parts
         if not (
@@ -42,11 +45,13 @@ def checked_baseline(path):
             and all(part not in (".", "..") for part in parts)
         ):
             raise ValueError("invalid baseline module path")
+
         if (
             hashlib.sha256(source.encode()).hexdigest()
             != data["source_sha256"][name]
         ):
             raise ValueError("corrupt baseline source")
+
     return data
 
 
@@ -86,6 +91,7 @@ def apply_revert(variant):
         ),
     }
     data = checked_baseline(BASELINE)
+
     for name, owner, function in changes[variant]:
         source = data["source"]["v2/" + name.replace(".", "/") + ".py"]
         tree = ast.parse(source)
@@ -118,7 +124,9 @@ def apply_revert(variant):
                         ast.Name(id=owner, ctx=ast.Load()),
                         ast.Name(id="self", ctx=ast.Load()),
                     ]
+
             ast.fix_missing_locations(node)
+
         module = importlib.import_module("v2." + name)
         module.__dict__.setdefault("Counter", Counter)
         namespace = {}
@@ -136,6 +144,7 @@ def apply_revert(variant):
             function,
             namespace[function],
         )
+
     if variant == "preprocessing":
         sys.modules["v2.portfolio"].integer_root = sys.modules[
             "v2.preprocessing"
@@ -178,9 +187,11 @@ def verify_corpus(corpus):
                 and gcd(pow(witness, (n - 1) // q, n) - 1, n) == 1
             ):
                 raise AssertionError("invalid Pocklington certificate")
+
         verified.add(n)
 
     seen = set()
+
     for fixture in corpus["fixtures"]:
         for factor in fixture["factors"]:
             verify(factor)
@@ -217,6 +228,7 @@ def make_config(case, band, modules):
             "p2_full_cache": dict(schedule_cache_bytes=2**20),
         }
         return choices[case]
+
     sieve = modules["sieve_collector"].SieveConfig
     options = sieve(
         score_policy="powers",
@@ -254,6 +266,7 @@ def make_config(case, band, modules):
                 residual_bound=25_000_000 if "residual" in case else 10000,
             ),
         )
+
     if case.startswith(("parallel", "native")):
         params = dict(
             base_bound=(
@@ -280,6 +293,7 @@ def make_config(case, band, modules):
         if "cap" in case:
             params["max_batch_atoms"] = 1024
         return modules["parallel"].ParallelConfig(**params)
+
     if case.startswith("siqs"):
         if "feasible" in case:
             return modules["siqs"].SIQSConfig(
@@ -316,12 +330,14 @@ def make_config(case, band, modules):
             memory_bytes=64 * 2**20,
             collector=options,
         )
+
     if case.startswith("collector"):
         return replace(
             options,
             division=case.split("_")[1],
             small_prime_cutoff=5 if "cutoff" in case else 0,
         )
+
     if case in ("collision", "matrix"):
         return None
     raise ValueError("unknown audit case: " + case)
@@ -344,6 +360,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
     began = time.perf_counter()
     divisor, stats, signature = None, {}, None
     factors, remaining, labels = [], [n], []
+
     try:
         if case.startswith("p2"):
             portfolio = modules["portfolio"]
@@ -353,6 +370,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                 budget=budget,
                 config=portfolio.PortfolioConfig(**config),
             )
+
             if outcome.result.reconstruct() != n:
                 raise AssertionError("portfolio reconstruction failed")
             reason = outcome.reason
@@ -378,6 +396,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
             matrix = modules["linear_algebra"].filter_matrix(
                 rows, weight_two=True, budget=budget, memory_bytes=64 * 2**20
             )
+
             masks = (
                 modules["linear_algebra"]
                 .DependencySolver(matrix, budget=budget)
@@ -418,6 +437,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                         config=config,
                         budget=budget,
                     )
+
                     result = collector.collect(-256, 257)
                     divisor, reason, stats = (
                         result.divisor,
@@ -437,6 +457,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                 job = modules["parallel"].ParallelSIQSJob(
                     n, seed=seed, budget=budget, config=config
                 )
+
                 result = job.run(pool=pool, fixed_work="fixed" in case)
                 if "fixed" in case and job.engine is not None:
                     signature = str(
@@ -464,6 +485,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                     max_trivial=4096,
                     collector=config.collector,
                 )
+
                 result = (
                     modules["siqs"]
                     .SIQSJob(n, seed=seed, budget=budget, config=native)
@@ -481,6 +503,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                     .SSSJob(n, seed=seed, budget=budget, config=config)
                     .run()
                 )
+
             divisor, reason, stats = (
                 result.divisor,
                 result.reason,
@@ -493,20 +516,25 @@ def run_one(case, fixture, seed, config, modules, pool=None):
     except MemoryError as error:
         reason = "memory_limit"
         stats["refusal_detail"] = str(error)
+
     if divisor is not None:
         if not utils.valid_divisor(divisor, n):
             raise AssertionError("invalid split")
         children = sorted((divisor, n // divisor))
+
         try:
             for child in children:
                 budget.consume(child.bit_length() * 32)
                 label = utils.classify_prime(child, rng=random.Random(seed))
+
                 if label is utils.Primality.COMPOSITE:
                     raise AssertionError("nonterminal semiprime child")
                 labels.append(label.value)
+
             factors, remaining = children, []
         except modules["budget"].BudgetExhaustedError:
             reason, labels = "classification_" + budget.reason, []
+
     if prod(factors) * prod(remaining) != n or (
         not remaining and factors != fixture["factors"]
     ):
@@ -540,6 +568,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
 
 def measure(call, args):
     attempts = []
+
     for attempt in range(3):
         began, warm_calls = time.perf_counter(), 0
         while time.perf_counter() - began < max(
@@ -547,14 +576,17 @@ def measure(call, args):
         ):
             call()
             warm_calls += 1
+
         warm_seconds = time.perf_counter() - began
         samples = []
+
         for _ in range(max(args.repetitions, 9 if not attempt else 15)):
             started = time.perf_counter()
             rows = call()
             samples.append(
                 dict(seconds=time.perf_counter() - started, rows=rows)
             )
+
         times = [sample["seconds"] for sample in samples]
         median = statistics.median(times)
         q1, _, q3 = statistics.quantiles(times, n=4)
@@ -584,6 +616,7 @@ def measure(call, args):
         )
         if stable:
             break
+
     return dict(stable=stable, median_seconds=median, attempts=attempts)
 
 
@@ -654,6 +687,7 @@ def run(args):
         raise RuntimeError(
             "invoke this file directly to isolate a different runtime"
         )
+
     sys.path.insert(0, str(args.runtime_root))
     modules = {
         name: importlib.import_module(
@@ -709,6 +743,7 @@ def run(args):
 
         modules["siqs"].family_assignments = ordered
         modules["parallel"].family_assignments = ordered
+
     before = fingerprint(args.runtime_root)
     data = dict(
         runtime=sys.version,
@@ -729,6 +764,7 @@ def run(args):
         results={},
         driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     )
+
     for band in args.bands.split(","):
         fixtures = [
             f
@@ -783,6 +819,7 @@ def run(args):
                     profiler.dump_stats(
                         str(args.output.with_suffix(f".{band}.{case}.prof"))
                     )
+
                 data["results"][band + "/" + case] = result
                 args.output.write_text(json.dumps(data, indent=2) + "\n")
                 last = result["attempts"][-1]["samples"][0]["rows"]
@@ -799,6 +836,7 @@ def run(args):
             finally:
                 if pool:
                     pool.close()
+
     if before != fingerprint(args.runtime_root):
         raise AssertionError("runtime source changed during measurement")
 

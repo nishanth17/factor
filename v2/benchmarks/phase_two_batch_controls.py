@@ -47,6 +47,7 @@ def run(args):
         }
 
     rows = []
+
     for kind in ("rho", "pm1", "ecm"):
         expected = candidate(baseline.advance_job, kind)
         row = _measure_case(
@@ -62,6 +63,7 @@ def run(args):
         row["expected"] = expected
         rows.append(row)
         print(kind, "done", flush=True)
+
     if environment()["source_sha256"] != measured_environment["source_sha256"]:
         raise RuntimeError("source changed during measurements")
     return {

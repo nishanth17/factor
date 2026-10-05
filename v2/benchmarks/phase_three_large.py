@@ -29,7 +29,10 @@ from .phase_one import environment
 from .phase_three_reference import _rss_bytes
 from .phase_three_siqs import _config
 
-CORPUS = Path(__file__).parent / "inputs/phase_three_p34_large_v3_corpus.json"
+CORPUS = (
+    Path(__file__).parent
+    / "inputs/corpora/phase_three_p34_large_v3_corpus.json"
+)
 MEMORY = 1024 * 1024 * 1024
 WORK = 10**13
 TIERS = ((2000, 147396, 32), (11000, 1000000, 32), (50000, 5000000, 64))
@@ -111,9 +114,11 @@ def run_one(
             fermat_steps=0,
             siqs=None if arm == "ecm" else replace(config, mode=arm),
         )
+
     print("starting", fixture["id"], arm, seed, "cap", seconds, flush=True)
     budget = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
     began, cpu = time.perf_counter(), time.process_time()
+
     result = factorize_bounded(
         fixture["n"],
         seed=seed,
@@ -256,6 +261,7 @@ def main():
             )
         )
         return
+
     verify_certificates(corpus["certificates"])
     corpus_sha = hashlib.sha256(CORPUS.read_bytes()).hexdigest()
     source = environment()
@@ -264,6 +270,7 @@ def main():
         if args.phase == "all"
         else (args.phase,)
     )
+
     for phase in phases:
         journal_path = args.output.with_name(
             args.output.stem + "." + phase + ".jsonl"
@@ -302,6 +309,7 @@ def main():
                     inherited = json.loads(encoded)
                     assert inherited["corpus_sha256"] == corpus_sha
                     inherited_sha = hashlib.sha256(encoded).hexdigest()
+
                 for digits in (30, 40, 50, 60, 70, 80):
                     fixtures = [
                         f
@@ -318,6 +326,7 @@ def main():
                             checkpoint_bytes=16 * 1024 * 1024,
                         )
                         rows = []
+
                         for fixture in fixtures:
                             row = run_one(
                                 fixture,
@@ -330,11 +339,13 @@ def main():
                             row["training_candidate"] = "inherited_calibration"
                             record(row)
                             rows.append(row)
+
                         configs[str(digits)] = asdict(config)
                         records[str(digits)] = dict(
                             rows=rows, summary=summary(rows)
                         )
                         continue
+
                     grid = (
                         (
                             ("small", 10000, 8192, 10**7, 1),
@@ -348,6 +359,7 @@ def main():
                             ("scored", 100000, 65536, 10**10, 0),
                         )
                     )
+
                     for label, bound, width, residual, multiplier in grid:
                         config = configuration(
                             fixtures[0]["n"],
@@ -357,6 +369,7 @@ def main():
                             multiplier,
                         )
                         rows = []
+
                         for fixture in fixtures:
                             # A diagnostic screen includes generous time and
                             # all stages, but supplies no promotion statistic.
@@ -371,6 +384,7 @@ def main():
                             row["training_candidate"] = label
                             record(row)
                             rows.append(row)
+
                         choices.append(
                             dict(
                                 name=label,
@@ -379,6 +393,7 @@ def main():
                                 summary=summary(rows),
                             )
                         )
+
                     chosen = max(
                         choices,
                         key=lambda c: (
@@ -392,6 +407,7 @@ def main():
                     configs[str(digits)] = chosen["config"]
                     records[str(digits)] = choices
                     print("selected", digits, chosen["name"], flush=True)
+
                 frozen = dict(
                     corpus_sha256=corpus_sha,
                     environment=source,
@@ -459,6 +475,7 @@ def main():
                             if digits >= 70
                             else ("qs", "mpqs", "siqs", "ecm")
                         )
+
                         for arm in arms:
                             warm = time.perf_counter()
                             calls = 0
@@ -467,6 +484,7 @@ def main():
                                     warm_fixture, 7, config, arm, seconds=3
                                 )
                                 calls += 1
+
                             record(
                                 dict(
                                     type="warmup",
@@ -500,6 +518,7 @@ def main():
                         for f in corpus["fixtures"]
                         if f["kind"] != "balanced" and f["split"] == "held_out"
                     ]
+
                     for arm in ("ecm", "fallback"):
                         warm = next(
                             f
@@ -509,6 +528,7 @@ def main():
                             and f["split"] == "training"
                         )
                         began = time.perf_counter()
+
                         while time.perf_counter() - began < 3:
                             run_one(
                                 warm,
@@ -518,12 +538,14 @@ def main():
                                 seconds=3,
                                 varied=True,
                             )
+
                         for fixture in fixtures:
                             digits = min(
                                 80,
                                 max(30, 10 * ((fixture["digits"] + 9) // 10)),
                             )
                             config = _config(frozen["configs"][str(digits)])
+
                             for seed in (7, 29):
                                 row = run_one(
                                     fixture,
@@ -558,6 +580,7 @@ def main():
                         and r.get("seed") == 7
                     )
                     config = _config(frozen["configs"]["50"])
+
                     for total_seconds in (600, 1800):
                         if prior["complete"] or prior["reason"] not in (
                             "wall_limit",
@@ -565,6 +588,7 @@ def main():
                             "work_limit",
                         ):
                             break
+
                         metadata = prior["checkpoint"]
                         path = args.output.parent / metadata["path"]
                         encoded = path.read_bytes()
@@ -597,6 +621,7 @@ def main():
                         and f["digits"] == 30
                     )
                     base = _config(frozen["configs"]["30"])
+
                     for label, options in (
                         ("powers", {}),
                         ("upper_bound", {"score_policy": "candidate"}),
@@ -608,6 +633,7 @@ def main():
                         while time.perf_counter() - warm < 3:
                             run_one(fixture, 7, config, "siqs")
                         samples = []
+
                         for index in range(9):
                             row = run_one(fixture, 7, config, "siqs")
                             row["control"] = label
@@ -615,6 +641,7 @@ def main():
                             record(row)
                             samples.append(row)
                             rows.append(row)
+
                         times = [r["seconds"] for r in samples]
                         quartiles = statistics.quantiles(times, n=4)
                         stable = (
@@ -639,6 +666,7 @@ def main():
                                 row["sample"] = index
                                 record(row)
                                 rows.append(row)
+
                     for digits in (50, 60, 80):
                         fixture = next(
                             f
@@ -647,6 +675,7 @@ def main():
                             and f["digits"] == digits
                         )
                         base = _config(frozen["configs"][str(digits)])
+
                         for label, changes in (
                             ("simple", dict(diverse=False)),
                             (
@@ -665,6 +694,7 @@ def main():
                             row["control"] = label
                             record(row)
                             rows.append(row)
+
                     profiler = cProfile.Profile()
                     profiler.enable()
                     run_one(fixture, 7, base, "siqs", seconds=10)
@@ -686,6 +716,7 @@ def main():
                     for arm in ("qs", "mpqs", "siqs", "ecm"):
                         for index in range(9):
                             began = time.perf_counter()
+
                             child = subprocess.run(
                                 [
                                     sys.executable,
@@ -715,6 +746,7 @@ def main():
                             )
                             record(row)
                             rows.append(row)
+
                 result = dict(
                     phase=phase,
                     corpus_sha256=corpus_sha,
@@ -729,6 +761,7 @@ def main():
                     args.output.stem + "." + phase + ".json"
                 ).open("x") as stream:
                     json.dump(result, stream, indent=2)
+
         print("phase_complete", phase, flush=True)
 
 
