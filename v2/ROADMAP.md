@@ -92,26 +92,100 @@ task/evidence IDs; Phase 8 is the user-requested future follow-up.
 <!-- BEGIN MASTER EXECUTION SEQUENCE -->
 ## Master execution sequence and model recommendations
 
-This dependency-based schedule mirrors [SEQUENCING.md](../SEQUENCING.md).
-Execution phases A–I are independent of roadmap phase numbers. Rows in the
-same layer can proceed in isolated worktrees; only named predecessors block
-later work. Conditional branches may be explicitly deferred. Performance
-runs share one machine-wide window, and shared runtime integration has one
-writer. Task-specific acceptance and experiment gates below remain unchanged.
+Planning snapshot: 4 October 2026, America/Los_Angeles.
+
+This is the authoritative dependency-based execution plan for the active
+`v2/` implementation on PyPy implementing Python 3.11, targeting general
+factoring below 100 decimal digits on the Apple M4 / 24 GiB machine. The
+execution tables below preserve the existing task IDs and acceptance gates
+in the numbered phase catalogue. This plan does not authorize experiments;
+`v1/` remains the baseline.
+
+**Recommended immediate allocation: start R1 calibration on the integrated R2
+control; start an isolated P4.3 backend tranche; use another available slot for
+P5.2 schedule/coverage design or P4.1 chain verification.** A1 is complete for
+the bounded R2 tranche. Conditional capacity/CRT follow-ups can remain
+deferred; ECM work can start independently.
 
 **Williams p+1 belongs to P5.1: A5 builds the binary reference, and B8 evaluates
 P5.1 parameter starts and P5.3 Lucas optimizations. It is eligible before P6.**
-GNFS starts at A9 and reaches small-engine integration at C7; optional P4–P6
-experiments do not delay that branch. D7 freezes the P8 control after small
-GNFS, and G1 waits for the measured SIQS/GNFS crossover before final allocation.
+P6 owns advanced ECM curve families, polynomial continuations, richer relation
+experiments, broader workers and comparative publication. GNFS starts at A9
+and reaches small-engine integration at C7; optional P4–P6 experiments do not
+delay that branch. D7 freezes the P8 control after small GNFS, and G1 waits
+for the measured SIQS/GNFS crossover before final allocation.
 
-For new tasks, Sol means GPT-6.1 Sol and Astra means GPT-6 Astra. Keep active
-R2 on its current configuration. The model/effort assignments are engineering
-recommendations, not Factor model-benchmark results; they use the distinctions
-in [OpenAI model-selection guidance](https://developers.openai.com/api/docs/guides/model-selection).
-Use max only for a named unresolved proof. Priority expresses expected return
-on effort, not promised speed. A documented retain/defer/reject decision can
-settle an optional predecessor; it cannot replace a missing correctness proof.
+### How to read the phases
+
+Phases A–I are execution layers, distinct from the roadmap's numbered phases.
+Rows in one layer have no dependency on one another's unfinished deliverables.
+Each row names its predecessors; it may start as soon as those predecessors
+are settled, without waiting for unrelated rows in an earlier layer.
+
+The plan includes two kinds of edge:
+
+- **Required:** an interface, oracle, implementation or measurement needed by
+  the successor. These are stated in the predecessor column.
+- **Evidence/order gate:** a deliberate choice to evaluate a cheaper control
+  before spending on a more expensive challenger. These are labeled in the
+  reason column; they are not mathematical necessities.
+
+An experimental predecessor is settled by an accepted implementation **or a
+documented retain-baseline/defer/reject decision**. If a required mathematical
+capability is missing, its dependent implementation stays deferred. A recorded
+deferral cannot stand in for a correctness proof.
+
+Priority means expected return per engineering/measurement effort, inferred
+from current evidence, not a promised speedup. **High** gets the next available
+slot; **medium** is useful independent work; **conditional** requires its stated
+trigger; **low/conditional** is deliberately a later investment. Within a
+phase, prefer higher-priority rows when slots are limited.
+
+### Current foundation: already available
+
+| Foundation | Confirmed scope | Consequence for this plan |
+| --- | --- | --- |
+| P1/P2 and P3.1–P3.4 | Exact bounded algorithms, recovery and a working SIQS relation/filter/extraction baseline exist. | ECM and complementary-method correctness work can start now. Full P3.8 completion is not a prerequisite. |
+| P3.6.1 and the follow-up repair pass | Accepted budget/storage/setup fixes and measured decisions are recorded; native defaults remain conservative. | Reuse these fixes. R2/R5 should reconcile the current baseline rather than reimplement polling, leases, base verification or rejected batching experiments. |
+| P3.8-R1 implementation | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Broader calibration remains open. | R1 is now mainly a workload/parameter/evidence task. Capacity reachability is not evidence of large balanced completion. |
+| P3.8-R3 bounded tranche | Stable mixed rows, complete identities and checked recovery are integrated. Cadence 32 has a scoped opt-in win; general policy and larger provenance/storage bounds remain open. | Matrix controls can start now. Do not reopen the accepted R3 work or assume its existing dense storage reservation has disappeared. |
+| P3.8-R2 bounded tranche | The isolated study and combined repaired/R3 acceptance pass; fixed scores and capped plans are integrated as opt-ins. The original promotion decision retains defaults. | A1 is complete for this scope and B1 can start. B13 resieve capacity and C8 family-wide CRT remain conditional follow-ups. |
+
+The prior R1 flyer comparison reduced a one-input, two-seed 30-digit cohort
+from 1.767 to 1.444 seconds (18.3%); the fixed legacy schedule was 3.0% slower
+in its frozen comparison. R1's one-second upper-band runs do not establish
+practical upper-band completion. R3's scoped cadence-32 confirmation reduced
+complete-cohort time by 38.7%, with 54/54 attempts completing per arm; this is
+not a universal filtering policy. These results favor careful calibration,
+not an assumption that every proposed optimization will win. See the
+[benchmark evidence](benchmarks/README.md).
+
+The isolated R2 fixed-score/plan arm reduced 30-digit held-out complete-cohort
+time by 5.7%; no candidate passed the prespecified causal training promotion
+gate. Keep fixed scores and capped plans opt-in, retain the streamed default,
+and preserve the rejected tiny-prime/batch/grouped-charge decisions.
+The 20–21-digit held-out median gain has an interval crossing zero. These
+isolated results settle the bounded study; the separate combined-source
+acceptance pass closes A1, without establishing broad scaling.
+
+### Model and effort key
+
+For **new** tasks, **Sol** means **GPT-6.1 Sol** (`gpt-6.1-sol`) and **Astra**
+means **GPT-6 Astra** (`gpt-6-astra`). The completed R2 tranche used its
+existing configuration; these recommendations apply to new tasks.
+
+Use Sol for bounded implementation, measurement and integration; use Astra
+for difficult algebraic/provenance invariants and new solver designs. `high`
+fits controlled execution and reconciliation; `xhigh` fits coupled correctness
+or selection decisions. Escalate to `max` only for a named unresolved proof or
+repeatedly failing design, not as the default for a long benchmark run.
+
+These assignments are engineering recommendations, not results of a model
+benchmark on Factor. They follow the general distinctions in
+[OpenAI model-selection guidance](https://developers.openai.com/api/docs/guides/model-selection).
+The [Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol) and
+[Astra](https://developers.openai.com/api/docs/models/gpt-6-astra) model pages
+confirm the model names and supported effort settings.
 
 ### Execution phase A — independent foundations that can proceed now
 
@@ -249,6 +323,174 @@ separate; choose only the challengers supported by its cost/yield profile.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | I1 — P6.4 final comparative publication | Publish source/configuration pins, commands, independent corpus/runner links, backend/core disclosures, supported limits and complete versus factor-one outcomes; run feasible pinned competitor arms. | H1, F1; selected P6 decisions and clean-checkout validation | **Required for comparative claims.** Final publication follows the measured integrated result, although individual milestone evidence can be published earlier. P8.1 supplies the protocol; P6.4 owns presentation/comparison rather than duplicating it. | Sol / **high**; **xhigh** for disputed comparisons | Sol/high fits evidence-backed reporting and reproduction checks. Use xhigh to resolve uncertain or incompatible comparisons; stronger model settings cannot replace missing measurements. |
+
+### Dependency overview
+
+The tables above are authoritative; this diagram shows the main branches.
+
+```mermaid
+flowchart TD
+    S[Accepted P2 / SIQS / repairs / R3] --> R2[A1: integrated R2 opt-ins]
+    ISO[Isolated R2 study: 171e69c] --> R2
+    S --> GMP[A2: backend boundary]
+    S --> PLAN[A3: reusable schedules and coverage]
+    S --> CHAIN[A4: verified chain records]
+    S --> PP[A5: Williams p+1 binary reference]
+    S --> PM[A6: p-1 and extension]
+    S --> AUD[A7: R5 reconciliation]
+    S --> MAT[A8: matrix control]
+    R2 --> CAL[B1: R1 calibration]
+    R2 --> NP[B5: NumPy if array-bound]
+    R2 --> RSV[B13: resieve capacity if still refused]
+    R2 --> CRT[C8: family-wide CRT if justified]
+    CAL --> CRT
+    GMP --> PAIR[B2: paired continuation]
+    PLAN --> PAIR
+    PM --> PAIR
+    GMP --> EXEC[B3: production chains]
+    PLAN --> EXEC
+    CHAIN --> EXEC
+    GMP --> KERN[B4: fused kernels]
+    PP --> LUC[B8: p+1 starts and Lucas chains]
+    CHAIN --> LUC
+    PM --> LUC
+    MAT --> FR[B6: Four Russians]
+    MAT --> PROV[B7: provenance/capacity if needed]
+    CAL --> DLP[C1: R4 + P5.4 DLP if yield-limited]
+    PAIR --> ADV[C2: advanced stage two]
+    CAL --> POL[C3: ECM allocation/handoff]
+    PAIR --> POL
+    EXEC --> POL
+    KERN --> POL
+    FR --> DENSE[C4: other dense/hybrid/filtering]
+    PROV --> DENSE
+    KERN --> RED[C5: reducers if justified]
+    EXEC --> SEARCH[C6: offline chain search if justified]
+    DENSE --> BL[D1: block Lanczos if justified]
+    DENSE --> BW[D2: block Wiedemann if justified]
+    R2 --> END[E1: selected-tranche integration and acceptance]
+    AUD --> END
+    RSV -->|adopt or defer| END
+    CRT -->|adopt or defer| END
+    NP --> END
+    LUC --> END
+    DLP --> END
+    ADV --> END
+    POL --> END
+    RED --> END
+    SEARCH --> END
+    BL --> END
+    BW --> END
+    S --> NF[A9: GNFS field and root contracts]
+    NF --> NC[B9: full relations]
+    NF --> NM[B10: GNFS matrix control]
+    NF --> NR[B11: exact field roots]
+    NC --> SMALL[C7: bounded small GNFS]
+    NM --> SMALL
+    NR --> SMALL
+    SMALL --> SCALE[D3-D6: independent scaling branches]
+    GMP --> SCALE
+    SCALE --> SCALED[E2: integrated scaling]
+    SMALL --> FREEZE[D7: P8.1 control]
+    FREEZE --> P8[E3-E6: independent P8 experiments]
+    SCALED --> CROSS[F1: measured SIQS-GNFS crossover]
+    END --> CROSS
+    END --> P6[F2-F3 and F5-F7: conditional P6 challengers]
+    GMP --> WC[B12: worker contracts]
+    PLAN --> WC
+    AUD --> WC
+    WC --> WORKERS[F4: production workers]
+    END --> WORKERS
+    WORKERS --> ALLOC
+    CROSS --> ALLOC[G1: final allocation]
+    P8 --> ALLOC
+    P6 --> ALLOC
+    ALLOC --> ACCEPT[H1: P8.7 acceptance]
+    ACCEPT --> PUB[I1: P6.4 publication]
+```
+
+### Parallel execution and ownership
+
+Use these lanes, with one integration owner for shared files:
+
+| Lane | Scope and collision rule |
+| --- | --- |
+| QS collector | B1 R1 calibration on the accepted A1 R2 control; B13 resieve capacity and C8 CRT are conditional. Reconcile the repair owner before shared collector edits; NumPy and DLP branch from explicit frozen versions. |
+| Matrix/provenance | A8/B6/B7/C4/D1/D2; preserve the agreed row/operator/lifting contract. Shared relation/checkpoint edits need a coordinated integration slot. |
+| ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm.py` and `stage_jobs.py` integration. |
+| Schedules/continuations | P5.2/P5.3 and p+1; coordinate `schedules.py`, `stage_jobs.py`, backend boundaries and checkpoint versions with the arithmetic lane. |
+| Evidence/integration | R5, final calibration and docs; one writer reconciles shared configuration, portfolio, benchmark guide and roadmap decisions. |
+
+Start with B1 R1 calibration on the integrated R2 control, one substantial
+ECM implementation lane and, if useful, one lighter schedule/oracle lane.
+There is no benefit in launching every eligible row at once. Worktrees
+isolate edits but not CPU, RAM, disk or thermal
+conditions. Reserve one machine-wide performance window; pause competing
+tests, compression, profiling and heavy correctness runs during accepted
+timings. Integrate changes sequentially and compare the exact combined source.
+
+### Acceptance, evidence and stop rules
+
+1. **Separate workload classes.** Train on prespecified total-size bands such
+   as 30/40/60/70/80/90/99 digits, with balanced inputs distinct from uneven
+   smaller-factor bands and smooth/close/power controls. Feasibility probes
+   choose finite allowances before fresh confirmation; they are not held-out
+   performance evidence. Do not substitute a single 50-digit target for the
+   general below-100-digit objective.
+2. **Require exact outputs and finite resources.** Preserve proper divisors,
+   complete reconstruction including unresolved cofactors, certainty labels,
+   nonunit recovery, cumulative work/time/storage and checked resume. Add
+   checkpoint identity/budget handling alongside each implementation, not
+   after the optimization is finished.
+3. **Measure the whole consequence.** Include setup, import/conversion where
+   relevant, planning, failed attempts, splitting, filtering, lifting,
+   serialization, replay and retained storage. Report owned bounds separately
+   from observed RSS. Benchmarks must use matched inputs, seeds and budgets,
+   at least three seconds of validated PyPy warmup and nine samples, extended
+   when unstable. Cold startup and instrumented profiles stay separate.
+4. **Use existing promotion gates.** Zero correctness failures; at least 10%
+   lower complete-run median time or 10 percentage points more completion on
+   a prespecified comparable cohort, with no more than 5 percentage points
+   of completion regression in another declared class, and uncertainty
+   reported. Faster refusal, microkernel throughput, extra rows and synthetic
+   matrix capacity alone do not establish a factoring win.
+5. **Run relevant checks.** Implementation changes use `make -C v2 test` and
+   `make -C v2 lint`; before publishing, verify tests and benchmark imports
+   in a committed-files-only checkout. Update API docs, accepted behavior and
+   measured summaries only after the corresponding gates pass.
+6. **Use the new evidence layout.** Required immutable corpora, baselines and
+   loader source snapshots belong in versioned `v2/benchmarks/inputs/`.
+   New generated captures, profiles and scratch evidence go under ignored
+   `results/` trees. The entire `v2/audit/` tree is local. Keep historical archives
+   at their recorded restoration locations; do not recreate obsolete loose
+   `_LOCAL` files or force-add generated outputs.
+7. **Re-rank after each meaningful result.** If collection dominates, prefer
+   calibrated collection/yield work; if sparse admission fails, require a
+   storage proof; if stage-two schedules dominate, prefer reuse/pairing; if
+   arithmetic dominates, use the backend/kernel evidence. Rejecting a
+   challenger and retaining the baseline is a valid completed experiment.
+
+This plan includes P6 research/parallelism/publication, P7 GNFS and P8 portfolio
+reconciliation. Their roadmap numbers are ownership labels, not a requirement
+to finish all lower-numbered optional experiments. Small GNFS starts at A9 and
+reaches its integration gate at C7; P4.3 is settled before scaling. P8.1 follows
+small GNFS, while final P8 allocation consumes the measured crossover later.
+Independent P8 oracle/profile spikes may start earlier when justified, without
+claiming integrated promotion. Preserve this distinction between early research
+and the named production/acceptance gates.
+
+### Sources and verification scope
+
+- Canonical task IDs and acceptance gates in the numbered phases below.
+- Phase 3+ research and below-100-digit priorities (local audit material), especially ECM schedule/backend priorities and R4/P5.4 ownership.
+- Matrix research (local audit material) and [benchmark results](benchmarks/README.md).
+- [Accepted implementation record](../CHANGELOG.md), [ECM control](ecm.py), [bounded stage execution](stage_jobs.py), [schedules](schedules.py) and [portfolio configuration](portfolio.py).
+
+The 4 October planning snapshot inspected the roadmap, code and isolated R2
+commit/acceptance record; it ran no new algorithm benchmarks. A1 records
+completed layout, combined-source validation and mainline integration;
+B13/C8 retain explicit conditional deferrals. Consolidating this execution
+guidance changes no implementation, task row or completion checkbox.
 
 <!-- END MASTER EXECUTION SEQUENCE -->
 
