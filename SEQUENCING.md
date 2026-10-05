@@ -8,7 +8,8 @@ digits on the Apple M4 / 24 GiB machine. It preserves the existing roadmap IDs
 and acceptance gates. It does not mark experiments complete or authorize their
 execution. `v1/` remains the baseline.
 
-**Recommended immediate allocation: finish the active R2 task; start an isolated
+**Recommended immediate allocation: start R1 calibration on the integrated R2
+control; start an isolated
 P4.3 backend tranche; use another available slot for P5.2 schedule/coverage
 design or P4.1 chain verification.** Full R1 calibration follows R2. There is
 no dependency requiring all P3.8 work to finish before ECM work starts.
@@ -47,7 +48,7 @@ phase, prefer higher-priority rows when slots are limited.
 | P3.6.1 and the follow-up repair pass | Accepted budget/storage/setup fixes and measured decisions are recorded; native defaults remain conservative. | Reuse these fixes. R2/R5 should reconcile the current baseline rather than reimplement polling, leases, base verification or rejected batching experiments. |
 | P3.8-R1 implementation | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Broader calibration remains open. | R1 is now mainly a workload/parameter/evidence task. Capacity reachability is not evidence of large balanced completion. |
 | P3.8-R3 bounded tranche | Stable mixed rows, complete identities and checked recovery are integrated. Cadence 32 has a scoped opt-in win; general policy and larger provenance/storage bounds remain open. | Matrix controls can start now. Do not reopen the accepted R3 work or assume its existing dense storage reservation has disappeared. |
-| P3.8-R2 | Active in a separate worktree; its final integration and held-out decisions are still pending at this snapshot. | Finish this task before broad SIQS tuning. In-progress training reports are not accepted broad speedups. |
+| P3.8-R2 bounded tranche | The isolated study and combined repaired/R3 acceptance pass; fixed scores and capped plans are integrated as opt-ins. The original promotion decision retains defaults. | A1 is complete for this scope and B1 can start. B13 resieve capacity and C8 family-wide CRT remain conditional follow-ups. |
 
 The prior R1 flyer comparison reduced a one-input, two-seed 30-digit cohort
 from 1.767 to 1.444 seconds (18.3%); the fixed legacy schedule was 3.0% slower
@@ -85,7 +86,7 @@ development and coordinated integration, not concurrent performance runs.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| A1 — P3.8-R2 finish | Complete collector experiments, freeze decisions, run fresh confirmation and integrate the accepted delta against the repaired/R3 baseline. | Existing R1/R3/repair contracts | **High.** Already active and unlocks meaningful R1 tuning. Finish the evidence even if the correct result is to retain the streamed default; do not assume another collector win. | Current Sol / **xhigh** | Keep Sol to preserve task continuity and use the existing controls. xhigh is justified by coupled scoring, budget, checkpoint and experimental-selection decisions. |
+| A1 — P3.8-R2 integration and acceptance | Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports. | Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions | **Complete for bounded scope.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence. | Current Sol / **xhigh** | Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation. |
 | A2 — P4.3 backend foundation | Specify coarse int/mpz boundaries; implement and validate specialized baseline ladder/stage paths, canonical checkpoints and explicit backend identity; compare available PyPy tracks. | Existing exact ECM and checkpoint controls | **High, bounded experiment.** Broad arithmetic costs make this a useful early test and it settles interfaces for later ECM work. Installed gmpy2 is availability evidence, not a speedup; retain int if GMP loses. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
 | A3 — P5.2 reusable programs and campaign feasibility | Build bounded immutable prime-power/coverage programs and independent coverage oracles; compare schedule reuse on the current int control; define finite curve/bound/storage/extension contracts. | Existing P2 schedules, recovery and ECM | **High.** Research identified repeated schedule generation and infeasible allowance combinations. Reusing bound-owned work across curves can matter without changing curve mathematics. This planning/schedule tranche does not need PRAC or GMP. | Sol / **xhigh** | Sol fits schedule construction and oracle-driven implementation. xhigh is warranted because coverage, amortization, memory limits and resumed execution must agree, even when individual arithmetic actions are unchanged. |
 | A4 — P4.1 chain correctness | Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder. | Existing exact point/ladder controls | **Medium/high potential, higher proof risk.** Mathematical validation can run independently of backend implementation. It must precede production chain execution; old exceptional `(0,0)` cases do not count as equality successes. | Astra / **xhigh** | Choose Astra for the proof-intensive chain invariants and exceptional composite-modulus cases. xhigh supports checking termination and valid projective states against independent oracles before production use. |
@@ -106,6 +107,7 @@ development and coordinated integration, not concurrent performance runs.
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
 | B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
 | B8 — P5.1 starts / P5.3 Lucas optimization | Compare bounded rational/seeded p+1 starts and validated Lucas-chain execution against the binary control; validate p+1 bound extension separately from ordinary powering. | A5, A4; A6's schedule-ratio contract | **Medium/conditional.** Binary correctness and verified chain machinery must exist first. This targets marginal p+1 coverage; the ECM recurrence is not a drop-in Lucas implementation. | Astra / **xhigh** | Choose Astra for transferring verified chain ideas to a distinct Lucas recurrence and reasoning about parameter-dependent orders. xhigh is for denominator/discriminant exceptions, composition and exact extension semantics. |
+| B13 — P3.8-R2 wide-block resieve capacity | Reconcile the repair owner's wide-block resieve accounting. If setup still refuses, prove a bound for the actual sparse scratch/storage representation, verify complete candidate coverage and refusal/resume, and compare bucket versus resieve complete runs under matched budgets. | A1; unresolved wide-block capacity refusal | **Conditional.** The isolated 30-digit resieve arm refused setup under the dense reservation. Reuse any accepted repair first; a new bound needs a proof, not a smaller constant. Streamed B1 calibration can proceed while this branch stays deferred. | Astra / **xhigh** | Astra fits representation/storage proofs and exceptional recovery cases. xhigh is for simultaneous live memory, exact coverage and first-uncommitted-position behavior under refusal and resume. |
 
 B6 and B7 use the same frozen matrix contract but can be independent challenger
 branches. If the B7 storage problem prevents even the representative B6 control
@@ -122,6 +124,7 @@ run only the already-feasible B6 cases until it is fixed.
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | C6 — P4.1 advanced offline chain search | Compare bounded/offline continued-fraction or near-optimal chain search with verified production chains. | B3 plus significant remaining stage-one cost | **Low/conditional.** First learn whether ordinary verified chains help. Shorter records or fewer search nodes alone cannot justify generation, dispatch and cache costs. No online search over the enormous full-lcm scalar. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5 or C1 is adopted, recalibrate the affected SIQS configuration before
 claiming a combined win. If C1 materially changes matrix density or dimensions,
@@ -162,7 +165,8 @@ The tables above are authoritative; this diagram shows the main branches.
 
 ```mermaid
 flowchart TD
-    S[Accepted P2 / SIQS / repairs / R3] --> R2[A1: finish R2]
+    S[Accepted P2 / SIQS / repairs / R3] --> R2[A1: integrated R2 opt-ins]
+    ISO[Isolated R2 study: 171e69c] --> R2
     S --> GMP[A2: backend boundary]
     S --> PLAN[A3: reusable schedules and coverage]
     S --> CHAIN[A4: verified chain records]
@@ -172,6 +176,9 @@ flowchart TD
     S --> MAT[A8: matrix control]
     R2 --> CAL[B1: R1 calibration]
     R2 --> NP[B5: NumPy if array-bound]
+    R2 --> RSV[B13: resieve capacity if still refused]
+    R2 --> CRT[C8: family-wide CRT if justified]
+    CAL --> CRT
     GMP --> PAIR[B2: paired continuation]
     PLAN --> PAIR
     PM --> PAIR
@@ -196,7 +203,10 @@ flowchart TD
     EXEC --> SEARCH[C6: offline chain search if justified]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
-    AUD --> END[E1: selected-tranche integration and acceptance]
+    R2 --> END[E1: selected-tranche integration and acceptance]
+    AUD --> END
+    RSV -->|adopt or defer| END
+    CRT -->|adopt or defer| END
     NP --> END
     LUC --> END
     DLP --> END
@@ -282,5 +292,5 @@ P4.3 forward before GNFS scaling.
 
 Current roadmap, code and recent repair/R2 task reports were inspected for this
 plan. No new algorithm benchmarks were run. R2 status is a dated snapshot;
-refresh its final result before starting B1. The file records sequencing and
+the bounded study and combined-source acceptance now settle A1 before B1. The file records sequencing and
 recommendations only; it changes no implementation or completion checkbox.

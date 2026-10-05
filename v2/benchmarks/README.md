@@ -1825,3 +1825,178 @@ lint, and a separate committed-input-only checkout's tests and **44 benchmark
 runner imports** (45 modules including the package). All 35 runtime hashes
 match the frozen confirmation source; `v1/` is untouched. Raw captures,
 profiles, local summaries and temporary checkouts remain excluded from Git.
+
+## P3.8-R2 bounded collector evaluation — 4 October 2026
+
+R2 is isolated on top of the committed repair/R1/R3 integration control
+`fba5a34a884fd129dfad5a07bba9f65f5657646f`, avoiding the concurrent P2/P3
+repair checkout. The hash-checked `p38_r2_baseline.json` retains that control's
+35 runtime modules. `p38_r2_frozen.json` binds the final 36 runtime modules,
+three comparison drivers, training corpus and decisions; the fresh held-out
+corpus binds that freeze. Required controls and certified corpora are committed;
+raw captures, profiles and stdout remain local.
+
+**Decision: retain defaults.** Integer fixed-point power scores and capped
+per-polynomial power plans remain explicit experimental options. The public
+adaptive/root settings and the configured streamed powers/bucket control stay
+unchanged. Sparse hit recovery, cached A support and performed-work charging
+come from the preceding repair control. R2 tests their coverage and measures
+the additional options independently; it does not claim those repairs as R2
+speedups or expand matrix capacity.
+
+Each training band contains two independent balanced inputs; held-out bands
+contain three, each run with seeds 7 and 29. Actual sizes are 8, 13, 21 and
+30 digits in training, and 8, 13, 20–21 and 30 digits held out. Pocklington
+certificates verify both factors independently. The sampler favors primes
+with a large known factor of p-1: these are finite comparison cohorts, with
+no RSA-distribution or upper-band claim. Complete-call measurements include
+setup, recovery, filtering, extraction, primality labels and validation.
+Every returned split is proper and every result reconstructs its input.
+
+All arms have work limit 10^10 and 128 MiB of owned workspace. Wall and CPU
+limits are each 0.2 seconds per smaller attempt and 2 seconds per 30-digit
+attempt; collector-only calls use 30 seconds. Base bounds are 200/1000/3000/
+10000 and half-widths 256/512/2048/8192. Blocks are 256 except 4096 for 30 digits.
+The 30-digit configuration uses the already accepted explicit R3 cadence 32
+in every arm, with row excess 32 and residual bound 10^7; it is no automatic
+size policy. Plans reserve a full additional 1 MiB before setup. Every capture
+records the complete per-arm configuration, including relation/store caps.
+
+Each arm receives at least three seconds of validated PyPy 3.11 warmup and
+nine interleaved samples; noisy comparisons extend to five seconds and fifteen
+samples, up to three attempts. Final held-out comparisons pass stability:
+90/90 complete outcomes per arm in each smaller band and 54/54 in 30 digits.
+Training has 60/60 medium and 36/36 larger outcomes per arm. Small training
+remains unstable after extensions and supports no promotion claim.
+
+| Cohort | Training current / fixed + plans | Held-out current / fixed + plans | Held-out causal reduction, conditional 95% interval |
+| --- | ---: | ---: | --- |
+| Small | unstable | 6.429 / 6.264 ms | 2.6%, 1.3–8.7% |
+| Medium | 17.162 / 16.766 ms | 28.496 / 26.886 ms | 5.7%, 0.8–7.1% |
+| Nominal 20-digit | 276.733 / 263.307 ms | 272.581 / 233.373 ms | 14.4%, -9.4–17.3% |
+| 30-digit | 1.024680 / 0.958610 s | 1.349218 / 1.272612 s | 5.7%, 1.4–8.2% |
+
+Times are entire four-attempt training or six-attempt held-out cohort medians,
+not per-input times. Intervals concern paired repeats conditional on these
+fixed cohorts, not a population of future inputs. Training causal reductions
+are 2.3% medium, 4.9% nominal 20-digit and 6.4% 30-digit, all below the frozen
+10% time / 10-point completion gate. The larger held-out nominal 20-digit
+median gain has an interval crossing zero and cannot overturn the training
+decision. No held-out retuning occurred. Training predates the final
+keyword-only compatibility declaration for `power_plan_bytes`; arithmetic,
+configuration values and measured kernels were unchanged. Final confirmation,
+cold and eligibility captures match the frozen source exactly.
+
+The conservative root-weight, cutoff-5, exact tiny-prime singleton, batch
+smooth-part and grouped-charge challengers all complete the matched 30-digit
+training cohort, but increase its cost versus current by approximately 93.5%,
+15.7%, 17.6%, 21.4% and 9.8%, respectively. Their bounded prototypes stay in
+the benchmark package. Batch recovery includes tree construction and scalar
+exponent recovery, with an independent residual check. Grouped charges retain
+identical cumulative work and reserve before execution; groups contain at most
+four root ranges (16,384 score updates), with cooperative cancellation between
+groups. This finite operation bound is not a real-time latency guarantee.
+Neither smaller bookkeeping cost nor smooth-part throughput earns promotion.
+
+Fresh medium and 30-digit collector comparisons validate 594 complete outcomes
+across repeats. Atomic signatures, admitted rows, partial occupancy and complete
+post-filter statistics match the frozen control for all complete arms,
+including medium resieving. Fixed scoring reduces 30-digit visited division
+primes about 43–46% while preserving the same 12/28/16 rows and filtered excess
+zero on the three first-polynomial fixtures. This reduction in division work
+does not imply a comparable full-factor gain or more useful dependencies.
+Wide-block 30-digit resieving refuses setup under the original dense capacity
+reservation (0/54 collector outcomes); its short refusal times are censored
+costs, with no time-to-factor ratio. Capacity repair was left with the parallel repair owner. The integrated
+bridge below retains that owner's subsequently accepted sparse support bound.
+
+The whole-interval CRT probe covers the first polynomial of each seeded
+training workload. No factor-base prime exceeds the complete interval in
+any band. Eligible higher powers do occur: in 30 digits their 27–28 hits are
+at most 0.072% of all power-mark hits. This scoped diagnostic does not justify
+a family-wide half-sum implementation, which remains deferred pending a
+workload demonstrating the cost. Eligibility uses the whole interval, never
+the smaller block width.
+
+Peak held-out owned workspace for current is approximately 20.46/23.45/36.82/
+79.03 MiB; the plan arms add the reserved 1 MiB. Observed process/JIT RSS peaks
+at 479.08 MiB and is separate from the owned-workspace allowance. Nine fresh
+processes per arm give cold first-split medians of 114.544/114.706/115.347 ms
+(control/current/joint) on one small training input and 802.951/795.655/800.459
+ms on one 30-digit input. These include process startup and imports, and
+establish no cold promotion. Separate instrumented 30-digit profiles reach
+their time cap; they locate costs but provide no performance evidence.
+
+The original study is pinned to isolated commit `171e69c`; its control,
+corpora and frozen policy now live under `inputs/baselines/`, `inputs/corpora/`
+and `inputs/controls/`, with unchanged bytes. Historical source/configuration
+pins remain separate from `p38_r2_integration_frozen.json` and its newer
+pre-R2 mainline baseline. The integrated runner uses `--integration` for a
+combined-source bridge on these previously inspected fixtures; this is not
+a fresh held-out promotion experiment. New and partial capture paths refuse
+overwrites. From the committed integration tree:
+
+```sh
+mkdir -p v2/benchmarks/results/p38_r2
+pypy3.11 -m v2.benchmarks.p38_r2 --integration --phase factor --variants control,current,fixed,plans,fixed_plans,resieve --output v2/benchmarks/results/p38_r2/factor-new.json
+pypy3.11 -m v2.benchmarks.p38_r2 --integration --phase collector --split held_out --bands medium,30d --variants control,current,fixed,plans,fixed_plans,resieve --output v2/benchmarks/results/p38_r2/collector-new.json
+pypy3.11 -m v2.benchmarks.p38_r2_eligibility --output v2/benchmarks/results/p38_r2/eligibility-new.json
+```
+
+The acceptance suite covers exhaustive signed windows, p=2, p|A, ramified
+p|N', high valuations, capped lifts, tails, integer rounding, score saturation,
+cap refusal, reserve-before-norm evaluation, cancellation/resume, polynomial
+switches, checkpoint cache rebuilding and unchanged positional construction.
+
+The isolated committed-files-only acceptance snapshot passes **282 PyPy
+tests**, full lint and imports of **all 45 benchmark modules**, and verifies
+the frozen runtime/driver hashes, immutable control and both certified corpora.
+It uses the existing development tooling environment without local captures
+or scratch inputs. Integration with the parallel repair branch remains a
+separate step; no unrelated cleanup or repair edits are included in R2.
+
+## R2 combined mainline acceptance — 4 October 2026
+
+The accepted opt-in R2 delta is integrated with the committed repaired/R3
+control `328c823`, preserving its resieve support bound and all other repairs.
+The four original R2 input files remain byte-identical in the versioned input
+folders. A separate integration baseline/freeze pins the combined source and
+runner hashes; generated captures stay under ignored `results/p38_r2/`.
+
+A serial quiet-window bridge validates all outcomes under the original shared
+work/wall/CPU/storage limits. Each arm receives at least three seconds of
+validated PyPy warmup and nine samples, extended to fifteen when needed.
+The six arms complete 60/60 medium and 36/36 nominal 20-digit and 30-digit
+training outcomes apiece. Small integration timing remains unstable and earns
+no timing claim. An earlier capture overlapped another session's verification
+and is diagnostic only; the repeated medium/20-digit/30-digit capture supplies
+the following performance evidence.
+
+| Inspected cohort | Pre-R2 repaired control | Integrated streamed powers | Integrated fixed + 1 MiB plans |
+| --- | ---: | ---: | ---: |
+| Medium, four attempts | 18.320 ms | 17.496 ms | 16.658 ms |
+| Nominal 20-digit, four attempts | 288.380 ms | 262.263 ms | 248.609 ms |
+| 30-digit, four attempts | 1.031281 s | 1.014611 s | 0.904477 s |
+
+These are integration results on previously inspected certified inputs, not
+fresh held-out selection evidence. The 30-digit joint reduction versus the
+integrated streamed arm is 10.9% (conditional repeat interval 8.5–11.3%).
+Retain the original defaults and frozen promotion decision; this bridge does
+not select a new policy or imply a population-level speedup.
+
+The medium and 30-digit collector bridges complete 54/54 and 90/90 outcomes
+per final arm, respectively. Across all repeat attempts, 1,188 outcomes match
+the repaired control's atomic signatures, row/partial counts and full
+post-filter statistics, including resieving. The repaired 30-digit resieve
+arm no longer refuses setup in this scope; peak collector-owned workspace
+is 28.30 MiB under the same 128 MiB allowance. Its whole-factor cohort is
+1.017612 s versus 1.014611 s for integrated bucket recovery, so no resieve
+default promotion is claimed. B13 can remain deferred unless a calibrated
+workload encounters a new capacity refusal; family-wide CRT remains C8's
+conditional follow-up.
+
+The combined tree passes 292 PyPy tests, full lint and all 48 benchmark-module
+imports. Committed-files-only validation checks all required loaders and
+immutable controls, without local captures or other sessions' readability
+changes. The API and checkpoint contracts are retained, and only the R2
+delta is included in the integration commit.

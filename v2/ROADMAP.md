@@ -999,7 +999,7 @@ post-capture acceptance changes are recorded in the benchmark README.
 
 **P3.8-R2 — Compare the candidate cascade before expanding matrix work**
 
-- [ ] Coarsen hot-loop work reservation and clock/cancellation polling over
+- [x] Evaluate coarsened hot-loop work reservation and clock/cancellation polling over
   bounded metadata/root/hit chunks, retaining exact cumulative work and
   first-uncommitted-position semantics. Validate immutable metadata at its
   boundary rather than repeating public type checks per hit. Define maximum
@@ -1009,28 +1009,28 @@ post-capture acceptance changes are recorded in the benchmark README.
   rejection, even for sparse/resieve recovery: align charges with performed
   evaluation, refinement and visited hit/division work under a documented
   model, without silently granting unaccounted work.
-- [ ] Build bounded per-polynomial prime-power root/hit plans and reuse them
+- [x] Build bounded per-polynomial prime-power root/hit plans and reuse them
   across working blocks. Avoid restarting Hensel lifting for every prime in
   every block and avoid duplicate base-prime passes in power-score mode.
   Bind caches to polynomial, root, interval/valuation bounds and score policy;
   preserve singular/2-adic/exceptional-root fallbacks and charge replay/cache
   construction. Compare segmented streaming with bounded cached plans before
   attempting family-wide algorithms.
-- [ ] Make exact recovery sparse in the already recorded hits. Bucket mode
+- [x] Make exact recovery sparse in the already recorded hits. Bucket mode
   currently enumerates every factor-base prime per surviving candidate;
   iterate set bits plus cached sparse A support. Resieving currently loops
   over every candidate per prime to add mostly zero A contributions; seed
   A support once and append valuations only for actual candidate hits.
   Preserve repeated valuations, exponent ordering, complete coverage and the
   independent full-division oracle; include metadata allocation/reuse cost.
-- [ ] Replace ineffective small-prime omission with a staged scoring
+- [x] Evaluate replacing ineffective small-prime omission with staged scoring in an
   experiment. In power-score mode, omitting 2 grants a maximum-bit-length
   allowance that collapses both coarse and refined thresholds to zero.
   Compare cheap exact tiny-prime corrections/refinement and bounded fixed-point
   log scores with explicit rounding/overflow bounds. If using an intentionally
   lossy tolerance arm like native sievers, label and measure missed admissible
   values separately; exact relation admission/extraction remains mandatory.
-- [ ] Evaluate the present prime-power score policy against conservative
+- [x] Evaluate the present prime-power score policy against conservative
   root weights; then profile bounded resieving, small-prime omission and
   scalar versus batch smooth-part recovery. Record positions, score survivors,
   exact divisions, residual tests, admitted/matched partials and useful rows.
@@ -1054,6 +1054,28 @@ post-capture acceptance changes are recorded in the benchmark README.
   construction and retained bytes. Compare complete factorization and the
   post-filter matrix under jointly trained thresholds; native cache sizes,
   score thresholds and batch sizes are hypotheses for PyPy, not defaults.
+
+**R2 integrated bounded scope (4 October 2026):** exact fixed-point scores
+and capped per-polynomial plans are explicit opt-ins, with upfront storage
+reservations, conservative lift fallback and charged checkpoint rebuilding.
+Sparse recovery, A support and performed-work charging retain the repaired
+mainline control. Independent oracles cover signed/tail windows, p=2, primes
+dividing A or N, high valuations, rounding, saturation, cap refusal and resumed
+prefixes. Positional configuration arguments remain compatible.
+
+The isolated certified training and fresh confirmation settle the original
+retain-defaults decision; no candidate passes its causal training promotion
+gate. The combined-source bridge uses a separately frozen repaired-mainline
+control and previously inspected inputs, preserving the original evidence
+bytes and source/configuration pins. Wide-block resieving consumes the accepted
+repair-owner support bound. Conditional B13 capacity and C8 family-wide CRT
+work remain triggered by new calibrated evidence, not presumed speedups.
+See [R2 measurements](benchmarks/README.md#p38-r2-bounded-collector-evaluation--4-october-2026).
+The combined acceptance passes 292 PyPy tests, lint and all 48 benchmark
+imports from committed files. Its quiet matched bridge completes every attempt,
+and 1,188 collector outcomes preserve exact atomic and post-filter results.
+The measured wide-block resieve capacity refusal is resolved by the retained
+repair-owner bound; larger-workload capacity and CRT remain conditional.
 
 **P3.8-R3 — Reduce preparation/filtering/provenance cost first**
 

@@ -207,3 +207,37 @@ Next priorities are measured arithmetic/backend improvements and a bounded
 GNFS reference pipeline, followed by scaling and held-out dispatch experiments.
 GNFS, double-large-prime SIQS and broader parameter/parallel promotion remain
 roadmap work; existing small or configured-cohort wins do not close those gates.
+
+## P3.8-R2 collector experiments
+
+`SieveConfig(score_policy="fixed")` uses conservative integer bounds in
+units of 1/32 bit. Prime weights round upward; norm thresholds round downward
+and residual allowances upward. Eleven leading bits select a small integer
+mantissa table, with adjacent bins bounding the exact logarithm. This avoids
+floating-point arithmetic and large per-candidate powers. Exact exponent
+recovery, residual checks and relation verification still decide admission.
+`threshold_extra` uses these scaled units for this policy; positive values
+remain intentionally lossy. Byte and unsigned-array scores saturate together
+with their thresholds, admitting extra candidates without losing coverage.
+
+The keyword-only `power_plan_bytes=0` preserves streamed lifting and existing
+positional configuration calls. A positive allowance, up to
+16 MiB, reserves that entire amount alongside the existing collector, store
+and solver workspace before setup. Power/fixed scoring can retain bounded
+modulus/root/weight plans for one polynomial. Fixed-polynomial and SIQS jobs
+bind them to the entire polynomial interval so collection batches share
+plans. Ordinary collector calls share plans only inside their checked span.
+Changing the polynomial or extending the span clears the plans. Each plan's
+construction and replay are charged; a cache-cap refusal falls back to
+streamed lifting. Singular capped-lift fallbacks remain conservative.
+
+Plans are disposable acceleration state. Checkpoints retain their configuration
+and fully reverify restored relations, then rebuild charged plans; cached roots
+are never trusted checkpoint evidence. These options preserve first-uncommitted
+position semantics, exact cumulative work and finite cancellation polling.
+
+The R2 benchmark harness compares these options with conservative scoring,
+bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
+recovery and grouped hit reservations. Its independent certified inputs,
+frozen source control and separate cold/profile modes are described in
+[the benchmark guide](benchmarks/README.md). Dispatcher defaults are unchanged.

@@ -196,3 +196,40 @@ the safe Montgomery ladder.
   kernel/setup, fixed-work, cold-pool and complete-factor claims separate.
 - Pass 282 PyPy tests, lint, exact cross-worker fixed-work comparisons,
   cooperative limit checks and retained-only test/benchmark imports.
+
+## P3.8 R2 isolated collector evaluation — 4 October 2026
+
+- Add opt-in integer fixed-point prime-power scoring with conservative rounding
+  and saturating array scores, retaining exact relation verification.
+- Add keyword-only `power_plan_bytes` with an upfront finite reservation,
+  capped per-polynomial plan reuse, streamed fallback and charged checkpoint
+  rebuilding. Preserve existing positional configuration arguments and
+  first-uncommitted-position resume behavior.
+- Evaluate sparse recovery, scoring, bounded batch/tiny-prime/grouped-charge
+  challengers and whole-interval CRT eligibility against an immutable
+  repair/R1/R3 control with independent certified training and held-out inputs.
+  All complete-factor confirmation attempts finish; complete collector arms
+  preserve atomic signatures and post-filter results.
+- Retain defaults: fixed scoring/plans remain experimental, and no candidate
+  passes the declared causal training promotion gate. Family-wide CRT and
+  wide-block resieve capacity remain deferred. See the
+  [R2 measurements](v2/benchmarks/README.md#p38-r2-bounded-collector-evaluation--4-october-2026)
+  for commands, uncertainty, censored outcomes and cold/profile separation.
+- Verify the isolated committed-files-only snapshot with 282 PyPy tests,
+  full lint, all 45 benchmark imports and frozen-source/corpus checks.
+  This records the original isolated acceptance; combined acceptance follows below.
+
+## P3.8 R2 mainline integration — 4 October 2026
+
+- Integrate R2 fixed-point scores and capped power plans as explicit opt-ins,
+  preserving the latest repair/R3 contracts, the resieve support bound and
+  existing defaults. Keep family-wide CRT and broader capacity changes
+  conditional on new workload evidence.
+- Move required R2 controls/corpora into versioned input folders without
+  changing historical bytes; retain a separate repaired-mainline integration
+  baseline and source/configuration freeze. Keep generated captures local.
+- Validate the combined source with 292 PyPy tests, lint, all 48 benchmark
+  imports and a committed-files-only checkout. Quiet matched comparisons
+  complete every attempt; 1,188 collector outcomes retain exact atomic and
+  post-filter results, including wide-block resieving under the same allowance.
+  Previously inspected integration inputs supply no fresh promotion claim.
