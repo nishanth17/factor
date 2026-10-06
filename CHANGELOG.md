@@ -26,6 +26,8 @@
   for combined GMP identity, and accept pre-integration backend snapshots.
   Verify program resume on both backends and PRAC against an independent
   point oracle; retain the existing ladder and streamed defaults.
+  The committed-files-only combined tree passes 358 PyPy/GMP tests, full lint
+  and all 57 benchmark imports, with required corpus/control loaders verified.
 
 - Complete the P4.1/A4 chain-correctness tranche and connect verified PRAC
   to `ecm.multiply_prac`. Separate bounded exact-rational generation from

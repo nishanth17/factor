@@ -722,6 +722,23 @@ their selected backend. These timing captures precede the P4.1/P5.2 integration
 and identify their measured sources; integration adds no new timing claim.
 The user subsequently authorized merging the results and removing the worktree.
 
+### Combined mainline acceptance — 5 October 2026
+
+The committed-files-only integration candidate combines the backend foundation
+with P4.1 PRAC and P5.2 reusable programs. It passes 358 PyPy/GMP tests, full
+lint and all 57 benchmark imports. Both P4.3 proof-backed corpora and the
+hash-verified P4.3/P5.2 loaders work without local captures. Independent PRAC
+point checks, program resume on each backend and old backend checkpoint
+compatibility are included. Native portfolio schemas 4/5 remain unchanged;
+combined GMP snapshots use 6. Existing ladder, streamed and integer defaults
+remain in place. Integration supplies no additional performance measurement.
+
+All 12 local captures, including explicitly diagnostic and unfinished sets,
+are copied and checksum-verified into ignored
+`results/p43/worktree_results/` before managed-worktree removal. The preservation
+manifest and combined-check logs stay in `results/p43/`. Required corpora,
+baselines and runners are committed; generated evidence is never force-added.
+
 ## P4.1/A4 verified PRAC — 5 October 2026
 
 `ecm.multiply_prac` now executes bounded verified records, including checked
