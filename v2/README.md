@@ -29,6 +29,38 @@ Rho retries and ECM curve counts have explicit limits; saturated batches recover
 or report failure. ECM uses the checked binary ladder; the unsafe original PRAC
 chain is not the default.
 
+`ecm.multiply_prac(k, x, z, n, a24)` now executes experimental verified PRAC
+records. It returns a valid projective pair or raises
+`prac.NonunitPointError`: its `factor` attribute is a proper divisor, or
+`None` requests a curve retry. This is a deliberate change from the former
+ladder wrapper; callers must handle that exception. Coordinates can differ
+from the ladder by projective scaling. Supply a point on a nonsingular
+Montgomery curve over an odd modulus, with `a24=(A+2)/4`, as returned by
+`ecm.setup_curve`.
+
+Generation uses exact rational splits for the odd part of scalars of at most
+32 bits, with at most 30 candidates and 512 instructions each. A 256-record
+LRU cache contains immutable integer records, never curve points. Each
+record receives a separate integer/differential verification. Larger
+scalars use a checked ladder without chain search. Zero, one, powers of two,
+infinity and the order-two point have explicit handling.
+
+Execution checks intermediate projective states and reports nonunit factors.
+An exceptional difference triggers at most 513 additional GCDs on retained
+coordinates and one ladder retry from the original point; `(0,0)` is never
+a successful point. `prac.get_chain`, `verify_chain`, `clear_cache` and
+`cache_info` expose the bounded record interface. `prac.multiply(...,
+chain=record)` re-verifies caller-supplied records before execution. Cost
+weights are positive integers of at most 32 bits; defaults model 4M+2S for
+addition and 3M+2S for doubling. They are not runtime speed estimates.
+
+This completes the P4.1/A4 correctness tranche. Both `factorize_ecm` and the
+bounded stage jobs still use the binary ladder. The diagnostic measurements
+in the [benchmark guide](benchmarks/README.md) do not justify promotion;
+B3 owns program composition, shared work accounting, checkpoint/replay
+integration and complete-factorization comparisons. The standalone PRAC
+helper has no portfolio budget or checkpoint contract.
+
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
 validated checkpoints. Later work adds exact relation provenance, shared SIQS

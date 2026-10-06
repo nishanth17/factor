@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Complete the P4.1/A4 chain-correctness tranche and connect verified PRAC
+  to `ecm.multiply_prac`. Separate bounded exact-rational generation from
+  independent integer verification and checked point execution; retain a
+  finite cache and one ladder retry. Expose proper factors or curve-retry
+  outcomes through `prac.NonunitPointError`, never a degenerate point.
+- Add independent affine, large-field, composite/prime-square and complete
+  prime-power schedule controls, plus reproducible PyPy cost measurements.
+  Preserve production ladder defaults: B3 integration and the optional
+  near-optimal/offline chain-search comparisons remain open.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,
