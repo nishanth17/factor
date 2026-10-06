@@ -636,3 +636,275 @@ Research references and the explicit B3/C6 follow-ups are recorded in
 GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
+
+## P5.2-A3 reusable programs and campaign feasibility — 5 October 2026
+
+The bounded A3 tranche adds opt-in immutable packed prime/power blocks, a
+run-local finite retention cap and independent +/- coverage fixtures. Production
+continuation remains unpaired; D tuning, wheel/common-Z experiments and automatic
+allocation belong to B2/C2/C3. `ecm_program_bytes=0` retains defaults, streamed
+work accounting and version-4 checkpoints. An enabled store reserves its full
+cap, charges construction and reads, and rebuilds after a version-5 resume;
+completed curves, buffered actions and RNG progress remain credited. Increasing
+an existing campaign's bounds or curve count is not supported by this tranche.
+
+The driver pins the pre-change `9b2d380` portfolio/stage sources in
+`inputs/baselines/p52_a3_baseline.json` and a separate immutable helper snapshot
+in `p52_a3_dependencies.json`. The original baseline bytes remain unchanged.
+The private control freezes arithmetic, budgets, preprocessing, sieves and result
+classes; inactive QS fallback types only support its dataclass annotations.
+The independent corpus in
+`inputs/corpora/p52_a3_corpus.json` contains ten freshly generated inputs with
+Pocklington certificates, seed 20261005052 and algorithm seeds 7/19/41. Complete
+factor results reconstruct and match the certified factors. Schedule-only rows
+match independent integer-index Eratosthenes/prime-power counts and digests;
+finite campaign rows validate every divisor and reconstruct the input.
+
+Four arms use matched inputs, seeds, bounds and finite work/time/storage grants:
+the frozen baseline, current default, an 8 MiB program cap, and packing with only
+the scratch reserve (no retained blocks). Confirmation on Apple M4 / 24 GiB with
+PyPy 7.3.23 implementing Python 3.11.15 supplies at least three seconds of validated
+warmup and nine samples per arm. All confirmation arms meet the relative-IQR
+threshold of 0.15. The following medians compare retained programs with the frozen
+baseline; intervals are unpaired bootstrap 95% intervals conditional on these
+fixed cohorts, not estimates for future inputs.
+
+| Cohort, per sample | Streamed baseline | Retained programs | Time reduction, 95% interval |
+| --- | ---: | ---: | --- |
+| Four 10-digit inputs, three seeds, 12/12 complete | 1.767 ms | 1.859 ms | -5.3%, -7.2 to -2.1% |
+| Four 16-digit inputs, three seeds, 12/12 complete | 11.036 ms | 11.407 ms | -3.4%, -11.4 to 13.8% |
+| One 80-digit input, two starts, three curves each; no splits | 812.181 ms | 744.879 ms | 8.3%, 7.7 to 9.1% |
+| 11,000/1,900,000 schedule only, three passes | 160.669 ms | 121.047 ms | 24.7%, 22.4 to 26.8% |
+| 50,000/5,000,000 schedule only, three passes | 455.596 ms | 324.290 ms | 28.8%, 27.1 to 32.8% |
+
+The large campaign performs 54 curve attempts per arm across the nine samples,
+with no factors. Its saving is a finite-curve execution result, not faster
+factoring or improved success. Small complete factoring regresses; the medium
+interval crosses zero. Packing without retention is about 4% slower on the large
+campaign. Default streamed outcomes and work are unchanged; tiny default timing
+differences earn no speed claim. The earlier 2,000/147,396 schedule comparison
+remains unstable after eight seconds of warmup and 63 samples and is inconclusive.
+Retain the default and bounds; the opt-in provides an explicit reuse control for
+B2, not a general promotion.
+
+A deterministic nonsplitting probe uses one 266-bit input, a 329-bit admission
+envelope and three curves under 50,000,000 work units and 120-second wall/CPU caps.
+The table includes full point/recovery work. Construction increases first-curve
+work; later curves amortize it. Counts exclude one-time context setup.
+
+| B1/B2 | Streamed units per curve | Program first / subsequent curve | Program accounting after three curves | Owned reserve, streamed / 8 MiB cap |
+| --- | ---: | ---: | ---: | ---: |
+| 2,000/147,396 | 110,517 | 124,445 / 45,014 | 414,528 bytes | 1,319,864 / 9,708,472 bytes |
+| 11,000/1,900,000 | 1,458,993 | 1,602,357 / 446,275 | 1,888,800 bytes | 2,665,104 / 11,053,712 bytes |
+| 50,000/5,000,000 | 4,080,627 | 4,434,273 / 1,122,672 | 4,345,712 bytes | 3,825,120 / 12,213,728 bytes |
+
+Program accounting includes the fixed scratch reserve and per-block allowance;
+the admission reserve includes the entire requested cap, not just populated
+blocks. A 16 MiB workspace and 329-bit envelope admit these tiers with an 8 MiB
+program cap. The 2,000,000-unit default cannot finish the tested full nonsplitting
+50,000/5,000,000 curve. These counts are not universal minimums for finding a
+factor. A predeclared 10,000-curve campaign is finite and admissible; a smaller
+work grant pauses it and can be extended cumulatively under the identical config.
+It does not guarantee completion or permit adding curves to an exhausted config.
+
+Observed large-schedule worker RSS is 102.02 MiB baseline and 117.16 MiB with
+programs. RSS includes the interpreter/JIT, independent oracle and warmup and is
+separate from owned workspace. Nine separate cold worker starts per arm give
+108.550/102.611/104.374/103.487 ms for baseline/default/programs/regenerated;
+these include imports and corpus validation and establish no cold promotion.
+
+Local ignored evidence lives in `results/p52/confirmation.json` and the earlier
+`final-comparison.json`, with source hashes and prior noisy attempts preserved.
+The final smallest-buffer checkpoint repair follows those measurements: an AST
+comparison isolates it to `_verify_progress`; fresh execution and measurement
+functions are unchanged. The repaired source passes the full acceptance
+suite. The later private
+control loader freezes the byte-identical helper sources to preserve the old
+control after mainline arithmetic changes; future captures pin that newer
+loader. Only the later focused 60/80-digit pass was collected in an exclusive
+window; historical timing/cold source pins have not been rewritten.
+
+```sh
+mkdir -p v2/benchmarks/results/p52
+pypy3 -B -m v2.benchmarks.p52_a3 --cases small medium large_campaign middle_schedule large_schedule --cold --probes --output v2/benchmarks/results/p52/confirmation-new.json
+pypy3 -B -m v2.benchmarks.p52_a3 --cold --probes --output v2/benchmarks/results/p52/all-cases-new.json
+```
+
+Output paths refuse overwrites. Unstable arms extend to five seconds/31 samples,
+then eight seconds/63 samples; unresolved instability prevents a timing claim.
+Acceptance covers exact actions, independent point cross-products, coverage
+exceptions/tails, atomic refusal, capped regeneration, mixed-factor replay,
+quiet factoring, every resume phase, legacy schema, resealed bounds/endpoints,
+wide packed words and cancellation with the smallest prime buffer. All 323
+PyPy tests and full lint pass, including private-control isolation, independent
+workload proofs and owned-worker overlap handling. Committed-files-only
+acceptance is recorded with the branch.
+
+## P5.2 realistic workload exploration and prepared protocol — 5 October 2026
+
+The user ended the expanded study early, then requested a focused 60/80-digit
+verification. The 256-curve campaigns, extra-seed sweep, larger-bound probes and
+full twelve-input exclusive-window confirmation were prepared but **not run**.
+Their commands below describe future experiments, not accepted results. The
+focused fixed-curve comparison is accepted below; no population-wide factor-size
+allocation or large-factor success claim is established by this tranche.
+
+The initial middle-policy capture did complete nine validated samples per
+arm after more than three seconds of warmup, on the twelve certified inputs
+with seeds 7/19. Other benchmark jobs overlapped it, so all its timings remain
+diagnostic. Its deterministic completion records remain useful: no input was
+time-censored, every result reconstructed, and all three arms had identical
+curve assignments and outcomes under the eight-curve 11,000/1,900,000 tier
+and 50,000,000-unit grant. Each row counts unique input/seed starts; the nine
+timing repetitions are not additional independent factoring trials.
+
+| Smaller factor | Completed starts | Scope |
+| --- | ---: | --- |
+| 10 digits | 8/8 | One input in each 30/40/60/80-digit band, two seeds |
+| 15 digits | 4/4 | Two 30-digit semiprimes, two seeds |
+| 20 digits | 1/8 | Two 40-digit, one 60-digit and one 80-digit input |
+| 30 digits | 0/2 | One balanced 60-digit semiprime, two seeds |
+| 40 digits | 0/2 | One balanced 80-digit semiprime, two seeds |
+
+These fixed-case counts do not estimate a population success probability.
+In particular, eight unsuccessful curves do not show that a factor cannot
+be found. The original A3 timing trend concerns repeated schedule reuse; its differing
+bounds and campaign lengths do not isolate input bit length.
+
+`p52_realistic` measures the full ECM-only portfolio on certified 30-, 40-, 60-
+and 80-digit inputs, including preprocessing, classification, curve execution
+and recursive split validation. Each band has a 10-digit-factor case, a 15/20-
+digit target-factor case and a balanced semiprime. The target and balanced cells
+at 30/40 digits use different inputs. The new frozen corpus uses generation seed
+20261006053 and independent Pocklington proofs. Known factors are used only for
+validation; terminal certainty labels and every unresolved cofactor are retained.
+
+The two original algorithm seeds are 7/19. Warmed comparisons use at least three
+seconds of validated warmup and nine samples, extending unstable cohort timing
+to five seconds/31 samples and then eight seconds/63 samples. Cell timing is
+separately labeled stable or inconclusive. These fixed inputs support scoped
+completion/cost evidence, not a population-wide allocation policy.
+
+| Policy | B1/B2 | Predeclared curves | Total work grant per input/seed |
+| --- | --- | ---: | ---: |
+| Pretest | 2,000/147,396 | 32 | 2,000,000 |
+| Middle | 11,000/1,900,000 | 8 | 50,000,000 |
+| Large | 50,000/5,000,000 | 4 | 50,000,000 |
+| Deep 20-digit-factor comparison | 11,000/1,900,000 | 256 | 400,000,000 |
+
+All use 120-second wall/CPU caps, a 329-bit envelope and 16 MiB owned workspace;
+programs reserve 8 MiB. Trial bound is 5, rho/p−1 are disabled and there is no
+sieve fallback. The pretest compares identical total allowances; changing the
+work ledger can fund more curves and produce different terminal outcomes. The
+campaigns compare identical declared curves, assignments and arithmetic outcomes.
+Elapsed unresolved searches are search costs, not time to factor.
+
+The deep comparison selects the four 20-digit-factor inputs (two 40-digit
+semiprimes and the 60-/80-digit unbalanced cases). A separate completion-only
+sweep adds algorithm seeds 41/73/101/137/179/223/269 without timing claims; combined
+with the original two seeds it examines nine starts on each fixed input. The
+native [GMP-ECM parameter guidance](https://github.com/sethtroisi/gmp-ecm/blob/main/README)
+motivates deeper allowances, including roughly 74 expected curves for a 20-digit
+factor at 11,000/1,900,000. This is a hypothesis for the PyPy engine, not a measured
+success guarantee or copied default.
+
+`p52_wider` separately probes balanced 60-/80-digit cases at
+250,000/130,000,000 (four curves, one billion work units) and
+3,000,000/5,700,000,000 (one curve, 50 billion units). Both reserve 512 MiB owned
+workspace, with a 128 MiB program cap in the opt-in arm, and stop at 120 seconds
+of wall or CPU use. Each is one cold seeded feasibility run: stage progress,
+completed curves and the actual exhaustion reason are recorded, without a
+comparative speed claim. These candidate bounds also come from the native table.
+
+The initial realistic capture overlapped p4.3's study and was stopped. Its six
+completed arm captures and source hashes remain under ignored `results/p52/`,
+explicitly diagnostic for timing. `--check-quiet` checks for other benchmark/test
+interpreter processes before, during and after each worker, terminating only the
+owned worker on overlap. It supplements coordinated timing windows; it does not
+measure every background operating-system activity. New output paths, including
+per-arm partials, refuse overwrites.
+
+
+### Focused 60/80-digit verification
+
+The later quiet pass uses the middle tier on the balanced 60-digit (198-bit)
+and 80-digit (263-bit) fixtures, with the same 11,000/1,900,000 bounds, two seeded
+starts and eight predeclared curves per start. All three arms complete the same
+32 curves per sample, with no factors, no time censoring and identical curve
+assignments/outcomes. Default streamed work also matches the frozen control.
+Each row below sums both starts, or 16 curves, for that input. Nine repetitions
+per arm reuse these fixed starts; they are not independent factor-success trials.
+
+Validated warmup is 8.106/8.052/6.973 seconds for baseline/default/programs,
+respectively. All cohort and cell relative IQRs are below 0.05, with no extended
+attempt needed. The monitor finds no competing benchmark/test interpreter
+before, during or after workers. These are uninstrumented full-portfolio costs,
+including preprocessing/classification and result validation, not profile data.
+
+| Input | Frozen streamed | Current default | Retained programs | Program saving, conditional 95% interval |
+| --- | ---: | ---: | ---: | --- |
+| Balanced 60 digits, 16 curves | 3.567 s | 3.652 s | 3.007 s | 15.7%, 13.0 to 17.4% |
+| Balanced 80 digits, 16 curves | 4.089 s | 4.205 s | 3.554 s | 13.1%, 11.5 to 14.3% |
+
+Across both inputs, programs save 14.1% (12.3–16.2%). Current default medians
+are 2.4%/2.8% slower by size; both conditional intervals cross zero, as does the
+combined default interval (-5.4 to 1.4% reduction). No default speed claim is
+made. Baseline uses 11,683,254/11,689,655 work units per start; programs use
+4,737,592/4,743,993. Different work ledgers do not by themselves establish speed.
+The same 16 MiB owned allowance and 8 MiB program cap apply throughout.
+
+The observed relative saving falls by 2.63 percentage points at 80 digits.
+A 10,000-draw bootstrap with seed 52080 resamples cohort indices jointly within
+each arm, preserving correlation between its 60/80 timings, and independently
+across arms. Its conditional difference interval is -4.52 to -0.09 points
+(80 minus 60). The earlier independent-band calculation is preserved locally,
+but the paired-cohort calculation is used for this difference. The per-size
+intervals use the driver's 3,000-draw unpaired-arm bootstrap. Absolute savings
+are similar, 0.560/0.534 seconds per 16 curves: the modest relative dilution is
+consistent with arithmetic taking a larger fraction at bigger integers. Two
+fixed inputs and two starts do not establish a general monotonic size trend.
+
+Keep programs opt-in. This verifies useful finite-curve execution at 60/80 digits;
+it does not show faster successful factoring of balanced 30/40-digit factors.
+Deeper success calibration and huge-bound feasibility remain deferred. Raw local
+captures are `results/p52/focused-60-80-quiet.json` with source/corpus/control
+hashes, and `focused-60-80-paired-trend.json`. The source passes 323 tests, full
+lint, both proof loaders, short validation-only smoke cases and all 50 benchmark
+module imports in a committed-files-only archive, without generated evidence.
+
+```sh
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --policies middle --fixtures 60d_balanced 80d_balanced --output v2/benchmarks/results/p52/focused-60-80-new.json
+```
+
+The following commands describe the deferred broader protocol:
+
+```sh
+mkdir -p v2/benchmarks/results/p52
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --output v2/benchmarks/results/p52/realistic-quiet-new.json
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --policies deep --fixtures 40d_target 40d_balanced 60d_target 80d_target --output v2/benchmarks/results/p52/deep-quiet-new.json
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --coverage-only --policies deep --fixtures 40d_target 40d_balanced 60d_target 80d_target --seeds 41 73 101 137 179 223 269 --output v2/benchmarks/results/p52/deep-seeds-new.json
+pypy3 -B -m v2.benchmarks.p52_wider --check-quiet --output v2/benchmarks/results/p52/wider-quiet-new.json
+```
+
+### A3/A4 integration acceptance — 5 October 2026
+
+The A3 merge preserves the accepted P4.1/A4 implementation and all six
+struck-through columns in both completed execution-plan rows. A committed-files-
+only merge candidate passes 337 tests under system PyPy, full lint, all 54
+benchmark-module imports, both A3 proof/control loaders and short validation-only
+smoke cases. System PyPy lacks optional gmpy2; all three otherwise-skipped GMP
+campaign tests pass in the existing PyPy 3.11 venv where it is installed.
+
+A3 source files are byte-identical to the measured branch. Compared with that
+branch, mainline's common ECM functions have identical ASTs except for A4's
+intentional `multiply_prac` implementation; the production ladder is unchanged.
+Integration adds no timing claim and leaves historical source pins intact.
+All 47 local A3 evidence files are copied and checksum-verified under ignored
+`results/p52/` before managed-worktree removal. Combined check logs and the
+preservation manifest stay local there as well.
+
+```sh
+make -C v2 test
+make -C v2 lint
+v2/.venv/bin/python -B -m unittest v2.tests.test_prac_campaign.GmpCampaignTests -v
+```

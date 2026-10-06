@@ -17,6 +17,23 @@
   GMP-ECM precomputed Lucas chains and compact execution to the separate
   P4.5/C6 experiment at the user's request.
 
+- Add P5.2 A3's opt-in immutable packed ECM prime/power blocks with bounded
+  retention, charged regeneration and curve-private arithmetic. Preserve
+  streamed defaults and version-4 snapshots; opt-in version-5 checkpoints pin
+  schedule/configuration identity and retain cumulative resume allowances.
+  Correct the resume cursor's odd-slot bound when prime 2 shares a tiny buffer.
+- Add independent +/- prime-coverage certificates and affine cross-product
+  oracles for the later paired executor. Document feasible explicit campaign
+  storage/work and predeclared-curve continuation; keep paired execution,
+  increased-B1 continuation, D tuning and allocation calibration open.
+
+- Add independently certified 30–80-digit ECM workload fixtures and prepared
+  finite deeper-campaign/large-bound runners with exclusive timing checks.
+  Preserve exploratory completion records and verify a focused fixed-curve
+  60/80-digit timing pass; defer broader timing and large-factor success claims
+  after the user ended the expanded study early. Freeze the original
+  control helpers separately without altering its immutable source snapshot.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,

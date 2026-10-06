@@ -121,10 +121,12 @@ in the numbered phase catalogue. This plan does not authorize experiments;
 `v1/` remains the baseline.
 
 **Recommended immediate allocation: start R1 calibration on the integrated R2
-control; start an isolated P4.3 backend tranche; use another available slot for
-P5.2 schedule/coverage design or P4.1 chain verification.** A1 is complete for
-the bounded R2 tranche. Conditional capacity/CRT follow-ups can remain
-deferred; ECM work can start independently. A10 can start now to recover
+control and finish the isolated P4.3 backend tranche.** A1, A3 and A4 are complete
+for their bounded tranches. A4 retains the ladder default; production chain
+routing and near-optimal chains remain B3/C6 work.
+A3 retains streamed defaults after matched reuse experiments; B2 production
+pairing follows A2, with A6 needed for increased-B1 extensions. Conditional
+capacity/CRT follow-ups can remain deferred. A10 can start now to recover
 verified v1 capabilities, beginning with wider deterministic primality.
 B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
 
@@ -174,6 +176,7 @@ phase, prefer higher-priority rows when slots are limited.
 | P3.8-R1 implementation | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Broader calibration remains open. | R1 is now mainly a workload/parameter/evidence task. Capacity reachability is not evidence of large balanced completion. |
 | P3.8-R3 bounded tranche | Stable mixed rows, complete identities and checked recovery are integrated. Cadence 32 has a scoped opt-in win; general policy and larger provenance/storage bounds remain open. | Matrix controls can start now. Do not reopen the accepted R3 work or assume its existing dense storage reservation has disappeared. |
 | P3.8-R2 bounded tranche | The isolated study and combined repaired/R3 acceptance pass; fixed scores and capped plans are integrated as opt-ins. The original promotion decision retains defaults. | A1 is complete for this scope and B1 can start. B13 resieve capacity and C8 family-wide CRT remain conditional follow-ups. |
+| P5.2-A3 bounded tranche | Immutable capped ECM prime/power programs, independent +/- coverage fixtures, resume checks and finite campaign contracts pass acceptance and matched experiments. Streamed defaults are retained. | Reuse the program/oracle contracts in B2 after A2. Paired execution, D selection, advanced pruning and allocation remain open. |
 
 The prior R1 flyer comparison reduced a one-input, two-seed 30-digit cohort
 from 1.767 to 1.444 seconds (18.3%); the fixed legacy schedule was 3.0% slower
@@ -220,8 +223,8 @@ development and coordinated integration, not concurrent performance runs.
 | --- | --- | --- | --- | --- | --- |
 | ~~A1 — P3.8-R2 integration and acceptance~~ | ~~Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports.~~ | ~~Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions~~ | ~~**[x] Complete for bounded scope; merged as `758d5b3`.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence.~~ | ~~Current Sol / **xhigh**~~ | ~~Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation.~~ |
 | A2 — P4.3 backend foundation | Specify coarse int/mpz boundaries; implement and validate specialized baseline ladder/stage paths, canonical checkpoints and explicit backend identity; compare available PyPy tracks. | Existing exact ECM and checkpoint controls | **High, bounded experiment.** Broad arithmetic costs make this a useful early test and it settles interfaces for later ECM work. Installed gmpy2 is availability evidence, not a speedup; retain int if GMP loses. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
-| A3 — P5.2 reusable programs and campaign feasibility | Build bounded immutable prime-power/coverage programs and independent coverage oracles; compare schedule reuse on the current int control; define finite curve/bound/storage/extension contracts, including feasible larger campaigns suggested by v1. | Existing P2 schedules, recovery and ECM | **High.** Research identified repeated schedule generation and infeasible allowance combinations. Reusing bound-owned work across curves can matter without changing curve mathematics. This planning/schedule tranche does not need PRAC or GMP. | Sol / **xhigh** | Sol fits schedule construction and oracle-driven implementation. xhigh is warranted because coverage, amortization, memory limits and resumed execution must agree, even when individual arithmetic actions are unchanged. |
-| ~~A4 — P4.1 chain correctness~~ | ~~Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder.~~ | ~~Existing exact point/ladder controls~~ | **[x] Complete for A4.** Verified records are connected to `ecm.multiply_prac`; independent field/composite/schedule checks pass. The checked implementation is retained as an opt-in correctness foundation; B3 and C6 remain open. | ~~Astra / **xhigh**~~ | ~~Proof-intensive chain invariants and exceptional composite-modulus cases; termination and projective validity are checked independently.~~ |
+| ~~A3 — P5.2 reusable programs and campaign feasibility~~ | ~~Completed for the bounded tranche: immutable capped prime/power programs, independent +/- coverage and point oracles, matched int-control comparisons and finite campaign/resume contracts.~~ | ~~Existing P2 schedules, recovery and ECM~~ | ~~**[x] Complete for bounded scope on 5 October 2026.** Programs remain opt-in: larger finite curves benefit, small complete factoring regresses and defaults are retained. B2/C2/C3 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Schedule construction, arithmetic coverage, amortization, finite storage and resumed execution agree under independent acceptance controls.~~ |
+| ~~A4 — P4.1 chain correctness~~ | ~~Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder.~~ | ~~Existing exact point/ladder controls~~ | ~~**[x] Complete for A4.** Verified records are connected to `ecm.multiply_prac`; independent field/composite/schedule checks pass. The checked implementation is retained as an opt-in correctness foundation; B3 and C6 remain open.~~ | ~~Astra / **xhigh**~~ | ~~Proof-intensive chain invariants and exceptional composite-modulus cases; termination and projective validity are checked independently.~~ |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
 | A6 — P5.3 p−1 and extension correctness | Compare bounded prime-power/chunk powering and gap reuse against current p−1; define and test exact increased-B1 schedule ratios without requiring new p+1 code. | Existing p−1/P2 controls | **Medium.** Cheap structured-factor coverage and correct continuation can be developed now. Raising B1 must include increased powers of old primes, not just new primes. Keep this p−1 tranche separate from the later Lucas optimization. | Sol / **xhigh** | Sol fits incremental changes to an existing verified method. xhigh is for proving exact schedule ratios, preserving chunk replay and separating genuine extra coverage from repeated work. |
 | A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
@@ -2065,14 +2068,57 @@ execution tables above for dependencies, priority and model/effort rationale.
 
 ### P5.2 — Pair ECM stage-2 primes and tune table size
 
+**A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
+immutable packed prime/power blocks under an explicit run-local cap. Generation,
+power compilation and reads are charged; blocks that do not fit regenerate.
+Curve points and replay stay private. Disabled programs retain the version-4
+schema and original work accounting; enabled programs use version 5 with the
+program identity and rebuild under the cumulative allowance after a resume.
+The final tiny-buffer repair admits prime 2 alongside one odd slot and retains
+exact checkpoint-buffer verification.
+
+- [x] Compile bounded reusable prime/power programs and +/- coverage fixtures;
+  verify exact LCM powers, streamed candidate actions, independent eligible-prime
+  coverage and affine point cross-products, including exceptions, positive
+  initialization, block boundaries and tails. Coverage supports direct records
+  or even D >= 2 with 2D below the initial odd scalar. It is an oracle/fixture
+  contract; production paired products and a broader D sweep remain B2 work.
+- [x] Compare retained 8 MiB programs with the frozen int control, current
+  streamed default and capped regeneration using certified fresh inputs,
+  validated PyPy warmup and at least nine samples. Retain defaults: small complete
+  factoring is 5.3% slower, medium is inconclusive, and a fixed nonsplitting
+  11,000/1,900,000 campaign is 8.3% faster. Three-pass schedule-only savings of
+  24.7% and 28.8% at the two larger tiers do not establish factoring gains.
+- [x] Define finite predeclared campaigns and workspace/bound envelopes. A
+  329-bit envelope with 16 MiB workspace admits the tested larger tiers with
+  an 8 MiB program cap. Identical-config resume credits completed curves, RNG
+  progress and buffered actions; cumulative budget extension is supported.
+  Adding curves or raising bounds on an exhausted config remains unsupported.
+
+All 323 PyPy tests and full lint pass. The matched experiment summary, owned
+storage/work probes, cold results and limitations are in `benchmarks/README.md`.
+The first constructed curve costs more; retained blocks amortize across later
+curves. Regeneration-only packing loses, and the default-bound schedule timing
+remains inconclusive after extended sampling. Acceptance settles A3 without
+promoting defaults. The additional certified 30–80-digit workload exploration
+preserves validated finite completion records, with overlapping timings
+explicitly diagnostic. The user deferred the full expanded
+study, 256-curve campaigns and larger-bound probes; those gates remain open.
+A requested focused quiet pass verifies 15.7%/13.1% savings on fixed eight-curve
+60/80-digit campaigns, without factors or a population-wide size/success claim.
+The A3 branch passed 323 tests, lint and all 50 benchmark imports.
+Combined A3/A4 mainline acceptance passes 337 system-PyPy tests and three
+optional GMP checks in the existing PyPy venv, full lint and all 54 benchmark
+imports on a committed-files-only candidate. Full P5.2 is still open below.
+
 - [ ] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence or explicitly redesigning it.
 - **A:** paired/unpaired schedules cover the same eligible primes; stage-2 terms and recovered factors validate. Product checkpoints handle early, late, and mixed-factor saturation; tail primes are included.
 - **E:** measure baby/giant steps, relation products, replay, setup, and RSS across B1/B2/D grids. Choose D by total continuation cost and factor yield, not simply `isqrt(B2)`.
 
-- [ ] Build an independent eligible-prime oracle for pairing, including
-  projective cross-products, D exceptions, initialization and final buckets.
-  Tune D using actual prime occupancy and simultaneous table/product/replay
-  storage, not an asymptotic square-root estimate alone.
+- [ ] B2: consume the accepted independent eligible-prime/cross-product
+  oracles in production pairing; validate products, replay and resumed curve
+  tables. Tune D using actual prime occupancy and simultaneous table/product/
+  replay storage, not an asymptotic square-root estimate alone.
 
 - [ ] Compare wheel/coprime-distance plans with explicit prime-to-term
   coverage certificates, including pruning when an existing `v*w +/- u`
@@ -2084,28 +2130,26 @@ execution tables above for dependencies, priority and model/effort rationale.
   mixed-factor saturation replay, and charge setup/table/product storage.
   Nonunit scaling over composite n is not projective equivalence.
 
-- [ ] Compile reusable, immutable bound-owned prime-power and paired
-  stage-two coverage programs, while keeping curve points private. Current
-  production jobs repeatedly request 2,048-wide prime segments, churning the
-  eight-entry schedule cache across multi-million B2 runs; cached powers/gaps
-  are not consumed by those jobs. Compare bounded program blocks, packed
-  schedules and regeneration, charging generation/reads/amortization across
-  curves and interrupted resumes. Prioritize this alongside paired products:
-  exploratory profiles show schedule generation can rival point arithmetic.
+- [ ] B2: execute the accepted immutable +/- coverage programs with
+  curve-private point tables, tuned D and mixed-factor recovery. A3 programs
+  already supply exact prime powers to production stage one and primes to
+  unpaired stage two. Extend matched whole-continuation comparisons to paired
+  products, charging tables, products, replay and interrupted rebuilds.
 - [ ] Allocate ECM by target factor size and expected marginal success per
   total CPU-second across the sub-100 classes. Allow caller-selected finite
   curve/bound/storage tiers with sufficient work to finish them and cumulative
   extension; current 2,000,000-unit default cannot complete one 50,000/5,000,000
-  curve in the existing deterministic work probe (4,081,645 units required).
+  curve in the A3 nonsplitting work probe (4,080,627 units before context setup).
   Native GMP-ECM curve tables supply hypotheses, not PyPy defaults, guaranteed
   success or evidence that ECM is economical for balanced 90–99-digit n.
-- [ ] Size the portfolio's modulus envelope and storage together with tiers.
+- [x] A3: size explicit modulus envelopes and storage together with tiers.
   All below-100-digit inputs fit 329 bits, while the default reservation uses
-  4,096 bits. Exact current-formula probes reserve 9,304,064 bytes for an
+  4,096 bits. Current-formula probes reserve 9,304,064 bytes for an
   11,000/1,900,000 ECM tier with that default envelope, exceeding 8 MiB before
-  execution; a 329-bit campaign reserves 2,665,104 bytes. Larger tiers still
-  need explicit storage. These are conservative owned-workspace estimates,
-  not RSS measurements; preserve validated bounds and checkpoint overhead.
+  execution; a 329-bit streamed campaign reserves 2,665,104 bytes. Reserving an
+  8 MiB program cap raises it to 11,053,712 bytes, within an explicit 16 MiB
+  workspace. These are conservative owned-workspace estimates, not RSS;
+  larger tiers still require validated explicit allowances.
 - [ ] Distinguish cheap automatic ECM pretesting from explicit ECM-only or
   factor-target campaigns, crediting prior completed curves/bounds instead
   of restarting work. Current YAFU and yamaquasi provide concrete allocation
@@ -2560,7 +2604,7 @@ open until the useful gaps are transferred or have recorded decisions.
 | --- | --- | --- |
 | Wider fixed-base primality tables in `v1/utils.py` | The first-12/13-prime-base ranges have independent published bounds; v2 currently certifies only below `2**64`. The reported 23-digit prime lies in the first-12 range. | A10 implements verified ranges; B14 adds certificates beyond them. Do not copy unsupported higher table entries. |
 | Larger input-dependent ECM bounds and up to 10,000 curves | v2's default tier is B1/B2 2,000/147,396 with 32 curves. v1 permits more search, but extra allowance alone proves no speed or completion advantage. | A3 makes larger campaigns feasible; C3 measures bound/curve allocation and SIQS handoff; G1 combines the final policy. |
-| Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; v2 streams exact schedules, with reusable bound-owned programs still planned. This is a concrete comparison candidate, not a validated performance win. | A3/B2 (P5.2), retaining exact powers, finite storage and charged replay. |
+| Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; A3 now supplies bounded opt-in packed prime/power programs. Retention saves larger schedule/finite-curve work but small complete factoring regresses; defaults remain streamed. | A3 accepted; B2 (P5.2) adds paired execution while retaining exact powers, finite storage and charged replay. |
 | PRAC and Montgomery kernels | Corrected ladder arithmetic already exists in v2. Legacy exceptional-state failures prevent treating PRAC as a ready-made faster replacement. | A4/B3 (P4.1) validate chains first; B4 (P4.2) compares whole-engine kernel costs. |
 | Atkin/Eratosthenes/segmented sieve variants | v2 retains these families with corrected boundaries and local state; no independent v1 speed advantage has been established. | E6 (P8.6) only if a validated setup/sieve bottleneck supports a challenger; retain corrected output contracts. |
 | Two-stage p−1 and Brent rho | Both are already present in v2; bounded p−1 participates in its recursive portfolio. Parameter/continuation tuning is not a missing-method port. | A6 (P5.3) owns p−1 powering/continuation, E4 (P8.3) owns rho calibration, and G1 (P8.4) combines the measured policy. |
