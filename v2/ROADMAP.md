@@ -2022,12 +2022,16 @@ exact checkpoint-buffer verification.
   progress and buffered actions; cumulative budget extension is supported.
   Adding curves or raising bounds on an exhausted config remains unsupported.
 
-All 318 PyPy tests and full lint pass. The matched experiment summary, owned
+All 323 PyPy tests and full lint pass. The matched experiment summary, owned
 storage/work probes, cold results and limitations are in `benchmarks/README.md`.
 The first constructed curve costs more; retained blocks amortize across later
 curves. Regeneration-only packing loses, and the default-bound schedule timing
 remains inconclusive after extended sampling. Acceptance settles A3 without
-promoting defaults. Full P5.2 is still open below.
+promoting defaults. The additional certified 30–80-digit workload exploration
+preserves validated finite completion records, with overlapping timings
+explicitly diagnostic. The user ended the expanded study before exclusive
+timing, 256-curve campaigns and larger-bound probes; those gates remain open.
+Full P5.2 is still open below.
 
 - [ ] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence or explicitly redesigning it.
 - **A:** paired/unpaired schedules cover the same eligible primes; stage-2 terms and recovered factors validate. Product checkpoints handle early, late, and mixed-factor saturation; tail primes are included.

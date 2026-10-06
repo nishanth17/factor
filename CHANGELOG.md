@@ -12,6 +12,12 @@
   storage/work and predeclared-curve continuation; keep paired execution,
   increased-B1 continuation, D tuning and allocation calibration open.
 
+- Add independently certified 30–80-digit ECM workload fixtures and prepared
+  finite deeper-campaign/large-bound runners with exclusive timing checks.
+  Preserve exploratory completion records; defer expanded timing and large-
+  factor claims after the user ended the study early. Freeze the original
+  control helpers separately without altering its immutable source snapshot.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,

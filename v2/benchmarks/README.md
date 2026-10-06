@@ -452,8 +452,12 @@ cap, charges construction and reads, and rebuilds after a version-5 resume;
 completed curves, buffered actions and RNG progress remain credited. Increasing
 an existing campaign's bounds or curve count is not supported by this tranche.
 
-The driver pins the pre-change `9b2d380` portfolio/stage sources and unchanged
-dependencies in `inputs/baselines/p52_a3_baseline.json`. The independent corpus in
+The driver pins the pre-change `9b2d380` portfolio/stage sources in
+`inputs/baselines/p52_a3_baseline.json` and a separate immutable helper snapshot
+in `p52_a3_dependencies.json`. The original baseline bytes remain unchanged.
+The private control freezes arithmetic, budgets, preprocessing, sieves and result
+classes; inactive QS fallback types only support its dataclass annotations.
+The independent corpus in
 `inputs/corpora/p52_a3_corpus.json` contains ten freshly generated inputs with
 Pocklington certificates, seed 20261005052 and algorithm seeds 7/19/41. Complete
 factor results reconstruct and match the certified factors. Schedule-only rows
@@ -517,8 +521,12 @@ Local ignored evidence lives in `results/p52/confirmation.json` and the earlier
 `final-comparison.json`, with source hashes and prior noisy attempts preserved.
 The final smallest-buffer checkpoint repair follows those measurements: an AST
 comparison isolates it to `_verify_progress`; fresh execution and measurement
-functions are unchanged. The repaired source passes the full acceptance suite;
-the historical timing/cold source pins have not been rewritten.
+functions are unchanged. The repaired source passes the full acceptance
+suite. The later private
+control loader freezes the byte-identical helper sources to preserve the old
+control after mainline arithmetic changes; future captures pin that newer
+loader. No expanded quiet comparison was collected before the user ended
+the study; historical timing/cold source pins have not been rewritten.
 
 ```sh
 mkdir -p v2/benchmarks/results/p52
@@ -531,5 +539,98 @@ then eight seconds/63 samples; unresolved instability prevents a timing claim.
 Acceptance covers exact actions, independent point cross-products, coverage
 exceptions/tails, atomic refusal, capped regeneration, mixed-factor replay,
 quiet factoring, every resume phase, legacy schema, resealed bounds/endpoints,
-wide packed words and cancellation with the smallest prime buffer. Final tests
-and lint pass; committed-files-only acceptance is recorded with the branch.
+wide packed words and cancellation with the smallest prime buffer. All 323
+PyPy tests and full lint pass, including private-control isolation, independent
+workload proofs and owned-worker overlap handling. Committed-files-only
+acceptance is recorded with the branch.
+
+## P5.2 realistic workload exploration and prepared protocol — 5 October 2026
+
+The user ended the expanded study early. The 256-curve campaigns, extra-seed
+sweep, larger-bound probes and exclusive-window timing confirmation were
+prepared but **not run**. Their commands below describe future experiments,
+not accepted results. No integer-size trend or large-factor performance
+claim is established by this tranche.
+
+The initial middle-policy capture did complete nine validated samples per
+arm after more than three seconds of warmup, on the twelve certified inputs
+with seeds 7/19. Other benchmark jobs overlapped it, so all its timings remain
+diagnostic. Its deterministic completion records remain useful: no input was
+time-censored, every result reconstructed, and all three arms had identical
+curve assignments and outcomes under the eight-curve 11,000/1,900,000 tier
+and 50,000,000-unit grant. Each row counts unique input/seed starts; the nine
+timing repetitions are not additional independent factoring trials.
+
+| Smaller factor | Completed starts | Scope |
+| --- | ---: | --- |
+| 10 digits | 8/8 | One input in each 30/40/60/80-digit band, two seeds |
+| 15 digits | 4/4 | Two 30-digit semiprimes, two seeds |
+| 20 digits | 1/8 | Two 40-digit, one 60-digit and one 80-digit input |
+| 30 digits | 0/2 | One balanced 60-digit semiprime, two seeds |
+| 40 digits | 0/2 | One balanced 80-digit semiprime, two seeds |
+
+These fixed-case counts do not estimate a population success probability.
+In particular, eight unsuccessful curves do not show that a factor cannot
+be found. The accepted A3 timing trend concerns repeated schedule reuse;
+its differing bounds and campaign lengths do not isolate input bit length.
+
+`p52_realistic` measures the full ECM-only portfolio on certified 30-, 40-, 60-
+and 80-digit inputs, including preprocessing, classification, curve execution
+and recursive split validation. Each band has a 10-digit-factor case, a 15/20-
+digit target-factor case and a balanced semiprime. The target and balanced cells
+at 30/40 digits use different inputs. The new frozen corpus uses generation seed
+20261006053 and independent Pocklington proofs. Known factors are used only for
+validation; terminal certainty labels and every unresolved cofactor are retained.
+
+The two original algorithm seeds are 7/19. Warmed comparisons use at least three
+seconds of validated warmup and nine samples, extending unstable cohort timing
+to five seconds/31 samples and then eight seconds/63 samples. Cell timing is
+separately labeled stable or inconclusive. These fixed inputs support scoped
+completion/cost evidence, not a population-wide allocation policy.
+
+| Policy | B1/B2 | Predeclared curves | Total work grant per input/seed |
+| --- | --- | ---: | ---: |
+| Pretest | 2,000/147,396 | 32 | 2,000,000 |
+| Middle | 11,000/1,900,000 | 8 | 50,000,000 |
+| Large | 50,000/5,000,000 | 4 | 50,000,000 |
+| Deep 20-digit-factor comparison | 11,000/1,900,000 | 256 | 400,000,000 |
+
+All use 120-second wall/CPU caps, a 329-bit envelope and 16 MiB owned workspace;
+programs reserve 8 MiB. Trial bound is 5, rho/p−1 are disabled and there is no
+sieve fallback. The pretest compares identical total allowances; changing the
+work ledger can fund more curves and produce different terminal outcomes. The
+campaigns compare identical declared curves, assignments and arithmetic outcomes.
+Elapsed unresolved searches are search costs, not time to factor.
+
+The deep comparison selects the four 20-digit-factor inputs (two 40-digit
+semiprimes and the 60-/80-digit unbalanced cases). A separate completion-only
+sweep adds algorithm seeds 41/73/101/137/179/223/269 without timing claims; combined
+with the original two seeds it examines nine starts on each fixed input. The
+native [GMP-ECM parameter guidance](https://github.com/sethtroisi/gmp-ecm/blob/main/README)
+motivates deeper allowances, including roughly 74 expected curves for a 20-digit
+factor at 11,000/1,900,000. This is a hypothesis for the PyPy engine, not a measured
+success guarantee or copied default.
+
+`p52_wider` separately probes balanced 60-/80-digit cases at
+250,000/130,000,000 (four curves, one billion work units) and
+3,000,000/5,700,000,000 (one curve, 50 billion units). Both reserve 512 MiB owned
+workspace, with a 128 MiB program cap in the opt-in arm, and stop at 120 seconds
+of wall or CPU use. Each is one cold seeded feasibility run: stage progress,
+completed curves and the actual exhaustion reason are recorded, without a
+comparative speed claim. These candidate bounds also come from the native table.
+
+The initial realistic capture overlapped p4.3's study and was stopped. Its six
+completed arm captures and source hashes remain under ignored `results/p52/`,
+explicitly diagnostic for timing. `--check-quiet` checks for other benchmark/test
+interpreter processes before, during and after each worker, terminating only the
+owned worker on overlap. It supplements coordinated timing windows; it does not
+measure every background operating-system activity. New output paths, including
+per-arm partials, refuse overwrites.
+
+```sh
+mkdir -p v2/benchmarks/results/p52
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --output v2/benchmarks/results/p52/realistic-quiet-new.json
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --policies deep --fixtures 40d_target 40d_balanced 60d_target 80d_target --output v2/benchmarks/results/p52/deep-quiet-new.json
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --coverage-only --policies deep --fixtures 40d_target 40d_balanced 60d_target 80d_target --seeds 41 73 101 137 179 223 269 --output v2/benchmarks/results/p52/deep-seeds-new.json
+pypy3 -B -m v2.benchmarks.p52_wider --check-quiet --output v2/benchmarks/results/p52/wider-quiet-new.json
+```

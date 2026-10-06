@@ -16,15 +16,14 @@ from collections import Counter
 from pathlib import Path
 from struct import pack
 
-from v2 import portfolio, utils
+from v2 import portfolio
 from v2.benchmarks.build_phase_two_corpus import verify_certificates
-from v2.budget import Budget
 from v2.ecm_programs import ECMPrograms
-from v2.schedules import SieveContext
 from v2.stage_jobs import advance_job, new_job
 
 INPUTS = Path(__file__).parent / "inputs"
 BASELINE = INPUTS / "baselines/p52_a3_baseline.json"
+DEPENDENCIES = INPUTS / "baselines/p52_a3_dependencies.json"
 CORPUS = INPUTS / "corpora/p52_a3_corpus.json"
 ARMS = ("baseline", "default", "programs", "regenerated")
 SCHEDULE_CASES = {
@@ -36,30 +35,93 @@ CASES = ("small", "medium", "campaign", "large_campaign", *SCHEDULE_CASES)
 
 
 def load_control():
-    """Load only owned, hash-checked mainline control modules."""
+    """Load a hash-checked private snapshot for ECM-only control arms.
+
+    Inactive QS fallback types support the original dataclass annotations;
+    control experiments always disable those fallbacks. Arithmetic, sieve,
+    budget and result helpers are frozen, independent of later v2 changes.
+    """
     data = json.loads(BASELINE.read_text())
-    root = Path(__file__).parents[2]
+    dependencies = json.loads(DEPENDENCIES.read_text())
+    if (
+        hashlib.sha256(BASELINE.read_bytes()).hexdigest()
+        != dependencies["original_baseline_sha256"]
+    ):
+        raise ValueError("P5.2 original baseline changed")
     for name, expected in data["dependency_sha256"].items():
-        if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:
-            raise ValueError("P5.2 control dependency changed: " + name)
+        if dependencies["source_sha256"][name] != expected:
+            raise ValueError("P5.2 dependency does not match original pin")
+    sources = {**dependencies["source"], **data["source"]}
+    hashes = {**dependencies["source_sha256"], **data["source_sha256"]}
+    for name, source in sources.items():
+        if hashlib.sha256(source.encode()).hexdigest() != hashes[name]:
+            raise ValueError("corrupt P5.2 frozen source: " + name)
+
+    package_name = "_p52_control"
+    package = types.ModuleType(package_name)
+    package.__path__ = []
+    sys.modules[package_name] = package
+    from v2 import qs
+    from v2.qs import sss
+
+    # No fallback is executed by these ECM-only arms. Sharing its type names
+    # avoids copying unrelated QS engines into an arithmetic control snapshot.
+    sys.modules[package_name + ".qs"] = qs
+    sys.modules[package_name + ".qs.sss"] = sss
+    package.qs = qs
     modules = {}
-    for name in ("stage_jobs", "portfolio"):
+    for name in (
+        "constants",
+        "utils",
+        "prime_sieve",
+        "budget",
+        "preprocessing",
+        "ecm",
+        "pollard_rho",
+        "factor",
+        "schedules",
+        "stage_jobs",
+        "portfolio",
+    ):
         path = "v2/" + name + ".py"
-        source = data["source"][path]
-        if (
-            hashlib.sha256(source.encode()).hexdigest()
-            != (data["source_sha256"][path])
-        ):
-            raise ValueError("corrupt P5.2 control source")
-        qualified = "_p52_control_" + name
+        qualified = package_name + "." + name
         module = types.ModuleType(qualified)
-        module.__package__ = "v2"
-        module.__file__ = str(BASELINE) + ":" + path
+        module.__package__ = package_name
+        snapshot = BASELINE if path in data["source"] else DEPENDENCIES
+        module.__file__ = str(snapshot) + ":" + path
         sys.modules[qualified] = module
-        exec(compile(source, module.__file__, "exec"), module.__dict__)
+        setattr(package, name, module)
+        exec(compile(sources[path], module.__file__, "exec"), module.__dict__)
         modules[name] = module
-    modules["portfolio"].advance_job = modules["stage_jobs"].advance_job
     return modules["portfolio"], modules["stage_jobs"]
+
+
+def source_hashes(*runners):
+    """Pin active helpers and validation runners with each capture."""
+    root = Path(__file__).parents[2]
+    names = (
+        "constants",
+        "utils",
+        "prime_sieve",
+        "budget",
+        "preprocessing",
+        "ecm",
+        "pollard_rho",
+        "factor",
+        "schedules",
+        "stage_jobs",
+        "portfolio",
+        "ecm_programs",
+    )
+    paths = ["v2/" + name + ".py" for name in names]
+    paths.extend(
+        "v2/benchmarks/" + name + ".py"
+        for name in ("p52_a3", "build_phase_two_corpus", *runners)
+    )
+    return {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in paths
+    }
 
 
 def load_corpus():
@@ -119,10 +181,12 @@ def measure(case, arm, corpus, engine, stages):
             else corpus["seeds"]
         )
         for seed in seeds:
-            budget = Budget(work_limit=50_000_000, seconds=30, cpu_seconds=30)
+            budget = engine.Budget(
+                work_limit=50_000_000, seconds=30, cpu_seconds=30
+            )
             n = fixture["n"]
             if case in ("campaign", "large_campaign"):
-                context = SieveContext(
+                context = engine.SieveContext(
                     config.max_hi,
                     segment_size=config.segment_size,
                     budget=budget,
@@ -135,7 +199,7 @@ def measure(case, arm, corpus, engine, stages):
                 b1, b2, curves = config.ecm_tiers[0]
                 outcomes = []
                 for index in range(curves):
-                    job = new_job("ecm", n, seed + index, b1, b2)
+                    job = stages.new_job("ecm", n, seed + index, b1, b2)
                     while not job["done"]:
                         if arm in ("programs", "regenerated"):
                             advance_job(job, budget, programs, config)
@@ -227,8 +291,8 @@ def measure_schedule(case, arm, corpus, engine):
     started = time.perf_counter()
     cpu_started = time.process_time()
     config = engine.PortfolioConfig(**options(case, arm))
-    budget = Budget(work_limit=50_000_000, seconds=30, cpu_seconds=30)
-    context = SieveContext(
+    budget = engine.Budget(work_limit=50_000_000, seconds=30, cpu_seconds=30)
+    context = engine.SieveContext(
         config.max_hi, segment_size=config.segment_size, budget=budget
     )
     programs = (
@@ -252,7 +316,10 @@ def measure_schedule(case, arm, corpus, engine):
                     )
                     primes = context.prime_segment(left, right)
                     powers = (
-                        [utils.prime_power(prime, b1) for prime in primes]
+                        [
+                            engine.utils.prime_power(prime, b1)
+                            for prime in primes
+                        ]
                         if bound
                         else None
                     )
@@ -315,10 +382,10 @@ def campaign_probes():
         for arm in ("baseline", "programs"):
             engine = control if arm == "baseline" else portfolio
             config = engine.PortfolioConfig(**options(case, arm))
-            budget = Budget(
+            budget = engine.Budget(
                 work_limit=50_000_000, seconds=120, cpu_seconds=120
             )
-            context = SieveContext(
+            context = engine.SieveContext(
                 config.max_hi, segment_size=config.segment_size, budget=budget
             )
             programs = (
@@ -331,7 +398,8 @@ def campaign_probes():
             outcomes = []
             for curve in range(curves):
                 start_work = budget.used
-                job = new_job("ecm", n, 7 + curve, b1, b2)
+                initializer = stages.new_job if arm == "baseline" else new_job
+                job = initializer("ecm", n, 7 + curve, b1, b2)
                 while not job["done"]:
                     if programs is None:
                         stages.advance_job(job, budget, context, config)
@@ -529,17 +597,10 @@ def run(args):
         platform=platform.platform(),
         corpus_sha256=hashlib.sha256(CORPUS.read_bytes()).hexdigest(),
         baseline_sha256=hashlib.sha256(BASELINE.read_bytes()).hexdigest(),
-        source_sha256={
-            name: hashlib.sha256(
-                (Path(__file__).parents[2] / name).read_bytes()
-            ).hexdigest()
-            for name in (
-                "v2/ecm_programs.py",
-                "v2/stage_jobs.py",
-                "v2/portfolio.py",
-                "v2/benchmarks/p52_a3.py",
-            )
-        },
+        dependency_sha256=hashlib.sha256(
+            DEPENDENCIES.read_bytes()
+        ).hexdigest(),
+        source_sha256=source_hashes(),
         probes=campaign_probes() if args.probes else [],
         summaries=summaries,
         captures=captures,
