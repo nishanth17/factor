@@ -440,3 +440,199 @@ imports. Committed-files-only validation checks all required loaders and
 immutable controls, without local captures or other sessions' readability
 changes. The API and checkpoint contracts are retained, and only the R2
 delta is included in the integration commit.
+
+## P4.1/A4 verified PRAC — 5 October 2026
+
+`ecm.multiply_prac` now executes bounded verified records, including checked
+exceptional recovery; it is no longer an alias for the binary ladder. This
+accepts A4 correctness. Production standalone and bounded factoring retain
+the ladder; B3 owns portfolio work charges, chunk replay and checkpoints.
+Near-optimal/offline search is still a separate comparison, not an accepted
+speedup.
+
+The independent affine corpus has 16,016 comparisons and zero mismatches.
+391 selected chain paths require checked recovery; these are not vacuous
+`(0,0)` equalities or a recount of the original prototype's 797 failures.
+Additional tests cover exhaustive small curves, fields through 521 bits,
+composite and prime-square moduli, Suyama prime-power schedules, retained
+nonunit factors, corrupt records and bounded storage/termination.
+The exact false-infinity example documented in GMP-ECM's `ecm.c`
+(`n=33554520197234177`, `sigma=2046841451`, B1=373) also passes the
+independent affine oracle and finishes at a non-infinite point.
+
+### Complete ECM attempts on 40–80-digit inputs
+
+`p41_campaign.py --gmp` compares four arms: the actual `factorize_ecm` ladder,
+checked PRAC with Python integers, the same ladder arithmetic with gmpy2,
+and checked PRAC with gmpy2. These gmpy2 arms run Python ECM, not the
+C GMP-ECM executable or its optional near-optimal chain interpreter.
+The gmpy2 adapter uses private function bindings with identical
+function code, replacing integer validation, GCD and inversion; it retains
+`mpz` coordinates through setup, both stages and recovery. There is no global
+backend patch or per-operation conversion. This benchmark adapter is not the
+P4.3 production backend contract. It requires the optional dependency in the
+same PyPy 3.11 interpreter and fails explicitly if unavailable.
+
+The versioned `p41_ecm_40_80_corpus.json` contains 14 certified semiprimes:
+exact 40/50/60/70/80-digit inputs, balanced cases, and controlled 10-/20-digit
+small factors. Prime certificates are recursively checked with Pocklington
+and trial-division leaves, independently of the ECM implementation. Fixtures
+were selected before examining ECM outcomes. Repeated small factors across
+sizes deliberately control factor difficulty; these are inspected fixtures,
+not independent population samples. Known factors enter validators only.
+The timer covers the known-composite ECM attempt; certificate and result
+verification run outside it. Portfolio preprocessing, recursive dispatch and
+checkpointing are not included.
+
+All arms receive the same nine seeds, Suyama parameters, B1/B2 bounds, batch
+size 128, maximum 32 curves and 60-second wall/CPU watchdogs. Every warmup and
+sample is validated, preserving unresolved composites and reconstructing all
+proper-factor results. gmpy2/Python pairs must also match every uncensored
+factor and curve/stage transition. Each case/arm receives at least three
+seconds of validated warmup. Groups with more than 25% timing spread repeat
+the same nine paired seeds in reversed order, retaining the original samples.
+Tables report the final nine-seed block for extended groups; the original
+block remains in the evidence. Fresh-process cold attempts are separate.
+Each cold sample repeats seed 41,001 on the balanced 40-digit case. Its
+curve count can differ from the warmed table's median across nine seeds;
+cold and warmed medians must not be subtracted to estimate startup overhead.
+
+The `current` tier uses B1=2,000 and B2=147,396 on all 14 inputs. `factor20`
+uses B1=11,000 and B2=1,873,422 on the five cases with 20-digit small factors.
+The latter is a published GMP-ECM reference tier, not a calibrated optimum
+for this Python engine. [Zimmermann's parameter table](
+https://members.loria.fr/PZimmermann/records/ecm/params.html) distinguishes
+factor size from input size and gives both newer and historical estimates.
+32 curves are a finite comparison budget, not a claim of sufficient coverage
+for every 20-digit factor. Balanced 50–80-digit cases are unresolved-work
+controls at the current tier; they do not demonstrate practical extraction
+of 25–40-digit factors with these bounds.
+
+The experimental PRAC campaign builds its program once per attempt and
+reuses it across curves. Construction, caller-record re-verification, dispatch,
+all intermediate checks, stage-two prime generation and saturation recovery
+are timed. Its cap is B1 <= 11,000 and 4,096 record references, in addition to
+the scalar compiler's 512-entry cache and 512-instruction limit per record.
+It avoids cache thrashing by retaining immutable bound-owned records and
+replays a collapsed prime power only from that power's saved starting point.
+This experimental composition does not modify `stage_jobs` or its accounting.
+
+Reproduce using the same PyPy environment for all arms (the accepted gmpy2
+configuration is gmpy2 2.3.1 / GMP 6.3.0):
+
+```sh
+v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier current --output v2/benchmarks/results/p41-current-new.json
+v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier factor20 --output v2/benchmarks/results/p41-factor20-new.json
+```
+
+### Accepted current-bound results
+
+All four arms find proper factors in the same **49/126 distinct seeded
+attempts**. There are zero timeouts, invalid factors or mismatched backend
+transitions; 432 GMP/Python pairs agree across primary and extended blocks.
+All five 10-digit-factor fixtures complete for 9/9 seeds; the four unbalanced
+20-digit-factor fixtures complete for 1/9 each. None of the balanced inputs
+splits in nine 32-curve attempts at these bounds.
+
+Median seconds per complete attempt, using the final nine-seed block where
+extension was triggered (success counts are identical across the four arms):
+
+| Input case | Factor digits | Successes / 9 | Int ladder | Int PRAC | gmpy2 ladder | gmpy2 PRAC |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Balanced 40 | 20 + 20 | 0 | 0.2536 | 0.3602 | 1.2179 | 1.3099 |
+| Small-factor 40 | 10 + 30 | 9 | 0.0111 | 0.0226 | 0.0577 | 0.0576 |
+| Balanced 50 | 25 + 25 | 0 | 0.2762 | 0.3981 | 1.2264 | 1.3240 |
+| Small-factor 50 | 10 + 40 | 9 | 0.0120 | 0.0243 | 0.0558 | 0.0585 |
+| Target-factor 50 | 20 + 30 | 1 | 0.2398 | 0.3645 | 1.2230 | 1.3306 |
+| Balanced 60 | 30 + 30 | 0 | 0.3275 | 0.4728 | 1.2925 | 1.4235 |
+| Small-factor 60 | 10 + 50 | 9 | 0.0150 | 0.0265 | 0.0579 | 0.0592 |
+| Target-factor 60 | 20 + 40 | 1 | 0.3043 | 0.4525 | 1.2379 | 1.3697 |
+| Balanced 70 | 35 + 35 | 0 | 0.3275 | 0.4955 | 1.2439 | 1.3765 |
+| Small-factor 70 | 10 + 60 | 9 | 0.0171 | 0.0362 | 0.0513 | 0.0607 |
+| Target-factor 70 | 20 + 50 | 1 | 0.3547 | 0.5241 | 1.2713 | 1.4057 |
+| Balanced 80 | 40 + 40 | 0 | 0.3864 | 0.5799 | 1.2683 | 1.4285 |
+| Small-factor 80 | 10 + 70 | 9 | 0.0197 | 0.0326 | 0.0593 | 0.0611 |
+| Target-factor 80 | 20 + 60 | 1 | 0.4142 | 0.6073 | 1.2822 | 1.4416 |
+
+On this finite corpus, checked PRAC/int takes 1.42–2.12 times the int ladder's
+median attempt time. The all-mpz ladder takes 3.00–5.22 times the int ladder;
+all-mpz checked PRAC takes 3.10–5.55 times. These are complete ECM attempts,
+including unsuccessful searches. They establish no PRAC or all-mpz promotion
+for this implementation. They do not calibrate selective GMP helpers or
+coarser compiled curve kernels.
+
+The first balanced-40 primary block showed roughly twofold timing drift
+shared across arms. Its repeated block supplies the reported values; both
+blocks are retained. Seed-dependent early factors also cause legitimate
+variation in attempt duration. No small timing differences are claimed as
+wins. Nine fresh-process balanced-40 attempts per arm give cold medians of
+0.3590/0.5469/1.3394/1.5164 seconds in table order, including startup, imports,
+certificate validation, construction and the first attempt.
+
+### Larger-bound extension: completed subset
+
+At B1=11,000 / B2=1,873,422, all four arms split **9/27** distinct seeded
+attempts across the three completed cases (3/9 per case). There are no
+invalid factors, timeouts or backend-transition mismatches in these captures;
+108 backend pairs agree across primary and repeated blocks.
+
+| Input case | Factor digits | Successes / 9 | Int ladder | Int PRAC | gmpy2 ladder | gmpy2 PRAC |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Balanced 40 | 20 + 20 | 3 | 1.9302 | 2.5034 | 9.4742 | 10.0334 |
+| Target-factor 50 | 20 + 30 | 3 | 1.8026 | 2.5088 | 9.5594 | 10.0408 |
+| Target-factor 60 | 20 + 40 | 3 | 4.5589 | 6.1432 | 19.4741 | 20.7905 |
+
+Values are median seconds in the final nine-seed block. Checked PRAC/int
+costs 1.30–1.39 times the paired int ladder; the gmpy2 ladder costs
+4.27–5.30 times, and gmpy2 PRAC costs 4.56–5.57 times. The first two cases
+and the third were captured in separate, explicitly coordinated timing
+windows. Absolute times across those windows are not a hardware-scaling
+comparison. The arithmetic source hashes match; the only driver change was
+an optional cold-control case selector, with all timed function ASTs unchanged.
+
+To close the existing work, the optional extension stopped at the completed
+60-digit case boundary. **The larger-bound 70-/80-digit cases and its cold
+controls are unfinished.** No result is inferred for them. This limitation
+does not remove any case from the completed 14-case current-bound study.
+The evidence retains every completed sample, original/repeated blocks,
+window provenance and the explicit closeout record.
+
+The checked implementation is a correctness foundation, not the preferred
+performance path. GMP-ECM precomputed Lucas codes and compact execution are
+explicitly deferred to **P4.5/C6** in the roadmap; no such executor or chain
+corpus is included in this change.
+
+### Kernel and standalone stage-one diagnostics
+
+`p41_prac.py` separately measures 28-, 57- and 96-digit moduli. Those sizes
+are **not** the 40–80-digit ECM campaign corpus and support no claim about
+whole factoring performance. They isolate construction, fixed Suyama stages,
+kernels and exceptional recovery. At B1=2,000 the records reduce the abstract
+6/5-weighted operation total from 31,369 to 25,273 (19.4%). This is an abstract
+count, not a 19.4% runtime gain.
+
+With a 512-record cache (303 prime powers at B1=2,000), the diagnostic medians
+for complete three-curve stage-one runs are:
+
+| Modulus digits | Ladder, 16-power chunks | Ladder, individual powers | Checked PRAC, individual powers |
+| --- | ---: | ---: | ---: |
+| 28 | 6.533 ms | 6.787 ms | 11.834 ms |
+| 57 | 12.938 ms | 13.382 ms | 24.491 ms |
+| 96 | 25.209 ms | 26.172 ms | 44.785 ms |
+
+B1=2,000 chain construction is 9.206 ms; 16 exceptional recovered operations
+are 18.521 µs as a separate tiny-field diagnostic. Fresh-process startup plus
+one checked multiplication is 37.280 ms median. Actual point addition/doubling
+kernel ratios are about 1.15–1.18 in this diagnostic, rather than assuming the
+abstract 6/5 model predicts total Python execution cost. Full construction,
+recovery and sample arrays remain in ignored local evidence.
+
+```sh
+pypy3 -B -u -m v2.benchmarks.p41_prac --output v2/benchmarks/results/p41-diagnostic-new.json
+```
+
+Research references and the explicit B3/C6 follow-ups are recorded in
+[ROADMAP P4.1](../ROADMAP.md#p41--finish-prac-repair-and-precompute-valid-chains).
+GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
+are useful follow-ups; neither provides evidence that its chain-selection
+savings outweigh checked Python execution here.

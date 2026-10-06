@@ -2,6 +2,21 @@
 
 ## Current development
 
+- Complete the P4.1/A4 chain-correctness tranche and connect verified PRAC
+  to `ecm.multiply_prac`. Separate bounded exact-rational generation from
+  independent integer verification and checked point execution; retain a
+  finite cache and one ladder retry. Expose proper factors or curve-retry
+  outcomes through `prac.NonunitPointError`, never a degenerate point.
+- Add independent affine, large-field, composite/prime-square and complete
+  prime-power schedule controls, plus reproducible PyPy cost measurements.
+  Compare full two-stage attempts on certified 40–80-digit composites with
+  matched Python-int/gmpy2 ladder and checked-PRAC arms; validate every factor,
+  unresolved cofactor and uncensored backend transition. Keep microbenchmarks
+  separate from complete-campaign evidence.
+  Preserve production ladder defaults. B3 integration remains open; defer
+  GMP-ECM precomputed Lucas chains and compact execution to the separate
+  P4.5/C6 experiment at the user's request.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,
