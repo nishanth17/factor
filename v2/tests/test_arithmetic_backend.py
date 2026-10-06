@@ -26,6 +26,8 @@ from v2.qs.smooth_batch import SmoothBatch
 from v2.qs.sss import SSSConfig, SSSJob
 from v2.schedules import SieveContext
 from v2.stage_jobs import advance_job, new_job, promote_job
+from v2.tests.test_ecm_programs import configuration as program_config
+from v2.tests.test_phase_two import reseal
 from v2.tests.test_qs_parallel import configuration as parallel_config
 from v2.tests.test_siqs import configuration as siqs_config
 
@@ -303,6 +305,98 @@ class EngineBackendTests(unittest.TestCase):
                     config=config,
                     checkpoint=damaged,
                     budget=allowance(),
+                )
+
+    def test_ecm_programs_resume_on_each_backend(self):
+        n = 25013 * 25031
+        reference = None
+        for name in BACKENDS:
+            config = program_config(backend=name)
+            whole = factorize_bounded(
+                n, seed=7, config=config, budget=allowance()
+            )
+            signature = (whole.result, whole.reason, whole.work_used)
+            if reference is None:
+                reference = signature
+            self.assertEqual(signature, reference)
+
+            paused = factorize_bounded(
+                n, seed=7, config=config, budget=allowance(1000)
+            )
+            self.assertEqual(
+                paused.checkpoint["payload"]["version"],
+                5 if name == "python-int" else 6,
+            )
+            resumed = factorize_bounded(
+                n,
+                config=config,
+                budget=allowance(),
+                checkpoint=json.loads(json.dumps(paused.checkpoint)),
+            )
+            self.assertEqual(resumed.result, whole.result)
+            self.assertEqual(resumed.reason, whole.reason)
+            self.assertGreaterEqual(resumed.work_used, paused.work_used)
+            self.assertEqual(
+                [
+                    (event["seed"], event["outcome"])
+                    for event in resumed.events
+                ],
+                [(event["seed"], event["outcome"]) for event in whole.events],
+            )
+
+            # Pre-integration GMP version 5 had no program identity. Merely
+            # relabeling a new program checkpoint must not make it legacy.
+            if name == "gmpy2-mpz":
+                damaged = copy.deepcopy(paused.checkpoint)
+                damaged["payload"]["version"] = 5
+                with self.assertRaisesRegex(ValueError, "incompatible"):
+                    factorize_bounded(
+                        n,
+                        config=config,
+                        budget=allowance(),
+                        checkpoint=reseal(damaged),
+                    )
+
+    def test_preintegration_backend_checkpoints_remain_readable(self):
+        n = 25013 * 25031
+        for name in BACKENDS:
+            config = program_config(backend=name, ecm_program_bytes=0)
+            whole = factorize_bounded(
+                n, seed=7, config=config, budget=allowance()
+            )
+            paused = factorize_bounded(
+                n, seed=7, config=config, budget=allowance(1000)
+            )
+            legacy = copy.deepcopy(paused.checkpoint)
+            legacy["payload"]["version"] = 5
+            legacy["payload"]["config"]["backend"] = name
+            resumed = factorize_bounded(
+                n,
+                config=config,
+                budget=allowance(),
+                checkpoint=reseal(legacy),
+            )
+            self.assertEqual(
+                (resumed.result, resumed.reason, resumed.work_used),
+                (whole.result, whole.reason, whole.work_used),
+            )
+
+    def test_verified_prac_uses_selected_arithmetic(self):
+        from v2.benchmarks.prac_oracle import affine_multiply, matches
+
+        for name in BACKENDS:
+            integer = arithmetic.get_backend(name).integer
+            for scalar in (13, 97):
+                point = ecm.multiply_prac(
+                    scalar, integer(3), integer(1), integer(1009), integer(2)
+                )
+                expected = affine_multiply(scalar, (3, 293), 1009, 6)
+                self.assertTrue(matches(point, expected, 1009))
+                self.assertTrue(
+                    all(
+                        arithmetic.is_mpz(value) == (name == "gmpy2-mpz")
+                        for value in point
+                    )
                 )
 
     def test_backend_keyword_preserves_positional_configurations(self):

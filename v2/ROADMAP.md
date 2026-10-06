@@ -121,10 +121,12 @@ in the numbered phase catalogue. This plan does not authorize experiments;
 `v1/` remains the baseline.
 
 **Recommended immediate allocation: start R1 calibration on the integrated R2
-control; start an isolated P4.3 backend tranche; use another available slot for
-P5.2 schedule/coverage design or P4.1 chain verification.** A1 is complete for
-the bounded R2 tranche. Conditional capacity/CRT follow-ups can remain
-deferred; ECM work can start independently. A10 can start now to recover
+control and finish the isolated P4.3 backend tranche.** A1, A3 and A4 are complete
+for their bounded tranches. A4 retains the ladder default; production chain
+routing and near-optimal chains remain B3/C6 work.
+A3 retains streamed defaults after matched reuse experiments; B2 production
+pairing follows A2, with A6 needed for increased-B1 extensions. Conditional
+capacity/CRT follow-ups can remain deferred. A10 can start now to recover
 verified v1 capabilities, beginning with wider deterministic primality.
 B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
 
@@ -174,6 +176,7 @@ phase, prefer higher-priority rows when slots are limited.
 | P3.8-R1 implementation | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Broader calibration remains open. | R1 is now mainly a workload/parameter/evidence task. Capacity reachability is not evidence of large balanced completion. |
 | P3.8-R3 bounded tranche | Stable mixed rows, complete identities and checked recovery are integrated. Cadence 32 has a scoped opt-in win; general policy and larger provenance/storage bounds remain open. | Matrix controls can start now. Do not reopen the accepted R3 work or assume its existing dense storage reservation has disappeared. |
 | P3.8-R2 bounded tranche | The isolated study and combined repaired/R3 acceptance pass; fixed scores and capped plans are integrated as opt-ins. The original promotion decision retains defaults. | A1 is complete for this scope and B1 can start. B13 resieve capacity and C8 family-wide CRT remain conditional follow-ups. |
+| P5.2-A3 bounded tranche | Immutable capped ECM prime/power programs, independent +/- coverage fixtures, resume checks and finite campaign contracts pass acceptance and matched experiments. Streamed defaults are retained. | Reuse the program/oracle contracts in B2 after A2. Paired execution, D selection, advanced pruning and allocation remain open. |
 
 The prior R1 flyer comparison reduced a one-input, two-seed 30-digit cohort
 from 1.767 to 1.444 seconds (18.3%); the fixed legacy schedule was 3.0% slower
@@ -219,9 +222,9 @@ development and coordinated integration, not concurrent performance runs.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | ~~A1 — P3.8-R2 integration and acceptance~~ | ~~Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports.~~ | ~~Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions~~ | ~~**[x] Complete for bounded scope; merged as `758d5b3`.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence.~~ | ~~Current Sol / **xhigh**~~ | ~~Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation.~~ |
-| A2 — P4.3 backend foundation | **Foundation implemented; size-dependent experiment gate reopened:** explicit int/mpz boundaries across the current engines, exact helpers, typed arithmetic loops, canonical checkpoints and backend/build identity. | Existing exact arithmetic and checkpoint controls | **In progress on 5 October 2026.** The first study uses an eight-digit QS fixture and small ECM bounds; it cannot settle algorithm/size selection. Compare realistic ECM campaigns, reachable larger QS collectors and selective GMP helpers before closing that decision. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
-| A3 — P5.2 reusable programs and campaign feasibility | Build bounded immutable prime-power/coverage programs and independent coverage oracles; compare schedule reuse on the current int control; define finite curve/bound/storage/extension contracts, including feasible larger campaigns suggested by v1. | Existing P2 schedules, recovery and ECM | **High.** Research identified repeated schedule generation and infeasible allowance combinations. Reusing bound-owned work across curves can matter without changing curve mathematics. This planning/schedule tranche does not need PRAC or GMP. | Sol / **xhigh** | Sol fits schedule construction and oracle-driven implementation. xhigh is warranted because coverage, amortization, memory limits and resumed execution must agree, even when individual arithmetic actions are unchanged. |
-| A4 — P4.1 chain correctness | Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder. | Existing exact point/ladder controls | **Medium/high potential, higher proof risk.** Mathematical validation can run independently of backend implementation. It must precede production chain execution; old exceptional `(0,0)` cases do not count as equality successes. | Astra / **xhigh** | Choose Astra for the proof-intensive chain invariants and exceptional composite-modulus cases. xhigh supports checking termination and valid projective states against independent oracles before production use. |
+| A2 — P4.3 backend foundation | Specify coarse int/mpz boundaries; implement and validate specialized baseline ladder/stage paths, canonical checkpoints and explicit backend identity; compare available PyPy tracks. | Existing exact ECM and checkpoint controls | **High, bounded experiment.** Broad arithmetic costs make this a useful early test and it settles interfaces for later ECM work. Installed gmpy2 is availability evidence, not a speedup; retain int if GMP loses. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
+| ~~A3 — P5.2 reusable programs and campaign feasibility~~ | ~~Completed for the bounded tranche: immutable capped prime/power programs, independent +/- coverage and point oracles, matched int-control comparisons and finite campaign/resume contracts.~~ | ~~Existing P2 schedules, recovery and ECM~~ | ~~**[x] Complete for bounded scope on 5 October 2026.** Programs remain opt-in: larger finite curves benefit, small complete factoring regresses and defaults are retained. B2/C2/C3 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Schedule construction, arithmetic coverage, amortization, finite storage and resumed execution agree under independent acceptance controls.~~ |
+| ~~A4 — P4.1 chain correctness~~ | ~~Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder.~~ | ~~Existing exact point/ladder controls~~ | ~~**[x] Complete for A4.** Verified records are connected to `ecm.multiply_prac`; independent field/composite/schedule checks pass. The checked implementation is retained as an opt-in correctness foundation; B3 and C6 remain open.~~ | ~~Astra / **xhigh**~~ | ~~Proof-intensive chain invariants and exceptional composite-modulus cases; termination and projective validity are checked independently.~~ |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
 | A6 — P5.3 p−1 and extension correctness | Compare bounded prime-power/chunk powering and gap reuse against current p−1; define and test exact increased-B1 schedule ratios without requiring new p+1 code. | Existing p−1/P2 controls | **Medium.** Cheap structured-factor coverage and correct continuation can be developed now. Raising B1 must include increased powers of old primes, not just new primes. Keep this p−1 tranche separate from the later Lucas optimization. | Sol / **xhigh** | Sol fits incremental changes to an existing verified method. xhigh is for proving exact schedule ratios, preserving chunk replay and separating genuine extra coverage from repeated work. |
 | A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
@@ -265,7 +268,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| C6 — P4.1 advanced offline chain search | Compare bounded/offline continued-fraction or near-optimal chain search with verified production chains. | B3 plus significant remaining stage-one cost | **Low/conditional.** First learn whether ordinary verified chains help. Shorter records or fewer search nodes alone cannot justify generation, dispatch and cache costs. No online search over the enormous full-lcm scalar. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Deferred by user, separate tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -409,7 +412,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    EXEC --> SEARCH[C6: offline chain search if justified]
+    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment, deferred]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -1867,21 +1870,72 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 ### P4.1 — Finish PRAC repair and precompute valid chains
 
-- [ ] Use `audit/prac_reference.py` as a prototype, not a drop-in. Guard 0/1/2 and powers of two; select `k//2 < r < k` with `gcd(k,r)=1`, require terminal `d=e=1`, and validate integer/differential invariants. Separate chain generation from execution; cache exact-rational choices and use ladder fallback.
+- [x] **A4 correctness tranche:** use `audit/prac_reference.py` as a prototype, not a drop-in. Guard 0/1/2 and powers of two; select `k//2 < r < k` with `gcd(k,r)=1` for the odd component, require terminal `d=e=1`, and validate integer/differential invariants. Separate chain generation from execution; cache exact-rational choices and use ladder fallback.
 - **A:** zero nondegenerate mismatches against independent affine/ladder oracles; `(0,0)` is always detected and handled by factor extraction, recovery, or retry. The prototype's 797 exceptional cases are not counted as passing point equalities.
 - **E:** extend the recorded 16,016 comparisons to larger fields, composite moduli, and actual prime-power schedules. Include chain construction, Python dispatch, exceptional recovery, and total stage-1 time. Enable PRAC only after the promotion gate.
+
+**A4 acceptance (5 October 2026):** `prac.py` compiles immutable records and
+independently interprets their integer action before `ecm.multiply_prac`
+executes them. The generator strips powers of two, tries at most 30 exact
+rational splits, requires decreasing positive `d+e` and terminal `d=e=1`,
+and enforces 32-bit scalars / 512 instructions / 512 cached records. The
+separate verifier checks every differential sum/difference and final scalar;
+it also accepts independently supplied Lucas records within the same limits.
+No scalar-search work is performed for an enormous full-lcm scalar.
+
+All 16,016 historical affine cases pass with 391 exceptional chain paths
+recovered, rather than counted as vacuous equalities. The new split choices
+and guards differ from the prototype, so 391 is not a recount of its 797
+degenerate outputs. Additional tests cover all x-coordinates on small
+nonsingular curves, fields through 521 bits, large scalars, rescaling,
+composite and prime-square moduli, actual Suyama prime-power schedules,
+corrupt records, cache limits and retained nonunits. Every intermediate Z is
+GCD-checked. Before a chain is discarded, retained X coordinates are checked
+for factors; exceptional differences receive at most one checked ladder
+retry. `NonunitPointError.factor` preserves a proper divisor, or requests
+curve retry with `None`. Returned `(0,0)` is never accepted.
+
+The [A4 benchmark record](benchmarks/README.md#p41a4-verified-prac-5-october-2026)
+separates kernel diagnostics from complete two-stage attempts on exact
+40/50/60/70/80-digit composites. It charges setup, construction, dispatch,
+intermediate checks, recovery and cold startup, and compares Python integers
+and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
+input size and target factor size are reported separately; unresolved
+composites are retained. This is acceptance of chain
+correctness, **not production promotion or completion of all P4.1**. The
+P4.5/C6 precomputed Lucas comparison and B3 integration remain open.
+
+**Research decision:** use ordinary bounded PRAC first. The
+[GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
+documents exceptional false infinities, so valid cross-products alone are
+insufficient. Its ten continued-fraction ratios inform exact rational
+candidate selection here; no upstream floating-point search is imported.
+[McLaughlin's LucasChainGenerator](https://github.com/sethtroisi/gmp-ecm/blob/main/LucasChainGenerator/README)
+precomputes optimal or near-optimal prime chains, but generation and storage
+still need to be charged. The
+[Bernstein–Cottaar–Lange paper](https://eprint.iacr.org/2024/1044)
+improves continued-fraction chain search by pruning and meet-in-the-middle;
+it does not establish a faster checked PyPy ECM engine. Compare precomputed chains separately in P4.5/C6 before drawing conclusions
+about their production value; the checked A4 timings cannot settle that question.
+[CADO's bytecode implementation](https://github.com/cado-nfs/cado-nfs/blob/master/sieve/ecm/bytecode.c)
+separates encoding, cost models and verification; compact program execution
+is a useful B3 comparison to the readable bounded records used in A4.
+
+The [full Bernstein–Cottaar–Lange paper](https://antsmath.org/ANTSXVI/papers/BernsteinCottaarLange.pdf)
+(published in 2025) optimizes length within the continued-fraction subclass,
+not weighted runtime over every differential addition-subtraction chain.
+Its compressed three-live-point interpreter is a useful execution comparison
+because PRAC has more complicated data movement. Section 1.1 explicitly
+separates multiplication, squaring and curve-constant costs and leaves
+low-level performance analysis open. A shorter chain therefore needs a
+measured implementation comparison before replacing this checked baseline.
 
 **Cost-model follow-up (M27):** v1's `ADD_COST=6`, `DUP_COST=5` and
 `lucas_cost` mirror GMP-ECM's abstract differential-add/double costs.
 The review maps the Fibonacci/golden-ratio
 split and existing prototype to this task; production still uses the ladder.
 
-- [ ] Compare guarded PRAC with optional precomputed near-optimal Lucas
-  chains, as in GMP-ECM 7.0.6. Model additions as 4M+2S and doubles as
-  3M+2S, then calibrate costs on actual PyPy kernels and available backends.
-  Keep integer/rational selection and charge generation, cache/storage,
-  dispatch and exceptional recovery. Independently verify every chain;
-  compare full stage-one and complete-factorization costs before promotion.
+The precomputed near-optimal comparison is tracked separately in **P4.5/C6**.
 
 **2026-10-04 research refinement:** test projective validity separately from
 cross-product equality, which can accept `(0,0)` vacuously. Exercise complete
@@ -1890,20 +1944,11 @@ and charging finite exceptional recovery. GMP-ECM's chain generator is a
 reference; abstract M/S counts need measured PyPy costs.
 
 - [ ] Route verified chain execution into the actual bounded stage-one path:
-  `multiply_prac` is currently a ladder wrapper and stage jobs call
-  `scalar_multiply` directly. Compile small prime/prime-power chain records
+  A4 now connects `multiply_prac` to verified execution; stage jobs still
+  call `scalar_multiply` directly. Compile small prime/prime-power chain records
   into bounded composed programs; retain chunk-start replay and factor/nonunit
   handling. Do not search near-optimal chains for an enormous full-lcm scalar
   online. Measure chain/schedule amortization across the sub-100 workload.
-
-- [ ] Add bounded/offline continued-fraction chain search as a separate
-  challenger, using Bernstein–Cottaar–Lange's 2025 pruning/meet-in-the-middle
-  work and CADO's compact bytecode representation as references. Independently
-  verify integer chain records and distinguish guaranteed from heuristic
-  search termination/optimality. Charge generation, tables, dispatch and
-  exceptional recovery; retain the ladder. Author prototype floating search
-  bounds and shorter-chain/node-count results are not exact production
-  contracts or measured full-ECM speedups.
 
 ### P4.2 — Compare fused and normalized Montgomery kernels
 
@@ -1959,14 +2004,15 @@ smoothness trees, relation verification/extraction and GF(2) masks. Arithmetic
 operators execute on persistent concrete int/mpz values; only arithmetic
 primitives dispatch, with no callback per multiplication. Small schedules,
 indices, seeds and resource counters remain native. Canonical public results
-and checkpoint versions 5/3/4/2 retain backend/build identity and reject
+and checkpoint versions 6/3/4/2 retain backend/build identity and reject
 incompatible resume; supported old integer checkpoints remain readable.
 Backend configuration is keyword-only, preserving prior positional APIs.
 
 The same available-backend arithmetic/result/certainty oracles, saturation,
 resume, provenance and spawned-worker checks pass: 316 PyPy tests and lint.
-Committed-files-only verification remains pending while this worktree is
-uncommitted; no merge or worktree removal is authorized at present.
+At the initial report boundary, committed-files-only verification and
+integration were pending. The user subsequently authorized mainline integration
+and worktree removal; combined acceptance is recorded below.
 The hash-verified pre-P4.3 control is `9b2d380`; the certified declared corpus
 and runner live in versioned benchmark inputs/code. Raw captures stay ignored.
 See the [backend study](benchmarks/README.md#p43-arithmetic-backends--5-october-2026)
@@ -2009,8 +2055,10 @@ persistent mpz 35.241 s (12.42x), and mpz with native small values 21.359 s
 ledger and 66 relations. The user then ended the 100-digit extension and all
 further experiments; unfinished comparisons earn no acceptance pass. Disjoint
 confirmation and automatic selection remain open. The native default and
-explicit optional GMP selectors stay in place. No merge or worktree removal
-is authorized by this report-only task.
+explicit optional GMP selectors stay in place. Subsequent integration combines
+P4.1 PRAC and P5.2 programs with the GMP boundary, preserves native portfolio
+versions 4/5, and uses version 6 for combined GMP snapshots. It accepts the
+pre-integration backend version-5 format without silently converting backends.
 
 ### P4.4 — Keep Barrett/Montgomery reducers experimental until measured
 
@@ -2021,6 +2069,36 @@ is authorized by this report-only task.
 - [ ] Include encoded one (`R % n`), coordinate/parameter conversion and
   canonical exits in reducer oracles. Prove any GCD invariance using the unit
   scaling assumption; a reducer does not authorize dropping nonunit recovery.
+
+### P4.5 — Experiment with GMP-ECM precomputed Lucas chains (C6)
+
+**Deferred at the user's request on 5 October 2026 to conserve the current
+session's token budget.** This is a separate future tranche, not part of A4's
+completion. Its result must not be inferred from checked PRAC's timings.
+
+- [ ] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
+  decode with the upstream implementation and independently verify every
+  integer/differential identity. Compare precomputed PRAC and Lucas chains
+  through the same compact executor, preserving bounded nonunit/factor
+  recovery. GMP-ECM uses a 16-point rolling buffer; the newer continued-fraction
+  paper's three-live-point interpreter is a distinct candidate.
+- [ ] Run ladder, precomputed PRAC and Lucas arms on the same certified
+  40/50/60/70/80-digit corpus, seeds, bounds and curve limits, with Python-int
+  and gmpy2 variants. Separate input digits from factor digits. Include
+  generation/load/verification, storage, dispatch, recovery, cold startup,
+  full stage-one and complete two-stage campaign costs; retain unresolved
+  cofactors and the ladder control. Coordinate exclusive timing windows.
+- [ ] Compare bounded/offline continued-fraction search using the 2025
+  Bernstein–Cottaar–Lange pruning/meet-in-the-middle work when warranted.
+  Distinguish minimal length within a chain family, near-optimal search,
+  weighted arithmetic cost and measured runtime; do not claim a global
+  optimum without a proof. No online search over the full-lcm scalar.
+- **A:** independent affine/composite/prime-power tests, including GMP-ECM's
+  published false-infinity regression, retain every proper factor and enforce
+  finite generation, cache and recovery bounds.
+- **E:** at least three seconds of validated PyPy warmup and nine paired
+  samples, extending unstable captures. Promote only after complete-run
+  evidence. B3 owns subsequent bounded-stage/checkpoint integration.
 
 **Phase 4 exit:** promote only variants with independently validated arithmetic and reproducible full-stage/portfolio benefit. A documented decision to retain the ladder or native `%` is a successful experiment outcome; a speedup is not guaranteed.
 
@@ -2052,14 +2130,57 @@ execution tables above for dependencies, priority and model/effort rationale.
 
 ### P5.2 — Pair ECM stage-2 primes and tune table size
 
+**A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
+immutable packed prime/power blocks under an explicit run-local cap. Generation,
+power compilation and reads are charged; blocks that do not fit regenerate.
+Curve points and replay stay private. Disabled programs retain the version-4
+schema and original work accounting; enabled programs use version 5 with the
+program identity and rebuild under the cumulative allowance after a resume.
+The final tiny-buffer repair admits prime 2 alongside one odd slot and retains
+exact checkpoint-buffer verification.
+
+- [x] Compile bounded reusable prime/power programs and +/- coverage fixtures;
+  verify exact LCM powers, streamed candidate actions, independent eligible-prime
+  coverage and affine point cross-products, including exceptions, positive
+  initialization, block boundaries and tails. Coverage supports direct records
+  or even D >= 2 with 2D below the initial odd scalar. It is an oracle/fixture
+  contract; production paired products and a broader D sweep remain B2 work.
+- [x] Compare retained 8 MiB programs with the frozen int control, current
+  streamed default and capped regeneration using certified fresh inputs,
+  validated PyPy warmup and at least nine samples. Retain defaults: small complete
+  factoring is 5.3% slower, medium is inconclusive, and a fixed nonsplitting
+  11,000/1,900,000 campaign is 8.3% faster. Three-pass schedule-only savings of
+  24.7% and 28.8% at the two larger tiers do not establish factoring gains.
+- [x] Define finite predeclared campaigns and workspace/bound envelopes. A
+  329-bit envelope with 16 MiB workspace admits the tested larger tiers with
+  an 8 MiB program cap. Identical-config resume credits completed curves, RNG
+  progress and buffered actions; cumulative budget extension is supported.
+  Adding curves or raising bounds on an exhausted config remains unsupported.
+
+All 323 PyPy tests and full lint pass. The matched experiment summary, owned
+storage/work probes, cold results and limitations are in `benchmarks/README.md`.
+The first constructed curve costs more; retained blocks amortize across later
+curves. Regeneration-only packing loses, and the default-bound schedule timing
+remains inconclusive after extended sampling. Acceptance settles A3 without
+promoting defaults. The additional certified 30–80-digit workload exploration
+preserves validated finite completion records, with overlapping timings
+explicitly diagnostic. The user deferred the full expanded
+study, 256-curve campaigns and larger-bound probes; those gates remain open.
+A requested focused quiet pass verifies 15.7%/13.1% savings on fixed eight-curve
+60/80-digit campaigns, without factors or a population-wide size/success claim.
+The A3 branch passed 323 tests, lint and all 50 benchmark imports.
+Combined A3/A4 mainline acceptance passes 337 system-PyPy tests and three
+optional GMP checks in the existing PyPy venv, full lint and all 54 benchmark
+imports on a committed-files-only candidate. Full P5.2 is still open below.
+
 - [ ] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence or explicitly redesigning it.
 - **A:** paired/unpaired schedules cover the same eligible primes; stage-2 terms and recovered factors validate. Product checkpoints handle early, late, and mixed-factor saturation; tail primes are included.
 - **E:** measure baby/giant steps, relation products, replay, setup, and RSS across B1/B2/D grids. Choose D by total continuation cost and factor yield, not simply `isqrt(B2)`.
 
-- [ ] Build an independent eligible-prime oracle for pairing, including
-  projective cross-products, D exceptions, initialization and final buckets.
-  Tune D using actual prime occupancy and simultaneous table/product/replay
-  storage, not an asymptotic square-root estimate alone.
+- [ ] B2: consume the accepted independent eligible-prime/cross-product
+  oracles in production pairing; validate products, replay and resumed curve
+  tables. Tune D using actual prime occupancy and simultaneous table/product/
+  replay storage, not an asymptotic square-root estimate alone.
 
 - [ ] Compare wheel/coprime-distance plans with explicit prime-to-term
   coverage certificates, including pruning when an existing `v*w +/- u`
@@ -2071,28 +2192,26 @@ execution tables above for dependencies, priority and model/effort rationale.
   mixed-factor saturation replay, and charge setup/table/product storage.
   Nonunit scaling over composite n is not projective equivalence.
 
-- [ ] Compile reusable, immutable bound-owned prime-power and paired
-  stage-two coverage programs, while keeping curve points private. Current
-  production jobs repeatedly request 2,048-wide prime segments, churning the
-  eight-entry schedule cache across multi-million B2 runs; cached powers/gaps
-  are not consumed by those jobs. Compare bounded program blocks, packed
-  schedules and regeneration, charging generation/reads/amortization across
-  curves and interrupted resumes. Prioritize this alongside paired products:
-  exploratory profiles show schedule generation can rival point arithmetic.
+- [ ] B2: execute the accepted immutable +/- coverage programs with
+  curve-private point tables, tuned D and mixed-factor recovery. A3 programs
+  already supply exact prime powers to production stage one and primes to
+  unpaired stage two. Extend matched whole-continuation comparisons to paired
+  products, charging tables, products, replay and interrupted rebuilds.
 - [ ] Allocate ECM by target factor size and expected marginal success per
   total CPU-second across the sub-100 classes. Allow caller-selected finite
   curve/bound/storage tiers with sufficient work to finish them and cumulative
   extension; current 2,000,000-unit default cannot complete one 50,000/5,000,000
-  curve in the existing deterministic work probe (4,081,645 units required).
+  curve in the A3 nonsplitting work probe (4,080,627 units before context setup).
   Native GMP-ECM curve tables supply hypotheses, not PyPy defaults, guaranteed
   success or evidence that ECM is economical for balanced 90–99-digit n.
-- [ ] Size the portfolio's modulus envelope and storage together with tiers.
+- [x] A3: size explicit modulus envelopes and storage together with tiers.
   All below-100-digit inputs fit 329 bits, while the default reservation uses
-  4,096 bits. Exact current-formula probes reserve 9,304,064 bytes for an
+  4,096 bits. Current-formula probes reserve 9,304,064 bytes for an
   11,000/1,900,000 ECM tier with that default envelope, exceeding 8 MiB before
-  execution; a 329-bit campaign reserves 2,665,104 bytes. Larger tiers still
-  need explicit storage. These are conservative owned-workspace estimates,
-  not RSS measurements; preserve validated bounds and checkpoint overhead.
+  execution; a 329-bit streamed campaign reserves 2,665,104 bytes. Reserving an
+  8 MiB program cap raises it to 11,053,712 bytes, within an explicit 16 MiB
+  workspace. These are conservative owned-workspace estimates, not RSS;
+  larger tiers still require validated explicit allowances.
 - [ ] Distinguish cheap automatic ECM pretesting from explicit ECM-only or
   factor-target campaigns, crediting prior completed curves/bounds instead
   of restarting work. Current YAFU and yamaquasi provide concrete allocation
@@ -2547,7 +2666,7 @@ open until the useful gaps are transferred or have recorded decisions.
 | --- | --- | --- |
 | Wider fixed-base primality tables in `v1/utils.py` | The first-12/13-prime-base ranges have independent published bounds; v2 currently certifies only below `2**64`. The reported 23-digit prime lies in the first-12 range. | A10 implements verified ranges; B14 adds certificates beyond them. Do not copy unsupported higher table entries. |
 | Larger input-dependent ECM bounds and up to 10,000 curves | v2's default tier is B1/B2 2,000/147,396 with 32 curves. v1 permits more search, but extra allowance alone proves no speed or completion advantage. | A3 makes larger campaigns feasible; C3 measures bound/curve allocation and SIQS handoff; G1 combines the final policy. |
-| Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; v2 streams exact schedules, with reusable bound-owned programs still planned. This is a concrete comparison candidate, not a validated performance win. | A3/B2 (P5.2), retaining exact powers, finite storage and charged replay. |
+| Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; A3 now supplies bounded opt-in packed prime/power programs. Retention saves larger schedule/finite-curve work but small complete factoring regresses; defaults remain streamed. | A3 accepted; B2 (P5.2) adds paired execution while retaining exact powers, finite storage and charged replay. |
 | PRAC and Montgomery kernels | Corrected ladder arithmetic already exists in v2. Legacy exceptional-state failures prevent treating PRAC as a ready-made faster replacement. | A4/B3 (P4.1) validate chains first; B4 (P4.2) compares whole-engine kernel costs. |
 | Atkin/Eratosthenes/segmented sieve variants | v2 retains these families with corrected boundaries and local state; no independent v1 speed advantage has been established. | E6 (P8.6) only if a validated setup/sieve bottleneck supports a challenger; retain corrected output contracts. |
 | Two-stage p−1 and Brent rho | Both are already present in v2; bounded p−1 participates in its recursive portfolio. Parameter/continuation tuning is not a missing-method port. | A6 (P5.3) owns p−1 powering/continuation, E4 (P8.3) owns rho calibration, and G1 (P8.4) combines the measured policy. |

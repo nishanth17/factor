@@ -21,6 +21,43 @@
   a fivefold longer 50-digit run confirms the loss. Keep native loops as the
   provisional default. The user ended further experiments, with disjoint
   confirmation and automatic selection still open.
+- Integrate the optional GMP boundary with verified PRAC and reusable ECM
+  programs. Preserve native portfolio checkpoint schemas 4/5, use version 6
+  for combined GMP identity, and accept pre-integration backend snapshots.
+  Verify program resume on both backends and PRAC against an independent
+  point oracle; retain the existing ladder and streamed defaults.
+
+- Complete the P4.1/A4 chain-correctness tranche and connect verified PRAC
+  to `ecm.multiply_prac`. Separate bounded exact-rational generation from
+  independent integer verification and checked point execution; retain a
+  finite cache and one ladder retry. Expose proper factors or curve-retry
+  outcomes through `prac.NonunitPointError`, never a degenerate point.
+- Add independent affine, large-field, composite/prime-square and complete
+  prime-power schedule controls, plus reproducible PyPy cost measurements.
+  Compare full two-stage attempts on certified 40–80-digit composites with
+  matched Python-int/gmpy2 ladder and checked-PRAC arms; validate every factor,
+  unresolved cofactor and uncensored backend transition. Keep microbenchmarks
+  separate from complete-campaign evidence.
+  Preserve production ladder defaults. B3 integration remains open; defer
+  GMP-ECM precomputed Lucas chains and compact execution to the separate
+  P4.5/C6 experiment at the user's request.
+
+- Add P5.2 A3's opt-in immutable packed ECM prime/power blocks with bounded
+  retention, charged regeneration and curve-private arithmetic. Preserve
+  streamed defaults and version-4 snapshots; opt-in version-5 checkpoints pin
+  schedule/configuration identity and retain cumulative resume allowances.
+  Correct the resume cursor's odd-slot bound when prime 2 shares a tiny buffer.
+- Add independent +/- prime-coverage certificates and affine cross-product
+  oracles for the later paired executor. Document feasible explicit campaign
+  storage/work and predeclared-curve continuation; keep paired execution,
+  increased-B1 continuation, D tuning and allocation calibration open.
+
+- Add independently certified 30–80-digit ECM workload fixtures and prepared
+  finite deeper-campaign/large-bound runners with exclusive timing checks.
+  Preserve exploratory completion records and verify a focused fixed-curve
+  60/80-digit timing pass; defer broader timing and large-factor success claims
+  after the user ended the expanded study early. Freeze the original
+  control helpers separately without altering its immutable source snapshot.
 
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`

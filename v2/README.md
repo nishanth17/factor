@@ -27,8 +27,44 @@ global deadline or resumable schedule.
 v2 fixes arithmetic and sieve boundaries, validates proper divisors, preserves
 failed recursive cofactors, and distinguishes probable from proven primes.
 Rho retries and ECM curve counts have explicit limits; saturated batches recover
-or report failure. ECM uses the checked binary ladder; the unsafe original PRAC
+or report failure. ECM uses the binary ladder; the unsafe original PRAC
 chain is not the default.
+
+`ecm.multiply_prac(k, x, z, n, a24)` now executes experimental verified PRAC
+records. It returns a valid projective pair or raises
+`prac.NonunitPointError`: its `factor` attribute is a proper divisor, or
+`None` requests a curve retry. This is a deliberate change from the former
+ladder wrapper; callers must handle that exception. Coordinates can differ
+from the ladder by projective scaling. Supply a point on a nonsingular
+Montgomery curve over an odd modulus, with `a24=(A+2)/4`, as returned by
+`ecm.setup_curve`.
+
+Generation uses exact rational splits for the odd part of scalars of at most
+32 bits, with at most 30 candidates and 512 instructions each. This bounds
+each prime/prime-power multiplier, not the integer being factored: the
+modulus can have 40–80 digits or more. A 512-record
+LRU cache contains immutable integer records, never curve points. Each
+record receives a separate integer/differential verification. Larger
+scalars use a checked ladder without chain search. Zero, one, powers of two,
+infinity and the order-two point have explicit handling.
+
+Execution checks intermediate projective states and reports nonunit factors.
+An exceptional difference triggers at most 513 additional GCDs on retained
+coordinates and one ladder retry from the original point; `(0,0)` is never
+a successful point. `prac.get_chain`, `verify_chain`, `clear_cache` and
+`cache_info` expose the bounded record interface. `prac.multiply(...,
+chain=record)` re-verifies caller-supplied records before execution. Cost
+weights are positive integers of at most 32 bits; defaults model 4M+2S for
+addition and 3M+2S for doubling. They are not runtime speed estimates.
+
+This completes the P4.1/A4 correctness tranche. Both `factorize_ecm` and the
+bounded stage jobs still use the binary ladder. The [benchmark guide](
+benchmarks/README.md#p41a4-verified-prac-5-october-2026) separates kernel
+diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
+including matched optional gmpy2 arms. These are experimental comparisons;
+B3 owns program composition, shared work accounting, checkpoint/replay
+integration and complete-factorization comparisons. The standalone PRAC
+helper has no portfolio budget or checkpoint contract.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
@@ -165,12 +201,15 @@ and serialized checkpoints contain canonical Python integers. Certainty,
 witness selection, seeds, bounds and logical work reservations are shared
 across the two tracks; GMP primality shortcuts do not upgrade classifications.
 
-New checkpoint versions are portfolio **5**, SIQS/SSS **3**, parallel SIQS
-**4**, and polynomial family **2**. They bind progress to the selected backend;
+GMP portfolio checkpoints use version **6**, including reusable ECM programs.
+Native portfolio formats remain **4** for streamed execution and **5** for
+programs. SIQS/SSS use **3**, parallel SIQS **4**, and polynomial families **2**.
+They bind progress to the selected backend;
 GMP identity includes gmpy2 and GMP versions. Resume rebuilds only arithmetic
 values as `mpz`, retaining native counters/cursors and cumulative resources.
 Backend/build mismatches are rejected. Older supported integer checkpoints
 remain readable on `python-int`; they cannot silently become GMP jobs.
+Pre-integration P4.3 version-5 backend snapshots also remain readable.
 GIL tuning and thread promotion remain separate experiments.
 
 ## Library and result contracts
@@ -220,6 +259,72 @@ resumed = factorize_bounded(
 `PortfolioConfig(sss=SSSConfig(...))` enables SSS. Their classes live in
 `v2.qs` and `v2.qs.sss`, respectively. Advanced settings and exact relation
 contracts are documented in the module docstrings and covered by the tests.
+
+## Optional ECM programs and explicit campaigns
+
+`PortfolioConfig(ecm_program_bytes=...)` opts into P5.2 A3's immutable packed
+prime/power blocks. Each block owns half-open endpoints and, for stage one,
+the inclusive B1 identity. Completed blocks are reused across curves and
+recursive cofactors; points, residues, products and recovery remain private to
+each job. `0` retains streamed execution and the native version-4 checkpoint
+schema. GMP snapshots use version 6. This is an experimental storage option,
+not a promoted default.
+
+The program cap is part of `memory_bytes`, with a scratch reserve of
+`4096 + 256 * segment_size` bytes and a 512-byte allowance per retained block
+plus packed payloads. A full cap causes regeneration rather than eviction or
+an unbounded allocation. Packed programs require B2 strictly below `2**64`;
+the streamed integer API retains its existing endpoint domain. Owned reserves
+are conservative estimates, not process RSS limits.
+
+Generation reserves `segment_size + len(base_primes)` units per block,
+plus one unit per prime for packing/reading and one per compiled stage-one
+power. A retained block reserves one unit per decoded prime. Stage-one copying,
+point arithmetic and recovery keep their existing charges. Program and streamed
+work counts therefore differ; reduced work counts alone establish no speedup.
+
+Programs are run-local and omitted from checkpoints. Opt-in snapshots use
+version 5 for native arithmetic or 6 for GMP and the `ecm-packed-blocks-v1`
+identity; old version-2/3/4 snapshots
+remain readable with programs disabled. Resume preserves the prime buffer,
+curve assignment, recovery and consumed allowances, but charges for regenerating
+missing future blocks. Powers for an already-buffered resumed segment can be
+recomputed under the existing copy reservation. A refusal during compilation
+publishes no partial block or advanced cursor, although completed generation
+work stays consumed.
+
+For an explicit finite campaign, declare all curve tiers up front and choose
+work, time and storage together. A 329-bit envelope admits every integer below
+100 decimal digits and avoids the default 4096-bit coordinate reserve:
+
+```python
+config = PortfolioConfig(
+    rho_attempts=0, pm1_attempts=0,
+    ecm_tiers=((11_000, 1_900_000, 10),),
+    max_input_bits=329, memory_bytes=16 * 2**20,
+    ecm_program_bytes=8 * 2**20,
+)
+run = factorize_bounded(
+    n, seed=7, config=config,
+    budget=Budget(work_limit=50_000_000, seconds=300, cpu_seconds=300),
+)
+assert run.result.reconstruct() == n
+```
+
+These are caller-selected allowances, not calibrated factor-size tiers or a
+success guarantee. Extend a paused campaign by increasing **total** allowances
+under the identical configuration; completed curves and their RNG progress are
+credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
+checkpoint, or extending B1 on the same curve, remains unsupported pending
+B2/A6: increasing B1 needs missing powers of old primes as well as new primes.
+
+`v2.ecm_programs.pair_coverage()` supplies bounded immutable +/- coverage
+certificates for the later B2 implementation. It includes direct-scalar
+exceptions, positive recurrence initialization and block tails. This bounded
+compiler currently accepts D=0 (direct scalars), or even D>=2 with
+`2*D < B1` for odd B1 and `2*D < B1-1` for even B1. Production
+stage two still executes the existing unpaired terms; D tuning, paired recovery,
+wheel pruning and common-Z tables retain their roadmap gates.
 
 ## Checkpoints and limits
 

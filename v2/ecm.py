@@ -1,14 +1,14 @@
 """Two-stage Montgomery ECM with modular Suyama setup and exact limits.
 
-The readable ladder is the Phase 1 baseline. Unsafe original PRAC chains are
-quarantined: multiply_prac delegates to the ladder until Phase 4 validation.
+The readable ladder remains the production baseline. The experimental
+multiply_prac entry point uses bounded, verified records and checked recovery.
 """
 
 from dataclasses import dataclass
 from math import prod
 from typing import Optional, Tuple
 
-from . import arithmetic, constants, prime_sieve, utils
+from . import arithmetic, constants, prac, prime_sieve, utils
 from .arithmetic import gcd, isqrt, pow
 
 Point = Tuple[int, int]
@@ -131,8 +131,13 @@ def scalar_multiply(scalar, px, pz, n, a24):
 
 
 def multiply_prac(scalar, px, pz, n, a24):
-    """Safe ladder fallback; production PRAC is intentionally disabled."""
-    return scalar_multiply(scalar, px, pz, n, a24)
+    """Experimental verified PRAC; return X:Z or raise prac.NonunitPointError.
+
+    The exception carries a proper factor, or factor=None for curve retry.
+    Large scalars and exceptional differences use a checked ladder. This
+    entry point is opt-in; factoring jobs retain scalar_multiply until B3.
+    """
+    return prac.multiply(scalar, (px, pz), n, a24, point_add, point_double)
 
 
 def stage_one_scalar(b1, *, backend="python-int"):

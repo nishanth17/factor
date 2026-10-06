@@ -13,7 +13,7 @@ def prime_cursor(lo, hi):
     return {"left": lo, "next": lo, "hi": hi, "values": [], "index": 0}
 
 
-def peek_prime(cursor, context, budget):
+def peek_prime(cursor, context, budget, *, power_bound=None):
     """Return the next prime without committing consumption.
 
     Segment generation is charged before replacing the buffer. At most one
@@ -24,13 +24,17 @@ def peek_prime(cursor, context, budget):
         if left >= cursor["hi"]:
             return None
         right = min(cursor["hi"], left + 2 * context.segment_size)
-        budget.consume(context.segment_size + len(context.base_primes))
-        segment = getattr(context, "prime_segment", None)
-        values = (
-            list(context.primes(left, right))
-            if segment is None
-            else segment(left, right)
-        )
+        program = getattr(context, "program_segment", None)
+        if program is not None:
+            values = program(left, right, budget, bound=power_bound)
+        else:
+            budget.consume(context.segment_size + len(context.base_primes))
+            segment = getattr(context, "prime_segment", None)
+            values = (
+                list(context.primes(left, right))
+                if segment is None
+                else segment(left, right)
+            )
         cursor.update(left=left, next=right, values=values, index=0)
 
     return cursor["values"][cursor["index"]]
@@ -181,7 +185,7 @@ def _stage_one(job, budget, context, config):
     prime = (
         None
         if len(job["powers"]) >= config.chunk_size
-        else peek_prime(job["cursor"], context, budget)
+        else peek_prime(job["cursor"], context, budget, power_bound=job["b1"])
     )
     if prime is not None and len(job["powers"]) < config.chunk_size:
         cursor = job["cursor"]
@@ -190,9 +194,26 @@ def _stage_one(job, budget, context, config):
             len(cursor["values"]) - cursor["index"],
         )
         budget.consume(count)
-        for _ in range(count):
+        read_powers = getattr(context, "power_values", None)
+        powers = (
+            read_powers(
+                cursor["left"],
+                cursor["next"],
+                job["b1"],
+                cursor["index"],
+                count,
+            )
+            if read_powers is not None
+            else None
+        )
+        for position in range(count):
             prime = cursor["values"][cursor["index"]]
-            job["powers"].append([prime, utils.prime_power(prime, job["b1"])])
+            power = (
+                powers[position]
+                if powers is not None
+                else utils.prime_power(prime, job["b1"])
+            )
+            job["powers"].append([prime, power])
             take_prime(cursor)
         return
 

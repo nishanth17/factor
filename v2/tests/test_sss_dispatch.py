@@ -206,7 +206,7 @@ class SSSDispatchTests(unittest.TestCase):
         )
 
         self.assertTrue(resumed.result.complete)
-        self.assertEqual(resumed.checkpoint["payload"]["version"], 5)
+        self.assertEqual(resumed.checkpoint["payload"]["version"], 4)
 
     def test_cli_selection_full_output_and_checkpoint_resume(self):
         n = 100003 * 100019

@@ -422,7 +422,7 @@ class EcmTests(unittest.TestCase):
 
         self.assertEqual(seen, {"factor", "retry", "curve"})
 
-    def test_ladder_and_prac_fallback_against_affine_oracle(self):
+    def test_ladder_and_prac_against_affine_oracle(self):
         modulus, curve_a = 1009, 6
         point = (3, 293)
         a24 = (curve_a + 2) * pow(4, -1, modulus) % modulus
@@ -441,9 +441,9 @@ class EcmTests(unittest.TestCase):
                     (actual[0] - expected[0] * actual[1]) % modulus, 0, scalar
                 )
 
-            self.assertEqual(
-                ecm.multiply_prac(scalar, point[0], 1, modulus, a24), actual
-            )
+            px, pz = ecm.multiply_prac(scalar, point[0], 1, modulus, a24)
+            self.assertNotEqual((px, pz), (0, 0))
+            self.assertEqual((px * actual[1] - pz * actual[0]) % modulus, 0)
 
     def test_invalid_scalar_and_projective_pair(self):
         with self.assertRaises(ValueError):

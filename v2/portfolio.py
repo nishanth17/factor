@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass, field
 from . import arithmetic, constants, prime_sieve, utils
 from .arithmetic import isqrt
 from .budget import Budget, BudgetExhaustedError
+from .ecm_programs import PROGRAM_VERSION, ECMPrograms
 from .factor import FactorizationResult, PrimeFactor
 from .preprocessing import (
     fermat_step,
@@ -28,7 +29,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 5
+CHECKPOINT_VERSION = 6
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -64,6 +65,7 @@ class PortfolioConfig:
     rolling: bool = False
     siqs: SIQSConfig | None = None
     sss: SSSConfig | None = None
+    ecm_program_bytes: int = 0
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -89,6 +91,7 @@ class PortfolioConfig:
             "segment_size": 1,
             "trial_chunk": 1,
             "schedule_cache_bytes": 0,
+            "ecm_program_bytes": 0,
             "max_input_bits": 2,
             "trace_limit": 0,
         }
@@ -118,6 +121,12 @@ class PortfolioConfig:
             utils.require_integer(b1, "B1", 2)
             utils.require_integer(b2, "B2", b1)
             utils.require_integer(curves, "curves", 0)
+
+        if self.ecm_program_bytes:
+            if self.ecm_program_bytes < 4096 + 256 * self.segment_size:
+                raise MemoryError("ECM program scratch exceeds configured cap")
+            if any(b2 >= 2**64 for _, b2, curves in tiers if curves):
+                raise ValueError("ECM programs require B2 below 2**64")
 
         object.__setattr__(self, "ecm_tiers", tiers)
         if self.siqs is not None and self.sss is not None:
@@ -183,6 +192,7 @@ class PortfolioConfig:
             + 1024 * self.trace_limit
             + 256 * self.chunk_size
             + self.schedule_cache_bytes
+            + self.ecm_program_bytes
         )
 
 
@@ -327,7 +337,9 @@ def _classify_step(current, config, budget, generator):
     return None
 
 
-def _advance(state, config, budget, context, generator, siqs_runtime):
+def _advance(
+    state, config, budget, context, generator, siqs_runtime, programs=None
+):
     """Commit one portfolio transition or one resumable candidate action."""
     if state["current"] is None:
         if not state["pending"]:
@@ -591,7 +603,10 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
 
     job = current["job"]
     started = time.perf_counter()
-    advance_job(job, budget, context, config)
+    job_context = (
+        programs if kind == "ecm" and programs is not None else context
+    )
+    advance_job(job, budget, job_context, config)
     phase = job["phase"]
     timing_key = f"{kind}:{phase}"
     state["stage_seconds"][timing_key] = (
@@ -622,11 +637,25 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
 def _pack(state, config, budget, generator):
     """Snapshot RNG, pending work, schedule identity, and resource use."""
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
+    configuration = asdict(config)
+    version = CHECKPOINT_VERSION
+    if config.backend == "python-int":
+        # Preserve mainline's native schemas. Version 5 was independently
+        # used by P4.3 and P5.2; version 6 combines GMP and program identity.
+        version = 5 if config.ecm_program_bytes else 4
+        configuration.pop("backend")
+        for name in ("siqs", "sss"):
+            if configuration[name] is not None:
+                configuration[name].pop("backend")
+    if not config.ecm_program_bytes:
+        configuration.pop("ecm_program_bytes")
     payload = {
-        "version": CHECKPOINT_VERSION,
-        "schedule": SCHEDULE_VERSION,
+        "version": version,
+        "schedule": PROGRAM_VERSION
+        if config.ecm_program_bytes
+        else SCHEDULE_VERSION,
         "backend": arithmetic.get_backend(config.backend).identity,
-        "config": asdict(config),
+        "config": configuration,
         "state": state,
         "rng": generator.getstate()
         if (state["pending"] or state["current"] is not None)
@@ -708,7 +737,23 @@ def _verify_progress(current, config):
     if current["job"]:
         if current["job"]["kind"] != current["stage"]:
             raise ValueError("candidate kind disagrees with portfolio stage")
-        cursors.append(current["job"].get("cursor"))
+        job = current["job"]
+        if config.ecm_program_bytes and job["kind"] == "ecm":
+            tier = utils.require_integer(current["tier"], "ECM tier", 0)
+            if tier >= len(config.ecm_tiers):
+                raise ValueError(
+                    "ECM program tier exceeds configured campaign"
+                )
+            b1, b2, curves = config.ecm_tiers[tier]
+            attempt = utils.require_integer(
+                current["attempt"], "ECM attempt", 0
+            )
+            if attempt >= curves or (job["b1"], job["b2"]) != (b1, b2):
+                raise ValueError("ECM program bounds disagree with campaign")
+            stage_one = job["phase"] in ("setup", "stage_one", "replay")
+            if job["cursor"]["hi"] != (b1 + 1 if stage_one else b2 + 1):
+                raise ValueError("ECM program cursor has the wrong endpoint")
+        cursors.append(job.get("cursor"))
     if not any(cursor is not None for cursor in cursors):
         return
     verifier = SieveContext(config.max_hi, segment_size=config.segment_size)
@@ -718,13 +763,15 @@ def _verify_progress(current, config):
             continue
         for name in ("left", "next", "hi", "index"):
             utils.require_integer(cursor[name], name, 0)
+        # The odd-slot bound excludes 2, which can share a tiny first block
+        # with every odd candidate. Exact buffer verification still follows.
+        max_values = config.segment_size + int(
+            cursor["left"] <= 2 < cursor["next"]
+        )
         if not (
             cursor["left"] <= cursor["next"] <= cursor["hi"] <= config.max_hi
             and cursor["next"] - cursor["left"] <= 2 * config.segment_size
-            and 0
-            <= cursor["index"]
-            <= len(cursor["values"])
-            <= config.segment_size
+            and 0 <= cursor["index"] <= len(cursor["values"]) <= max_values
         ):
             raise ValueError("invalid buffered prime metadata")
 
@@ -763,6 +810,10 @@ def _unpack(checkpoint, config):
             raise ValueError("checkpoint checksum mismatch")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if not config.ecm_program_bytes and (
+            "ecm_program_bytes" not in payload["config"]
+        ):
+            expected_config.pop("ecm_program_bytes")
         legacy = config.sss is None and (
             payload["version"] == 3
             or (payload["version"] == 2 and config.siqs is None)
@@ -771,7 +822,7 @@ def _unpack(checkpoint, config):
             expected_config.pop("sss")
         if payload["version"] == 2 and legacy:
             expected_config.pop("siqs")
-        if payload["version"] < 5 and "backend" not in payload["config"]:
+        if payload["version"] < 6 and "backend" not in payload["config"]:
             expected_config.pop("backend")
             for name in ("siqs", "sss"):
                 if expected_config.get(name) is not None:
@@ -779,9 +830,21 @@ def _unpack(checkpoint, config):
 
         if (
             type(payload["version"]) is not int
-            or payload["version"] not in (2, 3, 4, CHECKPOINT_VERSION)
+            or payload["version"] not in (2, 3, 4, 5, CHECKPOINT_VERSION)
             or (payload["version"] in (2, 3) and not legacy)
-            or payload["schedule"] != SCHEDULE_VERSION
+            or (payload["version"] < 5 and config.ecm_program_bytes != 0)
+            or (payload["version"] < 5 and config.backend != "python-int")
+            or (
+                payload["version"] == 5
+                and "backend" in payload["config"]
+                and config.ecm_program_bytes != 0
+            )
+            or payload["schedule"]
+            != (
+                PROGRAM_VERSION
+                if config.ecm_program_bytes
+                else SCHEDULE_VERSION
+            )
             or payload["backend"]
             != arithmetic.get_backend(config.backend).identity
             or payload["config"] != expected_config
@@ -1019,12 +1082,25 @@ def factorize_bounded(
             context = ScheduleCache(
                 context, cache_bytes=config.schedule_cache_bytes
             )
+        programs = (
+            ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+            if config.ecm_program_bytes
+            else None
+        )
         while state["pending"] or state["current"] is not None:
             stage = (
                 state["current"]["stage"] if state["current"] else "dispatch"
             )
             started = time.perf_counter()
-            _advance(state, config, budget, context, generator, siqs_runtime)
+            _advance(
+                state,
+                config,
+                budget,
+                context,
+                generator,
+                siqs_runtime,
+                programs,
+            )
             state["stage_seconds"][stage] = (
                 state["stage_seconds"].get(stage, 0)
                 + time.perf_counter()
