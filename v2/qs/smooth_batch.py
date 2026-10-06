@@ -1,8 +1,7 @@
 """Capped product/remainder trees with complete smooth-part detection."""
 
-from math import gcd
-
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import gcd
 from ..budget import Budget
 
 
@@ -87,6 +86,7 @@ class SmoothBatch:
         self,
         primes,
         *,
+        backend="python-int",
         budget=None,
         max_bits=262144,
         max_nodes=8192,
@@ -108,8 +108,9 @@ class SmoothBatch:
                 raise ValueError("smoothness base contains a composite")
             previous = prime
 
+        engine = arithmetic.get_backend(backend)
         tree = product_tree(
-            primes,
+            tuple(engine.integer(prime) for prime in primes),
             budget=self.budget,
             max_bits=max_bits,
             max_nodes=max_nodes,
@@ -155,6 +156,6 @@ class SmoothBatch:
                 self.budget.consume(2 * value.bit_length())
                 remainder = remainder * remainder % value
             self.budget.consume(value.bit_length())
-            output.append(value // gcd(value, remainder))
+            output.append(arithmetic.divexact(value, gcd(value, remainder)))
 
         return tuple(output)

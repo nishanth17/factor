@@ -219,7 +219,7 @@ development and coordinated integration, not concurrent performance runs.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | ~~A1 — P3.8-R2 integration and acceptance~~ | ~~Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports.~~ | ~~Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions~~ | ~~**[x] Complete for bounded scope; merged as `758d5b3`.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence.~~ | ~~Current Sol / **xhigh**~~ | ~~Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation.~~ |
-| A2 — P4.3 backend foundation | Specify coarse int/mpz boundaries; implement and validate specialized baseline ladder/stage paths, canonical checkpoints and explicit backend identity; compare available PyPy tracks. | Existing exact ECM and checkpoint controls | **High, bounded experiment.** Broad arithmetic costs make this a useful early test and it settles interfaces for later ECM work. Installed gmpy2 is availability evidence, not a speedup; retain int if GMP loses. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
+| A2 — P4.3 backend foundation | **Foundation implemented; size-dependent experiment gate reopened:** explicit int/mpz boundaries across the current engines, exact helpers, typed arithmetic loops, canonical checkpoints and backend/build identity. | Existing exact arithmetic and checkpoint controls | **In progress on 5 October 2026.** The first study uses an eight-digit QS fixture and small ECM bounds; it cannot settle algorithm/size selection. Compare realistic ECM campaigns, reachable larger QS collectors and selective GMP helpers before closing that decision. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
 | A3 — P5.2 reusable programs and campaign feasibility | Build bounded immutable prime-power/coverage programs and independent coverage oracles; compare schedule reuse on the current int control; define finite curve/bound/storage/extension contracts, including feasible larger campaigns suggested by v1. | Existing P2 schedules, recovery and ECM | **High.** Research identified repeated schedule generation and infeasible allowance combinations. Reusing bound-owned work across curves can matter without changing curve mathematics. This planning/schedule tranche does not need PRAC or GMP. | Sol / **xhigh** | Sol fits schedule construction and oracle-driven implementation. xhigh is warranted because coverage, amortization, memory limits and resumed execution must agree, even when individual arithmetic actions are unchanged. |
 | A4 — P4.1 chain correctness | Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder. | Existing exact point/ladder controls | **Medium/high potential, higher proof risk.** Mathematical validation can run independently of backend implementation. It must precede production chain execution; old exceptional `(0,0)` cases do not count as equality successes. | Astra / **xhigh** | Choose Astra for the proof-intensive chain invariants and exceptional composite-modulus cases. xhigh supports checking termination and valid projective states against independent oracles before production use. |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
@@ -1930,7 +1930,7 @@ before P7.6 GNFS scaling. Keep one supported runtime, PyPy Python 3.11.
 Canonical scalar serialization and backend identity must survive checkpoints;
 resume must reject an incompatible backend rather than silently converting it.
 
-- [ ] Introduce a coarse arithmetic boundary with specialized hot loops, avoiding per-multiply virtual dispatch. Keep long-lived GMP values as `mpz`; small indices remain Python integers. Implement backend-consistent GCD, powering, inversion, roots, and exact division contracts.
+- [x] Introduce a coarse arithmetic boundary with specialized hot loops, avoiding per-multiply virtual dispatch. Keep long-lived GMP values as `mpz`; small indices remain Python integers. Implement backend-consistent GCD, powering, inversion, roots, and exact division contracts.
 - **A:** every available backend passes the same result/certainty suite; conversions and missing dependencies have explicit behavior. `divexact` follows a divisibility check; failed inversion retains factor information.
 - **E:** compare PyPy Python 3.11 built-in integers and gmpy2 only where available on that runtime. Include import/startup, conversion, schedule, and whole-stage costs. Record unavailable environments without inventing speedup estimates; keep dependency-free and GMP results separate. No CPython support or comparison is required.
 
@@ -1939,19 +1939,78 @@ gmpy2 2.3.1 with GMP 6.3.0; the system PyPy has no gmpy2 installation. Both
 implement Python 3.11.15 on PyPy 7.3.23. The available venv enables the GMP
 comparison track; it does not close backend implementation or performance gates.
 
-- [ ] Resolve the actual backend boundary: point formulas accept mpz, but
+- [x] Resolve the actual backend boundary: point formulas accept mpz, but
   the public ladder's integer validation rejects an mpz modulus. Keep typed
   whole-ladder/stage/product loops with long-lived coordinates/modulus inside
   the backend, and explicit canonical conversion/checkpoint boundaries.
   Validate these paths on the installed ARM64 PyPy/GMP build; a successful
   mpz doubling probe alone establishes neither engine compatibility nor speed.
 
-- [ ] Pin any future PyPy/GMP build and compare specialized whole-stage kernels,
+- [x] Pin the available PyPy/GMP build and compare specialized whole-stage kernels,
   preserving exact roots, division and certainty semantics. `mpz / mpz` is
   not an exact-integer division contract. Measure bitset XOR separately from
   modular arithmetic and charge all representation conversions. Test any
   experimental `allow_release_gil` use on actual operations before a thread
   arm; its existence alone does not establish useful parallelism.
+
+**Backend foundation — 5 October 2026:** the explicit backend
+now spans preprocessing/primality, rho, p−1, ECM, QS/MPQS/SIQS, SSS/SSSf,
+smoothness trees, relation verification/extraction and GF(2) masks. Arithmetic
+operators execute on persistent concrete int/mpz values; only arithmetic
+primitives dispatch, with no callback per multiplication. Small schedules,
+indices, seeds and resource counters remain native. Canonical public results
+and checkpoint versions 5/3/4/2 retain backend/build identity and reject
+incompatible resume; supported old integer checkpoints remain readable.
+Backend configuration is keyword-only, preserving prior positional APIs.
+
+The same available-backend arithmetic/result/certainty oracles, saturation,
+resume, provenance and spawned-worker checks pass: 316 PyPy tests and lint.
+Committed-files-only verification remains pending while this worktree is
+uncommitted; no merge or worktree removal is authorized at present.
+The hash-verified pre-P4.3 control is `9b2d380`; the certified declared corpus
+and runner live in versioned benchmark inputs/code. Raw captures stay ignored.
+See the [backend study](benchmarks/README.md#p43-arithmetic-backends--5-october-2026)
+for commands, sample counts, uncertainty and limitations.
+
+Keep `python-int` as the provisional default. On ARM64 PyPy 7.3.23 /
+Python 3.11.15 with
+gmpy2 2.3.1 / GMP 6.3.0, inversion/powering improve individually, but GMP takes
+approximately 1.8–2.0 times the time in the eleven-input/three-seed portfolio.
+All 33 answers and logical work counts match: 15 complete and 18 unresolved
+per arm, with no reconstruction failures. Whole rho/p−1/ECM and small relation
+engine/matrix costs reject wholesale default promotion in this scope. This
+fixed-work comparison disables wall/CPU caps; it establishes neither deadline
+completion nor a universal size crossover. Wider calibration, fused kernels
+and conditional GIL/thread experiments remain separate work. No experimental
+GIL-release setting or new thread default is introduced by P4.3.
+
+- [ ] Close the algorithm/stage/size experiment gate using independent
+  3–100-digit inputs, production ECM bounds and reachable QS collection.
+  Compare persistent mpz against native loops with selective GMP helpers;
+  distinguish completed splits from fixed-work unresolved runs. Measure
+  conversions, setup and matrix costs and confirm proposed selections on
+  disjoint inputs. An aggregate portfolio ratio cannot set every backend.
+
+**6 October 2026 validation:** the user authorized continued exclusive QS
+trend measurements after reviewing the completed stage results.
+The exclusive-window ECM/p−1/rho screen is retained (15 comparisons,
+9–27 validated samples), along with five-arm QS correctness probes through
+100 digits and 500 million work units. Persistent gmpy2 mpz loses every
+completed stage comparison; selective p−1 helpers show screen gains but
+still need disjoint confirmation. The next exclusive QS screen completes
+matched 100-million-work comparisons at 40/50/80/100 digits. At the common
+50/80/100-digit configuration, persistent mpz takes 11.81/12.64/12.46 times
+native time; native small roots/offsets/masks reduce this to 7.25/7.73/7.74
+times. These unresolved collection runs establish a roughly flat penalty
+in this scope, rather than the narrowing relative gap seen in ECM/rho.
+The fivefold longer 50-digit comparison also completes: native 2.837 s,
+persistent mpz 35.241 s (12.42x), and mpz with native small values 21.359 s
+(7.53x), with nine validated samples per arm. All arms match the 499999846-work
+ledger and 66 relations. The user then ended the 100-digit extension and all
+further experiments; unfinished comparisons earn no acceptance pass. Disjoint
+confirmation and automatic selection remain open. The native default and
+explicit optional GMP selectors stay in place. No merge or worktree removal
+is authorized by this report-only task.
 
 ### P4.4 — Keep Barrett/Montgomery reducers experimental until measured
 

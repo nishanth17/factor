@@ -204,7 +204,7 @@ class FamilyTests(unittest.TestCase):
                 base, corrupt, budget=resumed_budget(original)
             )
         for key, value in (
-            ("version", 2),
+            ("version", 3),
             ("next_index", 999),
             ("base_identity", "wrong"),
             ("a_primes", [7, 7]),

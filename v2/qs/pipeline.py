@@ -3,7 +3,7 @@
 import time
 from dataclasses import dataclass
 
-from .. import utils
+from .. import arithmetic, utils
 from ..budget import Budget, BudgetExhaustedError
 from ..work_budget import PollingBudget
 from .extraction import (
@@ -25,6 +25,12 @@ class QSResult:
     reason: str
     next_position: int
     stats: dict
+
+    def __post_init__(self):
+        for name in ("divisor", "cofactor", "next_position", "stats"):
+            object.__setattr__(
+                self, name, arithmetic.canonical(getattr(self, name))
+            )
 
 
 class QSJob:

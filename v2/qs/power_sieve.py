@@ -1,5 +1,7 @@
 """Bounded exact Hensel lifting for an optional prime-power sieve."""
 
+from ..arithmetic import pow
+
 MAX_LIFT_ROOTS = 64
 
 

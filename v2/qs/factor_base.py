@@ -1,10 +1,10 @@
 """Bounded factor bases and exact modular square roots for reference QS."""
 
 from dataclasses import dataclass, field
-from math import gcd
 from types import MappingProxyType
 
-from .. import prime_sieve, utils
+from .. import arithmetic, prime_sieve, utils
+from ..arithmetic import gcd, pow
 from ..budget import Budget
 
 MAX_INPUT_BITS = 4096
@@ -196,6 +196,7 @@ def build_factor_base(
     bound=100,
     budget=None,
     memory_bytes=DEFAULT_MEMORY_BYTES,
+    backend=None,
 ):
     """Build roots for primes p < bound with gcd(h,n) checked first.
 
@@ -203,6 +204,8 @@ def build_factor_base(
     by all of n raises ValueError. Memory failure occurs before allocation;
     budget exhaustion raises BudgetExhaustedError without publishing a base.
     """
+    if backend is not None:
+        n = arithmetic.get_backend(backend).integer(n)
     target = checked_target(n, multiplier)
     utils.require_integer(bound, "bound", 3)
     utils.require_integer(memory_bytes, "memory_bytes", 0)

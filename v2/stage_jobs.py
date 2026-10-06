@@ -2,9 +2,10 @@
 
 import random
 from bisect import bisect_right
-from math import gcd, isqrt, prod
+from math import prod
 
-from . import ecm, utils
+from . import arithmetic, ecm, utils
+from .arithmetic import gcd, isqrt, pow
 
 
 def prime_cursor(lo, hi):
@@ -73,8 +74,12 @@ def _rho_step(job, budget, config):
         budget.consume()
         generator = random.Random(job["seed"])
         job.update(
-            y=generator.randrange(1, n),
-            offset=generator.randrange(1, n),
+            y=arithmetic.backend_for(n).integer(
+                generator.randrange(1, int(n))
+            ),
+            offset=arithmetic.backend_for(n).integer(
+                generator.randrange(1, int(n))
+            ),
             length=1,
             used=0,
             advance=0,
@@ -198,7 +203,10 @@ def _stage_one(job, budget, context, config):
         )
         return
 
-    scalar = prod(power for _, power in job["powers"])
+    scalar = prod(
+        (power for _, power in job["powers"]),
+        start=arithmetic.backend_for(job["n"]).integer(1),
+    )
     budget.consume(scalar.bit_length() + 1)
     # Keep the pre-chunk value until the GCD decides whether replay is needed.
     start = job["value"]
@@ -434,3 +442,34 @@ def advance_job(job, budget, context, config):
         return
 
     _stage_two(job, budget, context, config)
+
+
+def promote_job(job, backend):
+    """Rehydrate only long-lived arithmetic values at a checkpoint boundary."""
+
+    def convert(value):
+        if isinstance(value, list):
+            return [convert(item) for item in value]
+        if isinstance(value, dict):
+            return {key: convert(item) for key, item in value.items()}
+        return value if value is None else backend.integer(value)
+
+    for key in (
+        "n",
+        "value",
+        "a24",
+        "product",
+        "terms",
+        "replay_value",
+        "y",
+        "offset",
+        "x",
+        "saved",
+        "stage_two_value",
+        "gap_powers",
+        "baby",
+        "giant",
+        "previous",
+    ):
+        if key in job:
+            job[key] = convert(job[key])

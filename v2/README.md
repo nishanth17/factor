@@ -1,7 +1,8 @@
 # Factor v2
 
 Integer factorization using **PyPy implementing Python 3.11** and exact
-standard-library integers. v2 repairs the [original v1](../v1/) implementation
+Python integers or optional GMP integers. v2 repairs the
+[original v1](../v1/) implementation
 and adds bounded, resumable execution and experimental relation-based engines.
 
 ## Methods
@@ -108,6 +109,69 @@ These selections disable rho/p−1/ECM and use bounded execution after exact
 preprocessing. Defaults are 200 million work units, 30 wall/CPU seconds and
 80 MiB owned workspace. `--sss-base-bound` and `--sss-rounds` set finite search
 parameters; success is not guaranteed.
+
+## Arithmetic backends
+
+`python-int` remains the dependency-free default. Explicit `gmpy2-mpz` selection
+applies across preprocessing/primality, rho, p−1, ECM, QS/MPQS/SIQS, SSS/SSSf,
+relation verification/extraction, smoothness trees and GF(2) matrix masks.
+Moduli, residues, coordinates and polynomial coefficients retain `mpz` inside
+their arithmetic loops. Loop indices, small-prime schedules, budgets and seeds
+remain Python integers. Multiplication, reduction and XOR use those concrete
+operand types directly; there is no backend callback per multiplication.
+
+The tested optional build is **PyPy 7.3.23 / Python 3.11.15, ARM64,
+gmpy2 2.3.1 / GMP 6.3.0**. Install the optional dependency into that PyPy
+environment, then run:
+
+```sh
+v2/.venv/bin/python -m pip install -r v2/requirements-gmp.txt
+v2/.venv/bin/python -m v2.factor 626100403 --bounded --backend gmpy2-mpz
+v2/.venv/bin/python -m v2.factor 10002200057 --method siqs --backend gmpy2-mpz
+```
+
+An unavailable dependency raises an explicit error; GMP selection never falls
+back to another backend or CPython. Importing and using the integer default
+does not import gmpy2. GMP support is optional: faster individual operations
+do not establish a faster factoring engine. See the
+[matched backend study](benchmarks/README.md#p43-arithmetic-backends--5-october-2026).
+The current selectors are explicit; there is no automatic digit threshold.
+Algorithm/stage/size selection requires the separate production-bound and
+larger-QS study. Aggregate portfolio timings do not establish that policy.
+
+Library selection uses `factorize(..., backend="gmpy2-mpz")`, or
+`PortfolioConfig(backend="gmpy2-mpz")` for `factorize_bounded`. A configured
+SIQS/SSS fallback must select the same backend as its portfolio. Standalone
+`SIQSConfig`, `SSSConfig` and `ParallelConfig` accept the same keyword.
+Direct `factorize_rho`, `factorize_pm1`, `factorize_ecm` and `factorize_bf`
+accept `backend=`; omission preserves the representation of an exact input.
+`build_factor_base(..., backend=...)` and `stage_one_scalar(..., backend=...)`
+also expose the boundary. Existing positional configuration arguments retain
+their meanings.
+
+Low-level arithmetic/point/polynomial objects may contain `mpz`. For helper
+calls, convert once with `arithmetic.get_backend("gmpy2-mpz").integer(value)`.
+`utils.gcd`, `utils.extended_gcd`, `utils.modular_inverse`, `utils.isqrt`, and
+`preprocessing.integer_root` recognize exact GMP inputs. The shared
+`arithmetic.pow` handles exact powers and modular powers; `arithmetic.divexact`
+checks divisibility before invoking GMP exact division. `mpz / mpz` is never
+used for factoring arithmetic. Failed inversion raises `NonInvertibleError`,
+a `ValueError` subclass whose `divisor` retains the GCD, including saturation.
+The [gmpy2 integer API](https://gmpy2.readthedocs.io/en/latest/mpz.html)
+documents the underlying integer operations.
+
+High-level factorization results, splitters' returned divisors, QS results
+and serialized checkpoints contain canonical Python integers. Certainty,
+witness selection, seeds, bounds and logical work reservations are shared
+across the two tracks; GMP primality shortcuts do not upgrade classifications.
+
+New checkpoint versions are portfolio **5**, SIQS/SSS **3**, parallel SIQS
+**4**, and polynomial family **2**. They bind progress to the selected backend;
+GMP identity includes gmpy2 and GMP versions. Resume rebuilds only arithmetic
+values as `mpz`, retaining native counters/cursors and cumulative resources.
+Backend/build mismatches are rejected. Older supported integer checkpoints
+remain readable on `python-int`; they cannot silently become GMP jobs.
+GIL tuning and thread promotion remain separate experiments.
 
 ## Library and result contracts
 

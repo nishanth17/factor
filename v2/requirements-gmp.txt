@@ -1,0 +1,2 @@
+# Optional arithmetic track, tested on ARM64 PyPy Python 3.11.
+gmpy2==2.3.1

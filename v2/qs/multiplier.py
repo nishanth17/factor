@@ -2,9 +2,9 @@
 
 from dataclasses import dataclass
 from fractions import Fraction
-from math import gcd
 
 from .. import prime_sieve, utils
+from ..arithmetic import gcd, pow
 from ..budget import Budget
 from .factor_base import checked_target
 

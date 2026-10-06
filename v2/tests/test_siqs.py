@@ -347,7 +347,7 @@ class SIQSTests(unittest.TestCase):
         )
 
         self.assertEqual(result.result.reconstruct(), 4001 * 5003)
-        self.assertEqual(result.checkpoint["payload"]["version"], 4)
+        self.assertEqual(result.checkpoint["payload"]["version"], 5)
 
     def test_polynomial_switch_refusal_preserves_verified_store(self):
         job = SIQSJob(4001 * 5003, config=configuration(), budget=allowance())

@@ -1,8 +1,7 @@
 """Two-stage Pollard p-1 with complete relation batches and bounded retries."""
 
-from math import gcd
-
-from . import constants, prime_sieve, utils
+from . import arithmetic, constants, prime_sieve, utils
+from .arithmetic import gcd, pow
 
 
 def compute_bounds(n):
@@ -64,6 +63,7 @@ def factorize_pm1(
     base=2,
     max_attempts=constants.PM1_ATTEMPTS,
     batch_size=constants.GCD_BATCH_SIZE,
+    backend=None,
 ):
     """Return a proper divisor or None; bounds include B1 and B2.
 
@@ -71,6 +71,12 @@ def factorize_pm1(
     not a prime divisor of n between the bounds.
     """
     utils.require_integer(n, minimum=1)
+    engine = (
+        arithmetic.backend_for(n)
+        if backend is None
+        else arithmetic.get_backend(backend)
+    )
+    n = engine.integer(n)
     default_b1, default_b2 = compute_bounds(n)
     b1 = default_b1 if b1 is None else b1
     b2 = default_b2 if b2 is None else b2
@@ -94,7 +100,7 @@ def factorize_pm1(
         candidate = base + attempt
         divisor = gcd(candidate, n)
         if utils.valid_divisor(divisor, n):
-            return divisor
+            return int(divisor)
         if divisor == n:
             continue
         if verbose:
@@ -102,7 +108,7 @@ def factorize_pm1(
 
         residue, divisor = _stage_one(n, candidate, stage_one_primes, b1)
         if utils.valid_divisor(divisor, n):
-            return divisor
+            return int(divisor)
         if divisor == n:
             continue
         if stage_two_primes is None:
@@ -116,7 +122,7 @@ def factorize_pm1(
             if len(terms) == batch_size:
                 divisor, saturated = utils.batch_factor(terms, n)
                 if divisor is not None:
-                    return divisor
+                    return int(divisor)
                 terms.clear()
                 if saturated:
                     break
@@ -124,6 +130,6 @@ def factorize_pm1(
         if not saturated and terms:
             divisor, _ = utils.batch_factor(terms, n)
             if divisor is not None:
-                return divisor
+                return int(divisor)
 
     return None

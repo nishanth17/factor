@@ -12,7 +12,8 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait
 from dataclasses import asdict, dataclass, field, replace
 from types import SimpleNamespace
 
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import pow
 from ..budget import Budget, BudgetExhaustedError
 from ..work_budget import PollingBudget
 from .checkpoint import _restore_store, _store
@@ -40,6 +41,7 @@ class ParallelConfig:
     before submission; only reported unspent work is refunded.
     """
 
+    backend: str = field(default="python-int", kw_only=True)
     base_bound: int = 200
     half_width: int = 256
     factor_count: int = 1
@@ -65,6 +67,9 @@ class ParallelConfig:
     )
 
     def __post_init__(self):
+        if self.backend not in ("python-int", "gmpy2-mpz"):
+            raise ValueError("unknown arithmetic backend")
+
         for name, low, high in (
             ("base_bound", 3, 100000),
             ("half_width", 1, 8192),
@@ -218,7 +223,11 @@ def _collect(task, state=None):
             budget.consume(
                 len(base_record[3]) * base_record[2].bit_length() ** 2
             )
-            base = FactorBase(*base_record)
+            record = list(base_record)
+            record[0] = arithmetic.get_backend(config.backend).integer(
+                record[0]
+            )
+            base = FactorBase(*record)
 
         family = PolynomialFamily(
             base,
@@ -442,6 +451,7 @@ class ParallelSIQSJob:
         self.config = config if config is not None else ParallelConfig()
         if not isinstance(self.config, ParallelConfig):
             raise TypeError("config must be a ParallelConfig")
+        self.n = arithmetic.get_backend(self.config.backend).integer(n)
         self.budget = (
             budget if budget is not None else Budget(work_limit=200_000_000)
         )
@@ -1034,7 +1044,8 @@ class ParallelSIQSJob:
             ]
 
         payload = dict(
-            version=3,
+            version=4,
+            backend=arithmetic.get_backend(self.config.backend).identity,
             n=self.n,
             seed=self.seed,
             config=asdict(self.config),
@@ -1058,7 +1069,9 @@ class ParallelSIQSJob:
         parts, size = [], 0
 
         for part in json.JSONEncoder(
-            sort_keys=True, separators=(",", ":")
+            default=arithmetic.json_integer,
+            sort_keys=True,
+            separators=(",", ":"),
         ).iterencode(payload):
             size += len(part.encode())
             if size + 1024 > self.config.checkpoint_bytes:
@@ -1096,6 +1109,7 @@ class ParallelSIQSJob:
             1,
             2,
             3,
+            4,
         ):
             raise ValueError("unknown parallel checkpoint version")
 
@@ -1108,6 +1122,13 @@ class ParallelSIQSJob:
         options = payload["config"]
         options["collector"] = SieveConfig(**options["collector"])
         config = ParallelConfig(**options)
+        if (
+            payload.get(
+                "backend", "python-int" if payload["version"] < 4 else None
+            )
+            != arithmetic.get_backend(config.backend).identity
+        ):
+            raise ValueError("incompatible checkpoint backend")
         if payload["version"] == 1 and config.batch_width:
             raise ValueError("legacy checkpoint cannot contain chunk progress")
         if len(blob.encode()) + 1024 > config.checkpoint_bytes:

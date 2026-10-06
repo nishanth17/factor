@@ -1,8 +1,7 @@
 """Exact integer preprocessing; no arbitrary-size input enters a float."""
 
-from math import isqrt
-
-from . import utils
+from . import arithmetic, utils
+from .arithmetic import isqrt, pow
 
 # For prime exponent k, each listed prime q has k | q-1. Nonzero kth
 # powers modulo q lie in the kernel of z -> z**((q-1)//k). Passing is
@@ -33,24 +32,7 @@ def power_residue_possible(n, exponent):
 
 def integer_root(n, exponent):
     """Return floor(n**(1/exponent)) by integer Newton iteration."""
-    utils.require_integer(n, minimum=0)
-    utils.require_integer(exponent, "exponent", 1)
-    if n < 2 or exponent == 1:
-        return n
-    if exponent == 2:
-        return isqrt(n)
-    if exponent >= n.bit_length():
-        return 1
-    # Start above the root so integer Newton steps descend to its floor.
-    estimate = 1 << ((n.bit_length() + exponent - 1) // exponent)
-
-    while True:
-        following = (
-            (exponent - 1) * estimate + n // estimate ** (exponent - 1)
-        ) // exponent
-        if following >= estimate:
-            return estimate
-        estimate = following
+    return arithmetic.integer_root(n, exponent)
 
 
 def strip_twos(n):

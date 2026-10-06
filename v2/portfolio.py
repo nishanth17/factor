@@ -5,10 +5,10 @@ import json
 import math
 import random
 import time
-from dataclasses import asdict, dataclass
-from math import isqrt
+from dataclasses import asdict, dataclass, field
 
-from . import constants, prime_sieve, utils
+from . import arithmetic, constants, prime_sieve, utils
+from .arithmetic import isqrt
 from .budget import Budget, BudgetExhaustedError
 from .factor import FactorizationResult, PrimeFactor
 from .preprocessing import (
@@ -28,7 +28,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 4
+CHECKPOINT_VERSION = 5
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -41,6 +41,7 @@ class PortfolioConfig:
     them. memory_bytes bounds conservative owned workspace estimates, not RSS.
     """
 
+    backend: str = field(default="python-int", kw_only=True)
     trial_bound: int = constants.TRIAL_BOUND
     rho_attempts: int = 4
     rho_evaluations: int = 5000
@@ -66,6 +67,11 @@ class PortfolioConfig:
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
+        arithmetic.get_backend(self.backend)
+        for fallback in (self.siqs, self.sss):
+            if fallback is not None and fallback.backend != self.backend:
+                raise ValueError("portfolio and fallback backends must match")
+
         minima = {
             "trial_bound": 2,
             "rho_attempts": 0,
@@ -196,7 +202,12 @@ class PortfolioRun:
 
 def _canonical(value):
     """Encode exact decimal integers with stable keys for corruption checks."""
-    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+    return json.dumps(
+        value,
+        default=arithmetic.json_integer,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
 
 
 def _tuples(value):
@@ -252,7 +263,10 @@ def _split(state, divisor):
     if not utils.valid_divisor(divisor, n):
         raise ValueError("portfolio split is not a proper divisor")
     state["pending"].extend(
-        ([divisor, multiplicity], [n // divisor, multiplicity])
+        (
+            [arithmetic.backend_for(n).integer(divisor), multiplicity],
+            [arithmetic.divexact(n, divisor), multiplicity],
+        )
     )
     state["current"] = None
 
@@ -296,7 +310,7 @@ def _classify_step(current, config, budget, generator):
     rounds = len(bases) if bases else config.primality_rounds
     # Refusal precedes the random draw so resume sees the same witness.
     budget.consume(n.bit_length() + witness_state["s"])
-    base = bases[index] if bases else generator.randrange(2, n - 1)
+    base = bases[index] if bases else generator.randrange(2, int(n) - 1)
     survives = utils._strong_probable_prime(
         n, base, witness_state["d"], witness_state["s"]
     )
@@ -386,7 +400,7 @@ def _advance(state, config, budget, context, generator, siqs_runtime):
                 return
             exponent = 0
             while n % prime == 0:
-                n //= prime
+                n = arithmetic.divexact(n, prime)
                 exponent += 1
             take_prime(cursor)
             if exponent:
@@ -611,7 +625,7 @@ def _pack(state, config, budget, generator):
     payload = {
         "version": CHECKPOINT_VERSION,
         "schedule": SCHEDULE_VERSION,
-        "backend": "python-int",
+        "backend": arithmetic.get_backend(config.backend).identity,
         "config": asdict(config),
         "state": state,
         "rng": generator.getstate()
@@ -757,12 +771,19 @@ def _unpack(checkpoint, config):
             expected_config.pop("sss")
         if payload["version"] == 2 and legacy:
             expected_config.pop("siqs")
+        if payload["version"] < 5 and "backend" not in payload["config"]:
+            expected_config.pop("backend")
+            for name in ("siqs", "sss"):
+                if expected_config.get(name) is not None:
+                    expected_config[name].pop("backend", None)
+
         if (
             type(payload["version"]) is not int
-            or payload["version"] not in (2, 3, CHECKPOINT_VERSION)
+            or payload["version"] not in (2, 3, 4, CHECKPOINT_VERSION)
             or (payload["version"] in (2, 3) and not legacy)
             or payload["schedule"] != SCHEDULE_VERSION
-            or payload["backend"] != "python-int"
+            or payload["backend"]
+            != arithmetic.get_backend(config.backend).identity
             or payload["config"] != expected_config
         ):
             raise ValueError("incompatible checkpoint metadata")
@@ -899,6 +920,25 @@ def _unpack(checkpoint, config):
     return payload, generator
 
 
+def _promote_state(state, name):
+    """Restore only arithmetic state; counters, cursors and RNG stay native."""
+    backend = arithmetic.get_backend(name)
+    state["pending"] = [
+        [backend.integer(n), mult] for n, mult in state["pending"]
+    ]
+    state["remaining"] = [backend.integer(n) for n in state["remaining"]]
+    current = state["current"]
+    if current is not None:
+        current["n"] = backend.integer(current["n"])
+        if current.get("prime_job"):
+            witness = current["prime_job"]
+            witness["d"] = backend.integer(witness["d"])
+        if current.get("job"):
+            from .stage_jobs import promote_job
+
+            promote_job(current["job"], backend)
+
+
 def factorize_bounded(
     n,
     *,
@@ -952,6 +992,8 @@ def factorize_bounded(
         budget.used = payload["work_used"]
         budget.prior_wall = payload["wall_used"]
         budget.prior_cpu = payload["cpu_used"]
+
+    _promote_state(state, config.backend)
 
     reason = "exhausted"
     siqs_runtime = {}
@@ -1015,7 +1057,7 @@ def factorize_bounded(
         budget.used,
         budget.wall_used,
         budget.cpu_used,
-        tuple(state["events"]),
+        arithmetic.canonical(tuple(state["events"])),
         state["dropped_events"],
         snapshot,
     )

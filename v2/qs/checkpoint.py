@@ -5,7 +5,7 @@ import json
 from dataclasses import asdict
 from functools import partial
 
-from .. import utils
+from .. import arithmetic, utils
 from .assignment_stream import assignment_identity
 from .extraction import DependencyExtractor, prepare_relations
 from .families import (
@@ -27,7 +27,7 @@ from .relations import (
 )
 from .sieve_collector import SieveCollector, SieveConfig
 
-VERSION = 2
+VERSION = 3
 MAX_BLOB_BYTES = 64 * 1024 * 1024
 
 
@@ -44,7 +44,7 @@ def _solver_digest(solver, *, encoding="decimal-v1"):
         digest = hashlib.sha256()
 
         def feed(value):
-            if type(value) is int:
+            if arithmetic.is_integer(value):
                 digest.update(('"' + hex(value) + '"').encode())
             elif value is None:
                 digest.update(b"null")
@@ -150,6 +150,7 @@ def pack_job(job):
 
     payload = dict(
         version=VERSION,
+        backend=arithmetic.get_backend(job.config.backend).identity,
         n=job.n,
         seed=job.seed,
         config=asdict(job.config),
@@ -181,7 +182,9 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
-    encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"))
+    encoder = json.JSONEncoder(
+        default=arithmetic.json_integer, sort_keys=True, separators=(",", ":")
+    )
     parts, size = [], 0
     for part in encoder.iterencode(payload):
         size += len(part.encode())
@@ -339,10 +342,10 @@ def _restore_store(payload, collector, budget):
         selected = [take(i) for i in indices]
         item = CombinedRelation(
             tuple(a.relation_id for a in selected),
-            u,
+            arithmetic.backend_for(base.n).integer(u),
             sign,
             tuple(tuple(pair) for pair in exponents),
-            correction,
+            arithmetic.backend_for(base.n).integer(correction),
         )
         scratch = (
             _combination_workspace(selected, base, config.memory_bytes)
@@ -400,6 +403,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     blob = checkpoint["blob"]
     if type(checkpoint["version"]) is not int or checkpoint["version"] not in (
         1,
+        2,
         VERSION,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
@@ -441,6 +445,15 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         validate_extension(saved_config, config)
     else:
         config = saved_config
+
+    expected_backend = arithmetic.get_backend(config.backend).identity
+    if (
+        payload.get(
+            "backend", "python-int" if payload["version"] < 3 else None
+        )
+        != expected_backend
+    ):
+        raise ValueError("incompatible checkpoint backend")
 
     if len(blob.encode()) + 1024 > config.checkpoint_bytes:
         raise ValueError("SIQS checkpoint exceeds configured byte cap")

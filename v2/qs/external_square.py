@@ -1,9 +1,9 @@
 """Bounded classical MPQS coefficients with separately checked squares."""
 
 import random
-from math import gcd, isqrt
 
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import gcd, isqrt, pow
 from .polynomial import MAX_COEFFICIENT_BITS, Polynomial, a_target
 
 
@@ -59,8 +59,7 @@ def external_square(base, half_width, *, budget, cursor=0, trials=4096):
         # Lift B=root+q*t: 2*root*t == (N'-root²)/q (mod q), making
         # B²-N' divisible by q² without relying on coefficient primality.
         lift = (
-            (base.n_prime - root * root)
-            // candidate
+            arithmetic.divexact(base.n_prime - root * root, candidate)
             * utils.modular_inverse(2 * root, candidate)
         ) % candidate
         a = candidate * candidate

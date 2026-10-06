@@ -2,9 +2,9 @@
 
 from collections import Counter
 from dataclasses import dataclass
-from math import gcd
 
 from .. import utils
+from ..arithmetic import gcd, pow
 from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES, FactorBase
 from .linear_algebra import MAX_MATRIX_ROWS, verify_dependency

@@ -3,9 +3,9 @@
 import hashlib
 from collections import Counter
 from dataclasses import dataclass, field
-from math import gcd
 
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import gcd, pow
 from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import Polynomial, checked_position
@@ -110,7 +110,7 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         raise ValueError("zero is not a factorable relation")
     if relation.sign != (-1 if value < 0 else 1):
         raise ValueError("relation sign is incorrect")
-    remaining = abs(value) // (relation.square_correction**2)
+    remaining = arithmetic.divexact(abs(value), relation.square_correction**2)
     primes = factor_base._columns
 
     for prime, exponent in relation.exponents:
@@ -142,7 +142,9 @@ def parity_bits(relation, factor_base):
     The caller must first verify the atomic or combined relation. Full
     exponents and square corrections remain stored for later extraction.
     """
-    bits = int(relation.sign < 0)
+    bits = arithmetic.backend_for(factor_base.n).integer(
+        int(relation.sign < 0)
+    )
     columns = factor_base._columns
     for prime, exponent in relation.exponents:
         if prime not in columns:

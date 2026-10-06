@@ -1,9 +1,9 @@
 """Tiny exhaustive QS/MPQS collection: exact division at every position."""
 
 from dataclasses import dataclass
-from math import gcd
 
 from .. import utils
+from ..arithmetic import gcd
 from ..budget import Budget, BudgetExhaustedError
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import checked_position

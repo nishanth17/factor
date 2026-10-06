@@ -10,9 +10,9 @@ import random
 import sys
 from bisect import bisect_left, bisect_right
 from enum import Enum
-from math import gcd, isqrt
 
-from . import constants
+from . import arithmetic, constants
+from .arithmetic import gcd, isqrt, pow
 
 SMALL_PRIMES = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
 DETERMINISTIC_LIMIT = 2**64
@@ -31,7 +31,7 @@ class Primality(str, Enum):
 
 def require_integer(value, name="n", minimum=None):
     """Reject floats/booleans; optionally enforce an integer lower bound."""
-    if isinstance(value, bool) or not isinstance(value, int):
+    if not arithmetic.is_integer(value):
         raise TypeError(f"{name} must be an integer")
     if minimum is not None and value < minimum:
         raise ValueError(f"{name} must be at least {minimum}")
@@ -84,6 +84,9 @@ def extended_gcd(a, b):
     """Return (g, x, y) with g >= 0 and a*x + b*y == gcd(a, b)."""
     require_integer(a, "a")
     require_integer(b, "b")
+    if arithmetic.is_mpz(a) or arithmetic.is_mpz(b):
+        return arithmetic.gcdext(a, b)
+
     old_r, remainder = a, b
     old_x, x = 1, 0
     old_y, y = 0, 1
@@ -110,6 +113,9 @@ def modular_inverse(value, modulus):
     """
     require_integer(value, "value")
     require_integer(modulus, "modulus", 2)
+    if arithmetic.is_mpz(value) or arithmetic.is_mpz(modulus):
+        return arithmetic.invert(value, modulus)
+
     if not _USE_PYPY_INVERSE:
         return pow(value, -1, modulus)
     # Track only the coefficient of value. divmod shares quotient/remainder
@@ -126,7 +132,7 @@ def modular_inverse(value, modulus):
         )
 
     if a != 1:
-        raise ValueError("value is not invertible modulo modulus")
+        raise arithmetic.NonInvertibleError(a)
     return coefficient % modulus
 
 
@@ -143,7 +149,7 @@ def prime_power(prime, bound):
 def valid_divisor(divisor, n):
     """Reject failure sentinels, endpoints, booleans, and nondivisors."""
     return (
-        isinstance(divisor, int)
+        arithmetic.is_integer(divisor)
         and not isinstance(divisor, bool)
         and 1 < divisor < n
         and n % divisor == 0

@@ -440,3 +440,283 @@ imports. Committed-files-only validation checks all required loaders and
 immutable controls, without local captures or other sessions' readability
 changes. The API and checkpoint contracts are retained, and only the R2
 delta is included in the integration commit.
+
+
+## P4.3 arithmetic backends — 5 October 2026
+
+P4.3 adds an explicit `python-int` / `gmpy2-mpz` boundary across the factoring
+engines, preprocessing/primality, relation recovery/extraction, smoothness
+products and matrix bitsets. Keep Python integers as the provisional default.
+GMP is an available optional track, but its individual-operation wins do not pass the
+whole-engine promotion gate on this ARM64 PyPy build.
+
+The measured environment is PyPy 7.3.23 implementing Python 3.11.15,
+gmpy2 2.3.1 and GMP 6.3.0. The project-local PyPy environment supplies GMP;
+the system PyPy remains a dependency-free track. The optional package pin
+is in `v2/requirements-gmp.txt`. No CPython, GIL-release or thread-performance
+comparison is claimed.
+
+Reproduce the comparison from the repository root:
+
+```sh
+make -C v2 benchmark-backends PYTHON="$PWD/v2/.venv/bin/python"   REPETITIONS=9 WARMUP_SECONDS=3   BENCHMARK_OUTPUT=benchmarks/results/p43_backend.json
+```
+
+The runner loads the hash-checked pre-P4.3 control at `9b2d380` from
+[the immutable baseline](inputs/baselines/p43_before_sources.json).
+[The declared corpus](inputs/corpora/p43_backend_corpus.json) selects the
+first previously published held-out input in each of eleven bands and retains
+independent recursive Pocklington/trial proofs. Three seeds are 104729,
+130363 and 155921. This is a bounded backend study on inspected inputs,
+not fresh population-level calibration or proof of practical large balanced
+completion. Algorithms receive inputs/configuration/seeds, never the oracle
+factorizations.
+
+Every arm has a separate PyPy interpreter/JIT. Each receives at least three
+seconds of validated workload warmup and nine samples, extended to 18 or 27
+when relative standard deviation exceeds 15%. Arm order alternates by case.
+Each timed answer matches the same validated reference, including unresolved
+cofactors, certainty and exact work ledgers. Setup, schedules and representation
+conversions stay inside the measured calls. Matrix oracle validation is outside
+timing. Cold import/startup is measured separately, including shutdown.
+Some small samples remain variable at the 27-sample cap; intervals are
+conditional repeat-timing uncertainty, not input-population intervals.
+
+Representative medians from the final full capture:
+
+| Workload | Python integers | GMP | Observation |
+| --- | ---: | ---: | --- |
+| 128 modular inverses, 256-bit operands | 1.051 ms | 0.261 ms | GMP 75.1% lower time; conditional interval 74.5–76.2% |
+| 128 modular powers, exponent 65537 | 0.434 ms | 0.277 ms | GMP 36.2% lower time; interval 34.3–39.2% |
+| 128 seventh roots of 256-bit inputs | 0.422 ms | 0.221 ms | GMP 47.7% lower median time; some micro samples remain variable |
+| 128 GCDs, 256-bit operands | 0.151 ms | 0.231 ms | GMP slower with conversions included |
+| 320-row, 256-column filtering/elimination | 5.664 ms | 48.995 ms | GMP approximately 8.7 times the time |
+| Complete rho job, 265-bit certified composite | 0.557 ms | 2.069 ms | GMP approximately 3.7 times the time |
+| Complete p−1 job, same composite | 0.220 ms | 0.407 ms | GMP approximately 1.9 times the time |
+| Complete ECM job, same composite | 0.936 ms | 2.648 ms | GMP approximately 2.8 times the time |
+| Small SIQS setup through extraction | 1.572 ms | 20.006 ms | Optional GMP loses on this small fixture |
+| Eleven-input, three-seed portfolio | 48.844 ms | 98.531 ms | GMP 101.7% more time; interval 84.5–121.0% |
+
+A final result-boundary confirmation, which canonicalizes only exact `mpz`
+instead of coercing other caller-supplied container values, measures the same
+portfolio at **47.982 ms int versus 84.628 ms GMP**: GMP uses 76.4% more time
+(interval 64.7–93.4%). The frozen integer control is 45.522 ms; its difference
+from current integers is inconclusive (interval crosses zero). Both final
+captures support retaining the integer default. Do not interpret the small
+QS/SSS fixtures as scaling evidence or promote a native micro-optimization
+from this backend experiment.
+
+All 33 portfolio answers per repetition match across arms: **15 complete,
+18 explicitly unresolved** under the same 200,000-work-unit cap. Time and CPU
+caps are disabled for this fixed-work comparison; therefore it does not
+establish completion within a deadline. Engine-owned workspace caps match,
+and each isolated arm records process peak RSS separately. No owned-workspace
+or reconstruction failure occurs. The separate cold lifecycle medians are
+87.381 ms int and 110.814 ms GMP; neither is a warmed execution measurement.
+
+Generated evidence remains local under ignored `results/`:
+`p43_backend_final_20261005.json` and
+`p43_final_result_boundary_20261005.json`. Earlier in-process captures are
+diagnostic: mixed int/mpz traces contaminated the integer QS timings. They
+are excluded from the accepted performance evidence. The versioned runner,
+corpus and immutable control permit reruns without those captures.
+
+Acceptance includes the same exact arithmetic/result/certainty cases on each
+available backend, nonunit inverses with retained GCDs, checked exact division,
+large root boundaries, saturated stage replay, canonical JSON, backend/build
+mismatch rejection, old integer checkpoint compatibility, streamed/external
+polynomials, matrix identities and serial/spawned-worker consistency.
+The implementation passes 315 PyPy tests and full lint. Committed-files-only
+verification remains pending; this worktree is retained and uncommitted.
+Generated captures are never required inputs.
+
+### Size-dependent follow-up: protocol
+
+The first study cannot settle algorithm/size selection: complete QS uses an
+eight-digit fixture, and ECM uses B1/B2=200/2000. A new proof-backed balanced
+corpus has independent screen and confirmation inputs at exactly 3, 10, 20,
+30, 40, 50, 60, 70, 80, 90 and 100 decimal digits. It uses recursive
+Pocklington/trial certificates and is not an RSA-distribution sample. The
+versioned runner is `p43_sizes.py`; process-local representation experiments
+live in `p43_experiments.py`, with no production global switch.
+
+The arms are current native integers, persistent `mpz`, native loops with
+GMP powering/inversion/roots above 64 bits, and (for QS) persistent large
+`mpz` with native small roots/offsets/matrix masks. A frozen `before-int` arm
+checks default-path regressions. Full stage studies use B1/B2=2000/147396
+and 11000/1000000, two-curve/base trials, and 8192-evaluation rho attempts.
+QS studies include complete smaller splits, streamed large coefficients,
+larger factor bases/windows and longer fixed-work collection. Unresolved
+large runs compare time to identical work, not successful factoring time.
+
+Each arm has its own PyPy interpreter/JIT, validated warmup and at least nine
+samples. Variable samples extend to 18/27. Outputs include identical divisors,
+cofactors, stage-state digests, collection counts and logical work. Setup,
+conversion and result construction are measured. Timing fields are excluded
+only from output equality. Cold startup remains separate.
+
+Two early expanded captures overlapped the p5.2 benchmark. Their JSON now
+explicitly labels them diagnostic, and they are excluded from performance
+decisions. Cross-chat exclusive timing windows are coordinated. The runner
+checks foreign benchmark/test workers before, during and after each arm and
+aborts its own worker if overlap recurs. It saves completed arms incrementally;
+an interrupted worker supplies no timing samples. Rows explicitly distinguish
+complete comparisons from unfinished sets of arms.
+
+### First exclusive-window batch: 6 October 2026
+
+The 02:17–02:31 UTC window completed 15 screen comparisons, with five seconds
+of validated warmup and 9–27 samples per arm. Every divisor, unresolved
+cofactor, canonical stage-state digest and work count matched. The higher
+ECM/p−1 tier uses B1/B2=11000/1000000; rho uses two 8192-evaluation attempts.
+Medians below include setup, shared schedule reuse within each campaign,
+arithmetic conversions and result construction.
+
+| Stage | Input digits | Native int | Persistent mpz | Selective GMP helpers |
+| --- | ---: | ---: | ---: | ---: |
+| ECM, higher tier | 20 | 14.05 ms | 95.91 ms | 14.84 ms |
+| ECM, higher tier | 50 | 116.57 ms | 448.26 ms | 119.83 ms |
+| ECM, higher tier | 100 | 195.73 ms | 488.02 ms | 202.20 ms |
+| p−1, higher tier | 20 | 4.89 ms | 16.12 ms | 3.99 ms |
+| p−1, higher tier | 50 | 69.19 ms | 231.63 ms | 65.42 ms |
+| p−1, higher tier | 100 | 112.26 ms | 248.33 ms | 96.81 ms |
+| rho | 20 | 1.82 ms | 14.82 ms | 1.88 ms |
+| rho | 50 | 2.96 ms | 16.11 ms | 2.96 ms |
+| rho | 100 | 5.51 ms | 15.82 ms | 5.47 ms |
+
+The lower ECM tier also rejects persistent mpz: 6.35, 4.00 and 2.46 times
+native time at 20, 50 and 100 digits. The 20-digit ECM/p−1 trials find proper
+factors; the larger balanced inputs remain unresolved after their finite
+campaigns. These are matched campaign costs, not estimated times to factor
+50- or 100-digit balanced composites. Selective p−1 helpers improve all six
+screen cases, with higher-tier median reductions of 18.3%, 5.4% and 13.8%.
+Disjoint-input confirmation and frozen native regression controls remain
+required before promoting a helper policy. The 64-bit cutoff is experimental.
+Some persistent-mpz samples still vary after extension to 27; the large
+losses do not establish a precise universal slowdown ratio.
+
+Five-arm QS correctness probes at 500 million work units compare native,
+persistent mpz, selective helpers, native-small/mpz-large and frozen native
+code. The 20-digit input completes. The 50-digit input collects 2,428,946
+positions and 66 relations; the 100-digit input collects 1,703,949 positions
+and no relations. Both larger inputs stop at their finite work allowance.
+All five arms match the complete logical output and remain within owned
+workspace limits. With the factor-base bound of 100000, sampled polynomial
+values are 99 bits for the 50-digit modulus (166 bits) and 182 bits for the
+100-digit modulus (331 bits); small factor-base primes are at most 17 bits.
+Input digits alone therefore do not specify the arithmetic widths in QS.
+These probes include cold execution and are correctness evidence only.
+An earlier long warmed QS comparison was interrupted at the agreed window
+boundary before its complete set of arms and is excluded from the timing
+conclusions.
+
+These arms use gmpy2 inside the Python algorithms. The
+[gmpy2 overview](https://gmpy2.readthedocs.io/en/latest/overview.html) describes
+a variable integer-performance crossover; it does not establish a threshold
+for this PyPy implementation. The
+[PyPy C-extension FAQ](https://doc.pypy.org/faq.html#do-c-extension-modules-work-with-pypy)
+documents compatibility-layer/refcount costs. Binding and boxing overhead
+are a plausible explanation for cheap repeated mpz operators losing while
+larger single-call helpers win; that attribution remains an inference rather
+than a measured profile. Native GMP-ECM/C QS programs and fused/CFFI kernels
+are separate implementations and are not ranked by this substitution study.
+
+Reproduce the completed stage screen with:
+
+```sh
+v2/.venv/bin/python -u -m v2.benchmarks.p43_sizes \
+  --suites ecm pm1 rho --digits 20 50 100 \
+  --warmup-seconds 5 --repetitions 9 \
+  --output v2/benchmarks/results/p43_quiet_stages_screen.json
+```
+
+The proof-backed QS probe uses `--probe --suites qs --digits 20 50 100
+--large-qs --qs-work 500000000 --backends python-int gmpy2-mpz helpers-gmp
+gmp-small-native before-int`. Captures are ignored local evidence; the
+versioned corpus and runners are sufficient to rerun the comparisons.
+
+### QS size trend: 100-million-work screen
+
+The next exclusive window completed four five-arm QS comparisons. Each arm
+receives five seconds of validated warmup and 9 samples, extended to 18 for
+the variable 40-digit native arm. All outputs, collection statistics and work
+counts match the frozen native control. These runs stop at the work cap;
+they measure the cost of identical bounded collection, not time to factor.
+
+| Digits | Native int | Persistent mpz | Native loops, GMP helpers | Mpz with native small values | Frozen native | Mpz/native |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 40 | 0.685 s | 6.759 s | 0.654 s | 4.844 s | 0.638 s | 9.87x |
+| 50 | 0.566 s | 6.686 s | 0.546 s | 4.104 s | 0.557 s | 11.81x |
+| 80 | 0.414 s | 5.229 s | 0.421 s | 3.199 s | 0.416 s | 12.64x |
+| 100 | 0.355 s | 4.428 s | 0.351 s | 2.750 s | 0.360 s | 12.46x |
+
+The 50/80/100-digit cases share a factor-base bound of 100000, width 65536 and the
+same 100-million-work allowance. Persistent mpz's penalty is roughly flat
+across those sizes, unlike the shrinking relative gap in ECM/rho. Keeping
+small roots, collector offsets and matrix masks native reduces the penalty
+to 7.25/7.73/7.74x but does not reverse it. The 40-digit case uses a 50000
+bound and width 32768, so it is not a controlled continuation of that trend.
+
+Actual sampled F values are 81/99/149/182 bits at 40/50/80/100 digits; the
+moduli are 132/166/266/331 bits. Collection visits 524296/454659/375958/307202
+positions and finds 142/12/0/0 relations. The decrease in absolute runtime
+does not mean larger integers factor faster: the fixed work cap permits
+fewer positions and changes the mix of setup and collection costs.
+
+Frozen/current native differences at 50 and 80 digits have conditional
+repeat intervals crossing zero. The 40-digit native arm remains variable
+(14.7% relative standard deviation), and its apparent 6.8% increase needs
+a dedicated repeat before it can establish a default-path regression.
+The helper arm supplies no consistent size trend or selected QS policy.
+
+Reproduce this screen with:
+
+```sh
+v2/.venv/bin/python -u -m v2.benchmarks.p43_sizes \
+  --suites qs --digits 40 50 80 100 --large-qs --qs-work 100000000 \
+  --backends python-int gmpy2-mpz helpers-gmp gmp-small-native before-int \
+  --warmup-seconds 5 --repetitions 9 --window-seconds 3600 \
+  --output v2/benchmarks/results/p43_quiet_qs_trends_screen.json
+```
+
+### QS longer allowance: completed 50-digit comparison
+
+The fivefold longer screen completes all five 50-digit arms with nine validated
+samples each. Every arm performs 499999846 work units, visits 2428946 positions
+in 612 blocks across 19 polynomials, and retains 66 relations. All stop at the
+work allowance with the same unresolved cofactor and 70.51 MiB owned workspace.
+
+| Arm | Median time | Relative to current native |
+| --- | ---: | ---: |
+| Current native | 2.837 s | 1.00x |
+| Persistent mpz | 35.241 s | 12.42x |
+| Native loops, selective GMP helpers | 2.962 s | 1.04x |
+| Mpz with native small roots/offsets/masks | 21.359 s | 7.53x |
+| Frozen native | 2.787 s | 0.98x |
+
+Persistent mpz's conditional repeat interval is 12.01–12.81x native time.
+Relative sample deviations are 4.6% native, 0.9% mpz, 3.5% helper, 0.5%
+native-small/mpz-large and 1.2% frozen native. Longer collection does not
+amortize away the GMP penalty: it changes from 11.81x at 100 million work
+units to 12.42x at 500 million. The difference between those ratios is not
+a separately randomized duration effect, but neither run supports a crossover.
+Helper/current and frozen/current repeat intervals include zero difference.
+
+The user ended the 100-digit extension and all further experiments. Its parent
+and child were stopped and their absence verified. The incremental capture
+retains the completed 50-digit comparison and explicitly labels the unfinished
+100-digit set; the latter supplies no complete backend comparison. No new
+30-digit or disjoint-input confirmation was performed after this stop request.
+
+Reproduce the longer workload with the screen command above, replacing the
+digits with `50`, work with `500000000`, and output with
+`v2/benchmarks/results/p43_quiet_long_qs_screen.json`.
+
+The available size evidence supports retaining native integer loops in this
+PyPy implementation. The QS penalty is roughly flat across the common
+50/80/100-digit short-run configuration, and the longer 50-digit run confirms
+the large loss. These measurements do not select an automatic backend policy
+or close the disjoint confirmation gate. The final implementation passes
+316 PyPy tests and full lint, including canonical public divisors reentering
+their selected backend. The worktree is retained and uncommitted; this task
+does not merge it into mainline.

@@ -5,7 +5,8 @@ from dataclasses import dataclass, field, replace
 from functools import partial
 from math import prod
 
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import pow
 from ..budget import Budget, BudgetExhaustedError
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
@@ -25,6 +26,7 @@ class SSSConfig:
     These choices are adaptations, not upstream parameter defaults.
     """
 
+    backend: str = field(default="python-int", kw_only=True)
     mode: str = "sss"
     base_bound: int = 1000
     small_bound: int = 0
@@ -51,6 +53,9 @@ class SSSConfig:
 
     def __post_init__(self):
         """Refuse oversized schedules before setup or random assignments."""
+        if self.backend not in ("python-int", "gmpy2-mpz"):
+            raise ValueError("unknown arithmetic backend")
+
         limits = {
             "base_bound": (3, 100000),
             "small_bound": (0, 100000),
@@ -103,7 +108,9 @@ def collision_candidates(
     Exceeding the candidate cap refuses the whole unpublished assignment.
     """
     primes = tuple(roots[index].prime for index in selected)
-    modulus = prod(primes)
+    modulus = prod(
+        primes, start=arithmetic.backend_for(polynomial.n).integer(1)
+    )
     budget.consume(sum(value.bit_length() for value in coefficients) + 1)
     position = sum(coefficients[i] * roots[i].roots[0] for i in selected)
     position %= modulus
@@ -196,7 +203,9 @@ def collision_candidates(
                         raise ArithmeticError(
                             "SSS CRT divisor invariant failed"
                         )
-                    candidates.append((argument, abs(value) // step))
+                    candidates.append(
+                        (int(argument), arithmetic.divexact(abs(value), step))
+                    )
                     seen.add(argument)
 
     return tuple(candidates)
@@ -269,14 +278,16 @@ class SSSCollector(SieveCollector):
             raise ValueError("SSS needs nonempty small and remaining bases")
         self.budget.consume(sum(r.prime.bit_length() for r in self._roots))
         small_primes = tuple(r.prime for r in self._roots[: self.small_count])
-        small_product = prod(small_primes)
+        small_product = arithmetic.backend_for(self.factor_base.n).integer(
+            prod(small_primes)
+        )
         coefficients = []
 
         for prime in small_primes:
             self.budget.consume(
                 small_product.bit_length() + prime.bit_length() ** 2
             )
-            quotient = small_product // prime
+            quotient = arithmetic.divexact(small_product, prime)
             # The CRT coefficient is one at this prime and zero at the rest.
             coefficients.append(quotient * pow(quotient, -1, prime))
 
@@ -294,6 +305,7 @@ class SSSCollector(SieveCollector):
     def _batch(self, primes):
         return SmoothBatch(
             primes,
+            backend=arithmetic.backend_for(self.factor_base.n).name,
             budget=self.budget,
             max_bits=self.search.max_tree_bits,
             max_nodes=self.search.max_tree_nodes,
@@ -463,6 +475,7 @@ class SSSJob:
         self.config = config if config is not None else SSSConfig()
         if not isinstance(self.config, SSSConfig):
             raise TypeError("config must be an SSSConfig")
+        self.n = arithmetic.get_backend(self.config.backend).integer(n)
         self.budget = (
             budget if budget is not None else Budget(work_limit=200_000_000)
         )

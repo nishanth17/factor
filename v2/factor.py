@@ -15,7 +15,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     __package__ = "v2"
 
-from . import constants, ecm, pollard_rho, prime_sieve, utils
+from . import arithmetic, constants, ecm, pollard_rho, prime_sieve, utils
 
 
 @dataclass(frozen=True)
@@ -25,6 +25,9 @@ class PrimeFactor:
     value: int
     exponent: int
     certainty: utils.Primality
+
+    def __post_init__(self):
+        object.__setattr__(self, "value", arithmetic.canonical(self.value))
 
 
 @dataclass(frozen=True)
@@ -37,6 +40,12 @@ class FactorizationResult:
     remaining: Tuple[int, ...]
 
     def __post_init__(self):
+        object.__setattr__(
+            self, "original", arithmetic.canonical(self.original)
+        )
+        object.__setattr__(
+            self, "remaining", arithmetic.canonical(self.remaining)
+        )
         if self.reconstruct() != self.original:
             raise ValueError("factorization does not reconstruct its input")
 
@@ -67,13 +76,19 @@ def _trial_primes(bound):
     return tuple(prime_sieve.prime_sieve(bound + 1))
 
 
-def factorize_bf(n, *, bound=constants.TRIAL_BOUND):
+def factorize_bf(n, *, bound=constants.TRIAL_BOUND, backend=None):
     """Return (factor/exponent pairs, remainder) using exact trial division."""
     utils.require_integer(n, minimum=1)
     utils.require_integer(bound, "bound", 2)
+    engine = (
+        arithmetic.backend_for(n)
+        if backend is None
+        else arithmetic.get_backend(backend)
+    )
+    n = engine.integer(n)
     factors = []
     if n == 1:
-        return factors, n
+        return arithmetic.canonical((factors, n))
     # Refresh the exact bound only when division reduces n.
     root = utils.isqrt(n)
 
@@ -87,13 +102,13 @@ def factorize_bf(n, *, bound=constants.TRIAL_BOUND):
 
         exponent = 0
         while n % prime == 0:
-            n //= prime
+            n = arithmetic.divexact(n, prime)
             exponent += 1
         if exponent:
             factors.append((prime, exponent))
             root = utils.isqrt(n)
 
-    return factors, n
+    return arithmetic.canonical((factors, n))
 
 
 def factorize(
@@ -109,6 +124,7 @@ def factorize(
     ecm_b1=constants.ECM_B1,
     ecm_b2=constants.ECM_B2,
     primality_rounds=constants.PRIMALITY_ROUNDS,
+    backend="python-int",
 ):
     """Factor n, retaining unresolved composites and probable-prime labels.
 
@@ -139,6 +155,8 @@ def factorize(
             "seed must be None, int, float, str, bytes or bytearray"
         )
 
+    engine = arithmetic.get_backend(backend)
+    n = engine.integer(n)
     original = n
     sign = -1 if n < 0 else 1
     n = abs(n)
@@ -162,6 +180,7 @@ def factorize(
     remaining = []
     if level >= 3:
         trial_factors, n = factorize_bf(n, bound=trial_bound)
+        n = engine.integer(n)
         for prime, exponent in trial_factors:
             counts[prime] = counts.get(prime, 0) + exponent
             classifications[prime] = utils.Primality.PROVEN
@@ -200,6 +219,7 @@ def factorize(
                 max_attempts=rho_attempts,
                 max_evaluations=rho_evaluations,
                 _known_composite=True,
+                backend=backend,
             )
 
         if level >= 1 and not utils.valid_divisor(divisor, cofactor):
@@ -211,11 +231,17 @@ def factorize(
                 b1=ecm_b1,
                 b2=ecm_b2,
                 _known_composite=True,
+                backend=backend,
             )
 
         if utils.valid_divisor(divisor, cofactor):
             # Both children remain pending until independently classified.
-            pending.extend((divisor, cofactor // divisor))
+            pending.extend(
+                (
+                    engine.integer(divisor),
+                    arithmetic.divexact(cofactor, divisor),
+                )
+            )
         else:
             # Failure preserves the cofactor for result reconstruction.
             remaining.append(cofactor)
@@ -315,6 +341,9 @@ def main():
     parser.add_argument(
         "--ecm-curves", type=int, default=constants.MAX_CURVES_ECM
     )
+    parser.add_argument(
+        "--backend", choices=("python-int", "gmpy2-mpz"), default="python-int"
+    )
     args = parser.parse_args()
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
@@ -361,6 +390,7 @@ def main():
             from .qs.sss import SSSConfig
 
             parameters = dict(
+                backend=args.backend,
                 ecm_tiers=(
                     (constants.ECM_B1, constants.ECM_B2, args.ecm_curves),
                 ),
@@ -375,6 +405,7 @@ def main():
                 qs_parameters["memory_bytes"] = max(
                     0, args.memory_mib * 1024 * 1024 - 16 * 1024 * 1024
                 )
+                qs_parameters["backend"] = args.backend
                 qs_parameters["mode"] = (
                     "siqs" if args.method == "auto" else args.method
                 )
@@ -400,6 +431,7 @@ def main():
                     ecm_tiers=(),
                     sss=SSSConfig(
                         mode=args.method,
+                        backend=args.backend,
                         base_bound=args.sss_base_bound,
                         search_rounds=args.sss_rounds,
                         memory_bytes=max(
@@ -439,8 +471,16 @@ def main():
                 args.verbose,
                 seed=args.seed,
                 ecm_curves=args.ecm_curves,
+                backend=args.backend,
             )
-    except (TypeError, ValueError, OSError, KeyError, MemoryError) as error:
+    except (
+        TypeError,
+        ValueError,
+        OSError,
+        KeyError,
+        MemoryError,
+        arithmetic.BackendUnavailableError,
+    ) as error:
         parser.error(str(error))
 
     print(print_factorization(number, result))

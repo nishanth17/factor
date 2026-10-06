@@ -2,9 +2,9 @@
 
 import hashlib
 from dataclasses import dataclass, field
-from math import isqrt
 
-from .. import utils
+from .. import arithmetic, utils
+from ..arithmetic import isqrt
 from ..budget import Budget
 from .factor_base import MAX_INPUT_BITS, checked_target
 
@@ -41,6 +41,11 @@ class Polynomial:
     def __post_init__(self):
         """Validate finite coefficients and derive C and stable identity."""
         target = checked_target(self.n, self.multiplier)
+        backend = arithmetic.backend_for(self.n)
+        for name in ("a", "b", "square_coefficient"):
+            object.__setattr__(
+                self, name, backend.integer(getattr(self, name))
+            )
         utils.require_integer(self.a, "a", 1)
         utils.require_integer(self.b, "b")
         if max(self.a.bit_length(), abs(self.b).bit_length()) > (
@@ -73,7 +78,9 @@ class Polynomial:
     @property
     def supported_a(self):
         """A after removing the explicitly represented square coefficient."""
-        return self.a // (self.square_coefficient * self.square_coefficient)
+        return arithmetic.divexact(
+            self.a, self.square_coefficient * self.square_coefficient
+        )
 
     def value(self, position):
         """Evaluate normalized F at a signed integer position."""
@@ -143,7 +150,9 @@ def mpqs_polynomial(factor_base, half_width, *, budget=None, prime=None):
     budget.consume(factor_base.n_prime.bit_length() + prime.bit_length() ** 2)
     inverse = utils.modular_inverse(2 * root, prime)
     correction = (
-        ((factor_base.n_prime - root * root) // prime) * inverse % prime
+        arithmetic.divexact(factor_base.n_prime - root * root, prime)
+        * inverse
+        % prime
     )
     a = prime * prime
     b = root + prime * correction

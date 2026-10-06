@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass, field, replace
 from functools import partial
 
-from .. import utils
+from .. import arithmetic, utils
 from ..budget import Budget, BudgetExhaustedError
 from .assignment_stream import AssignmentStream
 from .external_square import (
@@ -33,6 +33,7 @@ from .sieve_collector import SieveCollector, SieveConfig
 class SIQSConfig:
     """Finite experimental parameters; growth retains the same factor base."""
 
+    backend: str = field(default="python-int", kw_only=True)
     mode: str = "siqs"
     base_bound: int = 1000
     multiplier: int = 1
@@ -68,6 +69,9 @@ class SIQSConfig:
 
     def __post_init__(self):
         """Bound schedules and reserve checkpoint/registry storage."""
+        if self.backend not in ("python-int", "gmpy2-mpz"):
+            raise ValueError("unknown arithmetic backend")
+
         limits = {
             "base_bound": (3, MAX_FACTOR_BASE_BOUND),
             "multiplier": (0, 1000000),
@@ -168,7 +172,8 @@ class SIQSJob:
         utils.require_integer(seed, "seed", 0)
         if seed >= 2**64:
             raise ValueError("seed exceeds 64 bits")
-        self.n, self.seed = n, seed
+        self.n = arithmetic.get_backend(self.config.backend).integer(n)
+        self.seed = seed
         self.budget = budget if budget is not None else Budget()
         self.base = self.family = self.engine = self.pending_step = None
         self.assignments = None

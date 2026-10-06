@@ -5,10 +5,11 @@ quarantined: multiply_prac delegates to the ladder until Phase 4 validation.
 """
 
 from dataclasses import dataclass
-from math import gcd, isqrt, prod
+from math import prod
 from typing import Optional, Tuple
 
-from . import constants, prime_sieve, utils
+from . import arithmetic, constants, prime_sieve, utils
+from .arithmetic import gcd, isqrt, pow
 
 Point = Tuple[int, int]
 
@@ -110,7 +111,7 @@ def scalar_multiply(scalar, px, pz, n, a24):
     if px == 0 and pz == 0:
         raise ValueError("(0, 0) is not a projective point")
     if scalar == 0 or pz == 0:
-        return 1, 0
+        return px * 0 + 1, pz * 0
     if scalar == 1:
         return px, pz
 
@@ -134,12 +135,15 @@ def multiply_prac(scalar, px, pz, n, a24):
     return scalar_multiply(scalar, px, pz, n, a24)
 
 
-def stage_one_scalar(b1):
+def stage_one_scalar(b1, *, backend="python-int"):
     """Exact lcm(1, ..., B1); moderate default bounds keep it manageable."""
     utils.require_integer(b1, "b1", 2)
     return prod(
-        utils.prime_power(prime, b1)
-        for prime in prime_sieve.prime_sieve(b1 + 1)
+        (
+            utils.prime_power(prime, b1)
+            for prime in prime_sieve.prime_sieve(b1 + 1)
+        ),
+        start=arithmetic.get_backend(backend).integer(1),
     )
 
 
@@ -220,6 +224,7 @@ def factorize_ecm(
     batch_size=constants.GCD_BATCH_SIZE,
     stats=None,
     _known_composite=False,
+    backend=None,
 ):
     """Return a proper divisor or None after exactly at most max_curves.
 
@@ -228,6 +233,12 @@ def factorize_ecm(
     _known_composite hint avoids repeating the dispatcher's classification.
     """
     utils.require_integer(n, minimum=1)
+    engine = (
+        arithmetic.backend_for(n)
+        if backend is None
+        else arithmetic.get_backend(backend)
+    )
+    n = engine.integer(n)
     default_b1, default_b2 = compute_bounds(n)
     b1 = default_b1 if b1 is None else b1
     b2 = default_b2 if b2 is None else b2
@@ -243,7 +254,7 @@ def factorize_ecm(
     if not _known_composite and utils.is_prime(n, rng=generator):
         return None
 
-    scalar = stage_one_scalar(b1)
+    scalar = stage_one_scalar(b1, backend=engine.name)
     work = stats if stats is not None else EcmStats()
     stage_two_primes = None
 
@@ -252,7 +263,7 @@ def factorize_ecm(
         sigma = generator.randint(6, constants.MAX_RANDOM_ECM)
         setup = setup_curve(n, sigma)
         if setup.factor is not None:
-            return setup.factor
+            return int(setup.factor)
         if setup.retry:
             work.setup_retries += 1
             continue
@@ -263,7 +274,7 @@ def factorize_ecm(
         point = scalar_multiply(scalar, *setup.point, n, setup.a24)
         divisor = gcd(point[1], n)
         if utils.valid_divisor(divisor, n):
-            return divisor
+            return int(divisor)
         if divisor == n:
             work.stage_one_saturations += 1
             continue
@@ -278,6 +289,6 @@ def factorize_ecm(
         if saturated:
             work.stage_two_saturations += 1
         if utils.valid_divisor(divisor, n):
-            return divisor
+            return int(divisor)
 
     return None

@@ -7,7 +7,7 @@ import random
 from dataclasses import dataclass
 from math import comb, prod
 
-from .. import utils
+from .. import arithmetic, utils
 from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
@@ -15,7 +15,7 @@ from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
 MAX_A_FACTORS = 32
 MAX_FAMILIES = 64
 MAX_FAMILY_POOL = 128
-FAMILY_CHECKPOINT_VERSION = 1
+FAMILY_CHECKPOINT_VERSION = 2
 MAX_CHECKPOINT_BYTES = 4096
 
 
@@ -29,7 +29,9 @@ def _identity(base):
         base.bound,
         [[entry.prime, entry.square_roots] for entry in base.entries],
     ]
-    encoded = json.dumps(payload, separators=(",", ":"))
+    encoded = json.dumps(
+        payload, default=arithmetic.json_integer, separators=(",", ":")
+    )
     identity = hashlib.sha256(encoded.encode()).hexdigest()
     object.__setattr__(base, "_family_identity", identity)
     return identity
@@ -37,7 +39,12 @@ def _identity(base):
 
 def _checksum(payload):
     """Canonical integrity marker; this is not an authentication signature."""
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    encoded = json.dumps(
+        payload,
+        default=arithmetic.json_integer,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     return hashlib.sha256(encoded.encode()).hexdigest()
 
 
@@ -237,7 +244,7 @@ class PolynomialFamily:
         ):
             raise ValueError("A primes must be nonsingular base members")
         utils.require_integer(memory_bytes, "memory_bytes", 0)
-        a = prod(a_primes)
+        a = arithmetic.backend_for(base.n).integer(prod(a_primes))
         reserve = base.workspace_bytes + 32768 + 640 * len(base.entries)
         reserve += 512 * len(a_primes) + 16 * (
             a.bit_length() + base.n.bit_length()
@@ -256,7 +263,7 @@ class PolynomialFamily:
 
         for prime in a_primes:
             self.budget.consume(a.bit_length() + prime.bit_length() ** 2)
-            quotient = a // prime
+            quotient = arithmetic.divexact(a, prime)
             inverse = utils.modular_inverse(quotient, prime)
             terms.append(
                 quotient * inverse * entries[prime].square_roots[0] % a
@@ -357,6 +364,7 @@ class PolynomialFamily:
         """
         payload = {
             "version": FAMILY_CHECKPOINT_VERSION,
+            "backend": arithmetic.backend_for(self.base.n).identity,
             "base_identity": self.base_identity,
             "a_primes": list(self.a_primes),
             "next_index": self.next_index,
@@ -367,7 +375,10 @@ class PolynomialFamily:
             },
         }
         _checked_resources(payload["resources"])
-        if len(json.dumps(payload).encode()) > MAX_CHECKPOINT_BYTES:
+        if (
+            len(json.dumps(payload, default=arithmetic.json_integer).encode())
+            > MAX_CHECKPOINT_BYTES
+        ):
             raise ValueError("family checkpoint exceeds its byte limit")
         return {"payload": payload, "sha256": _checksum(payload)}
 
@@ -388,7 +399,7 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint envelope")
 
         payload = checkpoint["payload"]
-        if not isinstance(payload, dict) or set(payload) != {
+        if not isinstance(payload, dict) or set(payload) - {"backend"} != {
             "version",
             "base_identity",
             "a_primes",
@@ -398,8 +409,16 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint payload")
 
         utils.require_integer(payload["version"], "checkpoint version", 1)
-        if payload["version"] != FAMILY_CHECKPOINT_VERSION:
+        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION):
             raise ValueError("unsupported family checkpoint version")
+        if (
+            payload.get(
+                "backend", "python-int" if payload["version"] < 2 else None
+            )
+            != arithmetic.backend_for(base.n).identity
+        ):
+            raise ValueError("incompatible family checkpoint backend")
+
         if (
             not isinstance(payload["base_identity"], str)
             or len(payload["base_identity"]) != 64
@@ -425,7 +444,10 @@ class PolynomialFamily:
         if index > 1 << (len(primes) - 1):
             raise ValueError("family checkpoint index exceeds its limit")
         resources = _checked_resources(payload["resources"])
-        if len(json.dumps(payload).encode()) > MAX_CHECKPOINT_BYTES:
+        if (
+            len(json.dumps(payload, default=arithmetic.json_integer).encode())
+            > MAX_CHECKPOINT_BYTES
+        ):
             raise ValueError("family checkpoint exceeds its byte limit")
         if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("family checkpoint integrity mismatch")

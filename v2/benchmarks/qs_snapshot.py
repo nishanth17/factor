@@ -42,6 +42,7 @@ def load_qs_arm(name, changes=()):
     sys.modules[qs.__name__] = qs
     package.qs = qs
     names = [key for key in sources if key != "qs.__init__"]
+    names.insert(names.index("constants") + 1, "arithmetic")
     names.insert(names.index("budget") + 1, "work_budget")
     names.insert(names.index("qs.sieve_collector"), "qs.families")
     names.insert(names.index("qs.sieve_collector"), "qs.power_sieve")

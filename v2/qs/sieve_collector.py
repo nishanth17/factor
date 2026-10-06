@@ -2,9 +2,9 @@
 
 from array import array
 from dataclasses import dataclass, field
-from math import gcd
 
 from .. import utils
+from ..arithmetic import gcd
 from ..budget import Budget, BudgetExhaustedError
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots

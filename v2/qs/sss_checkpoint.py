@@ -5,7 +5,7 @@ import json
 from dataclasses import asdict
 from math import isfinite
 
-from .. import utils
+from .. import arithmetic, utils
 from .checkpoint import _restore_store, _solver_digest, _store
 from .extraction import (
     DependencyExtractor,
@@ -16,7 +16,7 @@ from .families import _checked_resources, _checksum, _identity
 from .linear_algebra import MAX_MATRIX_ROWS, DependencySolver, filter_matrix
 from .sieve_collector import SieveConfig
 
-VERSION = 2
+VERSION = 3
 MAX_BLOB_BYTES = 1024 * 1024
 
 
@@ -62,6 +62,7 @@ def pack_job(job):
 
     payload = dict(
         version=VERSION,
+        backend=arithmetic.get_backend(job.config.backend).identity,
         n=job.n,
         seed=job.seed,
         config=asdict(job.config),
@@ -72,7 +73,9 @@ def pack_job(job):
         store=store,
     )
     parts, size = [], 0
-    encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"))
+    encoder = json.JSONEncoder(
+        default=arithmetic.json_integer, sort_keys=True, separators=(",", ":")
+    )
     for part in encoder.iterencode(payload):
         size += len(part.encode())
         if size + 1024 > job.config.checkpoint_bytes:
@@ -180,7 +183,7 @@ def restore_job(checkpoint, *, budget, config=None):
         raise ValueError("invalid SSS checkpoint envelope")
 
     if type(checkpoint["version"]) is not int or (
-        checkpoint["version"] not in (1, VERSION)
+        checkpoint["version"] not in (1, 2, VERSION)
     ):
         raise ValueError("unsupported SSS checkpoint version")
     blob = checkpoint["blob"]
@@ -215,6 +218,15 @@ def restore_job(checkpoint, *, budget, config=None):
     if config is not None and config != saved_config:
         raise ValueError("SSS checkpoint configuration mismatch")
     config = saved_config
+    expected_backend = arithmetic.get_backend(config.backend).identity
+    if (
+        payload.get(
+            "backend", "python-int" if payload["version"] < 3 else None
+        )
+        != expected_backend
+    ):
+        raise ValueError("incompatible checkpoint backend")
+
     if len(blob.encode()) + 1024 > config.checkpoint_bytes:
         raise ValueError("SSS checkpoint exceeds configured byte cap")
     if budget.work_limit < resources["work_used"]:

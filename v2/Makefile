@@ -22,6 +22,9 @@ export PYTHONDONTWRITEBYTECODE := 1
 .PHONY: benchmark-phase-three-siqs benchmark-phase-three-large
 .PHONY: benchmark-phase-three-sss
 .PHONY: benchmark-phase-three-parallel
+.PHONY: benchmark-backends benchmark-backend-sizes
+BACKEND_SUITES ?= arithmetic ecm qs
+BACKEND_SPLIT ?= screen
 LARGE_PHASE ?= all
 
 help:
@@ -106,6 +109,19 @@ benchmark-phase-three-parallel:
 	$(PYTHON) -u -m v2.benchmarks.phase_three_parallel \
 	  --phase all --repetitions $(REPETITIONS) \
 	  --warmup-seconds $(WARMUP_SECONDS) --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-backends:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.p43_backend \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
+
+benchmark-backend-sizes:
+	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
+	$(PYTHON) -u -m v2.benchmarks.p43_sizes \
+	  --suites $(BACKEND_SUITES) --split $(BACKEND_SPLIT) \
+	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
+	  --output "$(BENCHMARK_OUTPUT)"
 
 # Tools are installed in the ignored, project-local PyPy development venv.
 lint:

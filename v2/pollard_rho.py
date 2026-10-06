@@ -1,9 +1,9 @@
 """Bounded Brent rho with independent retries and local GCD recovery."""
 
 from dataclasses import dataclass
-from math import gcd
 
-from . import constants, utils
+from . import arithmetic, constants, utils
+from .arithmetic import gcd
 
 
 @dataclass
@@ -49,7 +49,7 @@ def _brent_attempt(
             divisor = gcd(product, n)
             stats.gcd_calls += 1
             if 1 < divisor < n:
-                return divisor
+                return int(divisor)
             if divisor == n:
                 stats.saturated_batches += 1
                 # Recovery evaluations also consume this attempt's allowance.
@@ -62,7 +62,7 @@ def _brent_attempt(
                     divisor = gcd(abs(x - saved), n)
                     stats.gcd_calls += 1
                     if 1 < divisor < n:
-                        return divisor
+                        return int(divisor)
 
                 return None
 
@@ -85,6 +85,7 @@ def factorize_rho(
     recovery_limit=constants.RHO_RECOVERY_LIMIT,
     stats=None,
     _known_composite=False,
+    backend=None,
 ):
     """Return a proper divisor or None within explicit evaluation limits.
 
@@ -92,6 +93,12 @@ def factorize_rho(
     ordinary public calls still check primality. All outputs remain divisors.
     """
     utils.require_integer(n, minimum=1)
+    engine = (
+        arithmetic.backend_for(n)
+        if backend is None
+        else arithmetic.get_backend(backend)
+    )
+    n = engine.integer(n)
     utils.require_integer(max_attempts, "max_attempts", 0)
     utils.require_integer(max_evaluations, "max_evaluations", 0)
     utils.require_integer(batch_size, "batch_size", 1)
@@ -106,8 +113,8 @@ def factorize_rho(
     work = stats if stats is not None else RhoStats()
 
     for _ in range(max_attempts):
-        start = generator.randint(1, n - 1)
-        offset = generator.randint(1, n - 1)
+        start = engine.integer(generator.randint(1, int(n) - 1))
+        offset = engine.integer(generator.randint(1, int(n) - 1))
         work.attempts += 1
         if verbose:
             print(f"Rho attempt {work.attempts}, offset={offset}")
@@ -115,6 +122,6 @@ def factorize_rho(
             n, start, offset, batch_size, max_evaluations, recovery_limit, work
         )
         if utils.valid_divisor(divisor, n):
-            return divisor
+            return int(divisor)
 
     return None

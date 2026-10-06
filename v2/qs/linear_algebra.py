@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from heapq import heapify, heappop, heappush
 
-from .. import utils
+from .. import arithmetic, utils
 from ..budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 
@@ -62,7 +62,11 @@ def filter_matrix(
         if row.bit_length() > MAX_MATRIX_COLUMNS:
             raise ValueError("matrix column cap exceeded")
     utils.require_integer(memory_bytes, "memory_bytes", 0)
-    union = 0
+    backend = arithmetic.backend_for(
+        next((row for row in rows if arithmetic.is_mpz(row)), 0)
+    )
+    zero_bit, one_bit = backend.integer(0), backend.integer(1)
+    union = zero_bit
     for row in rows:
         union |= row
     original_columns = union.bit_length()
@@ -103,17 +107,18 @@ def filter_matrix(
 
         for row in rows:
             budget.consume(0)
-            remapped, bits = 0, row
+            remapped, bits = zero_bit, row
             while bits:
                 bit = bits & -bits
-                remapped |= 1 << indices[bit.bit_length() - 1]
+                remapped |= one_bit << indices[bit.bit_length() - 1]
                 bits ^= bit
             working_rows.append(remapped)
 
         del indices
 
     active = {
-        index: (row, 1 << index) for index, row in enumerate(working_rows)
+        index: (row, one_bit << index)
+        for index, row in enumerate(working_rows)
     }
     zero, singletons, merges, rounds = [], 0, 0, 0
     input_nonzeros = sum(row.bit_count() for row in rows)
@@ -133,7 +138,9 @@ def filter_matrix(
         while bits:
             bit = bits & -bits
             column = bit.bit_length() - 1
-            incidence[column] = incidence.get(column, 0) | (1 << index)
+            incidence[column] = incidence.get(column, zero_bit) | (
+                one_bit << index
+            )
             bits ^= bit
 
     single_columns = {
@@ -151,13 +158,13 @@ def filter_matrix(
 
     def toggle(index, bits):
         """Update affected columns; queues contain at most one copy each."""
-        row_bit = 1 << index
+        row_bit = one_bit << index
 
         while bits:
             bit = bits & -bits
             column = bit.bit_length() - 1
             budget.consume(word_cost)
-            mask = incidence.get(column, 0) ^ row_bit
+            mask = incidence.get(column, zero_bit) ^ row_bit
             if mask:
                 incidence[column] = mask
             else:
@@ -194,7 +201,7 @@ def filter_matrix(
         while pair_columns:
             column = heappop(pair_columns)
             queued_pairs.remove(column)
-            mask = incidence.get(column, 0)
+            mask = incidence.get(column, zero_bit)
             if mask.bit_count() == 2:
                 first_bit = mask & -mask
                 pair = (

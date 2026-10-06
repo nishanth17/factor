@@ -150,7 +150,7 @@ class StableRowTests(unittest.TestCase):
         self.assertEqual(job.run(max_blocks=1).reason, "paused")
         checkpoint = job.checkpoint()
 
-        self.assertEqual(checkpoint["version"], 2)
+        self.assertEqual(checkpoint["version"], 3)
         damaged = mutate(
             checkpoint, lambda payload: payload["store"].pop("row_order")
         )
@@ -171,7 +171,7 @@ class StableRowTests(unittest.TestCase):
         job._setup()
         checkpoint = job.checkpoint()
 
-        self.assertEqual(checkpoint["version"], 2)
+        self.assertEqual(checkpoint["version"], 3)
         payload = json.loads(checkpoint["blob"])
         del payload["store"]["row_order"]
         with self.assertRaises(ValueError):
@@ -184,7 +184,7 @@ class StableRowTests(unittest.TestCase):
         job._setup()
         checkpoint = job.checkpoint()
 
-        self.assertEqual(json.loads(checkpoint["blob"])["version"], 3)
+        self.assertEqual(json.loads(checkpoint["blob"])["version"], 4)
         damaged = mutate(
             checkpoint, lambda payload: payload["store"].pop("row_order")
         )

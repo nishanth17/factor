@@ -2,6 +2,26 @@
 
 ## Current development
 
+- Complete the bounded P4.3 int/GMP backend foundation across preprocessing,
+  primality, rho, p−1, ECM, QS/MPQS/SIQS, SSS/SSSf, relation extraction and
+  matrix bitsets. Add explicit backend selection, exact GMP helper contracts,
+  canonical results and backend/build-bound checkpoints; preserve old integer
+  resume and positional configuration APIs. Pending children retain the chosen
+  backend after public splitters return canonical divisors. Missing GMP is an
+  explicit error.
+- Keep Python integers as the provisional default. The initial bounded ARM64
+  PyPy study establishes no algorithm/size crossover: its QS fixture has only
+  eight digits and its ECM bounds are small. In that declared scope,
+  GMP uses approximately 1.8–2.0 times the portfolio time, with all
+  factors, certainty, unresolved cofactors and work counts matching. Publish
+  the reproducible runner, certified corpus, immutable control and limitations;
+  keep captures local. The backend foundation passes 316 PyPy tests and lint;
+  retain production-bound stage and larger QS measurements. Persistent mpz
+  takes about 12 times native time in matched 50–100-digit bounded QS screens;
+  a fivefold longer 50-digit run confirms the loss. Keep native loops as the
+  provisional default. The user ended further experiments, with disjoint
+  confirmation and automatic selection still open.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,
