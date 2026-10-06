@@ -525,8 +525,8 @@ functions are unchanged. The repaired source passes the full acceptance
 suite. The later private
 control loader freezes the byte-identical helper sources to preserve the old
 control after mainline arithmetic changes; future captures pin that newer
-loader. No expanded quiet comparison was collected before the user ended
-the study; historical timing/cold source pins have not been rewritten.
+loader. Only the later focused 60/80-digit pass was collected in an exclusive
+window; historical timing/cold source pins have not been rewritten.
 
 ```sh
 mkdir -p v2/benchmarks/results/p52
@@ -546,11 +546,12 @@ acceptance is recorded with the branch.
 
 ## P5.2 realistic workload exploration and prepared protocol — 5 October 2026
 
-The user ended the expanded study early. The 256-curve campaigns, extra-seed
-sweep, larger-bound probes and exclusive-window timing confirmation were
-prepared but **not run**. Their commands below describe future experiments,
-not accepted results. No integer-size trend or large-factor performance
-claim is established by this tranche.
+The user ended the expanded study early, then requested a focused 60/80-digit
+verification. The 256-curve campaigns, extra-seed sweep, larger-bound probes and
+full twelve-input exclusive-window confirmation were prepared but **not run**.
+Their commands below describe future experiments, not accepted results. The
+focused fixed-curve comparison is accepted below; no population-wide factor-size
+allocation or large-factor success claim is established by this tranche.
 
 The initial middle-policy capture did complete nine validated samples per
 arm after more than three seconds of warmup, on the twelve certified inputs
@@ -571,8 +572,8 @@ timing repetitions are not additional independent factoring trials.
 
 These fixed-case counts do not estimate a population success probability.
 In particular, eight unsuccessful curves do not show that a factor cannot
-be found. The accepted A3 timing trend concerns repeated schedule reuse;
-its differing bounds and campaign lengths do not isolate input bit length.
+be found. The original A3 timing trend concerns repeated schedule reuse; its differing
+bounds and campaign lengths do not isolate input bit length.
 
 `p52_realistic` measures the full ECM-only portfolio on certified 30-, 40-, 60-
 and 80-digit inputs, including preprocessing, classification, curve execution
@@ -626,6 +627,60 @@ interpreter processes before, during and after each worker, terminating only the
 owned worker on overlap. It supplements coordinated timing windows; it does not
 measure every background operating-system activity. New output paths, including
 per-arm partials, refuse overwrites.
+
+
+### Focused 60/80-digit verification
+
+The later quiet pass uses the middle tier on the balanced 60-digit (198-bit)
+and 80-digit (263-bit) fixtures, with the same 11,000/1,900,000 bounds, two seeded
+starts and eight predeclared curves per start. All three arms complete the same
+32 curves per sample, with no factors, no time censoring and identical curve
+assignments/outcomes. Default streamed work also matches the frozen control.
+Each row below sums both starts, or 16 curves, for that input. Nine repetitions
+per arm reuse these fixed starts; they are not independent factor-success trials.
+
+Validated warmup is 8.106/8.052/6.973 seconds for baseline/default/programs,
+respectively. All cohort and cell relative IQRs are below 0.05, with no extended
+attempt needed. The monitor finds no competing benchmark/test interpreter
+before, during or after workers. These are uninstrumented full-portfolio costs,
+including preprocessing/classification and result validation, not profile data.
+
+| Input | Frozen streamed | Current default | Retained programs | Program saving, conditional 95% interval |
+| --- | ---: | ---: | ---: | --- |
+| Balanced 60 digits, 16 curves | 3.567 s | 3.652 s | 3.007 s | 15.7%, 13.0 to 17.4% |
+| Balanced 80 digits, 16 curves | 4.089 s | 4.205 s | 3.554 s | 13.1%, 11.5 to 14.3% |
+
+Across both inputs, programs save 14.1% (12.3–16.2%). Current default medians
+are 2.4%/2.8% slower by size; both conditional intervals cross zero, as does the
+combined default interval (-5.4 to 1.4% reduction). No default speed claim is
+made. Baseline uses 11,683,254/11,689,655 work units per start; programs use
+4,737,592/4,743,993. Different work ledgers do not by themselves establish speed.
+The same 16 MiB owned allowance and 8 MiB program cap apply throughout.
+
+The observed relative saving falls by 2.63 percentage points at 80 digits.
+A 10,000-draw bootstrap with seed 52080 resamples cohort indices jointly within
+each arm, preserving correlation between its 60/80 timings, and independently
+across arms. Its conditional difference interval is -4.52 to -0.09 points
+(80 minus 60). The earlier independent-band calculation is preserved locally,
+but the paired-cohort calculation is used for this difference. The per-size
+intervals use the driver's 3,000-draw unpaired-arm bootstrap. Absolute savings
+are similar, 0.560/0.534 seconds per 16 curves: the modest relative dilution is
+consistent with arithmetic taking a larger fraction at bigger integers. Two
+fixed inputs and two starts do not establish a general monotonic size trend.
+
+Keep programs opt-in. This verifies useful finite-curve execution at 60/80 digits;
+it does not show faster successful factoring of balanced 30/40-digit factors.
+Deeper success calibration and huge-bound feasibility remain deferred. Raw local
+captures are `results/p52/focused-60-80-quiet.json` with source/corpus/control
+hashes, and `focused-60-80-paired-trend.json`. The source passes 323 tests, full
+lint, both proof loaders, short validation-only smoke cases and all 50 benchmark
+module imports in a committed-files-only archive, without generated evidence.
+
+```sh
+pypy3 -B -m v2.benchmarks.p52_realistic --check-quiet --policies middle --fixtures 60d_balanced 80d_balanced --output v2/benchmarks/results/p52/focused-60-80-new.json
+```
+
+The following commands describe the deferred broader protocol:
 
 ```sh
 mkdir -p v2/benchmarks/results/p52

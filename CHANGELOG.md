@@ -14,8 +14,9 @@
 
 - Add independently certified 30–80-digit ECM workload fixtures and prepared
   finite deeper-campaign/large-bound runners with exclusive timing checks.
-  Preserve exploratory completion records; defer expanded timing and large-
-  factor claims after the user ended the study early. Freeze the original
+  Preserve exploratory completion records and verify a focused fixed-curve
+  60/80-digit timing pass; defer broader timing and large-factor success claims
+  after the user ended the expanded study early. Freeze the original
   control helpers separately without altering its immutable source snapshot.
 
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
