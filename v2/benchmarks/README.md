@@ -440,3 +440,110 @@ imports. Committed-files-only validation checks all required loaders and
 immutable controls, without local captures or other sessions' readability
 changes. The API and checkpoint contracts are retained, and only the R2
 delta is included in the integration commit.
+
+## P4.1/A4 verified PRAC — 5 October 2026
+
+`ecm.multiply_prac` now executes bounded verified records, including checked
+exceptional recovery; it is no longer an alias for the binary ladder. This
+accepts A4 correctness. Production standalone and bounded factoring retain
+the ladder; B3 owns portfolio work charges, chunk replay and checkpoints.
+Near-optimal/offline search is still a separate comparison, not an accepted
+speedup.
+
+The independent affine corpus has 16,016 comparisons and zero mismatches.
+391 selected chain paths require checked recovery; these are not vacuous
+`(0,0)` equalities or a recount of the original prototype's 797 failures.
+Additional tests cover exhaustive small curves, fields through 521 bits,
+composite and prime-square moduli, Suyama prime-power schedules, retained
+nonunit factors, corrupt records and bounded storage/termination.
+
+### Complete ECM attempts on 40–80-digit inputs
+
+`p41_campaign.py --gmp` compares four arms: the actual `factorize_ecm` ladder,
+checked PRAC with Python integers, the same ladder arithmetic with gmpy2,
+and checked PRAC with gmpy2. GMP uses private function bindings with identical
+function code, replacing integer validation, GCD and inversion; it retains
+`mpz` coordinates through setup, both stages and recovery. There is no global
+backend patch or per-operation conversion. This benchmark adapter is not the
+P4.3 production backend contract. It requires the optional dependency in the
+same PyPy 3.11 interpreter and fails explicitly if unavailable.
+
+The versioned `p41_ecm_40_80_corpus.json` contains 14 certified semiprimes:
+exact 40/50/60/70/80-digit inputs, balanced cases, and controlled 10-/20-digit
+small factors. Prime certificates are recursively checked with Pocklington
+and trial-division leaves, independently of the ECM implementation. Fixtures
+were selected before examining ECM outcomes. Repeated small factors across
+sizes deliberately control factor difficulty; these are inspected fixtures,
+not independent population samples. Known factors enter validators only.
+
+All arms receive the same nine seeds, Suyama parameters, B1/B2 bounds, batch
+size 128, maximum 32 curves and 60-second wall/CPU watchdogs. Every warmup and
+sample is validated, preserving unresolved composites and reconstructing all
+proper-factor results. GMP/Python pairs must also match every uncensored
+factor and curve/stage transition. Each case/arm receives at least three
+seconds of validated warmup. Groups with more than 25% timing spread repeat
+the same nine paired seeds in reversed order, retaining the original samples.
+Fresh-process cold attempts are separate.
+
+The `current` tier uses B1=2,000 and B2=147,396 on all 14 inputs. `factor20`
+uses B1=11,000 and B2=1,873,422 on the five cases with 20-digit small factors.
+The latter is a published GMP-ECM reference tier, not a calibrated optimum
+for this Python engine. [Zimmermann's parameter table](
+https://members.loria.fr/PZimmermann/records/ecm/params.html) distinguishes
+factor size from input size and gives both newer and historical estimates.
+32 curves are a finite comparison budget, not a claim of sufficient coverage
+for every 20-digit factor. Balanced 50–80-digit cases are unresolved-work
+controls at the current tier; they do not demonstrate practical extraction
+of 25–40-digit factors with these bounds.
+
+The experimental PRAC campaign builds its program once per attempt and
+reuses it across curves. Construction, caller-record re-verification, dispatch,
+all intermediate checks, stage-two prime generation and saturation recovery
+are timed. Its cap is B1 <= 11,000 and 4,096 record references, in addition to
+the scalar compiler's 512-entry cache and 512-instruction limit per record.
+It avoids cache thrashing by retaining immutable bound-owned records and
+replays a collapsed prime power only from that power's saved starting point.
+This experimental composition does not modify `stage_jobs` or its accounting.
+
+Reproduce using the same PyPy environment for all arms (the accepted GMP
+configuration is gmpy2 2.3.1 / GMP 6.3.0):
+
+```sh
+v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier current --output v2/benchmarks/results/p41-current-new.json
+v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier factor20 --output v2/benchmarks/results/p41-factor20-new.json
+```
+
+### Kernel and standalone stage-one diagnostics
+
+`p41_prac.py` separately measures 28-, 57- and 96-digit moduli. Those sizes
+are **not** the 40–80-digit ECM campaign corpus and support no claim about
+whole factoring performance. They isolate construction, fixed Suyama stages,
+kernels and exceptional recovery. At B1=2,000 the records reduce the abstract
+6/5-weighted operation total from 31,369 to 25,273 (19.4%). This is an abstract
+count, not a 19.4% runtime gain.
+
+With a 512-record cache (303 prime powers at B1=2,000), the diagnostic medians
+for complete three-curve stage-one runs are:
+
+| Modulus digits | Ladder, 16-power chunks | Ladder, individual powers | Checked PRAC, individual powers |
+| --- | ---: | ---: | ---: |
+| 28 | 6.533 ms | 6.787 ms | 11.834 ms |
+| 57 | 12.938 ms | 13.382 ms | 24.491 ms |
+| 96 | 25.209 ms | 26.172 ms | 44.785 ms |
+
+B1=2,000 chain construction is 9.206 ms; 16 exceptional recovered operations
+are 18.521 µs as a separate tiny-field diagnostic. Fresh-process startup plus
+one checked multiplication is 37.280 ms median. Actual point addition/doubling
+kernel ratios are about 1.15–1.18 in this diagnostic, rather than assuming the
+abstract 6/5 model predicts total Python execution cost. Full construction,
+recovery and sample arrays remain in ignored local evidence.
+
+```sh
+pypy3 -B -u -m v2.benchmarks.p41_prac --output v2/benchmarks/results/p41-diagnostic-new.json
+```
+
+Research references and the explicit B3/C6 follow-ups are recorded in
+[ROADMAP P4.1](../ROADMAP.md#p41--finish-prac-repair-and-precompute-valid-chains).
+GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
+are useful follow-ups; neither provides evidence that its chain-selection
+savings outweigh checked Python execution here.

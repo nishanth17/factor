@@ -14,7 +14,7 @@ from . import utils
 
 MAX_SCALAR_BITS = 32
 MAX_CHAIN_STEPS = 512
-CACHE_SIZE = 256
+CACHE_SIZE = 512
 RATIO_DENOMINATOR = 10**17
 # Exact rational approximations to GMP-ECM's continued-fraction choices.
 RATIO_NUMERATORS = (
@@ -265,7 +265,7 @@ def _prac_chain(scalar, split):
 def get_chain(scalar, *, add_cost=6, double_cost=5):
     """Get a verified record, or None above 32 bits for ladder fallback.
 
-    At most 30 rational candidate splits, 512 steps per candidate, and 256
+    At most 30 rational candidate splits, 512 steps per candidate, and 512
     cached records. No search for full-lcm scalars; no points in the cache.
     Costs are positive integer weights so selection is deterministic.
     """

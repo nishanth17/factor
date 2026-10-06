@@ -1875,7 +1875,7 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 independently interprets their integer action before `ecm.multiply_prac`
 executes them. The generator strips powers of two, tries at most 30 exact
 rational splits, requires decreasing positive `d+e` and terminal `d=e=1`,
-and enforces 32-bit scalars / 512 instructions / 256 cached records. The
+and enforces 32-bit scalars / 512 instructions / 512 cached records. The
 separate verifier checks every differential sum/difference and final scalar;
 it also accepts independently supplied Lucas records within the same limits.
 No scalar-search work is performed for an enormous full-lcm scalar.
@@ -1893,8 +1893,12 @@ retry. `NonunitPointError.factor` preserves a proper divisor, or requests
 curve retry with `None`. Returned `(0,0)` is never accepted.
 
 The [A4 benchmark record](benchmarks/README.md#p41a4-verified-prac-5-october-2026)
-charges construction, dispatch, intermediate checks, recovery, cold startup
-and complete standalone stage-one campaigns. This is acceptance of chain
+separates kernel diagnostics from complete two-stage attempts on exact
+40/50/60/70/80-digit composites. It charges setup, construction, dispatch,
+intermediate checks, recovery and cold startup, and compares Python integers
+and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
+input size and target factor size are reported separately; unresolved
+composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
 optional near-optimal comparison, B3 integration and C6 search remain open.
 

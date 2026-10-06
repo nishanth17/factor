@@ -9,6 +9,10 @@
   outcomes through `prac.NonunitPointError`, never a degenerate point.
 - Add independent affine, large-field, composite/prime-square and complete
   prime-power schedule controls, plus reproducible PyPy cost measurements.
+  Compare full two-stage attempts on certified 40–80-digit composites with
+  matched Python-int/GMP ladder and checked-PRAC arms; validate every factor,
+  unresolved cofactor and uncensored backend transition. Keep microbenchmarks
+  separate from complete-campaign evidence.
   Preserve production ladder defaults: B3 integration and the optional
   near-optimal/offline chain-search comparisons remain open.
 

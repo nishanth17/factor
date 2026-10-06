@@ -26,7 +26,7 @@ global deadline or resumable schedule.
 v2 fixes arithmetic and sieve boundaries, validates proper divisors, preserves
 failed recursive cofactors, and distinguishes probable from proven primes.
 Rho retries and ECM curve counts have explicit limits; saturated batches recover
-or report failure. ECM uses the checked binary ladder; the unsafe original PRAC
+or report failure. ECM uses the binary ladder; the unsafe original PRAC
 chain is not the default.
 
 `ecm.multiply_prac(k, x, z, n, a24)` now executes experimental verified PRAC
@@ -39,7 +39,7 @@ Montgomery curve over an odd modulus, with `a24=(A+2)/4`, as returned by
 `ecm.setup_curve`.
 
 Generation uses exact rational splits for the odd part of scalars of at most
-32 bits, with at most 30 candidates and 512 instructions each. A 256-record
+32 bits, with at most 30 candidates and 512 instructions each. A 512-record
 LRU cache contains immutable integer records, never curve points. Each
 record receives a separate integer/differential verification. Larger
 scalars use a checked ladder without chain search. Zero, one, powers of two,
@@ -55,8 +55,10 @@ weights are positive integers of at most 32 bits; defaults model 4M+2S for
 addition and 3M+2S for doubling. They are not runtime speed estimates.
 
 This completes the P4.1/A4 correctness tranche. Both `factorize_ecm` and the
-bounded stage jobs still use the binary ladder. The diagnostic measurements
-in the [benchmark guide](benchmarks/README.md) do not justify promotion;
+bounded stage jobs still use the binary ladder. The [benchmark guide](
+benchmarks/README.md#p41a4-verified-prac-5-october-2026) separates kernel
+diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
+including matched optional gmpy2 arms. These are experimental comparisons;
 B3 owns program composition, shared work accounting, checkpoint/replay
 integration and complete-factorization comparisons. The standalone PRAC
 helper has no portfolio budget or checkpoint contract.
