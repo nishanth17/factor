@@ -157,6 +157,70 @@ resumed = factorize_bounded(
 `v2.qs` and `v2.qs.sss`, respectively. Advanced settings and exact relation
 contracts are documented in the module docstrings and covered by the tests.
 
+## Optional ECM programs and explicit campaigns
+
+`PortfolioConfig(ecm_program_bytes=...)` opts into P5.2 A3's immutable packed
+prime/power blocks. Each block owns half-open endpoints and, for stage one,
+the inclusive B1 identity. Completed blocks are reused across curves and
+recursive cofactors; points, residues, products and recovery remain private to
+each job. `0` retains streamed execution and the existing version-4 checkpoint
+schema. This is an experimental storage option, not a promoted default.
+
+The program cap is part of `memory_bytes`, with a scratch reserve of
+`4096 + 256 * segment_size` bytes and a 512-byte allowance per retained block
+plus packed payloads. A full cap causes regeneration rather than eviction or
+an unbounded allocation. Packed programs require B2 strictly below `2**64`;
+the streamed integer API retains its existing endpoint domain. Owned reserves
+are conservative estimates, not process RSS limits.
+
+Generation reserves `segment_size + len(base_primes)` units per block,
+plus one unit per prime for packing/reading and one per compiled stage-one
+power. A retained block reserves one unit per decoded prime. Stage-one copying,
+point arithmetic and recovery keep their existing charges. Program and streamed
+work counts therefore differ; reduced work counts alone establish no speedup.
+
+Programs are run-local and omitted from checkpoints. Opt-in snapshots use
+version 5 and the `ecm-packed-blocks-v1` identity; old version-2/3/4 snapshots
+remain readable with programs disabled. Resume preserves the prime buffer,
+curve assignment, recovery and consumed allowances, but charges for regenerating
+missing future blocks. Powers for an already-buffered resumed segment can be
+recomputed under the existing copy reservation. A refusal during compilation
+publishes no partial block or advanced cursor, although completed generation
+work stays consumed.
+
+For an explicit finite campaign, declare all curve tiers up front and choose
+work, time and storage together. A 329-bit envelope admits every integer below
+100 decimal digits and avoids the default 4096-bit coordinate reserve:
+
+```python
+config = PortfolioConfig(
+    rho_attempts=0, pm1_attempts=0,
+    ecm_tiers=((11_000, 1_900_000, 10),),
+    max_input_bits=329, memory_bytes=16 * 2**20,
+    ecm_program_bytes=8 * 2**20,
+)
+run = factorize_bounded(
+    n, seed=7, config=config,
+    budget=Budget(work_limit=50_000_000, seconds=300, cpu_seconds=300),
+)
+assert run.result.reconstruct() == n
+```
+
+These are caller-selected allowances, not calibrated factor-size tiers or a
+success guarantee. Extend a paused campaign by increasing **total** allowances
+under the identical configuration; completed curves and their RNG progress are
+credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
+checkpoint, or extending B1 on the same curve, remains unsupported pending
+B2/A6: increasing B1 needs missing powers of old primes as well as new primes.
+
+`v2.ecm_programs.pair_coverage()` supplies bounded immutable +/- coverage
+certificates for the later B2 implementation. It includes direct-scalar
+exceptions, positive recurrence initialization and block tails. This bounded
+compiler currently accepts D=0 (direct scalars), or even D>=2 with
+`2*D < B1` for odd B1 and `2*D < B1-1` for even B1. Production
+stage two still executes the existing unpaired terms; D tuning, paired recovery,
+wheel pruning and common-Z tables retain their roadmap gates.
+
 ## Checkpoints and limits
 
 ```sh

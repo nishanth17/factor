@@ -440,3 +440,96 @@ imports. Committed-files-only validation checks all required loaders and
 immutable controls, without local captures or other sessions' readability
 changes. The API and checkpoint contracts are retained, and only the R2
 delta is included in the integration commit.
+
+## P5.2-A3 reusable programs and campaign feasibility — 5 October 2026
+
+The bounded A3 tranche adds opt-in immutable packed prime/power blocks, a
+run-local finite retention cap and independent +/- coverage fixtures. Production
+continuation remains unpaired; D tuning, wheel/common-Z experiments and automatic
+allocation belong to B2/C2/C3. `ecm_program_bytes=0` retains defaults, streamed
+work accounting and version-4 checkpoints. An enabled store reserves its full
+cap, charges construction and reads, and rebuilds after a version-5 resume;
+completed curves, buffered actions and RNG progress remain credited. Increasing
+an existing campaign's bounds or curve count is not supported by this tranche.
+
+The driver pins the pre-change `9b2d380` portfolio/stage sources and unchanged
+dependencies in `inputs/baselines/p52_a3_baseline.json`. The independent corpus in
+`inputs/corpora/p52_a3_corpus.json` contains ten freshly generated inputs with
+Pocklington certificates, seed 20261005052 and algorithm seeds 7/19/41. Complete
+factor results reconstruct and match the certified factors. Schedule-only rows
+match independent integer-index Eratosthenes/prime-power counts and digests;
+finite campaign rows validate every divisor and reconstruct the input.
+
+Four arms use matched inputs, seeds, bounds and finite work/time/storage grants:
+the frozen baseline, current default, an 8 MiB program cap, and packing with only
+the scratch reserve (no retained blocks). Confirmation on Apple M4 / 24 GiB with
+PyPy 7.3.23 implementing Python 3.11.15 supplies at least three seconds of validated
+warmup and nine samples per arm. All confirmation arms meet the relative-IQR
+threshold of 0.15. The following medians compare retained programs with the frozen
+baseline; intervals are unpaired bootstrap 95% intervals conditional on these
+fixed cohorts, not estimates for future inputs.
+
+| Cohort, per sample | Streamed baseline | Retained programs | Time reduction, 95% interval |
+| --- | ---: | ---: | --- |
+| Four 10-digit inputs, three seeds, 12/12 complete | 1.767 ms | 1.859 ms | -5.3%, -7.2 to -2.1% |
+| Four 16-digit inputs, three seeds, 12/12 complete | 11.036 ms | 11.407 ms | -3.4%, -11.4 to 13.8% |
+| One 80-digit input, two starts, three curves each; no splits | 812.181 ms | 744.879 ms | 8.3%, 7.7 to 9.1% |
+| 11,000/1,900,000 schedule only, three passes | 160.669 ms | 121.047 ms | 24.7%, 22.4 to 26.8% |
+| 50,000/5,000,000 schedule only, three passes | 455.596 ms | 324.290 ms | 28.8%, 27.1 to 32.8% |
+
+The large campaign performs 54 curve attempts per arm across the nine samples,
+with no factors. Its saving is a finite-curve execution result, not faster
+factoring or improved success. Small complete factoring regresses; the medium
+interval crosses zero. Packing without retention is about 4% slower on the large
+campaign. Default streamed outcomes and work are unchanged; tiny default timing
+differences earn no speed claim. The earlier 2,000/147,396 schedule comparison
+remains unstable after eight seconds of warmup and 63 samples and is inconclusive.
+Retain the default and bounds; the opt-in provides an explicit reuse control for
+B2, not a general promotion.
+
+A deterministic nonsplitting probe uses one 266-bit input, a 329-bit admission
+envelope and three curves under 50,000,000 work units and 120-second wall/CPU caps.
+The table includes full point/recovery work. Construction increases first-curve
+work; later curves amortize it. Counts exclude one-time context setup.
+
+| B1/B2 | Streamed units per curve | Program first / subsequent curve | Program accounting after three curves | Owned reserve, streamed / 8 MiB cap |
+| --- | ---: | ---: | ---: | ---: |
+| 2,000/147,396 | 110,517 | 124,445 / 45,014 | 414,528 bytes | 1,319,864 / 9,708,472 bytes |
+| 11,000/1,900,000 | 1,458,993 | 1,602,357 / 446,275 | 1,888,800 bytes | 2,665,104 / 11,053,712 bytes |
+| 50,000/5,000,000 | 4,080,627 | 4,434,273 / 1,122,672 | 4,345,712 bytes | 3,825,120 / 12,213,728 bytes |
+
+Program accounting includes the fixed scratch reserve and per-block allowance;
+the admission reserve includes the entire requested cap, not just populated
+blocks. A 16 MiB workspace and 329-bit envelope admit these tiers with an 8 MiB
+program cap. The 2,000,000-unit default cannot finish the tested full nonsplitting
+50,000/5,000,000 curve. These counts are not universal minimums for finding a
+factor. A predeclared 10,000-curve campaign is finite and admissible; a smaller
+work grant pauses it and can be extended cumulatively under the identical config.
+It does not guarantee completion or permit adding curves to an exhausted config.
+
+Observed large-schedule worker RSS is 102.02 MiB baseline and 117.16 MiB with
+programs. RSS includes the interpreter/JIT, independent oracle and warmup and is
+separate from owned workspace. Nine separate cold worker starts per arm give
+108.550/102.611/104.374/103.487 ms for baseline/default/programs/regenerated;
+these include imports and corpus validation and establish no cold promotion.
+
+Local ignored evidence lives in `results/p52/confirmation.json` and the earlier
+`final-comparison.json`, with source hashes and prior noisy attempts preserved.
+The final smallest-buffer checkpoint repair follows those measurements: an AST
+comparison isolates it to `_verify_progress`; fresh execution and measurement
+functions are unchanged. The repaired source passes the full acceptance suite;
+the historical timing/cold source pins have not been rewritten.
+
+```sh
+mkdir -p v2/benchmarks/results/p52
+pypy3 -B -m v2.benchmarks.p52_a3 --cases small medium large_campaign middle_schedule large_schedule --cold --probes --output v2/benchmarks/results/p52/confirmation-new.json
+pypy3 -B -m v2.benchmarks.p52_a3 --cold --probes --output v2/benchmarks/results/p52/all-cases-new.json
+```
+
+Output paths refuse overwrites. Unstable arms extend to five seconds/31 samples,
+then eight seconds/63 samples; unresolved instability prevents a timing claim.
+Acceptance covers exact actions, independent point cross-products, coverage
+exceptions/tails, atomic refusal, capped regeneration, mixed-factor replay,
+quiet factoring, every resume phase, legacy schema, resealed bounds/endpoints,
+wide packed words and cancellation with the smallest prime buffer. Final tests
+and lint pass; committed-files-only acceptance is recorded with the branch.

@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Add P5.2 A3's opt-in immutable packed ECM prime/power blocks with bounded
+  retention, charged regeneration and curve-private arithmetic. Preserve
+  streamed defaults and version-4 snapshots; opt-in version-5 checkpoints pin
+  schedule/configuration identity and retain cumulative resume allowances.
+  Correct the resume cursor's odd-slot bound when prime 2 shares a tiny buffer.
+- Add independent +/- prime-coverage certificates and affine cross-product
+  oracles for the later paired executor. Document feasible explicit campaign
+  storage/work and predeclared-curve continuation; keep paired execution,
+  increased-B1 continuation, D tuning and allocation calibration open.
+
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,
   or `--siqs`
   as the rho/p−1/ECM portfolio fallback. Both reuse recursive factor validation,
