@@ -456,12 +456,17 @@ The independent affine corpus has 16,016 comparisons and zero mismatches.
 Additional tests cover exhaustive small curves, fields through 521 bits,
 composite and prime-square moduli, Suyama prime-power schedules, retained
 nonunit factors, corrupt records and bounded storage/termination.
+The exact false-infinity example documented in GMP-ECM's `ecm.c`
+(`n=33554520197234177`, `sigma=2046841451`, B1=373) also passes the
+independent affine oracle and finishes at a non-infinite point.
 
 ### Complete ECM attempts on 40–80-digit inputs
 
 `p41_campaign.py --gmp` compares four arms: the actual `factorize_ecm` ladder,
 checked PRAC with Python integers, the same ladder arithmetic with gmpy2,
-and checked PRAC with gmpy2. GMP uses private function bindings with identical
+and checked PRAC with gmpy2. These gmpy2 arms run Python ECM, not the
+C GMP-ECM executable or its optional near-optimal chain interpreter.
+GMP uses private function bindings with identical
 function code, replacing integer validation, GCD and inversion; it retains
 `mpz` coordinates through setup, both stages and recovery. There is no global
 backend patch or per-operation conversion. This benchmark adapter is not the
@@ -475,6 +480,9 @@ and trial-division leaves, independently of the ECM implementation. Fixtures
 were selected before examining ECM outcomes. Repeated small factors across
 sizes deliberately control factor difficulty; these are inspected fixtures,
 not independent population samples. Known factors enter validators only.
+The timer covers the known-composite ECM attempt; certificate and result
+verification run outside it. Portfolio preprocessing, recursive dispatch and
+checkpointing are not included.
 
 All arms receive the same nine seeds, Suyama parameters, B1/B2 bounds, batch
 size 128, maximum 32 curves and 60-second wall/CPU watchdogs. Every warmup and
@@ -483,7 +491,11 @@ proper-factor results. GMP/Python pairs must also match every uncensored
 factor and curve/stage transition. Each case/arm receives at least three
 seconds of validated warmup. Groups with more than 25% timing spread repeat
 the same nine paired seeds in reversed order, retaining the original samples.
-Fresh-process cold attempts are separate.
+Tables report the final nine-seed block for extended groups; the original
+block remains in the evidence. Fresh-process cold attempts are separate.
+Each cold sample repeats seed 41,001 on the balanced 40-digit case. Its
+curve count can differ from the warmed table's median across nine seeds;
+cold and warmed medians must not be subtracted to estimate startup overhead.
 
 The `current` tier uses B1=2,000 and B2=147,396 on all 14 inputs. `factor20`
 uses B1=11,000 and B2=1,873,422 on the five cases with 20-digit small factors.
@@ -512,6 +524,50 @@ configuration is gmpy2 2.3.1 / GMP 6.3.0):
 v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier current --output v2/benchmarks/results/p41-current-new.json
 v2/.venv/bin/python -B -u -m v2.benchmarks.p41_campaign --gmp --tier factor20 --output v2/benchmarks/results/p41-factor20-new.json
 ```
+
+### Accepted current-bound results
+
+All four arms find proper factors in the same **49/126 distinct seeded
+attempts**. There are zero timeouts, invalid factors or mismatched backend
+transitions; 432 GMP/Python pairs agree across primary and extended blocks.
+All five 10-digit-factor fixtures complete for 9/9 seeds; the four unbalanced
+20-digit-factor fixtures complete for 1/9 each. None of the balanced inputs
+splits in nine 32-curve attempts at these bounds.
+
+Median seconds per complete attempt, using the final nine-seed block where
+extension was triggered (success counts are identical across the four arms):
+
+| Input case | Factor digits | Successes / 9 | Int ladder | Int PRAC | gmpy2 ladder | gmpy2 PRAC |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Balanced 40 | 20 + 20 | 0 | 0.2536 | 0.3602 | 1.2179 | 1.3099 |
+| Small-factor 40 | 10 + 30 | 9 | 0.0111 | 0.0226 | 0.0577 | 0.0576 |
+| Balanced 50 | 25 + 25 | 0 | 0.2762 | 0.3981 | 1.2264 | 1.3240 |
+| Small-factor 50 | 10 + 40 | 9 | 0.0120 | 0.0243 | 0.0558 | 0.0585 |
+| Target-factor 50 | 20 + 30 | 1 | 0.2398 | 0.3645 | 1.2230 | 1.3306 |
+| Balanced 60 | 30 + 30 | 0 | 0.3275 | 0.4728 | 1.2925 | 1.4235 |
+| Small-factor 60 | 10 + 50 | 9 | 0.0150 | 0.0265 | 0.0579 | 0.0592 |
+| Target-factor 60 | 20 + 40 | 1 | 0.3043 | 0.4525 | 1.2379 | 1.3697 |
+| Balanced 70 | 35 + 35 | 0 | 0.3275 | 0.4955 | 1.2439 | 1.3765 |
+| Small-factor 70 | 10 + 60 | 9 | 0.0171 | 0.0362 | 0.0513 | 0.0607 |
+| Target-factor 70 | 20 + 50 | 1 | 0.3547 | 0.5241 | 1.2713 | 1.4057 |
+| Balanced 80 | 40 + 40 | 0 | 0.3864 | 0.5799 | 1.2683 | 1.4285 |
+| Small-factor 80 | 10 + 70 | 9 | 0.0197 | 0.0326 | 0.0593 | 0.0611 |
+| Target-factor 80 | 20 + 60 | 1 | 0.4142 | 0.6073 | 1.2822 | 1.4416 |
+
+On this finite corpus, checked PRAC/int takes 1.42–2.12 times the int ladder's
+median attempt time. The all-mpz ladder takes 3.00–5.22 times the int ladder;
+all-mpz checked PRAC takes 3.10–5.55 times. These are complete ECM attempts,
+including unsuccessful searches. They establish no PRAC or all-mpz promotion
+for this implementation. They do not calibrate selective GMP helpers or
+coarser compiled curve kernels.
+
+The first balanced-40 primary block showed roughly twofold timing drift
+shared across arms. Its repeated block supplies the reported values; both
+blocks are retained. Seed-dependent early factors also cause legitimate
+variation in attempt duration. No small timing differences are claimed as
+wins. Nine fresh-process balanced-40 attempts per arm give cold medians of
+0.3590/0.5469/1.3394/1.5164 seconds in table order, including startup, imports,
+certificate validation, construction and the first attempt.
 
 ### Kernel and standalone stage-one diagnostics
 

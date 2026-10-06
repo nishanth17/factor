@@ -274,6 +274,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--tier", choices=TIERS, default="current")
     parser.add_argument("--case", action="append")
+    parser.add_argument("--cold-case")
     parser.add_argument("--seconds", type=float, default=60)
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--gmp", action="store_true")
@@ -298,6 +299,14 @@ def main():
         parser.error("unknown case")
     if args.tier == "factor20" and not args.case:
         cases = [c for c in cases if min(c["factor_digits"]) == 20]
+    cold_cases = [
+        c
+        for c in corpus["fixtures"]
+        if c["id"] == (args.cold_case or cases[0]["id"])
+    ]
+    if not cold_cases:
+        parser.error("unknown cold case")
+    cold_case = cold_cases[0]
     if args.cold_arm:
         result = attempt(
             args.cold_arm,
@@ -322,6 +331,7 @@ def main():
         "source_sha256": {},
         "cases": [],
         "cold": [],
+        "cold_case": cold_case["id"],
         "limitations": [
             "fixed inspected fixtures, not a population-level speedup claim",
             "32-curve attempts; unresolved composites remain explicit",
@@ -427,7 +437,7 @@ def main():
                         "--cold-arm",
                         arm,
                         "--case",
-                        cases[0]["id"],
+                        cold_case["id"],
                         "--tier",
                         args.tier,
                         "--seconds",
@@ -439,7 +449,7 @@ def main():
                 )
                 total = time.perf_counter() - started
                 result = json.loads(cold_path.read_text())
-                validate_result(result, cases[0])
+                validate_result(result, cold_case)
                 cold_path.unlink()
                 report["cold"].append({"total_seconds": total, **result})
         args.output.write_text(json.dumps(report, indent=2) + "\n")

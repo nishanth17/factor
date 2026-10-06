@@ -265,7 +265,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| C6 — P4.1 advanced offline chain search | Compare bounded/offline continued-fraction or near-optimal chain search with verified production chains. | B3 plus significant remaining stage-one cost | **Low/conditional.** First learn whether ordinary verified chains help. Shorter records or fewer search nodes alone cannot justify generation, dispatch and cache costs. No online search over the enormous full-lcm scalar. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Deferred by user, separate tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -409,7 +409,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    EXEC --> SEARCH[C6: offline chain search if justified]
+    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment, deferred]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -1900,7 +1900,7 @@ and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
 input size and target factor size are reported separately; unresolved
 composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
-optional near-optimal comparison, B3 integration and C6 search remain open.
+P4.5/C6 precomputed Lucas comparison and B3 integration remain open.
 
 **Research decision:** use ordinary bounded PRAC first. The
 [GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
@@ -1912,23 +1912,27 @@ precomputes optimal or near-optimal prime chains, but generation and storage
 still need to be charged. The
 [Bernstein–Cottaar–Lange paper](https://eprint.iacr.org/2024/1044)
 improves continued-fraction chain search by pruning and meet-in-the-middle;
-it does not establish a faster checked PyPy ECM engine. Keep that search as
-C6 after B3 identifies the remaining stage cost.
+it does not establish a faster checked PyPy ECM engine. Compare precomputed chains separately in P4.5/C6 before drawing conclusions
+about their production value; the checked A4 timings cannot settle that question.
 [CADO's bytecode implementation](https://github.com/cado-nfs/cado-nfs/blob/master/sieve/ecm/bytecode.c)
 separates encoding, cost models and verification; compact program execution
 is a useful B3 comparison to the readable bounded records used in A4.
+
+The [full Bernstein–Cottaar–Lange paper](https://antsmath.org/ANTSXVI/papers/BernsteinCottaarLange.pdf)
+(published in 2025) optimizes length within the continued-fraction subclass,
+not weighted runtime over every differential addition-subtraction chain.
+Its compressed three-live-point interpreter is a useful execution comparison
+because PRAC has more complicated data movement. Section 1.1 explicitly
+separates multiplication, squaring and curve-constant costs and leaves
+low-level performance analysis open. A shorter chain therefore needs a
+measured implementation comparison before replacing this checked baseline.
 
 **Cost-model follow-up (M27):** v1's `ADD_COST=6`, `DUP_COST=5` and
 `lucas_cost` mirror GMP-ECM's abstract differential-add/double costs.
 The review maps the Fibonacci/golden-ratio
 split and existing prototype to this task; production still uses the ladder.
 
-- [ ] Compare guarded PRAC with optional precomputed near-optimal Lucas
-  chains, as in GMP-ECM 7.0.6. Model additions as 4M+2S and doubles as
-  3M+2S, then calibrate costs on actual PyPy kernels and available backends.
-  Keep integer/rational selection and charge generation, cache/storage,
-  dispatch and exceptional recovery. Independently verify every chain;
-  compare full stage-one and complete-factorization costs before promotion.
+The precomputed near-optimal comparison is tracked separately in **P4.5/C6**.
 
 **2026-10-04 research refinement:** test projective validity separately from
 cross-product equality, which can accept `(0,0)` vacuously. Exercise complete
@@ -1942,15 +1946,6 @@ reference; abstract M/S counts need measured PyPy costs.
   into bounded composed programs; retain chunk-start replay and factor/nonunit
   handling. Do not search near-optimal chains for an enormous full-lcm scalar
   online. Measure chain/schedule amortization across the sub-100 workload.
-
-- [ ] Add bounded/offline continued-fraction chain search as a separate
-  challenger, using Bernstein–Cottaar–Lange's 2025 pruning/meet-in-the-middle
-  work and CADO's compact bytecode representation as references. Independently
-  verify integer chain records and distinguish guaranteed from heuristic
-  search termination/optimality. Charge generation, tables, dispatch and
-  exceptional recovery; retain the ladder. Author prototype floating search
-  bounds and shorter-chain/node-count results are not exact production
-  contracts or measured full-ECM speedups.
 
 ### P4.2 — Compare fused and normalized Montgomery kernels
 
@@ -2009,6 +2004,36 @@ comparison track; it does not close backend implementation or performance gates.
 - [ ] Include encoded one (`R % n`), coordinate/parameter conversion and
   canonical exits in reducer oracles. Prove any GCD invariance using the unit
   scaling assumption; a reducer does not authorize dropping nonunit recovery.
+
+### P4.5 — Experiment with GMP-ECM precomputed Lucas chains (C6)
+
+**Deferred at the user's request on 5 October 2026 to conserve the current
+session's token budget.** This is a separate future tranche, not part of A4's
+completion. Its result must not be inferred from checked PRAC's timings.
+
+- [ ] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
+  decode with the upstream implementation and independently verify every
+  integer/differential identity. Compare precomputed PRAC and Lucas chains
+  through the same compact executor, preserving bounded nonunit/factor
+  recovery. GMP-ECM uses a 16-point rolling buffer; the newer continued-fraction
+  paper's three-live-point interpreter is a distinct candidate.
+- [ ] Run ladder, precomputed PRAC and Lucas arms on the same certified
+  40/50/60/70/80-digit corpus, seeds, bounds and curve limits, with Python-int
+  and gmpy2 variants. Separate input digits from factor digits. Include
+  generation/load/verification, storage, dispatch, recovery, cold startup,
+  full stage-one and complete two-stage campaign costs; retain unresolved
+  cofactors and the ladder control. Coordinate exclusive timing windows.
+- [ ] Compare bounded/offline continued-fraction search using the 2025
+  Bernstein–Cottaar–Lange pruning/meet-in-the-middle work when warranted.
+  Distinguish minimal length within a chain family, near-optimal search,
+  weighted arithmetic cost and measured runtime; do not claim a global
+  optimum without a proof. No online search over the full-lcm scalar.
+- **A:** independent affine/composite/prime-power tests, including GMP-ECM's
+  published false-infinity regression, retain every proper factor and enforce
+  finite generation, cache and recovery bounds.
+- **E:** at least three seconds of validated PyPy warmup and nine paired
+  samples, extending unstable captures. Promote only after complete-run
+  evidence. B3 owns subsequent bounded-stage/checkpoint integration.
 
 **Phase 4 exit:** promote only variants with independently validated arithmetic and reproducible full-stage/portfolio benefit. A documented decision to retain the ladder or native `%` is a successful experiment outcome; a speedup is not guaranteed.
 

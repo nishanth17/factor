@@ -235,6 +235,27 @@ class PointTests(unittest.TestCase):
                 else:
                     self.assertTrue(matches(actual, expected, modulus))
 
+    def test_gmp_ecm_published_false_infinity_regression(self):
+        # GMP-ECM ecm.c warns that unguarded PRAC can falsely reach infinity
+        # for this Suyama curve at B1=373: the order contains 23**2 > B1.
+        modulus = 33554520197234177
+        setup = ecm.setup_curve(modulus, 2046841451)
+        self.assertIsNone(setup.factor)
+        self.assertFalse(setup.retry)
+        expected, curve_a, curve_b = twist_point(
+            setup.point, setup.a24, modulus
+        )
+        actual = setup.point
+        for prime in prime_sieve.prime_sieve(374):
+            power = utils.prime_power(prime, 373)
+            expected = affine_multiply(
+                power, expected, modulus, curve_a, curve_b
+            )
+            actual = ecm.multiply_prac(power, *actual, modulus, setup.a24)
+            self.assertTrue(matches(actual, expected, modulus))
+        self.assertIsNotNone(expected)
+        self.assertNotEqual(actual[1], 0)
+
     def test_nonunits_degenerate_states_and_single_retry(self):
         for x, z in ((5, 5), (1, 5), (5, 0)):
             with self.assertRaises(prac.NonunitPointError) as result:

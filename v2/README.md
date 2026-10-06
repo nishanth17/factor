@@ -39,7 +39,9 @@ Montgomery curve over an odd modulus, with `a24=(A+2)/4`, as returned by
 `ecm.setup_curve`.
 
 Generation uses exact rational splits for the odd part of scalars of at most
-32 bits, with at most 30 candidates and 512 instructions each. A 512-record
+32 bits, with at most 30 candidates and 512 instructions each. This bounds
+each prime/prime-power multiplier, not the integer being factored: the
+modulus can have 40–80 digits or more. A 512-record
 LRU cache contains immutable integer records, never curve points. Each
 record receives a separate integer/differential verification. Larger
 scalars use a checked ladder without chain search. Zero, one, powers of two,
