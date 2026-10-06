@@ -19,8 +19,9 @@ are complete at M31; broader scaling/default promotion stays separate.
 Phase 8 remains the M23 Phase 2 optimization follow-up. Research additions below close no implementation or experiment gate.
 
 Start with correctness repairs in Phase 1. Establish bounded, reproducible
-execution in Phase 2, add SIQS coverage in Phase 3, then build GNFS as a
-committed workstream. Keep the factoring algorithms in Python on PyPy Python
+execution in Phase 2, add SIQS coverage in Phase 3, then optimize and calibrate
+the current engines before revisiting GNFS as a later workstream.
+Keep the factoring algorithms in Python on PyPy Python
 3.11; compare built-in integers and optional gmpy2 arithmetic on that runtime
 as separate performance tracks. Existing phase/task IDs stay stable; the
 execution order below governs dependencies rather than numerical order.
@@ -52,10 +53,26 @@ Python defaults or measured Python improvements.
 
 Performance promotion policy proposed for Phases 3–8: zero correctness failures; obey the same time, CPU, and memory limits; show either at least 10% lower end-to-end median time on a prespecified comparable cohort or at least 10 percentage points higher completion within budget; allow no more than a 5-percentage-point completion regression in another declared workload class. Check uncertainty with repeated seeds and a confidence interval for the relevant difference. If evidence is inconclusive, retain the baseline and expand the sample. Include setup, conversion, timeout, and recovery costs. These thresholds are project policy suggestions, not measured predictions.
 
-## Execution order toward GNFS
+## Execution order: optimize current engines, then revisit GNFS
 
-**Decision (M18): GNFS is committed roadmap scope, not a conditional future
-project.** Its implementation is not started. Sequence by these prerequisites:
+**Decision (5 October 2026): prioritize the current factoring engines.**
+GNFS remains future roadmap scope and is deferred; this supersedes M18's
+immediate execution priority. First calibrate SIQS/MPQS, improve measured
+ECM and p±1 bottlenecks, reconcile v1 capabilities and tune the existing
+portfolio. Confirm selected changes together on fresh inputs before deciding
+whether remaining coverage gaps justify starting GNFS. Keep optional losses
+or inconclusive experiments as explicit deferrals rather than requiring every
+challenger to be implemented.
+
+- [x] ~~P3.8-R2 bounded candidate-cascade evaluation and integration~~ — merged
+  as `758d5b3`; acceptance and the retain-defaults decision are complete.
+  Conditional B13/C8 follow-ups remain separately open.
+- [ ] Optimize and confirm the current-engine portfolio through E1 and H1,
+  including selected P6 challengers and fresh P8 calibration.
+- [ ] Review measured coverage and marginal gains after H1; decide whether
+  to activate the deferred GNFS tranche starting at A9.
+
+Sequence by these prerequisites:
 
 1. P3.4's SIQS implementation, complete extraction/checkpoints and optional
    dispatch are tested. M31 completes the declared longer 30–80-digit and
@@ -63,14 +80,15 @@ project.** Its implementation is not started. Sequence by these prerequisites:
    negative outcomes; retain ECM defaults. Broader scaling remains open.
    P3.1–P3.3's exact relation/filter/dependency controls and their M28 repairs
    provide shared infrastructure and a comparison baseline.
-2. Bring P4.3 forward: assess a coarse arithmetic boundary and GMP/`mpz` on
-   PyPy Python 3.11 before GNFS scaling. Keep conversions outside hot loops
-   and preserve canonical checkpoints. A small GNFS reference can start with
-   Python integers while this proceeds; GMP availability or speed is not a
-   substitute for algorithm correctness and does not require CPython support.
-3. Build P7.1–P7.5: a bounded GNFS pipeline that completes small general
-   composites through both rational and algebraic square roots. Start its
-   contracts after P3.3; integrate after the SIQS baseline is working. Shared
+2. Optimize the existing engines: B1 SIQS calibration, P4.3 backend and
+   P4/P5 arithmetic/schedule improvements, profile-triggered relation/matrix
+   work and selected P6 challengers. Freeze the accepted E1 control for P8
+   tuning, then confirm the combined current-engine portfolio at H1. Keep
+   conversions outside hot loops and preserve canonical checkpoints; GMP
+   availability alone is not a speedup.
+3. After H1 and an explicit coverage review, revisit P7.1–P7.5: a bounded
+   GNFS pipeline that completes small general composites through both
+   rational and algebraic square roots. Shared
    relation storage/filtering interfaces may be reused, but SIQS relations and
    GNFS ideal/character data have distinct mathematical contracts.
 4. Scale P7.6–P7.7: improve polynomial selection, lattice sieving and sparse
@@ -80,11 +98,11 @@ project.** Its implementation is not started. Sequence by these prerequisites:
 
 P3.6.1 completes the bounded repair pass for the diagnosed P3.5/P3.6 costs;
 its evidence is available to P3.8 and P6.3. Further P3.5 SSS comparison, P3.6 parallel promotion,
-P3.7 NumPy, and P4–P6 optional optimizations can proceed when useful; completing
-every such experiment is not a prerequisite for GNFS. M23 consolidates
-remaining P2 optimization in future Phase 8, after working SIQS and bounded
-small GNFS, with individual
-spikes eligible earlier when profiling justifies them. Small reference
+P3.7 NumPy, and P4–P6 optional optimizations proceed when useful. M23 consolidates
+remaining P2 optimization in Phase 8, now using the accepted current-engine
+portfolio without waiting for GNFS. After selected improvements and explicit
+deferrals are confirmed at H1, revisit GNFS using the measured coverage gap.
+Small reference
 correctness, scalable execution, and performance-based default promotion are
 separate milestones. The eight-phase catalogue preserves existing
 task/evidence IDs; Phase 8 is the user-requested future follow-up.
@@ -92,7 +110,8 @@ task/evidence IDs; Phase 8 is the user-requested future follow-up.
 <!-- BEGIN MASTER EXECUTION SEQUENCE -->
 ## Master execution sequence and model recommendations
 
-Planning snapshot: 4 October 2026, America/Los_Angeles.
+Planning snapshot: 4 October 2026; execution priority updated 5 October 2026,
+America/Los_Angeles.
 
 This is the authoritative dependency-based execution plan for the active
 `v2/` implementation on PyPy implementing Python 3.11, targeting general
@@ -112,17 +131,20 @@ B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
 **Williams p+1 belongs to P5.1: A5 builds the binary reference, and B8 evaluates
 P5.1 parameter starts and P5.3 Lucas optimizations. It is eligible before P6.**
 P6 owns advanced ECM curve families, polynomial continuations, richer relation
-experiments, broader workers and comparative publication. GNFS starts at A9
-and reaches small-engine integration at C7; optional P4–P6 experiments do not
-delay that branch. D7 freezes the P8 control after small GNFS, and G1 waits
-for the measured SIQS/GNFS crossover before final allocation.
+experiments, broader workers and comparative publication. D7 freezes the
+current-engine P8 control after E1; G1/H1 tune and confirm that portfolio.
+GNFS starts at A9 only after H1 and the coverage review activates its later
+tranche, then reaches small-engine integration at C7. F1 owns a subsequent
+GNFS crossover update to the accepted allocation policy.
 
 ### How to read the phases
 
 Phases A–I are execution layers, distinct from the roadmap's numbered phases.
 Rows in one layer have no dependency on one another's unfinished deliverables.
 Each row names its predecessors; it may start as soon as those predecessors
-are settled, without waiting for unrelated rows in an earlier layer.
+are settled, without waiting for unrelated rows in an earlier layer. Deferred
+GNFS rows retain their IDs in a separate later-tranche table; their original
+letters no longer indicate immediate eligibility.
 
 The plan includes two kinds of edge:
 
@@ -196,7 +218,7 @@ development and coordinated integration, not concurrent performance runs.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| A1 — P3.8-R2 integration and acceptance | Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports. | Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions | **Complete for bounded scope.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence. | Current Sol / **xhigh** | Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation. |
+| ~~A1 — P3.8-R2 integration and acceptance~~ | Completed for the bounded tranche: integrate fixed scores/capped plans with the latest repairs, migrate required inputs/evidence without changing historical pins, validate combined budgets/checkpoints and matched comparisons, and verify committed-files-only tests/imports. | Existing R1/R3/repair contracts; isolated R2 implementation and frozen decisions | **[x] Complete for bounded scope; merged as `758d5b3`.** The accepted options remain opt-in and defaults are retained. B1 calibration is unblocked; B13/C8 remain conditional on new workload evidence. | Current Sol / **xhigh** | Sol preserves task continuity and existing controls. xhigh covers provenance-preserving migration, budget/checkpoint composition and combined-source validation. |
 | A2 — P4.3 backend foundation | Specify coarse int/mpz boundaries; implement and validate specialized baseline ladder/stage paths, canonical checkpoints and explicit backend identity; compare available PyPy tracks. | Existing exact ECM and checkpoint controls | **High, bounded experiment.** Broad arithmetic costs make this a useful early test and it settles interfaces for later ECM work. Installed gmpy2 is availability evidence, not a speedup; retain int if GMP loses. | Sol / **xhigh** | Sol fits a bounded backend implementation with exact reference outputs. xhigh helps reconcile type validation, nonunit handling, conversions and checkpoint identity across the complete stage. |
 | A3 — P5.2 reusable programs and campaign feasibility | Build bounded immutable prime-power/coverage programs and independent coverage oracles; compare schedule reuse on the current int control; define finite curve/bound/storage/extension contracts, including feasible larger campaigns suggested by v1. | Existing P2 schedules, recovery and ECM | **High.** Research identified repeated schedule generation and infeasible allowance combinations. Reusing bound-owned work across curves can matter without changing curve mathematics. This planning/schedule tranche does not need PRAC or GMP. | Sol / **xhigh** | Sol fits schedule construction and oracle-driven implementation. xhigh is warranted because coverage, amortization, memory limits and resumed execution must agree, even when individual arithmetic actions are unchanged. |
 | A4 — P4.1 chain correctness | Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder. | Existing exact point/ladder controls | **Medium/high potential, higher proof risk.** Mathematical validation can run independently of backend implementation. It must precede production chain execution; old exceptional `(0,0)` cases do not count as equality successes. | Astra / **xhigh** | Choose Astra for the proof-intensive chain invariants and exceptional composite-modulus cases. xhigh supports checking termination and valid projective states against independent oracles before production use. |
@@ -204,7 +226,6 @@ development and coordinated integration, not concurrent performance runs.
 | A6 — P5.3 p−1 and extension correctness | Compare bounded prime-power/chunk powering and gap reuse against current p−1; define and test exact increased-B1 schedule ratios without requiring new p+1 code. | Existing p−1/P2 controls | **Medium.** Cheap structured-factor coverage and correct continuation can be developed now. Raising B1 must include increased powers of old primes, not just new primes. Keep this p−1 tranche separate from the later Lucas optimization. | Sol / **xhigh** | Sol fits incremental changes to an existing verified method. xhigh is for proving exact schedule ratios, preserving chunk replay and separating genuine extra coverage from repeated work. |
 | A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
 | A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
-| A9 — P7.1 GNFS contracts + P7.4 root-method scope | Define polynomial/field, nonmonic norm, ideal/root and bad-prime identities; choose a finite supported algebraic-root strategy before expanding fields. Use exact small oracles. | Existing P2 contracts and P3.3/P3.4 reference | **High for committed coverage.** GNFS is already committed scope. Its contracts can start now on Python integers; optional P3.8/P4/P5/P6 experiments do not block them. Root-method constraints must inform field selection early. | Astra / **xhigh** | Astra fits the coupled number-field, ideal and square-root contracts. xhigh is for nonmonic corrections, unsupported-field refusal and independently checkable identities; no max setting is needed merely for drafting contracts. |
 | A10 — P8.2.1 verified v1 capability transfers | Audit missing v1 capabilities, route every verified advantage to its existing owner, and port independently supported wider deterministic Miller–Rabin ranges. Cover the reported 23-digit prime and threshold counterexamples; preserve explicit probabilistic mode and document certainty/accounting changes. | Existing P1.8/P2 exact classification and budget controls; preserved v1 sources | **High, immediate capability parity.** v1 has a verified fixed-base range that v2 currently labels probable. This tranche can ship before GNFS/P8 control freeze; larger v1 search allowances alone are not a proven algorithmic advantage. | Sol / **xhigh**; targeted Astra review for disputed range proofs | Sol fits a bounded source/capability reconciliation and range implementation. xhigh covers strict thresholds, pseudoprimes, caller semantics, RNG/work effects and honest provenance; use Astra only for an unresolved mathematical guarantee. |
 | A11 — P3.4 CLI usability follow-up | Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, useful help, examples and tests through the existing `v2.factor` recursive portfolio; retain opt-in SIQS fallback. | Existing P2 portfolio and P3.4 polynomial/checkpoint contracts | **Outstanding usability follow-up, eligible now.** Explicit engine access is independent of automatic-dispatch performance gates. All three selectors are now wired and tested; the complete usability follow-up remains tracked here under P3.4. | Sol / **high** | Sol fits connecting existing verified engines to the entry point. high covers cross-mode configuration, help/examples, recursive reconstruction and checked resume; no new factoring mathematics or automatic default is required. |
 
@@ -220,11 +241,8 @@ development and coordinated integration, not concurrent performance runs.
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
 | B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
 | B8 — Williams p+1 starts (P5.1) / Lucas optimization (P5.3) | Compare bounded rational/seeded p+1 starts and validated Lucas-chain execution against the binary control; validate p+1 bound extension separately from ordinary powering. | A5, A4; A6's schedule-ratio contract | **Medium/conditional.** Binary correctness and verified chain machinery must exist first. This targets marginal p+1 coverage; the ECM recurrence is not a drop-in Lucas implementation. | Astra / **xhigh** | Choose Astra for transferring verified chain ideas to a distinct Lucas recurrence and reasoning about parameter-dependent orders. xhigh is for denominator/discriminant exceptions, composition and exact extension semantics. |
-| B9 — P7.2 full-relation collector | Build bounded serial line sieving with exact two-norm/ideal verification, primitive-pair deduplication, collection cursors and bounded storage. Start with full relations. | A9 | **High for the GNFS reference.** Stable field/ideal identities must precede stored relations. Full relations provide a tractable control before partials and special-q scaling. | Astra / **xhigh** | Astra fits the rational/algebraic relation boundary and ideal valuation exceptions. xhigh is for deduplication, sign/known-factor corrections, norm reconstruction and bounded resume across both sides. |
-| B10 — P7.3 GNFS matrix/character control | Implement exact bitset constraints and original-relation lifting on independently generated fixtures, with explicit sign/character placement and kernel correction. | A9; existing P3.3 solver control | **High for correctness.** Fixture-based solver development can run alongside collection. It does not require Four Russians, Lanczos or Wiedemann; ideal parity alone is insufficient. | Astra / **xhigh** | Astra fits the distinction between ideal parity, character constraints and actual algebraic squareness. xhigh is needed for exact lifting and correction without treating a screened vector as a proved square. |
-| B11 — P7.4 algebraic/rational root implementation | Implement the selected bounded root method against known-square field fixtures, including coefficient/precision bounds, signs, denominators and modular mapping. Defer full pipeline acceptance to C7. | A9 | **High and proof-sensitive.** Root arithmetic can develop alongside B9/B10 using independent fixtures. An unsupported field or failed auxiliary-prime search must produce finite refusal, not an invalid root. | Astra / **xhigh**; **max** for a named unresolved proof | Astra fits reconstruction and number-field square-root arguments. xhigh is the normal setting; max is reserved for a concrete precision/sign/field-coverage counterexample that remains unresolved. |
 | B12 — P6.3 worker-contract preparation | Specify reusable assignment IDs, immutable schedules, parent-owned leases, aggregate CPU/RSS, cancellation and restart contracts; reconcile existing QS workers. Prepare bounded fixtures, not a new worker default. | A2, A3, A7 | **Medium, early preparation.** Contracts can proceed once backend, program and repair interfaces settle. Production portfolio experiments wait for the stable serial tranche in F4; existing QS workers are reused. | Sol / **xhigh** | Sol fits state-machine and accounting design around existing workers. xhigh is for cross-process ownership, in-flight reservations and interrupted restart, not for adding more worker processes. |
-| B13 — P3.8-R2 wide-block resieve capacity | Reconcile the repair owner's wide-block resieve accounting. If setup still refuses, prove a bound for the actual sparse scratch/storage representation, verify complete candidate coverage and refusal/resume, and compare bucket versus resieve complete runs under matched budgets. | A1; unresolved wide-block capacity refusal | **Conditional.** The isolated 30-digit resieve arm refused setup under the dense reservation. Reuse any accepted repair first; a new bound needs a proof, not a smaller constant. Streamed B1 calibration can proceed while this branch stays deferred. | Astra / **xhigh** | Astra fits representation/storage proofs and exceptional recovery cases. xhigh is for simultaneous live memory, exact coverage and first-uncommitted-position behavior under refusal and resume. |
+| B13 — P3.8-R2 wide-block resieve capacity | Reuse the accepted sparse resieve support bound. Only if a new calibrated workload still refuses setup, prove a bound for its actual scratch/storage representation, verify coverage and refusal/resume, and compare complete bucket/resieve runs under matched budgets. | A1; a new calibrated wide-block capacity refusal | **Deferred unless newly triggered.** The combined 30-digit bridge resolves the isolated refusal with the accepted repair. A larger workload needs new evidence and a proof; streamed B1 calibration proceeds independently. | Astra / **xhigh** | Astra fits representation/storage proofs and exceptional recovery cases. xhigh is for simultaneous live memory, exact coverage and first-uncommitted-position behavior under refusal and resume. |
 | B14 — P8.2.2 checked prime certificates | Add certificate generation and a separate exact verifier for primes beyond supported deterministic ranges, starting with finite n−1/Pocklington proofs. Bound recursive factor/proof work and storage, define requested-proof CLI/API and checked resume policy, and retain probable status when proof is unavailable. | A10; existing shared-budget/checkpoint controls | **High for certified results.** Proof is an explicit capability beyond v1 parity. Start after the range contract settles, without waiting for GNFS; certify supported cases rather than claiming arbitrary-size proof from extra probable-prime rounds. | Astra / **xhigh** | Astra fits recursive primality certificates and the trust boundary between generation and verification. xhigh is for independently checked factors/witnesses, corrupt certificates, bounded recursion and resumed proof accounting. |
 
 B6 and B7 use the same frozen matrix contract but can be independent challenger
@@ -238,7 +256,7 @@ refusing resieve representation; streamed B1 calibration does not wait for it.
 A1 can close with explicit B13/C8 deferrals, without marking their optional
 implementations complete.
 
-### Execution phase C — measured challengers and the small GNFS integration
+### Execution phase C — measured current-engine challengers
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
@@ -248,7 +266,6 @@ implementations complete.
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | C6 — P4.1 advanced offline chain search | Compare bounded/offline continued-fraction or near-optimal chain search with verified production chains. | B3 plus significant remaining stage-one cost | **Low/conditional.** First learn whether ordinary verified chains help. Shorter records or fewer search nodes alone cannot justify generation, dispatch and cache costs. No online search over the enormous full-lcm scalar. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
-| C7 — P7.3–P7.5 small GNFS integration | Connect collected relations, constrained dependencies and both square roots; validate complete small general composites, corrupt-state checks, cumulative allowances and explicit opt-in dispatch. | B9, B10, B11; existing working SIQS baseline | **High committed milestone.** This is the first whole-pipeline GNFS correctness gate. It does not wait for every optional P4–P6 result; a matrix success or integer norm root cannot substitute for a proper divisor. | Astra / **xhigh** | Astra fits integrating new algebraic contracts with budget/checkpoint semantics. xhigh is for end-to-end identity checks, finite root retries and preserving unresolved cofactors; use the independent oracles from the preceding tasks. |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -262,49 +279,43 @@ a sufficiently useful population of residuals recoverable within the proposed
 split/storage limits. Likewise, no useful matrix is a collection diagnosis,
 not evidence that a more elaborate solver is needed.
 
-### Execution phase D — GNFS scaling, P8 controls and sparse-solver alternatives
+### Execution phase D — sparse-solver alternatives
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | D1 — P3.8 block Lanczos | Bounded seeded recurrence, singular-block handling, original-operator kernel correction, lifting and resumable state. | C4 decision and a remaining sparse-solve or dense-memory bottleneck | **Low/conditional.** A credible dense/hybrid comparison comes first by investment policy. Validate every candidate against original `M d = 0`; a Gram-kernel candidate can be spurious. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for singular-block recurrence, self-orthogonality and original-operator kernel correction. xhigh is the starting point; max is reserved for a specific unresolved invariant or counterexample, not routine benchmark execution. |
 | D2 — P3.8 block Wiedemann | Projected Krylov sequence, a genuine block polynomial generator, reconstruction, original-kernel verification and bounded checkpoints. | C4 decision and a remaining sparse-solve or dense-memory bottleneck | **Low/conditional.** It is an alternative to D1, not dependent on D1. Generator/reconstruction/I/O costs and failure rates can outweigh sparse products. A correct base-case generator precedes fast generator algorithms. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for block polynomial generators, projection failure cases and reconstruction proofs. xhigh is the starting point; use max only for a named unresolved generator/kernel argument, not merely because the solver is large. |
-| D3 — P7.6 polynomial selection | Compare bounded degree/skew/root-quality search and trial sieving with the base-m reference; verify every common root and charge selection cost. | C7, A2 decision | **High scaling candidate after correctness.** Better norms can affect the entire collector. Compare on a fixed reference collector so improvements are attributable; GMP is optional. | Astra / **xhigh** | Astra fits exact polynomial transformations plus heuristic selection criteria. xhigh is for separating valid algebraic changes from uncertain quality estimates and accounting for search cost. |
-| D4 — P7.6 prime special-q lattice sieve | Implement bounded prime-special-q assignments, lattice mappings, forced ideal exponents, buckets/spills and exact duplicate coverage on fixed accepted polynomials. | C7, A2 decision | **High potential, substantial implementation.** The full-relation verifier is the control. This branch can run independently of D3 using frozen polynomials; composite special-q follows prime-q correctness within this track. | Astra / **xhigh** | Astra fits determinant/congruence and inverse-coordinate proofs. xhigh is needed for projective roots, overlapping assignments, forced factors and complete coverage under finite storage. |
-| D5 — P7.6 two-sided cofactoring and large ideals | Evaluate bounded residual strategies and general side-labelled ideal incidence against the full-relation control; preserve repeated powers, certainty and distinct roots above the same prime. | C7, A2 decision | **Conditional on collection/cofactor cost.** Use fixed polynomial and sieve fixtures for independent work. QS DLP code supplies implementation experience, not a valid general GNFS edge-graph contract. | Astra / **xhigh** | Astra fits the interaction of ideal identities, cofactor certification and general incidence. xhigh is needed to prevent equal primes or multiple large ideals from being incorrectly collapsed. |
-| D6 — P7.6 matrix/storage scaling | Profile genuine GNFS matrices, retain ideal/character constraints and lifting, and validate bounded layouts/spill. Reuse accepted P3.8 kernels; coordinate any new sparse solver with D1/D2. | C7, A2 decision | **Conditional on actual matrix pressure.** GNFS matrix preparation can run alongside D3–D5 against frozen fixtures. No duplicate Lanczos/Wiedemann implementation or compulsory sparse solver is introduced. | Astra / **xhigh** | Astra fits GNFS-specific constraint preservation and storage/lifting proofs. xhigh is for transferring infrastructure without confusing QS and GNFS relation semantics. |
-| D7 — P8.1 fresh portfolio control | Freeze a measured SIQS/small-GNFS control and certified training/untouched confirmation inputs; profile separately and retain source/configuration identity for every later challenger. | C7; existing SIQS/P2 controls | **High enabling value, bounded scope.** P8 integrated experiments need small GNFS, not completed GNFS scaling or all P6 options. Keep this control immutable while later engines remain separately versioned candidates. | Sol / **high**; **xhigh** for protocol decisions | Sol fits corpus/runner reuse and reproducibility checks. high suffices for a fixed protocol; xhigh is for workload stratification, censoring and leakage-resistant comparison design. |
 
 D1 and D2 belong in the same topological layer. With limited engineering
 capacity, my scheduling preference is to try Lanczos first and fund Wiedemann
 only if the evidence warrants another challenger. That preference is not a
 dependency. Both can remain deferred while other accepted improvements ship.
 
-### Execution phase E — earlier-tranche acceptance, scaled GNFS and P8 experiments
+### Execution phase E — current-engine acceptance, control freeze and P8 experiments
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | E1 — final R1/R5 and P4/P5 acceptance | Integrate selected changes, including accepted A10/B14 capabilities and A11 CLI integration; reconcile v1 transfer decisions and recalibrate affected SIQS/ECM/p±1 parameters; freeze selections; run fresh complete-factor comparisons, R5 SSS/worker challengers, resume checks and clean-checkout validation; publish adopt/defer/reject decisions. | A1, A7, A10, A11 and chosen P3.7/P3.8/P4/P5 predecessor decisions; B14 if proof support is selected; B13/C8 and other unchosen branches have recorded deferrals | **Required closure.** Independent wins are not additive and optional algorithms need not become defaults. Only the combined held-out comparison supports portfolio promotion. R5 consumes repaired interfaces and the final baseline rather than imposing a prerequisite on every earlier branch. | Sol / **xhigh**; targeted Astra / **xhigh** review for new arithmetic/provenance | Sol fits integration across established contracts and reproducible experiment runners. xhigh is for combined regressions, selection and uncertainty; targeted Astra / xhigh review is appropriate only where accepted changes introduce new arithmetic or provenance arguments. |
-| E2 — P7.6 scaled GNFS integration | Integrate accepted selection/sieve/cofactor/matrix branches, retain rejected controls, validate full reconstruction and bounded restart, and freeze the scaling configuration before crossover measurement. | D3, D4, D5, D6 decisions; D1/D2 only if their solvers are selected | **High downstream milestone.** Independent stage wins can interact or lose useful relations. This is the serial scaling gate; broad process parallelism is optional and must use F4 accounting if later adopted. | Astra / **xhigh** | Astra fits interactions among new field, lattice, partial-relation and solver contracts. xhigh is for full-pipeline verification and resource composition; neither stage throughput nor accepted component tests close this gate. |
+| D7 — P8.1 fresh portfolio control | Freeze the accepted current SIQS/MPQS, rho, ECM and p±1 portfolio with certified training/untouched confirmation inputs; profile separately and retain source/configuration identity for every later challenger. | E1; existing SIQS/P2 controls | **High enabling value, bounded scope.** P8 tuning uses the accepted current engines before GNFS. Keep this control immutable; future GNFS requires a separately versioned extension and crossover evaluation. | Sol / **high**; **xhigh** for protocol decisions | Sol fits corpus/runner reuse and reproducibility checks. high suffices for a fixed protocol; xhigh is for workload stratification, censoring and leakage-resistant comparison design. |
 | E3 — P8.2 preprocessing | Compare trial cutoffs, exact power-exponent/rejection filters and finite Fermat updates on the frozen control; reuse accepted A10/B14 classification/proof capabilities and retain exact equality and certainty semantics. | D7 | **Medium; profile-gated.** Broad cheap-path savings may help, but prior repair decisions are retained. Full integrated evaluation now has the right control; a justified isolated oracle spike could occur earlier. | Sol / **xhigh** | Sol fits controlled filters around existing exact routines. xhigh is needed because a false rejection can silently lose a factor or power, particularly across partial trial progress and resume. |
 | E4 — P8.3 rho calibration | Tune bounded batch/walk/restart policies under identical total budgets and assigned seeds; measure first-factor and complete runs including saturation recovery. | D7 | **Medium.** Parameter tuning is relatively contained, but must show marginal portfolio value on the new workload. It reuses current Brent/local-loop controls rather than rebuilding rho. | Sol / **high**; **xhigh** for changed recovery semantics | Sol/high fits sweeps over an existing verified implementation. Use xhigh if tuning changes replay, cancellation or consumed-work behavior; long sample collection alone needs no stronger setting. |
 | E5 — P8.5 recovery/polling/checkpoint costs | Separate cooperative checks, atomic commits, recovery, explicit durable writes and JSON verification; revisit batching or bounded recovery trees only where profiles justify them. | D7 | **Medium; conditional on changed cost.** Existing repair gains remain the starting point. Revisit only unresolved or newly dominant overhead, preserving validation and disclosing work-unit changes. | Sol / **xhigh** | Sol fits measurement and bounded state-machine changes. xhigh is for proving no lost work, false saturation success or invalid resume while reducing overhead. |
 | E6 — P8.6 contexts/schedules for changed workloads | Test lazy/staged setup, bounded reusable buffers and existing schedule/cache arms when new workloads alter their economics; evaluate any verified v1 sieve/setup advantage identified by A10. | D7 | **Conditional.** This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership changes | Sol/high fits existing-arm comparisons. Escalate to xhigh when changing private scratch ownership, cache identity or upfront resource reservations. |
 
 E1 accepts the selected P3–P5 tranche and early A10/B14 capability transfers;
-individual transfers may ship once their own gates pass. E2–E6 are independent
-work on the GNFS/P8 branches in this layer. Release individually accepted tranches once their
-predecessors settle. A deferred reducer, NumPy spike or solver does not block
-E1, and P6 experiments do not block GNFS correctness.
+individual transfers may ship once their own gates pass. E3–E6 use the frozen
+D7 current-engine control; their acceptance feeds G1/H1. Release individually
+accepted tranches once their predecessors settle. A deferred reducer, NumPy
+spike or solver does not block E1. E2 belongs to the deferred GNFS tranche.
 
-### Execution phase F — GNFS crossover and independent P6 challengers
+### Execution phase F — independent P6 challengers
 
 The P6 production experiments use the measured P3–P5 tranche from E1.
-GNFS correctness does not depend on these optional experiments. Each row is
-separate; choose only the challengers supported by its cost/yield profile.
+Choose challengers supported by their cost/yield profiles, and carry selected
+implementations or explicit deferrals into current-engine G1/H1 acceptance.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| F1 — P7.7 SIQS/GNFS crossover | Freeze scaled GNFS and calibrated SIQS arms; compare fresh general-composite bands, complete/factor-one outputs, exhaustion, CPU/RSS/disk and cold/warm costs before any default handoff. | E2, E1 | **High decision value.** A correct small GNFS engine is not evidence of a useful digit crossover. This needs both measured engines and remains independent of optional P6 research. | Sol / **xhigh** | Sol fits pinned-engine evaluation and dispatch policy. xhigh is for uncertainty, censored runs, observable decision features and separating special-form examples from general coverage. |
 | F2 — P6.1 Edwards/windowed/torsion-aware ECM | Compare a complete curve-family/stage-one package and a validated Montgomery stage-two conversion with the accepted Suyama engine, including mixed-coordinate chains and setup costs. | E1; A2/B3/B4 accepted contracts or retained controls | **Conditional.** First establish how far ordinary backend/chain/kernel improvements go. Curve-order torsion, chosen-point order and exceptional maps need whole-engine evidence, not operation counts. | Astra / **xhigh** | Astra fits curve-family hypotheses, coordinate maps and low-order exceptions. xhigh is needed to check the conditions over hidden prime factors rather than infer them from a composite-modulus Jacobi symbol. |
 | F3 — P6.2 polynomial ECM continuation | Choose one justified product/remainder-tree, multipoint or Brent–Suyama continuation challenger; bound nodes, coefficients, reconstruction precision and nonunit recovery. | E1, B2; C2 decision and a remaining continuation bottleneck | **Conditional, potentially important at larger targets.** Paired classical stage two is the baseline. Advance when per-prime continuation remains the limiting algorithm, not merely because larger bounds are available. | Astra / **xhigh** | Astra fits exact composite-ring polynomial arithmetic and coverage arguments. xhigh is required for coefficient/carry bounds, reconstruction and nonunit handling; floating FFT needs a separately proved exactness contract. |
 | F4 — P6.3 production ECM/portfolio workers | Implement/reuse bounded parent-owned work leases, stable assignments, cancellation and restart; compare 1/2/4 workers for fixed-work and first-valid-factor cases with total CPU and aggregate RSS. | E1, B12; E2 if GNFS jobs are included | **Conditional measured parallelism.** Stable serial engines and worker contracts precede credible comparisons. Reuse P3.6/P3.6.1 results; extra cores and earlier thread improvements do not establish a first-factor win. | Sol / **xhigh** | Sol fits orchestration over settled engines. xhigh is needed for in-flight/returned/cancelled work, live and exited process accounting and restart identity; thread use additionally requires observed backend behavior. |
@@ -316,7 +327,7 @@ separate; choose only the challengers supported by its cost/yield profile.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| G1 — P8.4 joint allocation and handoff | Fit bounded rho/p−1/p+1/ECM allocations and SIQS/GNFS handoff using observable input and completed-work metadata. Consume accepted engine changes without reimplementing them. | D7, E1, F1; E3–E6 and selected F2–F7 decisions | **High downstream value.** Allocation must use the settled engines and measured GNFS crossover. Known factor sizes stratify evaluation but are hidden from the dispatcher. P7.7 retains GNFS crossover ownership. | Sol / **xhigh** | Sol fits policy implementation using measured costs. xhigh is for uncertain marginal success, prior-work credit, shared child budgets and preventing hidden-label leakage or unmeasured native thresholds. |
+| G1 — P8.4 joint allocation and handoff | Fit bounded rho/p−1/p+1/ECM allocations and QS/MPQS/SIQS handoff using observable input and completed-work metadata. Consume accepted engine changes without reimplementing them. | D7, E1; E3–E6 and selected F2–F7 decisions | **High downstream value.** Tune the settled current engines before GNFS. Known factor sizes stratify evaluation but stay hidden from the dispatcher. Deferred F1 later supplies any measured GNFS crossover update. | Sol / **xhigh** | Sol fits policy implementation using measured costs. xhigh is for uncertain marginal success, prior-work credit, shared child budgets and preventing hidden-label leakage or unmeasured native thresholds. |
 
 ### Execution phase H — final Phase 8 reconciliation
 
@@ -328,7 +339,30 @@ separate; choose only the challengers supported by its cost/yield profile.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| I1 — P6.4 final comparative publication | Publish source/configuration pins, commands, independent corpus/runner links, backend/core disclosures, supported limits and complete versus factor-one outcomes; run feasible pinned competitor arms. | H1, F1; selected P6 decisions and clean-checkout validation | **Required for comparative claims.** Final publication follows the measured integrated result, although individual milestone evidence can be published earlier. P8.1 supplies the protocol; P6.4 owns presentation/comparison rather than duplicating it. | Sol / **high**; **xhigh** for disputed comparisons | Sol/high fits evidence-backed reporting and reproduction checks. Use xhigh to resolve uncertain or incompatible comparisons; stronger model settings cannot replace missing measurements. |
+| I1 — P6.4 final comparative publication | Publish source/configuration pins, commands, independent corpus/runner links, backend/core disclosures, supported limits and complete versus factor-one outcomes; run feasible pinned competitor arms. | H1; selected P6 decisions and clean-checkout validation; F1 only for later GNFS claims | **Required for comparative claims.** Final publication follows the measured integrated result, although individual milestone evidence can be published earlier. P8.1 supplies the protocol; P6.4 owns presentation/comparison rather than duplicating it. | Sol / **high**; **xhigh** for disputed comparisons | Sol/high fits evidence-backed reporting and reproduction checks. Use xhigh to resolve uncertain or incompatible comparisons; stronger model settings cannot replace missing measurements. |
+
+### Later tranche — GNFS after current-engine optimization
+
+All rows below are deferred. H1 confirms the selected current-engine improvements
+and recorded deferrals; a subsequent coverage review decides whether to activate
+A9. This is an investment-order gate, not an arithmetic prerequisite. Retain the
+original task IDs, mathematical contracts and acceptance gates. Once activated,
+follow the predecessors below; no GNFS task blocks current-engine P8 tuning,
+allocation, confirmation or publication.
+
+| ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
+| --- | --- | --- | --- | --- | --- |
+| A9 — P7.1 GNFS contracts + P7.4 root-method scope | Define polynomial/field, nonmonic norm, ideal/root and bad-prime identities; choose a finite supported algebraic-root strategy before expanding fields. Use exact small oracles. | H1; coverage review activates GNFS; existing P2 and P3.3/P3.4 controls | **Deferred, later coverage investment.** Start only after current-engine optimization and fresh confirmation, if the coverage review justifies GNFS. Root-method constraints must inform field selection early. | Astra / **xhigh** | Astra fits the coupled number-field, ideal and square-root contracts. xhigh is for nonmonic corrections, unsupported-field refusal and independently checkable identities; no max setting is needed merely for drafting contracts. |
+| B9 — P7.2 full-relation collector | Build bounded serial line sieving with exact two-norm/ideal verification, primitive-pair deduplication, collection cursors and bounded storage. Start with full relations. | A9 | **Deferred with GNFS.** **High for the GNFS reference.** Stable field/ideal identities must precede stored relations. Full relations provide a tractable control before partials and special-q scaling. | Astra / **xhigh** | Astra fits the rational/algebraic relation boundary and ideal valuation exceptions. xhigh is for deduplication, sign/known-factor corrections, norm reconstruction and bounded resume across both sides. |
+| B10 — P7.3 GNFS matrix/character control | Implement exact bitset constraints and original-relation lifting on independently generated fixtures, with explicit sign/character placement and kernel correction. | A9; existing P3.3 solver control | **Deferred with GNFS.** **High for correctness.** Fixture-based solver development can run alongside collection. It does not require Four Russians, Lanczos or Wiedemann; ideal parity alone is insufficient. | Astra / **xhigh** | Astra fits the distinction between ideal parity, character constraints and actual algebraic squareness. xhigh is needed for exact lifting and correction without treating a screened vector as a proved square. |
+| B11 — P7.4 algebraic/rational root implementation | Implement the selected bounded root method against known-square field fixtures, including coefficient/precision bounds, signs, denominators and modular mapping. Defer full pipeline acceptance to C7. | A9 | **Deferred with GNFS.** **High and proof-sensitive.** Root arithmetic can develop alongside B9/B10 using independent fixtures. An unsupported field or failed auxiliary-prime search must produce finite refusal, not an invalid root. | Astra / **xhigh**; **max** for a named unresolved proof | Astra fits reconstruction and number-field square-root arguments. xhigh is the normal setting; max is reserved for a concrete precision/sign/field-coverage counterexample that remains unresolved. |
+| C7 — P7.3–P7.5 small GNFS integration | Connect collected relations, constrained dependencies and both square roots; validate complete small general composites, corrupt-state checks, cumulative allowances and explicit opt-in dispatch. | B9, B10, B11; existing working SIQS baseline | **Deferred with GNFS.** **High correctness milestone once activated.** This is the first whole-pipeline GNFS correctness gate; a matrix success or integer norm root cannot substitute for a proper divisor. | Astra / **xhigh** | Astra fits integrating new algebraic contracts with budget/checkpoint semantics. xhigh is for end-to-end identity checks, finite root retries and preserving unresolved cofactors; use the independent oracles from the preceding tasks. |
+| D3 — P7.6 polynomial selection | Compare bounded degree/skew/root-quality search and trial sieving with the base-m reference; verify every common root and charge selection cost. | C7, A2 decision | **Deferred with GNFS.** **High scaling candidate after correctness.** Better norms can affect the entire collector. Compare on a fixed reference collector so improvements are attributable; GMP is optional. | Astra / **xhigh** | Astra fits exact polynomial transformations plus heuristic selection criteria. xhigh is for separating valid algebraic changes from uncertain quality estimates and accounting for search cost. |
+| D4 — P7.6 prime special-q lattice sieve | Implement bounded prime-special-q assignments, lattice mappings, forced ideal exponents, buckets/spills and exact duplicate coverage on fixed accepted polynomials. | C7, A2 decision | **Deferred with GNFS.** **High potential, substantial implementation.** The full-relation verifier is the control. This branch can run independently of D3 using frozen polynomials; composite special-q follows prime-q correctness within this track. | Astra / **xhigh** | Astra fits determinant/congruence and inverse-coordinate proofs. xhigh is needed for projective roots, overlapping assignments, forced factors and complete coverage under finite storage. |
+| D5 — P7.6 two-sided cofactoring and large ideals | Evaluate bounded residual strategies and general side-labelled ideal incidence against the full-relation control; preserve repeated powers, certainty and distinct roots above the same prime. | C7, A2 decision | **Deferred with GNFS.** **Conditional on collection/cofactor cost.** Use fixed polynomial and sieve fixtures for independent work. QS DLP code supplies implementation experience, not a valid general GNFS edge-graph contract. | Astra / **xhigh** | Astra fits the interaction of ideal identities, cofactor certification and general incidence. xhigh is needed to prevent equal primes or multiple large ideals from being incorrectly collapsed. |
+| D6 — P7.6 matrix/storage scaling | Profile genuine GNFS matrices, retain ideal/character constraints and lifting, and validate bounded layouts/spill. Reuse accepted P3.8 kernels; coordinate any new sparse solver with D1/D2. | C7, A2 decision | **Deferred with GNFS.** **Conditional on actual matrix pressure.** GNFS matrix preparation can run alongside D3–D5 against frozen fixtures. No duplicate Lanczos/Wiedemann implementation or compulsory sparse solver is introduced. | Astra / **xhigh** | Astra fits GNFS-specific constraint preservation and storage/lifting proofs. xhigh is for transferring infrastructure without confusing QS and GNFS relation semantics. |
+| E2 — P7.6 scaled GNFS integration | Integrate accepted selection/sieve/cofactor/matrix branches, retain rejected controls, validate full reconstruction and bounded restart, and freeze the scaling configuration before crossover measurement. | D3, D4, D5, D6 decisions; D1/D2 only if their solvers are selected | **Deferred with GNFS.** **High downstream milestone.** Independent stage wins can interact or lose useful relations. This is the serial scaling gate; broad process parallelism is optional and must use F4 accounting if later adopted. | Astra / **xhigh** | Astra fits interactions among new field, lattice, partial-relation and solver contracts. xhigh is for full-pipeline verification and resource composition; neither stage throughput nor accepted component tests close this gate. |
+| F1 — P7.7 SIQS/GNFS crossover | Freeze scaled GNFS and calibrated SIQS arms; compare fresh general-composite bands, complete/factor-one outputs, exhaustion, CPU/RSS/disk and cold/warm costs before any default handoff. | E2, E1 | **Deferred with GNFS.** **High decision value.** A correct small GNFS engine is not evidence of a useful digit crossover. This needs both measured engines and remains independent of optional P6 research. | Sol / **xhigh** | Sol fits pinned-engine evaluation and dispatch policy. xhigh is for uncertainty, censored runs, observable decision features and separating special-form examples from general coverage. |
 
 ### Dependency overview
 
@@ -336,7 +370,7 @@ The tables above are authoritative; this diagram shows the main branches.
 
 ```mermaid
 flowchart TD
-    S[Accepted P2 / SIQS / repairs / R3] --> R2[A1: integrated R2 opt-ins]
+    S[Accepted P2 / SIQS / repairs / R3] --> R2[A1: R2 complete and merged]
     ISO[Isolated R2 study: 171e69c] --> R2
     S --> GMP[A2: backend boundary]
     S --> PLAN[A3: reusable schedules and coverage]
@@ -393,7 +427,8 @@ flowchart TD
     SEARCH --> END
     BL --> END
     BW --> END
-    S --> NF[A9: GNFS field and root contracts]
+    ACCEPT --> REVIEW{Later coverage review: activate GNFS?}
+    REVIEW -->|if justified| NF[A9: deferred GNFS field and root contracts]
     NF --> NC[B9: full relations]
     NF --> NM[B10: GNFS matrix control]
     NF --> NR[B11: exact field roots]
@@ -403,7 +438,7 @@ flowchart TD
     SMALL --> SCALE[D3-D6: independent scaling branches]
     GMP --> SCALE
     SCALE --> SCALED[E2: integrated scaling]
-    SMALL --> FREEZE[D7: P8.1 control]
+    END --> FREEZE[D7: current-engine P8.1 control]
     FREEZE --> P8[E3-E6: independent P8 experiments]
     SCALED --> CROSS[F1: measured SIQS-GNFS crossover]
     END --> CROSS
@@ -414,11 +449,13 @@ flowchart TD
     WC --> WORKERS[F4: production workers]
     END --> WORKERS
     WORKERS --> ALLOC
-    CROSS --> ALLOC[G1: final allocation]
+    FREEZE --> ALLOC[G1: current-engine allocation]
+    END --> ALLOC
     P8 --> ALLOC
     P6 --> ALLOC
     ALLOC --> ACCEPT[H1: P8.7 acceptance]
-    ACCEPT --> PUB[I1: P6.4 publication]
+    ACCEPT --> PUB[I1: current-engine P6.4 publication]
+    CROSS --> GNFSUPDATE[Later measured GNFS allocation and publication update]
 ```
 
 ### Parallel execution and ownership
@@ -488,14 +525,12 @@ A10/B14 are early P8.2 capability work; they do not depend on D7. E3 owns
 later preprocessing tuning on the frozen integrated control. Existing P1.8
 acceptance remains historical; the new proof/range gates are open below.
 
-This plan includes P6 research/parallelism/publication, P7 GNFS and P8 portfolio
-reconciliation. Their roadmap numbers are ownership labels, not a requirement
-to finish all lower-numbered optional experiments. Small GNFS starts at A9 and
-reaches its integration gate at C7; P4.3 is settled before scaling. P8.1 follows
-small GNFS, while final P8 allocation consumes the measured crossover later.
-Independent P8 oracle/profile spikes may start earlier when justified, without
-claiming integrated promotion. Preserve this distinction between early research
-and the named production/acceptance gates.
+Current-engine optimization includes selected P6 challengers and P8 portfolio
+reconciliation. Their roadmap numbers are ownership labels. D7 freezes the
+accepted E1 control; G1/H1 tune and confirm the current engines. GNFS is a
+later tranche activated only after H1 and a coverage review; A9–C7 establish
+small-engine correctness, P4.3 precedes scaling, and F1 supplies any subsequent
+crossover update. Optional experiments can close with measured deferrals.
 
 ### Sources and verification scope
 
@@ -508,7 +543,10 @@ The 4 October planning snapshot inspected the roadmap, code and isolated R2
 commit/acceptance record; it ran no new algorithm benchmarks. A1 records
 completed layout, combined-source validation and mainline integration;
 B13/C8 retain explicit conditional deferrals. Consolidating this execution
-guidance changed no implementation or completion checkbox. The subsequent
+guidance changed no implementation or completion checkbox. The 5 October
+update visibly closes bounded A1/R2 and defers GNFS until
+current-engine H1 acceptance and coverage review; it changes no algorithm or
+performance decision. The subsequent
 v1 parity/proof follow-up adds open A10/B14 tasks and transfer ownership; it
 does not claim those capabilities have been implemented or accepted. A11
 separately tracks the P3.4 QS/MPQS/SIQS CLI usability follow-up; C3/G1
@@ -1469,7 +1507,10 @@ post-capture acceptance changes are recorded in the benchmark README.
   measurements. Separate cold startup, instrumented profiles, owned workspace
   and process RSS. Do not infer 30–80-digit capability from tiny fixtures.
 
-**P3.8-R2 — Compare the candidate cascade before expanding matrix work**
+**~~P3.8-R2 — Compare the candidate cascade before expanding matrix work~~**
+
+- [x] **Bounded R2 evaluation and mainline integration complete** — merged as
+  `758d5b3`; optional follow-ups remain tracked separately under B13/C8.
 
 - [x] Evaluate coarsened hot-loop work reservation and clock/cancellation polling over
   bounded metadata/root/hit chunks, retaining exact cumulative work and
@@ -1507,16 +1548,6 @@ post-capture acceptance changes are recorded in the benchmark README.
   scalar versus batch smooth-part recovery. Record positions, score survivors,
   exact divisions, residual tests, admitted/matched partials and useful rows.
   A restricted 2-adic polynomial variant is a separate optional experiment.
-- [ ] If family/root or large-factor-base-prime scanning costs justify it,
-  compare per-polynomial marking with bounded family-wide hit scheduling,
-  following Kleinjung's sorted CRT half-sums and CADO's experimental SIQS.
-  Its p>I condition uses the complete polynomial interval, not the smaller
-  working block; verify eligible prime/power counts before investing in it.
-  Verify every polynomial/position hit, Gray label, tail and prime-power hit;
-  handle p|A explicitly outside the coprime fast path. Bound half-sum tables
-  and queued hits before allocation; include construction/replay and complete
-  factorization. Experimental class-group/native results do not imply a
-  PyPy factoring speedup. Sources are in the research report.
 - **A:** independently enumerate small windows and high valuations, including
   p=2, p|A, p|N', singular lifts, tails and score saturation. A capped root
   lift needs a proven conservative fallback. Smooth-part recovery still needs
@@ -1549,6 +1580,24 @@ and 1,188 collector outcomes preserve exact atomic and post-filter results.
 The measured wide-block resieve capacity refusal is resolved by the retained
 repair-owner bound; larger-workload capacity and CRT remain conditional.
 
+**Reverified 5 October 2026:** merge `758d5b3` is an ancestor of mainline.
+The current committed source passes 301 PyPy tests and lint; all 48 benchmark
+modules (including the package initializer) import, both R2 controls load,
+and the certified corpora and four original immutable R2 inputs verify. The original performance decision and
+historical captures remain unchanged; this verification adds no new speed claim.
+
+**Deferred follow-up (C8; outside the completed bounded tranche):**
+
+- [ ] If family/root or large-factor-base-prime scanning costs justify it,
+  compare per-polynomial marking with bounded family-wide hit scheduling,
+  following Kleinjung's sorted CRT half-sums and CADO's experimental SIQS.
+  Its p>I condition uses the complete polynomial interval, not the smaller
+  working block; verify eligible prime/power counts before investing in it.
+  Verify every polynomial/position hit, Gray label, tail and prime-power hit;
+  handle p|A explicitly outside the coprime fast path. Bound half-sum tables
+  and queued hits before allocation; include construction/replay and complete
+  factorization. Experimental class-group/native results do not imply a
+  PyPy factoring speedup. Sources are in the research report.
 **P3.8-R3 — Reduce preparation/filtering/provenance cost first**
 
 - [x] Profile whole-store preparation on changed relation counts. Concurrent
@@ -1705,8 +1754,8 @@ If collection still dominates or representative useful matrices are unavailable,
 record a measured deferral and a trigger to revisit. Pursue iterative solvers
 when solve cost or dense memory requirements justify them. Record
 adopt/defer/reject for each track.
-This optional optimization milestone does not delay bounded GNFS work;
-P7.6 may reuse its exact kernels and measured solver decisions later.
+Prioritize this work when current-engine profiles justify it. Deferred P7.6
+may reuse its exact kernels and measured solver decisions later.
 Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 **Control and shared kernels**
@@ -2072,7 +2121,7 @@ part or higher batch throughput alone does not close a factorization gate.
 Triple-large-prime provenance is not a two-endpoint graph. Introduce a seeded
 sparse GF(2) solver only after filtered-matrix/provenance cost justifies it,
 with finite retries and original-matrix verification. These options remain
-experiments and do not delay GNFS.
+profile-triggered current-engine experiments; GNFS remains deferred.
 
 **M21 polynomial variant:** after ordinary P3.4 families work, optionally
 evaluate Bradford–Monagan–Percival A=A0*q reuse across families. If q is
@@ -2136,10 +2185,13 @@ parallel execution; it does not postpone their implementation.
 
 ## Phase 7 — Implement and scale GNFS
 
-**Status (M18): committed; not implemented.** **Prerequisites:** the Phase 2
-bounded contracts and Phase 3 relation/filter/dependency infrastructure.
-Complete SIQS is the integration/comparison baseline. Sequence P4.3 before
-scaling; Phases 4–6 in their entirety are not prerequisites. The engine lives
+**Status (5 October 2026): deferred future scope; not implemented.** This
+supersedes M18's immediate GNFS priority. First optimize and confirm the
+current-engine portfolio at H1, then review measured coverage and marginal
+gains before activating A9. Selected optional experiments may close with
+explicit deferrals. Mathematical prerequisites remain the Phase 2 bounded
+contracts and Phase 3 relation/filter/dependency infrastructure, with complete
+SIQS as the comparison baseline and P4.3 settled before scaling. The engine lives
 in `v2/` on PyPy Python 3.11, with optional GMP arithmetic behind the measured
 backend boundary. CADO-NFS supplies independently pinned reference results
 and comparison data for our implementation.
@@ -2347,11 +2399,12 @@ yet, and no calendar estimate or unmeasured digit threshold is claimed.
 ## Phase 8 — Revisit Phase 2 portfolio optimization
 
 **Status (M23): future research/experiment backlog; not implemented.**
-**Prerequisites:** the accepted M17 bounded contracts; working P3.4 SIQS and
-P7.5 small GNFS for integrated portfolio decisions. Profiling or independent
-preprocessing/rho experiments may proceed earlier when useful. This phase
-does not postpone GNFS correctness or scaling and does not require every
-optional P4–P6 optimization. **Goal:** resolve remaining Phase 2 tuning with
+**Prerequisites:** the accepted M17 bounded contracts, working P3.4 SIQS and
+the accepted E1 current-engine control. Execute this tuning before the deferred
+GNFS tranche; GNFS is added to a separately frozen future control only after
+its own correctness and crossover gates. Profiling or independent
+preprocessing/rho experiments may proceed earlier when useful. **Goal:**
+resolve remaining Phase 2 tuning with
 new evidence, retaining completed core work and earlier adopt/defer/reject
 decisions. Sources and transfer limits are in the
 research report (local audit material).
@@ -2365,7 +2418,7 @@ identify future execution and do not certify those gates by renumbering them.
 ### P8.1 — Freeze the new control and untouched evaluation data
 
 - [ ] Reuse the runner/oracles and preserve M12–M17 captures. Freeze the
-  current SIQS/small-GNFS portfolio, sources and configuration. Build fresh
+  accepted current-engine portfolio, sources and configuration. Build fresh
   training and held-out inputs with independent certificates hidden from
   algorithms; M15/M17 confirmation data already informed this review.
   Profile stage/setup/recovery costs separately from timing. Execute the
@@ -2520,7 +2573,8 @@ settles the deterministic/terminal-factor contract; it does not wait for D7.
 #### Calibrate automatic selection and handoff (C3, then G1)
 
 C3 owns the first usable ECM/SIQS handoff policy after engine/configuration
-controls settle; G1 owns the final SIQS/GNFS and multi-engine allocation.
+controls settle; G1 owns the current multi-engine allocation. Deferred F1
+later supplies any measured SIQS/GNFS handoff update.
 Train actual CLI-reachable configurations and confirm on fresh inputs before
 promoting a one-number automatic default. Reserve enough resources for the
 chosen later engine, credit work already performed, and distinguish timer,
@@ -2532,7 +2586,7 @@ complete result. Do not postpone CLI access until this calibration finishes.
 - [ ] Fit joint B1/B2/curve grids using measured PyPy stage costs and factor
   yield, with factor-size bands hidden from algorithms. Select a deterministic
   policy from observable input/configuration and completed-work metadata.
-  Compare shorter preprocessing with earlier SIQS/GNFS handoff, including
+  Compare shorter preprocessing with earlier QS/MPQS/SIQS handoff, including
   recursion/setup. Avoid duplicate p−1 base/bound work; any incremental
   prime-power or same-curve continuation implementation remains P5.3.
   P3.4/P7.7 retain dispatch/crossover ownership.
@@ -2619,9 +2673,10 @@ implementation completion is established by this M23 research milestone.
 | 7 | Bounded GNFS reference, scaling pipeline, SIQS/GNFS crossover | Separate correctness, scaling and held-out dispatch gates |
 | 8 | Reconciled Phase 2 calibration, preprocessing and overhead experiments | Fresh held-out promotion or explicit retain/defer/reject decisions |
 
-Execution priority after Phase 3 is early P4.3 arithmetic work followed by
-Phase 7. Existing phase numbers preserve references; optional Phases 4–6
-experiments and future Phase 8 calibration do not postpone the GNFS pipeline.
+Execution priority after Phase 3 is current-engine calibration, selected
+P4–P6 improvements and fresh Phase 8 portfolio confirmation. Existing phase
+numbers preserve references. GNFS remains deferred until H1 and a coverage
+review justify activating the later tranche.
 
 ## Existing evidence to reuse
 
