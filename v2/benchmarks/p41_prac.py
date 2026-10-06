@@ -83,11 +83,13 @@ def stage_sample(mode, bound, primes):
     """Three fixed curves with the exact lcm action; include every setup."""
     n = prod(primes)
     powers = powers_for(bound)
-    scalars = (
-        tuple(prod(powers[i : i + 16]) for i in range(0, len(powers), 16))
-        if mode == "ladder_chunks"
-        else powers
-    )
+    scalars = powers
+    if mode == "ladder_chunks":
+        chunks = []
+        for start in range(0, len(powers), 16):
+            end = start + 16
+            chunks.append(prod(powers[start:end]))
+        scalars = tuple(chunks)
     multiply = (
         ecm.multiply_prac if mode == "prac_powers" else ecm.scalar_multiply
     )

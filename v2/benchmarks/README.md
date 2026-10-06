@@ -466,7 +466,7 @@ independent affine oracle and finishes at a non-infinite point.
 checked PRAC with Python integers, the same ladder arithmetic with gmpy2,
 and checked PRAC with gmpy2. These gmpy2 arms run Python ECM, not the
 C GMP-ECM executable or its optional near-optimal chain interpreter.
-GMP uses private function bindings with identical
+The gmpy2 adapter uses private function bindings with identical
 function code, replacing integer validation, GCD and inversion; it retains
 `mpz` coordinates through setup, both stages and recovery. There is no global
 backend patch or per-operation conversion. This benchmark adapter is not the
@@ -487,7 +487,7 @@ checkpointing are not included.
 All arms receive the same nine seeds, Suyama parameters, B1/B2 bounds, batch
 size 128, maximum 32 curves and 60-second wall/CPU watchdogs. Every warmup and
 sample is validated, preserving unresolved composites and reconstructing all
-proper-factor results. GMP/Python pairs must also match every uncensored
+proper-factor results. gmpy2/Python pairs must also match every uncensored
 factor and curve/stage transition. Each case/arm receives at least three
 seconds of validated warmup. Groups with more than 25% timing spread repeat
 the same nine paired seeds in reversed order, retaining the original samples.
@@ -517,7 +517,7 @@ It avoids cache thrashing by retaining immutable bound-owned records and
 replays a collapsed prime power only from that power's saved starting point.
 This experimental composition does not modify `stage_jobs` or its accounting.
 
-Reproduce using the same PyPy environment for all arms (the accepted GMP
+Reproduce using the same PyPy environment for all arms (the accepted gmpy2
 configuration is gmpy2 2.3.1 / GMP 6.3.0):
 
 ```sh
@@ -568,6 +568,39 @@ variation in attempt duration. No small timing differences are claimed as
 wins. Nine fresh-process balanced-40 attempts per arm give cold medians of
 0.3590/0.5469/1.3394/1.5164 seconds in table order, including startup, imports,
 certificate validation, construction and the first attempt.
+
+### Larger-bound extension: completed subset
+
+At B1=11,000 / B2=1,873,422, all four arms split **9/27** distinct seeded
+attempts across the three completed cases (3/9 per case). There are no
+invalid factors, timeouts or backend-transition mismatches in these captures;
+108 backend pairs agree across primary and repeated blocks.
+
+| Input case | Factor digits | Successes / 9 | Int ladder | Int PRAC | gmpy2 ladder | gmpy2 PRAC |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Balanced 40 | 20 + 20 | 3 | 1.9302 | 2.5034 | 9.4742 | 10.0334 |
+| Target-factor 50 | 20 + 30 | 3 | 1.8026 | 2.5088 | 9.5594 | 10.0408 |
+| Target-factor 60 | 20 + 40 | 3 | 4.5589 | 6.1432 | 19.4741 | 20.7905 |
+
+Values are median seconds in the final nine-seed block. Checked PRAC/int
+costs 1.30–1.39 times the paired int ladder; the gmpy2 ladder costs
+4.27–5.30 times, and gmpy2 PRAC costs 4.56–5.57 times. The first two cases
+and the third were captured in separate, explicitly coordinated timing
+windows. Absolute times across those windows are not a hardware-scaling
+comparison. The arithmetic source hashes match; the only driver change was
+an optional cold-control case selector, with all timed function ASTs unchanged.
+
+To close the existing work, the optional extension stopped at the completed
+60-digit case boundary. **The larger-bound 70-/80-digit cases and its cold
+controls are unfinished.** No result is inferred for them. This limitation
+does not remove any case from the completed 14-case current-bound study.
+The evidence retains every completed sample, original/repeated blocks,
+window provenance and the explicit closeout record.
+
+The checked implementation is a correctness foundation, not the preferred
+performance path. GMP-ECM precomputed Lucas codes and compact execution are
+explicitly deferred to **P4.5/C6** in the roadmap; no such executor or chain
+corpus is included in this change.
 
 ### Kernel and standalone stage-one diagnostics
 
