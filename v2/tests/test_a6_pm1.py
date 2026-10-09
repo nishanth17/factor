@@ -385,6 +385,32 @@ class ResumeTests(unittest.TestCase):
                 1000003, config=cfg, budget=allowance(), checkpoint=resign(bad)
             )
 
+    def test_numeric_type_substitution_is_not_canonical_progress(self):
+        cfg = config()
+        first = factorize_pm1_bounded(
+            1000003, config=cfg, budget=allowance(), max_actions=8
+        )
+        for container, field, value in (
+            ("state", "rung", 0.0),
+            ("state", "done", 0),
+            ("payload", "n", 1000003.0),
+            ("payload", "base", 2.0),
+            ("config", "chunk_size", 16.0),
+        ):
+            bad = copy.deepcopy(first.checkpoint)
+            target = bad["payload"]
+            if container != "payload":
+                target = target[container]
+            target[field] = value
+
+            with self.assertRaises(ValueError, msg=(container, field)):
+                factorize_pm1_bounded(
+                    1000003,
+                    config=cfg,
+                    budget=allowance(),
+                    checkpoint=resign(bad),
+                )
+
     def test_corrupt_or_incompatible_identity_is_rejected(self):
         cfg = config()
         first = factorize_pm1_bounded(

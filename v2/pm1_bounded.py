@@ -348,8 +348,10 @@ def _restore(checkpoint, n, base, config):
             or payload["execution"] != EXECUTION_VERSION
             or payload["backend"] != "python-int"
             or payload["schedule"] != RATIO_VERSION
-            or payload["config"] != json.loads(_canonical(asdict(config)))
+            or _canonical(payload["config"]) != _canonical(asdict(config))
+            or type(payload["n"]) is not int
             or payload["n"] != n
+            or type(payload["base"]) is not int
             or payload["base"] != base
         ):
             raise ValueError("incompatible p-1 checkpoint")
@@ -445,7 +447,9 @@ def factorize_pm1_bounded(
                             "checkpoint continues past a terminal outcome"
                         )
                     _advance(state, budget, context, config)
-                if state != saved:
+                # JSON numeric types are part of canonical arithmetic state;
+                # Python equality would accept 0.0 == 0 and False == 0.
+                if _canonical(state) != _canonical(saved):
                     raise ValueError("corrupt p-1 arithmetic progress")
             finally:
                 verification_work = budget.used - started
