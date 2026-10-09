@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "parent_protocol": "a6_pm1_protocol.json",
+  "trigger": "Frozen eight-entry arm has zero hits over the 40-block schedule; it measures churn, not completed reuse.",
+  "fixtures": "p43_size_corpus.json: confirmation balanced 20/50/100 digits only",
+  "bounds": [2000, 20000],
+  "bases": [2, 3, 4],
+  "segment_size": 256,
+  "arms": ["stream", "entries8", "entries64"],
+  "cache_bytes": 262144,
+  "warmup_seconds": 3,
+  "samples": 9,
+  "instability": "Extend all arms to 27 samples if relative IQR exceeds 15% at nine; retain for still-unstable evidence.",
+  "selection": "Require actual hits, exact matching validated outcomes/work, setup-inclusive >=10% median win with paired 95% bootstrap interval above zero. No portfolio/default promotion from repeated same-order bases; any adopted use remains explicitly capped and opt-in. No further cache candidate search in this tranche."
+}

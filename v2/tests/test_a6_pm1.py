@@ -173,6 +173,22 @@ class CampaignTests(unittest.TestCase):
             outcome.checkpoint["payload"]["state"]["phase"], "term_replay"
         )
 
+    def test_stage_two_recovery_cap_retains_unresolved_input(self):
+        n = 607 * 103
+        outcome = factorize_pm1_bounded(
+            n,
+            config=config(((10, 101),), gcd_batch=64, recovery_limit=0),
+            budget=allowance(),
+        )
+        state = outcome.checkpoint["payload"]["state"]
+
+        self.assertEqual(outcome.reason, "saturated")
+        self.assertEqual(state["phase"], "term_replay")
+        self.assertEqual(state["recovery"], 0)
+        self.assertIsNone(outcome.divisor)
+        self.assertEqual(outcome.result.remaining, (n,))
+        self.assertEqual(outcome.result.reconstruct(), n)
+
     def test_every_atomic_refusal_preserves_serializable_state(self):
         cfg = config(((7, 13), (10, 31)), chunk_size=2, gcd_batch=2)
         state = pm1_bounded._initial(1000003, 2, cfg)
