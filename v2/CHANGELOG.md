@@ -1,5 +1,22 @@
 # v2 changelog
 
+## B4/P4.2 bounded kernel comparison — 9 October 2026
+
+- Freeze a complete private `bcf5f3d` control package, independently certified
+  training/confirmation inputs and five experimental kernels before timing.
+  Record source-linked primary research, per-file license findings, exact
+  (A+2)/4 convention, unit-normalization proof and intermediate-width bounds.
+- Attribute current stage costs separately from accepted timing; compare
+  kernel diagnostics, direct stages and complete bounded factoring on native
+  int and supported persistent mpz paths. Coordinate the machine-wide flock
+  with C6/A6 and extend unstable captures to 31/63 samples.
+- Retain baseline. Fresh native reductions save 8.78% (5.62–10.92% conditional
+  95% interval); separate GMP normalization saves 4.73% (3.02–6.51%). All
+  arms complete 27/27 with matching work, results and certainty; neither passes
+  the frozen promotion gate. Keep all production APIs, defaults, cancellation,
+  saturation recovery and canonical checkpoint formats. No merge or expanded
+  reducer/backend/curve-family experiments.
+
 ## A10 integration and research reconciliation — 9 October 2026
 
 - Integrate source-verified strict 12/13-base Miller–Rabin ranges with settled

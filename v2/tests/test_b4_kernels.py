@@ -181,9 +181,7 @@ class B4KernelTests(unittest.TestCase):
 
     def test_canonical_resume_and_cancellation(self):
         protocol, corpus = common.inputs()
-        fixture = next(
-            f for f in corpus["fixtures"] if f["id"] == "training_128_0"
-        )
+        fixture = next(f for f in corpus["fixtures"] if f["id"] == "stage_128")
         for backend in ("python-int", "gmpy2-mpz"):
             try:
                 arithmetic.get_backend(backend)
@@ -194,12 +192,33 @@ class B4KernelTests(unittest.TestCase):
                 config = common.config(
                     engine, protocol, fixture["case"], backend
                 )
-                stopped = engine.factorize_bounded(
-                    fixture["n"],
-                    seed=7,
-                    config=config,
-                    budget=engine.Budget(work_limit=2500),
-                )
+                module = kernels.ecm_module(engine)
+                original = module.scalar_multiply
+                progress = []
+
+                def stop_after_scalar(*args):
+                    point = original(*args)
+                    progress.append(point)
+                    return point
+
+                module.scalar_multiply = stop_after_scalar
+                try:
+                    stopped = engine.factorize_bounded(
+                        fixture["n"],
+                        seed=7,
+                        config=config,
+                        budget=engine.Budget(
+                            work_limit=protocol["work_limit"],
+                            cancelled=lambda: bool(progress),
+                        ),
+                    )
+                finally:
+                    module.scalar_multiply = original
+                self.assertEqual(stopped.reason, "cancelled")
+                self.assertEqual(len(progress), 1)
+                job = stopped.checkpoint["payload"]["state"]["current"]["job"]
+                self.assertEqual(job["phase"], "stage_one")
+                self.assertEqual(job["value"], list(map(int, progress[0])))
                 self.assertEqual(stopped.result.reconstruct(), fixture["n"])
                 checkpoint = json.loads(json.dumps(stopped.checkpoint))
                 resumed = engine.factorize_bounded(
@@ -264,6 +283,20 @@ class B4KernelTests(unittest.TestCase):
             self.assertTrue(job["done"])
             self.assertEqual(budget.used, 3)
             self.assertEqual(job["value"], [x, z])
+
+        for engine in self.engines.values():
+            package = __import__(engine.__package__, fromlist=["stage_jobs"])
+            job = package.stage_jobs.new_job("ecm", 35, 7, 2, 2)
+            job.update(phase="stage_two", terms=[5, 7], product=0)
+            budget = engine.Budget(work_limit=100)
+
+            # Saturation must replay and retain the proper term factor.
+            package.stage_jobs._batch_check(job, budget)
+            self.assertEqual(job["phase"], "term_replay")
+            self.assertIsNone(job["factor"])
+            package.stage_jobs._batch_check(job, budget)
+            self.assertEqual(job["factor"], 5)
+            self.assertTrue(job["done"])
 
     def test_isolation(self):
         self.assertIsNot(kernels.ecm_module(self.engines["squares"]), ecm)

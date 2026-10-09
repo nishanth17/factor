@@ -601,3 +601,16 @@ bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
 recovery and grouped hit reservations. Its independent certified inputs,
 frozen source control and separate cold/profile modes are described in
 [the benchmark guide](benchmarks/README.md). Dispatcher defaults are unchanged.
+
+## B4 arithmetic-kernel study
+
+The bounded P4.2 comparison retains the readable Montgomery ladder and the
+native-integer default. No public factoring API, option, work ledger or
+checkpoint format changes. Experimental kernels live only under
+`v2.benchmarks.b4_kernels` and bind to a private immutable mainline package;
+they are reproducibility controls, not supported production selectors.
+All use `a24=(A+2)/4` with the squared difference. Unit normalization retains
+failed-inversion GCDs and canonical X:Z exits; no normalized representation
+is stored in checkpoints. See the [research/proofs](benchmarks/b4_research.md)
+and [matched evidence](benchmarks/README.md#b4--p42-bounded-arithmetic-kernels--9-october-2026)
+for the retain-baseline decision and finite study limits.

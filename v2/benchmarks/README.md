@@ -1870,3 +1870,198 @@ make -C v2 test
 make -C v2 lint
 v2/.venv/bin/python -B -m unittest v2.tests.test_prac_campaign.GmpCampaignTests -v
 ```
+
+## B4 / P4.2 bounded arithmetic kernels — 9 October 2026
+
+This separate study uses the immutable `bcf5f3d` mainline package in
+[the versioned control](inputs/baselines/b4_mainline.json). The candidate
+sources and required inputs are frozen at `08ccac2` in
+[the source manifest](inputs/controls/b4_freeze.json),
+[protocol](inputs/controls/b4_protocol.json) and
+[certified corpus](inputs/corpora/b4_corpus.json). The
+[source-linked research and proofs](b4_research.md) document GMP-ECM,
+CADO-NFS, AVX-ECM and Yamaquasi revisions/licenses, native versus PyPy
+applicability, a24 conventions, exceptional points, normalization and widths.
+No upstream code is copied. C6 chains, A6 p−1, C5 reducers, new backends and
+curve families remain separate; production source and `v1/` are unchanged.
+
+### Frozen design and rerun
+
+Five candidates compare with the readable ladder: integer `**2` squares;
+a fused addition/doubling helper; an inlined whole ladder; that loop with
+selected AA/BB/U/V reductions; and that loop with unit-checked normalized
+fixed difference. Initial doubling in the fusion arms uses the explicit
+square helper. Whole-run comparisons include its cost. Normalization pays
+its checked inverse at every scalar entry; failed inversions retain the GCD
+and return proper factors or retry through the private bounded adapter.
+
+Full factoring uses nine independent fixtures per split and seeds 7/19/41:
+two inputs in each 64/128/256/329 target-bit class, with certified small
+factors of 22/26/28/30 bits, plus a prime-cube control. Actual products span
+51–330 bits; target labels are generation classes, not exact product widths.
+Training and confirmation each contain 27 input/seed trials per arm.
+The stage controls are four independently certified balanced inputs and
+three curve seeds. Stage timings separately pay setup/conversion and the
+B1 lcm in stage one, and prime generation, table initialization, products
+and recovery in stage two. Their fixed bounds are 1,000/50,000.
+These direct stages complement actual chunked portfolio measurements.
+Kernel diagnostics use 30 Suyama setups at ten widths from 64 through
+1024 bits and three sigmas, with a fixed 128-bit scalar. Output action,
+GCD/degeneracy status and complete/partial reconstruction are validated.
+Kernel setup and conversion costs are included; they are not full-run gains.
+
+All full arms use the same five-million-work, 30-second wall/CPU, 16-MiB
+owned-workspace and 331-bit limits. ECM-only tiers are 200/20,000/16 in the
+small class; 1,000/50,000/16 in the three wider classes; 50/2,000/8 for powers.
+Native integers remain default; persistent mpz is a separate supported
+track, not a backend crossover study. The available environment is PyPy
+7.3.23 / Python 3.11.15, gmpy2 2.3.1 / GMP 6.3.0, macOS 26.6.2 ARM64 on M4.
+
+Each worker receives at least three seconds of validated warmup and nine
+samples. Relative IQR over 0.15 triggers 5 seconds/31 samples, then
+8 seconds/63 samples; instability or censoring prevents promotion. Training
+selects the fastest stable full arm per backend without a >5-point class
+completion regression. Selection is saved before fresh inputs are measured.
+The roadmap gate requires zero failures and >=10% fresh pooled median
+reduction with a conditional 95% timing interval above zero, or >=10-point
+completion gain with a fixture-cluster interval above zero. Fixed cohorts
+and seeds limit population inference. Kernel/stage wins cannot promote.
+
+The machine-wide lock is `/private/tmp/factor-performance.lock`, with
+`factor-performance-owner.json` alongside it. C6 and A6 explicitly queued
+heavy checks/timings under this same lock. The runner polls for competing
+benchmark/test interpreters and fails closed if process inventory is denied.
+Do not run full checks during its accepted timing window. Raw JSON, cold
+captures, research downloads/manifests, logs and profiles stay in the ignored
+`v2/benchmarks/results/b4/` tree. The controls/corpora/runner remain versioned.
+
+```sh
+mkdir -p v2/benchmarks/results/b4
+# Use the project's GMP-enabled PyPy 3.11 venv for both declared tracks.
+v2/.venv/bin/python -B -m v2.benchmarks.b4_profile --output v2/benchmarks/results/b4/new-profile.json
+v2/.venv/bin/python -B -m v2.benchmarks.b4_study --phase training --output v2/benchmarks/results/b4/new-training.json
+v2/.venv/bin/python -B -m v2.benchmarks.b4_study --phase held_out --selection v2/benchmarks/results/b4/new-training.json --scopes full --cold --output v2/benchmarks/results/b4/new-confirmation.json
+v2/.venv/bin/python -B -m v2.benchmarks.b4_report --training v2/benchmarks/results/b4/new-training.json --confirmation v2/benchmarks/results/b4/new-confirmation.json --output v2/benchmarks/results/b4/new-report.json
+```
+
+The generation and freeze commands are one-shot creation tools, not required
+rerun steps; they refuse overwriting the immutable inputs/manifest. Source
+changes after freeze require a separately declared study rather than editing
+the existing controls. Cold starts comprise nine separate processes per
+confirmed arm/backend and include harness import/source/corpus verification;
+they are reported apart from warmed evidence. RSS includes the interpreter,
+JIT and warmup and is not the owned-workspace allowance.
+
+### Separately instrumented baseline breakdown
+
+Before candidate timing, private mainline profiles measured chunked portfolios
+on the four balanced controls. Instrumented timers attribute costs by job
+phase; cProfile supplies independent function totals. These are diagnostic,
+include instrumentation overhead, and are not comparable with warmed stage
+or full-run times. The smaller 64-bit control ends earlier, so its cost shares
+are not representative of a long campaign.
+
+| Track / bits | Stage one % of instrumented total | Stage two incl. baby/giant setup % | Point add/double % | Ladder self % |
+| --- | ---: | ---: | ---: | ---: |
+| int / 64 | 21.6 | 53.9 | 11.0 | 10.4 |
+| int / 128 | 43.3 | 45.7 | 17.8 | 20.4 |
+| int / 256 | 42.8 | 45.9 | 23.9 | 16.2 |
+| int / 330 | 45.0 | 44.5 | 28.1 | 14.7 |
+| mpz / 64 | 38.0 | 54.2 | 43.6 | 1.9 |
+| mpz / 128 | 49.7 | 49.1 | 53.5 | 1.9 |
+| mpz / 256 | 49.8 | 48.8 | 53.5 | 2.2 |
+| mpz / 330 | 49.8 | 48.9 | 53.4 | 2.2 |
+
+On native 128/256/330-bit controls, stage one's point formulas take
+36.1/49.2/55.5% of that phase and ladder self time 46.5/37.2/32.2%.
+Prime scheduling is 0.8% and GCD 0.5–1.1%. In the stage-two term loop,
+point adds take only 2.0–2.7%, prime scheduling 15.7–18.5% and batch/GCD
+checks 4.9–7.8%; its residual includes cross products, modular product
+accumulation, reservations, cursor handling and instrumentation overhead.
+Baby-table point arithmetic is reported in its separate initialization phase.
+On mpz, stage-one point formulas take 93.9–94.2%; stage-two recurrence point
+adds only 4.6–4.7%, with most time remaining in cross/product arithmetic and
+extension calls. Source-level operation counts therefore miss large costs.
+
+For a component share s and fractional component saving r, Amdahl's
+whole-run time saving is at most s*r and its ideal speedup is 1/(1−s).
+The native point-only shares above cap total savings at 17.8–28.1%
+(1.22–1.39x), even if their time vanished. Including all measured ladder
+self time raises the diagnostic ceiling to 38.2–42.9% (1.62–1.75x).
+The mpz point-only ceiling is about 53.4% (2.15x). A first cProfile-only
+pass attributed native point shares of 13.9–26.9%, illustrating measurement
+perturbation; neither ceiling is an uninstrumented forecast. Actual stages
+and full runs below govern decisions.
+
+### Matched candidate comparison and fresh confirmation
+
+All 36 final training captures are stable: 27 use nine samples, eight extend
+to 31, and one to 63. All four fresh full-run captures use nine stable
+samples after validated warmup. The 46 training attempts are retained locally;
+there are no censored or correctness-failing accepted samples. Every full
+arm completes all 27 trials on each split with matching factors, certainty,
+logical work and unresolved-cofactor reconstruction.
+
+The table reports percentage **time reduction** against the corresponding
+backend's baseline; a negative number is a loss. Kernel diagnostics aggregate
+the ten declared widths, so their savings are not a below-100-digit prediction.
+
+| Candidate | int kernel | int direct stages | int full training | mpz kernel | mpz direct stages | mpz full training |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Explicit squares | −48.61% | −79.92% | −45.77% | −5.02% | −2.17% | −3.73% |
+| Fused step helper | −0.31% | +2.17% | +0.41% | +6.51% | +5.34% | +2.95% |
+| Whole ladder | +0.73% | +2.44% | +1.22% | +6.58% | +7.17% | +5.54% |
+| Selected reductions | +30.56% | +8.51% | +8.79% | +3.69% | −1.06% | −1.73% |
+| Unit normalization | −7.78% | +2.15% | +0.85% | +3.73% | +9.93% | +5.67% |
+
+For the native selected-reduction arm, summed stage-one medians fall from
+31.55 to 26.77 ms (15.2%), while stage two is 26.87 versus 26.63 ms (0.9%).
+For the selected mpz normalized arm, stage one is 106.05 versus 89.70 ms
+(15.4%) and stage two 90.24 versus 86.48 ms (4.2%). These sums cover the
+same twelve balanced input/curve trials. Phase medians are computed
+separately and need not add exactly to the median combined cohort time.
+The unchanged stage-two recurrence and term-product loop explain why a
+large ladder diagnostic saving shrinks in actual factoring.
+
+Training froze `reductions` for native int and `normalized` for mpz. The mpz
+normalization/whole-ladder training medians differ by only about 0.12
+percentage points; this is not evidence that normalization is universally
+best. The deterministic predeclared selector still confirms the least
+observed training cost without further tuning.
+
+| Fresh full cohort | Baseline median | Selected median | Reduction | Conditional 95% interval | Completion |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| int / selected reductions | 282.25 ms | 257.47 ms | 8.78% | 5.62% to 10.92% | 27/27 both |
+| mpz / unit normalization | 627.79 ms | 598.10 ms | 4.73% | 3.02% to 6.51% | 27/27 both |
+
+Fresh native class reductions are 7.74/1.13/6.75/9.46% for the
+64/128/256/329 target classes and 1.73% for powers. The mpz reductions are
+0.65/3.77/6.78/4.18%, with a 1.94% loss on the tiny power control.
+Completion change is zero in every class; fixture-cluster intervals are
+[0,0] on these finite cohorts. This does not prove zero population risk.
+The larger classes dominate pooled time. Timing intervals resample fixed
+cohort samples, not independently chosen machines or general composites.
+
+Separate nine-process cold medians are 627.20/596.42 ms for native
+baseline/reductions and 1,033.57/1,036.54 ms for mpz baseline/normalization.
+They include immutable harness loading and certificate verification; they do
+not establish application cold-start gains. They are excluded from promotion.
+
+**Decision: retain the production baseline and native-int default.** Neither
+selected arm reaches the >=10% fresh median threshold, and completion cannot
+improve beyond the observed 27/27. The native timing interval crosses 10%,
+so it does not establish a >=10% effect; the bounded study ends here as
+requested. Explicit squares lose, fused/whole-ladder changes do not meet the
+complete-run gate, and earlier reductions or normalization remain research
+controls. No reducers, new backends, extra normalization policies or curve
+families are added to force a win. B4's bounded comparison is settled;
+broader workload/production-bound calibration and combined portfolio
+confirmation remain separate work.
+
+The eight new arithmetic tests cover independent affine/CRT/prime-power
+oracles, exact readable-formula agreement, unit scaling, degeneracy,
+failed-inversion factor recovery, cancellation and canonical resume on int
+and available mpz. Final test/lint and committed-only checkout results are
+recorded in the changelog. This branch is prepared for integration of the
+study, fixtures and retain-baseline decision; no production kernel is
+proposed for promotion and no merge is performed.

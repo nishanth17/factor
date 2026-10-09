@@ -2,6 +2,18 @@
 
 ## Current development
 
+- Complete the bounded B4/P4.2 arithmetic-kernel study on frozen mainline
+  controls: explicit squares, fused step, whole ladder, selected reductions
+  and unit-checked fixed-difference normalization. Pin primary research and
+  implementation licenses; prove a24/normalization/width invariants and test
+  independent affine/composite/prime-power, factor-recovery and resume controls.
+- Retain the readable ECM kernel and native-integer default. Fresh full-run
+  gains are 8.78% for native selected reductions and 4.73% for the separate
+  GMP normalized arm, below the frozen 10% median gate; completion stays
+  27/27 in every arm. Keep experimental code, certified corpora and immutable
+  controls versioned, raw evidence local, and production APIs/checkpoints
+  unchanged. Stop after bounded comparison and fresh confirmation; no merge.
+
 - Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
   independently checked Sorenson–Webster bounds: first 12 prime bases for
   `n < 318665857834031151167461`, first 13 for
