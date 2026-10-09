@@ -32,7 +32,7 @@ def resign(checkpoint):
 
 class RatioTests(unittest.TestCase):
     def test_exhaustive_lcm_identity_without_sieve_or_prime_power_oracle(self):
-        for new in range(2, 65):
+        for new in range(1, 65):
             new_lcm = math.lcm(*range(1, new + 1))
             for old in range(1, new + 1):
                 old_lcm = math.lcm(*range(1, old + 1))

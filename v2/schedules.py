@@ -324,7 +324,7 @@ def prime_power_ratios(old_bound, new_bound, **options):
     partial prime cursor is not a completed-bound certificate.
     """
     utils.require_integer(old_bound, "old_bound", 1)
-    utils.require_integer(new_bound, "new_bound", max(2, old_bound))
+    utils.require_integer(new_bound, "new_bound", old_bound)
     for prime in iter_primes(2, new_bound + 1, **options):
         ratio = prime_power_ratio(prime, old_bound, new_bound)
         if ratio != 1:
