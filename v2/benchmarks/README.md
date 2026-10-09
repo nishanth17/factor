@@ -1955,7 +1955,8 @@ JIT and warmup and is not the owned-workspace allowance.
 ### Separately instrumented baseline breakdown
 
 Before candidate timing, private mainline profiles measured chunked portfolios
-on the four balanced controls. Instrumented timers attribute costs by job
+on the four balanced controls with algorithm seed 7 and the declared
+class-specific tier caps. Instrumented timers attribute costs by job
 phase; cProfile supplies independent function totals. These are diagnostic,
 include instrumentation overhead, and are not comparable with warmed stage
 or full-run times. The smaller 64-bit control ends earlier, so its cost shares
@@ -1998,9 +1999,9 @@ and full runs below govern decisions.
 All 36 final training captures are stable: 27 use nine samples, eight extend
 to 31, and one to 63. All four fresh full-run captures use nine stable
 samples after validated warmup. The 46 training attempts are retained locally;
-there are no censored or correctness-failing accepted samples. Every full
-arm completes all 27 trials on each split with matching factors, certainty,
-logical work and unresolved-cofactor reconstruction.
+there are no censored or correctness-failing accepted samples. All six training arms and both confirmed selections/baselines complete their
+27 trials with matching factors, certainty, logical work and
+unresolved-cofactor reconstruction.
 
 The table reports percentage **time reduction** against the corresponding
 backend's baseline; a negative number is a loss. Kernel diagnostics aggregate
@@ -2065,3 +2066,27 @@ and available mpz. Final test/lint and committed-only checkout results are
 recorded in the changelog. This branch is prepared for integration of the
 study, fixtures and retain-baseline decision; no production kernel is
 proposed for promotion and no merge is performed.
+
+### Acceptance and retained local evidence
+
+At source/test/document commit `93e8f69`, `make -C v2 test` with the
+GMP-enabled PyPy interpreter passes **409 tests** from a committed-files-only
+`git archive` checkout. All **73 benchmark modules** import there, required
+B4 input/control loaders validate, and the frozen source manifest matches.
+`make -C v2 lint` passes Ruff checking/formatting and pycodestyle in the
+worktree. The later acceptance note changes documentation only. Production
+ECM, stage jobs, schedules, arithmetic, portfolio and `v1/` have no diff
+against mainline. The branch remains separate and unmerged.
+
+Raw evidence is retained locally, including all 46 training attempts, four
+fresh captures, 36 cold starts, two separately instrumented profile captures
+and the committed-only verification logs. The terminal capture hashes are:
+
+- `training.json`: `9c7977513b7238ab888b8282da672c23d764d371407241fd211e08f3e3867195`
+- `confirmation.json`: `332c223612cca3a75dad4d283cf400dda7d7dcfd3716858e074a8db28c8aa406`
+- `report.json`: `09e05266448be940b2f667dfd11f77e3835002a28ba2447ba8684f9d139d20eb`
+
+These ignored captures are not prerequisites for importing or rerunning the
+committed study. The frozen protocol, source control and certified inputs are
+required and versioned. B4's exclusive window is released to C6/A6; no further
+candidate experiments or heavy checks are planned in this tranche.

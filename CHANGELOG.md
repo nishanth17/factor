@@ -12,7 +12,9 @@
   GMP normalized arm, below the frozen 10% median gate; completion stays
   27/27 in every arm. Keep experimental code, certified corpora and immutable
   controls versioned, raw evidence local, and production APIs/checkpoints
-  unchanged. Stop after bounded comparison and fresh confirmation; no merge.
+  unchanged. Pass 409 committed-only PyPy/GMP tests, lint, 73 benchmark
+  imports and all B4 frozen loaders. Stop after bounded comparison and fresh
+  confirmation; no merge.
 
 - Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
   independently checked Sorenson–Webster bounds: first 12 prime bases for

@@ -16,6 +16,10 @@
   the frozen promotion gate. Keep all production APIs, defaults, cancellation,
   saturation recovery and canonical checkpoint formats. No merge or expanded
   reducer/backend/curve-family experiments.
+- Pass 409 PyPy/GMP tests from a committed-files-only archive, all 73
+  benchmark imports and B4 control/corpus/source-manifest loaders. Pass full
+  lint. Strengthen cancellation/resume after an actual ECM scalar action and
+  explicit saturated-term replay; no frozen timing source changes follow.
 
 ## A10 integration and research reconciliation — 9 October 2026
 
