@@ -55,6 +55,10 @@ was inspected together with the installed PyPy extension. The square arm
 uses integer `**2` on both supported types; no per-operation backend callback,
 mutable xmpz, new dependency or floating arithmetic is introduced.
 
+A later [research coverage audit](b4_research_audit.md) adds YAFU, newer
+literature and explicit coverage/optimality limits without changing this
+frozen comparison.
+
 ## Formula and normalization proof
 
 Write S=X+Z, D=X−Z, AA=S², BB=D², E=AA−BB=4XZ, and

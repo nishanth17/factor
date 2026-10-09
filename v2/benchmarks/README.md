@@ -1885,6 +1885,11 @@ applicability, a24 conventions, exceptional points, normalization and widths.
 No upstream code is copied. C6 chains, A6 p−1, C5 reducers, new backends and
 curve families remain separate; production source and `v1/` are unchanged.
 
+The subsequent [research coverage audit](b4_research_audit.md) checks YAFU
+micro/tiny-ECM and newer complete-addition/chain literature, documents source
+verification limits, and distinguishes this bounded comparison from a claim
+of optimal kernels. It adds no candidates or timing.
+
 ### Frozen design and rerun
 
 Five candidates compare with the readable ladder: integer `**2` squares;
