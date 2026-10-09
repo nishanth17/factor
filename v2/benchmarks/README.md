@@ -2059,6 +2059,17 @@ families are added to force a win. B4's bounded comparison is settled;
 broader workload/production-bound calibration and combined portfolio
 confirmation remain separate work.
 
+**Policy follow-up — 9 October 2026:** the revised
+[roadmap promotion policy](../ROADMAP.md#how-to-use-the-gates) removes the
+universal 10% time / 10-point completion floor while retaining fresh
+confirmation, uncertainty beyond measurement noise, correctness, finite
+limits and regression/maintenance review. The verdict above records the
+original frozen gate. Both fresh timing intervals exclude zero on this fixed
+cohort, making the native and separate GMP gains eligible for scoped
+integration review. Frozen protocols, source manifests, captures and measured
+results are unchanged. No production promotion or additional timing follows
+from this documentation update.
+
 The eight new arithmetic tests cover independent affine/CRT/prime-power
 oracles, exact readable-formula agreement, unit scaling, degeneracy,
 failed-inversion factor recovery, cancellation and canonical resume on int

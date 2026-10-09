@@ -57,7 +57,34 @@ Python defaults or measured Python improvements.
 - **Phase exit:** the condition for moving the dependent production work into the next phase. Independent research spikes may proceed once their stated prerequisites exist.
 - **Evidence:** store the implementation commit, command, corpus identifier, seeds, environment, raw results, and decision in a separate artifact for each task. Preserve the original audit JSON as historical evidence.
 
-Performance promotion policy proposed for Phases 3–8: zero correctness failures; obey the same time, CPU, and memory limits; show either at least 10% lower end-to-end median time on a prespecified comparable cohort or at least 10 percentage points higher completion within budget; allow no more than a 5-percentage-point completion regression in another declared workload class. Check uncertainty with repeated seeds and a confidence interval for the relevant difference. If evidence is inconclusive, retain the baseline and expand the sample. Include setup, conversion, timeout, and recovery costs. These thresholds are project policy suggestions, not measured predictions.
+**Performance promotion policy for Phases 3–8 — revised 9 October 2026:**
+require zero correctness failures and the same finite work, wall/CPU time,
+memory and storage limits. A repeatable reduction in complete-run median time
+or increase in completion within budget can qualify at any percentage.
+Confirm the effect on fresh held-out inputs with repeated seeds, stable
+samples and a prespecified uncertainty analysis, normally a 95% confidence
+interval supporting a positive improvement. Account for run-to-run noise,
+measurement order and drift; a positive point estimate alone is insufficient.
+Include setup, conversion, timeout, recovery and output-validation costs.
+
+Report absolute and relative benefits, per-class time/completion results and
+uncertainty. Allow no more than a 5-percentage-point completion regression in
+another declared class; explain any time, completion or resource regression
+and narrow the promoted scope where warranted. Weigh the confirmed benefit
+against implementation complexity, maintenance and arithmetic/resume risk.
+Small, simple improvements can be worthwhile; more invasive changes need a
+stronger benefit. Kernel-only wins cannot establish complete-factoring gains,
+and claims remain limited to the confirmed workload/resource classes.
+
+Freeze sources, inputs, seeds, bounds, budgets, metrics, sampling/stability
+rules and regression limits before timing. A change-specific minimum useful
+effect may be justified before measurement, but 10% time reduction and
+10 percentage points of completion gain are no longer universal gates.
+Inconclusive evidence retains the baseline; extend measurements only within
+the declared study limits. Preserve previous frozen protocols and historical
+verdicts. Reconsider their evidence through an explicit policy reassessment,
+without retuning on held-out inputs or treating the policy change as automatic
+production promotion.
 
 ## Execution order: optimize current engines, then revisit GNFS
 
@@ -247,10 +274,10 @@ development and coordinated integration, not concurrent performance runs.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| ~~B1 — P3.8-R1 calibration~~ | ~~**[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults.~~ | ~~A1~~ | ~~Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction misses the timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers.~~ | ~~Sol / **high**, **xhigh** for selection~~ | ~~Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates.~~ |
+| ~~B1 — P3.8-R1 calibration~~ | ~~**[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults.~~ | ~~A1~~ | ~~Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction missed its then-frozen timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers.~~ | ~~Sol / **high**, **xhigh** for selection~~ | ~~Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates.~~ |
 | ~~B2 — P5.2 paired continuation~~ | ~~Bounded reusable ± execution and aligned-wheel follow-up, independent coverage/point/replay/resume checks, D/table comparisons and finite predeclared campaign continuation.~~ | ~~A2, A3; A6 remains required for increased-B1 extensions.~~ | ~~**[x] Complete for bounded scope on 9 October 2026.** Both pairing layouts remain opt-in: selected held-out configurations lose to reusable unpaired programs, with no completion gain. Increased B1, advanced pruning and allocation remain deferred.~~ | ~~Astra / **xhigh**~~ | ~~Exact coverage, projective products, saturation recovery, finite accounting and canonical int/GMP resume agree; frozen experiments support retaining defaults.~~ |
 | B3 — P4.1 production chains | Route verified records into actual bounded ECM stage-one jobs, including chunk replay, finite caches and ladder fallback; compare whole-stage costs. | A2, A3, A4 | **Medium/high potential.** Verified chains cannot help while production still calls only the ladder. Backend and program contracts make this a controlled execution change rather than an orphan helper optimization. | Sol / **xhigh** | Sol fits production integration once chain mathematics is independently verified. xhigh is for routing the records through real stage jobs while preserving work charges, replay, caches and fallback behavior. |
-| ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | A2 | **[x] Complete for the bounded study, 9 October 2026.** Five arms, separately instrumented costs, independent affine/composite/prime-power controls and fresh confirmation are settled. Retain baseline: native reductions save 8.78%, GMP normalization 4.73%, below the whole-run gate; completion stays 27/27. No production kernel promotion. | Sol / **xhigh**; Astra for unresolved formula proofs | Sol fits a bounded set of kernels checked against fixed formulas. xhigh is for normalization assumptions, reduction bounds and backend interactions; use Astra / xhigh if a new algebraic equivalence remains unresolved. |
+| ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | A2 | **[x] Complete for the bounded study, 9 October 2026.** Five arms, separately instrumented costs, independent affine/composite/prime-power controls and fresh confirmation are settled. The original frozen gate retained baseline: native reductions save 8.78%, GMP normalization 4.73%; completion stays 27/27. The revised policy admits scoped integration review of these gains; no production kernel is promoted. | Sol / **xhigh**; Astra for unresolved formula proofs | Sol fits a bounded set of kernels checked against fixed formulas. xhigh is for normalization assumptions, reduction bounds and backend interactions; use Astra / xhigh if a new algebraic equivalence remains unresolved. |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
 | B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
@@ -513,12 +540,14 @@ timings. Integrate changes sequentially and compare the exact combined source.
    from observed RSS. Benchmarks must use matched inputs, seeds and budgets,
    at least three seconds of validated PyPy warmup and nine samples, extended
    when unstable. Cold startup and instrumented profiles stay separate.
-4. **Use existing promotion gates.** Zero correctness failures; at least 10%
-   lower complete-run median time or 10 percentage points more completion on
-   a prespecified comparable cohort, with no more than 5 percentage points
-   of completion regression in another declared class, and uncertainty
-   reported. Faster refusal, microkernel throughput, extra rows and synthetic
-   matrix capacity alone do not establish a factoring win.
+4. **Use the revised promotion policy above.** Require zero correctness
+   failures and a repeatable complete-run time or completion improvement
+   supported by fresh confirmation and uncertainty beyond measurement noise.
+   There is no universal minimum percentage gain. Keep the same finite
+   resource limits, report per-class regressions, retain the 5-percentage-point
+   completion-regression ceiling and weigh benefit against maintenance/risk.
+   Faster refusal, microkernel throughput, extra rows and synthetic matrix
+   capacity alone do not establish a factoring win.
 5. **Run relevant checks.** Implementation changes use `make -C v2 test` and
    `make -C v2 lint`; before publishing, verify tests and benchmark imports
    in a committed-files-only checkout. Update API docs, accepted behavior and
@@ -1336,10 +1365,11 @@ speedups or a general verdict on parallel SIQS.
   Exact relation/provenance, cross-worker resume, malformed checkpoints,
   cap/budget refusals and cancellation retain their contracts. Run
   `make -C v2 test` and `make -C v2 lint` for implementation changes.
-- **E:** evaluate one change at a time. Apply the existing promotion policy:
-  at least 10% lower complete-run median time or 10 percentage points higher
-  completion, with no more than 5 points of regression in another declared
-  class, under the same resource limits and with uncertainty reported.
+- **E:** evaluate one change at a time under the revised promotion policy:
+  confirm a repeatable complete-run time or completion benefit beyond
+  measurement noise, with no universal percentage floor. Keep the same
+  resource limits, report uncertainty and per-class regressions, retain the
+  5-point completion-regression ceiling and justify maintenance/risk costs.
   Keep serial defaults and SSS/SSSf experimental until their respective gates
   pass. Close this milestone only after the planned experiments, acceptance
   checks and explicit decisions are recorded; diagnosis alone does not
@@ -1700,7 +1730,8 @@ Public/checkpoint preparation fully reverifies all atoms and combinations.
   Default cadence 1 and automatic dispatch remain unchanged.
 - [ ] Promote cadence 8 independently or establish a general filtering policy:
   joint identity/cadence gains pass scoped comparisons, but isolated training
-  gains miss the 10% time / 10-point completion threshold. No held-out retuning.
+  gains missed their frozen 10% time / 10-point completion threshold.
+  Any reassessment uses the revised policy; no held-out retuning.
 - [ ] Prove and benchmark a reduced provenance/fill storage bound at larger
   matrix scales. Existing dense quadratic reservations are unchanged; no
   reduced constant is used to bypass a capacity refusal.
@@ -1921,7 +1952,7 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
   stable warmed repeated runs. Record medians/spread/confidence intervals,
   completion/exhaustion, CPU, peak/aggregate RSS, disk and verification costs.
   Synthetic capacity tests do not establish SIQS speed. Integrated defaults
-  require the unchanged end-to-end promotion policy above. Any independent
+  require the current end-to-end promotion policy above. Any independent
   sequence/process spike must also charge startup, matrix replication, IPC
   and cancellation against identical serial assignments; GPU/native libraries
   remain design references, with no new backend dependency here.
@@ -2033,6 +2064,14 @@ Kernel diagnostics cover 64–1024 bits; actual stages and full factoring cover
 feasible products through 330 bits. The broader production-bound/large-factor
 scope below remains unclaimed; B4's bounded decision is available to C3/E1.
 
+**Policy reassessment — 9 October 2026:** the revised promotion policy above
+removes the blanket 10% cutoff. Both fresh timing intervals exclude zero on
+the fixed confirmation cohort, so the native reduction and separate GMP
+normalization gains are eligible for scoped integration review. Review
+maintenance cost, per-class results and final production behavior before
+promotion. The original frozen verdict, controls and captures remain intact;
+this policy reassessment changes no production/default/API/checkpoint behavior
+and adds no measurements or candidate tuning.
 
 - [ ] Add explicit squares, fused ladder addition/doubling, and optional normalized fixed-difference kernels. Reuse setup inversion only where the algebra supports it. Maintain readable oracle formulas; specify intermediate-width and reduction bounds.
 - **A:** kernel variants agree on valid points and correctly surface degeneracy/nonunits. Chunk transitions and normalized representations preserve the same scalar action.

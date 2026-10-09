@@ -1,5 +1,16 @@
 # v2 changelog
 
+## Performance promotion policy — 9 October 2026
+
+- Replace the blanket 10% time / 10-point completion floor with repeatable,
+  freshly confirmed complete-run improvements beyond measurement noise.
+  Keep prespecified controls, uncertainty reporting, exact correctness,
+  finite allowances and the 5-point completion-regression ceiling. Weigh
+  benefit against maintenance/risk and report per-class regressions.
+- Preserve historical frozen protocols and decisions. B4's 8.78% native and
+  4.73% separate GMP gains become eligible for scoped integration review;
+  production kernels, defaults, APIs and checkpoint formats remain unchanged.
+
 ## B4/P4.2 bounded kernel comparison — 9 October 2026
 
 - Freeze a complete private `bcf5f3d` control package, independently certified

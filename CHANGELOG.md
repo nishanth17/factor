@@ -2,6 +2,13 @@
 
 ## Current development
 
+- Relax the roadmap's universal 10% time / 10-point completion promotion
+  floor. Permit smaller repeatable complete-run gains supported by fresh
+  confirmation and uncertainty beyond measurement noise; retain correctness,
+  finite-resource, per-class regression and maintenance/risk checks. Preserve
+  frozen experiment verdicts and make B4's positive native/GMP gains eligible
+  for scoped integration review. No production change or automatic promotion.
+
 - Complete the bounded B4/P4.2 arithmetic-kernel study on frozen mainline
   controls: explicit squares, fused step, whole ladder, selected reductions
   and unit-checked fixed-difference normalization. Pin primary research and

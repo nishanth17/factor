@@ -613,4 +613,8 @@ All use `a24=(A+2)/4` with the squared difference. Unit normalization retains
 failed-inversion GCDs and canonical X:Z exits; no normalized representation
 is stored in checkpoints. See the [research/proofs](benchmarks/b4_research.md)
 and [matched evidence](benchmarks/README.md#b4--p42-bounded-arithmetic-kernels--9-october-2026)
-for the retain-baseline decision and finite study limits.
+for the original frozen retain-baseline decision and finite study limits.
+The revised [roadmap promotion policy](ROADMAP.md#how-to-use-the-gates) permits
+repeatable gains below 10% when fresh evidence supports an improvement beyond
+measurement noise. B4's positive native/GMP results are eligible for scoped
+integration review; production kernels and supported selectors remain as above.
