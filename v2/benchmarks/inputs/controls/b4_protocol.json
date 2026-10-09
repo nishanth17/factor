@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "revision": "bcf5f3d1e57304694b48ba6e7ef8b4ea2ffd0db0",
+  "controls_sha256": "a364b34c2dff555e8003c3c6fa7db2ca9a9c26361975871a2eee56f89b4d9849",
+  "corpus_sha256": "8cc89a67971a7f496aa5fa1b9b14aecaab3eb9170bb2f743ce4cc1d42ba93574",
+  "seeds": [
+    7,
+    19,
+    41
+  ],
+  "stage_seeds": [
+    7,
+    19,
+    41
+  ],
+  "kernel_bits": [
+    64,
+    96,
+    128,
+    166,
+    200,
+    256,
+    329,
+    512,
+    768,
+    1024
+  ],
+  "kernel_sigmas": [
+    7,
+    19,
+    41
+  ],
+  "kernel_scalar": 170141183460469231731687303717910206670,
+  "cases": {
+    "64": [
+      200,
+      20000,
+      16
+    ],
+    "128": [
+      1000,
+      50000,
+      16
+    ],
+    "256": [
+      1000,
+      50000,
+      16
+    ],
+    "329": [
+      1000,
+      50000,
+      16
+    ],
+    "power": [
+      50,
+      2000,
+      8
+    ]
+  },
+  "stage_bounds": [
+    1000,
+    50000
+  ],
+  "stage_curves": 3,
+  "work_limit": 5000000,
+  "seconds": 30,
+  "cpu_seconds": 30,
+  "memory_bytes": 16777216,
+  "max_input_bits": 331,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      31
+    ],
+    [
+      8,
+      63
+    ]
+  ],
+  "relative_iqr_limit": 0.15,
+  "backends": [
+    "python-int",
+    "gmpy2-mpz"
+  ],
+  "candidate_limit": 5,
+  "selection": "Fastest stable whole-factoring arm per backend on the pooled training cohort, provided no declared class loses >5 completion points. Select even when gain is below promotion threshold, for a bounded fresh confirmation; no further tuning.",
+  "promotion": "Zero correctness failures; same finite limits; fresh complete-run median improves >=10% with conditional 95% timing interval above zero, or completion improves >=10 percentage points with fixture-cluster interval above zero; no declared class loses >5 completion points. Unstable/censored/inconclusive evidence retains baseline. Stage/kernel wins cannot promote.",
+  "timing_scope": "Initialization, conversion, normalization, recovery, result reconstruction and checkpoint serialization included. Kernel diagnostics, stage timings, full factoring, cold starts and instrumented profiles are reported separately.",
+  "machine_lock": "/private/tmp/factor-performance.lock",
+  "profile_status": "Baseline breakdown must precede candidate freeze."
+}

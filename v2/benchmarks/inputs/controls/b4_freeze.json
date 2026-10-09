@@ -1,0 +1,26 @@
+{
+  "source_hashes": {
+    "v2/benchmarks/b4_study.py": "e3a6560c27e823ed7914be5bb76d024386ae70f7b1e21e1cbec7afc4ee7d31cb",
+    "v2/benchmarks/b4_kernels.py": "962793cc45001ed14efe3c439f51330567acf636782b5e6e3a4dbba01f2a08db",
+    "v2/benchmarks/b4_common.py": "82c6e5e4b6e963df230e6fa8808514d813e224e3b480623905e176d82da6189e",
+    "v2/benchmarks/p52_a3.py": "9b721c0aeda52a9beab7b38636077c84d1efad72fa1b490731f5f4bbc7983fe9",
+    "v2/benchmarks/p52_realistic.py": "f3b469f82903c65407be1835e1ee21c1ae226d3ca348e6ba726534fa6a174f3a",
+    "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
+    "v2/benchmarks/build_phase_two_corpus.py": "1f46ec2165011e552923f836c701af3dbab6793d560dd007bdbb7cb31e5f0ce1",
+    "v2/benchmarks/prac_oracle.py": "d656822436b8e37f156d472cbbdb79800564f1e096311e72408fd2747dcae8db",
+    "v2/benchmarks/inputs/baselines/b4_mainline.json": "a364b34c2dff555e8003c3c6fa7db2ca9a9c26361975871a2eee56f89b4d9849",
+    "v2/benchmarks/inputs/corpora/b4_corpus.json": "8cc89a67971a7f496aa5fa1b9b14aecaab3eb9170bb2f743ce4cc1d42ba93574",
+    "v2/benchmarks/inputs/controls/b4_protocol.json": "31919cae03a304b2df54e7a667561ecdd36762866c57003ed18b3a21a5e50c02"
+  },
+  "arms": [
+    "baseline",
+    "squares",
+    "fused_step",
+    "whole_ladder",
+    "reductions",
+    "normalized"
+  ],
+  "baseline_profile_sha256": "b7d5093081d6928f6652c2c4675ac3fbfc8bff3bc62a1653030973a6262eaaf8",
+  "selection_reason": "Point arithmetic is a measured component; test five bounded syntax/fusion/reduction/normalization transfers. Leave reducers, backends, schedules and curve families unchanged."
+}
