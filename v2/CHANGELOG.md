@@ -1,5 +1,20 @@
 # v2 changelog
 
+## A10 integration and research reconciliation — 9 October 2026
+
+- Integrate source-verified strict 12/13-base Miller–Rabin ranges with settled
+  B1/B2 mainline. Preserve B2 schedule/schema identities and legacy primality
+  policy, random witnesses, cumulative work and conservative terminal labels;
+  add int/GMP regression coverage for paired/wheel checkpoints 7/8.
+- Cross off the completed bounded A10/P8.2.1 row. Publish an 11-project pinned
+  QS/GNFS comparison and route prospective experiments to existing owners;
+  no unmeasured candidate or combined portfolio/default gate is promoted.
+- Pass 401 PyPy/GMP tests and lint; the committed-files-only archive passes
+  398 system-PyPy tests (three optional-GMP skips), all 67 benchmark imports
+  and required A10 proof/control/protocol/v1-adapter loaders. Preserve versioned
+  inputs/citations/summaries; remove the isolated worktree and generated local
+  captures after integration at the user's request.
+
 ## B2 aligned-wheel follow-up — 9 October 2026
 
 - Add opt-in `ecm_pair_wheel`, with complete bounded nearest-center cells,

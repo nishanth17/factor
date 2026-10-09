@@ -63,8 +63,8 @@ range is adopted. [AKS](https://annals.math.princeton.edu/2004/160-2/p12) gives 
 unconditional general deterministic algorithm, but has no measured advantage
 for this bounded Python workload. APRCL/ECPP and n−1 certificates add proof
 capability rather than replacing a requested random test. No external
-implementation was adapted; license notices remain with ignored local source
-captures, and future source copying requires the stated obligations.
+implementation was adapted; license obligations are identified above, and
+future source copying requires checking and retaining the full source notices.
 
 Shared `n-1 = d*2**s` decomposition, first-witness rejection, small division
 filters and three-argument modular powering already transfer well to Python.
@@ -131,7 +131,8 @@ The longer follow-up was frozen in
 [a10_stability_protocol.json](inputs/corpora/a10_stability_protocol.json)
 before its outcome: eight seconds validated warmup and 500-ms batches. Its
 range/median is 20.44% for control and 10.80% for accepted (limit 15%); initial
-complete confirmation was 25.10% / 84.37%. Every sample is retained. These
+complete confirmation was 25.10% / 84.37%. Every sample was retained during
+acceptance. These
 conditional median intervals do not establish stable complete-run latency or
 universal optimality. This prime/power-heavy workload disables rho, p−1 and
 ECM; E1 still owns combined portfolio confirmation with B1/B2 changes.
@@ -183,6 +184,15 @@ No QS implementation change is included in A10.
 A committed-files-only archive of `0ee86ff` also passed the 369/372-test
 suites, all 59 benchmark imports and the corpus/control/protocol/v1-adapter
 loaders. The final acceptance update changes documentation only.
+
+**Mainline composition:** candidate `6bf7ca1` integrates settled B1/B2
+`6ec8a01` with A10 and the roadmap research reconciliation. The combined
+PyPy/GMP suite passes 401 tests and lint; a committed-files-only archive passes
+398 system-PyPy tests (three optional-GMP skips), all 67 benchmark imports and
+the A10 proof/control/protocol/v1-adapter loaders. A new integration regression
+preserves fresh/legacy primality policies and work/labels in B2 schemas 7/8
+on int/GMP. No new timings were run; historical A10/B1/B2 performance pins
+remain unchanged and E1/H1 confirmation stays open.
 
 ## B1 joint QS/MPQS/SIQS calibration — 9 October 2026
 

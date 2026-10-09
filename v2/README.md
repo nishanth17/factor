@@ -230,7 +230,7 @@ and serialized checkpoints contain canonical Python integers. Certainty,
 witness selection, seeds, bounds and logical work reservations are shared
 across the two tracks; GMP primality shortcuts do not upgrade classifications.
 
-GMP portfolio checkpoints use version **6**, including reusable ECM programs.
+Unpaired GMP portfolio checkpoints use version **6**, including reusable ECM programs.
 Native portfolio formats remain **4** for streamed execution and **5** for
 programs. SIQS/SSS use **3**, parallel SIQS **4**, and polynomial families **2**.
 They bind progress to the selected backend;
@@ -280,7 +280,8 @@ status. A composite witness exits early; small-prime membership/divisibility
 still decides trivial cases exactly.
 
 Fresh bounded runs use the checkpoint identity `primality: mr13-strict-v1`.
-Existing numeric schemas 4/5/6, backend and schedule identities are preserved.
+Existing numeric schemas 4–6 and B2's paired/wheel schemas 7/8 retain their
+backend and schedule identities; the primality policy composes with each.
 A missing primality identity means `mr64-strict-v1`; it stays attached to the
 whole resumed run, including pending children. Old random witness progress,
 RNG consumption and conservative terminal labels remain unchanged. Unknown

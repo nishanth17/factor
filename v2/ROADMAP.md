@@ -2832,6 +2832,18 @@ cohort tails persist after the fixed longer follow-up. This closes A10's
 bounded capability/reconciliation gate, not B14 certification, E3 filter
 promotion, E1 combined portfolio acceptance or H1's final coverage gate.
 
+**Combined integration validation:** candidate `6bf7ca1`, based on settled
+B1/B2 mainline `6ec8a01`, passes `make -C v2 test` on PyPy/GMP (401 tests)
+and `make -C v2 lint`. Its committed-files-only archive passes 398 system-PyPy
+tests (three optional-GMP skips), all 67 benchmark imports and required A10
+proof/control/protocol/v1-adapter loaders. The added integration regression
+checks fresh and legacy primality policies across paired/wheel schemas 7/8
+on int/GMP, including conservative labels, cumulative work and incompatible
+witness-policy rejection. Final acceptance edits are documentation only;
+no combined performance/default promotion is claimed. The isolated A10
+worktree and generated captures are removed after integration at the user's
+request; versioned inputs, source citations and summaries remain.
+
 **v1 capability decisions (9 October 2026):** the source audit covers all
 preserved modules and separates mathematical capability from larger search
 allowances. Range proofs and independent regression oracles support the A10
