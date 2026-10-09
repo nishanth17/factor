@@ -120,8 +120,10 @@ execution tables below preserve the existing task IDs and acceptance gates
 in the numbered phase catalogue. This plan does not authorize experiments;
 `v1/` remains the baseline.
 
-**Recommended immediate allocation: start R1 calibration on the integrated R2
-control and finish the isolated P4.3 backend tranche.** A1, A3 and A4 are complete
+**Recommended immediate allocation: use B1's bounded R1 calibration on the
+integrated R2 control for the selected E1/C3 follow-ups.** B1's 9 October
+30/40-digit tranche is complete; general defaults and broader crossover gates
+remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
 A3 retains streamed defaults after matched reuse experiments; B2 production
@@ -173,7 +175,7 @@ phase, prefer higher-priority rows when slots are limited.
 | --- | --- | --- |
 | P1/P2 and P3.1–P3.4 | Exact bounded algorithms, recovery and a working SIQS relation/filter/extraction baseline exist. | ECM and complementary-method correctness work can start now. Full P3.8 completion is not a prerequisite. |
 | P3.6.1 and the follow-up repair pass | Accepted budget/storage/setup fixes and measured decisions are recorded; native defaults remain conservative. | Reuse these fixes. R2/R5 should reconcile the current baseline rather than reimplement polling, leases, base verification or rejected batching experiments. |
-| P3.8-R1 implementation | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Broader calibration remains open. | R1 is now mainly a workload/parameter/evidence task. Capacity reachability is not evidence of large balanced completion. |
+| P3.8-R1 implementation and bounded B1 calibration | External-square MPQS, streamed assignments, up to 32 A factors, bounded quota extension and sparse initial charging are integrated. Frozen 30/40-digit joint calibration and fresh confirmation are complete on the R2 control; defaults are retained. | Larger feasible workloads, combined-source confirmation and portfolio/crossover calibration remain open. Capacity reachability is not evidence of large balanced completion. |
 | P3.8-R3 bounded tranche | Stable mixed rows, complete identities and checked recovery are integrated. Cadence 32 has a scoped opt-in win; general policy and larger provenance/storage bounds remain open. | Matrix controls can start now. Do not reopen the accepted R3 work or assume its existing dense storage reservation has disappeared. |
 | P3.8-R2 bounded tranche | The isolated study and combined repaired/R3 acceptance pass; fixed scores and capped plans are integrated as opt-ins. The original promotion decision retains defaults. | A1 is complete for this scope and B1 can start. B13 resieve capacity and C8 family-wide CRT remain conditional follow-ups. |
 | P5.2-A3 bounded tranche | Immutable capped ECM prime/power programs, independent +/- coverage fixtures, resume checks and finite campaign contracts pass acceptance and matched experiments. Streamed defaults are retained. | Reuse the program/oracle contracts in B2 after A2. Paired execution, D selection, advanced pruning and allocation remain open. |
@@ -236,7 +238,7 @@ development and coordinated integration, not concurrent performance runs.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| B1 — P3.8-R1 calibration | Jointly train base size, interval, A selection/factor count, Gray reuse, residual/store/matrix allowances; freeze feasible configurations and evaluate fresh inputs. | A1 | **High.** Collector changes can move the best configuration, so broad tuning follows R2. Use meaningful upper-band allowances and explain collection, yield, storage and time failures separately. This supplies the R4 decision. | Sol / **high**, **xhigh** for selection | Sol fits controlled parameter sweeps and evidence summaries. Use high for executing the frozen protocol and xhigh for joint parameter selection, uncertainty and crossover decisions; long runs alone do not justify extra effort. |
+| B1 — P3.8-R1 calibration | **[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults. | A1 | Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction misses the timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers. | Sol / **high**, **xhigh** for selection | Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates. |
 | B2 — P5.2 paired continuation | Execute reusable ±-paired stage-two programs; tune basic D/table sizes; preserve coverage, curve-private points, tails and replay; integrate supported finite campaign extensions. | A2, A3; A6 for extensions of the stage-one bound | **High potential.** Combines repeated-schedule savings with fewer continuation terms. Stable backend/program contracts avoid competing rewrites of stage jobs. It does not require PRAC or a GMP win. | Astra / **xhigh** | Choose Astra for proving paired-prime coverage while preserving projective terms and mixed-factor recovery. xhigh is warranted by interactions among tails, table bounds, reusable plans and resumed campaigns. |
 | B3 — P4.1 production chains | Route verified records into actual bounded ECM stage-one jobs, including chunk replay, finite caches and ladder fallback; compare whole-stage costs. | A2, A3, A4 | **Medium/high potential.** Verified chains cannot help while production still calls only the ladder. Backend and program contracts make this a controlled execution change rather than an orphan helper optimization. | Sol / **xhigh** | Sol fits production integration once chain mathematics is independently verified. xhigh is for routing the records through real stage jobs while preserving work charges, replay, caches and fallback behavior. |
 | B4 — P4.2 fused/normalized kernels | Compare explicit squares, fused addition/doubling, selected reductions and unit-checked normalization on stable int/mpz paths. | A2 | **Medium/high potential.** Representation, conversions and formula conventions must be fixed before ranking kernels. This can use the ladder control and run independently of B3's chain integration. | Sol / **xhigh**; Astra for unresolved formula proofs | Sol fits a bounded set of kernels checked against fixed formulas. xhigh is for normalization assumptions, reduction bounds and backend interactions; use Astra / xhigh if a new algebraic equivalence remains unresolved. |
@@ -1443,7 +1445,29 @@ cover implemented capacity/reachability contracts; broader parameter selection,
 Gray tuning and crossover gates remain open. Exact measured sources and
 post-capture acceptance changes are recorded in the benchmark README.
 
-- [ ] Freeze trained, feasible configurations before fresh held-out runs.
+**Bounded B1 calibration accepted (9 October 2026).** The integrated R2
+runtime at `94caf40` is unchanged. Twenty-three original joint bundles,
+eight separately frozen 40-digit bundles and four wider fixed-QS bundles
+cover base/interval, A selection/count/reuse and finite residual/store/matrix
+allowances. Selection precedes three mutually disjoint new certified corpora.
+Fresh balanced 30-digit SIQS improves the two-seed cohort by 36.6%
+(conditional repeat interval 35.4–37.5%); a second fresh input corroborates it.
+Uneven five-digit-factor and p+1 controls regress. At 40 digits SIQS/MPQS
+complete both starts, but MPQS's 6.9% reduction (5.4–9.5%) misses the timing
+gate. Wider fixed QS fails both fresh starts. At 60 digits 47 verified rows
+per streamed mode all disappear under singleton filtering; 70–99 digits
+produce at most one. These are collection/useful-yield and finite-window/time
+diagnoses, without a store/matrix-capacity failure or upper time-to-factor
+claim. Retain defaults; adopt only explicit balanced presets and reproducible
+controls. DLP needs an affordable recoverable-residual population, CRT a
+calibrated eligible-prime/root-cost case, and matrix work a useful matrix
+bottleneck; none is supplied here. GNFS scope is unchanged. Combined-source
+E1 and portfolio/handoff C3/G1/H1 confirmation remain open. The tranche passes
+365 PyPy/GMP tests, lint and finite early/deeper resume checks; see the
+[benchmark protocol, selections and limitations](benchmarks/README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
+
+- [x] Freeze trained, feasible configurations before fresh held-out runs
+  for the bounded 30/40-digit B1 tranche; larger affordable bands remain open.
   Jointly choose factor-base bound and actual cardinality, reachable A targets,
   interval/family quotas, residual bounds, relation/partial stores and matrix
   workspace. Verify that finite family exhaustion does not masquerade as a
@@ -1477,6 +1501,9 @@ post-capture acceptance changes are recorded in the benchmark README.
   exponential family length; stream/checkpoint families without preallocating
   the entire search history. For a classical MPQS arm, assess dual batch
   inversion only after its external-square representation is correct.
+  B1 completes the bounded nearest/flyer, three-to-five-factor and Gray-reuse
+  bundle comparison; broader scaling and any cost-triggered dual-batch
+  inversion study remain open.
 - [x] Address the verified large-job capacity restrictions (4 October 2026
   follow-up): default SIQS permits at most 64 polynomials, with no width
   growth, and terminates after 16 consecutive windows without new usable
