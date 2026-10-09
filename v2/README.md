@@ -134,6 +134,35 @@ Use `--verbose` to inspect method outcomes and work use. Measured automatic
 handoff/default selection is open in the [roadmap](ROADMAP.md); explicit CLI
 usability is tracked separately under P3.4.
 
+The calibrated B1 balanced 30-digit SIQS preset is available explicitly.
+Load its complete frozen configuration so the store, matrix and family
+allowances match the measured bundle:
+
+```python
+import json
+from pathlib import Path
+
+import v2
+from v2.budget import Budget
+from v2.qs import SIQSConfig, SIQSJob, SieveConfig
+
+selected_path = Path(v2.__file__).parent / (
+    "benchmarks/inputs/controls/b1_selected.json"
+)
+selected = json.loads(selected_path.read_text())
+settings = selected["configurations"][selected["selected"]["siqs"]]
+settings["collector"] = SieveConfig(**settings["collector"])
+config = SIQSConfig(**settings)
+budget = Budget(work_limit=10**13, seconds=5, cpu_seconds=5)
+result = SIQSJob(n, seed=7, config=config, budget=budget).run()
+assert (result.divisor or 1) * result.cofactor == n
+```
+
+Here `n` is the integer to split. The result preserves an explicit unresolved
+cofactor when its finite allowance ends. This preset reduced the tested
+balanced cohort's time by 36.6%; uneven-factor regressions keep it an explicit
+choice. See the [B1 measurements and limitations](benchmarks/README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
+
 Select an experimental SSS engine explicitly:
 
 ```sh

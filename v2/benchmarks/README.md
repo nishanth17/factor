@@ -5,6 +5,174 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## B1 joint QS/MPQS/SIQS calibration — 9 October 2026
+
+The B1 study uses committed mainline `94caf40`, including integrated R2,
+in an isolated worktree. Runtime arithmetic and production defaults are
+unchanged. `inputs/controls/b1_frozen.json` pins runtime/driver hashes, both
+previously inspected training corpora, seeds 7/29, 23 joint bundles, finite
+allowances and selection criteria. `b1_40d_frozen.json` separately freezes a
+bounded eight-bundle follow-up after the successful 40-digit feasibility
+probe; it does not rewrite the original protocol. Selection files freeze
+each mode before its new certified corpus is generated.
+
+The 30-digit sweep uses three balanced inputs and both seeds; the 40-digit
+follow-up uses one balanced training input and both seeds. Bound/interval,
+nearest/flyer selection, A-factor count, Gray quotas, residual bounds and
+row/partial/atom/matrix allowances vary together. This is a finite bundle
+comparison, not an exhaustive parameter search. QS keeps its fixed A=1;
+MPQS uses the accepted external-square representation. Powers/bucket
+collection, exact verification, certainty labels and checked resume stay
+intact. Known factors enter validation only. Pocklington generation biases
+the corpus toward primes with a large known p-1 factor; no RSA-distribution
+or population success claim is made.
+
+Every call has a 10^13 work grant and finite wall/CPU limits. The common
+owned-memory envelope is 256 MiB; individual bundles can reserve less.
+Feasibility caps are 5 seconds at 30 digits, 30 at 40/60, and 15 at 70–99.
+Warmed 30-digit timing admits bundles completing every screened start in
+at most two seconds; the separately frozen 40-digit threshold is ten.
+Each timed arm receives at least three seconds of validated PyPy warmup
+and nine samples, extending unstable series to fifteen, up to three blocks.
+Fresh comparisons interleave arms. Process inventory checks surround calls
+and poll long calls; the same exclusive flock and owner record are shared
+with B2/A10. These checks supplement coordination, not an OS-wide isolation
+guarantee. Cold startup and instrumented profiles supply no performance claim.
+
+The machine is Apple M4 / 24 GiB, using PyPy 7.3.23 implementing Python
+3.11.15. The following fresh 30-digit times sum both seeded complete calls,
+including setup, collection, filtering, extraction and classification.
+Process-inventory checks outside those calls are excluded; their separate
+outer timers remain in the captures. Each row is one independent input, not
+18 independent factoring trials. Close-factor timing needed a second block
+with five seconds of warmup and fifteen samples; other primary rows use nine.
+
+| Fresh class | R2 control, seconds | Selected SIQS | Selected MPQS |
+| --- | ---: | ---: | ---: |
+| Balanced | 0.447480 | 0.283728 | 0.415146 |
+| Uneven, five-digit smaller factor | 0.082175 | 0.429751 | 0.517652 |
+| Uneven, ten-digit smaller factor | 0.474256 | 0.363277 | 0.426907 |
+| p-1 smooth control | 0.504901 | 0.455407 | 0.576002 |
+| p+1 smooth control | 0.694064 | 0.771634 | 1.115285 |
+| Close factors | 0.462278 | 0.358044 | 0.418211 |
+| Prime square | 0.051126 | 0.024225 | 0.092133 |
+
+The balanced SIQS reduction is 36.6%, with a paired-repeat 95% interval of
+35.4–37.5%; MPQS reduces it by 7.2% (1.6–8.8%). Intervals are conditional on
+the fixed input/seeds. All R2/SIQS/MPQS classes complete both unique starts.
+The five-digit-factor control's factoring timer initially failed stability
+although its outer timer passed. Its reported cell comes from a separate
+frozen-parameter repeat: over three seconds of actual factoring warmup and
+nine stable samples per arm. The original unstable cell is excluded.
+
+The selected 30-digit SIQS bundle uses base bound 3,000, half-width 8,192,
+four A factors, flyer selection, eight effective Gray polynomials, residual
+bound 9,000,000, 2,048 rows/partials and 8,192 atoms. MPQS uses base 3,000,
+half-width 32,768 and the same stores/residual bound, with external square A
+and one polynomial per coefficient. Both have a finite 100,000-family grant,
+1 MiB checkpoint cap and 256 MiB owned cap. Actual assignment-space exhaustion
+remains distinct from the configured family grant.
+
+At 40 digits, six of eight training bundles complete both starts and pass
+nine-sample stability; both fixed-QS bundles exhaust their windows. Selection
+retains SIQS base 10,000, half-width 65,536, five flyer-selected A factors and
+16 effective Gray polynomials. External-square MPQS selects the same base
+and width. Both reserve 8,192 rows/partials, 32,768 atoms, a 100,000,000
+residual bound, 256 MiB owned memory and 1 MiB checkpoints. On the fresh
+balanced input, both complete 2/2 unique starts and all 18 timed calls.
+The two-seed cohort medians are 15.086435 seconds for SIQS and 14.043059
+for MPQS; MPQS's paired reduction is 6.9% (95% interval 5.4–9.5%). This
+40-digit comparison uses the frozen feasible SIQS control, not the smaller
+30-digit R2 configuration. Neither the point estimate nor interval reaches
+the 10% timing gate, so it establishes no MPQS crossover or promotion.
+
+A separately frozen wider-QS follow-up tests bases 3,000/10,000/30,000 and
+half-widths 131,072/499,999, using 8,192 rows/partials and at most 32,768 atoms.
+At the widest interval, training completion is 0/6, 2/6 and 4/6, respectively.
+The frozen 30,000-base challenger fails both fresh starts: 1,072 verified rows
+leave zero rows after singleton filtering. This is finite-window/useful-yield
+exhaustion, not a matrix-memory failure or a time-to-factor result. The same
+second fresh balanced input confirms the unchanged SIQS challenger at
+0.496728 seconds versus 0.660333 for R2; no retuning used either fresh input.
+
+The upper probes give SIQS/MPQS a 30-second cap at 60 digits and 15 seconds
+at 70–99. At 60 digits each produces 47 verified rows, all removed by
+singleton filtering, with owned peaks 81.49/66.62 MiB. SIQS uses about 90%
+of its time in collection. At 70 digits SIQS has one row and MPQS zero;
+80–99 have zero. A products approach the exact targets, the necessary matrix
+reservation fits, and neither store nor matrix capacity stops these attempts.
+Use post-filter output rows/columns to assess useful yield, not admitted-row
+counts alone. These are censored feasibility probes; they establish no
+upper-band time-to-factor ratio or impossibility claim.
+
+**Decisions:** adopt the frozen protocols, independent confirmation inputs
+and explicit balanced-input presets as the bounded B1 result. Retain runtime
+defaults and exact powers/bucket collection. The 30-digit balanced SIQS win
+does not establish a general portfolio policy: five-digit-factor and p+1
+controls regress, populations are small, and no ECM-to-SIQS handoff is timed.
+Defer larger calibration and combined E1/C3/G1/H1 confirmation. DLP remains
+deferred pending an affordable recoverable-residual population, beyond these
+low-yield probes. No calibrated matrix-capacity failure or eligible-base-prime
+CRT cost triggers matrix redesign or C8; GNFS stays with its existing roadmap.
+The small-store bundle fits 32 MiB but loses partials through FIFO eviction;
+larger stores help its wide counterpart without beating the narrow selection.
+These joint comparisons do not isolate a causal effect for every parameter.
+The incomplete-QS tie-break uses admitted verified rows, although the freeze
+describes them as useful rows; post-filter counts expose that limitation.
+No incomplete QS selection supplies an accepted speed or promotion claim.
+
+All three new 58-fixture certified corpora are mutually disjoint and disjoint
+from training. Early checked resumes reject changed configuration and reduced
+work grants. Eight distinct selected/control configurations also pass deeper
+pause/restore and a second checkpoint, preserving cumulative resources and
+reconstruction within the frozen 1 MiB checkpoint caps. Local raw JSON,
+stdout and verification records remain in this worktree's ignored
+`v2/benchmarks/results/b1/`. No cold-start or profile timing is pooled with
+the warmed evidence. New integrated A10/B2 sources require a new confirmation;
+these captures remain pinned to `94caf40` runtime arithmetic.
+Required checks pass: `make -C v2 test PYTHON=.venv/bin/python` runs 365 tests
+on PyPy/GMP, and `make -C v2 lint` passes. The v2-local changelog preserves
+this task's directory boundary.
+
+Native implementations inform the candidate design, not Python defaults:
+[PARI's flyer selection](https://pari.math.u-bordeaux.fr/lcov-report/basemath/mpqs.c.gcov.html)
+(development `31092-e6893b0017`),
+[msieve's A-factor/reuse tradeoff](https://github.com/radii/msieve/blob/master/mpqs/poly.c),
+and [Zimmermann's MPQS notes](https://members.loria.fr/PZimmermann/talks/tiny-mpqs.pdf)
+relate coefficient quality, interval and reuse. Sources were read on
+9 October 2026; no external engine was executed or timed.
+
+Reproduce in a quiet machine window from this committed tree. Freeze and
+selection outputs refuse replacement; use new paths for a new study.
+
+```sh
+pypy3 -m v2.benchmarks.b1_calibration freeze --protocol NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_calibration probe --protocol NEW_PROTOCOL.json \
+  --output v2/benchmarks/results/b1/new-probes.json
+pypy3 -m v2.benchmarks.b1_calibration train --protocol NEW_PROTOCOL.json \
+  --output v2/benchmarks/results/b1/new-training.json
+pypy3 -m v2.benchmarks.b1_calibration select --protocol NEW_PROTOCOL.json \
+  --training v2/benchmarks/results/b1/new-training.json \
+  --probes v2/benchmarks/results/b1/new-probes.json --output NEW_SELECTED.json
+pypy3 -m v2.benchmarks.b1_calibration confirm --protocol NEW_PROTOCOL.json \
+  --selected NEW_SELECTED.json --corpus NEW_CORPUS.json \
+  --output v2/benchmarks/results/b1/new-confirmation.json
+pypy3 -m v2.benchmarks.b1_40d freeze --protocol NEW_40D_PROTOCOL.json \
+  --parent NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_40d run --protocol NEW_40D_PROTOCOL.json \
+  --selected NEW_40D_SELECTED.json --corpus NEW_40D_CORPUS.json \
+  --output v2/benchmarks/results/b1/new-40d.json
+pypy3 -m v2.benchmarks.b1_qs_width freeze --protocol NEW_QS_PROTOCOL.json \
+  --parent NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_qs_width run --protocol NEW_QS_PROTOCOL.json \
+  --selected NEW_QS_SELECTED.json --corpus NEW_QS_CORPUS.json \
+  --siqs-selected NEW_SELECTED.json \
+  --output v2/benchmarks/results/b1/new-qs-width.json
+pypy3 -m v2.benchmarks.b1_timer_confirmation --selected NEW_SELECTED.json \
+  --corpus NEW_CORPUS.json --kind uneven_5 \
+  --output v2/benchmarks/results/b1/new-uneven-timers.json
+```
+
 ## SIQS CLI access (4 October 2026)
 
 The initial SIQS comparison below is retained. The P3.4 usability follow-up
