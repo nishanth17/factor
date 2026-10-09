@@ -290,3 +290,42 @@ class ScheduleCache:
                 self.used_bytes += 1024 + 16 * len(values)
         finally:
             self.active = False
+
+
+RATIO_VERSION = "inclusive-lcm-ratio-v1"
+
+
+def prime_power_ratio(prime, old_bound, new_bound):
+    """Return p**(e_new-e_old) for a caller-verified prime p.
+
+    e_B is the largest integer e with p**e <= B. The product over every
+    prime <= new_bound is M(new_bound)/M(old_bound), M(B)=lcm(1,...,B).
+    old_bound=1 denotes a fresh action. A prime above old_bound has e_old=0.
+    Identity factors are returned as 1; consumers may skip their powering.
+    """
+    utils.require_integer(prime, "prime", 2)
+    utils.require_integer(old_bound, "old_bound", 1)
+    utils.require_integer(new_bound, "new_bound", old_bound)
+    if prime > new_bound:
+        raise ValueError("prime exceeds new bound")
+
+    old_power = (
+        utils.prime_power(prime, old_bound) if prime <= old_bound else 1
+    )
+    return utils.prime_power(prime, new_bound) // old_power
+
+
+def prime_power_ratios(old_bound, new_bound, **options):
+    """Stream nonidentity (prime, ratio) actions, including old primes.
+
+    Options and their finite work/storage caps are those of iter_primes.
+    This is an integer schedule, independent of any modulus or group law.
+    It is valid only after the entire old M(B) action has completed. A
+    partial prime cursor is not a completed-bound certificate.
+    """
+    utils.require_integer(old_bound, "old_bound", 1)
+    utils.require_integer(new_bound, "new_bound", max(2, old_bound))
+    for prime in iter_primes(2, new_bound + 1, **options):
+        ratio = prime_power_ratio(prime, old_bound, new_bound)
+        if ratio != 1:
+            yield prime, ratio

@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "control_commit": "bcf5f3d",
+  "runtime": "PyPy implementing Python 3.11; Python integers",
+  "cohorts": {
+    "stages": "p43_size_corpus.json: screen and confirmation, balanced 20/50/100 digits",
+    "portfolio": "phase_two_m15_independent_corpus.json: first 12 fixtures with 20-digit products; seed 7",
+    "constructed": [
+      {
+        "id": "old_power_16",
+        "n": 17323,
+        "base": 3,
+        "bounds": [
+          [
+            15,
+            15
+          ],
+          [
+            16,
+            16
+          ]
+        ],
+        "factors": [
+          17,
+          1019
+        ]
+      },
+      {
+        "id": "stage_two_101",
+        "n": 618533,
+        "base": 2,
+        "bounds": [
+          [
+            10,
+            100
+          ],
+          [
+            10,
+            101
+          ]
+        ],
+        "factors": [
+          607,
+          1019
+        ]
+      },
+      {
+        "id": "mixed_saturation",
+        "n": 247,
+        "base": 2,
+        "bounds": [
+          [
+            10,
+            10
+          ],
+          [
+            16,
+            16
+          ]
+        ],
+        "factors": [
+          13,
+          19
+        ]
+      }
+    ]
+  },
+  "profile": {
+    "bounds": [
+      2000,
+      20000
+    ],
+    "chunk_size": 16,
+    "gcd_batch": 64,
+    "segment_size": 256,
+    "bases": [
+      2
+    ]
+  },
+  "candidates": [
+    "chunk sizes 1,16,64",
+    "cached gaps versus independent q powering",
+    "bounded schedule reuse over 3 bases"
+  ],
+  "timing": {
+    "bounds": [
+      2000,
+      20000
+    ],
+    "larger_bounds": [
+      11000,
+      100000
+    ],
+    "bases": [
+      2,
+      3,
+      4
+    ],
+    "warmup_seconds": 3,
+    "samples": 9,
+    "unstable_samples": 27,
+    "unstable_relative_iqr": 0.15,
+    "minimum_sample_seconds": 0.08,
+    "wall_seconds": 30,
+    "cpu_seconds": 30,
+    "work_limit": 2000000,
+    "memory_bytes": 8388608
+  },
+  "continuation": {
+    "bounds": [
+      [
+        500,
+        5000
+      ],
+      [
+        2000,
+        20000
+      ]
+    ],
+    "base": 2,
+    "arms": [
+      "fresh_final",
+      "fresh_each",
+      "in_memory_continuation",
+      "checkpoint_continuation"
+    ]
+  },
+  "portfolio": {
+    "seed": 7,
+    "trial_bound": 100,
+    "rho_attempts": 1,
+    "rho_evaluations": 512,
+    "ecm_tiers": [
+      [
+        50,
+        1000,
+        2
+      ]
+    ],
+    "pm1_bounds": [
+      2000,
+      20000
+    ],
+    "pm1_attempts": [
+      0,
+      1
+    ],
+    "work_limit": 500000,
+    "seconds": 5,
+    "cpu_seconds": 5
+  },
+  "selection": "Correctness first. General promotion requires >=10% complete-stage median reduction with paired 95% bootstrap interval above zero and no completion loss; portfolio evidence is reported separately. Constructed cases do not justify general promotion. Keep current defaults for inconclusive or negative evidence. Freeze candidate subset only after the separate baseline profile. No allocation or ECM implementation changes.",
+  "selected_after_profile": {
+    "diagnostic": "baseline_profile.json (separate instrumented capture; not speed evidence)",
+    "candidates": [
+      "chunk sizes 1/16/64",
+      "cached gaps versus direct q powers",
+      "bounded ScheduleCache over three bases"
+    ],
+    "reason": "Stage-two work and sieve setup dominate the small-bound diagnostic; retain bounded stage-one comparison because old-prime powers and chunk recovery are acceptance requirements. No polynomial/native arithmetic candidate."
+  }
+}

@@ -601,3 +601,60 @@ bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
 recovery and grouped hit reservations. Its independent certified inputs,
 frozen source control and separate cold/profile modes are described in
 [the benchmark guide](benchmarks/README.md). Dispatcher defaults are unchanged.
+
+
+### A6: opt-in finite p−1 bound campaigns
+
+```python
+from v2.budget import Budget
+from v2.pm1_bounded import PM1Config, factorize_pm1_bounded
+
+config = PM1Config(bounds=((15, 15), (16, 16)))
+run = factorize_pm1_bounded(17 * 1019, base=3, config=config,
+                            budget=Budget(work_limit=100000))
+assert run.divisor == 17
+assert run.result.reconstruct() == 17 * 1019
+```
+
+This separate Python-integer API predeclares 1–64 monotone inclusive (B1,B2)
+rungs for one explicit base. It stops on a valid factor, saturation, nonunit,
+finite allowance or final campaign exhaustion. Existing `factorize_pm1`,
+portfolio configuration, ECM campaigns and their checkpoints retain their
+behavior. Repeated p−1 bases have the same p−1 smoothness structure and are
+not independent ECM-like smooth-order trials.
+
+A B1 increase applies the exact ratio M(new B1)/M(old B1), where
+M(B)=lcm(1,…,B). This includes higher powers of old primes; it restarts stage
+two at new B1 using the updated residue. A B2-only increase reuses checked
+coverage and appends the new interval. Saturated chunks replay prime units,
+and saturated stage-two batches replay terms, both under `recovery_limit`.
+Saturation ends this base; increasing its bound cannot undo an identity
+residue. Input and base sizes, prime workspace, chunk/batch sizes and
+checkpoint output all have finite caps. The memory cap estimates owned
+workspace, not process RSS.
+
+`max_actions=N` pauses after at most N committed actions. Resume by passing
+`run.checkpoint`, the same n/base/config, and an unused `Budget` containing
+*total cumulative* allowances. Schema 1 binds `pm1-campaign-v1`,
+`inclusive-lcm-ratio-v1` and `python-int`. No RNG is consumed. Checksums detect
+accidental corruption; deterministic reconstruction verifies all saved
+arithmetic before reuse, and consumes the same action reservations in the
+cumulative budget. Reconstruction, context rebuilding and serialization time
+are charged on resume. A small grant may be spent entirely on verification;
+repeated pauses do not reset work or active-run wall/CPU usage. Paused time is
+excluded. An incompatible identity is rejected. Exhaustion does not grant
+new rungs, bases or ECM curves.
+
+`PM1Run` exposes divisor, reason, cumulative work/time, verification work and
+a reconstructible `FactorizationResult`. Its split pieces remain unresolved;
+this API makes no primality assertion or certainty upgrade. Work units are
+versioned for this API: prime segments cost segment_size+base-prime count;
+compiled candidates cost one each; chunk powering/GCD costs one plus the sum
+of exponent bit lengths; replay costs prime.bit_length()+1; stage-two terms
+cost gap.bit_length()+1 even on a cache hit; transitions/GCDs cost one. Context
+construction costs ceil(isqrt(max B2)/2). Every reservation precedes mutation.
+Deadlines/cancellation are cooperative between bounded actions.
+
+The group-independent ratio helpers and precise reuse rules are documented
+in the [A6 research and contract](benchmarks/a6_pm1_research.md). They unblock
+the scalar contract for later ECM work; ECM bound migration remains separate.
