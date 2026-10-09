@@ -23,7 +23,9 @@
   with remaining control-side tail spread disclosed. Version independent
   proof fixtures, immutable control sources, protocols and benchmark runners;
   keep raw evidence local. Pass PyPy tests and lint, including legacy/GMP
-  resume checks. Certificate generation and combined portfolio promotion
+  resume checks. A committed-files-only archive passes 369 system-PyPy tests,
+  372 GMP-enabled tests, all 59 benchmark imports and required input loaders.
+  Certificate generation and combined portfolio promotion
   remain B14 and E1 respectively.
 
 - Complete the bounded P4.3 int/GMP backend foundation across preprocessing,

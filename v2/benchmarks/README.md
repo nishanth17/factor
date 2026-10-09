@@ -165,6 +165,9 @@ under legacy schemas 4/5/6 on int/GMP. `make -C v2 test` passed 369 tests
 One earlier GMP suite failed the unchanged QS snapshot-lifetime assertion;
 its isolated test and full repeat passed. Its cause is undetermined and
 referred to B1; no QS implementation change is included in A10.
+A committed-files-only archive of `0ee86ff` also passed the 369/372-test
+suites, all 59 benchmark imports and the corpus/control/protocol/v1-adapter
+loaders. The final acceptance update changes documentation only.
 
 ## SIQS CLI access (4 October 2026)
 

@@ -126,9 +126,10 @@ for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
 A3 retains streamed defaults after matched reuse experiments; B2 production
 pairing follows A2, with A6 needed for increased-B1 extensions. Conditional
-capacity/CRT follow-ups can remain deferred. A10 can start now to recover
-verified v1 capabilities, beginning with wider deterministic primality.
-B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
+capacity/CRT follow-ups can remain deferred. A10 is complete on its isolated
+review branch: verified wider deterministic primality and the v1 ownership
+audit are accepted for this bounded tranche. B14 can now follow for certificate
+proofs; neither waits for GNFS or D7. Integration still belongs to E1.
 
 **Williams p+1 belongs to P5.1: A5 builds the binary reference, and B8 evaluates
 P5.1 parameter starts and P5.3 Lucas optimizations. It is eligible before P6.**
@@ -229,7 +230,7 @@ development and coordinated integration, not concurrent performance runs.
 | A6 — P5.3 p−1 and extension correctness | Compare bounded prime-power/chunk powering and gap reuse against current p−1; define and test exact increased-B1 schedule ratios without requiring new p+1 code. | Existing p−1/P2 controls | **Medium.** Cheap structured-factor coverage and correct continuation can be developed now. Raising B1 must include increased powers of old primes, not just new primes. Keep this p−1 tranche separate from the later Lucas optimization. | Sol / **xhigh** | Sol fits incremental changes to an existing verified method. xhigh is for proving exact schedule ratios, preserving chunk replay and separating genuine extra coverage from repeated work. |
 | A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
 | A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
-| A10 — P8.2.1 verified v1 capability transfers | Audit missing v1 capabilities, route every verified advantage to its existing owner, and port independently supported wider deterministic Miller–Rabin ranges. Cover the reported 23-digit prime and threshold counterexamples; preserve explicit probabilistic mode and document certainty/accounting changes. | Existing P1.8/P2 exact classification and budget controls; preserved v1 sources | **High, immediate capability parity.** v1 has a verified fixed-base range that v2 currently labels probable. This tranche can ship before GNFS/P8 control freeze; larger v1 search allowances alone are not a proven algorithmic advantage. | Sol / **xhigh**; targeted Astra review for disputed range proofs | Sol fits a bounded source/capability reconciliation and range implementation. xhigh covers strict thresholds, pseudoprimes, caller semantics, RNG/work effects and honest provenance; use Astra only for an unresolved mathematical guarantee. |
+| ~~A10 — P8.2.1 verified v1 capability transfers~~ | ~~Completed bounded tranche: source-verified strict 12/13-base ranges, reported regression, independent proof oracles, v1 ownership audit and checked legacy resume.~~ | ~~Existing P1.8/P2 exact classification and budget controls; preserved v1 sources~~ | ~~**[x] Complete on isolated `codex/a10-verified-primality`, 9 October 2026; not merged.** Committed-only suites/imports and lint pass. Range-only selection retained; complete-run tail spread disclosed. B14 and E1 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Primary-source computational guarantees, endpoint congruences, independent proof fixtures, finite budgets and RNG/work/checkpoint compatibility are reconciled; no disputed extra range was adopted.~~ |
 | A11 — P3.4 CLI usability follow-up | Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, useful help, examples and tests through the existing `v2.factor` recursive portfolio; retain opt-in SIQS fallback. | Existing P2 portfolio and P3.4 polynomial/checkpoint contracts | **Outstanding usability follow-up, eligible now.** Explicit engine access is independent of automatic-dispatch performance gates. All three selectors are now wired and tested; the complete usability follow-up remains tracked here under P3.4. | Sol / **high** | Sol fits connecting existing verified engines to the entry point. high covers cross-mode configuration, help/examples, recursive reconstruction and checked resume; no new factoring mathematics or automatic default is required. |
 
 ### Execution phase B — exploit the settled controls
@@ -550,8 +551,9 @@ guidance changed no implementation or completion checkbox. The 5 October
 update visibly closes bounded A1/R2 and defers GNFS until
 current-engine H1 acceptance and coverage review; it changes no algorithm or
 performance decision. The subsequent
-v1 parity/proof follow-up adds open A10/B14 tasks and transfer ownership; it
-does not claim those capabilities have been implemented or accepted. A11
+v1 parity/proof follow-up added A10/B14 tasks and transfer ownership. The
+9 October isolated A10 acceptance closes its bounded range/audit tranche;
+B14 certificates and E1 integration remain open. A11
 separately tracks the P3.4 QS/MPQS/SIQS CLI usability follow-up; C3/G1
 retain ownership of measured automatic selection and default promotion.
 
@@ -2626,17 +2628,17 @@ identify future execution and do not certify those gates by renumbering them.
 
 #### P8.2.1 — Transfer verified v1 advantages, starting with primality (A10)
 
-This is an early capability tranche, independent of D7 and GNFS. P1.8's
-accepted certainty contract remains intact; its completion does not imply
-that wider deterministic ranges or general prime certificates exist in v2.
+This early capability tranche is complete on its isolated review branch,
+independent of D7 and GNFS. P1.8's certainty contract remains intact; supported
+fixed ranges now extend as below. General prime certificates remain B14.
 
-- [ ] Compare the preserved v1 capabilities with current v2: primality ranges,
+- [x] Compare the preserved v1 capabilities with current v2: primality ranges,
   ECM bounds/curve campaigns, schedule reuse, scalar chains, sieves and CLI
   usability. Record each as already transferred, verified gap, benchmark
   hypothesis or unsafe/unsubstantiated behavior. Implement every verified
   useful gap under its owning gate; record a reason for any rejected or
   deferred candidate. Preserve v1 and all historical evidence.
-- [ ] Transfer the first-12-prime-base Miller–Rabin test for
+- [x] Transfer the first-12-prime-base Miller–Rabin test for
   `n < 318665857834031151167461` and the first-13-prime-base test for
   `n < 3317044064679887385961981`, after validating the strict bounds and
   witness sets against [Sorenson–Webster](https://arxiv.org/abs/1509.00864).
@@ -2644,7 +2646,7 @@ that wider deterministic ranges or general prime certificates exist in v2.
   separately against primary evidence; do not infer a guarantee from a
   table entry or copy v1's heuristic large-input rules. Explicitly requested
   probabilistic mode continues to honor its round count and certainty label.
-- [ ] Route remaining transfers without duplicating work: campaign feasibility
+- [x] Route remaining transfers without duplicating work: campaign feasibility
   and reusable schedules to A3/B2 (P5.2); measured v1 bound/curve allocation
   to C3 (P5.2), then G1 (P8.4); verified scalar-chain improvements to A4/B3
   (P4.1); sieve/setup candidates to E6 (P8.6); CLI convenience and certainty
@@ -2666,6 +2668,23 @@ that wider deterministic ranges or general prime certificates exist in v2.
   separately from speed. Validate v1 outputs before using its comparison
   adapter, disclose Python-2 emulation, and make no native-v1 timing claim.
   Record transfer decisions and owning rows so verified gaps are not lost.
+
+**Acceptance, 9 October 2026:** isolated branch `codex/a10-verified-primality`
+implements only the independently supported range transfer and classification
+policy. The reported input reconstructs exactly with all three factors proven.
+Fourteen targeted test methods cover 365 proof-backed cases, strict endpoints,
+explicit rounds, RNG/work reservations, int/GMP legacy schemas and recursive
+resume. A committed-files-only archive of `0ee86ff` passes 369 system-PyPy
+tests (two optional-GMP skips), 372 GMP-enabled tests and all 59 benchmark
+imports plus required corpus/control/protocol/v1-adapter loaders. Full lint
+passes. An earlier unchanged QS snapshot-lifetime assertion failed once;
+isolated, repeated full and committed-only suites pass. Cause remains
+undetermined and is referred to B1; no QS engine code is changed here.
+[Frozen comparisons and limitations](benchmarks/README.md#a10-verified-primality-transfers-9-october-2026)
+retain range-only selection: no optional speed candidate qualifies. Complete
+cohort tails persist after the fixed longer follow-up. This closes A10's
+bounded capability/reconciliation gate, not B14 certification, E3 filter
+promotion, E1 combined portfolio acceptance or H1's final coverage gate.
 
 **v1 capability decisions (9 October 2026):** the source audit covers all
 preserved modules and separates mathematical capability from larger search
