@@ -16,7 +16,9 @@ from .a6_pm1 import (
     verify_inputs,
 )
 
-PROTOCOL = Path(__file__).parent / "inputs/corpora/a6_pm1_confirm_protocol.json"
+PROTOCOL = (
+    Path(__file__).parent / "inputs/corpora/a6_pm1_confirm_protocol.json"
+)
 
 
 def main():
@@ -41,7 +43,9 @@ def main():
                 for arm, function in functions.items():
                     outcome = function()
                     if outcome["factor"] is not None:
-                        raise AssertionError("confirmation must be nonsplitting")
+                        raise AssertionError(
+                            "confirmation must be nonsplitting"
+                        )
                     records.append(
                         {
                             "id": fixture["id"],
