@@ -1103,6 +1103,313 @@ GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
 
+## P5.2-B2 aligned-wheel follow-up — 9 October 2026
+
+`p52_b2_wheel.py` freezes the original paired engine at `a670c4d`, retains
+the accepted `94caf40` streamed/reusable controls, and compares an opt-in
+aligned-cell wheel. The existing B2 corpus has already been inspected, so
+`build_p52_b2_wheel_inputs.py` generates fresh certified training and held-out
+inputs with seed 2026100953. Required snapshots, corpus and protocol live in
+versioned `inputs/`; raw captures remain local in `results/p52-b2-wheel/`.
+
+The frozen workload sizes, tiers, algorithm seeds 7/19/41, 50-million-unit
+work limit, 120-second wall/CPU limits, 16 MiB workspace, 8 MiB program cap and
+1,024-slot segments match the original study. Wheel grids are 6/30/210 for
+small, 30/210/420 for medium, 210/420/840 for uneven and 210/840/1890 for the
+nonsplitting campaign. Structured inputs inherit the small selection. Old
+paired controls use the previously selected D=24/64/768/2048. A regeneration
+arm uses the middle wheel with only the minimum program scratch reservation.
+Select the fastest stable training wheel with no completion regression against
+either accepted control; freeze that choice before held-out timing. This is a
+small fixed-cohort comparison, not factor-size or curve-allocation calibration.
+
+At least three seconds of validated warmup and nine samples are required;
+unstable arms extend to 5 seconds/31 samples, then 8 seconds/63 samples.
+The relative-IQR threshold is 0.15, and wall/CPU-censored or nondeterministic
+captures cannot pass. The same whole-factoring promotion rule applies: at
+least 10% median time reduction with an interval above zero, or a 10-point
+completion gain with an interval above zero, without a >5-point completion
+regression elsewhere. Fixed nonsplitting campaigns cannot promote defaults.
+All setup, tables, decoding, recovery, recursion and checkpoint costs are in
+the end-to-end measurement. Cold starts and instrumented diagnostics are
+separate; private-control reconstruction adds to cold startup and cannot be
+interpreted as an algorithmic speed advantage.
+
+Execution acquires the machine-wide flock and checks for competing benchmark/
+test processes. Coordinate the window with B1 and other heavy work first.
+The runner saves every attempt, pins source and input hashes, and refuses to
+overwrite evidence. The original B2 controls/protocol/results are unchanged.
+
+```sh
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase training --diagnostics --output v2/benchmarks/results/p52-b2-wheel/training.json
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase held_out --selection v2/benchmarks/results/p52-b2-wheel/training.json --cold --output v2/benchmarks/results/p52-b2-wheel/held-out.json
+```
+
+The implementation uses complete nearest-center cells, not Prime95's extended
+distance/relocation matcher. Its sparse odd-multiple generator still pays for
+discarded intermediate points. Those distinctions prevent attributing native
+pairing percentages to this PyPy implementation. Substantial matching,
+relocation, compact-map and common-Z extensions are deferred in C2; polynomial
+continuation remains F3.
+
+**Completed result: retain every production default.** Candidate `dba3cd2`
+ran under the coordinated flock after B1's QA finished; A10 confirmed no heavy
+work. No competing benchmark/test process was detected. Ordinary desktop
+activity remained; the captures do not assert an otherwise idle operating
+system. PyPy 7.3.23 implements Python 3.11.15. All 35 final training captures
+and 20 final held-out captures satisfy the frozen stability rule. Training
+needed 42 attempts: five arms finished at 31 samples and one at 63. Held-out
+needed 25 attempts: medium wheel/programs/legacy finished at 31 and uneven
+wheel at 63. All earlier attempts are retained. The uneven wheel's relative
+IQR fell from 0.274 (9 samples) through 0.195 (31) to 0.141 (63); its final
+median is 0.360 seconds. This extended fixed-cohort estimate is not evidence
+of stability across all populations or machines.
+
+Training selected W=30/210/840/1890 for small/medium/uneven/campaign, with
+structured inputs inheriting 30. Held-out medians below measure complete
+cohorts, including all declared seeds and all factoring/setup/serialization
+costs. Each small, medium and uneven arm completes 9/9 starts; structured
+completes 3/3. The campaign completes all four declared curves per start but
+finds no factors (0/3 starts complete). No arm changes completion.
+
+| Held-out class | Streamed seconds | Programs seconds | Original paired seconds | Wheel seconds | Wheel vs programs | Wheel vs original paired |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| Small | 0.001245 | 0.001324 | 0.002392 | 0.002319 | 75.1% slower | 3.1% faster |
+| Medium | 0.005141 | 0.005301 | 0.016067 | 0.011064 | 108.7% slower | 31.1% faster |
+| Uneven | 0.166597 | 0.165668 | 0.249830 | 0.359836 | 117.2% slower | 44.0% slower |
+| Fixed nonsplitting campaign | 1.588467 | 1.417380 | 1.840164 | 1.752086 | 23.6% slower | 4.8% faster |
+| Structured | 0.000147 | 0.000146 | 0.000153 | 0.000151 | 3.6% slower | 1.0% faster, inconclusive |
+
+All selected wheel arms also lose to streamed execution. Conditional 95%
+bootstrap intervals for the wheel's time reduction versus programs are
+[-79.9,-72.6]%, [-110.1,-107.6]%, [-133.7,-110.9]%, [-24.0,-22.4]% and
+[-4.3,-1.7]% in table order. Versus original pairing, the medium interval is
+[30.6,31.4]%, campaign [4.5,5.4]% and uneven [-54.9,-33.3]%. These resample
+repeated timings of fixed cohorts; they are not independent input-population
+confidence intervals. No speed or completion promotion gate passes. Reusable
+unpaired programs retain value: this fresh fixed campaign saves 10.8% versus
+streamed, consistent with the earlier 10.5% observation. Neither campaign
+establishes a successful-factoring or global allocation advantage.
+
+Separate three-curve campaign diagnostics explain the bounded layout change:
+
+| Arm | Certified eligible primes | Product terms | Giant advances | Retained baby point slots | First/later curve work |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Programs | 422,082 by unpaired schedule | 422,082 | 2,055 | 1,379 table slots | 1,602,356 / 446,274 |
+| Original D=2048 | 422,082 | 422,082 | 1,383 | 1,024 plus sentinel | 2,024,552 / 587,082 |
+| W=210 | 422,082 | 353,442 | 26,988 | 24 | 2,065,311 / 532,130 |
+| W=840 | 422,082 | 353,064 | 6,747 | 96 | 2,205,886 / 518,573 |
+| W=1890 | 422,082 | 352,884 | 2,997 | 216 | 2,049,600 / 516,419 |
+
+Selected W=1890 eliminates 16.4% of products, representing 32.8% of primes
+covered in pairs. Exact prime coverage is unchanged. It retains 216 rather
+than 1,024 baby points, but still computes discarded intermediate multiples
+and incurs more giant advances. Its final program store is 6,204,320 bytes
+versus original pairing's 6,863,584 and programs' 1,888,800. Conservative owned
+reserves are 12,845,944 / 12,948,696 / 11,053,712 bytes respectively. Held-out
+campaign process peaks are 88.3 / 97.5 / 87.6 MiB; RSS also includes runtime,
+JIT and private control loading, so it is not table storage. Regeneration-only
+W=840 costs 2.746 seconds in training versus 1.843 with retention.
+
+All 180 separate cold starts validate identical rows/work to their warm arm.
+Campaign process-wall medians are 1.923 / 1.772 / 2.233 / 2.080 seconds for
+streamed / programs / original paired / wheel. Small cold apparent wins cannot
+promote the wheel: immutable controls pay private source reconstruction, while
+the candidate imports normally. Separate validated profiles cover three
+complete starts (12 campaign curves), not accepted timing ratios. The wheel
+profile records 12,000 coverage reads, 3,000 coverage compilations and 1,411,536
+sparse-slot binary searches. Packing/decoding and slot lookup remain concrete
+costs despite fewer products. Compact indexed maps and richer matching require
+their own C2 representation, recovery, memory and timing gates; this tranche
+does not bundle that tuning.
+
+Full `make -C v2 test` and `make -C v2 lint` pass. A committed-files-only archive
+passes 376 system-PyPy tests (two optional skips), 379 PyPy/GMP tests (no skips),
+and all 61 benchmark imports plus frozen proof/control loading. New cases
+cover exact independent coverage across segment boundaries, affine points,
+zero-predecessor initialization, mixed-factor and one-sided saturation, every
+action's resumed execution, cancelled/refused work, regeneration, corrupted
+metadata, canonical int/GMP campaigns and cumulative budget extension. No
+v1 or SIQS implementation file changes.
+
+Raw evidence is local under `results/p52-b2-wheel/`, including every attempt,
+cold sample, work/storage diagnostic, profile and QA log, with `manifest.json`.
+Training SHA-256 is
+`63becb5e078b112ee44e958a4f50bd8b6ec4ee5bf42c26048555135043ac93cf`;
+held-out SHA-256 is
+`0c4485ab36648626d3abd5b1634590c0cf09a1255a3dd6125fbc03aa190c1ff0`.
+Frozen legacy source / protocol / corpus hashes are respectively
+`59b44b7c13ca8be758f062337a76c37b2fcecddce7da0b23bf9a4389a38b054f`,
+`004c7e0c04c61b5562b57c413f81ac8f44d9efd1fedc304f71d24eae49a8337a`,
+`b876defa8ad640219bdeb8d97f8d66a581fa3c110d1fc683309d80a576c9e0ab`.
+
+## P5.2-B2 paired continuation — 9 October 2026
+
+The bounded implementation and matched experiments are complete. Pairing stays
+opt-in: all selected held-out configurations lose to both accepted controls,
+with unchanged completion. No production promotion gate passes. Checks pass
+367 system-PyPy tests (two optional skips), 370 PyPy/GMP tests without skips
+and full `make -C v2 lint`.
+Native integers, streamed execution, the ladder and production
+parameters remain defaults. Required inputs are versioned; raw evidence stays
+in ignored `results/` directories.
+
+`p52_b2.py` compares immutable committed-mainline (`94caf40`) streamed and
+reusable-program controls with three paired D choices and a regeneration-only
+control. The private snapshot `inputs/baselines/p52_b2_mainline.json` freezes
+all active ECM arithmetic, schedules, budgets and portfolio dependencies.
+The older A3 snapshots are unchanged. Inactive QS types provide annotations
+only; these runs cannot dispatch to SIQS/SSS. Both control and corpus hashes are
+pinned in `inputs/controls/p52_b2_protocol.json`.
+
+`inputs/corpora/p52_b2_corpus.json` supplies independent Pocklington/trial
+certificates, generation seed 2026100952, disjoint training/held-out inputs and
+algorithm seeds 7/19/41. Three inputs per small, medium and uneven cohort and
+one fixed balanced campaign/structured input per split form a deliberately
+bounded study. Repeated timing samples are not new independent inputs.
+
+| Case | B1 / B2 / curves | Candidate D | Scope |
+| --- | --- | --- | --- |
+| Small balanced | 50 / 2,000 / 8 | 8, 16, 24 | Whole factoring |
+| Medium balanced | 200 / 20,000 / 16 | 32, 64, 96 | Whole factoring |
+| Uneven, 34-bit smaller prime | 2,000 / 147,396 / 8 | 128, 384, 768 | Whole factoring |
+| Balanced 266-bit campaign | 11,000 / 1,900,000 / 4 | 512, 1,024, 2,048 | Finite campaign; not a success-rate claim |
+| Prime-cube structure | 50 / 2,000 / 8 | Small-cohort choice | Whole factoring regression control |
+
+Every row grants 50,000,000 work units and 120-second wall/CPU caps per input
+and seed, a 329-bit envelope and 16 MiB owned workspace. Retained programs use
+8 MiB. The paired dense table has D/2 points plus its recurrence state; its
+coexisting certificates, products, recovery and checkpoint storage are reserved.
+Wall/CPU censoring prevents an accepted timing claim. Partial results still
+reconstruct and are validated against the certified factors.
+
+Each arm receives at least three seconds of validated warmup and nine samples
+on PyPy implementing Python 3.11. Relative IQR above 0.15 or changed deterministic
+outcomes triggers 5 seconds/31 samples and then 8 seconds/63 samples; unresolved
+instability stays inconclusive. Training chooses the fastest stable D without
+a completion regression against either control, per bound tier; the structured
+control inherits the small tier. The saved training output freezes that choice
+before held-out execution and rejects subsequent source changes. The unchanged
+roadmap promotion gate applies to fresh whole factoring; finite nonsplitting
+campaign savings cannot promote defaults. Timing intervals are conditional on
+the fixed cohort, and completion intervals cluster algorithm seeds by fixture.
+This small study cannot calibrate population-wide factor-size allocation.
+
+Costs include config, classification, setup, schedule/table construction,
+products, recovery, recursion and final checkpoint serialization. Optional cold
+rows use nine separate starts and are stored apart. Instrumented profiling,
+work/phase counters and stage throughput must be reported separately. RSS
+includes interpreter/JIT/warmup; it is not the owned-workspace cap.
+
+The accepted runs followed explicit B1/A10 handoffs and held the machine-wide
+exclusive flock at `/private/tmp/factor-performance.lock`. Reproductions must
+coordinate the same window. The runner also checks for
+competing benchmark/test interpreters and fails closed if inventory is denied.
+It never kills unrelated work. Output paths refuse overwrites and preserve
+unstable attempts as well as accepted captures.
+
+```sh
+mkdir -p v2/benchmarks/results/p52-b2
+pypy3 -B -m v2.benchmarks.p52_b2 --phase training --diagnostics --output v2/benchmarks/results/p52-b2/training.json
+pypy3 -B -m v2.benchmarks.p52_b2 --phase held_out --selection v2/benchmarks/results/p52-b2/training.json --cold --output v2/benchmarks/results/p52-b2/held-out.json
+```
+
+The optional diagnostic rows instrument at most three direct curves per arm
+and cohort using seeds 7/8/9. They report setup/table/giant/recovery actions,
+term products, work, peak baby-table slots and retained program storage without
+time ratios. These standalone curve counts are separate from the whole
+factoring cohort's seeds and recursive dispatch. They cannot establish a gain.
+
+### Matched results and retained defaults
+
+Production and runner source are frozen at `d7f873e`; documentation-only
+acceptance follows that commit. PyPy 7.3.23 implements Python 3.11.15 on
+macOS 26.6.2 arm64. All 30 training and 15 held-out final captures satisfy the
+predeclared relative-IQR limit, deterministic output and uncensored-budget
+requirements. Small `paired_1`, medium `paired_0`/`paired_1` and structured
+`regenerated` extended from nine to 31 samples; all attempts remain local.
+Every accepted capture has at least three seconds of validated warmup.
+
+Training selects D=24/64/768/2048 for the four bound tiers before held-out
+execution; the structured case inherits D=24. These select the least costly
+tested paired option and do not recommend enabling it. Cohort medians include
+all inputs and algorithm seeds, not one curve or one successful split:
+
+| Held-out case | D | Streamed ms | Programs ms | Paired ms | Complete starts, each arm | Paired cost increase vs streamed / programs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Small balanced | 24 | 1.207 | 1.238 | 2.189 | 9/9 | 81.3% / 76.8% |
+| Medium balanced | 64 | 3.647 | 4.062 | 9.270 | 9/9 | 154.2% / 128.2% |
+| Uneven | 768 | 154.148 | 155.629 | 223.469 | 9/9 | 45.0% / 43.6% |
+| Balanced campaign | 2048 | 1685.998 | 1509.368 | 1938.743 | 0/3 | 15.0% / 28.4% |
+| Prime cube | 24 | 0.146 | 0.148 | 0.153 | 3/3 | 4.8% / 3.2% |
+
+The conditional 95% bootstrap intervals for paired cost increases against
+streamed are 76.2–117.3%, 149.7–160.0%, 41.5–46.0%, 14.2–16.0% and 0.3–6.7%,
+respectively. Intervals against programs also exclude a benefit. These describe
+timing on fixed cohorts, not population factoring performance. All completion
+differences are zero; fixture-cluster intervals are [0, 0] on this small set
+and do not establish population equivalence. Training completion is also
+matched: 9/9 small/medium, 8/9 uneven, 0/3 campaign and 3/3 structured. Campaign
+rows are finite search costs; all four declared curves finish per start, and
+no factor is found. No row is wall/CPU-censored.
+
+The three-curve campaign diagnostics explain a limitation of this bounded
+layout. Streamed and unpaired programs produce 422,082 terms. Paired D=512
+produces 406,632 (3.7% fewer); D=1024 and D=2048 still produce 422,082 because
+the 1,024-slot prime segments separate opposite signs. All paired choices
+certify exactly 422,082 eligible primes. Their giant advances are 5,535/2,766/
+1,383 and baby-table slots including the sentinel are 257/513/1,025. Lower D's
+limited occupancy benefit does not pay for its extra recurrence/program work.
+Cross-segment coalescing or a different segment grid was not evaluated here.
+
+For D=2048, curve work is 2,024,553 initially and 587,083 on each subsequent
+curve, versus programs' 1,602,357/446,275 and streamed's 1,458,993 per curve.
+The paired store retains 6,863,584 bytes and records 923 coverage misses and
+1,846 hits over those three curves. Its owned reserve is 12,948,696 bytes,
+below the common 16 MiB cap; unpaired programs reserve 11,053,712 bytes.
+Held-out campaign process RSS is 91.5 MiB paired, 85.0 MiB programs and 82.8
+MiB streamed, including interpreter/JIT overhead. Regeneration-only training
+costs 2.588 seconds per campaign cohort, versus 1.878 seconds for retained
+programs at the same D=1024. The cap remains effective when retention is off.
+
+Separate instrumented full-campaign profiles validate all three arms and
+record 11,076 coverage calls / 2,769 certificate compilations in paired
+execution, along with packing, decoding and replay bookkeeping. This locates
+additional work but supplies no accepted timing ratio. Allocation tuning,
+kernel changes and advanced wheel/common-Z plans stay in their own workstreams.
+
+The 135 cold records are nine fresh starts for each held-out arm. Median
+startup-plus-cohort seconds (streamed/programs/paired) are
+0.163/0.166/0.152 small, 0.195/0.205/0.184 medium, 0.415/0.438/0.485 uneven,
+2.028/1.849/2.312 campaign and 0.152/0.152/0.128 structured. These include
+imports, proof checks and the controls' private snapshot reconstruction, so
+small cold differences are harness costs, not evidence for promotion.
+
+Raw captures, profiles and check logs remain local under ignored
+`results/p52-b2/`. The training/held-out SHA-256 digests are
+`569e06e22faf5210c03d9407de479151c99cc73559f81afab754d9ec019ea225` and
+`4257fc45af79f0e8131aca86bedbd65118bcb6081e263f34b93c1d8589901034`.
+The frozen protocol digest is
+`bd31511643617b3a4df124454573335edb49c6cb3f149b700a6ce2cf50a24ab8`.
+Required corpus/control/protocol inputs are versioned. The committed-files-only
+verification includes the unchanged `v1/` hash fixtures; an initial archive
+omitted them and its missing-file failure is retained alongside the repaired
+archive checks. Both full test suites and all 59 benchmark imports pass there;
+the proof/control loaders work without generated evidence. All 135 cold
+outcome/work records agree with the corresponding warmed records. No factoring
+source changed after training selection.
+
+The design retains Montgomery's x-coordinate symmetry and projective cross
+differences ([1987 paper](https://wstein.org/edu/124/misc/montgomery.pdf)).
+GMP-ECM's [stage-two implementation](https://github.com/sethtroisi/gmp-ecm/blob/main/stage2.c)
+illustrates separate memory/cost modeling and polynomial continuations; its
+native thresholds and advanced pruning are not imported into this PyPy tranche.
+Its [library contract](https://github.com/sethtroisi/gmp-ecm/blob/main/README.lib)
+and [stage-one code](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
+explicitly account for higher powers of old primes when B1 increases. A6 has
+not supplied that exact schedule-ratio contract here, so increased-B1 extensions
+are deferred. No external code was copied into the implementation.
+
 ## P5.2-A3 reusable programs and campaign feasibility — 5 October 2026
 
 The bounded A3 tranche adds opt-in immutable packed prime/power blocks, a

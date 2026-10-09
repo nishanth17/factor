@@ -126,8 +126,9 @@ integrated R2 control for the selected E1/C3 follow-ups.** B1's 9 October
 remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
-A3 retains streamed defaults after matched reuse experiments; B2 production
-pairing follows A2, with A6 needed for increased-B1 extensions. Conditional
+A3 retains streamed defaults after matched reuse experiments. B2 now supplies
+bounded opt-in pairing; its matched losses retain defaults, and A6 remains
+needed for increased-B1 extensions. Conditional
 capacity/CRT follow-ups can remain deferred. A10 can start now to recover
 verified v1 capabilities, beginning with wider deterministic primality.
 B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
@@ -239,7 +240,7 @@ development and coordinated integration, not concurrent performance runs.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | ~~B1 — P3.8-R1 calibration~~ | ~~**[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults.~~ | ~~A1~~ | ~~Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction misses the timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers.~~ | ~~Sol / **high**, **xhigh** for selection~~ | ~~Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates.~~ |
-| B2 — P5.2 paired continuation | Execute reusable ±-paired stage-two programs; tune basic D/table sizes; preserve coverage, curve-private points, tails and replay; integrate supported finite campaign extensions. | A2, A3; A6 for extensions of the stage-one bound | **High potential.** Combines repeated-schedule savings with fewer continuation terms. Stable backend/program contracts avoid competing rewrites of stage jobs. It does not require PRAC or a GMP win. | Astra / **xhigh** | Choose Astra for proving paired-prime coverage while preserving projective terms and mixed-factor recovery. xhigh is warranted by interactions among tails, table bounds, reusable plans and resumed campaigns. |
+| ~~B2 — P5.2 paired continuation~~ | ~~Bounded reusable ± execution and aligned-wheel follow-up, independent coverage/point/replay/resume checks, D/table comparisons and finite predeclared campaign continuation.~~ | ~~A2, A3; A6 remains required for increased-B1 extensions.~~ | ~~**[x] Complete for bounded scope on 9 October 2026.** Both pairing layouts remain opt-in: selected held-out configurations lose to reusable unpaired programs, with no completion gain. Increased B1, advanced pruning and allocation remain deferred.~~ | ~~Astra / **xhigh**~~ | ~~Exact coverage, projective products, saturation recovery, finite accounting and canonical int/GMP resume agree; frozen experiments support retaining defaults.~~ |
 | B3 — P4.1 production chains | Route verified records into actual bounded ECM stage-one jobs, including chunk replay, finite caches and ladder fallback; compare whole-stage costs. | A2, A3, A4 | **Medium/high potential.** Verified chains cannot help while production still calls only the ladder. Backend and program contracts make this a controlled execution change rather than an orphan helper optimization. | Sol / **xhigh** | Sol fits production integration once chain mathematics is independently verified. xhigh is for routing the records through real stage jobs while preserving work charges, replay, caches and fallback behavior. |
 | B4 — P4.2 fused/normalized kernels | Compare explicit squares, fused addition/doubling, selected reductions and unit-checked normalization on stable int/mpz paths. | A2 | **Medium/high potential.** Representation, conversions and formula conventions must be fixed before ranking kernels. This can use the ladder control and run independently of B3's chain integration. | Sol / **xhigh**; Astra for unresolved formula proofs | Sol fits a bounded set of kernels checked against fixed formulas. xhigh is for normalization assumptions, reduction bounds and backend interactions; use Astra / xhigh if a new algebraic equivalence remains unresolved. |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
@@ -266,7 +267,7 @@ implementations complete.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | C1 — P3.8-R4 + P5.4, one workstream | Implement bounded double-large-prime residual splitting/cycle provenance under P5.4; evaluate useful dependencies and complete factoring under R4. | B1 showing insufficient useful yield; accepted R3 contracts | **High potential when yield-limited; otherwise defer.** Calibrated single-large-prime behavior is the fair control. One owner prevents duplicate DLP implementations. Splitting, unmatched occupancy, repeated-prime corrections and lifting can erase raw collection gains. | Astra / **xhigh** | Choose Astra for the combined residual-certainty, graph-cycle and exact-provenance contract. xhigh is needed for repeated primes, self-loops, disconnected cycles, eviction and the distinction between cycles and useful dependencies. |
-| C2 — P5.2 wheel pruning/common-Z | Independently compare advanced prime-coverage pruning and no-inversion common-Z tables against paired continuation. | B2 plus remaining schedule/product cost | **Conditional.** A paired reference makes attribution possible. Common-Z scaling can be a nonunit over composite n, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs and common-Z identities over composite moduli. xhigh is needed because apparently harmless scaling can hide nonunits or change saturation recovery. |
+| C2 — P5.2 advanced pairing/common-Z | Separately evaluate extended distance sets, prime relocation and bounded overlapping-window matching; compare advanced coverage pruning and no-inversion common-Z tables. | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Each challenger needs exact prime-to-term certificates, bounded planner/replay storage and matched end-to-end evidence. Common-Z scaling can be a nonunit, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs, matching invariants and common-Z identities over composite moduli. xhigh is needed because scaling or relocation can hide nonunits or change saturation recovery. |
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
@@ -2167,6 +2168,56 @@ execution tables above for dependencies, priority and model/effort rationale.
 
 ### P5.2 — Pair ECM stage-2 primes and tune table size
 
+**B2 bounded tranche complete — 9 October 2026; no default promotion.**
+The isolated B2 work adds opt-in execution of the accepted +/- certificates,
+bounded curve-private tables, saturated-pair scalar recovery and version-7
+int/GMP checkpoints. Predeclared finite campaigns resume with cumulative
+allowances. Controls from committed A2/A3 mainline `94caf40`, independent fresh
+training/held-out corpora and a D/table protocol are frozen in versioned inputs.
+Exclusive-window PyPy comparisons select D=24/64/768/2048, then confirm losses
+on fresh inputs: 81.3%/154.2%/45.0% slower complete factoring than streamed ECM
+on small/medium/uneven cohorts and 15.0% slower on a nonsplitting campaign.
+Reusable unpaired programs also win; completion is unchanged. All 45 final
+captures meet the frozen stability rule, with four training arms extended to
+31 samples. No speed or completion promotion gate passes. Python integers and
+all production defaults remain unchanged. A6's exact increased-B1 schedule-ratio
+contract is absent; those extensions are explicitly deferred. Changing an
+exhausted checkpoint's curves/bounds, advanced wheel/common-Z, production PRAC,
+kernel changes and allocation remain separate. See the protocol and results in
+`benchmarks/README.md` and scoped development record in `v2/CHANGELOG.md`.
+
+**B2 focused follow-up complete — aligned wheel cells; no promotion.** A primary-source review of
+[Atnashev–Woltman](https://eprint.iacr.org/2021/1462.pdf),
+[Prime95's pair planner](https://github.com/primesearch/Prime95/blob/main/pair.cpp)
+and [AVX-ECM](https://github.com/bbuhrow/avx-ecm) identified reusable integer
+pair plans, coprime distance sets and preserving pairing opportunities across
+blocks. The bounded follow-up implements only nearest-center wheel cells
+aligned to the existing segment limit, with sparse curve-private baby points,
+exact certificates and version-8 int/GMP resume. Independent coverage, affine,
+saturation and finite-campaign checks pass. Fresh inputs, old B2 source and
+accepted A2/A3 controls are frozen. All 35 training and 20 held-out captures
+pass the sampling/stability gate after extensions through 63 samples. Selected
+W=30/210/840/1890 eliminates 16.4% of campaign products at exact prime coverage,
+with 216 instead of 1,024 retained baby points. Medium/campaign time improves
+31.1%/4.8% versus original pairing, but uneven time regresses 44.0%. Every
+selected wheel loses to reusable unpaired programs (campaign: 23.6% slower),
+without a completion gain. No promotion gate passes. This fresh nonsplitting
+campaign again supports unpaired reuse (10.8% faster than streamed); it does
+not calibrate successful factoring or curve allocation. All 180 separate cold
+starts validate; profiles remain separate. Committed-only 376-test native and
+379-test GMP suites, full lint and all 61 benchmark imports pass.
+
+Substantial extensions are explicitly deferred to **C2**: multiple/extended
+distance sets, prime relocation and graph/overlapping-window matching. Each
+requires an independently checked map from original primes to executed terms,
+finite matching/construction storage, cancellation/resume and recovery proofs,
+then setup-inclusive PyPy comparisons. Compact pairmap formats are also C2
+only when retained certificates/decoding are the measured bottleneck; no
+allocation rewrite is bundled here. Common-Z remains its own C2 challenger.
+Polynomial/product-tree continuation stays **F3**; production PRAC, arithmetic
+kernels and factor-size/curve allocation retain their existing workstreams.
+Increased-B1 extensions remain blocked on **A6's exact schedule-ratio contract**.
+
 **A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
 immutable packed prime/power blocks under an explicit run-local cap. Generation,
 power compilation and reads are charged; blocks that do not fit regenerate.
@@ -2181,7 +2232,8 @@ exact checkpoint-buffer verification.
   coverage and affine point cross-products, including exceptions, positive
   initialization, block boundaries and tails. Coverage supports direct records
   or even D >= 2 with 2D below the initial odd scalar. It is an oracle/fixture
-  contract; production paired products and a broader D sweep remain B2 work.
+  contract at A3 acceptance; B2 now executes these records and compares basic D
+  choices without promoting the paired path.
 - [x] Compare retained 8 MiB programs with the frozen int control, current
   streamed default and capped regeneration using certified fresh inputs,
   validated PyPy warmup and at least nine samples. Retain defaults: small complete
@@ -2210,17 +2262,31 @@ Combined A3/A4 mainline acceptance passes 337 system-PyPy tests and three
 optional GMP checks in the existing PyPy venv, full lint and all 54 benchmark
 imports on a committed-files-only candidate. Full P5.2 is still open below.
 
-- [ ] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence or explicitly redesigning it.
+- [x] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence. B2's bounded implementation passes correctness and matched experiments; negative timing evidence retains defaults.
 - **A:** paired/unpaired schedules cover the same eligible primes; stage-2 terms and recovered factors validate. Product checkpoints handle early, late, and mixed-factor saturation; tail primes are included.
 - **E:** measure baby/giant steps, relation products, replay, setup, and RSS across B1/B2/D grids. Choose D by total continuation cost and factor yield, not simply `isqrt(B2)`.
 
-- [ ] B2: consume the accepted independent eligible-prime/cross-product
+- [x] B2: consume the accepted independent eligible-prime/cross-product
   oracles in production pairing; validate products, replay and resumed curve
   tables. Tune D using actual prime occupancy and simultaneous table/product/
   replay storage, not an asymptotic square-root estimate alone.
+  Three D choices per bound tier are measured with fixed 1,024-slot segments.
+  Segment boundaries can split opposite signs: the 1,024/2,048 campaign D
+  choices eliminate no products, while D=512 eliminates only 3.7%. The bounded
+  aligned-cell follow-up below measures one layout correction; no layout is
+  promoted into defaults.
 
-- [ ] Compare wheel/coprime-distance plans with explicit prime-to-term
-  coverage certificates, including pruning when an existing `v*w +/- u`
+- [x] B2 focused follow-up: align bounded program blocks to complete wheel
+  cells and retain coprime baby distances. Independently check exact coverage,
+  affine point products, wheel-divisor/initial/tail exceptions and saturated
+  mixed-factor recovery. Preserve finite int/GMP campaigns and old schemas;
+  use version 8 only for the opt-in wheel. Freeze fresh inputs and compare
+  W/table choices against accepted unpaired and original paired controls.
+  Negative matched evidence retains defaults; see the result above.
+
+- [ ] C2: compare extended distance sets, relocation and bounded overlapping-
+  window matching with explicit original-prime-to-term coverage certificates,
+  including pruning when an existing `v*w +/- u`
   is divisible by another eligible prime. Cover wheel-divisor exceptions,
   initialization and tails; keep plan construction segmented/bounded rather
   than copying native arrays indexed by absolute B2. Separately evaluate
@@ -2229,7 +2295,7 @@ imports on a committed-files-only candidate. Full P5.2 is still open below.
   mixed-factor saturation replay, and charge setup/table/product storage.
   Nonunit scaling over composite n is not projective equivalence.
 
-- [ ] B2: execute the accepted immutable +/- coverage programs with
+- [x] B2: execute the accepted immutable +/- coverage programs with
   curve-private point tables, tuned D and mixed-factor recovery. A3 programs
   already supply exact prime powers to production stage one and primes to
   unpaired stage two. Extend matched whole-continuation comparisons to paired
