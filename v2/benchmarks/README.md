@@ -5,6 +5,167 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## A10 verified primality transfers (9 October 2026)
+
+The frozen control is `94caf40`; required inputs are
+[a10_before_sources.json](inputs/baselines/a10_before_sources.json),
+[a10_primality.json](inputs/corpora/a10_primality.json) and the
+[frozen protocol](inputs/corpora/a10_protocol.json). Expected truth comes from
+independent trial, Pocklington and full n−1 Lucas proofs, or exact composite
+divisors. These are test oracles; production certificate generation stays B14.
+
+The supported sets are deliberately small:
+
+| Strict upper bound | Bases | Guarantee/source |
+| --- | --- | --- |
+| `9080191` | 31, 73 | [Jaeschke 1993, p. 926](https://cr.yp.to/bib/1993/jaeschke.pdf), exhaustive computational limit |
+| `4759123141` | 2, 7, 61 | Same primary computation |
+| `2**64` | 2, 325, 9375, 28178, 450775, 9780504, 1795265022 | [Sinclair's 2011 record](https://miller-rabin.appspot.com/), also stated in [Forišek–Jančina 2015](https://ceur-ws.org/Vol-1326/020-Forisek.pdf); finite computational guarantee |
+| `318665857834031151167461` | First 12 primes, through 37 | [Sorenson–Webster, Theorem 1.1](https://arxiv.org/abs/1509.00864), exhaustive computational result |
+| `3317044064679887385961981` | First 13 primes, through 41 | Same theorem |
+
+The final two endpoints equal `399165290221 * 798330580441` and
+`1287836182261 * 2575672364521`. Tests independently check their strong
+congruences; endpoint equality never uses the preceding set. The paper's
+conjecture concerns search complexity, not these finite results. This task
+checks the primary reasoning and independent counterexamples/proof fixtures;
+it does not repeat the original enormous exhaustive searches. v1's higher
+entries and log-based rules have no accepted unconditional guarantee here.
+
+Relevant implementation comparison (versions pinned, no external code copied):
+
+| Reference | Certainty and practical choices | PyPy transfer / license review |
+| --- | --- | --- |
+| [GMP 6.3.0 release](https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz), [API](https://gmplib.org/manual/Number-Theoretic-Functions) (`pprime_p.c`, `millerrabin.c`) | Trial division, BPSW, then `max(0, reps-24)` random MR tests; return 0/1/2 separates composite/probable/definite. Default definite BPSW survivors have `n < 35*2**46`; a build macro extends this to `n < 2**64`. Neither certifies arbitrary integers. | Preserve our explicit random-round API. Native modular powers are a separate backend. Source is LGPL-3-or-later / GPL-2-or-later dual licensed. |
+| [FLINT 3.6.0](https://github.com/flintlib/flint/blob/v3.6.0/src/ulong_extras/ll_is_prime.c), [proof path](https://github.com/flintlib/flint/blob/v3.6.0/src/fmpz/is_prime.c) | Exact Sorenson–Webster cutoff in double-limb MR; shared decomposition, small filters and native multi-base powering. Larger exact proofs use n±1 methods and APRCL; probable entry points stay separate. | Range dispatch transfers directly. Limb reducers, instruction parallelism and hashed tables need their own Python evidence. LGPL-3-or-later. |
+| [PARI/GP 2.19.0 source release](https://pari.math.u-bordeaux.fr/pub/pari/unix/pari-2.19.0.tar.gz), [API](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Arithmetic_functions.html#isprime) | Machine-word MR/BPSW dispatch (`n < 2**64` on a 64-bit build); `ispseudoprime` remains probable above that checked domain. `isprime` proves via n−1, APRCL or ECPP; `primecert` supplies checkable evidence. | Proof work belongs to B14. Keep Boolean helpers separate from certainty-bearing results. GPL-2-or-later. |
+| [SymPy 1.14.0](https://github.com/sympy/sympy/blob/sympy-1.14.0/sympy/ntheory/primetest.py) | Small filters, hashed/fixed witnesses and the same 12/13-base bounds; GMP availability can bypass MR for strong BPSW. `_test` exits on a nontrivial square root of 1. | Compare `mr` with identical bases, not `isprime`'s backend shortcut. Test early exits and powering independently. BSD-3-Clause; copying would require notices. |
+| [zmwangx/miller-rabin, `34cd694`](https://github.com/zmwangx/miller-rabin/tree/34cd694b34fe916dc58705f42c4dbc4001b7990a) | CPython C extension: 16-bit lookup, hashed 64-bit witnesses, preliminary division/Fermat tests and GMP powering; larger results are probabilistic. | Its CPython/GMP timings do not predict PyPy integer performance. Own code MIT, with separate bundled/GMP notices. |
+
+[Mishra's implementation blog](https://neelmishra.github.io/blog/cp/number-theory-2/miller-rabin.html)
+and [GMP implementation discussion](https://gmplib.org/list-archives/gmp-devel/2018-November/005073.html)
+helped identify filters, powering and BPSW candidates; correctness rests on
+primary papers and pinned source. BPSW is useful screening, not an arbitrary-size
+proof. The blog's seven consecutive prime-base claim through the 13-base bound
+is refuted by `341550071728321`, checked independently in the tests; no such
+range is adopted. [AKS](https://annals.math.princeton.edu/2004/160-2/p12) gives an
+unconditional general deterministic algorithm, but has no measured advantage
+for this bounded Python workload. APRCL/ECPP and n−1 certificates add proof
+capability rather than replacing a requested random test. No external
+implementation was adapted; license notices remain with ignored local source
+captures, and future source copying requires the stated obligations.
+
+Shared `n-1 = d*2**s` decomposition, first-witness rejection, small division
+filters and three-argument modular powering already transfer well to Python.
+The measured challengers isolate direct built-in powering, Python binary
+powering, early rejection when a square reaches 1, extra prime/square/GCD
+filters and an always-13-base wider test. Hashed witness tables require a
+separately verified table and memory/setup comparison; native limb reducers,
+assembly and triple-base instruction parallelism are not assumed to transfer
+to PyPy. Broader preprocessing/filter promotion remains E3. Screening by
+BPSW followed by all required MR bases could preserve certainty, but adds a
+Lucas implementation and its validation cost; BPSW alone cannot replace those
+fixed bases or requested random rounds here.
+
+Commands from the worktree root (PyPy 3.11 only):
+
+```sh
+pypy3 -m v2.benchmarks.a10_inputs
+pypy3 -m unittest v2.tests.test_a10_primality -v
+pypy3 -m v2.benchmarks.a10_primality --split training --arms control accepted native_pow binary_pow early_one extra_filters square_filter primorial_filter thirteen_bases --output v2/benchmarks/results/a10/training.json
+pypy3 -m v2.benchmarks.a10_primality --split confirmation --arms control accepted --output v2/benchmarks/results/a10/confirmation.json
+pypy3 -m v2.benchmarks.a10_primality --split training --factoring --arms control accepted native_pow binary_pow early_one --output v2/benchmarks/results/a10/factoring-training.json
+pypy3 -m v2.benchmarks.a10_primality --split confirmation --factoring --output v2/benchmarks/results/a10/factoring.json
+pypy3 -m v2.benchmarks.a10_primality --split confirmation --factoring --arms control accepted --warmup-seconds 8 --repetitions 45 --batch-seconds 0.5 --output v2/benchmarks/results/a10/factoring-stability.json
+pypy3 -m v2.benchmarks.a10_primality --split confirmation --within-range --arms accepted gmp_same_bases sympy_same_bases --output v2/benchmarks/results/a10/references.json
+pypy3 -m v2.benchmarks.a10_primality --cold --output v2/benchmarks/results/a10/cold.json
+pypy3 -m v2.benchmarks.a10_primality --analyze v2/benchmarks/results/a10/factoring.json --output v2/benchmarks/results/a10/factoring-analysis.json
+```
+
+The runner acquires the shared nonblocking machine lock. Coordinate all heavy
+checks too. Each arm receives at least three seconds of validated warmup;
+seeded interleaving pairs at least nine approximately 100-ms samples. It
+extends unstable groups by nine through 45 and reports any unresolved spread.
+Cold process startup/import/testing and instrumented profiles are separate.
+Matched factoring uses seeds 7/104729/130363, 1,000,000 work units, trial 30,000,
+no rho/p−1/ECM attempts, and finite input/storage caps. Training/confirmation
+numbers are disjoint except the declared reported regression. The control
+labels wider primes probable; upgraded certainty is a capability change,
+reported separately from speed. Native same-base timings include conversion
+and are contextual evidence, not proof of a faster Python implementation.
+Conditional 95% intervals use 10,000 paired-round bootstrap draws with seed
+20261009; fixed inputs and starts are not resampled. The optional speed gate is
+at least 10% lower complete-run median with an interval excluding zero, then
+disjoint-input confirmation and no completion loss. All capture paths must be
+fresh; raw evidence and detailed research stay local. Select the fastest stable
+qualifying complete-training candidate before confirmation, or retain the
+range-only baseline if none qualifies. Other confirmation arms are contextual.
+
+**Measured decision:** retain the range-only implementation, existing small
+filters, shared decomposition, modular-power helper and first-failing-witness
+exit. No optional challenger qualified. PyPy 7.3.23 / Python 3.11.15 on macOS
+26.6.2 arm64 ran in the coordinated A10 machine window, after B1 released and
+before B2 started. Every warmup and sample validated results. The corpus has
+365 independently checked classification cases, 283 proof nodes and 26
+factoring fixtures; timing uses its frozen training/confirmation subsets.
+
+| Warm cohort (whole cohort per call) | Frozen control median | Accepted median | Observed saving; conditional 95% interval | Samples / stability |
+| --- | --- | --- | --- | --- |
+| Confirmation: eight wider primes | 1.946 ms | 0.672 ms | 65.45%; 65.19–65.65% | 9; both stable |
+| Complete training: 13 inputs × three seeds | 10.275 ms | 6.975 ms | 32.12%; 31.86–32.42% | 45; tails remain |
+| Complete confirmation: 14 inputs × three seeds | 11.262 ms | 7.243 ms | 35.68%; 35.47–35.97% | 45; tails remain |
+| Prespecified longer complete confirmation | 11.105 ms | 7.431 ms | 33.08%; 32.09–34.06% | 45; control remains unstable |
+
+The longer follow-up was frozen in
+[a10_stability_protocol.json](inputs/corpora/a10_stability_protocol.json)
+before its outcome: eight seconds validated warmup and 500-ms batches. Its
+range/median is 20.44% for control and 10.80% for accepted (limit 15%); initial
+complete confirmation was 25.10% / 84.37%. Every sample is retained. These
+conditional median intervals do not establish stable complete-run latency or
+universal optimality. This prime/power-heavy workload disables rho, p−1 and
+ECM; E1 still owns combined portfolio confirmation with B1/B2 changes.
+Control wider survivors were probable after 40 random witnesses; accepted
+ones receive deterministic 12/13-base proof. Their improved guarantee and
+reduced witness/RNG work are intentional, not an equal-certainty shortcut.
+
+Against accepted complete training, direct built-in powering saved 1.58%
+(1.04–1.96%), early-square-one rejection saved 1.11% (0.54–1.55%), and Python
+binary powering cost 6.34% (5.93–6.80%). None was stable or met the 10% gate.
+The null selection was recorded before confirmation; contextual confirmation
+then made all three slower than accepted. Always using 13 wider bases cost
+4.24% on training wider primes. Extra 41–97 trial filters reduced their
+43-divisible microcohort from 0.170 to 0.0149 ms (tails remain); a square check
+reduced squares from 0.454 to 0.0337 ms (stable). Those specialized wins lack
+complete-portfolio promotion evidence and belong to E3. A primorial GCD cost
+38.86% on already cheap small-divisor inputs. No filter was promoted here.
+
+Same-base native references used gmpy2 2.3.1 / GMP 6.3.0 and SymPy 1.14.0
+with `ground_types=gmpy` / `gmpy2.mpz`. All inputs were inside the supported
+range, with identical fixed witnesses and independently expected truth.
+For the eight wider primes, medians were accepted 0.679 ms, GMP 0.466 ms and
+SymPy 0.513 ms; all reference groups extended to 45 samples and retained tail
+spread. The smaller-prime subgroup was 0.193 / 0.279 / 0.186 ms, showing
+conversion/bridge costs can reverse the ordering. These are contextual native
+backend observations, not a Python-backend adoption decision or a comparison
+of unequal BPSW/random guarantees.
+
+Nine cold processes (startup, import, one reported-prime classification)
+had medians 33.59 / 33.72 ms for control/accepted. Separate instrumented
+profiles used three seconds validated warmup per arm, then ten full-corpus
+calls: 12,900 versus 6,570 MR witnesses across 780 bounded runs. Profiles
+explain reduced classification work; their timings are not warmed evidence.
+Raw captures, source hashes, selection records and profiles remain in the
+ignored local `results/a10/` and `audit/a10/` directories.
+
+Validation covers strict endpoints/neighbors, prime powers, Carmichael and
+strong pseudoprimes, exact reconstruction/labels/unresolved cofactors,
+explicit round/RNG spies, finite work/time/cancellation and checked resume
+under legacy schemas 4/5/6 on int/GMP. `make -C v2 test` passed 369 tests
+(two optional-GMP skips), the GMP-enabled repeat passed 372, and lint passed.
+One earlier GMP suite failed the unchanged QS snapshot-lifetime assertion;
+its isolated test and full repeat passed. Its cause is undetermined and
+referred to B1; no QS implementation change is included in A10.
+
 ## SIQS CLI access (4 October 2026)
 
 The initial SIQS comparison below is retained. The P3.4 usability follow-up

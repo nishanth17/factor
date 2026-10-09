@@ -2667,20 +2667,22 @@ that wider deterministic ranges or general prime certificates exist in v2.
   adapter, disclose Python-2 emulation, and make no native-v1 timing claim.
   Record transfer decisions and owning rows so verified gaps are not lost.
 
-**Initial v1 capability review:** code inspection identifies the following
-owners. Only the primality-range gap is independently verified here; the
-other performance candidates still need matched measurements. A10 remains
-open until the useful gaps are transferred or have recorded decisions.
+**v1 capability decisions (9 October 2026):** the source audit covers all
+preserved modules and separates mathematical capability from larger search
+allowances. Range proofs and independent regression oracles support the A10
+transfer; other candidates are already transferred, rejected, or explicitly
+deferred to the owners below. A10 introduces no new ECM, chain or sieve default.
 
 | v1 capability | Current v2 comparison | Transfer owner / decision |
 | --- | --- | --- |
-| Wider fixed-base primality tables in `v1/utils.py` | The first-12/13-prime-base ranges have independent published bounds; v2 currently certifies only below `2**64`. The reported 23-digit prime lies in the first-12 range. | A10 implements verified ranges; B14 adds certificates beyond them. Do not copy unsupported higher table entries. |
+| Wider fixed-base primality tables in `v1/utils.py` | Transfer the independently verified first-12/13-prime-base bounds; the reported 23-digit prime lies in the first-12 range. Keep faster existing small-domain sets. | A10; B14 owns certificates beyond the final strict bound. Reject higher entries without a proved/computed lower bound, heuristic log rules, v1's ignored requested round counts and truthy residue shortcuts. |
 | Larger input-dependent ECM bounds and up to 10,000 curves | v2's default tier is B1/B2 2,000/147,396 with 32 curves. v1 permits more search, but extra allowance alone proves no speed or completion advantage. | A3 makes larger campaigns feasible; C3 measures bound/curve allocation and SIQS handoff; G1 combines the final policy. |
 | Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; A3 now supplies bounded opt-in packed prime/power programs. Retention saves larger schedule/finite-curve work but small complete factoring regresses; defaults remain streamed. | A3 accepted; B2 (P5.2) adds paired execution while retaining exact powers, finite storage and charged replay. |
-| PRAC and Montgomery kernels | Corrected ladder arithmetic already exists in v2. Legacy exceptional-state failures prevent treating PRAC as a ready-made faster replacement. | A4/B3 (P4.1) validate chains first; B4 (P4.2) compares whole-engine kernel costs. |
+| PRAC and Montgomery kernels | Corrected ladder arithmetic and A4's independently checked opt-in PRAC already exist. Legacy exceptional-state failures prevent treating v1 PRAC as a ready-made faster replacement. | A4 accepted; B3 (P4.1) owns production chain routing, B4 (P4.2) whole-engine kernel costs. Reject unsafe legacy exceptional states. |
 | Atkin/Eratosthenes/segmented sieve variants | v2 retains these families with corrected boundaries and local state; no independent v1 speed advantage has been established. | E6 (P8.6) only if a validated setup/sieve bottleneck supports a challenger; retain corrected output contracts. |
 | Two-stage p−1 and Brent rho | Both are already present in v2; bounded p−1 participates in its recursive portfolio. Parameter/continuation tuning is not a missing-method port. | A6 (P5.3) owns p−1 powering/continuation, E4 (P8.3) owns rho calibration, and G1 (P8.4) combines the measured policy. |
-| Interactive CLI and method visibility | v2 already prompts for a missing number; explicit QS/MPQS/SIQS access belongs to the outstanding P3.4 usability follow-up. v1's repeated prompt/timing presentation is a separate convenience candidate. | A11 covers engine access, help, examples and resume. A10 records remaining convenience decisions while keeping library calls quiet. |
+| Interactive CLI and method visibility | v2 already prompts for a missing number and exposes QS/MPQS/SIQS with finite controls/resume. Repeated interactive sessions and printed timing add no factoring capability. | Retain quiet library calls and one-shot/scriptable CLI. Defer repeated-prompt convenience to A11 if requested; do not close A11's broader usability gate here. A10 updates certainty documentation. |
+| Floating roots, discarded cofactors and unbounded retries | Exact roots, validated divisors, reconstruction and finite shared budgets are already present in v2. | Reject legacy regressions; larger or unbounded work is not a verified speed advantage. |
 
 #### P8.2.2 — Generate and independently verify prime certificates (B14)
 

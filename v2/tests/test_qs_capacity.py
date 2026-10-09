@@ -18,6 +18,7 @@ from v2.qs.reference_collector import collect_block
 from v2.qs.relations import verify_atomic, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import SIQSConfig, SIQSJob
+from v2.utils import DETERMINISTIC_LIMIT
 
 
 def budget(work=10**12):
@@ -333,7 +334,7 @@ class CapacityTests(unittest.TestCase):
         for mask in compact.zero_dependencies:
             self.assertTrue(verify_dependency(mask, wide))
 
-    def test_99_digit_reachability_and_probable_coefficient(
+    def test_99_digit_reachability_and_proven_coefficient(
         self,
     ):
         n = int(
@@ -356,8 +357,9 @@ class CapacityTests(unittest.TestCase):
         self.assertTrue(report["target_in_product_envelope"])
         polynomial, _, certainty = external_square(base, 8192, budget=budget())
 
-        self.assertEqual(certainty, "probable_prime")
+        self.assertEqual(certainty, "proven_prime")
         self.assertGreater(polynomial.square_coefficient, 2**64)
+        self.assertLess(polynomial.square_coefficient, DETERMINISTIC_LIMIT)
         target = report["a_target"]
 
         self.assertLess(abs(polynomial.a - target) * 1000, target)

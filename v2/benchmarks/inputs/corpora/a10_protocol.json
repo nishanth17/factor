@@ -1,0 +1,25 @@
+{
+  "control_commit": "94caf40e9916d8e923f133fed3d3812403dd3c23",
+  "generation_seed": 20261009,
+  "seeds": [
+    7,
+    104729,
+    130363
+  ],
+  "work_limit": 1000000,
+  "trial_bound": 30000,
+  "rho_attempts": 0,
+  "pm1_attempts": 0,
+  "ecm_tiers": [],
+  "warmup_seconds": 3,
+  "samples": 9,
+  "unstable_rule": "range/median > 0.15: extend by nine through 45; disclose unstable arms",
+  "selection": "zero validation failures; capability expansion independently justified; optional speed promotion requires10% lower complete-run median, paired bootstrap interval excluding zero and no completion regression; broader filters remain E3; select the fastest stable qualifying complete-training candidate before confirmation, retain if none; only that frozen selection is eligible for promotion, other confirmation arms are contextual",
+  "workloads": "proof-backed primes20-127 bits; rough,43-divisible and2/3/37-divisible composites and squares; training indices0/1, confirmation2/3; adversarial endpoints separate; complete factoring includes reported regression and certified terminal primes",
+  "cold": "separate process startup, never mixed into warmed samples",
+  "references": "same fixed witnesses for GMP/SymPy timing; BPSW-only results contextual only",
+  "corpus_sha256": "8e7abdad660af827e21d4d0715e783ee4ca7d03f3c54192873a0395f5f75a79c",
+  "control_sha256": "bf143a4d7d8b60d9f9c700e17a01c96aa71df2e6279c656bb6bcbc8148978c1c",
+  "sampling": "Each arm >=3s validation warmup; seeded interleaving of >=9 approximately100ms batches; paired samples share round index, extend all arms together.",
+  "bootstrap": "10000 paired-round draws, seed20261009; conditional on fixed corpus/starts"
+}

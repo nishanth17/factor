@@ -2,6 +2,30 @@
 
 ## Current development
 
+- Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
+  independently checked Sorenson–Webster bounds: first 12 prime bases for
+  `n < 318665857834031151167461`, first 13 for
+  `n < 3317044064679887385961981`. Preserve the faster smaller tests and
+  reject certification at either strict endpoint by its preceding base set.
+  The reported 23-digit factor is now proven; survivors beyond the final
+  bound remain probable. Certificate generation stays B14.
+- Share witness dispatch between direct and bounded classification. Fresh
+  checkpoints pin `mr13-strict-v1`; old snapshots retain their original
+  random witnesses, RNG/work accounting and conservative terminal labels
+  across recursive children. Keep explicit probabilistic rounds and quiet
+  calls. Document intentional fresh-run RNG/work changes and reject unknown
+  policies or inconsistent retained evidence. Preserve v1; route its other
+  capability candidates to existing roadmap owners.
+- Retain the range-only implementation after frozen PyPy comparisons; no
+  optional powering/early-exit/filter candidate met the complete-run gate.
+  Wider-prime confirmation took 0.672 versus 1.946 ms per eight-input cohort.
+  Complete-run medians improved in the declared prime/power-heavy workload,
+  with remaining control-side tail spread disclosed. Version independent
+  proof fixtures, immutable control sources, protocols and benchmark runners;
+  keep raw evidence local. Pass PyPy tests and lint, including legacy/GMP
+  resume checks. Certificate generation and combined portfolio promotion
+  remain B14 and E1 respectively.
+
 - Complete the bounded P4.3 int/GMP backend foundation across preprocessing,
   primality, rho, p−1, ECM, QS/MPQS/SIQS, SSS/SSSf, relation extraction and
   matrix bitsets. Add explicit backend selection, exact GMP helper contracts,

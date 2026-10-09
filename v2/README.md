@@ -228,8 +228,49 @@ for factor in result.factors:
 `FactorizationResult` carries `original`, `sign`, prime factors and `remaining`
 cofactors. `complete` means no unresolved composite remains; `proven` additionally
 requires proven primality for every terminal factor. The deterministic
-Miller–Rabin domain is strictly below `2**64`; larger surviving candidates are
-labeled probable primes. An unresolved result still reconstructs its input.
+Miller–Rabin domains have strict upper bounds: the existing two/three/seven
+base tests cover smaller inputs through `n < 2**64`; the first 12 prime bases
+(2 through 37) cover `n < 318665857834031151167461`, and the first 13 (through
+41) cover `n < 3317044064679887385961981`. These wider guarantees rely on
+[Sorenson–Webster's exhaustive computational results](https://arxiv.org/abs/1509.00864),
+not a conjectured extension of v1's table. Both upper endpoints are composite
+strong pseudoprimes to their preceding witness sets. Above the last bound,
+survivors remain probable primes; certificate generation belongs to B14.
+An unresolved result still reconstructs its input.
+
+`utils.deterministic_bases(n)` exposes the strict witness dispatch (`None`
+outside its supported domain, including `n < 2`); nonintegers are rejected,
+and callers must handle small inputs/divisibility first. `classify_prime`
+supplies certainty, while `is_prime` and
+`is_prime_fast` remain Boolean convenience functions. `DETERMINISTIC_BASES`
+retains the seven word-domain witnesses; use the selector with the expanded
+`DETERMINISTIC_LIMIT`. Explicit
+`use_probabilistic=True` still draws exactly `tolerance` witnesses for every
+nontrivial survivor, including within the fixed ranges, and returns probable
+status. A composite witness exits early; small-prime membership/divisibility
+still decides trivial cases exactly.
+
+Fresh bounded runs use the checkpoint identity `primality: mr13-strict-v1`.
+Existing numeric schemas 4/5/6, backend and schedule identities are preserved.
+A missing primality identity means `mr64-strict-v1`; it stays attached to the
+whole resumed run, including pending children. Old random witness progress,
+RNG consumption and conservative terminal labels remain unchanged. Unknown
+identities or witness prefixes inconsistent with their policy are rejected.
+No completed probable factor is silently upgraded on resume; start a fresh
+run to request the wider policy. Stronger revalidation can reject a legacy
+probable factor now proved composite. Historic source snapshots remain immutable.
+
+The bounded classifier still reserves the small filter pass and then
+`n.bit_length() + s` work units before each witness, where `n-1 = d*2**s`.
+The new ranges use 12 or 13 fixed witnesses instead of `primality_rounds`
+random witnesses, consume no RNG draws, and may therefore change later
+random candidate seeds and work totals in fresh recursive runs.
+`PortfolioConfig.primality_rounds` controls random tests outside that run's
+policy; it does not request probabilistic mode inside fixed ranges. Decomposition
+is retained once per cofactor; refused witness reservations occur before RNG
+draws or progress mutation. Revalidation on resume retains existing wall/CPU
+and work-accounting conventions. Cooperative cancellation and finite shared
+allowances still apply; a single modular power remains atomic.
 
 Splitter functions return a proper divisor or `None`. Prime sieve bounds are
 half-open; p−1/ECM B1 and B2 bounds are inclusive. Import through the `v2` package

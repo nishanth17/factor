@@ -1,0 +1,4113 @@
+{
+  "schema": 1,
+  "seed": 20261009,
+  "seeds": [
+    7,
+    104729,
+    130363
+  ],
+  "work_limit": 1000000,
+  "certificates": {
+    "2": {
+      "kind": "trial"
+    },
+    "3": {
+      "kind": "trial"
+    },
+    "5": {
+      "kind": "trial"
+    },
+    "61": {
+      "kind": "trial"
+    },
+    "27103": {
+      "kind": "trial"
+    },
+    "562711": {
+      "kind": "trial"
+    },
+    "581557": {
+      "kind": "trial"
+    },
+    "2365185233": {
+      "kind": "trial"
+    },
+    "23220101083624511828731": {
+      "kind": "lucas",
+      "witness": 2,
+      "factors": [
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          562711,
+          1
+        ],
+        [
+          581557,
+          1
+        ],
+        [
+          2365185233,
+          1
+        ]
+      ]
+    },
+    "4783": {
+      "kind": "trial"
+    },
+    "6820559": {
+      "kind": "pocklington",
+      "q": 4783,
+      "witness": 2
+    },
+    "8158329801143": {
+      "kind": "pocklington",
+      "q": 6820559,
+      "witness": 2
+    },
+    "4274129158191617539726003": {
+      "kind": "pocklington",
+      "q": 8158329801143,
+      "witness": 2
+    },
+    "5107": {
+      "kind": "trial"
+    },
+    "4892507": {
+      "kind": "pocklington",
+      "q": 5107,
+      "witness": 2
+    },
+    "5293624078903": {
+      "kind": "pocklington",
+      "q": 4892507,
+      "witness": 2
+    },
+    "3534660359975772846098363": {
+      "kind": "pocklington",
+      "q": 5293624078903,
+      "witness": 2
+    },
+    "4591": {
+      "kind": "trial"
+    },
+    "6087667": {
+      "kind": "pocklington",
+      "q": 4591,
+      "witness": 2
+    },
+    "6624026988703": {
+      "kind": "pocklington",
+      "q": 6087667,
+      "witness": 2
+    },
+    "4354884199939864731865573": {
+      "kind": "pocklington",
+      "q": 6624026988703,
+      "witness": 2
+    },
+    "7297": {
+      "kind": "trial"
+    },
+    "5385187": {
+      "kind": "pocklington",
+      "q": 7297,
+      "witness": 2
+    },
+    "4751921319923": {
+      "kind": "pocklington",
+      "q": 5385187,
+      "witness": 2
+    },
+    "4311395317317115216530179": {
+      "kind": "pocklington",
+      "q": 4751921319923,
+      "witness": 2
+    },
+    "5381": {
+      "kind": "trial"
+    },
+    "7135207": {
+      "kind": "pocklington",
+      "q": 5381,
+      "witness": 2
+    },
+    "4632889905101": {
+      "kind": "pocklington",
+      "q": 7135207,
+      "witness": 2
+    },
+    "2843286359555512640623519": {
+      "kind": "pocklington",
+      "q": 4632889905101,
+      "witness": 2
+    },
+    "3929": {
+      "kind": "trial"
+    },
+    "801517": {
+      "kind": "pocklington",
+      "q": 3929,
+      "witness": 2
+    },
+    "1013": {
+      "kind": "trial"
+    },
+    "87119": {
+      "kind": "pocklington",
+      "q": 1013,
+      "witness": 2
+    },
+    "3163": {
+      "kind": "trial"
+    },
+    "797077": {
+      "kind": "pocklington",
+      "q": 3163,
+      "witness": 2
+    },
+    "557": {
+      "kind": "trial"
+    },
+    "88007": {
+      "kind": "pocklington",
+      "q": 557,
+      "witness": 2
+    },
+    "2909": {
+      "kind": "trial"
+    },
+    "983243": {
+      "kind": "pocklington",
+      "q": 2909,
+      "witness": 2
+    },
+    "727": {
+      "kind": "trial"
+    },
+    "72701": {
+      "kind": "pocklington",
+      "q": 727,
+      "witness": 2
+    },
+    "3041": {
+      "kind": "trial"
+    },
+    "662939": {
+      "kind": "pocklington",
+      "q": 3041,
+      "witness": 2
+    },
+    "769": {
+      "kind": "trial"
+    },
+    "78439": {
+      "kind": "pocklington",
+      "q": 769,
+      "witness": 2
+    },
+    "8521": {
+      "kind": "trial"
+    },
+    "9253807": {
+      "kind": "pocklington",
+      "q": 8521,
+      "witness": 2
+    },
+    "757": {
+      "kind": "trial"
+    },
+    "72673": {
+      "kind": "pocklington",
+      "q": 757,
+      "witness": 2
+    },
+    "8731": {
+      "kind": "trial"
+    },
+    "12991729": {
+      "kind": "pocklington",
+      "q": 8731,
+      "witness": 2
+    },
+    "99971": {
+      "kind": "pocklington",
+      "q": 769,
+      "witness": 2
+    },
+    "11071": {
+      "kind": "trial"
+    },
+    "11358847": {
+      "kind": "pocklington",
+      "q": 11071,
+      "witness": 2
+    },
+    "853": {
+      "kind": "trial"
+    },
+    "122833": {
+      "kind": "pocklington",
+      "q": 853,
+      "witness": 2
+    },
+    "13723": {
+      "kind": "trial"
+    },
+    "16687169": {
+      "kind": "pocklington",
+      "q": 13723,
+      "witness": 2
+    },
+    "673": {
+      "kind": "trial"
+    },
+    "75377": {
+      "kind": "pocklington",
+      "q": 673,
+      "witness": 2
+    },
+    "1031": {
+      "kind": "trial"
+    },
+    "167023": {
+      "kind": "pocklington",
+      "q": 1031,
+      "witness": 2
+    },
+    "3387226441": {
+      "kind": "pocklington",
+      "q": 167023,
+      "witness": 2
+    },
+    "733": {
+      "kind": "trial"
+    },
+    "99689": {
+      "kind": "pocklington",
+      "q": 733,
+      "witness": 2
+    },
+    "1069": {
+      "kind": "trial"
+    },
+    "218077": {
+      "kind": "pocklington",
+      "q": 1069,
+      "witness": 2
+    },
+    "3765317483": {
+      "kind": "pocklington",
+      "q": 218077,
+      "witness": 2
+    },
+    "887": {
+      "kind": "trial"
+    },
+    "76283": {
+      "kind": "pocklington",
+      "q": 887,
+      "witness": 2
+    },
+    "1523": {
+      "kind": "trial"
+    },
+    "158393": {
+      "kind": "pocklington",
+      "q": 1523,
+      "witness": 2
+    },
+    "3163741783": {
+      "kind": "pocklington",
+      "q": 158393,
+      "witness": 2
+    },
+    "821": {
+      "kind": "trial"
+    },
+    "129719": {
+      "kind": "pocklington",
+      "q": 821,
+      "witness": 2
+    },
+    "1201": {
+      "kind": "trial"
+    },
+    "242603": {
+      "kind": "pocklington",
+      "q": 1201,
+      "witness": 2
+    },
+    "3003425141": {
+      "kind": "pocklington",
+      "q": 242603,
+      "witness": 2
+    },
+    "571": {
+      "kind": "trial"
+    },
+    "115343": {
+      "kind": "pocklington",
+      "q": 571,
+      "witness": 2
+    },
+    "21871": {
+      "kind": "trial"
+    },
+    "41161223": {
+      "kind": "pocklington",
+      "q": 21871,
+      "witness": 2
+    },
+    "196640086895023": {
+      "kind": "pocklington",
+      "q": 41161223,
+      "witness": 2
+    },
+    "991": {
+      "kind": "trial"
+    },
+    "128831": {
+      "kind": "pocklington",
+      "q": 991,
+      "witness": 2
+    },
+    "28001": {
+      "kind": "trial"
+    },
+    "41049467": {
+      "kind": "pocklington",
+      "q": 28001,
+      "witness": 2
+    },
+    "166909924185757": {
+      "kind": "pocklington",
+      "q": 41049467,
+      "witness": 2
+    },
+    "941": {
+      "kind": "trial"
+    },
+    "124213": {
+      "kind": "pocklington",
+      "q": 941,
+      "witness": 2
+    },
+    "30781": {
+      "kind": "trial"
+    },
+    "63285737": {
+      "kind": "pocklington",
+      "q": 30781,
+      "witness": 2
+    },
+    "145883749502921": {
+      "kind": "pocklington",
+      "q": 63285737,
+      "witness": 2
+    },
+    "857": {
+      "kind": "trial"
+    },
+    "83987": {
+      "kind": "pocklington",
+      "q": 857,
+      "witness": 2
+    },
+    "27109": {
+      "kind": "trial"
+    },
+    "40771937": {
+      "kind": "pocklington",
+      "q": 27109,
+      "witness": 2
+    },
+    "244685440956841": {
+      "kind": "pocklington",
+      "q": 40771937,
+      "witness": 2
+    },
+    "599": {
+      "kind": "trial"
+    },
+    "125791": {
+      "kind": "pocklington",
+      "q": 599,
+      "witness": 2
+    },
+    "1277": {
+      "kind": "trial"
+    },
+    "247739": {
+      "kind": "pocklington",
+      "q": 1277,
+      "witness": 2
+    },
+    "4548488041": {
+      "kind": "pocklington",
+      "q": 247739,
+      "witness": 2
+    },
+    "5289652532248541123": {
+      "kind": "pocklington",
+      "q": 4548488041,
+      "witness": 2
+    },
+    "569": {
+      "kind": "trial"
+    },
+    "75109": {
+      "kind": "pocklington",
+      "q": 569,
+      "witness": 2
+    },
+    "1427": {
+      "kind": "trial"
+    },
+    "242591": {
+      "kind": "pocklington",
+      "q": 1427,
+      "witness": 2
+    },
+    "7388351497": {
+      "kind": "pocklington",
+      "q": 242591,
+      "witness": 2
+    },
+    "5210419360269379517": {
+      "kind": "pocklington",
+      "q": 7388351497,
+      "witness": 2
+    },
+    "116009": {
+      "kind": "pocklington",
+      "q": 853,
+      "witness": 2
+    },
+    "1567": {
+      "kind": "trial"
+    },
+    "194309": {
+      "kind": "pocklington",
+      "q": 1567,
+      "witness": 2
+    },
+    "4677406249": {
+      "kind": "pocklington",
+      "q": 194309,
+      "witness": 2
+    },
+    "7022227579905504467": {
+      "kind": "pocklington",
+      "q": 4677406249,
+      "witness": 2
+    },
+    "919": {
+      "kind": "trial"
+    },
+    "110281": {
+      "kind": "pocklington",
+      "q": 919,
+      "witness": 2
+    },
+    "1049": {
+      "kind": "trial"
+    },
+    "151057": {
+      "kind": "pocklington",
+      "q": 1049,
+      "witness": 2
+    },
+    "7123546007": {
+      "kind": "pocklington",
+      "q": 151057,
+      "witness": 2
+    },
+    "5682676371869795843": {
+      "kind": "pocklington",
+      "q": 7123546007,
+      "witness": 2
+    },
+    "116579": {
+      "kind": "pocklington",
+      "q": 757,
+      "witness": 2
+    },
+    "1733": {
+      "kind": "trial"
+    },
+    "356999": {
+      "kind": "pocklington",
+      "q": 1733,
+      "witness": 2
+    },
+    "9397641677": {
+      "kind": "pocklington",
+      "q": 356999,
+      "witness": 2
+    },
+    "10301264356748026693": {
+      "kind": "pocklington",
+      "q": 9397641677,
+      "witness": 2
+    },
+    "653": {
+      "kind": "trial"
+    },
+    "117541": {
+      "kind": "pocklington",
+      "q": 653,
+      "witness": 2
+    },
+    "1447": {
+      "kind": "trial"
+    },
+    "327023": {
+      "kind": "pocklington",
+      "q": 1447,
+      "witness": 2
+    },
+    "10711311343": {
+      "kind": "pocklington",
+      "q": 327023,
+      "witness": 2
+    },
+    "14979558350227119307": {
+      "kind": "pocklington",
+      "q": 10711311343,
+      "witness": 2
+    },
+    "647": {
+      "kind": "trial"
+    },
+    "69877": {
+      "kind": "pocklington",
+      "q": 647,
+      "witness": 2
+    },
+    "2003": {
+      "kind": "trial"
+    },
+    "288433": {
+      "kind": "pocklington",
+      "q": 2003,
+      "witness": 2
+    },
+    "9355035923": {
+      "kind": "pocklington",
+      "q": 288433,
+      "witness": 2
+    },
+    "14448544921740555611": {
+      "kind": "pocklington",
+      "q": 9355035923,
+      "witness": 2
+    },
+    "859": {
+      "kind": "trial"
+    },
+    "67003": {
+      "kind": "pocklington",
+      "q": 859,
+      "witness": 2
+    },
+    "1153": {
+      "kind": "trial"
+    },
+    "352819": {
+      "kind": "pocklington",
+      "q": 1153,
+      "witness": 2
+    },
+    "10232456639": {
+      "kind": "pocklington",
+      "q": 352819,
+      "witness": 2
+    },
+    "10306230911849561371": {
+      "kind": "pocklington",
+      "q": 10232456639,
+      "witness": 2
+    },
+    "587": {
+      "kind": "trial"
+    },
+    "96269": {
+      "kind": "pocklington",
+      "q": 587,
+      "witness": 2
+    },
+    "3191": {
+      "kind": "trial"
+    },
+    "899863": {
+      "kind": "pocklington",
+      "q": 3191,
+      "witness": 2
+    },
+    "103048711309": {
+      "kind": "pocklington",
+      "q": 899863,
+      "witness": 2
+    },
+    "904959360018003192361": {
+      "kind": "pocklington",
+      "q": 103048711309,
+      "witness": 2
+    },
+    "881": {
+      "kind": "trial"
+    },
+    "121579": {
+      "kind": "pocklington",
+      "q": 881,
+      "witness": 2
+    },
+    "2131": {
+      "kind": "trial"
+    },
+    "1022881": {
+      "kind": "pocklington",
+      "q": 2131,
+      "witness": 2
+    },
+    "78180840593": {
+      "kind": "pocklington",
+      "q": 1022881,
+      "witness": 2
+    },
+    "1099641729806022548471": {
+      "kind": "pocklington",
+      "q": 78180840593,
+      "witness": 2
+    },
+    "823": {
+      "kind": "trial"
+    },
+    "128389": {
+      "kind": "pocklington",
+      "q": 823,
+      "witness": 2
+    },
+    "3701": {
+      "kind": "trial"
+    },
+    "629171": {
+      "kind": "pocklington",
+      "q": 3701,
+      "witness": 2
+    },
+    "125279271179": {
+      "kind": "pocklington",
+      "q": 629171,
+      "witness": 2
+    },
+    "963101655660960119041": {
+      "kind": "pocklington",
+      "q": 125279271179,
+      "witness": 2
+    },
+    "827": {
+      "kind": "trial"
+    },
+    "90971": {
+      "kind": "pocklington",
+      "q": 827,
+      "witness": 2
+    },
+    "2843": {
+      "kind": "trial"
+    },
+    "750553": {
+      "kind": "pocklington",
+      "q": 2843,
+      "witness": 2
+    },
+    "94135858367": {
+      "kind": "pocklington",
+      "q": 750553,
+      "witness": 2
+    },
+    "843498031461647503729": {
+      "kind": "pocklington",
+      "q": 94135858367,
+      "witness": 2
+    },
+    "971": {
+      "kind": "trial"
+    },
+    "118463": {
+      "kind": "pocklington",
+      "q": 971,
+      "witness": 2
+    },
+    "6959": {
+      "kind": "trial"
+    },
+    "3632599": {
+      "kind": "pocklington",
+      "q": 6959,
+      "witness": 2
+    },
+    "1268568957583": {
+      "kind": "pocklington",
+      "q": 3632599,
+      "witness": 2
+    },
+    "189393816870494899952327": {
+      "kind": "pocklington",
+      "q": 1268568957583,
+      "witness": 2
+    },
+    "911": {
+      "kind": "trial"
+    },
+    "98389": {
+      "kind": "pocklington",
+      "q": 911,
+      "witness": 2
+    },
+    "6967": {
+      "kind": "trial"
+    },
+    "3762181": {
+      "kind": "pocklington",
+      "q": 6967,
+      "witness": 2
+    },
+    "1674855261943": {
+      "kind": "pocklington",
+      "q": 3762181,
+      "witness": 2
+    },
+    "160294027160295334807531": {
+      "kind": "pocklington",
+      "q": 1674855261943,
+      "witness": 2
+    },
+    "617": {
+      "kind": "trial"
+    },
+    "127103": {
+      "kind": "pocklington",
+      "q": 617,
+      "witness": 2
+    },
+    "4621": {
+      "kind": "trial"
+    },
+    "4149659": {
+      "kind": "pocklington",
+      "q": 4621,
+      "witness": 2
+    },
+    "1272318646673": {
+      "kind": "pocklington",
+      "q": 4149659,
+      "witness": 2
+    },
+    "256587329114339394217573": {
+      "kind": "pocklington",
+      "q": 1272318646673,
+      "witness": 2
+    },
+    "92557": {
+      "kind": "pocklington",
+      "q": 857,
+      "witness": 2
+    },
+    "4549": {
+      "kind": "trial"
+    },
+    "3948533": {
+      "kind": "pocklington",
+      "q": 4549,
+      "witness": 2
+    },
+    "1515336406477": {
+      "kind": "pocklington",
+      "q": 3948533,
+      "witness": 2
+    },
+    "164794082853695378299817": {
+      "kind": "pocklington",
+      "q": 1515336406477,
+      "witness": 2
+    },
+    "91573": {
+      "kind": "pocklington",
+      "q": 587,
+      "witness": 2
+    },
+    "6151": {
+      "kind": "trial"
+    },
+    "4982311": {
+      "kind": "pocklington",
+      "q": 6151,
+      "witness": 2
+    },
+    "3235223789363": {
+      "kind": "pocklington",
+      "q": 4982311,
+      "witness": 2
+    },
+    "1248763904140146738111029": {
+      "kind": "pocklington",
+      "q": 3235223789363,
+      "witness": 2
+    },
+    "659": {
+      "kind": "trial"
+    },
+    "100169": {
+      "kind": "pocklington",
+      "q": 659,
+      "witness": 2
+    },
+    "5399": {
+      "kind": "trial"
+    },
+    "6284437": {
+      "kind": "pocklington",
+      "q": 5399,
+      "witness": 2
+    },
+    "3635848457477": {
+      "kind": "pocklington",
+      "q": 6284437,
+      "witness": 2
+    },
+    "2084223445542204093112033": {
+      "kind": "pocklington",
+      "q": 3635848457477,
+      "witness": 2
+    },
+    "75533": {
+      "kind": "pocklington",
+      "q": 821,
+      "witness": 2
+    },
+    "7019": {
+      "kind": "trial"
+    },
+    "4730807": {
+      "kind": "pocklington",
+      "q": 7019,
+      "witness": 2
+    },
+    "3914638714747": {
+      "kind": "pocklington",
+      "q": 4730807,
+      "witness": 2
+    },
+    "2291746511005344528264889": {
+      "kind": "pocklington",
+      "q": 3914638714747,
+      "witness": 2
+    },
+    "809": {
+      "kind": "trial"
+    },
+    "92227": {
+      "kind": "pocklington",
+      "q": 809,
+      "witness": 2
+    },
+    "5851": {
+      "kind": "trial"
+    },
+    "4247827": {
+      "kind": "pocklington",
+      "q": 5851,
+      "witness": 2
+    },
+    "3416603716987": {
+      "kind": "pocklington",
+      "q": 4247827,
+      "witness": 2
+    },
+    "1368665584139043307464551": {
+      "kind": "pocklington",
+      "q": 3416603716987,
+      "witness": 2
+    },
+    "607": {
+      "kind": "trial"
+    },
+    "118973": {
+      "kind": "pocklington",
+      "q": 607,
+      "witness": 2
+    },
+    "7151": {
+      "kind": "trial"
+    },
+    "6907867": {
+      "kind": "pocklington",
+      "q": 7151,
+      "witness": 2
+    },
+    "4908840816073": {
+      "kind": "pocklington",
+      "q": 6907867,
+      "witness": 2
+    },
+    "2680238694846940469794957": {
+      "kind": "pocklington",
+      "q": 4908840816073,
+      "witness": 2
+    },
+    "787": {
+      "kind": "trial"
+    },
+    "66109": {
+      "kind": "pocklington",
+      "q": 787,
+      "witness": 2
+    },
+    "5167": {
+      "kind": "trial"
+    },
+    "6128063": {
+      "kind": "pocklington",
+      "q": 5167,
+      "witness": 2
+    },
+    "4982997660073": {
+      "kind": "pocklington",
+      "q": 6128063,
+      "witness": 2
+    },
+    "4621756926417888163036771": {
+      "kind": "pocklington",
+      "q": 4982997660073,
+      "witness": 2
+    },
+    "613": {
+      "kind": "trial"
+    },
+    "95629": {
+      "kind": "pocklington",
+      "q": 613,
+      "witness": 2
+    },
+    "6857": {
+      "kind": "trial"
+    },
+    "6952999": {
+      "kind": "pocklington",
+      "q": 6857,
+      "witness": 2
+    },
+    "7421213952661": {
+      "kind": "pocklington",
+      "q": 6952999,
+      "witness": 2
+    },
+    "2549895272864368061248409": {
+      "kind": "pocklington",
+      "q": 7421213952661,
+      "witness": 2
+    },
+    "65557": {
+      "kind": "pocklington",
+      "q": 607,
+      "witness": 2
+    },
+    "4751": {
+      "kind": "trial"
+    },
+    "6651401": {
+      "kind": "pocklington",
+      "q": 4751,
+      "witness": 2
+    },
+    "6339503504309": {
+      "kind": "pocklington",
+      "q": 6651401,
+      "witness": 2
+    },
+    "4251807543025884487656821": {
+      "kind": "pocklington",
+      "q": 6339503504309,
+      "witness": 2
+    },
+    "93739": {
+      "kind": "pocklington",
+      "q": 919,
+      "witness": 2
+    },
+    "30403": {
+      "kind": "trial"
+    },
+    "99721841": {
+      "kind": "pocklington",
+      "q": 30403,
+      "witness": 2
+    },
+    "810574824067079": {
+      "kind": "pocklington",
+      "q": 99721841,
+      "witness": 2
+    },
+    "56127007549969311992256628601": {
+      "kind": "pocklington",
+      "q": 810574824067079,
+      "witness": 2
+    },
+    "709": {
+      "kind": "trial"
+    },
+    "85081": {
+      "kind": "pocklington",
+      "q": 709,
+      "witness": 2
+    },
+    "27271": {
+      "kind": "trial"
+    },
+    "98611937": {
+      "kind": "pocklington",
+      "q": 27271,
+      "witness": 2
+    },
+    "642442963883821": {
+      "kind": "pocklington",
+      "q": 98611937,
+      "witness": 2
+    },
+    "43716008009891096642535907109": {
+      "kind": "pocklington",
+      "q": 642442963883821,
+      "witness": 2
+    },
+    "797": {
+      "kind": "trial"
+    },
+    "119551": {
+      "kind": "pocklington",
+      "q": 797,
+      "witness": 2
+    },
+    "25639": {
+      "kind": "trial"
+    },
+    "118298347": {
+      "kind": "pocklington",
+      "q": 25639,
+      "witness": 2
+    },
+    "676307627655203": {
+      "kind": "pocklington",
+      "q": 118298347,
+      "witness": 2
+    },
+    "75617822313515017764556858727": {
+      "kind": "pocklington",
+      "q": 676307627655203,
+      "witness": 2
+    },
+    "102139": {
+      "kind": "pocklington",
+      "q": 587,
+      "witness": 2
+    },
+    "24767": {
+      "kind": "trial"
+    },
+    "133890403": {
+      "kind": "pocklington",
+      "q": 24767,
+      "witness": 2
+    },
+    "1050873103888669": {
+      "kind": "pocklington",
+      "q": 133890403,
+      "witness": 2
+    },
+    "60172973940590061573181273627": {
+      "kind": "pocklington",
+      "q": 1050873103888669,
+      "witness": 2
+    },
+    "751": {
+      "kind": "trial"
+    },
+    "99133": {
+      "kind": "pocklington",
+      "q": 751,
+      "witness": 2
+    },
+    "513439": {
+      "kind": "pocklington",
+      "q": 1031,
+      "witness": 2
+    },
+    "14087739283": {
+      "kind": "pocklington",
+      "q": 513439,
+      "witness": 2
+    },
+    "35626561158116406539": {
+      "kind": "pocklington",
+      "q": 14087739283,
+      "witness": 2
+    },
+    "97953353104046761225303334495432944879": {
+      "kind": "pocklington",
+      "q": 35626561158116406539,
+      "witness": 2
+    },
+    "883": {
+      "kind": "trial"
+    },
+    "83003": {
+      "kind": "pocklington",
+      "q": 883,
+      "witness": 2
+    },
+    "1373": {
+      "kind": "trial"
+    },
+    "494281": {
+      "kind": "pocklington",
+      "q": 1373,
+      "witness": 2
+    },
+    "16301387381": {
+      "kind": "pocklington",
+      "q": 494281,
+      "witness": 2
+    },
+    "24855674406584021821": {
+      "kind": "pocklington",
+      "q": 16301387381,
+      "witness": 2
+    },
+    "123223663771618049591390356730075059133": {
+      "kind": "pocklington",
+      "q": 24855674406584021821,
+      "witness": 2
+    },
+    "71353": {
+      "kind": "pocklington",
+      "q": 991,
+      "witness": 2
+    },
+    "1987": {
+      "kind": "trial"
+    },
+    "317921": {
+      "kind": "pocklington",
+      "q": 1987,
+      "witness": 2
+    },
+    "13198808237": {
+      "kind": "pocklington",
+      "q": 317921,
+      "witness": 2
+    },
+    "25486626255847371847": {
+      "kind": "pocklington",
+      "q": 13198808237,
+      "witness": 2
+    },
+    "124592961628928716959966019376382852719": {
+      "kind": "pocklington",
+      "q": 25486626255847371847,
+      "witness": 2
+    },
+    "114743": {
+      "kind": "pocklington",
+      "q": 557,
+      "witness": 2
+    },
+    "1549": {
+      "kind": "trial"
+    },
+    "508073": {
+      "kind": "pocklington",
+      "q": 1549,
+      "witness": 2
+    },
+    "8932939487": {
+      "kind": "pocklington",
+      "q": 508073,
+      "witness": 2
+    },
+    "20258231901825703397": {
+      "kind": "pocklington",
+      "q": 8932939487,
+      "witness": 2
+    },
+    "162603435202326758589615767693292591329": {
+      "kind": "pocklington",
+      "q": 20258231901825703397,
+      "witness": 2
+    }
+  },
+  "fixtures": [
+    {
+      "n": 23220101083624511828731,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 2843286359555512640623519,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 801517,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 69827359523,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 87119
+    },
+    {
+      "n": 34465231,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 642429501289,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 801517
+    },
+    {
+      "n": 1603034,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 2404551,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 29656129,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 797077,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 70148355539,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 88007
+    },
+    {
+      "n": 34274311,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 635331743929,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 797077
+    },
+    {
+      "n": 1594154,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 2391231,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 29491849,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 983243,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 71482749343,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 72701
+    },
+    {
+      "n": 42279449,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 966766797049,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 983243
+    },
+    {
+      "n": 1966486,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 2949729,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 36379991,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 662939,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 52000272221,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 78439
+    },
+    {
+      "n": 28506377,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 439488117721,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 662939
+    },
+    {
+      "n": 1325878,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 1988817,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 24528743,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 9253807,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 672501916111,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 72673
+    },
+    {
+      "n": 397913701,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 85632943993249,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 9253807
+    },
+    {
+      "n": 18507614,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 27761421,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 342390859,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 12991729,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 1298796139859,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 99971
+    },
+    {
+      "n": 558644347,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 168785022409441,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 12991729
+    },
+    {
+      "n": 25983458,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 38975187,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 480693973,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 11358847,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 1395241253551,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 122833
+    },
+    {
+      "n": 488430421,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 129023405169409,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 11358847
+    },
+    {
+      "n": 22717694,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 34076541,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 420277339,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 16687169,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 1257828737713,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 75377
+    },
+    {
+      "n": 717548267,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 278461609234561,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 16687169
+    },
+    {
+      "n": 33374338,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 50061507,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 617425253,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 3387226441,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 337669216676849,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 99689
+    },
+    {
+      "n": 145650736963,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 11473302962609526481,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 3387226441
+    },
+    {
+      "n": 6774452882,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 10161679323,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 125327378317,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 3765317483,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 287229713555689,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 76283
+    },
+    {
+      "n": 161908651769,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 14177615747785455289,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 3765317483
+    },
+    {
+      "n": 7530634966,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 11295952449,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 139316746871,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 3163741783,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 410397420348977,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 129719
+    },
+    {
+      "n": 136040896669,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 10009262069500019089,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 3163741783
+    },
+    {
+      "n": 6327483566,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 9491225349,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 117058445971,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 3003425141,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 346424066038363,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 115343
+    },
+    {
+      "n": 129147281063,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 9020562577590869881,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 3003425141
+    },
+    {
+      "n": 6006850282,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 9010275423,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 111126730217,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 196640086895023,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 25333339034772708113,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 128831
+    },
+    {
+      "n": 8455523736485989,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 38667323774082196185022170529,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 196640086895023
+    },
+    {
+      "n": 393280173790046,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 589920260685069,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 7275683215115851,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 166909924185757,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 20732382412885434241,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 124213
+    },
+    {
+      "n": 7177126739987551,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 27858922791695149539441663049,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 166909924185757
+    },
+    {
+      "n": 333819848371514,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 500729772557271,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 6175667194873009,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 145883749502921,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 12252338469501826027,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 83987
+    },
+    {
+      "n": 6273001228625603,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 21282068369031003114587532241,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 145883749502921
+    },
+    {
+      "n": 291767499005842,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 437651248508763,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 5397698731608077,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 244685440956841,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 30779226303401986231,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 125791
+    },
+    {
+      "n": 10521473961144163,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 59870965016243723105624699281,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 244685440956841
+    },
+    {
+      "n": 489370881913682,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 734056322870523,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 9053361315403117,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 5289652532248541123,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 397300512044655675207407,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 75109
+    },
+    {
+      "n": 227455058886687268289,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 27980423911923403385227919561822101129,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 5289652532248541123
+    },
+    {
+      "n": 10579305064497082246,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 15868957596745623369,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 195717143693196021551,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 5210419360269379517,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 604455539565490448387653,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 116009
+    },
+    {
+      "n": 224048032491583319231,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 27148469909869970101201063564179153289,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 5210419360269379517
+    },
+    {
+      "n": 10420838720538759034,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 15631258080808138551,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 192785516329967042129,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 7022227579905504467,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 774418279739558938125227,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 110281
+    },
+    {
+      "n": 301955785935936692081,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 49311680183985518123970129125756954089,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 7022227579905504467
+    },
+    {
+      "n": 14044455159811008934,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 21066682739716513401,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 259822420456503665279,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 5682676371869795843,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 662480728756208929581097,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 116579
+    },
+    {
+      "n": 244355083990401221249,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 32292810747407266210976796314500080649,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 5682676371869795843
+    },
+    {
+      "n": 11365352743739591686,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 17048029115609387529,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 210259025759182446191,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 10301264356748026693,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 1210820913756519805521913,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 117541
+    },
+    {
+      "n": 442954367340165147799,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 106116047347607336156434453349440516249,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 10301264356748026693
+    },
+    {
+      "n": 20602528713496053386,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 30903793070244080079,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 381146781199676987641,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 14979558350227119307,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 1046726598838820415815239,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 69877
+    },
+    {
+      "n": 644121009059766130201,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 224387168367859016323287710079612160249,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 14979558350227119307
+    },
+    {
+      "n": 29959116700454238614,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 44938675050681357921,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 554243658958403414359,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 14448544921740555611,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 968095855391382447603833,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 67003
+    },
+    {
+      "n": 621287431634843891273,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 208760450355554798265612626074983583321,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 14448544921740555611
+    },
+    {
+      "n": 28897089843481111222,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 43345634765221666833,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 534596162104400557607,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 10306230911849561371,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 992170543652845423624799,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 96269
+    },
+    {
+      "n": 443167929209531138953,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 106218395608363441246905232485095399641,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 10306230911849561371
+    },
+    {
+      "n": 20612461823699122742,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 30918692735548684113,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 381330543738433770727,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 904959360018003192361,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 110024054031628810124058019,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 121579
+    },
+    {
+      "n": 38913252480774137271523,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 818951443284193914874259012855187168754321,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 904959360018003192361
+    },
+    {
+      "n": 1809918720036006384722,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 2714878080054009577083,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 33483496320666118117357,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 1099641729806022548471,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 141181902048065428975643219,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 128389
+    },
+    {
+      "n": 47284594381658969584253,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 1209211933930781499276945841361685544437841,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 1099641729806022548471
+    },
+    {
+      "n": 2199283459612045096942,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 3298925189418067645413,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 40686744002822834293427,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 963101655660960119041,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 87614320717133202989278811,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 90971
+    },
+    {
+      "n": 41413371193421285118763,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 927564799136882594511636504672692890759681,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 963101655660960119041
+    },
+    {
+      "n": 1926203311321920238082,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 2889304966982880357123,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 35634761259455524404517,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 843498031461647503729,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 99923307301041148234248527,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 118463
+    },
+    {
+      "n": 36270415352850842660347,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 711488929079674482036071732897217068905441,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 843498031461647503729
+    },
+    {
+      "n": 1686996062923295007458,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 2530494094384942511187,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 31209427164080957637973,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 189393816870494899952327,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 18634268248071122711409501203,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 98389
+    },
+    {
+      "n": 8143934125431280697950061,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 35870017868774558578780228062675793266872714929,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 189393816870494899952327
+    },
+    {
+      "n": 378787633740989799904654,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 568181450611484699856981,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 7007571224208311298236099,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 160294027160295334807531,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 20373851734155017940041612693,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 127103
+    },
+    {
+      "n": 6892643167892699396723833,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 25694175143265498476919422195732459372814315961,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 160294027160295334807531
+    },
+    {
+      "n": 320588054320590669615062,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 480882081480886004422593,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 5930879004930927387878647,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 256587329114339394217573,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 23748953420835911310595904161,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 92557
+    },
+    {
+      "n": 11033255151916593951355639,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 65837057462030320536603698935075565988862010329,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 256587329114339394217573
+    },
+    {
+      "n": 513174658228678788435146,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 769761987343018182652719,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 9493731177230557586050201,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 164794082853695378299817,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 15090688549161446877049142141,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 91573
+    },
+    {
+      "n": 7086145562708901266892131,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 27157089743590617077917925496455658381542233489,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 164794082853695378299817
+    },
+    {
+      "n": 329588165707390756599634,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 494382248561086134899451,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 6097381065586728997093229,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 1248763904140146738111029,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 125087431513814358609843663901,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 100169
+    },
+    {
+      "n": 53696847878026309738774247,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 1559411288283341591652429427197593348359131438841,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 1248763904140146738111029
+    },
+    {
+      "n": 2497527808280293476222058,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 3746291712420440214333087,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 46204264453185429310108073,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 2084223445542204093112033,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 157427649512139301765031188589,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 75533
+    },
+    {
+      "n": 89621608158314776003817419,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 4343987370947816990972109659014812151314689393089,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 2084223445542204093112033
+    },
+    {
+      "n": 4168446891084408186224066,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 6252670336626612279336099,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 77116267485061551445145221,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 2291746511005344528264889,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 211360905470489909808285917803,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 92227
+    },
+    {
+      "n": 98545099973229814715390227,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 5252102070705169729008029063086932197424950182321,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 2291746511005344528264889
+    },
+    {
+      "n": 4583493022010689056529778,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 6875239533016033584794667,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 84794620907197747545800893,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 1368665584139043307464551,
+      "prime": true,
+      "cohort": "wide_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 162834250541774399418980026123,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 118973
+    },
+    {
+      "n": 58852620117978862220975693,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 1873245481206668635243855548776249663836121631601,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 1368665584139043307464551
+    },
+    {
+      "n": 2737331168278086614929102,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 4105996752417129922393653,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 50640626613144602376188387,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 2680238694846940469794957,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 177187899877636387517674812313,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 66109
+    },
+    {
+      "n": 115250263878418440201183151,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 7183679461354830874035272154308818470461622631849,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 2680238694846940469794957
+    },
+    {
+      "n": 5360477389693880939589914,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 8040716084540821409384871,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 99168831709336797382413409,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 4621756926417888163036771,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 441973993116416227143043373959,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 95629
+    },
+    {
+      "n": 198735547835969191010581153,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 21360637086891724499791857640658138900284698106441,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 4621756926417888163036771
+    },
+    {
+      "n": 9243513852835776326073542,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 13865270779253664489110313,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 171005006277461862032360527,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 2549895272864368061248409,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 167163484403169376991261948813,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 65557
+    },
+    {
+      "n": 109645496733167826633681587,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 6501965902576050050037381198550829332391605031281,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 2549895272864368061248409
+    },
+    {
+      "n": 5099790545728736122496818,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 7649685818593104183745227,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 94346125095981618266191133,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 4251807543025884487656821,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 398560187275703385988462743719,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 93739
+    },
+    {
+      "n": 182827724350113032969243303,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 18077867382931808568732593853102862118703067826041,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 4251807543025884487656821
+    },
+    {
+      "n": 8503615086051768975313642,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 12755422629077653462970463,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 157316879091957726043302377,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 56127007549969311992256628601,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 4775341929358939033613186218001681,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 85081
+    },
+    {
+      "n": 2413461324648680415667035029843,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 3150240976514312150415387611805565132322944824622851217201,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 56127007549969311992256628601
+    },
+    {
+      "n": 112254015099938623984513257202,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 168381022649907935976769885803,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 2076699279348864543713495258237,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 43716008009891096642535907109,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 5226292473590490494711810230788059,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 119551
+    },
+    {
+      "n": 1879788344425317155629044005687,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 1911089356320862520005579503720586838176794852385476737881,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 43716008009891096642535907109
+    },
+    {
+      "n": 87432016019782193285071814218,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 131148024029673289927607721327,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 1617492296365970575773828563033,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 75617822313515017764556858727,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 7723528753280110399454072993517053,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 102139
+    },
+    {
+      "n": 3251566359481145763875944925261,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 5718055051438329713585863268105267895071196944497836060529,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 75617822313515017764556858727
+    },
+    {
+      "n": 151235644627030035529113717454,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 226853466940545053293670576181,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 2797859425600055657288603772899,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 60172973940590061573181273627,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 5965127425652514573934179198465391,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 99133
+    },
+    {
+      "n": 2587437879445372647646794765961,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 3620786792854930642932412534367105720292014930669845735129,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 60172973940590061573181273627
+    },
+    {
+      "n": 120345947881180123146362547254,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 180518921821770184719543820881,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 2226400035801832278207707124199,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 97953353104046761225303334495432944879,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 8130422167695193321983852673124420723791637,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 83003
+    },
+    {
+      "n": 4211994183474010732688043383303616629797,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 9594859384326067272443428633291725719384785523463918592807656043478252324641,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 97953353104046761225303334495432944879
+    },
+    {
+      "n": 195906706208093522450606668990865889758,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 293860059312140283675910003486298834637,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 3624274064849730165336223376331018960523,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 123223663771618049591390356730075059133,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "training",
+      "divisor": null
+    },
+    {
+      "n": 8792378081096262692494476123761045694316949,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "training",
+      "divisor": 71353
+    },
+    {
+      "n": 5298617542179576132429785339393227542719,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "training",
+      "divisor": 43
+    },
+    {
+      "n": 15184071313300774610527960493534449967311355894855617821781434664053446711689,
+      "prime": false,
+      "cohort": "powers",
+      "split": "training",
+      "divisor": 123223663771618049591390356730075059133
+    },
+    {
+      "n": 246447327543236099182780713460150118266,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 2
+    },
+    {
+      "n": 369670991314854148774171070190225177399,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 3
+    },
+    {
+      "n": 4559275559549867834881443199012777187921,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "training",
+      "divisor": 37
+    },
+    {
+      "n": 124592961628928716959966019376382852719,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 14296170196188167770137380961304297669536217,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 114743
+    },
+    {
+      "n": 5357497350043934829278538833184462666917,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 15523406087467703603497500643882875041348156845293416238707563142892445692961,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 124592961628928716959966019376382852719
+    },
+    {
+      "n": 249185923257857433919932038752765705438,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 373778884886786150879898058129148558157,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 4609939580270362527518742716926165550603,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 162603435202326758589615767693292591329,
+      "prime": true,
+      "cohort": "other_primes",
+      "split": "confirmation",
+      "divisor": null
+    },
+    {
+      "n": 14792197103790867555655936002826520325790459,
+      "prime": false,
+      "cohort": "rough_composites",
+      "split": "confirmation",
+      "divisor": 90971
+    },
+    {
+      "n": 6991947713700050619353478010811581427147,
+      "prime": false,
+      "cohort": "filtered_composites",
+      "split": "confirmation",
+      "divisor": 43
+    },
+    {
+      "n": 26439877139597276919110675555563461454070040440581738228386385877679805986241,
+      "prime": false,
+      "cohort": "powers",
+      "split": "confirmation",
+      "divisor": 162603435202326758589615767693292591329
+    },
+    {
+      "n": 325206870404653517179231535386585182658,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 2
+    },
+    {
+      "n": 487810305606980275768847303079877773987,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 3
+    },
+    {
+      "n": 6016327102486090067815783404651825879173,
+      "prime": false,
+      "cohort": "small_divisibles",
+      "split": "confirmation",
+      "divisor": 37
+    },
+    {
+      "n": 9080191,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 2131
+    },
+    {
+      "n": 4759123141,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 48781
+    },
+    {
+      "n": 341550071728321,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 10670053
+    },
+    {
+      "n": 3825123056546413051,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 149491
+    },
+    {
+      "n": 318665857834031151167461,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 399165290221
+    },
+    {
+      "n": 3317044064679887385961981,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 1287836182261
+    },
+    {
+      "n": 561,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 3
+    },
+    {
+      "n": 1105,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 5
+    },
+    {
+      "n": 1729,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 7
+    },
+    {
+      "n": 2465,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 5
+    },
+    {
+      "n": 2821,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 7
+    },
+    {
+      "n": 6601,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 7
+    },
+    {
+      "n": 3215031751,
+      "prime": false,
+      "cohort": "pseudoprimes",
+      "split": "adversarial",
+      "divisor": 151
+    },
+    {
+      "n": 9080190,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 9080192,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 4759123140,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 4759123142,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 18446744073709551615,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 3
+    },
+    {
+      "n": 18446744073709551617,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 274177
+    },
+    {
+      "n": 318665857834031151167460,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 318665857834031151167462,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 3317044064679887385961980,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 3317044064679887385961982,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": 18446744073709551616,
+      "prime": false,
+      "cohort": "boundaries",
+      "split": "adversarial",
+      "divisor": 2
+    },
+    {
+      "n": -1,
+      "prime": false,
+      "cohort": "trivial",
+      "split": "adversarial",
+      "divisor": null
+    },
+    {
+      "n": 0,
+      "prime": false,
+      "cohort": "trivial",
+      "split": "adversarial",
+      "divisor": null
+    },
+    {
+      "n": 1,
+      "prime": false,
+      "cohort": "trivial",
+      "split": "adversarial",
+      "divisor": null
+    }
+  ],
+  "factoring": [
+    {
+      "id": "reported",
+      "split": "regression",
+      "n": 38389398379837983789739873873,
+      "factors": [
+        [
+          61,
+          1
+        ],
+        [
+          27103,
+          1
+        ],
+        [
+          23220101083624511828731,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "upper_13_bases",
+      "split": "confirmation",
+      "n": 2843286359555512640623519,
+      "factors": [
+        [
+          2843286359555512640623519,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_20_0",
+      "split": "training",
+      "n": 801517,
+      "factors": [
+        [
+          801517,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_20_0",
+      "split": "training",
+      "n": 642429501289,
+      "factors": [
+        [
+          801517,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "prime_20_2",
+      "split": "confirmation",
+      "n": 983243,
+      "factors": [
+        [
+          983243,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_20_2",
+      "split": "confirmation",
+      "n": 966766797049,
+      "factors": [
+        [
+          983243,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "prime_24_0",
+      "split": "training",
+      "n": 9253807,
+      "factors": [
+        [
+          9253807,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_24_2",
+      "split": "confirmation",
+      "n": 11358847,
+      "factors": [
+        [
+          11358847,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_32_0",
+      "split": "training",
+      "n": 3387226441,
+      "factors": [
+        [
+          3387226441,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_32_2",
+      "split": "confirmation",
+      "n": 3163741783,
+      "factors": [
+        [
+          3163741783,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_48_0",
+      "split": "training",
+      "n": 196640086895023,
+      "factors": [
+        [
+          196640086895023,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_48_2",
+      "split": "confirmation",
+      "n": 145883749502921,
+      "factors": [
+        [
+          145883749502921,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_63_0",
+      "split": "training",
+      "n": 5289652532248541123,
+      "factors": [
+        [
+          5289652532248541123,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_63_2",
+      "split": "confirmation",
+      "n": 7022227579905504467,
+      "factors": [
+        [
+          7022227579905504467,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_64_0",
+      "split": "training",
+      "n": 10301264356748026693,
+      "factors": [
+        [
+          10301264356748026693,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_64_2",
+      "split": "confirmation",
+      "n": 14448544921740555611,
+      "factors": [
+        [
+          14448544921740555611,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_70_0",
+      "split": "training",
+      "n": 904959360018003192361,
+      "factors": [
+        [
+          904959360018003192361,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_70_0",
+      "split": "training",
+      "n": 818951443284193914874259012855187168754321,
+      "factors": [
+        [
+          904959360018003192361,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "prime_70_2",
+      "split": "confirmation",
+      "n": 963101655660960119041,
+      "factors": [
+        [
+          963101655660960119041,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_70_2",
+      "split": "confirmation",
+      "n": 927564799136882594511636504672692890759681,
+      "factors": [
+        [
+          963101655660960119041,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "prime_78_0",
+      "split": "training",
+      "n": 189393816870494899952327,
+      "factors": [
+        [
+          189393816870494899952327,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_78_2",
+      "split": "confirmation",
+      "n": 256587329114339394217573,
+      "factors": [
+        [
+          256587329114339394217573,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prime_81_0",
+      "split": "training",
+      "n": 1248763904140146738111029,
+      "factors": [
+        [
+          1248763904140146738111029,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_81_0",
+      "split": "training",
+      "n": 1559411288283341591652429427197593348359131438841,
+      "factors": [
+        [
+          1248763904140146738111029,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "prime_81_2",
+      "split": "confirmation",
+      "n": 2291746511005344528264889,
+      "factors": [
+        [
+          2291746511005344528264889,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "power_81_2",
+      "split": "confirmation",
+      "n": 5252102070705169729008029063086932197424950182321,
+      "factors": [
+        [
+          2291746511005344528264889,
+          2
+        ]
+      ]
+    }
+  ]
+}

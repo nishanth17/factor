@@ -281,7 +281,17 @@ def _split(state, divisor):
     state["current"] = None
 
 
-def _classify_step(current, config, budget, generator):
+def _classification_bases(n, policy):
+    """Keep legacy random jobs under their original certainty/RNG contract."""
+    if policy == utils.LEGACY_PRIMALITY_POLICY and (
+        n >= utils.WORD_DETERMINISTIC_LIMIT
+    ):
+        return None
+    bases = utils.deterministic_bases(n)
+    return list(bases) if bases is not None else None
+
+
+def _classify_step(current, config, budget, generator, policy):
     """Run at most one primality witness, preserving RNG position on pause."""
     n = current["n"]
     witness_state = current.get("prime_job")
@@ -296,15 +306,7 @@ def _classify_step(current, config, budget, generator):
         if n < 41 * 41:
             return utils.Primality.PROVEN.value
         shifts = ((n - 1) & -(n - 1)).bit_length() - 1
-        deterministic = n < utils.DETERMINISTIC_LIMIT
-        if not deterministic:
-            bases = None
-        elif n < 9_080_191:
-            bases = [31, 73]
-        elif n < 4_759_123_141:
-            bases = [2, 7, 61]
-        else:
-            bases = list(utils.DETERMINISTIC_BASES)
+        bases = _classification_bases(n, policy)
 
         current["prime_job"] = {
             "d": (n - 1) >> shifts,
@@ -338,7 +340,7 @@ def _classify_step(current, config, budget, generator):
 
 
 def _advance(
-    state, config, budget, context, generator, siqs_runtime, programs=None
+    state, config, budget, context, generator, siqs_runtime, programs, policy
 ):
     """Commit one portfolio transition or one resumable candidate action."""
     if state["current"] is None:
@@ -375,7 +377,9 @@ def _advance(
         key = str(n)
         certainty = state["classifications"].get(key)
         if certainty is None:
-            certainty = _classify_step(current, config, budget, generator)
+            certainty = _classify_step(
+                current, config, budget, generator, policy
+            )
             if certainty is None:
                 return
             state["classifications"][key] = certainty
@@ -634,7 +638,7 @@ def _advance(
             current.update(job=None, attempt=current["attempt"] + 1)
 
 
-def _pack(state, config, budget, generator):
+def _pack(state, config, budget, generator, policy):
     """Snapshot RNG, pending work, schedule identity, and resource use."""
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
     configuration = asdict(config)
@@ -651,6 +655,7 @@ def _pack(state, config, budget, generator):
         configuration.pop("ecm_program_bytes")
     payload = {
         "version": version,
+        "primality": policy,
         "schedule": PROGRAM_VERSION
         if config.ecm_program_bytes
         else SCHEDULE_VERSION,
@@ -692,20 +697,13 @@ def _pack(state, config, budget, generator):
     return checkpoint
 
 
-def _verify_progress(current, config):
+def _verify_progress(current, config, policy):
     """Verify retained witnesses and complete prime buffers before reuse."""
     witness = current.get("prime_job")
     if witness:
         n = current["n"]
         expected_shifts = ((n - 1) & -(n - 1)).bit_length() - 1
-        expected_bases = None
-        if n < utils.DETERMINISTIC_LIMIT:
-            if n < 9_080_191:
-                expected_bases = [31, 73]
-            elif n < 4_759_123_141:
-                expected_bases = [2, 7, 61]
-            else:
-                expected_bases = list(utils.DETERMINISTIC_BASES)
+        expected_bases = _classification_bases(n, policy)
 
         rounds = (
             len(expected_bases) if expected_bases else config.primality_rounds
@@ -809,6 +807,13 @@ def _unpack(checkpoint, config):
         ):
             raise ValueError("checkpoint checksum mismatch")
 
+        policy = payload.get("primality", utils.LEGACY_PRIMALITY_POLICY)
+        if policy not in (
+            utils.PRIMALITY_POLICY,
+            utils.LEGACY_PRIMALITY_POLICY,
+        ):
+            raise ValueError("incompatible primality policy")
+
         expected_config = json.loads(_canonical(asdict(config)))
         if not config.ecm_program_bytes and (
             "ecm_program_bytes" not in payload["config"]
@@ -893,7 +898,10 @@ def _unpack(checkpoint, config):
                 )
                 if actual is utils.Primality.COMPOSITE or (
                     classification is utils.Primality.PROVEN
-                    and actual is not utils.Primality.PROVEN
+                    and (
+                        actual is not utils.Primality.PROVEN
+                        or _classification_bases(n, policy) is None
+                    )
                 ):
                     raise ValueError("invalid cached primality evidence")
 
@@ -913,7 +921,10 @@ def _unpack(checkpoint, config):
             )
             if actual is utils.Primality.COMPOSITE or (
                 certainty == utils.Primality.PROVEN.value
-                and actual is not utils.Primality.PROVEN
+                and (
+                    actual is not utils.Primality.PROVEN
+                    or _classification_bases(int(value), policy) is None
+                )
             ):
                 raise ValueError(
                     "checkpoint contains invalid primality evidence"
@@ -970,7 +981,7 @@ def _unpack(checkpoint, config):
                     current["sss_start_work"], "SSS work start", 0
                 )
             else:
-                _verify_progress(current, config)
+                _verify_progress(current, config, policy)
 
         # Validate reconstruction after checking integer exponent bounds.
         _result(state)
@@ -980,6 +991,7 @@ def _unpack(checkpoint, config):
     except (KeyError, TypeError, AttributeError, IndexError) as error:
         raise ValueError("malformed checkpoint") from error
 
+    payload["primality"] = policy
     return payload, generator
 
 
@@ -1033,6 +1045,7 @@ def factorize_bounded(
         if budget.used or budget.prior_wall or budget.prior_cpu:
             raise ValueError("a fresh run requires an unused budget")
         generator = utils.resolve_rng(seed)
+        policy = utils.PRIMALITY_POLICY
         state = {
             "original": n,
             "pending": [[abs(n), 1]] if abs(n) > 1 else [],
@@ -1047,6 +1060,7 @@ def factorize_bounded(
         }
     else:
         payload, generator = _unpack(checkpoint, config)
+        policy = payload["primality"]
         state = payload["state"]
         if state["original"] != n:
             raise ValueError("checkpoint belongs to another input")
@@ -1100,6 +1114,7 @@ def factorize_bounded(
                 generator,
                 siqs_runtime,
                 programs,
+                policy,
             )
             state["stage_seconds"][stage] = (
                 state["stage_seconds"].get(stage, 0)
@@ -1126,7 +1141,7 @@ def factorize_bounded(
             "job"
         ].checkpoint()
 
-    snapshot = _pack(state, config, budget, generator)
+    snapshot = _pack(state, config, budget, generator, policy)
     return PortfolioRun(
         result,
         reason,

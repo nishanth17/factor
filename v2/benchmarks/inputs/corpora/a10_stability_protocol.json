@@ -1,0 +1,11 @@
+{
+  "purpose": "One prespecified follow-up to initial complete-cohort tail spread; no change to frozen null optional-candidate selection",
+  "control_commit": "94caf40e9916d8e923f133fed3d3812403dd3c23",
+  "corpus_sha256": "8e7abdad660af827e21d4d0715e783ee4ca7d03f3c54192873a0395f5f75a79c",
+  "split": "confirmation",
+  "arms": ["control", "accepted"],
+  "warmup_seconds": 8,
+  "samples": 45,
+  "batch_seconds": 0.5,
+  "stability_rule": "Retain every sample; disclose range/median > 0.15 if it persists; no additional parameter sweep"
+}

@@ -1,9 +1,9 @@
 """Exact integer helpers and explicit primality classifications.
 
-The deterministic Miller-Rabin domain is strictly n < 2**64. Larger
-survivors are probable primes, never certified by this module.
-The seven bounded bases are also used by SymPy's primetest implementation:
-https://github.com/sympy/sympy/blob/master/sympy/ntheory/primetest.py
+Fixed-base guarantees have strict upper bounds; see the source comparison
+in benchmarks/README.md. The wider ranges are exhaustive computational
+results of Sorenson and Webster, https://arxiv.org/abs/1509.00864.
+Survivors outside supported ranges remain probable primes.
 """
 
 import random
@@ -15,8 +15,13 @@ from . import arithmetic, constants
 from .arithmetic import gcd, isqrt, pow
 
 SMALL_PRIMES = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
-DETERMINISTIC_LIMIT = 2**64
+WORD_DETERMINISTIC_LIMIT = 2**64
+TWELVE_BASE_LIMIT = 318665857834031151167461
+DETERMINISTIC_LIMIT = 3317044064679887385961981
 DETERMINISTIC_BASES = (2, 325, 9375, 28178, 450775, 9780504, 1795265022)
+THIRTEEN_PRIME_BASES = SMALL_PRIMES + (41,)
+PRIMALITY_POLICY = "mr13-strict-v1"
+LEGACY_PRIMALITY_POLICY = "mr64-strict-v1"
 _USE_PYPY_INVERSE = hasattr(sys, "pypy_version_info")
 _USE_PYPY_SEARCH = _USE_PYPY_INVERSE
 
@@ -199,6 +204,29 @@ def is_prime_bf(n):
     return True
 
 
+def deterministic_bases(n):
+    """Return the supported fixed witnesses, or None outside their domain.
+
+    Callers handle small divisors before running these witnesses.
+    Equality belongs to the next range: the two wider endpoints are known
+    strong pseudoprimes to the preceding set, not certifiable primes.
+    """
+    require_integer(n)
+    if n < 2:
+        return None
+    if n < 9_080_191:
+        return (31, 73)
+    if n < 4_759_123_141:
+        return (2, 7, 61)
+    if n < WORD_DETERMINISTIC_LIMIT:
+        return DETERMINISTIC_BASES
+    if n < TWELVE_BASE_LIMIT:
+        return SMALL_PRIMES
+    if n < DETERMINISTIC_LIMIT:
+        return THIRTEEN_PRIME_BASES
+    return None
+
+
 def _strong_probable_prime(n, base, odd_part, shifts):
     base %= n
     if base in (0, 1):
@@ -243,17 +271,9 @@ def classify_prime(
     odd_part = n - 1
     shifts = (odd_part & -odd_part).bit_length() - 1
     odd_part >>= shifts
-    deterministic = not use_probabilistic and n < DETERMINISTIC_LIMIT
-    if deterministic:
-        # Strict smaller domains need fewer witnesses, with no loss of proof.
-        # These bounded sets are documented in SymPy's primetest source.
-        if n < 9_080_191:
-            bases = (31, 73)
-        elif n < 4_759_123_141:
-            bases = (2, 7, 61)
-        else:
-            bases = DETERMINISTIC_BASES
-    else:
+    bases = None if use_probabilistic else deterministic_bases(n)
+    deterministic = bases is not None
+    if not deterministic:
         generator = rng if rng is not None else random.SystemRandom()
         bases = (generator.randint(2, n - 2) for _ in range(tolerance))
 
@@ -289,5 +309,5 @@ def is_prime(
     *,
     rng=None,
 ):
-    """Return a bool; True above 2**64 means only probable prime."""
+    """Return a bool; classify_prime distinguishes proof from probability."""
     return is_prime_fast(n, use_probabilistic, tolerance, rng=rng)
