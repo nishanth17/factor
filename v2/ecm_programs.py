@@ -7,6 +7,7 @@ from struct import iter_unpack, pack
 from . import utils
 
 PROGRAM_VERSION = "ecm-packed-blocks-v1"
+PAIRED_VERSION = "ecm-packed-pairs-v1"
 WORD_LIMIT = 2**64
 
 
@@ -54,6 +55,55 @@ class ECMPrograms:
         self.hits = 0
         self.misses = 0
         self.unretained = 0
+        self.coverage_blocks = {}
+        self.coverage_hits = 0
+        self.coverage_misses = 0
+
+    def coverage(self, cursor, *, b1, b2, distance, budget):
+        """Reuse integer certificates; decoded records belong to one curve.
+
+        The caller reserves coverage construction and decoded workspace in
+        addition to this store's cap. Checkpoints retain the current decoded
+        block, so resuming never needs to regenerate a consumed prefix.
+        """
+        if (
+            cursor["next"] - cursor["left"] > 2 * self.segment_size
+            or len(cursor["values"]) > self.segment_size
+        ):
+            raise ValueError("paired coverage exceeds one prime segment")
+        key = (cursor["left"], cursor["next"], b1, b2, distance)
+        coverage = self.coverage_blocks.get(key)
+        if coverage is None:
+            values = cursor["values"]
+            budget.consume(len(values))
+            block = ProgramBlock(
+                key[0],
+                key[1],
+                None,
+                b"".join(pack("<Q", prime) for prime in values),
+                b"",
+            )
+            coverage = pair_coverage(
+                block,
+                b1=b1,
+                b2=b2,
+                distance=distance,
+                memory_bytes=4096 + 512 * len(values),
+                budget=budget,
+            )
+            # Reserve decoding before publishing anything to the store.
+            budget.consume(len(coverage.data) // 32)
+            reserve = 512 + len(coverage.data)
+            if self.used_bytes + reserve <= self.memory_bytes:
+                self.coverage_blocks[key] = coverage
+                self.used_bytes += reserve
+            else:
+                self.unretained += 1
+            self.coverage_misses += 1
+        else:
+            budget.consume(len(coverage.data) // 32)
+            self.coverage_hits += 1
+        return [list(record) for record in coverage.records()]
 
     def program_segment(self, lo, hi, budget, *, bound=None):
         """Return a complete block, never publishing an exhausted prefix."""
@@ -127,7 +177,7 @@ class CoverageBlock:
 
     A zero distance denotes direct scalar evaluation of the recorded prime.
     Nonzero records certify one or two eligible primes, independent of points.
-    Production execution remains the unpaired continuation until B2 acceptance.
+    These certificates are also consumed by the opt-in paired executor.
     """
 
     lo: int

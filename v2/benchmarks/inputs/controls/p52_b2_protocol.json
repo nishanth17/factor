@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "revision": "94caf40e9916d8e923f133fed3d3812403dd3c23",
+  "controls_sha256": "4f2a8b838c48985c487d72ef60e938483af3240359415118c3f741dae6311ae8",
+  "corpus_sha256": "18eb2d94b4d33e6b08b225ef4f03460890676fd8fef932cd70a5d0d6e733639d",
+  "backend": "python-int",
+  "seeds": [
+    7,
+    19,
+    41
+  ],
+  "memory_bytes": 16777216,
+  "max_input_bits": 329,
+  "segment_size": 1024,
+  "program_bytes": 8388608,
+  "work_limit": 50000000,
+  "seconds": 120,
+  "cpu_seconds": 120,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      31
+    ],
+    [
+      8,
+      63
+    ]
+  ],
+  "relative_iqr_limit": 0.15,
+  "cases": {
+    "small": {
+      "tier": [
+        50,
+        2000,
+        8
+      ],
+      "distances": [
+        8,
+        16,
+        24
+      ]
+    },
+    "medium": {
+      "tier": [
+        200,
+        20000,
+        16
+      ],
+      "distances": [
+        32,
+        64,
+        96
+      ]
+    },
+    "uneven": {
+      "tier": [
+        2000,
+        147396,
+        8
+      ],
+      "distances": [
+        128,
+        384,
+        768
+      ]
+    },
+    "campaign": {
+      "tier": [
+        11000,
+        1900000,
+        4
+      ],
+      "distances": [
+        512,
+        1024,
+        2048
+      ]
+    },
+    "structured": {
+      "tier": [
+        50,
+        2000,
+        8
+      ],
+      "distances": [
+        8,
+        16,
+        24
+      ]
+    }
+  },
+  "training_arms": [
+    "streamed",
+    "programs",
+    "paired_0",
+    "paired_1",
+    "paired_2",
+    "regenerated"
+  ],
+  "selection": "Fastest stable paired D per bound tier, with no training completion regression; ties choose smaller D. Structured uses small's selection. Regeneration is diagnostic only.",
+  "promotion": "Fresh held-out complete factoring only: zero correctness failures, same limits, >=10% median reduction with a 95% bootstrap interval above zero or >=10 percentage points completion improvement with interval above zero; no other declared class loses >5 completion points. Unstable or inconclusive results retain defaults. Fixed nonsplitting campaigns cannot promote factoring defaults.",
+  "uncertainty": "Timing bootstrap over repeated fixed-cohort samples; completion uncertainty clustered by fresh fixture, with all algorithm seeds kept together. Limited populations must be reported; no factor-size allocation claim.",
+  "timing_scope": "Config, setup, context, programs, tables, products, recovery, recursion and checkpoint serialization included. Cold starts, profiles and work/throughput diagnostics are separate from whole factoring evidence.",
+  "machine_lock": "/private/tmp/factor-performance.lock",
+  "status": "Prepared; performance execution requires user go-ahead."
+}

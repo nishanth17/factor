@@ -935,6 +935,92 @@ GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
 
+## P5.2-B2 paired continuation — prepared 9 October 2026
+
+Implementation is opt-in; performance evidence and B2 acceptance remain open.
+The user requested a stop before performance tests. No timings, D selection or
+speedup are claimed here. Final checks pass 367 system-PyPy tests (two optional
+skips), 370 PyPy/GMP tests without skips and full `make -C v2 lint`.
+Native integers, streamed execution, the ladder and production
+parameters remain defaults. Required inputs are versioned; raw evidence stays
+in ignored `results/` directories.
+
+`p52_b2.py` compares immutable committed-mainline (`94caf40`) streamed and
+reusable-program controls with three paired D choices and a regeneration-only
+control. The private snapshot `inputs/baselines/p52_b2_mainline.json` freezes
+all active ECM arithmetic, schedules, budgets and portfolio dependencies.
+The older A3 snapshots are unchanged. Inactive QS types provide annotations
+only; these runs cannot dispatch to SIQS/SSS. Both control and corpus hashes are
+pinned in `inputs/controls/p52_b2_protocol.json`.
+
+`inputs/corpora/p52_b2_corpus.json` supplies independent Pocklington/trial
+certificates, generation seed 2026100952, disjoint training/held-out inputs and
+algorithm seeds 7/19/41. Three inputs per small, medium and uneven cohort and
+one fixed balanced campaign/structured input per split form a deliberately
+bounded study. Repeated timing samples are not new independent inputs.
+
+| Case | B1 / B2 / curves | Candidate D | Scope |
+| --- | --- | --- | --- |
+| Small balanced | 50 / 2,000 / 8 | 8, 16, 24 | Whole factoring |
+| Medium balanced | 200 / 20,000 / 16 | 32, 64, 96 | Whole factoring |
+| Uneven, 34-bit smaller prime | 2,000 / 147,396 / 8 | 128, 384, 768 | Whole factoring |
+| Balanced 266-bit campaign | 11,000 / 1,900,000 / 4 | 512, 1,024, 2,048 | Finite campaign; not a success-rate claim |
+| Prime-cube structure | 50 / 2,000 / 8 | Small-cohort choice | Whole factoring regression control |
+
+Every row grants 50,000,000 work units and 120-second wall/CPU caps per input
+and seed, a 329-bit envelope and 16 MiB owned workspace. Retained programs use
+8 MiB. The paired dense table has D/2 points plus its recurrence state; its
+coexisting certificates, products, recovery and checkpoint storage are reserved.
+Wall/CPU censoring prevents an accepted timing claim. Partial results still
+reconstruct and are validated against the certified factors.
+
+Each arm receives at least three seconds of validated warmup and nine samples
+on PyPy implementing Python 3.11. Relative IQR above 0.15 or changed deterministic
+outcomes triggers 5 seconds/31 samples and then 8 seconds/63 samples; unresolved
+instability stays inconclusive. Training chooses the fastest stable D without
+a completion regression against either control, per bound tier; the structured
+control inherits the small tier. The saved training output freezes that choice
+before held-out execution and rejects subsequent source changes. The unchanged
+roadmap promotion gate applies to fresh whole factoring; finite nonsplitting
+campaign savings cannot promote defaults. Timing intervals are conditional on
+the fixed cohort, and completion intervals cluster algorithm seeds by fixture.
+This small study cannot calibrate population-wide factor-size allocation.
+
+Costs include config, classification, setup, schedule/table construction,
+products, recovery, recursion and final checkpoint serialization. Optional cold
+rows use nine separate starts and are stored apart. Instrumented profiling,
+work/phase counters and stage throughput must be reported separately. RSS
+includes interpreter/JIT/warmup; it is not the owned-workspace cap.
+
+After user approval, coordinate B1/A10 and acquire the machine-wide exclusive
+flock at `/private/tmp/factor-performance.lock`; the runner also checks for
+competing benchmark/test interpreters and fails closed if inventory is denied.
+It never kills unrelated work. Output paths refuse overwrites and preserve
+unstable attempts as well as accepted captures.
+
+```sh
+mkdir -p v2/benchmarks/results/p52-b2
+pypy3 -B -m v2.benchmarks.p52_b2 --phase training --diagnostics --output v2/benchmarks/results/p52-b2/training.json
+pypy3 -B -m v2.benchmarks.p52_b2 --phase held_out --selection v2/benchmarks/results/p52-b2/training.json --cold --output v2/benchmarks/results/p52-b2/held-out.json
+```
+
+The optional diagnostic rows instrument at most three direct curves per arm
+and cohort using seeds 7/8/9. They report setup/table/giant/recovery actions,
+term products, work, peak baby-table slots and retained program storage without
+time ratios. These standalone curve counts are separate from the whole
+factoring cohort's seeds and recursive dispatch. They cannot establish a gain.
+
+The design retains Montgomery's x-coordinate symmetry and projective cross
+differences ([1987 paper](https://wstein.org/edu/124/misc/montgomery.pdf)).
+GMP-ECM's [stage-two implementation](https://github.com/sethtroisi/gmp-ecm/blob/main/stage2.c)
+illustrates separate memory/cost modeling and polynomial continuations; its
+native thresholds and advanced pruning are not imported into this PyPy tranche.
+Its [library contract](https://github.com/sethtroisi/gmp-ecm/blob/main/README.lib)
+and [stage-one code](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
+explicitly account for higher powers of old primes when B1 increases. A6 has
+not supplied that exact schedule-ratio contract here, so increased-B1 extensions
+are deferred. No external code was copied into the implementation.
+
 ## P5.2-A3 reusable programs and campaign feasibility — 5 October 2026
 
 The bounded A3 tranche adds opt-in immutable packed prime/power blocks, a

@@ -2140,6 +2140,20 @@ execution tables above for dependencies, priority and model/effort rationale.
 
 ### P5.2 — Pair ECM stage-2 primes and tune table size
 
+**B2 implementation prepared — 9 October 2026; experiment gates remain open.**
+The isolated B2 work adds opt-in execution of the accepted +/- certificates,
+bounded curve-private tables, saturated-pair scalar recovery and version-7
+int/GMP checkpoints. Predeclared finite campaigns resume with cumulative
+allowances. Controls from committed A2/A3 mainline `94caf40`, independent fresh
+training/held-out corpora and a D/table protocol are frozen in versioned inputs.
+The user requested a stop before performance testing, so no B2 timing,
+selection, promotion or completed B2 gate is claimed. Python integers and all
+production defaults remain unchanged. A6's exact increased-B1 schedule-ratio
+contract is absent; those extensions are explicitly deferred. Changing an
+exhausted checkpoint's curves/bounds, advanced wheel/common-Z, production PRAC,
+kernel changes and allocation remain separate. See the prepared protocol in
+`benchmarks/README.md` and scoped development record in `v2/CHANGELOG.md`.
+
 **A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
 immutable packed prime/power blocks under an explicit run-local cap. Generation,
 power compilation and reads are charged; blocks that do not fit regenerate.

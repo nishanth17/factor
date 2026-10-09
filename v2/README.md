@@ -316,15 +316,47 @@ success guarantee. Extend a paused campaign by increasing **total** allowances
 under the identical configuration; completed curves and their RNG progress are
 credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
 checkpoint, or extending B1 on the same curve, remains unsupported pending
-B2/A6: increasing B1 needs missing powers of old primes as well as new primes.
+A6 and a separate migration contract: increasing B1 needs missing powers of
+old primes as well as new primes. B2 supports continuation of the predeclared
+finite campaign under cumulative work/wall/CPU allowances, including pauses
+inside table construction, a paired block or scalar recovery. It does not
+reinterpret an exhausted campaign as a new allowance of curves.
 
 `v2.ecm_programs.pair_coverage()` supplies bounded immutable +/- coverage
-certificates for the later B2 implementation. It includes direct-scalar
+certificates consumed by the opt-in B2 executor. It includes direct-scalar
 exceptions, positive recurrence initialization and block tails. This bounded
 compiler currently accepts D=0 (direct scalars), or even D>=2 with
-`2*D < B1` for odd B1 and `2*D < B1-1` for even B1. Production
-stage two still executes the existing unpaired terms; D tuning, paired recovery,
-wheel pruning and common-Z tables retain their roadmap gates.
+`2*D < B1` for odd B1 and `2*D < B1-1` for even B1.
+
+Set `ecm_pair_distance=D` together with a nonzero `ecm_program_bytes` to
+execute those programs. `None` (default) preserves unpaired execution;
+`0` is an explicit direct-scalar control. For example, add
+`ecm_pair_distance=1024` to the 11,000/1,900,000 campaign above. This is a
+caller-selected experimental setting, not a measured recommendation.
+The dense curve-private table holds even multiples through D, with a separate
+2D recurrence step. Each certified pair contributes one cross-product;
+singletons, block boundaries and inclusive tails remain covered. A saturated
+product replays individual terms, then both certified primes for any saturated
+term. A saturation never counts as a proper divisor.
+
+Coverage records share the program retention cap and regenerate when it fills.
+The additional conservative workspace reservation is
+`8192 + 2048 * (segment_size + gcd_batch + 1)` bytes, alongside point tables,
+the whole program cap, product/replay state and serialized output. Compilation
+charges prime packing, certificate construction and record decoding; cached
+reads charge decoding. Table additions/doublings and giant advances reserve
+two units each; paired term/product actions reserve two units per term. Direct
+scalars and recovery reserve their bit-length cost plus GCD/product cost.
+These are algorithmic accounting units, not measured bigint operation counts.
+
+Paired checkpoints use version 7 with `ecm-packed-pairs-v1`, exact D/config
+and backend/build identity. They retain the active decoded coverage block,
+curve-private table, products and recovery position. Resume verifies the prime
+buffer and coverage certificates, record/table bounds and product consistency;
+future missing programs rebuild under the cumulative allowance. Arithmetic
+state is protected by the checksum, as for stage one. Old unpaired native and
+GMP checkpoint formats remain unchanged. Performance promotion, wheel pruning,
+common-Z, PRAC routing and allocation remain separate roadmap gates.
 
 ## Checkpoints and limits
 

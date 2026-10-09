@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass, field
 from . import arithmetic, constants, prime_sieve, utils
 from .arithmetic import isqrt
 from .budget import Budget, BudgetExhaustedError
-from .ecm_programs import PROGRAM_VERSION, ECMPrograms
+from .ecm_programs import PAIRED_VERSION, PROGRAM_VERSION, ECMPrograms
 from .factor import FactorizationResult, PrimeFactor
 from .preprocessing import (
     fermat_step,
@@ -29,7 +29,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 6
+CHECKPOINT_VERSION = 7
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -66,6 +66,7 @@ class PortfolioConfig:
     siqs: SIQSConfig | None = None
     sss: SSSConfig | None = None
     ecm_program_bytes: int = 0
+    ecm_pair_distance: int | None = None
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -128,6 +129,25 @@ class PortfolioConfig:
             if any(b2 >= 2**64 for _, b2, curves in tiers if curves):
                 raise ValueError("ECM programs require B2 below 2**64")
 
+        if self.ecm_pair_distance is not None:
+            distance = utils.require_integer(
+                self.ecm_pair_distance, "ecm_pair_distance", 0
+            )
+            if not self.ecm_program_bytes:
+                raise ValueError("paired ECM requires a reusable program cap")
+            if distance and (distance < 2 or distance % 2):
+                raise ValueError("paired D must be zero or positive and even")
+            if distance and any(
+                2 * distance >= b1 - (b1 % 2 == 0)
+                for b1, _, curves in tiers
+                if curves
+            ):
+                raise ValueError("paired D requires positive initialization")
+            if any(
+                b2 + distance >= 2**64 for _, b2, curves in tiers if curves
+            ):
+                raise ValueError("paired centers must fit packed words")
+
         object.__setattr__(self, "ecm_tiers", tiers)
         if self.siqs is not None and self.sss is not None:
             raise ValueError("choose one relation fallback: siqs or sss")
@@ -184,6 +204,14 @@ class PortfolioConfig:
             ),
             default=0,
         )
+        paired_reserve = 0
+        if self.ecm_pair_distance is not None:
+            distance = self.ecm_pair_distance // 2 + 3
+            # Construction dict/sort/packing, decoded certificates, retained
+            # replay records and their JSON copies coexist with point tables.
+            paired_reserve = 8192 + 2048 * (
+                self.segment_size + self.gcd_batch + 1
+            )
         return (
             16_384
             + 8 * coordinate_bytes * (distance + self.gcd_batch)
@@ -193,6 +221,7 @@ class PortfolioConfig:
             + 256 * self.chunk_size
             + self.schedule_cache_bytes
             + self.ecm_program_bytes
+            + paired_reserve
         )
 
 
@@ -638,8 +667,8 @@ def _pack(state, config, budget, generator):
     """Snapshot RNG, pending work, schedule identity, and resource use."""
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
     configuration = asdict(config)
-    version = CHECKPOINT_VERSION
-    if config.backend == "python-int":
+    version = 6
+    if config.backend == "python-int" and config.ecm_pair_distance is None:
         # Preserve mainline's native schemas. Version 5 was independently
         # used by P4.3 and P5.2; version 6 combines GMP and program identity.
         version = 5 if config.ecm_program_bytes else 4
@@ -649,9 +678,15 @@ def _pack(state, config, budget, generator):
                 configuration[name].pop("backend")
     if not config.ecm_program_bytes:
         configuration.pop("ecm_program_bytes")
+    if config.ecm_pair_distance is None:
+        configuration.pop("ecm_pair_distance")
+    else:
+        version = CHECKPOINT_VERSION
     payload = {
         "version": version,
-        "schedule": PROGRAM_VERSION
+        "schedule": PAIRED_VERSION
+        if config.ecm_pair_distance is not None
+        else PROGRAM_VERSION
         if config.ecm_program_bytes
         else SCHEDULE_VERSION,
         "backend": arithmetic.get_backend(config.backend).identity,
@@ -779,6 +814,15 @@ def _verify_progress(current, config):
         if expected != cursor["values"]:
             raise ValueError("corrupt buffered prime values")
 
+    if (
+        current["job"]
+        and current["job"]["kind"] == "ecm"
+        and config.ecm_pair_distance is not None
+    ):
+        from .ecm_paired import verify_progress
+
+        verify_progress(current["job"], config, verifier)
+
 
 def _unpack(checkpoint, config):
     """Reject corrupt, incompatible, oversized, or inconsistent snapshots."""
@@ -810,6 +854,8 @@ def _unpack(checkpoint, config):
             raise ValueError("checkpoint checksum mismatch")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if config.ecm_pair_distance is None:
+            expected_config.pop("ecm_pair_distance")
         if not config.ecm_program_bytes and (
             "ecm_program_bytes" not in payload["config"]
         ):
@@ -830,7 +876,10 @@ def _unpack(checkpoint, config):
 
         if (
             type(payload["version"]) is not int
-            or payload["version"] not in (2, 3, 4, 5, CHECKPOINT_VERSION)
+            or payload["version"] not in (2, 3, 4, 5, 6, CHECKPOINT_VERSION)
+            or (
+                payload["version"] < 7 and config.ecm_pair_distance is not None
+            )
             or (payload["version"] in (2, 3) and not legacy)
             or (payload["version"] < 5 and config.ecm_program_bytes != 0)
             or (payload["version"] < 5 and config.backend != "python-int")
@@ -841,7 +890,9 @@ def _unpack(checkpoint, config):
             )
             or payload["schedule"]
             != (
-                PROGRAM_VERSION
+                PAIRED_VERSION
+                if config.ecm_pair_distance is not None
+                else PROGRAM_VERSION
                 if config.ecm_program_bytes
                 else SCHEDULE_VERSION
             )
