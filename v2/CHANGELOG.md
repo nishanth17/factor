@@ -2,26 +2,23 @@
 
 ## 9 October 2026 — QS snapshot ownership test
 
-- Harden the snapshot-release regression test with three bounded GC passes,
-  following the installed Python 3.11 test-support cleanup convention.
-  [PyPy documents](https://doc.pypy.org/cpython_differences.html) cases where
-  several collections are needed before weak references clear.
-- Add a deliberately retained-snapshot control that must still raise, and
-  verify reconstruction of the normal unresolved prime fixture. Keep the
-  assertion at the next collection boundary.
-- Preserve production QS/SIQS code, arithmetic, budgets, checkpoints and
-  defaults. The original intermittent A10 full-suite failure is retained
-  locally; its exact transient cause remains unconfirmed. One hundred
-  unchanged-case runs across default, disabled and accelerated JIT settings
-  and forty observed jobs did not reproduce it. The three-pass variant passed
-  forty accelerated runs and rejected all five in-memory retention controls.
-  This is test hardening, not evidence of a repaired factoring leak or a
-  performance improvement.
-- Four further original A10 GMP suites (three default JIT and one accelerated)
-  and a corrected failure-observer suite pass all 372 tests without recurrence.
-  The repair passes all 358 PyPy/GMP tests, both 20-test pipeline suites with
-  accelerated/disabled JIT, and full lint. The earlier observer-driver timeout
-  is excluded from acceptance and retained locally.
+- Isolate the snapshot-release ownership assertion in a finite PyPy child
+  with JIT disabled. Preserve JIT settings in the parent suite and normal
+  production execution. Keep the deliberate retained-snapshot control and
+  reconstruction of the unresolved prime fixture.
+- Reproduce the original one-GC assertion on job 12 in three fresh processes
+  using `--jit trace_eagerness=1`. A local heap capture identifies a compiled
+  `JITFRAME` and the active tracer's `History → RefFrontendOp` as snapshot
+  owners after Python's `del result`; three extra collections cannot release
+  these live roots. No Python frame local owns the snapshot. This corrects
+  the earlier assumption that more collections would suffice.
+- With JIT disabled, all 120 original jobs pass; an in-memory control omitting
+  `del result` fails immediately. The historical A10 failure has no heap
+  capture, so its exact bridge/guard identity cannot be recovered. Raw
+  reproduction logs and the heap remain in ignored local results.
+- Production QS/SIQS code, arithmetic, budgets, checkpoints and defaults are
+  unchanged. This fixes a test's ownership inference; it makes no factoring
+  performance claim or roadmap promotion.
 
 Run `make -C v2 test`, `make -C v2 lint`, or the focused regression with
 `pypy3 -m unittest v2.tests.test_qs_pipeline.PipelineTests.test_batch_snapshots_released_before_more_collection`.

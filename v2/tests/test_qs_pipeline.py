@@ -2,6 +2,8 @@
 
 import gc
 import random
+import subprocess
+import sys
 import unittest
 import weakref
 from dataclasses import replace
@@ -388,6 +390,28 @@ class PipelineTests(unittest.TestCase):
 
     def test_batch_snapshots_released_before_more_collection(self):
         """Collection cannot pin previous snapshots outside its reservation."""
+        # A live JIT bridge can retain deleted values in JITFRAME/History
+        # roots across any number of collections. Isolate Python ownership
+        # with JIT off; do not change the parent suite's JIT configuration.
+        command = (
+            "from v2.tests.test_qs_pipeline import PipelineTests; "
+            "case = PipelineTests("
+            "'test_batch_snapshots_released_before_more_collection'); "
+            "case._check_batch_snapshot_ownership()"
+        )
+        process = subprocess.run(
+            [sys.executable, "--jit", "off", "-B", "-c", command],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+
+        self.assertEqual(
+            process.returncode, 0, process.stdout + process.stderr
+        )
+
+    def _check_batch_snapshot_ownership(self):
+        """Check release and deliberate retention without JIT roots."""
 
         class ObservedCollector(SieveCollector):
             """Check lifetime independently with weak references."""
@@ -396,11 +420,8 @@ class PipelineTests(unittest.TestCase):
 
             def collect(self, lo, hi):
                 """Require release before allocating the next batch."""
-                # Match Python's test.support.gc_collect: tracing GC can
-                # require several passes before a dead weakref clears.
-                # A retained application snapshot survives every pass.
-                for _ in range(3):
-                    gc.collect()
+                # The child uses tracing GC but has no active JIT roots.
+                gc.collect()
                 if self.previous is not None and self.previous() is not None:
                     raise AssertionError("prior collection snapshot is pinned")
                 result = super().collect(lo, hi)
