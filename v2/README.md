@@ -66,6 +66,23 @@ B3 owns program composition, shared work accounting, checkpoint/replay
 integration and complete-factorization comparisons. The standalone PRAC
 helper has no portfolio budget or checkpoint contract.
 
+C6 adds reusable experimental machinery in `benchmarks.c6_chains`:
+`compact(Chain)` produces an immutable four-byte register record;
+`verify(Record)` independently proves its integer action, and
+`Executor(record, backend)` verifies once before repeated point execution.
+`build_program(B1, method, backend)` supports B1 <= 2,000 with checked PRAC,
+compact PRAC, precomputed Lucas and rolling Lucas layouts. The catalog uses
+303 independently verified prime records from a pinned GMP-ECM generator.
+`ThreePointExecutor` accepts only recognized continued-fraction records.
+These experiment APIs require the same nonsingular Montgomery curve, odd
+modulus and `(A+2)/4` convention as `multiply_prac`. Results are valid X:Z
+pairs or `NonunitPointError`; callers retain proper factors and handle retry.
+Records have at most 512 steps and 16 retained point slots; programs own at
+most 512 records, with no global point cache. See the [C6 study](
+benchmarks/c6_research.md) for recovery, storage and reproducibility details.
+No C6 candidate is routed into production stage jobs or checkpoint formats;
+that remains B3's decision after complete-run evidence.
+
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
 validated checkpoints. Later work adds exact relation provenance, shared SIQS

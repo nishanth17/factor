@@ -20,7 +20,10 @@ asks whether precomputation and compact execution change that decision.
 The paper's compressed CF state is `(a,b,c)`, initially `(1,2,3)` with
 `c=a+b`. Each bit keeps either `a` or `b`, retains `c`, and computes its
 sum with the retained entry using the other entry as known difference.
-This allows three persistent points. General Lucas chains need not have
+This allows three persistent points. The dispatch diagnostic admits only
+upstream records with the same additions and initial doubling; a matching
+integer sequence containing extra doublings is excluded. General Lucas
+chains need not have
 that shape; the GMP-ECM ring supports older differences and extra doublings.
 PRAC can also use subtraction, so its record verifier checks both permitted
 sum/difference directions. ECM x-coordinate chains are not a drop-in

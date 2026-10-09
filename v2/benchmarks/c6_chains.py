@@ -314,6 +314,11 @@ def continued_fraction_bits(chain):
     values = [1]
     for left, right, difference in chain.instructions:
         if difference == -1:
+            # Algorithm 1 has only its initial doubling. The same integer
+            # sequence can also use extra doublings; exclude those records
+            # so this diagnostic changes dispatch, not arithmetic cost.
+            if len(values) != 1:
+                return None
             values.append(2 * values[left])
         elif values[difference] == abs(values[left] - values[right]):
             values.append(values[left] + values[right])

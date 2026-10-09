@@ -80,6 +80,9 @@ class CompactTests(unittest.TestCase):
                 result = action(point, 101, 2)
                 self.assertNotEqual(result, (0, 0))
         self.assertGreater(count, 0)
+        # 1,2,3,4,7 is a CF value sequence, but upstream doubles 2 to
+        # obtain 4. Do not mistake replacing that doubling for dispatch.
+        self.assertIsNone(chains.continued_fraction_bits(self.catalog[7]))
 
     def test_all_records_independent_affine(self):
         for modulus, curve_a, point in historical_points():

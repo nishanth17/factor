@@ -20,7 +20,7 @@
     "v2/ecm_wheel.py": "fcda5a07b5152b5d963a1b15b73302ccef7ce13101593a924b6db8fdd0607a00",
     "v2/schedules.py": "5e8f3bef39cfda8a6f26424689f4f45894576bb2f829f8762a5ab57732073dbe",
     "v2/pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
-    "v2/benchmarks/c6_chains.py": "aaaa6a28c96b32dcbad6c9427dd6f8c11aa38220cb830e48ec3f16b99c75fa4e",
+    "v2/benchmarks/c6_chains.py": "e6b5fe382ad9f8a4b41cf29723107245f7339646b862a8300b8e1bafee9c5ace",
     "v2/benchmarks/c6_costs.py": "d5a8f4050ed9e1184d912052b5836cb29e344172e39ace134e5bba314c0ff0e5",
     "v2/benchmarks/c6_study.py": "027b6a78ee1e07a15cc0c34c4859d1a403792f0261369eee9f94de36d6ee74d6",
     "v2/benchmarks/build_c6_inputs.py": "40eab775c4e44cabc9566c7a23fdb548e0953042b6989c499467424201357963",
