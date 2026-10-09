@@ -22,6 +22,7 @@ PROTOCOL = Path(__file__).parent / "inputs/corpora/a6_pm1_confirm_protocol.json"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--samples", type=int, choices=(27, 63), default=27)
     args = parser.parse_args()
     require_runtime()
     records = []
@@ -36,7 +37,7 @@ def main():
                     )
                     for chunk in (16, 64)
                 }
-                measurements = _measure_arms(functions, samples=27)
+                measurements = _measure_arms(functions, samples=args.samples)
                 for arm, function in functions.items():
                     outcome = function()
                     if outcome["factor"] is not None:
