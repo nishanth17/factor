@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "revision": "a670c4dea9677f57c0638aa87a09d16922db4af6",
+  "controls_sha256": "59b44b7c13ca8be758f062337a76c37b2fcecddce7da0b23bf9a4389a38b054f",
+  "corpus_sha256": "b876defa8ad640219bdeb8d97f8d66a581fa3c110d1fc683309d80a576c9e0ab",
+  "accepted_controls_sha256": "4f2a8b838c48985c487d72ef60e938483af3240359415118c3f741dae6311ae8",
+  "backend": "python-int",
+  "seeds": [
+    7,
+    19,
+    41
+  ],
+  "memory_bytes": 16777216,
+  "max_input_bits": 329,
+  "segment_size": 1024,
+  "program_bytes": 8388608,
+  "work_limit": 50000000,
+  "seconds": 120,
+  "cpu_seconds": 120,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      31
+    ],
+    [
+      8,
+      63
+    ]
+  ],
+  "relative_iqr_limit": 0.15,
+  "cases": {
+    "small": {
+      "tier": [
+        50,
+        2000,
+        8
+      ],
+      "wheels": [
+        6,
+        30,
+        210
+      ],
+      "legacy_distance": 24
+    },
+    "medium": {
+      "tier": [
+        200,
+        20000,
+        16
+      ],
+      "wheels": [
+        30,
+        210,
+        420
+      ],
+      "legacy_distance": 64
+    },
+    "uneven": {
+      "tier": [
+        2000,
+        147396,
+        8
+      ],
+      "wheels": [
+        210,
+        420,
+        840
+      ],
+      "legacy_distance": 768
+    },
+    "campaign": {
+      "tier": [
+        11000,
+        1900000,
+        4
+      ],
+      "wheels": [
+        210,
+        840,
+        1890
+      ],
+      "legacy_distance": 2048
+    },
+    "structured": {
+      "tier": [
+        50,
+        2000,
+        8
+      ],
+      "wheels": [
+        6,
+        30,
+        210
+      ],
+      "legacy_distance": 24
+    }
+  },
+  "training_arms": [
+    "streamed",
+    "programs",
+    "legacy",
+    "paired_0",
+    "paired_1",
+    "paired_2",
+    "regenerated"
+  ],
+  "scope": "Aligned complete wheel cells and coprime baby tables only; no relocation, extended distance sets, graph matching or common-Z.",
+  "selection": "Fastest stable wheel per bound tier, with no training completion regression; ties choose smaller wheel. Structured uses small's selection. Regeneration is diagnostic only.",
+  "promotion": "Fresh held-out complete factoring only: zero correctness failures, same limits, >=10% median reduction with a 95% bootstrap interval above zero or >=10 percentage points completion improvement with interval above zero; no other declared class loses >5 completion points. Unstable or inconclusive results retain defaults. Fixed nonsplitting campaigns cannot promote factoring defaults.",
+  "uncertainty": "Timing bootstrap over repeated fixed-cohort samples; completion uncertainty clustered by fresh fixture, with all algorithm seeds kept together. Limited populations must be reported; no factor-size allocation claim.",
+  "timing_scope": "Config, setup, context, programs, tables, products, recovery, recursion and checkpoint serialization included. Cold starts, profiles and work/throughput diagnostics are separate from whole factoring evidence.",
+  "machine_lock": "/private/tmp/factor-performance.lock",
+  "status": "Frozen before comparisons; acquire coordinated CPU window."
+}

@@ -357,6 +357,103 @@ class A10Tests(unittest.TestCase):
         )
         self.assertFalse(resumed.result.proven)
 
+    def test_primality_policies_compose_with_paired_checkpoint_schemas(self):
+        for backend in ("python-int", "gmpy2-mpz"):
+            if backend == "gmpy2-mpz":
+                try:
+                    arithmetic.get_backend(backend)
+                except arithmetic.BackendUnavailableError:
+                    continue
+            old_cfg = config(
+                self.control.portfolio,
+                backend=backend,
+                ecm_program_bytes=65536,
+            )
+            old_whole = self.control.portfolio.factorize_bounded(
+                REPORTED_PRIME,
+                seed=7,
+                config=old_cfg,
+                budget=self.control.budget.Budget(
+                    work_limit=1000000, seconds=None, cpu_seconds=None
+                ),
+            )
+            old_paused = self.control.portfolio.factorize_bounded(
+                REPORTED_PRIME,
+                seed=7,
+                config=old_cfg,
+                budget=self.control.budget.Budget(
+                    work_limit=200, seconds=None, cpu_seconds=None
+                ),
+            )
+            for version, pairing in (
+                (7, {"ecm_pair_distance": 0}),
+                (8, {"ecm_pair_wheel": 6}),
+            ):
+                with self.subTest(backend=backend, version=version):
+                    cfg = config(
+                        backend=backend, ecm_program_bytes=65536, **pairing
+                    )
+                    whole = portfolio.factorize_bounded(
+                        REPORTED_PRIME,
+                        seed=7,
+                        config=cfg,
+                        budget=allowance(),
+                    )
+                    paused = portfolio.factorize_bounded(
+                        REPORTED_PRIME,
+                        seed=7,
+                        config=cfg,
+                        budget=allowance(200),
+                    )
+                    metadata = paused.checkpoint["payload"]
+                    self.assertEqual(metadata["version"], version)
+                    self.assertEqual(metadata["primality"], "mr13-strict-v1")
+                    resumed = portfolio.factorize_bounded(
+                        REPORTED_PRIME,
+                        config=cfg,
+                        budget=allowance(),
+                        checkpoint=paused.checkpoint,
+                    )
+                    self.assertTrue(resumed.result.proven)
+                    self.assertEqual(
+                        (resumed.result, resumed.work_used),
+                        (whole.result, whole.work_used),
+                    )
+
+                    # No ECM job exists: transplant the independently frozen
+                    # random-witness state into B2's configuration envelope.
+                    legacy = copy.deepcopy(old_paused.checkpoint)
+                    for name in ("version", "schedule", "config"):
+                        legacy["payload"][name] = copy.deepcopy(metadata[name])
+                    legacy = reseal(legacy)
+                    restored = portfolio.factorize_bounded(
+                        REPORTED_PRIME,
+                        config=cfg,
+                        budget=allowance(),
+                        checkpoint=legacy,
+                    )
+                    self.assertEqual(
+                        restored.result.factors[0].certainty,
+                        utils.Primality.PROBABLE,
+                    )
+                    self.assertEqual(restored.work_used, old_whole.work_used)
+                    self.assertEqual(
+                        restored.checkpoint["payload"]["primality"],
+                        "mr64-strict-v1",
+                    )
+                    self.assertEqual(
+                        restored.result.reconstruct(), REPORTED_PRIME
+                    )
+                    bad = copy.deepcopy(legacy)
+                    bad["payload"]["primality"] = "mr13-strict-v1"
+                    with self.assertRaises(ValueError):
+                        portfolio.factorize_bounded(
+                            REPORTED_PRIME,
+                            config=cfg,
+                            budget=allowance(),
+                            checkpoint=reseal(bad),
+                        )
+
     def test_above_final_bound_stays_probable_across_resume(self):
         n = next(
             f["n"]

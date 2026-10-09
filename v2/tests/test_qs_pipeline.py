@@ -2,6 +2,8 @@
 
 import gc
 import random
+import subprocess
+import sys
 import unittest
 import weakref
 from dataclasses import replace
@@ -388,6 +390,28 @@ class PipelineTests(unittest.TestCase):
 
     def test_batch_snapshots_released_before_more_collection(self):
         """Collection cannot pin previous snapshots outside its reservation."""
+        # A live JIT bridge can retain deleted values in JITFRAME/History
+        # roots across any number of collections. Isolate Python ownership
+        # with JIT off; do not change the parent suite's JIT configuration.
+        command = (
+            "from v2.tests.test_qs_pipeline import PipelineTests; "
+            "case = PipelineTests("
+            "'test_batch_snapshots_released_before_more_collection'); "
+            "case._check_batch_snapshot_ownership()"
+        )
+        process = subprocess.run(
+            [sys.executable, "--jit", "off", "-B", "-c", command],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+
+        self.assertEqual(
+            process.returncode, 0, process.stdout + process.stderr
+        )
+
+    def _check_batch_snapshot_ownership(self):
+        """Check release and deliberate retention without JIT roots."""
 
         class ObservedCollector(SieveCollector):
             """Check lifetime independently with weak references."""
@@ -396,8 +420,7 @@ class PipelineTests(unittest.TestCase):
 
             def collect(self, lo, hi):
                 """Require release before allocating the next batch."""
-                # PyPy uses tracing GC; weakrefs do not clear immediately
-                # after the last strong reference is dropped.
+                # The child uses tracing GC but has no active JIT roots.
                 gc.collect()
                 if self.previous is not None and self.previous() is not None:
                     raise AssertionError("prior collection snapshot is pinned")
@@ -405,21 +428,38 @@ class PipelineTests(unittest.TestCase):
                 self.previous = weakref.ref(result)
                 return result
 
-        base = build_factor_base(104729, bound=100).factor_base
-        job = QSJob(
-            qs_polynomial(base),
-            base,
-            -64,
-            65,
-            batch_width=16,
-            config=SieveConfig(residual_bound=1),
-            collector_class=ObservedCollector,
-            budget=unlimited_budget(),
-        )
+        class RetainingCollector(ObservedCollector):
+            """Deliberately pin a snapshot to verify the ownership guard."""
 
-        result = job.run()
+            def collect(self, lo, hi):
+                result = super().collect(lo, hi)
+                self.retained_snapshot = result
+                return result
+
+        base = build_factor_base(104729, bound=100).factor_base
+
+        def make_job(collector_class):
+            return QSJob(
+                qs_polynomial(base),
+                base,
+                -64,
+                65,
+                batch_width=16,
+                config=SieveConfig(residual_bound=1),
+                collector_class=collector_class,
+                budget=unlimited_budget(),
+            )
+
+        result = make_job(ObservedCollector).run()
 
         self.assertEqual(result.reason, "window_exhausted")
+        self.assertIsNone(result.divisor)
+        self.assertEqual(result.cofactor, 104729)
+
+        with self.assertRaisesRegex(
+            AssertionError, "prior collection snapshot is pinned"
+        ):
+            make_job(RetainingCollector).run()
 
 
 class StorageCompletionTests(unittest.TestCase):

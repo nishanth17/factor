@@ -134,6 +134,35 @@ Use `--verbose` to inspect method outcomes and work use. Measured automatic
 handoff/default selection is open in the [roadmap](ROADMAP.md); explicit CLI
 usability is tracked separately under P3.4.
 
+The calibrated B1 balanced 30-digit SIQS preset is available explicitly.
+Load its complete frozen configuration so the store, matrix and family
+allowances match the measured bundle:
+
+```python
+import json
+from pathlib import Path
+
+import v2
+from v2.budget import Budget
+from v2.qs import SIQSConfig, SIQSJob, SieveConfig
+
+selected_path = Path(v2.__file__).parent / (
+    "benchmarks/inputs/controls/b1_selected.json"
+)
+selected = json.loads(selected_path.read_text())
+settings = selected["configurations"][selected["selected"]["siqs"]]
+settings["collector"] = SieveConfig(**settings["collector"])
+config = SIQSConfig(**settings)
+budget = Budget(work_limit=10**13, seconds=5, cpu_seconds=5)
+result = SIQSJob(n, seed=7, config=config, budget=budget).run()
+assert (result.divisor or 1) * result.cofactor == n
+```
+
+Here `n` is the integer to split. The result preserves an explicit unresolved
+cofactor when its finite allowance ends. This preset reduced the tested
+balanced cohort's time by 36.6%; uneven-factor regressions keep it an explicit
+choice. See the [B1 measurements and limitations](benchmarks/README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
+
 Select an experimental SSS engine explicitly:
 
 ```sh
@@ -357,15 +386,81 @@ success guarantee. Extend a paused campaign by increasing **total** allowances
 under the identical configuration; completed curves and their RNG progress are
 credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
 checkpoint, or extending B1 on the same curve, remains unsupported pending
-B2/A6: increasing B1 needs missing powers of old primes as well as new primes.
+A6 and a separate migration contract: increasing B1 needs missing powers of
+old primes as well as new primes. B2 supports continuation of the predeclared
+finite campaign under cumulative work/wall/CPU allowances, including pauses
+inside table construction, a paired block or scalar recovery. It does not
+reinterpret an exhausted campaign as a new allowance of curves.
 
 `v2.ecm_programs.pair_coverage()` supplies bounded immutable +/- coverage
-certificates for the later B2 implementation. It includes direct-scalar
+certificates consumed by the opt-in B2 executor. It includes direct-scalar
 exceptions, positive recurrence initialization and block tails. This bounded
 compiler currently accepts D=0 (direct scalars), or even D>=2 with
-`2*D < B1` for odd B1 and `2*D < B1-1` for even B1. Production
-stage two still executes the existing unpaired terms; D tuning, paired recovery,
-wheel pruning and common-Z tables retain their roadmap gates.
+`2*D < B1` for odd B1 and `2*D < B1-1` for even B1.
+
+Set `ecm_pair_distance=D` together with a nonzero `ecm_program_bytes` to
+execute those programs. `None` (default) preserves unpaired execution;
+`0` is an explicit direct-scalar control. For example, add
+`ecm_pair_distance=1024` to the 11,000/1,900,000 campaign above. This is a
+caller-selected experimental setting, not a measured recommendation.
+The frozen B2 study retains all production defaults: its selected paired
+settings lose to streamed and reusable unpaired execution on held-out complete
+factoring and a finite nonsplitting campaign. See `benchmarks/README.md` for
+the D choices, costs and coverage/segmentation limitations.
+The dense curve-private table holds even multiples through D, with a separate
+2D recurrence step. Each certified pair contributes one cross-product;
+singletons, block boundaries and inclusive tails remain covered. A saturated
+product replays individual terms, then both certified primes for any saturated
+term. A saturation never counts as a proper divisor.
+
+Coverage records share the program retention cap and regenerate when it fills.
+The additional conservative workspace reservation is
+`8192 + 2048 * (segment_size + gcd_batch + 1)` bytes, alongside point tables,
+the whole program cap, product/replay state and serialized output. Compilation
+charges prime packing, certificate construction and record decoding; cached
+reads charge decoding. Table additions/doublings and giant advances reserve
+two units each; paired term/product actions reserve two units per term. Direct
+scalars and recovery reserve their bit-length cost plus GCD/product cost.
+These are algorithmic accounting units, not measured bigint operation counts.
+
+Paired checkpoints use version 7 with `ecm-packed-pairs-v1`, exact D/config
+and backend/build identity. They retain the active decoded coverage block,
+curve-private table, products and recovery position. Resume verifies the prime
+buffer and coverage certificates, record/table bounds and product consistency;
+future missing programs rebuild under the cumulative allowance. Arithmetic
+state is protected by the checksum, as for stage one. Old unpaired native and
+GMP checkpoint formats remain unchanged. Performance promotion, wheel pruning,
+common-Z, PRAC routing and allocation remain separate roadmap gates.
+
+For the bounded wheel alternative, set `ecm_pair_wheel=W` instead of
+`ecm_pair_distance`. W must be even, at least 2 and at most
+`2 * segment_size`; a nonzero program cap is required. For example,
+`ecm_pair_wheel=210` uses centers at multiples of 210 and retains only
+coprime distances through 105. Program blocks end halfway between centers,
+so their boundaries cannot split a pair. Initial/final partial cells and
+wheel-divisor primes remain covered; primes assigned to center zero use
+direct scalars. Initialization at the first positive center permits small B1;
+the first W-to-2W giant transition uses doubling when its predecessor is zero.
+
+The sparse table is generated by the existing odd-multiple recurrence with
+two private scratch points. Skipped distances still incur construction work.
+Workspace reserves conservatively allow a dense half-wheel plus scratch and
+integer indices; fewer retained points do not imply the same reduction in RSS
+or reserved bytes. Storage/decoding and mixed-factor replay use the original
+program and paired contracts. Wheel checkpoints use version 8 and
+`ecm-aligned-wheel-pairs-v1`; schemas 4–7 and their disabled-field encoding
+remain readable and unchanged. Same-config finite campaigns can extend their
+cumulative budgets. Increased B1 still requires A6's exact schedule ratio.
+
+This optional mode covers one nearest-center distance set. Extended sets,
+relocation and overlapping-window graph matching belong to C2, as does
+common-Z; polynomial continuation belongs to F3. No production default changes.
+The fresh wheel comparison protocol is documented in `benchmarks/README.md`.
+Its selected held-out wheel is 31.1% faster than original pairing on the medium
+cohort and 4.8% faster on the fixed nonsplitting campaign, but 44.0% slower on
+uneven inputs. Every selected wheel loses to reusable unpaired programs:
+75.1%/108.7%/117.2% slower on small/medium/uneven complete factoring and 23.6%
+slower on the campaign. Completion is unchanged. No promotion gate passes.
 
 ## Checkpoints and limits
 

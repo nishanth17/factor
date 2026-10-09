@@ -5,6 +5,17 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## QS/GNFS research reconciliation (9 October 2026)
+
+The [source-linked comparison](qs_gnfs_research.md) pins 11 repositories and
+records license/attribution requirements, primary papers and independently
+checked counterexamples. It routes residual handling to coordinated C1/E3,
+DLP to C1/R4/P5.4, Four Russians to A8/B6, changed-workload sieve allocation
+to E6, refreshed SSS to A7/R5 and polynomial/batch/general-incidence variants
+to F5/F7/F6. GNFS remains A9 onward after H1's coverage review; F1 owns a
+measured crossover. These are prospective experiments, not measured PyPy wins;
+no new benchmark or implementation gate is closed by source research.
+
 ## A10 verified primality transfers (9 October 2026)
 
 The frozen control is `94caf40`; required inputs are
@@ -154,20 +165,192 @@ had medians 33.59 / 33.72 ms for control/accepted. Separate instrumented
 profiles used three seconds validated warmup per arm, then ten full-corpus
 calls: 12,900 versus 6,570 MR witnesses across 780 bounded runs. Profiles
 explain reduced classification work; their timings are not warmed evidence.
-Raw captures, source hashes, selection records and profiles remain in the
-ignored local `results/a10/` and `audit/a10/` directories.
+Raw captures, source hashes, selection records and profiles were kept in the
+isolated worktree's ignored `results/a10/` and `audit/a10/` directories during
+acceptance. They were removed with that worktree at the user's request after
+integration. Required controls, certified inputs, protocols, runners, source
+citations and the acceptance summary remain versioned.
 
 Validation covers strict endpoints/neighbors, prime powers, Carmichael and
 strong pseudoprimes, exact reconstruction/labels/unresolved cofactors,
 explicit round/RNG spies, finite work/time/cancellation and checked resume
 under legacy schemas 4/5/6 on int/GMP. `make -C v2 test` passed 369 tests
 (two optional-GMP skips), the GMP-enabled repeat passed 372, and lint passed.
-One earlier GMP suite failed the unchanged QS snapshot-lifetime assertion;
-its isolated test and full repeat passed. Its cause is undetermined and
-referred to B1; no QS implementation change is included in A10.
+One earlier GMP suite failed the unchanged QS snapshot-lifetime assertion.
+B1 subsequently traced it to live PyPy JIT roots and isolated the ownership
+assertion in a finite JIT-off child; mainline retains that accepted test fix.
+No QS implementation change is included in A10.
 A committed-files-only archive of `0ee86ff` also passed the 369/372-test
 suites, all 59 benchmark imports and the corpus/control/protocol/v1-adapter
 loaders. The final acceptance update changes documentation only.
+
+## B1 joint QS/MPQS/SIQS calibration — 9 October 2026
+
+The B1 study uses committed mainline `94caf40`, including integrated R2,
+in an isolated worktree. Runtime arithmetic and production defaults are
+unchanged. `inputs/controls/b1_frozen.json` pins runtime/driver hashes, both
+previously inspected training corpora, seeds 7/29, 23 joint bundles, finite
+allowances and selection criteria. `b1_40d_frozen.json` separately freezes a
+bounded eight-bundle follow-up after the successful 40-digit feasibility
+probe; it does not rewrite the original protocol. Selection files freeze
+each mode before its new certified corpus is generated.
+
+The 30-digit sweep uses three balanced inputs and both seeds; the 40-digit
+follow-up uses one balanced training input and both seeds. Bound/interval,
+nearest/flyer selection, A-factor count, Gray quotas, residual bounds and
+row/partial/atom/matrix allowances vary together. This is a finite bundle
+comparison, not an exhaustive parameter search. QS keeps its fixed A=1;
+MPQS uses the accepted external-square representation. Powers/bucket
+collection, exact verification, certainty labels and checked resume stay
+intact. Known factors enter validation only. Pocklington generation biases
+the corpus toward primes with a large known p-1 factor; no RSA-distribution
+or population success claim is made.
+
+Every call has a 10^13 work grant and finite wall/CPU limits. The common
+owned-memory envelope is 256 MiB; individual bundles can reserve less.
+Feasibility caps are 5 seconds at 30 digits, 30 at 40/60, and 15 at 70–99.
+Warmed 30-digit timing admits bundles completing every screened start in
+at most two seconds; the separately frozen 40-digit threshold is ten.
+Each timed arm receives at least three seconds of validated PyPy warmup
+and nine samples, extending unstable series to fifteen, up to three blocks.
+Fresh comparisons interleave arms. Process inventory checks surround calls
+and poll long calls; the same exclusive flock and owner record are shared
+with B2/A10. These checks supplement coordination, not an OS-wide isolation
+guarantee. Cold startup and instrumented profiles supply no performance claim.
+
+The machine is Apple M4 / 24 GiB, using PyPy 7.3.23 implementing Python
+3.11.15. The following fresh 30-digit times sum both seeded complete calls,
+including setup, collection, filtering, extraction and classification.
+Process-inventory checks outside those calls are excluded; their separate
+outer timers remain in the captures. Each row is one independent input, not
+18 independent factoring trials. Close-factor timing needed a second block
+with five seconds of warmup and fifteen samples; other primary rows use nine.
+
+| Fresh class | R2 control, seconds | Selected SIQS | Selected MPQS |
+| --- | ---: | ---: | ---: |
+| Balanced | 0.447480 | 0.283728 | 0.415146 |
+| Uneven, five-digit smaller factor | 0.082175 | 0.429751 | 0.517652 |
+| Uneven, ten-digit smaller factor | 0.474256 | 0.363277 | 0.426907 |
+| p-1 smooth control | 0.504901 | 0.455407 | 0.576002 |
+| p+1 smooth control | 0.694064 | 0.771634 | 1.115285 |
+| Close factors | 0.462278 | 0.358044 | 0.418211 |
+| Prime square | 0.051126 | 0.024225 | 0.092133 |
+
+The balanced SIQS reduction is 36.6%, with a paired-repeat 95% interval of
+35.4–37.5%; MPQS reduces it by 7.2% (1.6–8.8%). Intervals are conditional on
+the fixed input/seeds. All R2/SIQS/MPQS classes complete both unique starts.
+The five-digit-factor control's factoring timer initially failed stability
+although its outer timer passed. Its reported cell comes from a separate
+frozen-parameter repeat: over three seconds of actual factoring warmup and
+nine stable samples per arm. The original unstable cell is excluded.
+
+The selected 30-digit SIQS bundle uses base bound 3,000, half-width 8,192,
+four A factors, flyer selection, eight effective Gray polynomials, residual
+bound 9,000,000, 2,048 rows/partials and 8,192 atoms. MPQS uses base 3,000,
+half-width 32,768 and the same stores/residual bound, with external square A
+and one polynomial per coefficient. Both have a finite 100,000-family grant,
+1 MiB checkpoint cap and 256 MiB owned cap. Actual assignment-space exhaustion
+remains distinct from the configured family grant.
+
+At 40 digits, six of eight training bundles complete both starts and pass
+nine-sample stability; both fixed-QS bundles exhaust their windows. Selection
+retains SIQS base 10,000, half-width 65,536, five flyer-selected A factors and
+16 effective Gray polynomials. External-square MPQS selects the same base
+and width. Both reserve 8,192 rows/partials, 32,768 atoms, a 100,000,000
+residual bound, 256 MiB owned memory and 1 MiB checkpoints. On the fresh
+balanced input, both complete 2/2 unique starts and all 18 timed calls.
+The two-seed cohort medians are 15.086435 seconds for SIQS and 14.043059
+for MPQS; MPQS's paired reduction is 6.9% (95% interval 5.4–9.5%). This
+40-digit comparison uses the frozen feasible SIQS control, not the smaller
+30-digit R2 configuration. Neither the point estimate nor interval reaches
+the 10% timing gate, so it establishes no MPQS crossover or promotion.
+
+A separately frozen wider-QS follow-up tests bases 3,000/10,000/30,000 and
+half-widths 131,072/499,999, using 8,192 rows/partials and at most 32,768 atoms.
+At the widest interval, training completion is 0/6, 2/6 and 4/6, respectively.
+The frozen 30,000-base challenger fails both fresh starts: 1,072 verified rows
+leave zero rows after singleton filtering. This is finite-window/useful-yield
+exhaustion, not a matrix-memory failure or a time-to-factor result. The same
+second fresh balanced input confirms the unchanged SIQS challenger at
+0.496728 seconds versus 0.660333 for R2; no retuning used either fresh input.
+
+The upper probes give SIQS/MPQS a 30-second cap at 60 digits and 15 seconds
+at 70–99. At 60 digits each produces 47 verified rows, all removed by
+singleton filtering, with owned peaks 81.49/66.62 MiB. SIQS uses about 90%
+of its time in collection. At 70 digits SIQS has one row and MPQS zero;
+80–99 have zero. A products approach the exact targets, the necessary matrix
+reservation fits, and neither store nor matrix capacity stops these attempts.
+Use post-filter output rows/columns to assess useful yield, not admitted-row
+counts alone. These are censored feasibility probes; they establish no
+upper-band time-to-factor ratio or impossibility claim.
+
+**Decisions:** adopt the frozen protocols, independent confirmation inputs
+and explicit balanced-input presets as the bounded B1 result. Retain runtime
+defaults and exact powers/bucket collection. The 30-digit balanced SIQS win
+does not establish a general portfolio policy: five-digit-factor and p+1
+controls regress, populations are small, and no ECM-to-SIQS handoff is timed.
+Defer larger calibration and combined E1/C3/G1/H1 confirmation. DLP remains
+deferred pending an affordable recoverable-residual population, beyond these
+low-yield probes. No calibrated matrix-capacity failure or eligible-base-prime
+CRT cost triggers matrix redesign or C8; GNFS stays with its existing roadmap.
+The small-store bundle fits 32 MiB but loses partials through FIFO eviction;
+larger stores help its wide counterpart without beating the narrow selection.
+These joint comparisons do not isolate a causal effect for every parameter.
+The incomplete-QS tie-break uses admitted verified rows, although the freeze
+describes them as useful rows; post-filter counts expose that limitation.
+No incomplete QS selection supplies an accepted speed or promotion claim.
+
+All three new 58-fixture certified corpora are mutually disjoint and disjoint
+from training. Early checked resumes reject changed configuration and reduced
+work grants. Eight distinct selected/control configurations also pass deeper
+pause/restore and a second checkpoint, preserving cumulative resources and
+reconstruction within the frozen 1 MiB checkpoint caps. Local raw JSON,
+stdout and verification records remain in this worktree's ignored
+`v2/benchmarks/results/b1/`. No cold-start or profile timing is pooled with
+the warmed evidence. New integrated A10/B2 sources require a new confirmation;
+these captures remain pinned to `94caf40` runtime arithmetic.
+Required checks pass: `make -C v2 test PYTHON=.venv/bin/python` runs 365 tests
+on PyPy/GMP, and `make -C v2 lint` passes. The v2-local changelog preserves
+this task's directory boundary.
+
+Native implementations inform the candidate design, not Python defaults:
+[PARI's flyer selection](https://pari.math.u-bordeaux.fr/lcov-report/basemath/mpqs.c.gcov.html)
+(development `31092-e6893b0017`),
+[msieve's A-factor/reuse tradeoff](https://github.com/radii/msieve/blob/master/mpqs/poly.c),
+and [Zimmermann's MPQS notes](https://members.loria.fr/PZimmermann/talks/tiny-mpqs.pdf)
+relate coefficient quality, interval and reuse. Sources were read on
+9 October 2026; no external engine was executed or timed.
+
+Reproduce in a quiet machine window from this committed tree. Freeze and
+selection outputs refuse replacement; use new paths for a new study.
+
+```sh
+pypy3 -m v2.benchmarks.b1_calibration freeze --protocol NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_calibration probe --protocol NEW_PROTOCOL.json \
+  --output v2/benchmarks/results/b1/new-probes.json
+pypy3 -m v2.benchmarks.b1_calibration train --protocol NEW_PROTOCOL.json \
+  --output v2/benchmarks/results/b1/new-training.json
+pypy3 -m v2.benchmarks.b1_calibration select --protocol NEW_PROTOCOL.json \
+  --training v2/benchmarks/results/b1/new-training.json \
+  --probes v2/benchmarks/results/b1/new-probes.json --output NEW_SELECTED.json
+pypy3 -m v2.benchmarks.b1_calibration confirm --protocol NEW_PROTOCOL.json \
+  --selected NEW_SELECTED.json --corpus NEW_CORPUS.json \
+  --output v2/benchmarks/results/b1/new-confirmation.json
+pypy3 -m v2.benchmarks.b1_40d freeze --protocol NEW_40D_PROTOCOL.json \
+  --parent NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_40d run --protocol NEW_40D_PROTOCOL.json \
+  --selected NEW_40D_SELECTED.json --corpus NEW_40D_CORPUS.json \
+  --output v2/benchmarks/results/b1/new-40d.json
+pypy3 -m v2.benchmarks.b1_qs_width freeze --protocol NEW_QS_PROTOCOL.json \
+  --parent NEW_PROTOCOL.json
+pypy3 -m v2.benchmarks.b1_qs_width run --protocol NEW_QS_PROTOCOL.json \
+  --selected NEW_QS_SELECTED.json --corpus NEW_QS_CORPUS.json \
+  --siqs-selected NEW_SELECTED.json \
+  --output v2/benchmarks/results/b1/new-qs-width.json
+pypy3 -m v2.benchmarks.b1_timer_confirmation --selected NEW_SELECTED.json \
+  --corpus NEW_CORPUS.json --kind uneven_5 \
+  --output v2/benchmarks/results/b1/new-uneven-timers.json
+```
 
 ## SIQS CLI access (4 October 2026)
 
@@ -1098,6 +1281,313 @@ Research references and the explicit B3/C6 follow-ups are recorded in
 GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
+
+## P5.2-B2 aligned-wheel follow-up — 9 October 2026
+
+`p52_b2_wheel.py` freezes the original paired engine at `a670c4d`, retains
+the accepted `94caf40` streamed/reusable controls, and compares an opt-in
+aligned-cell wheel. The existing B2 corpus has already been inspected, so
+`build_p52_b2_wheel_inputs.py` generates fresh certified training and held-out
+inputs with seed 2026100953. Required snapshots, corpus and protocol live in
+versioned `inputs/`; raw captures remain local in `results/p52-b2-wheel/`.
+
+The frozen workload sizes, tiers, algorithm seeds 7/19/41, 50-million-unit
+work limit, 120-second wall/CPU limits, 16 MiB workspace, 8 MiB program cap and
+1,024-slot segments match the original study. Wheel grids are 6/30/210 for
+small, 30/210/420 for medium, 210/420/840 for uneven and 210/840/1890 for the
+nonsplitting campaign. Structured inputs inherit the small selection. Old
+paired controls use the previously selected D=24/64/768/2048. A regeneration
+arm uses the middle wheel with only the minimum program scratch reservation.
+Select the fastest stable training wheel with no completion regression against
+either accepted control; freeze that choice before held-out timing. This is a
+small fixed-cohort comparison, not factor-size or curve-allocation calibration.
+
+At least three seconds of validated warmup and nine samples are required;
+unstable arms extend to 5 seconds/31 samples, then 8 seconds/63 samples.
+The relative-IQR threshold is 0.15, and wall/CPU-censored or nondeterministic
+captures cannot pass. The same whole-factoring promotion rule applies: at
+least 10% median time reduction with an interval above zero, or a 10-point
+completion gain with an interval above zero, without a >5-point completion
+regression elsewhere. Fixed nonsplitting campaigns cannot promote defaults.
+All setup, tables, decoding, recovery, recursion and checkpoint costs are in
+the end-to-end measurement. Cold starts and instrumented diagnostics are
+separate; private-control reconstruction adds to cold startup and cannot be
+interpreted as an algorithmic speed advantage.
+
+Execution acquires the machine-wide flock and checks for competing benchmark/
+test processes. Coordinate the window with B1 and other heavy work first.
+The runner saves every attempt, pins source and input hashes, and refuses to
+overwrite evidence. The original B2 controls/protocol/results are unchanged.
+
+```sh
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase training --diagnostics --output v2/benchmarks/results/p52-b2-wheel/training.json
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase held_out --selection v2/benchmarks/results/p52-b2-wheel/training.json --cold --output v2/benchmarks/results/p52-b2-wheel/held-out.json
+```
+
+The implementation uses complete nearest-center cells, not Prime95's extended
+distance/relocation matcher. Its sparse odd-multiple generator still pays for
+discarded intermediate points. Those distinctions prevent attributing native
+pairing percentages to this PyPy implementation. Substantial matching,
+relocation, compact-map and common-Z extensions are deferred in C2; polynomial
+continuation remains F3.
+
+**Completed result: retain every production default.** Candidate `dba3cd2`
+ran under the coordinated flock after B1's QA finished; A10 confirmed no heavy
+work. No competing benchmark/test process was detected. Ordinary desktop
+activity remained; the captures do not assert an otherwise idle operating
+system. PyPy 7.3.23 implements Python 3.11.15. All 35 final training captures
+and 20 final held-out captures satisfy the frozen stability rule. Training
+needed 42 attempts: five arms finished at 31 samples and one at 63. Held-out
+needed 25 attempts: medium wheel/programs/legacy finished at 31 and uneven
+wheel at 63. All earlier attempts are retained. The uneven wheel's relative
+IQR fell from 0.274 (9 samples) through 0.195 (31) to 0.141 (63); its final
+median is 0.360 seconds. This extended fixed-cohort estimate is not evidence
+of stability across all populations or machines.
+
+Training selected W=30/210/840/1890 for small/medium/uneven/campaign, with
+structured inputs inheriting 30. Held-out medians below measure complete
+cohorts, including all declared seeds and all factoring/setup/serialization
+costs. Each small, medium and uneven arm completes 9/9 starts; structured
+completes 3/3. The campaign completes all four declared curves per start but
+finds no factors (0/3 starts complete). No arm changes completion.
+
+| Held-out class | Streamed seconds | Programs seconds | Original paired seconds | Wheel seconds | Wheel vs programs | Wheel vs original paired |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| Small | 0.001245 | 0.001324 | 0.002392 | 0.002319 | 75.1% slower | 3.1% faster |
+| Medium | 0.005141 | 0.005301 | 0.016067 | 0.011064 | 108.7% slower | 31.1% faster |
+| Uneven | 0.166597 | 0.165668 | 0.249830 | 0.359836 | 117.2% slower | 44.0% slower |
+| Fixed nonsplitting campaign | 1.588467 | 1.417380 | 1.840164 | 1.752086 | 23.6% slower | 4.8% faster |
+| Structured | 0.000147 | 0.000146 | 0.000153 | 0.000151 | 3.6% slower | 1.0% faster, inconclusive |
+
+All selected wheel arms also lose to streamed execution. Conditional 95%
+bootstrap intervals for the wheel's time reduction versus programs are
+[-79.9,-72.6]%, [-110.1,-107.6]%, [-133.7,-110.9]%, [-24.0,-22.4]% and
+[-4.3,-1.7]% in table order. Versus original pairing, the medium interval is
+[30.6,31.4]%, campaign [4.5,5.4]% and uneven [-54.9,-33.3]%. These resample
+repeated timings of fixed cohorts; they are not independent input-population
+confidence intervals. No speed or completion promotion gate passes. Reusable
+unpaired programs retain value: this fresh fixed campaign saves 10.8% versus
+streamed, consistent with the earlier 10.5% observation. Neither campaign
+establishes a successful-factoring or global allocation advantage.
+
+Separate three-curve campaign diagnostics explain the bounded layout change:
+
+| Arm | Certified eligible primes | Product terms | Giant advances | Retained baby point slots | First/later curve work |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Programs | 422,082 by unpaired schedule | 422,082 | 2,055 | 1,379 table slots | 1,602,356 / 446,274 |
+| Original D=2048 | 422,082 | 422,082 | 1,383 | 1,024 plus sentinel | 2,024,552 / 587,082 |
+| W=210 | 422,082 | 353,442 | 26,988 | 24 | 2,065,311 / 532,130 |
+| W=840 | 422,082 | 353,064 | 6,747 | 96 | 2,205,886 / 518,573 |
+| W=1890 | 422,082 | 352,884 | 2,997 | 216 | 2,049,600 / 516,419 |
+
+Selected W=1890 eliminates 16.4% of products, representing 32.8% of primes
+covered in pairs. Exact prime coverage is unchanged. It retains 216 rather
+than 1,024 baby points, but still computes discarded intermediate multiples
+and incurs more giant advances. Its final program store is 6,204,320 bytes
+versus original pairing's 6,863,584 and programs' 1,888,800. Conservative owned
+reserves are 12,845,944 / 12,948,696 / 11,053,712 bytes respectively. Held-out
+campaign process peaks are 88.3 / 97.5 / 87.6 MiB; RSS also includes runtime,
+JIT and private control loading, so it is not table storage. Regeneration-only
+W=840 costs 2.746 seconds in training versus 1.843 with retention.
+
+All 180 separate cold starts validate identical rows/work to their warm arm.
+Campaign process-wall medians are 1.923 / 1.772 / 2.233 / 2.080 seconds for
+streamed / programs / original paired / wheel. Small cold apparent wins cannot
+promote the wheel: immutable controls pay private source reconstruction, while
+the candidate imports normally. Separate validated profiles cover three
+complete starts (12 campaign curves), not accepted timing ratios. The wheel
+profile records 12,000 coverage reads, 3,000 coverage compilations and 1,411,536
+sparse-slot binary searches. Packing/decoding and slot lookup remain concrete
+costs despite fewer products. Compact indexed maps and richer matching require
+their own C2 representation, recovery, memory and timing gates; this tranche
+does not bundle that tuning.
+
+Full `make -C v2 test` and `make -C v2 lint` pass. A committed-files-only archive
+passes 376 system-PyPy tests (two optional skips), 379 PyPy/GMP tests (no skips),
+and all 61 benchmark imports plus frozen proof/control loading. New cases
+cover exact independent coverage across segment boundaries, affine points,
+zero-predecessor initialization, mixed-factor and one-sided saturation, every
+action's resumed execution, cancelled/refused work, regeneration, corrupted
+metadata, canonical int/GMP campaigns and cumulative budget extension. No
+v1 or SIQS implementation file changes.
+
+Raw evidence is local under `results/p52-b2-wheel/`, including every attempt,
+cold sample, work/storage diagnostic, profile and QA log, with `manifest.json`.
+Training SHA-256 is
+`63becb5e078b112ee44e958a4f50bd8b6ec4ee5bf42c26048555135043ac93cf`;
+held-out SHA-256 is
+`0c4485ab36648626d3abd5b1634590c0cf09a1255a3dd6125fbc03aa190c1ff0`.
+Frozen legacy source / protocol / corpus hashes are respectively
+`59b44b7c13ca8be758f062337a76c37b2fcecddce7da0b23bf9a4389a38b054f`,
+`004c7e0c04c61b5562b57c413f81ac8f44d9efd1fedc304f71d24eae49a8337a`,
+`b876defa8ad640219bdeb8d97f8d66a581fa3c110d1fc683309d80a576c9e0ab`.
+
+## P5.2-B2 paired continuation — 9 October 2026
+
+The bounded implementation and matched experiments are complete. Pairing stays
+opt-in: all selected held-out configurations lose to both accepted controls,
+with unchanged completion. No production promotion gate passes. Checks pass
+367 system-PyPy tests (two optional skips), 370 PyPy/GMP tests without skips
+and full `make -C v2 lint`.
+Native integers, streamed execution, the ladder and production
+parameters remain defaults. Required inputs are versioned; raw evidence stays
+in ignored `results/` directories.
+
+`p52_b2.py` compares immutable committed-mainline (`94caf40`) streamed and
+reusable-program controls with three paired D choices and a regeneration-only
+control. The private snapshot `inputs/baselines/p52_b2_mainline.json` freezes
+all active ECM arithmetic, schedules, budgets and portfolio dependencies.
+The older A3 snapshots are unchanged. Inactive QS types provide annotations
+only; these runs cannot dispatch to SIQS/SSS. Both control and corpus hashes are
+pinned in `inputs/controls/p52_b2_protocol.json`.
+
+`inputs/corpora/p52_b2_corpus.json` supplies independent Pocklington/trial
+certificates, generation seed 2026100952, disjoint training/held-out inputs and
+algorithm seeds 7/19/41. Three inputs per small, medium and uneven cohort and
+one fixed balanced campaign/structured input per split form a deliberately
+bounded study. Repeated timing samples are not new independent inputs.
+
+| Case | B1 / B2 / curves | Candidate D | Scope |
+| --- | --- | --- | --- |
+| Small balanced | 50 / 2,000 / 8 | 8, 16, 24 | Whole factoring |
+| Medium balanced | 200 / 20,000 / 16 | 32, 64, 96 | Whole factoring |
+| Uneven, 34-bit smaller prime | 2,000 / 147,396 / 8 | 128, 384, 768 | Whole factoring |
+| Balanced 266-bit campaign | 11,000 / 1,900,000 / 4 | 512, 1,024, 2,048 | Finite campaign; not a success-rate claim |
+| Prime-cube structure | 50 / 2,000 / 8 | Small-cohort choice | Whole factoring regression control |
+
+Every row grants 50,000,000 work units and 120-second wall/CPU caps per input
+and seed, a 329-bit envelope and 16 MiB owned workspace. Retained programs use
+8 MiB. The paired dense table has D/2 points plus its recurrence state; its
+coexisting certificates, products, recovery and checkpoint storage are reserved.
+Wall/CPU censoring prevents an accepted timing claim. Partial results still
+reconstruct and are validated against the certified factors.
+
+Each arm receives at least three seconds of validated warmup and nine samples
+on PyPy implementing Python 3.11. Relative IQR above 0.15 or changed deterministic
+outcomes triggers 5 seconds/31 samples and then 8 seconds/63 samples; unresolved
+instability stays inconclusive. Training chooses the fastest stable D without
+a completion regression against either control, per bound tier; the structured
+control inherits the small tier. The saved training output freezes that choice
+before held-out execution and rejects subsequent source changes. The unchanged
+roadmap promotion gate applies to fresh whole factoring; finite nonsplitting
+campaign savings cannot promote defaults. Timing intervals are conditional on
+the fixed cohort, and completion intervals cluster algorithm seeds by fixture.
+This small study cannot calibrate population-wide factor-size allocation.
+
+Costs include config, classification, setup, schedule/table construction,
+products, recovery, recursion and final checkpoint serialization. Optional cold
+rows use nine separate starts and are stored apart. Instrumented profiling,
+work/phase counters and stage throughput must be reported separately. RSS
+includes interpreter/JIT/warmup; it is not the owned-workspace cap.
+
+The accepted runs followed explicit B1/A10 handoffs and held the machine-wide
+exclusive flock at `/private/tmp/factor-performance.lock`. Reproductions must
+coordinate the same window. The runner also checks for
+competing benchmark/test interpreters and fails closed if inventory is denied.
+It never kills unrelated work. Output paths refuse overwrites and preserve
+unstable attempts as well as accepted captures.
+
+```sh
+mkdir -p v2/benchmarks/results/p52-b2
+pypy3 -B -m v2.benchmarks.p52_b2 --phase training --diagnostics --output v2/benchmarks/results/p52-b2/training.json
+pypy3 -B -m v2.benchmarks.p52_b2 --phase held_out --selection v2/benchmarks/results/p52-b2/training.json --cold --output v2/benchmarks/results/p52-b2/held-out.json
+```
+
+The optional diagnostic rows instrument at most three direct curves per arm
+and cohort using seeds 7/8/9. They report setup/table/giant/recovery actions,
+term products, work, peak baby-table slots and retained program storage without
+time ratios. These standalone curve counts are separate from the whole
+factoring cohort's seeds and recursive dispatch. They cannot establish a gain.
+
+### Matched results and retained defaults
+
+Production and runner source are frozen at `d7f873e`; documentation-only
+acceptance follows that commit. PyPy 7.3.23 implements Python 3.11.15 on
+macOS 26.6.2 arm64. All 30 training and 15 held-out final captures satisfy the
+predeclared relative-IQR limit, deterministic output and uncensored-budget
+requirements. Small `paired_1`, medium `paired_0`/`paired_1` and structured
+`regenerated` extended from nine to 31 samples; all attempts remain local.
+Every accepted capture has at least three seconds of validated warmup.
+
+Training selects D=24/64/768/2048 for the four bound tiers before held-out
+execution; the structured case inherits D=24. These select the least costly
+tested paired option and do not recommend enabling it. Cohort medians include
+all inputs and algorithm seeds, not one curve or one successful split:
+
+| Held-out case | D | Streamed ms | Programs ms | Paired ms | Complete starts, each arm | Paired cost increase vs streamed / programs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Small balanced | 24 | 1.207 | 1.238 | 2.189 | 9/9 | 81.3% / 76.8% |
+| Medium balanced | 64 | 3.647 | 4.062 | 9.270 | 9/9 | 154.2% / 128.2% |
+| Uneven | 768 | 154.148 | 155.629 | 223.469 | 9/9 | 45.0% / 43.6% |
+| Balanced campaign | 2048 | 1685.998 | 1509.368 | 1938.743 | 0/3 | 15.0% / 28.4% |
+| Prime cube | 24 | 0.146 | 0.148 | 0.153 | 3/3 | 4.8% / 3.2% |
+
+The conditional 95% bootstrap intervals for paired cost increases against
+streamed are 76.2–117.3%, 149.7–160.0%, 41.5–46.0%, 14.2–16.0% and 0.3–6.7%,
+respectively. Intervals against programs also exclude a benefit. These describe
+timing on fixed cohorts, not population factoring performance. All completion
+differences are zero; fixture-cluster intervals are [0, 0] on this small set
+and do not establish population equivalence. Training completion is also
+matched: 9/9 small/medium, 8/9 uneven, 0/3 campaign and 3/3 structured. Campaign
+rows are finite search costs; all four declared curves finish per start, and
+no factor is found. No row is wall/CPU-censored.
+
+The three-curve campaign diagnostics explain a limitation of this bounded
+layout. Streamed and unpaired programs produce 422,082 terms. Paired D=512
+produces 406,632 (3.7% fewer); D=1024 and D=2048 still produce 422,082 because
+the 1,024-slot prime segments separate opposite signs. All paired choices
+certify exactly 422,082 eligible primes. Their giant advances are 5,535/2,766/
+1,383 and baby-table slots including the sentinel are 257/513/1,025. Lower D's
+limited occupancy benefit does not pay for its extra recurrence/program work.
+Cross-segment coalescing or a different segment grid was not evaluated here.
+
+For D=2048, curve work is 2,024,553 initially and 587,083 on each subsequent
+curve, versus programs' 1,602,357/446,275 and streamed's 1,458,993 per curve.
+The paired store retains 6,863,584 bytes and records 923 coverage misses and
+1,846 hits over those three curves. Its owned reserve is 12,948,696 bytes,
+below the common 16 MiB cap; unpaired programs reserve 11,053,712 bytes.
+Held-out campaign process RSS is 91.5 MiB paired, 85.0 MiB programs and 82.8
+MiB streamed, including interpreter/JIT overhead. Regeneration-only training
+costs 2.588 seconds per campaign cohort, versus 1.878 seconds for retained
+programs at the same D=1024. The cap remains effective when retention is off.
+
+Separate instrumented full-campaign profiles validate all three arms and
+record 11,076 coverage calls / 2,769 certificate compilations in paired
+execution, along with packing, decoding and replay bookkeeping. This locates
+additional work but supplies no accepted timing ratio. Allocation tuning,
+kernel changes and advanced wheel/common-Z plans stay in their own workstreams.
+
+The 135 cold records are nine fresh starts for each held-out arm. Median
+startup-plus-cohort seconds (streamed/programs/paired) are
+0.163/0.166/0.152 small, 0.195/0.205/0.184 medium, 0.415/0.438/0.485 uneven,
+2.028/1.849/2.312 campaign and 0.152/0.152/0.128 structured. These include
+imports, proof checks and the controls' private snapshot reconstruction, so
+small cold differences are harness costs, not evidence for promotion.
+
+Raw captures, profiles and check logs remain local under ignored
+`results/p52-b2/`. The training/held-out SHA-256 digests are
+`569e06e22faf5210c03d9407de479151c99cc73559f81afab754d9ec019ea225` and
+`4257fc45af79f0e8131aca86bedbd65118bcb6081e263f34b93c1d8589901034`.
+The frozen protocol digest is
+`bd31511643617b3a4df124454573335edb49c6cb3f149b700a6ce2cf50a24ab8`.
+Required corpus/control/protocol inputs are versioned. The committed-files-only
+verification includes the unchanged `v1/` hash fixtures; an initial archive
+omitted them and its missing-file failure is retained alongside the repaired
+archive checks. Both full test suites and all 59 benchmark imports pass there;
+the proof/control loaders work without generated evidence. All 135 cold
+outcome/work records agree with the corresponding warmed records. No factoring
+source changed after training selection.
+
+The design retains Montgomery's x-coordinate symmetry and projective cross
+differences ([1987 paper](https://wstein.org/edu/124/misc/montgomery.pdf)).
+GMP-ECM's [stage-two implementation](https://github.com/sethtroisi/gmp-ecm/blob/main/stage2.c)
+illustrates separate memory/cost modeling and polynomial continuations; its
+native thresholds and advanced pruning are not imported into this PyPy tranche.
+Its [library contract](https://github.com/sethtroisi/gmp-ecm/blob/main/README.lib)
+and [stage-one code](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
+explicitly account for higher powers of old primes when B1 increases. A6 has
+not supplied that exact schedule-ratio contract here, so increased-B1 extensions
+are deferred. No external code was copied into the implementation.
 
 ## P5.2-A3 reusable programs and campaign feasibility — 5 October 2026
 
