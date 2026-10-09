@@ -279,7 +279,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Deferred by user, separate tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Activated by user on 9 October 2026, separate bounded tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -423,7 +423,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment, deferred]
+    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -2146,9 +2146,10 @@ Twelve raw captures are copied and checksum-verified under ignored
 
 ### P4.5 — Experiment with GMP-ECM precomputed Lucas chains (C6)
 
-**Deferred at the user's request on 5 October 2026 to conserve the current
-session's token budget.** This is a separate future tranche, not part of A4's
-completion. Its result must not be inferred from checked PRAC's timings.
+**Activated by the user on 9 October 2026.** The earlier deferral is lifted.
+This is separate from A4 and B3; its result must not be inferred from checked
+PRAC's timings. See the [C6 study](benchmarks/c6_research.md) for pinned
+research, contracts and the frozen experiment scope.
 
 - [ ] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
   decode with the upstream implementation and independently verify every
