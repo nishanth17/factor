@@ -935,12 +935,13 @@ GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
 
-## P5.2-B2 paired continuation — prepared 9 October 2026
+## P5.2-B2 paired continuation — 9 October 2026
 
-Implementation is opt-in; performance evidence and B2 acceptance remain open.
-The user requested a stop before performance tests. No timings, D selection or
-speedup are claimed here. Final checks pass 367 system-PyPy tests (two optional
-skips), 370 PyPy/GMP tests without skips and full `make -C v2 lint`.
+The bounded implementation and matched experiments are complete. Pairing stays
+opt-in: all selected held-out configurations lose to both accepted controls,
+with unchanged completion. No production promotion gate passes. Checks pass
+367 system-PyPy tests (two optional skips), 370 PyPy/GMP tests without skips
+and full `make -C v2 lint`.
 Native integers, streamed execution, the ladder and production
 parameters remain defaults. Required inputs are versioned; raw evidence stays
 in ignored `results/` directories.
@@ -992,8 +993,9 @@ rows use nine separate starts and are stored apart. Instrumented profiling,
 work/phase counters and stage throughput must be reported separately. RSS
 includes interpreter/JIT/warmup; it is not the owned-workspace cap.
 
-After user approval, coordinate B1/A10 and acquire the machine-wide exclusive
-flock at `/private/tmp/factor-performance.lock`; the runner also checks for
+The accepted runs followed explicit B1/A10 handoffs and held the machine-wide
+exclusive flock at `/private/tmp/factor-performance.lock`. Reproductions must
+coordinate the same window. The runner also checks for
 competing benchmark/test interpreters and fails closed if inventory is denied.
 It never kills unrelated work. Output paths refuse overwrites and preserve
 unstable attempts as well as accepted captures.
@@ -1009,6 +1011,85 @@ and cohort using seeds 7/8/9. They report setup/table/giant/recovery actions,
 term products, work, peak baby-table slots and retained program storage without
 time ratios. These standalone curve counts are separate from the whole
 factoring cohort's seeds and recursive dispatch. They cannot establish a gain.
+
+### Matched results and retained defaults
+
+Production and runner source are frozen at `d7f873e`; documentation-only
+acceptance follows that commit. PyPy 7.3.23 implements Python 3.11.15 on
+macOS 26.6.2 arm64. All 30 training and 15 held-out final captures satisfy the
+predeclared relative-IQR limit, deterministic output and uncensored-budget
+requirements. Small `paired_1`, medium `paired_0`/`paired_1` and structured
+`regenerated` extended from nine to 31 samples; all attempts remain local.
+Every accepted capture has at least three seconds of validated warmup.
+
+Training selects D=24/64/768/2048 for the four bound tiers before held-out
+execution; the structured case inherits D=24. These select the least costly
+tested paired option and do not recommend enabling it. Cohort medians include
+all inputs and algorithm seeds, not one curve or one successful split:
+
+| Held-out case | D | Streamed ms | Programs ms | Paired ms | Complete starts, each arm | Paired cost increase vs streamed / programs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Small balanced | 24 | 1.207 | 1.238 | 2.189 | 9/9 | 81.3% / 76.8% |
+| Medium balanced | 64 | 3.647 | 4.062 | 9.270 | 9/9 | 154.2% / 128.2% |
+| Uneven | 768 | 154.148 | 155.629 | 223.469 | 9/9 | 45.0% / 43.6% |
+| Balanced campaign | 2048 | 1685.998 | 1509.368 | 1938.743 | 0/3 | 15.0% / 28.4% |
+| Prime cube | 24 | 0.146 | 0.148 | 0.153 | 3/3 | 4.8% / 3.2% |
+
+The conditional 95% bootstrap intervals for paired cost increases against
+streamed are 76.2–117.3%, 149.7–160.0%, 41.5–46.0%, 14.2–16.0% and 0.3–6.7%,
+respectively. Intervals against programs also exclude a benefit. These describe
+timing on fixed cohorts, not population factoring performance. All completion
+differences are zero; fixture-cluster intervals are [0, 0] on this small set
+and do not establish population equivalence. Training completion is also
+matched: 9/9 small/medium, 8/9 uneven, 0/3 campaign and 3/3 structured. Campaign
+rows are finite search costs; all four declared curves finish per start, and
+no factor is found. No row is wall/CPU-censored.
+
+The three-curve campaign diagnostics explain a limitation of this bounded
+layout. Streamed and unpaired programs produce 422,082 terms. Paired D=512
+produces 406,632 (3.7% fewer); D=1024 and D=2048 still produce 422,082 because
+the 1,024-slot prime segments separate opposite signs. All paired choices
+certify exactly 422,082 eligible primes. Their giant advances are 5,535/2,766/
+1,383 and baby-table slots including the sentinel are 257/513/1,025. Lower D's
+limited occupancy benefit does not pay for its extra recurrence/program work.
+Cross-segment coalescing or a different segment grid was not evaluated here.
+
+For D=2048, curve work is 2,024,553 initially and 587,083 on each subsequent
+curve, versus programs' 1,602,357/446,275 and streamed's 1,458,993 per curve.
+The paired store retains 6,863,584 bytes and records 923 coverage misses and
+1,846 hits over those three curves. Its owned reserve is 12,948,696 bytes,
+below the common 16 MiB cap; unpaired programs reserve 11,053,712 bytes.
+Held-out campaign process RSS is 91.5 MiB paired, 85.0 MiB programs and 82.8
+MiB streamed, including interpreter/JIT overhead. Regeneration-only training
+costs 2.588 seconds per campaign cohort, versus 1.878 seconds for retained
+programs at the same D=1024. The cap remains effective when retention is off.
+
+Separate instrumented full-campaign profiles validate all three arms and
+record 11,076 coverage calls / 2,769 certificate compilations in paired
+execution, along with packing, decoding and replay bookkeeping. This locates
+additional work but supplies no accepted timing ratio. Allocation tuning,
+kernel changes and advanced wheel/common-Z plans stay in their own workstreams.
+
+The 135 cold records are nine fresh starts for each held-out arm. Median
+startup-plus-cohort seconds (streamed/programs/paired) are
+0.163/0.166/0.152 small, 0.195/0.205/0.184 medium, 0.415/0.438/0.485 uneven,
+2.028/1.849/2.312 campaign and 0.152/0.152/0.128 structured. These include
+imports, proof checks and the controls' private snapshot reconstruction, so
+small cold differences are harness costs, not evidence for promotion.
+
+Raw captures, profiles and check logs remain local under ignored
+`results/p52-b2/`. The training/held-out SHA-256 digests are
+`569e06e22faf5210c03d9407de479151c99cc73559f81afab754d9ec019ea225` and
+`4257fc45af79f0e8131aca86bedbd65118bcb6081e263f34b93c1d8589901034`.
+The frozen protocol digest is
+`bd31511643617b3a4df124454573335edb49c6cb3f149b700a6ce2cf50a24ab8`.
+Required corpus/control/protocol inputs are versioned. The committed-files-only
+verification includes the unchanged `v1/` hash fixtures; an initial archive
+omitted them and its missing-file failure is retained alongside the repaired
+archive checks. Both full test suites and all 59 benchmark imports pass there;
+the proof/control loaders work without generated evidence. All 135 cold
+outcome/work records agree with the corresponding warmed records. No factoring
+source changed after training selection.
 
 The design retains Montgomery's x-coordinate symmetry and projective cross
 differences ([1987 paper](https://wstein.org/edu/124/misc/montgomery.pdf)).

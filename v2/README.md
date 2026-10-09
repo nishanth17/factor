@@ -333,6 +333,10 @@ execute those programs. `None` (default) preserves unpaired execution;
 `0` is an explicit direct-scalar control. For example, add
 `ecm_pair_distance=1024` to the 11,000/1,900,000 campaign above. This is a
 caller-selected experimental setting, not a measured recommendation.
+The frozen B2 study retains all production defaults: its selected paired
+settings lose to streamed and reusable unpaired execution on held-out complete
+factoring and a finite nonsplitting campaign. See `benchmarks/README.md` for
+the D choices, costs and coverage/segmentation limitations.
 The dense curve-private table holds even multiples through D, with a separate
 2D recurrence step. Each certified pair contributes one cross-product;
 singletons, block boundaries and inclusive tails remain covered. A saturated

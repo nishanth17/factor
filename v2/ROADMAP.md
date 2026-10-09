@@ -124,8 +124,9 @@ in the numbered phase catalogue. This plan does not authorize experiments;
 control and finish the isolated P4.3 backend tranche.** A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
-A3 retains streamed defaults after matched reuse experiments; B2 production
-pairing follows A2, with A6 needed for increased-B1 extensions. Conditional
+A3 retains streamed defaults after matched reuse experiments. B2 now supplies
+bounded opt-in pairing; its matched losses retain defaults, and A6 remains
+needed for increased-B1 extensions. Conditional
 capacity/CRT follow-ups can remain deferred. A10 can start now to recover
 verified v1 capabilities, beginning with wider deterministic primality.
 B14 follows A10 for certificate proofs; neither waits for GNFS or D7.
@@ -237,7 +238,7 @@ development and coordinated integration, not concurrent performance runs.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | B1 — P3.8-R1 calibration | Jointly train base size, interval, A selection/factor count, Gray reuse, residual/store/matrix allowances; freeze feasible configurations and evaluate fresh inputs. | A1 | **High.** Collector changes can move the best configuration, so broad tuning follows R2. Use meaningful upper-band allowances and explain collection, yield, storage and time failures separately. This supplies the R4 decision. | Sol / **high**, **xhigh** for selection | Sol fits controlled parameter sweeps and evidence summaries. Use high for executing the frozen protocol and xhigh for joint parameter selection, uncertainty and crossover decisions; long runs alone do not justify extra effort. |
-| B2 — P5.2 paired continuation | Execute reusable ±-paired stage-two programs; tune basic D/table sizes; preserve coverage, curve-private points, tails and replay; integrate supported finite campaign extensions. | A2, A3; A6 for extensions of the stage-one bound | **High potential.** Combines repeated-schedule savings with fewer continuation terms. Stable backend/program contracts avoid competing rewrites of stage jobs. It does not require PRAC or a GMP win. | Astra / **xhigh** | Choose Astra for proving paired-prime coverage while preserving projective terms and mixed-factor recovery. xhigh is warranted by interactions among tails, table bounds, reusable plans and resumed campaigns. |
+| ~~B2 — P5.2 paired continuation~~ | ~~Bounded reusable ± execution, independent coverage/point/replay/resume checks, basic D/table comparisons and finite predeclared campaign continuation.~~ | ~~A2, A3; A6 remains required for increased-B1 extensions.~~ | ~~**[x] Complete for bounded scope on 9 October 2026.** Pairing remains opt-in: selected held-out configurations lose to both accepted controls, with no completion gain. Increased B1, advanced pruning and allocation remain deferred.~~ | ~~Astra / **xhigh**~~ | ~~Exact coverage, projective products, saturation recovery, finite accounting and canonical int/GMP resume agree; frozen experiments support retaining defaults.~~ |
 | B3 — P4.1 production chains | Route verified records into actual bounded ECM stage-one jobs, including chunk replay, finite caches and ladder fallback; compare whole-stage costs. | A2, A3, A4 | **Medium/high potential.** Verified chains cannot help while production still calls only the ladder. Backend and program contracts make this a controlled execution change rather than an orphan helper optimization. | Sol / **xhigh** | Sol fits production integration once chain mathematics is independently verified. xhigh is for routing the records through real stage jobs while preserving work charges, replay, caches and fallback behavior. |
 | B4 — P4.2 fused/normalized kernels | Compare explicit squares, fused addition/doubling, selected reductions and unit-checked normalization on stable int/mpz paths. | A2 | **Medium/high potential.** Representation, conversions and formula conventions must be fixed before ranking kernels. This can use the ladder control and run independently of B3's chain integration. | Sol / **xhigh**; Astra for unresolved formula proofs | Sol fits a bounded set of kernels checked against fixed formulas. xhigh is for normalization assumptions, reduction bounds and backend interactions; use Astra / xhigh if a new algebraic equivalence remains unresolved. |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
@@ -2140,18 +2141,22 @@ execution tables above for dependencies, priority and model/effort rationale.
 
 ### P5.2 — Pair ECM stage-2 primes and tune table size
 
-**B2 implementation prepared — 9 October 2026; experiment gates remain open.**
+**B2 bounded tranche complete — 9 October 2026; no default promotion.**
 The isolated B2 work adds opt-in execution of the accepted +/- certificates,
 bounded curve-private tables, saturated-pair scalar recovery and version-7
 int/GMP checkpoints. Predeclared finite campaigns resume with cumulative
 allowances. Controls from committed A2/A3 mainline `94caf40`, independent fresh
 training/held-out corpora and a D/table protocol are frozen in versioned inputs.
-The user requested a stop before performance testing, so no B2 timing,
-selection, promotion or completed B2 gate is claimed. Python integers and all
-production defaults remain unchanged. A6's exact increased-B1 schedule-ratio
+Exclusive-window PyPy comparisons select D=24/64/768/2048, then confirm losses
+on fresh inputs: 81.3%/154.2%/45.0% slower complete factoring than streamed ECM
+on small/medium/uneven cohorts and 15.0% slower on a nonsplitting campaign.
+Reusable unpaired programs also win; completion is unchanged. All 45 final
+captures meet the frozen stability rule, with four training arms extended to
+31 samples. No speed or completion promotion gate passes. Python integers and
+all production defaults remain unchanged. A6's exact increased-B1 schedule-ratio
 contract is absent; those extensions are explicitly deferred. Changing an
 exhausted checkpoint's curves/bounds, advanced wheel/common-Z, production PRAC,
-kernel changes and allocation remain separate. See the prepared protocol in
+kernel changes and allocation remain separate. See the protocol and results in
 `benchmarks/README.md` and scoped development record in `v2/CHANGELOG.md`.
 
 **A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
@@ -2168,7 +2173,8 @@ exact checkpoint-buffer verification.
   coverage and affine point cross-products, including exceptions, positive
   initialization, block boundaries and tails. Coverage supports direct records
   or even D >= 2 with 2D below the initial odd scalar. It is an oracle/fixture
-  contract; production paired products and a broader D sweep remain B2 work.
+  contract at A3 acceptance; B2 now executes these records and compares basic D
+  choices without promoting the paired path.
 - [x] Compare retained 8 MiB programs with the frozen int control, current
   streamed default and capped regeneration using certified fresh inputs,
   validated PyPy warmup and at least nine samples. Retain defaults: small complete
@@ -2197,14 +2203,18 @@ Combined A3/A4 mainline acceptance passes 337 system-PyPy tests and three
 optional GMP checks in the existing PyPy venv, full lint and all 54 benchmark
 imports on a committed-files-only candidate. Full P5.2 is still open below.
 
-- [ ] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence or explicitly redesigning it.
+- [x] Pair eligible `r−d`/`r+d` candidates using x-coordinate symmetry; cache the union of distances. Keep point tables curve-specific. Sweep D under a memory cap, retaining a positive initialization scalar for the existing recurrence. B2's bounded implementation passes correctness and matched experiments; negative timing evidence retains defaults.
 - **A:** paired/unpaired schedules cover the same eligible primes; stage-2 terms and recovered factors validate. Product checkpoints handle early, late, and mixed-factor saturation; tail primes are included.
 - **E:** measure baby/giant steps, relation products, replay, setup, and RSS across B1/B2/D grids. Choose D by total continuation cost and factor yield, not simply `isqrt(B2)`.
 
-- [ ] B2: consume the accepted independent eligible-prime/cross-product
+- [x] B2: consume the accepted independent eligible-prime/cross-product
   oracles in production pairing; validate products, replay and resumed curve
   tables. Tune D using actual prime occupancy and simultaneous table/product/
   replay storage, not an asymptotic square-root estimate alone.
+  Three D choices per bound tier are measured with fixed 1,024-slot segments.
+  Segment boundaries can split opposite signs: the 1,024/2,048 campaign D
+  choices eliminate no products, while D=512 eliminates only 3.7%. Broader
+  segment/layout changes have not been measured or promoted.
 
 - [ ] Compare wheel/coprime-distance plans with explicit prime-to-term
   coverage certificates, including pruning when an existing `v*w +/- u`
@@ -2216,7 +2226,7 @@ imports on a committed-files-only candidate. Full P5.2 is still open below.
   mixed-factor saturation replay, and charge setup/table/product storage.
   Nonunit scaling over composite n is not projective equivalence.
 
-- [ ] B2: execute the accepted immutable +/- coverage programs with
+- [x] B2: execute the accepted immutable +/- coverage programs with
   curve-private point tables, tuned D and mixed-factor recovery. A3 programs
   already supply exact prime powers to production stage one and primes to
   unpaired stage two. Extend matched whole-continuation comparisons to paired
