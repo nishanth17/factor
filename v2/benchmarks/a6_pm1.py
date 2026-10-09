@@ -372,8 +372,15 @@ def continuations(samples=9):
                 )
                 if result.divisor is None and result.reason == "exhausted":
                     prior_work = result.work_used
+                    # Independent fresh stages share the campaign's total
+                    # allowance, just as in-memory and resumed execution do.
+                    remaining = Budget(
+                        work_limit=2_000_000 - prior_work,
+                        seconds=max(0, 30 - result.wall_seconds),
+                        cpu_seconds=max(0, 30 - result.cpu_seconds),
+                    )
                     result = factorize_pm1_bounded(
-                        n, config=final, budget=budget()
+                        n, config=final, budget=remaining
                     )
             elif arm == "in_memory":
                 result = factorize_pm1_bounded(
