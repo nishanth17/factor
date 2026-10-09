@@ -396,30 +396,49 @@ class PipelineTests(unittest.TestCase):
 
             def collect(self, lo, hi):
                 """Require release before allocating the next batch."""
-                # PyPy uses tracing GC; weakrefs do not clear immediately
-                # after the last strong reference is dropped.
-                gc.collect()
+                # Match Python's test.support.gc_collect: tracing GC can
+                # require several passes before a dead weakref clears.
+                # A retained application snapshot survives every pass.
+                for _ in range(3):
+                    gc.collect()
                 if self.previous is not None and self.previous() is not None:
                     raise AssertionError("prior collection snapshot is pinned")
                 result = super().collect(lo, hi)
                 self.previous = weakref.ref(result)
                 return result
 
-        base = build_factor_base(104729, bound=100).factor_base
-        job = QSJob(
-            qs_polynomial(base),
-            base,
-            -64,
-            65,
-            batch_width=16,
-            config=SieveConfig(residual_bound=1),
-            collector_class=ObservedCollector,
-            budget=unlimited_budget(),
-        )
+        class RetainingCollector(ObservedCollector):
+            """Deliberately pin a snapshot to verify the ownership guard."""
 
-        result = job.run()
+            def collect(self, lo, hi):
+                result = super().collect(lo, hi)
+                self.retained_snapshot = result
+                return result
+
+        base = build_factor_base(104729, bound=100).factor_base
+
+        def make_job(collector_class):
+            return QSJob(
+                qs_polynomial(base),
+                base,
+                -64,
+                65,
+                batch_width=16,
+                config=SieveConfig(residual_bound=1),
+                collector_class=collector_class,
+                budget=unlimited_budget(),
+            )
+
+        result = make_job(ObservedCollector).run()
 
         self.assertEqual(result.reason, "window_exhausted")
+        self.assertIsNone(result.divisor)
+        self.assertEqual(result.cofactor, 104729)
+
+        with self.assertRaisesRegex(
+            AssertionError, "prior collection snapshot is pinned"
+        ):
+            make_job(RetainingCollector).run()
 
 
 class StorageCompletionTests(unittest.TestCase):
