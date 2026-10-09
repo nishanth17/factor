@@ -9,7 +9,19 @@
   including initialization at zero-predecessor giants and one-sided tails.
 - Freeze fresh independent inputs, the original B2 control at `a670c4d` and
   three wheel choices per tier against accepted streamed/reusable controls.
-  Correctness and lint pass; experiment results will be recorded separately.
+  Complete 35 training and 20 held-out comparisons plus 180 separate cold
+  starts. Extend unstable arms to 31/63 samples; every final capture meets
+  the frozen stability criterion.
+- Retain defaults. Selected W=30/210/840/1890 cuts campaign products 16.4%
+  at exact coverage and reduces retained baby points from 1,024 to 216.
+  Medium/campaign time improves 31.1%/4.8% against original pairing, but the
+  uneven cohort regresses 44.0%. All selected wheels lose to reusable programs;
+  their campaign cost is 23.6% higher. Completion is unchanged. Unpaired
+  programs still save 10.8% versus streamed on this fresh nonsplitting campaign.
+- Pass full test/lint commands, committed-only suites with 376 system-PyPy
+  tests and 379 PyPy/GMP tests, and all 61 benchmark imports. Keep raw timing,
+  profiles and work/storage evidence local; version required inputs and
+  document both gains and losses with fixed-cohort limitations.
 - Defer extended distance sets, relocation, graph matching and common-Z to
   C2; polynomial continuation to F3. Increased B1 still depends on A6.
 

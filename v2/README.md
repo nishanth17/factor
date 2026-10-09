@@ -386,6 +386,11 @@ This optional mode covers one nearest-center distance set. Extended sets,
 relocation and overlapping-window graph matching belong to C2, as does
 common-Z; polynomial continuation belongs to F3. No production default changes.
 The fresh wheel comparison protocol is documented in `benchmarks/README.md`.
+Its selected held-out wheel is 31.1% faster than original pairing on the medium
+cohort and 4.8% faster on the fixed nonsplitting campaign, but 44.0% slower on
+uneven inputs. Every selected wheel loses to reusable unpaired programs:
+75.1%/108.7%/117.2% slower on small/medium/uneven complete factoring and 23.6%
+slower on the campaign. Completion is unchanged. No promotion gate passes.
 
 ## Checkpoints and limits
 

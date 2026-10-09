@@ -982,7 +982,98 @@ distance/relocation matcher. Its sparse odd-multiple generator still pays for
 discarded intermediate points. Those distinctions prevent attributing native
 pairing percentages to this PyPy implementation. Substantial matching,
 relocation, compact-map and common-Z extensions are deferred in C2; polynomial
-continuation remains F3. Experiment results are pending the exclusive window.
+continuation remains F3.
+
+**Completed result: retain every production default.** Candidate `dba3cd2`
+ran under the coordinated flock after B1's QA finished; A10 confirmed no heavy
+work. No competing benchmark/test process was detected. Ordinary desktop
+activity remained; the captures do not assert an otherwise idle operating
+system. PyPy 7.3.23 implements Python 3.11.15. All 35 final training captures
+and 20 final held-out captures satisfy the frozen stability rule. Training
+needed 42 attempts: five arms finished at 31 samples and one at 63. Held-out
+needed 25 attempts: medium wheel/programs/legacy finished at 31 and uneven
+wheel at 63. All earlier attempts are retained. The uneven wheel's relative
+IQR fell from 0.274 (9 samples) through 0.195 (31) to 0.141 (63); its final
+median is 0.360 seconds. This extended fixed-cohort estimate is not evidence
+of stability across all populations or machines.
+
+Training selected W=30/210/840/1890 for small/medium/uneven/campaign, with
+structured inputs inheriting 30. Held-out medians below measure complete
+cohorts, including all declared seeds and all factoring/setup/serialization
+costs. Each small, medium and uneven arm completes 9/9 starts; structured
+completes 3/3. The campaign completes all four declared curves per start but
+finds no factors (0/3 starts complete). No arm changes completion.
+
+| Held-out class | Streamed seconds | Programs seconds | Original paired seconds | Wheel seconds | Wheel vs programs | Wheel vs original paired |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| Small | 0.001245 | 0.001324 | 0.002392 | 0.002319 | 75.1% slower | 3.1% faster |
+| Medium | 0.005141 | 0.005301 | 0.016067 | 0.011064 | 108.7% slower | 31.1% faster |
+| Uneven | 0.166597 | 0.165668 | 0.249830 | 0.359836 | 117.2% slower | 44.0% slower |
+| Fixed nonsplitting campaign | 1.588467 | 1.417380 | 1.840164 | 1.752086 | 23.6% slower | 4.8% faster |
+| Structured | 0.000147 | 0.000146 | 0.000153 | 0.000151 | 3.6% slower | 1.0% faster, inconclusive |
+
+All selected wheel arms also lose to streamed execution. Conditional 95%
+bootstrap intervals for the wheel's time reduction versus programs are
+[-79.9,-72.6]%, [-110.1,-107.6]%, [-133.7,-110.9]%, [-24.0,-22.4]% and
+[-4.3,-1.7]% in table order. Versus original pairing, the medium interval is
+[30.6,31.4]%, campaign [4.5,5.4]% and uneven [-54.9,-33.3]%. These resample
+repeated timings of fixed cohorts; they are not independent input-population
+confidence intervals. No speed or completion promotion gate passes. Reusable
+unpaired programs retain value: this fresh fixed campaign saves 10.8% versus
+streamed, consistent with the earlier 10.5% observation. Neither campaign
+establishes a successful-factoring or global allocation advantage.
+
+Separate three-curve campaign diagnostics explain the bounded layout change:
+
+| Arm | Certified eligible primes | Product terms | Giant advances | Retained baby point slots | First/later curve work |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Programs | 422,082 by unpaired schedule | 422,082 | 2,055 | 1,379 table slots | 1,602,356 / 446,274 |
+| Original D=2048 | 422,082 | 422,082 | 1,383 | 1,024 plus sentinel | 2,024,552 / 587,082 |
+| W=210 | 422,082 | 353,442 | 26,988 | 24 | 2,065,311 / 532,130 |
+| W=840 | 422,082 | 353,064 | 6,747 | 96 | 2,205,886 / 518,573 |
+| W=1890 | 422,082 | 352,884 | 2,997 | 216 | 2,049,600 / 516,419 |
+
+Selected W=1890 eliminates 16.4% of products, representing 32.8% of primes
+covered in pairs. Exact prime coverage is unchanged. It retains 216 rather
+than 1,024 baby points, but still computes discarded intermediate multiples
+and incurs more giant advances. Its final program store is 6,204,320 bytes
+versus original pairing's 6,863,584 and programs' 1,888,800. Conservative owned
+reserves are 12,845,944 / 12,948,696 / 11,053,712 bytes respectively. Held-out
+campaign process peaks are 88.3 / 97.5 / 87.6 MiB; RSS also includes runtime,
+JIT and private control loading, so it is not table storage. Regeneration-only
+W=840 costs 2.746 seconds in training versus 1.843 with retention.
+
+All 180 separate cold starts validate identical rows/work to their warm arm.
+Campaign process-wall medians are 1.923 / 1.772 / 2.233 / 2.080 seconds for
+streamed / programs / original paired / wheel. Small cold apparent wins cannot
+promote the wheel: immutable controls pay private source reconstruction, while
+the candidate imports normally. Separate validated profiles cover three
+complete starts (12 campaign curves), not accepted timing ratios. The wheel
+profile records 12,000 coverage reads, 3,000 coverage compilations and 1,411,536
+sparse-slot binary searches. Packing/decoding and slot lookup remain concrete
+costs despite fewer products. Compact indexed maps and richer matching require
+their own C2 representation, recovery, memory and timing gates; this tranche
+does not bundle that tuning.
+
+Full `make -C v2 test` and `make -C v2 lint` pass. A committed-files-only archive
+passes 376 system-PyPy tests (two optional skips), 379 PyPy/GMP tests (no skips),
+and all 61 benchmark imports plus frozen proof/control loading. New cases
+cover exact independent coverage across segment boundaries, affine points,
+zero-predecessor initialization, mixed-factor and one-sided saturation, every
+action's resumed execution, cancelled/refused work, regeneration, corrupted
+metadata, canonical int/GMP campaigns and cumulative budget extension. No
+v1 or SIQS implementation file changes.
+
+Raw evidence is local under `results/p52-b2-wheel/`, including every attempt,
+cold sample, work/storage diagnostic, profile and QA log, with `manifest.json`.
+Training SHA-256 is
+`63becb5e078b112ee44e958a4f50bd8b6ec4ee5bf42c26048555135043ac93cf`;
+held-out SHA-256 is
+`0c4485ab36648626d3abd5b1634590c0cf09a1255a3dd6125fbc03aa190c1ff0`.
+Frozen legacy source / protocol / corpus hashes are respectively
+`59b44b7c13ca8be758f062337a76c37b2fcecddce7da0b23bf9a4389a38b054f`,
+`004c7e0c04c61b5562b57c413f81ac8f44d9efd1fedc304f71d24eae49a8337a`,
+`b876defa8ad640219bdeb8d97f8d66a581fa3c110d1fc683309d80a576c9e0ab`.
 
 ## P5.2-B2 paired continuation — 9 October 2026
 

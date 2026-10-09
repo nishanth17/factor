@@ -2159,7 +2159,7 @@ exhausted checkpoint's curves/bounds, advanced wheel/common-Z, production PRAC,
 kernel changes and allocation remain separate. See the protocol and results in
 `benchmarks/README.md` and scoped development record in `v2/CHANGELOG.md`.
 
-**B2 focused follow-up — aligned wheel cells.** A primary-source review of
+**B2 focused follow-up complete — aligned wheel cells; no promotion.** A primary-source review of
 [Atnashev–Woltman](https://eprint.iacr.org/2021/1462.pdf),
 [Prime95's pair planner](https://github.com/primesearch/Prime95/blob/main/pair.cpp)
 and [AVX-ECM](https://github.com/bbuhrow/avx-ecm) identified reusable integer
@@ -2168,9 +2168,17 @@ blocks. The bounded follow-up implements only nearest-center wheel cells
 aligned to the existing segment limit, with sparse curve-private baby points,
 exact certificates and version-8 int/GMP resume. Independent coverage, affine,
 saturation and finite-campaign checks pass. Fresh inputs, old B2 source and
-accepted A2/A3 controls are frozen; matched comparison acceptance remains open
-until the recorded experiments finish. No default is promoted by literature
-or by a reduction in product counts.
+accepted A2/A3 controls are frozen. All 35 training and 20 held-out captures
+pass the sampling/stability gate after extensions through 63 samples. Selected
+W=30/210/840/1890 eliminates 16.4% of campaign products at exact prime coverage,
+with 216 instead of 1,024 retained baby points. Medium/campaign time improves
+31.1%/4.8% versus original pairing, but uneven time regresses 44.0%. Every
+selected wheel loses to reusable unpaired programs (campaign: 23.6% slower),
+without a completion gain. No promotion gate passes. This fresh nonsplitting
+campaign again supports unpaired reuse (10.8% faster than streamed); it does
+not calibrate successful factoring or curve allocation. All 180 separate cold
+starts validate; profiles remain separate. Committed-only 376-test native and
+379-test GMP suites, full lint and all 61 benchmark imports pass.
 
 Substantial extensions are explicitly deferred to **C2**: multiple/extended
 distance sets, prime relocation and graph/overlapping-window matching. Each
@@ -2237,11 +2245,21 @@ imports on a committed-files-only candidate. Full P5.2 is still open below.
   replay storage, not an asymptotic square-root estimate alone.
   Three D choices per bound tier are measured with fixed 1,024-slot segments.
   Segment boundaries can split opposite signs: the 1,024/2,048 campaign D
-  choices eliminate no products, while D=512 eliminates only 3.7%. Broader
-  segment/layout changes have not been measured or promoted.
+  choices eliminate no products, while D=512 eliminates only 3.7%. The bounded
+  aligned-cell follow-up below measures one layout correction; no layout is
+  promoted into defaults.
 
-- [ ] Compare wheel/coprime-distance plans with explicit prime-to-term
-  coverage certificates, including pruning when an existing `v*w +/- u`
+- [x] B2 focused follow-up: align bounded program blocks to complete wheel
+  cells and retain coprime baby distances. Independently check exact coverage,
+  affine point products, wheel-divisor/initial/tail exceptions and saturated
+  mixed-factor recovery. Preserve finite int/GMP campaigns and old schemas;
+  use version 8 only for the opt-in wheel. Freeze fresh inputs and compare
+  W/table choices against accepted unpaired and original paired controls.
+  Negative matched evidence retains defaults; see the result above.
+
+- [ ] C2: compare extended distance sets, relocation and bounded overlapping-
+  window matching with explicit original-prime-to-term coverage certificates,
+  including pruning when an existing `v*w +/- u`
   is divisible by another eligible prime. Cover wheel-divisor exceptions,
   initialization and tails; keep plan construction segmented/bounded rather
   than copying native arrays indexed by absolute B2. Separately evaluate
