@@ -265,7 +265,7 @@ implementations complete.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | C1 — P3.8-R4 + P5.4, one workstream | Implement bounded double-large-prime residual splitting/cycle provenance under P5.4; evaluate useful dependencies and complete factoring under R4. | B1 showing insufficient useful yield; accepted R3 contracts | **High potential when yield-limited; otherwise defer.** Calibrated single-large-prime behavior is the fair control. One owner prevents duplicate DLP implementations. Splitting, unmatched occupancy, repeated-prime corrections and lifting can erase raw collection gains. | Astra / **xhigh** | Choose Astra for the combined residual-certainty, graph-cycle and exact-provenance contract. xhigh is needed for repeated primes, self-loops, disconnected cycles, eviction and the distinction between cycles and useful dependencies. |
-| C2 — P5.2 wheel pruning/common-Z | Independently compare advanced prime-coverage pruning and no-inversion common-Z tables against paired continuation. | B2 plus remaining schedule/product cost | **Conditional.** A paired reference makes attribution possible. Common-Z scaling can be a nonunit over composite n, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs and common-Z identities over composite moduli. xhigh is needed because apparently harmless scaling can hide nonunits or change saturation recovery. |
+| C2 — P5.2 advanced pairing/common-Z | Separately evaluate extended distance sets, prime relocation and bounded overlapping-window matching; compare advanced coverage pruning and no-inversion common-Z tables. | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Each challenger needs exact prime-to-term certificates, bounded planner/replay storage and matched end-to-end evidence. Common-Z scaling can be a nonunit, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs, matching invariants and common-Z identities over composite moduli. xhigh is needed because scaling or relocation can hide nonunits or change saturation recovery. |
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
@@ -2158,6 +2158,30 @@ contract is absent; those extensions are explicitly deferred. Changing an
 exhausted checkpoint's curves/bounds, advanced wheel/common-Z, production PRAC,
 kernel changes and allocation remain separate. See the protocol and results in
 `benchmarks/README.md` and scoped development record in `v2/CHANGELOG.md`.
+
+**B2 focused follow-up — aligned wheel cells.** A primary-source review of
+[Atnashev–Woltman](https://eprint.iacr.org/2021/1462.pdf),
+[Prime95's pair planner](https://github.com/primesearch/Prime95/blob/main/pair.cpp)
+and [AVX-ECM](https://github.com/bbuhrow/avx-ecm) identified reusable integer
+pair plans, coprime distance sets and preserving pairing opportunities across
+blocks. The bounded follow-up implements only nearest-center wheel cells
+aligned to the existing segment limit, with sparse curve-private baby points,
+exact certificates and version-8 int/GMP resume. Independent coverage, affine,
+saturation and finite-campaign checks pass. Fresh inputs, old B2 source and
+accepted A2/A3 controls are frozen; matched comparison acceptance remains open
+until the recorded experiments finish. No default is promoted by literature
+or by a reduction in product counts.
+
+Substantial extensions are explicitly deferred to **C2**: multiple/extended
+distance sets, prime relocation and graph/overlapping-window matching. Each
+requires an independently checked map from original primes to executed terms,
+finite matching/construction storage, cancellation/resume and recovery proofs,
+then setup-inclusive PyPy comparisons. Compact pairmap formats are also C2
+only when retained certificates/decoding are the measured bottleneck; no
+allocation rewrite is bundled here. Common-Z remains its own C2 challenger.
+Polynomial/product-tree continuation stays **F3**; production PRAC, arithmetic
+kernels and factor-size/curve allocation retain their existing workstreams.
+Increased-B1 extensions remain blocked on **A6's exact schedule-ratio contract**.
 
 **A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
 immutable packed prime/power blocks under an explicit run-local cap. Generation,

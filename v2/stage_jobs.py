@@ -4,7 +4,7 @@ import random
 from bisect import bisect_right
 from math import prod
 
-from . import arithmetic, ecm, ecm_paired, utils
+from . import arithmetic, ecm, ecm_paired, ecm_wheel, utils
 from .arithmetic import gcd, isqrt, pow
 
 
@@ -401,6 +401,9 @@ def advance_job(job, budget, context, config):
     if job["phase"] in ("stage_one", "replay"):
         _stage_one(job, budget, context, config)
         return
+    if job["kind"] == "ecm" and config.ecm_pair_wheel is not None:
+        ecm_wheel.advance(job, budget, context, config)
+        return
     if job["kind"] == "ecm" and config.ecm_pair_distance is not None:
         ecm_paired.advance(job, budget, context, config, peek_prime)
         return
@@ -495,6 +498,8 @@ def promote_job(job, backend):
         "giant",
         "previous",
         "pair_step",
+        "wheel_previous",
+        "wheel_last",
     ):
         if key in job:
             job[key] = convert(job[key])

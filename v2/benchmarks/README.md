@@ -935,6 +935,55 @@ GMP-ECM's near-optimal Lucas generator and newer continued-fraction searches
 are useful follow-ups; neither provides evidence that its chain-selection
 savings outweigh checked Python execution here.
 
+## P5.2-B2 aligned-wheel follow-up — 9 October 2026
+
+`p52_b2_wheel.py` freezes the original paired engine at `a670c4d`, retains
+the accepted `94caf40` streamed/reusable controls, and compares an opt-in
+aligned-cell wheel. The existing B2 corpus has already been inspected, so
+`build_p52_b2_wheel_inputs.py` generates fresh certified training and held-out
+inputs with seed 2026100953. Required snapshots, corpus and protocol live in
+versioned `inputs/`; raw captures remain local in `results/p52-b2-wheel/`.
+
+The frozen workload sizes, tiers, algorithm seeds 7/19/41, 50-million-unit
+work limit, 120-second wall/CPU limits, 16 MiB workspace, 8 MiB program cap and
+1,024-slot segments match the original study. Wheel grids are 6/30/210 for
+small, 30/210/420 for medium, 210/420/840 for uneven and 210/840/1890 for the
+nonsplitting campaign. Structured inputs inherit the small selection. Old
+paired controls use the previously selected D=24/64/768/2048. A regeneration
+arm uses the middle wheel with only the minimum program scratch reservation.
+Select the fastest stable training wheel with no completion regression against
+either accepted control; freeze that choice before held-out timing. This is a
+small fixed-cohort comparison, not factor-size or curve-allocation calibration.
+
+At least three seconds of validated warmup and nine samples are required;
+unstable arms extend to 5 seconds/31 samples, then 8 seconds/63 samples.
+The relative-IQR threshold is 0.15, and wall/CPU-censored or nondeterministic
+captures cannot pass. The same whole-factoring promotion rule applies: at
+least 10% median time reduction with an interval above zero, or a 10-point
+completion gain with an interval above zero, without a >5-point completion
+regression elsewhere. Fixed nonsplitting campaigns cannot promote defaults.
+All setup, tables, decoding, recovery, recursion and checkpoint costs are in
+the end-to-end measurement. Cold starts and instrumented diagnostics are
+separate; private-control reconstruction adds to cold startup and cannot be
+interpreted as an algorithmic speed advantage.
+
+Execution acquires the machine-wide flock and checks for competing benchmark/
+test processes. Coordinate the window with B1 and other heavy work first.
+The runner saves every attempt, pins source and input hashes, and refuses to
+overwrite evidence. The original B2 controls/protocol/results are unchanged.
+
+```sh
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase training --diagnostics --output v2/benchmarks/results/p52-b2-wheel/training.json
+pypy3 -B -m v2.benchmarks.p52_b2_wheel --phase held_out --selection v2/benchmarks/results/p52-b2-wheel/training.json --cold --output v2/benchmarks/results/p52-b2-wheel/held-out.json
+```
+
+The implementation uses complete nearest-center cells, not Prime95's extended
+distance/relocation matcher. Its sparse odd-multiple generator still pays for
+discarded intermediate points. Those distinctions prevent attributing native
+pairing percentages to this PyPy implementation. Substantial matching,
+relocation, compact-map and common-Z extensions are deferred in C2; polynomial
+continuation remains F3. Experiment results are pending the exclusive window.
+
 ## P5.2-B2 paired continuation — 9 October 2026
 
 The bounded implementation and matched experiments are complete. Pairing stays

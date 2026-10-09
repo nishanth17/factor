@@ -8,6 +8,7 @@ from . import utils
 
 PROGRAM_VERSION = "ecm-packed-blocks-v1"
 PAIRED_VERSION = "ecm-packed-pairs-v1"
+WHEEL_VERSION = "ecm-aligned-wheel-pairs-v1"
 WORD_LIMIT = 2**64
 
 
@@ -59,7 +60,7 @@ class ECMPrograms:
         self.coverage_hits = 0
         self.coverage_misses = 0
 
-    def coverage(self, cursor, *, b1, b2, distance, budget):
+    def coverage(self, cursor, *, b1, b2, distance, budget, wheel=None):
         """Reuse integer certificates; decoded records belong to one curve.
 
         The caller reserves coverage construction and decoded workspace in
@@ -72,6 +73,8 @@ class ECMPrograms:
         ):
             raise ValueError("paired coverage exceeds one prime segment")
         key = (cursor["left"], cursor["next"], b1, b2, distance)
+        if wheel is not None:
+            key += (wheel,)
         coverage = self.coverage_blocks.get(key)
         if coverage is None:
             values = cursor["values"]
@@ -90,6 +93,7 @@ class ECMPrograms:
                 distance=distance,
                 memory_bytes=4096 + 512 * len(values),
                 budget=budget,
+                wheel=wheel,
             )
             # Reserve decoding before publishing anything to the store.
             budget.consume(len(coverage.data) // 32)
@@ -192,7 +196,9 @@ class CoverageBlock:
         return iter_unpack("<QQQQ", self.data)
 
 
-def pair_coverage(block, *, b1, b2, distance, memory_bytes, budget):
+def pair_coverage(
+    block, *, b1, b2, distance, memory_bytes, budget, wheel=None
+):
     """Compile bounded coverage for a positive existing giant recurrence.
 
     Centers are odd and spaced by 2*D, so odd-prime distances are even.
@@ -207,7 +213,12 @@ def pair_coverage(block, *, b1, b2, distance, memory_bytes, budget):
     origin = b1 if b1 % 2 else b1 - 1
     if b2 >= WORD_LIMIT or block.lo < b1 + 1 or block.hi > b2 + 1:
         raise ValueError("coverage block lies outside inclusive bounds")
-    if distance and (distance < 2 or distance % 2 or 2 * distance >= origin):
+    if wheel is not None:
+        utils.require_integer(wheel, "wheel", 2)
+        if wheel % 2 or distance != wheel // 2:
+            raise ValueError("wheel requires an even period and half-distance")
+        origin = 0
+    elif distance and (distance < 2 or distance % 2 or 2 * distance >= origin):
         raise ValueError("D needs even distances and positive initialization")
     count = len(block.primes) // 8
     if 4096 + 512 * count > memory_bytes:
@@ -229,7 +240,7 @@ def pair_coverage(block, *, b1, b2, distance, memory_bytes, budget):
         offset = abs(prime - center)
         if center >= WORD_LIMIT:
             raise ValueError("coverage center exceeds packed word bounds")
-        if offset == 0:
+        if offset == 0 or (wheel is not None and center == 0):
             records[(prime, 0)] = [prime, 0]
             continue
 

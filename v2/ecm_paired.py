@@ -1,5 +1,8 @@
 """Bounded +/- continuation with curve-private points and scalar recovery."""
 
+from bisect import bisect_left
+from math import gcd as integer_gcd
+
 from . import ecm, utils
 from .arithmetic import gcd
 
@@ -26,10 +29,14 @@ def verify_progress(job, config, verifier):
         "pair_scalar_replay",
     ):
         raise ValueError("invalid paired phase")
-    distance, n = config.ecm_pair_distance, job["n"]
-    origin = job["b1"] - (job["b1"] % 2 == 0)
+    wheel = config.ecm_pair_wheel
+    distance, n = (
+        wheel // 2 if wheel else config.ecm_pair_distance,
+        job["n"],
+    )
+    origin = wheel or job["b1"] - (job["b1"] % 2 == 0)
     if job["distance"] != distance or not (
-        origin <= job["center"] <= job["b2"] + distance
+        origin <= job["center"] <= max(origin, job["b2"] + distance)
         and (
             job["center"] == origin
             if not distance
@@ -50,7 +57,11 @@ def verify_progress(job, config, verifier):
             raise ValueError("invalid paired point")
 
     point(job["value"])
-    if distance:
+    if wheel:
+        from .ecm_wheel import verify_table
+
+        verify_table(job, wheel, point)
+    elif distance:
         baby = job["baby"]
         if not (2 <= len(baby) <= distance // 2 + 1) or baby[0] is not None:
             raise ValueError("invalid paired baby table")
@@ -67,6 +78,13 @@ def verify_progress(job, config, verifier):
         job["pair_index"],
         job["cursor"],
     )
+    if wheel and (
+        cursor["left"] != job["b1"] + 1
+        and cursor["left"] % wheel != wheel // 2
+        or cursor["next"] not in (job["b1"] + 1, job["b2"] + 1)
+        and cursor["next"] % wheel != wheel // 2
+    ):
+        raise ValueError("paired window splits a wheel cell")
     utils.require_integer(index, "paired record index", 0)
     if (not records and index) or (records and not index < len(records)):
         raise ValueError("invalid paired program position")
@@ -95,6 +113,7 @@ def verify_progress(job, config, verifier):
                 seconds=None,
                 cpu_seconds=None,
             ),
+            wheel=wheel,
         )
         if records != [list(record) for record in coverage.records()]:
             raise ValueError("corrupt paired coverage records")
@@ -113,7 +132,11 @@ def verify_progress(job, config, verifier):
         if offset:
             if not (
                 distance
-                and offset % 2 == 0
+                and (
+                    integer_gcd(offset, wheel) == 1
+                    if wheel
+                    else offset % 2 == 0
+                )
                 and offset <= distance
                 and center >= origin
                 and (center - origin) % (2 * distance) == 0
@@ -283,13 +306,26 @@ def advance(job, budget, context, config, peek_prime):
         job["cursor"]["index"] = len(job["cursor"]["values"])
         return
 
+    _products(job, budget, config, distance)
+
+
+def _products(job, budget, config, distance, *, wheel=None):
+    """Execute certified terms with shared recurrence and recovery."""
+    n = job["n"]
     record = job["pair_records"][job["pair_index"]]
     center, offset, minus, plus = record
     if offset and job["center"] < center:
         budget.consume(2)
-        giant = list(
-            ecm.point_add(
-                *job["giant"], *job["pair_step"], *job["previous"], n
+        # With a wheel, the first giant is [W]Q and its predecessor is O.
+        # Differential addition with O as the difference degenerates;
+        # doubling is the exact first transition to [2W]Q.
+        giant = (
+            list(ecm.point_double(*job["giant"], n, job["a24"]))
+            if (wheel and job["center"] == wheel)
+            else list(
+                ecm.point_add(
+                    *job["giant"], *job["pair_step"], *job["previous"], n
+                )
             )
         )
         job.update(
@@ -316,7 +352,12 @@ def advance(job, budget, context, config, peek_prime):
         product = job["product"]
         for position in range(start, end):
             entry = records[position]
-            bx, bz = job["baby"][entry[1] // 2]
+            baby_index = (
+                bisect_left(job["baby_offsets"], entry[1])
+                if wheel
+                else entry[1] // 2
+            )
+            bx, bz = job["baby"][baby_index]
             term = (giant_x * bz - bx * giant_z) % n
             job["terms"].append(term)
             job["term_records"].append(entry)

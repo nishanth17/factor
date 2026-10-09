@@ -10,7 +10,12 @@ from dataclasses import asdict, dataclass, field
 from . import arithmetic, constants, prime_sieve, utils
 from .arithmetic import isqrt
 from .budget import Budget, BudgetExhaustedError
-from .ecm_programs import PAIRED_VERSION, PROGRAM_VERSION, ECMPrograms
+from .ecm_programs import (
+    PAIRED_VERSION,
+    PROGRAM_VERSION,
+    WHEEL_VERSION,
+    ECMPrograms,
+)
 from .factor import FactorizationResult, PrimeFactor
 from .preprocessing import (
     fermat_step,
@@ -29,7 +34,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 7
+CHECKPOINT_VERSION = 8
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -67,6 +72,7 @@ class PortfolioConfig:
     sss: SSSConfig | None = None
     ecm_program_bytes: int = 0
     ecm_pair_distance: int | None = None
+    ecm_pair_wheel: int | None = None
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -148,6 +154,24 @@ class PortfolioConfig:
             ):
                 raise ValueError("paired centers must fit packed words")
 
+        if self.ecm_pair_wheel is not None:
+            wheel = utils.require_integer(
+                self.ecm_pair_wheel, "ecm_pair_wheel", 2
+            )
+            if wheel % 2 or wheel > 2 * self.segment_size:
+                raise ValueError("even wheel must fit one prime segment")
+            if (
+                self.ecm_pair_distance is not None
+                or not self.ecm_program_bytes
+            ):
+                raise ValueError(
+                    "wheel requires programs and excludes legacy D"
+                )
+            if any(
+                b2 + wheel // 2 >= 2**64 for _, b2, curves in tiers if curves
+            ):
+                raise ValueError("wheel centers must fit packed words")
+
         object.__setattr__(self, "ecm_tiers", tiers)
         if self.siqs is not None and self.sss is not None:
             raise ValueError("choose one relation fallback: siqs or sss")
@@ -205,8 +229,15 @@ class PortfolioConfig:
             default=0,
         )
         paired_reserve = 0
-        if self.ecm_pair_distance is not None:
-            distance = self.ecm_pair_distance // 2 + 3
+        if (
+            self.ecm_pair_distance is not None
+            or self.ecm_pair_wheel is not None
+        ):
+            distance = (
+                self.ecm_pair_wheel // 2 + 6
+                if self.ecm_pair_wheel
+                else self.ecm_pair_distance // 2 + 3
+            )
             # Construction dict/sort/packing, decoded certificates, retained
             # replay records and their JSON copies coexist with point tables.
             paired_reserve = 8192 + 2048 * (
@@ -668,7 +699,11 @@ def _pack(state, config, budget, generator):
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
     configuration = asdict(config)
     version = 6
-    if config.backend == "python-int" and config.ecm_pair_distance is None:
+    if (
+        config.backend == "python-int"
+        and config.ecm_pair_distance is None
+        and config.ecm_pair_wheel is None
+    ):
         # Preserve mainline's native schemas. Version 5 was independently
         # used by P4.3 and P5.2; version 6 combines GMP and program identity.
         version = 5 if config.ecm_program_bytes else 4
@@ -681,10 +716,16 @@ def _pack(state, config, budget, generator):
     if config.ecm_pair_distance is None:
         configuration.pop("ecm_pair_distance")
     else:
+        version = 7
+    if config.ecm_pair_wheel is None:
+        configuration.pop("ecm_pair_wheel")
+    else:
         version = CHECKPOINT_VERSION
     payload = {
         "version": version,
-        "schedule": PAIRED_VERSION
+        "schedule": WHEEL_VERSION
+        if config.ecm_pair_wheel is not None
+        else PAIRED_VERSION
         if config.ecm_pair_distance is not None
         else PROGRAM_VERSION
         if config.ecm_program_bytes
@@ -817,7 +858,10 @@ def _verify_progress(current, config):
     if (
         current["job"]
         and current["job"]["kind"] == "ecm"
-        and config.ecm_pair_distance is not None
+        and (
+            config.ecm_pair_distance is not None
+            or config.ecm_pair_wheel is not None
+        )
     ):
         from .ecm_paired import verify_progress
 
@@ -856,6 +900,8 @@ def _unpack(checkpoint, config):
         expected_config = json.loads(_canonical(asdict(config)))
         if config.ecm_pair_distance is None:
             expected_config.pop("ecm_pair_distance")
+        if config.ecm_pair_wheel is None:
+            expected_config.pop("ecm_pair_wheel")
         if not config.ecm_program_bytes and (
             "ecm_program_bytes" not in payload["config"]
         ):
@@ -876,7 +922,8 @@ def _unpack(checkpoint, config):
 
         if (
             type(payload["version"]) is not int
-            or payload["version"] not in (2, 3, 4, 5, 6, CHECKPOINT_VERSION)
+            or payload["version"] not in (2, 3, 4, 5, 6, 7, CHECKPOINT_VERSION)
+            or (payload["version"] < 8 and config.ecm_pair_wheel is not None)
             or (
                 payload["version"] < 7 and config.ecm_pair_distance is not None
             )
@@ -890,7 +937,9 @@ def _unpack(checkpoint, config):
             )
             or payload["schedule"]
             != (
-                PAIRED_VERSION
+                WHEEL_VERSION
+                if config.ecm_pair_wheel is not None
+                else PAIRED_VERSION
                 if config.ecm_pair_distance is not None
                 else PROGRAM_VERSION
                 if config.ecm_program_bytes

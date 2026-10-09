@@ -1,5 +1,18 @@
 # v2 development changes
 
+## B2 aligned-wheel follow-up — 9 October 2026
+
+- Add opt-in `ecm_pair_wheel`, with complete bounded nearest-center cells,
+  coprime baby-point storage and shared certificate/saturation recovery.
+  Preserve original paired execution, old checkpoint encodings and defaults.
+- Add version-8 canonical wheel checkpoints and exact int/GMP continuation,
+  including initialization at zero-predecessor giants and one-sided tails.
+- Freeze fresh independent inputs, the original B2 control at `a670c4d` and
+  three wheel choices per tier against accepted streamed/reusable controls.
+  Correctness and lint pass; experiment results will be recorded separately.
+- Defer extended distance sets, relocation, graph matching and common-Z to
+  C2; polynomial continuation to F3. Increased B1 still depends on A6.
+
 ## B2 paired ECM continuation — bounded opt-in tranche, 9 October 2026
 
 - Add opt-in bounded reusable +/- stage-two execution through
