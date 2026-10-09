@@ -57,7 +57,34 @@ Python defaults or measured Python improvements.
 - **Phase exit:** the condition for moving the dependent production work into the next phase. Independent research spikes may proceed once their stated prerequisites exist.
 - **Evidence:** store the implementation commit, command, corpus identifier, seeds, environment, raw results, and decision in a separate artifact for each task. Preserve the original audit JSON as historical evidence.
 
-Performance promotion policy proposed for Phases 3–8: zero correctness failures; obey the same time, CPU, and memory limits; show either at least 10% lower end-to-end median time on a prespecified comparable cohort or at least 10 percentage points higher completion within budget; allow no more than a 5-percentage-point completion regression in another declared workload class. Check uncertainty with repeated seeds and a confidence interval for the relevant difference. If evidence is inconclusive, retain the baseline and expand the sample. Include setup, conversion, timeout, and recovery costs. These thresholds are project policy suggestions, not measured predictions.
+**Performance promotion policy for Phases 3–8 — revised 9 October 2026:**
+require zero correctness failures and the same finite work, wall/CPU time,
+memory and storage limits. A repeatable reduction in complete-run median time
+or increase in completion within budget can qualify at any percentage.
+Confirm the effect on fresh held-out inputs with repeated seeds, stable
+samples and a prespecified uncertainty analysis, normally a 95% confidence
+interval supporting a positive improvement. Account for run-to-run noise,
+measurement order and drift; a positive point estimate alone is insufficient.
+Include setup, conversion, timeout, recovery and output-validation costs.
+
+Report absolute and relative benefits, per-class time/completion results and
+uncertainty. Allow no more than a 5-percentage-point completion regression in
+another declared class; explain any time, completion or resource regression
+and narrow the promoted scope where warranted. Weigh the confirmed benefit
+against implementation complexity, maintenance and arithmetic/resume risk.
+Small, simple improvements can be worthwhile; more invasive changes need a
+stronger benefit. Kernel-only wins cannot establish complete-factoring gains,
+and claims remain limited to the confirmed workload/resource classes.
+
+Freeze sources, inputs, seeds, bounds, budgets, metrics, sampling/stability
+rules and regression limits before timing. A change-specific minimum useful
+effect may be justified before measurement, but 10% time reduction and
+10 percentage points of completion gain are no longer universal gates.
+Inconclusive evidence retains the baseline; extend measurements only within
+the declared study limits. Preserve previous frozen protocols and historical
+verdicts. Reconsider their evidence through an explicit policy reassessment,
+without retuning on held-out inputs or treating the policy change as automatic
+production promotion.
 
 ## Execution order: optimize current engines, then revisit GNFS
 
@@ -131,7 +158,8 @@ integrated R2 control for the selected E1/C3 follow-ups.** B1's 9 October
 30/40-digit tranche is complete; general defaults and broader crossover gates
 remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
-routing and near-optimal chains remain B3/C6 work.
+routing remains B3 work. C6's bounded comparison now retains the ladder;
+new chain-search extensions remain conditional.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
 bounded opt-in pairing; its matched losses retain defaults, and A6 remains
 needed for increased-B1 extensions. Conditional capacity/CRT follow-ups can
@@ -279,7 +307,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Activated by user on 9 October 2026, separate bounded tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| C6 — P4.5 precomputed Lucas-chain experiment | Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess the conditional CF search gate. | A4; stable A2/A3 benchmark interfaces | **[x] Bounded comparison complete, 9 October 2026.** Verify 303 upstream prime records, compact/ring/three-point contracts and int/GMP full-stage/campaign evidence. Retain the ladder under the revised promotion policy; stop new CF search for lack of a credible measured opportunity. B3 integration and unrun search remain open. | Astra / **xhigh** | Chain-search scope, independent scalar/projective verification and bounded recovery; no global-optimality or production-speedup claim. |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -423,7 +451,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment]
+    CHAIN --> SEARCH[C6/P4.5: bounded comparison complete, retain ladder]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -513,12 +541,14 @@ timings. Integrate changes sequentially and compare the exact combined source.
    from observed RSS. Benchmarks must use matched inputs, seeds and budgets,
    at least three seconds of validated PyPy warmup and nine samples, extended
    when unstable. Cold startup and instrumented profiles stay separate.
-4. **Use existing promotion gates.** Zero correctness failures; at least 10%
-   lower complete-run median time or 10 percentage points more completion on
-   a prespecified comparable cohort, with no more than 5 percentage points
-   of completion regression in another declared class, and uncertainty
-   reported. Faster refusal, microkernel throughput, extra rows and synthetic
-   matrix capacity alone do not establish a factoring win.
+4. **Use the revised promotion policy above.** Require zero correctness
+   failures and a repeatable complete-run time or completion improvement
+   supported by fresh confirmation and uncertainty beyond measurement noise.
+   There is no universal minimum percentage gain. Keep the same finite
+   resource limits, report per-class regressions, retain the 5-percentage-point
+   completion-regression ceiling and weigh benefit against maintenance/risk.
+   Faster refusal, microkernel throughput, extra rows and synthetic matrix
+   capacity alone do not establish a factoring win.
 5. **Run relevant checks.** Implementation changes use `make -C v2 test` and
    `make -C v2 lint`; before publishing, verify tests and benchmark imports
    in a committed-files-only checkout. Update API docs, accepted behavior and
@@ -1336,10 +1366,11 @@ speedups or a general verdict on parallel SIQS.
   Exact relation/provenance, cross-worker resume, malformed checkpoints,
   cap/budget refusals and cancellation retain their contracts. Run
   `make -C v2 test` and `make -C v2 lint` for implementation changes.
-- **E:** evaluate one change at a time. Apply the existing promotion policy:
-  at least 10% lower complete-run median time or 10 percentage points higher
-  completion, with no more than 5 points of regression in another declared
-  class, under the same resource limits and with uncertainty reported.
+- **E:** evaluate one change at a time under the revised promotion policy:
+  confirm a repeatable complete-run time or completion benefit beyond
+  measurement noise, with no universal percentage floor. Keep the same
+  resource limits, report uncertainty and per-class regressions, retain the
+  5-point completion-regression ceiling and justify maintenance/risk costs.
   Keep serial defaults and SSS/SSSf experimental until their respective gates
   pass. Close this milestone only after the planned experiments, acceptance
   checks and explicit decisions are recorded; diagnosis alone does not
@@ -1967,7 +1998,8 @@ and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
 input size and target factor size are reported separately; unresolved
 composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
-P4.5/C6 precomputed Lucas comparison and B3 integration remain open.
+bounded P4.5/C6 comparison is now complete with a retain-ladder decision;
+B3 integration and any new search extension remain open.
 
 **Research decision:** use ordinary bounded PRAC first. The
 [GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
@@ -1979,8 +2011,9 @@ precomputes optimal or near-optimal prime chains, but generation and storage
 still need to be charged. The
 [Bernstein–Cottaar–Lange paper](https://eprint.iacr.org/2024/1044)
 improves continued-fraction chain search by pruning and meet-in-the-middle;
-it does not establish a faster checked PyPy ECM engine. Compare precomputed chains separately in P4.5/C6 before drawing conclusions
-about their production value; the checked A4 timings cannot settle that question.
+it does not establish a faster checked PyPy ECM engine. The separate C6
+comparison below now measures those precomputed candidates; checked A4
+timings alone did not settle their production value.
 [CADO's bytecode implementation](https://github.com/cado-nfs/cado-nfs/blob/master/sieve/ecm/bytecode.c)
 separates encoding, cost models and verification; compact program execution
 is a useful B3 comparison to the readable bounded records used in A4.
@@ -2151,13 +2184,13 @@ This is separate from A4 and B3; its result must not be inferred from checked
 PRAC's timings. See the [C6 study](benchmarks/c6_research.md) for pinned
 research, contracts and the frozen experiment scope.
 
-- [ ] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
+- [x] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
   decode with the upstream implementation and independently verify every
   integer/differential identity. Compare precomputed PRAC and Lucas chains
   through the same compact executor, preserving bounded nonunit/factor
   recovery. GMP-ECM uses a 16-point rolling buffer; the newer continued-fraction
   paper's three-live-point interpreter is a distinct candidate.
-- [ ] Run ladder, precomputed PRAC and Lucas arms on the same certified
+- [x] Run ladder, precomputed PRAC and Lucas arms on the same certified
   40/50/60/70/80-digit corpus, seeds, bounds and curve limits, with Python-int
   and gmpy2 variants. Separate input digits from factor digits. Include
   generation/load/verification, storage, dispatch, recovery, cold startup,
@@ -2174,6 +2207,24 @@ research, contracts and the frozen experiment scope.
 - **E:** at least three seconds of validated PyPy warmup and nine paired
   samples, extending unstable captures. Promote only after complete-run
   evidence. B3 owns subsequent bounded-stage/checkpoint integration.
+
+**Bounded acceptance — 9 October 2026:** 303 pinned upstream records and
+all prime-power actions independently verify. Tests cover composite/nonunit,
+prime-square, saturation and the published false-infinity case; all 411 tests
+and full lint pass. Reused/fresh full stages and complete two-stage campaigns
+use frozen controls, certified 40–80-digit inputs, exclusive windows and
+separate int/GMP workers. Full campaign Lucas/ladder ratios are 2.034 and
+1.217, with the same 10/20 proper splits and all unresolved cases retained.
+Construction, cold startup, storage and the distinct three-point interpreter
+are documented in the [study](benchmarks/c6_research.md).
+
+The revised no-universal-percentage-floor policy is applied through an
+explicit amendment, preserving the historical frozen protocol. No candidate
+wins the complete comparison; neither abstract cost savings nor a gain over
+losing compact PRAC justifies promotion. The conditional new CF search gate
+was not opened: that unchecked task is deliberately unrun. Accept the bounded
+research candidate, retain the ladder, and leave B3 work accounting,
+checkpoint/replay and complete-portfolio integration open.
 
 **Phase 4 exit:** promote only variants with independently validated arithmetic and reproducible full-stage/portfolio benefit. A documented decision to retain the ladder or native `%` is a successful experiment outcome; a speedup is not guaranteed.
 

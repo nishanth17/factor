@@ -1096,6 +1096,71 @@ are copied and checksum-verified into ignored
 manifest and combined-check logs stay in `results/p43/`. Required corpora,
 baselines and runners are committed; generated evidence is never force-added.
 
+## C6 / P4.5 bounded Lucas study — 9 October 2026
+
+**Retain the ladder; accept the verified experimental candidate.** The user
+activated C6 and subsequently removed the universal 10% promotion floor.
+Even under that revised policy, every candidate loses the frozen complete-run
+comparison. No B3 production routing, checkpoint or kernel change is made.
+See [research, contracts and reproduction](c6_research.md).
+
+Control: committed mainline `bcf5f3d`; measured implementation `6d54a14`.
+Apple M4, macOS 26.6.2, PyPy 7.3.23 / Python 3.11.15, gmpy2 2.3.1 / GMP 6.3.0.
+B1=2,000, B2=147,396, eight curves, 20 seconds wall/CPU per attempt,
+seeds 41001/48920. Inputs have 40/50/60/70/80 digits; balanced target factors
+have 20/25/30/35/40 digits, while the small-factor class targets 10 digits.
+Stage samples contain ten balanced one-curve attempts; campaign samples
+contain twenty complete two-stage attempts across both classes. Medians below
+are **seconds per fixed cohort**, including unsuccessful attempts.
+
+| Arm | Int stage reused | Int stage fresh | Int campaign | GMP stage reused | GMP stage fresh | GMP campaign |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ladder | 0.091371 | 0.092123 | 1.643853 | 0.328431 | 0.339134 | 6.372317 |
+| Checked PRAC | 0.193277 | 0.408114 | 2.901655 | 0.404779 | 0.649989 | 7.556520 |
+| Compact PRAC | 0.262837 | 0.521947 | 3.668836 | 0.483140 | 0.725647 | 8.076335 |
+| Compact Lucas | 0.260573 | 0.372753 | 3.344097 | 0.456377 | 0.584851 | 7.756499 |
+| Rolling Lucas | 0.263638 | 0.380555 | 3.306575 | 0.460233 | 0.597376 | 7.842726 |
+
+Lucas/ladder campaign ratios are 2.034 (95% fixed-cohort repeat-timing interval
+1.988–2.249) for int and 1.217 (1.208–1.259) for GMP. Reused stage ratios are
+2.852 (2.846–2.896) and 1.390 (1.347–1.446). Fresh stage ratios are 4.046
+(3.979–4.120) and 1.725 (1.670–1.897). These are repeat-timing intervals,
+not success-probability intervals or fresh held-out confirmation.
+
+Every campaign arm obtains the same ten proper splits in twenty attempts:
+10/10 small-factor attempts succeed, 0/10 balanced attempts succeed, and all
+ten unresolved composites remain in evidence. No timeout occurs. Int/GMP
+results, exact coordinates, work counters and unresolved values match in
+200 cross-backend comparisons across the three scopes. All measured samples
+are reconstructed and deterministic. Balanced-80 coverage is deliberately
+feasible but insufficient for a claim about practical balanced-80 factoring.
+
+All groups use >=3 seconds validated warmup and nine samples. GMP rolling
+reuse and GMP checked fresh stages extend to 18 samples; all campaign groups
+settle at nine. Final relative IQR ranges 0.30–14.09%; no overlap with B4/A6
+accepted timing is detected. Cold startup is separate: nine fresh processes
+per arm give ladder/Lucas cohort medians of 1.154/1.502 seconds (int) and
+1.525/1.796 seconds (GMP), including imports, construction and independent
+validation. Warm execution timers exclude the external certificate/affine
+oracle; no promotion relies on those execution-only totals.
+
+The pinned upstream generator/decoder reproduces 303 prime records. Nine
+fresh upstream-process generation/decode/verification trials total 0.527 s
+median; one-time cold C compilation is 1.188 s. Warm Lucas program
+construction/verification is 8.780 ms; catalog load/decode/verification alone
+is 5.707 ms. Each full program owns 317 records including recovery units:
+17,512 bytecode bytes, four last-use point slots or sixteen ring slots.
+The 45-record CF diagnostic separately compares the three-point interpreter;
+it does not establish a full-stage speedup. Raw captures and failed scratch
+runs remain local in `results/c6/`; the catalog, pinned upstream inputs and
+frozen protocol/policy amendment are committed.
+
+The compact comparison identifies no credible chain-quality opportunity
+against the ladder. Stop the conditional offline continued-fraction search;
+leave that unrun gate and B3 integration open. Small sustained improvements
+remain eligible under the revised policy, but an abstract count reduction or
+a gain against the losing compact-PRAC arm is not a ladder promotion.
+
 ## P4.1/A4 verified PRAC — 5 October 2026
 
 `ecm.multiply_prac` now executes bounded verified records, including checked
@@ -1254,8 +1319,9 @@ window provenance and the explicit closeout record.
 
 The checked implementation is a correctness foundation, not the preferred
 performance path. GMP-ECM precomputed Lucas codes and compact execution are
-explicitly deferred to **P4.5/C6** in the roadmap; no such executor or chain
-corpus is included in this change.
+explicitly deferred to **P4.5/C6** at A4 acceptance; no such executor or chain
+corpus was included in that change. The separately activated 9 October C6
+study above now completes the bounded comparison and retains the ladder.
 
 ### Kernel and standalone stage-one diagnostics
 

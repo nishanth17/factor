@@ -1,5 +1,20 @@
 # v2 changelog
 
+## C6 bounded precomputed Lucas study — 9 October 2026
+
+- Reproduce pinned GMP-ECM LucasChainGenerator at B1=2,000; preserve upstream
+  licenses and independently verify every decoded/compact scalar action.
+  Add immutable bounded records, common PRAC/Lucas execution, 16-point ring
+  and restricted three-point diagnostics, including factor-preserving recovery.
+- Verify prime powers, composites, nonunits, prime squares, saturation and
+  published false infinity. Pass 411 PyPy/GMP tests and full lint.
+- Freeze certified inputs, seeds, bounds, budgets and controls; retain all
+  unsuccessful attempts. Compact Lucas loses reused/fresh stages and complete
+  two-stage campaigns for both backends. Accept the experimental correctness
+  candidate, retain the ladder and stop conditional CF search expansion.
+  Document the explicit relaxed-policy reassessment, generation/amortization,
+  storage and cold/warm evidence. Production integration stays with B3.
+
 ## A10 integration and research reconciliation — 9 October 2026
 
 - Integrate source-verified strict 12/13-base Miller–Rabin ranges with settled

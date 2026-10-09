@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-09",
+  "authority": "Explicit user instruction, followed by revised policy in B4 ROADMAP.md at commit 1133441",
+  "historical_protocol": "c6_protocol.json",
+  "timing_sources_unchanged": true,
+  "recorded_after": "stage_reuse observations; during stage_fresh capture",
+  "promotion": "No universal percentage floor. Require stable complete-run benefit, prespecified uncertainty supporting a positive improvement, fresh held-out inputs/repeated seeds, unchanged correctness/resource limits and no more than 5 percentage points completion regression in another declared class. Include all costs and weigh complexity.",
+  "search": "Reassess the historical 5%/10% search gate as a practical opportunity test. A small credible gain may justify further bounded work; a substantial ladder regression does not establish a remaining chain-quality opportunity.",
+  "preserved": "All source hashes, certified inputs, candidate arms, bounds, budgets, seeds, samples, instability extensions and historical protocol fields remain frozen. No held-out retuning."
+}

@@ -2,6 +2,17 @@
 
 ## Current development
 
+- Complete the explicitly activated bounded C6/P4.5 Lucas-chain comparison.
+  Version a pinned GMP-ECM generator/decoder and 303 independently verified
+  prime records; add reusable compact PRAC/Lucas, rolling and restricted
+  three-point research executors with bounded nonunit/factor recovery.
+- Retain the ladder: Lucas costs 2.03x native-int and 1.22x GMP complete ECM
+  campaign time with identical completion on the frozen 40–80-digit cohort.
+  Record generation, amortization, storage, cold costs and the conditional
+  search stop. Apply the user's revised policy allowing confirmed sub-10%
+  gains without rewriting the historical protocol. B3 production routing,
+  budgets and checkpoint integration remain open; v1 and kernels are unchanged.
+
 - Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
   independently checked Sorenson–Webster bounds: first 12 prime bases for
   `n < 318665857834031151167461`, first 13 for

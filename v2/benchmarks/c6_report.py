@@ -21,6 +21,34 @@ def ratio_interval(candidate, baseline):
     return samples[50], samples[1949]
 
 
+def class_timings(capture, baseline):
+    """Exploratory class breakdown; never a post-hoc promotion cohort."""
+    classes = sorted(
+        {r["case"].split("_")[0] for r in capture["samples"][0]["rows"]}
+    )
+    result = {}
+    for name in classes:
+        groups = []
+        for arm in (capture, baseline):
+            groups.append(
+                [
+                    sum(
+                        r["seconds"]
+                        for r in sample["rows"]
+                        if r["case"].startswith(name + "_")
+                    )
+                    for sample in arm["samples"]
+                ]
+            )
+        after, before = groups
+        result[name] = dict(
+            median_seconds=statistics.median(after),
+            ratio=statistics.median(after) / statistics.median(before),
+            ratio_interval=ratio_interval(after, before),
+        )
+    return result
+
+
 def summarize(path):
     report = json.loads(path.read_text())
     indexed = {(r["backend"], r["arm"]): r for r in report["captures"]}
@@ -77,6 +105,7 @@ def summarize(path):
                 ),
                 attempts=len(distinct),
                 timeouts=sum(o["timed_out"] for o in distinct.values()),
+                class_timings=class_timings(capture, baseline),
                 by_case=[
                     dict(case=case, seed=seed, **outcome)
                     for (case, seed), outcome in distinct.items()

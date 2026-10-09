@@ -81,7 +81,10 @@ Records have at most 512 steps and 16 retained point slots; programs own at
 most 512 records, with no global point cache. See the [C6 study](
 benchmarks/c6_research.md) for recovery, storage and reproducibility details.
 No C6 candidate is routed into production stage jobs or checkpoint formats;
-that remains B3's decision after complete-run evidence.
+B3 integration remains open. The bounded C6 study retains the ladder after
+full-stage and two-stage campaign losses on both backends, including under
+the revised policy allowing small confirmed gains. The records are accepted
+as a reusable correctness reference; new CF search is deliberately unrun.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
