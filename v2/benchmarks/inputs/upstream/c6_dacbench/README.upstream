@@ -1,0 +1,31 @@
+Software accompanying the paper "Searching for differential addition
+chains" by Daniel J. Bernstein, Jolijn Cottaar, and Tanja Lange.
+
+SPDX-License-Identifier: LicenseRef-PD-hp OR CC0-1.0 OR 0BSD OR MIT-0 OR MIT
+(https://cr.yp.to/spdx.html, https://spdx.org/licenses/CC0-1.0.html,
+https://spdx.org/licenses/0BSD.html, https://spdx.org/licenses/MIT-0.html,
+https://spdx.org/licenses/MIT.html)
+
+To run benchmarks and draw graphs for selected primes under 10000:
+
+    ./bench.py 10000 > bench.out
+    ./plot.py < bench.out
+
+Results are in plot*.pdf. The plotting relies on python3-matplotlib. To
+instead select primes under another integer N, change 10000 to N.
+
+bench.py automatically uses all available threads. To limit it to 1
+thread:
+
+    env THREADS=1 ./bench.py 10000 > bench.out
+
+To plot only the mitm algorithm:
+
+    grep -w mitm bench.out | ./plot.py
+
+Miscellaneous tests:
+
+    for x in gcd primes dac ladder cfrc prac sibc ctidh prune mitm mitm2
+    do
+      python3 $x.py > $x.out
+    done

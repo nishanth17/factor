@@ -81,10 +81,30 @@ Records have at most 512 steps and 16 retained point slots; programs own at
 most 512 records, with no global point cache. See the [C6 study](
 benchmarks/c6_research.md) for recovery, storage and reproducibility details.
 No C6 candidate is routed into production stage jobs or checkpoint formats;
-B3 integration remains open. The bounded C6 study retains the ladder after
-full-stage and two-stage campaign losses on both backends, including under
-the revised policy allowing small confirmed gains. The records are accepted
-as a reusable correctness reference; new CF search is deliberately unrun.
+B3 integration remains open. The initial conservative C6 study retained the
+ladder after full-stage and campaign losses; those results remain historical
+controls. The user reopened executor optimization. See the [follow-up](
+benchmarks/c6_optimization.md) for its independently proved factor coverage,
+frozen comparisons and final decision.
+
+`benchmarks.c6_fast.load_catalog()` verifies immutable scalar and coordinate
+coverage certificates once. `build_program(B1, family, mode, backend, batch)`
+constructs a bound-owned experimental program for binary, PRAC or upstream
+Lucas records. `program(point, n, a24, extra)` returns `(point, factor)`;
+a missing point with no factor denotes finite saturation/retry exhaustion.
+A unit aggregate certifies the block's intermediate coordinates. A nonunit
+aggregate replays the saved block through the unchanged strict recovery path,
+including saturated products containing different proper factors.
+
+The same curve/modulus preconditions apply. Programs have <=512 records,
+<=512 operations per record, <=16 point registers and <=64 records per check
+batch; generated source is capped at 128 KiB per record and 8 MiB per program.
+Caller-owned programs can be reused; there is no global point or code cache.
+`benchmarks.c6_cf` supplies the separately verified CF catalog and common-tuple
+or three-point execution, with the same stage result and recovery contract.
+These APIs do not provide a portfolio work ledger, cancellation checkpoint or
+serialized resume format. B3 must reserve whole-block execution and bounded
+replay work before integrating them.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and

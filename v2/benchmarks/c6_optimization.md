@@ -89,3 +89,75 @@ pinned whole-lcm ladder and original strict executor. Profiles remain separate
 from performance evidence. New CF search stays conditional on a credible
 opportunity in the optimized comparison; original negative results do not
 veto this explicitly authorized follow-up.
+
+## Frozen first screen
+
+Commit `17aca0b` freezes the optimized common-executor sources and independent
+held-out corpus. The GMP-enabled PyPy suite passes 421 tests and full lint.
+The completed screen contains 58 groups: three chain families, three execution
+modes, three batch sizes, plus both old strict controls, on each backend.
+Every group has >=3 seconds of validated warmup per arm and >=9 paired samples.
+One GMP inline-Lucas group extends to 18 samples; all final groups meet the
+frozen stability rule. The raw capture hash is
+`3f23585d99a37fc4cff2c1feb83d90a8828293436adc31cefd07d1f22bc734b4`.
+
+The selection rule favors the simpler executor and smaller batch within 1%
+of the best stable paired ratio. Selected stage-reuse training ratios are:
+
+| Family | int choice / ratio (95% interval) | GMP choice / ratio (95% interval) |
+| --- | --- | --- |
+| Binary prime powers | tuple/16: 1.244 [1.216, 1.254] | tuple/16: 1.114 [1.072, 1.164] |
+| PRAC | tuple/16: 0.879 [0.871, 0.888] | tuple/16: 0.888 [0.844, 0.909] |
+| GMP-ECM Lucas | tuple/64: 0.867 [0.864, 0.873] | tuple/16: 0.855 [0.838, 0.880] |
+
+Ratios use the pinned whole-lcm ladder as denominator; smaller is faster.
+These are training-stage results, not production or complete-campaign claims.
+The selected binary prime-power family remains a losing diagnostic control.
+Straight-line expansion does not win this screen. Profiles must be kept
+separate before attributing its loss to JIT behavior or call overhead.
+The largest observed worker RSS is 96,223,232 bytes; that is process peak
+memory, not the size of a retained program or an extra-memory estimate.
+
+The input catalog is 202,461 bytes and holds 333 records per family, covering
+all prime powers <=2,000. The complete catalog contains 6,025/4,507/4,483 point
+operations and 6,048/1,912/2,046 guard coordinates for binary/PRAC/Lucas.
+Those are catalog totals, not one stage's executed schedule; unused powers
+and recovery-unit records must not be counted as ordinary-stage arithmetic.
+
+## Conditional continued-fraction extension
+
+The stable optimized PRAC and Lucas gains open the new bounded search gate.
+The versioned `c6_cf_gate.json` records the evidence and finite selection rule
+before any new search is executed. This explicitly supersedes the original
+conservative executor's empirical search stop, without editing its captures.
+
+The paper links its own [dacbench-20240609 release](
+https://cr.yp.to/2024/dacbench-20240609.tar.gz). Its SHA-256 is
+`9319a21b30425d68363c0a2f1a9f375a4745e9fd5274a9c4d6aaf942468ce2bf`.
+The upstream README offers several permissive alternatives; this experiment
+uses CC0-1.0 and retains the authors' attribution and license text in
+`inputs/upstream/c6_dacbench/`. No license is inferred from the paper alone.
+
+The adapter uses the published incremental-length, Fibonacci-pruned search
+from Section 3.5. The immutable source is copied to isolated scratch; its
+single floating-point floor expression is replaced by exact integer division.
+External guards cap target primes at 2,000, depth at 18 bits, search nodes at
+10 million, wall/CPU time at 60 seconds, process RSS at 512 MiB and output at
+16 MiB. Upstream's threaded benchmark driver is never invoked. At this bound,
+meet-in-the-middle tables do not have a demonstrated need and remain unrun.
+
+The decoder independently reconstructs the differential instructions from
+upstream integer chains. A different verifier enumerates every coprime
+terminal pair `a<b`, `a+b=p` and runs the unique reverse Euclidean path to
+`(1,2)`, checking the claimed minimum without trusting forward-search pruning.
+This establishes minimum length only inside the defined CF family for the
+bounded prime records. Repeating a prime chain for a prime power is verified
+composition; it is not an optimality claim for that power or for the stage lcm.
+
+Both the common tuple executor and Algorithm 1's specialized three-point
+executor use identical CF arithmetic and the same guard certificate. The
+specialized metadata is checked against the certified compact record before
+execution. The known-difference identities, all intermediate coordinate
+factors, overwritten points, final scalar and finite strict recovery remain
+covered. Three persistent working points exclude the saved block/recovery
+point, scalar guard accumulator and arithmetic temporaries.

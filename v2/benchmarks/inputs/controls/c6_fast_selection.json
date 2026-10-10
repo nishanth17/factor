@@ -1,0 +1,16 @@
+{
+  "screen_sha256": "3f23585d99a37fc4cff2c1feb83d90a8828293436adc31cefd07d1f22bc734b4",
+  "protocol_sha256": "2b39b206df661d66bf42437164f3b459925e38da03f3044d87d9ff01ce8142b6",
+  "candidates": {
+    "int": [
+      "fast/ladder/tuple/16",
+      "fast/prac/tuple/16",
+      "fast/lucas/tuple/64"
+    ],
+    "gmp": [
+      "fast/ladder/tuple/16",
+      "fast/prac/tuple/16",
+      "fast/lucas/tuple/16"
+    ]
+  }
+}

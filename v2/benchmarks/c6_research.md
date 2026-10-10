@@ -1,5 +1,10 @@
 # C6 / P4.5: bounded precomputed Lucas chains
 
+This records the **initial conservative executor** and its historical stop.
+The user subsequently reopened optimization; see the [factor-coverage and
+optimized comparison follow-up](c6_optimization.md). Its new results do not
+rewrite the frozen sources or captures below.
+
 The user activated C6 on 9 October 2026. The control is mainline
 `bcf5f3d1e57304694b48ba6e7ef8b4ea2ffd0db0`; production remains unchanged.
 The accepted A4 campaigns already reject checked PRAC promotion. This study

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-09",
+  "stage": "training-only optimized screen; confirmation inputs unused",
+  "basis": "Pinned-kernel tuple/64 full-stage PRAC ratio 0.876922 [0.867299,0.892745]; Lucas ratio 0.867287 [0.864467,0.873393]. Both stable at nine paired samples after at least three seconds per-arm warmup. These reverse the conservative executor loss and identify a credible small chain/dataflow opportunity.",
+  "decision": "Open bounded offline CF prime search and three-point comparison. No production promotion or global-optimality inference.",
+  "limits": {
+    "prime_bound": 2000,
+    "records": 512,
+    "steps": 512,
+    "live_points": 16,
+    "depth": 18,
+    "nodes": 10000000,
+    "seconds": 60,
+    "rss_bytes": 536870912,
+    "output_bytes": 16777216
+  },
+  "selection": "Retain original frozen candidates. CF uses the same tuple executor and an independently verified specialized three-point executor, batch sizes 16 and 64 only. Select lowest stable paired training ratio per backend; within 1% prefer tuple then three and smaller batch. Freeze before fresh confirmation.",
+  "source": "dacbench-20240609.tar.gz, SHA256 9319a21b30425d68363c0a2f1a9f375a4745e9fd5274a9c4d6aaf942468ce2bf",
+  "scope": "Upstream Fibonacci-pruned incremental length search, independently checked by reverse Euclidean enumeration. No meet-in-the-middle run: B1<=2000 does not justify its extra table machinery. Minimum length only within the CF family; weighted arithmetic and measured runtime remain separate.",
+  "completed_screen_sha256": "3f23585d99a37fc4cff2c1feb83d90a8828293436adc31cefd07d1f22bc734b4",
+  "optimized_control_commit": "17aca0b"
+}
