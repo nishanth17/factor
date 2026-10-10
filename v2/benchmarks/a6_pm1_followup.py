@@ -656,7 +656,11 @@ def main():
         print(
             json.dumps(
                 summary(
-                    run(\n                        fixture["n"],\n                        ((2000, 200000),),\n                        options_for(args.arm, selection),\n                    )
+                    run(
+                        fixture["n"],
+                        ((2000, 200000),),
+                        options_for(args.arm, selection),
+                    )
                 )
             )
         )
