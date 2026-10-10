@@ -691,6 +691,7 @@ def main():
         args.output.write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps(report, indent=2))
         return
+    frozen_identity = identity()
     with performance_window():
         verify_inputs()
         verify_fresh()
@@ -704,6 +705,8 @@ def main():
             records = portfolio_measure(args.samples)
         else:
             records = continuation_measure(args.samples)
+    if identity() != frozen_identity:
+        raise RuntimeError("source/input identity changed during capture")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(
@@ -712,7 +715,7 @@ def main():
                 "cell": args.cell,
                 "runtime": sys.version,
                 "platform": platform.platform(),
-                "source_identity": identity(),
+                "source_identity": frozen_identity,
                 "records": records,
             },
             indent=2,
