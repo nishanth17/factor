@@ -923,3 +923,96 @@ remain inconclusive after extension. The [benchmark receipt](
 benchmarks/README.md#a6-production-default-promotion--9-october-2026)
 records both results. This is a user-directed default change, with the
 legacy executor available for reproducibility and existing resumes.
+
+## Experimental two-large-prime SIQS
+
+`DoubleLargeSieveConfig` enables the bounded serial graph collector explicitly.
+It separates the SLP bound, each DLP endpoint, their product and the cumulative
+splitting allowance. The normal `SieveConfig` remains the default.
+
+```python
+from v2.qs import DoubleLargeSieveConfig, SIQSConfig, SIQSJob
+
+collector = DoubleLargeSieveConfig(
+    residual_bound=1000**2,
+    large_prime_bound=100 * 1000,
+    large_product_bound=128 * 1000**2,
+    split_call_limit=131072,
+)
+config = SIQSConfig(base_bound=1000, collector=collector)
+# Supply the same finite Budget used by the rest of the factoring job.
+job = SIQSJob(n, seed=7, config=config, budget=budget)
+result = job.run()
+```
+
+These illustrative bounds are not a promoted preset. The
+[C1 protocol](benchmarks/c1_implementation_protocol.md) governs training and
+fresh complete-factor comparison. `candidate_bound=0` covers the entire
+admissible product domain; a smaller explicit allowance must preserve SLP
+coverage and intentionally sacrifices DLP candidates. Endpoints must be proven
+primes, outside the factor base, at most10¹²; each product and split attempt
+has a finite bound. Failure to split never establishes primality.
+
+Two-prime atoms use `AtomicRelation.large_primes=(p, q)` with unit scalar
+`residual`. Direct `verify_atomic` calls require explicit `large_prime_bound`
+and `large_product_bound`. A raw two-prime atom is not a full matrix row.
+Combined relations reconstruct all original exponents and known squares,
+including repeated-prime loops and cycles disconnected from the SLP component.
+Paths longer than256atoms are reported losses. FIFO eviction removes only
+unowned forest edges; emitted rows retain their original atoms.
+
+DLP SIQS checkpoints use version4, while ordinary SLP remains version3.
+`SIQSJob.from_checkpoint` verifies atoms, mixed row order, exact forest paths
+and square corrections, and charges rebuilding plus prior work/wall/CPU.
+Started splitting attempts remain charged across cancellation and resume.
+The explicit config also works through `PortfolioConfig(siqs=config)` under
+its enclosing memory allowance. SSS and parallel exporters reject this config.
+The API bounds owned workspace; process/JIT RSS is reported separately.
+
+The CLI has the same explicit opt-in. Supply both endpoint and product bounds;
+there is no automatic DLP digit cutoff or implied tuned preset:
+
+```sh
+pypy3 -m v2.factor NUMBER --method siqs --qs-dlp \
+  --qs-residual-bound 1000 --qs-large-prime-bound 10000 \
+  --qs-large-product-bound 50000000 --work-limit 1000000000 \
+  --seconds 30 --cpu-seconds 30 --memory-mib 80
+```
+
+`--qs-dlp-candidate-bound` and `--qs-dlp-split-call-limit` optionally narrow
+the finite candidate and splitting allowances. The flag also works with
+`--siqs` for an explicit auto-portfolio fallback. DLP-only bounds without
+`--qs-dlp`, missing required bounds, and QS/MPQS modes are rejected. CLI
+checkpoint/resume requires the same options; omitted flag retains SLP.
+
+The complete C1 comparison bundles are versioned in
+`benchmarks/inputs/controls/c1_selected.json`. Load the whole bundle to preserve
+its factor base, polynomial choices, graph/matrix allowances and collector
+bounds. For the explicitly selected 40-digit balanced workload:
+
+```python
+import json
+from pathlib import Path
+
+import v2
+from v2.budget import Budget
+from v2.qs import DoubleLargeSieveConfig, SIQSConfig, SIQSJob
+
+selected_path = Path(v2.__file__).parent / (
+    "benchmarks/inputs/controls/c1_selected.json"
+)
+selected = json.loads(selected_path.read_text())
+settings = dict(selected["configurations"]["40"]["dlp_half"])
+settings["collector"] = DoubleLargeSieveConfig(**settings["collector"])
+config = SIQSConfig(**settings)
+budget = Budget(work_limit=10**13, seconds=30, cpu_seconds=30)
+result = SIQSJob(n, seed=7, config=config, budget=budget).run()
+assert (result.divisor or 1) * result.cofactor == n
+```
+
+Here `n` is the integer to split; this is not an automatic digit-based dispatch
+rule. The result retains an unresolved cofactor when the allowance ends. The
+[C1 complete-factor report](benchmarks/c1_implementation_results.md) records
+training, fresh confirmation, certainty labels and the separate larger-store
+resume witness. Performance belongs to the tested configuration/input class,
+not every input with the same number of digits.

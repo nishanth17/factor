@@ -40,11 +40,17 @@ from .relations import (
     verify_atomic,
     verify_combined,
 )
-from .sieve_collector import SieveCollector, SieveConfig, SieveResult
+from .sieve_collector import (
+    DoubleLargeSieveConfig,
+    SieveCollector,
+    SieveConfig,
+    SieveResult,
+)
 from .siqs import SIQSConfig, SIQSJob
 
 __all__ = [
     "AtomicRelation",
+    "DoubleLargeSieveConfig",
     "CollectionResult",
     "CombinationResult",
     "CombinedRelation",

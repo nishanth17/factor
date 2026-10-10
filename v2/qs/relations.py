@@ -53,6 +53,7 @@ class AtomicRelation:
     sign: int
     exponents: tuple[tuple[int, int], ...]
     residual: int = 1
+    large_primes: tuple[int, ...] = field(default=(), kw_only=True)
     relation_id: str = field(init=False)
 
     def __post_init__(self):
@@ -67,9 +68,39 @@ class AtomicRelation:
         utils.require_integer(self.residual, "residual", 1)
         if self.residual > MAX_RESIDUAL:
             raise ValueError("residual exceeds the reference limit")
+        if not isinstance(self.large_primes, tuple) or len(
+            self.large_primes
+        ) not in (0, 2):
+            raise TypeError("large_primes must be an empty tuple or a pair")
+        if self.large_primes:
+            if self.residual != 1:
+                raise ValueError(
+                    "a two-prime atom must retain unit scalar residual"
+                )
+            for prime in self.large_primes:
+                utils.require_integer(prime, "large prime", 2)
+                if prime > MAX_RESIDUAL:
+                    raise ValueError("large prime exceeds the reference limit")
+            if self.large_primes[0] > self.large_primes[1]:
+                raise ValueError("large primes must be sorted")
         encoded = f"{self.polynomial.identity}:{hex(self.position)}"
         object.__setattr__(
             self, "relation_id", hashlib.sha256(encoded.encode()).hexdigest()
+        )
+
+    @property
+    def residual_primes(self):
+        """Return endpoints after verification; the scalar remains prime."""
+        return self.large_primes or (
+            (self.residual,) if self.residual != 1 else ()
+        )
+
+    @property
+    def residual_product(self):
+        return (
+            self.large_primes[0] * self.large_primes[1]
+            if self.large_primes
+            else self.residual
         )
 
     @property
@@ -83,7 +114,15 @@ class AtomicRelation:
         return self.polynomial.square_coefficient
 
 
-def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
+def verify_atomic(
+    relation,
+    factor_base,
+    *,
+    residual_bound=1,
+    large_prime_bound=0,
+    large_product_bound=0,
+    budget=None,
+):
     """Return True for an exact relation; reject invalid math with ValueError.
 
     Verify the full integer identity, including A, sign and known square.
@@ -123,15 +162,25 @@ def verify_atomic(relation, factor_base, *, residual_bound=1, budget=None):
         if remainder:
             raise ValueError("relation exponents do not divide its value")
 
-    if remaining != relation.residual:
+    if remaining != relation.residual_product:
         raise ValueError("relation factorization is incomplete or incorrect")
+    if relation.large_primes:
+        checked_residual_bound(large_prime_bound)
+        utils.require_integer(large_product_bound, "large_product_bound", 1)
+        if large_product_bound > MAX_RESIDUAL**2:
+            raise ValueError("large product bound exceeds the reference limit")
+        if (
+            remaining > large_product_bound
+            or relation.large_primes[-1] > large_prime_bound
+        ):
+            raise ValueError("two-prime residual exceeds its bounds")
     if relation.residual > residual_bound:
         raise ValueError("residual exceeds residual_bound")
-    if relation.residual != 1:
-        if relation.residual in primes:
+    for residual in relation.residual_primes:
+        if residual in primes:
             raise ValueError("factor-base exponents must be fully recovered")
-        budget.consume(relation.residual.bit_length() ** 2)
-        if utils.classify_prime(relation.residual) != utils.Primality.PROVEN:
+        budget.consume(residual.bit_length() ** 2)
+        if utils.classify_prime(residual) != utils.Primality.PROVEN:
             raise ValueError("residual must be a proven prime")
     return True
 
@@ -207,7 +256,9 @@ def _combined_values(atoms, modulus):
         correction = correction * atom.square_correction % modulus
         for prime, exponent in atom.exponents:
             exponents[prime] += exponent
-        if atom.residual != 1:
+        if atom.large_primes:
+            residuals.update(atom.large_primes)
+        elif atom.residual != 1:
             residuals[atom.residual] += 1
 
     for residual, count in sorted(residuals.items()):
@@ -267,12 +318,17 @@ def combine_relations(
     budget = budget if budget is not None else Budget()
     for atom in atoms:
         verify_atomic(
-            atom, factor_base, residual_bound=MAX_RESIDUAL, budget=budget
+            atom,
+            factor_base,
+            residual_bound=MAX_RESIDUAL,
+            large_prime_bound=MAX_RESIDUAL,
+            large_product_bound=MAX_RESIDUAL**2,
+            budget=budget,
         )
     for atom in atoms:
-        if atom.residual != 1:
+        for residual in atom.residual_primes:
             budget.consume(factor_base.n.bit_length())
-            divisor = gcd(atom.residual, factor_base.n)
+            divisor = gcd(residual, factor_base.n)
             if utils.valid_divisor(divisor, factor_base.n):
                 return CombinationResult(None, divisor)
             if divisor != 1:
@@ -313,7 +369,12 @@ def verify_combined(
     _combination_workspace(atoms, factor_base, memory_bytes)
     for atom in atoms:
         verify_atomic(
-            atom, factor_base, residual_bound=MAX_RESIDUAL, budget=budget
+            atom,
+            factor_base,
+            residual_bound=MAX_RESIDUAL,
+            large_prime_bound=MAX_RESIDUAL,
+            large_product_bound=MAX_RESIDUAL**2,
+            budget=budget,
         )
     budget.consume(len(atoms) * (len(factor_base.entries) + 1))
     values = _combined_values(atoms, factor_base.n)

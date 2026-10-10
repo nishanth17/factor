@@ -4,7 +4,7 @@
 import argparse
 import json
 import sys
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from functools import lru_cache
 from math import prod
 from pathlib import Path
@@ -329,6 +329,15 @@ def main():
     qs_options.add_argument(
         "--qs-residual-bound", "--siqs-residual-bound", type=int
     )
+    qs_options.add_argument(
+        "--qs-dlp",
+        action="store_true",
+        help="enable bounded two-large-prime collection with explicit bounds",
+    )
+    qs_options.add_argument("--qs-large-prime-bound", type=int)
+    qs_options.add_argument("--qs-large-product-bound", type=int)
+    qs_options.add_argument("--qs-dlp-candidate-bound", type=int)
+    qs_options.add_argument("--qs-dlp-split-call-limit", type=int)
     parser.add_argument("--sss-base-bound", type=int, default=1000)
     parser.add_argument("--sss-rounds", type=int, default=256)
     parser.add_argument("--work-limit", type=int)
@@ -365,6 +374,23 @@ def main():
     }
     if not use_qs and (qs_parameters or args.qs_residual_bound is not None):
         parser.error("QS parameters require --siqs or --method qs/mpqs/siqs")
+    dlp_bounds = (
+        args.qs_large_prime_bound,
+        args.qs_large_product_bound,
+    )
+    dlp_options = (
+        *dlp_bounds,
+        args.qs_dlp_candidate_bound,
+        args.qs_dlp_split_call_limit,
+    )
+    if args.qs_dlp and not use_qs:
+        parser.error("--qs-dlp requires --siqs or --method siqs")
+    if args.qs_dlp and args.method in ("qs", "mpqs"):
+        parser.error("--qs-dlp requires SIQS mode")
+    if args.qs_dlp and any(bound is None for bound in dlp_bounds):
+        parser.error("--qs-dlp requires both large-prime and product bounds")
+    if not args.qs_dlp and any(option is not None for option in dlp_options):
+        parser.error("DLP bounds require --qs-dlp")
 
     if args.memory_mib is None:
         args.memory_mib = 80 if use_sss or use_qs else 8
@@ -416,6 +442,27 @@ def main():
                         collector=replace(
                             qs_config.collector,
                             residual_bound=args.qs_residual_bound,
+                        ),
+                    )
+                if args.qs_dlp:
+                    from .qs import DoubleLargeSieveConfig
+
+                    dlp_parameters = {
+                        "large_prime_bound": args.qs_large_prime_bound,
+                        "large_product_bound": args.qs_large_product_bound,
+                    }
+                    if args.qs_dlp_candidate_bound is not None:
+                        dlp_parameters["candidate_bound"] = (
+                            args.qs_dlp_candidate_bound
+                        )
+                    if args.qs_dlp_split_call_limit is not None:
+                        dlp_parameters["split_call_limit"] = (
+                            args.qs_dlp_split_call_limit
+                        )
+                    qs_config = replace(
+                        qs_config,
+                        collector=DoubleLargeSieveConfig(
+                            **asdict(qs_config.collector), **dlp_parameters
                         ),
                     )
                 parameters["siqs"] = qs_config

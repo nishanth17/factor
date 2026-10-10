@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "source_commit": "76f06b0110941017b926caa51d341db6221f470b",
+  "files": {
+    "c1_protocol.md": "c70294c17bc5c2dfed19d94f3bd463624496598c91146ab850c6c37d8238d23d",
+    "inputs/controls/b1_selected.json": "34ae2c7c816540d63a8554eaacd0a26978b1af84fcfb8cb34826b43e9ae66d2f",
+    "inputs/controls/b1_40d_selected.json": "3d0e6503c22d8f4aa35d1cac14ae54bfdc5970554fd0caf95b5bbadef73f8b62",
+    "inputs/corpora/p38_r1_training_corpus.json": "89d0a9b25b150a1ee83a0958b0798c784e4af5f36eb59d2e9f77a993c4842423"
+  },
+  "seeds": [
+    7,
+    29
+  ],
+  "bands": [
+    30,
+    40,
+    60
+  ],
+  "prime_multiplier": 100,
+  "initial_blocks": 512,
+  "extension_blocks": 4096,
+  "split_attempt_limit": 8192,
+  "record_limit": 16384,
+  "record_bytes": 67108864,
+  "capture_bytes": 16777216,
+  "campaign_seconds": 2000
+}

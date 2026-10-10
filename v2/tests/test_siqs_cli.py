@@ -231,6 +231,7 @@ class SIQSCLITests(unittest.TestCase):
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertIn("{auto,qs,mpqs,siqs,sss,sssf}", run.stdout)
         self.assertIn("--qs-family-count", run.stdout)
+        self.assertIn("--qs-dlp", run.stdout)
         self.assertIn("--checkpoint", run.stdout)
         self.assertIn("--resume", run.stdout)
         self.assertIn("QS uses one polynomial", " ".join(run.stdout.split()))
@@ -243,6 +244,17 @@ class SIQSCLITests(unittest.TestCase):
             ("--method", "siqs", "--memory-mib", 8),
             ("--method", "qs", "--qs-assignment-policy", "nearest"),
             ("--method", "mpqs", "--qs-polynomials-per-family", 2),
+            ("--method", "siqs", "--qs-dlp"),
+            ("--method", "siqs", "--qs-large-prime-bound", 10000),
+            (
+                "--method",
+                "qs",
+                "--qs-dlp",
+                "--qs-large-prime-bound",
+                10000,
+                "--qs-large-product-bound",
+                50000000,
+            ),
         ):
             with self.subTest(options=options):
                 run = cli(NUMBER, *options)
@@ -250,6 +262,41 @@ class SIQSCLITests(unittest.TestCase):
                 self.assertEqual(run.returncode, 2)
                 self.assertIn("error:", run.stderr)
                 self.assertNotIn("Traceback", run.stderr)
+
+    def test_dlp_flag_serializes_explicit_bounds_and_replays(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "dlp.json"
+            options = (
+                "--method",
+                "siqs",
+                "--qs-dlp",
+                "--qs-residual-bound",
+                1000,
+                "--qs-large-prime-bound",
+                10000,
+                "--qs-large-product-bound",
+                50000000,
+                "--qs-dlp-candidate-bound",
+                50000000,
+                "--qs-dlp-split-call-limit",
+                64,
+                "--work-limit",
+                0,
+            )
+            first = cli(NUMBER, *options, "--checkpoint", path)
+
+            self.assertEqual(first.returncode, 1, first.stderr)
+            checkpoint = json.loads(path.read_text())
+            collector = checkpoint["payload"]["config"]["siqs"]["collector"]
+            self.assertEqual(collector["residual_bound"], 1000)
+            self.assertEqual(collector["large_prime_bound"], 10000)
+            self.assertEqual(collector["large_product_bound"], 50000000)
+            self.assertEqual(collector["candidate_bound"], 50000000)
+            self.assertEqual(collector["split_call_limit"], 64)
+
+            resumed = cli(*options, "--resume", path)
+            self.assertEqual(resumed.returncode, 1, resumed.stderr)
+            self.assertNotIn("Traceback", resumed.stderr)
 
     def test_existing_bounded_default_keeps_its_configuration(self):
         with tempfile.TemporaryDirectory() as directory:

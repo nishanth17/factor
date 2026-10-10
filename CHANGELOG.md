@@ -25,6 +25,28 @@
   claims separate. See the B3 benchmark summary for intervals and limitations.
   Final and committed-only PyPy/GMP checks pass 499 tests and full lint.
 
+- Integrate bounded two-large-prime SIQS as a configurable opt-in through the
+  Python API and `--qs-dlp` CLI flag. Preserve single-large-prime defaults and
+  charged DLP checkpoint/resume. C1's fresh balanced 40-digit complete-run
+  comparison supports only the declared explicit bundle; wider tuning and
+  portfolio/SSS dispatch remain open.
+
+- Add experimental opt-in two-large-prime serial SIQS after the bounded C1
+  residual study produced complete 40/50-digit witnesses. Preserve the failed
+  literal gate and explicitly identify the corrected cost-attribution go as
+  post-observation; no speedup or default promotion follows from that study.
+- Preserve scalar residual certainty with separate proven endpoint pairs,
+  finite splitting and all-component graph cycles. Retain exact original
+  atoms through FIFO eviction and use charged DLP-only SIQS checkpoint4;
+  default SLP remains checkpoint3. SSS/worker collection rejects the opt-in
+  config. Independent complete graph-kernel tests cover disconnected cycles,
+  repeated primes, loops, duplicates, exact corrections and retained ownership.
+- Accept the bounded C1 40-digit balanced opt-in bundle after a 31.73%
+  complete-run reduction against calibrated SLP (95% interval 29.21–33.99%),
+  with unchanged completion. Retain the 30-digit positive observation with
+  its fixed-seed drift limitation, all fresh 50-digit timeouts, and the
+  separately completing 50-digit charged-resume witness. Keep SLP defaults;
+  broader SSS/portfolio comparisons and larger-band promotion remain open.
 - Complete the bounded A7/P3.8-R5 interface/evidence reconciliation, preserving
   accepted repair decisions, immutable source/input pins and historical scope.
   Add both-mode SSS forced-valuation, interrupted/cumulative restore, authentic

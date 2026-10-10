@@ -289,6 +289,52 @@ for the one-worker backend comparison. The original replication uses
 frozen inputs. Required inputs are versioned; all raw samples, profiles,
 phase/deadline records, QA logs and checksums remain ignored/local.
 
+## C1 bounded DLP opt-in integration — 10 October 2026
+
+The [completed report](c1_implementation_results.md) adopts explicit bounded
+DLP and the selected balanced 40-digit bundle. Fresh complete-run cost falls
+31.73% against calibrated SLP (95% paired interval 29.21–33.99%), with 18/18
+completions per arm and stable original pooled checks. The 30-digit regression
+class has 36/36 completions per arm and an observed 17.80% reduction
+(10.50–30.35%); residual fixed-seed drift prevents a new 30-digit promotion.
+Every fresh 50-digit run times out: 0/18 completions per arm under matched
+120-second / 256 MiB owned allowances. Failures and full unresolved cofactors
+are retained. A separate 50-digit graph-checkpoint resume completes in
+141.063 seconds with its declared larger allowances; it is not a matched
+speed claim. Defaults remain SLP, with no automatic digit cutoff.
+
+The [research/license review](c1_research.md) reuses primary literature and
+pinned YAFU, msieve, Yamaquasi, FLINT and JavaMath implementations. The first
+short-screen defer was withdrawn. A [longer bounded census](c1_followup_results.md)
+separates threshold losses, residual policy and collection duration. Its
+literal gate failed; the explicitly post-observation accounting repair
+supports an investment go at 40/50, without rewriting that original verdict.
+The subsequent [implementation/confirmation protocol](c1_implementation_protocol.md)
+freezes finite training and fresh confirmation against an
+[owned pre-C1 SLP control](c1_implementation_controls.md).
+
+All-component cycles retain exact original atoms and square corrections;
+independent complete graph-kernel oracles, eviction/cancellation tests and
+charged DLP checkpoint4 checks cover the production contract. R3 filtering,
+lifting and independent extraction verification remain in use. The detailed
+report distinguishes graph counts, verified square trials and proper factors.
+Its smaller, denser 40-digit matrices require refreshed A8 evidence before a
+later solver promotion. Broader SSS/combined-portfolio comparisons remain E1.
+Generated captures stay local in `results/c1/`; required controls and corpora
+are versioned. The Python configuration and `--qs-dlp` CLI flag both require
+explicit endpoint/product bounds; neither changes the SLP default. Timings
+and heavy checks serialize on
+`/private/tmp/factor-performance.lock` with B3/A7.
+Committed-only validation passes 526 PyPy/GMP tests, full lint, 109 benchmark
+imports and all required C1 controls/certificate/source-pin loaders.
+
+After A7/mainline reconciliation and CLI integration, the combined PyPy 3.11
+suite passes 539 tests (6 optional-backend skips) and full lint. A temporary
+committed-files-only archive passes the same checks, imports 110 benchmark
+modules and loads the C1/A7 controls, pre-C1 baseline and fresh corpus. The
+temporary archive is removed after validation; its receipt stays in the ignored
+`results/c1/integration-committed-qa.log`. This is integration correctness,
+not a fresh performance or automatic-dispatch claim.
 
 ## QS/GNFS research reconciliation (9 October 2026)
 
@@ -306,11 +352,17 @@ no new benchmark or implementation gate is closed by source research.
 The [acceptance matrix and E1 handoff](a7_r5_reconciliation.md) reconcile the
 actual SSS/SSSf, relation/extraction, worker and checkpoint contracts with both
 accepted repair passes and R3. The [prepared arm plan](inputs/controls/a7_r5_e1_arms.json)
-pins current sources and historical inputs; `pypy3 -B -m v2.benchmarks.a7_r5`
+pins its original sources and historical inputs; `pypy3 -B -m v2.benchmarks.a7_r5`
 checks pins and constructs configurations without timing. Exact selected B1
 controls use current runtime code; SSS challengers use the same B1 budget and
 classification adapter. Worker arms retain their supported reference schedule,
 with flyer/wide-interval incompatibility explicit.
+
+C1 integration preserves the original A7 arm plan unchanged. A separate
+[current-source manifest](inputs/controls/a7_r5_c1_sources.json) binds that
+plan's digest and the changed integrated source bytes; the loader still rejects
+unexpected runtime or input changes. These prepared arms remain E1 candidates,
+not fresh A7 performance evidence or a final combined-source freeze.
 
 B1's stale above-2**64 certainty expectation is fixed for fresh A10 outputs.
 SSS now uses the shared streamed hexadecimal solver fingerprint, preserving

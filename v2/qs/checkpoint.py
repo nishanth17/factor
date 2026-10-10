@@ -25,7 +25,11 @@ from .relations import (
     verify_atomic,
     verify_combined,
 )
-from .sieve_collector import SieveCollector, SieveConfig
+from .sieve_collector import (
+    DoubleLargeSieveConfig,
+    SieveCollector,
+    SieveConfig,
+)
 
 VERSION = 3
 MAX_BLOB_BYTES = 64 * 1024 * 1024
@@ -65,6 +69,10 @@ def _solver_digest(solver, *, encoding="decimal-v1"):
 
 
 def _store(collector):
+    if collector._graph is not None:
+        from .large_prime_checkpoint import pack_store
+
+        return pack_store(collector)
     atoms = list(collector._atoms.values())
     indices = {atom.relation_id: i for i, atom in enumerate(atoms)}
     polynomials, lookup, encoded = [], {}, []
@@ -114,6 +122,11 @@ def _store(collector):
 
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
+    version = (
+        4
+        if isinstance(job.config.collector, DoubleLargeSieveConfig)
+        else VERSION
+    )
     engine = job.engine
     store = _store(engine.collector) if engine is not None else None
     progress = None
@@ -149,7 +162,7 @@ def pack_job(job):
         )
 
     payload = dict(
-        version=VERSION,
+        version=version,
         backend=arithmetic.get_backend(job.config.backend).identity,
         n=job.n,
         seed=job.seed,
@@ -202,7 +215,7 @@ def pack_job(job):
         )
     )
     return dict(
-        version=VERSION,
+        version=version,
         blob=blob,
         sha256=digest,
         resources=resources,
@@ -212,6 +225,10 @@ def pack_job(job):
 
 def _restore_store(payload, collector, budget):
     """Reserve decoded provenance and verify every atom/combination afresh."""
+    if collector._graph is not None:
+        from .large_prime_checkpoint import restore_store
+
+        return restore_store(payload, collector, budget)
     if not isinstance(payload, dict) or set(payload) - {"row_order"} != {
         "polynomials",
         "atoms",
@@ -405,6 +422,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         1,
         2,
         VERSION,
+        4,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -432,7 +450,10 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError("mixed-order checkpoint lacks row_order")
 
     values = dict(payload["config"])
-    values["collector"] = SieveConfig(**values["collector"])
+    collector_type = (
+        DoubleLargeSieveConfig if payload["version"] == 4 else SieveConfig
+    )
+    values["collector"] = collector_type(**values["collector"])
     saved_config = SIQSConfig(**values)
     if type(allow_extension) is not bool:
         raise TypeError("allow_extension must be Boolean")

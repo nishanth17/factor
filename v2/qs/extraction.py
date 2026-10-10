@@ -118,7 +118,7 @@ class _VerificationCache:
 
 def _verify_row(relation, base, store, budget, memory_bytes):
     if isinstance(relation, AtomicRelation):
-        if relation.residual != 1:
+        if relation.residual != 1 or getattr(relation, "large_primes", ()):
             raise ValueError("partial atom is not a full matrix row")
         verify_atomic(relation, base, budget=budget)
     else:

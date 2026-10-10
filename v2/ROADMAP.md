@@ -307,7 +307,7 @@ implementations complete.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| C1 — P3.8-R4 + P5.4, one workstream | Implement bounded double-large-prime residual splitting/cycle provenance under P5.4; evaluate useful dependencies and complete factoring under R4. | B1 showing insufficient useful yield; accepted R3 contracts | **High potential when yield-limited; otherwise defer.** Calibrated single-large-prime behavior is the fair control. One owner prevents duplicate DLP implementations. Splitting, unmatched occupancy, repeated-prime corrections and lifting can erase raw collection gains. | Astra / **xhigh** | Choose Astra for the combined residual-certainty, graph-cycle and exact-provenance contract. xhigh is needed for repeated primes, self-loops, disconnected cycles, eviction and the distinction between cycles and useful dependencies. |
+| ~~C1 — P3.8-R4 + P5.4, one workstream~~ | ~~**[x] Bounded implementation, calibrated-SLP evaluation and opt-in integration complete, 10 October 2026.** Certified DLP, all-component cycles, exact provenance, finite eviction and charged resume are available through explicit Python configuration and `--qs-dlp` CLI bounds.~~ | ~~B1/R3; longer bounded residual census and explicit post-observation cost repair~~ | ~~Fresh balanced 40-digit complete-run cost falls 31.73% (95% interval 29.21–33.99%) with unchanged completion. Adopt only that explicit bundle; retain defaults, 30-digit seed-drift limits and all 50/60-digit unresolved evidence. Broader SSS/portfolio comparison remains E1.~~ | ~~Astra / **xhigh**~~ | ~~Independent complete graph-cycle oracles and original-row/square verification cover correctness. Complete-factor evidence, not raw cycles, determines the scoped decision.~~ |
 | C2 — P5.2 advanced pairing/common-Z | Separately evaluate extended distance sets, prime relocation and bounded overlapping-window matching; compare advanced coverage pruning and no-inversion common-Z tables. | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Each challenger needs exact prime-to-term certificates, bounded planner/replay storage and matched end-to-end evidence. Common-Z scaling can be a nonunit, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs, matching invariants and common-Z identities over composite moduli. xhigh is needed because scaling or relocation can hide nonunits or change saturation recovery. |
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
@@ -1770,6 +1770,21 @@ concerns until changed representations and their gates are verified.
 
 **P3.8-R4 — Measure useful dependencies and large-prime economics**
 
+**C1 bounded tranche complete and opt-in integrated — 10 October 2026.** The
+[implementation and complete-factor report](benchmarks/c1_implementation_results.md)
+records the withdrawn short-screen defer, longer residual diagnosis, preserved
+failed literal gate and explicit accounting-repair investment go. Production
+DLP passes all-component cycle/provenance, finite storage, cancellation and
+charged-resume checks. Fresh balanced 40-digit complete-run cost falls 31.73%
+(95% interval 29.21–33.99%) with unchanged completion; adopt that explicit
+bundle, retaining SLP defaults. Thirty digits shows a positive aggregate
+observation but residual fixed-seed drift; no new preset promotion follows.
+Fresh 50-digit SLP/DLP both time out, while a separately bounded larger-store
+50-digit resume completes. The 60-digit captures still have no useful matrix.
+No universal DLP cutoff or 80–100-digit performance claim follows.
+Final committed-only validation passes 526 PyPy/GMP tests, full lint, 109
+benchmark imports and required controls/certificates/source pins.
+
 - [ ] Coordinate C1/E3 residual-classification experiments from the
   [FLINT comparison](benchmarks/qs_gnfs_research.md#candidate-decisions-and-owners)
   if profiling shows repeated intake/atomic primality checks matter. A
@@ -1778,10 +1793,13 @@ concerns until changed representations and their gates are verified.
   establish it. An opaque composite-cofactor arm needs a separate verified
   type/checkpoint policy, finite occupancy and unchanged terminal certainty.
   Preserve independent atomic verification and compare complete factoring.
-- [ ] When R1–R3 identify insufficient useful yield, evaluate P5.4's bounded
-  double-large-prime extension against optimized single-large-prime SIQS.
-  Jointly tune each prime limit, residual-product cap, splitting allowance,
-  unmatched occupancy, filtering and independent dependency output.
+  C1's bounded profile did not justify a classification shortcut; that
+  conditional experiment remains deferred, with residual certainty intact.
+- [x] Evaluate the bounded P5.4 extension against calibrated SLP after
+  diagnosing recoverable residuals. Freeze endpoint/product/splitting/store
+  limits, compare five training bundles, then confirm selected configurations
+  on fresh inputs. Record useful dependencies, proper factors and complete
+  costs. This bounded selection is not global parameter optimality.
 - **A:** preserve the admitted residual certainty domain or explicitly extend
   its proof contract. Recover exact square corrections for repeated primes
   and self-loops; support cycles in every connected component. Track verified
@@ -2672,11 +2690,12 @@ are the remaining group-specific/portfolio work, not part of A6's closure.
 profiling/yield justifies it; not a GNFS prerequisite. See the
 research report (local audit material).
 
-- [ ] Store residual pairs under explicit factorization/storage budgets;
+- [x] Bounded C1 tranche: store residual pairs under explicit
+  factorization/storage budgets;
   combine graph cycles with atomic provenance. Include repeated primes,
-  self-loops, duplicate edges and disconnected cycles. Improve duplicate/
-  singleton filtering and deterministic unmatched-partial eviction. Keep
-  single-large-prime mode as the comparison baseline.
+  self-loops, duplicate edges and disconnected cycles. Reuse accepted R3
+  duplicate/singleton/weight-two filtering and add deterministic unowned-edge
+  eviction. Keep single-large-prime mode as the comparison baseline.
   Separate each large-prime limit from the residual product cap and splitting
   allowance. Document any residual-shape rejection proof; tune bounds jointly
   with thresholds and filtering using training data.
@@ -2691,6 +2710,21 @@ research report (local audit material).
   weight; faster collection is insufficient if splitting, filtering or memory
   makes the pipeline slower. Graph cycle counts do not certify a useful
   GF(2) dependency or a proper divisor.
+
+**C1 acceptance and opt-in integration — 10 October 2026:** bounded implementation and the
+calibrated-SLP complete-factor comparison pass for the scope recorded in
+P3.8-R4 above. The independent
+boolean-incidence oracle covers every component; production's 256-atom cycle
+limit is an explicit loss policy. Prior resources and restore work stay charged.
+Owned reservations are capped; process/JIT RSS is reported separately, without
+a claim of an enforced OS RSS ceiling.
+The [report](benchmarks/c1_implementation_results.md) records fresh 40-digit
+benefit, lower observed proper-factor yield per extracted dependency, and
+larger unresolved results. No solver or default dispatch is promoted.
+
+- [ ] Complete the broader SSS comparison through E1. A7's reconciliation
+  prepares 30-digit arms but leaves 40-digit SSS calibration to E1 or an
+  explicit challenger-class deferral. Do not infer a DLP/SSS crossover here.
 
 **2026-10-04 cross-reference:** P3.8-R4 owns the current Phase 3 comparison
 and dependency-quality diagnostics; this section owns implementation of the

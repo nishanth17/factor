@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "source_commit": "762539c",
+  "files": {
+    "c1_followup_protocol.md": "0deddb2581157884f311688b0928b904e5f2294a2ff7c377d203eb796165db86",
+    "inputs/controls/c1_frozen.json": "f2f56f0566b3e1b703145485ef37edbb7213f0d699a3a005d3b1660c819c05d7",
+    "inputs/corpora/phase_three_p34_large_v3_corpus.json": "28ae182a8c935dd30cf51c5b7f586c63172b7bafd84e3f625f86d444422e19f3"
+  },
+  "bands": [
+    40,
+    50,
+    60
+  ],
+  "seeds": [
+    7,
+    29
+  ],
+  "product_multipliers": [
+    64,
+    128
+  ],
+  "endpoint_multiplier": 100,
+  "campaign_seconds": 4500,
+  "record_limit": 65536,
+  "split_limit": 131072,
+  "diagnostic_seconds": {
+    "40": 180,
+    "50": 480,
+    "60": 900
+  },
+  "control_seconds": {
+    "40": 30,
+    "50": 120,
+    "60": 300
+  }
+}
