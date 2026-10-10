@@ -3026,8 +3026,19 @@ The historical source manifests intentionally fail after later resume-input
 hardening or documentation/source changes. Use the stated committed source;
 freeze a new manifest before measuring another source. Required controls,
 protocols, corpora and runners are versioned. Generated captures remain ignored.
-Seven production tests cover direct relation oracles, oversized gaps, finite
+Nine production tests cover direct relation oracles, oversized gaps, finite
 saturation/nonunits, atomic refusal/cancellation, old action/work/checkpoint
-identity, charged reconstruction, corruption and implicit default/legacy resume;
-an additional malformed-input test covers both implicit APIs. General portfolio
+identity, charged reconstruction, corruption, implicit default/legacy resume,
+malformed metadata in both implicit APIs and table caps before rehydration.
+General portfolio
 calibration, larger ECM/Lucas continuation and allocation remain separate.
+
+Integration and cleanup: `ecf1c57` was fast-forwarded onto `master`. Mainline
+`make -C v2 test` passes 485 system-PyPy tests with six optional skips;
+`make -C v2 lint` passes. A committed-files-only checkout passes all 488
+PyPy/GMP tests, lint, 102 benchmark imports and control/corpus loaders. The
+32 local production evidence files were copied to mainline's ignored
+`results/a6-production/` and SHA-256 verified before archiving the managed
+worktree. Its checkout and fully merged branch are removed, along with the
+task-only test archive and scratch files. Shared PyPy, prior evidence and
+unrelated work remain intact.

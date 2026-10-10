@@ -2524,6 +2524,10 @@ pin version 9 execution settings; old default/CLI resumes retain their original
 executor and new table verification is charged cumulatively. Bounds, base and
 curve counts, ECM chunks and allocation are unchanged. See the
 [full promotion receipt](benchmarks/README.md#a6-production-default-promotion--9-october-2026).
+The promoted implementation is integrated as `ecf1c57`; mainline test/lint
+and committed-only verification pass (488 PyPy/GMP tests and 102 benchmark
+imports). Production evidence is preserved locally; the managed worktree,
+merged branch and task-only scratch checkout are cleaned up.
 
 **A6 bounded acceptance — 9 October 2026; integrated into mainline:** the tranche
 adds `pm1_bounded` and the group-independent `inclusive-lcm-ratio-v1` schedule.
