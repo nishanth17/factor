@@ -9,7 +9,7 @@ from pathlib import Path
 from . import c6_fast_study, p41_campaign
 
 
-def summarize(capture, settings, shape=None):
+def summarize(capture, settings, shape=None, seed=None, metric="seconds"):
     pairs = []
     outcomes = {}
     for sample in capture["samples"]:
@@ -18,9 +18,10 @@ def summarize(capture, settings, shape=None):
             rows = [
                 row
                 for row in sample[arm]["rows"]
-                if shape is None or row["case"].startswith(shape)
+                if (shape is None or row["case"].startswith(shape))
+                and (seed is None or row["seed"] == seed)
             ]
-            times[arm] = sum(row["seconds"] for row in rows)
+            times[arm] = sum(row[metric] for row in rows)
             current = dict(
                 attempts=len(rows),
                 splits=sum(row["factor"] is not None for row in rows),
@@ -45,6 +46,7 @@ def summarize(capture, settings, shape=None):
             outcomes[arm] = current
         pairs.append(times)
     ratios = [p["candidate"] / p["ladder"] for p in pairs]
+    middle = len(ratios) // 2
     return dict(
         median_ratio=statistics.median(ratios),
         ratio_95_interval=c6_fast_study.interval(ratios, settings),
@@ -53,6 +55,10 @@ def summarize(capture, settings, shape=None):
             for arm in ("ladder", "candidate")
         },
         outcomes=outcomes,
+        chronological_ratio_medians=[
+            statistics.median(ratios[:middle]),
+            statistics.median(ratios[middle:]),
+        ],
     )
 
 
@@ -86,6 +92,18 @@ def main():
             row["samples"] = len(capture["samples"])
             row["stable"] = capture["summary"]["stable"]
             row["all"] = summarize(capture, data["protocol"])
+            row["cpu"] = summarize(
+                capture, data["protocol"], metric="cpu_seconds"
+            )
+            first_rows = capture["samples"][0]["candidate"]["rows"]
+            row["seeds"] = {
+                str(seed): summarize(capture, data["protocol"], seed=seed)
+                for seed in sorted({r["seed"] for r in first_rows})
+            }
+            row["input_classes"] = {
+                case: summarize(capture, data["protocol"], shape=case)
+                for case in sorted({r["case"] for r in first_rows})
+            }
             if capture["scope"].startswith("campaign"):
                 row["classes"] = {
                     shape: summarize(capture, data["protocol"], shape)
