@@ -2106,3 +2106,60 @@ These ignored captures are not prerequisites for importing or rerunning the
 committed study. The frozen protocol, source control and certified inputs are
 required and versioned. B4's exclusive window is released to C6/A6; no further
 candidate experiments or heavy checks are planned in this tranche.
+
+### Requested fresh B4 bakeoff
+
+The user requested a new comparison after relaxing the universal percentage
+floor. This is a separate experiment; the original B4 source freeze, inputs,
+protocol, captures and historical verdict above remain unchanged. The same
+five arithmetic arms enter the screen. No new kernels, reducers, backends,
+chains or curve families are introduced.
+
+`build_b4_bakeoff.py` creates two disjoint, independently certified nine-input
+cohorts, also disjoint from the original B4 corpus, with generation seed
+2026100957 and factoring seeds 11/29/53. Target classes, smaller-factor sizes,
+ECM bounds and finite work/time/storage allowances match the original study.
+Each cohort contains 27 complete ECM-only portfolio trials. Native integers
+and the separately supported GMP path are assessed independently.
+
+`b4_bakeoff.py` uses independent PyPy processes in counterbalanced arm orders,
+alternates backend order and holds the shared machine lock through each
+phase. Every process performs at least three seconds of validated warmup,
+then measures whole cohorts for at least 0.5 CPU seconds. The initial nine
+paired process blocks extend to 27, then 63 only for unstable comparisons,
+with five/eight seconds of warmup in those extensions. Baseline, candidate
+and paired ratio relative IQR must each be at most 15%. Stable intervals
+crossing zero stop as inconclusive; additional samples cannot chase a win.
+Each phase has a 45-minute ceiling and each child a ten-minute ceiling.
+
+The screen freezes the fastest positive, stable candidate per backend with
+no class completion regression above five percentage points. Only that arm
+and its baseline run on the untouched confirmation cohort. Acceptance needs
+zero correctness failures, matched finite budgets, a fresh paired timing
+interval above zero, a positive CPU effect and positive effects in both
+chronological halves. These bootstrap intervals describe timing uncertainty
+conditional on a fixed cohort and machine. Integration still requires review
+of class effects, arithmetic risk and maintenance cost; no default is promoted
+by this benchmark runner.
+
+Initialization, backend conversion, normalization, recovery, reconstruction
+and output/checkpoint validation remain inside every measured cohort. Source
+loading, cold startup and profiles are outside these warmed measurements.
+The original instrumented component shares remain evidence for their original
+workloads; this follow-up does not claim new stage/kernel breakdowns.
+
+Run from the repository root with PyPy implementing Python 3.11 and the
+supported `gmpy2` environment, during a coordinated exclusive window:
+
+```sh
+v2/.venv/bin/python -B -u -m v2.benchmarks.b4_bakeoff --phase screen \
+  --output v2/benchmarks/results/b4/bakeoff-screen.json
+v2/.venv/bin/python -B -u -m v2.benchmarks.b4_bakeoff --phase confirmation \
+  --selection v2/benchmarks/results/b4/bakeoff-screen.json \
+  --output v2/benchmarks/results/b4/bakeoff-confirmation.json
+```
+
+New corpus, protocol and source manifest live in versioned `inputs/`; reports
+and partial captures remain in the ignored local `results/b4/` tree. The
+builder refuses to replace an existing freeze. Tests cover counterbalancing,
+paired-sample requirements, selection and independent corpus identity.

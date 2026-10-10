@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "revision": "bcf5f3d1e57304694b48ba6e7ef8b4ea2ffd0db0",
+  "controls_sha256": "a364b34c2dff555e8003c3c6fa7db2ca9a9c26361975871a2eee56f89b4d9849",
+  "corpus_sha256": "8e9c9ebf7e6ba1c4aafd7908f98d6f111aa7ee10a27bdaf32858dc99f3c4dbe0",
+  "seeds": [
+    11,
+    29,
+    53
+  ],
+  "stage_seeds": [
+    7,
+    19,
+    41
+  ],
+  "kernel_bits": [
+    64,
+    96,
+    128,
+    166,
+    200,
+    256,
+    329,
+    512,
+    768,
+    1024
+  ],
+  "kernel_sigmas": [
+    7,
+    19,
+    41
+  ],
+  "kernel_scalar": 170141183460469231731687303717910206670,
+  "cases": {
+    "64": [
+      200,
+      20000,
+      16
+    ],
+    "128": [
+      1000,
+      50000,
+      16
+    ],
+    "256": [
+      1000,
+      50000,
+      16
+    ],
+    "329": [
+      1000,
+      50000,
+      16
+    ],
+    "power": [
+      50,
+      2000,
+      8
+    ]
+  },
+  "stage_bounds": [
+    1000,
+    50000
+  ],
+  "stage_curves": 3,
+  "work_limit": 5000000,
+  "seconds": 30,
+  "cpu_seconds": 30,
+  "memory_bytes": 16777216,
+  "max_input_bits": 331,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      27
+    ],
+    [
+      8,
+      63
+    ]
+  ],
+  "relative_iqr_limit": 0.15,
+  "backends": [
+    "python-int",
+    "gmpy2-mpz"
+  ],
+  "candidate_limit": 5,
+  "selection": "Fastest positive, stable paired complete-cohort gain per backend with no >5-point class completion regression. The independent confirmation tests only that frozen winner against its baseline.",
+  "promotion": "No universal percentage floor. Require zero correctness failures, matched finite budgets, stable baseline/candidate/paired ratio IQR <=15%, fresh paired 95% timing interval above zero, positive CPU gain, positive effects in both chronological halves and positive screen direction. Scope claims to the fixed workload; review class regressions and maintenance before any production integration. Only unstable pairs extend to the frozen 27/63 ceilings; a stable interval crossing zero retains baseline without further repeats. Unresolved evidence retains baseline. Completion improvements are reported, not promoted from this timing-only study.",
+  "timing_scope": "Initialization, conversion, normalization, recovery, result reconstruction and checkpoint serialization included. Kernel diagnostics, stage timings, full factoring, cold starts and instrumented profiles are reported separately.",
+  "machine_lock": "/private/tmp/factor-performance.lock",
+  "profile_status": "Baseline breakdown must precede candidate freeze.",
+  "parent_protocol_sha256": "31919cae03a304b2df54e7a667561ecdd36762866c57003ed18b3a21a5e50c02",
+  "order_seed": 2026100957,
+  "sample_cpu_seconds": 0.5,
+  "window_seconds": 2700,
+  "timing_design": "Counterbalanced rotated arm orders and alternating backend order in independent process blocks. Every process pays at least three seconds validated warmup before one >=0.5 CPU-second sample, averaged over validated whole cohorts. Stable arms stop at nine pairs; only unstable candidates and their matched baseline continue. Parent holds exclusive machine lock through all children and extension rounds. Initialization, conversion, normalization, recovery and output/checkpoint validation remain inside each cohort. Cold/profiles are excluded.",
+  "reused_diagnostics": "Original frozen kernel/stage diagnostics and separately instrumented baseline share/Amdahl evidence remain valid for their original workloads; no claim of identical shares on these new inputs. This follow-up measures complete ECM-only portfolios."
+}

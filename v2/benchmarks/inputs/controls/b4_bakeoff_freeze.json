@@ -1,0 +1,18 @@
+{
+  "arms": [
+    "baseline",
+    "squares",
+    "fused_step",
+    "whole_ladder",
+    "reductions",
+    "normalized"
+  ],
+  "parent_revision": "08e40b99d52e6b81ae4cfd1cc63711c0e67b7612",
+  "source_hashes": {
+    "v2/benchmarks/b4_bakeoff.py": "a8fd70c5cf2447390779de1bebd9739b3c6034de4b2037f183817653e5eaf952",
+    "v2/benchmarks/build_b4_bakeoff.py": "fae88606d96d2f340cfe46fbe0b6b9ce0b141741ed5ce03dcfa600930e0cc904",
+    "v2/benchmarks/inputs/controls/b4_bakeoff_protocol.json": "3bb5bc4cc1ef621d9463f0d788b48d27d51ce040baa9fed42e202b42d3c8f1f3",
+    "v2/benchmarks/inputs/corpora/b4_bakeoff_corpus.json": "8e9c9ebf7e6ba1c4aafd7908f98d6f111aa7ee10a27bdaf32858dc99f3c4dbe0",
+    "v2/benchmarks/inputs/controls/b4_freeze.json": "d2184d007e50f64e16504266a2cd54fee8a5a3a6e66b6bdc714336502896bd39"
+  }
+}
