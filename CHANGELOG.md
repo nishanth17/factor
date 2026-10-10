@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Add experimental opt-in two-large-prime serial SIQS after the bounded C1
+  residual study produced complete 40/50-digit witnesses. Preserve the failed
+  literal gate and explicitly identify the corrected cost-attribution go as
+  post-observation; no speedup or default promotion follows from that study.
+- Preserve scalar residual certainty with separate proven endpoint pairs,
+  finite splitting and all-component graph cycles. Retain exact original
+  atoms through FIFO eviction and use charged DLP-only SIQS checkpoint4;
+  default SLP remains checkpoint3. SSS/worker collection rejects the opt-in
+  config. Fresh complete-factor confirmation remains in progress.
+
 - Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
   the user's explicit direction. Fresh complete stages save 9.73% CPU across
   nine matched cells; extended integer portfolio captures remain inconclusive.

@@ -556,7 +556,17 @@ class SIQSJob:
             self.stats["relations"] = len(self.engine.collector._full) + len(
                 self.engine.collector._combined
             )
-            self.stats["partials"] = len(self.engine.collector._pending)
+            self.stats["partials"] = len(self.engine.collector.partial_ids)
+            graph = self.engine.collector._graph
+            if graph is not None:
+                self.stats["large_prime_graph"] = dict(
+                    forest_edges=len(graph.edges),
+                    forest_vertices=len(graph.adjacency),
+                    components=len(graph.sizes),
+                    unowned_edges=len(graph.unowned),
+                    owned_forest_edges=len(graph.edges) - len(graph.unowned),
+                    split_calls=self.engine.collector._split_calls,
+                )
             self.stats["workspace_bytes"] = (
                 self.config.memory_bytes
                 - self.engine.config.memory_bytes

@@ -87,7 +87,8 @@ production option still needs bounded ownership/eviction, independent complete
 cycle oracles, charged cancellation/resume and fresh matched total-resource
 confirmation after training freezes.
 
-The 60-digit cells and attribution audit remain pending at this revision.
+At that intermediate revision, the 60-digit cells and attribution audit were
+still pending. The completed results below supersede that progress snapshot.
 
 ## Completed collection and investment decision
 

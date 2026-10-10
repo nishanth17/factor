@@ -837,3 +837,48 @@ remain inconclusive after extension. The [benchmark receipt](
 benchmarks/README.md#a6-production-default-promotion--9-october-2026)
 records both results. This is a user-directed default change, with the
 legacy executor available for reproducibility and existing resumes.
+
+## Experimental two-large-prime SIQS
+
+`DoubleLargeSieveConfig` enables the bounded serial graph collector explicitly.
+It separates the SLP bound, each DLP endpoint, their product and the cumulative
+splitting allowance. The normal `SieveConfig` remains the default.
+
+```python
+from v2.qs import DoubleLargeSieveConfig, SIQSConfig, SIQSJob
+
+collector = DoubleLargeSieveConfig(
+    residual_bound=1000**2,
+    large_prime_bound=100 * 1000,
+    large_product_bound=128 * 1000**2,
+    split_call_limit=131072,
+)
+config = SIQSConfig(base_bound=1000, collector=collector)
+# Supply the same finite Budget used by the rest of the factoring job.
+job = SIQSJob(n, seed=7, config=config, budget=budget)
+result = job.run()
+```
+
+These illustrative bounds are not a promoted preset. The
+[C1 protocol](benchmarks/c1_implementation_protocol.md) governs training and
+fresh complete-factor comparison. `candidate_bound=0` covers the entire
+admissible product domain; a smaller explicit allowance must preserve SLP
+coverage and intentionally sacrifices DLP candidates. Endpoints must be proven
+primes, outside the factor base, at most10¹²; each product and split attempt
+has a finite bound. Failure to split never establishes primality.
+
+Two-prime atoms use `AtomicRelation.large_primes=(p, q)` with unit scalar
+`residual`. Direct `verify_atomic` calls require explicit `large_prime_bound`
+and `large_product_bound`. A raw two-prime atom is not a full matrix row.
+Combined relations reconstruct all original exponents and known squares,
+including repeated-prime loops and cycles disconnected from the SLP component.
+Paths longer than256atoms are reported losses. FIFO eviction removes only
+unowned forest edges; emitted rows retain their original atoms.
+
+DLP SIQS checkpoints use version4, while ordinary SLP remains version3.
+`SIQSJob.from_checkpoint` verifies atoms, mixed row order, exact forest paths
+and square corrections, and charges rebuilding plus prior work/wall/CPU.
+Started splitting attempts remain charged across cancellation and resume.
+The explicit config also works through `PortfolioConfig(siqs=config)` under
+its enclosing memory allowance. SSS and parallel exporters reject this config.
+The API bounds owned workspace; process/JIT RSS is reported separately.

@@ -94,6 +94,41 @@ class SieveConfig:
 
 
 @dataclass(frozen=True)
+class DoubleLargeSieveConfig(SieveConfig):
+    """Opt-in two-prime bounds and a finite cumulative splitting quota.
+
+    candidate_bound=0 uses the full admissible product domain. A smaller
+    explicit allowance intentionally loses DLP candidates while retaining
+    conservative SLP coverage. Default SieveConfig serialization is unchanged.
+    """
+
+    large_prime_bound: int = field(kw_only=True)
+    large_product_bound: int = field(kw_only=True)
+    candidate_bound: int = field(default=0, kw_only=True)
+    split_call_limit: int = field(default=131072, kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        checked_residual_bound(self.large_prime_bound)
+        utils.require_integer(self.large_prime_bound, "large_prime_bound", 2)
+        utils.require_integer(
+            self.large_product_bound, "large_product_bound", 4
+        )
+        if self.large_product_bound > self.large_prime_bound**2:
+            raise ValueError("product bound exceeds the two endpoint envelope")
+        utils.require_integer(self.candidate_bound, "candidate_bound", 0)
+        if self.candidate_bound and not (
+            self.residual_bound
+            <= self.candidate_bound
+            <= max(self.residual_bound, self.large_product_bound)
+        ):
+            raise ValueError("candidate bound must preserve SLP coverage")
+        utils.require_integer(self.split_call_limit, "split_call_limit", 0)
+        if self.split_call_limit > 1048576:
+            raise ValueError("split-call limit exceeds the collector cap")
+
+
+@dataclass(frozen=True)
 class SieveResult:
     """Cumulative checked store and per-call diagnostics for [lo,hi).
 
@@ -134,6 +169,30 @@ class SieveCollector:
     ):
         """Reserve metadata/buffers and validate A's factor-base support."""
         self.config = config if config is not None else SieveConfig()
+        double = isinstance(self.config, DoubleLargeSieveConfig)
+        if double and type(self) is not SieveCollector:
+            raise ValueError("DLP supports the serial SieveCollector only")
+        self._graph = None
+        if double:
+            # Keep ordinary SLP and owned historic loader dependencies intact.
+            from .large_prime_collector import (
+                COUNTERS,
+                admit_large_relation,
+                divide_large_residual,
+            )
+            from .large_primes import LargePrimeForest, graph_reserve
+
+            self._graph = LargePrimeForest()
+            self._graph_reserve = graph_reserve
+            self._divide_double = divide_large_residual
+            self._admit_double = admit_large_relation
+            self._double_counters = COUNTERS
+        self._split_calls = 0
+        self._candidate_bound = self.config.residual_bound
+        if double:
+            self._candidate_bound = self.config.candidate_bound or max(
+                self.config.residual_bound, self.config.large_product_bound
+            )
         self.polynomial, self.factor_base = polynomial, factor_base
         self.budget = budget if budget is not None else Budget()
         if (polynomial.n, polynomial.multiplier) != (
@@ -150,6 +209,8 @@ class SieveCollector:
         self._workspace += self.config.block_width * (128 + (count + 7) // 8)
         self._workspace += 128 * (polynomial.n_prime.bit_length() + 16384)
         self._workspace += self.config.power_plan_bytes
+        if double:
+            self._workspace += self._graph_reserve(0)
         if self.config.score_policy in ("powers", "fixed"):
             # Two capped root lists coexist while lifting; coefficients and
             # positions have finite bit bounds even far from zero.
@@ -231,6 +292,15 @@ class SieveCollector:
         """Return an immutable prefix in mixed full/matched admission order."""
         return tuple(self._rows)
 
+    @property
+    def partial_ids(self):
+        """Unowned atoms only; emitted cycle provenance stays pinned."""
+        return (
+            tuple(self._graph.unowned)
+            if self._graph is not None
+            else tuple(self._pending.values())
+        )
+
     def set_polynomial(self, polynomial, roots, *, retain_relations=True):
         """Switch metadata atomically; retain verified cross-family rows.
 
@@ -265,6 +335,11 @@ class SieveCollector:
             if cache is not None:
                 cache.clear()
             self._workspace -= sum(self._atom_bytes.values())
+            if self._graph is not None:
+                self._workspace -= self._graph_reserve(
+                    len(self._graph.edges)
+                ) - self._graph_reserve(0)
+                self._graph = type(self._graph)()
             self._atoms.clear()
             self._pending.clear()
             self._atom_bytes.clear()
@@ -373,8 +448,8 @@ class SieveCollector:
 
     def _residual_score(self):
         if self.config.score_policy == "fixed":
-            return log_bounds(self.config.residual_bound)[1]
-        return (self.config.residual_bound - 1).bit_length()
+            return log_bounds(self._candidate_bound)[1]
+        return (self._candidate_bound - 1).bit_length()
 
     def _clip_threshold(self, threshold):
         if self.config.score_backend == "bytearray":
@@ -453,7 +528,7 @@ class SieveCollector:
             self._hits[index] = 0
         lower, maximum = self._bounds(lo, hi)
         lower_threshold = max(0, lower.bit_length() - 1)
-        lower_threshold -= (self.config.residual_bound - 1).bit_length()
+        lower_threshold -= (self._candidate_bound - 1).bit_length()
         if (
             self.config.score_policy == "adaptive"
             and lower_threshold <= 0
@@ -570,7 +645,7 @@ class SieveCollector:
         threshold -= (
             self._residual_score()
             if self.config.score_policy == "fixed"
-            else (self.config.residual_bound - 1).bit_length()
+            else (self._candidate_bound - 1).bit_length()
         ) + omitted
         threshold = max(0, threshold + self.config.threshold_extra)
         if self.config.score_backend != "list":
@@ -594,7 +669,7 @@ class SieveCollector:
             threshold = self._lower_score(abs(value)) - self._residual_score()
         else:
             threshold = abs(value).bit_length() - 1
-            threshold -= (self.config.residual_bound - 1).bit_length()
+            threshold -= (self._candidate_bound - 1).bit_length()
 
         if self.config.score_policy in ("powers", "fixed") and self._skipped:
             remaining, allowance = abs(value), 0
@@ -772,6 +847,10 @@ class SieveCollector:
             if exponent:
                 exponents.append((prime, exponent))
 
+        if self._graph is not None:
+            return self._divide_double(
+                self, position, value, remaining, exponents, stats
+            )
         if remaining > self.config.residual_bound:
             return None, None
         self.budget.consume(remaining.bit_length() ** 2)
@@ -810,6 +889,8 @@ class SieveCollector:
         FIFO eviction cannot reach pinned atoms. Refusal leaves store state
         untouched, so the same position can be retried with a new Budget.
         """
+        if self._graph is not None and atom.residual_product != 1:
+            return self._admit_double(self, atom, stats)
         if atom.relation_id in self._atoms:
             stats["duplicates"] += 1
             return None
@@ -943,6 +1024,8 @@ class SieveCollector:
             ),
             0,
         )
+        if self._graph is not None:
+            stats.update(dict.fromkeys(self._double_counters, 0))
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
 
@@ -1004,7 +1087,7 @@ class SieveCollector:
             tuple(self._atoms.values()),
             tuple(self._full),
             tuple(self._combined),
-            tuple(self._pending.values()),
+            self.partial_ids,
             divisor,
             position,
             reason,

@@ -16,8 +16,13 @@ analysis replaces the dense diagnostic LP matrix; nested 64/128 B² product
 bounds and longer collection address false-candidate cost and delayed matching.
 Full retained-record analysis now verifies the 30-digit factorization from
 both DLP captures while their same-position SLP incidence has no dependency.
-This is useful-yield evidence, not an accepted timing result. Production SLP,
-R3 provenance and all defaults remain unchanged during the gate.
+This is useful-yield evidence, not an accepted timing result. The completed [larger study and accounting audit](c1_followup_results.md)
+now support a bounded implementation investment at40/50digits;60digits remain
+unresolved. The literal frozen gate failed and its corrected attribution is
+explicitly post-observation. Opt-in graph collection is being validated under
+the [implementation protocol](c1_implementation_protocol.md), with an
+[owned pre-C1 SLP control](c1_implementation_controls.md). Default SLP settings
+and R3 original-row provenance remain the reference.
 Generated captures remain local in `results/c1/`; required controls and
 certified corpora are versioned. All diagnostic runs and heavy checks share
 `/private/tmp/factor-performance.lock` with B3/A7. No accepted timing claim
