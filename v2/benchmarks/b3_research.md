@@ -101,7 +101,7 @@ output and context storage. A recursive portfolio shares one store across
 curves and cofactors; each resumed invocation starts a fresh store. Setup,
 verification, evictions, output checks and unsuccessful curves are timed.
 
-The [frozen protocol](inputs/controls/b3_protocol_v2.json) fixes two certified
+The [frozen protocol](inputs/controls/b3_protocol_v3.json) fixes two certified
 12-input cohorts, repeated seeds, controls, scopes, bounds and equal resource
 caps before timing. The routing trial is explicit `reuse`, B1=2,000,
 chunk16, tier at least eight curves. Fresh/smaller/unsupported tiers retain
@@ -114,3 +114,7 @@ reference before replacement allocation. The original `b3_protocol.json`
 remains byte-identical and had no timing captures. `b3_protocol_v2.json`
 updates source hashes only, retaining all inputs, parameters, selection and
 uncertainty rules; no result informed this correction.
+
+The final pre-timing v3 freeze also replaces two equivalent complex slice
+endpoints with named indices to satisfy both Ruff and pycodestyle. v1/v2
+remain unchanged; no timing capture or candidate selection preceded v3.

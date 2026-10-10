@@ -24,7 +24,7 @@ from .prac_oracle import affine_multiply, matches, twist_point
 
 ROOT = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).parent / "inputs"
-PROTOCOL = INPUTS / "controls/b3_protocol_v2.json"
+PROTOCOL = INPUTS / "controls/b3_protocol_v3.json"
 CORPUS = INPUTS / "corpora/b3_corpus.json"
 BASELINE = INPUTS / "baselines/b3_mainline.json"
 SCOPES = (
@@ -282,9 +282,10 @@ def summarize(pairs, settings):
         default=0,
     )
     cpu_ratio = statistics.median(c["cpu"] / b["cpu"] for b, c in pairs)
+    midpoint = len(ratios) // 2
     halves = [
-        statistics.median(ratios[: len(ratios) // 2]),
-        statistics.median(ratios[len(ratios) // 2 :]),
+        statistics.median(ratios[:midpoint]),
+        statistics.median(ratios[midpoint:]),
     ]
     return dict(
         samples=len(pairs),

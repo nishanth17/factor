@@ -264,9 +264,10 @@ def verify_progress(job, backend, verifier):
         consumed += cursor["values"][: cursor["index"]]
         if len(powers) > len(consumed):
             raise ValueError("chain chunk exceeds consumed prime prefix")
+        first_pending = len(consumed) - len(powers)
         expected = [
             [prime, utils.prime_power(prime, job["b1"])]
-            for prime in consumed[len(consumed) - len(powers) :]
+            for prime in consumed[first_pending:]
         ]
         if powers != expected:
             raise ValueError("checkpoint chain powers disagree with schedule")
