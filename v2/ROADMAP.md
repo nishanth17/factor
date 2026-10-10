@@ -163,7 +163,8 @@ reused native PRAC gains 6.73% against pinned B4, and reused GMP Lucas gains
 8.42% against its control.
 The CF-family minima are independently certified; fresh native attempts
 retain the ladder. Its experimental code and required records are integrated
-into mainline; B3 production integration remains open.
+into mainline. B3 bounded production integration and the user-directed native
+PRAC default are complete; wider allocation remains C3/E1.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
 bounded opt-in pairing; its matched losses retain defaults. A6's integrated
 bounded tranche now supplies exact increased-B1 integer ratios and finite
@@ -282,7 +283,7 @@ development and coordinated integration, not concurrent performance runs.
 | --- | --- | --- | --- | --- | --- |
 | ~~B1 — P3.8-R1 calibration~~ | ~~**[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults.~~ | ~~A1~~ | ~~Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction missed its then-frozen timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers.~~ | ~~Sol / **high**, **xhigh** for selection~~ | ~~Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates.~~ |
 | ~~B2 — P5.2 paired continuation~~ | ~~Bounded reusable ± execution and aligned-wheel follow-up, independent coverage/point/replay/resume checks, D/table comparisons and finite predeclared campaign continuation.~~ | ~~A2, A3; A6 remains required for increased-B1 extensions.~~ | ~~**[x] Complete for bounded scope on 9 October 2026.** Both pairing layouts remain opt-in: selected held-out configurations lose to reusable unpaired programs, with no completion gain. Increased B1, advanced pruning and allocation remain deferred.~~ | ~~Astra / **xhigh**~~ | ~~Exact coverage, projective products, saturation recovery, finite accounting and canonical int/GMP resume agree; frozen experiments support retaining defaults.~~ |
-| ~~B3 — P4.1 production chains~~ | ~~Route C6 records through bounded ECM chunks, finite plans, recovery and schema-10 resume; measure fresh/reused and complete portfolios.~~ | ~~A2, A3, A4; accepted C6/B4~~ | **[x] Bounded integration/decision complete, 9 October 2026.** Explicit 40–80-digit reuse routes native PRAC and separate GMP Lucas at B1=2,000/chunk16/tier >=8. Defaults retain B4; full native gains are not promoted. [Acceptance and limitations](#b3-production-integration-acceptance-9-october-2026). | Sol / **xhigh** | Charged verification/recovery, finite simultaneous ownership and independently validated resume; wider allocation/default decisions remain C3/E1. |
+| ~~B3 — P4.1 production chains~~ | ~~Integrate C6 records, finite run-owned plans, strict recovery and compatible checkpoints; compare charged fresh/reused portfolios.~~ | ~~A2, A3, A4; accepted C6/B4~~ | ~~**[x] Complete and integrated, 10 October 2026.** User-approved native PRAC/batch16 default, optional Lucas/CF flags and approved finite automatic memory. Unsupported/small-cap jobs retain B4. [Acceptance and limitations](#b3-production-integration-acceptance-9-october-2026).~~ | ~~Sol / **xhigh**~~ | ~~Certified scalar/frontier coverage, atomic recovery, cumulative/resume accounting and charged 32-curve bridge verified. Wider allocation and population calibration remain C3/E1.~~ |
 | ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | ~~A2~~ | ~~**[x] Complete and integrated, 9 October 2026.** Native selected reductions pass the frozen production bridge: 6.79% saving (95% interval 5.82–13.58%), 27/27 matching outcomes/work. Retain readable GMP: its whole-ladder bridge is inconclusive. Five-candidate study, research, proofs, independent controls and fresh confirmation are complete; broader production bounds remain unclaimed. See [integration evidence](benchmarks/README.md#b4-production-integration-protocol).~~ | ~~Sol / **xhigh**; Astra for unresolved formula proofs~~ | ~~Bounded formula, normalization, intermediate-width and backend checks completed. No reducer, backend or curve-family expansion.~~ |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
@@ -1999,7 +2000,7 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 **Prerequisite:** Phases 1–2; end-to-end comparisons use the Phase 3 portfolio baseline. **Goal:** useful stage speedups that survive full-run costs. Sources: PRAC repair, coordinates, reduction, backends.
 
-### P4.1 — Finish PRAC repair and precompute valid chains
+### ~~P4.1 — Finish PRAC repair and precompute valid chains~~
 
 - [x] **A4 correctness tranche:** use `audit/prac_reference.py` as a prototype, not a drop-in. Guard 0/1/2 and powers of two; select `k//2 < r < k` with `gcd(k,r)=1` for the odd component, require terminal `d=e=1`, and validate integer/differential invariants. Separate chain generation from execution; cache exact-rational choices and use ladder fallback.
 - **A:** zero nondegenerate mismatches against independent affine/ladder oracles; `(0,0)` is always detected and handled by factor extraction, recovery, or retry. The prototype's 797 exceptional cases are not counted as passing point equalities.
@@ -2084,6 +2085,20 @@ reference; abstract M/S counts need measured PyPy costs.
 
 
 #### B3 production integration acceptance (9 October 2026)
+
+**User-directed completion — 10 October 2026:** native reduced PRAC/batch16
+is now the supported bounded default; Lucas/CF batch16 remain explicit options.
+The user separately approved a finite 16 MiB automatic cap. Explicit caps,
+unsupported schedules and automatic GMP retain their existing limits/B4.
+Schema 11 pins explicit families; default/legacy GMP reuse retain schema 10,
+and implicit resume restores saved memory and execution. The committed-mainline
+32-curve [regression bridge](benchmarks/README.md#b3-user-directed-native-default-and-optional-families-10-october-2026)
+charges construction, verification, failed searches and common-prefix rebuilds;
+it does not replace earlier regressions with a universal speedup claim.
+567 GMP-enabled tests, full lint and committed-only imports/catalogs pass.
+The bounded B3/P4.1 entry is crossed off. Public cross-call ownership, wider
+bounds/sizes, completed-curve extension, allocation and E1 confirmation stay open.
+The dated acceptance and diagnosis below describe their historical decisions.
 
 - [x] Route independently certified C6 native reduced PRAC/batch16 and separate
   GMP tuple Lucas/batch16 through actual bounded stage-one jobs. Keep B4 for

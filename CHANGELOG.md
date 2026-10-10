@@ -2,6 +2,22 @@
 
 ## Current development
 
+- Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
+  the user's direction. Keep B4 for unsupported jobs and insufficient explicit
+  caps; select the separately approved finite 16 MiB automatic workspace only
+  where supported. Preserve earlier construction/regression evidence.
+- Add optional `--ecm-chain lucas|cf` and the `ecm_chain_family` API setting;
+  `--ecm-chain off` retains the ladder. Keep eager certified recovery and finite
+  run-local ownership. Default schema 10 and optional-family schema 11 pin
+  execution identities; implicit resume restores saved caps/policy and legacy
+  schemas remain compatible. No new search or arithmetic kernel is introduced.
+- Freeze current-mainline 32-curve native regression controls and report charged
+  portfolio and pause/resume comparisons separately from C6; retain the prior
+  default-budget accounting diagnosis. Keep native claims separate from
+  GMP and cold startup. Working and committed-only checks pass 567 tests, lint,
+  benchmark imports and required catalogs. Close the bounded B3/P4.1 entry;
+  broader allocation and population/default calibration remain C3/E1 work.
+
 - Diagnose B3 recovery preparation and plan lifetime with matched PyPy
   ablations, fresh confirmation and exact original-harness replication.
   Retain accepted eager production/defaults: lazy setup has no supported

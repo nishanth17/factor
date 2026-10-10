@@ -175,3 +175,22 @@ explains C-API/refcounting boundary costs. That is a plausible runtime mechanism
 not an isolated attribution measurement or a universal backend guarantee.
 No extension code was adapted, no new license obligation was introduced, and no
 claim about the GMP-ECM C binary follows from these PyPy executor measurements.
+
+## User-directed default and optional families (10 October 2026)
+
+The supported native route now defaults to the same eager reduced PRAC/batch16
+executor. Optional Lucas and CF plans use the existing independently verified
+C6 records, reduced native kernels, batch16 guard coverage, whole-chunk recovery
+reservations and finite run-owned LRU. CF's 333 scalar/frontier records are a
+versioned projection of the completed C6 catalog; no search was repeated.
+No additional upstream code is adapted and the licensing boundary above holds.
+
+No new arithmetic proof is needed: optional-family scalar/frontier verification
+and the same chunk-composition induction discharge the existing obligation.
+New integration obligations are finite cap resolution before allocation,
+family/catalog identities, atomic cache publication and preserving saved policy
+through schema-11 and legacy resume. Independent affine/strict-factor oracles,
+saturation, failed preparation, eviction, cancellation, cumulative reconstruction
+and wrong-family resume tests cover those boundaries. The default decision is
+explicit user direction and does not turn historical per-call regressions into
+performance acceptance. Public cross-call owners and larger routes remain open.

@@ -5,6 +5,110 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## B3 user-directed native default and optional families (10 October 2026)
+
+The user requested and approved native reduced PRAC/batch 16 as the bounded
+production default, with Lucas and CF behind optional flags. The finite
+16 MiB automatic cap was separately approved. This changes the earlier
+retain-default decision; historical captures and negative results below remain
+intact. The supported route and [API/resume contract](../README.md#optional-bounded-praclucas-stage-one-plans)
+retain B1=2,000, chunk16, >=8-curve tiers and 40–80-digit cofactors. Explicit
+small caps and unsupported jobs use B4; automatic GMP remains on B4.
+
+[The new bridge protocol](inputs/controls/b3_default_protocol.json) freezes
+committed mainline `afbbafc` in [a standalone baseline](inputs/baselines/b3_pre_default.json)
+and candidate `8acbf97` before timing. Previously used certified training and
+confirmation cohorts/seeds supply a regression bridge, not new untouched
+population confirmation or a new candidate search. All four native arms use
+the actual default 32-curve tier, B1=2,000/B2=147,396, identical 32-million-unit,
+20-second wall/CPU grants, 32 MiB logical caps, 512 KiB programs, and the same
+recursive inputs and output validation. Chains add an 8 MiB reserve within
+that common cap. All unresolved cofactors must exhaust exactly 32 curves.
+The matched packed-program control isolates chain routing rather than
+claiming an all-knobs default comparison. Bounds/curves/default work grants
+are not recalibrated by this integration.
+
+Runs use PyPy 7.3.23/Python 3.11.15, >=3 seconds validated warmup per arm,
+9 samples (5 seconds/18 or 8 seconds/27 if relative IQR exceeds 15%), rotating
+balanced order and 4,000 paired bootstrap resamples. Setup, record proofs,
+misses, strict recovery reservations, failed searches, recursive reconstruction
+and charged empty-cache resume rebuilding are included. The machine-wide lock
+serializes all timings and heavy checks. Positive savings mean faster.
+
+| Scope / cohort / candidate | Saving [conditional 95% interval] | Ladder / candidate median | Samples / stable |
+| --- | ---: | ---: | --- |
+| portfolio, training, default | +3.07% [+2.80%, +3.66%] | 4.1860 / 4.0592 s | 9 / True |
+| portfolio, training, lucas | +2.74% [+0.40%, +3.80%] | 4.1860 / 4.0638 s | 9 / True |
+| portfolio, training, cf | +3.55% [+2.68%, +4.49%] | 4.1860 / 4.0309 s | 9 / True |
+| portfolio, confirmation, default | +1.55% [-0.80%, +2.08%] | 4.1656 / 4.0958 s | 9 / True |
+| portfolio, confirmation, lucas | +1.87% [+1.25%, +2.16%] | 4.1656 / 4.0923 s | 9 / True |
+| portfolio, confirmation, cf | +2.36% [+1.75%, +2.72%] | 4.1656 / 4.0675 s | 9 / True |
+| resume_equal, training, default | +2.25% [+0.61%, +3.14%] | 3.7953 / 3.7046 s | 9 / True |
+| resume_equal, confirmation, default | +2.03% [+1.48%, +3.33%] | 3.8326 / 3.7405 s | 9 / True |
+
+At 32 curves the native PRAC training saving is 3.07%, while confirmation
+is +1.55% with interval [-0.80%, +2.08%], hence inconclusive under the frozen
+positive-interval policy. Stable inconclusive observations were not repeated
+to seek significance. Optional Lucas/CF confirmation savings are 1.87%/2.36%
+on these previously used inputs. This is not an automatic family selection.
+Early-factor fixture medians can still regress even when aggregate throughput
+improves. The previous eight-curve full-call regression and one/four-curve
+construction losses below remain relevant to short reuse and late resume.
+
+| Scope / cohort / arm | Complete results | Curves per unresolved cofactor |
+| --- | ---: | ---: |
+| portfolio, training, ladder | 14/24 | 32–32 |
+| portfolio, training, default | 14/24 | 32–32 |
+| portfolio, training, lucas | 14/24 | 32–32 |
+| portfolio, training, cf | 14/24 | 32–32 |
+| portfolio, confirmation, ladder | 15/24 | 32–32 |
+| portfolio, confirmation, default | 15/24 | 32–32 |
+| portfolio, confirmation, lucas | 15/24 | 32–32 |
+| portfolio, confirmation, cf | 15/24 | 32–32 |
+| resume_equal, training, ladder | 0/10 | 32–32 |
+| resume_equal, training, default | 0/10 | 32–32 |
+| resume_equal, confirmation, ladder | 1/10 | 32–32 |
+| resume_equal, confirmation, default | 1/10 | 32–32 |
+
+`resume_equal` includes a common certified 16-prime pause, JSON checkpoint
+roundtrip, validation and rebuilding on ten balanced cases. `default_budget`
+is supported by the runner but its additional timing was stopped before a
+validated capture; no new default-budget result is claimed. Under the unchanged
+2-million-unit grant, the historical accounting diagnostic remains relevant:
+different work currencies can complete different unsuccessful searches, so its shorter
+times establish no engine speed gain. Every timed divisor, terminal label and
+unresolved product is validated; every arm has deterministic outcome/work
+signatures across samples. Completion differences are reported per fixture in
+the raw captures. These intervals concern the frozen cohorts, not all inputs.
+No new GMP timing or cold-start benefit is claimed; prior cold captures and
+separate instrumented diagnoses remain historical evidence.
+
+The default is user-directed, not inferred from a universal 10% threshold or
+from C6's reused-stage-only 6.73% saving. Per-call construction and resume can
+still regress, and optional Lucas/CF are not automatically selected from these
+results. Batch-64 C6 observations do not become batch-16 production claims.
+The eager certified executor, strict saturated replay and finite run-local LRU
+remain in place; no public cross-call owner, search, kernel or arithmetic formula
+was introduced. The proof obligation is existing scalar/frontier composition
+and atomic publication with a pinned optional-family identity. CF's required
+333-row input is versioned; upstream licensing and independent verification
+remain documented in [the source/proof record](b3_research.md).
+
+Reproduce one group at a time with:
+
+```sh
+v2/.venv/bin/python -B -m v2.benchmarks.b3_default \
+  --split confirmation --scope portfolio \
+  --output v2/benchmarks/results/b3/rerun-default-UNIQUE.json
+```
+
+Use both splits and `portfolio`, `resume_equal`, `default_budget`. Generated
+captures, logs and earlier evidence remain local under `results/b3/`. Working
+and committed-only GMP-enabled checks pass 567 tests, full lint and 115 benchmark
+imports; required catalogs, source pins and frozen baselines also load from
+committed files. Wider bounds/sizes, cross-call ownership, allocation/handoff
+and combined E1 population confirmation remain separate gates.
+
 ## B3 production PRAC/Lucas integration (9 October 2026)
 
 B3 completes bounded production stage-job integration with an explicit reuse

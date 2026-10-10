@@ -12,7 +12,7 @@ and adds bounded, resumable execution and experimental relation-based engines.
 | Exact preprocessing | Trial division, primality classification, powers of two and perfect powers; optional bounded Fermat search in the portfolio |
 | Brent rho | Seeded walks with finite attempts, batched GCDs and bounded recovery |
 | Pollard p−1 | Two-stage smoothness search with saturation replay; integrated into the bounded portfolio |
-| Montgomery ECM | Suyama curves, binary ladder and recoverable stage-two batches; the default portfolio's final search stage |
+| Montgomery ECM | Suyama curves, bounded native PRAC/batch16 where supported, B4 ladder fallback and recoverable stage-two batches; the default portfolio's final search stage |
 | QS / MPQS | Reference polynomials and verified relation pipeline, useful as comparison controls |
 | SIQS | Shared relations across CRT/Gray polynomial families, incremental roots, filtering, GF(2) dependencies and exact extraction; selectable CLI engine or optional portfolio fallback |
 | SSS / SSSf | Experimental Smooth Subsum Search; SSSf adds an optional lossy candidate filter; explicitly selectable through the CLI |
@@ -27,8 +27,9 @@ global deadline or resumable schedule.
 v2 fixes arithmetic and sieve boundaries, validates proper divisors, preserves
 failed recursive cofactors, and distinguishes probable from proven primes.
 Rho retries and ECM curve counts have explicit limits; saturated batches recover
-or report failure. ECM uses the binary ladder; the unsafe original PRAC
-chain is not the default.
+or report failure. Supported bounded ECM now uses independently certified
+reduced PRAC/batch16; unsupported cases retain the binary ladder. The unsafe
+original PRAC implementation is not used.
 
 `ecm.multiply_prac(k, x, z, n, a24)` now executes experimental verified PRAC
 records. It returns a valid projective pair or raises
@@ -400,20 +401,38 @@ contracts are documented in the module docstrings and covered by the tests.
 
 ## Optional bounded PRAC/Lucas stage-one plans
 
-`PortfolioConfig(ecm_chain_mode="reuse", ecm_chain_bytes=8 * 2**20,
-ecm_program_bytes=262144, memory_bytes=32 * 2**20)` enables B3's verified
-stage-one executor. These new fields are keyword-only. The default is
-`ecm_chain_mode="off", ecm_chain_bytes=0`; standalone ECM and CLI defaults
-retain the B4 ladder.
+Fresh `PortfolioConfig()` now resolves `ecm_chain_mode="auto"` to native
+reduced PRAC/batch 16 for supported bounded ECM schedules. This default was
+requested explicitly after reviewing C6 and production regressions; it is not
+an unconditional whole-portfolio speed claim. Standalone ECM and the legacy
+unbounded factoring path retain their existing executors.
 
-The supported route requires B1=2,000, ECM chunk size 16, a tier of at least
-eight curves and a current cofactor with 40–80 decimal digits. Exact integer
-bounds implement that size band. Native integers use reduced PRAC/batch 16;
-GMP uses separate tuple Lucas/batch 16. Unsupported sizes, bounds, chunks and
-short tiers use B4. This is explicit reuse intent, not a prediction that a
-factor will require eight curves. Early successful curves can still make
-preparation lose. Native whole-portfolio and resumed gains are not promoted;
-see the [complete measurements](benchmarks/README.md#b3-production-praclucas-integration-9-october-2026).
+The route requires B1=2,000, chunk size 16, a tier of at least eight curves
+and a current cofactor with 40–80 decimal digits, checked with exact integer
+bounds. Unsupported bounds, sizes, chunks and short tiers use B4. Preparation
+is lazy until a supported job starts, but is charged on every cache miss;
+early factor discoveries can prevent amortization.
+
+`memory_bytes=None` selects a finite 16 MiB cap for eligible automatic jobs,
+including an 8 MiB chain reserve and at least 512 KiB packed programs. Other
+fresh jobs retain 8 MiB. Explicit user caps are never raised: insufficient
+space keeps the ladder. These reserves coexist with the existing workspace
+and optional fallback; they do not bound process RSS.
+
+The bounded CLI accepts `--ecm-chain auto|off|prac|lucas|cf`; the flag also
+implies `--bounded`. `prac` selects the native default policy, `off` keeps the
+ladder, and `lucas`/`cf` select optional certified batch-16 families under the
+same support and capacity checks. The Lucas records are GMP-ECM-derived,
+executed by this repository's Python interpreter; this is not the GMP-ECM C
+binary. Native and GMP execution remain separate tracks. Automatic GMP jobs
+retain the ladder; explicit `ecm_chain_family="lucas"` or `"cf"` can select an
+alternative, and the accepted explicit GMP `ecm_chain_mode="reuse"` route
+continues to use tuple Lucas. API family/mode/chain-cap fields are keyword-only.
+
+For explicit reuse, set `ecm_chain_mode="reuse"`, `ecm_chain_bytes=8 * 2**20`,
+`ecm_program_bytes=512 * 1024` and a sufficient `memory_bytes`. To force the
+baseline, use `ecm_chain_mode="off"`. See the
+[default bridge and historical measurements](benchmarks/README.md#b3-user-directed-native-default-and-optional-families-10-october-2026).
 
 Each invocation owns a finite LRU of immutable verified plans, shared across
 its curves and recursive cofactors. No curve point or global plan cache is
@@ -434,7 +453,9 @@ chains can complete fewer unsuccessful curves despite identical final
 factorization completion. Lower unit counts or shorter capped runs establish
 no engine speed advantage.
 
-Opt-in checkpoints use schema **10** and pin catalog, bound, backend/build,
+Default PRAC and legacy explicit GMP reuse checkpoints use schema **10**;
+explicit Lucas/CF families use schema **11** with an additional family/catalog
+identity. Both pin catalog, bound, backend/build,
 kernel, batch, recovery and routing identities. Only certified chunks commit.
 Saturated guard products receive strict X/Z replay from the original chunk;
 unresolved recovery retains the existing durable prime-unit replay. Resume
@@ -443,7 +464,8 @@ replay position; it charges validation and rebuilds an empty cache, paying
 again for every miss. Configuration must match. Cumulative work, wall/CPU
 allowances and cancellation remain authoritative; a refused build publishes
 no partial plan. Existing schemas 2–9 retain their legacy routing and serialized
-shape with chains off. A legacy snapshot is not silently upgraded. Late
+shape with chains off. Implicit API/CLI resume restores the saved chain policy, program/chain caps
+and total memory exactly. A legacy snapshot is not silently upgraded. Late
 resumes may rebuild for too few remaining curves to amortize preparation;
 this is outside the confirmed common-prefix performance claim. ECM B1
 extension on a completed curve remains unsupported.
@@ -478,9 +500,9 @@ resource limitations and the prepared E1 comparison arms.
 prime/power blocks. Each block owns half-open endpoints and, for stage one,
 the inclusive B1 identity. Completed blocks are reused across curves and
 recursive cofactors; points, residues, products and recovery remain private to
-each job. `0` retains streamed execution and the native version-4 checkpoint
-schema. GMP snapshots use version 6. This is an experimental storage option,
-not a promoted default.
+each job. `0` retains streamed execution when chains are off, and the native version-4 checkpoint
+schema. GMP snapshots use version 6. Explicit standalone program storage remains experimental; supported bounded
+PRAC jobs now select a finite program cap automatically.
 
 The program cap is part of `memory_bytes`, with a scratch reserve of
 `4096 + 256 * segment_size` bytes and a 512-byte allowance per retained block
@@ -901,7 +923,7 @@ exceptional cached powers before use; this verification consumes cumulative
 allowances. Conservative owned workspace grows by the table/prime-chunk
 reserve, with all storage still inside the configured cap.
 
-New portfolio snapshots with the optimized p−1 execution use version 9;
+With chains disabled, portfolio snapshots with optimized p−1 use version 9;
 configuration identity pins both settings. Existing v2–v8 snapshots retain
 legacy chunks/cache. Omitted-config library resume and CLI resume select the
 saved p−1 settings automatically. An explicit custom config must match; for
