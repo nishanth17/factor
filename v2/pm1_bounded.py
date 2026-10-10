@@ -25,6 +25,8 @@ class PM1Config:
     Work units belong to this API and are distinct from portfolio job units.
     """
 
+    execution_version = EXECUTION_VERSION
+
     bounds: tuple = ((constants.PM1_B1, constants.PM1_B2),)
     chunk_size: int = 16
     gcd_batch: int = constants.GCD_BATCH_SIZE
@@ -61,6 +63,10 @@ class PM1Config:
         object.__setattr__(self, "bounds", bounds)
         if self.memory_bytes - self.workspace_reserve < 8192:
             raise MemoryError("p-1 state exceeds configured workspace cap")
+
+    def advance(self, state, budget, context):
+        """Apply this configuration's versioned execution action."""
+        _step(state, budget, context, self)
 
     @property
     def workspace_reserve(self):
@@ -321,7 +327,7 @@ def _step(state, budget, context, config):
 
 def _advance(state, budget, context, config):
     before = budget.used
-    _step(state, budget, context, config)
+    config.advance(state, budget, context)
     state["execution_work"] += budget.used - before
     state["steps"] += 1
 
@@ -345,7 +351,7 @@ def _restore(checkpoint, n, base, config):
         if (
             type(payload["version"]) is not int
             or payload["version"] != CHECKPOINT_VERSION
-            or payload["execution"] != EXECUTION_VERSION
+            or payload["execution"] != config.execution_version
             or payload["backend"] != "python-int"
             or payload["schedule"] != RATIO_VERSION
             or _canonical(payload["config"]) != _canonical(asdict(config))
@@ -479,7 +485,7 @@ def factorize_pm1_bounded(
     result = FactorizationResult(n, 1, (), tuple(sorted(remaining)))
     payload = {
         "version": CHECKPOINT_VERSION,
-        "execution": EXECUTION_VERSION,
+        "execution": config.execution_version,
         "backend": "python-int",
         "schedule": RATIO_VERSION,
         "n": n,
