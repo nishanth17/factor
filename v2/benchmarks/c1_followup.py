@@ -35,7 +35,7 @@ from .c1_feasibility import (
 from .performance_audit import fingerprint
 from .phase_three_reference import _rss_bytes
 
-CONTROL = HERE / "inputs/controls/c1_followup.json"
+CONTROL = HERE / "inputs/controls/c1_followup_observation.json"
 MEMORY = 512 * 2**20
 PREFIXES = (512, 2048, 8192, 32768, 131072)
 
@@ -308,14 +308,16 @@ def compact_report(records, n, *, budget=None, memory_bytes=MEMORY):
         dependencies = list(filtered.zero_dependencies)
         for mask in kernel(filtered.rows, budget):
             dependencies.append(xor_selected(filtered.masks, mask))
-        divisors = set()
+        divisors, nontrivial = set(), 0
         for mask in dependencies:
             assert mask and xor_selected(rows, mask) == 0
             lifted = xor_selected(cycles, mask)
             assert lifted and xor_selected(parity, lifted) == 0
             assert check_cycle(pairs, lifted)
             budget.consume(lifted.bit_count() * (1 + n.bit_length() ** 2))
-            divisors.update(verify_square(records, lifted, n))
+            recovered = verify_square(records, lifted, n)
+            nontrivial += bool(recovered)
+            divisors.update(recovered)
         factors, remaining, labels = [], [n], []
         if divisors:
             divisor = min(divisors)
@@ -336,6 +338,8 @@ def compact_report(records, n, *, budget=None, memory_bytes=MEMORY):
             independent_lp_constraints=len(cycles),
             post_filter=filtered.stats,
             dependencies=len(dependencies),
+            nontrivial_dependencies=nontrivial,
+            trivial_dependencies=len(dependencies) - nontrivial,
             proper_divisors=sorted(divisors),
             factors=factors,
             remaining=remaining,
@@ -574,13 +578,13 @@ def save_capture(path, value):
 
 def followup_probe(fixture, seed, config, seconds):
     audit = FollowupAudit(config, seed, seconds)
-    # Preserve up to three 30-second analysis slots before the total deadline.
+    # Preserve three analysis slots plus bounded retained-prefix refinement.
     # Otherwise a terminal collection timeout would censor already retained
     # evidence without ever examining its final useful-yield opportunity.
     budget = Budget(
         work_limit=10**13,
-        seconds=seconds - 90,
-        cpu_seconds=seconds - 90,
+        seconds=seconds - 120,
+        cpu_seconds=seconds - 120,
         cancelled=lambda: audit.stop is not None,
     )
     job = SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
@@ -612,6 +616,7 @@ def followup_probe(fixture, seed, config, seconds):
             )
             if result.reason != "paused" or audit.stop:
                 break
+    refine_prefixes(audit, snapshots, fixture["n"])
     assert (result.divisor or 1) * result.cofactor == fixture["n"]
     return dict(
         id=fixture["id"],
@@ -637,6 +642,73 @@ def followup_probe(fixture, seed, config, seconds):
         production_work=budget.used,
         rss_bytes=_rss_bytes(),
     ), audit.records
+
+
+class RefinementBudget:
+    """A small suballowance, charged to the whole diagnostic run."""
+
+    def __init__(self, parent):
+        self.parent = parent
+        self.local = Budget(work_limit=10**11, seconds=30, cpu_seconds=30)
+
+    def consume(self, amount=1):
+        self.parent.consume(amount)
+        self.local.consume(amount)
+
+
+def refine_prefixes(audit, snapshots, n):
+    """Seek a directly verified DLP lead without collecting more positions."""
+    bracket = None
+    for policy in ("128", "64"):
+        previous = 0
+        for prefix in snapshots:
+            result = prefix["reports"][policy]
+            if "censored" in result:
+                break
+            if result["complete"]:
+                bracket = previous, prefix["blocks"], prefix, policy
+                break
+            previous = prefix["blocks"]
+        if bracket:
+            break
+    if bracket is None:
+        return
+    lower, upper, enclosing, policy = bracket
+    budget = RefinementBudget(audit.budget)
+    for _ in range(8):
+        if upper - lower <= 1:
+            break
+        midpoint = (lower + upper) // 2
+        prefix_records = [r for r in audit.records if r["block"] <= midpoint]
+        reports = {}
+        for candidate in ("slp", "64", "128"):
+            selected = [
+                r
+                for r in prefix_records
+                if r["kind"] != "dlp"
+                or (
+                    candidate != "slp"
+                    and r["residual"]
+                    <= int(candidate) * audit.config.base_bound**2
+                )
+            ]
+            reports[candidate] = compact_report(selected, n, budget=budget)
+        snapshots.append(
+            dict(
+                blocks=midpoint,
+                reports=reports,
+                costs=enclosing["costs"],
+                stopped=None,
+                refined=True,
+                enclosing_blocks=enclosing["blocks"],
+            )
+        )
+        if any("censored" in result for result in reports.values()):
+            break
+        if reports[policy]["complete"]:
+            upper = midpoint
+        else:
+            lower = midpoint
 
 
 def cell_decision(report, baseline, fixture):

@@ -1770,8 +1770,9 @@ concerns until changed representations and their gates are verified.
 
 **C1 assessment in progress:** the [initial residual screen](benchmarks/c1_results.md)
 is not a final DLP deferral. At the user's direction, a separately
-[frozen follow-up](benchmarks/c1_followup_protocol.md) tests complete offline
-cycles, source-informed product bounds and longer 40/50/60-digit collection.
+[frozen follow-up](benchmarks/c1_followup_protocol.md), with its pre-collection
+[prefix-resolution addendum](benchmarks/c1_followup_resolution.md), tests complete
+offline cycles, source-informed bounds and longer 40/50/60-digit collection.
 The [research reconciliation](benchmarks/c1_research.md) distinguishes native
 large-input practice from evidence for this PyPy implementation. No C1, R4
 or P5.4 completion or performance promotion is claimed.

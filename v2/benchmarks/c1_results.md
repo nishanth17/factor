@@ -116,6 +116,37 @@ introduced. Retained record reservations peak at 34.6 MiB and process RSS at
 215.6 MiB; interpreter/JIT RSS is not owned-workspace accounting. The six cell
 captures occupy about 13.8 MiB, below the finite retained-byte envelope.
 
+## Subsequent complete retained-record analysis
+
+After the user reopened the assessment, the separately frozen follow-up's
+complete spanning-forest analyzer removed the dense LP-matrix artifact.
+All original captures remained unchanged. Local `results/c1/retained-full/`
+pins original record hashes, runtime/source hashes and driver commit `5f376c3`.
+Eighteen targeted PyPy 3.11 tests passed, including generic GF(2) comparisons,
+disconnected cycles, a 2,001-edge cycle, parallel edges, self-loops, exact
+square corrections, finite refusals and unchanged SLP behavior/work.
+
+| Initial records, seeds 7 / 29 | SLP LP-cancelled rows | DLP LP-cancelled rows | DLP dependencies | Verified complete factors |
+| --- | ---: | ---: | ---: | --- |
+| 30 digits | 121 / 104 | 316 / 288 | 92 / 64 | 880909969535437 × 902418641416693, both captures |
+| 40 digits | 55 / 55 | 57 / 57 | 0 / 0 | None at the short prefix |
+| 60 digits | 3 / 3 | 3 / 3 | 0 / 0 | None at the short prefix |
+
+Every enumerated dependency was checked through original incidence, exact
+exponents, square corrections and both GCD signs. Dependency counts include
+trivial outcomes; the listed factorizations establish at least one nontrivial
+outcome in each 30-digit capture. Same-position SLP-only incidence has no
+dependency in all six captures. All real cycles in this population happen to
+touch the SLP component; disconnected completeness is covered independently.
+The revised diagnostic reservations fit within about 25 MiB per analysis.
+This is a different sparse representation, not a reduction of R3's production
+matrix constants. Single instrumented processing costs are not timing claims.
+
+This result materially corrects the first screen: useful DLP relations already
+exist in the current collector's rejected population. It does not establish
+an end-to-end speedup, nor does the short 40/60-digit prefix settle delayed
+matching. The longer, tighter-product follow-up remains necessary.
+
 ## Complete-factor evidence and limits
 
 Uninstrumented SLP controls complete both 30-digit starts and both 40-digit

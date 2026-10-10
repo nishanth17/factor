@@ -13,6 +13,7 @@ from v2.benchmarks.c1_followup import (
     compact_report,
     fundamental_cycles,
     load_followup,
+    refine_prefixes,
     validate_records,
 )
 from v2.budget import Budget, BudgetExhaustedError
@@ -84,6 +85,8 @@ class CompleteOfflineGraphTests(unittest.TestCase):
         report = compact_report(records, 77)
         self.assertEqual(report["proper_divisors"], [7, 11])
         self.assertEqual(report["dependencies"], 1)
+        self.assertEqual(report["nontrivial_dependencies"], 1)
+        self.assertEqual(report["trivial_dependencies"], 0)
         self.assertEqual(report["post_filter"]["zero_dependencies"], 1)
         self.assertEqual(report["remaining"], [])
         self.assertTrue(report["complete"])
@@ -113,6 +116,55 @@ class CompleteOfflineGraphTests(unittest.TestCase):
 
 
 class FollowupCensusTests(unittest.TestCase):
+    def test_retained_prefix_refinement_verifies_both_sides_of_bracket(self):
+        config = SIQSConfig(
+            collector=SieveConfig(
+                division="bucket",
+                score_policy="powers",
+            )
+        )
+        audit = FollowupAudit(config, 7, 30)
+        audit.records = [
+            dict(
+                kind="slp",
+                block=1,
+                u=10,
+                sign=1,
+                square=1,
+                residual=23,
+                lp=(23,),
+                exponents=(),
+            ),
+            dict(
+                kind="slp",
+                block=3,
+                u=13,
+                sign=1,
+                square=2,
+                residual=23,
+                lp=(23,),
+                exponents=(),
+            ),
+        ]
+        snapshots = [
+            dict(
+                blocks=4,
+                costs={},
+                reports={
+                    policy: compact_report(audit.records, 77)
+                    for policy in ("slp", "64", "128")
+                },
+            )
+        ]
+
+        refine_prefixes(audit, snapshots, 77)
+
+        self.assertEqual([p["blocks"] for p in snapshots], [4, 2, 3])
+        self.assertFalse(snapshots[1]["reports"]["128"]["complete"])
+        self.assertEqual(snapshots[1]["reports"]["128"]["remaining"], [77])
+        self.assertEqual(snapshots[2]["reports"]["128"]["factors"], [7, 11])
+        self.assertLessEqual(len(snapshots), 9)
+
     def test_investment_gate_requires_two_inputs_and_slp_shortfall(self):
         witness = dict(blocks=2048, slp_has_factor=False, charged_cpu=1.0)
         first = dict(name="50-0", decision={"64": [witness], "128": []})

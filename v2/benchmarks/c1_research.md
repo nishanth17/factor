@@ -49,6 +49,35 @@ check compatibility and notices; the mathematical ideas above do not authorize
 copying GPL/LGPL implementations into the project. C1 reuses only existing v2
 routines and independently written diagnostic elimination/extraction.
 
+## Release cross-check and current research
+
+The official [msieve 1.53 source release](https://sourceforge.net/projects/msieve/files/msieve/Msieve%20v1.53/msieve153_src.tar.gz/download)
+was downloaded and matched the publisher's SHA-256
+`c5fcbaaff266a43aa8bca55239d5b087d3e3f138d1a95d75b776c04ce4d93bb4`.
+Its public-domain `mpqs/sieve.c` enables DLP at 282 bits, approximately 85
+digits, and uses the SLP limit raised to 1.8 instead of squaring it. The
+comment explicitly attributes this to rare, poorly surviving large-large
+pairs. Its residual path uses base-2 rejection then SQUFOF; `relation.c`
+initializes roots for every component, but its cycle enumerator skips paths
+longer than 100 edges per side. That finite heuristic is not a completeness
+guarantee. C1's offline oracle instead checks the full E−V+C dimension and
+includes a test for a 2,001-edge disconnected cycle. `Readme.qs`
+describes initially slow then accelerating combined-relation accumulation. These inspected release sources
+cross-check the historic mirror without implying that 85 digits is a PyPy
+cutoff. Release source files were read, not compiled or executed.
+
+The October 2026 [CUDA-MPQS preprint, v1](https://arxiv.org/html/2610.07126v1)
+reports a GPU SIQS pipeline using SLP, explicitly leaving multiple-large-prime
+variants unimplemented. Its useful-dependency failures and truncated-tuning
+limitations reinforce the need to measure extraction and adequate collection
+duration. Those are implementation-specific observations; its reported
+small-input SLP failure is not a universal theorem and does not describe v2's
+verified completing SLP controls. GPU timing is not evidence of PyPy speed.
+The paper lists LGPL-3.0-only code with a CUDA exception; the attempted direct
+license-file fetch failed, so no code adaptation or independent license audit
+of that project is claimed. The primary-source abstract and implementation
+sections were inspected; the reported record was not independently reproduced.
+
 ## Blogs and technical discussions
 
 [Programming Praxis, SQUFOF continued-fraction exercise](https://programmingpraxis.com/2014/07/08/squfof-continued-fraction-version/)
