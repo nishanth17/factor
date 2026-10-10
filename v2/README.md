@@ -66,6 +66,61 @@ B3 owns program composition, shared work accounting, checkpoint/replay
 integration and complete-factorization comparisons. The standalone PRAC
 helper has no portfolio budget or checkpoint contract.
 
+C6 adds reusable experimental machinery in `benchmarks.c6_chains`:
+`compact(Chain)` produces an immutable four-byte register record;
+`verify(Record)` independently proves its integer action, and
+`Executor(record, backend)` verifies once before repeated point execution.
+`build_program(B1, method, backend)` supports B1 <= 2,000 with checked PRAC,
+compact PRAC, precomputed Lucas and rolling Lucas layouts. The catalog uses
+303 independently verified prime records from a pinned GMP-ECM generator.
+`ThreePointExecutor` accepts only recognized continued-fraction records.
+These experiment APIs require the same nonsingular Montgomery curve, odd
+modulus and `(A+2)/4` convention as `multiply_prac`. Results are valid X:Z
+pairs or `NonunitPointError`; callers retain proper factors and handle retry.
+Records have at most 512 steps and 16 retained point slots; programs own at
+most 512 records, with no global point cache. See the [C6 study](
+benchmarks/c6_research.md) for recovery, storage and reproducibility details.
+No C6 candidate is routed into production stage jobs or checkpoint formats;
+B3 integration remains open. The initial conservative C6 study retained the
+ladder after full-stage and campaign losses; those results remain historical
+controls. The user reopened executor optimization. See the [follow-up](
+benchmarks/c6_optimization.md) for its independently proved factor coverage,
+frozen comparisons and final decision.
+
+`benchmarks.c6_fast.load_catalog()` verifies immutable scalar and coordinate
+coverage certificates once. `build_program(B1, family, mode, backend, batch)`
+constructs a bound-owned experimental program for binary, PRAC or upstream
+Lucas records. `program(point, n, a24, extra)` returns `(point, factor)`;
+a missing point with no factor denotes finite saturation/retry exhaustion.
+A unit aggregate certifies the block's intermediate coordinates. A nonunit
+aggregate replays the saved block through the unchanged strict recovery path,
+including saturated products containing different proper factors.
+
+The same curve/modulus preconditions apply. Programs have <=512 records,
+<=512 operations per record, <=16 point registers and <=64 records per check
+batch; generated source is capped at 128 KiB per record and 8 MiB per program.
+Caller-owned programs can be reused; there is no global point or code cache.
+`benchmarks.c6_cf` supplies the separately verified CF catalog and common-tuple
+or three-point execution, with the same stage result and recovery contract.
+These APIs do not provide a portfolio work ledger, cancellation checkpoint or
+serialized resume format. B3 must reserve whole-block execution and bounded
+replay work before integrating them.
+
+`benchmarks.c6_b4` additionally pins the committed B4 ECM control in an
+isolated module and supplies exact-residue early-reduction kernels and a
+bounded independent D/A fusion pass. `build_program(family, mode, backend,
+batch)` fixes B1=2,000 and accepts PRAC, Lucas or CF with `late`, `reduced` or
+`fused` execution. It preserves the same guard/replay contract; the native
+combined experiment does not modify production modules or checkpoint state.
+Cold and reused programs have different measured costs and adoption scope.
+The completed bounded study recommends reduced PRAC/batch 16 for B3's native
+B4 integration experiment and tuple Lucas/batch 16 for its separate GMP work.
+Native fresh construction retains the ladder; no production default changes.
+The PRAC, Lucas and CF catalogs, executors and research runners are available
+in mainline under `benchmarks.c6_*` for later experiments. Production ECM
+continues to use the integrated B4 ladder until B3 completes stage-job,
+budget and checkpoint integration.
+
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
 validated checkpoints. Later work adds exact relation provenance, shared SIQS

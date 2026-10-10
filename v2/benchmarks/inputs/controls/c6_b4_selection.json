@@ -1,0 +1,12 @@
+{
+  "screen_sha256": "5eaad3a29bf287358769e3dc1cc21503d442c50ab619dcac3c9e69504ece2c41",
+  "protocol_sha256": "f17c561a013140e2ce811d5e0e08a3600bb308253c404909ec9ee7d3b6fd106c",
+  "candidates": {
+    "int": [
+      "old-ladder",
+      "fast/prac/reduced/16",
+      "fast/lucas/reduced/64",
+      "fast/cf/fused/64"
+    ]
+  }
+}

@@ -158,7 +158,12 @@ integrated R2 control for the selected E1/C3 follow-ups.** B1's 9 October
 30/40-digit tranche is complete; general defaults and broader crossover gates
 remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
-routing and near-optimal chains remain B3/C6 work.
+routing remains B3 work. C6's optimized bounded study is complete: verified
+reused native PRAC gains 6.73% against pinned B4, and reused GMP Lucas gains
+8.42% against its control.
+The CF-family minima are independently certified; fresh native attempts
+retain the ladder. Its experimental code and required records are integrated
+into mainline; B3 production integration remains open.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
 bounded opt-in pairing; its matched losses retain defaults. A6's integrated
 bounded tranche now supplies exact increased-B1 integer ratios and finite
@@ -307,7 +312,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| C6 — P4.5 precomputed Lucas-chain experiment | Compare GMP-ECM prime-chain codes and compact execution with precomputed PRAC, then consider bounded continued-fraction search. | A4; stable A2/A3 benchmark interfaces | **Deferred by user, separate tranche.** The checked A4 result does not settle compact or precomputed chains. Compare before a B3 promotion decision; charge generation, storage, dispatch and recovery. No online full-lcm search. | Astra / **xhigh** | Choose Astra for chain-search termination, pruning validity and guaranteed-versus-heuristic claims. xhigh is for validating the search contract and generated records; optimize implementation cost only after those arguments hold. |
+| ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 integration remains open.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -451,7 +456,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    CHAIN --> SEARCH[C6/P4.5: precomputed Lucas experiment, deferred]
+    CHAIN --> SEARCH[C6/P4.5: verified reusable candidate, B3 integration open]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -1999,7 +2004,9 @@ and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
 input size and target factor size are reported separately; unresolved
 composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
-P4.5/C6 precomputed Lucas comparison and B3 integration remain open.
+initial bounded P4.5/C6 comparison retains the ladder. Its completed optimized
+follow-up supplies verified reusable candidates; B3 production integration
+remains open.
 
 **Research decision:** use ordinary bounded PRAC first. The
 [GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
@@ -2011,8 +2018,9 @@ precomputes optimal or near-optimal prime chains, but generation and storage
 still need to be charged. The
 [Bernstein–Cottaar–Lange paper](https://eprint.iacr.org/2024/1044)
 improves continued-fraction chain search by pruning and meet-in-the-middle;
-it does not establish a faster checked PyPy ECM engine. Compare precomputed chains separately in P4.5/C6 before drawing conclusions
-about their production value; the checked A4 timings cannot settle that question.
+it does not establish a faster checked PyPy ECM engine. The separate C6
+comparison below now measures those precomputed candidates; checked A4
+timings alone did not settle their production value.
 [CADO's bytecode implementation](https://github.com/cado-nfs/cado-nfs/blob/master/sieve/ecm/bytecode.c)
 separates encoding, cost models and verification; compact program execution
 is a useful B3 comparison to the readable bounded records used in A4.
@@ -2233,23 +2241,24 @@ Twelve raw captures are copied and checksum-verified under ignored
 
 ### P4.5 — Experiment with GMP-ECM precomputed Lucas chains (C6)
 
-**Deferred at the user's request on 5 October 2026 to conserve the current
-session's token budget.** This is a separate future tranche, not part of A4's
-completion. Its result must not be inferred from checked PRAC's timings.
+**Activated by the user on 9 October 2026.** The earlier deferral is lifted.
+This is separate from A4 and B3; its result must not be inferred from checked
+PRAC's timings. See the [C6 study](benchmarks/c6_research.md) for pinned
+research, contracts and the frozen experiment scope.
 
-- [ ] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
+- [x] Generate prime-chain codes with a pinned GMP-ECM LucasChainGenerator;
   decode with the upstream implementation and independently verify every
   integer/differential identity. Compare precomputed PRAC and Lucas chains
   through the same compact executor, preserving bounded nonunit/factor
   recovery. GMP-ECM uses a 16-point rolling buffer; the newer continued-fraction
   paper's three-live-point interpreter is a distinct candidate.
-- [ ] Run ladder, precomputed PRAC and Lucas arms on the same certified
+- [x] Run ladder, precomputed PRAC and Lucas arms on the same certified
   40/50/60/70/80-digit corpus, seeds, bounds and curve limits, with Python-int
   and gmpy2 variants. Separate input digits from factor digits. Include
   generation/load/verification, storage, dispatch, recovery, cold startup,
   full stage-one and complete two-stage campaign costs; retain unresolved
   cofactors and the ladder control. Coordinate exclusive timing windows.
-- [ ] Compare bounded/offline continued-fraction search using the 2025
+- [x] Compare bounded/offline continued-fraction search using the 2025
   Bernstein–Cottaar–Lange pruning/meet-in-the-middle work when warranted.
   Distinguish minimal length within a chain family, near-optimal search,
   weighted arithmetic cost and measured runtime; do not claim a global
@@ -2261,7 +2270,59 @@ completion. Its result must not be inferred from checked PRAC's timings.
   samples, extending unstable captures. Promote only after complete-run
   evidence. B3 owns subsequent bounded-stage/checkpoint integration.
 
+**Initial conservative acceptance — 9 October 2026:** 303 pinned upstream records and
+all prime-power actions independently verify. Tests cover composite/nonunit,
+prime-square, saturation and the published false-infinity case; all 411 tests
+and full lint pass. Reused/fresh full stages and complete two-stage campaigns
+use frozen controls, certified 40–80-digit inputs, exclusive windows and
+separate int/GMP workers. Full campaign Lucas/ladder ratios are 2.034 and
+1.217, with the same 10/20 proper splits and all unresolved cases retained.
+Construction, cold startup, storage and the distinct three-point interpreter
+are documented in the [study](benchmarks/c6_research.md).
+
+The revised no-universal-percentage-floor policy is applied through an
+explicit amendment, preserving the historical frozen protocol. No candidate
+wins the complete comparison; neither abstract cost savings nor a gain over
+losing compact PRAC justifies promotion. The conditional new CF search gate
+was not opened in that initial experiment. Accept its bounded
+research candidate, retain the ladder, and leave B3 work accounting,
+checkpoint/replay and complete-portfolio integration open.
+
 **Phase 4 exit:** promote only variants with independently validated arithmetic and reproducible full-stage/portfolio benefit. A documented decision to retain the ladder or native `%` is a successful experiment outcome; a speedup is not guaranteed.
+
+**Optimization follow-up completed after reopening by the user:** the
+conservative executor's negative result did not close optimized execution. See the [factor-coverage
+proof and new frozen comparison](benchmarks/c6_optimization.md). The old
+captures remain immutable; new acceptance requires independent recovery
+checks and fresh confirmation under the revised promotion policy.
+The common-executor screen now opens the bounded CF search gate: pinned
+upstream pruning and an independent reverse-Euclidean verifier certify
+minimum length within the CF family for primes <=2,000. Three-point
+execution and the common tuple executor are compared; weighted cost and
+measured runtime remain separate. No global optimum, larger search or
+meet-in-the-middle run is claimed. A separately pinned B4 control and
+reduced/fused experimental kernels are frozen before heldout confirmation.
+All 48 heldout groups settle under the frozen sampling rule. Reused native
+reduced PRAC/batch 16 takes 6.73% less complete-campaign time than pinned B4
+[5.98%, 7.26%], and 3.98% less [3.21%, 4.53%] after conservatively charging
+first-use preparation. CPU, both seeds/classes and chronological halves
+support the gain; the revised policy accepts this sustained sub-10% result.
+GMP tuple Lucas/batch 16 saves 8.42% reused and 5.97% with construction once
+per attempt. All arms preserve 10/20 splits, ten unresolved balanced inputs
+and zero timeouts. Combined native fresh-attempt candidates lose; combined
+Lucas's reused campaign interval crosses no change. Retain the ladder there
+and in production defaults. CF has no demonstrated chain-quality advantage;
+stop larger/MitM/full-lcm search and generated-code promotion at this bound.
+
+Construction, generation, storage, conservative amortization, 153 separate
+cold starts and profiles are reported in the follow-up. Accept the reusable
+research candidate for B3's bounded-work/checkpoint/recursive-portfolio gates,
+without closing those gates here. A committed-only archive of `a7642c2`
+passes 431 PyPy/GMP tests, full lint, all 84 benchmark imports and frozen
+hash/corpus/catalog checks. Required inputs are committed; raw evidence is
+local. The experimental PRAC, Lucas and CF code and required controls are now
+in mainline. Only C6's bounded study gate closes; B3 production routing,
+work accounting and checkpoint integration remain open.
 
 ## Phase 5 — Complementary methods and stronger continuations
 

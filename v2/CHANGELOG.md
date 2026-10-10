@@ -1,5 +1,50 @@
 # v2 changelog
 
+## C6 experimental-code integration — 9 October 2026
+
+- Bring the verified PRAC, Lucas and CF research executors, generation tools,
+  tests, required catalogs, controls and upstream notices into mainline.
+  Current ECM stage jobs continue to call the integrated B4 ladder; B3 owns
+  any production routing, budget accounting, cache and checkpoint changes.
+- Preserve both raw C6 evidence sets in ignored mainline results. The merged
+  PyPy/GMP suite passes 479 tests and full lint. Historical timing protocols
+  still pin the original sources and require their original checkout for
+  reproduction; new timing on current mainline needs a new frozen protocol.
+
+## C6 optimized execution and B4 confirmation — 9 October 2026
+
+- Complete the reopened C6 executor optimization and isolated B4 comparison.
+  Independently certify batched coordinate-factor checks with strict saturated
+  replay; reproduce bounded CF-family minima without claiming global optimality.
+- Confirm reused native reduced PRAC at 6.73% less complete-campaign time than
+  pinned B4 [5.98%, 7.26%], or 3.98% less after charging first preparation.
+  Separate GMP Lucas saves 8.42% reused and 5.97% with per-attempt construction.
+  Preserve all 10/20 splits, unsuccessful attempts and unresolved cofactors.
+- Retain the ladder for fresh native attempts and all production defaults;
+  combined Lucas is inconclusive and larger CF search is not justified.
+  Record generation, construction, bounded storage, 153 cold starts and
+  separate profiles. B3 owns production work/resume/portfolio integration.
+  A committed-only archive passes 431 PyPy/GMP tests, full lint and all 84
+  benchmark imports; controls and certified inputs are versioned, raw evidence
+  remains local. Preserve v1 and production kernels; C6 was still isolated
+  at this study acceptance point.
+
+## C6 bounded precomputed Lucas study — 9 October 2026
+
+- Reproduce pinned GMP-ECM LucasChainGenerator at B1=2,000; preserve upstream
+  licenses and independently verify every decoded/compact scalar action.
+  Add immutable bounded records, common PRAC/Lucas execution, 16-point ring
+  and restricted three-point diagnostics, including factor-preserving recovery.
+- Verify prime powers, composites, nonunits, prime squares, saturation and
+  published false infinity. Pass 411 PyPy/GMP tests and full lint, including a
+  committed-only archive with all 72 benchmark imports and required loaders.
+- Freeze certified inputs, seeds, bounds, budgets and controls; retain all
+  unsuccessful attempts. Compact Lucas loses reused/fresh stages and complete
+  two-stage campaigns for both backends. Accept the experimental correctness
+  candidate, retain the ladder and stop conditional CF search expansion.
+  Document the explicit relaxed-policy reassessment, generation/amortization,
+  storage and cold/warm evidence. Production integration stays with B3.
+
 ## A6 mainline integration and cleanup — 9 October 2026
 
 - Merge accepted A6 `869ed42` into current B4 mainline at `62a57f2`, resolving

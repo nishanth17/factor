@@ -2,6 +2,44 @@
 
 ## Current development
 
+- Integrate the completed C6 research modules, certified PRAC/Lucas/CF
+  records, independent tests and pinned source controls into mainline for
+  later experiments. Keep `ecm.py`, stage jobs, B4 arithmetic, checkpoints,
+  production defaults and `v1/` unchanged by this merge. B3 still owns
+  production routing, finite work reservations and resume behavior.
+- Preserve both ignored C6 evidence sets in mainline before retiring the
+  isolated checkout. The merged PyPy/GMP suite passes 479 tests and full
+  lint; historical benchmark protocols retain their original source pins.
+
+- Complete the reopened C6 executor optimization and isolated B4 comparison.
+  Independently certify batched coordinate-factor checks with strict saturated
+  replay; reproduce bounded CF-family minima without claiming global optimality.
+- Confirm reused native reduced PRAC at 6.73% less complete-campaign time than
+  pinned B4 [5.98%, 7.26%], or 3.98% less after charging first preparation.
+  Separate GMP Lucas saves 8.42% reused and 5.97% with per-attempt construction.
+  Preserve all 10/20 splits, unsuccessful attempts and unresolved cofactors.
+- Retain the ladder for fresh native attempts and all production defaults;
+  combined Lucas is inconclusive and larger CF search is not justified.
+  Record generation, construction, bounded storage, 153 cold starts and
+  separate profiles. B3 owns production work/resume/portfolio integration.
+  A committed-only archive passes 431 PyPy/GMP tests, full lint and all 84
+  benchmark imports; controls and certified inputs are versioned, raw evidence
+  remains local. Preserve v1 and production kernels; C6 was still isolated
+  at this study acceptance point.
+
+- Record the initial conservative C6/P4.5 Lucas-chain comparison (historical).
+  Version a pinned GMP-ECM generator/decoder and 303 independently verified
+  prime records; add reusable compact PRAC/Lucas, rolling and restricted
+  three-point research executors with bounded nonunit/factor recovery.
+- Retain the ladder: Lucas costs 2.03x native-int and 1.22x GMP complete ECM
+  campaign time with identical completion on the frozen 40–80-digit cohort.
+  Record generation, amortization, storage, cold costs and the conditional
+  search stop. Apply the user's revised policy allowing confirmed sub-10%
+  gains without rewriting the historical protocol. B3 production routing,
+  budgets and checkpoint integration remain open; v1 and kernels are unchanged.
+  A committed-only archive passes 411 PyPy/GMP tests, full lint and all 72
+  benchmark imports, including frozen C6 inputs and independent certificates.
+
 - Integrate accepted A6 bound-continuation and recurrence APIs into current
   B4 mainline at `62a57f2`. Preserve B4 arithmetic, direct p−1/portfolio/ECM
   defaults, bounds, attempts and checkpoint formats. Cross off the bounded

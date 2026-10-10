@@ -1,0 +1,104 @@
+{
+  "baseline_commit": "bcf5f3d1e57304694b48ba6e7ef8b4ea2ffd0db0",
+  "sha256": {
+    "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/stage_jobs.py": "0f659c26e22e1914443ac2fe7c0d7cb7855edb6ea3b6f86f7b6c522ae7f27720",
+    "v2/ecm.py": "d83f35c0206ee9234e713689ecc8eec4dfa2023bb674184870ece14f9530fa2d",
+    "v2/budget.py": "a176241cbaeeb79c48fa305150b38589db8dde99fd63e643422525f49b6acc8a",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm_paired.py": "f5ad5f729410a7ed9c08b430dd68cbd80614286c352bac563cccf1d6e7caeaa4",
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
+    "v2/preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
+    "v2/pollard_rho.py": "4976184d1ed412dc99562bde7d6eed4e2d08f653c0c7b8a684c48b2f85441c84",
+    "v2/factor.py": "4888b0f625f86d7baeb359af10481838e12fb89441cc2871ced61dffdf1d564e",
+    "v2/prime_sieve.py": "6f852e0e4c17504745bd172283802b976e57a05f9346034da008094e9f470db4",
+    "v2/work_budget.py": "8ea8d0a3d84f2c39ea0b3769f4800e2cacfb1ba138be46139639eb71bbcaefae",
+    "v2/ecm_programs.py": "41506cf55693e46586f07ffa890afbb401e7702442fe295bbbbe37b41569cf6c",
+    "v2/prac.py": "09b9140b8b23b074ad5a5e795bd4ecf131c2e728e0373c11a41a62adef1c3b2e",
+    "v2/portfolio.py": "99cba5bd3f0055220286edc62ed5ac0a03694f837584ee2fcfd1a240592840b0",
+    "v2/ecm_wheel.py": "fcda5a07b5152b5d963a1b15b73302ccef7ce13101593a924b6db8fdd0607a00",
+    "v2/schedules.py": "5e8f3bef39cfda8a6f26424689f4f45894576bb2f829f8762a5ab57732073dbe",
+    "v2/pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
+    "v2/benchmarks/c6_chains.py": "e6b5fe382ad9f8a4b41cf29723107245f7339646b862a8300b8e1bafee9c5ace",
+    "v2/benchmarks/c6_costs.py": "d5a8f4050ed9e1184d912052b5836cb29e344172e39ace134e5bba314c0ff0e5",
+    "v2/benchmarks/c6_study.py": "027b6a78ee1e07a15cc0c34c4859d1a403792f0261369eee9f94de36d6ee74d6",
+    "v2/benchmarks/build_c6_inputs.py": "40eab775c4e44cabc9566c7a23fdb548e0953042b6989c499467424201357963",
+    "v2/benchmarks/p41_campaign.py": "e3c675f9826e7db052cf28a826181304e4473db43139914627cbe7a79adf5b41",
+    "v2/benchmarks/p41_gmp.py": "2e1455ddf91b691c61d60ea4f250c0913af98edc14c2fee82b3021156f3c1a76",
+    "v2/benchmarks/prac_oracle.py": "d656822436b8e37f156d472cbbdb79800564f1e096311e72408fd2747dcae8db",
+    "v2/benchmarks/inputs/controls/c6_lucas_records.json": "0777fe3369c9df5d496073cb149cfeab14becb2bccfd046f428160ff214edef1",
+    "v2/benchmarks/inputs/corpora/p41_ecm_40_80_corpus.json": "86ac55a1f7d7f76bb197dcfc013bf5ebc8e51a178be8b581926e77883fb24349",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LCG_macros.h": "2a5e4efb1c1fde8e2342d175ea9dd6d73ca5d7b4ecbbb7341c30f8f49d67dd41",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/README.upstream": "0c45ac6734af8f65ee0278d934c5bd3bcb2cd6c0d0397f783b6dd76fbcc2ee71",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/ecm.c": "391391c152b357d748e89aa16e4928cdb98deec2a7a4e20ba8aed8b0e835137f",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LucasChainGen.c": "d81501b61bc4faa146ebe364b5c149d6e7a6ebc20064ab5a52fadbbfcd6cb05f",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/COPYING.LIB": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/COPYING": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LucasChainGen.h": "ea7effb92f3184dfb3e8c784b3ea4dec779261df4ef3c5350e0602c537cd3077",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/NOTICE.md": "c4249c97e3a20683fda718793ee0db6e5cd27ac31d8006bc4f98cc3779fb0209"
+  },
+  "arms": [
+    "ladder",
+    "checked",
+    "compact",
+    "lucas",
+    "rolling"
+  ],
+  "backends": [
+    "int",
+    "gmp"
+  ],
+  "b1": 2000,
+  "b2": 147396,
+  "curves": 8,
+  "seconds_per_attempt": 20,
+  "batch_size": 128,
+  "seeds": [
+    41001,
+    48920
+  ],
+  "confirmation_seeds": [
+    56839,
+    64758
+  ],
+  "cases": [
+    "balanced_40d",
+    "small10_40d",
+    "balanced_50d",
+    "small10_50d",
+    "balanced_60d",
+    "small10_60d",
+    "balanced_70d",
+    "small10_70d",
+    "balanced_80d",
+    "small10_80d"
+  ],
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      18
+    ],
+    [
+      8,
+      27
+    ]
+  ],
+  "max_relative_iqr": 0.15,
+  "promotion": "At least 10% full-stage and complete-campaign gain on each backend independently, stable timing and fresh confirmation; no proper-factor/validity regression. Otherwise retain ladder.",
+  "search_gate": "Only if compact Lucas beats compact PRAC by >=5% in stable stage reuse and is within 10% of ladder, consider bounded offline continued-fraction search; otherwise stop.",
+  "limits": {
+    "records": 512,
+    "steps": 512,
+    "live_points": 16,
+    "bytecode_bytes": 1048576,
+    "bound": 2000,
+    "generator_seconds": 60,
+    "generator_data_bytes": 536870912
+  },
+  "scope": "Finite inspected corpus; known-composite ECM, no portfolio or B3 checkpoint integration. Generation charged separately."
+}

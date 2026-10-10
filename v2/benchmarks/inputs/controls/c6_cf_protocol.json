@@ -1,0 +1,154 @@
+{
+  "baseline_commit": "bcf5f3d1e57304694b48ba6e7ef8b4ea2ffd0db0",
+  "strict_control_commit": "6d54a14",
+  "original_protocol": "c6_protocol.json",
+  "sha256": {
+    "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/stage_jobs.py": "0f659c26e22e1914443ac2fe7c0d7cb7855edb6ea3b6f86f7b6c522ae7f27720",
+    "v2/ecm.py": "d83f35c0206ee9234e713689ecc8eec4dfa2023bb674184870ece14f9530fa2d",
+    "v2/budget.py": "a176241cbaeeb79c48fa305150b38589db8dde99fd63e643422525f49b6acc8a",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm_paired.py": "f5ad5f729410a7ed9c08b430dd68cbd80614286c352bac563cccf1d6e7caeaa4",
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
+    "v2/preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
+    "v2/pollard_rho.py": "4976184d1ed412dc99562bde7d6eed4e2d08f653c0c7b8a684c48b2f85441c84",
+    "v2/factor.py": "4888b0f625f86d7baeb359af10481838e12fb89441cc2871ced61dffdf1d564e",
+    "v2/prime_sieve.py": "6f852e0e4c17504745bd172283802b976e57a05f9346034da008094e9f470db4",
+    "v2/work_budget.py": "8ea8d0a3d84f2c39ea0b3769f4800e2cacfb1ba138be46139639eb71bbcaefae",
+    "v2/ecm_programs.py": "41506cf55693e46586f07ffa890afbb401e7702442fe295bbbbe37b41569cf6c",
+    "v2/prac.py": "09b9140b8b23b074ad5a5e795bd4ecf131c2e728e0373c11a41a62adef1c3b2e",
+    "v2/portfolio.py": "99cba5bd3f0055220286edc62ed5ac0a03694f837584ee2fcfd1a240592840b0",
+    "v2/ecm_wheel.py": "fcda5a07b5152b5d963a1b15b73302ccef7ce13101593a924b6db8fdd0607a00",
+    "v2/schedules.py": "5e8f3bef39cfda8a6f26424689f4f45894576bb2f829f8762a5ab57732073dbe",
+    "v2/pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
+    "v2/benchmarks/c6_chains.py": "e6b5fe382ad9f8a4b41cf29723107245f7339646b862a8300b8e1bafee9c5ace",
+    "v2/benchmarks/c6_costs.py": "d5a8f4050ed9e1184d912052b5836cb29e344172e39ace134e5bba314c0ff0e5",
+    "v2/benchmarks/c6_study.py": "027b6a78ee1e07a15cc0c34c4859d1a403792f0261369eee9f94de36d6ee74d6",
+    "v2/benchmarks/build_c6_inputs.py": "40eab775c4e44cabc9566c7a23fdb548e0953042b6989c499467424201357963",
+    "v2/benchmarks/p41_campaign.py": "e3c675f9826e7db052cf28a826181304e4473db43139914627cbe7a79adf5b41",
+    "v2/benchmarks/p41_gmp.py": "2e1455ddf91b691c61d60ea4f250c0913af98edc14c2fee82b3021156f3c1a76",
+    "v2/benchmarks/prac_oracle.py": "d656822436b8e37f156d472cbbdb79800564f1e096311e72408fd2747dcae8db",
+    "v2/benchmarks/inputs/controls/c6_lucas_records.json": "0777fe3369c9df5d496073cb149cfeab14becb2bccfd046f428160ff214edef1",
+    "v2/benchmarks/inputs/corpora/p41_ecm_40_80_corpus.json": "86ac55a1f7d7f76bb197dcfc013bf5ebc8e51a178be8b581926e77883fb24349",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LCG_macros.h": "2a5e4efb1c1fde8e2342d175ea9dd6d73ca5d7b4ecbbb7341c30f8f49d67dd41",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/README.upstream": "0c45ac6734af8f65ee0278d934c5bd3bcb2cd6c0d0397f783b6dd76fbcc2ee71",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/ecm.c": "391391c152b357d748e89aa16e4928cdb98deec2a7a4e20ba8aed8b0e835137f",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LucasChainGen.c": "d81501b61bc4faa146ebe364b5c149d6e7a6ebc20064ab5a52fadbbfcd6cb05f",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/COPYING.LIB": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/COPYING": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/LucasChainGen.h": "ea7effb92f3184dfb3e8c784b3ea4dec779261df4ef3c5350e0602c537cd3077",
+    "v2/benchmarks/inputs/upstream/c6_gmp_ecm/NOTICE.md": "c4249c97e3a20683fda718793ee0db6e5cd27ac31d8006bc4f98cc3779fb0209",
+    "v2/benchmarks/c6_fast.py": "4356085637ca1ceaed89f753c60083b209e620f2422a1e9f4a79e9a9cf5db6f8",
+    "v2/benchmarks/c6_fast_study.py": "0917b06e09f9c53c3ee19e5be69809f62033cd81db8cf3e55928e15bda16d8dd",
+    "v2/benchmarks/build_c6_fast_inputs.py": "0ff567d5b2b66515215c352b44bbe396180d1bc35f725c433974421cd828bb31",
+    "v2/benchmarks/inputs/controls/c6_fast_records.json": "b316003a7238c1240f52dd28f48f507931ef7f4061362333dc436f016d531ed9",
+    "v2/benchmarks/inputs/corpora/c6_fast_heldout.json": "a65bf81755ceb1921dd80be192048653bd7dd8ffb75b14aa3d4591d7d3b4a722",
+    "v2/benchmarks/c6_cf.py": "4d2254b8fd5a6fc1e2fd378d3ef19c77ba294f2c821a035db8a66f8608118e16",
+    "v2/benchmarks/c6_cf_study.py": "27d1e6efb342b40b0052aaabd0bedffcf44980ca3e1ce3f0e0167c1dcfa03fa9",
+    "v2/benchmarks/build_c6_cf_inputs.py": "79d52c07f6b74d9b45452efe6a8749a828da28dc90c89e1160e9295ed5655e46",
+    "v2/benchmarks/inputs/controls/c6_cf_records.json": "8cb3180ad3ebf8133345bd2cf28aeb07349cae81d5d01317ff7902bf081f1150",
+    "v2/benchmarks/inputs/controls/c6_cf_gate.json": "83e2162cf1e0a9c6ca7f3cb0e7c102b15fc0757cc855be2276cf9ba5a6a1eb4d",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/README.upstream": "94460e9f62b010daadcfe673a060ab284125bcf849c5abf8f8f66c5b2062966f",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/CC0-1.0.txt": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/dac.py.txt": "7afa48c23c639b956d94495ce0db43cdcce479842e432d6a310154155e9d2991",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/tally.py.txt": "84cf6d6f2222edae0b704b3f93242372de23390fb236c855749724a2ff90ecf7",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/prune.py.txt": "b29b0e7c3b20061fca0d7bdf128cf0c2d1ec99e3ebc03a9a6578dcab3c9cfcb7",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/NOTICE.md": "865add66aa79c27ba754cfc1676a268f36d1c923967474592df9fadf017622e3",
+    "v2/benchmarks/inputs/upstream/c6_dacbench/ladder.py.txt": "d85a061a6f79c57fc686583929056e8e4c1788312794d34dadbabf3beef28047"
+  },
+  "b1": 2000,
+  "b2": 147396,
+  "curves": 8,
+  "seconds_per_attempt": 20,
+  "seeds": [
+    41001,
+    48920
+  ],
+  "confirmation_seeds": [
+    56839,
+    64758
+  ],
+  "cases": [
+    "balanced_40d",
+    "small10_40d",
+    "balanced_50d",
+    "small10_50d",
+    "balanced_60d",
+    "small10_60d",
+    "balanced_70d",
+    "small10_70d",
+    "balanced_80d",
+    "small10_80d"
+  ],
+  "families": [
+    "cf"
+  ],
+  "modes": [
+    "tuple",
+    "three"
+  ],
+  "batches": [
+    16,
+    64
+  ],
+  "backends": [
+    "int",
+    "gmp"
+  ],
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      18
+    ],
+    [
+      8,
+      27
+    ]
+  ],
+  "max_relative_iqr": 0.15,
+  "bootstrap_seed": 6104603,
+  "bootstrap_replicates": 4000,
+  "screen": "Paired reused full stages on the original training cohort. Select the lowest stable median paired runtime ratio per family/backend, tie within 1% favors tuple then calls then inline and smaller batch. Retain all rejected/unstable captures.",
+  "confirmation": "Freeze winners before running fresh held-out input/seed stages and complete campaigns. Positive paired 95% interval, stable samples, no correctness failure, no >5-point class completion loss. No universal percentage floor; report cold and amortized costs.",
+  "search": "Bounded offline CF search only if optimized common-executor results show credible remaining opportunity against the ladder. Any new family receives independent integer/projective/coverage verification and a separately frozen confirmation protocol.",
+  "limits": {
+    "records_per_family": 512,
+    "steps": 512,
+    "point_registers": 16,
+    "batch_records": 64,
+    "source_bytes_per_record": 131072,
+    "source_bytes_per_program": 8388608,
+    "catalog_bytes": 1048576,
+    "generator_seconds": 60,
+    "generator_draws": 500000,
+    "worker_seconds": 1200,
+    "phase_seconds": 2700
+  },
+  "cf_gate": {
+    "date": "2026-10-09",
+    "stage": "training-only optimized screen; confirmation inputs unused",
+    "basis": "Pinned-kernel tuple/64 full-stage PRAC ratio 0.876922 [0.867299,0.892745]; Lucas ratio 0.867287 [0.864467,0.873393]. Both stable at nine paired samples after at least three seconds per-arm warmup. These reverse the conservative executor loss and identify a credible small chain/dataflow opportunity.",
+    "decision": "Open bounded offline CF prime search and three-point comparison. No production promotion or global-optimality inference.",
+    "limits": {
+      "prime_bound": 2000,
+      "records": 512,
+      "steps": 512,
+      "live_points": 16,
+      "depth": 18,
+      "nodes": 10000000,
+      "seconds": 60,
+      "rss_bytes": 536870912,
+      "output_bytes": 16777216
+    },
+    "selection": "Retain original frozen candidates. CF uses the same tuple executor and an independently verified specialized three-point executor, batch sizes 16 and 64 only. Select lowest stable paired training ratio per backend; within 1% prefer tuple then three and smaller batch. Freeze before fresh confirmation.",
+    "source": "dacbench-20240609.tar.gz, SHA256 9319a21b30425d68363c0a2f1a9f375a4745e9fd5274a9c4d6aaf942468ce2bf",
+    "scope": "Upstream Fibonacci-pruned incremental length search, independently checked by reverse Euclidean enumeration. No meet-in-the-middle run: B1<=2000 does not justify its extra table machinery. Minimum length only within the CF family; weighted arithmetic and measured runtime remain separate.",
+    "completed_screen_sha256": "3f23585d99a37fc4cff2c1feb83d90a8828293436adc31cefd07d1f22bc734b4",
+    "optimized_control_commit": "17aca0b"
+  }
+}
