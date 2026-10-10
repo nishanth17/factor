@@ -660,3 +660,28 @@ Deadlines/cancellation are cooperative between bounded actions.
 The group-independent ratio helpers and precise reuse rules are documented
 in the [A6 research and contract](benchmarks/a6_pm1_research.md). They unblock
 the scalar contract for later ECM work; ECM bound migration remains separate.
+
+The separate `v2.pm1_tuning.PM1TuningConfig` follow-up is an opt-in execution
+configuration for this same entry point. Its frozen correctness/performance
+acceptance is pending. It adds `chunk_bits` (zero, or 32–4096),
+`gap_mode="cached"|"recurrence"`, `gap_entries` (1–256), and `wheel` (0, 30,
+or 210). The prime-count chunk cap still applies; a bit cap bounds the sum of
+factor bit lengths and therefore the product exponent's length. A nonzero
+wheel replaces the gap executor with ordinary p−1 ± relations; it does not
+change bounds or introduce Williams p+1/Lucas or ECM execution.
+
+Paired records contain only eligible primes. A two-prime trace term is the
+product of their ordinary relations times a unit modulo n; singleton terms
+are direct relations. Saturated batches replay each original prime under the
+finite recovery limit. Table setup/inversion, plan construction, multiplications
+and gap-table growth are charged before state mutation. The finite workspace
+reserve includes baby/inverse tables, pending center records, replay metadata
+and serialization copies; it is an owned-storage bound, not a process RSS cap.
+
+Tuned checkpoints use `execution="pm1-tuning-v1"` and bind every configuration
+field. They cannot resume as legacy campaigns or under different tuning.
+Legacy `PM1Config` serialization, `pm1-campaign-v1` identity and action work
+remain unchanged. Both modes reconstruct retained arithmetic and charge
+verification to cumulative allowances. Increased B1 invalidates all tuned
+residue tables; equal-B1 B2 extensions retain checked coverage and append only
+the new interval. Defaults, RNG assignments and portfolio APIs are unchanged.

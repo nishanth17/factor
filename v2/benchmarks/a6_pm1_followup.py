@@ -81,6 +81,8 @@ def selected():
 
 
 def options_for(arm, selection=None):
+    if arm == "legacy_hook64":
+        return {"chunk_size": 64, "legacy_hook": True}
     if arm.startswith("control"):
         return {"chunk_size": int(arm.removeprefix("control"))}
     if arm.startswith("bits"):
@@ -103,11 +105,13 @@ def options_for(arm, selection=None):
 
 
 def configuration(options, bounds):
+    options = dict(options)
+    legacy_hook = options.pop("legacy_hook", False)
     common = dict(
         bounds=tuple(tuple(p) for p in bounds), gcd_batch=64, segment_size=256
     )
     if set(options) == {"chunk_size"}:
-        module = frozen_control()
+        module = pm1_bounded if legacy_hook else frozen_control()
         return module, module.PM1Config(**common, **options)
     return pm1_bounded, PM1TuningConfig(**common, **options)
 

@@ -9,7 +9,7 @@
   "confirmation_bounds": [[2000, 20000], [11000, 100000], [2000, 200000]],
   "base": 2,
   "chunk_screen": {
-    "arms": ["control16", "control64", "bits256", "bits512", "bits1024", "recurrence64"],
+    "arms": ["control16", "control64", "legacy_hook64", "bits256", "bits512", "bits1024", "recurrence64"],
     "bit_arm_prime_cap": 256,
     "gap_entries": 64,
     "selection": "Among bits256/bits512/bits1024/recurrence64 choose at most one arithmetic challenger by greatest geometric-mean whole-API gain versus control64 across all six screen cells, provided every cell has positive median gain and the aggregate paired 95% bootstrap lower bound exceeds zero. Otherwise retain control64. Do not combine separately screened changes or retune caps."
@@ -19,9 +19,10 @@
     "selection": "Use the frozen chunk-screen selected arithmetic configuration for all paired arms. Choose at most one wheel by geometric-mean gain across all six screen cells, requiring every median gain positive and aggregate paired 95% bootstrap lower bound above zero. Otherwise retain unpaired execution. Coverage must be identical as a union of eligible prime relations up to multiplication by units; no relocation or square-exponent extension."
   },
   "confirmation": {
-    "arms": ["control16", "control64", "selected_arithmetic", "selected_pairing"],
+    "arms": ["control16", "control64", "legacy_hook64", "selected_arithmetic", "selected_pairing"],
     "selection": "Freeze selected configuration IDs in a versioned selection manifest before opening confirmation timings. Require zero correctness failures, all nine median gains positive versus control64 for promotion of a challenger, positive per-class aggregate paired 95% bootstrap intervals and relative IQR below 15%. Extend all arms together to 27 then 63 samples if uncertain/unstable; retain after 63 if inconclusive. No universal minimum percentage. Report losses and construction/recovery/storage/resume costs."
   },
+  "legacy_hook_check": "Measure the current default-config action hook against the frozen control64, separately from optimization selection; verify byte-canonical arithmetic/work and legacy checkpoint compatibility. Report any sustained regression.",
   "gcd_batch": 64,
   "segment_size": 256,
   "work_limit": 2000000,
