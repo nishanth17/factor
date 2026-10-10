@@ -2403,6 +2403,17 @@ three optional skips; a committed-file archive passes 422 PyPy/GMP tests,
 schedule ASTs and direct/portfolio/ECM execution remain unchanged; only ratio
 helpers are appended. No v1, immutable baseline or unrelated branch is changed.
 
+**Reopened bounded follow-up — 9 October 2026:** the user authorized the
+[additional research shortlist](benchmarks/a6_pm1_research.md#coverage-audit-and-next-bakeoffs--9-october-2026).
+The [frozen protocol](benchmarks/inputs/corpora/a6_pm1_followup_protocol.json)
+compares bit-capped chunks and even-gap recurrence before one exact p−1
+wheel/± stage-two executor. A committed source snapshot controls legacy
+behavior; fresh certified confirmation inputs, cumulative resume, production
+B2, storage and marginal portfolio completion remain required. Gains below
+10% can qualify under the revised uncertainty/confirmation gate. This follow-up
+is pending acceptance; ECM/Lucas, compiled cross-input plans, polynomial
+continuation and allocation remain separate.
+
 - [x] Compare bounded p−1 per-prime/chunk execution, gap reuse and capped
   reusable schedules on fixed and fresh independent inputs. The revised
   policy accepts chunk 64 for measured nonsplitting configurations: six

@@ -91,6 +91,27 @@ class PairedCoverageTests(unittest.TestCase):
                     self.assertEqual(len(covered), len(set(covered)))
                     self.assertEqual(state["reason"], "exhausted")
 
+    def test_trace_identity_over_composite_rings_and_prime_powers(self):
+        for n in (9, 15, 35, 49, 77):
+            for value in range(2, min(n, 12)):
+                if math.gcd(value, n) != 1:
+                    continue
+                for center, distance in ((15, 2), (30, 1), (210, 19)):
+                    giant = pow(value, center, n)
+                    baby = pow(value, distance, n)
+                    trace = (
+                        giant + pow(giant, -1, n) - baby - pow(baby, -1, n)
+                    ) % n
+                    direct = (
+                        (pow(value, center - distance, n) - 1)
+                        * (pow(value, center + distance, n) - 1)
+                        % n
+                    )
+                    self.assertEqual(
+                        trace, direct * pow(value, -center, n) % n
+                    )
+                    self.assertEqual(math.gcd(trace, n), math.gcd(direct, n))
+
     def test_singleton_excludes_partner_just_outside_bound(self):
         for wheel in (30, 210):
             cfg = configured(wheel=wheel)
@@ -293,6 +314,26 @@ class ExecutionTests(unittest.TestCase):
             paused.checkpoint["payload"]["state"],
         )
         self.assertGreater(limited.work_used, paused.work_used)
+
+    def test_resigned_table_corruption_is_rejected(self):
+        cfg = configured(wheel=30)
+        for actions in range(1, 100):
+            paused = pm1_bounded.factorize_pm1_bounded(
+                1000003, config=cfg, budget=allowance(), max_actions=actions
+            )
+            if "wheel_forward" in paused.checkpoint["payload"]["state"]:
+                break
+        else:
+            self.fail("paired setup was never reached")
+        corrupt = copy.deepcopy(paused.checkpoint)
+        corrupt["payload"]["state"]["wheel_forward"][0] += 1
+        with self.assertRaises(ValueError):
+            pm1_bounded.factorize_pm1_bounded(
+                1000003,
+                config=cfg,
+                budget=allowance(),
+                checkpoint=resign(corrupt),
+            )
 
     def test_quiet_result_reconstruction_and_finite_workspace(self):
         output = io.StringIO()

@@ -37,8 +37,8 @@ def build():
         "schema": 1,
         "seed": 2026100919,
         "construction": (
-            "Recursive Pocklington; biased p-1 structure, not an RSA population "
-            "model. No p-1 execution or timing selects inputs."
+            "Recursive Pocklington; biased p-1 structure, "
+            "not an RSA population model. No engine or timing selects inputs."
         ),
         "certificates": certificates,
         "fixtures": fixtures,
