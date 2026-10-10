@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
+  the user's explicit direction. Fresh complete stages save 9.73% CPU across
+  nine matched cells; extended integer portfolio captures remain inconclusive.
+  Record that limitation without claiming sustained portfolio improvement.
+- Use portfolio checkpoint version 9 for the new executor; pin both settings,
+  reserve finite table growth and charged resume reconstruction, and retain
+  old execution automatically for old default snapshots and CLI resumes.
+  Explicit legacy configurations preserve old work/state identity. Preserve
+  ECM chunks, bounds, attempt/curve counts, exact integers and quiet calls.
+
 - Integrate the completed C6 research modules, certified PRAC/Lucas/CF
   records, independent tests and pinned source controls into mainline for
   later experiments. Keep `ecm.py`, stage jobs, B4 arithmetic, checkpoints,

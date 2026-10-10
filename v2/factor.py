@@ -441,7 +441,12 @@ def main():
                 )
 
             if checkpoint is not None:
-                saved = checkpoint["payload"]["config"]
+                try:
+                    saved = checkpoint["payload"]["config"]
+                    if type(saved) is not dict:
+                        raise ValueError("malformed checkpoint config")
+                except (KeyError, TypeError) as error:
+                    raise ValueError("malformed checkpoint") from error
                 parameters.update(
                     pm1_gap_mode=saved.get("pm1_gap_mode", "cached"),
                     pm1_chunk_size=saved.get("pm1_chunk_size"),

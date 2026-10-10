@@ -19,7 +19,8 @@ PROTOCOL = Path(__file__).parent / "inputs/controls/a6_portfolio_protocol.json"
 def run(arm, backend, start):
     data = json.loads(INPUT.read_text())
     fixtures = [f for f in data["fixtures"] if len(str(f["n"])) == 20]
-    fixtures = fixtures[start : start + 12]
+    stop = start + 12
+    fixtures = fixtures[start:stop]
     module, configuration = config(
         "control" if arm == "no_pm1" else arm,
         backend,

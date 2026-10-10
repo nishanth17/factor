@@ -802,3 +802,38 @@ records replay original prime q with `q.bit_length()+1` per attempt. Finite
 transitions, GCDs, context building and full checkpoint verification retain
 explicit reservations. These are deterministic allowance units, not measured
 CPU instructions; cache hits never reset or refund cumulative allowances.
+
+## A6 production default promotion — 9 October 2026
+
+Fresh bounded portfolio calls use `pm1_chunk_size=64` and
+`pm1_gap_mode="recurrence"`. The shared `chunk_size=16` still governs ECM;
+`pm1_chunk_size=None` inherits it. The recurrence retains at most 64 even
+powers of the fixed stage-one residue. Oversized/odd gaps use the existing
+64-entry exponent cache. Reserve each growth before mutation, in addition to
+the legacy gap reservation. On resume, reserve/recompute even powers and
+exceptional cached powers before use; this verification consumes cumulative
+allowances. Conservative owned workspace grows by the table/prime-chunk
+reserve, with all storage still inside the configured cap.
+
+New portfolio snapshots with the optimized p−1 execution use version 9;
+configuration identity pins both settings. Existing v2–v8 snapshots retain
+legacy chunks/cache. Omitted-config library resume and CLI resume select the
+saved p−1 settings automatically. An explicit custom config must match; for
+an old checkpoint use `pm1_gap_mode="cached", pm1_chunk_size=None` with its
+original remaining settings. Increasing a work allowance permits progress;
+changing bounds, seeds, attempts or curves requires a new declared campaign.
+
+`factorize_pm1_bounded(n)` now defaults to
+`PM1TuningConfig(chunk_size=64, gap_mode="recurrence")`. Explicit `PM1Config`
+continues to denote the legacy campaign executor and preserves its checkpoint
+identity/work rules. Omitted-config resume of a legacy default campaign
+retains that executor; custom campaigns still require the original config.
+Its full deterministic resume reconstruction remains charged, and can cost
+more than running a fresh final bound. No new continuation rung is allocated.
+
+The user explicitly requested this default promotion. Fresh complete-stage
+confirmation saves 9.73% CPU across nine cells; integer portfolio captures
+remain inconclusive after extension. The [benchmark receipt](
+benchmarks/README.md#a6-production-default-promotion--9-october-2026)
+records both results. This is a user-directed default change, with the
+legacy executor available for reproducibility and existing resumes.

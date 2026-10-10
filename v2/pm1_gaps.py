@@ -5,7 +5,7 @@ from .arithmetic import pow
 
 
 def verify_powers(job, budget, mode):
-    """Reserve reconstruction before using any deserialized even powers."""
+    """Reserve reconstruction of even and exceptional cached powers."""
     powers = job.get("even_powers", [])
     if not isinstance(powers, list) or len(powers) > 64:
         raise ValueError("invalid p-1 recurrence table")

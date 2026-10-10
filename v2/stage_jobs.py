@@ -320,6 +320,8 @@ def _stage_two(job, budget, context, config):
         growth = max(0, needed - len(powers))
         budget.consume(sum(gap.bit_length() + 1 for gap in gaps) + growth)
         if growth:
+            # A^(2(k+1)) = A^(2k) * A^2. Retain at most 64 powers of
+            # this fixed stage-one residue, after reserving all growth.
             square = job["value"] * job["value"] % n
             while len(powers) < needed:
                 powers.append((powers[-1] if powers else 1) * square % n)

@@ -1,5 +1,17 @@
 # v2 changelog
 
+## A6 default promotion — 9 October 2026
+
+- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
+  the user's explicit direction. Fresh complete stages save 9.73% CPU across
+  nine matched cells; extended integer portfolio captures remain inconclusive.
+  Record that limitation without claiming sustained portfolio improvement.
+- Use portfolio checkpoint version 9 for the new executor; pin both settings,
+  reserve finite table growth and charged resume reconstruction, and retain
+  old execution automatically for old default snapshots and CLI resumes.
+  Explicit legacy configurations preserve old work/state identity. Preserve
+  ECM chunks, bounds, attempt/curve counts, exact integers and quiet calls.
+
 ## C6 experimental-code integration — 9 October 2026
 
 - Bring the verified PRAC, Lucas and CF research executors, generation tools,

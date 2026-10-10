@@ -2962,3 +2962,72 @@ archive metadata remains. Preserve the shared PyPy environment, mainline
 ignored evidence and unrelated C6 worktree/branch. All A6 timing/heavy checks
 are finished and the shared window is explicitly returned to C6. Only this
 documentation receipt follows the committed-only checks.
+
+## A6 production default promotion — 9 October 2026
+
+The user requested promotion after reviewing the gains and explicitly directed
+promotion before the final long-batch extension finished. Fresh bounded
+portfolio calls now use p−1 chunk 64 plus bounded even-gap recurrence directly
+in `stage_jobs.py`, avoiding the campaign-API bridge. Omitted-config bounded
+p−1 calls use the same optimized settings. ECM's shared chunk 16, bounds,
+attempts, bases, seeds and allocation remain unchanged.
+
+Controls are immutable `319d5c6` production sources in
+`inputs/controls/a6_production_319d5c6/`. The protocol, source identity and
+selection are versioned beside them. All captures require PyPy/Python 3.11,
+at least three validated warm seconds and 27 samples; later portfolio
+extensions use 63. Order is randomized, inputs/seed/bounds/budgets are fixed,
+outputs reconstruct and matched factoring outcomes agree. The A6 performance
+window was exclusive. Cold startup and instrumented profiles are separate.
+
+| Comparison | CPU saving | Evidence and decision |
+| --- | ---: | --- |
+| Direct complete-stage screen, combined versus production | 9.32% geometric mean | Select combined; all nine medians and intervals positive |
+| Fresh complete stages, 20/50/100 digits and three bound pairs | 9.73% geometric mean | All nine intervals positive; individual savings 4.59–12.82% at 27 samples |
+| Fresh GMP complete stages | 2.52% geometric mean | All medians positive; two individual intervals include zero |
+| First integer portfolio capture | 3.14% [2.20%,8.20%] | Five completions/splits out of twelve in both arms |
+| Supplemental integer marginal capture | −3.04% [−9.73%,1.28%] | Disagrees with first capture; no sustained portfolio gain established |
+| Direct integer portfolio extension, 63 samples | 1.84% [−0.51%,4.09%] | Still inconclusive; recurrence alone 0.89% [−1.70%,3.12%], chunk alone −4.50% [−9.18%,−1.05%] |
+| GMP portfolio confirmation, 63 samples | 1.32% [0.40%,2.07%] | Same five completions/splits out of twelve |
+
+In the supplemental marginal capture, no p−1 completes 0/12 at 13.126 ms
+CPU; control and promoted execution complete 5/12 at 105.331 and 108.538 ms.
+Marginal completions per added CPU-second are 54.23 and 52.40 respectively.
+These are CPU costs for matched execution, not a claim of additional factoring
+coverage. The initial default candidate passed complete-stage confirmation;
+integer portfolio performance did not pass the predeclared sustained-gain
+gate. Promotion is **user-directed**; do not describe the integer portfolio
+result as a confirmed improvement. The subsequently frozen long-batch screen
+was interrupted at the user's direction and supplies no accepted measurement.
+Its independent held-out portfolio confirmation was not run. This supersedes
+the earlier decision to leave all A6 performance settings opt-in.
+
+Separate 50-digit, B1=2000/B2=200000 instrumentation counts 58→6 modular powers
+and 297→283 GCDs. Owned conservative workspace is 1,724,416→2,064,384 bytes
+(+332 KiB); a completed job serializes to 2,995→3,046 bytes (+51 bytes), with
+43 retained even powers. Work is 220,683→220,705: growth is reserved explicitly,
+while existing per-gap charges are retained. These instrumented timings are
+not promotion evidence. Nine cold runs per arm have median wall times 368.861 ms control and
+366.674 ms promoted. They include common benchmark/control setup and startup,
+and are kept separately; they are not plain CLI startup.
+
+Completed raw evidence is local in `results/a6-production/`. Reproduce the
+primary screen at `a490dce`, fresh stage and original portfolio captures at
+`0cbf1f7`/`472985f`, and the direct 63-sample screen at `534a62e`:
+
+```sh
+pypy3 -m v2.benchmarks.a6_production screen --samples 27 --output results/screen.json
+pypy3 -m v2.benchmarks.a6_production confirmation --arm recurrence64 --samples 27 --output results/confirmation.json
+pypy3 -m v2.benchmarks.a6_production portfolio --arm recurrence64 --samples 27 --output results/portfolio.json
+pypy3 -m v2.benchmarks.a6_production_portfolio screen --output results/portfolio63.json
+```
+
+The historical source manifests intentionally fail after later resume-input
+hardening or documentation/source changes. Use the stated committed source;
+freeze a new manifest before measuring another source. Required controls,
+protocols, corpora and runners are versioned. Generated captures remain ignored.
+Seven production tests cover direct relation oracles, oversized gaps, finite
+saturation/nonunits, atomic refusal/cancellation, old action/work/checkpoint
+identity, charged reconstruction, corruption and implicit default/legacy resume;
+an additional malformed-input test covers both implicit APIs. General portfolio
+calibration, larger ECM/Lucas continuation and allocation remain separate.

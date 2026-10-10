@@ -259,3 +259,16 @@ class ProductionPM1Tests(unittest.TestCase):
         self.assertEqual(
             resumed.checkpoint["payload"]["config"]["chunk_size"], 16
         )
+
+    def test_malformed_implicit_resume_is_rejected(self):
+        from v2.pm1_bounded import factorize_pm1_bounded
+
+        for checkpoint in ([1], {"payload": []}, {"payload": {}}):
+            for function in (
+                portfolio.factorize_bounded,
+                factorize_pm1_bounded,
+            ):
+                with self.assertRaises(ValueError):
+                    function(
+                        1009 * 1013, budget=allowance(), checkpoint=checkpoint
+                    )
