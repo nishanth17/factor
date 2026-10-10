@@ -57,8 +57,9 @@ chain=record)` re-verifies caller-supplied records before execution. Cost
 weights are positive integers of at most 32 bits; defaults model 4M+2S for
 addition and 3M+2S for doubling. They are not runtime speed estimates.
 
-This completes the P4.1/A4 correctness tranche. `factorize_ecm` and default bounded jobs retain the B4 ladder;
-explicit B3 reuse routing is documented below. The [benchmark guide](
+This completes the P4.1/A4 correctness tranche. `factorize_ecm` and default
+bounded jobs retain the B4 ladder; explicit B3 reuse routing is documented
+below. The [benchmark guide](
 benchmarks/README.md#p41a4-verified-prac-5-october-2026) separates kernel
 diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
 including matched optional gmpy2 arms. These are experimental comparisons;
@@ -81,7 +82,8 @@ Records have at most 512 steps and 16 retained point slots; programs own at
 most 512 records, with no global point cache. See the [C6 study](
 benchmarks/c6_research.md) for recovery, storage and reproducibility details.
 B3 now routes the selected records through bounded production jobs under
-its explicit reuse option; default ladder behavior is preserved. The initial conservative C6 study retained the
+its explicit reuse option; default ladder behavior is preserved. The initial
+conservative C6 study retained the
 ladder after full-stage and campaign losses; those results remain historical
 controls. The user reopened executor optimization. See the [follow-up](
 benchmarks/c6_optimization.md) for its independently proved factor coverage,
@@ -103,7 +105,8 @@ Caller-owned programs can be reused; there is no global point or code cache.
 `benchmarks.c6_cf` supplies the separately verified CF catalog and common-tuple
 or three-point execution, with the same stage result and recovery contract.
 These APIs do not provide a portfolio work ledger, cancellation checkpoint or
-serialized resume format. The production B3 adapter reserves whole-block execution and bounded
+serialized resume format. The production B3 adapter reserves whole-block
+execution and bounded
 replay work separately from these experimental APIs.
 
 `benchmarks.c6_b4` additionally pins the committed B4 ECM control in an
@@ -117,8 +120,9 @@ The completed bounded study recommends reduced PRAC/batch 16 for B3's native
 B4 integration experiment and tuple Lucas/batch 16 for its separate GMP work.
 Native fresh construction retains the ladder; no production default changes.
 The PRAC, Lucas and CF catalogs, executors and research runners are available
-in mainline under `benchmarks.c6_*` for later experiments. Production defaults retain B4. The optional B3 adapter supplies finite
-stage-job, budget and checkpoint integration without changing these research APIs.
+in mainline under `benchmarks.c6_*` for later experiments. Production defaults
+retain B4. The optional B3 adapter supplies finite stage-job, budget and
+checkpoint integration without changing these research APIs.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
@@ -430,9 +434,9 @@ replay position; it charges validation and rebuilds an empty cache, paying
 again for every miss. Configuration must match. Cumulative work, wall/CPU
 allowances and cancellation remain authoritative; a refused build publishes
 no partial plan. Existing schemas 2–9 retain their legacy routing and serialized
-shape with chains off. A legacy snapshot is not silently upgraded. Late resumes may rebuild for
-too few remaining curves to amortize preparation; this is outside the
-confirmed common-prefix performance claim. ECM B1
+shape with chains off. A legacy snapshot is not silently upgraded. Late
+resumes may rebuild for too few remaining curves to amortize preparation;
+this is outside the confirmed common-prefix performance claim. ECM B1
 extension on a completed curve remains unsupported.
 
 ## Optional ECM programs and explicit campaigns

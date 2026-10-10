@@ -34,13 +34,15 @@ counterbalanced paired observations under the machine-wide performance lock.
 Each arm has at least three seconds of validated warmup and nine samples;
 the frozen extensions are 5 seconds/18 and 8 seconds/27 for >15% relative IQR.
 Native fresh training extended to 27; the final native resume confirmation
-extended to 18 after instability. Other final groups use nine stable samples. Paired median 95% bootstrap intervals use 4,000 resamples
+extended to 18 after instability. Other final groups use nine stable samples.
+Paired median 95% bootstrap intervals use 4,000 resamples
 and seed 193001. CPU and both chronological halves must also improve, with
 zero correctness failures and at most 5 percentage points completion loss per
 fixture. No universal 10% floor is applied. Absolute timings vary across
 workers on this unpinned macOS machine; compare paired arms, not historical
-C6 times or unrelated worker medians. Intervals describe repeated frozen-cohort timings, not the population of all
-40–80-digit inputs. No instrumented profile supplies timing evidence. A7/C1 heavy checks and accepted timings were serialized.
+C6 times or unrelated worker medians. Intervals describe repeated frozen-cohort
+timings, not the population of all 40–80-digit inputs. No instrumented profile
+supplies timing evidence. A7/C1 heavy checks and accepted timings were serialized.
 
 Initial **complete stage-one campaign** savings include a fresh plan for each
 fixture/seed campaign, verification and point checks. Positive is faster;
@@ -120,8 +122,8 @@ confidence claim. Completion is identical for native/GMP arms.
 | small10_80d | 0.0805 / 0.0882 (-9.59%) | 0.2077 / 0.2055 (+1.04%) | 100 / 100% |
 
 Conservative simultaneous chain ownership is 4 MiB scratch plus at most
-4 MiB per retained plan; initial native/GMP misses cost 223,815/223,702 units, including
-lookup. A hit costs one. Plans are verified independently and never serialize
+4 MiB per retained plan; initial native/GMP misses cost 223,815/223,702 units,
+including lookup. A hit costs one. Plans are verified independently and never serialize
 curve points. Replacements evict before allocation. Failed preparation is
 charged and publishes no plan; strict and prime-unit worst-case recovery is
 reserved before each atomic chunk and unused credit is not refunded.
@@ -163,7 +165,7 @@ stdout, checks, RSS records and SHA-256 manifests stay in ignored
 `benchmarks/results/b3/`, with the detailed local journal in `v2/LOG.md`.
 
 The final 499-test PyPy/GMP suite and full lint pass, including a committed-files-
-only archive with all benchmark imports and required catalog loaders. Broader
+only archive with all 105 benchmark imports and required catalog loaders. Broader
 bounds, sizes, allocation/handoff, completed-curve B1 extension and default
 promotion remain C3/E1 or later work. No merge or push accompanies this tranche.
 
