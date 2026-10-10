@@ -88,3 +88,44 @@ cycle oracles, charged cancellation/resume and fresh matched total-resource
 confirmation after training freezes.
 
 The 60-digit cells and attribution audit remain pending at this revision.
+
+## Completed collection and investment decision
+
+The six-cell collection finished in3,002.638 wall /2,970.117 CPU seconds.
+Its literal frozen gate returns no qualifying policy; that verdict is preserved
+in the original decision capture. The accounting audit then took24.869 wall /
+24.773 CPU seconds. Even conservatively reserving all180 seconds originally
+allowed for the earlier retained-record analysis, the complete study remains
+within4,500 seconds. Twenty targeted PyPy3.11 tests passed in0.183 seconds.
+
+The corrected attribution witnesses are:
+
+| Input | Directly verified prefix | SLP constraints | DLP constraints | Charged split/certification + complete candidate processing CPU upper bound | Allowance |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 40/0 | 2,087 blocks | 303 | 633 | 1.474s | 15s |
+| 40/1 | 2,391 blocks | 242 | 615 | 1.410s | 15s |
+| 50/0 | 19,808 blocks | 735 | 1,630 | 5.132s | 60s |
+| 50/1 | 23,552 blocks | 749 | 1,749 | 5.194s | 60s |
+
+Every listed DLP prefix completes and the same-position SLP has no dependency.
+The50/0 DLP factors match the independently certified factors listed above.
+Forty-digit factors receive runtime PROVEN labels;50-digit factors receive
+PROBABLE labels from the runtime, with separate corpus certificates. No label
+was silently upgraded. Every generated algebraic dependency was checked against
+original rows; every extracted square congruence was checked independently.
+Unextracted algebraic masks are counted separately from verified squares.
+
+Both60-digit runs remain unresolved after their longer collection allowances.
+At106,548/97,258 blocks they retain12,179/13,699 DLP residuals. Policy128
+increases LP-cancelled rows from534 to591 and628 to728 respectively, but all
+rows are singleton-filtered away. At the terminal128 prefixes,45,543 of50,100
+and51,201 of56,560 vertices have degree one. Split failures29/26 remain
+unresolved; bounds and deadlines were not expanded. This diagnoses poor
+useful density at these fixed parameters, not universal DLP infeasibility.
+
+**Decision: proceed with bounded opt-in implementation at40/50.** This is an
+explicitly post-observation investment decision after repairing cost attribution,
+not a retrospective claim that the literal preregistered gate passed and not
+an accepted speedup. The [implementation/confirmation protocol](c1_implementation_protocol.md)
+freezes the next finite stage before production edits. Sixty-digit calibration,
+80–100-digit claims and default promotion remain unpassed.
