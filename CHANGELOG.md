@@ -9,7 +9,10 @@
   production routing, finite work reservations and resume behavior.
 - Preserve both ignored C6 evidence sets in mainline before retiring the
   isolated checkout. The merged PyPy/GMP suite passes 479 tests and full
-  lint; historical benchmark protocols retain their original source pins.
+  lint. A committed-only archive of merge `ce7574e` passes the same 479 tests,
+  full lint and 98 benchmark imports with required C6 catalogs. The C6
+  worktree is retired; historical benchmark protocols retain their original
+  source pins.
 
 - Complete the reopened C6 executor optimization and isolated B4 comparison.
   Independently certify batched coordinate-factor checks with strict saturated

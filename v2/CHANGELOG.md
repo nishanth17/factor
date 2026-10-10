@@ -7,9 +7,12 @@
   Current ECM stage jobs continue to call the integrated B4 ladder; B3 owns
   any production routing, budget accounting, cache and checkpoint changes.
 - Preserve both raw C6 evidence sets in ignored mainline results. The merged
-  PyPy/GMP suite passes 479 tests and full lint. Historical timing protocols
-  still pin the original sources and require their original checkout for
-  reproduction; new timing on current mainline needs a new frozen protocol.
+  PyPy/GMP suite passes 479 tests and full lint. A committed-only archive of
+  merge `ce7574e` passes 479 tests, full lint and 98 benchmark imports with
+  required C6 catalogs. The isolated C6 worktree is retired. Historical
+  timing protocols still pin the original sources and require their original
+  checkout for reproduction; new timing on current mainline needs a new
+  frozen protocol.
 
 ## C6 optimized execution and B4 confirmation — 9 October 2026
 

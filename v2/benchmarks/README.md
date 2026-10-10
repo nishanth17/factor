@@ -1142,7 +1142,11 @@ attempts and all production defaults. Committed code/input `a7642c2` passes
 431 PyPy/GMP tests, full lint and 84 benchmark imports plus required loaders.
 Controls/corpora are committed; raw evidence stays in ignored
 `results/c6-fast/`. The experimental code and records are integrated into
-mainline; stage jobs and production defaults remain on the B4 ladder.
+mainline; stage jobs and production defaults remain on the B4 ladder. A
+committed-only archive of merge `ce7574e` passes 479 PyPy/GMP tests, full
+lint, all 98 benchmark imports and C6 catalog loads. The isolated C6
+worktree is retired; both raw evidence sets remain in ignored mainline
+results.
 
 ## C6 / P4.5 initial conservative study — 9 October 2026
 

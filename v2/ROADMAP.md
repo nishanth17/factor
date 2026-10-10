@@ -2321,8 +2321,10 @@ without closing those gates here. A committed-only archive of `a7642c2`
 passes 431 PyPy/GMP tests, full lint, all 84 benchmark imports and frozen
 hash/corpus/catalog checks. Required inputs are committed; raw evidence is
 local. The experimental PRAC, Lucas and CF code and required controls are now
-in mainline. Only C6's bounded study gate closes; B3 production routing,
-work accounting and checkpoint integration remain open.
+in mainline. The integration merge `ce7574e` passes a committed-only archive
+check with 479 tests, full lint, 98 benchmark imports and C6 catalog loads;
+the isolated checkout is retired. Only C6's bounded study gate closes; B3
+production routing, work accounting and checkpoint integration remain open.
 
 ## Phase 5 — Complementary methods and stronger continuations
 
