@@ -107,12 +107,14 @@ def restore_store(payload, collector, budget):
         _index(index, row_count)
     if len(set(order)) != row_count:
         raise ValueError("DLP row order repeats an original row")
-    reserves = []
+    reserves, used_polynomials = [], set()
     for record in payload["atoms"]:
         budget.consume(1)
         if not isinstance(record, list) or len(record) != 6:
             raise ValueError("invalid DLP atomic record")
-        _, position, _, exponents, _, pair = record
+        poly_index, position, _, exponents, _, pair = record
+        _index(poly_index, len(payload["polynomials"]))
+        used_polynomials.add(poly_index)
         checked_position(position)
         if (
             not isinstance(exponents, list)
@@ -126,6 +128,8 @@ def restore_store(payload, collector, budget):
             + 256 * len(exponents)
             + 16 * (abs(position).bit_length() + base.n_prime.bit_length())
         )
+    if len(used_polynomials) != len(payload["polynomials"]):
+        raise ValueError("DLP checkpoint retains an unreferenced polynomial")
     combined_bytes = []
     for record in payload["combined"]:
         budget.consume(1)

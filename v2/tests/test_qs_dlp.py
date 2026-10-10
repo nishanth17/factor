@@ -418,6 +418,7 @@ class StoreTests(unittest.TestCase):
     def test_corruption_and_cancelled_restore_publish_nothing(self):
         payload = encoded(self.mixed())
         changes = [
+            lambda p: p["polynomials"].append([1, 11, 1]),
             lambda p: p["row_order"].__setitem__(0, 0),
             lambda p: p["forest"].append(p["forest"][0]),
             lambda p: p["combined"][0].__setitem__(4, 2),
