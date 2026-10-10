@@ -1,0 +1,12 @@
+{
+  "screen_sha256": "21d63d361d3764c7b11fdc8b2d1de98afdbb637a397a9c390d9b4f7677f883ee",
+  "protocol_sha256": "28f2337d81c1a7172ee8c980087001268680623f2f0ee81b5c3ab1f1c0d1704e",
+  "candidates": {
+    "int": [
+      "fast/cf/tuple/16"
+    ],
+    "gmp": [
+      "fast/cf/tuple/64"
+    ]
+  }
+}
