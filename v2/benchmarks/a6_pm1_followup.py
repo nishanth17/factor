@@ -449,6 +449,8 @@ def continuation_call(n, options, arm, pause_steps=None):
             prior_work += outcome.work_used
             prior_wall += outcome.wall_seconds
             prior_cpu += outcome.cpu_seconds
+            if outcome.divisor is not None or outcome.reason == "saturated":
+                break
         result = summary(outcome)
         result["work"] = prior_work
         return result
@@ -647,14 +649,14 @@ def main():
     args = parser.parse_args()
     require_runtime()
     if args.phase == "cold-one":
-        selected()  # Match source/input verification in both cold arms.
+        selection = selected()  # Match verification in both cold arms.
         fixture = next(
             f for f in stage_fixtures("screen") if f["digits"] == 20
         )
         print(
             json.dumps(
                 summary(
-                    run(fixture["n"], ((2000, 200000),), options_for(args.arm))
+                    run(\n                        fixture["n"],\n                        ((2000, 200000),),\n                        options_for(args.arm, selection),\n                    )
                 )
             )
         )
