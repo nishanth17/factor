@@ -153,7 +153,7 @@ def portfolio_call(arm, backend):
             {
                 "complete": outcome.result.complete,
                 "factors": [
-                    (int(f.value), f.multiplicity, f.certainty.value)
+                    (int(f.value), f.exponent, f.certainty.value)
                     for f in outcome.result.factors
                 ],
                 "remaining": list(map(int, outcome.result.remaining)),

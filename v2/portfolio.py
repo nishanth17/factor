@@ -724,7 +724,8 @@ def _pack(state, config, budget, generator, policy):
     configuration = asdict(config)
     version = 6
     if (
-        config.backend == "python-int"
+        _legacy_pm1(config)
+        and config.backend == "python-int"
         and config.ecm_pair_distance is None
         and config.ecm_pair_wheel is None
     ):

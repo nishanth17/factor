@@ -25,6 +25,8 @@ def reference_primes(lo, hi):
 def small_config(**changes):
     """Small finite candidates make saturation/resume tests inexpensive."""
     config = PortfolioConfig(
+        pm1_gap_mode="cached",
+        pm1_chunk_size=None,
         trial_bound=5,
         rho_attempts=2,
         rho_evaluations=500,
