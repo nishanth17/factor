@@ -1,0 +1,44 @@
+{
+  "backend": "python-int",
+  "candidate_commit": "f59f2e6",
+  "claims": "Ownership remains a diagnostic with its first miss charged, not a production API/default promotion. Original-harness replication is a disclosed follow-up motivated by observed method sensitivity, not untouched confirmation. No extra search, kernels or allocation.",
+  "groups": [
+    [
+      "ownership_confirmation",
+      "f59f2e6",
+      "confirmation",
+      "ownership"
+    ],
+    [
+      "original_training_replication",
+      "b956801",
+      "training",
+      "portfolio"
+    ],
+    [
+      "original_confirmation_replication",
+      "b956801",
+      "confirmation",
+      "portfolio"
+    ]
+  ],
+  "motivation": "The three-arm ablation gives a small native ladder gain while eager/lazy is inconclusive; a finite cohort owner saves about 5% in training. Confirm ownership independently and repeat the exact original two-arm source/harness before attributing the change to eager recovery or declaring a sustained native regression.",
+  "original_commit": "b956801",
+  "parent_sha256": "54c7657569a53f0237c6c6c3ab1180e7efbea989fd4124060b9d62c00a0d97c5",
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      18
+    ],
+    [
+      8,
+      27
+    ]
+  ],
+  "source_and_input_policy": "Use exact committed sources and their existing frozen inputs, seeds, budgets and sampling rules. No new candidate or corpus generation. Ownership confirmation uses the already frozen new untouched cohort/seeds. Preserve every earlier capture.",
+  "timing_limit": "These three cells may consume ONLY the unused portion of the existing 1800-second timing/profiling allowance, after the original queue. At most 480 seconds per cell. No extension after that budget. Required QA stays separate and serialized."
+}
