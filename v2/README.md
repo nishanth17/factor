@@ -387,8 +387,9 @@ success guarantee. Extend a paused campaign by increasing **total** allowances
 under the identical configuration; completed curves and their RNG progress are
 credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
 checkpoint, or extending B1 on the same curve, remains unsupported pending
-A6 and a separate migration contract: increasing B1 needs missing powers of
-old primes as well as new primes. B2 supports continuation of the predeclared
+a separate ECM migration contract. A6 supplies the exact integer schedule
+ratio, including missing powers of old primes as well as new primes. B2
+supports continuation of the predeclared
 finite campaign under cumulative work/wall/CPU allowances, including pauses
 inside table construction, a paired block or scalar recovery. It does not
 reinterpret an exhausted campaign as a new allowance of curves.
@@ -451,7 +452,8 @@ or reserved bytes. Storage/decoding and mixed-factor replay use the original
 program and paired contracts. Wheel checkpoints use version 8 and
 `ecm-aligned-wheel-pairs-v1`; schemas 4–7 and their disabled-field encoding
 remain readable and unchanged. Same-config finite campaigns can extend their
-cumulative budgets. Increased B1 still requires A6's exact schedule ratio.
+cumulative budgets. A6 supplies the exact increased-B1 integer ratio; ECM
+checkpoint migration and point-specific recovery remain separate work.
 
 This optional mode covers one nearest-center distance set. Extended sets,
 relocation and overlapping-window graph matching belong to C2, as does
@@ -638,8 +640,8 @@ workspace, not process RSS.
 *total cumulative* allowances. Schema 1 binds `pm1-campaign-v1`,
 `inclusive-lcm-ratio-v1` and `python-int`. No RNG is consumed. Checksums detect
 accidental corruption; deterministic reconstruction verifies all saved
-arithmetic before reuse, and consumes the same action reservations in the
-cumulative budget. Reconstruction, context rebuilding and serialization time
+arithmetic and canonical numeric types before reuse, and consumes the same
+action reservations in the cumulative budget. Reconstruction, context rebuilding and serialization time
 are charged on resume. A small grant may be spent entirely on verification;
 repeated pauses do not reset work or active-run wall/CPU usage. Paused time is
 excluded. An incompatible identity is rejected. Exhaustion does not grant

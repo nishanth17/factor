@@ -1,5 +1,34 @@
 # v2 changelog
 
+## A6 / P5.3 bounded p−1 correctness tranche — 9 October 2026
+
+- Add the exact inclusive LCM ratio, including old-prime power increases,
+  and an explicit finite one-base campaign. Reuse complete verified stage-one
+  state; rebuild stage two after increased B1 and append only new B2 coverage
+  when B1 is fixed. Saturation and nonunits stop this base after finite recovery.
+- Introduce isolated schema-1 Python-integer checkpoints with complete
+  assignment/configuration identity, charged deterministic reconstruction,
+  canonical numeric types and cumulative work/wall/CPU allowances. No RNG is
+  consumed. Preserve proper divisors, reconstruction and unresolved certainty.
+  Existing direct, portfolio and ECM APIs/checkpoints remain unchanged.
+- Inspect primary papers and pinned GMP-ECM, CADO-NFS, FLINT/PARI and SymPy
+  implementations/licenses. Implement the integer identities independently;
+  keep native polynomial/REDC techniques and ECM/Lucas migration separate.
+
+- Reassess the original 10% gate under the revised roadmap without retuning:
+  all six 27-repeat complete-stage comparisons confirm chunk 64 gains of
+  6.1–9.2%, with positive paired intervals and declared stability. Accept this
+  bounded configuration for scoped integration review; keep shared defaults,
+  bounds, attempts, caches and allocation unchanged. Exact in-memory ratios
+  save 8.8–9.6% versus fresh-each; charged checkpoint reconstruction loses
+  12.4–14.2%. The declared portfolio cohort finds no extra completions.
+- Pass 21 new independent/adversarial checks, full `make -C v2 test` with
+  419 tests (three optional-GMP skips), and `make -C v2 lint`. A committed-file
+  archive passes 422 PyPy/GMP tests, all 70 benchmark imports and independent
+  certificate/product verification. Python sources and required inputs remain
+  identical after the documentation-only acceptance update. Keep raw evidence
+  in ignored results; this isolated tranche remains unmerged.
+
 ## A10 integration and research reconciliation — 9 October 2026
 
 - Integrate source-verified strict 12/13-base Miller–Rabin ranges with settled

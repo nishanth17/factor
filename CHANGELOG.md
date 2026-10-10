@@ -2,6 +2,30 @@
 
 ## Current development
 
+- Add A6/P5.3's exact `inclusive-lcm-ratio-v1` integer schedule and opt-in
+  `factorize_pm1_bounded` finite one-base campaigns. Increasing B1 includes
+  higher powers of old primes and rebuilds stage two; a B2-only increase
+  appends checked coverage. Stop after finite recovery, nonunit or exhaustion;
+  never silently add bounds, bases or ECM curves.
+- Bind the new schema-1 checkpoints to modulus/base/configuration, Python
+  integers and `pm1-campaign-v1`. Reconstruct all saved actions and canonical
+  numeric types under cumulative allowances before trusting arithmetic.
+  Preserve proper divisors, unresolved reconstruction, certainty labels and
+  quiet calls. Existing APIs, portfolio/ECM checkpoint versions, RNG and work
+  accounting remain unchanged; the integer ratio unblocks later ECM scalar
+  planning without implementing point/checkpoint migration.
+
+- Apply the revised performance policy without changing frozen inputs or
+  candidates. Accept chunk 64 for scoped p−1 integration review after all six
+  27-repeat stage comparisons improve 6.1–9.2% with positive paired intervals.
+  Preserve current defaults, streamed schedules, bounds and allocation.
+  In-memory continuation saves 8.8–9.6% against fresh-each; verified resume
+  costs 12.4–14.2% more. The declared portfolio cohort gains no completions.
+  Pass 419 system-PyPy tests (three optional-GMP skips), lint, 422 tests from
+  committed files with GMP enabled, all 70 benchmark imports and independent
+  certificate/product loaders. Keep raw evidence local; leave ECM/Lucas
+  migration and combined production promotion with their existing owners.
+
 - Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
   independently checked Sorenson–Webster bounds: first 12 prime bases for
   `n < 318665857834031151167461`, first 13 for
