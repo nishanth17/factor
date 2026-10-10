@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Complete the requested fresh B4 bakeoff on a separately committed source,
+  certified-input and sampling freeze. Reuse the same five candidates;
+  counterbalance independent PyPy processes and extend only the unstable GMP
+  whole-ladder comparison to 27 blocks. Fresh nine-block confirmation saves
+  12.52% for native reductions (paired 95% interval 5.09–16.63%) and 6.05% for
+  separate GMP whole-ladder fusion (1.52–17.61%), with 27/27 complete and
+  matching work/results throughout. Both pass the revised scoped timing gate.
+  Report noisy class losses and finite-workload limits. Keep production
+  kernels/APIs/checkpoints unchanged; prepare integration review, no merge.
+
 - Relax the roadmap's universal 10% time / 10-point completion promotion
   floor. Permit smaller repeatable complete-run gains supported by fresh
   confirmation and uncertainty beyond measurement noise; retain correctness,

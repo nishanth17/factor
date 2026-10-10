@@ -2163,3 +2163,102 @@ New corpus, protocol and source manifest live in versioned `inputs/`; reports
 and partial captures remain in the ignored local `results/b4/` tree. The
 builder refuses to replace an existing freeze. Tests cover counterbalancing,
 paired-sample requirements, selection and independent corpus identity.
+
+#### Fresh bakeoff results and decision
+
+Source/input freeze commit **`c80eb0b`** precedes all accepted timings.
+The exclusive window began after A6/C6 released their checks. The screen
+retains 144 independent process captures: nine for every arm/backend,
+extending only GMP whole-ladder fusion and its baseline to 27. That candidate
+initially had 15.84% relative IQR and settled at 3.61%; its matched baseline
+and ratio settled at 9.66% and 8.73%. All other candidate comparisons kept
+their original nine paired blocks. Confirmation uses 36 captures, nine per
+selected arm/backend and baseline, with no extension. No accepted sample
+is censored or fails validation. Across 180 processes the minimum validated
+warmup is 3.007 seconds; there are 822 warmup and 217 measured whole cohorts.
+Peak process RSS is 90.58 MiB including interpreter/JIT; this is separate
+from the unchanged 16 MiB owned-workspace allowance. The runtime remains
+PyPy 7.3.23 / Python 3.11.15, gmpy2 2.3.1 / GMP 6.3.0 on the M4.
+
+The screen reports paired median percentage time reduction and its
+conditional bootstrap interval. Positive means faster. Every comparison is
+stable at its frozen stopping point and completes 27/27 with identical
+factors, certainty, unresolved cofactors and logical work.
+
+| Candidate | Native screen reduction [95% interval] | Separate GMP screen reduction [95% interval] | Decision |
+| --- | ---: | ---: | --- |
+| Explicit squares | −43.77% [−45.41, −37.35] | −4.59% [−7.80, −1.49] | Reject for this workload on both tracks. |
+| Fused step helper | +0.71% [−3.24, +9.16] | +8.11% [+4.45, +14.56] | Native inconclusive; positive GMP screen, not selected for confirmation. |
+| Whole ladder | −3.12% [−5.68, +4.99] | +9.20% [+8.02, +11.33] | Native not selected; GMP selected and confirmed. |
+| Selected reductions | +5.83% [+2.31, +14.08] | +1.93% [−0.83, +9.09] | Native selected and confirmed; GMP inconclusive. |
+| Unit normalization | −3.88% [−19.78, +0.20] | +6.89% [−0.89, +16.08] | Not selected; no new fresh confirmation of this arm. |
+
+The GMP whole-ladder result uses 27 matched blocks; other rows use nine.
+GMP fusion/normalization intervals overlap. The selector chooses the largest
+stable estimate, not a proved pairwise winner over those alternatives.
+The earlier experiment's normalized-arm confirmation remains separate,
+unchanged evidence; the fresh screen does not invalidate or repeat it.
+
+| Untouched confirmation | Baseline median / cohort | Candidate median / cohort | Paired median reduction | Conditional 95% interval | CPU reduction | Completion |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Native selected reductions | 394.19 ms | 349.85 ms | **12.52%** | **5.09% to 16.63%** | 12.03% | 27/27 both |
+| GMP whole ladder | 794.42 ms | 745.33 ms | **6.05%** | **1.52% to 17.61%** | 6.06% | 27/27 both |
+
+The reported effect is the median of matched process ratios; it need not
+match the ratio of the two marginal medians in the table. Native effects
+in the two chronological halves are 10.87/14.13%; GMP effects are 4.61/6.05%.
+Native baseline/candidate/ratio relative IQR is 12.08/4.60/11.55%; GMP is
+11.32/8.38/10.91%. Both fresh intervals exclude zero, CPU effects are
+positive, every class has zero completion change, and results/work match
+in all blocks. Both selections pass the prespecified revised timing gate.
+
+| Confirmation class | Native reduction [95% interval] | GMP reduction [95% interval] |
+| --- | ---: | ---: |
+| 64 target | +24.29% [+22.50, +35.68] | +24.69% [−3.01, +31.09] |
+| 128 target | −5.79% [−18.56, +11.55] | −0.13% [−5.49, +8.61] |
+| 256 target | +16.06% [+13.28, +22.64] | +9.32% [−0.28, +18.79] |
+| 329 target | +6.54% [−2.60, +14.04] | +10.18% [+2.68, +14.32] |
+| Prime cube | +16.61% [+14.21, +24.27] | −22.23% [−48.10, +24.41] |
+
+The 128-target loss estimates are noisy: native marginal class time is
+74.00 versus 77.59 ms and GMP 225.23 versus 220.09 ms. The GMP prime-cube
+control costs 2.49 versus 2.89 ms per three-seed class; its negative paired
+estimate is small in absolute time and its interval includes zero. These
+regressions still need integration review; pooled gains do not establish a
+win for each class. There are only two products per width class and one
+prime cube. This fixed-machine, fixed-cohort bootstrap is not a population
+risk bound or a sequential confidence sequence. Changing warmup, sample
+aggregation and input cohorts also prevents treating differences from the
+original B4 percentages as a causal improvement to the candidate itself.
+
+**Decision:** native selected reductions and the separate GMP whole-ladder
+arm are ready for scoped production-integration review. The native candidate
+has positive complete-run evidence in the original confirmation and both
+new cohorts. GMP whole-ladder fusion has fresh confirmation here; its small
+lead in screening does not settle a universal ranking against the helper or
+normalization. Early reductions preserve exact polynomial residues; whole
+fusion adds no inversion precondition. Their maintenance cost is an inlined
+ladder with readable formulas/oracles retained. Review class effects and
+confirm the final combined production source before default promotion.
+Native integers remain default, all production APIs/work/checkpoints remain
+unchanged, and this task performs no integration or merge.
+
+The original separate stage-one/stage-two breakdown and Amdahl ceilings
+above remain scoped to their original controls. There is no new profile or
+cold-start measurement in this follow-up. Complete ECM-only portfolios here
+use feasible products through 330 bits, 22–30-bit smaller factors and the
+same modest B1/B2/curve caps; no claim covers large-factor production
+campaigns, reducers, broad backend crossovers or different curve families.
+Stop after these five candidates and fresh confirmation; no further tuning
+is needed to force a larger gain.
+
+Raw reports remain local and are not loader dependencies:
+
+- `bakeoff-screen.json`: `e668f390e0ff0d11436d1043407d99e659c194a80353b74f5ec96cc2f4199538`
+- `bakeoff-confirmation.json`: `4874daa7ccf616a21b383d950bf31bd624efe0d74c6a6fb680db8127f1664f50`
+
+The worktree passes **414 PyPy/GMP tests** and full `make -C v2 lint`.
+An old generated verification checkout was moved unchanged from `results/`
+to ignored `audit/` so pycodestyle does not lint its preserved `v1/` copy.
+The initial lint failure and clean rerun logs remain local. Required new
+corpora/protocol/source hashes and five sampling-contract tests are versioned.

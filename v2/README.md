@@ -618,3 +618,12 @@ The revised [roadmap promotion policy](ROADMAP.md#how-to-use-the-gates) permits
 repeatable gains below 10% when fresh evidence supports an improvement beyond
 measurement noise. B4's positive native/GMP results are eligible for scoped
 integration review; production kernels and supported selectors remain as above.
+
+The separately frozen [requested fresh bakeoff](benchmarks/README.md#requested-fresh-b4-bakeoff)
+confirms native selected reductions (12.52%) and separate GMP whole-ladder
+fusion (6.05%) on new certified inputs. These are scoped integration-review
+candidates; the experimental runner's `screen` and `confirmation` phases do
+not add a production kernel selector or alter supported factoring APIs.
+The readable production ladder, native default and canonical checkpoint
+contract remain unchanged. Class uncertainty and finite workload limits are
+recorded with the evidence; no merge is performed by this study.

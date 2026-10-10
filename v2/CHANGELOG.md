@@ -1,5 +1,21 @@
 # v2 changelog
 
+## Requested fresh B4 bakeoff — 9 October 2026
+
+- Freeze the same five kernels on disjoint certified screen/confirmation
+  inputs and new seeds. Preserve all original B4 source controls and verdicts.
+  Use independent counterbalanced PyPy process blocks, at least three seconds
+  of validated warmup and nine pairs, with finite instability-only extensions.
+- Confirm native reductions at 12.52% (paired 95% interval 5.09–16.63%) and
+  separate GMP whole-ladder fusion at 6.05% (1.52–17.61%). Complete 27/27 in
+  every arm, with identical factors/certainty/work and no censoring. Both pass
+  the revised scoped timing gate; noisy 128-target and tiny-power regressions
+  limit class claims and require integration review.
+- Keep native integers and readable production kernels unchanged. No public
+  API, work ledger, checkpoint, integration or merge changes. Retain 180 process
+  captures locally; version required inputs, frozen runner and five sampling
+  contract tests. Pass 414 PyPy/GMP tests and full lint in the isolated tree.
+
 ## Performance promotion policy — 9 October 2026
 
 - Replace the blanket 10% time / 10-point completion floor with repeatable,
