@@ -57,8 +57,8 @@ chain=record)` re-verifies caller-supplied records before execution. Cost
 weights are positive integers of at most 32 bits; defaults model 4M+2S for
 addition and 3M+2S for doubling. They are not runtime speed estimates.
 
-This completes the P4.1/A4 correctness tranche. Both `factorize_ecm` and the
-bounded stage jobs still use the binary ladder. The [benchmark guide](
+This completes the P4.1/A4 correctness tranche. `factorize_ecm` and default bounded jobs retain the B4 ladder;
+explicit B3 reuse routing is documented below. The [benchmark guide](
 benchmarks/README.md#p41a4-verified-prac-5-october-2026) separates kernel
 diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
 including matched optional gmpy2 arms. These are experimental comparisons;
@@ -80,8 +80,8 @@ pairs or `NonunitPointError`; callers retain proper factors and handle retry.
 Records have at most 512 steps and 16 retained point slots; programs own at
 most 512 records, with no global point cache. See the [C6 study](
 benchmarks/c6_research.md) for recovery, storage and reproducibility details.
-No C6 candidate is routed into production stage jobs or checkpoint formats;
-B3 integration remains open. The initial conservative C6 study retained the
+B3 now routes the selected records through bounded production jobs under
+its explicit reuse option; default ladder behavior is preserved. The initial conservative C6 study retained the
 ladder after full-stage and campaign losses; those results remain historical
 controls. The user reopened executor optimization. See the [follow-up](
 benchmarks/c6_optimization.md) for its independently proved factor coverage,
@@ -103,8 +103,8 @@ Caller-owned programs can be reused; there is no global point or code cache.
 `benchmarks.c6_cf` supplies the separately verified CF catalog and common-tuple
 or three-point execution, with the same stage result and recovery contract.
 These APIs do not provide a portfolio work ledger, cancellation checkpoint or
-serialized resume format. B3 must reserve whole-block execution and bounded
-replay work before integrating them.
+serialized resume format. The production B3 adapter reserves whole-block execution and bounded
+replay work separately from these experimental APIs.
 
 `benchmarks.c6_b4` additionally pins the committed B4 ECM control in an
 isolated module and supplies exact-residue early-reduction kernels and a
@@ -117,9 +117,8 @@ The completed bounded study recommends reduced PRAC/batch 16 for B3's native
 B4 integration experiment and tuple Lucas/batch 16 for its separate GMP work.
 Native fresh construction retains the ladder; no production default changes.
 The PRAC, Lucas and CF catalogs, executors and research runners are available
-in mainline under `benchmarks.c6_*` for later experiments. Production ECM
-continues to use the integrated B4 ladder until B3 completes stage-job,
-budget and checkpoint integration.
+in mainline under `benchmarks.c6_*` for later experiments. Production defaults retain B4. The optional B3 adapter supplies finite
+stage-job, budget and checkpoint integration without changing these research APIs.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
@@ -385,6 +384,56 @@ resumed = factorize_bounded(
 `PortfolioConfig(sss=SSSConfig(...))` enables SSS. Their classes live in
 `v2.qs` and `v2.qs.sss`, respectively. Advanced settings and exact relation
 contracts are documented in the module docstrings and covered by the tests.
+
+## Optional bounded PRAC/Lucas stage-one plans
+
+`PortfolioConfig(ecm_chain_mode="reuse", ecm_chain_bytes=8 * 2**20,
+ecm_program_bytes=262144, memory_bytes=32 * 2**20)` enables B3's verified
+stage-one executor. These new fields are keyword-only. The default is
+`ecm_chain_mode="off", ecm_chain_bytes=0`; standalone ECM and CLI defaults
+retain the B4 ladder.
+
+The supported route requires B1=2,000, ECM chunk size 16, a tier of at least
+eight curves and a current cofactor with 40–80 decimal digits. Exact integer
+bounds implement that size band. Native integers use reduced PRAC/batch 16;
+GMP uses separate tuple Lucas/batch 16. Unsupported sizes, bounds, chunks and
+short tiers use B4. This is explicit reuse intent, not a prediction that a
+factor will require eight curves. Early successful curves can still make
+preparation lose. Native whole-portfolio and resumed gains are not promoted;
+see the [complete measurements](benchmarks/README.md#b3-production-praclucas-integration-9-october-2026).
+
+Each invocation owns a finite LRU of immutable verified plans, shared across
+its curves and recursive cofactors. No curve point or global plan cache is
+retained. A minimum 8 MiB chain cap reserves 4 MiB plan ownership plus 4 MiB
+simultaneous construction/recovery scratch, added to the packed-program and
+existing workspace reserves. Eviction releases old ownership before allocating
+a replacement. These are conservative owned-memory bounds; PyPy/JIT process
+RSS is measured separately and is larger.
+
+A miss pays for reading/hashing/parsing 202,461 bytes, independent scalar and
+coordinate-factor verification, decoding and schedule construction. A hit
+costs one unit. Every chunk reserves its entire fast execution and bounded
+strict/prime-unit recovery before arithmetic; unused recovery credit is not
+refunded. These units differ from ladder scalar-bit charges. For example,
+the matched full-campaign experiment uses `Budget(work_limit=8_000_000,
+seconds=20, cpu_seconds=20)` for both arms. At the initial 2,000,000-unit cap,
+chains can complete fewer unsuccessful curves despite identical final
+factorization completion. Lower unit counts or shorter capped runs establish
+no engine speed advantage.
+
+Opt-in checkpoints use schema **10** and pin catalog, bound, backend/build,
+kernel, batch, recovery and routing identities. Only certified chunks commit.
+Saturated guard products receive strict X/Z replay from the original chunk;
+unresolved recovery retains the existing durable prime-unit replay. Resume
+validates the prime prefix, pending powers, chunk count, canonical point and
+replay position; it charges validation and rebuilds an empty cache, paying
+again for every miss. Configuration must match. Cumulative work, wall/CPU
+allowances and cancellation remain authoritative; a refused build publishes
+no partial plan. Existing schemas 2–9 retain their legacy routing and serialized
+shape with chains off. A legacy snapshot is not silently upgraded. Late resumes may rebuild for
+too few remaining curves to amortize preparation; this is outside the
+confirmed common-prefix performance claim. ECM B1
+extension on a completed curve remains unsupported.
 
 ## Optional ECM programs and explicit campaigns
 

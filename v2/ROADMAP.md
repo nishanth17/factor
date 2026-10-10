@@ -282,7 +282,7 @@ development and coordinated integration, not concurrent performance runs.
 | --- | --- | --- | --- | --- | --- |
 | ~~B1 — P3.8-R1 calibration~~ | ~~**[x] Bounded tranche complete, 9 October 2026.** Freeze joint 30/40-digit bundles before independent confirmation; retain explicit balanced presets and runtime defaults.~~ | ~~A1~~ | ~~Fresh 30-digit SIQS reduces balanced time by 36.6%; uneven/structured regressions and small populations prevent general promotion. At 40 digits MPQS's 6.9% reduction missed its then-frozen timing gate. Wider QS exhausts fresh windows; 60–99-digit collection/useful-yield probes remain censored. R4/DLP, CRT and matrix redesign remain deferred under their triggers.~~ | ~~Sol / **high**, **xhigh** for selection~~ | ~~Bounded parameter/evidence work is complete; combined E1, larger workload feasibility and C3/G1/H1 policy calibration remain separate gates.~~ |
 | ~~B2 — P5.2 paired continuation~~ | ~~Bounded reusable ± execution and aligned-wheel follow-up, independent coverage/point/replay/resume checks, D/table comparisons and finite predeclared campaign continuation.~~ | ~~A2, A3; A6 remains required for increased-B1 extensions.~~ | ~~**[x] Complete for bounded scope on 9 October 2026.** Both pairing layouts remain opt-in: selected held-out configurations lose to reusable unpaired programs, with no completion gain. Increased B1, advanced pruning and allocation remain deferred.~~ | ~~Astra / **xhigh**~~ | ~~Exact coverage, projective products, saturation recovery, finite accounting and canonical int/GMP resume agree; frozen experiments support retaining defaults.~~ |
-| B3 — P4.1 production chains | Route verified records into actual bounded ECM stage-one jobs, including chunk replay, finite caches and ladder fallback; compare whole-stage costs. | A2, A3, A4 | **Medium/high potential.** Verified chains cannot help while production still calls only the ladder. Backend and program contracts make this a controlled execution change rather than an orphan helper optimization. | Sol / **xhigh** | Sol fits production integration once chain mathematics is independently verified. xhigh is for routing the records through real stage jobs while preserving work charges, replay, caches and fallback behavior. |
+| ~~B3 — P4.1 production chains~~ | ~~Route C6 records through bounded ECM chunks, finite plans, recovery and schema-10 resume; measure fresh/reused and complete portfolios.~~ | ~~A2, A3, A4; accepted C6/B4~~ | **[x] Bounded integration/decision complete, 9 October 2026.** Explicit 40–80-digit reuse routes native PRAC and separate GMP Lucas at B1=2,000/chunk16/tier >=8. Defaults retain B4; full native gains are not promoted. [Acceptance and limitations](#b3-production-integration-acceptance-9-october-2026). | Sol / **xhigh** | Charged verification/recovery, finite simultaneous ownership and independently validated resume; wider allocation/default decisions remain C3/E1. |
 | ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | ~~A2~~ | ~~**[x] Complete and integrated, 9 October 2026.** Native selected reductions pass the frozen production bridge: 6.79% saving (95% interval 5.82–13.58%), 27/27 matching outcomes/work. Retain readable GMP: its whole-ladder bridge is inconclusive. Five-candidate study, research, proofs, independent controls and fresh confirmation are complete; broader production bounds remain unclaimed. See [integration evidence](benchmarks/README.md#b4-production-integration-protocol).~~ | ~~Sol / **xhigh**; Astra for unresolved formula proofs~~ | ~~Bounded formula, normalization, intermediate-width and backend checks completed. No reducer, backend or curve-family expansion.~~ |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
@@ -312,7 +312,7 @@ implementations complete.
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
-| ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 integration remains open.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
+| ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 
 If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
@@ -456,7 +456,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    CHAIN --> SEARCH[C6/P4.5: verified reusable candidate, B3 integration open]
+    CHAIN --> SEARCH[C6/P4.5: verified reusable candidate, B3 bounded integration accepted]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -2005,8 +2005,8 @@ input size and target factor size are reported separately; unresolved
 composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
 initial bounded P4.5/C6 comparison retains the ladder. Its completed optimized
-follow-up supplies verified reusable candidates; B3 production integration
-remains open.
+follow-up supplies verified reusable candidates; the subsequent B3 bounded
+integration decision appears below.
 
 **Research decision:** use ordinary bounded PRAC first. The
 [GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
@@ -2047,12 +2047,47 @@ prime-power chains over composite moduli, retaining nonunit/factor information
 and charging finite exceptional recovery. GMP-ECM's chain generator is a
 reference; abstract M/S counts need measured PyPy costs.
 
-- [ ] Route verified chain execution into the actual bounded stage-one path:
-  A4 now connects `multiply_prac` to verified execution; stage jobs still
-  call `scalar_multiply` directly. Compile small prime/prime-power chain records
-  into bounded composed programs; retain chunk-start replay and factor/nonunit
-  handling. Do not search near-optimal chains for an enormous full-lcm scalar
-  online. Measure chain/schedule amortization across the sub-100 workload.
+- [x] B3 routes verified prime/prime-power records through bounded stage-one
+  chunks with finite ownership, saved-chunk replay and validated nonunits.
+  The acceptance below records charged construction, backend-specific break-even
+  and retained defaults. No enormous full-lcm chain search is performed.
+
+
+#### B3 production integration acceptance (9 October 2026)
+
+- [x] Route independently certified C6 native reduced PRAC/batch16 and separate
+  GMP tuple Lucas/batch16 through actual bounded stage-one jobs. Keep B4 for
+  unsupported bounds/sizes/chunks/short tiers and all defaults; explicit reuse
+  supports B1=2,000, chunk16, >=8-curve tiers and 40–80-digit cofactors.
+- [x] Own finite run-local plans, charged preparation/verification/hits/misses,
+  eviction before replacement, simultaneous scratch and whole-chunk strict/
+  prime-unit recovery reservations. Preserve saturated mixed-factor recovery,
+  durable replay, cancellation, cumulative allowances and recursive sharing.
+- [x] Pin schema-10 routing/catalog/backend/recovery identities; independently
+  validate consumed prime prefixes, powers, chunk counters, canonical points
+  and replay positions. Resume rebuilds an empty cache at charged cost.
+  Chains-off schemas 2–9 and bidirectional committed-mainline resume survive.
+- [x] Freeze mainline controls, certified training/untouched cohorts and seeds
+  before measurements. Initial capped full-run gains fail the equal-search
+  audit; retain captures. Separately freeze the narrower route and new untouched
+  inputs, use common eight-curve coverage and a common certified pause prefix,
+  and report setup/recovery/failed-search/reconstruction costs on both backends.
+- [x] Run >=3 seconds validated PyPy3.11 warmup and >=9 samples, extend unstable
+  measurements under the frozen rules, serialize A7/C1 with the machine lock,
+  and separate cold startup. Apply the revised positive-interval policy.
+- [x] Pass 499 tests/full lint plus committed-files-only tests, benchmark imports
+  and required catalog loading. Publish only concise summaries and required
+  inputs; preserve raw evidence locally and leave v1/history untouched.
+
+The [B3 measurements](benchmarks/README.md#b3-production-praclucas-integration-9-october-2026)
+show native stage preparation breaking even at eight curves and further gains
+at sixteen. Full native portfolio/default promotion is unsupported; equal-prefix
+resume rebuilding can erase reuse benefits. Separate GMP results do not transfer
+to integers. [The new proof obligation](benchmarks/b3_research.md#integration-proof-obligation)
+is chunk composition and atomic publication of existing C6 factor coverage,
+not a new arithmetic formula. This closes the bounded integration and measured
+retain/promote decisions. Wider bounds/sizes, allocation, defaults and same-curve
+B1 extension remain separate C3/E1/later gates; no new chain search is required.
 
 ### P4.2 — Compare fused and normalized Montgomery kernels
 

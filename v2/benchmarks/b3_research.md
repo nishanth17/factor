@@ -118,3 +118,30 @@ uncertainty rules; no result informed this correction.
 The final pre-timing v3 freeze also replaces two equivalent complex slice
 endpoints with named indices to satisfy both Ruff and pycodestyle. v1/v2
 remain unchanged; no timing capture or candidate selection preceded v3.
+
+## Production decision and equal-schedule follow-up
+
+The initial source freeze is `0e10221`; all primary timing captures use it.
+Those stage-only balanced 40–80-digit runs establish preparation break-even,
+not complete-factorization promotion. The initial 2,000,000-unit full runs
+are ineligible for equal-search speed claims: conservative chain reservations
+stop later unsuccessful curves while the ladder completes all eight. Their
+statistical `accepted` flags alone are insufficient and are overridden by
+this accounting audit.
+
+The final source freeze is `b9005b2`. Initial recursive diagnostics justified
+narrowing routing to the existing C6 40–80-digit input band, with no new chain,
+kernel or search. The separate [follow-up protocol](inputs/controls/b3_coverage_protocol.json)
+freezes that change, eight million units for both arms, identical time/RAM
+caps and a new untouched certified confirmation corpus before timing.
+Every unresolved full run must exhaust exactly eight root curves; the
+resume comparison cancels both arms after the same certified 16-prime chunk,
+then charges JSON, independent validation and fresh plan reconstruction.
+Replay checkpoints also validate their bounded prime-unit index, accumulated
+prime power and canonical unit-Z replay point.
+
+The [accepted measurement summary](README.md#b3-production-praclucas-integration-9-october-2026)
+records both positive and negative decisions. The default remains off.
+Further allocation, wider bounds/input sizes and default promotion require
+separate C3/E1 evidence; neither C6's historical gain nor a stage-only gain
+establishes a whole-portfolio improvement.

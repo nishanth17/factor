@@ -2,6 +2,20 @@
 
 ## Current development
 
+- Complete B3/P4.1 bounded PRAC/Lucas production integration with an explicit
+  reuse option for B1=2,000, chunk 16, tiers of at least eight curves and
+  40–80-digit cofactors. Native reduced PRAC and separate GMP tuple Lucas
+  reuse C6 certificates; fresh/unsupported routes and all defaults retain B4.
+- Bound run-owned plans, charged preparation/verification/eviction, simultaneous
+  scratch and worst-case strict/saturated recovery. Schema 10 pins the opt-in
+  identity and charges empty-cache rebuilding; schemas 2–9 remain compatible.
+  Validate divisors, certified chunks and every unresolved reconstruction.
+- Record production break-even and fresh equal-schedule portfolio/resume
+  confirmation, including native whole-portfolio regressions and unequal-search
+  rejection of initial capped gains. Retain the native default; keep GMP
+  claims separate. See the B3 benchmark summary for intervals and limitations.
+  Final and committed-only PyPy/GMP checks pass 499 tests and full lint.
+
 - Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
   the user's explicit direction. Fresh complete stages save 9.73% CPU across
   nine matched cells; extended integer portfolio captures remain inconclusive.

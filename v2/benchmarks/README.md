@@ -5,6 +5,168 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## B3 production PRAC/Lucas integration (9 October 2026)
+
+B3 completes bounded production stage-job integration with an explicit reuse
+option; all defaults retain B4. Native reduced PRAC and separate GMP tuple
+Lucas use the existing C6 batch-16 records/certificates. No new search,
+reducer, kernel, curve family, pairing or allocation policy is introduced.
+The [research/proof and ownership record](b3_research.md) identifies the new
+composition/atomic-commit obligation, primary sources and upstream licenses.
+The [API/resume contract](../README.md#optional-bounded-praclucas-stage-one-plans)
+defines finite plan preparation, LRU ownership, recovery and schema 10.
+
+Controls are committed mainline `76f06b0`, frozen as all 44 production source
+modules in [b3_mainline.json](inputs/baselines/b3_mainline.json). Initial
+candidate `0e10221` uses [protocol v3](inputs/controls/b3_protocol_v3.json)
+and [certified training/confirmation inputs](inputs/corpora/b3_corpus.json).
+Preflight protocols v1/v2 are preserved; no timings preceded v3. Independent
+Pocklington/Lucas certificates establish input truth, not runtime proof labels.
+Both arms use B1=2,000, B2=147,396, identical curves/seeds, 20-second wall/CPU
+caps, 32 MiB logical workspace, 256 KiB packed programs and 8 MiB chain reserve
+where enabled. Setup, misses, verification, recovery, failed curves and output
+validation are timed. Affine stage targets are independently computed before
+warmup and validated inside each timed observation. Output reconstruction
+includes every unresolved cofactor.
+
+PyPy 7.3.23 implementing Python 3.11.15, with GMP as a separate track, ran
+counterbalanced paired observations under the machine-wide performance lock.
+Each arm has at least three seconds of validated warmup and nine samples;
+the frozen extensions are 5 seconds/18 and 8 seconds/27 for >15% relative IQR.
+Native fresh training extended to 27; the final native resume confirmation
+extended to 18 after instability. Other final groups use nine stable samples. Paired median 95% bootstrap intervals use 4,000 resamples
+and seed 193001. CPU and both chronological halves must also improve, with
+zero correctness failures and at most 5 percentage points completion loss per
+fixture. No universal 10% floor is applied. Absolute timings vary across
+workers on this unpinned macOS machine; compare paired arms, not historical
+C6 times or unrelated worker medians. Intervals describe repeated frozen-cohort timings, not the population of all
+40–80-digit inputs. No instrumented profile supplies timing evidence. A7/C1 heavy checks and accepted timings were serialized.
+
+Initial **complete stage-one campaign** savings include a fresh plan for each
+fixture/seed campaign, verification and point checks. Positive is faster;
+brackets are confirmation 95% intervals. Eviction alternates 2000/1999/2000
+at the minimum cap and is a low-level stress outside public routing.
+
+| Scope | Native training | Native confirmation | GMP training | GMP confirmation |
+| --- | ---: | ---: | ---: | ---: |
+| fresh1 | -57.63% | -42.90% [-51.35%, -8.46%] | +1.18% | +2.62% [+2.25%, +3.47%] |
+| reuse2 | -25.50% | -25.17% [-27.39%, -11.97%] | +7.72% | +7.27% [+4.08%, +9.92%] |
+| reuse4 | -8.01% | -6.74% [-8.16%, -0.67%] | +13.56% | +11.67% [+9.36%, +12.22%] |
+| reuse8 | +2.23% | +1.26% [+1.08%, +6.42%] | +13.72% | +13.20% [+10.40%, +18.42%] |
+| reuse16 | +6.94% | +6.31% [+5.41%, +7.04%] | +14.80% | +14.14% [+12.20%, +15.53%] |
+| eviction | -52.41% | -54.52% [-57.05%, -51.98%] | -1.41% | -1.14% [-5.17%, -0.44%] |
+
+Native preparation breaks even at eight curves in these balanced-stage
+cohorts, rather than at one or four; sixteen curves amortize it further.
+GMP improves from two curves, but the public route conservatively retains
+one shared eight-curve threshold. Fresh GMP training is inconclusive, so
+its positive confirmation point estimate does not promote fresh construction.
+Eviction/misses destroy native amortization. Existing defaults and short tiers
+retain the ladder. Early factor discoveries can still make a planned reused
+campaign pay construction without reaching break-even.
+
+The initial equal-cap 2,000,000-unit portfolio/resume captures **cannot support
+an equal-search engine speed claim**. Ten unresolved balanced rows stop at the
+chain work cap while ladder rows finish all eight curves. Completion remains
+14/24, masking lost unsuccessful search. Preserve those captures, including
+their purely statistical flags, as diagnostics; do not promote their apparent
+GMP or resume gains.
+
+The accounting follow-up freezes final route `b9005b2`,
+[its protocol](inputs/controls/b3_coverage_protocol.json) and a
+[new untouched twelve-input corpus](inputs/corpora/b3_coverage_confirmation.json).
+It narrows input sizes to C6's 40–80-digit band based on initial small-recursive
+construction losses. It changes no chain candidate or eight-curve threshold.
+Training reuses its original corpus/seeds; confirmation uses generation seed
+108841 and run seeds 62677/70596. Both arms receive 8,000,000 units with all
+other caps unchanged. Every unresolved result must exhaust exactly eight root
+curves. The common-prefix resume diagnostic cancels both arms after the first
+certified 16-prime chunk, JSON-roundtrips the checkpoint and charges rebuilding;
+it runs the ten balanced input/seed cases rather than shifting pause positions
+under different work currencies.
+
+| Final matched schedule | Training saving [95% CI] | Fresh confirmation saving [95% CI] | Confirmation control / candidate median | Decision |
+| --- | ---: | ---: | ---: | --- |
+| portfolio, python-int | -1.68% [-4.43%, -1.12%] | -2.63% [-3.35%, -1.23%] | 2.8920 / 2.9681 s | retain baseline performance decision |
+| portfolio, gmpy2-mpz | +4.11% [+3.36%, +7.03%] | +4.13% [+1.49%, +5.92%] | 8.8620 / 8.4727 s | positive in both cohorts |
+| resume_equal, python-int | -1.52% [-2.84%, +0.55%] | -1.85% [-2.49%, -0.63%] | 1.2143 / 1.2345 s | retain baseline performance decision |
+| resume_equal, gmpy2-mpz | +3.53% [+2.47%, +5.56%] | +4.14% [+2.17%, +5.56%] | 3.7094 / 3.5697 s | positive in both cohorts |
+
+Full portfolios complete 14/24 input/seed cases in both arms; common-prefix
+resumes complete 0/10 balanced cases and retain all ten unresolved inputs.
+There is no completion regression in any declared fixture. Every full run,
+split, certificate target and resumed reconstruction validates. Native
+whole-portfolio/default promotion remains unsupported; stage-only gains are
+not a substitute. Equal-prefix resume may lose the amortization after a new
+miss. GMP decisions remain separate and limited to the reported scope.
+
+Per-fixture final full-portfolio confirmation: medians sum both seeds inside
+each cohort. Parentheses show descriptive time savings, with no per-row
+confidence claim. Completion is identical for native/GMP arms.
+
+| Fixture | Native control / candidate | GMP control / candidate | Complete control / candidate |
+| --- | ---: | ---: | ---: |
+| balanced_40d | 0.4066 / 0.4150 (-2.06%) | 1.4229 / 1.3551 (+4.76%) | 0 / 0% |
+| balanced_50d | 0.4232 / 0.4433 (-4.76%) | 1.4285 / 1.3653 (+4.43%) | 0 / 0% |
+| balanced_60d | 0.4803 / 0.4893 (-1.89%) | 1.4656 / 1.3915 (+5.05%) | 0 / 0% |
+| balanced_70d | 0.4846 / 0.4846 (+0.01%) | 1.4679 / 1.3866 (+5.54%) | 0 / 0% |
+| balanced_80d | 0.5541 / 0.5519 (+0.40%) | 1.4758 / 1.4272 (+3.30%) | 0 / 0% |
+| recursive_0 | 0.0052 / 0.0057 (-9.57%) | 0.0245 / 0.0245 (-0.25%) | 100 / 100% |
+| recursive_1 | 0.0654 / 0.0667 (-1.92%) | 0.2446 / 0.2425 (+0.83%) | 100 / 100% |
+| small10_40d | 0.0768 / 0.0875 (-13.98%) | 0.2709 / 0.2626 (+3.09%) | 100 / 100% |
+| small10_50d | 0.1166 / 0.1225 (-5.05%) | 0.3820 / 0.3751 (+1.80%) | 100 / 100% |
+| small10_60d | 0.0790 / 0.0878 (-11.06%) | 0.2320 / 0.2274 (+1.99%) | 100 / 100% |
+| small10_70d | 0.0834 / 0.0909 (-8.96%) | 0.2240 / 0.2243 (-0.15%) | 100 / 100% |
+| small10_80d | 0.0805 / 0.0882 (-9.59%) | 0.2077 / 0.2055 (+1.04%) | 100 / 100% |
+
+Conservative simultaneous chain ownership is 4 MiB scratch plus at most
+4 MiB per retained plan; initial native/GMP misses cost 223,815/223,702 units, including
+lookup. A hit costs one. Plans are verified independently and never serialize
+curve points. Replacements evict before allocation. Failed preparation is
+charged and publishes no plan; strict and prime-unit worst-case recovery is
+reserved before each atomic chunk and unused credit is not refunded.
+Final workers peak at 94.3–118.7 MiB process RSS, including
+PyPy/JIT and both frozen/candidate modules; the 32 MiB configured bound covers
+owned algorithm workspace, not OS/JIT RSS. Resume checks the certified prefix
+and bounded replay state, then pays an empty-cache rebuild. Schemas 2–9 with
+chains off retain their shapes and bidirectional mainline resume behavior.
+
+Separate cold startup uses the immutable initial source `0e10221` and fresh1
+stage scaffold: nine new processes per arm/backend, including process launch,
+certificate/independent affine target preparation and validated execution.
+These totals are not warmed performance evidence or a final-route default claim.
+
+| Cold track | Control median | Candidate median |
+| --- | ---: | ---: |
+| python-int | 0.6417 s | 0.6712 s |
+| gmpy2-mpz | 0.8354 s | 0.8428 s |
+
+Reproduce the final matched groups from this committed checkout, one at a time
+while the machine is quiet (the runner acquires the shared lock):
+
+```sh
+v2/.venv/bin/python -B -m v2.benchmarks.b3_coverage \
+  --split confirmation --scope portfolio --backend python-int \
+  --output v2/benchmarks/results/b3/rerun-confirmation-int.json
+v2/.venv/bin/python -B -m v2.benchmarks.b3_coverage \
+  --split confirmation --scope resume_equal --backend gmpy2-mpz \
+  --output v2/benchmarks/results/b3/rerun-resume-gmp.json
+```
+
+Repeat with `--split training` and each backend/scope. Historical initial
+stage/cold runs require a committed-only archive of `0e10221` and
+`python -B -m v2.benchmarks.b3_production --scope reuse8 --split confirmation
+--backend python-int --output <new-local-result.json>`; `--cold --scope fresh1`
+selects separate startup. Historical source-pin rejection on the final route
+is intentional. Required corpora/catalogs/baselines are versioned; raw captures,
+stdout, checks, RSS records and SHA-256 manifests stay in ignored
+`benchmarks/results/b3/`, with the detailed local journal in `v2/LOG.md`.
+
+The final 499-test PyPy/GMP suite and full lint pass, including a committed-files-
+only archive with all benchmark imports and required catalog loaders. Broader
+bounds, sizes, allocation/handoff, completed-curve B1 extension and default
+promotion remain C3/E1 or later work. No merge or push accompanies this tranche.
+
 ## QS/GNFS research reconciliation (9 October 2026)
 
 The [source-linked comparison](qs_gnfs_research.md) pins 11 repositories and
