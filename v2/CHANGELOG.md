@@ -2,16 +2,18 @@
 
 ## B4 production integration — 9 October 2026
 
-- Promote native selected reductions and separate GMP fused whole-ladder
-  arithmetic behind the existing scalar API, with one representation check
-  per action. Preserve readable point formulas, exact a24 convention and
+- Promote native selected reductions behind the existing scalar API:
+  production confirmation saves 6.79% (paired 95% interval 5.82–13.58%).
+  Retain the readable GMP baseline because its whole-ladder bridge interval
+  crosses zero. Preserve readable point formulas, exact a24 convention and
   canonical X:Z results; add no production inversion or normalized state.
 - Preserve seeds, work accounting, finite cancellation/recovery and checkpoint
-  formats. Extend existing independent arithmetic/resume tests to production.
-  Freeze the final source delta for a matched bridge against mainline; retain
-  earlier source controls and versioned corpora unchanged.
-- Keep production integration validation, mainline receipt and user-requested
-  worktree/temp cleanup in the benchmark acceptance record.
+  formats. Extend independent arithmetic and old/new resume tests to production.
+  Keep the measured native helper unchanged after the GMP rollback; its AST
+  matches the frozen bridge and the GMP loop matches the original baseline.
+- Complete the bounded B4 entry. Keep final acceptance, mainline integration
+  and user-requested worktree/temp cleanup in the benchmark record; preserve
+  required versioned corpora and all historical frozen controls.
 
 ## Requested fresh B4 bakeoff — 9 October 2026
 

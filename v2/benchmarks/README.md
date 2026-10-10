@@ -2275,41 +2275,77 @@ queued C6 then A6 follow-ups; no further B4 timings or heavy checks are planned.
 
 ### B4 production integration protocol
 
-The user subsequently requested integration into mainline and deletion of
-B4 worktree/temp state. Promote only native selected reductions and separate
-GMP whole-ladder fusion. Keep the binary schedule, readable `point_add` and
-`point_double` oracles, all stage jobs/budgets and checkpoint formats. Dispatch
-once per scalar entry from the modulus representation. Production uses the
-readable doubling for its initial adjacent point; the frozen experiments
-used the algebraically identical explicit square there. No normalization,
-reducer, curve or backend-selection change is part of integration.
+The user subsequently requested mainline integration and deletion of B4's
+worktree/temp state. Freeze `4a44c67` tests the native selected-reduction
+adapter and separate GMP whole-ladder adapter. Keep the binary schedule,
+readable `point_add`/`point_double` oracles, stage jobs/budgets and checkpoint
+formats. Dispatch once per scalar entry from the modulus representation.
+The adapter uses readable doubling for its initial adjacent point; the
+experiments used the algebraically identical explicit square there. No
+normalization, reducer, curve or backend-selection change enters production.
 
-`b4_integration.py` freezes the actual production ECM source as a small
-versioned delta over the complete immutable mainline package. All remaining
-production source must match that package. The `--current` check verifies
-this identity before/after accepted timing and during committed-only
-acceptance. Historical reruns reconstruct the frozen package, independent
-of later production edits. The old B4 freezes remain byte-identical.
+`b4_integration.py` freezes that two-adapter trial as a small versioned ECM
+delta over the complete immutable mainline package. All remaining production
+source matches that package. `--current` verified this identity before/after
+accepted timing. The final native-only source intentionally differs after
+rolling back the inconclusive GMP adapter; historical reruns omit `--current`
+and reconstruct the immutable trial. Earlier B4 freezes remain byte-identical.
 
-Compare frozen mainline against the final production source with the fresh
-bakeoff's confirmation cohort, bounds, seeds and finite allowances. This is
-a production-source bridge on already inspected inputs, not another
-independent-input claim. Reuse the frozen process-block design: at least
-three seconds validated warmup, nine matched samples, counterbalanced arm
-orders and alternating backends; extend only unstable pairs to 27/63 with
-five/eight-second warmups. Require identical outcomes/work, the declared
-IQR rule, positive paired timing interval/CPU effect and positive effects
-in both chronological halves. A stable inconclusive result stops; no new
-candidate or tuning is added on failure. The exclusive window and existing
-600-second child / 45-minute phase caps remain enforced.
+Compare frozen mainline against that production trial with the fresh bakeoff's
+confirmation cohort, bounds, seeds and finite allowances. This bridge uses
+already inspected inputs, not a new independent-input claim. Reuse the frozen
+process-block design: at least three seconds validated warmup, nine matched
+samples, counterbalanced arms and alternating backends; extend only unstable
+pairs to 27/63 with five/eight-second warmups. Require identical outcomes/work,
+the declared relative-IQR rule, a positive paired timing interval/CPU effect,
+and positive effects in both chronological halves. A stable inconclusive
+result stops; no candidate, tuning or repeated sampling is added on failure.
+The exclusive window and 600-second child / 45-minute phase caps apply.
+
+Historical trial command (the original accepted capture used `--current`):
 
 ```sh
-v2/.venv/bin/python -B -u -m v2.benchmarks.b4_integration --current \
+v2/.venv/bin/python -B -u -m v2.benchmarks.b4_integration \
   --output v2/benchmarks/results/b4/production-bridge.json
 ```
 
-Required production delta and freeze live under versioned `inputs/`.
-Run full tests/lint and committed-only benchmark imports/loaders before
-merging B4. Delete task-owned ignored captures/checkouts with the managed
-worktree after integration, as explicitly requested; preserve required
-versioned controls/corpora and other chats' worktrees, runtimes and locks.
+| Backend / trial adapter | Baseline median cohort seconds | Trial median cohort seconds | Paired complete-run saving / 95% interval | Decision |
+| --- | ---: | ---: | --- | --- |
+| native / selected reductions | 0.372593 | 0.344879 | **6.79% [5.82, 13.58]** | **Integrate** |
+| GMP / whole ladder | 0.787541 | 0.792392 | **4.89% [-4.69, 7.76]** | **Retain readable baseline** |
+
+These are medians of paired block reductions; ratios of the two marginal
+medians need not equal them. Both comparisons pass the variability rule with
+nine blocks (36 process captures total), and all arms complete 27/27 with
+identical factors, certainty and work. Minimum validated warmup is 3.023s.
+Native CPU saving is 6.62%; its chronological halves save 7.22% and 6.32%.
+GMP's positive point estimate is inconclusive, so its failure stops this arm
+without an instability extension. The two-adapter report's overall acceptance
+is false; only native passes. Small classes remain noisy, including native
+power controls and GMP power regressions. No universal size/class gain follows.
+
+Final production keeps `_ladder_reduced` byte/AST-identical to the measured
+native helper. The public entry AST differs only in its docstring and the
+GMP-only dispatch target, which the native path never executes. The retained
+GMP loop AST matches the original readable baseline exactly. Independent
+affine/composite/prime-power, exact canonical-coordinate, degenerate-state,
+nonunit/recovery and bidirectional old/new checkpoint tests exercise actual
+production. Cross-product equality alone is not the oracle. No API, seed,
+work ledger, checkpoint schema, saturation recovery or cancellation change.
+
+This additional bridge supports the bounded native integration; it does not
+reopen candidate selection or establish large-factor/campaign behavior.
+Original instrumented component shares and ceilings remain scoped to their
+original controls; no new profile, cold-start or broad backend study is claimed.
+PyPy 7.3.23 implements Python 3.11.15; the separate GMP trial uses gmpy2 2.3.1 /
+GMP 6.3.0. All timings ran within the agreed machine-wide exclusive B4 slot.
+
+Raw bridge SHA-256:
+`efe6aeb94d63b5ef6413ace1beb821fef8d5b18b973ce810f0567e32b2dbaf4c`.
+Required trial delta, freeze and certified inputs remain versioned. Final
+committed-files-only checks and mainline/cleanup receipt follow below.
+The user's subsequent deletion request supersedes earlier raw-capture/local
+checkout retention notes: B4's ignored captures and verification checkouts
+will be deleted with its managed worktree, preserving shared runtimes/locks
+and other worktrees. This leaves the concise summaries and immutable rerun
+controls, not the historical raw sample arrays.

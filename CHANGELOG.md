@@ -2,15 +2,17 @@
 
 ## Current development
 
-- Integrate B4's confirmed native selected reductions and separate GMP
-  whole-ladder fusion into the production binary ladder. Select once per
-  scalar action; retain readable point formulas and the exact `(A+2)/4`
-  squared-difference convention. Preserve public APIs, native defaults,
-  canonical coordinates, work/cancellation/recovery and checkpoint formats.
-- Extend independent field/composite/prime-power controls to production and
-  test old/new resume in both directions. Freeze the production source delta
-  and matched complete-factoring bridge before timing. Integration acceptance
-  and cleanup receipts follow in the benchmark record.
+- Integrate B4's native selected-reduction ladder, confirmed at 6.79%
+  complete-run saving (paired 95% interval 5.82–13.58%) in the frozen
+  production bridge. Retain readable GMP arithmetic: whole-ladder fusion's
+  bridge interval crosses zero. Select once per scalar action; preserve
+  readable point formulas, exact `(A+2)/4` squared-difference convention,
+  public APIs, native defaults, canonical coordinates and checkpoint formats.
+- Extend independent field/composite/prime-power and bidirectional resume
+  controls to production. Preserve finite work, cancellation and saturation
+  recovery. Complete the bounded B4 roadmap entry; retain immutable research,
+  source controls and certified corpora. Record final checks and the requested
+  mainline integration/worktree cleanup in the benchmark acceptance record.
 
 - Complete the requested fresh B4 bakeoff on a separately committed source,
   certified-input and sampling freeze. Reuse the same five candidates;

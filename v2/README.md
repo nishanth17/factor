@@ -605,17 +605,22 @@ frozen source control and separate cold/profile modes are described in
 ## B4 arithmetic kernels
 
 `ecm.scalar_multiply` uses the confirmed selected-reduction ladder for native
-integers and fused whole-ladder arithmetic for an mpz modulus. Representation
+integers and the readable baseline for an mpz modulus. Representation
 selection happens once per scalar action. Native integers remain the default;
 there is no new kernel selector or public factoring option.
 
-Both kernels preserve `a24=(A+2)/4` with the squared difference, exactly the
+Both paths preserve `a24=(A+2)/4` with the squared difference, exactly the
 same canonical X:Z coordinates, scalar validation and infinity shortcuts.
 The readable `point_add` and `point_double` formulas remain available as
 oracles and for stage-two recurrences. No normalization/inversion is added to
 production. Work charges, cancellation boundaries, saturation recovery and
 checkpoint schema/backend identities are unchanged. Old and new checkpoints
 resume in either engine without migration.
+
+The final production bridge confirms a native complete-run saving of 6.79%
+(paired 95% interval 5.82–13.58%) on the bounded cohort. GMP whole-ladder
+fusion is retained as an experiment: its production bridge interval crosses
+zero, so the readable GMP path remains in production.
 
 The independent affine/composite/prime-power and exact readable-formula
 controls exercise production as well as the frozen candidates. See the

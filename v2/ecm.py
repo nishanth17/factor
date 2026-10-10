@@ -1,6 +1,7 @@
 """Two-stage Montgomery ECM with modular Suyama setup and exact limits.
 
-The binary ladder uses measured native/GMP kernels and canonical X:Z exits.
+The binary ladder uses a measured native kernel and readable GMP baseline.
+Both preserve canonical X:Z exits.
 The experimental multiply_prac entry point uses bounded, verified records
 and checked recovery.
 """
@@ -108,7 +109,7 @@ def scalar_multiply(scalar, px, pz, n, a24):
     """Binary ladder with a24=(A+2)/4; scalar zero returns infinity (1:0).
 
     Select once per scalar action: early reductions for native integers,
-    fused late-reduction arithmetic for mpz. Both preserve the exact readable
+    the readable baseline for mpz. Both preserve the exact readable
     point formulas, canonical coordinates and existing work/checkpoint rules.
     """
     utils.require_integer(scalar, "scalar", 0)
@@ -122,7 +123,7 @@ def scalar_multiply(scalar, px, pz, n, a24):
         return px, pz
 
     if arithmetic.is_mpz(n):
-        return _ladder_fused(scalar, px, pz, n, a24)
+        return _ladder_readable(scalar, px, pz, n, a24)
     return _ladder_reduced(scalar, px, pz, n, a24)
 
 
@@ -157,32 +158,20 @@ def _ladder_reduced(scalar, px, pz, n, a24):
     return qx, qz
 
 
-def _ladder_fused(scalar, px, pz, n, a24):
-    """GMP kernel with a24=(A+2)/4 and BB in the doubling bracket.
-
-    Late remainders won this track; canonical inputs bound numerators below
-    20*n**5. The shared sums/differences preserve the adjacent-multiple proof.
-    """
+def _ladder_readable(scalar, px, pz, n, a24):
+    """Retained GMP baseline; a24=(A+2)/4 with the squared difference."""
+    # Q and R remain adjacent multiples, so their difference is always P.
     qx, qz = px, pz
     rx, rz = point_double(px, pz, n, a24)
+
     for bit in bin(scalar)[3:]:
         if bit == "1":
-            qx, rx, qz, rz = rx, qx, rz, qz
+            qx, qz = point_add(rx, rz, qx, qz, px, pz, n)
+            rx, rz = point_double(rx, rz, n, a24)
+        else:
+            rx, rz = point_add(qx, qz, rx, rz, px, pz, n)
+            qx, qz = point_double(qx, qz, n, a24)
 
-        total, difference = qx + qz, qx - qz
-        aa, bb = total * total, difference * difference
-        delta = aa - bb
-        u = difference * (rx + rz)
-        v = total * (rx - rz)
-        added_total, added_difference = u + v, u - v
-        qx, qz, rx, rz = (
-            aa * bb % n,
-            delta * (bb + a24 * delta) % n,
-            pz * added_total * added_total % n,
-            px * added_difference * added_difference % n,
-        )
-        if bit == "1":
-            qx, rx, qz, rz = rx, qx, rz, qz
     return qx, qz
 
 
