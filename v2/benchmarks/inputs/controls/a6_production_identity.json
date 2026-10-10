@@ -21,7 +21,7 @@
   "stage_jobs.py": "6a3e595d0f6d35826e1f12dcba70d1bed45346c7f58d79c13159e648386262a4",
   "utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
   "work_budget.py": "8ea8d0a3d84f2c39ea0b3769f4800e2cacfb1ba138be46139639eb71bbcaefae",
-  "benchmarks/a6_production.py": "f91c2df481e4dd49d9f46986c4c8011191069440573d866046549f46c529b843",
+  "benchmarks/a6_production.py": "fb4d8ed8226a0dd70375b34895d6ea7a6709c95f935d672483204ece3e278392",
   "benchmarks/inputs/controls/a6_production_protocol.json": "11aa6feed9d8ba3435b76bc70513c9853d5ebad129c23247c46f199c4c4deda1",
   "benchmarks/inputs/controls/a6_production_319d5c6/pollard_pm1.py.txt": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
   "benchmarks/inputs/controls/a6_production_319d5c6/portfolio.py.txt": "99cba5bd3f0055220286edc62ed5ac0a03694f837584ee2fcfd1a240592840b0",

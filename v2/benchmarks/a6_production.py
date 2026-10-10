@@ -104,14 +104,15 @@ def stage(arm, fixture, bounds, backend):
     job = jobs.new_job("pm1", n, 0, b1, b2)
     while not job["done"]:
         jobs.advance_job(job, ledger, context, cfg)
-    if job["factor"] is not None:
-        raise AssertionError("complete-stage fixture split unexpectedly")
+    if job["factor"] is not None and not (
+        1 < job["factor"] < n and n % job["factor"] == 0
+    ):
+        raise AssertionError("invalid stage divisor")
     return {
         "work": ledger.used,
-        "factor": None,
+        "factor": int(job["factor"]) if job["factor"] else None,
         "workspace": cfg.workspace_reserve,
         "table_entries": len(job.get("even_powers", [])),
-        "job_bytes": len(json.dumps(job, default=int)),
     }
 
 
@@ -228,6 +229,12 @@ def main():
                         )
                         for arm in arms
                     }
+                    reference = functions["control"]()["factor"]
+                    for function in functions.values():
+                        if bool(function()["factor"]) != bool(reference):
+                            raise AssertionError(
+                                "matched split outcome changed"
+                            )
                     measured = measure(functions, args.samples)
                     records.append(
                         {
