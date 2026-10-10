@@ -1096,9 +1096,13 @@ are copied and checksum-verified into ignored
 manifest and combined-check logs stay in `results/p43/`. Required corpora,
 baselines and runners are committed; generated evidence is never force-added.
 
-## C6 / P4.5 bounded Lucas study — 9 October 2026
+## C6 / P4.5 initial conservative study — 9 October 2026
 
-**Retain the ladder; accept the verified experimental candidate.** The user
+This is the initial conservative executor result. The separately frozen
+[optimized and combined B4 follow-up](c6_optimization.md) preserves these
+historical captures and reopens the executor comparison.
+
+**Historical decision: retain the ladder.** The user
 activated C6 and subsequently removed the universal 10% promotion floor.
 Even under that revised policy, every candidate loses the frozen complete-run
 comparison. No B3 production routing, checkpoint or kernel change is made.

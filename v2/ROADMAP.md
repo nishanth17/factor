@@ -158,8 +158,9 @@ integrated R2 control for the selected E1/C3 follow-ups.** B1's 9 October
 30/40-digit tranche is complete; general defaults and broader crossover gates
 remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are complete
 for their bounded tranches. A4 retains the ladder default; production chain
-routing remains B3 work. C6's bounded comparison now retains the ladder;
-new chain-search extensions remain conditional.
+routing remains B3 work. C6's conservative comparison retains the ladder;
+the user reopened optimized execution and a separate combined B4 comparison.
+The optimized screen opened the bounded CF-family search gate.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
 bounded opt-in pairing; its matched losses retain defaults, and A6 remains
 needed for increased-B1 extensions. Conditional capacity/CRT follow-ups can
@@ -451,7 +452,7 @@ flowchart TD
     FR --> DENSE[C4: other dense/hybrid/filtering]
     PROV --> DENSE
     KERN --> RED[C5: reducers if justified]
-    CHAIN --> SEARCH[C6/P4.5: bounded comparison complete, retain ladder]
+    CHAIN --> SEARCH[C6/P4.5: optimized and combined B4 confirmation]
     DENSE --> BL[D1: block Lanczos if justified]
     DENSE --> BW[D2: block Wiedemann if justified]
     R2 --> END[E1: selected-tranche integration and acceptance]
@@ -1998,8 +1999,8 @@ and optional gmpy2 on the same cases, seeds, bounds and curve limits. Total
 input size and target factor size are reported separately; unresolved
 composites are retained. This is acceptance of chain
 correctness, **not production promotion or completion of all P4.1**. The
-bounded P4.5/C6 comparison is now complete with a retain-ladder decision;
-B3 integration and any new search extension remain open.
+initial bounded P4.5/C6 comparison retains the ladder. Its optimized
+follow-up is separately frozen; B3 production integration remains open.
 
 **Research decision:** use ordinary bounded PRAC first. The
 [GMP-ECM source](https://github.com/sethtroisi/gmp-ecm/blob/main/ecm.c)
@@ -2196,7 +2197,7 @@ research, contracts and the frozen experiment scope.
   generation/load/verification, storage, dispatch, recovery, cold startup,
   full stage-one and complete two-stage campaign costs; retain unresolved
   cofactors and the ladder control. Coordinate exclusive timing windows.
-- [ ] Compare bounded/offline continued-fraction search using the 2025
+- [x] Compare bounded/offline continued-fraction search using the 2025
   Bernstein–Cottaar–Lange pruning/meet-in-the-middle work when warranted.
   Distinguish minimal length within a chain family, near-optimal search,
   weighted arithmetic cost and measured runtime; do not claim a global
@@ -2208,7 +2209,7 @@ research, contracts and the frozen experiment scope.
   samples, extending unstable captures. Promote only after complete-run
   evidence. B3 owns subsequent bounded-stage/checkpoint integration.
 
-**Bounded acceptance — 9 October 2026:** 303 pinned upstream records and
+**Initial conservative acceptance — 9 October 2026:** 303 pinned upstream records and
 all prime-power actions independently verify. Tests cover composite/nonunit,
 prime-square, saturation and the published false-infinity case; all 411 tests
 and full lint pass. Reused/fresh full stages and complete two-stage campaigns
@@ -2222,7 +2223,7 @@ The revised no-universal-percentage-floor policy is applied through an
 explicit amendment, preserving the historical frozen protocol. No candidate
 wins the complete comparison; neither abstract cost savings nor a gain over
 losing compact PRAC justifies promotion. The conditional new CF search gate
-was not opened: that unchecked task is deliberately unrun. Accept the bounded
+was not opened in that initial experiment. Accept its bounded
 research candidate, retain the ladder, and leave B3 work accounting,
 checkpoint/replay and complete-portfolio integration open.
 
@@ -2233,6 +2234,15 @@ negative result does not close optimized execution. See the [factor-coverage
 proof and new frozen comparison](benchmarks/c6_optimization.md). The old
 captures remain immutable; new acceptance requires independent recovery
 checks and fresh confirmation under the revised promotion policy.
+The common-executor screen now opens the bounded CF search gate: pinned
+upstream pruning and an independent reverse-Euclidean verifier certify
+minimum length within the CF family for primes <=2,000. Three-point
+execution and the common tuple executor are compared; weighted cost and
+measured runtime remain separate. No global optimum, larger search or
+meet-in-the-middle run is claimed. A separately pinned B4 control and
+reduced/fused experimental kernels are frozen before heldout confirmation.
+All 431 PyPy/GMP tests and full lint pass; complete-run acceptance remains
+pending that confirmation and construction/cold-cost accounting.
 
 ## Phase 5 — Complementary methods and stronger continuations
 

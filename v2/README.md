@@ -106,6 +106,14 @@ These APIs do not provide a portfolio work ledger, cancellation checkpoint or
 serialized resume format. B3 must reserve whole-block execution and bounded
 replay work before integrating them.
 
+`benchmarks.c6_b4` additionally pins the committed B4 ECM control in an
+isolated module and supplies exact-residue early-reduction kernels and a
+bounded independent D/A fusion pass. `build_program(family, mode, backend,
+batch)` fixes B1=2,000 and accepts PRAC, Lucas or CF with `late`, `reduced` or
+`fused` execution. It preserves the same guard/replay contract; the native
+combined experiment does not modify production modules or checkpoint state.
+Cold and reused programs have different measured costs and adoption scope.
+
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
 validated checkpoints. Later work adds exact relation provenance, shared SIQS

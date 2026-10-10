@@ -15,6 +15,13 @@ profile assigning time to individual operations. The earlier study establishes
 that the conservative implementation loses; it does not isolate arithmetic
 quality from that safety-policy cost.
 
+The pinned GMP-ECM [top-level README, section 8](https://github.com/sethtroisi/gmp-ecm/blob/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e/README)
+describes precomputed near-optimal codes as an optional `-param 0` stage-one
+path replacing PRAC for primes >=11. It is not a promise that every GMP-ECM
+configuration always uses that path. Its native dispatch and arithmetic
+selection also differ from this Python/GMP-wrapper implementation. The
+common-executor experiment separates chain quality from these costs.
+
 ## Exact factor-coverage certificate
 
 Write a point as `(X,Z)`. All expressions below are modulo the odd modulus n.
@@ -162,6 +169,31 @@ factors, overwritten points, final scalar and finite strict recovery remain
 covered. Three persistent working points exclude the saved block/recovery
 point, scalar guard accumulator and arithmetic temporaries.
 
+## CF search and common-executor screen results
+
+The first bounded upstream search used 239,243 nodes; independent reverse
+verification used 1,923,503 nodes. The initial fresh search process took
+0.119 seconds and independent verification 0.056 seconds; repeated generation
+costs are reported separately below. The generated output is pinned at SHA-256
+`ad3b413d76675158d4ccd7d7604a22a2c21d6aa1e4f5cb185c7fc818ebd1c2d0`.
+The 303 prime records compose into 333 independently certified prime-power
+records. No search is performed during a factoring attempt.
+
+All twelve CF-screen groups settled at nine samples. The frozen choices are
+`tuple/16` for int, ratio 0.867 [0.865, 0.874], and `tuple/64` for GMP,
+0.875 [0.833, 0.887], against the original ladder. The distinct three-point
+executor did not win the prespecified within-1% simplicity rule. These are
+training-stage results. The raw capture hash is
+`21d63d361d3764c7b11fdc8b2d1de98afdbb637a397a9c390d9b4f7677f883ee`.
+
+CF uses 3,982 additions and 333 doublings per stage, 4,315 operations total.
+GMP-ECM Lucas uses 3,437 additions and 864 doublings, 4,301 operations total.
+Under the illustrative 6A+5D weighting, CF costs 25,557 versus 24,942, or 2.47%
+more. This weighting is not a calibrated PyPy cost model. Exact minimality
+within CF therefore supplies no arithmetic or runtime dominance over Lucas.
+No larger search, meet-in-the-middle table or full-lcm search is justified by
+this bounded chain-quality comparison.
+
 ## Combined B4 comparison, frozen before confirmation
 
 The user's newly integrated B4 control is pinned separately at `a521573`
@@ -199,3 +231,114 @@ capture compile roots and abort reasons, not every inlined function, and
 instrumented times are not acceptance evidence. GMP inline tracing reports
 `ABORT_TOO_LONG`; this is diagnostic evidence, not proof of the entire cost
 breakdown. See [PyPy's JIT-hook documentation](https://doc.pypy.org/jit-hooks.html).
+
+The combined screen finishes all twenty groups; two instability extensions
+use eighteen samples and all final captures pass the frozen spread rule.
+The raw capture hash is
+`5eaad3a29bf287358769e3dc1cc21503d442c50ab619dcac3c9e69504ece2c41`.
+Commit `8ba1d60` freezes the following choices before heldout timing:
+
+| Family | Chosen kernel / batch | Training ratio to B4 (95% interval) |
+| --- | --- | --- |
+| PRAC | reduced / 16 | 0.900 [0.890, 0.902] |
+| GMP-ECM Lucas | reduced / 64 | 0.888 [0.879, 0.904] |
+| CF | fused / 64 | 0.876 [0.847, 0.900] |
+
+The full PyPy/GMP suite passes 431 tests and full lint. The initial lint run
+found a formatter/pycodestyle slice disagreement in the report utility; an
+explicit midpoint variable resolves it. No timed source changed. Neither
+the screen nor the correctness pass closes B3's production acceptance gates.
+
+## Reproduction and accounting
+
+Use a GMP-enabled PyPy implementing Python 3.11, the committed inputs and
+new output paths. Coordinate the entire sequence with other experiment
+owners; each parent runner takes the shared lock and checks for competing
+benchmark/test interpreters. Training selections are already frozen; never
+regenerate or replace them after viewing confirmation results.
+
+```sh
+v2/.venv/bin/python -B -u -m v2.benchmarks.c6_fast_study --confirmation --scope stage_reuse --output v2/benchmarks/results/c6-fast/fast-stage-reuse-new.json
+v2/.venv/bin/python -B -u -m v2.benchmarks.c6_cf_study --confirmation --scope stage_reuse --output v2/benchmarks/results/c6-fast/cf-stage-reuse-new.json
+v2/.venv/bin/python -B -u -m v2.benchmarks.c6_b4_study --confirmation --scope stage_reuse --output v2/benchmarks/results/c6-fast/b4-stage-reuse-new.json
+```
+
+Repeat each runner for `stage_fresh`, `campaign_reuse`, and `campaign_fresh`.
+A stage cohort has ten one-curve attempts; a campaign cohort has twenty
+complete bounded two-stage ECM attempts, including failures. These are not
+recursive portfolio factorizations. The ten certified heldout composites
+are distinct from training, with seeds 56839/64758. Input sizes are
+40/50/60/70/80 digits; target factors are 10 digits or 20/25/30/35/40 digits.
+Each attempt has B1=2,000, B2=147,396, eight curves and twenty seconds wall/CPU.
+Balanced cases intentionally test feasible failures, not balanced-80 success.
+
+Reuse means one verified program is owned across the cohort; its construction
+is separately reported. Fresh means construct/load/verify once per attempt,
+inside its timer, then reuse across that attempt's curves. Timed work includes
+conversion, setup, dispatch, intermediate guards, recovery and result
+validation. Stage outputs are also compared with independently precomputed
+affine targets inside the timed attempt. Certificate checking and computing
+the affine targets happen before warmed timing and are included in fresh
+process totals. Import/startup and instrumented profiles remain separate.
+
+`c6_fast_costs` repeats bounded CF generation nine times and measures catalog
+precomputation, load/verification, construction and identical-arithmetic
+compact/ring/three-point layouts. `c6_b4_costs` measures the combined choices.
+Use `--confirmation --scope stage_fresh --cold` with each study runner for
+nine fresh processes per selected arm and control. `--profiles --scope
+stage_reuse` produces separate profile files. `c6_fast_report` validates every
+factor/cofactor again and reports repeat-timing intervals, CPU, seeds,
+chronological halves, each input-size/shape class, completion and unresolved
+values. Repeated timing samples do not create new independent factor trials.
+
+## Additional research boundary
+
+Neill Clift's author-maintained [Lucas-chain notes](https://additionchains.com/Lucas.html)
+report extensive length-table enumeration and a corrected integer-overflow
+pruning bug. This is an additional primary technical-blog lead, not an
+independently certified catalog for this experiment. No multi-gigabyte table,
+unspecified-license search implementation or claimed general optimum is
+imported. Its claims do not replace the explicit CF-family proof above.
+The blog and the GMP-ECM maintainer discussion reinforce the need to verify
+pruning assumptions and integer overflow separately from successful sample
+chains. The literature/software inspection is bounded, not a claim to have
+audited every differential-chain implementation.
+
+## Reusable contract for B3
+
+The candidate is a program of independently certified scalar records, not a
+replacement for a production stage job. B3 can build on the following explicit
+boundary without importing the research runner's signal timers:
+
+- Own immutable verified records per bounded schedule and backend; never cache
+  curve points globally. Identity must cover the scalar schedule, record and
+  guard digests, interpreter/kernel version and batch policy. A catalog is
+  data requiring verification, not trusted executable code.
+- Reserve an entire block's fast arithmetic, guard multiplications/GCD and
+  worst-case strict replay before starting it. Retain one original block
+  point. The research counters describe executed recovery; they are not the
+  current portfolio's scalar-bit work currency and cannot replace its ledger.
+- Commit a stage cursor and point only after the aggregate certifies the block
+  or strict replay produces a valid continuation. A pending unchecked point
+  is not a checkpoint. On nonunit aggregates, replay the exact saved block
+  once; preserve a proper factor even when the aggregate itself is n.
+- Preserve cancellation/time checks at a documented finite block boundary,
+  cumulative allowances, curve/RNG identity and unresolved cofactors. Reject
+  incompatible program/checkpoint identities; use an intentional new state
+  version rather than reinterpreting an existing ladder checkpoint.
+- This API computes a fresh M(B1) stage. Applying it to an already completed
+  stage multiplies by M(B1) again; increased-B1 continuation requires the
+  exact schedule ratio and its separately verified multiplicities. Coordinate
+  that contract with A6; this study implements no ECM bound continuation.
+- Keep construction and verification charged on cache misses and resumed
+  reconstruction. Bound retained programs and metadata explicitly. Reduced
+  execution retains at most two bounded decoded-operation tuples per action;
+  fusion adds at most one plan row per original operation. Shared immutable
+  records are not duplicated curve states. Serialized code/mask byte counts
+  and process RSS are reported separately from Python object memory.
+- Recheck complete recursive portfolio behavior against integrated B4 with
+  real work reservations and checkpoint/resume enabled. This study's complete
+  two-stage ECM attempts establish only the documented candidate scope.
+
+No source or result here changes production defaults, portfolios or checkpoint
+formats. The C6 branch remains separate and unmerged.
