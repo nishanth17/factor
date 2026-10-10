@@ -63,6 +63,15 @@ class ProductionChainTests(unittest.TestCase):
             "prac", "reduced", PYTHON_BACKEND, 16
         )
 
+    @staticmethod
+    def lazy_control():
+        """Load the unpromoted recovery/resume candidate."""
+        from v2.benchmarks import b3_recovery
+
+        path = b3_recovery.EAGER.with_name("b3_lazy_chains.json")
+        with patch.object(b3_recovery, "EAGER", path):
+            return b3_recovery.eager_module()
+
     def test_all_records_retain_independent_scalar_and_factor_coverage(self):
         for prime, (power, action, unit, _) in self.native.entries.items():
             self.assertEqual(action.record.scalar, power)
@@ -129,10 +138,11 @@ class ProductionChainTests(unittest.TestCase):
         self.assertEqual(divisor, 5)
         self.assertTrue(replayed)
 
-    def test_strict_preparation_is_lazy_reserved_and_cached(self):
+    def test_frozen_lazy_preparation_is_reserved_and_cached(self):
         budget = allowance()
-        with patch("v2.ecm_chains.Executor", wraps=Executor) as prepare:
-            plan = ChainPlan(2000, "python-int", budget)
+        lazy = self.lazy_control()
+        with patch.object(lazy, "Executor", wraps=Executor) as prepare:
+            plan = lazy.ChainPlan(2000, "python-int", budget)
             self.assertEqual(budget.used, 223814)
             self.assertEqual(prepare.call_count, 0)
             actions = {
@@ -295,31 +305,30 @@ class ProductionChainTests(unittest.TestCase):
         self.assertEqual(restored.result.reconstruct(), n)
 
     def test_eager_and_lazy_checkpoint_rebuilding_is_bidirectional(self):
-        from v2.benchmarks.b3_recovery import eager_module, selected
+        from v2.benchmarks.b3_recovery import selected
 
-        eager = eager_module()
+        lazy = self.lazy_control()
         config = configuration()
         n = 6120168563605791616423380424731852610871
-        with selected(eager.ChainPlans):
-            old_partial = factorize_bounded(
-                n, seed=19, config=config, budget=allowance(250000)
-            )
-        new_partial = factorize_bounded(
+        old_partial = factorize_bounded(
             n, seed=19, config=config, budget=allowance(250000)
         )
-        restored = factorize_bounded(
-            n,
-            checkpoint=old_partial.checkpoint,
-            config=config,
-            budget=allowance(),
-        )
-        with selected(eager.ChainPlans):
-            old_restored = factorize_bounded(
+        with selected(lazy.ChainPlans):
+            new_partial = factorize_bounded(
+                n, seed=19, config=config, budget=allowance(250000)
+            )
+            restored = factorize_bounded(
                 n,
-                checkpoint=new_partial.checkpoint,
+                checkpoint=old_partial.checkpoint,
                 config=config,
                 budget=allowance(),
             )
+        old_restored = factorize_bounded(
+            n,
+            checkpoint=new_partial.checkpoint,
+            config=config,
+            budget=allowance(),
+        )
 
         self.assertEqual(restored.result.reconstruct(), n)
         self.assertEqual(restored.result, old_restored.result)
