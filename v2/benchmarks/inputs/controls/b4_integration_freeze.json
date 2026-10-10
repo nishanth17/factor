@@ -1,0 +1,14 @@
+{
+  "scope": "Production bridge on the already inspected confirmation cohort; no new independent-input claim or candidate tuning.",
+  "choices": {
+    "python-int": "reductions",
+    "gmpy2-mpz": "whole_ladder"
+  },
+  "source_hashes": {
+    "v2/benchmarks/b4_integration.py": "f8047324f381a27f0766a5cc3768577c72a3195ce627ac859dc3b1288334b16a",
+    "v2/benchmarks/inputs/baselines/b4_integrated_ecm.json": "490ec55cfba4a5d02f52f5c6e608c539d71ff1d7fc6483a31f777d3ef25c1809",
+    "v2/benchmarks/inputs/controls/b4_bakeoff_freeze.json": "c7d6d7d145537201b7e7235cbc1a211b6f555339e47dc2d04075ed4aba362cf4"
+  },
+  "protocol_sha256": "3bb5bc4cc1ef621d9463f0d788b48d27d51ce040baa9fed42e202b42d3c8f1f3",
+  "criteria": "Require exact outcomes/work and the frozen revised timing gate: stable pairs, positive bridge interval/CPU effect and both chronological halves. No expansion on failure."
+}
