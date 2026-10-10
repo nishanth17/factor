@@ -5,6 +5,20 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
+## C1 DLP assessment — in progress
+
+The [initial screen](c1_results.md) found useful diagnostic limitations; it
+does not establish a final DLP deferral. The user authorized the separately
+[frozen larger-input follow-up](c1_followup_protocol.md), informed by the
+[pinned source and license review](c1_research.md). Complete offline cycle
+analysis replaces the dense diagnostic LP matrix; nested 64/128 B² product
+bounds and longer collection address false-candidate cost and delayed matching.
+Production SLP, R3 provenance and all defaults remain unchanged during the gate.
+Generated captures remain local in `results/c1/`; required controls and
+certified corpora are versioned. All diagnostic runs and heavy checks share
+`/private/tmp/factor-performance.lock` with B3/A7. No accepted timing claim
+follows from these instrumented observations.
+
 ## QS/GNFS research reconciliation (9 October 2026)
 
 The [source-linked comparison](qs_gnfs_research.md) pins 11 repositories and

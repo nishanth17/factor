@@ -1768,6 +1768,14 @@ concerns until changed representations and their gates are verified.
 
 **P3.8-R4 — Measure useful dependencies and large-prime economics**
 
+**C1 assessment in progress:** the [initial residual screen](benchmarks/c1_results.md)
+is not a final DLP deferral. At the user's direction, a separately
+[frozen follow-up](benchmarks/c1_followup_protocol.md) tests complete offline
+cycles, source-informed product bounds and longer 40/50/60-digit collection.
+The [research reconciliation](benchmarks/c1_research.md) distinguishes native
+large-input practice from evidence for this PyPy implementation. No C1, R4
+or P5.4 completion or performance promotion is claimed.
+
 - [ ] Coordinate C1/E3 residual-classification experiments from the
   [FLINT comparison](benchmarks/qs_gnfs_research.md#candidate-decisions-and-owners)
   if profiling shows repeated intake/atomic primality checks matter. A
