@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "parent_protocol": "a6_pm1_protocol.json at 6618c5f",
+  "amendment": "The user explicitly permits a sustained low-noise improvement below 10%. Original inputs, candidates and captures remain unchanged. This repeat extension was frozen before its timing window.",
+  "inputs": "p43_size_corpus.json: all existing confirmation fixtures at 20/50/100 digits",
+  "arms": [16, 64],
+  "bounds": [[2000, 20000], [11000, 100000]],
+  "base": 2,
+  "gcd_batch": 64,
+  "segment_size": 256,
+  "work_limit": 2000000,
+  "wall_seconds": 30,
+  "cpu_seconds": 30,
+  "warmup_seconds": 3,
+  "samples": 27,
+  "minimum_sample_cpu_seconds": 0.08,
+  "arm_order_seed": 2026100906,
+  "selection": "Accept chunk 64 as a measured bounded configuration if all six complete-stage comparisons improve, paired 95% bootstrap intervals exclude zero and relative IQR is below 15%, consistent with the original screen/confirmation direction. If inconclusive, extend to 63 repeats without changing inputs/arms, then retain if still inconclusive. No global default or portfolio allocation promotion: larger production B2 and combined E1 completion remain separate gates. Cache policy is unchanged: its one uncertain class and additional storage preclude general promotion."
+}

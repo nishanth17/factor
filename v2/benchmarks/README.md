@@ -2369,3 +2369,428 @@ corpora, source snapshots and runners remain. The shared PyPy environment,
 performance lock and C6/A6 worktrees are preserved. No further B4 benchmarks or
 heavy checks remain; release the exclusive window to the queued C6 then A6
 work. This final receipt changes documentation only.
+
+## A6 / P5.3 bounded p−1 tranche — 9 October 2026
+
+Adopt the exact increased-B1 integer contract and the opt-in finite campaign in
+`v2.pm1_bounded`; retain Python integers, current chunk/gap execution, streamed
+schedules, bounds and portfolio allocation. ECM bound migration, Williams p+1,
+Lucas optimization and polynomial/native continuations remain separate work.
+The [research/license review and exact reuse contract](a6_pm1_research.md)
+links the primary papers and pinned implementations.
+
+Controls and criteria were frozen at `6618c5f`, from mainline `bcf5f3d`.
+Required inputs are `inputs/corpora/a6_pm1_protocol.json`, the existing
+independently certified `p43_size_corpus.json` and
+`phase_two_m15_independent_corpus.json`. The original bounded stage engine,
+portfolio, direct p−1 and ECM modules are unchanged. Existing schedule ASTs
+match mainline; only the ratio constant/functions were added.
+
+Measurements used PyPy 7.3.23 / Python 3.11.15, ARM64 macOS 26.6.2, Python
+integers, seed 7 for the portfolio and bases 2/3/4 only for the schedule-reuse
+cost experiment. Every arm had at least three seconds of validated warmup,
+then nine interleaved samples with at least 80 ms of process CPU per sample.
+Unstable comparisons extended all arms to 27 samples. Every final relative
+IQR was below the frozen 15% cutoff; one continuation arm was close at 14.9%.
+The shared `/private/tmp/factor-performance.lock` and competing-interpreter
+checks excluded B4/C6 heavy work. One reuse capture was aborted when C6 ran
+its short source-freeze command, then rerun; no rejected capture is evidence.
+Cold startup and instrumented profiles are separate captures. Paired 95%
+bootstrap intervals below use 10,000 resamples of repeat pairs; they quantify
+repeat uncertainty, not uncertainty over the population of factoring inputs.
+
+The separate diagnostic profile recorded 303 exact prime-power compilations,
+40 sieve blocks, 42 modular powers and 51 GCDs at B1/B2=2000/20000. Inclusive
+stage-two time accounted for roughly one-half to three-quarters of diagnostic
+CPU, depending on input size; instrumentation overhead makes these a cost map,
+not speed evidence. This justified a small set of whole-stage comparisons.
+
+### Complete bounded stages
+
+Fresh confirmation uses distinct certified balanced 20/50/100-digit inputs.
+These are nonsplitting stages, not successful factoring timings. B1/B2 are
+2000/20000 and 11000/100000, with base 2, batch 64, segment 256, 2,000,000 work
+units and 30-second wall/CPU caps. These B2 values are smaller than the direct
+p−1 defaults; no production-bound crossover is claimed.
+
+| Confirmation input | Bounds | Current chunk 16, ms CPU | Chunk 64, ms CPU | Reduction |
+| --- | --- | ---: | ---: | ---: |
+| 20 digits | 2000/20000 | 2.046 | 1.908 | 6.8% |
+| 50 digits | 2000/20000 | 2.513 | 2.319 | 7.7% |
+| 100 digits | 2000/20000 | 4.092 | 3.762 | 8.1% |
+| 20 digits | 11000/100000 | 10.813 | 10.151 | 6.1% |
+| 50 digits | 11000/100000 | 13.027 | 12.121 | 7.0% |
+| 100 digits | 11000/100000 | 20.859 | 18.853 | 9.6% |
+
+The original frozen 10% rule retained chunk 16; one 50-digit interval also
+crossed zero. The user's revised policy permits smaller sustained gains.
+The explicit amendment at `8d0c69a`/`799ec4e` froze a 27-repeat extension
+(63 ceiling only if inconclusive), with identical inputs/arms and no retuning.
+All six extended paired intervals exclude zero, every median improves, and
+the largest relative IQR is 9.0%, below the declared 15% cutoff.
+
+| Repeat extension | Bounds | Chunk 16, ms CPU | Chunk 64, ms CPU | Reduction, paired 95% interval |
+| --- | --- | ---: | ---: | --- |
+| 20 digits | 2000/20000 | 1.993 | 1.867 | 6.3% [0.8%, 7.0%] |
+| 50 digits | 2000/20000 | 2.464 | 2.276 | 7.6% [6.8%, 8.6%] |
+| 100 digits | 2000/20000 | 3.996 | 3.696 | 7.5% [6.3%, 8.2%] |
+| 20 digits | 11000/100000 | 11.186 | 10.498 | 6.1% [3.4%, 8.7%] |
+| 50 digits | 11000/100000 | 12.834 | 11.831 | 7.8% [6.7%, 8.3%] |
+| 100 digits | 11000/100000 | 20.267 | 18.403 | 9.2% [8.6%, 9.7%] |
+
+**Accept chunk 64 as a measured bounded p−1 configuration for scoped E1
+integration review.** It uses an existing configuration knob, adds no engine
+complexity and agrees in direction with the original screen and confirmation.
+This is a complete-stage gain on the fixed nonsplitting cohort, not a
+complete-factoring or population claim. Production defaults remain 16: the
+shared portfolio knob also affects ECM, and its larger default B2 and combined
+completion need separate confirmation. The existing chunk-16
+control is 27–34% faster than per-prime powering on confirmation inputs.
+Its cached-gap stage execution is 72–79% faster than independently computing
+every A**q. Retain gap reuse; every eligible first/tail relation remains
+covered. Arithmetic reservations differ appropriately for direct q powering,
+but all arms receive the same finite allowance and validate their outcomes.
+
+### Reuse capacity and storage
+
+The initial eight-entry, 256 KiB cache arm retained 14,080 estimated bytes but
+had zero hits over the 40-block schedule; it lost 2.7–6.6% against streaming.
+This is LRU churn, not evidence that completed schedule reuse is impossible.
+A single bounded follow-up was frozen at `9b146d3` in
+`a6_pm1_reuse_protocol.json`, before using fresh confirmation inputs. It
+compared streaming, eight entries and 64 entries without further candidate
+search. The 64-entry arm retained 77,152 estimated bytes and achieved exactly
+80 hits over three bases; every outcome and work ledger matched streaming.
+
+| Confirmation input | Three streamed bases, ms CPU | 64-entry reuse, ms CPU | Reduction, paired 95% interval |
+| --- | ---: | ---: | --- |
+| 20 digits | 6.235 | 5.817 | 6.7% [5.0%, 9.6%] |
+| 50 digits | 7.409 | 7.152 | 3.5% [−1.7%, 4.9%] |
+| 100 digits | 12.472 | 12.161 | 2.5% [0.5%, 3.1%] |
+
+The original 10% rule retained streaming. Under the revised policy, the
+50-digit interval still includes zero, while retention adds approximately
+77 kB and repeated same-order bases have no established allocation benefit.
+Keep the existing cache opt-in and streaming default; the smaller positive
+20/100-digit gains are not rejected solely for being below 10%. Repeated
+bases are a schedule amortization experiment, not independent
+ECM-like smooth-order trials or evidence for granting more p−1 attempts.
+The retained-byte counts follow the cache's conservative payload/header
+convention; they are not process RSS measurements.
+
+### Fresh execution versus exact continuation
+
+The explicitly declared campaign is (500,5000) → (2000,20000), base 2, chunk
+16, batch 128, segment 256, the same 2,000,000-work/30-second allowances and
+8 MiB workspace cap. A B1 increase rebuilds stage two under the new residue.
+The checkpoint arm pauses once at the complete first-rung boundary, then
+reconstructs all committed actions before continuing. Fresh-each runs both
+bounds independently; fresh-final runs only the final bound.
+
+| Input | Fresh final, ms CPU | Fresh each, ms CPU | In-memory ratio, ms CPU | Checkpoint ratio, ms CPU |
+| --- | ---: | ---: | ---: | ---: |
+| 20 digits | 2.093 | 2.783 | 2.522 | 3.178 |
+| 50 digits | 2.843 | 3.738 | 3.408 | 4.202 |
+| 100 digits | 4.450 | 5.805 | 5.248 | 6.536 |
+
+Final continuation sources were frozen at `c0762ee`, after rejecting
+noncanonical numeric substitutions and giving fresh-each stages a shared
+total allowance. The earlier capture gave each fresh stage a full allowance;
+its limits were nonbinding, but it is superseded and stays local. The table
+uses the final matched run (27/9/27 repeats). Actual work/outcomes and the
+separate action-count profile are unchanged.
+
+In-memory continuation saves 9.4% [8.4%,11.1%], 8.8% [7.2%,11.3%] and 9.6%
+[9.4%,10.0%] relative to fresh-each. Charged checkpoint continuation instead
+costs 14.2% [11.9%,16.0%], 12.4% [9.6%,25.7%] and 12.6% [11.9%,13.2%]
+more. Starting directly at the final bound is
+fastest in these nonsplitting cases; a predeclared smaller rung provides
+additional early stopping opportunities whose population value is not
+established here.
+
+A separate operation-count profile independently constructs M(500) and
+M(2000): they have 724 and 2878 bits, and their ratio has 2154 bits. Relative
+to fresh-each, in-memory continuation reduces stage-one pow calls from 25 to
+20, and the sum of actual chunk-exponent bit lengths from 3612 to 2886
+(20.1%). Stage-two powering remains 40 calls because increased B1 invalidates
+old stage-two arithmetic. Checkpoint reconstruction raises the total to 26
+stage-one and 57 stage-two powers, including verification. These counts are
+not timing measurements or exact bigint-operation counts.
+
+The in-memory campaign uses 29,441/29,542/29,707 work units versus
+30,164/30,366/30,696 for fresh-each. Checkpoint verification alone costs
+6341/6442/6607 additional units, plus rebuilt context work, producing total
+35,853/36,055/36,385 units. Terminal checkpoints occupy approximately
+1.8/2.7/4.0 kB; workspace remains capped conservatively at 8 MiB. This
+tranche chooses complete reconstruction for corrupt-state safety; a faster
+verified resume representation is deferred rather than silently giving
+cached state free work credit.
+
+### Portfolio contribution and decisions
+
+On the first twelve independently certified balanced 20-digit inputs from
+the existing M15 corpus, seed 7, trial bound 100, one 512-evaluation rho
+attempt and two ECM curves at 50/1000, both p−1-disabled and one-attempt
+2000/20000 arms complete and split 0/12. Median cohort CPU increases from
+17.727 to 44.466 ms (150.8%); the marginal completion gain is zero per added
+0.026739 CPU-second. Both use the same 500,000-work, five-second wall/CPU
+limits. This cohort's prime-certificate construction favors a known large
+factor of p−1 and is not an RSA-distribution model. It establishes no general
+p−1 allocation rule. Constructed bound-boundary successes remain correctness
+fixtures, not promotion evidence. Nine separate cold starts of the small
+stage-two factor case have median wall time 117.5 ms, including interpreter
+startup/imports; do not compare that number with warmed CPU medians.
+
+- **Adopt:** exact reusable integer ratios and the explicit finite p−1
+  campaign, with proper-divisor validation, reconstructible unresolved pieces,
+  finite recovery and schema-1 cumulative verified checkpoints. Accept chunk
+  64 for the measured bounded p−1 configurations and scoped integration review
+  under the revised policy; no production engine/default changes follow here.
+- **Retain:** Python integers, current default 16-prime chunks and stage-two gap
+  caching, streamed/default schedule policy, current bounds/attempts and all
+  portfolio/ECM allocation and checkpoint behavior.
+- **Defer:** production promotion of chunk 64, larger default caches/bounds,
+  broader allocation claims, a faster verified resume representation and
+  ECM/Lucas bound migration.
+  A6 supplies the scalar contract required by those later group-specific
+  extensions; it does not implement or authorize them.
+
+Acceptance: 21 new independent/adversarial tests, `make -C v2 test` with
+419 system-PyPy tests (three optional-GMP skips), and `make -C v2 lint` pass.
+A committed-files-only archive at `c0762ee` passes 422 PyPy/GMP tests, all
+70 benchmark imports and independent certificate/product verification. The
+following acceptance commit changes documentation only; Python sources and
+required inputs remain identical. Existing schedule ASTs match the control
+prefix; v1, direct p−1, stage jobs, portfolio and ECM are unchanged. The
+worktree remains on `codex/a6-pm1-continuation`, without merging.
+
+Rerun each mode in an exclusive window. The runner acquires the shared lock
+itself and fails closed on competing benchmark/test interpreters. Required
+inputs/protocols/runners are versioned; raw timing JSON, profiles, aborted-run
+notes, verification output and acceptance logs remain in ignored
+`results/a6/`.
+
+```sh
+pypy3 -B -m v2.benchmarks.a6_pm1 profile --output v2/benchmarks/results/a6/profile.json
+pypy3 -B -m v2.benchmarks.a6_pm1 stages --split screen --output v2/benchmarks/results/a6/stages-screen.json
+pypy3 -B -m v2.benchmarks.a6_pm1 stages --split confirmation --output v2/benchmarks/results/a6/stages-confirmation.json
+pypy3 -B -m v2.benchmarks.a6_pm1_confirm --output v2/benchmarks/results/a6/chunks-confirm27.json
+pypy3 -B -m v2.benchmarks.a6_pm1 reuse --output v2/benchmarks/results/a6/reuse.json
+pypy3 -B -m v2.benchmarks.a6_pm1_reuse --output v2/benchmarks/results/a6/reuse-capacity.json
+pypy3 -B -m v2.benchmarks.a6_pm1 continuation --output v2/benchmarks/results/a6/continuation.json
+pypy3 -B -m v2.benchmarks.a6_pm1 portfolio --output v2/benchmarks/results/a6/portfolio.json
+pypy3 -B -m v2.benchmarks.a6_pm1 cold --output v2/benchmarks/results/a6/cold.json
+make -C v2 test
+make -C v2 lint
+```
+
+## A6 follow-up — bit caps, recurrence and exact wheel execution
+
+Completed 9 October 2026 in the separate, unmerged A6 worktree. The
+[expanded audit](a6_pm1_research.md) covers current official GMP-ECM, pinned
+CADO-NFS, FLINT/PARI, Yamaquasi, YAFU, Prime95, GPUOwl, PrMers, Mlucas and
+CUDAPm1, with source-access and license limits stated. No upstream code was
+copied. Native FFT/NTT, special-form seeds and SIMD thresholds supply no PyPy
+performance evidence. This is a bounded comparison, not an exhaustive SOTA
+or global-optimality claim.
+
+### Frozen controls and decision
+
+The [protocol](inputs/corpora/a6_pm1_followup_protocol.json) freezes all arms,
+controls, bounds, inputs, seeds, budgets and selection criteria before timing.
+The immutable complete API control is `32b3c65`; imported implementation and
+input identities are frozen at `132a829`. Arithmetic selection is committed
+at `45c16a8`, then wheel selection at `66ec7ac`, before unused confirmation
+inputs are timed. Captures bind every top-level implementation module, runner,
+helper, builder and required corpus, and reject an identity change during
+execution. An earlier one-cell pilot lacking two corpus/import hashes is
+retained locally but excluded from selection and acceptance.
+
+Python integers on PyPy 7.3.23 / Python 3.11.15, macOS arm64, are the only
+performance backend here. Every arm receives at least three seconds of
+validated warmup; calibrated samples contain at least 0.08 CPU seconds.
+Interleaved order seed is 2026100917; paired bootstrap seed is 2026100918,
+10,000 resamples. Nine-sample uncertainty triggers a fresh all-arm 27-sample
+confirmation; stability extensions keep all arms together. The shared A6/C6/B4
+lock and explicit window handoffs exclude accepted timing/heavy-check overlap.
+Instrumented profiles and cold subprocesses are separate from warmed evidence.
+
+Six screen cells use independently certified 20/50/100-digit inputs at
+B1/B2=2000/20000 and 11000/100000. Base 2, GCD batch 64, segment 256,
+2,000,000 work, 30-second wall/CPU allowances and an 8 MiB owned-workspace cap
+are fixed. Complete calls include construction, transitions, recovery checks,
+result validation and final checkpoint serialization. Recurrence wins the
+predeclared arithmetic screen: 2.88% [1.14%,4.50%] less CPU versus chunk 64,
+with all six medians positive. No separately screened changes are combined.
+
+| Screen challenger vs chunk 64 | Aggregate CPU gain, paired 95% interval | Decision |
+| --- | ---: | --- |
+| 256-bit cap, prime cap 256 | −7.58% [−9.37%,−5.68%] | Retain fixed chunk control |
+| 512-bit cap, prime cap 256 | −6.36% [−9.77%,−4.68%] | Retain fixed chunk control |
+| 1024-bit cap, prime cap 256 | 0.20% [−2.69%,1.54%] | Inconclusive; not selected |
+| Even-gap recurrence, chunk 64, 64 entries | 2.88% [1.14%,4.50%] | Freeze for confirmation |
+
+Using this selected arithmetic for every paired arm, wheel 30 costs 76.24%
+[71.37%,78.77%] more CPU and wheel 210 costs 7.93% [5.59%,9.84%] more.
+Neither qualifies generally or in the predeclared larger-bound scope.
+Unit-scaled relation coverage is independently verified, but fewer modular
+powers do not compensate for this executor's setup, dispatch and GCD costs.
+No wheel is promoted.
+
+### Fresh complete-call confirmation
+
+The versioned [fresh corpus](inputs/corpora/a6_followup_corpus.json), seed
+2026100919, is generated and Pocklington-certified before timing, with no
+engine/outcome/speed filtering. One balanced fixture per input size is used;
+recursive Pocklington construction biases p−1 structure and does not represent
+a uniform semiprime population. Factors are approximately half the stated
+input digits. All nine cells exhaust without a split, validating full stages.
+
+| Input digits | B1/B2 | Chunk 64, ms CPU | Recurrence 64, ms CPU | CPU gain |
+| ---: | --- | ---: | ---: | ---: |
+| 20 | 2000/20000 | 0.991 | 0.963 | 2.85% |
+| 20 | 11000/100000 | 4.973 | 4.848 | 2.52% |
+| 20 | 2000/200000 | 8.533 | 8.308 | 2.63% |
+| 50 | 2000/20000 | 1.316 | 1.289 | 2.00% |
+| 50 | 11000/100000 | 6.488 | 6.382 | 1.64% |
+| 50 | 2000/200000 | 10.346 | 10.113 | 2.25% |
+| 100 | 2000/20000 | 2.052 | 2.014 | 1.87% |
+| 100 | 11000/100000 | 10.038 | 9.933 | 1.04% |
+| 100 | 2000/200000 | 14.147 | 13.992 | 1.09% |
+
+All arms use 27 samples in the final capture. Every selected-arithmetic median
+improves; aggregate gain is 1.99% [1.85%,2.21%]. Per-size-class aggregates are
+2.67% [2.36%,2.97%], 1.97% [1.77%,2.34%] and 1.34% [1.02%,1.69%]. The
+predeclared selected-pairing arm is the same unpaired recurrence after wheel
+rejection: it independently measures 1.92% [1.44%,2.13%], with every median
+and size-class interval positive. Maximum relative IQR across all arms is
+11.98%, below the 15% limit. These sustained small gains pass the revised
+policy; accept recurrence with chunk 64 for scoped opt-in integration review.
+The nine-sample capture is superseded, preserved and not pooled selectively.
+
+The legacy-config dispatch hook is measured independently against the complete
+immutable chunk-64 control. It costs 0.78% [0.61%,1.32%] aggregate CPU, with
+unchanged arithmetic/state/work and legacy resume identity. This cost belongs
+to the separate A6 bounded API; existing direct p−1, production portfolio and
+ECM sources/dispatch are untouched. Automatic defaults remain unchanged.
+
+### Computation, storage, recovery and resume
+
+A separate instrumented 50-digit 2000/20000 profile attributes about two-thirds
+of the control call's inclusive CPU to stage two. Counts are diagnostic, not
+warmed timing: chunk 64 makes 28 modular powers and 37 GCDs; recurrence makes
+6 powers and the same 37 GCDs, replacing 22 distinct small-gap powers with
+bounded multiplication. Its work ledger adds 26 growth units (24041→24067).
+Conservative owned-workspace reservation rises from 2,228,224 to 2,631,680
+bytes, 18.1%; serialized final checkpoints are about 2.64 versus 2.80 kB.
+Float time-field encoding causes a few bytes of capture-to-capture variation.
+The instrumented process peaks at 74,399,744 RSS bytes across all eight arms;
+this is neither per-arm RSS nor the owned-workspace bound.
+
+Wheel 30/210 make 22/8 powers plus one inversion, but take 1943/444 committed
+actions versus 189 for chunk 64 and reserve 2,800,640/3,814,400 workspace bytes.
+Paired traces contain only eligible primes, including wheel-prime exceptions;
+singletons exclude absent partners. Saturation replays original individual
+prime relations, including same-pair mixed factors, under a finite allowance.
+B1 increase invalidates all even-gap/wheel tables. B2-only append retains
+checked coverage without pairing across an unchecked rung boundary.
+
+The fresh-corpus continuation is (500,5000)→(2000,20000), with the same total
+allowances. Fresh-each shares those allowances and stops early after a factor
+or saturation. Verified resume pauses at the complete first-rung boundary,
+serializes/parses state, reconstructs every saved action and continues.
+
+| Input digits | Fresh final, ms CPU | Fresh each, ms CPU | In-memory recurrence, ms CPU | Verified resume, ms CPU |
+| ---: | ---: | ---: | ---: | ---: |
+| 20 | 0.966 | 1.259 | 1.152 | 1.533 |
+| 50 | 1.251 | 1.628 | 1.493 | 1.944 |
+| 100 | 2.065 | 2.663 | 2.434 | 3.145 |
+
+The initial nine-sample run had uncertain intervals and is superseded by the
+all-arm 27-sample run; its selected 20-digit group automatically extends to
+63 for stability. In-memory recurrence saves 8.48% [8.03%,10.45%], 8.30%
+[8.11%,8.92%] and 8.61% [7.97%,9.44%] against fresh-each. Verified resume costs
+21.76% [18.96%,23.85%], 19.46% [18.64%,19.66%] and 18.09% [16.55%,19.51%]
+more. The retained chunk-64 control independently saves 7.97–8.33% in memory
+and costs 15.42–16.24% more with verified resume. All final comparison intervals
+exclude zero and relative IQRs satisfy the frozen limit. Fresh-final remains
+fastest; no population claim for selecting a multi-rung ladder follows.
+
+Recurrence in-memory work is 29495/29595/29760 versus 30211/30411/30741 for
+fresh-each: 716/816/981 units saved. Resume adds 6430/6530/6695 units to the
+in-memory totals, including 6359/6459/6624 verification units plus 71 context
+rebuilding units. Final serialized checkpoints are about 1.89/2.82/4.36 kB.
+The preceding tranche's independent M(500)/M(2000) operation-count oracle
+explains the scalar saving; stage two must still repeat under increased B1.
+
+Nine separate cold subprocesses per arm include startup, imports and harness
+validation: median wall time is 132.08 ms for chunk 64 and 135.09 ms for
+recurrence. This 2.28% observed cold cost is separate from warmed acceptance;
+it is not a startup win or a confidence-backed cold promotion claim.
+
+### Complete portfolio and stop decisions
+
+The first 12 independent M15 20-digit fixtures, seed 7, use trial 100,
+one rho attempt/512 evaluations, one p−1 assignment at 2000/200000, and two
+ECM curves at 50/1000. Work 500000 and wall/CPU 5 seconds are fixed. The
+benchmark-only bridge preserves the production seed/base assignment and
+parent budget/context; production portfolio serialization is unchanged.
+All results reconstruct, including unresolved cofactors. Stability extends all
+four arms to 27 samples.
+
+| Arm | Complete / split inputs | CPU per 12 inputs, ms | Marginal completions per added CPU-second vs no p−1 |
+| --- | ---: | ---: | ---: |
+| No p−1 | 0 / 0 | 14.460 | — |
+| Retained production portfolio | 5 / 5 | 106.679 | 54.22 |
+| Bounded chunk-16 bridge | 5 / 5 | 114.372 | 50.04 |
+| Selected recurrence-64 bridge | 5 / 5 | 110.524 | 52.05 |
+
+The selected bridge is 3.36% faster than the bounded chunk-16 bridge by median,
+but costs 3.60% [1.62%,4.50%] more CPU than retained production and adds no
+completions. Retain production dispatch/allocation. The five extra completions
+versus no p−1 belong to this production-B2 cohort; the preceding tranche used
+B2=20000 and found no extra completions. Neither small, structurally biased
+cohort supports a general coverage or allocation claim. Repeated p−1 bases
+are correlated smooth-order trials, not independent ECM-like trials.
+
+Adopt the exact continuation contract and verified bounded API; accept
+recurrence-64 for scoped opt-in integration review. Retain defaults, ordinary
+cached execution, bounds/attempt counts and production portfolio policy.
+Keep tested bit-cap/wheel alternatives experimental and unpromoted. Defer
+compiled cross-input schedules, the upstream square-root prime jump,
+relocation and polynomial/chirp-z crossover to separately frozen studies.
+ECM point continuation and Williams p+1/Lucas remain with their owners.
+
+Fourteen new tests independently cover direct small powers, exhaustive
+eligible-prime coverage, unit-scaled traces over composite rings/prime powers,
+inside/outside endpoints, old-prime power increases, same/cross-pair saturation,
+nonunits, finite recovery, cancellation, atomic refusal, canonical corruption,
+legacy compatibility and cumulative resume grants. Together with the original
+21 A6 tests, the full worktree passes `make -C v2 test` and `make -C v2 lint`.
+A checkout from only committed `66ec7ac` files passes all 436 PyPy/GMP tests,
+lint, 73 top-level benchmark imports and original/fresh certificate/product
+and selection-identity loaders. Only documentation changes follow that check.
+No v1, immutable baseline, other worktree or mainline changes are included.
+
+Reproduce in a separately reserved performance window:
+
+```sh
+pypy3 -B -m v2.benchmarks.a6_pm1_followup profile --output v2/benchmarks/results/a6/followup/profile.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup arithmetic --output v2/benchmarks/results/a6/followup/arithmetic.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup select-arithmetic --input v2/benchmarks/results/a6/followup/arithmetic.json --output v2/benchmarks/results/a6/followup/arithmetic-decision.json
+# Freeze/version the arithmetic selection before the paired screen.
+pypy3 -B -m v2.benchmarks.a6_pm1_followup paired --output v2/benchmarks/results/a6/followup/paired.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup select-paired --input v2/benchmarks/results/a6/followup/paired.json --output v2/benchmarks/results/a6/followup/paired-decision.json
+# Freeze/version the complete selection before fresh confirmation.
+pypy3 -B -m v2.benchmarks.a6_pm1_followup confirmation --samples 27 --output v2/benchmarks/results/a6/followup/confirmation27.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup continuation --samples 27 --output v2/benchmarks/results/a6/followup/continuation27.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup portfolio --output v2/benchmarks/results/a6/followup/portfolio.json
+pypy3 -B -m v2.benchmarks.a6_pm1_followup cold --output v2/benchmarks/results/a6/followup/cold.json
+make -C v2 test
+make -C v2 lint
+```
+
+Required corpora, certificates, control snapshot, protocol and selections are
+versioned. Raw captures, profiles, pilot failures, AST review, archive receipts
+and analysis remain local under ignored `results/a6/followup/`; source/license
+captures remain under ignored `results/a6/research/`. Nothing is merged.

@@ -160,8 +160,9 @@ remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are co
 for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
-bounded opt-in pairing; its matched losses retain defaults, and A6 remains
-needed for increased-B1 extensions. Conditional capacity/CRT follow-ups can
+bounded opt-in pairing; its matched losses retain defaults. A6's isolated
+bounded tranche now supplies exact increased-B1 integer ratios and finite
+p−1 campaigns; ECM point/checkpoint migration remains separate. Conditional capacity/CRT follow-ups can
 remain deferred. A10's verified wider deterministic primality and v1 ownership
 audit are complete and integrated into mainline. B14 can now follow for
 certificate proofs; neither waits for GNFS or D7. E1 retains combined portfolio
@@ -264,7 +265,7 @@ development and coordinated integration, not concurrent performance runs.
 | ~~A3 — P5.2 reusable programs and campaign feasibility~~ | ~~Completed for the bounded tranche: immutable capped prime/power programs, independent +/- coverage and point oracles, matched int-control comparisons and finite campaign/resume contracts.~~ | ~~Existing P2 schedules, recovery and ECM~~ | ~~**[x] Complete for bounded scope on 5 October 2026.** Programs remain opt-in: larger finite curves benefit, small complete factoring regresses and defaults are retained. B2/C2/C3 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Schedule construction, arithmetic coverage, amortization, finite storage and resumed execution agree under independent acceptance controls.~~ |
 | ~~A4 — P4.1 chain correctness~~ | ~~Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder.~~ | ~~Existing exact point/ladder controls~~ | ~~**[x] Complete for A4.** Verified records are connected to `ecm.multiply_prac`; independent field/composite/schedule checks pass. The checked implementation is retained as an opt-in correctness foundation; B3 and C6 remain open.~~ | ~~Astra / **xhigh**~~ | ~~Proof-intensive chain invariants and exceptional composite-modulus cases; termination and projective validity are checked independently.~~ |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
-| A6 — P5.3 p−1 and extension correctness | Compare bounded prime-power/chunk powering and gap reuse against current p−1; define and test exact increased-B1 schedule ratios without requiring new p+1 code. | Existing p−1/P2 controls | **Medium.** Cheap structured-factor coverage and correct continuation can be developed now. Raising B1 must include increased powers of old primes, not just new primes. Keep this p−1 tranche separate from the later Lucas optimization. | Sol / **xhigh** | Sol fits incremental changes to an existing verified method. xhigh is for proving exact schedule ratios, preserving chunk replay and separating genuine extra coverage from repeated work. |
+| ~~A6 — P5.3 p−1 and extension correctness~~ | ~~Completed exact increased-B1 ratios, finite campaign/checkpoint validation and bounded chunk/gap/wheel comparisons.~~ | ~~Existing p−1/P2 controls~~ | ~~**[x] Complete and integrated, 9 October 2026.** Exact old-prime power increases and cumulative verified resume pass. Chunk 64 and recurrence are explicit opt-ins; recurrence confirms 1.99% complete-call saving [1.85%,2.21%]. Retain production defaults/allocation after the bridge loses 3.6% with no completion gain.~~ | ~~Sol / **xhigh**~~ | ~~Independent LCM/direct-power/coverage oracles, finite saturation recovery, canonical int state and matched fresh evidence settle this bounded contribution. ECM/Lucas migration and broader allocation remain separate.~~ |
 | A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
 | A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
 | ~~A10 — P8.2.1 verified v1 capability transfers~~ | ~~Completed bounded tranche: source-verified strict 12/13-base ranges, reported regression, independent proof oracles, v1 ownership audit and checked legacy resume.~~ | ~~Existing P1.8/P2 exact classification and budget controls; preserved v1 sources~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026; implementation `0ee86ff`, acceptance `6794af6`.** Committed-only suites/imports and lint pass. Range-only selection retained; complete-run tail spread disclosed. B14 and E1 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Primary-source computational guarantees, endpoint congruences, independent proof fixtures, finite budgets and RNG/work/checkpoint compatibility are reconciled; no disputed extra range was adopted.~~ |
@@ -2447,13 +2448,71 @@ imports on a committed-files-only candidate. Full P5.2 is still open below.
 
 ### P5.3 — Improve p±1 powering and continuation independently
 
-- [ ] Compare p−1 per-prime powering with prime-power/chunk powering; tune B2/B1 and gap caching. Compare binary Lucas with validated cached Lucas PRAC for p+1. Share integer schedules, deadlines, and recovery tools while retaining distinct group recurrences.
+**A6 bounded acceptance — 9 October 2026; integrated into mainline:** the tranche
+adds `pm1_bounded` and the group-independent `inclusive-lcm-ratio-v1` schedule.
+[Research, licenses and exact reuse rules](benchmarks/a6_pm1_research.md) and
+[matched comparisons](benchmarks/README.md#a6--p53-bounded-p1-tranche--9-october-2026)
+record the bounded decision. Full test/lint pass: 419 system-PyPy tests with
+three optional skips; a committed-file archive passes 422 PyPy/GMP tests,
+70 benchmark imports and independent certificate/product checks. Existing
+schedule ASTs and direct/portfolio/ECM execution remain unchanged; only ratio
+helpers are appended. No v1, immutable baseline or unrelated branch is changed.
+
+**Bounded follow-up complete — 9 October 2026; integrated as opt-ins:** the
+[expanded primary-source/license audit](benchmarks/a6_pm1_research.md#coverage-audit-and-next-bakeoffs--9-october-2026)
+and [frozen protocol](benchmarks/inputs/corpora/a6_pm1_followup_protocol.json)
+compare bit-capped chunks, bounded even-gap recurrence and exact p−1 wheel/±
+execution. The committed selection precedes fresh certified confirmation.
+Recurrence with chunk 64 saves 1.0–2.8% in all nine complete-call cells,
+aggregate 1.99% [1.85%,2.21%], with positive per-size-class intervals at 27
+samples; the duplicate arm agrees. Accept it for scoped opt-in integration
+review under the revised policy allowing sustained gains below 10%. Bit caps
+fail selection; D=30/210 wheels cost 76.2%/7.9% more and remain unpromoted.
+The bounded legacy dispatch hook costs 0.78% [0.61%,1.32%]; production p−1,
+portfolio/ECM APIs, defaults, bounds, attempts and allocation remain unchanged.
+
+[Complete stages, continuation, storage and portfolio evidence](benchmarks/README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution)
+include production B2=200000. The selected portfolio bridge has the same 5/12
+completions as the retained portfolio and costs 3.6% more CPU, so no portfolio
+promotion follows. In-memory recurrence continuation saves 8.3–8.6% versus
+fresh-each; charged verified resume costs 18.1–21.8% more. Fourteen additional
+independent/adversarial tests pass; a committed-only checkout passes all 436
+PyPy/GMP tests, lint, 73 benchmark imports and certificate/input/selection
+loaders. Legacy arithmetic/work/checkpoints remain compatible; tuned state
+binds `pm1-tuning-v1`. ECM/Lucas continuation, compiled cross-input plans,
+relocation, polynomial continuation and allocation remain separate.
+
+- [x] Compare bounded p−1 per-prime/chunk execution, gap reuse and capped
+  reusable schedules on fixed and fresh independent inputs. The revised
+  policy accepts chunk 64 for measured nonsplitting configurations: six
+  27-repeat comparisons save 6.1–9.2%, every paired interval is positive and
+  samples meet the frozen stability rule. Existing 16-prime defaults, gap
+  caching, streamed schedules, bounds and allocation are retained. The
+  declared portfolio cohort gains no completions; E1 owns combined promotion.
+- [x] Prove and independently verify M(U)/M(L), including higher powers of
+  old primes, and implement explicit finite p−1 rungs. Increased B1 reuses
+  only complete verified stage-one arithmetic and repeats stage two; B2-only
+  extension appends checked coverage. Saturation stops this base after finite
+  recovery. Schema 1 binds base/modulus/full configuration and canonical
+  integers; deterministic reconstruction is charged to cumulative allowances.
+  In-memory continuation saves 8.8–9.6% versus fresh-each, while verified
+  checkpoint continuation costs 12.4–14.2% more; fresh-final is fastest here.
+
+The scalar identity now unblocks later ECM extension design; point-specific
+validation, recovery and checkpoint migration remain unimplemented. Historical
+B2 records describe the earlier missing-contract state and stay intact.
+Williams p+1/Lucas composition, production-bound B2/B1 tuning and allocation
+are the remaining group-specific/portfolio work, not part of A6's closure.
+
+- [ ] Calibrate remaining production-bound p−1 B2/B1 and gap/cache policies.
+  Compare binary Lucas with validated cached Lucas PRAC for p+1. Share integer
+  schedules, deadlines and recovery tools while retaining distinct recurrences.
 - **A:** stage-1 actions and all stage-2 relations agree with each method's reference. Saturation can recover/retry without lost factors; no p−1 gap multiplication is copied into Lucas code as an ordinary-power update.
 - **E:** measure stage-1/2 success gain separately on structured and random corpora. Include schedule/chain overhead and cache hit rate; require a full-run win before expanding default bounds.
 
-- [ ] For a larger resumed B1, apply the ratio of the new and old exact
-  prime-power schedules, including increased powers of old primes. For
-  example, B1=8 to 16 needs extra factors 2 and 3 as well as new primes.
+- [ ] Implement remaining ECM/Lucas larger-B1 continuation using A6's exact
+  ratio of new and old prime-power schedules, including increased old powers.
+  For example, B1=8 to 16 needs extra factors 2 and 3 as well as new primes.
   Pin starting point/base and schedule extent; ordinary powering, Lucas
   composition and elliptic scalar action retain their distinct recurrences.
 

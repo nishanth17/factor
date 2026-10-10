@@ -387,8 +387,9 @@ success guarantee. Extend a paused campaign by increasing **total** allowances
 under the identical configuration; completed curves and their RNG progress are
 credited. An exhausted schedule stays exhausted. Adding curves/bounds to a
 checkpoint, or extending B1 on the same curve, remains unsupported pending
-A6 and a separate migration contract: increasing B1 needs missing powers of
-old primes as well as new primes. B2 supports continuation of the predeclared
+a separate ECM migration contract. A6 supplies the exact integer schedule
+ratio, including missing powers of old primes as well as new primes. B2
+supports continuation of the predeclared
 finite campaign under cumulative work/wall/CPU allowances, including pauses
 inside table construction, a paired block or scalar recovery. It does not
 reinterpret an exhausted campaign as a new allowance of curves.
@@ -451,7 +452,8 @@ or reserved bytes. Storage/decoding and mixed-factor replay use the original
 program and paired contracts. Wheel checkpoints use version 8 and
 `ecm-aligned-wheel-pairs-v1`; schemas 4–7 and their disabled-field encoding
 remain readable and unchanged. Same-config finite campaigns can extend their
-cumulative budgets. Increased B1 still requires A6's exact schedule ratio.
+cumulative budgets. A6 supplies the exact increased-B1 integer ratio; ECM
+checkpoint migration and point-specific recovery remain separate work.
 
 This optional mode covers one nearest-center distance set. Extended sets,
 relocation and overlapping-window graph matching belong to C2, as does
@@ -632,3 +634,106 @@ The original frozen retain-baseline verdict and subsequent revised-policy
 confirmation are historical records; their source controls and certified
 inputs remain immutable. Experimental square, helper and normalized arms
 remain reproducibility controls under `v2.benchmarks.b4_kernels`.
+
+### A6: opt-in finite p−1 bound campaigns
+
+```python
+from v2.budget import Budget
+from v2.pm1_bounded import PM1Config, factorize_pm1_bounded
+
+config = PM1Config(bounds=((15, 15), (16, 16)))
+run = factorize_pm1_bounded(17 * 1019, base=3, config=config,
+                            budget=Budget(work_limit=100000))
+assert run.divisor == 17
+assert run.result.reconstruct() == 17 * 1019
+```
+
+This separate Python-integer API predeclares 1–64 monotone inclusive (B1,B2)
+rungs for one explicit base. It stops on a valid factor, saturation, nonunit,
+finite allowance or final campaign exhaustion. Existing `factorize_pm1`,
+portfolio configuration, ECM campaigns and their checkpoints retain their
+behavior. Repeated p−1 bases have the same p−1 smoothness structure and are
+not independent ECM-like smooth-order trials.
+
+A B1 increase applies the exact ratio M(new B1)/M(old B1), where
+M(B)=lcm(1,…,B). This includes higher powers of old primes; it restarts stage
+two at new B1 using the updated residue. A B2-only increase reuses checked
+coverage and appends the new interval. Saturated chunks replay prime units,
+and saturated stage-two batches replay terms, both under `recovery_limit`.
+Saturation ends this base; increasing its bound cannot undo an identity
+residue. Input and base sizes, prime workspace, chunk/batch sizes and
+checkpoint output all have finite caps. The memory cap estimates owned
+workspace, not process RSS.
+
+`max_actions=N` pauses after at most N committed actions. Resume by passing
+`run.checkpoint`, the same n/base/config, and an unused `Budget` containing
+*total cumulative* allowances. Schema 1 binds `pm1-campaign-v1`,
+`inclusive-lcm-ratio-v1` and `python-int`. No RNG is consumed. Checksums detect
+accidental corruption; deterministic reconstruction verifies all saved
+arithmetic and canonical numeric types before reuse, and consumes the same
+action reservations in the cumulative budget. Reconstruction, context rebuilding and serialization time
+are charged on resume. A small grant may be spent entirely on verification;
+repeated pauses do not reset work or active-run wall/CPU usage. Paused time is
+excluded. An incompatible identity is rejected. Exhaustion does not grant
+new rungs, bases or ECM curves.
+
+`PM1Run` exposes divisor, reason, cumulative work/time, verification work and
+a reconstructible `FactorizationResult`. Its split pieces remain unresolved;
+this API makes no primality assertion or certainty upgrade. Work units are
+versioned for this API: prime segments cost segment_size+base-prime count;
+compiled candidates cost one each; chunk powering/GCD costs one plus the sum
+of exponent bit lengths; replay costs prime.bit_length()+1; stage-two terms
+cost gap.bit_length()+1 even on a cache hit; transitions/GCDs cost one. Context
+construction costs ceil(isqrt(max B2)/2). Every reservation precedes mutation.
+Deadlines/cancellation are cooperative between bounded actions.
+
+The group-independent ratio helpers and precise reuse rules are documented
+in the [A6 research and contract](benchmarks/a6_pm1_research.md). They unblock
+the scalar contract for later ECM work; ECM bound migration remains separate.
+
+The separate `v2.pm1_tuning.PM1TuningConfig` is an opt-in execution
+configuration for this same entry point. Its bounded correctness gate passes.
+`chunk_size=64, gap_mode="recurrence"` is accepted for scoped integration
+review after fresh 27-sample complete-call confirmation: 1.0–2.8% less CPU
+than the frozen chunk-64 control, with positive aggregate intervals in every
+size class. Bit caps and wheels remain experimental, unpromoted alternatives;
+production defaults and allocation remain unchanged. See the
+[complete comparison and limitations](benchmarks/README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution).
+It adds `chunk_bits` (zero, or 32–4096),
+`gap_mode="cached"|"recurrence"`, `gap_entries` (1–256), and `wheel` (0, 30,
+or 210). The prime-count chunk cap still applies; a bit cap bounds the sum of
+factor bit lengths and therefore the product exponent's length. A nonzero
+wheel replaces the gap executor with ordinary p−1 ± relations; it does not
+change bounds or introduce Williams p+1/Lucas or ECM execution.
+
+Paired tables retain coprime offsets and the small prime divisors of the
+wheel, so exceptional primes remain covered. Records contain only eligible
+primes. A two-prime trace term is the
+product of their ordinary relations times a unit modulo n; singleton terms
+are direct relations. Saturated batches replay each original prime under the
+finite recovery limit. Table setup/inversion, plan construction, multiplications
+and gap-table growth are charged before state mutation. The finite workspace
+reserve includes baby/inverse tables, pending center records, replay metadata
+and serialization copies; it is an owned-storage bound, not a process RSS cap.
+
+Tuned checkpoints use `execution="pm1-tuning-v1"` and bind every configuration
+field. They cannot resume as legacy campaigns or under different tuning.
+Legacy `PM1Config` serialization, `pm1-campaign-v1` identity and action work
+remain unchanged. Both modes reconstruct retained arithmetic and charge
+verification to cumulative allowances. Increased B1 invalidates all tuned
+residue tables; equal-B1 B2 extensions retain checked coverage and append only
+the new interval. Defaults, RNG assignments and portfolio APIs are unchanged.
+
+Tuned work units are separately identified by `pm1-tuning-v1`. Bit-capped
+filling reserves `max(1, scanned_candidates)` before publishing a chunk;
+powering and prime-unit recovery keep the legacy charges. Even-gap recurrence
+keeps each gap's `gap.bit_length()+1` charge and adds one per newly retained
+even power. Wheel setup reserves `2*n.bit_length()+2*D+4`, including unit
+checking/inversion and both bounded power tables. A center plan with k primes
+reserves `2*center.bit_length()+k+4` for its first giant, or
+`2*max(1, distance_in_wheels.bit_length())+k+4` for a later giant. Collecting k
+primes costs k+1; evaluating k paired/singleton records costs 2*k+1. Saturated
+records replay original prime q with `q.bit_length()+1` per attempt. Finite
+transitions, GCDs, context building and full checkpoint verification retain
+explicit reservations. These are deterministic allowance units, not measured
+CPU instructions; cache hits never reset or refund cumulative allowances.

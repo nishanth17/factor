@@ -67,6 +67,65 @@
   lint. Strengthen cancellation/resume after an actual ECM scalar action and
   explicit saturated-term replay; no frozen timing source changes follow.
 
+## A6 bounded execution follow-up — 9 October 2026
+
+- Add opt-in bit-capped chunks, bounded even-gap multiplication and exact
+  wheel/± stage-two relations. Independent oracles verify inclusive prime
+  coverage, unit-scaled products over composite rings, singleton endpoints,
+  exceptional wheel primes and same-pair mixed-factor replay. No code copied.
+- Keep legacy campaign arithmetic, deterministic charges and checkpoints
+  compatible. Tuned checkpoints/work use `pm1-tuning-v1`, bind every option,
+  reconstruct all saved tables/actions under cumulative grants, clear
+  residue-dependent state on increased B1 and append checked B2-only coverage.
+  No RNG, production portfolio/ECM schema, bounds or attempt count changes.
+- Freeze controls, certified inputs, selection and complete-call gates before
+  timing. At 27 fresh samples, recurrence/chunk 64 saves 1.0–2.8%, aggregate
+  1.99% [1.85%,2.21%], with every median and class interval positive; the
+  duplicate arm agrees. Accept it for scoped opt-in integration review under
+  the revised sustained-gain policy. Bit caps fail selection and wheel 30/210
+  cost 76.2%/7.9% more, so neither is promoted. Disclose the bounded legacy
+  dispatch hook's 0.78% [0.61%,1.32%] cost and 18.1% larger recurrence workspace.
+- Fresh continuation saves 8.3–8.6% in memory versus fresh-each; fully verified
+  resume costs 18.1–21.8% more. The selected production-B2 portfolio bridge
+  matches retained production's 5/12 completions but costs 3.6% more CPU.
+  Retain defaults/allocation; keep cold startup, profiles and population limits
+  separate. Defer compiled plans, relocation, polynomial/chirp-z and group-
+  specific ECM/Lucas continuation.
+- Pass 14 additional independent/adversarial tests and required worktree
+  test/lint. A committed-only archive passes all 436 PyPy/GMP tests, lint,
+  73 benchmark imports and required proof/product/selection loaders. Preserve
+  immutable controls, versioned loaders/inputs and ignored local raw evidence.
+  Only documentation follows the archive check. Remain isolated and unmerged.
+
+## A6 / P5.3 bounded p−1 correctness tranche — 9 October 2026
+
+- Add the exact inclusive LCM ratio, including old-prime power increases,
+  and an explicit finite one-base campaign. Reuse complete verified stage-one
+  state; rebuild stage two after increased B1 and append only new B2 coverage
+  when B1 is fixed. Saturation and nonunits stop this base after finite recovery.
+- Introduce isolated schema-1 Python-integer checkpoints with complete
+  assignment/configuration identity, charged deterministic reconstruction,
+  canonical numeric types and cumulative work/wall/CPU allowances. No RNG is
+  consumed. Preserve proper divisors, reconstruction and unresolved certainty.
+  Existing direct, portfolio and ECM APIs/checkpoints remain unchanged.
+- Inspect primary papers and pinned GMP-ECM, CADO-NFS, FLINT/PARI and SymPy
+  implementations/licenses. Implement the integer identities independently;
+  keep native polynomial/REDC techniques and ECM/Lucas migration separate.
+
+- Reassess the original 10% gate under the revised roadmap without retuning:
+  all six 27-repeat complete-stage comparisons confirm chunk 64 gains of
+  6.1–9.2%, with positive paired intervals and declared stability. Accept this
+  bounded configuration for scoped integration review; keep shared defaults,
+  bounds, attempts, caches and allocation unchanged. Exact in-memory ratios
+  save 8.8–9.6% versus fresh-each; charged checkpoint reconstruction loses
+  12.4–14.2%. The declared portfolio cohort finds no extra completions.
+- Pass 21 new independent/adversarial checks, full `make -C v2 test` with
+  419 tests (three optional-GMP skips), and `make -C v2 lint`. A committed-file
+  archive passes 422 PyPy/GMP tests, all 70 benchmark imports and independent
+  certificate/product verification. Python sources and required inputs remain
+  identical after the documentation-only acceptance update. Keep raw evidence
+  in ignored results; this isolated tranche remains unmerged.
+
 ## A10 integration and research reconciliation — 9 October 2026
 
 - Integrate source-verified strict 12/13-base Miller–Rabin ranges with settled

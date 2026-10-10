@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "seed": 2026100919,
+  "construction": "Recursive Pocklington; biased p-1 structure, not an RSA population model. No engine or timing selects inputs.",
+  "certificates": {
+    "2011": {
+      "kind": "trial"
+    },
+    "241321": {
+      "kind": "pocklington",
+      "q": 2011,
+      "witness": 2
+    },
+    "6742508741": {
+      "kind": "pocklington",
+      "q": 241321,
+      "witness": 2
+    },
+    "1429": {
+      "kind": "trial"
+    },
+    "214351": {
+      "kind": "pocklington",
+      "q": 1429,
+      "witness": 2
+    },
+    "8327536351": {
+      "kind": "pocklington",
+      "q": 214351,
+      "witness": 2
+    },
+    "6521": {
+      "kind": "trial"
+    },
+    "5516767": {
+      "kind": "pocklington",
+      "q": 6521,
+      "witness": 2
+    },
+    "6852740397323": {
+      "kind": "pocklington",
+      "q": 5516767,
+      "witness": 2
+    },
+    "7553710802112822672555277": {
+      "kind": "pocklington",
+      "q": 6852740397323,
+      "witness": 2
+    },
+    "4421": {
+      "kind": "trial"
+    },
+    "4226477": {
+      "kind": "pocklington",
+      "q": 4421,
+      "witness": 2
+    },
+    "6965098848737": {
+      "kind": "pocklington",
+      "q": 4226477,
+      "witness": 2
+    },
+    "9148373849767624913245913": {
+      "kind": "pocklington",
+      "q": 6965098848737,
+      "witness": 2
+    },
+    "12097": {
+      "kind": "trial"
+    },
+    "13548641": {
+      "kind": "pocklington",
+      "q": 12097,
+      "witness": 2
+    },
+    "11969248821349": {
+      "kind": "pocklington",
+      "q": 13548641,
+      "witness": 2
+    },
+    "21153545418269833340730631": {
+      "kind": "pocklington",
+      "q": 11969248821349,
+      "witness": 2
+    },
+    "49691721381429296316550929875894494756977124489877": {
+      "kind": "pocklington",
+      "q": 21153545418269833340730631,
+      "witness": 2
+    },
+    "16229": {
+      "kind": "trial"
+    },
+    "14021857": {
+      "kind": "pocklington",
+      "q": 16229,
+      "witness": 2
+    },
+    "13363054070713": {
+      "kind": "pocklington",
+      "q": 14021857,
+      "witness": 2
+    },
+    "26024415849530133434037187": {
+      "kind": "pocklington",
+      "q": 13363054070713,
+      "witness": 2
+    },
+    "52147428152903508758873410156111302483975112180559": {
+      "kind": "pocklington",
+      "q": 26024415849530133434037187,
+      "witness": 2
+    }
+  },
+  "fixtures": [
+    {
+      "id": "a6_fresh_balanced_20d",
+      "digits": 20,
+      "n": 56148486637612744091,
+      "factors": [
+        6742508741,
+        8327536351
+      ]
+    },
+    {
+      "id": "a6_fresh_balanced_50d",
+      "digits": 50,
+      "n": 69104170370756177484335557518435815556691986832901,
+      "factors": [
+        7553710802112822672555277,
+        9148373849767624913245913
+      ]
+    },
+    {
+      "id": "a6_fresh_balanced_100d",
+      "digits": 100,
+      "n": 2591295470532183322246876346060972856789281075746135171095259587297645506553834975105196561991701243,
+      "factors": [
+        49691721381429296316550929875894494756977124489877,
+        52147428152903508758873410156111302483975112180559
+      ]
+    }
+  ]
+}
