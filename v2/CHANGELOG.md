@@ -1,5 +1,22 @@
 # v2 changelog
 
+## C6 optimized execution and B4 confirmation — 9 October 2026
+
+- Complete the reopened C6 executor optimization and isolated B4 comparison.
+  Independently certify batched coordinate-factor checks with strict saturated
+  replay; reproduce bounded CF-family minima without claiming global optimality.
+- Confirm reused native reduced PRAC at 6.73% less complete-campaign time than
+  pinned B4 [5.98%, 7.26%], or 3.98% less after charging first preparation.
+  Separate GMP Lucas saves 8.42% reused and 5.97% with per-attempt construction.
+  Preserve all 10/20 splits, unsuccessful attempts and unresolved cofactors.
+- Retain the ladder for fresh native attempts and all production defaults;
+  combined Lucas is inconclusive and larger CF search is not justified.
+  Record generation, construction, bounded storage, 153 cold starts and
+  separate profiles. B3 owns production work/resume/portfolio integration.
+  A committed-only archive passes 431 PyPy/GMP tests, full lint and all 84
+  benchmark imports; controls and certified inputs are versioned, raw evidence
+  remains local. Preserve v1 and production kernels; keep C6 unmerged.
+
 ## C6 bounded precomputed Lucas study — 9 October 2026
 
 - Reproduce pinned GMP-ECM LucasChainGenerator at B1=2,000; preserve upstream

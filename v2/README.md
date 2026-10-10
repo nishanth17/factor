@@ -113,6 +113,9 @@ batch)` fixes B1=2,000 and accepts PRAC, Lucas or CF with `late`, `reduced` or
 `fused` execution. It preserves the same guard/replay contract; the native
 combined experiment does not modify production modules or checkpoint state.
 Cold and reused programs have different measured costs and adoption scope.
+The completed bounded study recommends reduced PRAC/batch 16 for B3's native
+B4 integration experiment and tuple Lucas/batch 16 for its separate GMP work.
+Native fresh construction retains the ladder; no production default changes.
 
 The bounded portfolio adds one allowance across preprocessing, retries and
 recursive children, with streamed prime schedules, controlled workspace and
