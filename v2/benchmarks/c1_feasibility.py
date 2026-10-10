@@ -545,6 +545,30 @@ def probe(fixture, seed, config, control):
     return report, audit.records
 
 
+def validate_control(row, fixture):
+    """Use A10's accepted strict range without editing historical B1 evidence."""
+    assert prod(row["factors"]) * prod(row["remaining"]) == fixture["n"]
+    expected = Counter(fixture["factors"])
+    assert not Counter(row["factors"]) - expected
+    assert row["complete"] == (not row["remaining"])
+    if row["complete"]:
+        assert Counter(row["factors"]) == expected
+    if row["divisor"] is not None:
+        assert utils.valid_divisor(row["divisor"], fixture["n"])
+    assert len(row["certainty"]) == len(row["factors"])
+    for factor, label in zip(row["factors"], row["certainty"]):
+        # Certificates in the independently verified corpus prove these factors.
+        # Runtime guarantees still stop strictly before the A10 endpoint.
+        wanted = (
+            "proven_prime"
+            if factor < 3317044064679887385961981
+            else "probable_prime"
+        )
+        assert label == wanted
+    assert row["work"] <= 10**13
+    assert row["stats"].get("workspace_bytes", 0) <= 256 * 2**20
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -571,24 +595,48 @@ def main():
             ).strip(),
             cells=[],
         )
-        save(args.output / "manifest.json", summary)
+        if (args.output / "manifest.json").exists():
+            original_manifest = json.loads(
+                (args.output / "manifest.json").read_text()
+            )
+            if original_manifest["sources"] != summary["sources"]:
+                raise ValueError(
+                    "changed production source during continuation"
+                )
+            save(args.output / "continuation.json", summary)
+        else:
+            save(args.output / "manifest.json", summary)
         for fixture in fixtures:
             for seed in control["seeds"]:
                 # Reserve a whole possible cell before launch.
                 if (
                     max(time.monotonic() - started, time.process_time() - cpu)
-                    + 250
+                    + 310
                     > 2000
                 ):
                     summary["stopped"] = "campaign_limit"
                     break
                 name = f"{fixture['digits']}-{seed}"
-                baseline = run_one(
-                    fixture,
-                    seed,
-                    configs[fixture["digits"]],
-                    5 if fixture["digits"] == 30 else 30,
-                )
+                prior = args.output / (name + "-probe.json")
+                if prior.exists():
+                    report = json.loads(prior.read_text())
+                    summary["cells"].append(
+                        dict(
+                            name=name,
+                            go=report["go"],
+                            stopped=report["stopped"],
+                        )
+                    )
+                    continue
+                with patch(
+                    "v2.benchmarks.b1_calibration.validate", validate_control
+                ):
+                    baseline = run_one(
+                        fixture,
+                        seed,
+                        configs[fixture["digits"]],
+                        5 if fixture["digits"] == 30 else 30,
+                    )
                 save(args.output / (name + "-control.json"), baseline)
                 report, records = probe(
                     fixture, seed, configs[fixture["digits"]], baseline

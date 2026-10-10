@@ -11,6 +11,7 @@ from v2.benchmarks.c1_feasibility import (
     kernel,
     load_control,
     split_residual,
+    validate_control,
     verify_square,
     xor_selected,
 )
@@ -171,6 +172,30 @@ class DiagnosticSamplingTests(unittest.TestCase):
         audit.budget = Budget(work_limit=0)
         audit.observe(run, 0, 1, 0)
         self.assertEqual(audit.stop, "diagnostic_work_limit")
+
+    def test_control_certainty_uses_strict_a10_range(self):
+        for factor, expected in (
+            (2**64 + 13, "proven_prime"),
+            (3317044064679887385961981, "probable_prime"),
+        ):
+            fixture = dict(n=factor, factors=[factor])
+            row = dict(
+                factors=[factor],
+                remaining=[],
+                complete=True,
+                divisor=None,
+                certainty=[expected],
+                work=0,
+                stats={},
+            )
+            validate_control(row, fixture)
+            row["certainty"] = [
+                "probable_prime"
+                if expected == "proven_prime"
+                else "proven_prime"
+            ]
+            with self.assertRaises(AssertionError):
+                validate_control(row, fixture)
 
     def test_frozen_loaders_need_only_versioned_files(self):
         control, fixtures, configs = load_control()
