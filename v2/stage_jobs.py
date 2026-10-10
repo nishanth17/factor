@@ -230,7 +230,12 @@ def _stage_one(job, budget, context, config):
         return
 
     chains = getattr(context, "chains", None) if job["kind"] == "ecm" else None
-    plan = chains.get(job["b1"], budget) if chains is not None else None
+    plan = None
+    if chains is not None:
+        from .ecm_chains import supports_modulus
+
+        if supports_modulus(job["n"]):
+            plan = chains.get(job["b1"], budget)
     if plan is not None:
         start = job["value"]
         value, divisor, replayed = plan.execute(

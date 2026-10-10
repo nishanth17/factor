@@ -22,6 +22,8 @@ from v2.ecm_chains import (
     ChainPlan,
     ChainPlans,
     identity,
+    supports_modulus,
+    verify_progress,
 )
 from v2.ecm_programs import ECMPrograms
 from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -167,6 +169,7 @@ class ProductionChainTests(unittest.TestCase):
             (1009 * 1013, 6),
             (1000000000039 * 1000000000061, 17),
             (33554520197234177, 2046841451),
+            (6120168563605791616423380424731852610871, 17),
         ):
             context = SieveContext(
                 config.max_hi, segment_size=config.segment_size
@@ -205,7 +208,7 @@ class ProductionChainTests(unittest.TestCase):
         )
 
     def test_pause_rebuild_cumulative_allowance_identity_and_legacy(self):
-        config, n = configuration(), 1000000000039 * 1000000000061
+        config, n = configuration(), 6120168563605791616423380424731852610871
         full = factorize_bounded(n, seed=19, config=config, budget=allowance())
         self.assertEqual(full.result.reconstruct(), n)
         partial = factorize_bounded(
@@ -337,3 +340,56 @@ class ProductionChainTests(unittest.TestCase):
         )
         self.assertEqual(old_restored.result.reconstruct(), n)
         self.assertEqual(restored.work_used, old_restored.work_used)
+
+    def test_supported_size_band_uses_exact_boundaries(self):
+        self.assertFalse(supports_modulus(10**39 - 1))
+        self.assertTrue(supports_modulus(10**39))
+        self.assertTrue(supports_modulus(10**80 - 1))
+        self.assertFalse(supports_modulus(10**80))
+        config = configuration()
+        n = 1000000000039 * 1000000000061
+        with patch(
+            "v2.ecm_chains.ChainPlans.get",
+            side_effect=AssertionError("unsupported modulus prepared chains"),
+        ):
+            candidate = factorize_bounded(
+                n, seed=19, config=config, budget=allowance()
+            )
+        control = factorize_bounded(
+            n,
+            seed=19,
+            config=replace(config, ecm_chain_mode="off", ecm_chain_bytes=0),
+            budget=allowance(),
+        )
+        self.assertEqual(candidate.result, control.result)
+        self.assertEqual(candidate.work_used, control.work_used)
+
+    def test_durable_replay_progress_rejects_corrupt_recovery(self):
+        config = configuration()
+        n = 6120168563605791616423380424731852610871
+        context = SieveContext(config.max_hi, segment_size=config.segment_size)
+        store = ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+        store.chains = ChainPlans(MIN_MEMORY_BYTES, "python-int", (2000,))
+        job = new_job("ecm", n, 17, 2000, 2500)
+        with patch.object(
+            ChainPlan, "execute", return_value=(None, None, True)
+        ):
+            for _ in range(100):
+                advance_job(job, allowance(), store, config)
+                if job["phase"] == "replay":
+                    break
+            else:
+                self.fail("saved-chunk replay was not reached")
+        verify_progress(job, "python-int", context)
+        advance_job(job, allowance(), store, config)
+        self.assertFalse(job["done"])
+        verify_progress(job, "python-int", context)
+        for field, value in (
+            ("replay_index", 17),
+            ("replay_power", 3),
+            ("replay_value", [1, 0]),
+        ):
+            corrupt = copy.deepcopy(job)
+            corrupt[field] = value
+            with self.assertRaises(ValueError):
+                verify_progress(corrupt, "python-int", context)

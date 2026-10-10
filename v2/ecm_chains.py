@@ -28,6 +28,8 @@ BATCH = 16
 SCRATCH_BYTES = 4 * 1024**2
 PLAN_BYTES = 4 * 1024**2
 MIN_MEMORY_BYTES = SCRATCH_BYTES + PLAN_BYTES
+MIN_MODULUS = 10**39
+MAX_MODULUS = 10**80
 
 
 def point_add(px, pz, qx, qz, rx, rz, n):
@@ -45,6 +47,11 @@ def point_double(px, pz, n, a24):
     bb = difference * difference % n
     delta = aa - bb
     return aa * bb % n, delta * (bb + a24 * delta) % n
+
+
+def supports_modulus(n):
+    """Keep inputs outside the C6 measured size band on the B4 ladder."""
+    return MIN_MODULUS <= n < MAX_MODULUS
 
 
 def identity(bound, backend):
@@ -282,8 +289,27 @@ def verify_progress(job, backend, verifier):
             raise ValueError("chain cursor disagrees with committed chunks")
     elif "chain_identity" in job:
         raise ValueError("unexpected certified chain prefix")
-    if phase != "setup":
-        point = job["value"]
+    points = [] if phase == "setup" else [job["value"]]
+    if phase == "replay":
+        index, power = job["replay_index"], job["replay_power"]
+        utils.require_integer(index, "chain replay index", 0)
+        utils.require_integer(power, "chain replay power", 1)
+        if index > len(job["powers"]):
+            raise ValueError("chain replay index exceeds chunk")
+        if index == len(job["powers"]):
+            if power != 1:
+                raise ValueError("completed chain replay has pending power")
+        else:
+            prime, target = job["powers"][index]
+            if power >= target or target % power:
+                raise ValueError("chain replay power exceeds pending scalar")
+            remaining = power
+            while remaining > 1 and remaining % prime == 0:
+                remaining //= prime
+            if remaining != 1:
+                raise ValueError("chain replay power has an unrelated prime")
+        points.append(job["replay_value"])
+    for point in points:
         if not isinstance(point, list) or len(point) != 2:
             raise ValueError("invalid chain checkpoint point")
         for coordinate in point:

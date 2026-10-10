@@ -739,12 +739,20 @@ def _chain_bounds(config):
     )
 
 
+def _chain_job_supported(job, config):
+    if job["kind"] != "ecm" or job["b1"] not in _chain_bounds(config):
+        return False
+    from .ecm_chains import supports_modulus
+
+    return supports_modulus(job["n"])
+
+
 def _chain_policy(config):
     if config.ecm_chain_mode == "off":
         return None
     from .ecm_chains import CHAIN_VERSION
 
-    return CHAIN_VERSION + "/reuse8/chunk16"
+    return CHAIN_VERSION + "/reuse8/chunk16/40-80digits-v1"
 
 
 def _legacy_pm1(config):
@@ -917,7 +925,7 @@ def _verify_progress(current, config, policy):
 
             if (
                 job["kind"] != "ecm"
-                or job["b1"] not in _chain_bounds(config)
+                or not _chain_job_supported(job, config)
                 or job["chain_identity"] != identity(job["b1"], config.backend)
             ):
                 raise ValueError("incompatible ECM chain progress")
@@ -955,7 +963,7 @@ def _verify_progress(current, config, policy):
 
     if current["job"] and current["job"]["kind"] == "ecm":
         job = current["job"]
-        if job["b1"] in _chain_bounds(config):
+        if _chain_job_supported(job, config):
             from .ecm_chains import verify_progress
 
             verify_progress(job, config.backend, verifier)
@@ -1345,11 +1353,7 @@ def factorize_bounded(
             )
         if checkpoint is not None and state["current"] is not None:
             job = state["current"].get("job")
-            if (
-                job is not None
-                and job["kind"] == "ecm"
-                and job["b1"] in _chain_bounds(config)
-            ):
+            if job is not None and _chain_job_supported(job, config):
                 # Bounded schedule/coordinate reconstruction was checked by
                 # unpack; a refused continuation must still pay that work.
                 budget.consume(
