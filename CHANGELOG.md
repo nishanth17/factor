@@ -11,6 +11,8 @@
   matching work/results throughout. Both pass the revised scoped timing gate.
   Report noisy class losses and finite-workload limits. Keep production
   kernels/APIs/checkpoints unchanged; prepare integration review, no merge.
+  Verify 414 tests, full lint, 75 benchmark imports and frozen loaders from
+  committed files; release the shared performance window to C6/A6.
 
 - Relax the roadmap's universal 10% time / 10-point completion promotion
   floor. Permit smaller repeatable complete-run gains supported by fresh

@@ -2262,3 +2262,13 @@ An old generated verification checkout was moved unchanged from `results/`
 to ignored `audit/` so pycodestyle does not lint its preserved `v1/` copy.
 The initial lint failure and clean rerun logs remain local. Required new
 corpora/protocol/source hashes and five sampling-contract tests are versioned.
+
+Final committed-files-only acceptance at **`a007313`** passes **414 tests**,
+full `make -C v2 lint`, all **75 benchmark module imports**, and original/fresh
+B4 source/corpus/protocol loaders. The checkout is retained under ignored
+`v2/audit/b4-bakeoff-committed-a007313/`; it uses the external PyPy/GMP tool
+environment and no uncommitted source/input. Logs and archive receipt remain
+in local `results/b4/`. Production ECM, stage jobs, schedules, arithmetic,
+portfolio, utilities and `v1/` have no diff against mainline `bcf5f3d`.
+The branch is clean and unmerged. B4's performance window is released to the
+queued C6 then A6 follow-ups; no further B4 timings or heavy checks are planned.

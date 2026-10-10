@@ -14,7 +14,8 @@
 - Keep native integers and readable production kernels unchanged. No public
   API, work ledger, checkpoint, integration or merge changes. Retain 180 process
   captures locally; version required inputs, frozen runner and five sampling
-  contract tests. Pass 414 PyPy/GMP tests and full lint in the isolated tree.
+  contract tests. Pass 414 PyPy/GMP tests, full lint, all 75 benchmark imports
+  and original/fresh frozen loaders from committed-files-only `a007313`.
 
 ## Performance promotion policy — 9 October 2026
 
