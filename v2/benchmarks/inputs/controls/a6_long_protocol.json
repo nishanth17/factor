@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "reason": "Single-cohort short batches remain inconclusive at63; amortize PyPy GC/JIT variation before default selection.",
+  "screen_arms": [
+    "no_pm1",
+    "control",
+    "recurrence16",
+    "recurrence64"
+  ],
+  "screen_inputs": "first12 independent M15 20-digit fixtures",
+  "confirmation_inputs": "next12 independent M15 20-digit fixtures, no selection from these outcomes or timings",
+  "warmup": "10 validated wall seconds per arm; CPU-calibrated approximately1CPU-second sample batches",
+  "samples": [
+    9,
+    27,
+    63
+  ],
+  "extend": "all arms if relative IQR>5% or no candidate lower95%CI>0; confirmation extends if selected CI unresolved; retain at63 if failing.",
+  "selection": "largest CPU saving with lower95%CI>0; freeze before held-out confirmation; unchanged outcomes required; no 10% floor",
+  "fixed": "same seed7,319d5c6 controls, original bounds,budgets,12inputs/cohort; code unchanged; no wrapper or concurrent heavy work"
+}
