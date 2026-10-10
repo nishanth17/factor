@@ -102,3 +102,134 @@ The ratio also specifies the integer scalar needed by later ECM extensions:
 [M(U)]P=[R(L,U)]([M(L)]P). This does not certify an ECM checkpoint, migrate a
 campaign, implement saturation recovery for points, or authorize new bounds
 or curve counts. Those actions remain with the ECM continuation owner.
+
+## Coverage audit and next bakeoffs — 9 October 2026
+
+The accepted tranche is a bounded comparison, not an exhaustive claim about
+state-of-the-art p−1 implementations or literature. Its correctness evidence
+stands independently of its candidate selection. The following audit adds
+important implementation families that were absent from that selection.
+FLINT's inspected routines are p+1, and the inspected PARI driver is not a
+standalone p−1 benchmark: neither is counted as an independent p−1 speed
+baseline. All candidates below remain unmeasured in this project.
+
+### Additional pinned source inspection
+
+| Source and inspected files | Findings, limits and license |
+| --- | --- |
+| [Yamaquasi `3f95f436`](https://github.com/remyoudompheng/yamaquasi/blob/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/pollard_pm1.rs), `src/pollard_pm1.rs`, `LICENSE` | Both small-integer reusable factor bases and generic p−1 are present. Generic stage one uses bounded machine-word / 1024-bit exponent blocks. Classical stage two grows even gap powers by recurrence; above its configured threshold it builds a root polynomial and evaluates it by chirp-z/NTT convolution. The native crossover is not a PyPy crossover. Prime-power comparisons and approximate/rounded stage-two parameter selection differ from our inclusive exact-bound contract; normalize coverage before comparison. BSD-3-Clause. |
+| [YAFU `8110dfbd`](https://github.com/bbuhrow/yafu/blob/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/gmp-ecm/micropm1.c), `factor/gmp-ecm/micropm1.c`, `factor/avx-ecm/avxppm1.c` | Micro p−1 has precomputed stage-one window plans and D=60 square-exponent BSGS pairing, with fixed small B1 choices and B2=25·B1. That is an additional ordinary p−1 algorithm family, not merely a wrapper around GMP-ECM. The micro file permits FreeBSD two-clause or MPL-2.0 licensing; the AVX file contains both a two-clause notice and LGPL-3.0-or-later material. Review each adapted region's provenance. Fixed-word REDC and AVX execution do not transfer directly to Python integers. |
+| [Prime95 mirror `027cb137`](https://github.com/primesearch/Prime95/blob/027cb13799d46bbcc5dc5fd208cb71ebe4efb348/ecm.cpp), `ecm.cpp`, `pair.cpp`, `license.txt` | The p−1 sections select pairing or polynomial stage two under memory/cost estimates. `calc_exp2` constructs bit-sized exponent batches with balanced multiplication and includes every prime-power threshold above the completed B1. Stage one limits uninterruptible work. The FFT arithmetic and its cost model target very different sizes/hardware. The source has Mersenne Research copyright/all-rights-reserved notices and a custom GIMPS EULA; public availability does not supply a general adaptation license. Use independently derived mathematics, not copied planner code. |
+| [GPUOwl v6 `98ff9c78`](https://github.com/preda/gpuowl/blob/98ff9c78068543674866c333c7e46c5c92212686/Pm1Plan.cpp), `Pm1Plan.cpp`, `LICENSE` | This older execution-plan source contains D=30030 pairing and relocation of small multiples of eligible primes. GPL-3.0. Current repository HEAD [`4d0e7590`](https://github.com/preda/gpuowl/blob/4d0e75902d12e57dcea36f23b56bcfe364ad9df2/pm1/pm1.cpp) was separately checked: its `pm1/pm1.cpp` is a Mersenne probability/bound calculator, not a p−1 execution kernel. Do not count the two as independent execution baselines or transfer Mersenne allocation probabilities to generic composites. |
+| [PrMers `af6f9965`](https://github.com/cherubrock-seb/PrMers/blob/af6f99659082105c1eb077ccf56a7b3674693fc1/src/modes/RunPM1.cpp), `src/modes/RunPM1.cpp`, `LICENSE`, `LICENSES/README.md` | Current Mersenne-specific code exposes classical BSGS, scalar-trace stage two, a Pair95 option and Prime95 handoff/checkpoint handling. This is a useful recent source lead, not evidence of superiority or an independently validated algorithm here. Authored source is MIT; its optional GPUOwl-derived Aevum engine is GPL-3.0 and files retain their own notices. Whole-program licensing cannot be inferred from the root MIT notice. |
+
+Pins were resolved on the audit date; source/license captures and SHA-256
+manifests remain in ignored `results/a6/research/coverage-audit/`. No upstream
+code was copied. Mlucas 20.1.1 and CUDAPm1 are additional special-form leads,
+not inspected execution baselines in this audit. Proprietary implementations,
+all historical forks and every recent paper have not been exhaustively audited.
+
+### Literature coverage and a recent claim
+
+[Montgomery–Silverman (1990), *An FFT Extension to the p−1 Factoring
+Algorithm*](https://cr.yp.to/bib/1990/montgomery.pdf) is the primary predecessor
+of the later polynomial continuation. Its PDF was captured; the available web
+text exposed the abstract and classical gap recurrence, but a complete local
+text extraction was unavailable in this audit. [Montgomery–Kruppa (2008),
+*Improved Stage 2 to P±1 Factoring Algorithms*](https://inria.hal.science/inria-00188192/file/pm1fft-final.pdf)
+is the primary space-efficient reciprocal-polynomial continuation paper.
+Its full HAL download was access-blocked; the original tranche inspected the
+authors' ANTS presentation and Kruppa's thesis. These access limits must not be
+reported as a full reading of those two papers.
+
+The author-hosted [Brent–Kruppa–Zimmermann chapter, §8.3](https://members.loria.fr/PZimmermann/papers/Chap8.pdf)
+was inspected in this audit. It supplies the p−1-specific scaling/product
+construction and geometric-progression evaluation by Bluestein/chirp-z,
+distinct from ECM's generic product/remainder tree. It explicitly notes
+possible missing primes near interval edges for some set choices. A bounded
+implementation must certify those edges and exceptional wheel primes rather
+than infer exact coverage from a convolution size. Polynomial multiplication,
+coefficient representation and evaluation costs remain part of stage two;
+there is no justified standalone O(log B2) total-stage claim here.
+
+[Xia–Wang–Gu (13 August 2026), *Dynamic Scaling Pollard's P-1
+Algorithm*](https://www.mdpi.com/2410-387X/10/4/57) is a recent primary lead.
+The publisher's indexed abstract and algorithm discussion were available;
+direct HTML/XML/full-PDF retrieval failed. It studies dynamic exponent/prime
+scaling, reuse of prime products and balanced multiplication. Its experiment
+constructs smooth p−1 inputs, and its named comparisons do not establish a
+win over our retained bounded chunk/gap implementation or GMP-ECM. Its
+resistance assumptions for the other factor also require review for mixed
+saturation. Treat it as a separate schedule hypothesis requiring complete
+paper/pseudocode inspection and an exact exponent/coverage oracle before any
+matched experiment; do not transfer its speedup claims or silently replace
+M(B)=lcm(1,...,B).
+
+### Ranked hypotheses for a separate bounded follow-up
+
+1. **Ordinary p−1 wheel/± BSGS stage two.** This has the largest algorithmic
+   opportunity because stage two accounts for substantial inclusive CPU in
+   the A6 diagnostic profile. Compare a small bounded wheel against retained
+   gap execution, including all table setup, singleton/tail work, GCD and
+   finite replay costs. YAFU's square-exponent method and CADO/PrMers' trace
+   representation are distinct possible arms; start with one. For unit A,
+   writing T=A^(kD), H=A^r gives
+   `T + T^-1 - H - H^-1 = (T-H)*(T*H-1)/(T*H)`.
+   This independently explains the ± coverage modulo each prime factor.
+   Check units before inversion, certify every eligible prime, retain
+   exceptional wheel primes, and account explicitly for any incidental
+   coverage from singletons or square exponents. Mixed factors can saturate
+   a product, so direct-prime replay remains necessary. This is a separate
+   p−1 executor; no Williams p+1, Lucas optimizer or ECM pairing changes.
+
+2. **Exponent chunks capped by bit length.** Compare a few frozen bit caps
+   with the accepted fixed-prime-count chunk 64 and retained chunk 16.
+   Prime counts hide changing exponent lengths across bounds. Include
+   sequential versus balanced product construction only where profiling
+   shows setup matters. Preserve chunk-start recovery, latency limits and
+   cumulative charges. Built-in `pow` remains the control; a Python window
+   interpreter is not assumed to beat it because native code uses windows.
+
+3. **Bounded even-gap power recurrence.** Compare the current per-distinct-gap
+   `pow(A,gap,n)` cache with growing `A^2, A^4, ...` by multiplication and
+   with a sparse compiled gap plan. Keep the first prime exponent separate,
+   cap retained powers, and charge unused setup. The existing cache already
+   removes repeated gap exponentiation, so the remaining opportunity may be
+   small. Measure complete stages rather than just table construction.
+
+4. **Compiled integer schedules reused across different inputs.** Measure
+   packed prime-power/chunk/gap/ratio plans with construction, decoding,
+   memory and resume rebuilding charged. The A6 generic prime-cache study
+   does not settle this richer representation. The existing program store's
+   `program_segment`/`power_values` interface is a coordination reference;
+   avoid changing the ECM-owned store during a p−1 experiment. Amortize over
+   genuinely different inputs at matched bounds. Repeated bases for one n
+   are correlated smooth-order trials and cannot justify ECM-like success
+   claims.
+
+5. **Polynomial/chirp-z stage-two crossover.** Use GMP-ECM and Yamaquasi as
+   architectural references after the classical stage-two alternatives.
+   Establish a feasible exact polynomial kernel and finite coefficient/
+   workspace/recovery contract before building a new transform backend.
+   Compare complete stages over predeclared larger B2 ranges, including the
+   project's production B2 when feasible. Native NTT/FFT thresholds and
+   GPU/Mersenne speedups supply no Python-integer promotion evidence.
+
+The cheapest first screen is bit-capped chunks plus even-gap recurrence;
+the next substantive new algorithm is p−1 wheel/± stage two. A polynomial
+implementation and dynamic-scaling schedule remain conditional. Resume
+verification is another possible later study: the current replay cost is
+measured, but accepting an unverified cached residue is not an optimization.
+
+Freeze a fresh protocol and untouched confirmation inputs before any new
+timing. Keep Python integers, exact bound/coverage identities and existing
+allowances as controls. Include nonsplitting, independently certified general
+inputs and marginal portfolio completion per CPU-second alongside constructed
+boundary/recovery cases. Charge fresh construction and distinguish legitimate
+batch amortization from warm-only reuse. Require PyPy Python 3.11, at least
+three seconds of validated warmup, nine samples with stability extensions,
+paired uncertainty estimates, and an exclusive window coordinated with B4/C6.
+The revised roadmap permits gains below 10% when sustained beyond noise and
+confirmed independently; practical regressions, storage, reconstruction and
+completion evidence still govern promotion. This audit performs no new timing
+and changes no API, defaults, allocation or roadmap completion status.
