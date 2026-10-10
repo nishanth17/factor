@@ -233,3 +233,36 @@ The revised roadmap permits gains below 10% when sustained beyond noise and
 confirmed independently; practical regressions, storage, reconstruction and
 completion evidence still govern promotion. This audit performs no new timing
 and changes no API, defaults, allocation or roadmap completion status.
+
+### Follow-up wheel contract (implementation pending acceptance)
+
+The frozen follow-up independently implements the trace identity with D=30
+or 210. For the nearest center c=kD and eligible primes c-r and c+r,
+
+```
+A**c + A**(-c) - A**r - A**(-r)
+    = A**(-c) * (A**(c-r)-1) * (A**(c+r)-1)  (mod n).
+```
+
+Setup verifies gcd(A,n)=1 before inversion. Thus A**(-c) is a unit modulo n,
+so the trace has the same GCD as the two ordinary relations, also over
+composite rings and prime powers. A singleton evaluates its one direct
+relation; an absent partner outside the inclusive interval is not introduced.
+For prime q=c±r, gcd(r,D)>1 implies q divides D, so tables retain coprime
+offsets plus the prime divisors of D. This compact representation requires
+explicit small-prime exceptions, retained in the implementation and oracle.
+
+Pending centers survive prime-segment boundaries. Records contain their
+original eligible primes and are consumed in finite GCD batches. If different
+factors satisfy different primes within one trace, the trace can saturate;
+recovery therefore replays each original q rather than only the trace. The
+recovery allowance counts these attempts. Increasing B1 clears all retained
+wheel/even-gap state, then repeats the complete new stage-two interval.
+Equal-B1 B2 append preserves checked coverage; it need not pair across rungs.
+
+The executor has its own checkpoint identity and deterministic work ledger;
+it does not copy CADO, YAFU, Prime95 or PrMers code. The existing group-neutral
+LCM ratio remains the only shared schedule interface. Future ECM point
+continuation and allocation remain separate. The frozen follow-up protocol
+and source control live in versioned `inputs/`; final acceptance still requires
+correctness, fresh confirmation and complete-stage/portfolio measurements.

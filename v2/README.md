@@ -687,3 +687,17 @@ remain unchanged. Both modes reconstruct retained arithmetic and charge
 verification to cumulative allowances. Increased B1 invalidates all tuned
 residue tables; equal-B1 B2 extensions retain checked coverage and append only
 the new interval. Defaults, RNG assignments and portfolio APIs are unchanged.
+
+Tuned work units are separately identified by `pm1-tuning-v1`. Bit-capped
+filling reserves `max(1, scanned_candidates)` before publishing a chunk;
+powering and prime-unit recovery keep the legacy charges. Even-gap recurrence
+keeps each gap's `gap.bit_length()+1` charge and adds one per newly retained
+even power. Wheel setup reserves `2*n.bit_length()+2*D+4`, including unit
+checking/inversion and both bounded power tables. A center plan with k primes
+reserves `2*center.bit_length()+k+4` for its first giant, or
+`2*max(1, distance_in_wheels.bit_length())+k+4` for a later giant. Collecting k
+primes costs k+1; evaluating k paired/singleton records costs 2*k+1. Saturated
+records replay original prime q with `q.bit_length()+1` per attempt. Finite
+transitions, GCDs, context building and full checkpoint verification retain
+explicit reservations. These are deterministic allowance units, not measured
+CPU instructions; cache hits never reset or refund cumulative allowances.
