@@ -16,6 +16,47 @@ CF_SHA256 = "fd1e650180c1c576fe9bd95e64221f3d19bb0a730a772d356f0876d1e91284ae"
 CF_BYTES = 62430
 
 
+def default_options(config, tiers=None, *, automatic_memory=False):
+    """Resolve fresh automatic routing within the existing finite cap.
+
+    This pure preparation decision never loads records or runs arithmetic.
+    Unsupported schedules and smaller user caps retain streamed execution.
+    """
+    tiers = config.ecm_tiers if tiers is None else tiers
+    program_bytes = config.ecm_program_bytes or max(
+        512 * 1024, 4096 + 256 * config.segment_size
+    )
+    chain_bytes = config.ecm_chain_bytes or core.MIN_MEMORY_BYTES
+    extra = (
+        program_bytes
+        - config.ecm_program_bytes
+        + chain_bytes
+        - config.ecm_chain_bytes
+    )
+    eligible = (
+        (config.backend == "python-int" or config.ecm_chain_family != "auto")
+        and config.chunk_size == 16
+        and any(b1 == 2000 and curves >= 8 for b1, _, curves in tiers)
+        and all(b2 < 2**64 for _, b2, curves in tiers if curves)
+    )
+    memory_bytes = (
+        16 * 1024**2 if automatic_memory and eligible else config.memory_bytes
+    )
+    available = memory_bytes - config.workspace_reserve - 8192
+    fallback = config.siqs or config.sss
+    if fallback is not None:
+        available -= fallback.memory_bytes
+    supported = eligible and available >= extra
+    return dict(
+        memory_bytes=memory_bytes if supported else config.memory_bytes,
+        ecm_chain_mode="reuse" if supported else "off",
+        ecm_program_bytes=program_bytes
+        if supported
+        else config.ecm_program_bytes,
+        ecm_chain_bytes=chain_bytes if supported else config.ecm_chain_bytes,
+    )
+
+
 def identity(bound, backend, family):
     """Pin the optional family without changing legacy PRAC/Lucas IDs."""
     if family not in ("lucas", "cf"):

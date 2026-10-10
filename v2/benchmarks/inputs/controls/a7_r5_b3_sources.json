@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "base_control_sha256": "9ec74ab79c1b1dd5a979370a96bfbac517113ee483c47ce3d3656b1027e33d72",
+  "status": "B3 user-directed native default and optional Lucas/CF integration pins; not fresh E1 timing or a new calibrated selection.",
+  "source_sha256": {
+    "v2/benchmarks/a7_r5.py": "bb1fd9ebf6e0d9695d42017ae0dd3f30a9eae4ed8498c670ef11676f0e4ea6bd",
+    "v2/factor.py": "1e60c1f731a8d98882264da5a3ff59a51465b3374f1072cfe6d0e85d680fc1b6",
+    "v2/qs/__init__.py": "d12995525a3a27f8174443d20842f17dacfd4dc26a771885aa15de0644eae8ed",
+    "v2/qs/checkpoint.py": "4c765fb0ec7ca74f5067cc4b0d761b2e13a7699dd714c06c5b4be2931bd7943c",
+    "v2/qs/extraction.py": "0e28fee97ba01100f5eaba8c0aebd8e1cbf855fb844528171cce297ed86c23ab",
+    "v2/qs/relations.py": "5684d2fde47eca91d148bdc3e3e5e11d2ad30a0215c8a2892d0c7afd5449cf82",
+    "v2/qs/sieve_collector.py": "8999f114d4dbe824008c1308bdd0edb39bb6075fc6e4f575a57c707fd45ebcea",
+    "v2/qs/siqs.py": "1e958c74187d59217eb9a2a6d7fde76fb85e9b23556a80d810151d0682e7e922",
+    "v2/portfolio.py": "4d990f3c65a786769db47522d5637b0deb66f22b45ec6cb6013a7044f194cbcc",
+    "v2/ecm_programs.py": "dcbb3300bfff413f044a43d72de2b3ee20378e443cc6d06c6a8ab1ce970f77c6",
+    "v2/stage_jobs.py": "2d0d63172563c3e36c95af5e085049e5a207e50a6857acc31f1b1136fafa9276"
+  },
+  "previous_manifest_sha256": "b360a2a5c1fc5032dfc32d9af65e74ee2f353e5e20c89c8dd006ebad8e09b376"
+}

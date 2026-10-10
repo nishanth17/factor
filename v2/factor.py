@@ -351,13 +351,23 @@ def main():
         "--ecm-curves", type=int, default=constants.MAX_CURVES_ECM
     )
     parser.add_argument(
+        "--ecm-chain",
+        choices=("auto", "off", "prac", "lucas", "cf"),
+        help="bounded ECM chains; lucas and cf are explicit alternatives",
+    )
+    parser.add_argument(
         "--backend", choices=("python-int", "gmpy2-mpz"), default="python-int"
     )
     args = parser.parse_args()
+    implicit_memory = args.memory_mib is None
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
     if args.siqs and args.method != "auto":
         parser.error("--siqs is an auto fallback; use --method siqs alone")
+    if args.ecm_chain is not None and args.method != "auto":
+        parser.error("--ecm-chain requires the auto portfolio")
+    if args.ecm_chain == "prac" and args.backend != "python-int":
+        parser.error("--ecm-chain prac requires the native integer backend")
     qs_parameters = {
         name: getattr(args, "qs_" + name)
         for name in (
@@ -410,7 +420,14 @@ def main():
                 else int(input("Enter number: "))
             )
 
-        if args.bounded or args.resume or args.checkpoint or use_sss or use_qs:
+        if (
+            args.bounded
+            or args.resume
+            or args.checkpoint
+            or use_sss
+            or use_qs
+            or args.ecm_chain is not None
+        ):
             from .budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
             from .qs.sss import SSSConfig
@@ -423,6 +440,8 @@ def main():
                 memory_bytes=args.memory_mib * 1024 * 1024,
                 fermat_steps=args.fermat_steps,
             )
+            if implicit_memory and not (use_qs or use_sss):
+                parameters.pop("memory_bytes")
             if use_qs:
                 from .qs import SIQSConfig
 
@@ -497,7 +516,26 @@ def main():
                 parameters.update(
                     pm1_gap_mode=saved.get("pm1_gap_mode", "cached"),
                     pm1_chunk_size=saved.get("pm1_chunk_size"),
+                    ecm_chain_mode=saved.get("ecm_chain_mode", "off"),
+                    ecm_chain_family=saved.get("ecm_chain_family", "auto"),
+                    ecm_chain_bytes=saved.get("ecm_chain_bytes", 0),
+                    ecm_program_bytes=saved.get("ecm_program_bytes", 0),
                 )
+                if implicit_memory:
+                    parameters["memory_bytes"] = saved.get(
+                        "memory_bytes", 8_388_608
+                    )
+            if args.ecm_chain is not None:
+                parameters.update(
+                    ecm_chain_mode="off"
+                    if args.ecm_chain == "off"
+                    else "auto",
+                    ecm_chain_family=args.ecm_chain
+                    if args.ecm_chain in ("lucas", "cf")
+                    else "auto",
+                )
+                if args.ecm_chain == "off":
+                    parameters["ecm_chain_bytes"] = 0
             config = PortfolioConfig(**parameters)
             run = factorize_bounded(
                 number,

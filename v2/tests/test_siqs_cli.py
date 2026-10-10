@@ -298,7 +298,7 @@ class SIQSCLITests(unittest.TestCase):
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertNotIn("Traceback", resumed.stderr)
 
-    def test_existing_bounded_default_keeps_its_configuration(self):
+    def test_bounded_prac_default_keeps_bounds_and_optional_qs_disabled(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "progress.json"
 
@@ -315,7 +315,8 @@ class SIQSCLITests(unittest.TestCase):
             self.assertEqual(run.returncode, 1, run.stderr)
             self.assertIsNone(config["siqs"])
             self.assertIsNone(config["sss"])
-            self.assertEqual(config["memory_bytes"], 8 * 1024 * 1024)
+            self.assertEqual(config["memory_bytes"], 16 * 1024 * 1024)
+            self.assertEqual(config["ecm_chain_mode"], "reuse")
             self.assertEqual(config["ecm_tiers"], [[2000, 147396, 32]])
 
 

@@ -16,7 +16,7 @@ from .phase_three_sss import deserialize_config
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = Path(__file__).parent / "inputs/controls/a7_r5_e1_arms.json"
 CURRENT_SOURCES = (
-    Path(__file__).parent / "inputs/controls/a7_r5_c1_sources.json"
+    Path(__file__).parent / "inputs/controls/a7_r5_b3_sources.json"
 )
 
 

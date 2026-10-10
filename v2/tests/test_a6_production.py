@@ -248,7 +248,7 @@ class ProductionPM1Tests(unittest.TestCase):
         self.assertEqual(config.chunk_size, 16)
         n = 1009 * 1013
         fresh = portfolio.factorize_bounded(n, budget=allowance(0))
-        self.assertEqual(fresh.checkpoint["payload"]["version"], 9)
+        self.assertEqual(fresh.checkpoint["payload"]["version"], 10)
         resumed = portfolio.factorize_bounded(
             n, budget=allowance(0), checkpoint=fresh.checkpoint
         )

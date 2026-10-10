@@ -384,6 +384,7 @@ class ProductionChainTests(unittest.TestCase):
         options = asdict(config)
         options.pop("ecm_chain_mode")
         options.pop("ecm_chain_bytes")
+        options.pop("ecm_chain_family")
         old_config = old.PortfolioConfig(**options)
         n = 1000000000039 * 1000000000061
         first = old.factorize_bounded(
