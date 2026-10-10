@@ -448,6 +448,30 @@ resumes may rebuild for too few remaining curves to amortize preparation;
 this is outside the confirmed common-prefix performance claim. ECM B1
 extension on a completed curve remains unsupported.
 
+### Experimental SSS resume and loss policy
+
+`SSSJob(n, seed=7, config=SSSConfig(...), budget=...)` returns the common
+split/cofactor result; recursive terminal classification belongs to
+`factorize_bounded`. `SSSConfig(mode="sssf", filter_bound=0)` retains two-stage
+smoothness without the candidate cutoff. A positive `filter_bound` deliberately
+loses candidates; it is an explicit policy, never an automatic default.
+Collision trees inspect the forced-divisor quotient, while admission recovers
+all exponents from the original polynomial value.
+
+In-memory resume must extend the original `Budget` object. For serialized
+resume, use `SSSJob.from_checkpoint(checkpoint, budget=total_allowance,
+config=same_config)`. Native SSS versions 1/2 migrate to 3; backend/build and
+configuration identities are checked. New solver fingerprints carry
+`digest_encoding="hex-v1"` and avoid decimal-mask conversion limits; absent
+tags retain legacy decimal replay, and unknown tags are rejected.
+Restoration retains prior work/wall/CPU
+and additionally charges setup, relation verification, assignment regeneration
+and solver/extraction replay. A total grant equal to previously consumed work
+can therefore refuse reconstruction. Checkpoint byte-cap refusal leaves the
+in-memory job available; exhausted schedules do not restart on budget extension.
+See the [A7 acceptance matrix](benchmarks/a7_r5_reconciliation.md) for worker
+resource limitations and the prepared E1 comparison arms.
+
 ## Optional ECM programs and explicit campaigns
 
 `PortfolioConfig(ecm_program_bytes=...)` opts into P5.2 A3's immutable packed
