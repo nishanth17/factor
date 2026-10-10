@@ -85,9 +85,10 @@ def _fill_bits(state, budget, context, config):
         control._step(state, budget, context, config)
         return
 
+    start = cursor["index"]
     bit_count = sum(power.bit_length() for _, power in state["powers"])
     additions, scanned, full = [], 0, False
-    for prime in cursor["values"][cursor["index"] :]:
+    for prime in cursor["values"][start:]:
         ratio = control.prime_power_ratio(prime, state["old_b1"], state["b1"])
         if ratio != 1:
             bits = ratio.bit_length()
@@ -121,7 +122,9 @@ def _even_gaps(state, budget, context, config):
         config.gcd_batch - len(state["terms"]),
         len(cursor["values"]) - cursor["index"],
     )
-    primes = cursor["values"][cursor["index"] : cursor["index"] + count]
+    start = cursor["index"]
+    stop = start + count
+    primes = cursor["values"][start:stop]
     previous, gaps = state["previous_prime"], []
     for prime in primes:
         gaps.append(prime - previous)
@@ -257,7 +260,8 @@ def _paired_terms(state, budget, config):
     n, center, giant = state["n"], state["wheel_center"], state["wheel_giant"]
     trace = giant + state["wheel_inverse_giant"]
     forward, backward = state["wheel_forward"], state["wheel_backward"]
-    for primes in records[start : start + count]:
+    stop = start + count
+    for primes in records[start:stop]:
         offset = primes[0] - center
         index = state["wheel_indices"][abs(offset)]
         if index < 0:
@@ -337,20 +341,20 @@ def _paired_step(state, budget, context, config):
 
     cursor, pending = state["cursor"], state["wheel_pending"]
     if cursor["index"] < len(cursor["values"]):
-        prime = cursor["values"][cursor["index"]]
+        start = cursor["index"]
+        prime = cursor["values"][start]
         center = _center(prime, config.wheel)
         if pending and center != _center(pending[0], config.wheel):
             _compile_center(state, budget, config)
             return
         count = 0
-        for prime in cursor["values"][cursor["index"] :]:
+        for prime in cursor["values"][start:]:
             if _center(prime, config.wheel) != center:
                 break
             count += 1
         budget.consume(count + 1)
-        pending.extend(
-            cursor["values"][cursor["index"] : cursor["index"] + count]
-        )
+        stop = start + count
+        pending.extend(cursor["values"][start:stop])
         cursor["index"] += count
     elif cursor["next"] < cursor["hi"]:
         control._load_segment(state, context, budget, config)
