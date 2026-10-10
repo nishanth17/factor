@@ -1,7 +1,7 @@
 """Opt-in DLP intake and atomic publication into the relation store."""
 
-from .. import utils
-from ..arithmetic import gcd
+from ..common import utils
+from ..common.arithmetic import gcd
 from .large_primes import CycleTooLongError, graph_reserve, split_two_primes
 from .relations import (
     AtomicRelation,

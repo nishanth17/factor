@@ -7,7 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.benchmarks import a7_r5
+from v2.benchmarks.qs.a7 import a7_r5
 from v2.qs.sss import SSSJob
 
 

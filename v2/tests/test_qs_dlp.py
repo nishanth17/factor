@@ -9,8 +9,8 @@ from dataclasses import asdict, replace
 from math import gcd
 from unittest.mock import patch
 
-from v2 import arithmetic
-from v2.budget import Budget, BudgetExhaustedError
+from v2.common import arithmetic
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     AtomicRelation,

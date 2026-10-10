@@ -1,5 +1,17 @@
 # Changelog
 
+## Folder organization (10 October 2026)
+
+- Group v2 algorithms under `ecm/`, `pm1/`, `rho/` and existing `qs/`;
+  place shared helpers in `common/` and budgets/dispatch in `execution/`.
+- Group benchmark runners, builders and research notes by subject and study;
+  preserve immutable inputs and move the detailed study record behind an index.
+- Record exact structural source migrations separately from frozen evidence;
+  update module commands and loaders without changing factoring algorithms,
+  defaults, work accounting or checkpoint formats.
+- Consolidate ignore rules and place local journals under `v2/local/`.
+
+
 ## Current development
 
 - Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
@@ -404,7 +416,7 @@
   factor extraction with in-memory resume.
 - Remove redundant collector budget polling and proved-useless score marking.
   Keep experimental resieving and alternative scoring/filtering controls
-  optional; see [measurement scope](v2/benchmarks/README.md).
+  optional; see [measurement scope](v2/benchmarks/docs/studies.md).
 - Keep code, tests, roadmap, research and required fixtures on GitHub.
   Exclude generated run captures, logs, profiles and local development records.
 
@@ -438,7 +450,7 @@ ECM remains the default and SIQS stays opt-in. A general SIQS crossover and
 practical 60–80-digit scaling remain unestablished. The earlier M30 completion
 claim was corrected because 0.2-second probes and 24–26-bit fixtures were
 insufficient; M31 supplies the declared longer experiment and its explicit
-retain-baseline decision. See [measurements](v2/benchmarks/README.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
+retain-baseline decision. See [measurements](v2/benchmarks/docs/studies.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
 P4.3 arithmetic assessment and bounded GNFS remain roadmap work.
 
 PRAC optimization remains [P4.1](v2/ROADMAP.md); production currently uses
@@ -541,7 +553,7 @@ the safe Montgomery ladder.
 - Retain defaults: fixed scoring/plans remain experimental, and no candidate
   passes the declared causal training promotion gate. Family-wide CRT and
   wide-block resieve capacity remain deferred. See the
-  [R2 measurements](v2/benchmarks/README.md#p38-r2-bounded-collector-evaluation--4-october-2026)
+  [R2 measurements](v2/benchmarks/docs/studies.md#p38-r2-bounded-collector-evaluation--4-october-2026)
   for commands, uncertainty, censored outcomes and cold/profile separation.
 - Verify the isolated committed-files-only snapshot with 282 PyPy tests,
   full lint, all 45 benchmark imports and frozen-source/corpus checks.

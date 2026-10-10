@@ -5,17 +5,18 @@ import unittest
 from dataclasses import FrozenInstanceError, replace
 from math import gcd
 
-from v2 import ecm, prac
-from v2.benchmarks import c6_chains as strict
-from v2.benchmarks import c6_fast as fast
-from v2.benchmarks import c6_study as study
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND, gmp_backend
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_chains as strict
+from v2.benchmarks.ecm.c6 import c6_fast as fast
+from v2.benchmarks.ecm.c6 import c6_study as study
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND, gmp_backend
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
     twist_point,
 )
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class FastChainTests(unittest.TestCase):
@@ -229,7 +230,8 @@ class FastChainTests(unittest.TestCase):
         corpus = json.loads(study.control.CORPUS.read_text())
         case = next(c for c in corpus["fixtures"] if c["id"] == "balanced_40d")
         n, seed = case["n"], 41001
-        from v2 import constants, utils
+        from v2 import constants
+        from v2.common import utils
 
         rng = utils.resolve_rng(seed, None)
         setup = ecm.setup_curve(n, rng.randint(6, constants.MAX_RANDOM_ECM))

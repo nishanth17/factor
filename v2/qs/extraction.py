@@ -3,9 +3,9 @@
 from collections import Counter
 from dataclasses import dataclass
 
-from .. import utils
-from ..arithmetic import gcd, pow
-from ..budget import Budget
+from ..common import utils
+from ..common.arithmetic import gcd, pow
+from ..execution.budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES, FactorBase
 from .linear_algebra import MAX_MATRIX_ROWS, verify_dependency
 from .relations import (

@@ -315,7 +315,7 @@ Run `make -C v2 test`, `make -C v2 lint`, or the focused regression with
   60–99-digit probes limit promotion. Defer larger calibration, combined-source
   acceptance and portfolio handoff; no DLP, CRT, matrix or GNFS expansion.
 - Verify 365 PyPy/GMP tests and selected early/deeper checkpoints. See the
-  [benchmark record](benchmarks/README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026)
+  [benchmark record](benchmarks/docs/studies.md#b1-joint-qsmpqssiqs-calibration--9-october-2026)
   for configurations, timing uncertainty, commands and remaining gates.
 
 This scoped changelog is under `v2/` to honor the B2 work boundary; the root

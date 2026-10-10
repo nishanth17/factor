@@ -4,14 +4,16 @@ import json
 import unittest
 from math import gcd
 
-from v2 import arithmetic, ecm, portfolio
-from v2.benchmarks import b4_common as common
-from v2.benchmarks import b4_kernels as kernels
-from v2.benchmarks.prac_oracle import (
+from v2 import portfolio
+from v2.benchmarks.ecm.b4 import b4_common as common
+from v2.benchmarks.ecm.b4 import b4_kernels as kernels
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
 )
+from v2.common import arithmetic
+from v2.ecm import core as ecm
 
 
 def primitive(point, n):
@@ -308,7 +310,7 @@ class B4KernelTests(unittest.TestCase):
     def test_isolation(self):
         self.assertIsNot(kernels.ecm_module(self.engines["squares"]), ecm)
         self.assertIsNot(self.engines["baseline"], portfolio)
-        self.assertEqual(ecm.scalar_multiply.__module__, "v2.ecm")
+        self.assertEqual(ecm.scalar_multiply.__module__, "v2.ecm.core")
 
 
 if __name__ == "__main__":

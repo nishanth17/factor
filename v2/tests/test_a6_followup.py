@@ -11,9 +11,10 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from pathlib import Path
 
-from v2 import pm1_bounded, utils
-from v2.pm1_tuning import PM1TuningConfig
-from v2.schedules import SieveContext
+from v2.common import utils
+from v2.execution.schedules import SieveContext
+from v2.pm1 import bounded as pm1_bounded
+from v2.pm1.tuning import PM1TuningConfig
 from v2.tests.test_a6_pm1 import allowance, resign
 
 
@@ -30,6 +31,9 @@ def prime_oracle(lo, hi):
 
 
 def frozen_control():
+    from v2.benchmarks.support.paths import install_legacy_aliases
+
+    install_legacy_aliases()
     name = "v2._a6_followup_frozen"
     if name not in sys.modules:
         source = (

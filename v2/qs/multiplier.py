@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from fractions import Fraction
 
-from .. import prime_sieve, utils
-from ..arithmetic import gcd, pow
-from ..budget import Budget
+from ..common import prime_sieve, utils
+from ..common.arithmetic import gcd, pow
+from ..execution.budget import Budget
 from .factor_base import checked_target
 
 DEFAULT_MULTIPLIERS = (1, 3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 29, 31)

@@ -2,8 +2,8 @@
 
 import random
 
-from .. import arithmetic, utils
-from ..arithmetic import gcd, isqrt, pow
+from ..common import arithmetic, utils
+from ..common.arithmetic import gcd, isqrt, pow
 from .polynomial import MAX_COEFFICIENT_BITS, Polynomial, a_target
 
 

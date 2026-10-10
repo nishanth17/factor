@@ -3,10 +3,15 @@
 import unittest
 from math import gcd
 
-from v2 import ecm, prac
-from v2.benchmarks import c6_b4, c6_cf, c6_fast
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND
-from v2.benchmarks.prac_oracle import affine_multiply, matches, twist_point
+from v2.benchmarks.ecm.c6 import c6_b4, c6_cf, c6_fast
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.support.prac_oracle import (
+    affine_multiply,
+    matches,
+    twist_point,
+)
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class CombinedChainTests(unittest.TestCase):

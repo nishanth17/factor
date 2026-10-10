@@ -7,9 +7,12 @@ from dataclasses import replace
 from math import gcd
 from unittest.mock import patch
 
-from v2 import arithmetic, ecm_paired, ecm_wheel, portfolio, utils
-from v2.budget import BudgetExhaustedError
-from v2.stage_jobs import advance_job, new_job, prime_cursor
+from v2 import portfolio
+from v2.common import arithmetic, utils
+from v2.ecm import paired as ecm_paired
+from v2.ecm import wheel as ecm_wheel
+from v2.execution.budget import BudgetExhaustedError
+from v2.execution.stage_jobs import advance_job, new_job, prime_cursor
 from v2.tests.test_ecm_paired import continuation, store
 from v2.tests.test_ecm_programs import allowance, configuration, primes_between
 from v2.tests.test_phase_one import affine_add
@@ -55,7 +58,7 @@ class WheelExecutionTests(unittest.TestCase):
                 phases = set()
                 while not job["done"]:
                     resumed = arithmetic.canonical(copy.deepcopy(job))
-                    from v2.stage_jobs import promote_job
+                    from v2.execution.stage_jobs import promote_job
 
                     promote_job(resumed, arithmetic.get_backend(backend))
                     advance_job(job, allowance(), context, config)

@@ -4,9 +4,9 @@ import hashlib
 from collections import Counter
 from dataclasses import dataclass, field
 
-from .. import arithmetic, utils
-from ..arithmetic import gcd, pow
-from ..budget import Budget
+from ..common import arithmetic, utils
+from ..common.arithmetic import gcd, pow
+from ..execution.budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import Polynomial, checked_position
 

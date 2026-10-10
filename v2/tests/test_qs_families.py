@@ -7,7 +7,7 @@ from dataclasses import replace
 from functools import partial
 from math import prod
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import (
     PolynomialFamily,
     QSJob,

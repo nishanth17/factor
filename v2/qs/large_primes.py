@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from itertools import islice
 from math import isqrt
 
-from .. import utils
-from ..pollard_rho import RhoStats, factorize_rho
+from ..common import utils
+from ..rho.brent import RhoStats, factorize_rho
 from .relations import MAX_COMBINED_ATOMS, MAX_RESIDUAL
 
 MAX_GRAPH_EDGES = 65536

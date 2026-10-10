@@ -3,9 +3,9 @@
 import unittest
 from copy import deepcopy
 
-from v2.benchmarks.b1_40d import configurations
-from v2.benchmarks.b1_calibration import rank, training_configs, validate
-from v2.benchmarks.b1_qs_width import configurations as qs_configurations
+from v2.benchmarks.qs.b1.b1_40d import configurations
+from v2.benchmarks.qs.b1.b1_calibration import rank, training_configs, validate
+from v2.benchmarks.qs.b1.b1_qs_width import configurations as qs_configurations
 
 
 class CalibrationTests(unittest.TestCase):

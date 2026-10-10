@@ -3,9 +3,9 @@
 import hashlib
 from dataclasses import dataclass, field
 
-from .. import arithmetic, utils
-from ..arithmetic import isqrt
-from ..budget import Budget
+from ..common import arithmetic, utils
+from ..common.arithmetic import isqrt
+from ..execution.budget import Budget
 from .factor_base import MAX_INPUT_BITS, checked_target
 
 MAX_COEFFICIENT_BITS = MAX_INPUT_BITS

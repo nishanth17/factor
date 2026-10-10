@@ -6,17 +6,18 @@ from dataclasses import asdict, replace
 from math import gcd, prod
 from unittest.mock import patch
 
-from v2 import arithmetic, ecm, prac, utils
-from v2.benchmarks import c6_b4, c6_fast
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_b4, c6_fast
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
 )
-from v2.budget import Budget, BudgetExhaustedError
-from v2.ecm_chain_records import Executor, Record, verify_frontier
-from v2.ecm_chains import (
+from v2.common import arithmetic, utils
+from v2.ecm import core as ecm
+from v2.ecm import prac
+from v2.ecm.chain_records import Executor, Record, verify_frontier
+from v2.ecm.chains import (
     MIN_MEMORY_BYTES,
     SCRATCH_BYTES,
     ChainPlan,
@@ -25,10 +26,11 @@ from v2.ecm_chains import (
     supports_modulus,
     verify_progress,
 )
-from v2.ecm_programs import ECMPrograms
+from v2.ecm.programs import ECMPrograms
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import SieveContext
+from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
-from v2.schedules import SieveContext
-from v2.stage_jobs import advance_job, new_job
 from v2.tests.test_phase_two import reseal
 
 
@@ -66,7 +68,7 @@ class ProductionChainTests(unittest.TestCase):
     @staticmethod
     def lazy_control():
         """Load the unpromoted recovery/resume candidate."""
-        from v2.benchmarks import b3_recovery
+        from v2.benchmarks.ecm.b3 import b3_recovery
 
         path = b3_recovery.EAGER.with_name("b3_lazy_chains.json")
         with patch.object(b3_recovery, "EAGER", path):
@@ -178,7 +180,7 @@ class ProductionChainTests(unittest.TestCase):
             self.assertEqual(prepare.call_count, 1)
 
     def test_catalog_corruption_missing_schedule_and_caps(self):
-        with patch("v2.ecm_chains.CATALOG_SHA256", "0" * 64):
+        with patch("v2.ecm.chains.CATALOG_SHA256", "0" * 64):
             budget = allowance()
             with self.assertRaisesRegex(ValueError, "catalog identity"):
                 ChainPlan(2000, "python-int", budget)
@@ -305,7 +307,7 @@ class ProductionChainTests(unittest.TestCase):
         self.assertEqual(restored.result.reconstruct(), n)
 
     def test_eager_and_lazy_checkpoint_rebuilding_is_bidirectional(self):
-        from v2.benchmarks.b3_recovery import selected
+        from v2.benchmarks.ecm.b3.b3_recovery import selected
 
         lazy = self.lazy_control()
         config = configuration()
@@ -377,7 +379,7 @@ class ProductionChainTests(unittest.TestCase):
         )
 
     def test_committed_mainline_bidirectional_ladder_resume(self):
-        from v2.benchmarks.b3_production import baseline
+        from v2.benchmarks.ecm.b3.b3_production import baseline
 
         old = baseline()
         config = configuration(ecm_chain_mode="off", ecm_chain_bytes=0)
@@ -433,7 +435,7 @@ class ProductionChainTests(unittest.TestCase):
         config = configuration()
         n = 1000000000039 * 1000000000061
         with patch(
-            "v2.ecm_chains.ChainPlans.get",
+            "v2.ecm.chains.ChainPlans.get",
             side_effect=AssertionError("unsupported modulus prepared chains"),
         ):
             candidate = factorize_bounded(

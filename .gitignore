@@ -25,8 +25,8 @@ htmlcov/
 *.swo
 .idea/
 
-# The detailed development journal is local; publish CHANGELOG.md instead.
-/v2/LOG.md
+# Local journals and personal scratch work.
+/v2/local/
 
 # Reproducible sources, docs and inputs are versioned by default.
 # Put generated captures, logs, profiles and scratch work in these folders.

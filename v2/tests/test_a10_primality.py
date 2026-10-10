@@ -7,18 +7,19 @@ import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch
 
-from v2 import arithmetic, portfolio, utils
-from v2.benchmarks.a10_inputs import (
+from v2 import portfolio
+from v2.benchmarks.primality.a10.a10_inputs import (
     REPORTED_INPUT,
     REPORTED_PRIME,
     load_corpus,
 )
-from v2.benchmarks.a10_primality import (
+from v2.benchmarks.primality.a10.a10_primality import (
     load_control,
     load_protocol,
     load_v1_adapter,
 )
-from v2.budget import Budget
+from v2.common import arithmetic, utils
+from v2.execution.budget import Budget
 from v2.factor import factorize
 from v2.tests.test_phase_two import reseal
 
@@ -653,7 +654,7 @@ class A10Tests(unittest.TestCase):
         )
         self.assertEqual(limited.result.remaining, (n,))
         self.assertEqual(limited.result.reconstruct(), n)
-        with patch("v2.utils.resolve_rng", side_effect=AssertionError):
+        with patch("v2.common.utils.resolve_rng", side_effect=AssertionError):
             self.assertEqual(
                 factorize(REPORTED_PRIME).factors[0].certainty,
                 utils.Primality.PROVEN,

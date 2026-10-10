@@ -57,7 +57,7 @@ required by test/benchmark loaders. Required inputs live in versioned
 the public acceptance plan in `v2/ROADMAP.md`.
 
 Keep generated captures, stdout transcripts, profiles, verification dumps,
-scratch output and the detailed `v2/LOG.md` journal local. Do not add those
+scratch output and the detailed `v2/local/LOG.md` journal local. Do not add those
 files by force. Preserve useful raw evidence locally or in durable external
 storage; publish a concise summary with commands and limitations.
 

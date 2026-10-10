@@ -11,8 +11,11 @@ from math import gcd, isqrt
 from pathlib import Path
 from unittest.mock import patch
 
-from v2 import ecm, pollard_pm1, pollard_rho, prime_sieve, utils
+from v2.common import prime_sieve, utils
+from v2.ecm import core as ecm
 from v2.factor import factorize, factorize_bf, print_factorization
+from v2.pm1 import core as pollard_pm1
+from v2.rho import brent as pollard_rho
 
 
 def reference_primes(hi):

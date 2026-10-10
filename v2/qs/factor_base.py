@@ -3,9 +3,9 @@
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from .. import arithmetic, prime_sieve, utils
-from ..arithmetic import gcd, pow
-from ..budget import Budget
+from ..common import arithmetic, prime_sieve, utils
+from ..common.arithmetic import gcd, pow
+from ..execution.budget import Budget
 
 MAX_INPUT_BITS = 4096
 MAX_MULTIPLIER = 1_000_000

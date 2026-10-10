@@ -5,7 +5,7 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
 

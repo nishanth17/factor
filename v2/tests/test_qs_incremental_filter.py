@@ -3,7 +3,7 @@
 import random
 import unittest
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs.linear_algebra import (
     DependencySolver,
     filter_matrix,

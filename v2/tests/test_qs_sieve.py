@@ -4,7 +4,7 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, qs_polynomial, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.tests.test_qs import reference_positions, unlimited_budget

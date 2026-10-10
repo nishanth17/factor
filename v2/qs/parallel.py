@@ -12,10 +12,10 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait
 from dataclasses import asdict, dataclass, field, replace
 from types import SimpleNamespace
 
-from .. import arithmetic, utils
-from ..arithmetic import pow
-from ..budget import Budget, BudgetExhaustedError
-from ..work_budget import PollingBudget
+from ..common import arithmetic, utils
+from ..common.arithmetic import pow
+from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from .checkpoint import _restore_store, _store
 from .factor_base import FactorBase, build_factor_base, checked_target
 from .families import (

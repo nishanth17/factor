@@ -4,8 +4,8 @@ import random
 from bisect import bisect_left
 from math import comb, prod
 
-from .. import utils
-from ..arithmetic import gcd
+from ..common import utils
+from ..common.arithmetic import gcd
 from .families import MAX_A_FACTORS, _checksum, _identity
 from .polynomial import a_target
 

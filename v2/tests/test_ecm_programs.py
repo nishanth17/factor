@@ -9,12 +9,18 @@ from math import gcd, isqrt, prod
 from struct import pack
 from unittest.mock import patch
 
-from v2 import ecm, utils
-from v2.budget import Budget, BudgetExhaustedError
-from v2.ecm_programs import ECMPrograms, ProgramBlock, pair_coverage
+from v2.common import utils
+from v2.ecm import core as ecm
+from v2.ecm.programs import ECMPrograms, ProgramBlock, pair_coverage
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import ScheduleCache, SieveContext
+from v2.execution.stage_jobs import (
+    advance_job,
+    new_job,
+    peek_prime,
+    prime_cursor,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
-from v2.schedules import ScheduleCache, SieveContext
-from v2.stage_jobs import advance_job, new_job, peek_prime, prime_cursor
 from v2.tests.test_phase_one import affine_add
 from v2.tests.test_phase_two import reseal
 
@@ -487,7 +493,7 @@ class CampaignContractTests(unittest.TestCase):
         self.assertEqual(resumed.reason, "exhausted")
 
     def test_versioned_runner_inputs_and_small_schedule_oracle(self):
-        from v2.benchmarks import p52_a3
+        from v2.benchmarks.ecm.p52 import p52_a3
 
         corpus = p52_a3.load_corpus()
         control, _ = p52_a3.load_control()

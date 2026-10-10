@@ -6,7 +6,8 @@ import unittest
 from contextlib import redirect_stdout
 from unittest.mock import MagicMock, patch
 
-from v2.benchmarks import parallel_candidates, phase_two
+from v2.benchmarks.infrastructure.parallel import parallel_candidates
+from v2.benchmarks.suites import phase_two
 
 
 class BenchmarkTests(unittest.TestCase):

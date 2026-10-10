@@ -8,8 +8,8 @@ from dataclasses import replace
 from math import prod
 from unittest.mock import patch
 
-from v2 import utils
-from v2.budget import Budget
+from v2.common import utils
+from v2.execution.budget import Budget
 from v2.qs import (
     build_factor_base,
     qs_polynomial,

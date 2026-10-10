@@ -8,8 +8,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from v2.budget import Budget, BudgetExhaustedError
-from v2.prime_sieve import prime_sieve
+from v2.common.prime_sieve import prime_sieve
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, verify_atomic
 from v2.qs.extraction import DependencyExtractor, prepare_relations
 from v2.qs.factor_base import FactorBase, FactorBaseEntry, modular_square_roots
@@ -309,7 +309,7 @@ class PrimePowerSieveTests(unittest.TestCase):
         self.assertTrue(verify_atomic(atom, base, residual_bound=10**10))
 
     def test_historic_collector_control_keeps_certified_coverage(self):
-        from v2.benchmarks.qs_snapshot import load_qs_arm
+        from v2.benchmarks.support.qs_snapshot import load_qs_arm
 
         arm = load_qs_arm("_m31_power_loader", ("qs.sieve_collector",))
         base = arm.qs.factor_base.build_factor_base(
@@ -335,7 +335,10 @@ class PrimePowerSieveTests(unittest.TestCase):
         )
 
     def test_benchmark_checkpoint_survives_disk_and_cumulative_resume(self):
-        from v2.benchmarks.phase_three_large import configuration, run_one
+        from v2.benchmarks.qs.phase_three.phase_three_large import (
+            configuration,
+            run_one,
+        )
 
         fixture = dict(
             id="checkpoint_control",

@@ -13,9 +13,14 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2 import arithmetic, ecm, pollard_pm1, pollard_rho, portfolio, utils
-from v2.budget import Budget
+from v2 import portfolio
+from v2.common import arithmetic, utils
+from v2.ecm import core as ecm
+from v2.execution.budget import Budget
+from v2.execution.schedules import SieveContext
+from v2.execution.stage_jobs import advance_job, new_job, promote_job
 from v2.factor import factorize
+from v2.pm1 import core as pollard_pm1
 from v2.portfolio import PortfolioConfig, _canonical, factorize_bounded
 from v2.qs import SIQSJob, build_factor_base
 from v2.qs.checkpoint import _solver_digest
@@ -24,8 +29,7 @@ from v2.qs.linear_algebra import DependencySolver, filter_matrix
 from v2.qs.parallel import CollectionPool, ParallelSIQSJob
 from v2.qs.smooth_batch import SmoothBatch
 from v2.qs.sss import SSSConfig, SSSJob
-from v2.schedules import SieveContext
-from v2.stage_jobs import advance_job, new_job, promote_job
+from v2.rho import brent as pollard_rho
 from v2.tests.test_ecm_programs import configuration as program_config
 from v2.tests.test_phase_two import reseal
 from v2.tests.test_qs_parallel import configuration as parallel_config
@@ -382,7 +386,7 @@ class EngineBackendTests(unittest.TestCase):
             )
 
     def test_verified_prac_uses_selected_arithmetic(self):
-        from v2.benchmarks.prac_oracle import affine_multiply, matches
+        from v2.benchmarks.support.prac_oracle import affine_multiply, matches
 
         for name in BACKENDS:
             integer = arithmetic.get_backend(name).integer

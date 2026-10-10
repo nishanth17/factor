@@ -15,7 +15,10 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     __package__ = "v2"
 
-from . import arithmetic, constants, ecm, pollard_rho, prime_sieve, utils
+from . import constants
+from .common import arithmetic, prime_sieve, utils
+from .ecm import core as ecm
+from .rho import brent as pollard_rho
 
 
 @dataclass(frozen=True)
@@ -428,7 +431,7 @@ def main():
             or use_qs
             or args.ecm_chain is not None
         ):
-            from .budget import Budget
+            from .execution.budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
             from .qs.sss import SSSConfig
 

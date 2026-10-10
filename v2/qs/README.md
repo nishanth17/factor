@@ -40,7 +40,7 @@ full exponents, referenced atoms and original row identities remain available.
 From the repository root, with the supported PyPy runtime:
 
 ```python
-from v2.budget import Budget
+from v2.execution.budget import Budget
 from v2.qs import SIQSConfig, SIQSJob
 
 n = 4001 * 5003
@@ -106,7 +106,7 @@ make -C v2 benchmark-phase-three-siqs WARMUP_SECONDS=3 REPETITIONS=9
 make -C v2 benchmark-phase-three-sss WARMUP_SECONDS=3 REPETITIONS=9
 ```
 
-The [benchmark guide](../benchmarks/README.md) summarizes measured improvements
+The [benchmark guide](../benchmarks/docs/studies.md) summarizes measured improvements
 and their limits. Keep small successful cohorts, capped failures and configured
 large continuations distinct; no universal digit cutoff follows from them.
 See the [roadmap](../ROADMAP.md) for remaining acceptance gates.

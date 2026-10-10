@@ -5,7 +5,7 @@ import json
 from dataclasses import asdict
 from math import isfinite
 
-from .. import arithmetic, utils
+from ..common import arithmetic, utils
 from .checkpoint import _restore_store, _solver_digest, _store
 from .extraction import (
     DependencyExtractor,

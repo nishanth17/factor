@@ -9,9 +9,11 @@ import unittest
 from contextlib import redirect_stdout
 from dataclasses import replace
 
-from v2 import pm1_bounded, schedules, utils
-from v2.budget import Budget
-from v2.pm1_bounded import PM1Config, factorize_pm1_bounded
+from v2.common import utils
+from v2.execution import schedules
+from v2.execution.budget import Budget
+from v2.pm1 import bounded as pm1_bounded
+from v2.pm1.bounded import PM1Config, factorize_pm1_bounded
 
 
 def allowance(work=2_000_000, **options):
@@ -193,7 +195,7 @@ class CampaignTests(unittest.TestCase):
         cfg = config(((7, 13), (10, 31)), chunk_size=2, gcd_batch=2)
         state = pm1_bounded._initial(1000003, 2, cfg)
         context = schedules.SieveContext(32, segment_size=8)
-        from v2.budget import BudgetExhaustedError
+        from v2.execution.budget import BudgetExhaustedError
 
         while not state["done"]:
             before = copy.deepcopy(state)

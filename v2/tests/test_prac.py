@@ -6,14 +6,16 @@ from dataclasses import replace
 from math import gcd
 from unittest.mock import patch
 
-from v2 import ecm, prac, prime_sieve, utils
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.support.prac_oracle import (
     affine_add,
     affine_multiply,
     historical_points,
     matches,
     twist_point,
 )
+from v2.common import prime_sieve, utils
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class ChainTests(unittest.TestCase):

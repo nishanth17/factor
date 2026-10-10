@@ -2,15 +2,15 @@
 
 import unittest
 
-from v2 import prac
-from v2.benchmarks import c6_chains, c6_fast
-from v2.benchmarks.c6_fast_costs import ThreePoint
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_chains, c6_fast
+from v2.benchmarks.ecm.c6.c6_fast_costs import ThreePoint
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
 )
+from v2.ecm import prac
 
 
 class FastLayoutTests(unittest.TestCase):

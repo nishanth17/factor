@@ -3,8 +3,8 @@
 import unittest
 from unittest.mock import patch
 
-from v2 import ecm
-from v2.benchmarks import p52_b2, p52_b2_wheel
+from v2.benchmarks.ecm.p52 import p52_b2, p52_b2_wheel
+from v2.ecm import core as ecm
 
 
 class WheelProtocolTests(unittest.TestCase):

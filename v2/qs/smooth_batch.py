@@ -1,8 +1,8 @@
 """Capped product/remainder trees with complete smooth-part detection."""
 
-from .. import arithmetic, utils
-from ..arithmetic import gcd
-from ..budget import Budget
+from ..common import arithmetic, utils
+from ..common.arithmetic import gcd
+from ..execution.budget import Budget
 
 
 def _tree_reservation(values, max_bits, max_nodes, memory_bytes):

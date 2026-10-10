@@ -6,11 +6,12 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2 import arithmetic, portfolio, utils
-from v2.budget import BudgetExhaustedError
-from v2.ecm_programs import ECMPrograms
-from v2.schedules import SieveContext
-from v2.stage_jobs import advance_job, new_job, prime_cursor
+from v2 import portfolio
+from v2.common import arithmetic, utils
+from v2.ecm.programs import ECMPrograms
+from v2.execution.budget import BudgetExhaustedError
+from v2.execution.schedules import SieveContext
+from v2.execution.stage_jobs import advance_job, new_job, prime_cursor
 from v2.tests.test_ecm_programs import allowance, configuration, primes_between
 from v2.tests.test_phase_one import affine_add
 from v2.tests.test_phase_two import reseal

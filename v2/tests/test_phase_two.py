@@ -9,12 +9,18 @@ from dataclasses import replace
 from math import gcd, isqrt, prod
 from unittest.mock import patch
 
-from v2 import ecm, utils
-from v2.budget import Budget, BudgetExhaustedError
+from v2.common import utils
+from v2.common.preprocessing import fermat_step, integer_root, strip_twos
+from v2.ecm import core as ecm
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import (
+    ScheduleCache,
+    SieveContext,
+    iter_primes,
+    prime_powers,
+)
+from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
-from v2.preprocessing import fermat_step, integer_root, strip_twos
-from v2.schedules import ScheduleCache, SieveContext, iter_primes, prime_powers
-from v2.stage_jobs import advance_job, new_job
 
 
 def reference_primes(lo, hi):
@@ -180,7 +186,7 @@ class ScheduleTests(unittest.TestCase):
 
     def test_experimental_sieve_residues_and_restarts(self):
         """Unpromoted variants still require complete independent sequences."""
-        from v2.benchmarks.sieve_candidates import (
+        from v2.benchmarks.infrastructure.sieves.sieve_candidates import (
             integer_bitset,
             presieved,
             wheel_thirty,
@@ -229,7 +235,7 @@ class CandidateTests(unittest.TestCase):
 
     def test_m12_atomic_boundary_state_and_work_are_unchanged(self):
         """Compare every committed action with the verified frozen control."""
-        from v2.benchmarks.snapshot_loader import load_stage_jobs
+        from v2.benchmarks.support.snapshot_loader import load_stage_jobs
 
         baseline = load_stage_jobs()
 
@@ -343,7 +349,7 @@ class CandidateTests(unittest.TestCase):
 
     def test_ecm_early_middle_tail_saturation_is_bounded(self):
         """Replay saturation at early, middle, and tail chunks."""
-        from v2 import stage_jobs
+        from v2.execution import stage_jobs
 
         original = stage_jobs._apply
 

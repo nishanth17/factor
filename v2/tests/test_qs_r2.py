@@ -4,7 +4,7 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.budget import BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.score import SCORE_SCALE, log_bounds
@@ -58,7 +58,9 @@ class R2CollectorTests(unittest.TestCase):
         self.assertIsNone(worker._plan_window)
 
     def test_experimental_tiny_batch_and_chunks_preserve_exact_coverage(self):
-        from v2.benchmarks.p38_r2_experiments import experiment_collector
+        from v2.benchmarks.qs.p38.p38_r2_experiments import (
+            experiment_collector,
+        )
         from v2.qs import sieve_collector
 
         base = build_factor_base(10403, bound=100).factor_base

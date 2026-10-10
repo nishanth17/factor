@@ -5,16 +5,18 @@ from dataclasses import replace
 from math import gcd
 from unittest.mock import patch
 
-from v2 import ecm, prac, prime_sieve, utils
-from v2.benchmarks import c6_chains as chains
-from v2.benchmarks import c6_study as study
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_chains as chains
+from v2.benchmarks.ecm.c6 import c6_study as study
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
     twist_point,
 )
+from v2.common import prime_sieve, utils
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class CompactTests(unittest.TestCase):

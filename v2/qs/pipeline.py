@@ -3,9 +3,9 @@
 import time
 from dataclasses import dataclass
 
-from .. import arithmetic, utils
-from ..budget import Budget, BudgetExhaustedError
-from ..work_budget import PollingBudget
+from ..common import arithmetic, utils
+from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from .extraction import (
     DependencyExtractor,
     _prepare_relations,

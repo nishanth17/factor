@@ -5,8 +5,10 @@ import unittest
 from bisect import bisect_left, bisect_right
 from unittest.mock import patch
 
-from v2 import ecm, pollard_rho, utils
+from v2.common import utils
+from v2.ecm import core as ecm
 from v2.factor import factorize, factorize_bf
+from v2.rho import brent as pollard_rho
 
 
 class OptimizationTests(unittest.TestCase):
@@ -201,7 +203,7 @@ class OptimizationTests(unittest.TestCase):
 
     def test_wheel_sieve_all_small_endpoints(self):
         """All six endpoint residues and nearby squares match trial proof."""
-        from v2 import prime_sieve
+        from v2.common import prime_sieve
 
         primes = [n for n in range(2, 1001) if utils.is_prime_bf(n)]
         for hi in range(-3, 1002):

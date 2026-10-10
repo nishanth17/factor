@@ -6,7 +6,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SieveConfig, SIQSConfig, SIQSJob
 from v2.qs.families import _checksum

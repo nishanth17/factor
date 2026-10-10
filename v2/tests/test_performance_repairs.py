@@ -9,16 +9,16 @@ from dataclasses import replace
 from math import isqrt, prod
 from unittest.mock import patch
 
-from v2.budget import Budget, BudgetExhaustedError
-from v2.preprocessing import (
+from v2.common.preprocessing import (
     _POWER_MODULI,
     integer_root,
     power_residue_possible,
 )
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import SieveContext
+from v2.execution.work_budget import PollingBudget
 from v2.qs.linear_algebra import DependencySolver, filter_matrix
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
-from v2.schedules import SieveContext
-from v2.work_budget import PollingBudget
 
 
 def allowance(work=10**12):
@@ -240,7 +240,9 @@ class PreparationReuseTests(unittest.TestCase):
 
 class CollisionRepairTests(unittest.TestCase):
     def test_frozen_constructor_control_keeps_its_superclass_context(self):
-        from v2.benchmarks.performance_audit import apply_revert
+        from v2.benchmarks.infrastructure.performance import performance_audit
+
+        apply_revert = performance_audit.apply_revert
         from v2.qs.sss import SSSCollector
         from v2.tests.test_sss import search_collector
 
@@ -292,11 +294,14 @@ class CollisionRepairTests(unittest.TestCase):
                 self.assertEqual(collector._assignment, tuple(expected))
 
     def test_assignment_order_and_work_match_the_immutable_control(self):
-        from v2.benchmarks.performance_audit import BASELINE, checked_baseline
+        from v2.benchmarks.infrastructure.performance import performance_audit
+
+        baseline = performance_audit.BASELINE
+        checked_baseline = performance_audit.checked_baseline
         from v2.qs import sss
         from v2.tests.test_sss import search_collector
 
-        source = checked_baseline(BASELINE)["source"]["v2/qs/sss.py"]
+        source = checked_baseline(baseline)["source"]["v2/qs/sss.py"]
         node = next(
             n
             for n in ast.parse(source).body
@@ -306,7 +311,7 @@ class CollisionRepairTests(unittest.TestCase):
         namespace = dict(vars(sss), Counter=Counter)
         exec(
             compile(
-                ast.Module(body=[node], type_ignores=[]), str(BASELINE), "exec"
+                ast.Module(body=[node], type_ignores=[]), str(baseline), "exec"
             ),
             namespace,
         )

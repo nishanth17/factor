@@ -4,8 +4,8 @@ import time
 from dataclasses import dataclass, field, replace
 from functools import partial
 
-from .. import arithmetic, utils
-from ..budget import Budget, BudgetExhaustedError
+from ..common import arithmetic, utils
+from ..execution.budget import Budget, BudgetExhaustedError
 from .assignment_stream import AssignmentStream
 from .external_square import (
     CoefficientDivisorError,

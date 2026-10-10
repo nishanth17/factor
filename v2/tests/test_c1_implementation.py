@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from dataclasses import asdict
 
-from v2.benchmarks.c1_implementation import (
+from v2.benchmarks.qs.c1.c1_implementation import (
     ARMS,
     arm_config,
     decode_config,

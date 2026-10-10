@@ -4,23 +4,26 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2 import arithmetic, ecm, ecm_chains, prac, utils
-from v2.benchmarks import c6_cf, c6_fast
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_cf, c6_fast
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
 )
-from v2.budget import Budget, BudgetExhaustedError
-from v2.ecm_chain_options import (
+from v2.common import arithmetic, utils
+from v2.ecm import chains as ecm_chains
+from v2.ecm import core as ecm
+from v2.ecm import prac
+from v2.ecm.chain_options import (
     ChainPlan,
     ChainPlans,
     default_options,
     identity,
     verify_progress,
 )
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import SieveContext
 from v2.portfolio import PortfolioConfig, factorize_bounded
-from v2.schedules import SieveContext
 from v2.tests.test_ecm_chains import configuration
 
 

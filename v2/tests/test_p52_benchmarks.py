@@ -5,9 +5,9 @@ import subprocess
 import unittest
 from unittest.mock import Mock, patch
 
-from v2 import ecm
-from v2.benchmarks import p52_a3, p52_realistic
-from v2.budget import Budget
+from v2.benchmarks.ecm.p52 import p52_a3, p52_realistic
+from v2.ecm import core as ecm
+from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig
 
 
@@ -76,12 +76,18 @@ class RealisticBenchmarkTests(unittest.TestCase):
     def test_monitor_tracks_process_ownership(self):
         listing = "\n".join(
             (
-                "100 1 /opt/pypy3 -m v2.benchmarks.p52_realistic",
-                "101 100 /opt/pypy3 -m v2.benchmarks.p52_realistic --worker",
-                "200 1 /opt/python -m v2.benchmarks.p43_sizes",
+                "100 1 /opt/pypy3 -m v2.benchmarks.ecm.p52.p52_realistic",
+                (
+                    "101 100 /opt/pypy3 -m "
+                    "v2.benchmarks.ecm.p52.p52_realistic --worker"
+                ),
+                (
+                    "200 1 /opt/python -m "
+                    "v2.benchmarks.infrastructure.backends.p43_sizes"
+                ),
                 "201 1 /opt/pypy3 -m unittest discover",
                 "202 1 /opt/python -m http.server",
-                "203 1 /opt/pypy3 -m v2.benchmarks.p52_realistic",
+                "203 1 /opt/pypy3 -m v2.benchmarks.ecm.p52.p52_realistic",
                 "malformed row",
             )
         )

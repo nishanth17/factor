@@ -7,11 +7,12 @@ import unittest
 from dataclasses import replace
 from math import gcd
 
-from v2 import portfolio, stage_jobs
-from v2.benchmarks.a6_production import load_control
-from v2.budget import Budget, BudgetExhaustedError
-from v2.pm1_gaps import verify_powers
-from v2.schedules import SieveContext
+from v2 import portfolio
+from v2.benchmarks.pm1.a6.a6_production import load_control
+from v2.execution import stage_jobs
+from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.schedules import SieveContext
+from v2.pm1.gaps import verify_powers
 
 
 def allowance(work=1000000):
@@ -266,7 +267,7 @@ class ProductionPM1Tests(unittest.TestCase):
         self.assertEqual(resumed.work_used, paused.work_used)
 
     def test_implicit_bounded_campaign_default_and_legacy_resume(self):
-        from v2.pm1_bounded import factorize_pm1_bounded
+        from v2.pm1.bounded import factorize_pm1_bounded
         from v2.tests.test_a6_followup import frozen_control
 
         n = 1009 * 1013
@@ -297,7 +298,7 @@ class ProductionPM1Tests(unittest.TestCase):
         )
 
     def test_malformed_implicit_resume_is_rejected(self):
-        from v2.pm1_bounded import factorize_pm1_bounded
+        from v2.pm1.bounded import factorize_pm1_bounded
 
         for checkpoint in ([1], {"payload": []}, {"payload": {}}):
             for function in (

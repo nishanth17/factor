@@ -5,9 +5,9 @@ from dataclasses import dataclass, field, replace
 from functools import partial
 from math import prod
 
-from .. import arithmetic, utils
-from ..arithmetic import pow
-from ..budget import Budget, BudgetExhaustedError
+from ..common import arithmetic, utils
+from ..common.arithmetic import pow
+from ..execution.budget import Budget, BudgetExhaustedError
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial

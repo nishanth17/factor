@@ -11,8 +11,8 @@ from dataclasses import replace
 from itertools import product
 from pathlib import Path
 
-from v2 import utils
-from v2.budget import Budget
+from v2.common import utils
+from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
 from v2.qs.sss import SSSConfig, SSSJob

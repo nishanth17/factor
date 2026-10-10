@@ -2,9 +2,9 @@
 
 from dataclasses import dataclass
 
-from .. import utils
-from ..arithmetic import gcd
-from ..budget import Budget, BudgetExhaustedError
+from ..common import utils
+from ..common.arithmetic import gcd
+from ..execution.budget import Budget, BudgetExhaustedError
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import checked_position
 from .relations import AtomicRelation, checked_residual_bound, verify_atomic

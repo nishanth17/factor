@@ -2,7 +2,7 @@
 
 import unittest
 
-from v2.benchmarks import b4_bakeoff as bakeoff
+from v2.benchmarks.ecm.b4 import b4_bakeoff as bakeoff
 
 
 class BakeoffContracts(unittest.TestCase):

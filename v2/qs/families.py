@@ -7,8 +7,8 @@ import random
 from dataclasses import dataclass
 from math import comb, prod
 
-from .. import arithmetic, utils
-from ..budget import Budget
+from ..common import arithmetic, utils
+from ..execution.budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
 

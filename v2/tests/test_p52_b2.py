@@ -4,8 +4,9 @@ import copy
 import unittest
 from unittest.mock import patch
 
-from v2 import ecm, portfolio
-from v2.benchmarks import p52_b2
+from v2 import portfolio
+from v2.benchmarks.ecm.p52 import p52_b2
+from v2.ecm import core as ecm
 
 
 class PairedProtocolTests(unittest.TestCase):

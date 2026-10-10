@@ -7,32 +7,33 @@ import random
 import time
 from dataclasses import asdict, dataclass, field
 
-from . import arithmetic, constants, prime_sieve, utils
-from .arithmetic import isqrt
-from .budget import Budget, BudgetExhaustedError
-from .ecm_programs import (
-    PAIRED_VERSION,
-    PROGRAM_VERSION,
-    WHEEL_VERSION,
-    ECMPrograms,
-)
-from .factor import FactorizationResult, PrimeFactor
-from .preprocessing import (
+from . import constants
+from .common import arithmetic, prime_sieve, utils
+from .common.arithmetic import isqrt
+from .common.preprocessing import (
     fermat_step,
     integer_root,
     power_residue_possible,
     strip_twos,
 )
-from .qs import SIQSConfig, SIQSJob
-from .qs.sss import SSSConfig, SSSJob
-from .schedules import ScheduleCache, SieveContext
-from .stage_jobs import (
+from .ecm.programs import (
+    PAIRED_VERSION,
+    PROGRAM_VERSION,
+    WHEEL_VERSION,
+    ECMPrograms,
+)
+from .execution.budget import Budget, BudgetExhaustedError
+from .execution.schedules import ScheduleCache, SieveContext
+from .execution.stage_jobs import (
     advance_job,
     new_job,
     peek_prime,
     prime_cursor,
     take_prime,
 )
+from .factor import FactorizationResult, PrimeFactor
+from .qs import SIQSConfig, SIQSJob
+from .qs.sss import SSSConfig, SSSJob
 
 CHECKPOINT_VERSION = 10
 OPTIONAL_CHAIN_CHECKPOINT_VERSION = 11
@@ -98,7 +99,7 @@ class PortfolioConfig:
             raise ValueError("ECM chain family must be auto, lucas or cf")
         utils.require_integer(self.ecm_chain_bytes, "ecm_chain_bytes", 0)
         if self.ecm_chain_mode == "reuse":
-            from .ecm_chains import MIN_MEMORY_BYTES
+            from .ecm.chains import MIN_MEMORY_BYTES
 
             if not self.ecm_program_bytes:
                 raise ValueError(
@@ -163,8 +164,8 @@ class PortfolioConfig:
             utils.require_integer(curves, "curves", 0)
 
         if self.ecm_chain_mode == "auto":
-            from .ecm_chain_options import default_options
-            from .ecm_chains import MIN_MEMORY_BYTES
+            from .ecm.chain_options import default_options
+            from .ecm.chains import MIN_MEMORY_BYTES
 
             # Store the resolved policy, never an auto decision, so resume
             # retains its executor even if future defaults change again.
@@ -766,7 +767,7 @@ def _chain_bounds(config):
 def _chain_job_supported(job, config):
     if job["kind"] != "ecm" or job["b1"] not in _chain_bounds(config):
         return False
-    from .ecm_chains import supports_modulus
+    from .ecm.chains import supports_modulus
 
     return supports_modulus(job["n"])
 
@@ -774,7 +775,7 @@ def _chain_job_supported(job, config):
 def _chain_policy(config):
     if config.ecm_chain_mode == "off":
         return None
-    from .ecm_chains import CHAIN_VERSION
+    from .ecm.chains import CHAIN_VERSION
 
     if config.ecm_chain_family != "auto":
         return _chain_identity(2000, config) + "/reuse8/chunk16/40-80digits-v1"
@@ -784,10 +785,10 @@ def _chain_policy(config):
 def _chain_identity(bound, config):
     """Leave accepted default identities intact; pin explicit alternatives."""
     if config.ecm_chain_family == "auto":
-        from .ecm_chains import identity
+        from .ecm.chains import identity
 
         return identity(bound, config.backend)
-    from .ecm_chain_options import identity
+    from .ecm.chain_options import identity
 
     return identity(bound, config.backend, config.ecm_chain_family)
 
@@ -1004,11 +1005,11 @@ def _verify_progress(current, config, policy):
         job = current["job"]
         if _chain_job_supported(job, config):
             if config.ecm_chain_family == "auto":
-                from .ecm_chains import verify_progress
+                from .ecm.chains import verify_progress
 
                 verify_progress(job, config.backend, verifier)
             else:
-                from .ecm_chain_options import verify_progress
+                from .ecm.chain_options import verify_progress
 
                 verify_progress(
                     job, config.backend, verifier, config.ecm_chain_family
@@ -1022,7 +1023,7 @@ def _verify_progress(current, config, policy):
             or config.ecm_pair_wheel is not None
         )
     ):
-        from .ecm_paired import verify_progress
+        from .ecm.paired import verify_progress
 
         verify_progress(current["job"], config, verifier)
 
@@ -1306,7 +1307,7 @@ def _promote_state(state, name):
             witness = current["prime_job"]
             witness["d"] = backend.integer(witness["d"])
         if current.get("job"):
-            from .stage_jobs import promote_job
+            from .execution.stage_jobs import promote_job
 
             promote_job(current["job"], backend)
 
@@ -1430,7 +1431,7 @@ def factorize_bounded(
         )
         if config.ecm_chain_mode != "off":
             if config.ecm_chain_family == "auto":
-                from .ecm_chains import ChainPlans
+                from .ecm.chains import ChainPlans
 
                 programs.chains = ChainPlans(
                     config.ecm_chain_bytes,
@@ -1438,7 +1439,7 @@ def factorize_bounded(
                     _chain_bounds(config),
                 )
             else:
-                from .ecm_chain_options import ChainPlans
+                from .ecm.chain_options import ChainPlans
 
                 programs.chains = ChainPlans(
                     config.ecm_chain_bytes,
@@ -1459,7 +1460,7 @@ def factorize_bounded(
                 and job["kind"] == "pm1"
                 and not _legacy_pm1(config)
             ):
-                from .pm1_gaps import verify_powers
+                from .pm1.gaps import verify_powers
 
                 verify_powers(job, budget, config.pm1_gap_mode)
         while state["pending"] or state["current"] is not None:

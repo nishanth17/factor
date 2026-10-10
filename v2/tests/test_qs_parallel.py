@@ -8,7 +8,7 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.budget import Budget
+from v2.execution.budget import Budget
 from v2.qs.families import _checksum
 from v2.qs.parallel import (
     CollectionPool,

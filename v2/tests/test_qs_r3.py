@@ -6,8 +6,11 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.benchmarks.p38_r3_experiments import history_filter, live_compaction
-from v2.budget import BudgetExhaustedError
+from v2.benchmarks.qs.p38.p38_r3_experiments import (
+    history_filter,
+    live_compaction,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import linear_algebra
 from v2.qs.checkpoint import _restore_store, _store
 from v2.qs.extraction import (
@@ -99,7 +102,7 @@ class StableRowTests(unittest.TestCase):
     def test_frozen_legacy_pending_solver_replays(
         self,
     ):
-        from v2.benchmarks.p38_r3 import load_control, modules
+        from v2.benchmarks.qs.p38.p38_r3 import load_control, modules
         from v2.qs.siqs import SIQSJob
 
         with tempfile.TemporaryDirectory(prefix="r3-legacy-") as directory:

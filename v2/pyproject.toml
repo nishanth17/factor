@@ -8,12 +8,12 @@ classifiers = ["Programming Language :: Python :: Implementation :: PyPy"]
 [tool.ruff]
 target-version = "py311"
 line-length = 79
-extend-exclude = ["audit"]
+extend-exclude = ["audit", "local", "benchmarks/results", "benchmarks/history"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N"]
 
 [tool.ruff.lint.per-file-ignores]
 "factor.py" = ["E402"]
-"benchmarks/legacy_loader.py" = ["N802"]
-"benchmarks/validate_phase_one.py" = ["N802"]
+"benchmarks/support/legacy_loader.py" = ["N802"]
+"benchmarks/suites/validate_phase_one.py" = ["N802"]

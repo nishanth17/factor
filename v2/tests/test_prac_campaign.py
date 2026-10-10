@@ -4,13 +4,15 @@ import unittest
 from dataclasses import asdict
 from unittest.mock import patch
 
-from v2 import ecm, prac, utils
-from v2.benchmarks import p41_campaign as campaign
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.p41 import p41_campaign as campaign
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
 )
+from v2.common import utils
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class CampaignTests(unittest.TestCase):

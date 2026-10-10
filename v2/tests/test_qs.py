@@ -7,7 +7,7 @@ from dataclasses import FrozenInstanceError, replace
 from math import isqrt
 from unittest.mock import patch
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
     FactorBase,

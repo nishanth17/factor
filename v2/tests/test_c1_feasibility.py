@@ -5,7 +5,7 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.benchmarks.c1_feasibility import (
+from v2.benchmarks.qs.c1.c1_feasibility import (
     ResidualAudit,
     incidence_report,
     kernel,
@@ -15,7 +15,7 @@ from v2.benchmarks.c1_feasibility import (
     verify_square,
     xor_selected,
 )
-from v2.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import SIQSConfig, build_factor_base, qs_polynomial
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.tests.test_qs import unlimited_budget
@@ -88,7 +88,8 @@ class DiagnosticOracleTests(unittest.TestCase):
         with self.assertRaises(BudgetExhaustedError):
             split_residual(101 * 103, 200, Budget(cancelled=lambda: True))
         with patch(
-            "v2.benchmarks.c1_feasibility.factorize_rho", return_value=None
+            "v2.benchmarks.qs.c1.c1_feasibility.factorize_rho",
+            return_value=None,
         ):
             self.assertEqual(
                 split_residual(101 * 103, 200, unlimited_budget())[1],

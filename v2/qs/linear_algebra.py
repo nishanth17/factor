@@ -3,8 +3,8 @@
 from dataclasses import dataclass
 from heapq import heapify, heappop, heappush
 
-from .. import arithmetic, utils
-from ..budget import Budget
+from ..common import arithmetic, utils
+from ..execution.budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
 
 MAX_MATRIX_ROWS = 65536

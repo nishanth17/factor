@@ -4,15 +4,16 @@ import json
 import unittest
 from dataclasses import replace
 
-from v2 import ecm, prac
-from v2.benchmarks import c6_cf, c6_chains, c6_fast, c6_study
-from v2.benchmarks.p41_campaign import PYTHON_BACKEND, gmp_backend
-from v2.benchmarks.prac_oracle import (
+from v2.benchmarks.ecm.c6 import c6_cf, c6_chains, c6_fast, c6_study
+from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND, gmp_backend
+from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
     matches,
     twist_point,
 )
+from v2.ecm import core as ecm
+from v2.ecm import prac
 
 
 class CFTests(unittest.TestCase):
@@ -118,7 +119,8 @@ class CFTests(unittest.TestCase):
             for c in c6_study.control.load_corpus()["fixtures"]
             if c["id"] == "balanced_40d"
         )
-        from v2 import constants, utils
+        from v2 import constants
+        from v2.common import utils
 
         rng = utils.resolve_rng(41001, None)
         setup = ecm.setup_curve(

@@ -6,7 +6,8 @@ import unittest
 from dataclasses import replace
 from math import prod
 
-from v2.budget import Budget, BudgetExhaustedError
+from v2.common.utils import DETERMINISTIC_LIMIT
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs.assignment_stream import AssignmentStream, unrank_combination
 from v2.qs.capacity import capacity_report, validate_extension
 from v2.qs.external_square import CoefficientExhaustedError, external_square
@@ -18,7 +19,6 @@ from v2.qs.reference_collector import collect_block
 from v2.qs.relations import verify_atomic, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import SIQSConfig, SIQSJob
-from v2.utils import DETERMINISTIC_LIMIT
 
 
 def budget(work=10**12):

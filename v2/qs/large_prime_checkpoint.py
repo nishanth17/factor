@@ -1,6 +1,6 @@
 """Checked DLP stores; the default SLP encoding remains unchanged."""
 
-from .. import arithmetic, utils
+from ..common import arithmetic, utils
 from .large_primes import CycleTooLongError, LargePrimeForest, graph_reserve
 from .polynomial import Polynomial, checked_position
 from .relations import (

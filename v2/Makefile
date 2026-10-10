@@ -47,78 +47,78 @@ test:
 
 validate:
 	@mkdir -p "$(dir $(VALIDATION_OUTPUT))"
-	$(PYTHON) -m v2.benchmarks.validate_phase_one \
+	$(PYTHON) -m v2.benchmarks.suites.validate_phase_one \
 	  --milestone "$(MILESTONE)" \
 	  --output "$(VALIDATION_OUTPUT)"
 
 benchmark:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_one \
+	$(PYTHON) -u -m v2.benchmarks.suites.phase_one \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-two:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_two \
+	$(PYTHON) -u -m v2.benchmarks.suites.phase_two \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-reference:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_reference \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_reference \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-collector:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_collector \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_collector \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-pipeline:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_pipeline \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_pipeline \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-families:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_families \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_families \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-siqs:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_siqs \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_siqs \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-large:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_large \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_large \
 	  --phase $(LARGE_PHASE) --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-sss:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_sss \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_sss \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-phase-three-parallel:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.phase_three_parallel \
+	$(PYTHON) -u -m v2.benchmarks.qs.phase_three.phase_three_parallel \
 	  --phase all --repetitions $(REPETITIONS) \
 	  --warmup-seconds $(WARMUP_SECONDS) --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-backends:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.p43_backend \
+	$(PYTHON) -u -m v2.benchmarks.infrastructure.backends.p43_backend \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
 
 benchmark-backend-sizes:
 	@mkdir -p "$(dir $(BENCHMARK_OUTPUT))"
-	$(PYTHON) -u -m v2.benchmarks.p43_sizes \
+	$(PYTHON) -u -m v2.benchmarks.infrastructure.backends.p43_sizes \
 	  --suites $(BACKEND_SUITES) --split $(BACKEND_SPLIT) \
 	  --repetitions $(REPETITIONS) --warmup-seconds $(WARMUP_SECONDS) \
 	  --output "$(BENCHMARK_OUTPUT)"
@@ -127,4 +127,4 @@ benchmark-backend-sizes:
 lint:
 	.venv/bin/ruff check --no-cache .
 	.venv/bin/ruff format --check --no-cache .
-	.venv/bin/python -m pycodestyle --exclude=audit,.venv .
+	.venv/bin/python -m pycodestyle --exclude=audit,local,results,history,.venv .

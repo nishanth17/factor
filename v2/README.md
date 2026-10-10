@@ -2,7 +2,7 @@
 
 Integer factorization using **PyPy implementing Python 3.11** and exact
 Python integers or optional GMP integers. v2 repairs the
-[original v1](../v1/) implementation
+[original v1](../v1) implementation
 and adds bounded, resumable execution and experimental relation-based engines.
 
 ## Methods
@@ -61,7 +61,7 @@ addition and 3M+2S for doubling. They are not runtime speed estimates.
 This completes the P4.1/A4 correctness tranche. `factorize_ecm` and default
 bounded jobs retain the B4 ladder; explicit B3 reuse routing is documented
 below. The [benchmark guide](
-benchmarks/README.md#p41a4-verified-prac-5-october-2026) separates kernel
+benchmarks/docs/studies.md#p41a4-verified-prac-5-october-2026) separates kernel
 diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
 including matched optional gmpy2 arms. These are experimental comparisons;
 B3 owns program composition, shared work accounting, checkpoint/replay
@@ -81,13 +81,13 @@ modulus and `(A+2)/4` convention as `multiply_prac`. Results are valid X:Z
 pairs or `NonunitPointError`; callers retain proper factors and handle retry.
 Records have at most 512 steps and 16 retained point slots; programs own at
 most 512 records, with no global point cache. See the [C6 study](
-benchmarks/c6_research.md) for recovery, storage and reproducibility details.
+benchmarks/ecm/c6/c6_research.md) for recovery, storage and reproducibility details.
 B3 now routes the selected records through bounded production jobs under
 its explicit reuse option; default ladder behavior is preserved. The initial
 conservative C6 study retained the
 ladder after full-stage and campaign losses; those results remain historical
 controls. The user reopened executor optimization. See the [follow-up](
-benchmarks/c6_optimization.md) for its independently proved factor coverage,
+benchmarks/ecm/c6/c6_optimization.md) for its independently proved factor coverage,
 frozen comparisons and final decision.
 
 `benchmarks.c6_fast.load_catalog()` verifies immutable scalar and coordinate
@@ -132,7 +132,7 @@ stores, compact matrix storage and recovery. Performance repairs reduce repeated
 primality/root work, sparse exponent recovery, prime-power inversions and
 relation verification. New or untrusted data still receives exact verification.
 
-The [10 October ownership/recovery diagnosis](benchmarks/README.md#recovery-preparation-and-plan-lifetime-diagnosis-10-october-2026)
+The [10 October ownership/recovery diagnosis](benchmarks/docs/studies.md#recovery-preparation-and-plan-lifetime-diagnosis-10-october-2026)
 retains the accepted eager implementation and all defaults. Deferring strict
 preparation showed no reliable full-run improvement. A separately charged,
 finite owner shared across a complete cohort confirmed a native benefit, but
@@ -140,6 +140,33 @@ finite owner shared across a complete cohort confirmed a native benefit, but
 cross-call owner or serialized cache; resumed runs continue to validate progress
 and pay rebuilding. GMP's gain against its own ladder does not imply that it
 runs faster than native integers.
+
+## Source layout
+
+Algorithm packages are `ecm/`, `pm1/`, `rho/` and `qs/`. Shared exact arithmetic,
+prime generation, preprocessing and validation helpers live in `common/`.
+Budgets, schedules and resumable stage dispatch live in `execution/`.
+`factor.py` remains the public factoring API/CLI; `portfolio.py` coordinates
+bounded execution. Algorithm defaults, work accounting and checkpoint formats
+are unchanged by this folder migration.
+
+Use the new module paths when importing moved helpers:
+
+```python
+from v2.common import arithmetic, utils
+from v2.execution.budget import Budget
+from v2.execution.schedules import SieveContext
+from v2.ecm.core import factorize_ecm
+from v2.ecm.prac import get_chain
+from v2.pm1.core import factorize_pm1
+from v2.pm1.bounded import factorize_pm1_bounded
+from v2.rho.brent import factorize_rho
+```
+
+`v2.ecm` also exports the public ECM functions. Previous flat helper and benchmark
+module paths have moved; the factoring entry points remain `v2.factor` and
+`v2.portfolio`. See the [benchmark index](benchmarks/README.md) for grouped runners
+and preserved study records. Local journals now live under ignored `local/`.
 
 ## Run
 
@@ -211,7 +238,7 @@ import json
 from pathlib import Path
 
 import v2
-from v2.budget import Budget
+from v2.execution.budget import Budget
 from v2.qs import SIQSConfig, SIQSJob, SieveConfig
 
 selected_path = Path(v2.__file__).parent / (
@@ -229,7 +256,7 @@ assert (result.divisor or 1) * result.cofactor == n
 Here `n` is the integer to split. The result preserves an explicit unresolved
 cofactor when its finite allowance ends. This preset reduced the tested
 balanced cohort's time by 36.6%; uneven-factor regressions keep it an explicit
-choice. See the [B1 measurements and limitations](benchmarks/README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
+choice. See the [B1 measurements and limitations](benchmarks/docs/studies.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
 
 Select an experimental SSS engine explicitly:
 
@@ -267,7 +294,7 @@ An unavailable dependency raises an explicit error; GMP selection never falls
 back to another backend or CPython. Importing and using the integer default
 does not import gmpy2. GMP support is optional: faster individual operations
 do not establish a faster factoring engine. See the
-[matched backend study](benchmarks/README.md#p43-arithmetic-backends--5-october-2026).
+[matched backend study](benchmarks/docs/studies.md#p43-arithmetic-backends--5-october-2026).
 The current selectors are explicit; there is no automatic digit threshold.
 Algorithm/stage/size selection requires the separate production-bound and
 larger-QS study. Aggregate portfolio timings do not establish that policy.
@@ -377,7 +404,7 @@ rather than mixing both version directories on `sys.path`.
 Use the bounded API for shared limits and resumable execution:
 
 ```python
-from v2.budget import Budget
+from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 
 config = PortfolioConfig()
@@ -432,7 +459,7 @@ continues to use tuple Lucas. API family/mode/chain-cap fields are keyword-only.
 For explicit reuse, set `ecm_chain_mode="reuse"`, `ecm_chain_bytes=8 * 2**20`,
 `ecm_program_bytes=512 * 1024` and a sufficient `memory_bytes`. To force the
 baseline, use `ecm_chain_mode="off"`. See the
-[default bridge and historical measurements](benchmarks/README.md#b3-user-directed-native-default-and-optional-families-10-october-2026).
+[default bridge and historical measurements](benchmarks/docs/studies.md#b3-user-directed-native-default-and-optional-families-10-october-2026).
 
 Each invocation owns a finite LRU of immutable verified plans, shared across
 its curves and recursive cofactors. No curve point or global plan cache is
@@ -491,7 +518,7 @@ and additionally charges setup, relation verification, assignment regeneration
 and solver/extraction replay. A total grant equal to previously consumed work
 can therefore refuse reconstruction. Checkpoint byte-cap refusal leaves the
 in-memory job available; exhausted schedules do not restart on budget extension.
-See the [A7 acceptance matrix](benchmarks/a7_r5_reconciliation.md) for worker
+See the [A7 acceptance matrix](benchmarks/qs/a7/a7_r5_reconciliation.md) for worker
 resource limitations and the prepared E1 comparison arms.
 
 ## Optional ECM programs and explicit campaigns
@@ -557,7 +584,7 @@ finite campaign under cumulative work/wall/CPU allowances, including pauses
 inside table construction, a paired block or scalar recovery. It does not
 reinterpret an exhausted campaign as a new allowance of curves.
 
-`v2.ecm_programs.pair_coverage()` supplies bounded immutable +/- coverage
+`v2.ecm.programs.pair_coverage()` supplies bounded immutable +/- coverage
 certificates consumed by the opt-in B2 executor. It includes direct-scalar
 exceptions, positive recurrence initialization and block tails. This bounded
 compiler currently accepts D=0 (direct scalars), or even D>=2 with
@@ -692,7 +719,7 @@ Later v2-to-v2 comparisons show where the newer work helps:
   **38.7%** against R3 cadence 1. It remains an explicit option; the default
   cadence stays 1. Parallel workers have no demonstrated universal advantage.
 
-See the [benchmark guide](benchmarks/README.md) for protocols, commands,
+See the [benchmark guide](benchmarks/docs/studies.md) for protocols, commands,
 uncertainty, rejected experiments and size/budget limitations. A recorded
 balanced 50-digit success took **19 min 43 s**; one success does not establish
 broad coverage. There is no supported “50–60 digits within a minute” guarantee.
@@ -720,7 +747,7 @@ separate cold startup from warmed execution.
 ## Files and next work
 
 `tests/` contains acceptance and arithmetic regressions; the
-[QS guide](qs/README.md) covers relation engines. [Benchmark documentation](benchmarks/README.md) holds detailed results;
+[QS guide](qs/README.md) covers relation engines. [Benchmark documentation](benchmarks/docs/studies.md) holds detailed results;
 the [roadmap](ROADMAP.md) records acceptance gates. Benchmark `inputs/`
 retain independent corpora, immutable sources, provenance and frozen controls.
 The entire `audit/` tree is Git-ignored local research and diagnostic material;
@@ -765,7 +792,7 @@ The R2 benchmark harness compares these options with conservative scoring,
 bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
 recovery and grouped hit reservations. Its independent certified inputs,
 frozen source control and separate cold/profile modes are described in
-[the benchmark guide](benchmarks/README.md). Dispatcher defaults are unchanged.
+[the benchmark guide](benchmarks/docs/studies.md). Dispatcher defaults are unchanged.
 
 ## B4 arithmetic kernels
 
@@ -789,20 +816,20 @@ zero, so the readable GMP path remains in production.
 
 The independent affine/composite/prime-power and exact readable-formula
 controls exercise production as well as the frozen candidates. See the
-[research/proofs](benchmarks/b4_research.md),
-[source/license audit](benchmarks/b4_research_audit.md),
-[fresh comparison](benchmarks/README.md#fresh-bakeoff-results-and-decision) and
-[production integration](benchmarks/README.md#b4-production-integration-protocol).
+[research/proofs](benchmarks/ecm/b4/b4_research.md),
+[source/license audit](benchmarks/ecm/b4/b4_research_audit.md),
+[fresh comparison](benchmarks/docs/studies.md#fresh-bakeoff-results-and-decision) and
+[production integration](benchmarks/docs/studies.md#b4-production-integration-protocol).
 The original frozen retain-baseline verdict and subsequent revised-policy
 confirmation are historical records; their source controls and certified
 inputs remain immutable. Experimental square, helper and normalized arms
-remain reproducibility controls under `v2.benchmarks.b4_kernels`.
+remain reproducibility controls under `v2.benchmarks.ecm.b4.b4_kernels`.
 
 ### A6: opt-in finite p−1 bound campaigns
 
 ```python
-from v2.budget import Budget
-from v2.pm1_bounded import PM1Config, factorize_pm1_bounded
+from v2.execution.budget import Budget
+from v2.pm1.bounded import PM1Config, factorize_pm1_bounded
 
 config = PM1Config(bounds=((15, 15), (16, 16)))
 run = factorize_pm1_bounded(17 * 1019, base=3, config=config,
@@ -851,10 +878,10 @@ construction costs ceil(isqrt(max B2)/2). Every reservation precedes mutation.
 Deadlines/cancellation are cooperative between bounded actions.
 
 The group-independent ratio helpers and precise reuse rules are documented
-in the [A6 research and contract](benchmarks/a6_pm1_research.md). They unblock
+in the [A6 research and contract](benchmarks/pm1/a6/a6_pm1_research.md). They unblock
 the scalar contract for later ECM work; ECM bound migration remains separate.
 
-The separate `v2.pm1_tuning.PM1TuningConfig` is an opt-in execution
+The separate `v2.pm1.tuning.PM1TuningConfig` is an opt-in execution
 configuration for this same entry point. These A6 APIs are integrated into
 mainline; their bounded correctness gate passes.
 `chunk_size=64, gap_mode="recurrence"` is accepted for scoped integration
@@ -862,10 +889,10 @@ review after fresh 27-sample complete-call confirmation: 1.0–2.8% less CPU
 than the frozen chunk-64 control, with positive aggregate intervals in every
 size class. Bit caps and wheels remain experimental, unpromoted alternatives;
 production defaults and allocation remain unchanged. See the
-[complete comparison and limitations](benchmarks/README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution).
+[complete comparison and limitations](benchmarks/docs/studies.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution).
 
 ```python
-from v2.pm1_tuning import PM1TuningConfig
+from v2.pm1.tuning import PM1TuningConfig
 
 config = PM1TuningConfig(
     bounds=((2000, 20000),), chunk_size=64, gap_mode="recurrence"
@@ -942,7 +969,7 @@ more than running a fresh final bound. No new continuation rung is allocated.
 The user explicitly requested this default promotion. Fresh complete-stage
 confirmation saves 9.73% CPU across nine cells; integer portfolio captures
 remain inconclusive after extension. The [benchmark receipt](
-benchmarks/README.md#a6-production-default-promotion--9-october-2026)
+benchmarks/docs/studies.md#a6-production-default-promotion--9-october-2026)
 records both results. This is a user-directed default change, with the
 legacy executor available for reproducibility and existing resumes.
 
@@ -968,7 +995,7 @@ result = job.run()
 ```
 
 These illustrative bounds are not a promoted preset. The
-[C1 protocol](benchmarks/c1_implementation_protocol.md) governs training and
+[C1 protocol](benchmarks/qs/c1/c1_implementation_protocol.md) governs training and
 fresh complete-factor comparison. `candidate_bound=0` covers the entire
 admissible product domain; a smaller explicit allowance must preserve SLP
 coverage and intentionally sacrifices DLP candidates. Endpoints must be proven
@@ -1017,7 +1044,7 @@ import json
 from pathlib import Path
 
 import v2
-from v2.budget import Budget
+from v2.execution.budget import Budget
 from v2.qs import DoubleLargeSieveConfig, SIQSConfig, SIQSJob
 
 selected_path = Path(v2.__file__).parent / (
@@ -1034,7 +1061,7 @@ assert (result.divisor or 1) * result.cofactor == n
 
 Here `n` is the integer to split; this is not an automatic digit-based dispatch
 rule. The result retains an unresolved cofactor when the allowance ends. The
-[C1 complete-factor report](benchmarks/c1_implementation_results.md) records
+[C1 complete-factor report](benchmarks/qs/c1/c1_implementation_results.md) records
 training, fresh confirmation, certainty labels and the separate larger-store
 resume witness. Performance belongs to the tested configuration/input class,
 not every input with the same number of digits.

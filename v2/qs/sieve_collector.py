@@ -3,9 +3,9 @@
 from array import array
 from dataclasses import dataclass, field
 
-from .. import utils
-from ..arithmetic import gcd
-from ..budget import Budget, BudgetExhaustedError
+from ..common import utils
+from ..common.arithmetic import gcd
+from ..execution.budget import Budget, BudgetExhaustedError
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
 from .polynomial import (

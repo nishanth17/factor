@@ -5,7 +5,7 @@ import json
 from dataclasses import asdict
 from functools import partial
 
-from .. import arithmetic, utils
+from ..common import arithmetic, utils
 from .assignment_stream import assignment_identity
 from .extraction import DependencyExtractor, prepare_relations
 from .families import (
