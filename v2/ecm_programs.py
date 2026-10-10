@@ -59,6 +59,7 @@ class ECMPrograms:
         self.coverage_blocks = {}
         self.coverage_hits = 0
         self.coverage_misses = 0
+        self.chains = None
 
     def coverage(self, cursor, *, b1, b2, distance, budget, wheel=None):
         """Reuse integer certificates; decoded records belong to one curve.

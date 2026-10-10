@@ -1,0 +1,112 @@
+{
+  "acceptance": "Zero invalid result/coordinate failure. Positive paired median saving with 95% bootstrap interval, CPU and both chronological halves positive; stable samples and <=5 percentage-point completion regression in each declared fixture class. No universal percentage floor. Do not extend stable inconclusive comparisons. Claims limited to confirmed scope.",
+  "accounting": "Timers include actual plan construction, verification, conversion, recovery, failed curves, output validation and checkpoint JSON. Atomic strict/prime-unit replay reserves are charged on every chain chunk; cache misses rebuild under the same cumulative allowance. Certificates and independent affine target construction precede warmed timing and belong to separate cold totals. Stage reuse means a fresh plan per fixture/seed campaign, not an uncharged global cache. Eviction is a low-level 2000/1999/2000 stress, outside enabled routing.",
+  "b1": 2000,
+  "b2": 147396,
+  "backends": [
+    "python-int",
+    "gmpy2-mpz"
+  ],
+  "base_commit": "76f06b0110941017b926caa51d341db6221f470b",
+  "bootstrap_replicates": 4000,
+  "bootstrap_seed": 193001,
+  "chain_bytes": 8388608,
+  "chunk": 16,
+  "confirmation_seeds": [
+    46839,
+    54758
+  ],
+  "cpu_seconds": 20,
+  "curves": 8,
+  "limits": "60-second/500000-draw corpus generation; 1200-second worker; 2700-second phase. No online chain search. Cold nine processes per arm/backend kept separate; no instrumented profile is performance evidence.",
+  "max_relative_iqr": 0.15,
+  "memory_bytes": 33554432,
+  "preflight_parent_sha256": "1cb06bb8e15255cd10a40725d36bcbd0b3ffb7b7f7052af3f1aa7f1281201a2f",
+  "preflight_reason": "Release evicted local plan before allocation; no timings preceded this correction. All study parameters and inputs unchanged.",
+  "program_bytes": 262144,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      18
+    ],
+    [
+      8,
+      27
+    ]
+  ],
+  "scopes": [
+    "fresh1",
+    "reuse2",
+    "reuse4",
+    "reuse8",
+    "reuse16",
+    "eviction",
+    "portfolio",
+    "resume"
+  ],
+  "seconds": 20,
+  "segment_size": 128,
+  "selection": "No new chain/kernel/search choices. On training compare fresh1 and 2/4/8/16 curves with preparation charged per campaign. Production reuse routing remains explicit opt-in, B1=2000, chunk16, tier >=8 curves. Confirm all scopes on untouched inputs; retain ladder defaults on inconclusive/full-run losses.",
+  "sha256": {
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/benchmarks/b3_production.py": "d77fc4fb78948d8a16c94ec75675414ffa5109d7fbbdc918408ca4b3ca780e20",
+    "v2/benchmarks/build_b3_inputs.py": "acb9dbaf0eeb16196672db9cfcf4e089ee133d2698f35233c352909c50ecfe61",
+    "v2/benchmarks/inputs/baselines/b3_mainline.json": "1da9569035882b5579240acba3be982f637af88f1ce5aec93bc06b984b8d505e",
+    "v2/benchmarks/inputs/controls/c6_fast_records.json": "b316003a7238c1240f52dd28f48f507931ef7f4061362333dc436f016d531ed9",
+    "v2/benchmarks/inputs/corpora/b3_corpus.json": "1b558afc9a6fb9ab8b8b3e451591104b66bc32fb4dcd4439932337fdcb117604",
+    "v2/budget.py": "a176241cbaeeb79c48fa305150b38589db8dde99fd63e643422525f49b6acc8a",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm.py": "326f04ff19c07d85225603aa9247ee830e5f9c4b2dc7a72ee231da461ec7fa50",
+    "v2/ecm_chain_records.py": "9c9add832a3ab738dc26e2c3aab37f4c65d1a3b2f67a4dfc35701f6ed2e42469",
+    "v2/ecm_chains.py": "78ca877195415a14b197e52992f59733433720aa3b88bfad64256cd7af599418",
+    "v2/ecm_paired.py": "f5ad5f729410a7ed9c08b430dd68cbd80614286c352bac563cccf1d6e7caeaa4",
+    "v2/ecm_programs.py": "dcbb3300bfff413f044a43d72de2b3ee20378e443cc6d06c6a8ab1ce970f77c6",
+    "v2/ecm_wheel.py": "fcda5a07b5152b5d963a1b15b73302ccef7ce13101593a924b6db8fdd0607a00",
+    "v2/factor.py": "6f0497b83e7245940d9801d447eccdc373313e1b7eb339ca4e5b463ae37adbf9",
+    "v2/pm1_bounded.py": "c598b9c07e99706c3e5e74e0a2f6220ad2c4154208a5667acf69b5331ed4c981",
+    "v2/pm1_gaps.py": "908b6d2c12449160e278a5c432451febe010ada0c69ca9790b14548fbdc67ca7",
+    "v2/pm1_tuning.py": "63cf5ab41e5407bbac9c8d101c67f81c92dfc80ad2d1e5a3275c62ccd2ce4669",
+    "v2/pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
+    "v2/pollard_rho.py": "4976184d1ed412dc99562bde7d6eed4e2d08f653c0c7b8a684c48b2f85441c84",
+    "v2/portfolio.py": "80c5b544ba420a5be7ef6b05ff5152655a550b0ab032745d907d1f697f332956",
+    "v2/prac.py": "09b9140b8b23b074ad5a5e795bd4ecf131c2e728e0373c11a41a62adef1c3b2e",
+    "v2/preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
+    "v2/prime_sieve.py": "6f852e0e4c17504745bd172283802b976e57a05f9346034da008094e9f470db4",
+    "v2/qs/__init__.py": "7e9d7e9bbf94fa6e6b26b1cc7b99fae8633e59003c0318cb673d64c2f032e6fa",
+    "v2/qs/assignment_stream.py": "52cd4d90487bee6040f7679b75faba47c2b651fe16fe5b914e11c34c849b5838",
+    "v2/qs/capacity.py": "b15dad537fc283aec8e44f6140e5d716574414f4aaf5ef3e75299d98b2613de8",
+    "v2/qs/checkpoint.py": "f7991b33a5a4955127433c9f2e8d2923d1c7e2d299cb54e1f115cae936992936",
+    "v2/qs/external_square.py": "723895bb4a261cac690f2fd8b224df425c6c8ec29a8769f556c23b1a050db760",
+    "v2/qs/extraction.py": "4bb913264ba5dc6a2da3662528e70e6d66a906cba776b013801ac00613f03836",
+    "v2/qs/factor_base.py": "14f846255475fdebcf5cf2f3d87078012acc1620065ad5bbedbb05e0d0eb4d41",
+    "v2/qs/families.py": "e6648b134691373c00661bd405d64a5a15f61856d6bee589535055b7cfd4dd7a",
+    "v2/qs/linear_algebra.py": "ce6788568aecb14fc7bd4d7aa5b1af67ae6c670bbf3a18cd88268987aaa91d51",
+    "v2/qs/multiplier.py": "6367fc6d06dd8c0e9c71a7e83eb8e11444f18aaa3431031eb2a4c1e1c17ca785",
+    "v2/qs/parallel.py": "87b4912cce59d89ad0eca14b30c65b578117ec5e6997a8110ea0b1713c512ea8",
+    "v2/qs/pipeline.py": "b168e5286572a649c439465d55940fad6bac6c956c9dcc2543471270fef36bcc",
+    "v2/qs/polynomial.py": "1832a80f403fbc1a61aa73e20a518483e26301007c7ce6a3000823f4d07581e5",
+    "v2/qs/power_sieve.py": "a78660148c5c96432dc3ae09b78e38df0a3943a352dd5fd6fdb5b2391476359a",
+    "v2/qs/reference_collector.py": "0b476152dfe592b8042d96ed1df1b711c4b15bbfeb8cb1e8daaae2e1c7baefbb",
+    "v2/qs/relations.py": "ca15e67eac085a718c9a8b8ffe860f09396773142ecad7057f66aa57d0f29dc0",
+    "v2/qs/score.py": "f9c5f4c1b1ed19bc7c1e8ab61bd9577907a1795f874c77d73bd616c1b79b4675",
+    "v2/qs/sieve_collector.py": "d2860dc6a5ae6e887e48548de70f2d7a8a9c15da5883ae98b8e2969987c11255",
+    "v2/qs/siqs.py": "6e8b1de0a3e2e78ecf102cc288ddd38c660e5d77a85a51ee29ad0505b9f64e3a",
+    "v2/qs/smooth_batch.py": "fab558b2c04d3a68ebdfb81c32f9cd96828e7ef68692f81c527bf880ccd6709b",
+    "v2/qs/sss.py": "55470a67fccac563c960f41692fd190967f6642ae3b24a5487f31c5054563ea3",
+    "v2/qs/sss_checkpoint.py": "786f30342e96c13af1aa429b124f41167c512f26f8a9e70ae065e9791acfa67f",
+    "v2/schedules.py": "5e0f8fd137a5146325547cd557c74e44dc769884b0a7a086c450213eb71afb52",
+    "v2/stage_jobs.py": "3af3d6846639fb5e17bd192fe39627b051e11b2ac498ec91cf26650a07c74f03",
+    "v2/utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
+    "v2/work_budget.py": "8ea8d0a3d84f2c39ea0b3769f4800e2cacfb1ba138be46139639eb71bbcaefae"
+  },
+  "training_seeds": [
+    31001,
+    38920
+  ],
+  "work": 2000000
+}

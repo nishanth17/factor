@@ -34,7 +34,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 9
+CHECKPOINT_VERSION = 10
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -73,6 +73,8 @@ class PortfolioConfig:
     siqs: SIQSConfig | None = None
     sss: SSSConfig | None = None
     ecm_program_bytes: int = 0
+    ecm_chain_mode: str = field(default="off", kw_only=True)
+    ecm_chain_bytes: int = field(default=0, kw_only=True)
     ecm_pair_distance: int | None = None
     ecm_pair_wheel: int | None = None
 
@@ -85,6 +87,22 @@ class PortfolioConfig:
             if self.pm1_chunk_size > 256:
                 raise ValueError("limit p-1 chunks to 256 primes")
         arithmetic.get_backend(self.backend)
+        if self.ecm_chain_mode not in ("off", "reuse"):
+            raise ValueError("ECM chain mode must be off or reuse")
+        utils.require_integer(self.ecm_chain_bytes, "ecm_chain_bytes", 0)
+        if self.ecm_chain_mode == "reuse":
+            from .ecm_chains import MIN_MEMORY_BYTES
+
+            if not self.ecm_program_bytes:
+                raise ValueError(
+                    "ECM chains require bounded reusable programs"
+                )
+            if self.ecm_chain_bytes < MIN_MEMORY_BYTES:
+                raise MemoryError(
+                    "ECM chain preparation exceeds configured cap"
+                )
+        elif self.ecm_chain_bytes:
+            raise ValueError("ECM chain memory requires reuse mode")
         for fallback in (self.siqs, self.sss):
             if fallback is not None and fallback.backend != self.backend:
                 raise ValueError("portfolio and fallback backends must match")
@@ -265,6 +283,7 @@ class PortfolioConfig:
             )
             + self.schedule_cache_bytes
             + self.ecm_program_bytes
+            + self.ecm_chain_bytes
             + paired_reserve
         )
 
@@ -711,6 +730,23 @@ def _advance(
             current.update(job=None, attempt=current["attempt"] + 1)
 
 
+def _chain_bounds(config):
+    """Keep fresh/unsupported schedules on the measured B4 ladder."""
+    if config.ecm_chain_mode == "off" or config.chunk_size != 16:
+        return ()
+    return tuple(
+        b1 for b1, _, curves in config.ecm_tiers if b1 == 2000 and curves >= 8
+    )
+
+
+def _chain_policy(config):
+    if config.ecm_chain_mode == "off":
+        return None
+    from .ecm_chains import CHAIN_VERSION
+
+    return CHAIN_VERSION + "/reuse8/chunk16"
+
+
 def _legacy_pm1(config):
     """Old snapshots retain their original chunk and gap execution."""
     return not config.pm1_attempts or (
@@ -725,6 +761,7 @@ def _pack(state, config, budget, generator, policy):
     version = 6
     if (
         _legacy_pm1(config)
+        and config.ecm_chain_mode == "off"
         and config.backend == "python-int"
         and config.ecm_pair_distance is None
         and config.ecm_pair_wheel is None
@@ -746,9 +783,14 @@ def _pack(state, config, budget, generator, policy):
         configuration.pop("ecm_pair_wheel")
     else:
         version = 8
-    if _legacy_pm1(config):
+    if _legacy_pm1(config) and config.ecm_chain_mode == "off":
         configuration.pop("pm1_gap_mode")
         configuration.pop("pm1_chunk_size")
+    else:
+        version = 9
+    if config.ecm_chain_mode == "off":
+        configuration.pop("ecm_chain_mode")
+        configuration.pop("ecm_chain_bytes")
     else:
         version = CHECKPOINT_VERSION
     payload = {
@@ -761,6 +803,7 @@ def _pack(state, config, budget, generator, policy):
         else PROGRAM_VERSION
         if config.ecm_program_bytes
         else SCHEDULE_VERSION,
+        "chains": _chain_policy(config),
         "backend": arithmetic.get_backend(config.backend).identity,
         "config": configuration,
         "state": state,
@@ -783,6 +826,8 @@ def _pack(state, config, budget, generator, policy):
             else None,
         },
     }
+    if config.ecm_chain_mode == "off":
+        payload.pop("chains")
     encoded = _canonical(payload)
     if len(encoded.encode()) > config.memory_bytes // 2:
         raise MemoryError("serialized checkpoint exceeds output reserve")
@@ -867,6 +912,21 @@ def _verify_progress(current, config, policy):
             stage_one = job["phase"] in ("setup", "stage_one", "replay")
             if job["cursor"]["hi"] != (b1 + 1 if stage_one else b2 + 1):
                 raise ValueError("ECM program cursor has the wrong endpoint")
+        if "chain_identity" in job:
+            from .ecm_chains import identity
+
+            if (
+                job["kind"] != "ecm"
+                or job["b1"] not in _chain_bounds(config)
+                or job["chain_identity"] != identity(job["b1"], config.backend)
+            ):
+                raise ValueError("incompatible ECM chain progress")
+            utils.require_integer(job["chain_chunks"], "chain chunks", 1)
+            utils.require_integer(job["chain_replays"], "chain replays", 0)
+            if not job["chain_replays"] <= job["chain_chunks"] <= 303:
+                raise ValueError("invalid ECM chain recovery counters")
+        elif any(key in job for key in ("chain_chunks", "chain_replays")):
+            raise ValueError("missing ECM chain progress identity")
         cursors.append(job.get("cursor"))
     if not any(cursor is not None for cursor in cursors):
         return
@@ -892,6 +952,13 @@ def _verify_progress(current, config, policy):
         expected = list(verifier.primes(cursor["left"], cursor["next"]))
         if expected != cursor["values"]:
             raise ValueError("corrupt buffered prime values")
+
+    if current["job"] and current["job"]["kind"] == "ecm":
+        job = current["job"]
+        if job["b1"] in _chain_bounds(config):
+            from .ecm_chains import verify_progress
+
+            verify_progress(job, config.backend, verifier)
 
     if (
         current["job"]
@@ -943,6 +1010,9 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible primality policy")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if config.ecm_chain_mode == "off":
+            expected_config.pop("ecm_chain_mode")
+            expected_config.pop("ecm_chain_bytes")
         if _legacy_pm1(config) and payload["version"] < 9:
             expected_config.pop("pm1_gap_mode")
             expected_config.pop("pm1_chunk_size")
@@ -971,8 +1041,11 @@ def _unpack(checkpoint, config):
         if (
             type(payload["version"]) is not int
             or payload["version"]
-            not in (2, 3, 4, 5, 6, 7, 8, CHECKPOINT_VERSION)
+            not in (2, 3, 4, 5, 6, 7, 8, 9, CHECKPOINT_VERSION)
             or (payload["version"] < 9 and not _legacy_pm1(config))
+            or (payload["version"] < 10 and config.ecm_chain_mode != "off")
+            or (payload["version"] == 10 and config.ecm_chain_mode == "off")
+            or payload.get("chains") != _chain_policy(config)
             or (payload["version"] < 8 and config.ecm_pair_wheel is not None)
             or (
                 payload["version"] < 7 and config.ecm_pair_distance is not None
@@ -1264,8 +1337,24 @@ def factorize_bounded(
             if config.ecm_program_bytes
             else None
         )
+        if config.ecm_chain_mode != "off":
+            from .ecm_chains import ChainPlans
+
+            programs.chains = ChainPlans(
+                config.ecm_chain_bytes, config.backend, _chain_bounds(config)
+            )
         if checkpoint is not None and state["current"] is not None:
             job = state["current"].get("job")
+            if (
+                job is not None
+                and job["kind"] == "ecm"
+                and job["b1"] in _chain_bounds(config)
+            ):
+                # Bounded schedule/coordinate reconstruction was checked by
+                # unpack; a refused continuation must still pay that work.
+                budget.consume(
+                    2000 + job["n"].bit_length() + len(job["powers"])
+                )
             if (
                 job is not None
                 and job["kind"] == "pm1"

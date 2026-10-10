@@ -229,6 +229,31 @@ def _stage_one(job, budget, context, config):
         )
         return
 
+    chains = getattr(context, "chains", None) if job["kind"] == "ecm" else None
+    plan = chains.get(job["b1"], budget) if chains is not None else None
+    if plan is not None:
+        start = job["value"]
+        value, divisor, replayed = plan.execute(
+            job["powers"], start, job["n"], job["a24"], budget
+        )
+        job["chain_identity"] = plan.identity
+        job["chain_chunks"] = job.get("chain_chunks", 0) + 1
+        job["chain_replays"] = job.get("chain_replays", 0) + int(replayed)
+        if divisor is not None:
+            _finish(job, divisor)
+        elif value is None:
+            # Preserve the durable original-chunk/prime-unit recovery path.
+            # Its later atomic units retain their normal separate charges.
+            job.update(
+                phase="replay",
+                replay_index=0,
+                replay_power=1,
+                replay_value=start,
+            )
+        else:
+            job.update(value=list(value), powers=[])
+        return
+
     scalar = prod(
         (power for _, power in job["powers"]),
         start=arithmetic.backend_for(job["n"]).integer(1),
