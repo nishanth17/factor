@@ -161,3 +161,41 @@ execution. The known-difference identities, all intermediate coordinate
 factors, overwritten points, final scalar and finite strict recovery remain
 covered. Three persistent working points exclude the saved block/recovery
 point, scalar guard accumulator and arithmetic temporaries.
+
+## Combined B4 comparison, frozen before confirmation
+
+The user's newly integrated B4 control is pinned separately at `a521573`
+(native integration `0b568ec`). Its complete `ecm.py` is an immutable versioned
+input loaded under a separate module name; C6 production sources remain at
+`bcf5f3d`. The B4 change fuses ladder addition/doubling and reduces four
+selected intermediates. Its historical 6.79% complete-factoring saving cannot
+be added to C6 stage-one percentages.
+
+The bounded new screen crosses PRAC, GMP-ECM Lucas and CF records with late
+kernels, early-reduction kernels, and an adjacent independent D/A fusion pass,
+using batches 16/64. All variants retain the same certified records and guard
+masks. Fusion requires that the second instruction does not read the first
+instruction's destination, the destinations differ, and the double input is
+one addition input. Both outputs are computed before writes and both masks
+are charged. Thus exact canonical coordinate residues and the coverage proof
+are unchanged, including over nonfields. Strict replay retains its original
+kernels. Independent tests cover every retained record, affine action,
+nonunits, prime squares, split saturation and the published false-infinity
+input. The new stage-two control uses B4's scalar actions; early point
+reductions apply only to experimental stage one.
+
+The paired control is B4 alone. The original ladder is also a confirmation
+arm. Each family's stable screen winner is frozen before the unused heldout
+corpus is timed; ties within 1% prefer late, reduced, then fused, followed by
+the smaller batch. `c6_b4_protocol.json` pins sources and the unchanged
+bounds, inputs, seeds, budgets and sampling policy. GMP stays in the separate
+original-kernel comparison because B4 retained its readable GMP control.
+
+Separate JIT diagnostics compare three seconds and an additional twenty
+seconds of validated warmup. Tuple execution remains faster in both phases;
+extra warmup does not rescue generated inline code. The initial optional
+snapshot API aborted on this PyPy build and is excluded. The revised hooks
+capture compile roots and abort reasons, not every inlined function, and
+instrumented times are not acceptance evidence. GMP inline tracing reports
+`ABORT_TOO_LONG`; this is diagnostic evidence, not proof of the entire cost
+breakdown. See [PyPy's JIT-hook documentation](https://doc.pypy.org/jit-hooks.html).

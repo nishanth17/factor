@@ -37,7 +37,16 @@ def main():
     def compiled_hook(info):
         if info.jitdriver_name != "pypyjit":
             return
-        code = info.greenkey[2]
+        code = next(
+            (
+                key
+                for key in info.greenkey or ()
+                if hasattr(key, "co_filename")
+            ),
+            None,
+        )
+        if code is None:
+            return
         key = Path(code.co_filename).name + ":" + code.co_name
         if len(compiled) < 512 or key in compiled:
             compiled[key] += 1
@@ -87,7 +96,6 @@ def main():
                 elapsed += sample()
                 runs += 1
             samples = [sample() for _ in range(9)]
-            snapshot = pypyjit.get_stats_snapshot()
             phases.append(
                 dict(
                     additional_warmup_seconds=elapsed,
@@ -97,8 +105,6 @@ def main():
                     compiled_roots=dict(compiled),
                     aborted=dict(aborted),
                     generated_root_codes=len(generated_codes),
-                    counters=snapshot.counters,
-                    counter_times=snapshot.counter_times,
                     assembler_bytes=pypyjit.get_stats_asmmemmgr(),
                 )
             )
