@@ -15,7 +15,7 @@ from v2.benchmarks.prac_oracle import (
     matches,
 )
 from v2.budget import Budget, BudgetExhaustedError
-from v2.ecm_chain_records import Record, verify_frontier
+from v2.ecm_chain_records import Executor, Record, verify_frontier
 from v2.ecm_chains import (
     MIN_MEMORY_BYTES,
     SCRATCH_BYTES,
@@ -128,6 +128,44 @@ class ProductionChainTests(unittest.TestCase):
         self.assertIsNone(value)
         self.assertEqual(divisor, 5)
         self.assertTrue(replayed)
+
+    def test_strict_preparation_is_lazy_reserved_and_cached(self):
+        budget = allowance()
+        with patch("v2.ecm_chains.Executor", wraps=Executor) as prepare:
+            plan = ChainPlan(2000, "python-int", budget)
+            self.assertEqual(budget.used, 223814)
+            self.assertEqual(prepare.call_count, 0)
+            actions = {
+                id(action): action
+                for _, action, unit, _ in plan.entries.values()
+                for action in (action, unit)
+            }
+            self.assertEqual(len(actions), 317)
+            self.assertTrue(
+                all("strict" not in a.__dict__ for a in actions.values())
+            )
+
+            power, action, _, reserve = plan.entries[2]
+            powers = [[2, power]]
+            with patch.object(action, "run", return_value=((1, 1), 35)) as run:
+                with self.assertRaises(BudgetExhaustedError):
+                    plan.execute(powers, (5, 1), 35, 2, allowance(1))
+                run.assert_not_called()
+                self.assertEqual(prepare.call_count, 0)
+
+                # Saturation forces strict recovery after its whole-chunk
+                # reservation. The hidden coordinate factor remains visible.
+                before = budget.used
+                value, divisor, replayed = plan.execute(
+                    powers, (5, 1), 35, 2, budget
+                )
+            self.assertEqual(budget.used - before, 1 + reserve)
+            self.assertIsNone(value)
+            self.assertEqual(divisor, 5)
+            self.assertTrue(replayed)
+            self.assertEqual(prepare.call_count, 1)
+            self.assertIs(action.strict, action.strict)
+            self.assertEqual(prepare.call_count, 1)
 
     def test_catalog_corruption_missing_schedule_and_caps(self):
         with patch("v2.ecm_chains.CATALOG_SHA256", "0" * 64):
@@ -255,6 +293,42 @@ class ProductionChainTests(unittest.TestCase):
             n, checkpoint=old.checkpoint, config=off, budget=allowance()
         )
         self.assertEqual(restored.result.reconstruct(), n)
+
+    def test_eager_and_lazy_checkpoint_rebuilding_is_bidirectional(self):
+        from v2.benchmarks.b3_recovery import eager_module, selected
+
+        eager = eager_module()
+        config = configuration()
+        n = 6120168563605791616423380424731852610871
+        with selected(eager.ChainPlans):
+            old_partial = factorize_bounded(
+                n, seed=19, config=config, budget=allowance(250000)
+            )
+        new_partial = factorize_bounded(
+            n, seed=19, config=config, budget=allowance(250000)
+        )
+        restored = factorize_bounded(
+            n,
+            checkpoint=old_partial.checkpoint,
+            config=config,
+            budget=allowance(),
+        )
+        with selected(eager.ChainPlans):
+            old_restored = factorize_bounded(
+                n,
+                checkpoint=new_partial.checkpoint,
+                config=config,
+                budget=allowance(),
+            )
+
+        self.assertEqual(restored.result.reconstruct(), n)
+        self.assertEqual(restored.result, old_restored.result)
+        self.assertEqual(restored.work_used, old_restored.work_used)
+        self.assertEqual(old_partial.work_used, new_partial.work_used)
+        self.assertEqual(
+            old_partial.checkpoint["payload"]["chains"],
+            new_partial.checkpoint["payload"]["chains"],
+        )
 
     def test_separate_gmp_tuple_lucas_and_native_policy(self):
         try:

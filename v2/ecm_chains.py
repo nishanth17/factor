@@ -3,6 +3,7 @@
 import hashlib
 import json
 from collections import OrderedDict
+from functools import cached_property
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -62,7 +63,7 @@ def identity(bound, backend):
 
 
 class Action:
-    """Own certified operations and an eagerly verified strict interpreter."""
+    """Own certified operations and defer strict recovery preparation."""
 
     def __init__(self, record, masks, backend):
         verify_frontier(record, masks)
@@ -71,10 +72,17 @@ class Action:
             (*operation, mask)
             for operation, mask in zip(instructions(record), masks[1:])
         )
-        self.strict = Executor(record, backend)
+        self.backend = backend
         native = backend.name == "python-int"
         self.add = point_add if native else ecm.point_add
         self.double = point_double if native else ecm.point_double
+
+    @cached_property
+    def strict(self):
+        # The scalar and coverage proofs have already run. Strict recovery
+        # repeats scalar verification only when used, within the unchanged
+        # preparation charge, chunk allowance and simultaneous memory reserve.
+        return Executor(self.record, self.backend)
 
     def run(self, point, n, a24):
         points = [None] * self.record.slots
