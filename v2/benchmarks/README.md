@@ -2346,6 +2346,26 @@ Required trial delta, freeze and certified inputs remain versioned. Final
 committed-files-only checks and mainline/cleanup receipt follow below.
 The user's subsequent deletion request supersedes earlier raw-capture/local
 checkout retention notes: B4's ignored captures and verification checkouts
-will be deleted with its managed worktree, preserving shared runtimes/locks
+were deleted with its managed worktree, preserving shared runtimes/locks
 and other worktrees. This leaves the concise summaries and immutable rerun
 controls, not the historical raw sample arrays.
+
+Final committed-files-only acceptance at **`0b568ec`** passes **414 PyPy/GMP
+tests** (61.849s), full `make -C v2 lint`, all **76 benchmark imports**, and
+original/fresh/production-trial frozen loaders. The source proof confirms
+byte/AST-identical native helper, equivalent native entry except docstring and
+unexecuted GMP target, and an original-baseline GMP loop. All other production
+source matches frozen mainline. This is acceptance of the final native-only
+source, not a claim that it matches the rejected two-adapter trial in full.
+
+Mainline **`master`** fast-forwarded from `bcf5f3d` to **`0b568ec`** after those
+checks. The B4 roadmap row is crossed off; broader P4.2 production-bound items
+remain open. `v1/`, immutable earlier controls and unrelated work are unchanged.
+The managed `/Users/nishanthmohan/.codex/worktrees/b4-kernel/factor` checkout
+was removed, including task-owned ignored raw captures, logs and verification
+checkouts; the fully merged `codex/b4-kernels` branch was deleted. Codex keeps
+its normal recoverable worktree archive metadata. Required versioned research,
+corpora, source snapshots and runners remain. The shared PyPy environment,
+performance lock and C6/A6 worktrees are preserved. No further B4 benchmarks or
+heavy checks remain; release the exclusive window to the queued C6 then A6
+work. This final receipt changes documentation only.

@@ -13,7 +13,10 @@
   matches the frozen bridge and the GMP loop matches the original baseline.
 - Complete the bounded B4 entry. Keep final acceptance, mainline integration
   and user-requested worktree/temp cleanup in the benchmark record; preserve
-  required versioned corpora and all historical frozen controls.
+  required versioned corpora and all historical frozen controls. Pass 414
+  committed-only PyPy/GMP tests, full lint, 76 benchmark imports and frozen
+  loaders. Merge native-only integration to master; delete the B4 checkout,
+  ignored captures/checkouts and fully merged branch, preserving v1/C6/A6.
 
 ## Requested fresh B4 bakeoff — 9 October 2026
 

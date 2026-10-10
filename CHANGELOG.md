@@ -13,6 +13,9 @@
   recovery. Complete the bounded B4 roadmap entry; retain immutable research,
   source controls and certified corpora. Record final checks and the requested
   mainline integration/worktree cleanup in the benchmark acceptance record.
+  Pass 414 tests, full lint, 76 benchmark imports and frozen loaders from
+  committed files; merge to master and remove the B4 worktree/temp state and
+  fully merged branch. Preserve v1 and unrelated C6/A6 work.
 
 - Complete the requested fresh B4 bakeoff on a separately committed source,
   certified-input and sampling freeze. Reuse the same five candidates;
