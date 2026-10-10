@@ -883,6 +883,22 @@ The explicit config also works through `PortfolioConfig(siqs=config)` under
 its enclosing memory allowance. SSS and parallel exporters reject this config.
 The API bounds owned workspace; process/JIT RSS is reported separately.
 
+The CLI has the same explicit opt-in. Supply both endpoint and product bounds;
+there is no automatic DLP digit cutoff or implied tuned preset:
+
+```sh
+pypy3 -m v2.factor NUMBER --method siqs --qs-dlp \
+  --qs-residual-bound 1000 --qs-large-prime-bound 10000 \
+  --qs-large-product-bound 50000000 --work-limit 1000000000 \
+  --seconds 30 --cpu-seconds 30 --memory-mib 80
+```
+
+`--qs-dlp-candidate-bound` and `--qs-dlp-split-call-limit` optionally narrow
+the finite candidate and splitting allowances. The flag also works with
+`--siqs` for an explicit auto-portfolio fallback. DLP-only bounds without
+`--qs-dlp`, missing required bounds, and QS/MPQS modes are rejected. CLI
+checkpoint/resume requires the same options; omitted flag retains SLP.
+
 The complete C1 comparison bundles are versioned in
 `benchmarks/inputs/controls/c1_selected.json`. Load the whole bundle to preserve
 its factor base, polynomial choices, graph/matrix allowances and collector

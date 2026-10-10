@@ -2,6 +2,12 @@
 
 ## Current development
 
+- Integrate bounded two-large-prime SIQS as a configurable opt-in through the
+  Python API and `--qs-dlp` CLI flag. Preserve single-large-prime defaults and
+  charged DLP checkpoint/resume. C1's fresh balanced 40-digit complete-run
+  comparison supports only the declared explicit bundle; wider tuning and
+  portfolio/SSS dispatch remain open.
+
 - Add experimental opt-in two-large-prime serial SIQS after the bounded C1
   residual study produced complete 40/50-digit witnesses. Preserve the failed
   literal gate and explicitly identify the corrected cost-attribution go as
