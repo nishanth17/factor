@@ -356,18 +356,23 @@ class ExecutionTests(unittest.TestCase):
                 budget=allowance(),
                 checkpoint=resign(corrupt),
             )
-        limited = pm1_bounded.factorize_pm1_bounded(
-            1000003,
-            config=cfg,
-            budget=allowance(paused.work_used + 1),
-            checkpoint=paused.checkpoint,
-        )
-        self.assertEqual(limited.reason, "work_limit")
-        self.assertEqual(
-            limited.checkpoint["payload"]["state"],
-            paused.checkpoint["payload"]["state"],
-        )
-        self.assertGreater(limited.work_used, paused.work_used)
+        # B2=101 needs five context units. A smaller remaining grant cannot
+        # reserve that atomic action; six units rebuild context but stop
+        # before replaying setup. Neither grant can publish replay progress.
+        for additional in (1, 6):
+            limited = pm1_bounded.factorize_pm1_bounded(
+                1000003,
+                config=cfg,
+                budget=allowance(paused.work_used + additional),
+                checkpoint=paused.checkpoint,
+            )
+            self.assertEqual(limited.reason, "work_limit")
+            self.assertEqual(
+                limited.checkpoint["payload"]["state"],
+                paused.checkpoint["payload"]["state"],
+            )
+            expected = paused.work_used + (5 if additional == 6 else 0)
+            self.assertEqual(limited.work_used, expected)
 
     def test_resigned_table_corruption_is_rejected(self):
         cfg = configured(wheel=30)
