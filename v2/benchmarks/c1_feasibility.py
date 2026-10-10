@@ -546,7 +546,7 @@ def probe(fixture, seed, config, control):
 
 
 def validate_control(row, fixture):
-    """Use A10's accepted strict range without editing historical B1 evidence."""
+    """Use A10's accepted strict range; preserve historical B1 evidence."""
     assert prod(row["factors"]) * prod(row["remaining"]) == fixture["n"]
     expected = Counter(fixture["factors"])
     assert not Counter(row["factors"]) - expected
@@ -557,7 +557,7 @@ def validate_control(row, fixture):
         assert utils.valid_divisor(row["divisor"], fixture["n"])
     assert len(row["certainty"]) == len(row["factors"])
     for factor, label in zip(row["factors"], row["certainty"]):
-        # Certificates in the independently verified corpus prove these factors.
+        # The independently verified corpus certifies these factors.
         # Runtime guarantees still stop strictly before the A10 endpoint.
         wanted = (
             "proven_prime"
