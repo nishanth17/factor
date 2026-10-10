@@ -169,6 +169,127 @@ only archive with all 105 benchmark imports and required catalog loaders. Broade
 bounds, sizes, allocation/handoff, completed-curve B1 extension and default
 promotion remain C3/E1 or later work. No merge or push accompanies this tranche.
 
+### Recovery preparation and plan lifetime diagnosis (10 October 2026)
+
+A matched follow-up answers why the C6 native reused gain did not become a
+reliable per-call portfolio gain. **Native execution is faster than GMP here;
+plan lifetime is the larger integration cost.** C6's reused campaign owned one
+program across twenty attempts, with construction reported separately. The
+public bounded portfolio builds a fresh run-local cache for every independent
+call and resume. A planned eight-curve tier can also stop at an early factor.
+Those ownership and completion patterns have different amortization.
+
+Freeze `f59f2e6` uses [the recovery protocol](inputs/controls/b3_recovery_protocol.json),
+[accepted eager source](inputs/baselines/b3_eager_chains.json), the unchanged
+44-module mainline ladder, original certified training inputs/seeds, and a
+[new twelve-input confirmation corpus](inputs/corpora/b3_recovery_confirmation.json)
+(generation seed 116761; run seeds 78515/86434). The sole proposed production
+change defers strict `Executor` construction; scalar/frontier verification,
+work charges, identities, 8 MiB ownership and whole-chunk recovery reservations
+stay identical. All output/work signatures must agree between eager and lazy.
+Every unresolved recursive cofactor must receive eight completed curves and
+reconstruct exactly. Confirmation completes 13/24 rows in all arms, retaining
+one additional unsuccessful small-factor search; training completes 14/24.
+
+PyPy 7.3.23/Python 3.11.15 and gmpy2 2.3.1/GMP 6.3.0 ran under the same machine
+lock, without overlapping heavy checks. Every completed timing group has
+>=3 seconds validated warmup and nine stable samples, using the earlier
+paired-bootstrap, CPU, chronological-half and revised positive-interval rules.
+Stable inconclusive groups were not repeated to seek significance. Profiles
+are separate; cold startup was not remeasured. The two phases plus frozen
+follow-up consumed **1,561.5 seconds of the 1,800-second limit**. At the safe
+phase boundary, GMP resume confirmation, fresh1/reuse8/eviction ablations and
+the two setup confirmation workers were not run. The direct comparisons already fail lazy
+promotion; remaining cells are unclaimed gates. Earlier accepted production
+evidence remains historical and intact.
+
+A one-worker stage-one comparison uses balanced 40–80-digit cases, eight
+curves, and the same inputs/seeds/budgets/output checks. GMP takes **3.73x native
+time** on their selected production routes. With **identical Lucas records and
+identical readable kernels**, GMP takes **3.50x native time** (paired 95% interval
+3.38–3.51x). Thus a larger percentage improvement against GMP's own ladder
+never established that GMP was faster than native integers. These are PyPy
+executors of the pinned GMP-ECM-derived records, not the GMP-ECM C binary.
+
+Setup batches construct, verify and release 32 fresh finite owners inside each
+observation. Per-plan medians and paired savings follow; intervals cross zero.
+
+| Backend | Eager / plan | Lazy / plan | Setup saving [95% CI] |
+| --- | ---: | ---: | ---: |
+| python-int | 5.180 ms | 5.004 ms | +4.53% [-7.59%, +11.63%] |
+| gmpy2-mpz | 5.446 ms | 5.235 ms | +3.17% [-0.53%, +7.21%] |
+
+Full-run savings of lazy **against accepted eager production** are likewise
+inconclusive. Positive is faster; no scalar or recovery proof was removed.
+
+| Scope | Training saving [95% CI] | Fresh confirmation saving [95% CI] |
+| --- | ---: | ---: |
+| python-int, portfolio | +0.32% [-0.02%, +1.30%] | +0.59% [-0.62%, +1.10%] |
+| python-int, resume_equal | +0.85% [-0.34%, +1.72%] | -0.83% [-1.95%, +1.74%] |
+| gmpy2-mpz, portfolio | -0.07% [-1.01%, +1.23%] | -0.07% [-1.06%, +1.00%] |
+| gmpy2-mpz, resume_equal | -0.07% [-3.14%, +1.95%] | not run at phase boundary |
+
+The separate instrumented cohorts build twenty plans. Eager construction
+creates 6,660 strict interpreters; lazy recovery creates 26. Both execute 1,826
+chain chunks and 104,162 stage-two advances, with identical outcomes and work.
+These counts establish avoided preparation, but instrumented elapsed times do
+not establish a speedup. Most construction remains: reading/hashing/parsing the
+catalog, independent scalar/frontier proofs, decoded tuples and schedules.
+
+The ownership diagnostic then keeps **one finite 8 MiB lazy plan owner per timed
+cohort**, shares only immutable records across calls, and charges its first
+miss inside the timer. It starts empty for every observation, retains no points
+or budgets, and pays ordinary lookup/recovery charges. It changes no public API
+or allocation policy. The [follow-up freeze](inputs/controls/b3_recovery_followup.json)
+was committed before fresh ownership confirmation and exact original-harness
+replication; it uses only unspent study time. Results are:
+
+| Native complete portfolio | Training saving [95% CI] | Fresh confirmation saving [95% CI] |
+| --- | ---: | ---: |
+| Finite cohort owner versus per-run plans | +5.05% [+3.08%, +6.38%] | +3.52% [+2.48%, +5.33%] |
+| Finite cohort owner versus ladder | +5.42% [+3.30%, +6.91%] | +2.48% [+2.00%, +3.34%] |
+
+Both owner comparisons pass CPU, chronological halves, stability and unchanged
+coverage gates in both cohorts. This establishes a native reuse benefit in the
+bounded diagnostic, including setup and failures. It does not expose a public
+cross-call owner, serialize a cache, or transfer the C6 6.73% number unchanged.
+
+Small native ratios are also sensitive to the warmed harness. The three-arm
+lazy-versus-ladder training result is +1.36%, but fresh confirmation is -3.56%.
+Repeating **exact committed `b956801` source and the original two-arm coverage
+runner** gives -2.82% [-3.86%, -0.55%] in training and -2.15% [-3.76%, -0.02%] on its original heldout
+inputs, with all incomplete roots exhausting eight curves. This reproduces the
+per-call regression. Do not credit the three-arm sign change to lazy setup;
+its direct eager/lazy comparisons are inconclusive. This replication is a
+post-observation diagnostic, rather than new untouched confirmation.
+
+**Decision:** retain accepted eager production and all defaults byte-for-byte.
+The unpromoted [lazy source](inputs/baselines/b3_lazy_chains.json) remains a
+versioned recovery/resume fixture. An explicit caller-owned campaign API is a
+separate integration gate: define leases, compatible configuration and charged
+misses/eviction, simultaneous ownership, cancellation and mandatory charged
+resume rebuilding, then validate its actual implementation on fresh inputs.
+No new arithmetic formula, chain search, kernel, reducer, pairing or allocation
+was added. Working and committed-files-only trees pass **501 tests, full lint,
+106 benchmark imports and required catalogs/corpora**.
+
+Reproduce the experimental runner from `f59f2e6` (its immutable source checks
+intentionally reject the final retained-production tree). Use a new ignored
+output path and the shared machine lock; the parent command acquires it:
+
+```sh
+v2/.venv/bin/python -B -m v2.benchmarks.b3_recovery \
+  --scope portfolio --split confirmation --backend python-int \
+  --output v2/benchmarks/results/b3/recovery/new-confirmation.json
+```
+
+Use `--scope ownership` for the finite-owner comparison and `--scope absolute`
+for the one-worker backend comparison. The original replication uses
+`b956801` and `v2.benchmarks.b3_coverage --scope portfolio` with its unchanged
+frozen inputs. Required inputs are versioned; all raw samples, profiles,
+phase/deadline records, QA logs and checksums remain ignored/local.
+
+
 ## QS/GNFS research reconciliation (9 October 2026)
 
 The [source-linked comparison](qs_gnfs_research.md) pins 11 repositories and

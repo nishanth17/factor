@@ -145,3 +145,33 @@ records both positive and negative decisions. The default remains off.
 Further allocation, wider bounds/input sizes and default promotion require
 separate C3/E1 evidence; neither C6's historical gain nor a stage-only gain
 establishes a whole-portfolio improvement.
+
+## Recovery and owner lifecycle follow-up (10 October 2026)
+
+The frozen lazy candidate repeats scalar verification only when constructing a
+strict interpreter for recovery. Independent scalar/frontier verification still
+runs before fast use, and the original preparation charge and whole-chunk
+strict/unit reservation stay paid. The lifecycle obligation is that immutable
+records remain bound to their verified masks/backend, and strict construction
+occurs after the paid reservation. No new elliptic-curve identity or factor
+coverage theorem is needed. Tests retain saturated recovery, refusal before
+mutation and bidirectional schema-10 rebuilding. Production remains byte-for-byte
+accepted eager source because timing promotion failed; the candidate is a
+versioned fixture, not a relaxed verifier.
+
+The owner diagnostic reuses existing finite plans across complete bounded calls
+within one timed cohort, charging the first miss. It retains no curve points or
+budgets and resets between observations. This mirrors C6's broader reuse while
+including construction; its confirmed benefit does not define a new public API.
+A future caller-owned API must prove finite simultaneous ownership and compatible
+leases, charge construction/misses/recovery, and preserve independent progress
+validation and charged rebuilding on resume. The current one-call contract stays.
+
+The same-Lucas comparison isolates the backend representation while retaining
+identical records and readable kernels. Native is faster on this frozen small
+integer workload. The [official gmpy2 description](https://github.com/gmpy2/gmpy2#readme)
+identifies a C extension, and [PyPy's official FAQ](https://doc.pypy.org/faq.html#do-c-extension-modules-work-with-pypy)
+explains C-API/refcounting boundary costs. That is a plausible runtime mechanism,
+not an isolated attribution measurement or a universal backend guarantee.
+No extension code was adapted, no new license obligation was introduced, and no
+claim about the GMP-ECM C binary follows from these PyPy executor measurements.

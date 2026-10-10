@@ -2,6 +2,15 @@
 
 ## Current development
 
+- Diagnose B3 recovery preparation and plan lifetime with matched PyPy
+  ablations, fresh confirmation and exact original-harness replication.
+  Retain accepted eager production/defaults: lazy setup has no supported
+  full-run benefit. A charged finite cohort owner confirms a 2.48% native
+  saving versus the ladder; public cross-call ownership remains a separate
+  API gate. Identical Lucas execution shows native integers outperforming
+  GMP here. Preserve all prior evidence and the unpromoted lazy fixture;
+  working/committed-only checks pass 501 tests, full lint and 106 imports.
+
 - Complete B3/P4.1 bounded PRAC/Lucas production integration with an explicit
   reuse option for B1=2,000, chunk 16, tiers of at least eight curves and
   40–80-digit cofactors. Native reduced PRAC and separate GMP tuple Lucas

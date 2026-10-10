@@ -2089,6 +2089,19 @@ not a new arithmetic formula. This closes the bounded integration and measured
 retain/promote decisions. Wider bounds/sizes, allocation, defaults and same-curve
 B1 extension remain separate C3/E1/later gates; no new chain search is required.
 
+**Recovery/ownership follow-up — 10 October 2026:** matched ablations and
+exact original-harness replication retain accepted eager production and all
+defaults. Lazy preparation has no supported end-to-end benefit. A finite
+cohort owner with its first miss charged saves 5.05%/3.52% against per-run plans
+and 5.42%/2.48% against the ladder on training/fresh confirmation, respectively.
+Native integers also beat GMP on identical Lucas records/kernels. These
+[diagnostic results](benchmarks/README.md#recovery-preparation-and-plan-lifetime-diagnosis-10-october-2026)
+explain the C6 reuse distinction; they do not add a public cross-call owner or
+change B3 routing. Such an API still needs finite lease/configuration/resume
+contracts and confirmation of its implementation. No new arithmetic formula or
+search was required. Both working and committed-only checks pass 501 tests,
+full lint, 106 imports and required catalogs; raw evidence remains local.
+
 ### P4.2 — Compare fused and normalized Montgomery kernels
 
 **B4 bounded decision — 9 October 2026:** the separately committed study at

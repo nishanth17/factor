@@ -131,6 +131,15 @@ stores, compact matrix storage and recovery. Performance repairs reduce repeated
 primality/root work, sparse exponent recovery, prime-power inversions and
 relation verification. New or untrusted data still receives exact verification.
 
+The [10 October ownership/recovery diagnosis](benchmarks/README.md#recovery-preparation-and-plan-lifetime-diagnosis-10-october-2026)
+retains the accepted eager implementation and all defaults. Deferring strict
+preparation showed no reliable full-run improvement. A separately charged,
+finite owner shared across a complete cohort confirmed a native benefit, but
+`factorize_bounded` still owns a fresh cache per call/resume. There is no public
+cross-call owner or serialized cache; resumed runs continue to validate progress
+and pay rebuilding. GMP's gain against its own ladder does not imply that it
+runs faster than native integers.
+
 ## Run
 
 Run all commands below from the repository root. `pypy3` must implement Python
