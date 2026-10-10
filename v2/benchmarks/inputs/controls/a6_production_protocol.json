@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "control": "319d5c6",
+  "seed": 7,
+  "arms": [
+    "control",
+    "recurrence16",
+    "chunk64",
+    "recurrence64"
+  ],
+  "bounds": [
+    [
+      2000,
+      20000
+    ],
+    [
+      11000,
+      100000
+    ],
+    [
+      2000,
+      200000
+    ]
+  ],
+  "screen": "p43_size_corpus screen first fixture each 20/50/100 digits",
+  "confirmation": "a6_followup_corpus all 3 fixtures, same 9 cells",
+  "portfolio": "first 12 M15 independent 20-digit fixtures; original production, no bridge; seed 7, trial100, rho1x512, pm1 2000/200000, ECM2x50/1000, work500000, seconds/cpu5, 8MiB",
+  "warmup_seconds": 3,
+  "samples": 27,
+  "extend": "all arms to63 if relative IQR>15% or acceptance CI unresolved",
+  "criterion": "Screen choose largest geometric mean gain with all size classes positive; freeze selection before confirmation. Confirm all-size positive geometric mean and lower95% bootstrap CI>0; production portfolio lower95% CI>0 with identical completion/split outcomes. No ten-percent floor. Any backend failing stays legacy.",
+  "storage": "64 even powers; fixed conservative owned reserve, growth charged in addition to legacy gap ledger; full table verification charged on resume.",
+  "exclusions": "No allocation/bounds/base/curve changes; no ECM/Lucas; no accepted concurrent heavy checks; cold/profile separate."
+}

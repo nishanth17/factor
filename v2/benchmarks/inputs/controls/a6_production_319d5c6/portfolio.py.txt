@@ -34,7 +34,7 @@ from .stage_jobs import (
     take_prime,
 )
 
-CHECKPOINT_VERSION = 9
+CHECKPOINT_VERSION = 8
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -48,8 +48,6 @@ class PortfolioConfig:
     """
 
     backend: str = field(default="python-int", kw_only=True)
-    pm1_gap_mode: str = field(default="recurrence", kw_only=True)
-    pm1_chunk_size: int | None = field(default=64, kw_only=True)
     trial_bound: int = constants.TRIAL_BOUND
     rho_attempts: int = 4
     rho_evaluations: int = 5000
@@ -78,12 +76,6 @@ class PortfolioConfig:
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
-        if self.pm1_gap_mode not in ("cached", "recurrence"):
-            raise ValueError("p-1 gap mode must be cached or recurrence")
-        if self.pm1_chunk_size is not None:
-            utils.require_integer(self.pm1_chunk_size, "pm1_chunk_size", 1)
-            if self.pm1_chunk_size > 256:
-                raise ValueError("limit p-1 chunks to 256 primes")
         arithmetic.get_backend(self.backend)
         for fallback in (self.siqs, self.sss):
             if fallback is not None and fallback.backend != self.backend:
@@ -257,12 +249,7 @@ class PortfolioConfig:
             + 256 * self.segment_size
             + 256 * self.max_input_bits
             + 1024 * self.trace_limit
-            + 256 * max(self.chunk_size, self.pm1_chunk_size or 0)
-            + (
-                8 * coordinate_bytes * 64
-                if self.pm1_attempts and self.pm1_gap_mode == "recurrence"
-                else 0
-            )
+            + 256 * self.chunk_size
             + self.schedule_cache_bytes
             + self.ecm_program_bytes
             + paired_reserve
@@ -711,13 +698,6 @@ def _advance(
             current.update(job=None, attempt=current["attempt"] + 1)
 
 
-def _legacy_pm1(config):
-    """Old snapshots retain their original chunk and gap execution."""
-    return not config.pm1_attempts or (
-        config.pm1_gap_mode == "cached" and config.pm1_chunk_size is None
-    )
-
-
 def _pack(state, config, budget, generator, policy):
     """Snapshot RNG, pending work, schedule identity, and resource use."""
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
@@ -743,11 +723,6 @@ def _pack(state, config, budget, generator, policy):
         version = 7
     if config.ecm_pair_wheel is None:
         configuration.pop("ecm_pair_wheel")
-    else:
-        version = 8
-    if _legacy_pm1(config):
-        configuration.pop("pm1_gap_mode")
-        configuration.pop("pm1_chunk_size")
     else:
         version = CHECKPOINT_VERSION
     payload = {
@@ -928,9 +903,6 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible primality policy")
 
         expected_config = json.loads(_canonical(asdict(config)))
-        if _legacy_pm1(config) and payload["version"] < 9:
-            expected_config.pop("pm1_gap_mode")
-            expected_config.pop("pm1_chunk_size")
         if config.ecm_pair_distance is None:
             expected_config.pop("ecm_pair_distance")
         if config.ecm_pair_wheel is None:
@@ -955,9 +927,7 @@ def _unpack(checkpoint, config):
 
         if (
             type(payload["version"]) is not int
-            or payload["version"]
-            not in (2, 3, 4, 5, 6, 7, 8, CHECKPOINT_VERSION)
-            or (payload["version"] < 9 and not _legacy_pm1(config))
+            or payload["version"] not in (2, 3, 4, 5, 6, 7, CHECKPOINT_VERSION)
             or (payload["version"] < 8 and config.ecm_pair_wheel is not None)
             or (
                 payload["version"] < 7 and config.ecm_pair_distance is not None
@@ -1231,12 +1201,6 @@ def factorize_bounded(
             if config.ecm_program_bytes
             else None
         )
-        if checkpoint is not None and state["current"] is not None:
-            job = state["current"].get("job")
-            if job is not None and job["kind"] == "pm1":
-                from .pm1_gaps import verify_powers
-
-                verify_powers(job, budget, config.pm1_gap_mode)
         while state["pending"] or state["current"] is not None:
             stage = (
                 state["current"]["stage"] if state["current"] else "dispatch"

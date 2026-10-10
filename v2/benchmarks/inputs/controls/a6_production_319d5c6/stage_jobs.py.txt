@@ -182,20 +182,15 @@ def _stage_one(job, budget, context, config):
             job.update(replay_index=position + 1, replay_power=1)
         return
 
-    chunk_size = (
-        config.pm1_chunk_size or config.chunk_size
-        if job["kind"] == "pm1"
-        else config.chunk_size
-    )
     prime = (
         None
-        if len(job["powers"]) >= chunk_size
+        if len(job["powers"]) >= config.chunk_size
         else peek_prime(job["cursor"], context, budget, power_bound=job["b1"])
     )
-    if prime is not None and len(job["powers"]) < chunk_size:
+    if prime is not None and len(job["powers"]) < config.chunk_size:
         cursor = job["cursor"]
         count = min(
-            chunk_size - len(job["powers"]),
+            config.chunk_size - len(job["powers"]),
             len(cursor["values"]) - cursor["index"],
         )
         budget.consume(count)
@@ -308,37 +303,18 @@ def _stage_two(job, budget, context, config):
             previous = candidate
         # Cache hits save arithmetic, not reservations: warm and resumed
         # execution must traverse the same work ledger as a cold chunk.
-        powers = job.get("even_powers", [])
-        needed = (
-            max(
-                (gap // 2 for gap in gaps if gap % 2 == 0 and gap <= 128),
-                default=0,
-            )
-            if config.pm1_gap_mode == "recurrence"
-            else 0
-        )
-        growth = max(0, needed - len(powers))
-        budget.consume(sum(gap.bit_length() + 1 for gap in gaps) + growth)
-        if growth:
-            square = job["value"] * job["value"] % n
-            while len(powers) < needed:
-                powers.append((powers[-1] if powers else 1) * square % n)
-            job["even_powers"] = powers
+        budget.consume(sum(gap.bit_length() + 1 for gap in gaps))
         cache = job.setdefault("gap_powers", {})
         value, residue = job["value"], job["stage_two_value"]
         product, terms = job["product"], job["terms"]
 
         for candidate, gap in zip(primes, gaps):
-            if gap % 2 == 0 and gap // 2 <= len(powers):
-                power = powers[gap // 2 - 1]
-            else:
-                key = str(gap)  # Preserve JSON keys for exceptional gaps.
-                if key not in cache:
-                    if len(cache) >= 64:
-                        cache.clear()
-                    cache[key] = pow(value, gap, n)
-                power = cache[key]
-            residue = residue * power % n
+            key = str(gap)  # String keys survive a JSON roundtrip unchanged.
+            if key not in cache:
+                if len(cache) >= 64:
+                    cache.clear()
+                cache[key] = pow(value, gap, n)
+            residue = residue * cache[key] % n
             term = (residue - 1) % n
             terms.append(term)
             product = product * term % n
@@ -518,7 +494,6 @@ def promote_job(job, backend):
         "saved",
         "stage_two_value",
         "gap_powers",
-        "even_powers",
         "baby",
         "giant",
         "previous",
