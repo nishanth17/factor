@@ -2,6 +2,17 @@
 
 ## Current development
 
+- Integrate accepted A6 bound-continuation and recurrence APIs into current
+  B4 mainline at `62a57f2`. Preserve B4 arithmetic, direct p−1/portfolio/ECM
+  defaults, bounds, attempts and checkpoint formats. Cross off the bounded
+  A6 roadmap contribution; keep later ECM/Lucas migration and allocation open.
+- Pass combined mainline test/lint and all 449 PyPy/GMP tests, lint, 82
+  benchmark imports and A6/B4 frozen loaders from committed files. Verify all
+  92 raw A6 evidence files before managed-worktree cleanup. Remove the A6
+  checkout, fully merged branch and temporary test archives; preserve ignored
+  mainline evidence, shared PyPy and unrelated C6 work. Historical A6 timing
+  remains bound to `869ed42`; no combined B4/A6 speedup is claimed.
+
 - Integrate B4's native selected-reduction ladder, confirmed at 6.79%
   complete-run saving (paired 95% interval 5.82–13.58%) in the frozen
   production bridge. Retain readable GMP arithmetic: whole-ladder fusion's

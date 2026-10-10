@@ -160,7 +160,7 @@ remain open. The isolated P4.3 backend tranche is complete. A1, A3 and A4 are co
 for their bounded tranches. A4 retains the ladder default; production chain
 routing and near-optimal chains remain B3/C6 work.
 A3 retains streamed defaults after matched reuse experiments. B2 now supplies
-bounded opt-in pairing; its matched losses retain defaults. A6's isolated
+bounded opt-in pairing; its matched losses retain defaults. A6's integrated
 bounded tranche now supplies exact increased-B1 integer ratios and finite
 p−1 campaigns; ECM point/checkpoint migration remains separate. Conditional capacity/CRT follow-ups can
 remain deferred. A10's verified wider deterministic primality and v1 ownership
@@ -2339,7 +2339,9 @@ only when retained certificates/decoding are the measured bottleneck; no
 allocation rewrite is bundled here. Common-Z remains its own C2 challenger.
 Polynomial/product-tree continuation stays **F3**; production PRAC, arithmetic
 kernels and factor-size/curve allocation retain their existing workstreams.
-Increased-B1 extensions remain blocked on **A6's exact schedule-ratio contract**.
+A6's exact integer schedule-ratio contract is now integrated. Increased-B1
+ECM extensions still require the group-specific point, recovery and checkpoint
+migration tracked under P5.3; B2 does not implement that migration.
 
 **A3 accepted bounded tranche — 5 October 2026.** Production ECM can consume
 immutable packed prime/power blocks under an explicit run-local cap. Generation,
@@ -2481,6 +2483,15 @@ PyPy/GMP tests, lint, 73 benchmark imports and certificate/input/selection
 loaders. Legacy arithmetic/work/checkpoints remain compatible; tuned state
 binds `pm1-tuning-v1`. ECM/Lucas continuation, compiled cross-input plans,
 relocation, polynomial continuation and allocation remain separate.
+
+**Mainline integration and cleanup:** merge `62a57f2` preserves accepted A6
+runtime bytes and current B4 kernels. Combined mainline test/lint pass;
+committed-only validation passes all 449 PyPy/GMP tests, lint, 82 benchmark
+imports and A6/B4 frozen loaders. All 92 local evidence files are checksum
+preserved before managed A6 worktree removal, fully merged branch deletion and
+temporary test-archive cleanup. Shared PyPy and unrelated C6 remain intact.
+The A6 row is complete and crossed off; no combined performance/default
+promotion is claimed. Historical source/selection pins remain unchanged.
 
 - [x] Compare bounded p−1 per-prime/chunk execution, gap reuse and capped
   reusable schedules on fixed and fresh independent inputs. The revised

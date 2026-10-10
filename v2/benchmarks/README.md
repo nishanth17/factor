@@ -2794,3 +2794,45 @@ Required corpora, certificates, control snapshot, protocol and selections are
 versioned. Raw captures, profiles, pilot failures, AST review, archive receipts
 and analysis remain local under ignored `results/a6/followup/`; source/license
 captures remain under ignored `results/a6/research/`. Nothing is merged.
+
+### A6 mainline integration and cleanup — 9 October 2026
+
+The user subsequently authorized integration of the accepted A6 functionality.
+Merge `62a57f2` combines `869ed42` with current B4 mainline `a521573`.
+Only documentation conflicts required resolution; both lanes' historical
+acceptance records remain. `pm1_bounded.py`, `pm1_tuning.py` and `schedules.py`
+retain the accepted A6 bytes; B4's `ecm.py`, production p−1/portfolio/stage jobs,
+immutable inputs and `v1/` retain their prior bytes. Exact continuation and
+recurrence are available as explicit APIs/options. Production defaults,
+allocation, bounds, attempts and checkpoint formats are unchanged.
+
+Historical A6 timing belongs to the isolated accepted source at `869ed42`;
+no combined B4/A6 speedup is claimed. Its selection manifest intentionally
+binds every imported top-level implementation source, including `ecm.py`.
+B4's newer ECM source therefore makes that old manifest fail closed on current
+mainline. Preserve the manifest rather than rewriting historical provenance;
+reproduce the frozen follow-up commands from `869ed42`. Any new combined
+measurement requires a new source/selection freeze. Importing the runner and
+loading the required immutable controls/certificates remain supported.
+
+Raw A6 captures and research bytes are copied to mainline's ignored
+`results/a6/` before worktree cleanup. Combined test/lint, committed-only
+imports/loaders, checksum preservation and cleanup receipts belong in the
+ignored `results/a6/integration/` directory. In the explicitly released C6
+window, `make -C v2 test` passes 446 system-PyPy tests (three optional-GMP
+skips) and `make -C v2 lint` passes. A checkout from only committed `62a57f2`
+files passes all 449 PyPy/GMP tests, full lint (163 Python files), all 82
+top-level benchmark imports and the original/fresh A6 and B4 control,
+certificate/product and source-pin loaders. The historical A6 selection
+correctly rejects the changed ECM identity rather than accepting old timing
+as new combined evidence. Accepted A6 arithmetic/schedules and current B4
+kernel bytes are independently checked unchanged; `v1/` has no diff.
+
+All 92 original A6 evidence files are copied and SHA-256 verified before
+cleanup. The managed A6 worktree is archived and its checkout removed; the
+fully merged `codex/a6-pm1-continuation` branch is deleted. Both task-owned
+temporary committed-checkout archives are removed. Normal recoverable Codex
+archive metadata remains. Preserve the shared PyPy environment, mainline
+ignored evidence and unrelated C6 worktree/branch. All A6 timing/heavy checks
+are finished and the shared window is explicitly returned to C6. Only this
+documentation receipt follows the committed-only checks.

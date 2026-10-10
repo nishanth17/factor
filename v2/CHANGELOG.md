@@ -1,5 +1,25 @@
 # v2 changelog
 
+## A6 mainline integration and cleanup — 9 October 2026
+
+- Merge accepted A6 `869ed42` into current B4 mainline at `62a57f2`, resolving
+  documentation conflicts while preserving both historical studies. Exact
+  finite continuation and recurrence remain explicit opt-ins; production
+  defaults/allocation and unrelated arithmetic/checkpoints are unchanged.
+- Cross off A6 as complete and integrated. Remove the obsolete scalar-ratio
+  blocker while keeping ECM point/recovery/checkpoint migration under P5.3.
+  Preserve frozen manifests: historical A6 timing is reproduced at `869ed42`,
+  and its selection intentionally rejects current B4 ECM source identity.
+- Pass mainline tests (446 system-PyPy tests, three optional-GMP skips) and
+  full lint. A committed-only checkout passes all 449 PyPy/GMP tests, lint,
+  82 benchmark imports and A6/B4 required control/certificate/source loaders.
+  Check accepted A6/B4 runtime bytes and unchanged v1. Only docs follow checks.
+- Copy and SHA-256 verify all 92 raw A6 evidence files into ignored mainline
+  results, then archive/remove the A6 managed checkout, delete its fully merged
+  branch and remove both task-owned temporary test archives. Preserve shared
+  PyPy, normal recoverable archive metadata and C6 worktree/branch. Return the
+  exclusive window after all checks; no further A6 heavy work remains.
+
 ## B4 production integration — 9 October 2026
 
 - Promote native selected reductions behind the existing scalar API:

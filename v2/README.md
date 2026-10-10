@@ -692,13 +692,23 @@ in the [A6 research and contract](benchmarks/a6_pm1_research.md). They unblock
 the scalar contract for later ECM work; ECM bound migration remains separate.
 
 The separate `v2.pm1_tuning.PM1TuningConfig` is an opt-in execution
-configuration for this same entry point. Its bounded correctness gate passes.
+configuration for this same entry point. These A6 APIs are integrated into
+mainline; their bounded correctness gate passes.
 `chunk_size=64, gap_mode="recurrence"` is accepted for scoped integration
 review after fresh 27-sample complete-call confirmation: 1.0–2.8% less CPU
 than the frozen chunk-64 control, with positive aggregate intervals in every
 size class. Bit caps and wheels remain experimental, unpromoted alternatives;
 production defaults and allocation remain unchanged. See the
 [complete comparison and limitations](benchmarks/README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution).
+
+```python
+from v2.pm1_tuning import PM1TuningConfig
+
+config = PM1TuningConfig(
+    bounds=((2000, 20000),), chunk_size=64, gap_mode="recurrence"
+)
+```
+
 It adds `chunk_bits` (zero, or 32–4096),
 `gap_mode="cached"|"recurrence"`, `gap_entries` (1–256), and `wheel` (0, 30,
 or 210). The prime-count chunk cap still applies; a bit cap bounds the sum of
