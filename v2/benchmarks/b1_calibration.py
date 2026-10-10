@@ -259,15 +259,19 @@ def validate(row, fixture):
     if len(row["certainty"]) != len(row["factors"]):
         raise AssertionError("factor labels missing")
     for factor, label in zip(row["factors"], row["certainty"]):
-        wanted = "proven_prime" if factor < 2**64 else "probable_prime"
+        wanted = (
+            "proven_prime"
+            if utils.deterministic_bases(factor) is not None
+            else "probable_prime"
+        )
         if label != wanted:
             raise AssertionError("runtime certainty was overstated or changed")
     if row["work"] > WORK or row["stats"].get("workspace_bytes", 0) > MEMORY:
         raise AssertionError("finite work/storage envelope exceeded")
 
 
-def run_one(fixture, seed, config, seconds):
-    """Include setup through split classification, without ECM/pretests."""
+def run_one(fixture, seed, config, seconds, *, job_type=SIQSJob):
+    """Include setup/classification; R5 can supply the existing SSS job."""
     check_quiet({os.getpid()})
     last_poll = time.monotonic()
 
@@ -285,7 +289,7 @@ def run_one(fixture, seed, config, seconds):
         cancelled=overlap_poll,
     )
     started, cpu = time.perf_counter(), time.process_time()
-    job = SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
+    job = job_type(fixture["n"], seed=seed, config=config, budget=budget)
     result = job.run()
     if (result.divisor or 1) * result.cofactor != fixture["n"]:
         raise AssertionError("split/cofactor reconstruction failed")

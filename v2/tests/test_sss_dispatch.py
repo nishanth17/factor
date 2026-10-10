@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from dataclasses import replace
+from itertools import product
 from pathlib import Path
 
 from v2 import utils
@@ -102,10 +103,12 @@ class SSSDispatchTests(unittest.TestCase):
         self.assertEqual(resumed.result.reconstruct(), n)
 
     def test_full_checkpoint_rebuilds_interrupted_assignment_and_solver(self):
-        config = SSSConfig(base_bound=400)
         n = 4001 * 4003
 
-        for stage in ("assignment", "solver", "extractor"):
+        for mode, stage in product(
+            ("sss", "sssf"), ("assignment", "solver", "extractor")
+        ):
+            config = SSSConfig(base_bound=400, mode=mode)
             job = SSSJob(n, config=config, budget=allowance())
 
             def cancel():

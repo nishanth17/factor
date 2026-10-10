@@ -271,10 +271,10 @@ development and coordinated integration, not concurrent performance runs.
 | ~~A4 — P4.1 chain correctness~~ | ~~Verify bounded PRAC/precomputed prime-power chain records against integer and independent point oracles; retain the ladder.~~ | ~~Existing exact point/ladder controls~~ | ~~**[x] Complete for A4.** Verified records are connected to `ecm.multiply_prac`; independent field/composite/schedule checks pass. The checked implementation is retained as an opt-in correctness foundation; B3 and C6 remain open.~~ | ~~Astra / **xhigh**~~ | ~~Proof-intensive chain invariants and exceptional composite-modulus cases; termination and projective validity are checked independently.~~ |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
 | ~~A6 — P5.3 p−1 and extension correctness~~ | ~~Completed exact increased-B1 ratios, finite campaign/checkpoint validation and bounded chunk/gap/wheel comparisons.~~ | ~~Existing p−1/P2 controls~~ | ~~**[x] Complete and integrated, 9 October 2026.** Exact old-prime power increases and cumulative verified resume pass. Direct recurrence/chunk 64 defaults are subsequently promoted at explicit user direction. Fresh complete stages save 9.73%; extended integer portfolio evidence remains inconclusive. Bounds and allocation remain unchanged.~~ | ~~Sol / **xhigh**~~ | ~~Independent LCM/direct-power/coverage oracles, finite saturation recovery, canonical int state and matched fresh evidence settle this bounded contribution. ECM/Lucas migration and broader allocation remain separate.~~ |
-| A7 — P3.8-R5 reconciliation | Reconcile SSS/SSSf, workers, forced factors, loss policies, API/checkpoints and the two repair-pass decisions; prepare comparable arms. | Accepted repair and R3 records | **High leverage, modest scope.** Prevents duplicate work and stale comparisons. This is the early interface/evidence audit; broad promotion waits for the final portfolio comparison. | Sol / **high** | Sol fits reconciliation against existing code and accepted evidence. high is sufficient for bounded API/documentation and checkpoint audits; escalate to xhigh only if a new conflicting invariant appears. |
+| ~~A7 — P3.8-R5 reconciliation~~ | ~~Completed SSS/SSSf, relation/extraction, worker, loss-policy and checkpoint reconciliation; comparable current-control arms prepared. See the [acceptance matrix](benchmarks/a7_r5_reconciliation.md).~~ | ~~Accepted repair and R3 records~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026.** Fixes and acceptance coverage pass 503 PyPy/GMP tests, full lint and committed-only imports/loaders. Final E1 comparison remains open; no worker/collector promotion.~~ | ~~Sol / **high**~~ | ~~Bounded contracts and both repair decisions are reconciled. Remaining calibrated worker/40-digit SSS and final combined confirmation prerequisites belong to E1; C1 larger-input feasibility remains open.~~ |
 | A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
 | ~~A10 — P8.2.1 verified v1 capability transfers~~ | ~~Completed bounded tranche: source-verified strict 12/13-base ranges, reported regression, independent proof oracles, v1 ownership audit and checked legacy resume.~~ | ~~Existing P1.8/P2 exact classification and budget controls; preserved v1 sources~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026; implementation `0ee86ff`, acceptance `6794af6`.** Committed-only suites/imports and lint pass. Range-only selection retained; complete-run tail spread disclosed. B14 and E1 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Primary-source computational guarantees, endpoint congruences, independent proof fixtures, finite budgets and RNG/work/checkpoint compatibility are reconciled; no disputed extra range was adopted.~~ |
-| A11 — P3.4 CLI usability follow-up | Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, useful help, examples and tests through the existing `v2.factor` recursive portfolio; retain opt-in SIQS fallback. | Existing P2 portfolio and P3.4 polynomial/checkpoint contracts | **Outstanding usability follow-up, eligible now.** Explicit engine access is independent of automatic-dispatch performance gates. All three selectors are now wired and tested; the complete usability follow-up remains tracked here under P3.4. | Sol / **high** | Sol fits connecting existing verified engines to the entry point. high covers cross-mode configuration, help/examples, recursive reconstruction and checked resume; no new factoring mathematics or automatic default is required. |
+| A11 — P3.4 CLI usability follow-up | Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, useful help, examples and tests through the existing `v2.factor` recursive portfolio; retain opt-in SIQS fallback. | Existing P2 portfolio and P3.4 polynomial/checkpoint contracts | **Accepted usability gate; prior outstanding status was stale.** All three explicit selectors, finite controls and checked resume are accepted. Automatic handoff remains C3/G1. | Sol / **high** | Sol fits connecting existing verified engines to the entry point. high covers cross-mode configuration, help/examples, recursive reconstruction and checked resume; no new factoring mathematics or automatic default is required. |
 
 ### Execution phase B — exploit the settled controls
 
@@ -1167,14 +1167,16 @@ large-band experiment gates below remain open. No whole-SIQS promotion.
 
 #### P3.4 usability follow-up — explicit QS/MPQS/SIQS CLI access (A11)
 
-This remains a separate outstanding usability follow-up to the accepted M31
-bounded engine. Explicit selection can ship now; automatic crossover/default
-promotion is still owned by C3/G1 and the existing P3.4 performance gates.
+A11's usability gate is accepted, as confirmed by the user during A7 on
+9 October 2026. The committed snapshot calling it outstanding was stale;
+this reconciliation does not reopen its implementation. The historical
+progress and measurements below retain their original scope. Automatic
+crossover/default promotion remains C3/G1 and the P3.4 performance gates.
 The entry point is `v2/factor.py`; preserve `v1/factor.py` as historical code.
 Reuse `factorize_bounded()` so both children of every split share the same
 recursive dispatcher, resource ledger and checked resume state.
 
-- [ ] Complete `--method qs|mpqs|siqs` CLI usability: finite base/interval/
+- [x] Complete `--method qs|mpqs|siqs` CLI usability: finite base/interval/
   family/storage/work/time controls, checkpoint/resume, help, runnable examples
   and tests for all three modes. Retain `--siqs` as the optional automatic
   portfolio fallback; explicit selection skips rho/p−1/ECM after preprocessing.
@@ -1207,8 +1209,8 @@ engines' extraction, recursive composite children, sign/multiplicity and
 configuration identity. The 301-test PyPy suite and lint pass. Matched
 library/CLI comparisons preserve factors, seeds and consumed work after
 validated warmup and repeated samples; see the benchmark scope above.
-Keep A11 listed as the outstanding P3.4 usability follow-up; this records
-implemented coverage without closing any automatic-dispatch performance gate.
+The historical outstanding-status instruction is superseded by the accepted
+usability status above; automatic-dispatch performance gates remain open.
 
 ### P3.5 — Evaluate Smooth Subsum Search on the same interface
 
@@ -1820,8 +1822,18 @@ Immediate diagnosis, SSS/SSSf cost improvements, worker accounting/batching,
 and their fresh matched comparisons are owned by P3.6.1. This section consumes
 that evidence for broader interface/array reconciliation.
 
-- [ ] Retain P3.5's completed bounded adapter/upstream evidence and P3.6.1's
-  eventual validated decisions, with unchanged author code as a separately
+**A7 acceptance — 9 October 2026:** bounded reconciliation complete. The
+[acceptance matrix](benchmarks/a7_r5_reconciliation.md) maps inspected code and
+tests to both repair decisions, R3 identities and checked SSS/worker resume.
+Fresh-output certainty and wide SSS solver-fingerprint fixes, plus missing
+acceptance coverage, are included; [pinned current-control arms](benchmarks/inputs/controls/a7_r5_e1_arms.json)
+prepare E1. No new A7 timing study was necessary. Worker flyer/large-interval
+compatibility, 40-digit SSS calibration and final integrated fresh comparisons
+remain explicit E1 prerequisites/deferrals; array work stays conditional on a
+measured bottleneck. SSS/SSSf remain experimental and native serial stays default.
+
+- [x] Retain P3.5's completed bounded adapter/upstream evidence and P3.6.1's
+  accepted validated decisions, with unchanged author code as a separately
   labeled arm. Reconcile the common interface and record the
   forced-prime quotient, recovered exponents, SSSf candidate loss, tree caps
   and in-memory versus serialized resume scope. Reuse P3.6.1's checked stable
@@ -1843,7 +1855,7 @@ pins the upstream comparator and records that the reported 5.1–6.8× figures
 are relation-yield ratios on two inputs per size. A7/R5 reuse existing bounded
 SSS/SSSf and P3.6.1 repairs; E1 owns a fresh final-control comparison. Clarify
 the missing upstream root license before any further code adaptation.
-- [ ] Reconcile current SSS serialized checkpoints and explicit portfolio/CLI
+- [x] Reconcile current SSS serialized checkpoints and explicit portfolio/CLI
   selection with README/API and current tests. Verify cumulative resources,
   interrupted assignment and solver reconstruction, terminal evidence and
   checkpoint-size refusal. The original-budget guard has been restored;
