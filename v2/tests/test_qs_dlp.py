@@ -160,6 +160,7 @@ class GraphTests(unittest.TestCase):
         forest = LargePrimeForest()
         for i in range(256):
             forest.commit(forest.plan(i + 1, i + 2, str(i), 300, allowance()))
+        self.assertEqual(len(forest.path(1, 256, allowance())), 255)
         saved = copy.deepcopy(forest.__dict__)
         with self.assertRaises(CycleTooLongError):
             forest.plan(1, 257, "closing", 300, allowance())
@@ -271,6 +272,15 @@ class RelationTests(unittest.TestCase):
             )
         with self.assertRaises(ValueError):
             combine_relations((valid,), collector.factor_base)
+
+    def test_large_prime_nonunit_exposes_only_a_proper_divisor(self):
+        collector = worker()
+        # 7^2 - 91 = -2 * 3 * 7: one endpoint is a factor of n.
+        result = collector.collect(-3, -2)
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor, 7)
+        self.assertEqual(result.divisor * (91 // result.divisor), 91)
+        self.assertFalse(collector._atoms)
 
     def test_candidate_coverage_against_independent_trial_division(self):
         base = build_factor_base(1009 * 1013, bound=40).factor_base

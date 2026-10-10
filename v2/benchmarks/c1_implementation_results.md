@@ -1,7 +1,7 @@
 # C1 bounded DLP implementation and complete-factor evaluation
 
-Status: production correctness checks passed; frozen training is running.
-Fresh confirmation and promotion are pending. This report will retain failed
+Status: production correctness, training and large-store resume checks passed
+as described below; fresh performance confirmation and promotion are pending. This report will retain failed
 and unresolved outcomes along with complete factorizations.
 
 ## Why implementation proceeded
@@ -94,3 +94,54 @@ claim a DLP-versus-SSS crossover. P5.4's broader SSS comparison remains an E1
 integration prerequisite. B3 released the performance window at07:12:46UTC;
 C1's committed-only QA and subsequent study each hold the machine-wide lock.
 No B3/A7 algorithm or shared portfolio/stage-job file was edited.
+
+## Completed training and bounded profile
+
+The fixed20-run training matrix completed in1,930.186 wall /1,838.703 CPU
+seconds. Every arm completed both40-digit inputs. Total elapsed seconds
+across those two single-run diagnostics were20.160 for SLP,20.055 for
+graph-SLP,15.492 for full DLP,15.097 for narrowed DLP and13.518 for the
+smaller-base DLP arm. These exploratory values select a policy; they are
+not accepted speed estimates. The half-base arm incurred no eviction on
+either40-digit input and retained less workspace than full DLP.
+
+All five arms exhausted120seconds on both50-digit training inputs. On the
+first input, full/narrowed DLP and SLP filtered to zero. The half-base DLP
+arm retained a nonempty466-row /711-column filtered matrix but no kernel.
+It was closer to a useful matrix, not a complete-factor winner. Equal capped
+failure costs leave the50-digit DLP selection tied; the already implemented
+arm-order tie break selects full DLP. No row-count surrogate changes that
+predeclared ranking.
+
+The one diagnostic profile used120.019 wall /119.439 CPU seconds, including
+60seconds of unprofiled collection followed by a profiled tail under the
+same cumulative allowance. Sieve/root work dominates the profiled tail;
+graph admission is small by comparison. The profile does not justify a
+DLP-specific repair or a residual-certainty shortcut. Its function timings
+are instrumentation, not accepted throughput estimates. No implementation
+repair or repeated training matrix is undertaken. Broader sieve/root reuse
+remains the existing R2/C8 workstream.
+
+## Large-store charged resume
+
+The separately frozen [resume control](inputs/controls/c1_resume_acceptance.json)
+uses the already inspected first50-digit input, half-base DLP,512MiB owned
+allowance,8MiB checkpoint allowance, and300seconds cumulative wall/CPU.
+These larger allowances are not substituted into timing arms. A pause at
+60seconds was serialized, released, read from JSON and restored with prior
+work/wall/CPU charged. The checkpoint occupied1,441,315bytes; reconstruction
+charged32,155,909additional work units.
+
+The resumed run completed in141.063 total wall /140.888 CPU seconds, returning
+6,234,745,488,095,579,115,919,703 ×9,192,770,129,255,987,774,468,263. Both
+runtime labels remain probable-prime; independent corpus certificates prove
+the expected factors. It retained8,795forest edges, including889owned edges,
+after20,480evictions. Every returned divisor was proper and the outcome
+reconstructed the original input. This establishes a concrete larger-input
+production/resume witness, not a matched50-digit speedup.
+
+Training, profile and this acceptance check together used2,191.268 active
+wall seconds, within the4,500-second envelope. Source/setting freeze and fresh
+confirmation follow. The [pre-generation seed-stability clarification](c1_seed_stability.md)
+preserves pooled extension triggers and predeclares conditional fixed-seed
+checks without additional runs or relaxed correctness/resource gates.

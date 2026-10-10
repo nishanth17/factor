@@ -121,9 +121,11 @@ weaken production reservations or silently change accepted R3 provenance.
 
 ## Contracts preserved during feasibility
 
-The SLP collector, admitted residual type, R3 stable mixed order, complete
-immutable cache identities, original-row lifting, exact square corrections,
-charged checkpoint replay and finite stores remain byte-for-byte unchanged.
+During the diagnostic studies, the SLP collector, admitted residual type,
+R3 stable mixed order, complete immutable cache identities, original-row
+lifting, exact square corrections, charged checkpoint replay and finite
+stores remained byte-for-byte unchanged. Later opt-in implementation and its
+separate acceptance are recorded in [the implementation report](c1_implementation_results.md).
 Diagnostic records are not `AtomicRelation` objects and never enter a runtime
 checkpoint. Full trial division on randomly chosen positions cross-checks the
 root-guided diagnostic recovery, including rejected candidates. Offline
