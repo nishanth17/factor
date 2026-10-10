@@ -52,7 +52,8 @@ def pack_job(job):
             if solver is None
             else dict(
                 actions=solver.next_row + solver.xors,
-                digest=_solver_digest(solver),
+                digest=_solver_digest(solver, encoding="hex-v1"),
+                digest_encoding="hex-v1",
                 pending=solver.pending is not None,
                 extract_index=None
                 if engine.extractor is None
@@ -141,7 +142,8 @@ def _restore_solver(engine, prefix, resources):
             matrix.masks[solver.next_row],
         )
 
-    if _solver_digest(solver) != prefix["digest"]:
+    encoding = prefix.get("digest_encoding", "decimal-v1")
+    if _solver_digest(solver, encoding=encoding) != prefix["digest"]:
         raise ValueError("SSS elimination prefix mismatch")
     engine.prepared, engine.solver = prepared, solver
     index = prefix["extract_index"]

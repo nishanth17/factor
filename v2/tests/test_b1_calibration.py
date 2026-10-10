@@ -59,6 +59,19 @@ class CalibrationTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate(row, fixture)
 
+    def test_fresh_a10_deterministic_labels_above_word_domain(self):
+        # This prime lies in A10's wider domain, as do B1's 40-digit children.
+        prime = 2**64 + 13
+        fixture = {"n": prime, "factors": [prime]}
+        row = dict(
+            self.row, factors=[prime], divisor=None, certainty=["proven_prime"]
+        )
+
+        validate(row, fixture)
+        row["certainty"] = ["probable_prime"]
+        with self.assertRaises(AssertionError):
+            validate(row, fixture)
+
     def test_fast_refusal_cannot_outrank_completion(self):
         complete = dict(complete=True, seconds=2, stats={})
         refusal = dict(complete=False, seconds=0.01, stats={"relations": 1})
