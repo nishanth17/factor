@@ -90,6 +90,25 @@ def main():
                 for key in ("arm", "backend", "scope", "confirmation")
             }
             row["samples"] = len(capture["samples"])
+            row["preparation_seconds"] = capture["preparation_seconds"]
+            if capture["scope"].endswith("reuse"):
+                # Preparation includes both programs. Charging all of it to
+                # the candidate is a conservative first-cohort estimate;
+                # warmed execution plus this cost is not a cold process run.
+                charged = [
+                    (
+                        sample["candidate"]["seconds"]
+                        + capture["preparation_seconds"]
+                    )
+                    / sample["ladder"]["seconds"]
+                    for sample in capture["samples"]
+                ]
+                row["first_cohort_preparation_charged"] = dict(
+                    median_ratio=statistics.median(charged),
+                    ratio_95_interval=c6_fast_study.interval(
+                        charged, data["protocol"]
+                    ),
+                )
             row["stable"] = capture["summary"]["stable"]
             row["all"] = summarize(capture, data["protocol"])
             row["cpu"] = summarize(
