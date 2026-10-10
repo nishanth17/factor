@@ -419,7 +419,12 @@ def factorize_pm1_bounded(
     if config is None:
         from .pm1_tuning import PM1TuningConfig
 
-        execution = (checkpoint or {}).get("payload", {}).get("execution")
+        execution = None
+        if checkpoint is not None:
+            try:
+                execution = checkpoint["payload"]["execution"]
+            except (KeyError, TypeError) as error:
+                raise ValueError("malformed p-1 checkpoint") from error
         config = (
             PM1Config()
             if execution == EXECUTION_VERSION

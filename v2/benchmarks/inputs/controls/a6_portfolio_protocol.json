@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "reason": "Primary int portfolio gain and independent marginal capture disagree; extend and separate recurrence from chunk size before default selection.",
+  "screen_arms": [
+    "no_pm1",
+    "control",
+    "recurrence16",
+    "chunk64",
+    "recurrence64"
+  ],
+  "samples": 63,
+  "warmup_seconds": 3,
+  "screen_inputs": "first12 independent M15 20digit fixtures (same as previous cohort)",
+  "confirmation_inputs": "next12 independent M15 20digit fixtures, untouched by selection",
+  "controls": "same319d5c6 frozen sources; fixedseed7 and all original bounds/budgets; direct production code, no patch/wrapper",
+  "criterion": "Select greatest matched median CPU saving with lower95%CI>0, identical outcomes. Freeze selection before independent cohort confirmation. Default requires lower95%CI>0 on held-out full portfolio as well as positive complete-stage evidence; no ten-percent floor. Otherwise retain legacy production settings."
+}

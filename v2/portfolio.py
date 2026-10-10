@@ -1178,7 +1178,14 @@ def factorize_bounded(
     if config is None:
         # A resume retains the saved p-1 executor; fresh calls use the accepted
         # default. Other configuration still has to match the snapshot.
-        saved_config = (checkpoint or {}).get("payload", {}).get("config", {})
+        saved_config = {}
+        if checkpoint is not None:
+            try:
+                saved_config = checkpoint["payload"]["config"]
+                if type(saved_config) is not dict:
+                    raise ValueError("malformed checkpoint config")
+            except (KeyError, TypeError) as error:
+                raise ValueError("malformed checkpoint") from error
         config = PortfolioConfig(
             pm1_gap_mode=saved_config.get("pm1_gap_mode", "cached")
             if checkpoint is not None
