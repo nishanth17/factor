@@ -24,7 +24,7 @@
     "pm1_tuning.py": "63cf5ab41e5407bbac9c8d101c67f81c92dfc80ad2d1e5a3275c62ccd2ce4669",
     "pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
     "pollard_rho.py": "4976184d1ed412dc99562bde7d6eed4e2d08f653c0c7b8a684c48b2f85441c84",
-    "portfolio.py": "0ae1c84e5a11189f3ab4aea5840f64e3b157ae9ffe6870dce196017912873342",
+    "portfolio.py": "4170c89cae6988bec0271dfa230aa1de3e514257e2676217e0e5f945373069ad",
     "prac.py": "09b9140b8b23b074ad5a5e795bd4ecf131c2e728e0373c11a41a62adef1c3b2e",
     "preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
     "prime_sieve.py": "6f852e0e4c17504745bd172283802b976e57a05f9346034da008094e9f470db4",
@@ -80,5 +80,5 @@
     "pypy": "sys.pypy_version_info(major=7, minor=3, micro=23, releaselevel='final', serial=0)",
     "platform": "macOS-26.6.2-arm64-arm-64bit"
   },
-  "verification": "Final stage_jobs AST equals measured0cbf1f7; later production edits only harden malformed resume metadata and add invariant comments/docstrings. Portfolio benchmark slice uses an equivalent stop local to satisfy both formatters."
+  "verification": "Final stage_jobs AST equals measured0cbf1f7; later production edits only harden malformed resume metadata and add invariant comments/docstrings. Portfolio benchmark slice uses an equivalent stop local to satisfy both formatters. New table caps also reject before backend rehydration; independent oversized-state test covers that boundary."
 }

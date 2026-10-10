@@ -839,6 +839,13 @@ def _verify_progress(current, config, policy):
             raise ValueError("candidate kind disagrees with portfolio stage")
         job = current["job"]
         if job["kind"] == "pm1" and not _legacy_pm1(config):
+            # Reject oversized new tables before backend rehydration copies
+            # their contents. Full arithmetic verification remains charged.
+            if (
+                len(job.get("even_powers", [])) > 64
+                or len(job.get("gap_powers", {})) > 64
+            ):
+                raise ValueError("p-1 gap storage exceeds its cap")
             if (job["b1"], job["b2"], job["seed"]) != (
                 config.pm1_b1,
                 config.pm1_b2,

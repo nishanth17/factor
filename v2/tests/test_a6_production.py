@@ -204,6 +204,42 @@ class ProductionPM1Tests(unittest.TestCase):
                 n, config=config, budget=allowance(), checkpoint=damaged
             )
 
+    def test_oversized_tables_reject_before_rehydration(self):
+        from unittest.mock import patch
+
+        config = configuration()
+        paused = portfolio.factorize_bounded(
+            1009 * 1013, config=config, budget=allowance(0)
+        )
+        damaged = copy.deepcopy(paused.checkpoint)
+        state = damaged["payload"]["state"]
+        # Supply an otherwise coherent assignment before any allocation of
+        # backend-specific table entries can occur.
+        state["pending"] = []
+        state["current"] = {
+            "n": 1009 * 1013,
+            "mult": 1,
+            "stage": "pm1",
+            "attempt": 0,
+            "job": stage_jobs.new_job("pm1", 1009 * 1013, 0, 7, 71),
+        }
+        state["current"]["job"]["even_powers"] = [1] * 65
+        damaged["sha256"] = hashlib.sha256(
+            portfolio._canonical(damaged["payload"]).encode()
+        ).hexdigest()
+        with patch.object(
+            portfolio,
+            "_promote_state",
+            side_effect=AssertionError("rehydrated corrupt table"),
+        ):
+            with self.assertRaisesRegex(ValueError, "storage exceeds"):
+                portfolio.factorize_bounded(
+                    1009 * 1013,
+                    config=config,
+                    budget=allowance(),
+                    checkpoint=damaged,
+                )
+
     def test_implicit_defaults_and_legacy_snapshot_inference(self):
         config = portfolio.PortfolioConfig()
         self.assertEqual(
