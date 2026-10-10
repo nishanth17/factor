@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "control_commit": "afbbafc0fd2b7acb74cec700333fa38041b8d338",
+  "source_commit": "8acbf97e9e628da7d1f1528bb8fa1c27ab5d3a3a",
+  "sha256": {
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/budget.py": "a176241cbaeeb79c48fa305150b38589db8dde99fd63e643422525f49b6acc8a",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/ecm.py": "326f04ff19c07d85225603aa9247ee830e5f9c4b2dc7a72ee231da461ec7fa50",
+    "v2/ecm_paired.py": "f5ad5f729410a7ed9c08b430dd68cbd80614286c352bac563cccf1d6e7caeaa4",
+    "v2/ecm_programs.py": "dcbb3300bfff413f044a43d72de2b3ee20378e443cc6d06c6a8ab1ce970f77c6",
+    "v2/ecm_wheel.py": "fcda5a07b5152b5d963a1b15b73302ccef7ce13101593a924b6db8fdd0607a00",
+    "v2/factor.py": "1e60c1f731a8d98882264da5a3ff59a51465b3374f1072cfe6d0e85d680fc1b6",
+    "v2/pm1_bounded.py": "c598b9c07e99706c3e5e74e0a2f6220ad2c4154208a5667acf69b5331ed4c981",
+    "v2/pm1_gaps.py": "908b6d2c12449160e278a5c432451febe010ada0c69ca9790b14548fbdc67ca7",
+    "v2/pm1_tuning.py": "63cf5ab41e5407bbac9c8d101c67f81c92dfc80ad2d1e5a3275c62ccd2ce4669",
+    "v2/pollard_pm1.py": "abe4902147836fdfd75cb5592ca91b27a1d8e2aeea5150122acb0e0cf1c720c1",
+    "v2/pollard_rho.py": "4976184d1ed412dc99562bde7d6eed4e2d08f653c0c7b8a684c48b2f85441c84",
+    "v2/portfolio.py": "4d990f3c65a786769db47522d5637b0deb66f22b45ec6cb6013a7044f194cbcc",
+    "v2/prac.py": "09b9140b8b23b074ad5a5e795bd4ecf131c2e728e0373c11a41a62adef1c3b2e",
+    "v2/preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
+    "v2/prime_sieve.py": "6f852e0e4c17504745bd172283802b976e57a05f9346034da008094e9f470db4",
+    "v2/qs/__init__.py": "d12995525a3a27f8174443d20842f17dacfd4dc26a771885aa15de0644eae8ed",
+    "v2/qs/assignment_stream.py": "52cd4d90487bee6040f7679b75faba47c2b651fe16fe5b914e11c34c849b5838",
+    "v2/qs/capacity.py": "b15dad537fc283aec8e44f6140e5d716574414f4aaf5ef3e75299d98b2613de8",
+    "v2/qs/checkpoint.py": "4c765fb0ec7ca74f5067cc4b0d761b2e13a7699dd714c06c5b4be2931bd7943c",
+    "v2/qs/external_square.py": "723895bb4a261cac690f2fd8b224df425c6c8ec29a8769f556c23b1a050db760",
+    "v2/qs/extraction.py": "0e28fee97ba01100f5eaba8c0aebd8e1cbf855fb844528171cce297ed86c23ab",
+    "v2/qs/factor_base.py": "14f846255475fdebcf5cf2f3d87078012acc1620065ad5bbedbb05e0d0eb4d41",
+    "v2/qs/families.py": "e6648b134691373c00661bd405d64a5a15f61856d6bee589535055b7cfd4dd7a",
+    "v2/qs/large_prime_checkpoint.py": "9e03d43eccfc3d84ddf2c051b4f9a26e921018914472d70fa73e38ccabf6d315",
+    "v2/qs/large_prime_collector.py": "8d637ef0995a8d1aed6e4ca2d872a1df424be389f6037320e5bb981015a6bf23",
+    "v2/qs/large_primes.py": "1488aa3b739777125965a7d033263e5261b428cbbc130eeb2dba13e61c33888d",
+    "v2/qs/linear_algebra.py": "ce6788568aecb14fc7bd4d7aa5b1af67ae6c670bbf3a18cd88268987aaa91d51",
+    "v2/qs/multiplier.py": "6367fc6d06dd8c0e9c71a7e83eb8e11444f18aaa3431031eb2a4c1e1c17ca785",
+    "v2/qs/parallel.py": "87b4912cce59d89ad0eca14b30c65b578117ec5e6997a8110ea0b1713c512ea8",
+    "v2/qs/pipeline.py": "b168e5286572a649c439465d55940fad6bac6c956c9dcc2543471270fef36bcc",
+    "v2/qs/polynomial.py": "1832a80f403fbc1a61aa73e20a518483e26301007c7ce6a3000823f4d07581e5",
+    "v2/qs/power_sieve.py": "a78660148c5c96432dc3ae09b78e38df0a3943a352dd5fd6fdb5b2391476359a",
+    "v2/qs/reference_collector.py": "0b476152dfe592b8042d96ed1df1b711c4b15bbfeb8cb1e8daaae2e1c7baefbb",
+    "v2/qs/relations.py": "5684d2fde47eca91d148bdc3e3e5e11d2ad30a0215c8a2892d0c7afd5449cf82",
+    "v2/qs/score.py": "f9c5f4c1b1ed19bc7c1e8ab61bd9577907a1795f874c77d73bd616c1b79b4675",
+    "v2/qs/sieve_collector.py": "8999f114d4dbe824008c1308bdd0edb39bb6075fc6e4f575a57c707fd45ebcea",
+    "v2/qs/siqs.py": "1e958c74187d59217eb9a2a6d7fde76fb85e9b23556a80d810151d0682e7e922",
+    "v2/qs/smooth_batch.py": "fab558b2c04d3a68ebdfb81c32f9cd96828e7ef68692f81c527bf880ccd6709b",
+    "v2/qs/sss.py": "55470a67fccac563c960f41692fd190967f6642ae3b24a5487f31c5054563ea3",
+    "v2/qs/sss_checkpoint.py": "48870fd541fca9b62bfa5262800d6b6a87d72be939583e50261bae6e18aa3714",
+    "v2/schedules.py": "5e0f8fd137a5146325547cd557c74e44dc769884b0a7a086c450213eb71afb52",
+    "v2/stage_jobs.py": "2d0d63172563c3e36c95af5e085049e5a207e50a6857acc31f1b1136fafa9276",
+    "v2/utils.py": "96bf853427d233c09e9c05f8d5ceadaf9e273a4a2ba3bfddf1fe9f5349e767b8",
+    "v2/work_budget.py": "8ea8d0a3d84f2c39ea0b3769f4800e2cacfb1ba138be46139639eb71bbcaefae",
+    "v2/ecm_chains.py": "53477de3b8b86070b8d4b2f5e7a38d31c6c0f843ba0dca12fd725d98889960bf",
+    "v2/ecm_chain_records.py": "9c9add832a3ab738dc26e2c3aab37f4c65d1a3b2f67a4dfc35701f6ed2e42469",
+    "v2/ecm_chain_options.py": "8d9cba5df20ecbb4a28b39aefa61c74ed712b0b483c69c674b7c63cedc3d4988",
+    "v2/benchmarks/b3_default.py": "13da386a6b900f81f869bdf95dc11859ff76d4c279d2cb44272bb09cf2d49aae",
+    "v2/benchmarks/b3_production.py": "be5a87e537b5086a4c1262a8c1f4e079d74c60abfcabe74eef3fd3be63a6cfde",
+    "v2/benchmarks/b3_coverage.py": "17e83420e0fc7faa2811c419ae45c70ca3eaddef6114d2e67f2767c52f803a71",
+    "v2/benchmarks/inputs/baselines/b3_pre_default.json": "435ac1f6835d8da1ab4be5c1cb2ed09c330dc9725f74fa1c7aa302b10896e7c4",
+    "v2/benchmarks/inputs/controls/c6_fast_records.json": "b316003a7238c1240f52dd28f48f507931ef7f4061362333dc436f016d531ed9",
+    "v2/benchmarks/inputs/controls/b3_cf_records.json": "fd1e650180c1c576fe9bd95e64221f3d19bb0a730a772d356f0876d1e91284ae",
+    "v2/benchmarks/inputs/corpora/b3_corpus.json": "1b558afc9a6fb9ab8b8b3e451591104b66bc32fb4dcd4439932337fdcb117604",
+    "v2/benchmarks/inputs/corpora/b3_coverage_confirmation.json": "7dd82ea9e57ef04b1f6327238b566dbdd43632eb8e5751696fccbf548787083a"
+  },
+  "training_seeds": [
+    31001,
+    38920
+  ],
+  "confirmation_seeds": [
+    62677,
+    70596
+  ],
+  "b1": 2000,
+  "b2": 147396,
+  "curves": 32,
+  "work": 32000000,
+  "seconds": 20,
+  "cpu_seconds": 20,
+  "memory_bytes": 33554432,
+  "program_bytes": 524288,
+  "chain_bytes": 8388608,
+  "sampling": [
+    [
+      3,
+      9
+    ],
+    [
+      5,
+      18
+    ],
+    [
+      8,
+      27
+    ]
+  ],
+  "max_relative_iqr": 0.15,
+  "bootstrap_seed": 193001,
+  "arms": [
+    "ladder",
+    "default",
+    "lucas",
+    "cf"
+  ],
+  "scopes": [
+    "portfolio",
+    "resume_equal",
+    "default_budget"
+  ],
+  "policy": "User-directed default; no new selection or population confirmation. Previously used certified inputs supply a regression bridge. Setup, proof, recovery, failed curves and validation are timed. Native ints only; optional Lucas/CF use batch16. Equal-search runs need 32 curves for each unresolved cofactor. The 2M budget diagnostic is censored, with no equal-search speed claim. User promotion implies no measured gain."
+}
