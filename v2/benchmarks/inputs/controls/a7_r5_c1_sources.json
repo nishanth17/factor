@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "base_control_sha256": "9ec74ab79c1b1dd5a979370a96bfbac517113ee483c47ce3d3656b1027e33d72",
+  "status": "C1 opt-in integration source pins for prepared A7 arms; not fresh E1 timing or a new calibrated selection.",
+  "source_sha256": {
+    "v2/benchmarks/a7_r5.py": "7e83f79dcada83e8a36ee2427dbfdbebfe5e3002fda0df36011d66629b31ccad",
+    "v2/factor.py": "6b8889d1c46f1b5bf2fc209a4ef3f0b8a60094de301caa178bb539e459030225",
+    "v2/qs/__init__.py": "d12995525a3a27f8174443d20842f17dacfd4dc26a771885aa15de0644eae8ed",
+    "v2/qs/checkpoint.py": "4c765fb0ec7ca74f5067cc4b0d761b2e13a7699dd714c06c5b4be2931bd7943c",
+    "v2/qs/extraction.py": "0e28fee97ba01100f5eaba8c0aebd8e1cbf855fb844528171cce297ed86c23ab",
+    "v2/qs/relations.py": "5684d2fde47eca91d148bdc3e3e5e11d2ad30a0215c8a2892d0c7afd5449cf82",
+    "v2/qs/sieve_collector.py": "8999f114d4dbe824008c1308bdd0edb39bb6075fc6e4f575a57c707fd45ebcea",
+    "v2/qs/siqs.py": "1e958c74187d59217eb9a2a6d7fde76fb85e9b23556a80d810151d0682e7e922"
+  }
+}

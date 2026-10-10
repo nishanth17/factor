@@ -15,15 +15,30 @@ from .phase_three_sss import deserialize_config
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = Path(__file__).parent / "inputs/controls/a7_r5_e1_arms.json"
+CURRENT_SOURCES = (
+    Path(__file__).parent / "inputs/controls/a7_r5_c1_sources.json"
+)
 
 
 def load_plan():
     """Reject changed runtime/adapter/input bytes before using frozen arms."""
-    plan = json.loads(PLAN.read_text())
+    plan_bytes = PLAN.read_bytes()
+    plan = json.loads(plan_bytes)
     if plan["schema"] != 1:
         raise ValueError("unknown R5 arm schema")
+    integrated = json.loads(CURRENT_SOURCES.read_text())
+    if (
+        integrated["schema"] != 1
+        or integrated["base_control_sha256"]
+        != hashlib.sha256(plan_bytes).hexdigest()
+        or not integrated["source_sha256"].keys()
+        <= plan["source_sha256"].keys()
+    ):
+        raise ValueError("R5 integrated source pin changed")
     for group in ("source_sha256", "input_sha256"):
         for name, expected in plan[group].items():
+            if group == "source_sha256":
+                expected = integrated["source_sha256"].get(name, expected)
             path = ROOT / name
             if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
                 raise ValueError("R5 arm pin changed: " + name)

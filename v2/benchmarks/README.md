@@ -5,7 +5,7 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
-## C1 bounded DLP — 10 October 2026
+## C1 bounded DLP opt-in integration — 10 October 2026
 
 The [completed report](c1_implementation_results.md) adopts explicit bounded
 DLP and the selected balanced 40-digit bundle. Fresh complete-run cost falls
@@ -37,7 +37,9 @@ report distinguishes graph counts, verified square trials and proper factors.
 Its smaller, denser 40-digit matrices require refreshed A8 evidence before a
 later solver promotion. Broader SSS/combined-portfolio comparisons remain E1.
 Generated captures stay local in `results/c1/`; required controls and corpora
-are versioned. Timings and heavy checks serialize on
+are versioned. The Python configuration and `--qs-dlp` CLI flag both require
+explicit endpoint/product bounds; neither changes the SLP default. Timings
+and heavy checks serialize on
 `/private/tmp/factor-performance.lock` with B3/A7.
 Committed-only validation passes 526 PyPy/GMP tests, full lint, 109 benchmark
 imports and all required C1 controls/certificate/source-pin loaders.
@@ -58,11 +60,17 @@ no new benchmark or implementation gate is closed by source research.
 The [acceptance matrix and E1 handoff](a7_r5_reconciliation.md) reconcile the
 actual SSS/SSSf, relation/extraction, worker and checkpoint contracts with both
 accepted repair passes and R3. The [prepared arm plan](inputs/controls/a7_r5_e1_arms.json)
-pins current sources and historical inputs; `pypy3 -B -m v2.benchmarks.a7_r5`
+pins its original sources and historical inputs; `pypy3 -B -m v2.benchmarks.a7_r5`
 checks pins and constructs configurations without timing. Exact selected B1
 controls use current runtime code; SSS challengers use the same B1 budget and
 classification adapter. Worker arms retain their supported reference schedule,
 with flyer/wide-interval incompatibility explicit.
+
+C1 integration preserves the original A7 arm plan unchanged. A separate
+[current-source manifest](inputs/controls/a7_r5_c1_sources.json) binds that
+plan's digest and the changed integrated source bytes; the loader still rejects
+unexpected runtime or input changes. These prepared arms remain E1 candidates,
+not fresh A7 performance evidence or a final combined-source freeze.
 
 B1's stale above-2**64 certainty expectation is fixed for fresh A10 outputs.
 SSS now uses the shared streamed hexadecimal solver fingerprint, preserving
