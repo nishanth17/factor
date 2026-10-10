@@ -33,5 +33,7 @@
   },
   "arithmetic": "recurrence64",
   "wheel": 0,
-  "arithmetic_capture_sha256": "622b6e051935ae838f1b47dfe2bbe369410cc9779421fe33f53ea92e83cb308b"
+  "arithmetic_capture_sha256": "622b6e051935ae838f1b47dfe2bbe369410cc9779421fe33f53ea92e83cb308b",
+  "wheel_scope": "retain",
+  "paired_capture_sha256": "10eff4b87a5f4af55badd31c3b87a51715acb6c21860a1a4be0fb94936945a2c"
 }
