@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "purpose": "One large-store correctness/resume check; not timing or tuning evidence",
+  "digits": 50,
+  "training_index": 0,
+  "seed": 7,
+  "arm": "dlp_half",
+  "pause_seconds": 60,
+  "cumulative_seconds": 300,
+  "harness_seconds": 360,
+  "work": 10000000000000,
+  "memory_bytes": 536870912,
+  "checkpoint_bytes": 8388608,
+  "retained_byte_limit": 33554432,
+  "stop_rule": "One attempt only; retain refusal or unresolved result. No cap expansion or new settings search. Charge its runtime against the unspent 4500-second training/profile envelope."
+}
