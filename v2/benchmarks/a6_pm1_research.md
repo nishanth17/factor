@@ -266,3 +266,21 @@ LCM ratio remains the only shared schedule interface. Future ECM point
 continuation and allocation remain separate. The frozen follow-up protocol
 and source control live in versioned `inputs/`; final acceptance still requires
 correctness, fresh confirmation and complete-stage/portfolio measurements.
+
+### Supplementary special-form source check — 9 October 2026
+
+This closes the two named source-inspection gaps above, without expanding the
+frozen follow-up candidates or claiming exhaustive SOTA coverage.
+
+| Source pin and inspected files | Findings and limits |
+| --- | --- |
+| [Mlucas `fe933b7f`](https://github.com/primesearch/Mlucas/blob/fe933b7f75cc0b51421a6daccf9fbffcc5814172/src/pm1.c), `src/pm1.c`, `LICENSE` | Stage one builds/saves a full prime-power exponent with a Mersenne/Fermat-specific seed and packs small products into word multipliers. Stage two includes memory-selected expanded pairing windows, small-prime relocation, basic square-exponent and optional inverse/trace paths. It extends the final center sweep to avoid orphaned eligible tail primes; this supports explicit endpoint coverage checks rather than blindly rounding B2. FFT representation, special-form seeds, relocation and automatic bound adjustment are not transferred. The file header permits GPL-2.0-or-later; root LICENSE is GPL-3.0. No code copied. |
+| [CUDAPm1 fork `5cfbc221`](https://github.com/BleuSquid/cuda-p1/blob/5cfbc2213d22b6f78196c068e1f5d39c294e590f/CUDAPm1.cu), `CUDAPm1.cu`, `LICENSE` | Uses CUDA/cuFFT Mersenne arithmetic, a GMP-built stage-one exponent seeded by 2p, bounded-memory passes over wheel residues, relocation and tunable even degree in stage two. This archived fork is an implementation lead, not a current GPU performance baseline. Its `-eb1` path contains a placeholder instead of extension calls; the unused nonzero-second-bound `get_control` branch enumerates primes in the new interval rather than the complete LCM ratio. Neither establishes exact increased-B1 support. Root license is GPL-3.0, with mixed upstream provenance documented in the source header; no adaptation attempted. |
+
+Pinned source/license bytes and SHA-256 values remain local in
+`results/a6/research/coverage-audit/supplement/`. The IACR eprint mirror for
+Montgomery–Kruppa 2008 was also attempted and returned HTTP 403, so the
+previous full-paper access limitation still stands. The authors' thesis,
+chapter and slides support the mathematical discussion; no unavailable text
+is described as read. These supplementary inspections reinforce the present
+small exact wheel screen and the separate later relocation/polynomial work.
