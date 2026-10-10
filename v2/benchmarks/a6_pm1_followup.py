@@ -94,7 +94,11 @@ def options_for(arm, selection=None):
     if arm in ("wheel30", "wheel210"):
         return {**arithmetic, "wheel": int(arm.removeprefix("wheel"))}
     if arm == "selected_pairing":
-        return {**arithmetic, "wheel": selection["wheel"]}
+        return (
+            {**arithmetic, "wheel": selection["wheel"]}
+            if selection["wheel"]
+            else arithmetic
+        )
     raise ValueError("unknown frozen arm")
 
 

@@ -112,6 +112,31 @@ class PairedCoverageTests(unittest.TestCase):
                     )
                     self.assertEqual(math.gcd(trace, n), math.gcd(direct, n))
 
+    def test_independent_coverage_after_increased_b1_and_b2_only(self):
+        bounds = ((7, 31), (10, 43), (10, 61))
+        for wheel in (30, 210):
+            cfg = replace(configured(wheel=wheel, gcd_batch=2), bounds=bounds)
+            state = pm1_bounded._initial(1000003, 2, cfg)
+            context, ledger = SieveContext(62, segment_size=3), allowance()
+            covered = {0: [], 1: [], 2: []}
+            while not state["done"]:
+                phase, rung = state["phase"], state["rung"]
+                before = len(state["terms"])
+                pm1_bounded._advance(state, ledger, context, cfg)
+                if phase == "wheel_terms":
+                    value = pow(
+                        2, math.lcm(*range(1, bounds[rung][0] + 1)), 1000003
+                    )
+                    self.assertEqual(state["value"], value)
+                    for primes in state["wheel_term_primes"][before:]:
+                        covered[rung].extend(primes)
+            for rung, (lower, upper) in enumerate(
+                ((8, 31), (11, 43), (44, 61))
+            ):
+                self.assertEqual(
+                    sorted(covered[rung]), prime_oracle(lower, upper)
+                )
+
     def test_singleton_excludes_partner_just_outside_bound(self):
         for wheel in (30, 210):
             cfg = configured(wheel=wheel)
@@ -259,6 +284,35 @@ class ExecutionTests(unittest.TestCase):
                 )
                 if not state["done"]:
                     pm1_bounded._advance(state, ledger, context, cfg)
+
+    def test_every_saturation_replay_boundary_resumes(self):
+        cases = (
+            (13 * 19, configured(chunk_bits=32, chunk_size=256)),
+            (
+                59 * 311,
+                replace(configured(wheel=30, gcd_batch=1), bounds=((10, 31),)),
+            ),
+            (607 * 103, configured(wheel=210, gcd_batch=64)),
+        )
+        for n, cfg in cases:
+            complete = pm1_bounded.factorize_pm1_bounded(
+                n, config=cfg, budget=allowance()
+            )
+            expected = complete.checkpoint["payload"]["state"]
+            for actions in range(expected["steps"] + 1):
+                paused = pm1_bounded.factorize_pm1_bounded(
+                    n, config=cfg, budget=allowance(), max_actions=actions
+                )
+                resumed = pm1_bounded.factorize_pm1_bounded(
+                    n,
+                    config=cfg,
+                    budget=allowance(),
+                    checkpoint=json.loads(json.dumps(paused.checkpoint)),
+                )
+                self.assertEqual(
+                    resumed.checkpoint["payload"]["state"], expected
+                )
+                self.assertEqual(resumed.result.reconstruct(), n)
 
     def test_increased_old_power_and_table_invalidation(self):
         cfg = configured(wheel=30, gap_mode="recurrence")
