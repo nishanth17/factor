@@ -39,6 +39,8 @@ later solver promotion. Broader SSS/combined-portfolio comparisons remain E1.
 Generated captures stay local in `results/c1/`; required controls and corpora
 are versioned. Timings and heavy checks serialize on
 `/private/tmp/factor-performance.lock` with B3/A7.
+Committed-only validation passes 526 PyPy/GMP tests, full lint, 109 benchmark
+imports and all required C1 controls/certificate/source-pin loaders.
 
 ## QS/GNFS research reconciliation (9 October 2026)
 

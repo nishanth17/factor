@@ -1780,6 +1780,8 @@ observation but residual fixed-seed drift; no new preset promotion follows.
 Fresh 50-digit SLP/DLP both time out, while a separately bounded larger-store
 50-digit resume completes. The 60-digit captures still have no useful matrix.
 No universal DLP cutoff or 80–100-digit performance claim follows.
+Final committed-only validation passes 526 PyPy/GMP tests, full lint, 109
+benchmark imports and required controls/certificates/source pins.
 
 - [ ] Coordinate C1/E3 residual-classification experiments from the
   [FLINT comparison](benchmarks/qs_gnfs_research.md#candidate-decisions-and-owners)

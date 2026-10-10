@@ -3,7 +3,7 @@
 Status: the bounded C1 implementation and calibrated-SLP comparison are
 complete. Adopt the explicit smaller-base DLP bundle for the tested balanced
 40-digit class. Preserve defaults and the larger unresolved outcomes. Final
-committed-files-only validation is recorded below after its execution.
+committed-files-only validation passes 526 tests, lint and required loaders.
 
 ## Why implementation proceeded
 
@@ -46,13 +46,12 @@ cycles are supported. A 256-atom cycle limit is an explicit yield loss.
 
 Only unowned forest edges can be evicted. Planning is read-only, followed by
 verification and a final resource check before publication. Owned paths survive
-rebuilding. SIQS checkpoint version 4 reconstructs the forest and verifies every
-row,
+rebuilding. SIQS checkpoint version 4 reconstructs the forest and verifies every row,
 closing edge, atom reference and polynomial ownership, preserving original
 mixed row order. Prior work/wall/CPU, replay and started split attempts stay
 charged. Ordinary SLP uses checkpoint version 3. The same explicit SIQS
-configuration
-works through portfolio resume; no shared portfolio/stage schema changed.
+configuration works through portfolio resume; no shared portfolio/stage
+schema changed.
 
 Independent tests enumerate the entire boolean incidence kernel of small
 multigraphs and compare its span with emitted cycles, including eviction.
@@ -62,10 +61,15 @@ Further checks cover all four division backends, conservative and deliberately
 narrowed candidate domains, corrupted corrections/stores, cap refusals,
 cancellation, native/GMP arithmetic, and charged nested portfolio resume.
 
-The committed-only `b5066ad` archive passed 525 tests, full `make -C v2 lint`,
-107 benchmark imports and required C1 loaders. The final orphan-polynomial
-bound in `ebd049e` additionally passed the 15 DLP tests. Full final-source
-committed-only validation remains scheduled after confirmation.
+The final committed-only `40d8d71` archive passed **526 PyPy/GMP tests** in
+80.333 seconds using `make -C v2 test` with the explicit PyPy 3.11 interpreter.
+`make -C v2 lint` passed Ruff checks/formatting and pycodestyle for all 205
+Python files. All **109 benchmark modules** imported, and required C1
+controls, the owned SLP baseline, independent corpus certificates, selected
+configurations and frozen source hashes loaded and verified. The receipt is
+local `results/c1/final-committed-1.log`; the committed-only archive is retained
+beside it. Later receipt edits are Markdown only, with tested runtime, test,
+control and corpus bytes unchanged. Generated evidence is not committed.
 
 ## Frozen evaluation
 
