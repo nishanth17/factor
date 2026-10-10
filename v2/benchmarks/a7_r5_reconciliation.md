@@ -130,7 +130,12 @@ or further adaptation. No external code was adapted in A7.
 
 ## Verification
 
-Full PyPy tests, full lint, prepared-arm loading and a committed-files-only
-archive/import/loader check are required before publication. Raw logs stay in
-ignored `v2/benchmarks/results/a7-r5/`; final counts are recorded in the
-[benchmark guide](README.md#a7--p38-r5-reconciliation--9-october-2026).
+Full supported PyPy/GMP QA passes 503 tests and full lint. A committed-files-only
+archive of `65f57ba` passes the same 503 tests/lint, 103 benchmark imports,
+148 source pins, 16 input pins, three baseline loaders and seven certified
+corpora. Only the external development runtime/toolchain is reused; ignored
+repository source/evidence is unnecessary. The source-location-free AST review
+limits existing function changes to the declared fixes/adapter and acceptance
+tests. Raw logs stay in ignored `v2/benchmarks/results/a7-r5/`; commands and
+counts are recorded in the [benchmark guide](README.md#a7--p38-r5-reconciliation--9-october-2026).
+A7 is closed for its own bounded acceptance; final E1 confirmation remains open.

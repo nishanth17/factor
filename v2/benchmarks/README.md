@@ -43,8 +43,14 @@ checks. Native serial and automatic dispatch remain unchanged. Raw QA captures
 stay under ignored `results/a7-r5/`. The full supported PyPy 3.11.15 /
 PyPy 7.3.23 / gmpy2 2.3.1 run passes **503 tests**, and full lint passes
 (**194 formatted files**). Commands: `make -C v2 test PYTHON=.venv/bin/python`
-and `make -C v2 lint`. Committed-files-only verification is recorded below
-once the branch snapshot has been checked.
+and `make -C v2 lint`. A committed-files-only archive of `65f57ba` also
+passes **503 tests**, full lint, **103 benchmark imports**, all **148 source /
+16 input pins**, **three immutable snapshot loaders** and **seven certified
+corpora**. The archive uses the external PyPy/GMP development toolchain only;
+no ignored source, history or evidence is needed. Changed existing function
+ASTs are limited to the two checkpoint functions, B1 validator/adapter and
+intentional acceptance tests; this is not a readability pass. A7 released its
+exclusive QA window to C1, then B3; no A7 timing campaign was run.
 
 ## A10 verified primality transfers (9 October 2026)
 
