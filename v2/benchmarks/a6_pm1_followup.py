@@ -54,9 +54,13 @@ def identity():
         Path(__file__),
         PROTOCOL,
         BASELINE,
-        ROOT / "pm1_bounded.py",
-        ROOT / "pm1_tuning.py",
         FRESH,
+        INPUTS / "p43_size_corpus.json",
+        INPUTS / "phase_two_m15_independent_corpus.json",
+        ROOT / "benchmarks/a6_pm1.py",
+        ROOT / "benchmarks/build_phase_two_corpus.py",
+        ROOT / "benchmarks/build_a6_followup_corpus.py",
+        *sorted(ROOT.glob("*.py")),
     )
     return {
         str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
