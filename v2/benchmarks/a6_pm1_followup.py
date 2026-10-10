@@ -212,7 +212,7 @@ def relative_iqr(values):
     return (q[2] - q[0]) / statistics.median(values)
 
 
-def stages(phase, samples):
+def stages(phase, samples, cell=None):
     protocol = json.loads(PROTOCOL.read_text())
     selection = None if phase == "arithmetic" else selected()
     if phase == "arithmetic":
@@ -229,9 +229,12 @@ def stages(phase, samples):
         if phase == "confirmation"
         else protocol["screen_bounds"]
     )
-    records = []
+    records, index = [], -1
     for fixture in fixtures:
         for b1, b2 in bounds:
+            index += 1
+            if cell is not None and index != cell:
+                continue
             functions = {
                 arm: lambda arm=arm: run(
                     fixture["n"], ((b1, b2),), options_for(arm, selection)
@@ -260,6 +263,8 @@ def stages(phase, samples):
                 }
             )
             print(phase, fixture["id"], b1, b2, flush=True)
+    if not records:
+        raise ValueError("cell is outside this phase's frozen grid")
     return records
 
 
@@ -297,6 +302,14 @@ def select(data, phase):
     if data["source_identity"] != identity():
         raise ValueError("capture identity changed")
     cells = data["records"]
+    expected = {
+        (fixture["id"], tuple(bounds))
+        for fixture in stage_fixtures("screen")
+        for bounds in json.loads(PROTOCOL.read_text())["screen_bounds"]
+    }
+    actual = {(cell["id"], tuple(cell["bounds"])) for cell in cells}
+    if actual != expected or len(cells) != len(expected):
+        raise ValueError("selection requires the complete frozen screen grid")
     reference = "control64" if phase == "arithmetic" else "arithmetic_control"
     arms = (
         ("bits256", "bits512", "bits1024", "recurrence64")
@@ -644,6 +657,7 @@ def main():
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--input", type=Path)
+    parser.add_argument("--cell", type=int, choices=range(9))
     parser.add_argument("--samples", type=int, choices=(9, 27, 63), default=9)
     parser.add_argument("--arm", choices=("control64", "selected_pairing"))
     args = parser.parse_args()
@@ -677,7 +691,7 @@ def main():
         verify_inputs()
         verify_fresh()
         if args.phase in ("arithmetic", "paired", "confirmation"):
-            records = stages(args.phase, args.samples)
+            records = stages(args.phase, args.samples, args.cell)
         elif args.phase == "profile":
             records = diagnostic_profile()
         elif args.phase == "cold":
@@ -691,6 +705,7 @@ def main():
         json.dumps(
             {
                 "phase": args.phase,
+                "cell": args.cell,
                 "runtime": sys.version,
                 "platform": platform.platform(),
                 "source_identity": identity(),
