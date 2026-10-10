@@ -203,3 +203,59 @@ class ProductionPM1Tests(unittest.TestCase):
             portfolio.factorize_bounded(
                 n, config=config, budget=allowance(), checkpoint=damaged
             )
+
+    def test_implicit_defaults_and_legacy_snapshot_inference(self):
+        config = portfolio.PortfolioConfig()
+        self.assertEqual(
+            (config.pm1_chunk_size, config.pm1_gap_mode), (64, "recurrence")
+        )
+        self.assertEqual(config.chunk_size, 16)
+        n = 1009 * 1013
+        fresh = portfolio.factorize_bounded(n, budget=allowance(0))
+        self.assertEqual(fresh.checkpoint["payload"]["version"], 9)
+        resumed = portfolio.factorize_bounded(
+            n, budget=allowance(0), checkpoint=fresh.checkpoint
+        )
+        self.assertEqual(resumed.reason, "work_limit")
+
+        old = load_control("portfolio")
+        paused = old.factorize_bounded(n, budget=allowance(0))
+        resumed = portfolio.factorize_bounded(
+            n, budget=allowance(0), checkpoint=paused.checkpoint
+        )
+        self.assertEqual(resumed.checkpoint["payload"]["version"], 4)
+        self.assertNotIn(
+            "pm1_gap_mode", resumed.checkpoint["payload"]["config"]
+        )
+        self.assertEqual(resumed.work_used, paused.work_used)
+
+    def test_implicit_bounded_campaign_default_and_legacy_resume(self):
+        from v2.pm1_bounded import factorize_pm1_bounded
+        from v2.tests.test_a6_followup import frozen_control
+
+        n = 1009 * 1013
+        fresh = factorize_pm1_bounded(n, budget=allowance(), max_actions=0)
+        saved = fresh.checkpoint["payload"]
+        self.assertEqual(saved["execution"], "pm1-tuning-v1")
+        self.assertEqual(
+            (saved["config"]["chunk_size"], saved["config"]["gap_mode"]),
+            (64, "recurrence"),
+        )
+        resumed = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=fresh.checkpoint, max_actions=0
+        )
+        self.assertEqual(resumed.result, fresh.result)
+
+        old = frozen_control()
+        paused = old.factorize_pm1_bounded(
+            n, budget=allowance(), max_actions=0
+        )
+        resumed = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=paused.checkpoint, max_actions=0
+        )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["execution"], "pm1-campaign-v1"
+        )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["config"]["chunk_size"], 16
+        )
