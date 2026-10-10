@@ -440,6 +440,12 @@ def main():
                     ),
                 )
 
+            if checkpoint is not None:
+                saved = checkpoint["payload"]["config"]
+                parameters.update(
+                    pm1_gap_mode=saved.get("pm1_gap_mode", "cached"),
+                    pm1_chunk_size=saved.get("pm1_chunk_size"),
+                )
             config = PortfolioConfig(**parameters)
             run = factorize_bounded(
                 number,

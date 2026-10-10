@@ -416,7 +416,15 @@ def factorize_pm1_bounded(
     utils.require_integer(base, "base", 2)
     if type(n) is not int or type(base) is not int:
         raise TypeError("bounded p-1 uses Python integers")
-    config = PM1Config() if config is None else config
+    if config is None:
+        from .pm1_tuning import PM1TuningConfig
+
+        execution = (checkpoint or {}).get("payload", {}).get("execution")
+        config = (
+            PM1Config()
+            if execution == EXECUTION_VERSION
+            else PM1TuningConfig(chunk_size=64, gap_mode="recurrence")
+        )
     budget = Budget() if budget is None else budget
     if max(n.bit_length(), base.bit_length()) > config.max_input_bits:
         raise ValueError("input or base exceeds configured bit cap")

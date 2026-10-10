@@ -838,6 +838,13 @@ def _verify_progress(current, config, policy):
         if current["job"]["kind"] != current["stage"]:
             raise ValueError("candidate kind disagrees with portfolio stage")
         job = current["job"]
+        if job["kind"] == "pm1" and not _legacy_pm1(config):
+            if (job["b1"], job["b2"], job["seed"]) != (
+                config.pm1_b1,
+                config.pm1_b2,
+                current["attempt"],
+            ) or current["attempt"] >= config.pm1_attempts:
+                raise ValueError("p-1 assignment disagrees with campaign")
         if config.ecm_program_bytes and job["kind"] == "ecm":
             tier = utils.require_integer(current["tier"], "ECM tier", 0)
             if tier >= len(config.ecm_tiers):
@@ -1168,7 +1175,18 @@ def factorize_bounded(
         raise ValueError("zero has no finite prime factorization")
     if type(stop_after_split) is not bool:
         raise TypeError("stop_after_split must be Boolean")
-    config = PortfolioConfig() if config is None else config
+    if config is None:
+        # A resume retains the saved p-1 executor; fresh calls use the accepted
+        # default. Other configuration still has to match the snapshot.
+        saved_config = (checkpoint or {}).get("payload", {}).get("config", {})
+        config = PortfolioConfig(
+            pm1_gap_mode=saved_config.get("pm1_gap_mode", "cached")
+            if checkpoint is not None
+            else "recurrence",
+            pm1_chunk_size=saved_config.get("pm1_chunk_size")
+            if checkpoint is not None
+            else 64,
+        )
     budget = Budget() if budget is None else budget
     if abs(n).bit_length() > config.max_input_bits:
         raise ValueError("input exceeds max_input_bits")
@@ -1234,7 +1252,11 @@ def factorize_bounded(
         )
         if checkpoint is not None and state["current"] is not None:
             job = state["current"].get("job")
-            if job is not None and job["kind"] == "pm1":
+            if (
+                job is not None
+                and job["kind"] == "pm1"
+                and not _legacy_pm1(config)
+            ):
                 from .pm1_gaps import verify_powers
 
                 verify_powers(job, budget, config.pm1_gap_mode)
