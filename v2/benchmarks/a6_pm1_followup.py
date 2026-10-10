@@ -402,13 +402,13 @@ def portfolio_run(arm):
     return {"complete": completed, "splits": splits, "inputs": len(fixtures)}
 
 
-def portfolio_call(arm):
+def portfolio_call(arm, chosen_options=None):
     if arm in ("no_pm1", "retained_portfolio"):
         return portfolio_run(arm)
     options = (
         {"chunk_size": 16}
         if arm == "bounded_control_bridge"
-        else options_for("selected_pairing")
+        else chosen_options
     )
     with patch.object(portfolio, "advance_job", bridge(options)):
         return portfolio_run(arm)
@@ -416,7 +416,11 @@ def portfolio_call(arm):
 
 def portfolio_measure(samples):
     arms = json.loads(PROTOCOL.read_text())["portfolio"]["arms"]
-    functions = {arm: lambda arm=arm: portfolio_call(arm) for arm in arms}
+    chosen_options = options_for("selected_pairing")
+    functions = {
+        arm: lambda arm=arm: portfolio_call(arm, chosen_options)
+        for arm in arms
+    }
     measurements = measure(functions, samples)
     return {
         arm: {"outcome": function(), **measurements[arm]}
@@ -519,7 +523,13 @@ def diagnostic_profile():
         module, cfg = configuration(options, ((2000, 20000),))
         phases, counts = (
             {},
-            {"pow": 0, "exponent_bits": 0, "inversions": 0, "gcd": 0},
+            {
+                "pow": 0,
+                "exponent_bits": 0,
+                "inversions": 0,
+                "gcd": 0,
+                "gcd_argument_bits": 0,
+            },
         )
         original = module._advance
 
@@ -539,6 +549,9 @@ def diagnostic_profile():
 
         def gcd(left, right):
             counts["gcd"] += 1
+            counts["gcd_argument_bits"] += max(
+                left.bit_length(), right.bit_length()
+            )
             return math.gcd(left, right)
 
         with contextlib.ExitStack() as patches:
@@ -634,6 +647,7 @@ def main():
     args = parser.parse_args()
     require_runtime()
     if args.phase == "cold-one":
+        selected()  # Match source/input verification in both cold arms.
         fixture = next(
             f for f in stage_fixtures("screen") if f["digits"] == 20
         )
