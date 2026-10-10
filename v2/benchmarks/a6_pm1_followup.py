@@ -309,6 +309,21 @@ def select(data, phase):
         for arm in arms
         if decisions[arm]["all_positive"] and decisions[arm]["ci95"][0] > 0
     ]
+    scope = "all_screen_bounds" if eligible else "retain"
+    if phase == "paired" and not eligible:
+        larger = [c for c in cells if c["bounds"] == [11000, 100000]]
+        for arm in arms:
+            decisions[arm]["larger_bounds"] = paired_interval(
+                larger, arm, reference
+            )
+        eligible = [
+            arm
+            for arm in arms
+            if decisions[arm]["larger_bounds"]["all_positive"]
+            and decisions[arm]["larger_bounds"]["ci95"][0] > 0
+        ]
+        if eligible:
+            scope = "larger_bounds"
     winner = (
         max(eligible, key=lambda arm: decisions[arm]["gain"])
         if eligible
@@ -320,6 +335,7 @@ def select(data, phase):
         else selected()
     )
     if phase == "paired":
+        manifest["wheel_scope"] = scope
         manifest["wheel"] = (
             int(winner.removeprefix("wheel"))
             if winner.startswith("wheel")
@@ -362,6 +378,8 @@ def portfolio_run(arm):
     fixtures = [f for f in fixtures if len(str(f["n"])) == 20][:12]
     config = portfolio.PortfolioConfig(
         trial_bound=100,
+        chunk_size=16,
+        gcd_batch=64,
         rho_attempts=1,
         rho_evaluations=512,
         pm1_attempts=0 if arm == "no_pm1" else 1,

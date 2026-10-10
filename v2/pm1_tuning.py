@@ -301,6 +301,15 @@ def _paired_step(state, budget, context, config):
     if phase == "wheel_terms":
         _paired_terms(state, budget, config)
         return
+    cursor = state["cursor"]
+    if (
+        "wheel_forward" not in state
+        and cursor["index"] == len(cursor["values"])
+        and cursor["next"] >= cursor["hi"]
+        and not state["terms"]
+    ):
+        control._next_rung(state, budget, config)
+        return
     if "wheel_forward" not in state:
         _pair_setup(state, budget, config)
         return

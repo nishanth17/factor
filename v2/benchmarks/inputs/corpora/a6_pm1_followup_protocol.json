@@ -16,11 +16,11 @@
   },
   "paired_screen": {
     "arms": ["arithmetic_control", "wheel30", "wheel210"],
-    "selection": "Use the frozen chunk-screen selected arithmetic configuration for all paired arms. Choose at most one wheel by geometric-mean gain across all six screen cells, requiring every median gain positive and aggregate paired 95% bootstrap lower bound above zero. Otherwise retain unpaired execution. Coverage must be identical as a union of eligible prime relations up to multiplication by units; no relocation or square-exponent extension."
+    "selection": "Use the frozen chunk-screen selected arithmetic configuration for all paired arms. Choose at most one wheel by geometric-mean gain across all six screen cells, requiring every median gain positive and aggregate paired 95% bootstrap lower bound above zero. If no wheel qualifies generally, carry at most one scoped wheel with positive medians in all three 11000/100000 screen classes and a positive aggregate paired 95% lower bound at that bound; otherwise retain unpaired execution. Record the scope before confirmation. Coverage must be identical as a union of eligible prime relations up to multiplication by units; no relocation or square-exponent extension."
   },
   "confirmation": {
     "arms": ["control16", "control64", "legacy_hook64", "selected_arithmetic", "selected_pairing"],
-    "selection": "Freeze selected configuration IDs in a versioned selection manifest before opening confirmation timings. Require zero correctness failures, all nine median gains positive versus control64 for promotion of a challenger, positive per-class aggregate paired 95% bootstrap intervals and relative IQR below 15%. Extend all arms together to 27 then 63 samples if uncertain/unstable; retain after 63 if inconclusive. No universal minimum percentage. Report losses and construction/recovery/storage/resume costs."
+    "selection": "Freeze selected configuration IDs in a versioned selection manifest before opening confirmation timings. Require zero correctness failures, all nine median gains positive versus control64 for general promotion of a challenger, positive per-class aggregate paired 95% bootstrap intervals and relative IQR below 15%. Extend all arms together to 27 then 63 samples if uncertain/unstable; retain after 63 if inconclusive. A predeclared larger-bound wheel may qualify for scoped adoption only when all three fresh size-class medians improve and its per-bound aggregate paired 95% interval excludes zero; report all other classes and keep automatic defaults unchanged. No universal minimum percentage. Report losses and construction/recovery/storage/resume costs."
   },
   "legacy_hook_check": "Measure the current default-config action hook against the frozen control64, separately from optimization selection; verify byte-canonical arithmetic/work and legacy checkpoint compatibility. Report any sustained regression.",
   "gcd_batch": 64,
@@ -47,6 +47,8 @@
     "inputs": "phase_two_m15_independent_corpus.json: first 12 20-digit fixtures",
     "seed": 7,
     "trial_bound": 100,
+    "chunk_size": 16,
+    "gcd_batch": 64,
     "rho_attempts": 1,
     "rho_evaluations": 512,
     "pm1_bounds": [2000, 200000],
