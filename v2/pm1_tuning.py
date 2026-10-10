@@ -180,15 +180,26 @@ def _pair_setup(state, budget, config):
         return
 
     inverse = pow(value, -1, n)
-    forward, backward = [1], [1]
-    for _ in range(wheel // 2):
-        forward.append(forward[-1] * value % n)
-        backward.append(backward[-1] * inverse % n)
+    forward, backward = [], []
+    indices = [-1] * (wheel // 2 + 1)
+    power = inverse_power = 1
+    for distance in range(1, wheel // 2 + 1):
+        power = power * value % n
+        inverse_power = inverse_power * inverse % n
+        # For prime q=center +/- distance, a noncoprime offset can occur
+        # only when q itself divides D. Keep these small prime exceptions.
+        if gcd(distance, wheel) == 1 or (
+            distance in (2, 3, 5, 7) and wheel % distance == 0
+        ):
+            indices[distance] = len(forward)
+            forward.append(power)
+            backward.append(inverse_power)
     state.update(
         wheel_forward=forward,
         wheel_backward=backward,
-        wheel_step=forward[-1] * forward[-1] % n,
-        wheel_inverse_step=backward[-1] * backward[-1] % n,
+        wheel_indices=indices,
+        wheel_step=power * power % n,
+        wheel_inverse_step=inverse_power * inverse_power % n,
         wheel_inverse=inverse,
         wheel_pending=[],
         wheel_records=[],
@@ -248,13 +259,15 @@ def _paired_terms(state, budget, config):
     forward, backward = state["wheel_forward"], state["wheel_backward"]
     for primes in records[start : start + count]:
         offset = primes[0] - center
+        index = state["wheel_indices"][abs(offset)]
+        if index < 0:
+            raise ValueError("eligible prime has no certified wheel offset")
         if len(primes) == 2:
-            distance = abs(offset)
             # This is A^-center times the two direct prime relations.
             # Multiplication by this unit preserves their product's GCD.
-            term = (trace - forward[distance] - backward[distance]) % n
+            term = (trace - forward[index] - backward[index]) % n
         else:
-            baby = forward[offset] if offset >= 0 else backward[-offset]
+            baby = forward[index] if offset >= 0 else backward[index]
             term = (giant * baby - 1) % n
         state["terms"].append(term)
         state["wheel_term_primes"].append(primes)

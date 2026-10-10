@@ -670,7 +670,9 @@ factor bit lengths and therefore the product exponent's length. A nonzero
 wheel replaces the gap executor with ordinary p−1 ± relations; it does not
 change bounds or introduce Williams p+1/Lucas or ECM execution.
 
-Paired records contain only eligible primes. A two-prime trace term is the
+Paired tables retain coprime offsets and the small prime divisors of the
+wheel, so exceptional primes remain covered. Records contain only eligible
+primes. A two-prime trace term is the
 product of their ordinary relations times a unit modulo n; singleton terms
 are direct relations. Saturated batches replay each original prime under the
 finite recovery limit. Table setup/inversion, plan construction, multiplications
