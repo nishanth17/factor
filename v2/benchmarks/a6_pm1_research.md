@@ -234,7 +234,7 @@ confirmed independently; practical regressions, storage, reconstruction and
 completion evidence still govern promotion. This audit performs no new timing
 and changes no API, defaults, allocation or roadmap completion status.
 
-### Follow-up wheel contract (implementation pending acceptance)
+### Follow-up wheel contract (correctness accepted; performance unpromoted)
 
 The frozen follow-up independently implements the trace identity with D=30
 or 210. For the nearest center c=kD and eligible primes c-r and c+r,
@@ -264,8 +264,15 @@ The executor has its own checkpoint identity and deterministic work ledger;
 it does not copy CADO, YAFU, Prime95 or PrMers code. The existing group-neutral
 LCM ratio remains the only shared schedule interface. Future ECM point
 continuation and allocation remain separate. The frozen follow-up protocol
-and source control live in versioned `inputs/`; final acceptance still requires
-correctness, fresh confirmation and complete-stage/portfolio measurements.
+and source control live in versioned `inputs/`. The completed
+[follow-up comparison](README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution)
+passes correctness but retains unpaired execution: wheel 30/210 cost
+76.2%/7.9% more complete-call CPU than the selected recurrence control.
+Recurrence itself confirms a 1.99% aggregate gain on fresh inputs, with
+positive per-size-class intervals and every cell median improved. This is
+accepted only for scoped opt-in integration review; the portfolio bridge is
+slower than retained production and gains no completions. No allocation or
+automatic default is promoted.
 
 ### Supplementary special-form source check — 9 October 2026
 

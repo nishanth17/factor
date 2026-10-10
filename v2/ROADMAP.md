@@ -2403,16 +2403,29 @@ three optional skips; a committed-file archive passes 422 PyPy/GMP tests,
 schedule ASTs and direct/portfolio/ECM execution remain unchanged; only ratio
 helpers are appended. No v1, immutable baseline or unrelated branch is changed.
 
-**Reopened bounded follow-up — 9 October 2026:** the user authorized the
-[additional research shortlist](benchmarks/a6_pm1_research.md#coverage-audit-and-next-bakeoffs--9-october-2026).
-The [frozen protocol](benchmarks/inputs/corpora/a6_pm1_followup_protocol.json)
-compares bit-capped chunks and even-gap recurrence before one exact p−1
-wheel/± stage-two executor. A committed source snapshot controls legacy
-behavior; fresh certified confirmation inputs, cumulative resume, production
-B2, storage and marginal portfolio completion remain required. Gains below
-10% can qualify under the revised uncertainty/confirmation gate. This follow-up
-is pending acceptance; ECM/Lucas, compiled cross-input plans, polynomial
-continuation and allocation remain separate.
+**Bounded follow-up complete — 9 October 2026; isolated and unmerged:** the
+[expanded primary-source/license audit](benchmarks/a6_pm1_research.md#coverage-audit-and-next-bakeoffs--9-october-2026)
+and [frozen protocol](benchmarks/inputs/corpora/a6_pm1_followup_protocol.json)
+compare bit-capped chunks, bounded even-gap recurrence and exact p−1 wheel/±
+execution. The committed selection precedes fresh certified confirmation.
+Recurrence with chunk 64 saves 1.0–2.8% in all nine complete-call cells,
+aggregate 1.99% [1.85%,2.21%], with positive per-size-class intervals at 27
+samples; the duplicate arm agrees. Accept it for scoped opt-in integration
+review under the revised policy allowing sustained gains below 10%. Bit caps
+fail selection; D=30/210 wheels cost 76.2%/7.9% more and remain unpromoted.
+The bounded legacy dispatch hook costs 0.78% [0.61%,1.32%]; production p−1,
+portfolio/ECM APIs, defaults, bounds, attempts and allocation remain unchanged.
+
+[Complete stages, continuation, storage and portfolio evidence](benchmarks/README.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution)
+include production B2=200000. The selected portfolio bridge has the same 5/12
+completions as the retained portfolio and costs 3.6% more CPU, so no portfolio
+promotion follows. In-memory recurrence continuation saves 8.3–8.6% versus
+fresh-each; charged verified resume costs 18.1–21.8% more. Fourteen additional
+independent/adversarial tests pass; a committed-only checkout passes all 436
+PyPy/GMP tests, lint, 73 benchmark imports and certificate/input/selection
+loaders. Legacy arithmetic/work/checkpoints remain compatible; tuned state
+binds `pm1-tuning-v1`. ECM/Lucas continuation, compiled cross-input plans,
+relocation, polynomial continuation and allocation remain separate.
 
 - [x] Compare bounded p−1 per-prime/chunk execution, gap reuse and capped
   reusable schedules on fixed and fresh independent inputs. The revised
