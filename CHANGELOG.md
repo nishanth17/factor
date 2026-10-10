@@ -10,7 +10,14 @@
   finite splitting and all-component graph cycles. Retain exact original
   atoms through FIFO eviction and use charged DLP-only SIQS checkpoint4;
   default SLP remains checkpoint3. SSS/worker collection rejects the opt-in
-  config. Fresh complete-factor confirmation remains in progress.
+  config. Independent complete graph-kernel tests cover disconnected cycles,
+  repeated primes, loops, duplicates, exact corrections and retained ownership.
+- Accept the bounded C1 40-digit balanced opt-in bundle after a 31.73%
+  complete-run reduction against calibrated SLP (95% interval 29.21–33.99%),
+  with unchanged completion. Retain the 30-digit positive observation with
+  its fixed-seed drift limitation, all fresh 50-digit timeouts, and the
+  separately completing 50-digit charged-resume witness. Keep SLP defaults;
+  broader SSS/portfolio comparisons and larger-band promotion remain open.
 
 - Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
   the user's explicit direction. Fresh complete stages save 9.73% CPU across

@@ -5,28 +5,40 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../README.md) covers usage; the [roadmap](../ROADMAP.md) records
 remaining acceptance gates.
 
-## C1 DLP assessment — in progress
+## C1 bounded DLP — 10 October 2026
 
-The [initial screen](c1_results.md) found useful diagnostic limitations; it
-does not establish a final DLP deferral. The user authorized the separately
-[frozen larger-input follow-up](c1_followup_protocol.md) and its pre-collection
-[observation-resolution addendum](c1_followup_resolution.md), informed by the
-[pinned source and license review](c1_research.md). Complete offline cycle
-analysis replaces the dense diagnostic LP matrix; nested 64/128 B² product
-bounds and longer collection address false-candidate cost and delayed matching.
-Full retained-record analysis now verifies the 30-digit factorization from
-both DLP captures while their same-position SLP incidence has no dependency.
-This is useful-yield evidence, not an accepted timing result. The completed [larger study and accounting audit](c1_followup_results.md)
-now support a bounded implementation investment at40/50digits;60digits remain
-unresolved. The literal frozen gate failed and its corrected attribution is
-explicitly post-observation. Opt-in graph collection is being validated under
-the [implementation protocol](c1_implementation_protocol.md), with an
-[owned pre-C1 SLP control](c1_implementation_controls.md). Default SLP settings
-and R3 original-row provenance remain the reference.
-Generated captures remain local in `results/c1/`; required controls and
-certified corpora are versioned. All diagnostic runs and heavy checks share
-`/private/tmp/factor-performance.lock` with B3/A7. No accepted timing claim
-follows from these instrumented observations.
+The [completed report](c1_implementation_results.md) adopts explicit bounded
+DLP and the selected balanced 40-digit bundle. Fresh complete-run cost falls
+31.73% against calibrated SLP (95% paired interval 29.21–33.99%), with 18/18
+completions per arm and stable original pooled checks. The 30-digit regression
+class has 36/36 completions per arm and an observed 17.80% reduction
+(10.50–30.35%); residual fixed-seed drift prevents a new 30-digit promotion.
+Every fresh 50-digit run times out: 0/18 completions per arm under matched
+120-second / 256 MiB owned allowances. Failures and full unresolved cofactors
+are retained. A separate 50-digit graph-checkpoint resume completes in
+141.063 seconds with its declared larger allowances; it is not a matched
+speed claim. Defaults remain SLP, with no automatic digit cutoff.
+
+The [research/license review](c1_research.md) reuses primary literature and
+pinned YAFU, msieve, Yamaquasi, FLINT and JavaMath implementations. The first
+short-screen defer was withdrawn. A [longer bounded census](c1_followup_results.md)
+separates threshold losses, residual policy and collection duration. Its
+literal gate failed; the explicitly post-observation accounting repair
+supports an investment go at 40/50, without rewriting that original verdict.
+The subsequent [implementation/confirmation protocol](c1_implementation_protocol.md)
+freezes finite training and fresh confirmation against an
+[owned pre-C1 SLP control](c1_implementation_controls.md).
+
+All-component cycles retain exact original atoms and square corrections;
+independent complete graph-kernel oracles, eviction/cancellation tests and
+charged DLP checkpoint4 checks cover the production contract. R3 filtering,
+lifting and independent extraction verification remain in use. The detailed
+report distinguishes graph counts, verified square trials and proper factors.
+Its smaller, denser 40-digit matrices require refreshed A8 evidence before a
+later solver promotion. Broader SSS/combined-portfolio comparisons remain E1.
+Generated captures stay local in `results/c1/`; required controls and corpora
+are versioned. Timings and heavy checks serialize on
+`/private/tmp/factor-performance.lock` with B3/A7.
 
 ## QS/GNFS research reconciliation (9 October 2026)
 

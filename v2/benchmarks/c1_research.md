@@ -46,8 +46,8 @@ before choosing adaptations; C1 adapts no external code.
 
 Factor has no explicit top-level license in this checkout. Future copying must
 check compatibility and notices; the mathematical ideas above do not authorize
-copying GPL/LGPL implementations into the project. C1 reuses only existing v2
-routines and independently written diagnostic elimination/extraction.
+copying GPL/LGPL implementations into the project. C1 reuses existing v2 routines and independently written graph, provenance
+and diagnostic code; no upstream implementation was adapted.
 
 ## Release cross-check and current research
 
@@ -130,6 +130,7 @@ Diagnostic records are not `AtomicRelation` objects and never enter a runtime
 checkpoint. Full trial division on randomly chosen positions cross-checks the
 root-guided diagnostic recovery, including rejected candidates. Offline
 kernels are checked against the original incidence, then exact exponent sums
-and both GCD signs. This does not satisfy a production DLP graph's eviction,
-retained-atom ownership, cancellation or resume acceptance: those gates stay
-open unless a later feasibility protocol justifies implementation.
+and both GCD signs. Diagnostic completeness alone does not establish a production graph's
+eviction, retained ownership, cancellation or resume acceptance. The later
+implementation report records those separate passed gates and explicitly
+bounds production cycle length.

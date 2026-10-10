@@ -882,3 +882,35 @@ Started splitting attempts remain charged across cancellation and resume.
 The explicit config also works through `PortfolioConfig(siqs=config)` under
 its enclosing memory allowance. SSS and parallel exporters reject this config.
 The API bounds owned workspace; process/JIT RSS is reported separately.
+
+The complete C1 comparison bundles are versioned in
+`benchmarks/inputs/controls/c1_selected.json`. Load the whole bundle to preserve
+its factor base, polynomial choices, graph/matrix allowances and collector
+bounds. For the explicitly selected 40-digit balanced workload:
+
+```python
+import json
+from pathlib import Path
+
+import v2
+from v2.budget import Budget
+from v2.qs import DoubleLargeSieveConfig, SIQSConfig, SIQSJob
+
+selected_path = Path(v2.__file__).parent / (
+    "benchmarks/inputs/controls/c1_selected.json"
+)
+selected = json.loads(selected_path.read_text())
+settings = dict(selected["configurations"]["40"]["dlp_half"])
+settings["collector"] = DoubleLargeSieveConfig(**settings["collector"])
+config = SIQSConfig(**settings)
+budget = Budget(work_limit=10**13, seconds=30, cpu_seconds=30)
+result = SIQSJob(n, seed=7, config=config, budget=budget).run()
+assert (result.divisor or 1) * result.cofactor == n
+```
+
+Here `n` is the integer to split; this is not an automatic digit-based dispatch
+rule. The result retains an unresolved cofactor when the allowance ends. The
+[C1 complete-factor report](benchmarks/c1_implementation_results.md) records
+training, fresh confirmation, certainty labels and the separate larger-store
+resume witness. Performance belongs to the tested configuration/input class,
+not every input with the same number of digits.
