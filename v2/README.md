@@ -602,28 +602,28 @@ recovery and grouped hit reservations. Its independent certified inputs,
 frozen source control and separate cold/profile modes are described in
 [the benchmark guide](benchmarks/README.md). Dispatcher defaults are unchanged.
 
-## B4 arithmetic-kernel study
+## B4 arithmetic kernels
 
-The bounded P4.2 comparison retains the readable Montgomery ladder and the
-native-integer default. No public factoring API, option, work ledger or
-checkpoint format changes. Experimental kernels live only under
-`v2.benchmarks.b4_kernels` and bind to a private immutable mainline package;
-they are reproducibility controls, not supported production selectors.
-All use `a24=(A+2)/4` with the squared difference. Unit normalization retains
-failed-inversion GCDs and canonical X:Z exits; no normalized representation
-is stored in checkpoints. See the [research/proofs](benchmarks/b4_research.md)
-and [matched evidence](benchmarks/README.md#b4--p42-bounded-arithmetic-kernels--9-october-2026)
-for the original frozen retain-baseline decision and finite study limits.
-The revised [roadmap promotion policy](ROADMAP.md#how-to-use-the-gates) permits
-repeatable gains below 10% when fresh evidence supports an improvement beyond
-measurement noise. B4's positive native/GMP results are eligible for scoped
-integration review; production kernels and supported selectors remain as above.
+`ecm.scalar_multiply` uses the confirmed selected-reduction ladder for native
+integers and fused whole-ladder arithmetic for an mpz modulus. Representation
+selection happens once per scalar action. Native integers remain the default;
+there is no new kernel selector or public factoring option.
 
-The separately frozen [requested fresh bakeoff](benchmarks/README.md#requested-fresh-b4-bakeoff)
-confirms native selected reductions (12.52%) and separate GMP whole-ladder
-fusion (6.05%) on new certified inputs. These are scoped integration-review
-candidates; the experimental runner's `screen` and `confirmation` phases do
-not add a production kernel selector or alter supported factoring APIs.
-The readable production ladder, native default and canonical checkpoint
-contract remain unchanged. Class uncertainty and finite workload limits are
-recorded with the evidence; no merge is performed by this study.
+Both kernels preserve `a24=(A+2)/4` with the squared difference, exactly the
+same canonical X:Z coordinates, scalar validation and infinity shortcuts.
+The readable `point_add` and `point_double` formulas remain available as
+oracles and for stage-two recurrences. No normalization/inversion is added to
+production. Work charges, cancellation boundaries, saturation recovery and
+checkpoint schema/backend identities are unchanged. Old and new checkpoints
+resume in either engine without migration.
+
+The independent affine/composite/prime-power and exact readable-formula
+controls exercise production as well as the frozen candidates. See the
+[research/proofs](benchmarks/b4_research.md),
+[source/license audit](benchmarks/b4_research_audit.md),
+[fresh comparison](benchmarks/README.md#fresh-bakeoff-results-and-decision) and
+[production integration](benchmarks/README.md#b4-production-integration-protocol).
+The original frozen retain-baseline verdict and subsequent revised-policy
+confirmation are historical records; their source controls and certified
+inputs remain immutable. Experimental square, helper and normalized arms
+remain reproducibility controls under `v2.benchmarks.b4_kernels`.

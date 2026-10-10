@@ -2272,3 +2272,44 @@ in local `results/b4/`. Production ECM, stage jobs, schedules, arithmetic,
 portfolio, utilities and `v1/` have no diff against mainline `bcf5f3d`.
 The branch is clean and unmerged. B4's performance window is released to the
 queued C6 then A6 follow-ups; no further B4 timings or heavy checks are planned.
+
+### B4 production integration protocol
+
+The user subsequently requested integration into mainline and deletion of
+B4 worktree/temp state. Promote only native selected reductions and separate
+GMP whole-ladder fusion. Keep the binary schedule, readable `point_add` and
+`point_double` oracles, all stage jobs/budgets and checkpoint formats. Dispatch
+once per scalar entry from the modulus representation. Production uses the
+readable doubling for its initial adjacent point; the frozen experiments
+used the algebraically identical explicit square there. No normalization,
+reducer, curve or backend-selection change is part of integration.
+
+`b4_integration.py` freezes the actual production ECM source as a small
+versioned delta over the complete immutable mainline package. All remaining
+production source must match that package. The `--current` check verifies
+this identity before/after accepted timing and during committed-only
+acceptance. Historical reruns reconstruct the frozen package, independent
+of later production edits. The old B4 freezes remain byte-identical.
+
+Compare frozen mainline against the final production source with the fresh
+bakeoff's confirmation cohort, bounds, seeds and finite allowances. This is
+a production-source bridge on already inspected inputs, not another
+independent-input claim. Reuse the frozen process-block design: at least
+three seconds validated warmup, nine matched samples, counterbalanced arm
+orders and alternating backends; extend only unstable pairs to 27/63 with
+five/eight-second warmups. Require identical outcomes/work, the declared
+IQR rule, positive paired timing interval/CPU effect and positive effects
+in both chronological halves. A stable inconclusive result stops; no new
+candidate or tuning is added on failure. The exclusive window and existing
+600-second child / 45-minute phase caps remain enforced.
+
+```sh
+v2/.venv/bin/python -B -u -m v2.benchmarks.b4_integration --current \
+  --output v2/benchmarks/results/b4/production-bridge.json
+```
+
+Required production delta and freeze live under versioned `inputs/`.
+Run full tests/lint and committed-only benchmark imports/loaders before
+merging B4. Delete task-owned ignored captures/checkouts with the managed
+worktree after integration, as explicitly requested; preserve required
+versioned controls/corpora and other chats' worktrees, runtimes and locks.

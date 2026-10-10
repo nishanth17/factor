@@ -22,6 +22,8 @@ class B4KernelTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.engines = {arm: kernels.engine(arm) for arm in kernels.ARMS}
+        cls.reference = kernels.ecm_module(cls.engines["baseline"])
+        cls.engines["production"] = portfolio
 
     def test_independent_affine_fields_and_prime_powers(self):
         for prime, curve_a, point in historical_points():
@@ -42,7 +44,9 @@ class B4KernelTests(unittest.TestCase):
                         # The affine oracle cannot divide a nonunit over p².
                         # Its field reductions remain independent controls.
                         continue
-                    baseline = ecm.scalar_multiply(scalar, x, 1, modulus, a24)
+                    baseline = self.reference.scalar_multiply(
+                        scalar, x, 1, modulus, a24
+                    )
                     for arm, engine in self.engines.items():
                         candidate = kernels.ecm_module(engine).scalar_multiply(
                             scalar, x, 1, modulus, a24
@@ -128,7 +132,7 @@ class B4KernelTests(unittest.TestCase):
                 if setup.point is None:
                     continue
                 for scalar in (0, 1, 2, 3, 7, 19, 127, 2**64 + 19):
-                    expected = ecm.scalar_multiply(
+                    expected = self.reference.scalar_multiply(
                         scalar, *setup.point, n, setup.a24
                     )
                     for arm, engine in self.engines.items():
@@ -239,16 +243,19 @@ class B4KernelTests(unittest.TestCase):
                 )
                 # Canonical X:Z and the existing a24 convention also resume in
                 # the unmodified engine; no candidate identity is serialized.
-                plain = self.engines["baseline"]
-                cross = plain.factorize_bounded(
-                    fixture["n"],
-                    config=common.config(
-                        plain, protocol, fixture["case"], backend
-                    ),
-                    checkpoint=checkpoint,
-                    budget=plain.Budget(work_limit=protocol["work_limit"]),
-                )
-                self.assertEqual(cross.result.reconstruct(), fixture["n"])
+                for plain in (self.engines["baseline"], portfolio):
+                    cross = plain.factorize_bounded(
+                        fixture["n"],
+                        config=common.config(
+                            plain, protocol, fixture["case"], backend
+                        ),
+                        checkpoint=checkpoint,
+                        budget=plain.Budget(work_limit=protocol["work_limit"]),
+                    )
+                    self.assertEqual(
+                        common.validate_run(cross, fixture),
+                        common.validate_run(uninterrupted, fixture),
+                    )
                 cancelled = engine.factorize_bounded(
                     fixture["n"],
                     config=config,

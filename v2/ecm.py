@@ -1,7 +1,8 @@
 """Two-stage Montgomery ECM with modular Suyama setup and exact limits.
 
-The readable ladder remains the production baseline. The experimental
-multiply_prac entry point uses bounded, verified records and checked recovery.
+The binary ladder uses measured native/GMP kernels and canonical X:Z exits.
+The experimental multiply_prac entry point uses bounded, verified records
+and checked recovery.
 """
 
 from dataclasses import dataclass
@@ -104,7 +105,12 @@ def point_double(px, pz, n, a24):
 
 
 def scalar_multiply(scalar, px, pz, n, a24):
-    """Montgomery ladder for nonnegative scalars; 0 returns infinity (1:0)."""
+    """Binary ladder with a24=(A+2)/4; scalar zero returns infinity (1:0).
+
+    Select once per scalar action: early reductions for native integers,
+    fused late-reduction arithmetic for mpz. Both preserve the exact readable
+    point formulas, canonical coordinates and existing work/checkpoint rules.
+    """
     utils.require_integer(scalar, "scalar", 0)
     utils.require_integer(n, minimum=2)
     px, pz = px % n, pz % n
@@ -115,18 +121,68 @@ def scalar_multiply(scalar, px, pz, n, a24):
     if scalar == 1:
         return px, pz
 
-    # Q and R remain adjacent multiples, so their difference is always P.
+    if arithmetic.is_mpz(n):
+        return _ladder_fused(scalar, px, pz, n, a24)
+    return _ladder_reduced(scalar, px, pz, n, a24)
+
+
+def _ladder_reduced(scalar, px, pz, n, a24):
+    """Native kernel; inputs are validated canonical coordinates."""
     qx, qz = px, pz
     rx, rz = point_double(px, pz, n, a24)
+    for bit in bin(scalar)[3:]:
+        # Adjacent multiples always differ by P. Swapping for a set bit
+        # lets one fused formula update either side of that invariant.
+        if bit == "1":
+            qx, rx, qz, rz = rx, qx, rz, qz
 
+        total, difference = qx + qz, qx - qz
+        # Polynomial residues are unchanged. With canonical a24/coordinates,
+        # steady numerators are below 4*n**3; the initial double stays late.
+        # The four extra remainders pay off on the measured native PyPy path.
+        aa, bb = total * total % n, difference * difference % n
+        delta = aa - bb
+        u = difference * (rx + rz) % n
+        v = total * (rx - rz) % n
+        added_total, added_difference = u + v, u - v
+        qx, qz, rx, rz = (
+            aa * bb % n,
+            # (A+2)/4 requires BB, the squared difference, in this bracket.
+            delta * (bb + a24 * delta) % n,
+            pz * added_total * added_total % n,
+            px * added_difference * added_difference % n,
+        )
+        if bit == "1":
+            qx, rx, qz, rz = rx, qx, rz, qz
+    return qx, qz
+
+
+def _ladder_fused(scalar, px, pz, n, a24):
+    """GMP kernel with a24=(A+2)/4 and BB in the doubling bracket.
+
+    Late remainders won this track; canonical inputs bound numerators below
+    20*n**5. The shared sums/differences preserve the adjacent-multiple proof.
+    """
+    qx, qz = px, pz
+    rx, rz = point_double(px, pz, n, a24)
     for bit in bin(scalar)[3:]:
         if bit == "1":
-            qx, qz = point_add(rx, rz, qx, qz, px, pz, n)
-            rx, rz = point_double(rx, rz, n, a24)
-        else:
-            rx, rz = point_add(qx, qz, rx, rz, px, pz, n)
-            qx, qz = point_double(qx, qz, n, a24)
+            qx, rx, qz, rz = rx, qx, rz, qz
 
+        total, difference = qx + qz, qx - qz
+        aa, bb = total * total, difference * difference
+        delta = aa - bb
+        u = difference * (rx + rz)
+        v = total * (rx - rz)
+        added_total, added_difference = u + v, u - v
+        qx, qz, rx, rz = (
+            aa * bb % n,
+            delta * (bb + a24 * delta) % n,
+            pz * added_total * added_total % n,
+            px * added_difference * added_difference % n,
+        )
+        if bit == "1":
+            qx, rx, qz, rz = rx, qx, rz, qz
     return qx, qz
 
 

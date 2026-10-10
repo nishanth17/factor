@@ -2,6 +2,16 @@
 
 ## Current development
 
+- Integrate B4's confirmed native selected reductions and separate GMP
+  whole-ladder fusion into the production binary ladder. Select once per
+  scalar action; retain readable point formulas and the exact `(A+2)/4`
+  squared-difference convention. Preserve public APIs, native defaults,
+  canonical coordinates, work/cancellation/recovery and checkpoint formats.
+- Extend independent field/composite/prime-power controls to production and
+  test old/new resume in both directions. Freeze the production source delta
+  and matched complete-factoring bridge before timing. Integration acceptance
+  and cleanup receipts follow in the benchmark record.
+
 - Complete the requested fresh B4 bakeoff on a separately committed source,
   certified-input and sampling freeze. Reuse the same five candidates;
   counterbalance independent PyPy processes and extend only the unstable GMP

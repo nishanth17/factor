@@ -1,5 +1,18 @@
 # v2 changelog
 
+## B4 production integration — 9 October 2026
+
+- Promote native selected reductions and separate GMP fused whole-ladder
+  arithmetic behind the existing scalar API, with one representation check
+  per action. Preserve readable point formulas, exact a24 convention and
+  canonical X:Z results; add no production inversion or normalized state.
+- Preserve seeds, work accounting, finite cancellation/recovery and checkpoint
+  formats. Extend existing independent arithmetic/resume tests to production.
+  Freeze the final source delta for a matched bridge against mainline; retain
+  earlier source controls and versioned corpora unchanged.
+- Keep production integration validation, mainline receipt and user-requested
+  worktree/temp cleanup in the benchmark acceptance record.
+
 ## Requested fresh B4 bakeoff — 9 October 2026
 
 - Freeze the same five kernels on disjoint certified screen/confirmation
