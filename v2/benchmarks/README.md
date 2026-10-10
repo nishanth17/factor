@@ -44,6 +44,14 @@ and heavy checks serialize on
 Committed-only validation passes 526 PyPy/GMP tests, full lint, 109 benchmark
 imports and all required C1 controls/certificate/source-pin loaders.
 
+After A7/mainline reconciliation and CLI integration, the combined PyPy 3.11
+suite passes 539 tests (6 optional-backend skips) and full lint. A temporary
+committed-files-only archive passes the same checks, imports 110 benchmark
+modules and loads the C1/A7 controls, pre-C1 baseline and fresh corpus. The
+temporary archive is removed after validation; its receipt stays in the ignored
+`results/c1/integration-committed-qa.log`. This is integration correctness,
+not a fresh performance or automatic-dispatch claim.
+
 ## QS/GNFS research reconciliation (9 October 2026)
 
 The [source-linked comparison](qs_gnfs_research.md) pins 11 repositories and
