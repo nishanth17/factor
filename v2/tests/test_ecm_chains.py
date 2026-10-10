@@ -316,8 +316,16 @@ class ProductionChainTests(unittest.TestCase):
             n, seed=19, config=config, budget=allowance(10000)
         )
         self.assertEqual(
-            first.checkpoint["payload"]["state"],
-            second.checkpoint["payload"]["state"],
+            {
+                k: v
+                for k, v in first.checkpoint["payload"]["state"].items()
+                if k != "stage_seconds"
+            },
+            {
+                k: v
+                for k, v in second.checkpoint["payload"]["state"].items()
+                if k != "stage_seconds"
+            },
         )
         old_restored = old.factorize_bounded(
             n,
