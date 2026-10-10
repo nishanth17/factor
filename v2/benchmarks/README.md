@@ -1155,6 +1155,10 @@ it does not establish a full-stage speedup. Raw captures and failed scratch
 runs remain local in `results/c6/`; the catalog, pinned upstream inputs and
 frozen protocol/policy amendment are committed.
 
+A committed-files-only archive of `860bab4` passes all 411 PyPy/GMP tests,
+full lint and all 72 benchmark imports; frozen C6 hashes, catalog and certified
+corpus loaders need no ignored files. Final receipts remain local.
+
 The compact comparison identifies no credible chain-quality opportunity
 against the ladder. Stop the conditional offline continued-fraction search;
 leave that unrun gate and B3 integration open. Small sustained improvements

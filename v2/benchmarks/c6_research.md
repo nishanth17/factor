@@ -277,3 +277,15 @@ into production defaults. Reopen performance work only with a concrete cost
 hypothesis and fresh frozen full-stage/campaign evidence, including output
 validation and the integration obligations described above. Do not combine
 these numbers with B4 kernels or A6 changes: the arithmetic control stays pinned.
+
+## Committed-only acceptance receipt
+
+An archive of commit `860bab4` (with only the external PyPy development
+runtime linked in) passes `make -C v2 test` with 411 tests, `make -C v2 lint`
+with all 148 Python files formatted, and imports all 72 benchmark modules.
+Frozen C6 hashes, the 303-record catalog and the independently certified
+campaign corpus load without any raw evidence or ignored audit inputs.
+Logs and the validation receipt remain in `results/c6/committed-*`.
+The shared timing/check window was released to B4 after these checks.
+Subsequent changes only add this documentation receipt; no measured source
+or required input changed. Mainline stays at `bcf5f3d`; no merge was performed.

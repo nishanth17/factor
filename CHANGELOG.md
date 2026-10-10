@@ -12,6 +12,8 @@
   search stop. Apply the user's revised policy allowing confirmed sub-10%
   gains without rewriting the historical protocol. B3 production routing,
   budgets and checkpoint integration remain open; v1 and kernels are unchanged.
+  A committed-only archive passes 411 PyPy/GMP tests, full lint and all 72
+  benchmark imports, including frozen C6 inputs and independent certificates.
 
 - Extend A10/P8.2.1 deterministic Miller–Rabin classification using the
   independently checked Sorenson–Webster bounds: first 12 prime bases for

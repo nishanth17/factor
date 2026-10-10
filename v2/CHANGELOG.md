@@ -7,7 +7,8 @@
   Add immutable bounded records, common PRAC/Lucas execution, 16-point ring
   and restricted three-point diagnostics, including factor-preserving recovery.
 - Verify prime powers, composites, nonunits, prime squares, saturation and
-  published false infinity. Pass 411 PyPy/GMP tests and full lint.
+  published false infinity. Pass 411 PyPy/GMP tests and full lint, including a
+  committed-only archive with all 72 benchmark imports and required loaders.
 - Freeze certified inputs, seeds, bounds, budgets and controls; retain all
   unsuccessful attempts. Compact Lucas loses reused/fresh stages and complete
   two-stage campaigns for both backends. Accept the experimental correctness
