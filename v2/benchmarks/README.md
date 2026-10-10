@@ -16,6 +16,36 @@ to F5/F7/F6. GNFS remains A9 onward after H1's coverage review; F1 owns a
 measured crossover. These are prospective experiments, not measured PyPy wins;
 no new benchmark or implementation gate is closed by source research.
 
+## A7 / P3.8-R5 reconciliation — 9 October 2026
+
+The [acceptance matrix and E1 handoff](a7_r5_reconciliation.md) reconcile the
+actual SSS/SSSf, relation/extraction, worker and checkpoint contracts with both
+accepted repair passes and R3. The [prepared arm plan](inputs/controls/a7_r5_e1_arms.json)
+pins current sources and historical inputs; `pypy3 -B -m v2.benchmarks.a7_r5`
+checks pins and constructs configurations without timing. Exact selected B1
+controls use current runtime code; SSS challengers use the same B1 budget and
+classification adapter. Worker arms retain their supported reference schedule,
+with flyer/wide-interval incompatibility explicit.
+
+B1's stale above-2**64 certainty expectation is fixed for fresh A10 outputs.
+SSS now uses the shared streamed hexadecimal solver fingerprint, preserving
+legacy decimal replay and schema 3 while avoiding wide-mask conversion failure.
+New acceptance coverage checks full forced valuations, both SSS modes through
+interrupted assignment/solver/extraction, genuine native v1/v2 migration,
+charged cumulative reconstruction, terminal/refused states and output claims.
+A11's CLI usability was already accepted; its older outstanding status was stale.
+
+No new timings were needed for A7, and no historical speed ratio is relabelled
+as a current calibrated algorithm comparison. E1 still needs selected integrated
+sources, training-only policy selection, fresh certified inputs, repeated matched
+complete calls, supported worker calibration/deferral and final combined resume
+checks. Native serial and automatic dispatch remain unchanged. Raw QA captures
+stay under ignored `results/a7-r5/`. The full supported PyPy 3.11.15 /
+PyPy 7.3.23 / gmpy2 2.3.1 run passes **503 tests**, and full lint passes
+(**194 formatted files**). Commands: `make -C v2 test PYTHON=.venv/bin/python`
+and `make -C v2 lint`. Committed-files-only verification is recorded below
+once the branch snapshot has been checked.
+
 ## A10 verified primality transfers (9 October 2026)
 
 The frozen control is `94caf40`; required inputs are

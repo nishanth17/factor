@@ -2,6 +2,20 @@
 
 ## Current development
 
+- Complete the bounded A7/P3.8-R5 interface/evidence reconciliation, preserving
+  accepted repair decisions, immutable source/input pins and historical scope.
+  Add both-mode SSS forced-valuation, interrupted/cumulative restore, authentic
+  legacy migration and terminal/output validation coverage.
+- Repair wide SSS solver fingerprints using the existing streamed hexadecimal
+  encoding; keep explicit encoding identity and legacy decimal replay without
+  changing the SSS schema version or old snapshot bytes.
+- Fix B1 fresh-output validation to honor A10's wider deterministic certainty
+  domains; reuse its complete-call adapter for separately labelled SSS arms.
+  Prepare current calibrated controls and bounded worker arms for E1 without
+  new timing or default promotion. Record worker schedule incompatibilities,
+  missing 40-digit SSS calibration and fresh combined confirmation as deferrals.
+  Flag A11's prior outstanding status as stale; automatic handoff stays C3/G1.
+
 - Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
   the user's explicit direction. Fresh complete stages save 9.73% CPU across
   nine matched cells; extended integer portfolio captures remain inconclusive.
