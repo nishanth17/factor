@@ -284,3 +284,26 @@ previous full-paper access limitation still stands. The authors' thesis,
 chapter and slides support the mathematical discussion; no unavailable text
 is described as read. These supplementary inspections reinforce the present
 small exact wheel screen and the separate later relocation/polynomial work.
+
+### Official GMP-ECM freshness check — 9 October 2026
+
+The initial GitHub mirror pin is not presented as the latest upstream commit.
+The official repository resolved HEAD to
+[`6226d2d752f07ca183e88bcc1fd5478dfee1ccd6`](https://gitlab.inria.fr/zimmerma/ecm/-/tree/6226d2d752f07ca183e88bcc1fd5478dfee1ccd6)
+and tag `git-7.0.7` to `1c038e2224992ebb40cb6a87710f64080e67dd09`.
+Its pinned `pm1.c`, `pm1fs2.c`, `COPYING.LIB` and `ChangeLog` were retrieved
+from upstream and compared with the audited mirror bytes. The license is
+identical. The p−1-relevant executable difference replaces walking already
+completed exponent-one primes with a `getprime_jump_and_next_mt` jump; the
+small-prime loop still includes every prime-power threshold above B1done.
+Other inspected differences are diagnostic formatting corrections. The
+polynomial stage-two architecture and the ratio conclusion stand.
+
+This suggests a later exact schedule-generation optimization: when L exceeds
+floor(sqrt(U)), old primes in (sqrt(U),L] have ratio one and need not be
+re-enumerated. Old primes at or below sqrt(U) still require the complete power
+ratio, and newly admitted primes still require inclusion. This is an integer
+schedule hypothesis, distinct from native primesieve's implementation and
+from changing a bound. The present frozen executor deliberately scans all
+primes through U; no post-screen retuning is introduced. Upstream captures,
+diffs and SHA-256 values remain ignored local evidence.
