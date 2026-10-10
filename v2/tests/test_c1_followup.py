@@ -106,6 +106,29 @@ class CompleteOfflineGraphTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_records(records, 77, unlimited_budget())
 
+    def test_first_factor_cost_audit_keeps_full_arithmetic_validation(self):
+        records = [
+            dict(
+                u=9, sign=1, square=1, residual=1, lp=(), exponents=((2, 2),)
+            ),
+            dict(u=10, sign=1, square=1, residual=23, lp=(23,), exponents=()),
+            dict(u=13, sign=1, square=2, residual=23, lp=(23,), exponents=()),
+        ]
+        exhaustive = compact_report(records, 77)
+        first = compact_report(records, 77, first_factor=True)
+
+        self.assertEqual(exhaustive["dependencies"], 2)
+        self.assertEqual(exhaustive["unextracted_dependencies"], 0)
+        self.assertEqual(first["algebraic_dependencies"], 2)
+        self.assertEqual(first["dependencies"], 1)
+        self.assertEqual(first["unextracted_dependencies"], 1)
+        self.assertEqual(first["factors"], [7, 11])
+        self.assertEqual(first["remaining"], [])
+        # A later atom is still checked even when the first row factors n.
+        records[-1]["square"] = 1
+        with self.assertRaises(ValueError):
+            compact_report(records, 77, first_factor=True)
+
     def test_censoring_is_explicit_not_zero_yield(self):
         row = dict(u=10, sign=1, square=1, residual=23, lp=(23,), exponents=())
         report = compact_report([row], 77, memory_bytes=1)

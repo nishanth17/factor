@@ -265,7 +265,9 @@ class AnalysisBudget:
         self.local.consume(amount)
 
 
-def compact_report(records, n, *, budget=None, memory_bytes=MEMORY):
+def compact_report(
+    records, n, *, budget=None, memory_bytes=MEMORY, first_factor=False
+):
     """Eliminate LPs sparsely and verify original-row square congruences."""
     budget = AnalysisBudget(budget)
     start_cpu, start_wall = time.process_time(), time.monotonic()
@@ -308,16 +310,34 @@ def compact_report(records, n, *, budget=None, memory_bytes=MEMORY):
         dependencies = list(filtered.zero_dependencies)
         for mask in kernel(filtered.rows, budget):
             dependencies.append(xor_selected(filtered.masks, mask))
-        divisors, nontrivial = set(), 0
+        # Algebraic validation covers every generated mask. Extraction may
+        # stop at a factor only for the separately frozen cost-attribution
+        # audit; unextracted masks are never reported as square congruences.
         for mask in dependencies:
+            budget.consume(mask.bit_count() * (1 + (len(columns) + 63) // 64))
             assert mask and xor_selected(rows, mask) == 0
+        divisors, nontrivial, extracted = set(), 0, 0
+        for mask in dependencies:
             lifted = xor_selected(cycles, mask)
             assert lifted and xor_selected(parity, lifted) == 0
             assert check_cycle(pairs, lifted)
             budget.consume(lifted.bit_count() * (1 + n.bit_length() ** 2))
             recovered = verify_square(records, lifted, n)
+            extracted += 1
             nontrivial += bool(recovered)
             divisors.update(recovered)
+            if first_factor and recovered:
+                divisor = min(recovered)
+                children = (divisor, n // divisor)
+                budget.consume(
+                    sum(child.bit_length() ** 2 for child in children)
+                )
+                if all(
+                    utils.classify_prime(child)
+                    is not utils.Primality.COMPOSITE
+                    for child in children
+                ):
+                    break
         factors, remaining, labels = [], [n], []
         if divisors:
             divisor = min(divisors)
@@ -337,9 +357,11 @@ def compact_report(records, n, *, budget=None, memory_bytes=MEMORY):
             reserve=reserve,
             independent_lp_constraints=len(cycles),
             post_filter=filtered.stats,
-            dependencies=len(dependencies),
+            dependencies=extracted,
+            algebraic_dependencies=len(dependencies),
+            unextracted_dependencies=len(dependencies) - extracted,
             nontrivial_dependencies=nontrivial,
-            trivial_dependencies=len(dependencies) - nontrivial,
+            trivial_dependencies=extracted - nontrivial,
             proper_divisors=sorted(divisors),
             factors=factors,
             remaining=remaining,
