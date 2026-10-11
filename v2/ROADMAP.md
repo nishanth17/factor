@@ -24,6 +24,16 @@ handling, DLP, matrix, SSS, sieve-allocation and later GNFS experiments under
 their existing owners. These are unmeasured candidates; A10's accepted
 primality transfer is the completed implementation, not an optimality claim.
 
+Alpertron reconciliation: 10 October 2026. The
+[repository-wide source comparison and phased candidate inventory](benchmarks/alpertron_gap_analysis.md)
+pins all 307 upstream files, distinguishes active C from historical Java and
+dormant code, and maps AP01–AP40 to existing owners. SLP anchor reuse and compact
+replayable partials are explicit C1a/C9a follow-ups; C3a holds new allocation
+deltas after C3. C10 diagnoses collector policies and A1a owns selected kernel
+deltas; sparse solvers retain their measured A8/B6/B7/C4 gates.
+The comparison adds no accepted behavior or measured speedup. Wider GMP-ECM,
+YAFU/msieve and CADO comparisons extend the existing pinned research.
+
 Start with correctness repairs in Phase 1. Establish bounded, reproducible
 execution in Phase 2, add SIQS coverage in Phase 3, then optimize and calibrate
 the current engines before revisiting GNFS as a later workstream.
@@ -273,7 +283,7 @@ development and coordinated integration, not concurrent performance runs.
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Medium, complementary coverage.** This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | Sol fits established binary Lucas formulas with direct small-index controls. xhigh is for integrating both stages, discriminant checks, parameter identity and saturation recovery without conflating group actions. |
 | ~~A6 — P5.3 p−1 and extension correctness~~ | ~~Completed exact increased-B1 ratios, finite campaign/checkpoint validation and bounded chunk/gap/wheel comparisons.~~ | ~~Existing p−1/P2 controls~~ | ~~**[x] Complete and integrated, 9 October 2026.** Exact old-prime power increases and cumulative verified resume pass. Direct recurrence/chunk 64 defaults are subsequently promoted at explicit user direction. Fresh complete stages save 9.73%; extended integer portfolio evidence remains inconclusive. Bounds and allocation remain unchanged.~~ | ~~Sol / **xhigh**~~ | ~~Independent LCM/direct-power/coverage oracles, finite saturation recovery, canonical int state and matched fresh evidence settle this bounded contribution. ECM/Lucas migration and broader allocation remain separate.~~ |
 | ~~A7 — P3.8-R5 reconciliation~~ | ~~Completed SSS/SSSf, relation/extraction, worker, loss-policy and checkpoint reconciliation; comparable current-control arms prepared. See the [acceptance matrix](benchmarks/qs/a7/a7_r5_reconciliation.md).~~ | ~~Accepted repair and R3 records~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026.** Fixes and acceptance coverage pass 503 PyPy/GMP tests, full lint and committed-only imports/loaders. Final E1 comparison remains open; no worker/collector promotion.~~ | ~~Sol / **high**~~ | ~~Bounded contracts and both repair decisions are reconciled. Remaining calibrated worker/40-digit SSS and final combined confirmation prerequisites belong to E1; C1 larger-input feasibility remains open.~~ |
-| A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
+| A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; measure solve/filter/extraction cost, fill, provenance peaks and capacity refusals; compare packed sparse products using msieve, Yamaquasi and Alpertron references (AP16). | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation; safe now.** Refresh after C9/C10 change the matrices. Establish whether solving or memory blocks useful factoring; synthetic capacity cases cannot establish a current speedup. A verified dense-memory refusal can justify B7/D1/D2 preparation without dominant solve CPU. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
 | ~~A10 — P8.2.1 verified v1 capability transfers~~ | ~~Completed bounded tranche: source-verified strict 12/13-base ranges, reported regression, independent proof oracles, v1 ownership audit and checked legacy resume.~~ | ~~Existing P1.8/P2 exact classification and budget controls; preserved v1 sources~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026; implementation `0ee86ff`, acceptance `6794af6`.** Committed-only suites/imports and lint pass. Range-only selection retained; complete-run tail spread disclosed. B14 and E1 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Primary-source computational guarantees, endpoint congruences, independent proof fixtures, finite budgets and RNG/work/checkpoint compatibility are reconciled; no disputed extra range was adopted.~~ |
 | ~~A11 — P3.4 CLI usability follow-up~~ | ~~Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, help, examples and tests through the recursive portfolio; retain opt-in SIQS fallback.~~ | ~~Existing P2 portfolio and P3.4 polynomial/checkpoint contracts~~ | ~~**[x] Complete; status reconciled 9 October 2026.** Existing three-mode implementation, nine CLI regressions and matched CLI/library evidence satisfy the usability gate. All nine CLI tests pass on recheck. Automatic allocation/handoff remains C3/G1 work.~~ | ~~Sol / **high**~~ | ~~Engine selection, recursive reconstruction, finite controls, help, configuration rejection and checked resume are implemented and verified; no automatic-dispatch promotion is implied.~~ |
 
@@ -287,11 +297,11 @@ development and coordinated integration, not concurrent performance runs.
 | ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | ~~A2~~ | ~~**[x] Complete and integrated, 9 October 2026.** Native selected reductions pass the frozen production bridge: 6.79% saving (95% interval 5.82–13.58%), 27/27 matching outcomes/work. Retain readable GMP: its whole-ladder bridge is inconclusive. Five-candidate study, research, proofs, independent controls and fresh confirmation are complete; broader production bounds remain unclaimed. See [integration evidence](benchmarks/docs/studies.md#b4-production-integration-protocol).~~ | ~~Sol / **xhigh**; Astra for unresolved formula proofs~~ | ~~Bounded formula, normalization, intermediate-width and backend checks completed. No reducer, backend or curve-family expansion.~~ |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
-| B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess compact bounded layouts, merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
+| B7 — remaining P3.8-R3 capacity/provenance | Prove bounded compact partial/relation/provenance layouts, replayable records, merge histories or normalized square-root payloads against Alpertron/YAFU/msieve (AP02/AP15); independently verify original identities and lifting. | A8 for matrix/provenance work, or C9a for a scoped partial-store implementation; demonstrated capacity/provenance bottleneck | **Conditional.** A compact C9a partial-store challenger need not wait for a solver. Charge replay, pinned ownership and simultaneous scratch; reducing a reservation coefficient alone is not a storage implementation. Keep original-row verification and nonunit recovery. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
 | B8 — Williams p+1 starts (P5.1) / Lucas optimization (P5.3) | Compare bounded rational/seeded p+1 starts and validated Lucas-chain execution against the binary control; validate p+1 bound extension separately from ordinary powering. | A5, A4; A6's schedule-ratio contract | **Medium/conditional.** Binary correctness and verified chain machinery must exist first. This targets marginal p+1 coverage; the ECM recurrence is not a drop-in Lucas implementation. | Astra / **xhigh** | Choose Astra for transferring verified chain ideas to a distinct Lucas recurrence and reasoning about parameter-dependent orders. xhigh is for denominator/discriminant exceptions, composition and exact extension semantics. |
 | B12 — P6.3 worker-contract preparation | Specify reusable assignment IDs, immutable schedules, parent-owned leases, aggregate CPU/RSS, cancellation and restart contracts; reconcile existing QS workers. Prepare bounded fixtures, not a new worker default. | A2, A3, A7 | **Medium, early preparation.** Contracts can proceed once backend, program and repair interfaces settle. Production portfolio experiments wait for the stable serial tranche in F4; existing QS workers are reused. | Sol / **xhigh** | Sol fits state-machine and accounting design around existing workers. xhigh is for cross-process ownership, in-flight reservations and interrupted restart, not for adding more worker processes. |
 | B13 — P3.8-R2 wide-block resieve capacity | Reuse the accepted sparse resieve support bound. Only if a new calibrated workload still refuses setup, prove a bound for its actual scratch/storage representation, verify coverage and refusal/resume, and compare complete bucket/resieve runs under matched budgets. | A1; a new calibrated wide-block capacity refusal | **Deferred unless newly triggered.** The combined 30-digit bridge resolves the isolated refusal with the accepted repair. A larger workload needs new evidence and a proof; streamed B1 calibration proceeds independently. | Astra / **xhigh** | Astra fits representation/storage proofs and exceptional recovery cases. xhigh is for simultaneous live memory, exact coverage and first-uncommitted-position behavior under refusal and resume. |
-| B14 — P8.2.2 checked prime certificates | Add certificate generation and a separate exact verifier for primes beyond supported deterministic ranges, starting with finite n−1/Pocklington proofs. Bound recursive factor/proof work and storage, define requested-proof CLI/API and checked resume policy, and retain probable status when proof is unavailable. | A10; existing shared-budget/checkpoint controls | **High for certified results.** Proof is an explicit capability beyond v1 parity. Start after the range contract settles, without waiting for GNFS; certify supported cases rather than claiming arbitrary-size proof from extra probable-prime rounds. | Astra / **xhigh** | Astra fits recursive primality certificates and the trust boundary between generation and verification. xhigh is for independently checked factors/witnesses, corrupt certificates, bounded recursion and resumed proof accounting. |
+| B14 — P8.2.2 checked prime certificates | Add bounded n−1/Pocklington certificate generation and a separate exact verifier beyond deterministic ranges, with recursive work/storage caps and requested-proof CLI/resume. Record historical APRT-CLE (AP28) as a later coverage candidate only if this first tranche leaves a measured gap; distinguish its probabilistic fallback. | A10; existing shared-budget/checkpoint controls | **High for certified results.** Proof is an explicit capability beyond v1 parity. Start after the range contract settles, without waiting for GNFS; certify supported cases rather than claiming arbitrary-size proof from extra probable-prime rounds. | Astra / **xhigh** | Astra fits recursive primality certificates and the trust boundary between generation and verification. xhigh is for independently checked factors/witnesses, corrupt certificates, bounded recursion and resumed proof accounting. |
 
 B6 and B7 use the same frozen matrix contract but can be independent challenger
 branches. If the B7 storage problem prevents even the representative B6 control
@@ -309,15 +319,62 @@ implementations complete.
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | ~~C1 — P3.8-R4 + P5.4, one workstream~~ | ~~**[x] Bounded implementation, calibrated-SLP evaluation and opt-in integration complete, 10 October 2026.** Certified DLP, all-component cycles, exact provenance, finite eviction and charged resume are available through explicit Python configuration and `--qs-dlp` CLI bounds.~~ | ~~B1/R3; longer bounded residual census and explicit post-observation cost repair~~ | ~~Fresh balanced 40-digit complete-run cost falls 31.73% (95% interval 29.21–33.99%) with unchanged completion. Adopt only that explicit bundle; retain defaults, 30-digit seed-drift limits and all 50/60-digit unresolved evidence. Broader SSS/portfolio comparison remains E1.~~ | ~~Astra / **xhigh**~~ | ~~Independent complete graph-cycle oracles and original-row/square verification cover correctness. Complete-factor evidence, not raw cycles, determines the scoped decision.~~ |
-| C2 — P5.2 advanced pairing/common-Z | Separately evaluate extended distance sets, prime relocation and bounded overlapping-window matching; compare advanced coverage pruning and no-inversion common-Z tables. | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Each challenger needs exact prime-to-term certificates, bounded planner/replay storage and matched end-to-end evidence. Common-Z scaling can be a nonunit, so denominator checks and mixed-factor replay remain necessary. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs, matching invariants and common-Z identities over composite moduli. xhigh is needed because scaling or relocation can hide nonunits or change saturation recovery. |
+| C2 — P5.2 advanced pairing/common-Z | Separately compare extended distances, relocation/matching and coverage pruning with GMP-ECM/other pinned references; compare projective terms, Alpertron-style affine differences, derived batch inversion and no-inversion common-Z tables (AP29). | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Coordinate geometry and coordinate choices without conflating them. Bound planning, tables, inversions and replay; independently certify prime coverage and nonunit recovery. Prior B2 losses remain the control; polynomial continuation stays F3. | Astra / **xhigh** | Choose Astra for coverage-pruning proofs, matching invariants and common-Z identities over composite moduli. xhigh is needed because scaling or relocation can hide nonunits or change saturation recovery. |
 | C3 — P5.2 ECM allocation/handoff | Train finite factor-size tiers, curve counts and automatic-pretest versus explicit-campaign policies; compare useful v1 bound/curve policies as candidates, credit completed work and calibrate the recursive CLI portfolio’s ECM-to-SIQS handoff before earlier stages consume its whole allowance. | A11; B1, B2, B3 and B4 decisions | **High downstream value.** Allocation should reflect measured engine costs and a calibrated SIQS alternative. Stratify by smaller-factor size; total digit count alone cannot choose an economical ECM investment. | Sol / **xhigh** | Sol fits integrating measured engine costs into a bounded policy. xhigh is for weighing uncertain marginal success, factor-size strata, prior-work credit and handoff costs without overfitting a digit threshold. |
 | C4 — P3.8 other dense/hybrid/filtering | Compare PLE/free-variable recovery, sparse-to-dense cores, components and stronger bounded filtering; integrate any accepted provenance representation. | B6 decision; B7 decision for changed representations | **Conditional.** Four Russians goes first by evaluation policy, not mathematical necessity. Reuse its control before adding more interacting transformations; charge fill, retained history and recovery, not just matrix dimension. | Astra / **xhigh** | Choose Astra for interacting rank, fill, component and lifting transformations. xhigh is needed to distinguish exact simplifications from lossy pruning and evaluate their combined memory/recovery consequences. |
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 | C9 — P5.4 source-derived large-prime yield and DLP economics | Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **High; unresolved larger-input yield.** C1's 120-second 50-digit comparisons were censored; evictions identify one possible loss, not its sole cause. The separate 141-second resume witness changed configuration and allowances. Distinguish duration, residual opportunity, retention and post-filter usefulness before selecting a larger-band bundle. Preserve the accepted 40-digit result. | Astra / **xhigh** | Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit. |
-| C10 — QS/SIQS collection-strategy audit and continuing size-band calibration | Extend the [source-to-v2 audit](benchmarks/qs_parameter_audit.md) from constants to mechanisms: explain how pinned papers and leading implementations improve polynomial quality, smoothness/candidate yield and useful relations per total resource. Identify existing v2 equivalents, missing algorithms and interacting size policies; implement or route justified bounded challengers, train selected bundles and confirm fresh complete factoring. | B1/C1 controls; C9 for residual/DLP specifics; E1/D7 for combined controls | **High, continuing.** Study factor base, interval/blocking, A/family/Gray schedules, multiplier, scoring/powers, candidate recovery and relation targets together where evidence supports interaction. Reference defaults, native thresholds and C1's historical 120-second window are not optimized size policies. Each tranche predeclares duration tiers, total resources and progress/stop rules. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Explain the yield mechanism and normalize units before proposing transfer. Compare useful post-filter dependencies, proper divisors and complete outcomes; preserve exact coverage or label deliberate losses, certainty, provenance and charged resume. |
-| C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) for preprocessing/primality, rho, p−1, ECM, sieves/schedules, SSS-specific search and shared budgets. Reconcile each performance-bearing default, embedded threshold, cap and caller override against pinned implementations and primary literature; distinguish exact invariants, formats, finite policies, measured choices and uncalibrated heuristics. Profile and confirm bounded source-grounded tuning tranches. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
+| C10 — QS/SIQS collection-strategy audit and continuing size-band calibration | Extend the [source-to-v2 audit](benchmarks/qs_parameter_audit.md) using pinned papers and Alpertron/YAFU/msieve paths. Diagnose AP05–AP09 kernels and route their selected implementation to A1a; jointly assess base/interval/A/family quality, multiplier search, declared score losses, A pools and stopping targets (AP10–AP14). Consume the settled C9 control; optional C9a/C1a changes get separate confirmation. | B1/C1 controls; C9 for residual/DLP specifics; E1/D7 for combined controls | **High, continuing.** Study factor base, interval/blocking, A/family/Gray schedules, multiplier, scoring/powers, candidate recovery and relation targets together where evidence supports interaction. Reference defaults, native thresholds and C1's historical 120-second window are not optimized size policies. Each tranche predeclares duration tiers, total resources and progress/stop rules. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Explain the yield mechanism and normalize units before proposing transfer. Compare useful post-filter dependencies, proper divisors and complete outcomes; preserve exact coverage or label deliberate losses, certainty, provenance and charged resume. |
+| C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) against pinned GMP-ECM, Alpertron and other primary implementations. Route allocation deltas to C3a, classification deltas to A10a, inverse microkernels to A2a and GCD/replay cadence to E5. Record AP34/AP35 native fixed-limb/FFT/NTT dispositions under existing Python/PyPy scope and prior losses; C9a/C10 retain new QS intake/collection ownership. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
+
+#### New source-derived deltas — separate follow-up items
+
+**Scope freeze — 10 October 2026:** C3 and C9 are already in progress.
+Their original rows and acceptance scope remain unchanged. The additions from
+this source review belong to C3a/C9a or the completed-parent follow-ups below;
+they do not become requirements for the running sessions. Existing completed
+rows and historical verdicts remain unchanged. A suffix identifies the parent
+workstream, not permission to bypass execution prerequisites.
+
+Before starting a follow-up, reconcile the parent's final report and frozen
+scope against the [AP01–AP40 inventory](benchmarks/alpertron_gap_analysis.md).
+Record each candidate as already covered, genuinely missing, rejected or
+conditional. Implement only the uncovered delta. A documented already-covered
+or defer decision is valid; do not rerun a completed experiment under a new ID.
+No suffix item is a new prerequisite for closing its parent or shipping an
+unrelated accepted improvement.
+
+| ID / roadmap work | Concrete delta | Predecessors | Priority and boundary | Model / effort | Why this model / effort |
+| --- | --- | --- | --- | --- | --- |
+| C3a — source-derived ECM policy follow-up | After C3, reconcile Alpertron/GMP-ECM effort, curve/bound and pretest/campaign policies (AP04) with its final selection. Compare only missing source-supported alternatives, prior-work credit or handoff behavior; retain C3's frozen evidence. | C3 decision; a documented uncovered policy or changed-cost hypothesis | **Conditional follow-up.** Do not expand or repeat C3 while it runs. Existing C3 coverage can resolve candidates without another study; any new selection needs fresh complete-factor evidence. | Sol / **xhigh** | Reuses the settled allocation/state contracts; the new work is bounded policy selection and charged handoff. |
+| C9a — compact partial storage and uncovered intake mechanisms | After C9, diagnose compact replayable partial records and any specifically omitted Alpertron/YAFU/msieve intake or retention mechanism (AP02; AP03 only where uncovered). Coordinate changed storage proofs with B7; C1a owns the separate anchor-only experiment. | C9 decision; measured residual/retention/capacity loss and an uncovered mechanism | **Conditional; potentially high when storage limits useful yield.** Preserve the C9 control and accepted C1 bundle. Charge replay, pinning, scratch, certification and resume; more stored partials alone is not a win. | Astra / **xhigh** | Reconstruction, exact provenance and bounded ownership require new storage proofs. |
+| A1a — collector-kernel follow-up to completed R2 | Compare selected periodic tiny-prime presieving, precomputed CRT-term Gray shifts, paired-polynomial traversal, bulk candidate masks and density kernels (AP05–AP09). C10 selects the cost/yield hypothesis; C8 retains the separate CRT half-sum scheduler. | Completed A1; C10 diagnosis and a stable chosen C9 control; demonstrated affected-stage cost | **Conditional implementation tranche.** Reuse R2 controls and rejected-arm evidence. Bound tables/scratch; preserve root/score/candidate identities, position charges, cancellation and checked resume. E6 reuses this work rather than duplicating it. | Astra / **xhigh** | Coupled Gray, exceptional-root, packed-score and resumable collector invariants. |
+| A2a — inverse-microkernel follow-up to completed backend study | Compare batched binary/Montgomery inversion and small-integer quotient shortcuts (AP32/AP33) only for newly profiled inversion-dominant sizes, against native Euclid/GMP including conversions and nonunits. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Low/conditional.** Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. | Sol / **xhigh**; targeted Astra proof review if required | Bounded backend controls already exist; changed inverse/nonunit semantics need independent arithmetic checks. |
+| A7a — SIQS worker-granularity follow-up | Compare historical Alpertron family-sharing/partitioning with existing bounded QS workers (AP37), only after measured setup/coordination cost motivates the alternative. F4 integrates any selected worker result. | Completed A7; B12 contracts; stable serial control and F4 experiment gate | **Conditional.** No generic worker reimplementation or changed A7 closure. Charge shared stores, barriers, aggregate work/RSS, cancellation and restart; Java thread behavior is not PyPy evidence. | Sol / **xhigh** | Assignment identity, leases, private state and cancellation/restart accounting. |
+| A10a — classification follow-up to completed primality transfer | Evaluate MR-residue proper-factor recovery, optional BPSW composite rejection and grouped small-prime remainders (AP25–AP27) only where E3/C11 profiles identify an uncovered benefit. | Completed A10; E3 frozen control or a justified isolated oracle spike; classification-cost evidence | **Conditional.** Preserve deterministic ranges, requested MR rounds, RNG/work identity and certainty. A BPSW pass is not proof; prior primorial losses remain the control. B14 retains certificate ownership. | Sol / **xhigh** | Exact witness/factor recovery and certainty/checkpoint compatibility are the key risks. |
+| A11a — optional input/browser follow-up | Separately select validated factor hints/opt-in lookup, bounded batch/expression input or browser progress/offline/save-continue (AP38–AP40). Give each selected subtranche its own API and acceptance boundary. | Completed A11; explicit product selection, outside the optimization critical path | **Optional; no factoring speed claim.** Preserve quiet library APIs, exact reconstruction, certainty, finite input/output/network allowances and checked checkpoints. | Sol / **high**; **xhigh** for changed accounting/resume | Product adapters can reuse settled contracts; shared allowances or serialization need deeper validation. |
+| C1a — cheaper SLP anchor reuse follow-up | Compare an anchor-only SLP implementation or changed retention regime (AP01) with ordinary SLP and the existing graph-SLP/DLP controls. Prove residual cancellation and bounded pinned ownership without adopting source dependency-discard policies. | Completed C1; C9 decision; a new cost/retention hypothesis | **Low/conditional.** C1 graph-SLP training totaled 20.055 s versus 20.160 s for SLP, with no established win; DLP already retains anchors. Do not repeat that arm or promote on raw cancellation counts. | Astra / **xhigh** | Original atoms, duplicate/zero dependencies, ownership/eviction and resume require exact provenance checks. |
+
+**Execution order:** finish the running C3/C9 sessions first. C3a/C9a and C1a
+consume their decisions and are optional. C10's remaining AP10–AP14 policy work
+can proceed on the settled control without requiring those deltas to win.
+A1a implements a justified collector tranche; C10 diagnoses and E6 integrates
+changed shared contexts. A8/B7/B6/C4/D1/D2 remain cost/capacity-gated matrix work.
+E3 owns AP18–AP24 and coordinates A10a; B14's initial n−1/Pocklington scope is
+unchanged, with AP28 a later coverage candidate. Existing C2 already provides
+a distinct follow-up to completed B2 for AP29; F2/E5 own AP30/AP31, F3 owns
+required AP36 primitives, and C11 records AP34/AP35 deferrals. Do not create
+duplicate suffix work where an existing separate open item already owns it.
+
+Use GMP-ECM for continuation/curve/effort mechanisms, YAFU and official msieve
+for collection/cofactor/filtering/storage, msieve/Yamaquasi/Alpertron for
+Lanczos/products and CADO for Wiedemann/generator/reconstruction/checkpoints.
+The [source inventory](benchmarks/alpertron_gap_analysis.md) provides pins,
+original-v2 comparisons and individual gates. Confirm complete factoring and
+real peak storage under the common uncertainty policy; no universal 10% floor.
+Research or a new task ID closes no implementation/experiment gate.
 
 If B5, B13, C1, C8, C9 or C10 is adopted, recalibrate the affected SIQS configuration before
 claiming a combined win. If C1 materially changes matrix density or dimensions,
@@ -334,8 +391,8 @@ not evidence that a more elaborate solver is needed.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| D1 — P3.8 block Lanczos | Bounded seeded recurrence, singular-block handling, original-operator kernel correction, lifting and resumable state. | C4 decision and a remaining sparse-solve or dense-memory bottleneck | **Low/conditional.** A credible dense/hybrid comparison comes first by investment policy. Validate every candidate against original `M d = 0`; a Gram-kernel candidate can be spurious. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for singular-block recurrence, self-orthogonality and original-operator kernel correction. xhigh is the starting point; max is reserved for a specific unresolved invariant or counterexample, not routine benchmark execution. |
-| D2 — P3.8 block Wiedemann | Projected Krylov sequence, a genuine block polynomial generator, reconstruction, original-kernel verification and bounded checkpoints. | C4 decision and a remaining sparse-solve or dense-memory bottleneck | **Low/conditional.** It is an alternative to D1, not dependent on D1. Generator/reconstruction/I/O costs and failure rates can outweigh sparse products. A correct base-case generator precedes fast generator algorithms. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for block polynomial generators, projection failure cases and reconstruction proofs. xhigh is the starting point; use max only for a named unresolved generator/kernel argument, not merely because the solver is large. |
+| D1 — P3.8 block Lanczos | Use pinned official msieve, Yamaquasi and Alpertron to implement bounded packed-product Block Lanczos (AP16/AP17): seeded recurrence, selected nonsingular blocks, original-operator kernel correction, lifting, finite retries and checked resume. | A8; B6/C4 decision or documented dense-memory infeasibility; remaining sparse-solve/capacity bottleneck | **Conditional; first sparse candidate by scheduling preference.** Compare total solve/recovery/storage with feasible bitset/dense/hybrid controls. Capacity can justify the work before solve CPU dominates. Every candidate must satisfy original `M d = 0`; no solver fixes absent useful relations. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for singular-block recurrence, self-orthogonality and original-operator kernel correction. xhigh is the starting point; max is reserved for a specific unresolved invariant or counterexample, not routine benchmark execution. |
+| D2 — P3.8 block Wiedemann | Use pinned CADO-NFS for genuine Block Wiedemann: projected Krylov sequences, a block polynomial generator, reconstruction, original-kernel verification, finite I/O/checkpoints and independent-sequence accounting. Reuse A8 packed-product oracles; Alpertron does not implement this solver. | A8; B6/C4 decision or documented dense-memory infeasibility; remaining sparse-solve/capacity bottleneck | **Conditional alternative to D1; no D1 dependency.** Compare generator/reconstruction/I/O and failure costs, retained state and complete factors. Prefer Lanczos first for the current single-machine tranche unless measured capacity/sequence/restart needs favor Wiedemann; start with an exact base-case generator. | Astra / **xhigh**; **max** for a specific unresolved proof | Choose Astra for block polynomial generators, projection failure cases and reconstruction proofs. xhigh is the starting point; use max only for a named unresolved generator/kernel argument, not merely because the solver is large. |
 
 D1 and D2 belong in the same topological layer. With limited engineering
 capacity, my scheduling preference is to try Lanczos first and fund Wiedemann
@@ -348,10 +405,10 @@ dependency. Both can remain deferred while other accepted improvements ship.
 | --- | --- | --- | --- | --- | --- |
 | E1 — final R1/R5 and P4/P5 acceptance | Integrate selected changes, including accepted A10/B14 capabilities and A11 CLI integration; reconcile v1 transfer decisions and recalibrate affected SIQS/ECM/p±1 parameters; freeze selections; run fresh complete-factor comparisons, R5 SSS/worker challengers, resume checks and clean-checkout validation; publish adopt/defer/reject decisions. | A1, A7, A10, A11 and chosen P3.7/P3.8/P4/P5 predecessor decisions; B14 if proof support is selected; B13/C8 and other unchosen branches have recorded deferrals | **Required closure.** Independent wins are not additive and optional algorithms need not become defaults. Only the combined held-out comparison supports portfolio promotion. R5 consumes repaired interfaces and the final baseline rather than imposing a prerequisite on every earlier branch. | Sol / **xhigh**; targeted Astra / **xhigh** review for new arithmetic/provenance | Sol fits integration across established contracts and reproducible experiment runners. xhigh is for combined regressions, selection and uncertainty; targeted Astra / xhigh review is appropriate only where accepted changes introduce new arithmetic or provenance arguments. |
 | D7 — P8.1 fresh portfolio control | Freeze the accepted current SIQS/MPQS, rho, ECM and p±1 portfolio with certified training/untouched confirmation inputs; profile separately and retain source/configuration identity for every later challenger. | E1; existing SIQS/P2 controls | **High enabling value, bounded scope.** P8 tuning uses the accepted current engines before GNFS. Keep this control immutable; future GNFS requires a separately versioned extension and crossover evaluation. | Sol / **high**; **xhigh** for protocol decisions | Sol fits corpus/runner reuse and reproducibility checks. high suffices for a fixed protocol; xhigh is for workload stratification, censoring and leakage-resistant comparison design. |
-| E3 — P8.2 preprocessing | Compare trial cutoffs, exact power-exponent/rejection filters and finite Fermat updates on the frozen control; reuse accepted A10/B14 classification/proof capabilities and retain exact equality and certainty semantics. | D7 | **Medium; profile-gated.** Broad cheap-path savings may help, but prior repair decisions are retained. Full integrated evaluation now has the right control; a justified isolated oracle spike could occur earlier. | Sol / **xhigh** | Sol fits controlled filters around existing exact routines. xhigh is needed because a false rejection can silently lose a factor or power, particularly across partial trial progress and resume. |
+| E3 — P8.2 preprocessing | Compare bounded multiplier Fermat/Lehman, shared power screens, inherited trial coverage and high-valuation extraction (AP18/AP22–AP24). Separately evaluate opt-in algebraic a^k±1, sums/differences of powers and historical Fibonacci/Lucas families (AP19–AP21); A10a owns AP25–AP27 classification implementation. Reuse accepted A10/B14 certainty controls. | D7 | **Medium; profile-gated.** Broad cheap-path savings may help, but prior repair decisions are retained. Full integrated evaluation now has the right control; a justified isolated oracle spike could occur earlier. | Sol / **xhigh** | Sol fits controlled filters around existing exact routines. xhigh is needed because a false rejection can silently lose a factor or power, particularly across partial trial progress and resume. |
 | E4 — P8.3 rho calibration | Tune bounded batch/walk/restart policies under identical total budgets and assigned seeds; measure first-factor and complete runs including saturation recovery. | D7 | **Medium.** Parameter tuning is relatively contained, but must show marginal portfolio value on the new workload. It reuses current Brent/local-loop controls rather than rebuilding rho. | Sol / **high**; **xhigh** for changed recovery semantics | Sol/high fits sweeps over an existing verified implementation. Use xhigh if tuning changes replay, cancellation or consumed-work behavior; long sample collection alone needs no stronger setting. |
-| E5 — P8.5 recovery/polling/checkpoint costs | Separate cooperative checks, atomic commits, recovery, explicit durable writes and JSON verification; revisit batching or bounded recovery trees only where profiles justify them. | D7 | **Medium; conditional on changed cost.** Existing repair gains remain the starting point. Revisit only unresolved or newly dominant overhead, preserving validation and disclosing work-unit changes. | Sol / **xhigh** | Sol fits measurement and bounded state-machine changes. xhigh is for proving no lost work, false saturation success or invalid resume while reducing overhead. |
-| E6 — P8.6 contexts/schedules for changed workloads | Test lazy/staged setup, bounded reusable buffers, compact candidate hit prefilters and staged exact rejection against existing schedule/collector controls when new workloads alter their economics; evaluate any verified v1 sieve/setup advantage identified by A10. | D7 | **Conditional.** This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling and small-prime-skipping decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership/rejection changes | Sol/high fits existing-arm comparisons. Escalate to xhigh when changing private scratch ownership, cache identity, upfront resource reservations or conservative candidate-rejection bounds. |
+| E5 — P8.5 recovery/polling/checkpoint costs | Separate polling, atomic commits, saturation recovery, durable writes and JSON verification; compare source-derived ECM GCD cadence/replay (AP31) and bounded recovery trees only where profiles justify them. Preserve strict local factor recovery, deadlines and charged resume. | D7 | **Medium; conditional on changed cost.** Existing repair gains remain the starting point. Revisit only unresolved or newly dominant overhead, preserving validation and disclosing work-unit changes. | Sol / **xhigh** | Sol fits measurement and bounded state-machine changes. xhigh is for proving no lost work, false saturation success or invalid resume while reducing overhead. |
+| E6 — P8.6 contexts/schedules for changed workloads | Reuse C10-diagnosed/A1a-implemented periodic presieve, paired-polynomial, bulk-mask, density kernels and Gray-shift tables (AP05–AP09); avoid duplicate implementation. Test changed-workload shared contexts, lazy setup/private buffers and hit prefilters against accepted exact controls and prior cache/wheel losses. | D7 | **Conditional.** This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling and small-prime-skipping decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership/rejection changes | Sol/high fits existing-arm comparisons. Escalate to xhigh when changing private scratch ownership, cache identity, upfront resource reservations or conservative candidate-rejection bounds. |
 
 E1 accepts the selected P3–P5 tranche and early A10/B14 capability transfers;
 individual transfers may ship once their own gates pass. E3–E6 use the frozen
@@ -367,9 +424,9 @@ implementations or explicit deferrals into current-engine G1/H1 acceptance.
 
 | ID / roadmap work | Concrete deliverable | Predecessors | Priority and reason for placement | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
-| F2 — P6.1 Edwards/windowed/torsion-aware ECM | Compare a complete curve-family/stage-one package and a validated Montgomery stage-two conversion with the accepted Suyama engine, including mixed-coordinate chains and setup costs. | E1; A2/B3/B4 accepted contracts or retained controls | **Conditional.** First establish how far ordinary backend/chain/kernel improvements go. Curve-order torsion, chosen-point order and exceptional maps need whole-engine evidence, not operation counts. | Astra / **xhigh** | Astra fits curve-family hypotheses, coordinate maps and low-order exceptions. xhigh is needed to check the conditions over hidden prime factors rather than infer them from a composite-modulus Jacobi symbol. |
-| F3 — P6.2 polynomial ECM continuation | Choose one justified product/remainder-tree, multipoint or Brent–Suyama continuation challenger; bound nodes, coefficients, reconstruction precision and nonunit recovery. | E1, B2; C2 decision and a remaining continuation bottleneck | **Conditional, potentially important at larger targets.** Paired classical stage two is the baseline. Advance when per-prime continuation remains the limiting algorithm, not merely because larger bounds are available. | Astra / **xhigh** | Astra fits exact composite-ring polynomial arithmetic and coverage arguments. xhigh is required for coefficient/carry bounds, reconstruction and nonunit handling; floating FFT needs a separately proved exactness contract. |
-| F4 — P6.3 production ECM/portfolio workers | Implement/reuse bounded parent-owned work leases, stable assignments, cancellation and restart; compare 1/2/4 workers for fixed-work and first-valid-factor cases with total CPU and aggregate RSS. | E1, B12; E2 if GNFS jobs are included | **Conditional measured parallelism.** Stable serial engines and worker contracts precede credible comparisons. Reuse P3.6/P3.6.1 results; extra cores and earlier thread improvements do not establish a first-factor win. | Sol / **xhigh** | Sol fits orchestration over settled engines. xhigh is needed for in-flight/returned/cancelled work, live and exited process accounting and restart identity; thread use additionally requires observed backend behavior. |
+| F2 — P6.1 Edwards/windowed/torsion-aware ECM | Compare complete curve-family/stage-one packages from GMP-ECM and other pinned references with accepted Suyama, including Alpertron’s different rational Montgomery family (AP30), Edwards/windowed variants, validated stage-two conversion and setup costs. | E1; A2/B3/B4 accepted contracts or retained controls | **Conditional.** First establish how far ordinary backend/chain/kernel improvements go. Curve-order torsion, chosen-point order and exceptional maps need whole-engine evidence, not operation counts. | Astra / **xhigh** | Astra fits curve-family hypotheses, coordinate maps and low-order exceptions. xhigh is needed to check the conditions over hidden prime factors rather than infer them from a composite-modulus Jacobi symbol. |
+| F3 — P6.2 polynomial ECM continuation | Choose a justified GMP-ECM/primary-source Brent–Suyama, product/remainder-tree or multipoint continuation challenger. Assess required exact polynomial kernels, cached reciprocal reduction and coefficient/storage bounds using AP36 references; Alpertron’s polynomial calculator is not an implemented polynomial ECM engine. | E1, B2; C2 decision and a remaining continuation bottleneck | **Conditional, potentially important at larger targets.** Paired classical stage two is the baseline. Advance when per-prime continuation remains the limiting algorithm, not merely because larger bounds are available. | Astra / **xhigh** | Astra fits exact composite-ring polynomial arithmetic and coverage arguments. xhigh is required for coefficient/carry bounds, reconstruction and nonunit handling; floating FFT needs a separately proved exactness contract. |
+| F4 — P6.3 production ECM/portfolio workers | Reuse bounded parent-owned leases, stable assignments, cancellation/restart and settled QS worker decisions; consume any selected A7a family-granularity result (AP37). Compare 1/2/4 production workers for fixed-work and first-factor cases with total CPU and aggregate RSS. | E1, B12; E2 if GNFS jobs are included | **Conditional measured parallelism.** Stable serial engines and worker contracts precede credible comparisons. Reuse P3.6/P3.6.1 results; extra cores and earlier thread improvements do not establish a first-factor win. | Sol / **xhigh** | Sol fits orchestration over settled engines. xhigh is needed for in-flight/returned/cancelled work, live and exited process accounting and restart identity; thread use additionally requires observed backend behavior. |
 | F5 — P6.2 cross-family A=A0*q polynomial reuse | Compare bounded reuse across QS families with calibrated factor-base-smooth A, explicitly carrying any external q exponent, partial-relation role and duplicate policy. | E1; B1 calibrated QS control | **Conditional on polynomial/root setup cost.** This changes relation semantics and is not a drop-in root cache. Ordinary families and the R1 external-square distinction provide the control, not a correctness shortcut. | Astra / **xhigh** | Astra fits changed polynomial identities and external-factor provenance. xhigh is for separating an external factor from an external square correction and proving complete exponent recovery. |
 | F6 — P6.2 triple-large-prime/general QS relations | If DLP economics justify another extension, implement general sparse incidence/provenance and bounded residual splitting; compare useful dependencies and complete factors with the calibrated DLP control. | E1, C1 with a viable DLP comparison and a remaining yield bottleneck | **Low/conditional.** A third large prime increases splitting, storage and verification complexity. Do not reuse a two-endpoint edge-cycle algorithm as though it represented every higher-arity relation. | Astra / **xhigh** | Astra fits the transition from graph cycles to general incidence and dependency lifting. xhigh is for residual certainty, repeated factors, eviction and resource bounds across the expanded provenance model. |
 | F7 — P6.2 batch smooth-part/remainder-tree revisit | Revisit bounded batch recovery only if larger candidates or a new backend change the measured cost; retain scalar exact exponent recovery and compare full pipeline latency/storage. | E1; A1 decisions and a newly demonstrated candidate-division bottleneck | **Low/conditional.** R2 already evaluates batch recovery. This is a changed-workload revisit, not duplicate work or an automatic reversal of a loss. Sparse solvers and higher merges remain owned by the existing matrix rows. | Astra / **xhigh** | Astra fits exact tree arithmetic, coefficient/node bounds and recovery of every exponent. xhigh is warranted only once the new profile supports the experiment; throughput alone cannot justify adoption. |
@@ -1850,6 +1907,23 @@ flags unit mismatches: base prime *value* versus *count*, half-width versus
 full interval, hash slots versus retained edges, and probable versus proven
 residuals. No first-pass source value is an accepted PyPy optimum.
 
+- [ ] Use the [Alpertron inventory](benchmarks/alpertron_gap_analysis.md) and
+  pinned YAFU/official msieve paths to rank A1a periodic tiny-prime initialization,
+  paired-polynomial traversal, bulk masks and density-specific marking
+  (AP05/AP07–AP09); A1a owns the selected implementation. Compare existing controls;
+  verify lane independence, saturation/tails, candidate identities, position
+  charges, cancellation and resumed block cursors.
+- [ ] Route bounded precomputed CRT-term Gray shifts to A1a (AP06). Its gate
+  is root-update cost versus table/setup/storage cost; handle centered-B wrap
+  corrections and exceptional primes independently. Keep the larger CRT
+  half-sum scheduler's eligibility gate and existing deferral separate.
+- [ ] Train justified joint collection bundles (AP10–AP14): base count/value,
+  full interval/block width, A quality/pools/spacing/family schedule, wider
+  multiplier search including checked even cases, declared tiny/A-prime score
+  losses, and relation targets/solve cadence. Freeze residual controls with C9;
+  source/oracle work may overlap, but interacting timing selections wait for
+  stable interfaces. Report useful post-filter rank and complete factors.
+
 - [ ] Produce a mechanism comparison from pinned primary papers and actual
   implementation paths, not only a table of constants. Trace polynomial and
   multiplier selection, factor-base/interval tradeoffs, A quality and Gray
@@ -1902,6 +1976,17 @@ residuals. No first-pass source value is an accepted PyPy optimum.
   bounded tranche closes; a single 30/40-digit result cannot settle 50–100
   digits or a changed backend. Safety/proof caps require separate invariants
   and independent oracles before any relaxation.
+
+#### A1a — Selected collector-kernel delta (after completed A1)
+
+- [ ] Freeze one C10-justified AP05–AP09 tranche against the accepted R2 and
+  settled C9 controls. Preserve existing negative tiny-prime/batching/cache
+  decisions; state the changed mechanism/workload rather than reopening A1.
+- [ ] Independently verify periodic residues, centered-B Gray shifts and
+  exceptional roots, packed-lane independence, saturation/tails and complete
+  candidate identities. Bound tables/scratch and preserve per-position charges,
+  cancellation and resume. Compare complete factoring, including table setup
+  and replay; C8's larger CRT scheduler remains a separate optional experiment.
 
 **P3.8-R5 — Reconcile optional SSS, workers and array challengers**
 
@@ -1977,6 +2062,11 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 **Control and shared kernels**
 
+- [ ] Refresh A8 using C9/C10's actual post-filter matrices and pinned
+  msieve/Yamaquasi/Alpertron packed-product paths (AP16). Record filtering,
+  solving, extraction, fill, provenance bytes and simultaneous storage/refusal.
+  A demonstrated dense-memory refusal can justify B7/D1/D2 investigation even
+  when solve CPU is small; distinguish capacity evidence from a speedup.
 - [ ] Freeze an exact matrix interface and a representative QS/SIQS corpus
   with original relations and lifting maps. Declare orientation; in this
   milestone `M` has constraint rows and relation columns, and `M d = 0`
@@ -2022,6 +2112,11 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 **Block Lanczos challenger**
 
+- [ ] Reconcile Alpertron's 32-lane recurrence and original-operator correction
+  with official msieve and Yamaquasi (AP17), translating relation-row storage
+  into the declared v2 orientation. Reuse A8 products and the feasible B6/C4
+  control or explicitly document its memory infeasibility. Do not copy
+  unbounded retries or row-discard policies that lose dependencies.
 - [ ] When sparse solving is justified, prototype finite-field block Lanczos
   with seeded finite retries, selected nonsingular Gram subblocks and original-
   operator kernel correction. After correctness, compare homogeneous recurrence
@@ -2043,6 +2138,11 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
 
 **Block Wiedemann challenger**
 
+- [ ] Trace pinned CADO's preparation, Krylov, block-generator, reconstruction
+  and verification paths. Compare sequence/history/checkpoint storage and
+  independent-sequence economics with Lanczos/bitset controls. This is an
+  alternative D2 workstream, not an Alpertron feature or a dependency on D1.
+  State the measured capacity/cost trigger before implementation.
 - [ ] When justified, prototype seeded block Wiedemann with an explicit
   square-operator/kernel map, projected Krylov sequence, matrix-polynomial
   generator, reconstruction, lifting and original verification. Scalar
@@ -2585,6 +2685,14 @@ only when retained certificates/decoding are the measured bottleneck; no
 allocation rewrite is bundled here. Common-Z remains its own C2 challenger.
 Polynomial/product-tree continuation stays **F3**; production PRAC, arithmetic
 kernels and factor-size/curve allocation retain their existing workstreams.
+
+- [ ] Under C2's remaining-cost gate, compare Alpertron-style affine stage-two
+  differences with projective cross-products (AP29), then separately assess
+  derived batch inversion and no-inversion common-Z. Source uses individual
+  inversions; it does not establish a batch-inversion win. Prove denominator/
+  nonunit checks and local mixed-factor recovery, cap tables and scratch, and
+  charge normalization/replay in the complete-factor comparison.
+
 A6's exact integer schedule-ratio contract is now integrated. Increased-B1
 ECM extensions still require the group-specific point, recovery and checkpoint
 migration tracked under P5.3; B2 does not implement that migration.
@@ -2940,8 +3048,33 @@ eviction. Native triple-large-prime code is not a two-edge DLP template.
 
 **Prerequisite:** a stable, measured portfolio through Phase 5. **Goal:** test higher-cost ideas with explicit stop/go decisions. Sources: coordinate families, continuations, benchmark design.
 
+#### C9a — Compact storage and uncovered intake deltas (after C9)
+
+- [ ] Reconcile C9's final scope and results against AP02/AP03. Record what its
+  session already covered, rejected or deferred; select only an uncovered
+  compact-record/replay or intake mechanism. C9's original closure is unaffected.
+- [ ] For a selected storage challenger, coordinate B7 proofs for reconstruction
+  of original relations, certification, corruption checks, ownership/pinning,
+  eviction, simultaneous scratch and charged resume. Compare useful filtered
+  dependencies and complete factors under the settled C9 control and matched
+  total allowances. Larger tables alone do not establish the benefit.
+
+#### C1a — Cheaper SLP anchor delta (after C9)
+
+- [ ] Reuse C1's graph-SLP/DLP evidence before considering anchor-only SLP
+  (AP01). Its two graph-SLP training runs totaled 20.055 s versus 20.160 s for
+  ordinary SLP, with no established speedup; DLP already retains anchors.
+- [ ] Proceed only with a new cheaper implementation or changed-retention
+  hypothesis. Verify residual cancellation, original atoms, duplicate/zero
+  dependencies, pinned ownership, eviction and checked resume. Compare useful
+  dependencies and complete factors; raw LP cancellation counts cannot promote it.
+
 ### P6.1 — Compare Edwards/windowed and torsion-aware ECM
 
+- [ ] Compare pinned GMP-ECM curve/stage-one packages and Alpertron's rational
+  Montgomery family (AP30) with Suyama. Prove valid curve/point construction
+  and denominator/discriminant exclusions before measuring success; do not
+  infer torsion or useful point-order gain from formulas alone.
 - [ ] Prototype a complete stage-1 package: valid curve families, formula assumptions, signed windows, prime grouping, and table costs. Test a compatible conversion to Montgomery stage 2, including exceptional denominators and correct parameter scaling. Compare against corrected Suyama curves.
 - **A:** independent point/map checks pass over prime and composite moduli; nonunits become factors/retries. A formula's exceptional cases are handled explicitly.
 - **E:** compare empirical success within fixed work budgets and total time-to-factor across many curves/seeds, including setup/conversion. Promote only a whole-engine win; an operation-count advantage alone cannot pass.
@@ -2960,6 +3093,13 @@ eviction. Native triple-large-prime code is not a two-edge DLP template.
   Full-coordinate operation counts do not predict x-only ECM performance.
 
 ### P6.2 — Investigate polynomial continuations and richer relation collectors
+
+- [ ] Under F3's continuation gate, trace GMP-ECM Brent–Suyama/product-tree
+  mechanisms and compare only the required exact polynomial primitives with
+  Alpertron's calculator kernels (AP36): multiplication/packing, cached inverse
+  reduction and Newton division where justified. Polynomial factorization,
+  Hensel/LLL and FFT/NTT are separately conditional references, not requirements
+  to build an arithmetic library or evidence of an Alpertron ECM continuation.
 
 The [9 October source reconciliation](benchmarks/qs/qs_gnfs_research.md)
 keeps F5 external-q reuse, F6 general multi-LP incidence and F7 batch recovery
@@ -2991,7 +3131,7 @@ weight-two control; include fill-in and retained provenance in the decision.
 
 - [ ] Profile first, then choose one bottleneck: product/remainder trees, multipoint evaluation, Brent–Suyama extension, triple-large-prime collection, or sparse linear algebra. Prototype behind the validated interfaces. For bigint coefficient packing, prove carry/coefficient bounds and account for memory.
 - **A:** continuation coverage or relation identities/dependencies independently validate; peak RSS and residual/matrix work remain bounded. Every prototype can fall back to the baseline.
-- **E:** compare one change at a time against Phase 5. Advance sparse solvers only when filtered matrix cost dominates; advance a third large prime only when the full pipeline wins. Stop research that cannot pass the promotion policy.
+- **E:** compare one change at a time against Phase 5. Advance sparse solvers when filtered solve cost or a demonstrated dense-memory/provenance refusal justifies them; absent useful relations remain a collection problem. Advance a third large prime only when the full pipeline wins. Stop research that cannot pass the promotion policy.
 
 - [ ] Compare paired classical stage 2 before polynomial/FFT continuations.
   Exact monic product/remainder operations over composite moduli need explicit
@@ -3006,6 +3146,11 @@ weight-two control; include fill-in and retained provenance in the decision.
 Immediate P3.5/P3.6 diagnosis and improvements are owned by P3.6.1 and can
 proceed now. This milestone reuses those results for broader ECM/portfolio
 parallel execution; it does not postpone their implementation.
+
+- [ ] Under A7a, reuse existing bounded QS workers before comparing historical Java SIQS
+  family partitioning/shared setup with private roots/sieves (AP37). Current
+  Alpertron C runs one SIQS thread. Charge barriers, shared-store contention,
+  startup and cancelled assignments; Java threads establish no PyPy advantage.
 
 - [ ] Assign distinct ECM curves/SIQS polynomial families to workers; share compact immutable schedules or bounded caches. Cancel promptly after a validated split, reconcile pending relations, and checkpoint worker assignments. Use threads only if measured backend operations release the GIL.
 - **A:** no duplicated/lost assignments after restart; one validated split cancels remaining work safely; combined results reconstruct n. Aggregate memory and total CPU limits apply across workers.
@@ -3397,6 +3542,12 @@ deferred to the owners below. A10 introduces no new ECM, chain or sieve default.
 This extends proof capability beyond v1's fixed-base tables. Start after A10
 settles the deterministic/terminal-factor contract; it does not wait for D7.
 
+- [ ] Record historical Alpertron APRT-CLE (AP28) as a later proof-coverage
+  comparison if finite n−1/Pocklington leaves a measured need. Do not expand
+  the initial tranche automatically. Its probabilistic fallback needs a distinct
+  result type; independent exact verification, finite work/storage and checked
+  resume precede any new proven-prime label.
+
 - [ ] Add a bounded exact certificate generator and a separate verifier for
   supported primes beyond the deterministic ranges. Start with n−1/Pocklington
   certificates: prove the required prime factors of n−1, check their powers
@@ -3430,6 +3581,22 @@ settles the deterministic/terminal-factor contract; it does not wait for D7.
 
 #### Later integrated preprocessing tuning (E3)
 
+- [ ] Compare inherited trial-coverage metadata, high-valuation exponent
+  doubling and shared/adaptive power screens (AP22–AP24); route MR-residue
+  factor recovery to A10a (AP25). Prove exclusion inheritance through splits and
+  partial chunks; check checkpoint migration. Reuse exact routines/A10 controls; charge failed
+  tests, replay and extra witnesses.
+- [ ] Evaluate bounded multiplier Fermat/Lehman with residue screening (AP18)
+  against finite plain Fermat, including its tax on generic inputs. Separately
+  select an opt-in structured-input tranche for a^k±1/Cunningham/Aurifeuillean,
+  sums/differences of powers and historical Fibonacci/Lucas splitting
+  (AP19–AP21). Bound recognition/coefficient work; require exact identities,
+  proper divisors and reconstruction. Report structured and generic outcomes
+  separately; floating recognition cannot reject exact matches.
+- [ ] Under A10a, compare optional BPSW composite rejection and small-prime
+  product groups (AP26/AP27) only when classification profiles justify them. Preserve supported
+  deterministic ranges, requested MR rounds, RNG/work identity and certainty.
+  Earlier primorial/filter decisions remain controls.
 - [ ] Tune the existing trial cutoff on training data. Compare a proven
   factor lower bound from completed trial division to reduce power exponents
   using `L**k <= n`; use exact comparisons and preserve progress proof on
@@ -3498,8 +3665,23 @@ complete result. Do not postpone CLI access until this calibration finishes.
   Include structured/random primes and relevant residue classes; neither
   GMP-ECM tables nor YAFU/FLINT native thresholds are production defaults.
 
+#### C3a — Source-derived policy delta (after C3)
+
+- [ ] Reconcile AP04's Alpertron/GMP-ECM effort, bound/curve and handoff policies
+  with C3's final frozen scope/results. Mark already covered or unsupported
+  candidates explicitly; do not enlarge the running C3 session or repeat its
+  training/confirmation. Select only a justified remaining policy difference.
+- [ ] If selected, compare against the accepted C3 control with completed-work
+  credit, finite pretest/campaign tiers, reserved later-engine resources and
+  hidden factor-size labels. Charge setup/recursion/resume and confirm fresh
+  complete-factor outcomes before any policy/default change.
+
 ### P8.5 — Measure recovery, polling and checkpoint costs separately
 
+- [ ] Use Alpertron's coarse ECM GCD/replay path as a cadence challenger only
+  after profiling (AP31). Preserve stricter v2 local recovery; compare saved
+  checks with detection latency, saturation replay, simultaneous storage and
+  cancellation overshoot under the same cumulative allowances.
 - [ ] Distinguish GCD/chunk polling, cooperative budget checks/atomic commits,
   caller durable checkpoint writes, and final JSON pack/unpack verification.
   Sweep existing chunks/batches and resumptions. Consider bounded product-tree
@@ -3519,6 +3701,11 @@ complete result. Do not postpone CLI access until this calibration finishes.
 
 ### P8.6 — Revisit context setup and schedules only for changed workloads
 
+- [ ] Reuse A1a's C10-selected periodic-presieve, paired-polynomial, bulk-mask and
+  density-kernel experiments (AP05/AP07–AP09), rather than tuning them again.
+  Keep A1a Gray-shift tables under their own setup/root-cost gate. E6 owns shared
+  buffers/context integration when workloads change; acceptance includes initialization,
+  scratch, retained tables, complete factoring and resume.
 - [ ] If a changed profile exposes score allocation/candidate scanning, compare
   bounded 256-byte score-table reuse and bulk threshold-mask extraction from
   the [numthy comparison](benchmarks/qs/qs_gnfs_research.md). Bytearray slice
@@ -3558,6 +3745,12 @@ complete result. Do not postpone CLI access until this calibration finishes.
 
 #### C11 — Cross-engine constant provenance and calibration (open)
 
+- [ ] Route inverse microkernels to A2a; give fixed-limb/SIMD layouts and cached
+  FFT/NTT ideas explicit dispositions (AP32–AP35), using GMP-ECM/GMP references
+  and current PyPy/native/GMP controls. Revisit inverse work only from a changed
+  profile; larger native kernels remain later references within the existing
+  Python/PyPy scope. NTT has no caller at the inspected pin. Preserve earlier
+  reducer/backend losses; do not replace Python ints with limb loops.
 - [x] Publish the first-pass [parameter reconciliation](benchmarks/parameter_audit.md),
   including generator locations, pinned sources/licenses, inherited versus
   measured choices and missing evidence. This is an audit artifact, not
@@ -3619,6 +3812,20 @@ complete result. Do not postpone CLI access until this calibration finishes.
 retain/defer/reject disposition, with historical P2 tuning gates reconciled
 honestly. No speed claim, new default, competitor execution or additional
 implementation completion is established by this M23 research milestone.
+
+## Optional product follow-ups — separate from factoring optimization
+
+A11a owns these AP38–AP40 capabilities outside completed A11 and the critical
+path. Select and freeze an individual product subtranche before implementation.
+
+- [ ] Validated caller-supplied factor hints and explicitly opt-in external
+  known-factor lookup (AP38). Bound lookup/cache work, validate all splits and
+  reconstruct unresolved cofactors; exclude hidden corpus hints from timing.
+- [ ] Bounded batch/expression input (AP39), with finite parse/exponent/output
+  work, per-item failure/certainty and shared allowances where applicable.
+- [ ] Browser progress/offline/save-continue UI (AP40) if a browser product is
+  desired. Reuse checked checkpoints; source curve/factor persistence cannot
+  replace exact state, cumulative resources or corrupt-input validation.
 
 ## Phase checkpoints
 
