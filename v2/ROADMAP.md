@@ -315,7 +315,7 @@ implementations complete.
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
-| C9 — P5.4 source-derived large-prime yield and DLP economics | Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **High; unresolved larger-input yield.** C1's 120-second 50-digit comparisons were censored; evictions identify one possible loss, not its sole cause. The separate 141-second resume witness changed configuration and allowances. Distinguish duration, residual opportunity, retention and post-filter usefulness before selecting a larger-band bundle. Preserve the accepted 40-digit result. | Astra / **xhigh** | Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit. |
+| C9 — P5.4 source-derived large-prime yield and DLP economics | Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **C9.2 adaptive storage implemented; fresh confirmation in progress.** Pinned source/caller audit, rejected-position attribution and the complete longer-window training grid select full-base aligned growth. Preserve C1 and stopped C9.1 outcomes; close only the named tranche after its remaining gates. | Astra / **xhigh** | Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit. |
 | C10 — QS/SIQS collection-strategy audit and continuing size-band calibration | Extend the [source-to-v2 audit](benchmarks/qs_parameter_audit.md) from constants to mechanisms: explain how pinned papers and leading implementations improve polynomial quality, smoothness/candidate yield and useful relations per total resource. Identify existing v2 equivalents, missing algorithms and interacting size policies; implement or route justified bounded challengers, train selected bundles and confirm fresh complete factoring. | B1/C1 controls; C9 for residual/DLP specifics; E1/D7 for combined controls | **High, continuing.** Study factor base, interval/blocking, A/family/Gray schedules, multiplier, scoring/powers, candidate recovery and relation targets together where evidence supports interaction. Reference defaults, native thresholds and C1's historical 120-second window are not optimized size policies. Each tranche predeclares duration tiers, total resources and progress/stop rules. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Explain the yield mechanism and normalize units before proposing transfer. Compare useful post-filter dependencies, proper divisors and complete outcomes; preserve exact coverage or label deliberate losses, certainty, provenance and charged resume. |
 | C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) for preprocessing/primality, rho, p−1, ECM, sieves/schedules, SSS-specific search and shared budgets. Reconcile each performance-bearing default, embedded threshold, cap and caller override against pinned implementations and primary literature; distinguish exact invariants, formats, finite policies, measured choices and uncalibrated heuristics. Profile and confirm bounded source-grounded tuning tranches. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
 
@@ -2827,7 +2827,19 @@ The [report](benchmarks/qs/c1/c1_implementation_results.md) records fresh 40-dig
 benefit, lower observed proper-factor yield per extracted dependency, and
 larger unresolved results. No solver or default dispatch is promoted.
 
-#### C9 — Source-derived large-prime yield and DLP economics (open)
+#### C9 — Source-derived large-prime yield and DLP economics (C9.2 confirmation in progress)
+
+C9.2 now provides [allocator-grown serial DLP storage and a full training
+record](benchmarks/qs/c9/c9_growth_results.md), supported by the
+[pinned mechanism comparison](benchmarks/qs/c9/c9_research.md) and
+[actual upstream constraint audit](benchmarks/qs/c9/c9_growth_audit.md).
+The new explicit policy removes implicit FIFO/count/storage ceilings while
+preserving exact endpoints, all-component cycles and checked schema-five
+resume. The selected configuration and corrected source froze before the
+new corpus. Fresh matched confirmation and final committed-only verification
+remain open; API support is separate from performance promotion. C10, E1,
+higher arity and matrix redesign retain their existing ownership/gates.
+The C1 motivation below describes historical and legacy bounded controls.
 
 The broader [QS/SIQS parameter audit](benchmarks/qs_parameter_audit.md)
 records this first source comparison. C9 investigates how leading
@@ -2868,7 +2880,7 @@ clarifies that recovered products can exceed that target when both endpoints
 fit its common ceiling; the target is not a hard intake limit. These are concrete candidate rules to test, not validated PyPy
 thresholds or memory capacities.
 
-- [ ] Make a pinned source-to-mechanism and parameter comparison before new
+- [x] Make a pinned source-to-mechanism and parameter comparison before new
   tuning. Extract actual numeric factor-base, SLP/DLP endpoint and product
   rules, cofactor splitting limits, relation targets, growth/eviction policies, and memory
   units from [YAFU](https://github.com/bbuhrow/yafu/blob/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/qs/filter.c),
@@ -2881,7 +2893,7 @@ thresholds or memory capacities.
   [CUDA-MPQS single-LP witness table](https://github.com/drjanosch42/cuda-mpqs/blob/main/USER_GUIDE.md)
   defaults to 1,048,576 slots but is neither a DLP graph nor a PyPy preset;
   pin its revision before using its values in an experiment.
-- [ ] Explain each implementation's route from candidate to useful dependency:
+- [x] Explain each implementation's route from candidate to useful dependency:
   score/refinement domain, smooth and one/two-large-prime admission, splitter
   choice and effort, duplicate/matching policy, graph components and cycle
   construction, pruning/eviction or disk retention, and filtering/oversampling
@@ -2895,7 +2907,7 @@ thresholds or memory capacities.
   Rank transfer candidates by expected useful dependencies and complete-factor
   value per total resource, not a claim that an upstream implementation is
   universally fastest or that its raw relation yield transfers to PyPy.
-- [ ] Freeze one finite training-only grid from that table and the retained
+- [x] Freeze one finite training-only grid from that table and the retained
   C1 losses. Select a few source-supported mechanism/policy families after
   attribution pilots; neither graph growth nor tuning constants is mandatory
   if another transferable yield mechanism has stronger evidence. Separate

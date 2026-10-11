@@ -20,6 +20,7 @@ see [contributor guidance](../../AGENTS.md).
 | [qs/p38/](qs/p38/) | Capacity, collector and matrix experiments |
 | [qs/b1/](qs/b1/) | QS/MPQS/SIQS calibration and width studies |
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
+| [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
 | [qs/a7/](qs/a7/) | Frozen comparison arms and reconciliation |
 | [primality/a10/](primality/a10/) | Primality dispatch and validation |
 | [infrastructure/](infrastructure/) | Arithmetic backends, parallelism, sieves and performance audits |

@@ -113,6 +113,29 @@ filter/solve work despite the configured growth/excess target; changing its
 cadence needs collection/matrix-owner coordination. Neither observation
 expands the already frozen C9.1 candidate grid.
 
+## C9.2 allocator-grown storage
+
+The [constraint audit](qs/c9/c9_growth_audit.md) verifies that YAFU full SIQS,
+msieve and FLINT grow original-record storage separately from graph tables;
+Yamaquasi/JavaMath use growing containers with different retention semantics.
+YAFU tiny-QS, cycle tracebacks, residual admission and splitter effort retain
+limits. Initial allocation is not a universal eviction policy.
+
+| Setting / mechanism | Growing v2 policy | Rationale and evidence scope |
+| --- | --- | --- |
+| Partial, original-atom and row counts | `None` by default in `GrowingDoubleLargeSieveConfig`; explicit integer quotas supported | Native full-SIQS history retention motivates removal of implicit FIFO/count stops. Matched training retains >32,768 atoms without eviction; complete confirmation is reported separately. |
+| Graph allocation | PyPy list/dict growth; no extra manually doubled container | Python already provides dynamic allocation. The existing 4-KiB-per-edge reservation covers coexisting graph maps and scratch, not measured packed memory. |
+| Standalone memory/checkpoint bytes | `None` with growing SIQS; finite explicit caps supported | No new 256/512-MiB production ceiling. The study's 1-GiB owned/3-GiB RSS envelope applies equally to controls and challengers. A finite portfolio still supplies a finite child share. |
+| Cumulative split calls | No implicit quota in growing mode | Each attempt remains charged; two 2,048-evaluation rho walks and proven endpoint validation are unchanged. Zero observed failures do not justify a certainty shortcut. |
+| Common endpoint admission | Separate candidate policy; align SLP endpoint to DLP L at fixed DLP scoring/product domain | Removes rare high-endpoint opportunities deliberately; compare complete outcomes rather than declaring those endpoints mathematically useless. |
+| Reusable SLP | Existing graph-SLP route evaluated with growing storage | k−1 versus floor(k/2) LP cancellations is an arithmetic opportunity; downstream useful dependency and complete-call economics decide. |
+| Cycle provenance length | Existing 256-original-atom policy retained | Zero observed rejections; source traceback limits are not copied or interpreted as an optimum. Removing this policy is outside the accepted storage implementation. |
+
+[The C9.2 report](qs/c9/c9_growth_results.md) keeps individual growth attribution,
+selected combinations, charged resume and fresh performance decisions distinct.
+Legacy classes, controls, checkpoints and historical verdicts remain unchanged.
+Broader scoring/polynomial/base calibration remains C10; higher arity remains F6.
+
 ## Continuing experiment ledger (C10)
 
 The first audit identifies the gaps; it does **not** choose larger defaults.

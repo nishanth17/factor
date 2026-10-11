@@ -5,6 +5,17 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../../README.md) covers usage; the [roadmap](../../ROADMAP.md) records
 remaining acceptance gates.
 
+## C9.2 adaptive large-prime storage (11 October 2026)
+
+[Research and implementation results](../qs/c9/c9_growth_results.md) distinguish
+upstream relation-store growth from residual, splitter, path and stopping
+limits. Growing serial SIQS retains partial history in PyPy containers, with
+optional explicit quotas and checked schema-five resume. Legacy bounded
+configurations remain compatible. The finite study compares complete outcomes
+at equal resources and preserves C1 and stopped C9.1 evidence; current
+confirmation status and acceptance are stated in that report. C10 collector
+calibration and E1 combined portfolio acceptance remain separate.
+
 ## B3 user-directed native default and optional families (10 October 2026)
 
 The user requested and approved native reduced PRAC/batch 16 as the bounded

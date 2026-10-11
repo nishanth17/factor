@@ -14,6 +14,19 @@
 
 ## Current development
 
+- Add `GrowingDoubleLargeSieveConfig` for serial SIQS with allocator-grown
+  partial history and no implicit FIFO, original-atom, row or cumulative
+  split-count ceiling. Standalone growing memory/checkpoint quotas default to
+  `None`; explicit caller quotas and finite portfolio ownership remain.
+- Preserve proven endpoints, all-component cycles and exact original-atom
+  square corrections. Schema 5 supports checked growing-store resume; legacy
+  configurations retain schemas 3/4. Interrupted publication invalidates the
+  live object while prior complete checkpoints remain recoverable.
+- Document pinned large-prime mechanisms, actual upstream limits, loss
+  attribution and the separately frozen adaptive-growth study. Performance
+  acceptance and supported scope are recorded in the C9.2 benchmark report;
+  broader C10/E1 calibration is not closed by storage support.
+
 - Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
   the user's direction. Keep B4 for unsupported jobs and insufficient explicit
   caps; select the separately approved finite 16 MiB automatic workspace only
