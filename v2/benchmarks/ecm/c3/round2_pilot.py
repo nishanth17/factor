@@ -18,7 +18,7 @@ from ..p52.p52_realistic import check_quiet
 from . import c3_study as first
 from .round2_corpus import load_training, write_training
 
-CONTROL = first.INPUTS / "controls/c3_round2_pilot.json"
+CONTROL = first.INPUTS / "controls/c3_round2_pilot_v2.json"
 # These are mechanism bundles, not a Cartesian sweep. Economic ceilings are
 # cumulative fractions of historical C1-sized relation-call estimates.
 POLICIES = {
@@ -157,7 +157,11 @@ def run_one(
         curve_costs=curve_costs,
         stage_seconds=run.checkpoint["payload"]["state"]["stage_seconds"],
         bounds=[list(t) for t in config.ecm_tiers],
-        allocation=asdict(config.allocation) if config.allocation else None,
+        allocation=(
+            asdict(config.allocation)
+            if getattr(config, "allocation", None)
+            else None
+        ),
         active_curve=current.get("job"),
         fallback_started=any(e["stage"] == "siqs" for e in run.events)
         or "siqs_seed" in current,

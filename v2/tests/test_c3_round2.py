@@ -106,3 +106,19 @@ class RoundTwoControlsTests(unittest.TestCase):
             with round2_pilot.attribution(portfolio, False) as costs:
                 self.assertIs(portfolio.advance_job, execute)
             self.assertEqual(costs, [])
+
+    def test_historical_control_without_allocation_field(self):
+        from v2.benchmarks.ecm.c3 import c3_study
+
+        fixture = dict(
+            id="small",
+            kind="regression",
+            n=1009 * 1013,
+            factors=[(1009, 1), (1013, 1)],
+        )
+        row = round2_pilot.run_one(
+            fixture, 17, "control", c3_study.baseline(), instrument=True
+        )
+        self.assertTrue(row["complete"])
+        self.assertIsNone(row["allocation"])
+        self.assertTrue(row["instrumented"])

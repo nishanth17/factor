@@ -17,10 +17,15 @@ class WindowAllowanceError(RuntimeError):
 def run(output):
     first.runtime()
     started, cpu = time.monotonic(), time.process_time()
-    receipt = dict(mode="round2-window", limit_seconds=600, phases=[])
+    receipt = dict(
+        mode="round2-window",
+        limit_seconds=570,
+        prior_charge_seconds=30,
+        phases=[],
+    )
 
     def remaining():
-        return 600 - max(time.monotonic() - started, time.process_time() - cpu)
+        return 570 - max(time.monotonic() - started, time.process_time() - cpu)
 
     with first.machine_window():
         try:
@@ -65,7 +70,7 @@ def run(output):
                 )
                 names.update(
                     (
-                        "v2/benchmarks/ecm/c3/round2_protocol.md",
+                        "v2/benchmarks/ecm/c3/round2_protocol_v2.md",
                         "v2/benchmarks/ecm/c3/round2_research.md",
                         str(TRAINING.relative_to(first.ROOT)),
                         (
@@ -85,6 +90,10 @@ def run(output):
                         ).strip(),
                         seeds=[17, 43],
                         active_seconds=480,
+                        prior_charge_seconds=30,
+                        previous_protocol_sha256=first.digest(
+                            first.INPUTS / "controls/c3_round2_pilot.json"
+                        ),
                         policies=pilot.POLICIES,
                         sha256={
                             name: first.digest(first.ROOT / name)
