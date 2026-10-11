@@ -258,7 +258,16 @@ def training():
             if kind not in kinds or digits not in (30, 40) or key in chosen:
                 continue
             chosen.add(key)
-            fixtures.append(dict(source, id="training_" + source["id"]))
+            counts = {}
+            for factor in source["factors"]:
+                counts[factor] = counts.get(factor, 0) + 1
+            fixtures.append(
+                dict(
+                    source,
+                    id="training_" + source["id"],
+                    factors=sorted(counts.items()),
+                )
+            )
     return fixtures
 
 
@@ -361,7 +370,21 @@ def measure(mode, output):
                             check_quiet({os.getpid()})
                             row = run_one(fixture, seed, arm, control)
                             row["repetition"] = repetition
-                            rows.append(row)
+                            receipt = (
+                                output.parent
+                                / (output.stem + "-rows")
+                                / (
+                                    f"{fixture['id']}-{seed}-{repetition}-{arm}.json"
+                                )
+                            )
+                            save(receipt, row)
+                            rows.append(
+                                {
+                                    key: value
+                                    for key, value in row.items()
+                                    if key != "events"
+                                }
+                            )
                 print(mode, fixture["id"], "samples", target, flush=True)
     save(
         output,
@@ -495,17 +518,18 @@ def freeze():
         if name.endswith(".py")
         and not name.startswith(("v2/tests/", "v2/benchmarks/"))
     }
-    save(
-        BASELINE,
-        dict(
-            commit="b3b3cfbea6105f08db0a8484ec09c8260d310e28",
-            source=sources,
-            sha256={
-                name: hashlib.sha256(value.encode()).hexdigest()
-                for name, value in sources.items()
-            },
-        ),
-    )
+    if not BASELINE.exists():
+        save(
+            BASELINE,
+            dict(
+                commit="b3b3cfbea6105f08db0a8484ec09c8260d310e28",
+                source=sources,
+                sha256={
+                    name: hashlib.sha256(value.encode()).hexdigest()
+                    for name, value in sources.items()
+                },
+            ),
+        )
     paths = [ROOT / name for name in sources]
     paths += list((ROOT / "v2/benchmarks/ecm/c3").glob("*.py"))
     paths += [
