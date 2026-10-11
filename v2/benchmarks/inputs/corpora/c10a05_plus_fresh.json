@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "seed": 202610111203,
+  "fixtures": [
+    {
+      "id": "c10a05_plus_fresh_0",
+      "n": 835438783729472663684217905213656278634612587267007,
+      "factors": [
+        22013214262982516960445869,
+        37951694548049208467432603
+      ],
+      "digits": 51,
+      "kind": "balanced",
+      "split": "held_out"
+    },
+    {
+      "id": "c10a05_plus_fresh_1",
+      "n": 690440912747213393510894082073527022681842261318263,
+      "factors": [
+        20683052556584363282797519,
+        33381963849790364548034777
+      ],
+      "digits": 51,
+      "kind": "balanced",
+      "split": "held_out"
+    },
+    {
+      "id": "c10a05_plus_fresh_2",
+      "n": 687563225256084325355569953471269623647763286142091,
+      "factors": [
+        19594860560468830029129887,
+        35088957287258877461919893
+      ],
+      "digits": 51,
+      "kind": "balanced",
+      "split": "held_out"
+    }
+  ],
+  "certificates": {
+    "11483": {
+      "kind": "trial"
+    },
+    "9530891": {
+      "kind": "pocklington",
+      "q": 11483,
+      "witness": 2
+    },
+    "9045253979987": {
+      "kind": "pocklington",
+      "q": 9530891,
+      "witness": 2
+    },
+    "34758076923646507487369779": {
+      "kind": "pocklington",
+      "q": 9045253979987,
+      "witness": 2
+    },
+    "14767": {
+      "kind": "trial"
+    },
+    "12315679": {
+      "kind": "pocklington",
+      "q": 14767,
+      "witness": 2
+    },
+    "12141215091287": {
+      "kind": "pocklington",
+      "q": 12315679,
+      "witness": 2
+    },
+    "32565469481505068162684449": {
+      "kind": "pocklington",
+      "q": 12141215091287,
+      "witness": 2
+    },
+    "8521": {
+      "kind": "trial"
+    },
+    "14247113": {
+      "kind": "pocklington",
+      "q": 8521,
+      "witness": 2
+    },
+    "17484399004313": {
+      "kind": "pocklington",
+      "q": 14247113,
+      "witness": 2
+    },
+    "22013214262982516960445869": {
+      "kind": "pocklington",
+      "q": 17484399004313,
+      "witness": 2
+    },
+    "15227": {
+      "kind": "trial"
+    },
+    "9806189": {
+      "kind": "pocklington",
+      "q": 15227,
+      "witness": 2
+    },
+    "12378528886103": {
+      "kind": "pocklington",
+      "q": 9806189,
+      "witness": 2
+    },
+    "37951694548049208467432603": {
+      "kind": "pocklington",
+      "q": 12378528886103,
+      "witness": 2
+    },
+    "12823": {
+      "kind": "trial"
+    },
+    "15156787": {
+      "kind": "pocklington",
+      "q": 12823,
+      "witness": 2
+    },
+    "16614051442903": {
+      "kind": "pocklington",
+      "q": 15156787,
+      "witness": 2
+    },
+    "20683052556584363282797519": {
+      "kind": "pocklington",
+      "q": 16614051442903,
+      "witness": 2
+    },
+    "11369": {
+      "kind": "trial"
+    },
+    "10436743": {
+      "kind": "pocklington",
+      "q": 11369,
+      "witness": 2
+    },
+    "17416732350971": {
+      "kind": "pocklington",
+      "q": 10436743,
+      "witness": 2
+    },
+    "33381963849790364548034777": {
+      "kind": "pocklington",
+      "q": 17416732350971,
+      "witness": 2
+    },
+    "16381": {
+      "kind": "trial"
+    },
+    "16315477": {
+      "kind": "pocklington",
+      "q": 16381,
+      "witness": 2
+    },
+    "16406908933109": {
+      "kind": "pocklington",
+      "q": 16315477,
+      "witness": 2
+    },
+    "19594860560468830029129887": {
+      "kind": "pocklington",
+      "q": 16406908933109,
+      "witness": 2
+    },
+    "10223": {
+      "kind": "trial"
+    },
+    "10999949": {
+      "kind": "pocklington",
+      "q": 10223,
+      "witness": 2
+    },
+    "9506595923761": {
+      "kind": "pocklington",
+      "q": 10999949,
+      "witness": 2
+    },
+    "35088957287258877461919893": {
+      "kind": "pocklington",
+      "q": 9506595923761,
+      "witness": 2
+    }
+  },
+  "selection_sha256": "5a1279f067303c4276b8b8ca1b4dcf0b7fc84fd5a10988852414d8b62b59b584",
+  "generation_seconds": 0.21512433304451406,
+  "sampling": "certified balanced products conditioned on a large p-1 factor, generated after committed selection"
+}
