@@ -2,7 +2,7 @@
 
 from ..common import utils
 from ..common.arithmetic import gcd
-from .large_primes import CycleTooLongError, graph_reserve, split_two_primes
+from .large_primes import CycleTooLongError, split_two_primes
 from .relations import (
     AtomicRelation,
     _combination_workspace,
@@ -10,6 +10,7 @@ from .relations import (
     combined_storage_reserve,
     verify_atomic,
 )
+from .storage import RelationPublicationError, require_published
 
 COUNTERS = (
     "double_residuals",
@@ -55,7 +56,7 @@ def divide_large_residual(
             if remaining > config.large_product_bound:
                 stats["product_rejections"] += 1
                 return None, None
-            if collector._split_calls >= config.split_call_limit:
+            if collector._split_calls >= config.split_limit:
                 stats["split_quota_rejections"] += 1
                 return None, None
             # A started attempt remains charged even if a later cancellation
@@ -103,6 +104,7 @@ def divide_large_residual(
 
 def admit_large_relation(collector, atom, stats):
     """Plan first, verify exact provenance, then commit a bounded change."""
+    require_published(collector)
     config, graph, budget = (
         collector.config,
         collector._graph,
@@ -121,7 +123,7 @@ def admit_large_relation(collector, atom, stats):
     # old atoms remain live until commit, so do not subtract evictions here.
     if (
         collector._workspace + collector._scratch_bytes + reserve + 4096
-        > config.memory_bytes
+        > config.memory_limit
     ):
         return "memory_limit"
     endpoints = atom.large_primes or (1, atom.residual)
@@ -132,7 +134,7 @@ def admit_large_relation(collector, atom, stats):
     except MemoryError:
         return (
             "atom_limit"
-            if len(collector._atoms) >= config.max_atoms
+            if len(collector._atoms) >= config.atom_limit
             else "memory_limit"
         )
     except CycleTooLongError:
@@ -142,13 +144,15 @@ def admit_large_relation(collector, atom, stats):
         stats["dropped_partials"] += 1
         return None
     accepted = plan.cycle is not None
-    if accepted and len(collector._rows) >= config.max_relations:
+    if accepted and len(collector._rows) >= config.relation_limit:
         return "relation_limit"
-    if len(collector._atoms) + 1 - len(plan.evicted) > config.max_atoms:
+    if len(collector._atoms) + 1 - len(plan.evicted) > config.atom_limit:
         return "atom_limit"
     old_edges = len(graph.edges)
     new_edges = old_edges + int(not accepted) - len(plan.evicted)
-    graph_delta = graph_reserve(new_edges) - graph_reserve(old_edges)
+    graph_delta = collector._graph_reserve(
+        new_edges
+    ) - collector._graph_reserve(old_edges)
     combination, atoms, scratch = None, (), 0
     if accepted:
         atoms = tuple(collector._atoms[i] for i in plan.cycle) + (atom,)
@@ -158,7 +162,7 @@ def admit_large_relation(collector, atom, stats):
         )
         scratch = (
             _combination_workspace(
-                atoms, collector.factor_base, config.memory_bytes
+                atoms, collector.factor_base, config.memory_limit
             )
             - collector.factor_base.workspace_bytes
         )
@@ -168,7 +172,7 @@ def admit_large_relation(collector, atom, stats):
         + reserve
         + scratch
         + max(0, graph_delta)
-        > config.memory_bytes
+        > config.memory_limit
     ):
         return "memory_limit"
     if accepted:
@@ -179,27 +183,38 @@ def admit_large_relation(collector, atom, stats):
             atoms,
             collector.factor_base,
             budget=budget,
-            memory_bytes=config.memory_bytes,
+            memory_bytes=config.memory_limit,
         )
         if combination.divisor is not None:
             raise ArithmeticError("previously checked unit residual changed")
     budget.consume(len(atom.exponents) + len(atoms) + len(plan.evicted) + 1)
     released = sum(collector._atom_bytes[i] for i in plan.evicted)
-    graph.commit(plan)
-    for identity in plan.evicted:
-        del collector._atoms[identity]
-        del collector._atom_bytes[identity]
-    collector._atoms[atom.relation_id] = atom
-    collector._atom_bytes[atom.relation_id] = reserve
-    collector._workspace += reserve - released + graph_delta
-    stats["admitted_atoms"] += 1
-    stats["evictions"] += len(plan.evicted)
-    stats["graph_rebuilds"] += plan.rebuilt is not None
-    if accepted:
-        collector._combined.append(combination.relation)
-        collector._rows.append(combination.relation)
-        stats["matches"] += 1
-        stats["graph_cycles"] += 1
-        stats["dlp_cycles"] += any(a.large_primes for a in atoms)
-        stats["cycle_atoms"] += len(atoms)
+    # Containers allocate during insertion. If the allocator fails midway,
+    # old external checkpoints remain valid, but this live store must never
+    # masquerade as a resumable resource refusal or publish a partial row.
+    collector._publication_failed = True
+    try:
+        graph.commit(plan)
+        for identity in plan.evicted:
+            del collector._atoms[identity]
+            del collector._atom_bytes[identity]
+        collector._atoms[atom.relation_id] = atom
+        collector._atom_bytes[atom.relation_id] = reserve
+        collector._workspace += reserve - released + graph_delta
+        stats["admitted_atoms"] += 1
+        stats["evictions"] += len(plan.evicted)
+        stats["graph_rebuilds"] += plan.rebuilt is not None
+        if accepted:
+            collector._combined.append(combination.relation)
+            collector._rows.append(combination.relation)
+            stats["matches"] += 1
+            stats["graph_cycles"] += 1
+            stats["dlp_cycles"] += any(a.large_primes for a in atoms)
+            stats["cycle_atoms"] += len(atoms)
+    except MemoryError as error:
+        raise RelationPublicationError(
+            "allocation failed during relation publication"
+        ) from error
+    else:
+        collector._publication_failed = False
     return None

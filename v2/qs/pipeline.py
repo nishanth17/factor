@@ -14,6 +14,7 @@ from .extraction import (
 from .linear_algebra import DependencySolver, filter_matrix
 from .polynomial import checked_position
 from .sieve_collector import SieveCollector, SieveConfig
+from .storage import require_published, storage_limit
 
 
 @dataclass(frozen=True)
@@ -87,9 +88,13 @@ class QSJob:
             self.collector._set_plan_interval(lo, hi)
         # Only retained rows are cached. The collector owns the reservation,
         # including while matrix scratch coexists or a polynomial is switched.
-        cache_bytes = min(2 * 2**20, 2048 * self.config.max_relations)
+        cache_bytes = min(
+            2 * 2**20, 2048 * storage_limit(self.config.max_relations)
+        )
         self.collector._preparation_cache = None
-        if self.collector._workspace + cache_bytes < self.config.memory_bytes:
+        if self.collector._workspace + cache_bytes < storage_limit(
+            self.config.memory_bytes
+        ):
             self.collector._preparation_cache = _VerificationCache(cache_bytes)
             self.collector._workspace += cache_bytes
         self.lo, self.hi, self.next_position = lo, hi, lo
@@ -147,9 +152,11 @@ class QSJob:
                     self.collector.factor_base,
                     store,
                     budget=self.budget,
-                    memory_bytes=self.config.memory_bytes,
+                    memory_bytes=storage_limit(self.config.memory_bytes),
                     retained_workspace_bytes=self.collector._workspace,
                     verification_cache=self.collector._preparation_cache,
+                    max_rows=self.config.max_relations,
+                    max_atoms=self.config.max_atoms,
                 ),
             )
             # Collection buffers and preparation scratch coexist. Only
@@ -160,7 +167,9 @@ class QSJob:
                 - prepared.shared_workspace_bytes
             )
             self._workspace_peak = max(self._workspace_peak, live_workspace)
-            remaining = self.config.memory_bytes - live_workspace
+            remaining = (
+                storage_limit(self.config.memory_bytes) - live_workspace
+            )
             matrix = self._timed(
                 "filtering",
                 lambda: filter_matrix(
@@ -168,6 +177,7 @@ class QSJob:
                     weight_two=self.weight_two,
                     budget=self.budget,
                     memory_bytes=max(0, remaining),
+                    max_rows=self.config.max_relations,
                 ),
             )
             self._workspace_peak = max(
@@ -203,6 +213,7 @@ class QSJob:
                 self.prepared,
                 dependencies,
                 budget=self.budget,
+                max_dependencies=self.config.max_relations,
                 tested_cache=(
                     self.collector._preparation_cache
                     if self.tested_dependencies
@@ -248,6 +259,7 @@ class QSJob:
 
     def run(self, *, batch_limit=None):
         """Amortize external polls while retaining the caller's work ledger."""
+        require_published(self.collector)
         original = self.budget
         if not isinstance(original, PollingBudget):
             self.budget = PollingBudget(original)

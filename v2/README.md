@@ -1083,3 +1083,51 @@ configuration identity includes all these bounds, so a changed policy must
 be supplied consistently on restore. There is no new serialized relation
 format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 [bounded evidence and decision](benchmarks/qs/c9/c9_results.md).
+
+### C9 allocator-grown DLP storage
+
+`GrowingDoubleLargeSieveConfig` uses growable PyPy relation containers. Its
+`max_partials`, `max_atoms`, `max_relations`, `memory_bytes` and cumulative
+`split_call_limit` default to `None`. With this collector, standalone
+`SIQSConfig.memory_bytes` and `checkpoint_bytes` also default to `None`.
+There is no implicit FIFO eviction or record-count stop; give integer quotas
+when a caller needs them. `DoubleLargeSieveConfig` retains its legacy finite
+defaults and schema 4, and ordinary SLP retains schema 3.
+
+```python
+from v2.execution.budget import Budget
+from v2.qs import GrowingDoubleLargeSieveConfig, SIQSConfig, SIQSJob
+
+config = SIQSConfig(
+    base_bound=30000, half_width=65536, factor_count=6,
+    collector=GrowingDoubleLargeSieveConfig(
+        residual_bound=3000000, large_prime_bound=3000000,
+        large_product_bound=115200000000,
+    ),
+)
+job = SIQSJob(n, seed=7, config=config,
+              budget=Budget(work_limit=10**13, seconds=360, cpu_seconds=360))
+result = job.run()
+```
+
+This example demonstrates the API, not a calibrated universal parameter set.
+Work/time allowances, exact endpoint certification, finite effort per residual
+and the documented 256-atom cycle policy remain. Collection still uses the
+configured polynomial and stopping schedule. The finite outer portfolio
+resolves an uncapped child's memory to its own remaining allowance, including
+coexisting metadata; it cannot supply uncapped storage. The existing CLI
+continues to select legacy bounded configurations.
+
+Growing jobs use checkpoint schema 5. Checkpoint encoding reserves from the
+actual retained store and retains elapsed wall/CPU cost; restores charge
+verification and replay work and validate original atoms,
+cycles and resource consumption. An explicit checkpoint-byte quota still
+applies. After actual allocator failure during publication, the live object
+raises `v2.qs.storage.RelationPublicationError` and cannot be reused or saved.
+Restore the previous completed checkpoint with charged replay. An OS kill is
+not recoverable without such a checkpoint. A quota refusal before publication
+leaves the checked store resumable. No disk-spill implementation is implied.
+
+See the [source and constraint audit](benchmarks/qs/c9/c9_growth_audit.md) and
+[frozen study](benchmarks/qs/c9/c9_growth_protocol.md). Adaptive storage support
+and measured performance promotion are separate decisions.

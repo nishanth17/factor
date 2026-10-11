@@ -5,7 +5,7 @@ import json
 import math
 import random
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 from . import constants
 from .common import arithmetic, prime_sieve, utils
@@ -240,6 +240,19 @@ class PortfolioConfig:
         if self.siqs is not None:
             if not isinstance(self.siqs, SIQSConfig):
                 raise TypeError("siqs must be a SIQSConfig or None")
+            if self.siqs.memory_bytes is None:
+                # A growing child still shares an explicit parent's allowance.
+                # Resolve once so checked resume serializes the same ownership.
+                object.__setattr__(
+                    self,
+                    "siqs",
+                    replace(
+                        self.siqs,
+                        memory_bytes=self.memory_bytes
+                        - self.workspace_reserve
+                        - 8192,
+                    ),
+                )
             if (
                 self.siqs.memory_bytes + self.workspace_reserve + 8192
                 > self.memory_bytes

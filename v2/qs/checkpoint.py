@@ -14,7 +14,7 @@ from .families import (
     _checksum,
     _identity,
 )
-from .linear_algebra import MAX_MATRIX_ROWS, DependencySolver, filter_matrix
+from .linear_algebra import DependencySolver, filter_matrix
 from .pipeline import QSJob
 from .polynomial import Polynomial, polynomial_roots
 from .relations import (
@@ -25,8 +25,10 @@ from .relations import (
     verify_atomic,
     verify_combined,
 )
+from .storage import require_published
 from .sieve_collector import (
     DoubleLargeSieveConfig,
+    GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
 )
@@ -69,6 +71,7 @@ def _solver_digest(solver, *, encoding="decimal-v1"):
 
 
 def _store(collector):
+    require_published(collector)
     if collector._graph is not None:
         from .large_prime_checkpoint import pack_store
 
@@ -120,13 +123,54 @@ def _store(collector):
     )
 
 
+def _reserve_growing_checkpoint(job):
+    """Reserve uncapped encoding before allocation, including scratch.
+
+    Finite checkpoint quotas already reserve eight coexisting representations
+    in SIQS metadata. With no byte quota, estimate from the actual live store
+    instead; an explicit total-memory cap still applies to the snapshot.
+    """
+    collector = None if job.engine is None else job.engine.collector
+    # Like legacy snapshots, emergency encoding may follow a stopped budget.
+    # Its elapsed wall/CPU time is included in the resources captured at the
+    # end of pack_job; restore separately charges verification/replay work.
+    if job.config.checkpoint_bytes is not None:
+        return
+    encoded_bound = 65536
+    if collector is not None:
+        for atom in collector._atoms.values():
+            encoded_bound += 2048 + 128 * len(atom.exponents)
+            encoded_bound += 8 * (
+                atom.polynomial.a.bit_length()
+                + abs(atom.polynomial.b).bit_length()
+                + abs(atom.position).bit_length()
+            )
+        for row in collector._combined:
+            encoded_bound += 2048 + 128 * (
+                len(row.atom_ids) + len(row.exponents)
+            )
+        live = (
+            collector._workspace
+            + job.config.memory_limit
+            - job.engine.config.memory_limit
+        )
+    else:
+        live = job.config.metadata_reserve
+    if live + 8 * encoded_bound > job.config.memory_limit:
+        raise MemoryError("growing checkpoint encoding exceeds memory_bytes")
+
+
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        4
+        5
+        if isinstance(job.config.collector, GrowingDoubleLargeSieveConfig)
+        else 4
         if isinstance(job.config.collector, DoubleLargeSieveConfig)
         else VERSION
     )
+    if version == 5:
+        _reserve_growing_checkpoint(job)
     engine = job.engine
     store = _store(engine.collector) if engine is not None else None
     progress = None
@@ -201,7 +245,7 @@ def pack_job(job):
     parts, size = [], 0
     for part in encoder.iterencode(payload):
         size += len(part.encode())
-        if size + 1024 > job.config.checkpoint_bytes:
+        if size + 1024 > job.config.checkpoint_limit:
             raise MemoryError("full SIQS checkpoint exceeds checkpoint_bytes")
         parts.append(part)
 
@@ -306,7 +350,7 @@ def _restore_store(payload, collector, budget):
     retained_workspace = (
         collector._workspace + sum(reserves) + combined_reserve
     )
-    if retained_workspace > config.memory_bytes:
+    if retained_workspace > config.memory_limit:
         raise MemoryError("restored SIQS store exceeds memory_bytes")
     polynomials = [
         Polynomial(base.n, base.multiplier, *values)
@@ -365,10 +409,10 @@ def _restore_store(payload, collector, budget):
             arithmetic.backend_for(base.n).integer(correction),
         )
         scratch = (
-            _combination_workspace(selected, base, config.memory_bytes)
+            _combination_workspace(selected, base, config.memory_limit)
             - base.workspace_bytes
         )
-        if retained_workspace + scratch > config.memory_bytes:
+        if retained_workspace + scratch > config.memory_limit:
             raise MemoryError("restored SIQS match scratch exceeds cap")
         collector._scratch_peak_bytes = max(
             collector._scratch_peak_bytes, scratch
@@ -378,7 +422,7 @@ def _restore_store(payload, collector, budget):
             base,
             collector._atoms,
             budget=budget,
-            memory_bytes=config.memory_bytes,
+            memory_bytes=config.memory_limit,
         )
         collector._combined.append(item)
         last = atoms[max(indices)].relation_id
@@ -423,13 +467,23 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         2,
         VERSION,
         4,
+        5,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
     if (
         not isinstance(blob, str)
-        or len(blob) > MAX_BLOB_BYTES
-        or len(blob.encode()) > MAX_BLOB_BYTES
+        or (
+            checkpoint["version"] < 5
+            and (
+                len(blob) > MAX_BLOB_BYTES
+                or len(blob.encode()) > MAX_BLOB_BYTES
+            )
+        )
+        or (
+            config is not None
+            and len(blob.encode()) + 1024 > config.checkpoint_limit
+        )
     ):
         raise ValueError("SIQS checkpoint blob exceeds its cap")
 
@@ -451,7 +505,11 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
 
     values = dict(payload["config"])
     collector_type = (
-        DoubleLargeSieveConfig if payload["version"] == 4 else SieveConfig
+        GrowingDoubleLargeSieveConfig
+        if payload["version"] == 5
+        else DoubleLargeSieveConfig
+        if payload["version"] == 4
+        else SieveConfig
     )
     values["collector"] = collector_type(**values["collector"])
     saved_config = SIQSConfig(**values)
@@ -476,7 +534,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     ):
         raise ValueError("incompatible checkpoint backend")
 
-    if len(blob.encode()) + 1024 > config.checkpoint_bytes:
+    if len(blob.encode()) + 1024 > config.checkpoint_limit:
         raise ValueError("SIQS checkpoint exceeds configured byte cap")
     if budget.work_limit < resources["work_used"]:
         raise ValueError("resume allowance is below consumed work")
@@ -500,7 +558,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         ("epoch", config.growth_steps),
         ("family_index", config.family_count),
         ("stalled", config.polynomial_limit),
-        ("poly_start_rows", MAX_MATRIX_ROWS),
+        ("poly_start_rows", config.collector.relation_limit),
     ):
         value = utils.require_integer(payload[name], name, 0)
         if value > limit:
@@ -611,7 +669,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             job.base,
             job.assignments[job.family_index],
             budget=budget,
-            memory_bytes=config.memory_bytes - config.metadata_reserve,
+            memory_bytes=config.memory_limit - config.metadata_reserve,
         )
         utils.require_integer(gray, "Gray index", 0)
         if gray > min(job.family.count, config.gray_limit):
@@ -652,7 +710,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         from dataclasses import replace
 
         collector_config = replace(
-            config.collector, memory_bytes=config.memory_bytes - extra
+            config.collector, memory_bytes=config.memory_limit - extra
         )
         job.engine = QSJob(
             polynomial,
@@ -721,8 +779,10 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 job.base,
                 engine.collector._atoms,
                 budget=budget,
-                memory_bytes=collector_config.memory_bytes,
+                memory_bytes=collector_config.memory_limit,
                 retained_workspace_bytes=engine.collector._workspace,
+                max_rows=collector_config.max_relations,
+                max_atoms=collector_config.max_atoms,
             )
             live = (
                 engine.collector._workspace
@@ -733,16 +793,16 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 prepared.rows,
                 weight_two=config.weight_two,
                 budget=budget,
-                memory_bytes=max(0, collector_config.memory_bytes - live),
+                memory_bytes=max(0, collector_config.memory_limit - live),
+                max_rows=collector_config.max_relations,
             )
             solver = DependencySolver(matrix, budget=budget)
             actions = utils.require_integer(
                 prefix["actions"], "solver actions", 0
             )
-            if (
-                actions > resources["work_used"]
-                or actions > MAX_MATRIX_ROWS**2 + MAX_MATRIX_ROWS
-            ):
+            if actions > resources["work_used"] or actions > len(
+                matrix.rows
+            ) ** 2 + len(matrix.rows):
                 raise ValueError(
                     "SIQS checkpoint solver prefix exceeds consumed work"
                 )
@@ -789,7 +849,10 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                         "SIQS checkpoint extraction index exceeds kernels"
                     )
                 engine.extractor = DependencyExtractor(
-                    prepared, tuple(solver.dependencies), budget=budget
+                    prepared,
+                    tuple(solver.dependencies),
+                    budget=budget,
+                    max_dependencies=collector_config.max_relations,
                 )
                 # Completed trials are independently replayed and charged.
                 from .extraction import extract_dependency
@@ -821,12 +884,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             "stalled_yield": config.max_stalled > saved_config.max_stalled,
             "trivial_dependency_limit": config.max_trivial
             > saved_config.max_trivial,
-            "relation_limit": config.collector.max_relations
-            > saved_config.collector.max_relations,
-            "atom_limit": config.collector.max_atoms
-            > saved_config.collector.max_atoms,
-            "memory_limit": config.memory_bytes - config.metadata_reserve
-            > saved_config.memory_bytes - saved_config.metadata_reserve,
+            "relation_limit": config.collector.relation_limit
+            > saved_config.collector.relation_limit,
+            "atom_limit": config.collector.atom_limit
+            > saved_config.collector.atom_limit,
+            "memory_limit": config.memory_limit - config.metadata_reserve
+            > saved_config.memory_limit - saved_config.metadata_reserve,
         }
         if reasons.get(job.finished_reason, False):
             job.finished_reason = None

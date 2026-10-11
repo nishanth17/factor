@@ -6,6 +6,7 @@ from heapq import heapify, heappop, heappush
 from ..common import arithmetic, utils
 from ..execution.budget import Budget
 from .factor_base import DEFAULT_MEMORY_BYTES
+from .storage import storage_limit
 
 MAX_MATRIX_ROWS = 65536
 MAX_MATRIX_COLUMNS = 100_001
@@ -44,6 +45,7 @@ def filter_matrix(
     weight_two=False,
     budget=None,
     memory_bytes=DEFAULT_MEMORY_BYTES,
+    max_rows=MAX_MATRIX_ROWS,
 ):
     """Remove singleton constraints and optionally eliminate weight two.
 
@@ -55,7 +57,7 @@ def filter_matrix(
     """
     if not isinstance(rows, tuple):
         raise TypeError("rows must be an immutable tuple")
-    if len(rows) > MAX_MATRIX_ROWS:
+    if len(rows) > storage_limit(max_rows):
         raise ValueError("matrix row cap exceeded")
     for row in rows:
         utils.require_integer(row, "row", 0)

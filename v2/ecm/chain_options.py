@@ -47,7 +47,12 @@ def default_options(config, tiers=None, *, automatic_memory=False):
     available = memory_bytes - config.workspace_reserve - 8192
     fallback = config.siqs or config.sss
     if fallback is not None:
-        available -= fallback.memory_bytes
+        # An allocator-grown child owns the remaining parent allowance.
+        # Do not reserve optional ECM plans from that same space twice.
+        if fallback.memory_bytes is None:
+            available = min(0, available)
+        else:
+            available -= fallback.memory_bytes
     supported = eligible and available >= extra
     return dict(
         memory_bytes=memory_bytes if supported else config.memory_bytes,

@@ -63,7 +63,7 @@ def split_two_primes(residual, bound, budget, *, known_composite=False):
     return pair, "square" if pair[0] == pair[1] else "double", evaluations
 
 
-def graph_reserve(edges):
+def graph_reserve(edges, *, edge_limit=MAX_GRAPH_EDGES):
     """Cover two forests plus traversal/planning scratch, not shared atoms.
 
     A forest has at most 2E vertices, each a <=40-bit label. Maps retain
@@ -71,7 +71,7 @@ def graph_reserve(edges):
     edge reserves simultaneous old/new maps during a staged FIFO rebuild.
     """
     utils.require_integer(edges, "graph edges", 0)
-    if edges > MAX_GRAPH_EDGES:
+    if edge_limit is not None and edges > edge_limit:
         raise MemoryError("large-prime graph edge cap")
     return 32768 + 4096 * edges
 
@@ -110,7 +110,10 @@ class LargePrimeForest:
     cancellation points after its caller's final resource check.
     """
 
-    def __init__(self):
+    def __init__(self, *, edge_limit=MAX_GRAPH_EDGES):
+        if edge_limit is not None:
+            utils.require_integer(edge_limit, "edge_limit", 0)
+        self.edge_limit = edge_limit
         self.edges, self.adjacency = {}, {}
         self.parent, self.depth, self.component, self.sizes = {}, {}, {}, {}
         self.unowned = {}
@@ -153,7 +156,7 @@ class LargePrimeForest:
         """Precompute a union by rerooting only the smaller component."""
         self._vertices(left, right)
         self._identity(identity)
-        if len(self.edges) >= MAX_GRAPH_EDGES:
+        if self.edge_limit is not None and len(self.edges) >= self.edge_limit:
             raise MemoryError("large-prime graph edge cap")
         a, b = self.component.get(left, left), self.component.get(right, right)
         if a == b:
@@ -195,21 +198,22 @@ class LargePrimeForest:
 
     def plan(self, left, right, identity, max_partials, budget):
         self._identity(identity)
-        utils.require_integer(max_partials, "max_partials", 0)
-        if max_partials > MAX_GRAPH_EDGES:
-            raise ValueError("partial cap exceeds graph limit")
+        if max_partials is not None:
+            utils.require_integer(max_partials, "max_partials", 0)
+            if self.edge_limit is not None and max_partials > self.edge_limit:
+                raise ValueError("partial cap exceeds graph limit")
         path = self.path(left, right, budget)
         if path is not None:
             return GraphPlan(cycle=path)
-        if not max_partials:
+        if max_partials == 0:
             return GraphPlan(dropped=True)
-        if len(self.unowned) < max_partials:
+        if max_partials is None or len(self.unowned) < max_partials:
             return GraphPlan(
                 link=self.plan_link(left, right, identity, budget)
             )
         evicted = tuple(islice(self.unowned, max(1, max_partials // 8)))
         removed = set(evicted)
-        rebuilt = LargePrimeForest()
+        rebuilt = LargePrimeForest(edge_limit=self.edge_limit)
         for edge, (a, b) in self.edges.items():
             budget.consume(1)
             if edge in removed:

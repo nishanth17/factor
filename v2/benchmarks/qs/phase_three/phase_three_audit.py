@@ -33,6 +33,7 @@ MODULES = (
     "reference_collector",
     "power_sieve",
     "score",
+    "storage",
     "sieve_collector",
     "linear_algebra",
     "extraction",

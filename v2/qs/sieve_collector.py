@@ -24,6 +24,11 @@ from .relations import (
     verify_atomic,
 )
 from .score import log_bounds
+from .storage import (
+    RelationPublicationError,
+    require_published,
+    storage_limit,
+)
 
 MAX_BLOCK_WIDTH = 4096
 MAX_WINDOW_WIDTH = 1_000_000
@@ -71,11 +76,21 @@ class SieveConfig:
         }
         for name, (minimum, maximum) in limits.items():
             value = getattr(self, name)
+            if getattr(self, "storage_policy", None) == "grow" and name in (
+                "max_partials",
+                "max_atoms",
+                "max_relations",
+            ):
+                storage_limit(value)
+                continue
             utils.require_integer(value, name, minimum)
             if value > maximum:
                 raise ValueError(f"{name} exceeds the collector limit")
 
-        utils.require_integer(self.memory_bytes, "memory_bytes", 0)
+        if getattr(self, "storage_policy", None) == "grow":
+            storage_limit(self.memory_bytes)
+        else:
+            utils.require_integer(self.memory_bytes, "memory_bytes", 0)
         checked_residual_bound(self.residual_bound)
         if self.score_backend not in ("list", "bytearray", "array"):
             raise ValueError("unknown score backend")
@@ -91,6 +106,22 @@ class SieveConfig:
             "fixed",
         ):
             raise ValueError("unknown score policy")
+
+    @property
+    def memory_limit(self):
+        return storage_limit(self.memory_bytes)
+
+    @property
+    def atom_limit(self):
+        return storage_limit(self.max_atoms)
+
+    @property
+    def partial_limit(self):
+        return storage_limit(self.max_partials)
+
+    @property
+    def relation_limit(self):
+        return storage_limit(self.max_relations)
 
 
 @dataclass(frozen=True)
@@ -123,9 +154,38 @@ class DoubleLargeSieveConfig(SieveConfig):
             <= max(self.residual_bound, self.large_product_bound)
         ):
             raise ValueError("candidate bound must preserve SLP coverage")
-        utils.require_integer(self.split_call_limit, "split_call_limit", 0)
-        if self.split_call_limit > 1048576:
-            raise ValueError("split-call limit exceeds the collector cap")
+        if getattr(self, "storage_policy", None) == "grow":
+            storage_limit(self.split_call_limit)
+        else:
+            utils.require_integer(self.split_call_limit, "split_call_limit", 0)
+            if self.split_call_limit > 1048576:
+                raise ValueError("split-call limit exceeds the collector cap")
+
+    @property
+    def split_limit(self):
+        return storage_limit(self.split_call_limit)
+
+
+@dataclass(frozen=True)
+class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
+    """Retain partial history with allocator-grown containers by default.
+
+    None removes a storage or cumulative split-count quota. Integer limits
+    remain explicit opt-ins; work/time and per-residual effort are unchanged.
+    The policy marker distinguishes this execution from legacy capped DLP.
+    """
+
+    storage_policy: str = field(default="grow", kw_only=True)
+    max_partials: int | None = None
+    max_atoms: int | None = None
+    max_relations: int | None = None
+    memory_bytes: int | None = None
+    split_call_limit: int | None = field(default=None, kw_only=True)
+
+    def __post_init__(self):
+        if self.storage_policy != "grow":
+            raise ValueError("unknown growing-storage policy")
+        super().__post_init__()
 
 
 @dataclass(frozen=True)
@@ -182,8 +242,14 @@ class SieveCollector:
             )
             from .large_primes import LargePrimeForest, graph_reserve
 
-            self._graph = LargePrimeForest()
-            self._graph_reserve = graph_reserve
+            if isinstance(self.config, GrowingDoubleLargeSieveConfig):
+                from functools import partial
+
+                self._graph = LargePrimeForest(edge_limit=None)
+                self._graph_reserve = partial(graph_reserve, edge_limit=None)
+            else:
+                self._graph = LargePrimeForest()
+                self._graph_reserve = graph_reserve
             self._divide_double = divide_large_residual
             self._admit_double = admit_large_relation
             self._double_counters = COUNTERS
@@ -219,7 +285,7 @@ class SieveCollector:
             )
             self._workspace += 512 * count
 
-        if self._workspace > self.config.memory_bytes:
+        if self._workspace > self.config.memory_limit:
             raise MemoryError("collector setup exceeds memory_bytes")
         if precomputed_roots is not None:
             verify_polynomial_roots(
@@ -310,7 +376,7 @@ class SieveCollector:
         if type(retain_relations) is not bool:
             raise TypeError("retain_relations must be Boolean")
         extra = 512 * len(self.factor_base.entries) + 32768
-        if self._workspace + extra > self.config.memory_bytes:
+        if self._workspace + extra > self.config.memory_limit:
             raise MemoryError("polynomial switch exceeds memory_bytes")
         verify_polynomial_roots(
             polynomial, self.factor_base, roots, budget=self.budget
@@ -720,7 +786,7 @@ class SieveCollector:
             support += 1
 
         scratch = (hi - lo) * (1024 + 128 * support + 4 * maximum.bit_length())
-        if self._workspace + scratch > self.config.memory_bytes:
+        if self._workspace + scratch > self.config.memory_limit:
             return False
         self._scratch_bytes = scratch
         self._scratch_peak_bytes = max(self._scratch_peak_bytes, scratch)
@@ -889,6 +955,7 @@ class SieveCollector:
         FIFO eviction cannot reach pinned atoms. Refusal leaves store state
         untouched, so the same position can be retried with a new Budget.
         """
+        require_published(self)
         if self._graph is not None and atom.residual_product != 1:
             return self._admit_double(self, atom, stats)
         if atom.relation_id in self._atoms:
@@ -899,7 +966,7 @@ class SieveCollector:
         )
         accepted = atom.residual == 1 or partner is not None
         if accepted and len(self._full) + len(self._combined) >= (
-            self.config.max_relations
+            self.config.relation_limit
         ):
             return "relation_limit"
         evicted = None
@@ -907,13 +974,13 @@ class SieveCollector:
             if self.config.max_partials == 0:
                 stats["dropped_partials"] += 1
                 return None
-            if len(self._pending) >= self.config.max_partials:
+            if len(self._pending) >= self.config.partial_limit:
                 evicted = next(iter(self._pending.values()))
 
         released = self._atom_bytes[evicted] if evicted else 0
         if (
             len(self._atoms) + 1 - int(evicted is not None)
-            > self.config.max_atoms
+            > self.config.atom_limit
         ):
             return "atom_limit"
 
@@ -933,7 +1000,7 @@ class SieveCollector:
                 _combination_workspace(
                     combination_atoms,
                     self.factor_base,
-                    self.config.memory_bytes,
+                    self.config.memory_limit,
                 )
                 - self.factor_base.workspace_bytes
             )
@@ -944,7 +1011,7 @@ class SieveCollector:
             + reserve
             + scratch
             - released
-            > self.config.memory_bytes
+            > self.config.memory_limit
         ):
             return "memory_limit"
 
@@ -957,7 +1024,7 @@ class SieveCollector:
                 combination_atoms,
                 self.factor_base,
                 budget=self.budget,
-                memory_bytes=self.config.memory_bytes,
+                memory_bytes=self.config.memory_limit,
             )
             if combination.divisor is not None:
                 raise ArithmeticError(
@@ -965,26 +1032,37 @@ class SieveCollector:
                 )
 
         self.budget.consume(len(atom.exponents) + 1)
-        if evicted:
-            del self._pending[self._atoms[evicted].residual]
-            del self._atoms[evicted]
-            del self._atom_bytes[evicted]
-            stats["evictions"] += 1
+        # A failed insertion must not expose a partially published smooth
+        # row (or legacy SLP match) as a resumable memory-limit result.
+        self._publication_failed = True
+        try:
+            if evicted:
+                del self._pending[self._atoms[evicted].residual]
+                del self._atoms[evicted]
+                del self._atom_bytes[evicted]
+                stats["evictions"] += 1
 
-        self._atoms[atom.relation_id] = atom
-        self._atom_bytes[atom.relation_id] = reserve
-        self._workspace += reserve - released
-        stats["admitted_atoms"] += 1
-        if atom.residual == 1:
-            self._full.append(atom)
-            self._rows.append(atom)
-        elif partner is not None:
-            del self._pending[atom.residual]
-            self._combined.append(combination.relation)
-            self._rows.append(combination.relation)
-            stats["matches"] += 1
+            self._atoms[atom.relation_id] = atom
+            self._atom_bytes[atom.relation_id] = reserve
+            self._workspace += reserve - released
+            stats["admitted_atoms"] += 1
+            if atom.residual == 1:
+                self._full.append(atom)
+                self._rows.append(atom)
+            elif partner is not None:
+                del self._pending[atom.residual]
+                self._combined.append(combination.relation)
+                self._rows.append(combination.relation)
+                stats["matches"] += 1
+            else:
+                self._pending[atom.residual] = atom.relation_id
+
+        except MemoryError as error:
+            raise RelationPublicationError(
+                "allocation failed during relation publication"
+            ) from error
         else:
-            self._pending[atom.residual] = atom.relation_id
+            self._publication_failed = False
 
         return None
 
@@ -995,6 +1073,7 @@ class SieveCollector:
         scratch may change on refusal; accepted store state never does.
         Eviction and thresholds may lose yield only as documented in config.
         """
+        require_published(self)
         checked_position(lo)
         checked_position(hi)
         if not 0 <= hi - lo <= MAX_WINDOW_WIDTH:

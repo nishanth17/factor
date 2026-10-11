@@ -52,6 +52,7 @@ def load_qs_arm(name, changes=()):
     names.insert(names.index("qs.sieve_collector"), "qs.families")
     names.insert(names.index("qs.sieve_collector"), "qs.power_sieve")
     names.insert(names.index("qs.sieve_collector"), "qs.score")
+    names.insert(names.index("qs.sieve_collector"), "qs.storage")
     names += ["qs.linear_algebra", "qs.extraction", "qs.pipeline"]
     for module_name in names:
         current = module_name in changes or module_name not in sources

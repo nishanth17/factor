@@ -15,6 +15,7 @@ from .relations import (
     verify_atomic,
     verify_combined,
 )
+from .storage import storage_limit
 
 
 @dataclass(frozen=True)
@@ -135,6 +136,8 @@ def prepare_relations(
     budget=None,
     memory_bytes=DEFAULT_MEMORY_BYTES,
     retained_workspace_bytes=0,
+    max_rows=MAX_MATRIX_ROWS,
+    max_atoms=MAX_MATRIX_ROWS,
 ):
     """Verify and deduplicate immutable rows, with full public validation."""
     return _prepare_relations(
@@ -144,6 +147,8 @@ def prepare_relations(
         budget=budget,
         memory_bytes=memory_bytes,
         retained_workspace_bytes=retained_workspace_bytes,
+        max_rows=max_rows,
+        max_atoms=max_atoms,
     )
 
 
@@ -156,6 +161,8 @@ def _prepare_relations(
     memory_bytes=DEFAULT_MEMORY_BYTES,
     retained_workspace_bytes=0,
     verification_cache=None,
+    max_rows=MAX_MATRIX_ROWS,
+    max_atoms=MAX_MATRIX_ROWS,
 ):
     """Verify all inputs before removing exact provenance/payload duplicates.
 
@@ -167,7 +174,9 @@ def _prepare_relations(
     """
     if not isinstance(relations, tuple):
         raise TypeError("relations must be an immutable tuple")
-    if len(relations) > MAX_MATRIX_ROWS or len(atom_store) > MAX_MATRIX_ROWS:
+    if len(relations) > storage_limit(max_rows) or len(
+        atom_store
+    ) > storage_limit(max_atoms):
         raise ValueError("relation/provenance row cap exceeded")
     utils.require_integer(memory_bytes, "memory_bytes", 0)
     utils.require_integer(
@@ -324,12 +333,18 @@ class DependencyExtractor:
     """Try finite dependencies, retaining position after trivial GCDs."""
 
     def __init__(
-        self, prepared, dependencies, *, budget=None, tested_cache=None
+        self,
+        prepared,
+        dependencies,
+        *,
+        budget=None,
+        tested_cache=None,
+        max_dependencies=MAX_MATRIX_ROWS,
     ):
-        """Accept at most 65536 masks; validate each during its trial."""
+        """Honor an optional trial-count limit; validate each mask exactly."""
         if not isinstance(dependencies, tuple):
             raise TypeError("dependencies must be an immutable tuple")
-        if len(dependencies) > MAX_MATRIX_ROWS:
+        if len(dependencies) > storage_limit(max_dependencies):
             raise ValueError("dependency trial cap exceeded")
         self.prepared, self.dependencies = prepared, dependencies
         self.budget = budget if budget is not None else Budget()

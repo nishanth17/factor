@@ -5,11 +5,12 @@ from math import prod
 
 from .linear_algebra import matrix_workspace
 from .polynomial import a_target
+from .storage import storage_limit
 
 
 def preparation_cache_reserve(config):
     """Return the maximum verified-row cache reservation used by QSJob."""
-    return min(2 * 2**20, 2048 * config.collector.max_relations)
+    return min(2 * 2**20, 2048 * config.collector.relation_limit)
 
 
 def validate_extension(previous, proposed):
@@ -28,11 +29,13 @@ def validate_extension(previous, proposed):
     if previous.external_coefficients:
         quotas.add("coefficient_trials")
     for name in quotas:
-        if new[name] < old[name]:
+        if storage_limit(new[name]) < storage_limit(old[name]):
             raise ValueError(f"extension cannot reduce {name}")
         new[name] = old[name]
     for name in ("max_atoms", "max_partials", "max_relations"):
-        if new["collector"][name] < old["collector"][name]:
+        if storage_limit(new["collector"][name]) < storage_limit(
+            old["collector"][name]
+        ):
             raise ValueError(f"extension cannot reduce {name}")
         new["collector"][name] = old["collector"][name]
     if new != old:
@@ -40,10 +43,10 @@ def validate_extension(previous, proposed):
             "extension changes mathematical or execution configuration"
         )
     if (
-        proposed.memory_bytes
+        proposed.memory_limit
         - proposed.metadata_reserve
         - preparation_cache_reserve(proposed)
-        < previous.memory_bytes
+        < previous.memory_limit
         - previous.metadata_reserve
         - preparation_cache_reserve(previous)
     ):
@@ -65,11 +68,15 @@ def capacity_report(base, config):
     enough = len(eligible) >= count
     low = prod(eligible[:count]) if enough else None
     high = prod(eligible[-count:]) if enough else None
-    matrix_bytes = matrix_workspace(
-        config.collector.max_relations, len(base.entries) + 1
+    matrix_bytes = (
+        None
+        if config.collector.max_relations is None
+        else matrix_workspace(
+            config.collector.max_relations, len(base.entries) + 1
+        )
     )
     available = (
-        config.memory_bytes
+        config.memory_limit
         - config.metadata_reserve
         - base.workspace_bytes
         - preparation_cache_reserve(config)
@@ -93,6 +100,8 @@ def capacity_report(base, config):
         metadata_reserve_bytes=config.metadata_reserve,
         preparation_cache_reserve_bytes=preparation_cache_reserve(config),
         base_reserve_bytes=base.workspace_bytes,
-        matrix_alone_fits=matrix_bytes <= available,
+        matrix_alone_fits=None
+        if matrix_bytes is None
+        else matrix_bytes <= available,
         owned_cap_bytes=config.memory_bytes,
     )

@@ -26,7 +26,12 @@ from .polynomial import (
     polynomial_roots,
     qs_polynomial,
 )
-from .sieve_collector import SieveCollector, SieveConfig
+from .sieve_collector import (
+    GrowingDoubleLargeSieveConfig,
+    SieveCollector,
+    SieveConfig,
+)
+from .storage import require_published, storage_limit
 
 
 @dataclass(frozen=True)
@@ -56,8 +61,8 @@ class SIQSConfig:
     batch_width: int = 256
     filter_row_growth: int = 1
     tested_dependencies: bool = False
-    memory_bytes: int = 32 * 1024 * 1024
-    checkpoint_bytes: int = 1024 * 1024
+    memory_bytes: int | None = None
+    checkpoint_bytes: int | None = None
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
             residual_bound=10000,
@@ -68,7 +73,13 @@ class SIQSConfig:
     )
 
     def __post_init__(self):
-        """Bound schedules and reserve checkpoint/registry storage."""
+        """Bound schedules; growing DLP has no implicit storage quota."""
+        growing = isinstance(self.collector, GrowingDoubleLargeSieveConfig)
+        if not growing:
+            if self.memory_bytes is None:
+                object.__setattr__(self, "memory_bytes", 32 * 1024 * 1024)
+            if self.checkpoint_bytes is None:
+                object.__setattr__(self, "checkpoint_bytes", 1024 * 1024)
         if self.backend not in ("python-int", "gmpy2-mpz"):
             raise ValueError("unknown arithmetic backend")
 
@@ -98,6 +109,11 @@ class SIQSConfig:
             "memory_bytes": (4 * 1024 * 1024, 4 * 1024 * 1024 * 1024),
         }
         for name, (low, high) in limits.items():
+            if growing and name in ("memory_bytes", "checkpoint_bytes"):
+                value = getattr(self, name)
+                if value is not None:
+                    utils.require_integer(value, name, low)
+                continue
             value = utils.require_integer(getattr(self, name), name, low)
             if value > high:
                 raise ValueError(f"{name} exceeds the SIQS limit")
@@ -127,10 +143,18 @@ class SIQSConfig:
             raise ValueError("unknown polynomial mode")
         if not isinstance(self.collector, SieveConfig):
             raise TypeError("collector must be a SieveConfig")
-        if self.metadata_reserve + 3 * 1024 * 1024 > self.memory_bytes:
+        if self.metadata_reserve + 3 * 1024 * 1024 > self.memory_limit:
             raise MemoryError(
                 "SIQS metadata/checkpoint reservation exceeds cap"
             )
+
+    @property
+    def memory_limit(self):
+        return storage_limit(self.memory_bytes)
+
+    @property
+    def checkpoint_limit(self):
+        return storage_limit(self.checkpoint_bytes)
 
     @property
     def streaming(self):
@@ -155,7 +179,7 @@ class SIQSConfig:
     def metadata_reserve(self):
         """Registry, assignments and coexistence with checkpoint encoding."""
         registry = 0 if self.streaming else 512 * self.polynomial_limit
-        return 65536 + 8 * self.checkpoint_bytes + registry
+        return 65536 + 8 * (self.checkpoint_bytes or 0) + registry
 
 
 class SIQSJob:
@@ -232,7 +256,7 @@ class SIQSJob:
                     multiplier=self.multiplier,
                     bound=self.config.base_bound,
                     budget=self.budget,
-                    memory_bytes=self.config.memory_bytes
+                    memory_bytes=self.config.memory_limit
                     - self.config.metadata_reserve,
                 ),
             )
@@ -257,7 +281,7 @@ class SIQSJob:
                         seed=self.seed,
                         policy=self.config.assignment_policy,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_bytes
+                        memory_bytes=self.config.memory_limit
                         - self.config.metadata_reserve,
                     ),
                 )
@@ -275,7 +299,7 @@ class SIQSJob:
                         pool_size=self.config.pool_size,
                         seed=(self.seed + self.epoch) % 2**64,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_bytes
+                        memory_bytes=self.config.memory_limit
                         - self.config.metadata_reserve,
                     ),
                 )
@@ -348,7 +372,7 @@ class SIQSJob:
                     self.base,
                     self.assignments[self.family_index],
                     budget=self.budget,
-                    memory_bytes=self.config.memory_bytes
+                    memory_bytes=self.config.memory_limit
                     - self.config.metadata_reserve,
                 )
 
@@ -392,7 +416,7 @@ class SIQSJob:
         )
         config = replace(
             self.config.collector,
-            memory_bytes=self.config.memory_bytes - extra,
+            memory_bytes=self.config.memory_limit - extra,
         )
         if self.engine is None:
             self.engine = QSJob(
@@ -468,6 +492,8 @@ class SIQSJob:
 
     def run(self, *, max_blocks=None):
         """Run or pause at block boundaries; all exhausted results retain n."""
+        if self.engine is not None:
+            require_published(self.engine.collector)
         if max_blocks is not None:
             utils.require_integer(max_blocks, "max_blocks", 0)
         blocks = 0
@@ -568,8 +594,8 @@ class SIQSJob:
                     split_calls=self.engine.collector._split_calls,
                 )
             self.stats["workspace_bytes"] = (
-                self.config.memory_bytes
-                - self.engine.config.memory_bytes
+                self.config.memory_limit
+                - self.engine.config.memory_limit
                 + max(
                     self.engine._workspace_peak,
                     self.engine.collector._workspace,
