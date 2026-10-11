@@ -74,27 +74,33 @@ class PretestBudget:
         self.budget = budget
         self.policy = policy
         self.fallback = fallback
+        self.needs_wall = policy.pretest_seconds is not None
+        self.needs_cpu = policy.pretest_cpu_seconds is not None
 
     def __getattr__(self, name):
         return getattr(self.budget, name)
 
     def consume(self, amount=1):
-        utils.require_integer(amount, "amount", 0)
-        # Real cancellation/deadline exhaustion takes precedence over handoff.
-        # A refused arithmetic action never advances a cursor or draws a seed.
-        self.budget.consume(0)
+        self.budget._consume_reserved(amount, self)
+
+    def check(self, amount, wall, cpu):
+        """Refuse optional work against the base ledger's sampled clocks."""
         policy = self.policy
         if (
             policy.pretest_work is not None
             and amount > policy.pretest_work - self.budget.used
         ):
             raise HandoffRequiredError("pretest_work")
-        for ceiling, used, reason in (
-            (policy.pretest_seconds, self.budget.wall_used, "pretest_wall"),
-            (policy.pretest_cpu_seconds, self.budget.cpu_used, "pretest_cpu"),
+        if (
+            policy.pretest_seconds is not None
+            and wall >= policy.pretest_seconds
         ):
-            if ceiling is not None and used >= ceiling:
-                raise HandoffRequiredError(reason)
+            raise HandoffRequiredError("pretest_wall")
+        if (
+            policy.pretest_cpu_seconds is not None
+            and cpu >= policy.pretest_cpu_seconds
+        ):
+            raise HandoffRequiredError("pretest_cpu")
 
         if self.fallback:
             if (
@@ -104,23 +110,17 @@ class PretestBudget:
                 - policy.fallback_work
             ):
                 raise HandoffRequiredError("reserved_work")
-            for limit, used, reserve, reason in (
-                (
-                    self.budget.seconds,
-                    self.budget.wall_used,
-                    policy.fallback_seconds,
-                    "reserved_wall",
-                ),
-                (
-                    self.budget.cpu_seconds,
-                    self.budget.cpu_used,
-                    policy.fallback_cpu_seconds,
-                    "reserved_cpu",
-                ),
+            if (
+                self.budget.seconds is not None
+                and self.budget.seconds - wall <= policy.fallback_seconds
             ):
-                if limit is not None and limit - used <= reserve:
-                    raise HandoffRequiredError(reason)
-        self.budget.consume(amount)
+                raise HandoffRequiredError("reserved_wall")
+            if (
+                self.budget.cpu_seconds is not None
+                and self.budget.cpu_seconds - cpu
+                <= policy.fallback_cpu_seconds
+            ):
+                raise HandoffRequiredError("reserved_cpu")
 
 
 def fallback_refusal(budget, policy):

@@ -122,3 +122,90 @@ class RoundTwoControlsTests(unittest.TestCase):
         self.assertTrue(row["complete"])
         self.assertIsNone(row["allocation"])
         self.assertTrue(row["instrumented"])
+
+    def test_reserved_charges_match_frozen_policy_boundaries(self):
+        import hashlib
+        import importlib
+        import itertools
+        import json
+        import sys
+
+        from v2.benchmarks.ecm.c3 import c3_study
+        from v2.execution.allocation import ECMAllocation, PretestBudget
+        from v2.execution.budget import Budget
+
+        path = c3_study.INPUTS / "baselines/c3_round2_before_optimization.json"
+        snapshot = json.loads(path.read_text())
+        for name, source in snapshot["source"].items():
+            self.assertEqual(
+                hashlib.sha256(source.encode()).hexdigest(),
+                snapshot["sha256"][name],
+            )
+        package = "_c3_before_reservation_optimization"
+        if package not in sys.modules:
+            sys.meta_path.insert(
+                0, c3_study.SourceFinder(package, snapshot["source"])
+            )
+        old_view = importlib.import_module(
+            package + ".execution.allocation"
+        ).PretestBudget
+        old_budget = importlib.import_module(
+            package + ".execution.budget"
+        ).Budget
+
+        policies = [
+            ECMAllocation("campaign"),
+            ECMAllocation(
+                "campaign",
+                fallback_work=4,
+                fallback_seconds=2,
+                fallback_cpu_seconds=2,
+            ),
+            ECMAllocation(
+                "pretest",
+                pretest_work=8,
+                pretest_seconds=3,
+                pretest_cpu_seconds=3,
+            ),
+        ]
+
+        def outcome(view, budget):
+            outcomes = []
+            for amount in (0, 5, 2, 9, 0):
+                try:
+                    view.consume(amount)
+                    error = None
+                except Exception as refusal:
+                    error = (type(refusal).__name__, str(refusal))
+                outcomes.append((error, budget.used, budget.reason))
+            return outcomes
+
+        with (
+            patch("time.monotonic", return_value=100),
+            patch("time.process_time", return_value=100),
+        ):
+            for policy, prior, clocks, fallback, cancel in itertools.product(
+                policies,
+                (0, 2, 4, 11),
+                (None, 10),
+                (False, True),
+                (False, True),
+            ):
+                options = dict(
+                    work_limit=20,
+                    used=7,
+                    prior_wall=prior,
+                    prior_cpu=prior,
+                    _wall_start=100,
+                    _cpu_start=100,
+                    seconds=clocks,
+                    cpu_seconds=clocks,
+                    cancelled=lambda: cancel,
+                )
+                new, old = Budget(**options), old_budget(**options)
+                self.assertEqual(
+                    outcome(
+                        PretestBudget(new, policy, fallback=fallback), new
+                    ),
+                    outcome(old_view(old, policy, fallback=fallback), old),
+                )

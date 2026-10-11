@@ -20,8 +20,8 @@ from ..phase_three.phase_three_sss import deserialize_config
 
 ROOT = REPOSITORY_ROOT
 PLAN = BENCHMARK_ROOT / "inputs/controls/a7_r5_e1_arms.json"
-CURRENT_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_c3_v5_sources.json"
-PREVIOUS_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_c3_sources.json"
+CURRENT_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_c3_r2_sources.json"
+PREVIOUS_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_c3_v5_sources.json"
 
 
 def load_plan():

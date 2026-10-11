@@ -14,6 +14,13 @@
 
 ## Current development
 
+- Continue C3 after the negative quick8 result with CADO-NFS/Alpertron source
+  and probability/cost research, 57 revealed training subjects and a validated
+  seven-bundle attribution pilot. Reduce duplicate reserved-charge clock
+  checks and reuse the allocation view, preserving the ordinary budget path
+  and shared work ledger. Differential boundaries, 600 tests and lint pass;
+  warmed policy selection and fresh confirmation remain open.
+
 - Add opt-in cumulative ECM pretesting and finite campaign allocation, with
   protected work/wall/CPU admission floors for SIQS/SSS, lazy schedule setup,
   one-way handoff and partial-attempt evidence. Preserve shared child budgets,

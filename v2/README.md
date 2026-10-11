@@ -1089,6 +1089,8 @@ them.
 Memory validation reserves simultaneous relation-engine, context/program and
 output workspace within `memory_bytes`; RSS/JIT is separate from owned memory.
 Clock reservations are cooperative and cannot interrupt one integer operation.
+A reserved charge checks cancellation once and samples each required clock
+once on the shared ledger; callback invocation counts are not an API guarantee.
 
 A reservation is an admission floor, not a completion estimate or an extra
 allowance. The selected fallback must fit the remaining total Budget before

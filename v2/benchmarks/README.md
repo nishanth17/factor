@@ -36,6 +36,17 @@ their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
 
+## C3 continuing optimization
+
+[Additional primary research](ecm/c3/round2_research.md) and
+[diagnostic findings](ecm/c3/round2_findings.md) expand the search beyond quick8.
+A frozen 84-call instrumented pilot validates all outcomes and finds two
+extra-curve hits that avoid SIQS. Matched profiles identify redundant
+reservation checks; their candidate reduction passes 600 tests and lint.
+These are mechanism findings, with no warmed policy promotion yet. The
+broadened training set has 57 revealed subjects; later acceptance needs new
+independent confirmation. Frozen earlier experiments use their source commits.
+
 ## C3 bounded ECM allocation and handoff (10 October 2026)
 
 [Research](ecm/c3/research.md), [protocol](ecm/c3/protocol.md) and

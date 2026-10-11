@@ -1607,6 +1607,13 @@ def factorize_bounded(
 
     reason = "exhausted"
     siqs_runtime = {}
+    optional_budget = (
+        PretestBudget(
+            budget, config.allocation, fallback=bool(config.siqs or config.sss)
+        )
+        if config.allocation is not None
+        else budget
+    )
 
     try:
         budget.consume(0)
@@ -1623,11 +1630,7 @@ def factorize_bounded(
                 job = state["current"].get("job")
                 restore_budget = budget
                 if config.allocation is not None and job is not None:
-                    restore_budget = PretestBudget(
-                        budget,
-                        config.allocation,
-                        fallback=bool(config.siqs or config.sss),
-                    )
+                    restore_budget = optional_budget
                 if job is not None and _chain_job_supported(job, config):
                     # Bounded schedule/coordinate reconstruction was checked by
                     # unpack; a refused continuation must still pay that work.
@@ -1658,11 +1661,7 @@ def factorize_bounded(
             )
             ledger = budget
             if optional and config.allocation is not None:
-                ledger = PretestBudget(
-                    budget,
-                    config.allocation,
-                    fallback=bool(config.siqs or config.sss),
-                )
+                ledger = optional_budget
             try:
                 current = state["current"]
                 if (
