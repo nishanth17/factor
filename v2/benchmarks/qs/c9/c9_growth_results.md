@@ -138,7 +138,10 @@ retains 37,432/36,894 original atoms, exceeding the old 32,768 atom quota.
 Admitted original atoms, graph edges and combined rows are different counts.
 Growth's filtered matrices have 1,522/1,560 rows, compared with 1,237/1,329
 for fixed DLP. Both complete on both inputs, with fewer collection positions
-under growth and more retained memory.
+under growth and more retained memory. On input 0, growth produces 1,234
+large-prime combinations from 78,512,727 positions, versus 674 combinations
+from 186,779,025 positions for fixed DLP. Both reach proper factors; this is
+a useful-yield improvement along the complete trajectory, not just occupancy.
 
 Aligned growth retains 17,615/17,463 original atoms and produces 1,529/1,561
 filtered rows. Its extra admission loss reduces storage/preparation while
@@ -224,7 +227,10 @@ timeout, conservative charge and final verification reserve transfer.
 
 ## Fresh confirmation and acceptance
 
-Pending completion of the preregistered matched samples. Fresh inputs are
+The 30/40-digit bands each completed 18 matched samples, with correct complete
+factors from every arm. Paired signs and repeated-cell drift remained unstable
+after the one permitted extension, so neither band receives a new growth
+speed promotion. The 50-digit comparison is still running. Fresh inputs are
 three independent balanced 50-digit, three balanced 40-digit and one 30-digit
 regression integer, disjoint from versioned corpora. Their certified-prime
 construction conditions p−1 on a large known factor; they are not RSA samples.
@@ -233,6 +239,53 @@ not increase the independent-input count. The 30/40-digit challenger changes
 storage on C1's existing half-base DLP bundle; the 50-digit challenger is the
 selected full-base aligned growth configuration. All arms receive the same
 1-GiB owned memory, 3-GiB RSS, 10¹³ work and per-band 5/30/360-second caps.
+
+## Verification and reproduction
+
+At committed revision `fcc90abe694a1514404457caa4bf7c471b7ebb08`,
+`make -C v2 test` passes **594 tests**, and `make -C v2 lint` passes. A clean
+`git archive` containing only committed files independently passes the same
+594 tests. All **125 benchmark modules** import, and required snapshot,
+A7/B4/C6/C1 and current C9 corpus/control loaders pass. Installed PyPy and
+third-party dependencies are supplied externally; the archive contains no
+working-tree `.venv`, ignored source or generated input dependency. Combined
+final verification costs 198.327 wall / 208.271 CPU seconds, charged against
+the prepaid 750-second QA reservation. The source freeze is unchanged.
+
+Graph tests compare generated cycles with an independent dense incidence
+kernel, including self-loops, parallel edges and disconnected components.
+Arithmetic tests reconstruct original atoms and square corrections. Growth
+and explicit-FIFO cases retain referenced paths across rebuilding and repeated
+restore. Fault cases cover corruption, pre-publication cap/cancellation
+refusal, interrupted multi-container publication, dynamic checkpoint coexistence
+and repeated restore without leaking the transient reservation.
+
+From the repository root, with PyPy implementing Python 3.11 and an explicitly
+coordinated machine lease, reproduce the frozen confirmation with:
+
+```sh
+v2/.venv/bin/python -B -m v2.benchmarks.qs.c9.c9_growth_confirmation confirm \
+  --output "$PWD/v2/benchmarks/results/c9/reproduction" \
+  --digits 30 --lease-seconds 600
+v2/.venv/bin/python -B -m v2.benchmarks.qs.c9.c9_growth_confirmation confirm \
+  --output "$PWD/v2/benchmarks/results/c9/reproduction" \
+  --digits 40 --lease-seconds 1800
+v2/.venv/bin/python -B -m v2.benchmarks.qs.c9.c9_growth_confirmation confirm \
+  --output "$PWD/v2/benchmarks/results/c9/reproduction" \
+  --digits 50 --lease-seconds 3600
+v2/.venv/bin/python -B -m v2.benchmarks.qs.c9.c9_growth_confirmation summarize \
+  --output "$PWD/v2/benchmarks/results/c9/reproduction"
+```
+
+Resume the same output directory after an agreed lease yield; source and
+manifest checks reject retuning or corpus replacement. Each new process
+performs fresh validated warmup. Do not regenerate the now-public corpus or
+call it new confirmation. Use the retained source revisions for historical
+training; the current confirmation loader intentionally requires the corrected
+pre-confirmation freeze. Leases longer than the original default were explicitly
+coordinated with C3; they change neither call limits nor the aggregate study
+allowance. The frozen runner admits individual calls, so a matched group may
+cross a process boundary; process IDs are retained for that limitation.
 
 ## Integration boundaries
 

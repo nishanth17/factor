@@ -338,3 +338,12 @@ The user-directed [C9.2 audit](c9_growth_audit.md) follows the relevant full
 SIQS growth paths and also records their actual limits, including YAFU tiny-QS,
 cycle traceback restrictions and Yamaquasi final-row truncation. It supersedes
 the production fixed-storage assumption without rewriting C9.1 outcomes.
+
+C9.2 also resolves the reusable-SLP follow-up above as an **existing mechanism
+requiring measurement**, rather than a missing graph algorithm: C1's
+`graph_slp` configuration already routes one-prime relations through the DLP
+forest. The ordinary SLP matcher still uses disjoint pairs. The growing
+`graph_slp` arm now has complete training outcomes in the
+[C9.2 report](c9_growth_results.md); extra independent LP combinations alone
+did not select it over aligned DLP growth. This clarification preserves the
+original C9.1 grid and does not relabel its untimed counterfactual as a result.
