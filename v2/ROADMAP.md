@@ -29,8 +29,9 @@ Alpertron reconciliation: 10 October 2026. The
 pins all 307 upstream files, distinguishes active C from historical Java and
 dormant code, and maps AP01–AP40 to existing owners. SLP anchor reuse and compact
 replayable partials are explicit C1a/C9a follow-ups; C3a holds new allocation
-deltas after C3. C10 diagnoses collector policies and A1a owns selected kernel
-deltas; sparse solvers retain their measured A8/B6/B7/C4 gates.
+deltas after C3. The closed C10 audit diagnoses collector policies; C10a gates
+later collection studies and A1a owns selected kernel deltas; sparse solvers
+retain their measured A8/B6/B7/C4 gates.
 The comparison adds no accepted behavior or measured speedup. Wider GMP-ECM,
 YAFU/msieve and CADO comparisons extend the existing pinned research.
 
@@ -326,9 +327,9 @@ implementations complete.
 | ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
 | ~~C9 — P5.4 source-derived large-prime yield and DLP economics~~ | ~~Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs.~~ | ~~C1 and B1; A7 interfaces for any SSS comparison~~ | ~~**[x] C9.2 bounded tranche complete and integrated, 11 October 2026.** Adopt explicit full-base aligned growing DLP for measured balanced 50-digit inputs: 38.10% less complete-call time versus calibrated SLP, 53.08% versus fixed DLP, 9/9 valid completions per arm. Higher memory cost is explicit. Retain defaults/30–40 recommendations and all historical outcomes; broader C10/E1 gates remain open.~~ | ~~Astra / **xhigh**~~ | ~~Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit.~~ |
-| C10 — QS/SIQS collection-strategy audit and continuing size-band calibration | Extend the [source-to-v2 audit](benchmarks/qs_parameter_audit.md) using pinned papers and Alpertron/YAFU/msieve paths. Diagnose AP05–AP09 kernels and route their selected implementation to A1a; jointly assess base/interval/A/family quality, multiplier search, declared score losses, A pools and stopping targets (AP10–AP14). Consume the settled C9 control; optional C9a/C1a changes get separate confirmation. | B1/C1 controls; C9 for residual/DLP specifics; E1/D7 for combined controls | **High, continuing.** Study factor base, interval/blocking, A/family/Gray schedules, multiplier, scoring/powers, candidate recovery and relation targets together where evidence supports interaction. Reference defaults, native thresholds and C1's historical 120-second window are not optimized size policies. Each tranche predeclares duration tiers, total resources and progress/stop rules. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Explain the yield mechanism and normalize units before proposing transfer. Compare useful post-filter dependencies, proper divisors and complete outcomes; preserve exact coverage or label deliberate losses, certainty, provenance and charged resume. |
-| C10a — conditional collection-policy follow-ups | Revisit normalized/mod-8 representation and coupled multiplier ranking, a separately justified A-family diversity/product selector, bounded per-job threshold feedback, coupled size policies and fixed solve cadence only at their [documented triggers](benchmarks/qs/c10/c10a_followups.md). | C10 tranche 1 evidence; coordinate A1a and C9 boundaries | **Open, conditional.** The scoped 2 MiB plan passed fresh 40/50-digit gates; the fixed 16-family quality arm did not advance. Neither result closes broader representation or diversity questions. | Astra / **xhigh** for representation; Sol / **high** for frozen policies | Preserve exact roots, loss accounting, checkpoints, complete factors and finite budgets. A1a owns kernels, C8 CRT scheduling, C9 residual/yield feedback, and matrix/solver owners their structures. |
-| C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) against pinned GMP-ECM, Alpertron and other primary implementations. Route allocation deltas to C3a, classification deltas to A10a, inverse microkernels to A2a and GCD/replay cadence to E5. Record AP34/AP35 native fixed-limb/FFT/NTT dispositions under existing Python/PyPy scope and prior losses; C9a/C10 retain new QS intake/collection ownership. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
+| ~~C10 — QS/SIQS collection-strategy audit and bounded size-band tranche~~ | ~~Trace pinned papers and nine implementation paths through polynomial quality, scoring and useful dependencies; isolate a justified plan and A-quality arm on settled C9 growing-DLP controls, then confirm complete factoring on fresh inputs.~~ | ~~B1/C1 controls and settled C9; A1a/C8/C9a/E1 retain distinct work~~ | ~~**[x] Delivered bounded tranche complete, 11 October 2026.** The 2 MiB power plan passed nine fresh matched complete calls per arm at 40 and 50 digits (21.83%/17.79% lower cost) and is routed automatically for exact native bands at the confirmed 1 GiB allowance. The fixed 16-family A ordering failed promotion; other mechanisms have conditional C10a gates. No additive C1/C9/C10 or combined E1 speed claim.~~ | ~~Astra / **xhigh** for arithmetic; Sol / **high** for frozen policy~~ | ~~Exact source reconciliation, independent oracles, finite controls, proper factors, certainty, provenance and charged resume remain the acceptance boundary.~~ |
+| C10a — conditional collection-policy follow-ups | Revisit normalized/mod-8 representation and coupled multiplier ranking, a separately justified A-family diversity/product selector, bounded per-job threshold feedback, coupled size policies and fixed solve cadence only at their [documented triggers](benchmarks/qs/c10/c10a_followups.md). | Closed C10 tranche evidence; coordinate A1a and C9a boundaries | **Open, conditional.** The accepted plan is now in the scoped automatic selector. The fixed 16-family quality arm did not advance; its loss does not reject wider product-population or diversity selection. A runner marker repair is due only before another measurement. | Astra / **xhigh** for representation; Sol / **high** for frozen policies | Preserve exact roots, loss accounting, checkpoints, complete factors and finite budgets. A1a owns kernels, C8 CRT scheduling, C9a residual/yield feedback, and matrix/solver owners their structures. |
+| C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) against pinned GMP-ECM, Alpertron and other primary implementations. Route allocation deltas to C3a, classification deltas to A10a, inverse microkernels to A2a and GCD/replay cadence to E5. Record AP34/AP35 native fixed-limb/FFT/NTT dispositions under existing Python/PyPy scope and prior losses; C9a/C10a retain new QS intake/collection ownership. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9a/C10a retain remaining QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
 
 #### New source-derived deltas — separate follow-up items
 
@@ -350,8 +351,8 @@ unrelated accepted improvement.
 | ID / roadmap work | Concrete delta | Predecessors | Priority and boundary | Model / effort | Why this model / effort |
 | --- | --- | --- | --- | --- | --- |
 | C3a — source-derived ECM policy follow-up | After C3, reconcile Alpertron/GMP-ECM effort, curve/bound and pretest/campaign policies (AP04) with its final selection. Compare only missing source-supported alternatives, prior-work credit or handoff behavior; retain C3's frozen evidence. | C3 decision; a documented uncovered policy or changed-cost hypothesis | **Conditional follow-up.** Do not expand or repeat C3 while it runs. Existing C3 coverage can resolve candidates without another study; any new selection needs fresh complete-factor evidence. | Sol / **xhigh** | Reuses the settled allocation/state contracts; the new work is bounded policy selection and charged handoff. |
-| C9a — remaining large-prime yield, target feedback and compact storage | Attribute the literature-verification gaps: yield-dependent retry targets, wider recovered-product intake, asymmetric ordered endpoints, shorter cycles/algebraic duplicates and compact replayable partial records. Coordinate scheduling/scoring with C10/C10a and storage/provenance proofs with B7; C1a owns anchor-only SLP. | Completed C9.2 control and transfer audit; measured affected-stage cost or useful-yield loss | **Open; ranked follow-up.** Start with target feedback/pacing attribution, then residual domains and cycle weight. Splitter/batch/disk work remains profile-gated. Freeze each selected tranche and confirm fresh complete factors under matched total resources; preserve C9 acceptance. | Astra / **xhigh** | Exact residual certainty, all-component cycles, original atoms, ownership and charged resume constrain every transfer. Native thresholds and raw yield are not PyPy optima. |
-| A1a — collector-kernel follow-up to completed R2 | Compare selected periodic tiny-prime presieving, precomputed CRT-term Gray shifts, paired-polynomial traversal, bulk candidate masks and density kernels (AP05–AP09). C10 selects the cost/yield hypothesis; C8 retains the separate CRT half-sum scheduler. | Completed A1; C10 diagnosis and a stable chosen C9 control; demonstrated affected-stage cost | **Conditional implementation tranche.** Reuse R2 controls and rejected-arm evidence. Bound tables/scratch; preserve root/score/candidate identities, position charges, cancellation and checked resume. E6 reuses this work rather than duplicating it. | Astra / **xhigh** | Coupled Gray, exceptional-root, packed-score and resumable collector invariants. |
+| C9a — remaining large-prime yield, target feedback and compact storage | Attribute the literature-verification gaps: yield-dependent retry targets, wider recovered-product intake, asymmetric ordered endpoints, shorter cycles/algebraic duplicates and compact replayable partial records. Coordinate scheduling/scoring with C10a and storage/provenance proofs with B7; C1a owns anchor-only SLP. | Completed C9.2 control and transfer audit; measured affected-stage cost or useful-yield loss | **Open; ranked follow-up.** Start with target feedback/pacing attribution, then residual domains and cycle weight. Splitter/batch/disk work remains profile-gated. Freeze each selected tranche and confirm fresh complete factors under matched total resources; preserve C9 acceptance. | Astra / **xhigh** | Exact residual certainty, all-component cycles, original atoms, ownership and charged resume constrain every transfer. Native thresholds and raw yield are not PyPy optima. |
+| A1a — collector-kernel follow-up to completed R2 | Compare selected periodic tiny-prime presieving, precomputed CRT-term Gray shifts, paired-polynomial traversal, bulk candidate masks and density kernels (AP05–AP09). C10a selects a new cost/yield hypothesis; C8 retains the separate CRT half-sum scheduler. | Completed A1; C10 diagnosis and a stable chosen C9 control; demonstrated affected-stage cost | **Conditional implementation tranche.** Reuse R2 controls and rejected-arm evidence. Bound tables/scratch; preserve root/score/candidate identities, position charges, cancellation and checked resume. E6 reuses this work rather than duplicating it. | Astra / **xhigh** | Coupled Gray, exceptional-root, packed-score and resumable collector invariants. |
 | A2a — inverse-microkernel follow-up to completed backend study | Compare batched binary/Montgomery inversion and small-integer quotient shortcuts (AP32/AP33) only for newly profiled inversion-dominant sizes, against native Euclid/GMP including conversions and nonunits. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Low/conditional.** Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. | Sol / **xhigh**; targeted Astra proof review if required | Bounded backend controls already exist; changed inverse/nonunit semantics need independent arithmetic checks. |
 | A7a — SIQS worker-granularity follow-up | Compare historical Alpertron family-sharing/partitioning with existing bounded QS workers (AP37), only after measured setup/coordination cost motivates the alternative. F4 integrates any selected worker result. | Completed A7; B12 contracts; stable serial control and F4 experiment gate | **Conditional.** No generic worker reimplementation or changed A7 closure. Charge shared stores, barriers, aggregate work/RSS, cancellation and restart; Java thread behavior is not PyPy evidence. | Sol / **xhigh** | Assignment identity, leases, private state and cancellation/restart accounting. |
 | A10a — classification follow-up to completed primality transfer | Evaluate MR-residue proper-factor recovery, optional BPSW composite rejection and grouped small-prime remainders (AP25–AP27) only where E3/C11 profiles identify an uncovered benefit. | Completed A10; E3 frozen control or a justified isolated oracle spike; classification-cost evidence | **Conditional.** Preserve deterministic ranges, requested MR rounds, RNG/work identity and certainty. A BPSW pass is not proof; prior primorial losses remain the control. B14 retains certificate ownership. | Sol / **xhigh** | Exact witness/factor recovery and certainty/checkpoint compatibility are the key risks. |
@@ -360,9 +361,9 @@ unrelated accepted improvement.
 
 **Execution order:** the delivered C3 and C9 tranches are integrated. C3a/C9a
 and C1a consume their settled decisions and remain separate follow-ups.
-C10's remaining AP10–AP14 policy work
+C10a's AP10–AP14 policy work
 can proceed on the settled control without requiring those deltas to win.
-A1a implements a justified collector tranche; C10 diagnoses and E6 integrates
+A1a implements a justified collector tranche; C10a diagnoses and E6 integrates
 changed shared contexts. A8/B7/B6/C4/D1/D2 remain cost/capacity-gated matrix work.
 E3 owns AP18–AP24 and coordinates A10a; B14's initial n−1/Pocklington scope is
 unchanged, with AP28 a later coverage candidate. Existing C2 already provides
@@ -1900,110 +1901,76 @@ SLP matching is a residual-intake reference, not a DLP cycle implementation.
 The transfers here and in B7/E6/D1 close no acceptance gate and do not change
 the current B3/A7/C1 scheduling recommendation or existing prerequisites.
 
-#### C10 — Source-derived collection strategies and size-band calibration (open)
+#### C10 — Source-derived collection strategies (closed bounded tranche)
 
-The [C10 mechanism study](benchmarks/qs/c10/research.md) pins nine source
-implementations and the [tranche 1 report](benchmarks/qs/c10/tranche1_results.md)
-records isolated complete-factor results. The existing exact 2 MiB power plan
-passed fresh scoped gates at 40 digits (21.83% lower complete wall cost) and
-50 digits (17.79%), each with nine matched calls on three independent certified
-inputs and wholly favorable hierarchical intervals. The 30-digit control was
-retained; the fixed 16-family exact A-quality arm did not advance from
-training. No global default or combined portfolio acceptance follows.
+The [nine-implementation mechanism study](benchmarks/qs/c10/research.md),
+[candidate reconciliation](benchmarks/qs/c10/candidate_reconciliation.md),
+[frozen protocol](benchmarks/qs/c10/protocol.md) and
+[tranche result](benchmarks/qs/c10/tranche1_results.md) close this delivered
+C10 scope. The existing exact 2 MiB plan passed nine matched fresh complete
+calls per arm on three independent certified balanced products in each band:
+21.83% lower complete cost at 40 digits and 17.79% at 50 digits. The tested
+fixed 16-family A-quality ordering did not advance. That failure does not
+reject wider actual-product population selection or separate family diversity.
+The 30-digit plan did not pass selection. The normalized/mod-8 arithmetic
+oracles do not establish a production representation win.
 
-The [candidate reconciliation](benchmarks/qs/c10/candidate_reconciliation.md)
-distinguishes those tested arms from equivalent, rejected, deferred and
-handed-off mechanisms, with source paths and revisit triggers. Independent
-normalized/mod-8 arithmetic oracles are complete; production representation,
-family diversity, threshold feedback, coupled size policy and fixed solve
-cadence have conditional [C10a gates](benchmarks/qs/c10/c10a_followups.md).
-A1a, C8, C9, matrix/solver owners and E1 retain their existing boundaries.
-This bounded C10 tranche is complete; the continuing C10 workstream is open.
-Scoped automatic selection of the accepted plan has not been implemented;
-[C10a-07](benchmarks/qs/c10/c10a_followups.md) owns that C10 follow-up for
-the exact tested bundle identities. E1 retains only combined portfolio/default
-acceptance, not the C10 collection selector.
+The [subsequent default decision](benchmarks/qs/c10/default_promotion.md)
+routes the accepted 40/50-digit growing-DLP plan through the settled C9
+selector at the confirmed 1 GiB owned allowance. Full PyPy/gmpy2 and
+committed-files-only checks pass; direct default calls on one certified fresh
+input per band return proper factors and reconstruct n. C1's fixed-store
+40-digit DLP result, C9's 50-digit growing-DLP result and C10's incremental
+plan comparisons are separate studies; no additive speedup or combined
+portfolio/SSS acceptance is claimed. Other sizes, backends, memory grants and
+input classes remain outside the measured benefit.
 
-The [first-pass parameter audit](benchmarks/qs_parameter_audit.md) compares
-the current reference defaults, B1/C1 selected bundles and safety ceilings
-with pinned msieve, YAFU, Yamaquasi, FLINT, SymPy and JavaMath choices. It
-flags unit mismatches: base prime *value* versus *count*, half-width versus
-full interval, hash slots versus retained edges, and probable versus proven
-residuals. No first-pass source value is an accepted PyPy optimum.
+- [x] Trace pinned implementation callers, size branches, source licenses and
+  primary papers through multiplier, base/interval, A/Gray quality, scoring,
+  candidate recovery, useful rows and complete factors. Classify equivalent,
+  tested, deferred, rejected and handed-off mechanisms with revisit triggers.
+- [x] Freeze C9 controls, isolated plan/quality hypotheses, finite resources,
+  training selection and disjoint certified confirmation inputs before timing.
+  Preserve cold starts, instrumented profiles, stopped training, failure costs,
+  exact reconstruction, certainty and charged resume.
+- [x] Confirm the plan on nine matched fresh complete calls per 40/50 band;
+  retain the 30-digit control and reject only the tested fixed-batch A ordering.
+- [x] Compose the scoped plan with the settled default route, preserve explicit
+  overrides and numerical checkpoints, verify the live A7 source chain, full
+  tests/lint, complete-factor smoke checks and committed-files-only imports.
 
-- [ ] Use the [Alpertron inventory](benchmarks/alpertron_gap_analysis.md) and
-  pinned YAFU/official msieve paths to rank A1a periodic tiny-prime initialization,
-  paired-polynomial traversal, bulk masks and density-specific marking
-  (AP05/AP07–AP09); A1a owns the selected implementation. Compare existing controls;
-  verify lane independence, saturation/tails, candidate identities, position
-  charges, cancellation and resumed block cursors.
-- [ ] Route bounded precomputed CRT-term Gray shifts to A1a (AP06). Its gate
-  is root-update cost versus table/setup/storage cost; handle centered-B wrap
-  corrections and exceptional primes independently. Keep the larger CRT
-  half-sum scheduler's eligibility gate and existing deferral separate.
-- [ ] Train justified joint collection bundles (AP10–AP14): base count/value,
-  full interval/block width, A quality/pools/spacing/family schedule, wider
-  multiplier search including checked even cases, declared tiny/A-prime score
-  losses, and relation targets/solve cadence. Freeze residual controls with C9;
-  source/oracle work may overlap, but interacting timing selections wait for
-  stable interfaces. Report useful post-filter rank and complete factors.
+#### C10a — Conditional collection-policy questions (open)
 
-- [x] Produce a mechanism comparison from pinned primary papers and actual
-  implementation paths, not only a table of constants. Trace polynomial and
-  multiplier selection, factor-base/interval tradeoffs, A quality and Gray
-  reuse, prime-power/tiny-prime scoring, candidate recovery and refinement,
-  and relation targets through to post-filter dependencies and proper factors.
-  Publish a concise explanation with concrete examples of why each technique
-  can improve yield or total cost, the input/resource regime it targets,
-  its deliberate losses and certainty assumptions,
-  and where v2 already implements an equivalent. Identify missing algorithms
-  separately from uncalibrated settings; propose bounded implementation work
-  when justified, with licensing and independent correctness requirements.
-  Route matrix/provenance redesign to A8/B6/B7/C4 and higher-arity relations
-  to F6 under their existing gates rather than silently expanding this tranche.
-- [ ] Maintain a versioned parameter ledger for every performance-bearing
-  QS/MPQS/SIQS default, hard cap and size policy. Record source revision,
-  license, units, input-size/hardware context, v2 counterpart, proof or
-  representation role, local measurements and decision. Refresh it when an
-  upstream source, arithmetic backend, collector, solver or feasible input
-  band changes. Do not silently reuse an earlier optimum outside its band.
-- [ ] Rank experiments from observed stage cost and useful-yield losses.
-  Include factor-base size, interval/block width, A-factor/pool/family/Gray
-  schedule, multiplier candidates, scoring/threshold/tiny-prime policy,
-  SLP/DLP bounds and splitting, partial/atom/row capacities, relation target,
-  filter/solve cadence, owned memory and checkpoint cost. C9 owns residual
-  admission, splitting, matching/cycles and DLP retention economics; coordinate
-  interacting collection choices in one experiment. E1 combines selected
-  SIQS/SSS/worker arms; C3/G1 own portfolio allocation and handoff.
-  Avoid duplicate ownership.
-- [ ] Run one finite, prespecified training-and-fresh-confirmation tranche
-  per newly feasible size/workload class. Normalize units and compare a few
-  source-grounded bundles under matched total work, wall/CPU and memory,
-  including setup, collection, splitting/certification, graph, filtering,
-  matrix, extraction and charged resume. Use versioned controls/corpora,
-  PyPy 3.11, validated warmup, nine or more samples and the performance lock.
-  Apply the revised complete-factor promotion policy; retain failures and
-  unresolved cofactors. C1's 120-second window is a historical observation,
-  not a feasibility ceiling for later bands. Predeclare short/medium/long
-  cumulative observation points, advancement criteria and a finite overall
-  experiment allowance; choose actual durations from source context and
-  training progress. Measure useful-yield trajectories and distinguish delayed
-  graph/matrix formation from stalled collection. A short prefix with zero
-  useful rows alone does not terminate the band. Stop at the declared total
-  cap or prespecified resource/progress failure; report unresolved feasibility
-  as inconclusive where appropriate. Longer runs receive matched control
-  allowances and charged continuation; they do not establish a speedup merely
-  by completing more search. Publish the limiting stage and revisit trigger.
-- [ ] On each accepted or rejected tranche, update the ledger and affected
-  size-band recommendation with the chosen bundle, uncertainty, completion,
-  resource and correctness evidence. Leave this continuing item open after a
-  bounded tranche closes; a single 30/40-digit result cannot settle 50–100
-  digits or a changed backend. Safety/proof caps require separate invariants
-  and independent oracles before any relaxation.
+The [C10a ledger](benchmarks/qs/c10/c10a_followups.md) holds distinct mechanisms,
+not prerequisites for the closed C10 tranche. Start one bounded experiment
+only when its stated stage-cost, useful-yield or exact-loss trigger is met.
+Freeze a new source identity, controls, finite work/time/storage, independent
+inputs and complete-factor acceptance before measuring. Preserve the C10
+negative arm and all historical pins.
+
+- [ ] Revisit discriminant-normalized/mod-8 polynomials with multiplier and
+  exceptional-root proof only if an exact-value/root cost case supports it.
+- [ ] Separately test a wider actual-A-product population and inter-family
+  diversity only if product error or overlap predicts useful post-filter work.
+- [ ] Test bounded per-job threshold feedback only after recovery cost or an
+  exact rejected-position audit supports a declared loss budget.
+- [ ] Consider coupled multiplier/base/interval/A-size policies only after a
+  measured complete-cost gap; compare actual base endpoints and even-k cases.
+- [ ] Compare fixed relation excess and retry cadence after the measured
+  repeated filter/solve cost, using dependencies and proper factors rather
+  than relation counts. C9a owns yield-dependent target feedback.
+- [ ] Repair repeated-lease yield markers only before another C10a measurement.
+
+A1a owns AP05–AP09 collector kernels and bounded CRT-term Gray shifts; C8
+retains the larger CRT half-sum scheduler. C9a/C1a own residual/yield/graph
+policy; A8/B6/B7/C4/D1/D2 own matrix and solver structures, F6 higher-arity
+relations, and E1 combined SIQS/SSS/worker acceptance. Continue the
+[QS parameter ledger](benchmarks/qs_parameter_audit.md) when a new band or
+backend is actually studied; no native constant is an accepted PyPy optimum.
 
 #### A1a — Selected collector-kernel delta (after completed A1)
 
-- [ ] Freeze one C10-justified AP05–AP09 tranche against the accepted R2 and
+- [ ] Freeze one C10a-justified AP05–AP09 tranche against the accepted R2 and
   settled C9 controls. Preserve existing negative tiny-prime/batching/cache
   decisions; state the changed mechanism/workload rather than reopening A1.
 - [ ] Independently verify periodic residues, centered-B Gray shifts and
@@ -3078,7 +3045,7 @@ thresholds or memory capacities.
   attribution pilots; neither graph growth nor tuning constants is mandatory
   if another transferable yield mechanism has stronger evidence. Separate
   retention, endpoint/product and candidate bounds, splitting effort and
-  collection duration before testing justified joint bundles with C10's
+  collection duration before testing justified joint bundles with C10a's
   base/threshold/polynomial choices. The 8,192/16,384/32,768-edge and
   256/512 MiB options are initial retention hypotheses, not the complete grid
   or required settings. Bound inputs, seeds, samples, wall/CPU/work, retained
@@ -3131,14 +3098,14 @@ historical censored outcomes, scoped 50-digit benefit and retained defaults.
 - [ ] Attribute yield-dependent collection/retry targets against downstream
   cost. The accepted growth cohort made 5,402 solver calls across nine complete
   factorizations; this motivates investigation without establishing avoidable
-  work. C9a owns target feedback and useful-yield economics; C10/C10a owns
+  work. C9a owns target feedback and useful-yield economics; C10a owns
   filtering/solve scheduling. Coordinate the interface, preserve true final
   and storage-cap extraction, and charge every unsuccessful attempt/continuation.
 - [ ] Evaluate wider recovered-product admission separately from asymmetric
   ordered endpoint bounds. The first is an uncalibrated use of v2's existing
   candidate/admission separation; the second needs an explicit smaller-endpoint
   policy. Sample rejected positions/norms and late prefixes as well as survivors.
-  C9a owns exact residual admission and certainty; C10 owns sieve scoring and
+  C9a owns exact residual admission and certainty; C10a owns sieve scoring and
   recovery. Any shared-domain change requires an explicit joint freeze and
   execution/checkpoint identity where semantics change.
 - [ ] Quantify cycle/provenance weight and algebraically equivalent rows before
@@ -3165,7 +3132,7 @@ historical censored outcomes, scoped 50-digit benefit and retained defaults.
   retain the five-percentage-point class completion-regression ceiling.
 - [ ] Record scoped adopt/retain/defer decisions and justified negative results;
   update API documentation, parameter ledger, benchmark summary and changelog
-  for accepted changes. Do not reopen C9's frozen verdict or close C10's broader
+  for accepted changes. Do not reopen C9's frozen verdict or close C10a's broader
   collector calibration, E1 combined acceptance or matrix/higher-arity gates.
 
 #### C1a — Cheaper SLP anchor delta (after C9)
@@ -3822,7 +3789,7 @@ complete result. Do not postpone CLI access until this calibration finishes.
 
 ### P8.6 — Revisit context setup and schedules only for changed workloads
 
-- [ ] Reuse A1a's C10-selected periodic-presieve, paired-polynomial, bulk-mask and
+- [ ] Reuse A1a's C10a-selected periodic-presieve, paired-polynomial, bulk-mask and
   density-kernel experiments (AP05/AP07–AP09), rather than tuning them again.
   Keep A1a Gray-shift tables under their own setup/root-cost gate. E6 owns shared
   buffers/context integration when workloads change; acceptance includes initialization,
@@ -3881,7 +3848,7 @@ complete result. Do not postpone CLI access until this calibration finishes.
   finite policy, scoped measurement, uncalibrated heuristic or dormant field.
   Include preprocessing/primality, rho, p−1, ECM, prime schedules, SSS-specific
   search and shared execution/portfolio reservations. Keep QS/MPQS/SIQS and DLP
-  with C10/C9; reference their ledger rather than duplicate their experiments.
+  with C10a/C9a; reference their ledger rather than duplicate their experiments.
 - [ ] For each tunable choice, record current symbol/value, units, call sites,
   source revision/license and model assumptions. Compare actual size/reuse
   policies, not isolated native numbers. Explain candidate values and deferrals;

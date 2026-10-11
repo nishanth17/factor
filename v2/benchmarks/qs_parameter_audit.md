@@ -1,7 +1,9 @@
 # QS/SIQS parameter audit — 10 October 2026
 
-This is a source-to-current-control inventory for the continuing C10 roadmap
-work, not a new parameter selection or performance result. Read it with the
+This began as a source-to-current-control inventory for C10, not a parameter
+selection or performance result by itself. The [closed C10 tranche](qs/c10/tranche1_results.md)
+and [scoped default decision](qs/c10/default_promotion.md) now supply the
+measured selection; C10a holds conditional new experiments. Read it with the
 [B1 calibrated controls](README.md#b1-joint-qsmpqssiqs-calibration--9-october-2026),
 [C1 DLP research](qs/c1/c1_research.md), [C1 complete-run report](qs/c1/c1_implementation_results.md)
 and [C9 mechanism research](qs/c9/c9_research.md).
@@ -16,9 +18,14 @@ explicitly uses another definition. v2 `base_bound` is an exclusive prime
 full `2M` positions. Hash slots, retained partials, owned atoms, cycle rows,
 and matrix rows are different resources. Normalize these before any sweep.
 
-## Current choices and source differences
+## Pre-C10 reference choices and source differences
 
-| Parameter family | v2 current choice and evidence status | Inspected external choice or contrast | Experiment implication |
+The table is the 10 October reference-control snapshot. Its statements that
+there is no automatic QS/DLP selector, and its 32 MiB reference memory, are
+historical for the exact 40/50-digit native bands after the C9/C10 default
+decisions below. `SIQSConfig()` still denotes that unchanged reference object.
+
+| Parameter family | v2 reference choice and evidence status | Inspected external choice or contrast | Experiment implication |
 | --- | --- | --- | --- |
 | Input-size selection | [`SIQSConfig`](../qs/siqs.py) defaults to base bound 1,000 and half-width 512; there is no automatic QS/DLP digit selector. B1 validated explicit balanced 30/40-digit bundles; C1 validated one explicit 40-digit DLP bundle. | [msieve 1.53 `mpqs.c`][msieve-release] interpolates a bit-size table; [Yamaquasi `siqs.rs`][yamaquasi-siqs] enables DLP by default above 256 bits, while msieve's `sieve.c` enables it from 282 bits. YAFU's current, unpinned [official configuration][yafu-config] lists SIQS overrides and a QS/NFS crossover option. | Treat external crossover points as candidate strata, including larger feasible inputs. Train complete-cost policies using only observable input/work metadata; preserve SLP and unresolved runs. |
 | Factor base | v2 `base_bound=1,000` by default, with a 1,000,000 value cap; B1 uses 3,000/10,000 on selected balanced 30/40-digit controls. This is not a size-derived runtime default. | [msieve 1.53 `mpqs.c`][msieve-release] has `fb_size=3,000` at 200 bits, 55,000 at 283 bits and interpolates between entries. [Yamaquasi `siqs.rs`][yamaquasi-siqs] halves its chosen base *count* when DLP is active. [FLINT QS docs][flint-docs] expose factor-base count and restart with a larger base when necessary. | Compare actual prime counts and largest prime after construction, not the unlike numerical units. Pair base changes with interval, residual and relation targets; charge setup and matrix width. |
@@ -33,6 +40,22 @@ and matrix rows are different resources. Normalize these before any sweep.
 | Recovery and stopping | v2 has `growth_steps=0` (so default `max_half_width=8,192` is dormant), `max_stalled=16` no-row windows and `max_trivial=128` trivial dependencies; selected B1/C1 bounds differ. These are finite stop/recovery policies, not estimated yield optima. | [Yamaquasi `siqs.rs`][yamaquasi-siqs] scales its planned A count by input bits; [FLINT QS docs][flint-docs] describe restarting with a larger base when relations are insufficient. Neither maps directly to v2's resumable work ledger. | Diagnose stalled windows versus low-quality dependencies before changing growth or stop rules. Charge repeated setup/old work and preserve resumable exhaustion semantics. |
 | Capacity, resume and score safety | v2 has hard caps including 4,096 input bits, 1e12 proven residual endpoints, 1M factor-base prime bound, 1M-position collection windows, 4,096 sieve block width, 64 Hensel lift roots, 256 atoms/cycle, 65,536 graph/matrix rows, and serialized checkpoint allowances. The SIQS default is 32 MiB owned memory and a 1 MiB checkpoint; selected B1/C1 use 256 MiB. These protect exactness, bounded work or restoration; they are not claims of economic optimality. | Native growable lists, 32-bit/64-bit cofactor limits, GPU SLP witness-table slots and v2 owned-memory reservations do not measure the same object. The current, **not yet pinned** [CUDA-MPQS guide][cuda-guide] lists a 1,048,576-slot GPU SLP witness table; it does not implement a DLP graph. | Audit every cap by role: proof, representation, or policy. Change proof/storage limits only with independent correctness, peak simultaneous-memory, cancellation and charged-resume evidence. Measure process RSS separately from owned reservations. |
 
+## Selected 11 October 40/50-digit native defaults
+
+`default_siqs_config(n)` now selects exact 40- and 50-decimal-digit
+Python-integer growing-DLP bundles at an omitted 1 GiB owned allowance.
+Both use half-width 65,536, 4,096-position blocks, flyer A assignment,
+`powers` scores and the accepted 2 MiB power plan. The 40-digit bundle uses
+base-bound **value** 5,000, five A factors, endpoint bound 500,000 and DLP
+product bound 3,200,000,000; the 50-digit bundle uses value 30,000, six A
+factors, endpoint bound 3,000,000 and product bound 115,200,000,000. These
+are not factor-base *counts*. The 40-digit SLP ceiling is 25,000,000; at 50
+digits it is 3,000,000. Explicit caller quotas and numerical checkpoints win.
+Other bands/backends retain the reference policy. The
+[C10 default decision](qs/c10/default_promotion.md) gives the separate
+C1/C9/C10 evidence and limitations; no native threshold is transplanted as a
+PyPy optimum. Future changes enter C10a with a new frozen comparison.
+
 The [prior source/license review](qs/qs_gnfs_research.md#external-implementations-and-licenses)
 records inspected YAFU/msieve public-domain notices, Yamaquasi/SymPy BSD-3,
 FLINT QS LGPL-3-or-later and JavaMath GPL-3-or-later. Dependencies have their
@@ -45,17 +68,18 @@ prediction.
 
 ## Mechanisms and useful-yield research queue
 
-The first table is an inventory. C9/C10 must add an explanatory mechanism
-comparison using pinned primary papers and actual implementation paths.
+The first table is an inventory. The completed C9/C10 studies add explanatory
+mechanism comparisons using pinned papers and actual implementation paths.
 For each technique, explain its arithmetic or statistical rationale,
 applicable size/resource regime, interactions, deliberate losses and certainty
 assumptions. Map it to an existing v2 equivalent, a missing bounded algorithm,
 a configuration experiment or a justified deferral. Follow callers and
 size-dependent branches to establish the whole policy.
 
-C10 covers polynomial/multiplier quality, factor-base/interval tradeoffs,
-A selection and Gray reuse, sieve/prime-power scoring, candidate recovery and
-refinement, and collection targets. C9 follows accepted/rejected residuals
+C10's closed tranche covers polynomial/multiplier quality, factor-base and
+interval tradeoffs, A selection and Gray reuse, sieve/prime-power scoring,
+candidate recovery/refinement and collection targets. C10a retains conditional
+transfers. C9 follows accepted/rejected residuals
 through SLP/DLP admission, splitting, matching, graph components/cycles,
 retention and filtering into useful dependencies. Coordinate their interacting
 choices in one study. Research can identify further algorithmic gaps, but
@@ -103,7 +127,7 @@ training inputs inside 240 seconds; 16K retention alone refused the common
 256-MiB reservation. Fixed-prefix replay identifies competition from rare
 high-endpoint SLP matches, while preserving and measuring the combinations
 that alignment deliberately loses. Fresh confirmation, not these diagnostics,
-determines any new promoted scope. C10 retains the broader collection study.
+determines any new promoted scope. C10a retains broader conditional collection work.
 
 The caller audit also distinguishes SLP's disjoint-pair matching from DLP's
 reusable pinned paths: retained SLP atoms can span more LP combinations than
@@ -146,10 +170,10 @@ dimension. The 1,200-second comparison allowance is not a production ceiling.
 
 Legacy classes, controls, checkpoints and historical verdicts remain unchanged.
 No new 30/40-digit growth benefit is promoted. Broader scoring/polynomial/base
-calibration remains C10; combined portfolio acceptance remains E1; higher arity
+calibration remains C10a; combined portfolio acceptance remains E1; higher arity
 remains F6.
 
-## Continuing experiment ledger (C10)
+## Continuing experiment ledger (C10a)
 
 The first audit identifies the gaps; it does **not** choose larger defaults.
 For each new feasible input band, arithmetic backend, collector or solver change:
@@ -181,8 +205,9 @@ For each new feasible input band, arithmetic backend, collector or solver change
    failure. Record the limiting stage, any undecided feasibility and the next
    concrete trigger; a short empty prefix alone does not settle the band.
 
-The item stays open as a maintained decision ledger. A completed experiment
-closes only its named size/workload tranche, not the whole parameter space.
+The conditional C10a item stays open as a maintained decision ledger. The
+delivered C10 tranche is closed; a completed experiment never settles every
+size/workload class or arithmetic backend.
 
 [msieve-release]: https://sourceforge.net/projects/msieve/files/msieve/Msieve%20v1.53/msieve153_src.tar.gz/download
 [yamaquasi-siqs]: https://github.com/remyoudompheng/yamaquasi/blob/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/siqs.rs

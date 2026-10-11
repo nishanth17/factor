@@ -81,3 +81,32 @@ factor gate. This final validation note and the roadmap checkbox are
 documentation-only changes after that committed-checkout run; runtime,
 benchmark Python, controls and corpora remain byte-identical. No merge or push
 was performed.
+
+## Subsequent C9/C10 default integration verification
+
+The later user-directed integration commits the scoped selector and new live
+A7 manifest at `9935b3c`, on top of mainline C9 default routing `7f1c38f`.
+It does not modify C10's frozen controls, corpus, timing runner or original
+result. The selected production configurations exactly match both frozen C10
+`plan` records; setting only `power_plan_bytes` back to zero recovers their
+`control` records. C9's frozen 50-digit challenger is likewise unchanged
+except for C10's plan allowance. The live A7 manifest chains to C9's manifest
+and validates 25 current source hashes; the historical C10 timing loader
+correctly refuses this changed production runtime.
+
+The working-tree `make -C v2 test` passed 718 system-PyPy tests with nine
+optional backend skips; `make -C v2 lint` passed. A `git archive HEAD` checkout
+of `9935b3c`, with only the external project PyPy environment linked, passed
+**721 PyPy 3.11/gmpy2 tests without failures or skips**, full lint and imports
+of all 144 live benchmark modules plus the A7 loader. A first sandboxed
+committed-only run had one environmental `ps` permission error in the existing
+C1 quiet-process harness; rerunning with process-list access passed. That
+error was not a factoring failure. One certified fresh 40-digit and one
+50-digit input also completed through omitted-config `SIQSJob` defaults with
+proper divisors and exact reconstruction. Their single-call elapsed times are
+functional smoke data, not a new timing comparison.
+
+This receipt closes the delivered bounded C10 tranche after its original
+nine-sample fresh gates and the subsequent default-route checks. The distinct
+mechanisms and their revisit triggers remain under C10a or existing owners;
+there is no claim that every implementation or size policy is adapted.

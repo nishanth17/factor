@@ -34,7 +34,7 @@ results, rejected experiments, commands and limitations.
 
 The [cross-engine parameter audit](parameter_audit.md) reconciles constant
 provenance and missing tuning evidence under roadmap C11. QS/SIQS and DLP keep
-their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
+their [existing parameter audit](qs_parameter_audit.md) and C10a/C9a follow-up ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
 
@@ -62,14 +62,15 @@ the C9 control and its default-promotion report remain historical evidence.
 
 The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
 compatibility and preserved study freezes. Remaining literature transfers are
-phased into roadmap C9a; E1 and C10 remain separate.
+phased into roadmap C9a; E1 and C10a remain separate.
 
 C9.2's [adaptive-storage acceptance](qs/c9/c9_growth_results.md) confirms an
 explicit balanced 50-digit bundle: 38.10% less complete-call time than calibrated
 SLP and 53.08% less than fixed DLP, with 9/9 valid completions in all arms.
 Peak owned reservation rises to 326 MiB (SLP 167, fixed DLP 198). Three
 independent inputs and three seeds per input support this narrow scope;
-30/40 recommendations, C10 calibration and E1 combined acceptance stay separate.
+30/40 historical recommendations, C10a calibration and E1 combined acceptance
+stay separate from the C9 result.
 
 ## C3 continuing optimization
 
