@@ -20,6 +20,12 @@
   checks and reuse the allocation view, preserving the ordinary budget path
   and shared work ledger. Differential boundaries, 600 tests and lint pass;
   warmed policy selection and fresh confirmation remain open.
+- Complete the frozen 2,052-call instrumented stopping calibration and commit
+  the fitted compact64/wide64 table before comparison. Add complete matched
+  group reservations, warm both size bands and SIQS paths, retain interrupted
+  grants and preserve the existing comparison cap and decision gates.
+  Prepare independently checked prime certificates for possible later fresh
+  confirmation; no new policy or performance acceptance is claimed.
 
 - Add opt-in cumulative ECM pretesting and finite campaign allocation, with
   protected work/wall/CPU admission floors for SIQS/SSS, lazy schedule setup,

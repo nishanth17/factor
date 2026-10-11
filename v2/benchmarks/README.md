@@ -43,9 +43,22 @@ from uncalibrated defaults; adding an audit does not change production settings.
 A frozen 84-call instrumented pilot validates all outcomes and finds two
 extra-curve hits that avoid SIQS. Matched profiles identify redundant
 reservation checks; their candidate reduction passes 600 tests and lint.
-These are mechanism findings, with no warmed policy promotion yet. The
-broadened training set has 57 revealed subjects; later acceptance needs new
-independent confirmation. Frozen earlier experiments use their source commits.
+The [offline stopping fit](ecm/c3/round2_fitted.md) subsequently completes all
+2,052 validated instrumented calibration calls in 2,893.780 active seconds.
+It selects 64 curves at 2000/50000 for 30 digits and 64 at 2000/147396 for
+40 digits, with nineteen independent root-ECM entrants per band. The table
+and every calibration-capture hash are committed before comparison. These
+are training projections; no warmed policy promotion follows from the fit.
+
+The [complete-call procedure](ecm/c3/round2_comparison_protocol.md) retains
+all 57 revealed subjects, nine seeds, three arms and the 3,600-second cap.
+It warms both size bands and both SIQS implementations and reserves a whole
+matched three-arm group before admission, addressing observed session CPU
+variation. A positive paired result against both controls is required before
+new independent confirmation. See [model limits](ecm/c3/round2_model_limits.md)
+and the [prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
+No round-two fresh inputs exist. Frozen earlier experiments use their source
+commits; historical manifests are not repinned to newer production sources.
 
 ## C3 bounded ECM allocation and handoff (10 October 2026)
 
