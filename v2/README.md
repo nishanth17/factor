@@ -1121,8 +1121,10 @@ adapters reject the growing class; use `SIQSJob` or `SieveCollector` for this
 policy until those adapters have their own ownership and resume integration.
 
 Growing jobs use checkpoint schema 5. Checkpoint encoding reserves from the
-actual retained store and retains elapsed wall/CPU cost; restores charge
-verification and replay work and validate original atoms,
+actual retained store plus any live preparation/solver state, and retains
+elapsed wall/CPU cost. Restore reserves decoded-input coexistence before
+rebuilding, then releases that transient reservation without changing the
+public storage policy. Restores charge verification/replay work and validate original atoms,
 cycles and resource consumption. An explicit checkpoint-byte quota still
 applies. After actual allocator failure during publication, the live object
 raises `v2.qs.storage.RelationPublicationError` and cannot be reused or saved.

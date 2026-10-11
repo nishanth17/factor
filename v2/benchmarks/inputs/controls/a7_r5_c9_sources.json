@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "base_control_sha256": "9ec74ab79c1b1dd5a979370a96bfbac517113ee483c47ce3d3656b1027e33d72",
-  "status": "C9 allocator-grown integration pins for current prepared A7 arms; not historical timing, fresh E1 confirmation, or a new calibrated selection.",
+  "status": "C9 allocator-grown integration pins for current prepared A7 arms; not historical timing, fresh E1 confirmation, or a new calibrated selection. Includes the pre-confirmation uncapped checkpoint live-workspace repair.",
   "source_sha256": {
     "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
     "v2/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
@@ -28,7 +28,7 @@
     "v2/qs/__init__.py": "dc152d0416c043b4ac048913467d314327f50e751b01b4fe7779f03b6b8bd63e",
     "v2/qs/assignment_stream.py": "563782b961c4294e3bb464a2916d3e1732bd3494e8779577655983e0a780f399",
     "v2/qs/capacity.py": "670cf485920d282003a9b8a47a77fdb09e061192246ca3666113f848d2ae2a82",
-    "v2/qs/checkpoint.py": "e725b3981bed187579c02cefa219deef1fd30553df53c2f86acea313b6353f28",
+    "v2/qs/checkpoint.py": "153308037b8a45ca7291fa0e2528deb7b09b1ca298a10c3d7eb5dd9a4855b150",
     "v2/qs/external_square.py": "599a972448c6886db23aa3f9ed37dd303990d72ab66c6181eb149997585ef27d",
     "v2/qs/extraction.py": "6beb7faf3836e7ebd91b344df147ad7015b815addcc61453a4a35c1a23010f4a",
     "v2/qs/factor_base.py": "f1596956d3faf5eee60feaf67a4982f410d146f6ae5210bafcc2f27b884623f7",

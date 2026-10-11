@@ -154,6 +154,16 @@ def _reserve_growing_checkpoint(job):
             + job.config.memory_limit
             - job.engine.config.memory_limit
         )
+        # A pause may retain preparation and elimination alongside the store.
+        # Their existing reservations include solver fill-in and scratch;
+        # releasing them for an earlier solve must not impose a later cap.
+        if job.engine.prepared is not None:
+            live += (
+                job.engine.prepared.workspace_bytes
+                - job.engine.prepared.shared_workspace_bytes
+            )
+        if job.engine.solver is not None:
+            live += job.engine.solver.matrix.workspace_bytes
     else:
         live = job.config.metadata_reserve
     if live + 8 * encoded_bound > job.config.memory_limit:
@@ -448,6 +458,17 @@ def _restore_store(payload, collector, budget):
     collector._workspace += sum(collector._atom_bytes.values())
 
 
+def _checkpoint_restore_config(config, blob_bytes):
+    """Reserve decoded snapshot coexistence until checked restore completes."""
+    if config.checkpoint_bytes is not None:
+        return config
+    from dataclasses import replace
+
+    # Reuse the existing eight-representation checkpoint reservation, sized
+    # from actual input rather than inventing a fixed growing-mode ceiling.
+    return replace(config, checkpoint_bytes=blob_bytes + 1024)
+
+
 def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     """Verify and rebuild charged roots, stores and solver prefixes."""
     from .siqs import SIQSConfig, SIQSJob
@@ -486,6 +507,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         )
     ):
         raise ValueError("SIQS checkpoint blob exceeds its cap")
+
+    if config is not None and config.checkpoint_bytes is None:
+        # The character count rejects oversized input before making another
+        # byte copy. The exact UTF-8 size then covers non-ASCII input too.
+        _checkpoint_restore_config(config, len(blob))
+        _checkpoint_restore_config(config, len(blob.encode()))
 
     if hashlib.sha256(blob.encode()).hexdigest() != checkpoint["sha256"]:
         raise ValueError("SIQS checkpoint integrity mismatch")
@@ -549,6 +576,10 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     ):
         raise ValueError("resume must retain consumed resources")
 
+    public_config = config
+    dynamic_snapshot = config.checkpoint_bytes is None
+    if dynamic_snapshot:
+        config = _checkpoint_restore_config(config, len(blob.encode()))
     budget.consume(0)
     job = SIQSJob(
         payload["n"], seed=payload["seed"], config=config, budget=budget
@@ -869,9 +900,23 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
 
             job.stats["matrix_reconstructions"] += 1
 
+    if dynamic_snapshot:
+        # Decoded input and rebuild scratch cease to be job-owned on return.
+        # Keep the original public policy/identity and release only this
+        # transient reservation; partials and prepared solver state stay live.
+        released = config.metadata_reserve - public_config.metadata_reserve
+        job.config = public_config
+        if job.engine is not None:
+            job.engine.config = replace(
+                job.engine.config,
+                memory_bytes=job.engine.config.memory_limit + released,
+            )
+            job.engine.collector.config = job.engine.config
+        config = public_config
+
     if job.active and job.engine is None:
         raise ValueError("active SIQS checkpoint has no collector")
-    if extended and job.base is not None:
+    if (extended or dynamic_snapshot) and job.base is not None:
         from .capacity import capacity_report
 
         job.stats["capacity"] = capacity_report(job.base, config)

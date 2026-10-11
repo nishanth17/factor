@@ -4,6 +4,7 @@ import copy
 import json
 import unittest
 from dataclasses import asdict, replace
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.execution.budget import BudgetExhaustedError
@@ -225,6 +226,86 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertTrue(resumed.result.complete)
         self.assertEqual(resumed.result.reconstruct(), n)
         self.assertGreater(resumed.work_used, first.work_used)
+
+    def test_uncapped_checkpoint_counts_live_solver_and_preparation(self):
+        from v2.qs.checkpoint import _reserve_growing_checkpoint
+
+        collector = growing_worker()
+        admit(collector, 1, (3, 5))
+        config = SIQSConfig(
+            mode="qs",
+            base_bound=3,
+            half_width=8,
+            factor_count=1,
+            memory_bytes=4 * 2**20,
+            collector=collector.config,
+        )
+        engine = SimpleNamespace(
+            config=replace(collector.config, memory_bytes=4 * 2**20),
+            collector=collector,
+            prepared=None,
+            solver=None,
+        )
+        job = SimpleNamespace(config=config, engine=engine)
+        _reserve_growing_checkpoint(job)
+
+        # Model each independently retained reservation at a solver pause.
+        # Refusal must precede any snapshot allocation and leave atoms intact.
+        before = encoded(collector)
+        for stage in ("prepared", "solver"):
+            if stage == "prepared":
+                engine.prepared = SimpleNamespace(
+                    workspace_bytes=4 * 2**20, shared_workspace_bytes=0
+                )
+            else:
+                engine.solver = SimpleNamespace(
+                    matrix=SimpleNamespace(workspace_bytes=4 * 2**20)
+                )
+            with self.assertRaises(MemoryError):
+                _reserve_growing_checkpoint(job)
+            self.assertEqual(encoded(collector), before)
+            setattr(engine, stage, None)
+
+        # Completed solves release these containers; a historical high-water
+        # mark must not become an artificial checkpoint refusal.
+        engine._workspace_peak = 4 * 2**20
+        _reserve_growing_checkpoint(job)
+
+    def test_dynamic_restore_reserves_input_and_preserves_public_policy(self):
+        config = SIQSConfig(
+            mode="qs",
+            base_bound=3,
+            half_width=8,
+            factor_count=1,
+            memory_bytes=4 * 2**20,
+            collector=growing_worker().config,
+        )
+        job = SIQSJob(91, config=config, budget=allowance())
+        job.run(max_blocks=1)
+        child_limit = job.engine.config.memory_limit
+        snapshot = job.checkpoint()
+        for _ in range(2):
+            restored = SIQSJob.from_checkpoint(
+                snapshot, config=config, budget=allowance()
+            )
+            self.assertEqual(restored.config, config)
+            self.assertIsNone(restored.config.checkpoint_bytes)
+            self.assertEqual(restored.engine.config.memory_limit, child_limit)
+            self.assertIs(
+                restored.engine.collector.config, restored.engine.config
+            )
+            self.assertEqual(
+                restored.stats["capacity"]["metadata_reserve_bytes"],
+                config.metadata_reserve,
+            )
+            snapshot = restored.checkpoint()
+
+        oversized = dict(snapshot, blob=snapshot["blob"] + " " * 2**20)
+        with patch("v2.qs.checkpoint.json.loads", side_effect=AssertionError):
+            with self.assertRaises(MemoryError):
+                SIQSJob.from_checkpoint(
+                    oversized, config=config, budget=allowance()
+                )
 
     def test_version_five_full_job_restore_is_charged_and_checked(self):
         config = SIQSConfig(

@@ -5,6 +5,7 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from v2.benchmarks.qs.c9 import c9_growth_confirmation as confirmation
 from v2.benchmarks.qs.c9 import c9_growth_study as study
@@ -89,6 +90,28 @@ class GrowthProtocolTests(unittest.TestCase):
                 loaded.call("forbidden", 100, lambda: None)
             self.assertEqual(len(loaded.data["calls"]), 1)
             self.assertEqual(loaded.data["calls"][0]["status"], "failed")
+
+    def test_training_resume_keeps_identical_manifests(self):
+        with TemporaryDirectory() as directory:
+            output = Path(directory)
+            control = output / "control.json"
+            control.write_text(json.dumps(dict(source={}, fixtures=[])))
+            with (
+                patch.object(study, "CONTROL", control),
+                patch.object(study, "hashes", return_value={}),
+            ):
+                study.train(output)
+                paths = [
+                    output / name
+                    for name in ("manifest.json", "finished.json")
+                ]
+                before = [path.read_bytes() for path in paths]
+                study.train(output)
+                self.assertEqual([path.read_bytes() for path in paths], before)
+
+                paths[0].write_text(json.dumps(dict(source={}, fixtures=[1])))
+                with self.assertRaisesRegex(ValueError, "different frozen"):
+                    study.train(output)
 
     def test_no_reveal_or_reselection_during_decode(self):
         self.assertNotEqual(confirmation.GENERATION_SEED, 202610100909)

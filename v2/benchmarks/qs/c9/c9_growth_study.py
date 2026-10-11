@@ -377,7 +377,8 @@ def train(output, joint=False, lease_seconds=600):
     manifest = output / ("joint-manifest.json" if joint else "manifest.json")
     if manifest.exists() and json.loads(manifest.read_text()) != control:
         raise ValueError("output has a different frozen manifest")
-    save(manifest, control)
+    if not manifest.exists():
+        save(manifest, control)
     expense = expenses(output)
     started, cpu = time.monotonic(), time.process_time()
     for index, fixture in enumerate(control["fixtures"]):
@@ -419,10 +420,9 @@ def train(output, joint=False, lease_seconds=600):
                 ),
                 flush=True,
             )
-    save(
-        output / ("joint-finished.json" if joint else "finished.json"),
-        dict(total_charged=expense.used()),
-    )
+    finished = output / ("joint-finished.json" if joint else "finished.json")
+    if not finished.exists():
+        save(finished, dict(total_charged=expense.used()))
 
 
 def rank(rows, arms):

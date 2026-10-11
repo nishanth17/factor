@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "original_selection_sha256": "8221c317cf9eb58a18e6512ccc5210b9b44e0c0f09c6378e96d688faa05bd859",
+  "training_source_commit": "9707dab",
+  "changed_source": {
+    "v2/qs/checkpoint.py": {
+      "before": "e725b3981bed187579c02cefa219deef1fd30553df53c2f86acea313b6353f28",
+      "after": "153308037b8a45ca7291fa0e2528deb7b09b1ca298a10c3d7eb5dd9a4855b150"
+    },
+    "v2/benchmarks/qs/c9/c9_growth_study.py": {
+      "before": "3ff441b31cbae142d3101cf8c8230a2ed71e97d67a2148c33e4eabab6ca42330",
+      "after": "cefdd9a1a0a72f368492692f33231cf55ea26f791808a0428d6944c29c5268aa"
+    }
+  },
+  "changed_functions": {
+    "v2/qs/checkpoint.py": [
+      "_checkpoint_restore_config",
+      "_reserve_growing_checkpoint",
+      "restore_job"
+    ],
+    "v2/benchmarks/qs/c9/c9_growth_study.py": [
+      "train"
+    ]
+  },
+  "ast_outside_reviewed_functions": "identical",
+  "selection_and_configurations": "unchanged",
+  "reason": "Reserve live preparation/solver memory during uncapped schema-five encoding and reserve decoded-input coexistence during checked restore; preserve the public no-checkpoint-quota policy. Repair the training runner to preserve existing identical manifests on segment restart.",
+  "timing_reachability": "Every training/confirmation configuration has an explicit positive checkpoint_bytes; new dynamic snapshot reservations apply only when checkpoint_bytes is None. Normal factoring and explicit-size diagnostics are unchanged.",
+  "disclosure": "Correctness repair and new source freeze before fresh corpus generation; old training controls and captures retain their original hashes.",
+  "qa_allowance_transfer": {
+    "seconds": 150,
+    "from_allowance": "Unspent original 14400-second study cap",
+    "to_allowance": "Additional final QA reserve; unused reserve is not refunded",
+    "reason": "Complete working and committed-only suites after a 65-second harness timeout; no larger candidate search or overall cap extension."
+  }
+}
