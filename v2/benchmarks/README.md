@@ -65,6 +65,12 @@ to 18/27 samples only within the separately fixed phase cap. This screening
 cannot establish a broad default. A selected candidate still needs disjoint
 fresh confirmation. See [model limits](ecm/c3/round2_model_limits.md) and the
 [prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
+The [initial source-screen results](ecm/c3/source_preset_results.md) complete
+all 324 calls. Yamaquasi escalation and Alpertron show 44.44%/47.39% lower
+training CPU cost than fixed32, but uncertainty remains wide. After the user raised
+a time concern, defer the prescribed extension and fresh confirmation, select no
+policy and retain defaults. Final committed-only checks pass 653 tests, lint,
+154 benchmark imports and 35 certified corpora.
 No round-two fresh inputs exist. Frozen earlier experiments use their source
 commits; historical manifests are not repinned to newer production sources.
 

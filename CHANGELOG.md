@@ -14,6 +14,13 @@
 
 ## Current development
 
+- Complete the initial 54-group upstream ECM transfer screen: all 324 calls
+  validate under unchanged SIQS settings and reserves. Escalating Yamaquasi
+  and Alpertron schedules show 44.44%/47.39% lower revealed-training CPU cost
+  than fixed32, with wide uncertainty. Stop this pass after the user raised
+  a time concern; defer extension/fresh confirmation and retain defaults.
+  Committed-only checks pass 653 tests, lint and all benchmark/input loaders.
+
 - Reduce C3's next policy-screening scope after stopping the oversized
   513-group comparison. Preserve its 72 complete matched groups as
   inconclusive and retain the interrupted grant. Prepare a separate 54-group
