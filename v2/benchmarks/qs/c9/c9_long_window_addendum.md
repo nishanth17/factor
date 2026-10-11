@@ -76,7 +76,8 @@ arm order and unchanged resource envelope are recorded in
 The following runner composes the already frozen, validated study functions.
 Save the Python block as an ignored local `.py` file, run it from the repository
 root with PyPy implementing Python 3.11, and use a new output directory. Its
-source digest is retained in the diagnostic manifest. It refuses to overwrite
+source digest is retained in the diagnostic manifest. Fifty seconds of the
+4,500-second allowance are prepaid for setup and assessment. It refuses to overwrite
 an earlier attempt, reserves unsuccessful calls, validates every warmup and
 outcome, and leaves the original confirmation directory untouched. The lease
 must be separately coordinated before execution.
@@ -120,7 +121,7 @@ with study.machine_window():
     ))
     expense = confirmation.Expenses(
         output,
-        {"spent_before_confirmation": {"wall": 0, "cpu": 0}},
+        {"spent_before_confirmation": {"wall": 50, "cpu": 50}},
         {"generation_seconds": 0},
     )
 
