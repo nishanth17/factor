@@ -1297,7 +1297,7 @@ The opt-in Python helper `with_ecm_preset(config, name)` from
 `v2.execution.ecm_presets` replaces only the ECM tiers with a numerical schedule
 from the reviewed upstream implementations. It requires explicit SIQS and an
 allocation with positive work, wall and CPU fallback floors. For example,
-`config = with_ecm_preset(config, "alpertron20")` retains the exact SIQS object,
+`config = with_ecm_preset(config, "ladder115")` retains the exact SIQS object,
 pretest ceilings, fallback floors and outer memory cap of an existing protected
 configuration. Larger ECM workspace must coexist with the unchanged SIQS
 storage or construction raises `MemoryError`. Total run budgets still bind;
@@ -1309,6 +1309,11 @@ prefix, Alpertron's 20/25-digit-factor ladder prefixes, and GMP-ECM's published
 native arithmetic, curve families and stage-two methods differ, and some source
 counts describe standalone ECM rather than automatic SIQS handoff. See the
 [preset table and source qualifications](benchmarks/ecm/c3/source_presets.md).
+Preset names describe schedule shape and total curve count: `pretest8`,
+`escalating140`, `ladder115`, `ladder415`, `single74` and `single214`.
+These replace the former upstream-named keys; those keys now raise `ValueError`.
+Tier values and checkpoint formats are unchanged. Frozen historical benchmark runners and evidence retain their original labels
+and require their pinned source checkout; they are not migrated to this API.
 The helper is an explicit override. The bounded defaults below reuse the
 reviewed escalating prefix following the user's promotion request.
 

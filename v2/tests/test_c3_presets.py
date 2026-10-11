@@ -48,11 +48,9 @@ class PresetTests(unittest.TestCase):
         self.assertEqual(base.ecm_tiers, ((2000, 147396, 32),))
 
     def test_source_tables_have_exact_integer_bounds_and_escalation(self):
-        self.assertEqual(sum(t[2] for t in ECM_PRESETS["alpertron25"]), 415)
-        self.assertEqual(
-            sum(t[2] for t in ECM_PRESETS["yamaquasi_ecm64"]), 140
-        )
-        self.assertEqual(ECM_PRESETS["gmp_ecm20"], ((11000, 1900000, 74),))
+        self.assertEqual(sum(t[2] for t in ECM_PRESETS["ladder415"]), 415)
+        self.assertEqual(sum(t[2] for t in ECM_PRESETS["escalating140"]), 140)
+        self.assertEqual(ECM_PRESETS["single74"], ((11000, 1900000, 74),))
         for tiers in ECM_PRESETS.values():
             self.assertTrue(
                 all(type(x) is int for tier in tiers for x in tier)
@@ -69,7 +67,7 @@ class PresetTests(unittest.TestCase):
             base_config(allocation=None, siqs=None),
         ):
             with self.assertRaisesRegex(ValueError, "protected allocation"):
-                with_ecm_preset(config, "alpertron20")
+                with_ecm_preset(config, "ladder115")
         for field in (
             "fallback_work",
             "fallback_seconds",
@@ -80,7 +78,7 @@ class PresetTests(unittest.TestCase):
                 base, allocation=replace(base.allocation, **{field: 0})
             )
             with self.assertRaisesRegex(ValueError, "positive SIQS"):
-                with_ecm_preset(base, "alpertron20")
+                with_ecm_preset(base, "ladder115")
         with self.assertRaisesRegex(ValueError, "unknown"):
             with_ecm_preset(base_config(), "guess")
 
@@ -93,7 +91,7 @@ class PresetTests(unittest.TestCase):
             + 8192,
         )
         with self.assertRaisesRegex(MemoryError, "coexistence"):
-            with_ecm_preset(tight, "gmp_ecm25")
+            with_ecm_preset(tight, "single214")
         self.assertEqual(tight.siqs.memory_bytes, 32 * 2**20)
 
     def test_large_campaign_obeys_pretest_floor_and_restores_exact_tiers(self):
@@ -101,7 +99,7 @@ class PresetTests(unittest.TestCase):
         base = replace(
             base, allocation=replace(base.allocation, fallback_work=500_000)
         )
-        config = with_ecm_preset(base, "alpertron25")
+        config = with_ecm_preset(base, "ladder415")
         first = factorize_bounded(
             1009 * 1013,
             config=config,

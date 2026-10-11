@@ -92,6 +92,12 @@ uses the confirmed resource window; this adds no new timing evidence.
 The later C10 selector composes its accepted plan with that 50-digit bundle;
 the C9 control and its default-promotion report remain historical evidence.
 
+The [multi-source implementation gap audit](implementation_gap_audit.md)
+extends the [Alpertron inventory](alpertron_gap_analysis.md), distinguishes
+missing mechanisms from existing/planned work, and ranks follow-ups against
+current evidence. Roadmap A1b separately reviews remaining R2 fixed-score combinations
+against the accepted C10 plan control; it does not repeat that plan study.
+
 The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
 compatibility and preserved study freezes. Remaining literature transfers are
 phased into roadmap C9a; E1 and C10a remain separate.
@@ -203,3 +209,12 @@ an old measurement, or create a new protocol/freeze for current-source timings.
 New captures always identify the actual current source bytes. Frozen source
 loaders retain their private historical module names; mixed arms adapt only live
 imports to that private topology.
+
+### ECM preset naming maintenance (11 October 2026)
+
+The active helper uses descriptive schedule names (see `../README.md`).
+Frozen C3 runners and evidence keep their original keys and source hashes;
+replay them from their pinned checkout. The new
+`inputs/controls/a7_r5_preset_names_sources.json` chains the prior A7 manifest
+for the unchanged numerical defaults and renamed preset API. No new performance
+claim or measurement accompanies this naming change.

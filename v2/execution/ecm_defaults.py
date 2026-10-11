@@ -6,7 +6,7 @@ from ..common import utils
 from .ecm_presets import ECM_PRESETS
 
 COMPACT64 = ((2000, 50000, 64),)
-ESCALATING140 = ECM_PRESETS["yamaquasi_ecm64"]
+ESCALATING140 = ECM_PRESETS["escalating140"]
 
 
 def resolve_defaults(config, n):

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "base_control_sha256": "9ec74ab79c1b1dd5a979370a96bfbac517113ee483c47ce3d3656b1027e33d72",
+  "status": "Descriptive ECM preset API names; unchanged numerical schedules and frozen A7 arms. E1 remains open.",
+  "source_sha256": {
+    "v2/benchmarks/a7_r5.py": "f43b15d1f714a4f6f485ba52dfc2017cbfb7e45f7ea4f5097f8dfbd8ef298a6d",
+    "v2/benchmarks/phase_three_audit.py": "de727d801b4681734860fe1b220a582c639d7b0e5ce7fb12ee732edef0366182",
+    "v2/benchmarks/qs_snapshot.py": "5fe3586bc107761631dd655b567d954c455c28ec4030eb1b281513a63883bfa5",
+    "v2/budget.py": "fa2549b899792f4306b427d79f22d8aa30f42c1036c61ab6eb8c8aefac4847e5",
+    "v2/ecm_programs.py": "c77a2129c84b7be0d35b1ac8fdeedfe715c5e9de5867ded554161b7fc5e1b903",
+    "v2/factor.py": "f3cfaa92bdae9b6b638df253339e74f8b351ec34079db639ef82b622270329dd",
+    "v2/portfolio.py": "3133c06f2c1b8fd74fc7d833a907f56fcba9dc3f8385436e22081d13dd6c359a",
+    "v2/qs/__init__.py": "33923179d5fd877f0836acd691e6a5a59b600a8b3f99fbe568714dce7737ece9",
+    "v2/qs/assignment_stream.py": "c494a33c8df3c1b0bf4c6368e0026df63a5465385bfa6c8022213087e49859ac",
+    "v2/qs/capacity.py": "670cf485920d282003a9b8a47a77fdb09e061192246ca3666113f848d2ae2a82",
+    "v2/qs/checkpoint.py": "02777a25753b367c7bdaeddaa982f7bfa41a2bee180fc576bf29d82c65c6f7b5",
+    "v2/qs/extraction.py": "6beb7faf3836e7ebd91b344df147ad7015b815addcc61453a4a35c1a23010f4a",
+    "v2/qs/linear_algebra.py": "c49b0ad814a76decb2464906b8007323533e79393f4fee53fee72d86839fc8ce",
+    "v2/qs/parallel.py": "02de7112ee5560f6506c6b483d8e9177aa2d5f93c15950f25a95ab725d016bd9",
+    "v2/qs/pipeline.py": "59f414d9c47814c765a0ee8d0170a3e678abd5c0fa4db71eda0aa9cff0e98920",
+    "v2/qs/relations.py": "4aba47cb7df3fac44785fdbdef690f2ebdede843785331413223d1758740b4bb",
+    "v2/qs/sieve_collector.py": "3833b22598eb1a4fdce6d8cab413040a47eac5dd59e8b2ee8b199a849f9c2479",
+    "v2/qs/siqs.py": "736905d6c5875e7f302cae5ddc3056fe4c3fcd440c2c5b9ade33af04415f913a",
+    "v2/qs/sss.py": "3a6133e4fefb6de7014a4a053e72ac3cc087abea5f1cd87d9a6e6edeed3f3af4",
+    "v2/stage_jobs.py": "5779fc06e6ae9a91db91f4a4ce7cf9d0de00d45d89a27418b8a7be9b3b0fd14a"
+  },
+  "previous_manifest_sha256": "2286875dd13dc4fef233a0a0ab9721c1a9eacab50b15815675aad963b0a4d1e3",
+  "additional_source_sha256": {
+    "v2/execution/allocation.py": "794397c456ebf0302b7da2b43071d9462c822da013dda8d82d169a8d7ee30c7b",
+    "v2/execution/ecm_defaults.py": "2cc337cf179b5bed4cc98f13e084121418802e3aa3925606322742a5d5f45220",
+    "v2/execution/ecm_presets.py": "c0870b2122e84dc9b85dab713010beb0eded30803fb42aec5c4643b10bb14e39",
+    "v2/qs/storage.py": "df08aa4f51254a9bc874662685e3157f1a3c412c99a526ed441dbbdf9451c4a9",
+    "v2/qs/defaults.py": "407bca4fd23a8c7cc1da2f07c1620f67e327f78fa5d02b765171c69a2c4d90f4"
+  }
+}

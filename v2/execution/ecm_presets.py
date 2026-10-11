@@ -9,20 +9,20 @@ from types import MappingProxyType
 # not claims of equal success probabilities or accepted PyPy speedups.
 ECM_PRESETS = MappingProxyType(
     {
-        "yamaquasi_auto160": ((200, 7700, 8),),
-        "yamaquasi_ecm64": (
+        "pretest8": ((200, 7700, 8),),
+        "escalating140": (
             (200, 7700, 10),
             (2000, 81000, 30),
             (10000, 554000, 100),
         ),
-        "alpertron20": ((2000, 200000, 25), (11000, 1100000, 90)),
-        "alpertron25": (
+        "ladder115": ((2000, 200000, 25), (11000, 1100000, 90)),
+        "ladder415": (
             (2000, 200000, 25),
             (11000, 1100000, 90),
             (50000, 5000000, 300),
         ),
-        "gmp_ecm20": ((11000, 1900000, 74),),
-        "gmp_ecm25": ((50000, 13000000, 214),),
+        "single74": ((11000, 1900000, 74),),
+        "single214": ((50000, 13000000, 214),),
     }
 )
 

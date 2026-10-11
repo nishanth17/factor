@@ -1,5 +1,12 @@
 # Changelog
 
+## Descriptive ECM preset names (11 October 2026)
+
+- Replace upstream-named preset keys with `pretest8`, `escalating140`,
+  `ladder115`, `ladder415`, `single74` and `single214`. Previous keys are
+  rejected; numerical schedules, defaults and checkpoints are unchanged.
+  Retain source provenance and historical evidence in benchmark documentation.
+
 ## C10a-05 larger-band default scope (11 October 2026)
 
 - Extend the accepted native 1 GiB C9+C10+collection bundle to exactly
