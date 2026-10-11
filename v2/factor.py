@@ -298,13 +298,16 @@ def main():
         "--qs-base-bound",
         "--siqs-base-bound",
         type=int,
-        help="factor-base prime bound (default: 1000)",
+        help=(
+            "factor-base prime bound "
+            "(50-digit SIQS default: 30000; otherwise 1000)"
+        ),
     )
     qs_options.add_argument(
         "--qs-half-width",
         "--siqs-half-width",
         type=int,
-        help="half-width of each polynomial interval (default: 512)",
+        help="half-width (50-digit SIQS default: 65536; otherwise 512)",
     )
     qs_options.add_argument(
         "--qs-max-half-width", "--siqs-max-half-width", type=int
@@ -344,8 +347,8 @@ def main():
     parser.add_argument("--sss-base-bound", type=int, default=1000)
     parser.add_argument("--sss-rounds", type=int, default=256)
     parser.add_argument("--work-limit", type=int)
-    parser.add_argument("--seconds", type=float, default=30)
-    parser.add_argument("--cpu-seconds", type=float, default=30)
+    parser.add_argument("--seconds", type=float)
+    parser.add_argument("--cpu-seconds", type=float)
     parser.add_argument("--memory-mib", type=int)
     parser.add_argument("--fermat-steps", type=int, default=0)
     parser.add_argument("--checkpoint", type=Path)
@@ -378,6 +381,13 @@ def main():
     )
     args = parser.parse_args()
     implicit_memory = args.memory_mib is None
+    implicit_work = args.work_limit is None
+    implicit_seconds = args.seconds is None
+    implicit_cpu_seconds = args.cpu_seconds is None
+    if implicit_seconds:
+        args.seconds = 30
+    if implicit_cpu_seconds:
+        args.cpu_seconds = 30
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
     if args.siqs and args.method != "auto":
@@ -441,6 +451,10 @@ def main():
     if not args.qs_dlp and any(option is not None for option in dlp_options):
         parser.error("DLP bounds require --qs-dlp")
 
+    explicit_qs = bool(
+        qs_parameters or args.qs_residual_bound is not None or args.qs_dlp
+    )
+
     if args.memory_mib is None:
         args.memory_mib = 80 if use_sss or use_qs else 8
     if args.work_limit is None:
@@ -448,7 +462,12 @@ def main():
     try:
         checkpoint = None
         if args.resume:
-            if args.resume.stat().st_size > args.memory_mib * 1024 * 1024:
+            read_memory_mib = (
+                max(args.memory_mib, 1040)
+                if implicit_memory
+                else args.memory_mib
+            )
+            if args.resume.stat().st_size > read_memory_mib * 1024 * 1024:
                 raise ValueError("checkpoint file exceeds configured cap")
             checkpoint = json.loads(args.resume.read_text())
         number = args.n
@@ -458,6 +477,32 @@ def main():
                 if checkpoint
                 else int(input("Enter number: "))
             )
+
+        from .qs.defaults import (
+            C9_SECONDS,
+            C9_WORK_LIMIT,
+            default_siqs_config,
+            uses_c9_defaults,
+        )
+
+        automatic_qs = (
+            checkpoint is None
+            and args.method in ("auto", "siqs")
+            and not qs_parameters
+            and args.qs_residual_bound is None
+            and not args.qs_dlp
+            and uses_c9_defaults(number, backend=args.backend)
+        )
+        if automatic_qs:
+            use_qs = True
+            if implicit_memory:
+                args.memory_mib = 1040
+            if implicit_work:
+                args.work_limit = C9_WORK_LIMIT
+            if implicit_seconds:
+                args.seconds = C9_SECONDS
+            if implicit_cpu_seconds:
+                args.cpu_seconds = C9_SECONDS
 
         if (
             args.bounded
@@ -511,7 +556,15 @@ def main():
                 qs_parameters["mode"] = (
                     "siqs" if args.method == "auto" else args.method
                 )
-                qs_config = SIQSConfig(**qs_parameters)
+                qs_config = (
+                    default_siqs_config(
+                        number,
+                        backend=args.backend,
+                        memory_bytes=qs_parameters["memory_bytes"],
+                    )
+                    if automatic_qs
+                    else SIQSConfig(**qs_parameters)
+                )
                 if args.qs_residual_bound is not None:
                     qs_config = replace(
                         qs_config,
@@ -576,28 +629,59 @@ def main():
                     and args.method == "auto"
                 ):
                     parameters["ecm_tiers"] = saved["ecm_tiers"]
-                if saved.get("allocation") is not None:
-                    if args.ecm_policy is None:
+                restore_saved_qs = (
+                    saved.get("siqs") is not None
+                    and not explicit_qs
+                    and not use_sss
+                    and args.method in ("auto", saved["siqs"]["mode"])
+                )
+                if (
+                    restore_saved_qs
+                    and uses_c9_defaults(number, backend=args.backend)
+                    and saved["siqs"]["collector"].get("storage_policy")
+                    == "grow"
+                ):
+                    if implicit_work:
+                        args.work_limit = C9_WORK_LIMIT
+                    if implicit_seconds:
+                        args.seconds = C9_SECONDS
+                    if implicit_cpu_seconds:
+                        args.cpu_seconds = C9_SECONDS
+                if restore_saved_qs and args.method == "auto":
+                    # An omitted method retains direct-SIQS pretest settings;
+                    # restoring the collector alone would change its identity.
+                    parameters["rho_attempts"] = saved["rho_attempts"]
+                    parameters["pm1_attempts"] = saved["pm1_attempts"]
+                if (
+                    saved.get("allocation") is not None
+                    or saved.get("siqs") is not None
+                ):
+                    if (
+                        saved.get("allocation") is not None
+                        and args.ecm_policy is None
+                    ):
                         parameters["allocation"] = ECMAllocation(
                             **saved["allocation"]
                         )
                     # New policy snapshots retain the selected fallback even
                     # when a resumed CLI invocation omits its original flags.
-                    if not (use_qs or use_sss):
+                    if not (use_qs or use_sss) or restore_saved_qs:
                         if saved.get("siqs") is not None:
                             from .qs import (
                                 DoubleLargeSieveConfig,
+                                GrowingDoubleLargeSieveConfig,
                                 SieveConfig,
                                 SIQSConfig,
                             )
 
                             values = dict(saved["siqs"])
                             collector = values["collector"]
-                            collector_type = (
-                                DoubleLargeSieveConfig
-                                if "large_prime_bound" in collector
-                                else SieveConfig
-                            )
+                            if collector.get("storage_policy") == "grow":
+                                collector_type = GrowingDoubleLargeSieveConfig
+                            elif "large_prime_bound" in collector:
+                                collector_type = DoubleLargeSieveConfig
+                            else:
+                                collector_type = SieveConfig
                             values["collector"] = collector_type(**collector)
                             parameters["siqs"] = SIQSConfig(**values)
                         if saved.get("sss") is not None:

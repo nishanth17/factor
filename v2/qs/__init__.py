@@ -1,5 +1,6 @@
 """Exact QS/MPQS contracts, bounded collection and SIQS family primitives."""
 
+from .defaults import default_siqs_config
 from .extraction import (
     CongruenceResult,
     DependencyExtractor,
@@ -50,6 +51,7 @@ from .sieve_collector import (
 from .siqs import SIQSConfig, SIQSJob
 
 __all__ = [
+    "default_siqs_config",
     "AtomicRelation",
     "DoubleLargeSieveConfig",
     "GrowingDoubleLargeSieveConfig",

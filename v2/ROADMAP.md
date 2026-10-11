@@ -2995,6 +2995,12 @@ implicit growing resume and finite child ownership: 690 working and
 committed-only tests, full lint, 140 live benchmark imports and required
 loaders pass. Historical C9 controls, corpus and timing verdict are unchanged.
 
+At the user's subsequent direction, [50-digit default promotion](benchmarks/qs/c9/c9_default_promotion.md)
+selects the confirmed growing bundle for fresh native SIQS/automatic calls,
+with explicit overrides and saved configurations preserved. Omitted grants
+use the confirmed finite resource envelope. This does not rewrite the original
+retain-defaults verdict, establish arbitrary-input gains or close C10/E1.
+
 Remaining transfers now belong to [C9a](#c9a--remaining-large-prime-yield-and-storage-transfers-open).
 C9 closes only its accepted C9.2 tranche; C9a has separate attribution, freeze
 and acceptance gates. No claim of exhaustive adaptation or optimality is made.
