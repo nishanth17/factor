@@ -74,7 +74,8 @@ A in one explanatory equation; the executable polynomial and exact identity
 below require `4A`. Informal timing/blog claims are not accepted measurements.
 The [supplemental source audit](source_supplement.md) follows Kechlibar's
 paper to the Prague implementation and a recent GPU SIQS paper to CUDA-MPQS
-v1.0.8. Both additional implementations are pinned in the same manifest.
+v1.0.8. CADO's active SIQS build supplies an additional concrete C8 handoff.
+All three additional implementations are pinned in the same manifest.
 
 ## End-to-end transfer map
 

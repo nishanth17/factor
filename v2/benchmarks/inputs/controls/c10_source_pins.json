@@ -482,6 +482,100 @@
           "bytes": 115218
         }
       }
+    },
+    {
+      "name": "cado-siqs",
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "license": "Root COPYING supplies LGPL version 2.1; no source text incorporated into v2",
+      "scope": "SIQS build/caller, A scheduling, norm and sparse/dense kernel paths; no claim to a complete new CADO residual/solver audit",
+      "files": {
+        "sieve/siqs-fill-in-buckets.inl": {
+          "sha256": "48c782bde455e6ebb5f09b46faa5ea242dfb8827db5ff9aa81cc86080428db6e",
+          "git_blob": "7a6da5abd66650aa29bc3d33ddd21fe04baa4e8c",
+          "bytes": 8229
+        },
+        "sieve/siqs-largesieve.hpp": {
+          "sha256": "6199943cd051a1b42501db8144422fb4875ab70a6ecf2c452feb2c9d7c30e729",
+          "git_blob": "ec672e579b78eb36b34ac1b065139b054193de64",
+          "bytes": 14734
+        },
+        "sieve/siqs-smallsieve-glue.hpp": {
+          "sha256": "2903f709a73ebae54e7089241eb7fca2c9e3ea5a2c35dc1fb5bdeda6f2e9e83e",
+          "git_blob": "24f3040160569a62997fd6a335c9357851c68649",
+          "bytes": 29574
+        },
+        "sieve/siqs-smallsieve.cpp": {
+          "sha256": "acfc5f1048b38f5cf4f0d2f3ad8d35c530412fd5755d2a6467a9dbc3d7350d0e",
+          "git_blob": "91252c82a11af1d924ee07ac20a4fd78ccf2788e",
+          "bytes": 14225
+        },
+        "sieve/siqs-smallsieve.hpp": {
+          "sha256": "43e47f4ac83232cfc2a7b12bf1766b628a87421f341cad02e5756cf80f00a890",
+          "git_blob": "43505be02daa1da3b46800c31498474811e6b403",
+          "bytes": 5202
+        },
+        "sieve/CMakeLists.txt": {
+          "sha256": "cec591d09ad2f82b9accf1cb6772975ac6aeffd3c566f68325e6a69f119369d4",
+          "git_blob": "37eac5671f60523b0af6c4ec0771149e79670ff3",
+          "bytes": 5799
+        },
+        "COPYING": {
+          "sha256": "d878b79d5ff41186e865c5147907a543b2eae6d6e98fbc43bcd151a5d4b8390d",
+          "git_blob": "9dedff689c365c9a38894d133795b67d3ca4a31d",
+          "bytes": 26437
+        },
+        "sieve/las.cpp": {
+          "sha256": "0883bd39651732f50a1f78a1c0a5334c89d76faa900e5816cada5117679a39f2",
+          "git_blob": "322bbc523ef18fd7bf632d68d453696339706390",
+          "bytes": 74118
+        },
+        "sieve/las-qlattice.cpp": {
+          "sha256": "6cfc0ad43cc1bc7a4baf5af1afda148870ea96516881d9a9ef097104ecb8d3a7",
+          "git_blob": "1241d7d6b81ead0766b8dae9dba99d11eac9d6ca",
+          "bytes": 11952
+        },
+        "sieve/las-qlattice.hpp": {
+          "sha256": "19dd4f68e09a4dddc5b41a7845c2685bd27aa3ec183149a8a8de6e1d76e72735",
+          "git_blob": "08f8e40b06a2bb8bc40ec8b85956c3261d3144c0",
+          "bytes": 5634
+        },
+        "sieve/las-todo-list.cpp": {
+          "sha256": "31f6ea1f1fdb3117ae1d2c3e25d801d7587d92d1cccea38f7ebc31d1719cf117",
+          "git_blob": "644792e43c9edd0797a2a0ce707cee07587efa20",
+          "bytes": 23737
+        },
+        "sieve/las-todo-list.hpp": {
+          "sha256": "9065d84ed4c855460ca21868e2d8055ec15367c24f89e0d3e6f9d471a698bbe9",
+          "git_blob": "8dd7856950ea7a6da177bd24227bf85196349c8a",
+          "bytes": 5546
+        },
+        "sieve/las-fill-in-buckets.cpp": {
+          "sha256": "365d49e23080eb205b452e5593d57fd0ea34326220f3f6bd7255b00784b7ab8e",
+          "git_blob": "90687233b94a6fab68696be82f2c5cd232c7c0ff",
+          "bytes": 12578
+        },
+        "sieve/las-smallsieve.cpp": {
+          "sha256": "30c4a5eb9a6b3b07c27f170d51b5eefc9add8303bde2c3086c59c086d2b69ac3",
+          "git_blob": "f35f01d3915de6d113eb8cf45c9da118bf75be16",
+          "bytes": 54277
+        },
+        "sieve/las-norms.cpp": {
+          "sha256": "f970568aea29fd038a5a0eb74059a628a94c926c4e099f4f2cafb3c181776ff9",
+          "git_blob": "669bb5164121b631184ea1fca0869201282423d8",
+          "bytes": 49829
+        },
+        "sieve/las-divide-primes.cpp": {
+          "sha256": "f69b488bf7f1f497ebc738e37166be2ce309547b7022912fe3c9aa594ac3cbc7",
+          "git_blob": "b59e711b88477edc1ddf36235d134adb97f23e4c",
+          "bytes": 10433
+        },
+        "README.md": {
+          "sha256": "ab16c079e2b3f109287349bf4cfb725f79493b32ed88383cd0a0338de2bb7fbf",
+          "git_blob": "9c0270e27c179b6052a08bf4ec1a301c0b2a387f",
+          "bytes": 26211
+        }
+      }
     }
   ],
   "method": "Read executable source and callers. Git blob hashes verified against pinned tree snapshots; official msieve and Prague source archives verified by SHA-256. No upstream code copied into the implementation or executed.",

@@ -82,3 +82,27 @@ They do not justify new C9 admission limits, an SLP ban for small inputs, or a
 matrix change in C10. The current tranche retains settled C9 residual and
 storage controls. Revisit N03 only with a bounded lost-candidate/useful-row
 audit; revisit N09 only with a measured remaining sparse-setup cost.
+
+## CADO SIQS: an executable C8 handoff
+
+The recent paper also led to CADO's SIQS build, inspected at
+[`692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b`](https://github.com/cado-nfs/cado-nfs/tree/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b).
+Its root `COPYING` supplies LGPL version 2.1. `sieve/CMakeLists.txt:135`
+builds `siqs` from `las.cpp` with `SIQS_SIEVE=1`; `las.cpp:90` then selects the
+SIQS algorithm. File names inherited from the NFS sieve do not make this a
+historical or unreachable QS implementation.
+
+| Follow-up | Exact source and transfer boundary |
+| --- | --- |
+| C8-S01: sorted half-sum scheduler | `siqs_largesieve.hpp::set_Ti` builds two sorted arrays of signed CRT half-sums modulo each sparse prime; `prepare_for_root` shifts one using the root and remaining Gray bits. `siqs-fill-in-buckets.inl::fill_in_buckets_siqs_compute_hits` joins pairs whose modular sum lies in the interval and decodes polynomial labels. `las-fill-in-buckets.cpp:119` selects that file under the SIQS build. This is a concrete executable handoff to C8, not a new C10 implementation. |
+| C8-S01: obligations before transfer | `siqs_largesieve::memory_required` includes both arrays and shift scratch; `make_lattice_bases` excludes primes sharing a factor with A. A v2 scheduler must separately cover those exceptional primes, both signs and prime powers; bound all half-sum/scratch storage; retain original assignment identities; and charge construction/replay. Existing v2 Gray updates and A-product ordering do not supply these sorted joins. C8 owns performance evaluation of this larger scheduling mechanism. |
+| N02: indexed A population | `las-todo-list.cpp::siqs_todo_list::special_q_from_index` un-ranks a fixed-cardinality prime subset and multiplies its entries. `feed_qrange` traverses an index range or samples its strata; `get_qfac_prime` finds eligible primes inside explicit bounds. This corroborates indexable family populations, but the inspected path has no actual-product ranking or family-overlap criterion. Its q is the SIQS A coefficient. |
+| N01: representation distinction | `siqs_special_q_data` prepares signed CRT roots; `las-norms.cpp::lognorm_base::norm` recovers `((r_j+A*i)^2-D)/A` with an exact Gray-dependent correction. This is the standard form, not the discriminant-normalized division by 4A. Floating log-norm approximations elsewhere are scoring heuristics, unlike v2's integer bounds. |
+| N06/A1a: build-dependent powers | `las-fill-in-buckets.cpp::discard_power_for_bucket_sieving` omits higher powers for general entries unless `BUCKET_SIEVE_POWERS` is enabled. The inspected CMake target does not itself set that macro; an external build definition could. Do not label every native build as having conservative prime-power coverage. v2's existing power lifting/plan contract remains the comparison control. |
+
+The half-sum source explicitly cites Kleinjung's *Quadratic sieving*.
+The [institutional publication record](https://graphsearch.epfl.ch/fr/publication/c3229829-6720-4486-8548-0db6c62685dc)
+confirms its scope; the publisher PDF returned HTTP 403. The handoff above is
+based on the executable source, not a claimed reading of the full paper.
+This is a focused source extension, not a fresh audit of all CADO residual,
+filtering or solver behavior. Those ownership boundaries remain unchanged.

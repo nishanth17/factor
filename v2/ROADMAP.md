@@ -1843,7 +1843,7 @@ the current B3/A7/C1 scheduling recommendation or existing prerequisites.
 
 #### C10 — Source-derived collection strategies and size-band calibration (open)
 
-The [C10 mechanism study](benchmarks/qs/c10/research.md) pins six executable
+The [C10 mechanism study](benchmarks/qs/c10/research.md) pins nine source
 implementations and ranks the first tranche from C9's observed stage costs.
 Independent normalized/mod-8 polynomial oracles and bounded actual-A ordering
 are implemented; [isolated experiments](benchmarks/qs/c10/protocol.md) await
