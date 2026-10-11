@@ -1,5 +1,17 @@
 # Changelog
 
+## C10 collection strategy preparation (11 October 2026)
+
+- Add Python-only experimental SIQS `assignment_policy="quality"`, ordering
+  fixed batches of flyer families by exact A-product distance. Preserve full
+  batch populations, extendable prefixes and distinct checkpoint identities;
+  reserve cache coexistence and charge reconstruction for finite/growing jobs.
+- Add independent normalized-polynomial/mod-8, root, reconstruction and
+  declared-threshold-loss oracles, a pinned six-implementation mechanism
+  comparison, and a bounded isolated policy experiment harness. Existing
+  defaults remain unchanged; complete-factor performance acceptance waits
+  for the settled C9 control and C10 measurements.
+
 ## Folder organization (10 October 2026)
 
 - Group v2 algorithms under `ecm/`, `pm1/`, `rho/` and existing `qs/`;

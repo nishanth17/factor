@@ -9,6 +9,13 @@ from ..common.arithmetic import gcd
 from .families import MAX_A_FACTORS, _checksum, _identity
 from .polynomial import a_target
 
+QUALITY_BATCH_SIZE = 16
+
+
+def quality_workspace(factor_count):
+    """Reserve a fixed batch, sort keys and old/new cache coexistence."""
+    return 4096 + 2 * QUALITY_BATCH_SIZE * (512 + 256 * factor_count)
+
 
 def unrank_combination(size, count, rank):
     """Unrank a lexicographic subset without enumerating its predecessors."""
@@ -59,11 +66,16 @@ class AssignmentStream:
             if value > high:
                 raise ValueError(f"{name} exceeds the stream limit")
 
-        if policy not in ("nearest", "flyer"):
+        if policy not in ("nearest", "flyer", "quality"):
             raise ValueError("unknown streaming A policy")
+        self.policy = policy
+        self._quality_start = -1
+        self._quality_values = ()
         self.workspace_bytes = (
             base.workspace_bytes + 65536 + 512 * len(base.entries)
         )
+        if policy == "quality":
+            self.workspace_bytes += quality_workspace(factor_count)
         if self.workspace_bytes > memory_bytes:
             raise MemoryError("assignment stream exceeds memory_bytes")
         self.budget = budget
@@ -76,7 +88,7 @@ class AssignmentStream:
             )[:pool_size]
         )
         self.core_count = factor_count - (
-            policy == "flyer" and factor_count > 1
+            policy in ("flyer", "quality") and factor_count > 1
         )
         self.flyers = ()
         if self.core_count < factor_count:
@@ -106,7 +118,9 @@ class AssignmentStream:
 
         self.identity = _checksum(
             [
-                "assignment-stream-v1",
+                "assignment-stream-quality-16-v1"
+                if policy == "quality"
+                else "assignment-stream-v1",
                 _identity(base),
                 self.target,
                 factor_count,
@@ -123,6 +137,12 @@ class AssignmentStream:
         utils.require_integer(index, "assignment index", 0)
         if index >= self.count:
             raise IndexError("assignment cursor is exhausted")
+        if self.policy == "quality":
+            return self._quality_item(index)
+        return self._raw_item(index)
+
+    def _raw_item(self, index):
+        """Recover one member of the original bijective assignment order."""
         self.budget.consume(len(self.pool) * (self.core_count + 1))
         rank = (
             0
@@ -145,6 +165,32 @@ class AssignmentStream:
                 min(choices, key=lambda p: (abs(product * p - self.target), p))
             )
         return tuple(sorted(values))
+
+    def _quality_item(self, index):
+        """Order fixed batches by actual A-product error without discards.
+
+        Batch boundaries depend on the full assignment space, never the
+        current grant. Extending family_count therefore preserves every
+        prefix, including a grant that ends inside a batch. Rebuilding this
+        disposable cache on resume repeats and charges all selection work.
+        """
+        start = index - index % QUALITY_BATCH_SIZE
+        if start != self._quality_start:
+            stop = min(start + QUALITY_BATCH_SIZE, self.total)
+            size = stop - start
+            # Charge products and sorting before publishing a complete cache.
+            self.budget.consume(
+                size * (self.core_count + self.target.bit_length() + 5)
+            )
+            candidates = [self._raw_item(i) for i in range(start, stop)]
+            candidates.sort(
+                key=lambda values: (abs(prod(values) - self.target), values)
+            )
+            self._quality_values = tuple(candidates)
+            self._quality_start = start
+
+        self.budget.consume(1)
+        return self._quality_values[index - start]
 
 
 def assignment_identity(assignments):

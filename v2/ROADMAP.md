@@ -1843,6 +1843,15 @@ the current B3/A7/C1 scheduling recommendation or existing prerequisites.
 
 #### C10 — Source-derived collection strategies and size-band calibration (open)
 
+The [C10 mechanism study](benchmarks/qs/c10/research.md) pins six executable
+implementations and ranks the first tranche from C9's observed stage costs.
+Independent normalized/mod-8 polynomial oracles and bounded actual-A ordering
+are implemented; [isolated experiments](benchmarks/qs/c10/protocol.md) await
+the settled C9 decision. Product diversity, representation-coupled multiplier
+scoring, threshold feedback and the concrete A1a kernel handoff remain
+separate gates. No C10 performance acceptance or workstream completion is
+claimed by this preparation.
+
 The [first-pass parameter audit](benchmarks/qs_parameter_audit.md) compares
 the current reference defaults, B1/C1 selected bundles and safety ceilings
 with pinned msieve, YAFU, Yamaquasi, FLINT, SymPy and JavaMath choices. It

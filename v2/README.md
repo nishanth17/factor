@@ -788,6 +788,17 @@ and fully reverify restored relations, then rebuild charged plans; cached roots
 are never trusted checkpoint evidence. These options preserve first-uncommitted
 position semantics, exact cumulative work and finite cancellation polling.
 
+The Python-only experimental `SIQSConfig(assignment_policy="quality")`
+orders fixed batches of 16 flyer families by exact `abs(A-target)` and then
+their prime tuples. It retains the same complete-batch population; it does not
+guarantee lower overlap or discard poor products. Batch boundaries use the
+entire assignment space, so extending `family_count` preserves every prefix.
+One bounded cache is reserved, and its reconstruction on resume is charged.
+Its identity is distinct from `flyer`; changing policy during resume is
+rejected. Finite and growing collectors retain their existing quota semantics.
+The policy is under [C10 evaluation](benchmarks/qs/c10/protocol.md); defaults
+and the CLI's existing choices are unchanged.
+
 The R2 benchmark harness compares these options with conservative scoring,
 bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
 recovery and grouped hit reservations. Its independent certified inputs,

@@ -6,7 +6,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
-from .assignment_stream import AssignmentStream
+from .assignment_stream import AssignmentStream, quality_workspace
 from .external_square import (
     CoefficientDivisorError,
     CoefficientExhaustedError,
@@ -127,7 +127,12 @@ class SIQSConfig:
             if type(getattr(self, name)) is not bool:
                 raise TypeError(f"{name} must be Boolean")
 
-        if self.assignment_policy not in ("reference", "nearest", "flyer"):
+        if self.assignment_policy not in (
+            "reference",
+            "nearest",
+            "flyer",
+            "quality",
+        ):
             raise ValueError("unknown assignment policy")
         if self.assignment_policy != "reference" and self.mode != "siqs":
             raise ValueError("streaming A policies require SIQS")
@@ -179,7 +184,12 @@ class SIQSConfig:
     def metadata_reserve(self):
         """Registry, assignments and coexistence with checkpoint encoding."""
         registry = 0 if self.streaming else 512 * self.polynomial_limit
-        return 65536 + 8 * (self.checkpoint_bytes or 0) + registry
+        quality = (
+            quality_workspace(self.factor_count)
+            if self.assignment_policy == "quality"
+            else 0
+        )
+        return 65536 + 8 * (self.checkpoint_bytes or 0) + registry + quality
 
 
 class SIQSJob:

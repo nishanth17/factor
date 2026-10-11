@@ -1,0 +1,303 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-10",
+  "sources": [
+    {
+      "name": "yafu",
+      "repository": "bbuhrow/yafu",
+      "revision": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "license": "Public-domain notices in inspected QS files; dependencies separate",
+      "files": {
+        "README.md": {
+          "sha256": "dc1b7e4f1931bf795095843b02a140899199d7aff2bb1b8ea9dd386867b4b104",
+          "git_blob": "b55a796e975f7e33287b6e73fb16a831641cd3fa",
+          "bytes": 7870
+        },
+        "factor/qs/SIQS.c": {
+          "sha256": "7529f4b46afdfb844bb24f28766486957fddcca174b6094669871249b7a75dbf",
+          "git_blob": "eca829f496512366a410ac94098b751ae922ace3",
+          "bytes": 238668
+        },
+        "factor/qs/new_poly.c": {
+          "sha256": "7ca2a6849f5a552fdb8980db0c140283a424bced2dc756fd2ef51f8578b230bf",
+          "git_blob": "afa8d137fd6322633e6c9f0fbfd98a0833daf19d",
+          "bytes": 33654
+        },
+        "factor/qs/poly_roots.c": {
+          "sha256": "aa172e9c41cf2cd2cb110a9c54789e9d4efd545700a416a419d50e1e2bfcf7f3",
+          "git_blob": "26ff9711d6372db532878a1018392f17104ec0ff",
+          "bytes": 20967
+        },
+        "factor/qs/poly_roots_32k.c": {
+          "sha256": "1e48573c46acf3de6abe451dd138c71790d4bf0066fba4b476e38d954bf81911",
+          "git_blob": "1a3397ba6dd767600e19c801ae6a0fb639478d5d",
+          "bytes": 68606
+        },
+        "factor/qs/update_poly_roots_32k.c": {
+          "sha256": "40052cf2ae1a53f09b67c428e2ce1d5ee34817610414b9dcfc39354e1658b365",
+          "git_blob": "8e3a7205ff3925235d7ca3c67b8c62a424446aa9",
+          "bytes": 108457
+        },
+        "factor/qs/med_sieve_32k.c": {
+          "sha256": "967d422aa23ae5adbc5fa1a51659dfcd05329ffbc39ff0bda7ac59c6d91d253e",
+          "git_blob": "cc4ec126c7c0c90afe62d692ae72335795d8abd8",
+          "bytes": 9122
+        },
+        "factor/qs/large_sieve.c": {
+          "sha256": "30aa9094406d5e77024d5efabad95e5af52806476a2a4858d0d892a1b8fc9d35",
+          "git_blob": "704f03e4eb0c85f7009d245a55048c5477b5f76e",
+          "bytes": 27426
+        },
+        "factor/qs/tdiv_scan.c": {
+          "sha256": "fd54462638631235355d7275d99f3cad0c7a2c2899c586d74dc6008649479d37",
+          "git_blob": "76c1915ca1c149c5a67ebbaa9d8757c133156a35",
+          "bytes": 35433
+        },
+        "factor/qs/tdiv.c": {
+          "sha256": "4f19aef399250a98c925ddc1f3ac64562511896c5757d463ca71c7992bcafcba",
+          "git_blob": "3de513585f4ea96ce4d21b1ab2a1f8080cf3b9d2",
+          "bytes": 47536
+        },
+        "factor/qs/tdiv_small.c": {
+          "sha256": "9fbbeaea6bb8f8c8b5b38eeab9c28949f0fbd1bd2cf8b6047b0f3431df0d216a",
+          "git_blob": "0111fb6890db079f6d46b322e2fca9645d59101d",
+          "bytes": 11405
+        },
+        "factor/qs/tdiv_resieve.c": {
+          "sha256": "fd5e1106c2c911e5e38c729ffdebbcad5ce49376585f1280dac386770b16df1f",
+          "git_blob": "6b7a809b77a8028cad324cd7c145f617ffee5399",
+          "bytes": 29850
+        },
+        "factor/qs/filter.c": {
+          "sha256": "3cbba701a6f85c782f61f7ee4c392a06ffa08ee5e9cc4297e0f7676749b9c1de",
+          "git_blob": "b1ab9c0bf8829c56324f21387c29b26f32204f3d",
+          "bytes": 111451
+        }
+      }
+    },
+    {
+      "name": "yamaquasi",
+      "repository": "remyoudompheng/yamaquasi",
+      "revision": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "license": "BSD-3-Clause",
+      "files": {
+        "LICENSE": {
+          "sha256": "aa19870bfcb410c161a810fa1f84a50a58284eb976af2c32b4c0053ca3ea9a9d",
+          "git_blob": "1d18a46069071dc2dacffe6df9409f175f8b303d",
+          "bytes": 1524
+        },
+        "README_qsieve.md": {
+          "sha256": "3a396d15d0deced033c048ccaa625ed1022b4f2bedfcb68aa36add1c2c228352",
+          "git_blob": "ea3b8fbc39eb2d8804d2d7c75715b3a894f32a9b",
+          "bytes": 5886
+        },
+        "src/siqs.rs": {
+          "sha256": "bec52e5a3e6018602d62ad09fee91b0eebec6039ad868c0164a338a08db5dc18",
+          "git_blob": "789370d945990dcebb3aec48618f2755c4d056ec",
+          "bytes": 58330
+        },
+        "src/fbase.rs": {
+          "sha256": "51b2aef33a7ca36595e2e6d26c82fc340f64049f8d8c9e9e8e4ead588d6ea66a",
+          "git_blob": "464d647866845e08ca83baa6fab93ae305c49d46",
+          "bytes": 19327
+        },
+        "src/sieve.rs": {
+          "sha256": "61f39fd94ed21a5258997e27d3dade84ee26f6a3ffc869ee80761dd786ed0c3d",
+          "git_blob": "15ba65c5593ae2c2ec47a43dab4d8597908198ce",
+          "bytes": 37176
+        },
+        "src/relations.rs": {
+          "sha256": "cb9a1e52a1ba63fb0415bbccd401e50d4b7f1b2bb1e81f114953a256c235da5b",
+          "git_blob": "565884f014ebf01520dd30a8b6db6e678ca2c18d",
+          "bytes": 31702
+        },
+        "src/params.rs": {
+          "sha256": "3f0e62ba404fe628cbe7ee9356e6b3f47a20386befdfae95180c8ef004f156f6",
+          "git_blob": "de5b6e16e4541aebbd34da2aec6fcb07fd232e57",
+          "bytes": 8461
+        }
+      }
+    },
+    {
+      "name": "flint",
+      "repository": "flintlib/flint",
+      "revision": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "license": "LGPL-3.0-or-later for inspected qsieve files",
+      "files": {
+        "COPYING": {
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "git_blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+          "bytes": 35149
+        },
+        "COPYING.LESSER": {
+          "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+          "git_blob": "0a041280bd00a9d068f503b8ee7ce35214bd24a1",
+          "bytes": 7652
+        },
+        "src/qsieve/factor.c": {
+          "sha256": "f1e5395e736b26fea79ad1943851b581d7b65ed6d61f55c9e36c87907747aeb7",
+          "git_blob": "32552d54da98106bf5044cf75a027c27cfe78b48",
+          "bytes": 15640
+        },
+        "src/qsieve/init.c": {
+          "sha256": "815506ec8c8febab7af752760cc4bc5f66e0d404581b01a82226c341af007320",
+          "git_blob": "13e8b11cc042738c623635ad117f30fb16db4ae1",
+          "bytes": 2617
+        },
+        "src/qsieve/knuth_schroeppel.c": {
+          "sha256": "d5c490d235888a80420dfc51c2cdbad6a7fa7b6f7ff85aa861c41d99bbde16f2",
+          "git_blob": "e38d047773c65b94faedfb0e43c47cbc39dda05b",
+          "bytes": 3910
+        },
+        "src/qsieve/primes_init.c": {
+          "sha256": "16f6740724b59058059ab761f49a63f337eefb90db6413fc8cfb39f624181b10",
+          "git_blob": "79a09fa199aed9045799ea664f95426efe607eae",
+          "bytes": 4746
+        },
+        "src/qsieve/compute_poly_data.c": {
+          "sha256": "54b91ff047c63e2f817b59008ef5f1bbf06ef2c0d5401953f6c647ef6245f49e",
+          "git_blob": "5cee63cda442e1da45feb17f48a0602eacb6387b",
+          "bytes": 24576
+        },
+        "src/qsieve/poly.c": {
+          "sha256": "fa09b9d4adff805f0c67154c0fb50f27281f298d1fc89a738c43ca231b36bba7",
+          "git_blob": "b4ac259288ece6e7e4a676b08f70789f5bdef49f",
+          "bytes": 3631
+        },
+        "src/qsieve/collect_relations.c": {
+          "sha256": "587a79b3d793591c55ebef84d0a0ca351260b4255cea91e700313c3deb421d36",
+          "git_blob": "2e33e04d4e4dbdfa06ab38d7b0de62d0dbe10ce6",
+          "bytes": 21062
+        },
+        "src/qsieve/large_prime_variant.c": {
+          "sha256": "ce107686acac68c25c0ffb1a6bcccb64fdc1e09ebccdf262675262507cc08d71",
+          "git_blob": "360516978a831ce8e180c32c730cd31e7b7ee7a7",
+          "bytes": 16083
+        },
+        "src/qsieve/linalg.c": {
+          "sha256": "3663128aa6abf201eaf8f8517578b6c77c7e8afa065b44ec29346ba5c2453901",
+          "git_blob": "6cd30f662f9a28d8d60f015030e84fd6b721211a",
+          "bytes": 5376
+        }
+      }
+    },
+    {
+      "name": "javamath",
+      "repository": "TilmanNeumann/java-math-library",
+      "revision": "088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97",
+      "license": "GPL-3.0-or-later",
+      "files": {
+        "LICENSE": {
+          "sha256": "3237699d9e6781c85877365abd9493ca132a0fd31f43e1a3278b8e75f3654af4",
+          "git_blob": "b059d641385896720b27bdbe7e40c36650a5651f",
+          "bytes": 33094
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/SIQS.java": {
+          "sha256": "9cf8b5e8256a8196c9e62921974a09d20300d6a6a0cef626cde3a0a1ee7cecba",
+          "git_blob": "6ac373e14e545f38bc66e1aaed5a9cf8007b8568",
+          "bytes": 18720
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/KnuthSchroeppel.java": {
+          "sha256": "9dd540e5519e477a771ee82038b18c161f1435264e2531f0dff739d79711f677",
+          "git_blob": "5f6378d1fb1e22a49f6697a5fd0c85f8a3baa402",
+          "bytes": 7228
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/poly/AParamGenerator02.java": {
+          "sha256": "b23c1367c37f55733334b4d5f984e1c62651bafda88d52a4a48d03db1cb9a764",
+          "git_blob": "0efc5428febccf8f09822b3fbcda51e26ceae72c",
+          "bytes": 12983
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/poly/SIQSPolyGenerator.java": {
+          "sha256": "e72863efcff2da61523f983d6a23080b860f8cf0821a6e7018cd23aec1e400a6",
+          "git_blob": "8ce55ce3b0cec339702a335111a547e404c6be8a",
+          "bytes": 22313
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/sieve/SieveParamsFactory02.java": {
+          "sha256": "7161f00e65935ee6c857234b4a83150d82bfdeed81e32ea992a927ea62377a3d",
+          "git_blob": "2722677fc6429e94dc828d7558b177425b1cadc2",
+          "bytes": 6414
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/sieve/Sieve03g.java": {
+          "sha256": "cf83fd4ad763b9764909c2ee7618a29d62e64038d5ef98569b9b97668092f06e",
+          "git_blob": "051aca8969e02d14bf7d7033189503ae47ac53af",
+          "bytes": 13667
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/sieve/SingleBlockSieve.java": {
+          "sha256": "4a5d3705ab9ab0d12d4f7d1b447f51ebc106e975a55423437a887f10f1a5deed",
+          "git_blob": "e92a74a55ab539c5eaf9df515e6ede5a58008867",
+          "bytes": 23986
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/tdiv/TDiv_QS_2LP.java": {
+          "sha256": "ce042fa60a2d2825cbccdfa15164a4188e9520d205613277d4f4e531bb02b9e1",
+          "git_blob": "dca48b01acd926fff599049320ac0ff7a17059cf",
+          "bytes": 18108
+        }
+      }
+    },
+    {
+      "name": "official-msieve",
+      "revision": "1.53 release",
+      "url": "https://sourceforge.net/projects/msieve/files/msieve/Msieve%20v1.53/msieve153_src.tar.gz/download",
+      "archive_sha256": "c5fcbaaff266a43aa8bca55239d5b087d3e3f138d1a95d75b776c04ce4d93bb4",
+      "license": "Public domain in inspected source; dependencies separate",
+      "files": {
+        "Readme": {
+          "sha256": "2c35b2c3f4ef002f6d9f9311ca49a4af4254b33e5cb03b35e373615f80bf4624",
+          "bytes": 25290
+        },
+        "Readme.qs": {
+          "sha256": "0ec770a2b7a93e1d11135a82d5941118bd6854d702d908e5a73e33ed977dc512",
+          "bytes": 7987
+        },
+        "mpqs/mpqs.c": {
+          "sha256": "df6200510829e8fe10c8b6e8d04f952c27ce3d87429fb7e4abfa5a5b9eac2386",
+          "bytes": 10699
+        },
+        "mpqs/poly.c": {
+          "sha256": "1c13949ef3846411a6b28997788afcd69515f7b01b12330671bad2b44a7900cc",
+          "bytes": 15420
+        },
+        "mpqs/sieve.c": {
+          "sha256": "71ff57e26d18b6fc1a697a4bd84e04db0ce451a9c56575622aa27df082fd30ba",
+          "bytes": 33885
+        },
+        "mpqs/sieve_core.c": {
+          "sha256": "c7711677da6518c23e571fc058b0c25a2ce0b03b9091f93512f2dfd99fdaf448",
+          "bytes": 19569
+        },
+        "mpqs/relation.c": {
+          "sha256": "072a7f11079c7d875867329274af9b3956b1d5e934b7ec83f72d15495c013720",
+          "bytes": 33906
+        },
+        "mpqs/sqrt.c": {
+          "sha256": "f77f9d4f5fb8fea7f45b360d7295f33f79303474aee13cd5a2e1f3d0136bca19",
+          "bytes": 7270
+        }
+      }
+    },
+    {
+      "name": "alpertron",
+      "repository": "alpertron/calculators",
+      "revision": "93c5c8189cb2f149c8dae898eb11997c5f2e7980",
+      "license": "GPL-3.0-or-later",
+      "files": {
+        "siqs.c": {
+          "sha256": "011c0f7519743dae016891e503960c17651a302bb5cb51c772086677a40ac2fd",
+          "git_blob": "aa5eec6e9e806a95bc305dc658fd20fb96fa9352",
+          "bytes": 135068
+        },
+        "siqsLA.c": {
+          "sha256": "81fbb9014a54782bc5b901d68fdc844c0b0140aebc6eb84f473cead715ac19b6",
+          "git_blob": "1a7630e037e92abb7c9d93de356973caebce67f2",
+          "bytes": 34956
+        },
+        "OldApplets/Siqs.java": {
+          "sha256": "50c9c598264fd82637b81c9d82d9308a55fdf77cc9411b9af61b23833966dabc",
+          "git_blob": "922942cd08796f7724a49426e29d83374510b0b9",
+          "bytes": 152398
+        }
+      }
+    }
+  ],
+  "method": "Read executable source and callers. Git blob hashes verified against pinned tree snapshots; official msieve archive verified by SHA-256. No upstream code copied into the implementation or executed."
+}
