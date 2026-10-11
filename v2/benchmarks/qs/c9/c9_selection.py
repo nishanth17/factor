@@ -82,6 +82,10 @@ def freeze(training, joint, spent_wall, spent_cpu):
             configurations=configs,
             choices={"slp": slp_rank, "dlp": dlp_rank},
             spent_before_confirmation=dict(wall=spent_wall, cpu=spent_cpu),
+            expense_convention="Conservative charged prior, including "
+            "the full 600-second heavy-QA allowance prepaid for both "
+            "working and committed-only verification. Final documentation "
+            "reconciles actual receipts without refunding this reserve.",
             evidence=[
                 dict(
                     name=str(p),

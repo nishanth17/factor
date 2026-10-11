@@ -18,6 +18,17 @@ class C9StudyTests(unittest.TestCase):
         aligned["collector"]["residual_bound"] = 900000000
         self.assertEqual(control, aligned)
 
+    def test_offline_validation_rejects_composite_terminal_output(self):
+        from v2.benchmarks.qs.c9.c9_census import validate_report
+
+        result = dict(factors=[21], remaining=[], complete=True)
+        report = {arm: {"pipeline": result} for arm in ("current", "aligned")}
+        with self.assertRaisesRegex(AssertionError, "disagree"):
+            validate_report(report, {"n": 21, "factors": [3, 7]})
+        result.update(factors=[3, 7], proper_divisors=[1])
+        with self.assertRaisesRegex(AssertionError, "improper"):
+            validate_report(report, {"n": 21, "factors": [3, 7]})
+
     def test_multigraph_core_and_disconnected_cycles(self):
         # A triangle, a parallel pair, a loop and a two-edge hanging path.
         pairs = [
@@ -56,6 +67,21 @@ class C9StudyTests(unittest.TestCase):
 
 
 class C9ConfirmationTests(unittest.TestCase):
+    def test_fresh_generator_cannot_replace_revealed_inputs(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+
+        from v2.benchmarks.qs.c9 import c9_confirmation as confirmation
+
+        with TemporaryDirectory() as directory:
+            corpus = Path(directory) / "corpus.json"
+            corpus.write_text("already revealed")
+            with patch.object(confirmation, "CORPUS", corpus):
+                with self.assertRaisesRegex(ValueError, "no regeneration"):
+                    confirmation.generate()
+            self.assertEqual(corpus.read_text(), "already revealed")
+
     def test_extension_preserves_negative_and_censored_pairs(self):
         from v2.benchmarks.qs.c9.c9_confirmation import unstable
 

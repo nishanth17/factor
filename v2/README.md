@@ -1065,3 +1065,21 @@ rule. The result retains an unresolved cofactor when the allowance ends. The
 training, fresh confirmation, certainty labels and the separate larger-store
 resume witness. Performance belongs to the tested configuration/input class,
 not every input with the same number of digits.
+
+C9 distinguishes the single-prime ceiling from the DLP endpoint ceiling.
+With DLP enabled, setting `residual_bound=large_prime_bound` deliberately
+rejects higher SLP primes that can only match each other. It can preserve more
+useful history in the finite forest, but loses some valid SLP pairs. This is
+an explicit policy choice, not a primality or coverage shortcut. When
+`candidate_bound=0` and the DLP product allowance exceeds both SLP ceilings,
+changing only that SLP ceiling leaves the DLP product and conservative
+candidate-score domain unchanged. In SLP-only mode the
+residual ceiling also determines the candidate domain.
+
+`max_partials` caps unowned DLP forest edges. Pinned paths, original atoms,
+combined rows and matrix storage have separate ownership and limits; doubling
+this value can exhaust memory before collection becomes useful. The existing
+configuration identity includes all these bounds, so a changed policy must
+be supplied consistently on restore. There is no new serialized relation
+format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
+[bounded evidence and decision](benchmarks/qs/c9/c9_results.md).

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "total_wall_cap": 14400,
+  "total_cpu_cap": 14400,
+  "charges": [
+    {
+      "name": "aborted overlap attempt",
+      "wall": 240,
+      "cpu": 240,
+      "kind": "conservative full allowance"
+    },
+    {
+      "name": "individual training",
+      "seconds": 1002.3525192080997,
+      "cpu_seconds": 965.113053
+    },
+    {
+      "name": "corrected short census window",
+      "status": "complete",
+      "seconds": 7.2891968339681625,
+      "cpu_seconds": 7.075456
+    },
+    {
+      "name": "failed illustrative-prime preflight",
+      "wall": 0.2,
+      "cpu": 0.2,
+      "kind": "conservative charge"
+    },
+    {
+      "name": "joint training, census repeat, profiles and repeated restore",
+      "status": "complete",
+      "seconds": 438.16037566703744,
+      "cpu_seconds": 436.81824800000004,
+      "source_sha256": "61b65e7d84d3280af3a2db2be48bd02a5e017dcbeb34b1db60bc8945db33f4d2"
+    },
+    {
+      "name": "all heavy QA",
+      "wall": 600,
+      "cpu": 600,
+      "kind": "prepaid whole suballowance; includes prior 47.543 wall/50.587 CPU and final working/committed-only checks"
+    }
+  ],
+  "charged_prior": {
+    "wall": 2310,
+    "cpu": 2270
+  },
+  "overhead_policy": "Round upward with more than 20 seconds each for metadata, verification and selection overhead. Do not refund unused QA reservation. Corpus generation and every cold, warmup and confirmation call are added by the persistent expense ledger.",
+  "qa_already_measured": {
+    "seconds": 47.54258687491529,
+    "cpu_seconds": 50.586923999999996
+  }
+}

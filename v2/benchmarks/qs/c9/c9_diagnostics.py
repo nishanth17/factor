@@ -4,6 +4,7 @@ import argparse
 import cProfile
 import gc
 import json
+import os
 import pstats
 import time
 from dataclasses import replace
@@ -59,7 +60,21 @@ def resume(config, fixture, output):
         collector=replace(config.collector, memory_bytes=512 * 2**20),
     )
     start, cpu = time.monotonic(), time.process_time()
-    budget = Budget(work_limit=10**13, seconds=300, cpu_seconds=300)
+    last_poll = time.monotonic()
+
+    def poll():
+        nonlocal last_poll
+        now = time.monotonic()
+        if now - last_poll >= 1:
+            study.check_quiet({os.getpid()})
+            if study._rss_bytes() > 2**30:
+                raise MemoryError("C9 resume RSS cap")
+            last_poll = now
+        return False
+
+    budget = Budget(
+        work_limit=10**13, seconds=300, cpu_seconds=300, cancelled=poll
+    )
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     receipts = []
     for tier in (10, 20):
@@ -109,6 +124,7 @@ def resume(config, fixture, output):
             seconds=time.monotonic() - start,
             cpu_seconds=time.process_time() - cpu,
             receipts=receipts,
+            rss_bytes=study._rss_bytes(),
             reason=result.reason,
             divisor=result.divisor,
             remaining=[] if result.divisor else [fixture["n"]],

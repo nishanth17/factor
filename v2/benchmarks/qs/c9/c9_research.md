@@ -29,8 +29,9 @@ separates the factor-base bound, one-prime limit and double-prime region.
 Its SGI/Cray evidence shows that memory, reporting thresholds and implementation
 change the crossover. Its DLP prediction applies to similar sizes and fixed
 parameters. Section 6 explicitly rejects prime residuals beyond the common
-endpoint bound because those partials contributed little in its experiments. This supports measuring long prefixes, rather than extrapolating a 60-second
-empty matrix or copying an 80-digit threshold.
+endpoint bound because those partials contributed little in its experiments. This supports
+measuring long prefixes, rather than extrapolating a 60-second empty matrix
+or copying an 80-digit threshold.
 
 [Cavallar, 2000, §2.1–2.2](https://ir.cwi.nl/pub/2078/2078D.pdf)
 explains recursive singleton removal and the size/weight tradeoff of merging.
@@ -44,6 +45,16 @@ gives SQUFOF's arithmetic, queue and multiplier obligations. It is a plausible
 bounded residual splitter, not evidence to replace successful v2 rho. Batch
 smooth-part extraction would additionally require finite batch storage and
 amortization; higher-arity relation admission remains F6.
+
+A useful statistical approximation is that an endpoint seen with a small
+Poisson mean λ contributes about λ records but only λ²/2 equal-endpoint
+pairs. Keeping many very rare endpoints therefore has poor immediate return
+per stored atom. DLP changes the calculation because two distinct endpoints
+can become useful through a path; connected-component development and its
+retained history matter, not just pair collisions. This approximation ranks
+hypotheses; it does not prove an optimal cutoff or justify deleting degree-one
+edges. The fixed-prefix replay measures the actual lost matches and gained
+cycles instead of assuming uniform prime frequencies.
 
 ## Implementation comparison: follow the actual intake
 
@@ -69,6 +80,33 @@ The older ledger describes Yamaquasi's
 in the inspected caller; `fbase::cofactor` explicitly retains larger recovered
 products if endpoints fit. C1's strict v2 product policy remains exactly what
 its historical experiment tested. No historical result is rewritten.
+
+Two caller examples help normalize these choices. JavaMath Factory02 uses
+`sieveHitExponent = 0.21 + max(0, bits−150)*0.045/150`, while trial-test and
+smooth-residual exponents are 0.12 below 250 bits and 0.16 thereafter. Near
+50 digits this gives roughly a 10^6 exact residual ceiling, even though the
+initial sieve-hit allowance is much larger. Skipped-small-prime compensation
+and post-filtering explain why those domains differ. Java's `BigInteger`,
+custom unsigned division and word Montgomery splitters supply a different
+cost model; its `findSingleFactor` calls are not v2's explicit shared quotas.
+For Yamaquasi near 166 bits, the nominal DLP scoring factor is 83B² and the
+common endpoint multiplier is 109B; the recovered product can still exceed
+the nominal score factor. Neither source's logarithm/byte constants map to
+v2's 32-units-per-bit conservative integer score. Yamaquasi's cofactor
+caller tries rho three times at 2,048 evaluations below 40 residual bits,
+three at 4,096 below 48 bits, and once at 8,192 otherwise, before its ECM
+fallback. That size-dependent effort schedule is meaningful; its numerical
+limits and native ECM economics have not been calibrated for PyPy.
+
+YAFU's setup selects DLP at 70 decimal digits, ordinarily postpones TLP to
+an effectively disabled 221-digit cutoff unless forced, and then explicitly
+assigns its bit-tiered `dlp_exp` in `SIQS.c`. Suggestive exponent columns in
+architecture-specific parameter tables are not the operative assignment.
+Higher-arity batch paths and GPU variants are distinct callers, not the DLP
+path evaluated here. FLINT may continue collection when relation processing
+returns insufficient rows; its later failed solve/extraction path can restart
+with a larger base. These control-flow distinctions prevent mistaking a
+processing trigger for a guaranteed stopping target.
 
 ## Storage counts that must not be equated
 

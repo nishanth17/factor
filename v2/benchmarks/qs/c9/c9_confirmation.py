@@ -92,6 +92,8 @@ def existing_inputs():
 
 
 def generate():
+    if CORPUS.exists():
+        raise ValueError("C9 fresh corpus already exists; no regeneration")
     selection = json.loads(SELECTED.read_text())
     if selection["source"] != hashes():
         raise ValueError("selection must freeze source before generation")
@@ -286,19 +288,23 @@ def unstable(rows):
 def confirm(output, digits):
     selection, corpus = load()
     metadata = output / "manifest.json"
-    if not metadata.exists():
-        save(
-            metadata,
-            dict(
-                source=selection["source"],
-                runtime=sys.version,
-                platform=platform.platform(),
-                selected_sha256=hashlib.sha256(
-                    SELECTED.read_bytes()
-                ).hexdigest(),
-                corpus_sha256=hashlib.sha256(CORPUS.read_bytes()).hexdigest(),
-            ),
-        )
+    expected = dict(
+        source=selection["source"],
+        runtime=sys.version,
+        platform=platform.platform(),
+        selected_sha256=hashlib.sha256(SELECTED.read_bytes()).hexdigest(),
+        corpus_sha256=hashlib.sha256(CORPUS.read_bytes()).hexdigest(),
+    )
+    if metadata.exists():
+        if json.loads(metadata.read_text()) != expected:
+            raise ValueError(
+                "confirmation output belongs to a different freeze"
+            )
+    else:
+        save(metadata, expected)
+    if (output / f"finished-{digits}.json").exists():
+        # Repeating a finished band cannot acquire additional samples.
+        return
     expense = Expenses(output, selection, corpus)
     fixtures = [f for f in corpus["fixtures"] if f["digits"] == digits]
     configs = {
@@ -315,8 +321,8 @@ def confirm(output, digits):
             )
         path = output / f"warmup-{digits}-{arm}.json"
         if not path.exists():
-            warm, elapsed = [], 0.0
-            while elapsed < 3:
+            warm, elapsed, elapsed_cpu = [], 0.0, 0.0
+            while min(elapsed, elapsed_cpu) < 3:
                 row = expense.call(
                     f"warmup-{digits}-{arm}",
                     5,
@@ -326,6 +332,7 @@ def confirm(output, digits):
                 )
                 warm.append(row)
                 elapsed += row["seconds"]
+                elapsed_cpu += row["cpu_seconds"]
             save(path, warm)
     rows = []
     for target in (9, 18):
@@ -380,7 +387,14 @@ def confirm(output, digits):
         )
         if not reasons:
             break
-        if target == 9 and expense.used() + 9 * 3 * (CAPS[digits] + 2) > 14400:
+        cached_extension = sum(
+            1
+            for path in output.glob("c9_fresh_*.json")
+            if (saved := json.loads(path.read_text()))["digits"] == digits
+            and saved["sample"] >= 9 // len(fixtures)
+        )
+        extension_cap = max(0, 27 - cached_extension) * (CAPS[digits] + 2)
+        if target == 9 and expense.used() + extension_cap > 14400:
             save(
                 output / f"extension-refused-{digits}.json",
                 dict(

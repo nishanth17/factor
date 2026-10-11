@@ -1,6 +1,6 @@
 # C9.1 useful large-prime yield: evidence and acceptance
 
-Status: training complete; confirmation and acceptance pending. This report
+Status: individual and joint training complete; confirmation and acceptance pending. This report
 separates source-supported hypotheses, instrumented attribution and fresh
 complete-call evidence. The [research](c9_research.md) and immutable initial
 [protocol](c9_protocol.md) explain the investment and finite limits.
@@ -55,6 +55,13 @@ is also retained.
 | Current | 1587 / 1610 | 1237 / 1329 | 78848 / 75776 | 27272 / 26703 | 0 / 0 | 193.74 / 194.85 |
 | Aligned | 1612 / 1633 | 1442 / 1457 | 12288 / 12288 | 15488 / 15578 | 0 / 0 | 219.30 / 222.41 |
 | 16K retention | 293 / 276 | 0 / 0 | 0 / 0 | 5019 / 5063 | 0 / 0 | 255.39 / 254.93 |
+
+The 16K refusal applies to the frozen 8,192-row/32,768-atom reservation
+bundle. It does not prove that 16K retention is always uneconomic: a smaller
+matrix-row reservation or different finite storage design could make it fit.
+That is an untested coordinated resource bundle, not a reason to rescue this
+arm with more memory. The two permitted follow-ups instead use the historical
+half-base configuration, supported by C1's prior useful-prefix witness.
 
 Alignment retained more useful combined rows and pinned cycle paths, so its
 owned memory **increased** despite fewer evictions and lower full-call cost.
@@ -158,5 +165,45 @@ The 65,536-record cutoffs, input order and original sampling scope remain C1's.
 Unlimited-history rank is only an optimistic diagnostic, not a feasible
 memory-matched challenger.
 
-New fresh confirmation, separate profile/resume costs, acceptance decision,
-verification and reproduction instructions follow after the frozen joint study.
+## Frozen joint collector study
+
+The second freeze is committed in `9006eae`; exact settings and the completed
+individual-arm gate are in `inputs/controls/c9_combinations.json`. It compares
+C1's historical half-base DLP against that same bundle with endpoint alignment.
+Both use base 15,000, endpoint 1.5M/product 28.8B, interval half-width 65,536,
+six A factors and unchanged finite stores. The SLP ceilings are 225M and
+1.5M respectively. These remain instrumented training calls, not fresh timings.
+
+| Joint arm | Input 0 seconds | Input 1 seconds | Complete | Total seconds |
+| --- | ---: | ---: | ---: | ---: |
+| Historical half-base DLP | 77.510 | 86.588 | 2/2 | 164.098 |
+| Half-base DLP plus endpoint alignment | 45.603 | 53.616 | 2/2 | 99.219 |
+
+The prescribed ranking selects **half-base plus alignment** as the DLP
+challenger and full-base **3M SLP** as its calibrated SLP comparison. The
+candidate's training cost falls 39.54% against the same half-base collector,
+51.08% against selected SLP and 68.50% against current full-base DLP. These
+percentages select a candidate; they do not establish accepted benefits.
+SLP calibration compares the two frozen endpoint policies at the existing
+full base, not every possible SLP base/interval combination. Broader joint
+SLP/DLP optimization remains C10.
+
+The half-base comparison isolates alignment at that collector: both controls
+evict 20,480 edges; both aligned calls finish without eviction. Filtered rows
+rise from 806/874 to 840/901, while owned peaks rise from 179.81/185.49 to
+190.08/193.55 MiB. Split attempts fall from 11,246/11,374 to 7,067/7,077;
+all splits succeed or reject an out-of-bound endpoint, with no failed split.
+The final solver produces 2/2 dependencies for the control and 2/3 for the
+aligned bundle; every complete output has a proper factor and independently
+certified reconstruction. The retained incidence cycle ranks are 858/911 and
+861/914, with 2-core edges 1,747/1,850 and 2,352/2,475. The aligned calls retain
+9,939/9,929 original atoms, distinct from their 861/914 combined rows.
+
+Cross-base effects are not isolated C9 credit. On input 0, half-base alignment
+scans **137.4M** positions versus full-base alignment's **106.6M**, yet uses
+51.35B work units versus 117.97B and has a much smaller parity universe.
+More reports or positions alone would rank those outcomes incorrectly.
+The collector and residual-policy interaction is the useful finding.
+
+Fresh confirmation, separate profile/resume costs, acceptance decision,
+verification and reproduction instructions follow after the frozen study.

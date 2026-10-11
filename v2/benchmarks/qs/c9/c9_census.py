@@ -19,6 +19,9 @@ def replay(records, n, aligned, budget):
     """Compare finite FIFO retention and optimistic no-eviction rank."""
     forest, kept, parents, sizes = LargePrimeForest(), set(), {}, {}
     counts = Counter()
+    retained_reserve = sum(2048 + 128 * len(r["exponents"]) for r in records)
+    if retained_reserve + 32768 >= 512 * 2**20:
+        raise MemoryError("C9 census raw-record reservation")
 
     def root(v):
         while parents[v] != v:
@@ -51,6 +54,12 @@ def replay(records, n, aligned, budget):
                 a, b = b, a
             parents[b] = a
             sizes[a] += sizes.pop(b)
+        # Reserve prospective publication/rebuild scratch before creating it.
+        replay_reserve = (
+            32768 + 4096 * (len(forest.edges) + 1) + 512 * len(parents)
+        )
+        if retained_reserve + replay_reserve >= 512 * 2**20:
+            raise MemoryError("C9 census simultaneous-storage reservation")
         identity = str(index)
         plan = forest.plan(left, right, identity, 8192, budget)
         if plan.cycle is not None:
@@ -63,7 +72,6 @@ def replay(records, n, aligned, budget):
     selected = kept | {int(i) for i in forest.edges}
     # Input records stay live while forest references and analysis coexist.
     # Reserve raw-record objects, two forest maps and replay union-find first.
-    retained_reserve = sum(2048 + 128 * len(r["exponents"]) for r in records)
     replay_reserve = 32768 + 4096 * len(forest.edges) + 512 * len(parents)
     available = 512 * 2**20 - retained_reserve - replay_reserve
     report = compact_report(
@@ -104,12 +112,26 @@ def run(retained, output):
     start, cpu = time.monotonic(), time.process_time()
     control = json.loads(study.CONTROL.read_text())
     reports = []
-    budget = Budget(work_limit=10**13, seconds=120, cpu_seconds=120)
+    last_poll = time.monotonic()
+
+    def poll():
+        nonlocal last_poll
+        if time.monotonic() - last_poll >= 1:
+            if study._rss_bytes() > 2**30:
+                raise MemoryError("C9 census RSS cap")
+            last_poll = time.monotonic()
+        return False
+
+    budget = Budget(
+        work_limit=10**13, seconds=120, cpu_seconds=120, cancelled=poll
+    )
     for index, fixture in enumerate(control["fixtures"]):
         path = retained / f"50-{index}-records.json"
         if path.stat().st_size > 32 * 2**20:
             raise ValueError("retained census byte cap")
         records = json.loads(path.read_text())
+        if len(records) > 65536:
+            raise ValueError("C9 retained record-count cap")
         validate_records(records, fixture["n"], budget)
         high = Counter(
             r["residual"]
@@ -152,6 +174,11 @@ def run(retained, output):
             seconds=time.monotonic() - start,
             cpu_seconds=time.process_time() - cpu,
             work=budget.used,
+            rss_bytes=study._rss_bytes(),
+            owned_allowance_bytes=512 * 2**20,
+            source_sha256=hashlib.sha256(
+                Path(__file__).read_bytes()
+            ).hexdigest(),
             limitation="Retained C1 fixed-prefix counterfactual; acquisition, "
             "scoring and full-call cost are not measured here. "
             "No-eviction rank is optimistic, not a memory-feasible arm.",
