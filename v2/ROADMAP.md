@@ -1861,6 +1861,10 @@ family diversity, threshold feedback, coupled size policy and fixed solve
 cadence have conditional [C10a gates](benchmarks/qs/c10/c10a_followups.md).
 A1a, C8, C9, matrix/solver owners and E1 retain their existing boundaries.
 This bounded C10 tranche is complete; the continuing C10 workstream is open.
+Scoped automatic selection of the accepted plan has not been implemented;
+[C10a-07](benchmarks/qs/c10/c10a_followups.md) owns that C10 follow-up for
+the exact tested bundle identities. E1 retains only combined portfolio/default
+acceptance, not the C10 collection selector.
 
 The [first-pass parameter audit](benchmarks/qs_parameter_audit.md) compares
 the current reference defaults, B1/C1 selected bundles and safety ceilings
