@@ -55,5 +55,100 @@ class C9StudyTests(unittest.TestCase):
         self.assertEqual(result["core_vertices"], 6)
 
 
+class C9ConfirmationTests(unittest.TestCase):
+    def test_extension_preserves_negative_and_censored_pairs(self):
+        from v2.benchmarks.qs.c9.c9_confirmation import unstable
+
+        rows = []
+        for sample, candidate in enumerate((8, 12, 10)):
+            for arm, seconds in (
+                ("slp", 10),
+                ("dlp", 10),
+                ("challenger", candidate),
+            ):
+                rows.append(
+                    dict(
+                        id="case",
+                        sample=sample,
+                        seed=sample,
+                        arm=arm,
+                        seconds=seconds,
+                        capped_seconds=seconds,
+                    )
+                )
+        self.assertEqual(len(unstable(rows)), 2)
+        for row in rows:
+            row["capped_seconds"] = 240
+        self.assertEqual(unstable(rows), [])
+
+    def test_training_selection_charges_fast_refusals_at_full_cap(self):
+        from v2.benchmarks.qs.c9.c9_selection import ranked
+
+        rows = [
+            dict(arm=arm, complete=complete, capped_seconds=cost)
+            for arm, complete, cost in (
+                ("refused", False, 240),
+                ("refused", False, 240),
+                ("completed", True, 120),
+                ("completed", True, 100),
+                ("mixed", True, 1),
+                ("mixed", False, 240),
+            )
+        ]
+        result = ranked(rows, ("refused", "completed", "mixed"))
+        self.assertEqual(
+            [r["arm"] for r in result], ["completed", "mixed", "refused"]
+        )
+        with self.assertRaises(ValueError):
+            ranked(rows[:-1], ("mixed",))
+
+    def test_input_heterogeneity_alone_is_not_temporal_instability(self):
+        from v2.benchmarks.qs.c9.c9_confirmation import unstable
+
+        rows = [
+            dict(
+                id=identity,
+                sample=0,
+                seed=7,
+                arm=arm,
+                seconds=cost,
+                capped_seconds=cost,
+            )
+            for identity, candidate in (("easy", 8), ("hard", 12))
+            for arm, cost in (
+                ("slp", 10),
+                ("dlp", 10),
+                ("challenger", candidate),
+            )
+        ]
+        self.assertEqual(unstable(rows), [])
+
+    def test_expense_refusal_and_failed_call_remain_charged(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+
+        from v2.benchmarks.qs.c9.c9_confirmation import Expenses
+
+        with TemporaryDirectory() as directory:
+            selection = {
+                "spent_before_confirmation": {"wall": 14398, "cpu": 14398}
+            }
+            expense = Expenses(
+                Path(directory), selection, {"generation_seconds": 0}
+            )
+            with self.assertRaises(RuntimeError):
+                expense.call("over cap", 3, lambda: self.fail("ran"))
+            self.assertEqual(expense.data["calls"], [])
+            with (
+                patch("time.monotonic", side_effect=[10, 11]),
+                patch("time.process_time", side_effect=[20, 21]),
+            ):
+                with self.assertRaises(ZeroDivisionError):
+                    expense.call("failed", 2, lambda: 1 / 0)
+            self.assertEqual(expense.data["calls"][0]["status"], "failed")
+            self.assertGreaterEqual(expense.used(), 14399)
+
+
 if __name__ == "__main__":
     unittest.main()

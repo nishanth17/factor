@@ -13,10 +13,12 @@
         "factor/qs/siqs_aux.c": "431641e0547d1fafc9c7b9f5233c8b933d6b6849ffa170c9ba061311225b7209",
         "factor/qs/tdiv.c": "4f19aef399250a98c925ddc1f3ac64562511896c5757d463ca71c7992bcafcba",
         "factor/qs/filter.c": "3cbba701a6f85c782f61f7ee4c392a06ffa08ee5e9cc4297e0f7676749b9c1de",
-        "README.md": "dc1b7e4f1931bf795095843b02a140899199d7aff2bb1b8ea9dd386867b4b104"
+        "README.md": "dc1b7e4f1931bf795095843b02a140899199d7aff2bb1b8ea9dd386867b4b104",
+        "factor/qs/tdiv_scan.c": "fd54462638631235355d7275d99f3cad0c7a2c2899c586d74dc6008649479d37"
       },
       "missing_paths": [],
-      "archive_sha256": "ae87be8a8b2d88b99fa3cb3bbbc35034a958793313b17b2e605947ab5b6eb71d"
+      "archive_sha256": "ae87be8a8b2d88b99fa3cb3bbbc35034a958793313b17b2e605947ab5b6eb71d",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     },
     {
       "repo": "radii/msieve",
@@ -29,12 +31,12 @@
         "mpqs/relation.c": "81db5d89a116a100e045d0da70061a8caefd96a81aa12bc7dbf06146df3f6f94",
         "mpqs/mpqs.c": "67326a47fca42eef0295ab8764097ee0c290aa03cd16e7ef530c132ac78c38e7",
         "mpqs/sqrt.c": "9c086fcf589b8e83fdb7ee35c3cd1b3264f41cdf47b9ccc24b0a8ed2eceec269",
-        "Readme": "f7acc69fb27cde0cb6492ca8aeb0745232f5c394630492c4b71c391ff1ffb2b2"
+        "Readme": "f7acc69fb27cde0cb6492ca8aeb0745232f5c394630492c4b71c391ff1ffb2b2",
+        "Readme.qs": "0ec770a2b7a93e1d11135a82d5941118bd6854d702d908e5a73e33ed977dc512"
       },
-      "missing_paths": [
-        "Readme.qs"
-      ],
-      "archive_sha256": "d95a9b10d511eecf104137cd3c517c612230db4b212d799e55c6bae20fc1df1b"
+      "missing_paths": [],
+      "archive_sha256": "d95a9b10d511eecf104137cd3c517c612230db4b212d799e55c6bae20fc1df1b",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     },
     {
       "repo": "remyoudompheng/yamaquasi",
@@ -47,10 +49,12 @@
         "src/fbase.rs": "51b2aef33a7ca36595e2e6d26c82fc340f64049f8d8c9e9e8e4ead588d6ea66a",
         "src/pollard_rho.rs": "5801e1a8d3706b2ffcb34175c2c421e918a2f99376c18ff96094d73a574c9910",
         "src/relations.rs": "cb9a1e52a1ba63fb0415bbccd401e50d4b7f1b2bb1e81f114953a256c235da5b",
-        "LICENSE": "aa19870bfcb410c161a810fa1f84a50a58284eb976af2c32b4c0053ca3ea9a9d"
+        "LICENSE": "aa19870bfcb410c161a810fa1f84a50a58284eb976af2c32b4c0053ca3ea9a9d",
+        "src/ecm128.rs": "ff1f166051670597fbc165005c04de1b30627f1ccd343afd94cda07e9ecb599f"
       },
       "missing_paths": [],
-      "archive_sha256": "9500b5f7ff41dceb3e1e505e078938da3de5ac660b3d225f7ce562937ff54461"
+      "archive_sha256": "9500b5f7ff41dceb3e1e505e078938da3de5ac660b3d225f7ce562937ff54461",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     },
     {
       "repo": "TilmanNeumann/java-math-library",
@@ -64,10 +68,13 @@
         "src/main/java/de/tilman_neumann/jml/factor/siqs/tdiv/TDiv_QS_2LP.java": "ce042fa60a2d2825cbccdfa15164a4188e9520d205613277d4f4e531bb02b9e1",
         "src/main/java/de/tilman_neumann/jml/factor/base/congruence/CongruenceCollector01.java": "4617462647c0071c28b3b3bb69a740ff325f7f77c160131d3019077298270ab1",
         "src/main/java/de/tilman_neumann/jml/factor/base/congruence/PartialSolver01.java": "7f97f5309486f9b466e955a12008111a859b23fc0089e3e7526e66b98e73bf90",
-        "LICENSE": "3237699d9e6781c85877365abd9493ca132a0fd31f43e1a3278b8e75f3654af4"
+        "LICENSE": "3237699d9e6781c85877365abd9493ca132a0fd31f43e1a3278b8e75f3654af4",
+        "src/main/java/de/tilman_neumann/jml/factor/CombinedFactorAlgorithm.java": "4f0341eb0f7a4bcfc92a458e7a44b2a5ca553d9c39da834764b0ddb8922b649d",
+        "src/main/java/de/tilman_neumann/jml/factor/psiqs/PSIQSBase.java": "8b3a8891fd5a5717f4f0cb3db88fb2d405157121d642ceba6c06880ec56f36ba"
       },
       "missing_paths": [],
-      "archive_sha256": "880004c6e265030623f28725924cd61ae0eabf47035e1639203ee9a1d5f70f61"
+      "archive_sha256": "880004c6e265030623f28725924cd61ae0eabf47035e1639203ee9a1d5f70f61",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     },
     {
       "repo": "flintlib/flint",
@@ -80,13 +87,14 @@
         "src/qsieve/factor.c": "f1e5395e736b26fea79ad1943851b581d7b65ed6d61f55c9e36c87907747aeb7",
         "src/qsieve/linalg.c": "3663128aa6abf201eaf8f8517578b6c77c7e8afa065b44ec29346ba5c2453901",
         "src/qsieve/large_prime_variant.c": "ce107686acac68c25c0ffb1a6bcccb64fdc1e09ebccdf262675262507cc08d71",
-        "COPYING": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        "COPYING": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "COPYING.LESSER": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
       },
       "missing_paths": [
-        "src/qsieve/io.c",
-        "COPYING.LESSER"
+        "src/qsieve/io.c"
       ],
-      "archive_sha256": "c7387bff3574b8289ca12642ebbfd2f327787d85ab4343ce322fe49dc8e0943b"
+      "archive_sha256": "c7387bff3574b8289ca12642ebbfd2f327787d85ab4343ce322fe49dc8e0943b",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     },
     {
       "repo": "MersenneForum/msieve",
@@ -99,12 +107,12 @@
         "mpqs/relation.c": "81db5d89a116a100e045d0da70061a8caefd96a81aa12bc7dbf06146df3f6f94",
         "mpqs/mpqs.c": "67326a47fca42eef0295ab8764097ee0c290aa03cd16e7ef530c132ac78c38e7",
         "mpqs/sqrt.c": "9c086fcf589b8e83fdb7ee35c3cd1b3264f41cdf47b9ccc24b0a8ed2eceec269",
-        "Readme": "2c35b2c3f4ef002f6d9f9311ca49a4af4254b33e5cb03b35e373615f80bf4624"
+        "Readme": "2c35b2c3f4ef002f6d9f9311ca49a4af4254b33e5cb03b35e373615f80bf4624",
+        "Readme.qs": "0ec770a2b7a93e1d11135a82d5941118bd6854d702d908e5a73e33ed977dc512"
       },
-      "missing_paths": [
-        "Readme.qs"
-      ],
-      "archive_sha256": "c39bea9de584f7c0214cd608605cdc9d718be5e6b36d07cfc30073fa73830811"
+      "missing_paths": [],
+      "archive_sha256": "c39bea9de584f7c0214cd608605cdc9d718be5e6b36d07cfc30073fa73830811",
+      "missing_paths_meaning": "Requested names absent from pinned source; not a claim that no equivalent implementation exists."
     }
   ]
 }
