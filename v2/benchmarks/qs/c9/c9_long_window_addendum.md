@@ -59,3 +59,14 @@ feasibility witness on this selected input, not a new speed promotion, a
 universal digit cutoff or general 60–100-digit capability. No automatic new
 confirmation batch follows. Preserve the original C9.2 decision and leave
 broader calibration to C10 and combined acceptance to E1.
+
+## Selected diagnostic input
+
+The rule selects `c9_growth_fresh_50_1`, seed 7: fixed DLP sample 0 is
+the first qualifying censor, with 408,681,517 positions, 164,112,078,576
+work units, 60,416 evictions and no surviving filtered matrix at 360 seconds.
+The growing arm had already completed in 263.777 seconds. The condition is
+collection/time censoring, not whether the challenger succeeds. The original
+rule was committed in `d6f95fa` before the censored result. Exact selection,
+arm order and unchanged resource envelope are recorded in
+`inputs/controls/c9_long_window_protocol.json`.

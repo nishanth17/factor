@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "scope": "One user-requested diagnostic, not fresh speed confirmation",
+  "original_confirmation_cap": 14400,
+  "additional_active_wall_cpu_cap": 4500,
+  "selection_sha256": "f238da560d9e197e55653593d3c04297f883e7cb3403eeb16ed38e20566b62b8",
+  "fixture": "c9_growth_fresh_50_1",
+  "seed": 7,
+  "selection_reason": "First chronological validated time-censored warm confirmation call in any arm; sample 0 fixed DLP, wall_limit, 408681517 positions, 164112078576 work, no surviving filtered matrix. Chosen by the rule committed in d6f95fa before this outcome.",
+  "arms": [
+    "slp",
+    "challenger",
+    "dlp"
+  ],
+  "seconds": 1200,
+  "cpu_seconds": 1200,
+  "work": 10000000000000,
+  "owned_bytes": 1073741824,
+  "process_rss_bytes": 3221225472,
+  "minimum_validated_warmup_wall_cpu_seconds": 3,
+  "prefixes": [
+    60,
+    180,
+    "terminal"
+  ],
+  "max_calls_per_arm": 1,
+  "unsuccessful_call_reservation": 1202,
+  "configuration_changes": false,
+  "new_confirmation_after_pilot": false
+}
