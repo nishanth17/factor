@@ -233,9 +233,38 @@ def run_one(fixture, seed, arm, control, *, regime="service"):
         ),
         bounds=[list(tier) for tier in config.ecm_tiers],
         events=events,
+        fallback_selected=any(e["stage"] == "handoff" for e in events),
         fallback_started=any(e["stage"] == "siqs" for e in events)
         or (run.checkpoint["payload"]["state"]["current"] or {}).get("stage")
         == "siqs",
+        active_curve={
+            key: value
+            for key, value in (
+                (run.checkpoint["payload"]["state"]["current"] or {}).get(
+                    "job"
+                )
+                or {}
+            ).items()
+            if key
+            in (
+                "kind",
+                "seed",
+                "b1",
+                "b2",
+                "phase",
+                "cursor",
+                "start_work",
+                "chain_replays",
+                "chain_chunks",
+            )
+        },
+        fallback_owned_peak=max(
+            (e.get("stats", {}).get("workspace_bytes", 0) for e in events),
+            default=0,
+        ),
+        fallback_recoveries=sum(
+            e.get("stats", {}).get("recoveries", 0) for e in events
+        ),
         checkpoint_bytes=len(json.dumps(run.checkpoint).encode()),
     )
 

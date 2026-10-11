@@ -68,8 +68,7 @@ the process inventory before the window; release it in finally.
 Commit the selected policy and training capture digest before generating
 confirmation with seed 2026101103. Generator has 200000 random-draw and
 1000 decimal-band attempt caps. Each 30/40-digit band gets two balanced
-inputs and one each with approximately 8/12/14-digit smaller factors at 30 digits and
-8/12/16-digit smaller factors at 40 digits.
+inputs and one each with approximately 8/12/16-digit smaller factors.
 Add recursion (three factors), a square, a prime, close small factors and a
 smooth p−1 control. Independent recursive Pocklington certificates and exact
 trial-division leaves validate expected factors. Large-q p=kq+1 generation
