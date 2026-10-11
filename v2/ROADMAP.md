@@ -275,7 +275,7 @@ development and coordinated integration, not concurrent performance runs.
 | ~~A7 — P3.8-R5 reconciliation~~ | ~~Completed SSS/SSSf, relation/extraction, worker, loss-policy and checkpoint reconciliation; comparable current-control arms prepared. See the [acceptance matrix](benchmarks/qs/a7/a7_r5_reconciliation.md).~~ | ~~Accepted repair and R3 records~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026.** Fixes and acceptance coverage pass 503 PyPy/GMP tests, full lint and committed-only imports/loaders. Final E1 comparison remains open; no worker/collector promotion.~~ | ~~Sol / **high**~~ | ~~Bounded contracts and both repair decisions are reconciled. Remaining calibrated worker/40-digit SSS and final combined confirmation prerequisites belong to E1; C1 larger-input feasibility remains open.~~ |
 | A8 — P3.8 matrix control + remaining R3 diagnosis | Freeze exact matrix/operator/lifting interfaces and genuine post-filter fixtures; profile solving, filtering, provenance and capacity refusals; establish independent packed-product oracles. | Accepted R3 identities/lifting and P3.3 control | **Conditional preparation.** It is safe now and unlocks Four Russians without waiting for R4. If representative useful matrices are missing, record the gap and revisit after B1/C1 rather than inventing a synthetic speed claim. | Astra / **xhigh** | Choose Astra because matrix orientation, nullspaces, lifting and representation bounds define the validity of every later solver comparison. xhigh is for designing independent oracles and distinguishing mathematical from capacity failures. |
 | ~~A10 — P8.2.1 verified v1 capability transfers~~ | ~~Completed bounded tranche: source-verified strict 12/13-base ranges, reported regression, independent proof oracles, v1 ownership audit and checked legacy resume.~~ | ~~Existing P1.8/P2 exact classification and budget controls; preserved v1 sources~~ | ~~**[x] Complete and integrated into mainline, 9 October 2026; implementation `0ee86ff`, acceptance `6794af6`.** Committed-only suites/imports and lint pass. Range-only selection retained; complete-run tail spread disclosed. B14 and E1 remain open.~~ | ~~Sol / **xhigh**~~ | ~~Primary-source computational guarantees, endpoint congruences, independent proof fixtures, finite budgets and RNG/work/checkpoint compatibility are reconciled; no disputed extra range was adopted.~~ |
-| A11 — P3.4 CLI usability follow-up | Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, useful help, examples and tests through the existing `v2.factor` recursive portfolio; retain opt-in SIQS fallback. | Existing P2 portfolio and P3.4 polynomial/checkpoint contracts | **Accepted usability gate; prior outstanding status was stale.** All three explicit selectors, finite controls and checked resume are accepted. Automatic handoff remains C3/G1. | Sol / **high** | Sol fits connecting existing verified engines to the entry point. high covers cross-mode configuration, help/examples, recursive reconstruction and checked resume; no new factoring mathematics or automatic default is required. |
+| ~~A11 — P3.4 CLI usability follow-up~~ | ~~Expose `--method qs/mpqs/siqs`, finite configuration controls, checkpoint/resume, help, examples and tests through the recursive portfolio; retain opt-in SIQS fallback.~~ | ~~Existing P2 portfolio and P3.4 polynomial/checkpoint contracts~~ | ~~**[x] Complete; status reconciled 9 October 2026.** Existing three-mode implementation, nine CLI regressions and matched CLI/library evidence satisfy the usability gate. All nine CLI tests pass on recheck. Automatic allocation/handoff remains C3/G1 work.~~ | ~~Sol / **high**~~ | ~~Engine selection, recursive reconstruction, finite controls, help, configuration rejection and checked resume are implemented and verified; no automatic-dispatch promotion is implied.~~ |
 
 ### Execution phase B — exploit the settled controls
 
@@ -287,7 +287,7 @@ development and coordinated integration, not concurrent performance runs.
 | ~~B4 — P4.2 fused/normalized kernels~~ | ~~Bounded explicit-square, fused-step/whole-ladder, selected-reduction and unit-normalization comparison on frozen int/mpz controls.~~ | ~~A2~~ | ~~**[x] Complete and integrated, 9 October 2026.** Native selected reductions pass the frozen production bridge: 6.79% saving (95% interval 5.82–13.58%), 27/27 matching outcomes/work. Retain readable GMP: its whole-ladder bridge is inconclusive. Five-candidate study, research, proofs, independent controls and fresh confirmation are complete; broader production bounds remain unclaimed. See [integration evidence](benchmarks/docs/studies.md#b4-production-integration-protocol).~~ | ~~Sol / **xhigh**; Astra for unresolved formula proofs~~ | ~~Bounded formula, normalization, intermediate-width and backend checks completed. No reducer, backend or curve-family expansion.~~ |
 | B5 — P3.7 optional NumPy spike | Test bounded vectorized score/root-hit updates and candidate extraction against PyPy bytearray/array/list controls. | A1 plus a measured remaining array bottleneck | **Conditional.** Optimizing arrays before R2 risks accelerating work that R2 removes. Verify PyPy availability, overflow bounds, duplicate-hit accumulation and full-run conversion/import costs; otherwise defer. It is not required for Phase 3 exit. | Sol / **xhigh** | Sol fits a small optional array adapter with an exact scalar oracle. xhigh is needed for fixed-width overflow, duplicate accumulation, tails and conversion costs, despite the limited implementation scope. |
 | B6 — P3.8 Four Russians | First bounded dense/hybrid challenger against the bitset control; account for tables, conversion, recovery, lifting and peak simultaneous storage. | A8 plus a representative solve-cost/memory case | **Conditional, first matrix investment.** Existing identities and real matrix controls are the prerequisites. It can overlap B1 and ECM work; it does not wait for R4, R5 or NumPy. | Astra / **xhigh** | Choose Astra for rank/nullspace preservation, table construction and dependency recovery across transformed matrices. xhigh is justified by lifting correctness and simultaneous memory bounds, not simply by the amount of XOR work. |
-| B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
+| B7 — remaining P3.8-R3 capacity/provenance | If diagnosed, prove and test new fill/provenance storage bounds; assess compact bounded layouts, merge histories or accumulated square-root payloads with independent verification. | A8 plus a demonstrated capacity or provenance bottleneck | **Conditional.** Faster elimination cannot fix an admission refusal caused by representation bounds. Address a proved bottleneck without reopening rejected small-workload defaults or merely lowering a reservation constant. | Astra / **xhigh** | Choose Astra because the deliverable includes new representation and storage proofs, not merely code tuning. xhigh is needed to connect retained provenance, corrupt-state detection, exact lifting and peak live memory. |
 | B8 — Williams p+1 starts (P5.1) / Lucas optimization (P5.3) | Compare bounded rational/seeded p+1 starts and validated Lucas-chain execution against the binary control; validate p+1 bound extension separately from ordinary powering. | A5, A4; A6's schedule-ratio contract | **Medium/conditional.** Binary correctness and verified chain machinery must exist first. This targets marginal p+1 coverage; the ECM recurrence is not a drop-in Lucas implementation. | Astra / **xhigh** | Choose Astra for transferring verified chain ideas to a distinct Lucas recurrence and reasoning about parameter-dependent orders. xhigh is for denominator/discriminant exceptions, composition and exact extension semantics. |
 | B12 — P6.3 worker-contract preparation | Specify reusable assignment IDs, immutable schedules, parent-owned leases, aggregate CPU/RSS, cancellation and restart contracts; reconcile existing QS workers. Prepare bounded fixtures, not a new worker default. | A2, A3, A7 | **Medium, early preparation.** Contracts can proceed once backend, program and repair interfaces settle. Production portfolio experiments wait for the stable serial tranche in F4; existing QS workers are reused. | Sol / **xhigh** | Sol fits state-machine and accounting design around existing workers. xhigh is for cross-process ownership, in-flight reservations and interrupted restart, not for adding more worker processes. |
 | B13 — P3.8-R2 wide-block resieve capacity | Reuse the accepted sparse resieve support bound. Only if a new calibrated workload still refuses setup, prove a bound for its actual scratch/storage representation, verify coverage and refusal/resume, and compare complete bucket/resieve runs under matched budgets. | A1; a new calibrated wide-block capacity refusal | **Deferred unless newly triggered.** The combined 30-digit bridge resolves the isolated refusal with the accepted repair. A larger workload needs new evidence and a proof; streamed B1 calibration proceeds independently. | Astra / **xhigh** | Astra fits representation/storage proofs and exceptional recovery cases. xhigh is for simultaneous live memory, exact coverage and first-uncommitted-position behavior under refusal and resume. |
@@ -315,8 +315,11 @@ implementations complete.
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
+| C9 — P5.4 source-derived DLP parameter and capacity calibration | Pin and extract actual size rules, table growth, large-prime bounds and memory policies from leading implementations; explain each transferable candidate and each nontransferable native/GPU limit. Freeze a bounded PyPy grid for endpoint/product bounds, candidate scoring, splitting, factor-base size, unmatched/atom/row caps, graph reservation and eviction. Confirm selected bundles against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **High; unresolved C1 economics.** The matched 8,192-unowned-edge policy had median evictions of 21,504 and 28,672 in the two fresh 50-digit input classes. A 65,536-edge graph reservation would exceed 256 MiB after overhead. Neither number was optimized. Establish whether more retention produces useful rows and complete factors before claiming a larger-band setting. This does not reopen the accepted 40-digit opt-in result. | Astra / **xhigh** | Source-derived hypotheses still need PyPy validation. Exact graph ownership, resource accounting, checkpoint replay and independent dependency verification must survive any capacity or eviction change. |
+| C10 — QS/SIQS parameter audit and continuing size-band calibration | Maintain the [source-to-v2 parameter audit](benchmarks/qs_parameter_audit.md): compare units, certainty, resource policies and actual size rules from pinned leading implementations with every performance-bearing v2 default and cap. At each new feasible input band or engine change, profile and freeze a small source-grounded training grid, then confirm selected bundles on fresh complete factoring. Publish accepted and rejected choices without erasing earlier controls. | B1/C1 controls; C9 for DLP graph specifics; E1/D7 for combined controls | **High, continuing.** Fixed reference defaults and safety ceilings are not optimized size policies. This audit covers factor base, sieve width/blocking, A/family/Gray schedules, multiplier, scoring/threshold, SLP/DLP limits and splitting, retention, relation/solve cadence and memory. Start from measured cost or yield gaps, not a blanket Cartesian search. Every bounded tranche has a stop rule. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Unit normalization and source verification prevent copying native or GPU numbers into PyPy. Matched total-resource, proper-factor and complete-outcome evidence decides each band; exact relation, provenance, certainty and resume contracts stay mandatory. |
+| C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) for preprocessing/primality, rho, p−1, ECM, sieves/schedules, SSS-specific search and shared budgets. Reconcile each performance-bearing default, embedded threshold, cap and caller override against pinned implementations and primary literature; distinguish exact invariants, formats, finite policies, measured choices and uncalibrated heuristics. Profile and confirm bounded source-grounded tuning tranches. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
 
-If B5, B13, C1 or C8 is adopted, recalibrate the affected SIQS configuration before
+If B5, B13, C1, C8, C9 or C10 is adopted, recalibrate the affected SIQS configuration before
 claiming a combined win. If C1 materially changes matrix density or dimensions,
 refresh A8's workload evidence before promoting a solver. This is a new version
 of the control for integration, not a cycle requiring every earlier experiment
@@ -348,7 +351,7 @@ dependency. Both can remain deferred while other accepted improvements ship.
 | E3 — P8.2 preprocessing | Compare trial cutoffs, exact power-exponent/rejection filters and finite Fermat updates on the frozen control; reuse accepted A10/B14 classification/proof capabilities and retain exact equality and certainty semantics. | D7 | **Medium; profile-gated.** Broad cheap-path savings may help, but prior repair decisions are retained. Full integrated evaluation now has the right control; a justified isolated oracle spike could occur earlier. | Sol / **xhigh** | Sol fits controlled filters around existing exact routines. xhigh is needed because a false rejection can silently lose a factor or power, particularly across partial trial progress and resume. |
 | E4 — P8.3 rho calibration | Tune bounded batch/walk/restart policies under identical total budgets and assigned seeds; measure first-factor and complete runs including saturation recovery. | D7 | **Medium.** Parameter tuning is relatively contained, but must show marginal portfolio value on the new workload. It reuses current Brent/local-loop controls rather than rebuilding rho. | Sol / **high**; **xhigh** for changed recovery semantics | Sol/high fits sweeps over an existing verified implementation. Use xhigh if tuning changes replay, cancellation or consumed-work behavior; long sample collection alone needs no stronger setting. |
 | E5 — P8.5 recovery/polling/checkpoint costs | Separate cooperative checks, atomic commits, recovery, explicit durable writes and JSON verification; revisit batching or bounded recovery trees only where profiles justify them. | D7 | **Medium; conditional on changed cost.** Existing repair gains remain the starting point. Revisit only unresolved or newly dominant overhead, preserving validation and disclosing work-unit changes. | Sol / **xhigh** | Sol fits measurement and bounded state-machine changes. xhigh is for proving no lost work, false saturation success or invalid resume while reducing overhead. |
-| E6 — P8.6 contexts/schedules for changed workloads | Test lazy/staged setup, bounded reusable buffers and existing schedule/cache arms when new workloads alter their economics; evaluate any verified v1 sieve/setup advantage identified by A10. | D7 | **Conditional.** This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership changes | Sol/high fits existing-arm comparisons. Escalate to xhigh when changing private scratch ownership, cache identity or upfront resource reservations. |
+| E6 — P8.6 contexts/schedules for changed workloads | Test lazy/staged setup, bounded reusable buffers, compact candidate hit prefilters and staged exact rejection against existing schedule/collector controls when new workloads alter their economics; evaluate any verified v1 sieve/setup advantage identified by A10. | D7 | **Conditional.** This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling and small-prime-skipping decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership/rejection changes | Sol/high fits existing-arm comparisons. Escalate to xhigh when changing private scratch ownership, cache identity, upfront resource reservations or conservative candidate-rejection bounds. |
 
 E1 accepts the selected P3–P5 tranche and early A10/B14 capability transfers;
 individual transfers may ship once their own gates pass. E3–E6 use the frozen
@@ -603,7 +606,7 @@ performance decision. The subsequent
 v1 parity/proof follow-up added A10/B14 tasks and transfer ownership. The
 9 October A10 acceptance and mainline integration close its bounded range/audit
 tranche; B14 certificates and E1 combined portfolio confirmation remain open. A11
-separately tracks the P3.4 QS/MPQS/SIQS CLI usability follow-up; C3/G1
+is complete for P3.4 QS/MPQS/SIQS CLI usability; C3/G1
 retain ownership of measured automatic selection and default promotion.
 
 <!-- END MASTER EXECUTION SEQUENCE -->
@@ -1168,11 +1171,10 @@ large-band experiment gates below remain open. No whole-SIQS promotion.
 
 #### P3.4 usability follow-up — explicit QS/MPQS/SIQS CLI access (A11)
 
-A11's usability gate is accepted, as confirmed by the user during A7 on
-9 October 2026. The committed snapshot calling it outstanding was stale;
-this reconciliation does not reopen its implementation. The historical
-progress and measurements below retain their original scope. Automatic
-crossover/default promotion remains C3/G1 and the P3.4 performance gates.
+**Complete; status reconciled 9 October 2026.** The existing three-mode
+implementation and acceptance evidence below close this usability follow-up
+to the accepted M31 bounded engine. Automatic crossover/default promotion
+remains owned by C3/G1 and the existing P3.4 performance gates.
 The entry point is `v2/factor.py`; preserve `v1/factor.py` as historical code.
 Reuse `factorize_bounded()` so both children of every split share the same
 recursive dispatcher, resource ledger and checked resume state.
@@ -1210,8 +1212,11 @@ engines' extraction, recursive composite children, sign/multiplicity and
 configuration identity. The 301-test PyPy suite and lint pass. Matched
 library/CLI comparisons preserve factors, seeds and consumed work after
 validated warmup and repeated samples; see the benchmark scope above.
-The historical outstanding-status instruction is superseded by the accepted
-usability status above; automatic-dispatch performance gates remain open.
+**Completion reconciliation (9 October 2026):** the three-mode implementation,
+nine CLI regressions and matched library/CLI comparisons above satisfy A11's
+separate usability gate. A fresh `pypy3 -B -m unittest v2.tests.test_siqs_cli`
+recheck passes all nine tests. This corrects the stale outstanding status;
+it adds no implementation or performance claim and closes no C3/G1 gate.
 
 ### P3.5 — Evaluate Smooth Subsum Search on the same interface
 
@@ -1762,6 +1767,14 @@ must not be presented as a fresh result for the touched-column implementation.
 Dense lift-mask reservation and uncompacted labels remain separate capacity
 concerns until changed representations and their gates are verified.
 
+- [ ] If relation storage or allocation is a demonstrated bottleneck, compare
+  compact bounded layouts/pools with the current dictionaries and objects.
+  C-Quadratic-Sieve's [relation arena](https://github.com/michel-leonard/C-Quadratic-Sieve/blob/main/quadratic-sieve.c)
+  is a layout reference, not a Python allocator prescription. Charge conversion,
+  simultaneous live storage, eviction and checkpoint reconstruction; preserve
+  stable identities and independently verified provenance. Its AVL trees do
+  not justify replacing dictionary lookups without a measured lookup bottleneck
+  and a winning PyPy comparison. This remains B7 work under A8's diagnosis.
 - [ ] If extraction/provenance storage dominates, separately assess retained
   merge histories and accumulated modular square-root payloads. CUDA-MPQS's
   V1 replay/tree and V2 packed-exponent/incremental-root designs are distinct
@@ -1788,7 +1801,11 @@ benchmark imports and required controls/certificates/source pins.
 
 - [ ] Coordinate C1/E3 residual-classification experiments from the
   [FLINT comparison](benchmarks/qs/qs_gnfs_research.md#candidate-decisions-and-owners)
-  if profiling shows repeated intake/atomic primality checks matter. A
+  and C-Quadratic-Sieve's [equal-cofactor intake](https://github.com/michel-leonard/C-Quadratic-Sieve/blob/main/quadratic-sieve.c)
+  if profiling shows repeated intake/atomic primality checks matter. Compare
+  bounded certification reuse only with an explicit trust boundary: independent
+  verification remains available, and loaded state cannot assert its own
+  certification. Account for cache identity, retention and resumed work. A
   `1 < r < B**2` shortcut needs checked complete eligible-prime coverage,
   including A/multiplier exceptions; supplied FactorBase entries alone do not
   establish it. An opaque composite-cofactor arm needs a separate verified
@@ -1816,6 +1833,51 @@ inform splitting and cycles; the disconnected-triangle oracle prevents treating
 SLP-connected cycles as complete. A small exact SLP example also refutes a
 universal below-85-digit failure rule. B1's low-yield probes alone do not
 establish affordable recoverable DLP residuals or activate a new default.
+
+C-Quadratic-Sieve was selectively source-reviewed on branch `main` on
+9 October 2026; no local benchmark or complete correctness audit was performed.
+Pin an immutable revision before implementing or timing its candidates. Its
+SLP matching is a residual-intake reference, not a DLP cycle implementation.
+The transfers here and in B7/E6/D1 close no acceptance gate and do not change
+the current B3/A7/C1 scheduling recommendation or existing prerequisites.
+
+#### C10 — Continuing source-derived QS/SIQS calibration (open)
+
+The [first-pass parameter audit](benchmarks/qs_parameter_audit.md) compares
+the current reference defaults, B1/C1 selected bundles and safety ceilings
+with pinned msieve, YAFU, Yamaquasi, FLINT, SymPy and JavaMath choices. It
+flags unit mismatches: base prime *value* versus *count*, half-width versus
+full interval, hash slots versus retained edges, and probable versus proven
+residuals. No first-pass source value is an accepted PyPy optimum.
+
+- [ ] Maintain a versioned parameter ledger for every performance-bearing
+  QS/MPQS/SIQS default, hard cap and size policy. Record source revision,
+  license, units, input-size/hardware context, v2 counterpart, proof or
+  representation role, local measurements and decision. Refresh it when an
+  upstream source, arithmetic backend, collector, solver or feasible input
+  band changes. Do not silently reuse an earlier optimum outside its band.
+- [ ] Rank experiments from observed stage cost and useful-yield losses.
+  Include factor-base size, interval/block width, A-factor/pool/family/Gray
+  schedule, multiplier candidates, scoring/threshold/tiny-prime policy,
+  SLP/DLP bounds and splitting, partial/atom/row capacities, relation target,
+  filter/solve cadence, owned memory and checkpoint cost. C9 owns DLP graph
+  capacity and product-bound work; E1 combines selected SIQS/SSS/worker arms;
+  C3/G1 own portfolio allocation and handoff. Avoid duplicate ownership.
+- [ ] Run one finite, prespecified training-and-fresh-confirmation tranche
+  per newly feasible size/workload class. Normalize units and compare a few
+  source-grounded bundles under matched total work, wall/CPU and memory,
+  including setup, collection, splitting/certification, graph, filtering,
+  matrix, extraction and charged resume. Use versioned controls/corpora,
+  PyPy 3.11, validated warmup, nine or more samples and the performance lock.
+  Apply the revised complete-factor promotion policy; retain failures and
+  unresolved cofactors. Stop when bounded pilots cannot produce useful rows,
+  and publish the limiting stage and a concrete trigger to revisit.
+- [ ] On each accepted or rejected tranche, update the ledger and affected
+  size-band recommendation with the chosen bundle, uncertainty, completion,
+  resource and correctness evidence. Leave this continuing item open after a
+  bounded tranche closes; a single 30/40-digit result cannot settle 50–100
+  digits or a changed backend. Safety/proof caps require separate invariants
+  and independent oracles before any relaxation.
 
 **P3.8-R5 — Reconcile optional SSS, workers and array challengers**
 
@@ -1941,6 +2003,10 @@ Keep Factor's algorithms in Python on supported PyPy Python 3.11.
   operator kernel correction. After correctness, compare homogeneous recurrence
   and low-rank auxiliary updates, block width and packed-kernel variants.
   Otherwise record a profile/memory-based deferral with a trigger to revisit.
+  C-Quadratic-Sieve's [packed products and finite retries](https://github.com/michel-leonard/C-Quadratic-Sieve/blob/main/block-lanczos.c)
+  are implementation references; validate them against independent operator
+  oracles and retain the A8/B6/C4 investment gates before D1. Native solver
+  timings do not establish a PyPy benefit or replace bounded resume contracts.
 - **A:** handle self-orthogonal vectors and singular blocks without invalid
   inversion. Apply `Mᵀ(M V)` implicitly if required; do not form a dense Gram
   matrix. A Gram-kernel candidate must pass `M d = 0`: for
@@ -2737,6 +2803,66 @@ The [report](benchmarks/qs/c1/c1_implementation_results.md) records fresh 40-dig
 benefit, lower observed proper-factor yield per extracted dependency, and
 larger unresolved results. No solver or default dispatch is promoted.
 
+#### C9 — Source-derived DLP choices and capacity (open)
+
+The broader [QS/SIQS parameter audit](benchmarks/qs_parameter_audit.md)
+records this first source comparison. C9 remains open for the detailed DLP
+parameter table, bounded capacity experiments and fresh complete-run decision.
+
+The integrated C1 settings are a tested 40-digit bundle, **not** an optimum
+by digit size. In fresh 40-digit runs the graph retained 5,801–6,163 edges
+without eviction. At 50 digits the matched 8,192-unowned-edge allowance
+had median evictions of 21,504 and 28,672 in the two input classes, despite
+unused atom capacity; every 120-second filtered matrix was empty. The
+independent 50-digit larger-store resume completed after 20,480 evictions.
+Neither result isolates retention from threshold, collection duration or
+graph/rebuild costs. The 65,536-edge hard ceiling copies the older atom
+ceiling; at 4 KiB reserved per edge plus graph overhead it exceeds the
+256 MiB comparison cap. It is a safety bound, not a measured or externally
+established optimum.
+
+Existing pinned source review records [msieve 1.53](benchmarks/qs/c1/c1_research.md)
+enabling DLP at 282 bits with a product limit of about SLP-limit^1.8, and
+[Yamaquasi](benchmarks/qs/c1/c1_research.md) enabling it by default above 256 bits,
+halving its factor-base preset, and using about 100 B² as a product limit near
+200 bits. These are concrete candidate rules to test, not validated PyPy
+thresholds or memory capacities.
+
+- [ ] Make a pinned source-to-parameter table before new tuning. Extract
+  actual numeric factor-base, SLP/DLP endpoint and product rules, cofactor
+  splitting limits, relation targets, growth/eviction policies, and memory
+  units from [YAFU](https://github.com/bbuhrow/yafu/blob/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/qs/filter.c),
+  [msieve 1.53](https://sourceforge.net/projects/msieve/files/msieve/Msieve%20v1.53/msieve153_src.tar.gz/download),
+  [Yamaquasi](https://github.com/remyoudompheng/yamaquasi/blob/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/relations.rs),
+  JavaMath and FLINT. YAFU/msieve grow cycle tables; Yamaquasi uses dynamic
+  partial maps. Distinguish hash buckets, retained edges, atoms, matrix rows
+  and on-disk relations. Record the implementation's input size, language,
+  memory and certainty contract before treating a rule as a candidate. The
+  [CUDA-MPQS single-LP witness table](https://github.com/drjanosch42/cuda-mpqs/blob/main/USER_GUIDE.md)
+  defaults to 1,048,576 slots but is neither a DLP graph nor a PyPy preset;
+  pin its revision before using its values in an experiment.
+- [ ] Freeze one finite training-only grid from that table and the retained
+  C1 losses. Separate the 8,192/16,384/32,768 unmatched-edge candidates from
+  atom/row caps and from the 256/512 MiB total owned allowances. Jointly
+  vary endpoint/product and candidate bounds, factor-base/threshold choices,
+  split work, graph reservation and eviction batch only where the source and
+  profile support them. Budget training inputs, seeds, samples, wall/CPU/work,
+  retained bytes and checkpoint size in advance; stop a band when bounded
+  pilots cannot form useful filtered rows. Compare 50-digit feasible longer
+  windows first, then representative 60-digit and larger bands only if the
+  declared resource gate passes. Do not keep expanding a censored search.
+- [ ] Freeze selected configurations before fresh confirmation. Match SLP and
+  DLP on total resources, including splitting/certification, rebuilds,
+  filtering, matrix, extraction and charged resume. Report peak retained and
+  unowned occupancy, evictions and lost matching opportunity, post-filter
+  rank/dependencies, proper divisors, complete outcomes and unresolved
+  cofactors. Recheck all-component cycle/provenance oracles, cancellation,
+  ownership and checkpoint validation if storage policy changes. Select an
+  explicit larger-band bundle only with a fresh complete-factor benefit under
+  the promotion policy; otherwise retain the present opt-in and document the
+  limiting cost. No native table size or digit threshold becomes a default
+  merely because it appears upstream.
+
 - [ ] Complete the broader SSS comparison through E1. A7's reconciliation
   prepares 30-digit arms but leaves 40-digit SSS calibration to E1 or an
   explicit challenger-class deferral. Do not infer a DLP/SSS crossover here.
@@ -3202,7 +3328,7 @@ deferred to the owners below. A10 introduces no new ECM, chain or sieve default.
 | PRAC and Montgomery kernels | Corrected ladder arithmetic and A4's independently checked opt-in PRAC already exist. Legacy exceptional-state failures prevent treating v1 PRAC as a ready-made faster replacement. | A4 accepted; B3 (P4.1) owns production chain routing, B4 (P4.2) whole-engine kernel costs. Reject unsafe legacy exceptional states. |
 | Atkin/Eratosthenes/segmented sieve variants | v2 retains these families with corrected boundaries and local state; no independent v1 speed advantage has been established. | E6 (P8.6) only if a validated setup/sieve bottleneck supports a challenger; retain corrected output contracts. |
 | Two-stage p−1 and Brent rho | Both are already present in v2; bounded p−1 participates in its recursive portfolio. Parameter/continuation tuning is not a missing-method port. | A6 (P5.3) owns p−1 powering/continuation, E4 (P8.3) owns rho calibration, and G1 (P8.4) combines the measured policy. |
-| Interactive CLI and method visibility | v2 already prompts for a missing number and exposes QS/MPQS/SIQS with finite controls/resume. Repeated interactive sessions and printed timing add no factoring capability. | Retain quiet library calls and one-shot/scriptable CLI. Defer repeated-prompt convenience to A11 if requested; do not close A11's broader usability gate here. A10 updates certainty documentation. |
+| Interactive CLI and method visibility | v2 already prompts for a missing number and exposes QS/MPQS/SIQS with finite controls/resume. Repeated interactive sessions and printed timing add no factoring capability. | Retain quiet library calls and one-shot/scriptable CLI. A11 usability acceptance is complete; repeated-prompt convenience remains a separate optional request. A10 updates certainty documentation. |
 | Floating roots, discarded cofactors and unbounded retries | Exact roots, validated divisors, reconstruction and finite shared budgets are already present in v2. | Reject legacy regressions; larger or unbounded work is not a verified speed advantage. |
 
 #### P8.2.2 — Generate and independently verify prime certificates (B14)
@@ -3340,6 +3466,18 @@ complete result. Do not postpone CLI access until this calibration finishes.
   refinement, per-position work, cancellation and resume cursors. Include
   table creation/retention and full factoring; prior cache losses remain the
   control until new workload evidence changes the trigger.
+- [ ] If a changed profile exposes candidate intake/division cost, compare
+  compact large-prime hit flags and staged small-factor processing inspired by
+  C-Quadratic-Sieve's [sieve and intake](https://github.com/michel-leonard/C-Quadratic-Sieve/blob/main/quadratic-sieve.c).
+  Position-class flags may exclude a prime only when complete hit coverage is
+  established; surviving flags still require exact root/divisibility checks.
+  Early candidate rejection needs a conservative bound on all remaining score
+  contributions, including omitted primes, powers, saturation and A exceptions.
+  Do not import native heuristic thresholds as exact rejection rules. Compare
+  existing refinement, roots, buckets and resieving; charge flag construction,
+  retention and extra passes, and preserve work/cancellation/resume cursors.
+  Prior small-prime-skipping losses remain the control. Promote only on complete
+  factoring evidence under D7's frozen control, not fewer division tests alone.
 - [ ] Profile context construction before early classification/rho success.
   Compare lazy creation or staged bounds if wasted setup matters, preserving
   upfront configuration/cap checks and one-time charges. Reuse private buffers
@@ -3356,6 +3494,48 @@ complete result. Do not postpone CLI access until this calibration finishes.
   RAM/disk costs. Include process/JIT RSS separately from owned workspace.
   Keep wheel-6/bytearray, cache off and rolling off without full-run promotion;
   use the C transfer review (local audit material), not its native cutoffs.
+
+#### C11 — Cross-engine constant provenance and calibration (open)
+
+- [x] Publish the first-pass [parameter reconciliation](benchmarks/parameter_audit.md),
+  including generator locations, pinned sources/licenses, inherited versus
+  measured choices and missing evidence. This is an audit artifact, not
+  acceptance of new defaults or completion of calibration.
+- [ ] Give every performance-bearing constant, embedded literal, validation
+  ceiling and caller override a disposition: exact proof/invariant, format,
+  finite policy, scoped measurement, uncalibrated heuristic or dormant field.
+  Include preprocessing/primality, rho, p−1, ECM, prime schedules, SSS-specific
+  search and shared execution/portfolio reservations. Keep QS/MPQS/SIQS and DLP
+  with C10/C9; reference their ledger rather than duplicate their experiments.
+- [ ] For each tunable choice, record current symbol/value, units, call sites,
+  source revision/license and model assumptions. Compare actual size/reuse
+  policies, not isolated native numbers. Explain candidate values and deferrals;
+  do not call inherited defaults or finite safety caps optimal. Derive exact
+  coefficients and simultaneous memory reservations from their contracts.
+- [ ] Resolve duplicate entry-point settings and establish profile/yield-based
+  priorities with E3/E4/C3/E6/E1/G1. Freeze a small bounded training grid, source,
+  catalogs, certified training/untouched-confirmation inputs, seeds, bounds,
+  curves, total allowances, objective, selection rule and stop criteria before
+  timing. Reuse accepted C6 chains and B3/B4/A6 controls; new chain search,
+  kernels, reducers and curve families retain their original research gates.
+- **A:** preserve exact arithmetic, certainty labels, every proper-divisor check
+  and reconstruction including unresolved cofactors. A changed formula, exact
+  rejection, witness policy, work reservation or saved policy needs an explicit
+  proof/compatibility obligation and relevant tests. Derive simultaneous owned
+  storage, finite eviction/recovery and cancellation bounds; version changed
+  accounting or resume semantics. Catalog identities are integrity metadata,
+  not arithmetic proofs or constants to remove for a timing gain.
+- **E:** keep int/GMP tracks separate; use PyPy implementing Python 3.11,
+  at least three seconds of validated warmup and nine samples, extending
+  instability under a frozen rule. Serialize accepted timings using the
+  machine-wide performance lock and avoid overlapping heavy checks. Separate
+  cold startup and instrumented profiles. Charge setup, verification, cache
+  hit/miss/eviction, unsuccessful searches, recovery, recursive portfolios and
+  pause/resume rebuilding. Report completion/search coverage, censoring,
+  CPU/time, owned memory/RSS, seed variation and sensitivity. Apply the revised
+  acceptance policy without a universal 10% floor; confirm selected bundles on
+  untouched inputs and retain defaults where evidence is inconclusive. Publish
+  rejected/deferred choices and close only named, confirmed tranches.
 
 ### P8.7 — Integrate accepted winners and close the reconciliation
 

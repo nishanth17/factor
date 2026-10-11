@@ -75,6 +75,10 @@
   its fixed-seed drift limitation, all fresh 50-digit timeouts, and the
   separately completing 50-digit charged-resume witness. Keep SLP defaults;
   broader SSS/portfolio comparisons and larger-band promotion remain open.
+- Reconcile A11 as complete using the existing three-mode QS/MPQS/SIQS CLI,
+  matched library comparisons and nine passing CLI regressions. Correct stale
+  roadmap status; automatic allocation and handoff remain C3/G1 work.
+
 - Complete the bounded A7/P3.8-R5 interface/evidence reconciliation, preserving
   accepted repair decisions, immutable source/input pins and historical scope.
   Add both-mode SSS forced-valuation, interrupted/cumulative restore, authentic
