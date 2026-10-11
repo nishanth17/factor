@@ -32,11 +32,7 @@ campaign mode. A changed bound always starts a new curve; it never claims
 same-curve continuation. These are six bundles, not a Cartesian grid.
 
 Pretests have absolute cumulative ceilings of 2M work and 0.5 wall/CPU
-seconds, including earlier preprocessing and children. Classification and
-exact power checks remain mandatory under the total allowance even with a
-zero pretest ceiling; optional-stage admission then observes all their cost.
-Explicit policies prepare schedules lazily and charge snapshot verification
-bytes on resume, in addition to elapsed decoding/rebuilding time. Fallback reservations
+seconds, including earlier preprocessing and children. Fallback reservations
 are 500M work/1 wall/CPU second at 30 digits and 15B work/10 wall/CPU seconds
 at 40 digits. They are conservative admission floors, not completion promises.
 Campaign arms have the same reserves but no extra pretest ceiling. All arms
@@ -46,8 +42,6 @@ C1 30-digit calibrated SLP or the accepted 40-digit half-base DLP bundle.
 This larger service envelope is a separately labelled policy regime; the
 control receives it too. Default 2M-work/2-second diagnostics remain censored
 resource probes, not accepted speed evidence or a raised production default.
-Separate default-grant and explicit enlarged-total resume diagnostics have a
-600-second total cap; report their single-run costs only as functional data.
 
 ## Training, pilots and stop criteria
 

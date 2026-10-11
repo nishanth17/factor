@@ -24,3 +24,14 @@ Telemetry now distinguishes selected fallback from actual setup and records
 active curves at a capped stop. These reporting/generation repairs precede
 training selection and all accepted measurements. Original v2 JSON and prose
 remain versioned. No policy values or candidate ranking rules changed.
+
+
+Revision 4 preserves revision 3's JSON/prose before any training or fresh
+inputs. Review found a zero-ceiling exact-power prerequisite, eager unused
+context setup, missing resume-verification byte charges and fallback telemetry
+that confused selecting a stage with executing it. Fix those boundaries and
+validate new progress metadata. The fresh 30-digit final uneven factor band
+is 14 digits (16 would exceed half the product size). Add envelope checks
+before warmup calls and reject incomplete training selection. The candidate
+bundles, selection rule, seeds, total resources and acceptance thresholds stay
+fixed. The earlier cold pilot remains revision-2 feasibility evidence only.

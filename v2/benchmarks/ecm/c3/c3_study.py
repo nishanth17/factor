@@ -233,10 +233,14 @@ def run_one(fixture, seed, arm, control, *, regime="service"):
         ),
         bounds=[list(tier) for tier in config.ecm_tiers],
         events=events,
-        fallback_selected=any(e["stage"] == "handoff" for e in events),
-        fallback_started=any(e["stage"] == "siqs" for e in events)
+        fallback_selected=any(
+            e["stage"] in ("handoff", "siqs") for e in events
+        )
         or (run.checkpoint["payload"]["state"]["current"] or {}).get("stage")
         == "siqs",
+        fallback_started=any(e["stage"] == "siqs" for e in events)
+        or "siqs_seed"
+        in (run.checkpoint["payload"]["state"]["current"] or {}),
         active_curve={
             key: value
             for key, value in (
@@ -328,6 +332,24 @@ def measure(mode, output):
     envelope = protocol["envelopes"][mode]
     start, cpu_start = time.monotonic(), time.process_time()
     rows = []
+
+    def allowed():
+        return (
+            time.monotonic() - start <= envelope
+            and time.process_time() - cpu_start <= envelope
+        )
+
+    def stop():
+        save(
+            output,
+            dict(
+                mode=mode,
+                stopped="study_allowance",
+                rows=rows,
+                protocol_sha256=digest(CONTROL),
+            ),
+        )
+
     with machine_window():
         for fixture in fixtures:
             if mode == "pilot" and fixture["kind"] != "balanced":
@@ -343,6 +365,9 @@ def measure(mode, output):
             for arm in active:
                 began = time.monotonic()
                 while time.monotonic() - began < warm:
+                    if not allowed():
+                        stop()
+                        return
                     run_one(fixture, seeds[0], arm, control)
             sample_count = (
                 1 if mode == "pilot" else (3 if mode == "train" else 9)
@@ -373,38 +398,31 @@ def measure(mode, output):
                         while time.monotonic() - began < (
                             5 if target == 18 else 8
                         ):
+                            if not allowed():
+                                stop()
+                                return
                             run_one(fixture, seeds[0], arm, control)
                 for repetition in range(existing, target):
                     for seed in seeds:
-                        order = (
-                            active[repetition % len(active) :]
-                            + active[: repetition % len(active)]
-                        )
+                        offset = repetition % len(active)
+                        order = active[offset:] + active[:offset]
                         if (repetition // len(active)) % 2:
                             order = list(reversed(order))
                         for arm in order:
-                            if (
-                                time.monotonic() - start > envelope
-                                or time.process_time() - cpu_start > envelope
-                            ):
-                                save(
-                                    output,
-                                    dict(
-                                        mode=mode,
-                                        stopped="study_allowance",
-                                        rows=rows,
-                                    ),
-                                )
+                            if not allowed():
+                                stop()
                                 return
                             check_quiet({os.getpid()})
                             row = run_one(fixture, seed, arm, control)
                             row["repetition"] = repetition
+                            filename = (
+                                f"{fixture['id']}-{seed}-"
+                                f"{repetition}-{arm}.json"
+                            )
                             receipt = (
                                 output.parent
                                 / (output.stem + "-rows")
-                                / (
-                                    f"{fixture['id']}-{seed}-{repetition}-{arm}.json"
-                                )
+                                / filename
                             )
                             save(receipt, row)
                             rows.append(
@@ -430,6 +448,23 @@ def measure(mode, output):
 
 def select(path):
     data = json.loads(path.read_text())
+    if data.get("stopped") or data.get("mode") != "train":
+        raise ValueError("selection requires a completed training study")
+    if data["protocol_sha256"] != digest(CONTROL):
+        raise ValueError("training protocol differs from the frozen study")
+    expected = {
+        (fixture["id"], seed, arm, repetition)
+        for fixture in training()
+        for seed in (7, 29)
+        for arm in POLICIES
+        for repetition in range(3)
+    }
+    observed = {
+        (row["id"], row["seed"], row["arm"], row["repetition"])
+        for row in data["rows"]
+    }
+    if observed != expected or len(data["rows"]) != len(expected):
+        raise ValueError("incomplete or duplicated training comparisons")
     bands = {}
     for band in (30, 40):
 
@@ -495,7 +530,7 @@ def generate():
             (digits // 2, 2),
             (8, 1),
             (12, 1),
-            (16, 1),
+            (min(16, digits // 2 - 1), 1),
         ):
             for _ in range(count):
                 for attempt in range(1000):

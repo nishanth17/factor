@@ -5,8 +5,10 @@ import hashlib
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from dataclasses import replace
+from pathlib import Path
 from unittest.mock import patch
 
 from v2.execution.allocation import (
@@ -209,17 +211,27 @@ class AllocationPortfolioTests(unittest.TestCase):
     def test_partial_curve_handoff_retains_coverage_and_charge(self):
         config = configuration(
             siqs=None,
-            allocation=ECMAllocation("pretest", pretest_work=1000),
-            ecm_tiers=((2000, 147396, 32),),
+            max_input_bits=256,
+            ecm_chain_mode="off",
+            allocation=ECMAllocation("pretest", pretest_work=10_000),
+            ecm_tiers=((200, 7700, 32),),
         )
-        run = factorize_bounded(
-            1_000_003 * 1_000_033, config=config, budget=ledger()
-        )
+        number = (2**61 - 1) * (2**89 - 1)
+        run = factorize_bounded(number, config=config, budget=ledger())
         self.assertFalse(run.result.complete)
-        self.assertLessEqual(run.work_used, 1000)
+        self.assertEqual(run.reason, "pretest_exhausted")
+        self.assertLessEqual(run.work_used, 10_000)
         self.assertEqual(run.events[-1]["stage"], "handoff")
         self.assertEqual(run.events[-1]["outcome"], "pretest_work")
-        self.assertEqual(run.result.reconstruct(), 1_000_003 * 1_000_033)
+        partial = next(
+            e
+            for e in run.events
+            if e["stage"] == "ecm" and e["outcome"] == "handoff"
+        )
+        self.assertGreater(partial["work"], 0)
+        self.assertIn("phase", partial)
+        self.assertIn("cursor", partial)
+        self.assertEqual(run.result.reconstruct(), number)
 
     def test_campaign_exhaustion_and_legacy_schema(self):
         config = configuration(
@@ -273,7 +285,7 @@ class AllocationPortfolioTests(unittest.TestCase):
 
     def test_prime_and_power_do_not_use_relation_engine(self):
         config = configuration(
-            allocation=ECMAllocation("pretest", pretest_work=10000)
+            allocation=ECMAllocation("pretest", pretest_work=0)
         )
         for number in (1009, 1009**3, -(1009**2), 2**30):
             with patch(
@@ -282,6 +294,166 @@ class AllocationPortfolioTests(unittest.TestCase):
                 run = factorize_bounded(number, config=config, budget=ledger())
             self.assertTrue(run.result.complete)
             self.assertEqual(run.result.reconstruct(), number)
+
+    def test_direct_handoff_avoids_unused_schedule_setup(self):
+        with patch(
+            "v2.portfolio._execution_context",
+            side_effect=AssertionError("unused ECM context"),
+        ):
+            run = factorize_bounded(
+                1009 * 1013, config=configuration(), budget=ledger()
+            )
+        self.assertTrue(run.result.complete)
+
+    def test_reserved_work_reaches_actual_fallback(self):
+        # A campaign can end before an unfinished curve consumes the floor.
+        config = configuration(
+            allocation=ECMAllocation("campaign", fallback_work=400_000),
+            ecm_tiers=((2000, 147396, 32),),
+        )
+
+        def expensive_action(job, budget, context, config):
+            budget.consume(100_000)
+
+        with patch("v2.portfolio.advance_job", expensive_action):
+            run = factorize_bounded(
+                1009 * 1013,
+                config=config,
+                seed=7,
+                budget=ledger(450_000),
+            )
+        handoff = next(e for e in run.events if e["stage"] == "handoff")
+        self.assertEqual(handoff["outcome"], "reserved_work")
+        self.assertGreaterEqual(handoff["remaining_work"], 400_000)
+        self.assertTrue(
+            any(e["stage"] == "siqs" for e in run.events)
+            or "siqs_seed"
+            in (run.checkpoint["payload"]["state"]["current"] or {})
+        )
+        self.assertEqual(run.result.reconstruct(), 1009 * 1013)
+
+    def test_cancelled_curve_resumes_deterministic_assignments(self):
+        config = configuration(
+            siqs=None,
+            allocation=ECMAllocation("campaign"),
+            ecm_tiers=((50, 1000, 3),),
+        )
+        number = 1_000_003 * 1_000_033
+        uninterrupted = factorize_bounded(
+            number, config=config, seed=7, budget=ledger()
+        )
+        budget = ledger()
+        budget.cancelled = lambda: budget.used >= 3000
+        first = factorize_bounded(number, config=config, seed=7, budget=budget)
+        self.assertEqual(first.reason, "cancelled")
+        restored = factorize_bounded(
+            number, checkpoint=first.checkpoint, budget=ledger()
+        )
+
+        def assignments(run):
+            return [
+                (e.get("seed"), e.get("b1"), e.get("b2"), e["outcome"])
+                for e in run.events
+                if e["stage"] == "ecm"
+            ]
+
+        self.assertEqual(assignments(restored), assignments(uninterrupted))
+        self.assertEqual(restored.result, uninterrupted.result)
+        self.assertGreater(restored.work_used, uninterrupted.work_used)
+        self.assertGreaterEqual(restored.wall_seconds, first.wall_seconds)
+
+    def test_new_progress_metadata_rejects_resealed_corruption(self):
+        first = factorize_bounded(
+            1009 * 1013, config=configuration(), budget=ledger(1000)
+        )
+        for field, value in (
+            ("fallback_admitted", "yes"),
+            ("pending_handoff", "invented"),
+        ):
+            corrupt = copy.deepcopy(first.checkpoint)
+            corrupt["payload"]["state"]["current"][field] = value
+            with self.assertRaises(ValueError):
+                factorize_bounded(
+                    1009 * 1013, checkpoint=reseal(corrupt), budget=ledger()
+                )
+
+    def test_immutable_mainline_checkpoint_loads_with_identical_policy(self):
+        from v2.benchmarks.ecm.c3.c3_study import baseline
+
+        old = baseline()
+        native_config = configuration(siqs=None, allocation=None)
+        values = dict(vars(native_config))
+        values.pop("allocation")
+        old_config = old.PortfolioConfig(**values)
+        old_budget = sys.modules[old.__package__ + ".execution.budget"].Budget
+        original = old.factorize_bounded(
+            1_000_003 * 1_000_033,
+            config=old_config,
+            seed=7,
+            budget=old_budget(work_limit=3000, seconds=None, cpu_seconds=None),
+        )
+        restored = factorize_bounded(
+            1_000_003 * 1_000_033,
+            config=native_config,
+            checkpoint=original.checkpoint,
+            budget=ledger(),
+        )
+        self.assertEqual(restored.result.reconstruct(), 1_000_003 * 1_000_033)
+        self.assertGreater(restored.work_used, original.work_used)
+
+    def test_cli_policy_resume_restores_fallback_and_rejects_override(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+            command = [sys.executable, "-B", "-m", "v2.factor"]
+            first = subprocess.run(
+                command
+                + [
+                    "1022117",
+                    "--siqs",
+                    "--ecm-policy",
+                    "pretest",
+                    "--pretest-work",
+                    "0",
+                    "--fallback-work",
+                    "500000",
+                    "--work-limit",
+                    "1000",
+                    "--checkpoint",
+                    str(path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertTrue(path.exists(), first.stderr)
+            resumed = subprocess.run(
+                command
+                + [
+                    "--resume",
+                    str(path),
+                    "--work-limit",
+                    "2000000",
+                    "--verbose",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(resumed.returncode, 0, resumed.stderr)
+            self.assertIn("complete", resumed.stdout.lower())
+            invalid = subprocess.run(
+                command
+                + [
+                    "--resume",
+                    str(path),
+                    "--ecm-policy",
+                    "pretest",
+                    "--pretest-work",
+                    "1",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(invalid.returncode, 0)
+            self.assertIn("incompatible", invalid.stderr)
 
     def test_cli_explicit_campaign_and_invalid_override(self):
         command = [sys.executable, "-B", "-m", "v2.factor", "1022117"]
@@ -305,3 +477,58 @@ class AllocationPortfolioTests(unittest.TestCase):
         )
         self.assertEqual(invalid.returncode, 2)
         self.assertIn("requires --pretest-work", invalid.stderr)
+
+
+class StudyContractTests(unittest.TestCase):
+    def test_censored_fast_refusal_does_not_count_as_speed_gain(self):
+        from v2.benchmarks.ecm.c3.analyze import compare, summarize
+
+        rows = []
+        for identity in ("first", "second"):
+            for arm, wall in (("control", 5), ("quick8", 0.001)):
+                for repetition in range(9):
+                    rows.append(
+                        dict(
+                            id=identity,
+                            seed=7,
+                            arm=arm,
+                            kind="balanced",
+                            band=40,
+                            complete=False,
+                            proper_factor=False,
+                            wall=wall,
+                            cpu=wall,
+                            work=10,
+                            curves=0,
+                            fallback_started=False,
+                            memory_cap=100,
+                            workspace_reserve=20,
+                            fallback_owned_peak=0,
+                            rss=200,
+                            checkpoint_bytes=30,
+                            cap_seconds=30,
+                        )
+                    )
+        medians, unstable = summarize(rows)
+        result = compare(medians, ["first", "second"], "quick8")
+        self.assertEqual(unstable, [])
+        self.assertEqual(result["saving"], 0)
+        self.assertEqual(result["interval95"], [0, 0])
+        self.assertEqual(result["inputs"], 2)
+        self.assertEqual(result["candidate_completion"], 0)
+
+    def test_historical_corpora_validate_and_do_not_enter_policy(self):
+        from v2 import portfolio
+        from v2.benchmarks.ecm.c3.c3_study import config_for, training
+
+        fixtures = training()
+        self.assertEqual(len(fixtures), 10)
+        for fixture in fixtures:
+            self.assertEqual(
+                fixture["n"],
+                __import__("math").prod(p**e for p, e in fixture["factors"]),
+            )
+        first = config_for(10**29 + 1, "quick8", portfolio)
+        second = config_for(10**29 + 3, "quick8", portfolio)
+        self.assertEqual(first, second)
+        self.assertFalse(hasattr(first, "factors"))

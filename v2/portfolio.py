@@ -482,6 +482,12 @@ def _handoff(state, config, budget, reason):
     """Commit handoff with spent work and partial-assignment evidence."""
     current = state["current"]
     job = current.get("job")
+    if config.allocation is not None and current["stage"] == "trial":
+        # Relation engines require power preprocessing even when optional
+        # trial work cannot be admitted. Its exact roots use the shared ledger.
+        current.update(stage="powers", pending_handoff=reason, job=None)
+        return
+    current.pop("pending_handoff", None)
     if config.allocation is not None:
         if job is not None:
             cursor = job.get("cursor")
@@ -520,6 +526,8 @@ def _handoff(state, config, budget, reason):
     else:
         state["remaining"].extend([current["n"]] * current["mult"])
         state["current"] = None
+        if config.allocation is not None and reason != "schedule_exhausted":
+            state["stop_reason"] = "pretest_exhausted"
 
 
 def _admit_fallback(current, config, budget):
@@ -1365,6 +1373,29 @@ def _unpack(checkpoint, config):
             ):
                 raise ValueError("invalid current-cofactor metadata")
 
+        if config.allocation is not None:
+            if state.get("stop_reason") not in (None, "pretest_exhausted"):
+                raise ValueError("invalid allocation stop reason")
+            if current:
+                if "fallback_admitted" in current and (
+                    type(current["fallback_admitted"]) is not bool
+                    or current["stage"] not in ("siqs", "sss")
+                ):
+                    raise ValueError("invalid fallback admission metadata")
+                if "pending_handoff" in current and (
+                    current["stage"] not in ("powers", "fermat")
+                    or current["pending_handoff"]
+                    not in (
+                        "pretest_work",
+                        "pretest_wall",
+                        "pretest_cpu",
+                        "reserved_work",
+                        "reserved_wall",
+                        "reserved_cpu",
+                    )
+                ):
+                    raise ValueError("invalid pending handoff metadata")
+
         if current and current["job"] and current["job"]["n"] != current["n"]:
             raise ValueError("candidate modulus disagrees with parent")
         if current:
@@ -1412,6 +1443,53 @@ def _promote_state(state, name):
             from .execution.stage_jobs import promote_job
 
             promote_job(current["job"], backend)
+
+
+def _execution_context(state, config, budget):
+    """Prepare finite schedules only when the selected policy will use them."""
+    if config.allocation is not None or not state.get("context_ready"):
+        budget.consume((isqrt(config.max_hi - 1) + 1) // 2)
+    context = SieveContext(
+        config.max_hi,
+        memory_bytes=config.memory_bytes
+        - config.workspace_reserve
+        - (
+            (config.siqs or config.sss).memory_bytes
+            if (config.siqs or config.sss)
+            else 0
+        ),
+        segment_size=config.segment_size,
+        rolling=config.rolling,
+    )
+    state["context_ready"] = True
+    if config.schedule_cache_bytes:
+        context = ScheduleCache(
+            context, cache_bytes=config.schedule_cache_bytes
+        )
+    programs = (
+        ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+        if config.ecm_program_bytes
+        else None
+    )
+    if config.ecm_chain_mode != "off":
+        if config.ecm_chain_family == "auto":
+            from .ecm.chains import ChainPlans
+
+            programs.chains = ChainPlans(
+                config.ecm_chain_bytes,
+                config.backend,
+                _chain_bounds(config),
+            )
+        else:
+            from .ecm.chain_options import ChainPlans
+
+            programs.chains = ChainPlans(
+                config.ecm_chain_bytes,
+                config.backend,
+                _chain_bounds(config),
+                config.ecm_chain_family,
+            )
+    return context, programs
 
 
 def factorize_bounded(
@@ -1528,64 +1606,40 @@ def factorize_bounded(
 
     try:
         budget.consume(0)
-        if config.allocation is not None or not state.get("context_ready"):
-            budget.consume((isqrt(config.max_hi - 1) + 1) // 2)
-        context = SieveContext(
-            config.max_hi,
-            memory_bytes=config.memory_bytes
-            - config.workspace_reserve
-            - (
-                (config.siqs or config.sss).memory_bytes
-                if (config.siqs or config.sss)
-                else 0
-            ),
-            segment_size=config.segment_size,
-            rolling=config.rolling,
-        )
-        state["context_ready"] = True
-        if config.schedule_cache_bytes:
-            context = ScheduleCache(
-                context, cache_bytes=config.schedule_cache_bytes
-            )
-        programs = (
-            ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
-            if config.ecm_program_bytes
-            else None
-        )
-        if config.ecm_chain_mode != "off":
-            if config.ecm_chain_family == "auto":
-                from .ecm.chains import ChainPlans
-
-                programs.chains = ChainPlans(
-                    config.ecm_chain_bytes,
-                    config.backend,
-                    _chain_bounds(config),
-                )
-            else:
-                from .ecm.chain_options import ChainPlans
-
-                programs.chains = ChainPlans(
-                    config.ecm_chain_bytes,
-                    config.backend,
-                    _chain_bounds(config),
-                    config.ecm_chain_family,
-                )
+        if checkpoint is not None and config.allocation is not None:
+            # Verification has already reconstructed the bounded snapshot.
+            # Charge its bytes on the shared ledger even if pretesting stops;
+            # actual verification/decoding time is included by Budget's clock.
+            budget.consume(len(_canonical(checkpoint["payload"]).encode()))
+        context = programs = None
+        if config.allocation is None:
+            context, programs = _execution_context(state, config, budget)
         if checkpoint is not None and state["current"] is not None:
-            job = state["current"].get("job")
-            if job is not None and _chain_job_supported(job, config):
-                # Bounded schedule/coordinate reconstruction was checked by
-                # unpack; a refused continuation must still pay that work.
-                budget.consume(
-                    2000 + job["n"].bit_length() + len(job["powers"])
-                )
-            if (
-                job is not None
-                and job["kind"] == "pm1"
-                and not _legacy_pm1(config)
-            ):
-                from .pm1.gaps import verify_powers
+            try:
+                job = state["current"].get("job")
+                restore_budget = budget
+                if config.allocation is not None and job is not None:
+                    restore_budget = PretestBudget(
+                        budget,
+                        config.allocation,
+                        fallback=bool(config.siqs or config.sss),
+                    )
+                if job is not None and _chain_job_supported(job, config):
+                    # Bounded schedule/coordinate reconstruction was checked by
+                    # unpack; a refused continuation must still pay that work.
+                    restore_budget.consume(
+                        2000 + job["n"].bit_length() + len(job["powers"])
+                    )
+                if (
+                    job is not None
+                    and job["kind"] == "pm1"
+                    and not _legacy_pm1(config)
+                ):
+                    from .pm1.gaps import verify_powers
 
-                verify_powers(job, budget, config.pm1_gap_mode)
+                    verify_powers(job, restore_budget, config.pm1_gap_mode)
+            except HandoffRequiredError as error:
+                _handoff(state, config, budget, str(error))
         while state["pending"] or state["current"] is not None:
             stage = (
                 state["current"]["stage"] if state["current"] else "dispatch"
@@ -1593,7 +1647,6 @@ def factorize_bounded(
             started = time.perf_counter()
             optional = stage in (
                 "trial",
-                "powers",
                 "fermat",
                 "rho",
                 "pm1",
@@ -1607,8 +1660,20 @@ def factorize_bounded(
                     fallback=bool(config.siqs or config.sss),
                 )
             try:
+                current = state["current"]
+                if (
+                    current is not None
+                    and current.get("pending_handoff")
+                    and stage == "fermat"
+                ):
+                    _handoff(state, config, budget, current["pending_handoff"])
+                    continue
                 if ledger is not budget:
                     ledger.consume(0)
+                if context is None and stage in ("trial", "pm1", "ecm"):
+                    context, programs = _execution_context(
+                        state, config, ledger
+                    )
                 _advance(
                     state,
                     config,
@@ -1641,6 +1706,8 @@ def factorize_bounded(
     result = _result(state)
     if result.complete:
         reason = "complete"
+    elif reason == "exhausted":
+        reason = state.get("stop_reason", reason)
     # Live fallback state must reach the parent snapshot before packing.
     if siqs_runtime.get("job") is not None:
         stage = state["current"]["stage"]

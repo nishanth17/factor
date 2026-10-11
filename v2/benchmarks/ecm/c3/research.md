@@ -2,8 +2,9 @@
 
 Inspected 10 October 2026, America/Los_Angeles. This is a mechanism transfer
 review, not a native-factorer speed ranking. No upstream code was copied or
-executed. Downloads, failures and SHA-256 receipts remain local under
-results/c3/research. Existing source pins are deliberately reused.
+executed. Downloaded source bytes remain local under results/c3/research;
+[URL/hash/failure receipts](../../inputs/controls/c3_research_sources.json)
+are versioned for reproducibility. Existing source pins are deliberately reused.
 
 ## Probability and economic model
 
@@ -48,8 +49,11 @@ accounting; CPU/wall and actual search coverage must decide the economics.
 | [PARI development 31092-e6893b0017](https://pari.math.u-bordeaux.fr/lcov-report/basemath/ifactor1.c.gcov.html), src/basemath/ifactor1.c ellfacteur and ifac_crack; GPL-2.0-or-later header, coverage snapshot 6 October 2026, locally hash-pinned | ellfacteur(N,insist) distinguishes a finite pre-MPQS path from deeper ECM. Normal/insist phases use disjoint curve seeds, and repeated calls on factors try fresh curves. ifac_crack reaches normal ECM, MPQS and later forced ECM according to flags. Stack-managed GEN arithmetic/native kernels and its continuation differ. | Preserve deterministic new curve assignments and checkpoint identity; do not interpret a changed bound as extending a saved curve. Campaigns have finite v2 tiers even though insist may keep escalating upstream. Check interrupted campaigns against uninterrupted seed/attempt prefixes and forbid config drift on restore. |
 | [GMP-ECM 8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e](https://github.com/sethtroisi/gmp-ecm/tree/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e), README, rho.c prob/ecmprob; LGPL-3.0-or-later library files, program licensing separate | Smoothness estimates include continuation/torsion assumptions; block count trades polynomial-stage time for storage. It is an ECM executor with explicit caller-selected bounds, not a complete SIQS portfolio. | Reuse existing independent coverage and finite program/plan accounting. Fit bounds/count/setup jointly; do not copy expected curves, polynomial benefit or memory coefficients. C3 does not reopen B2 geometry/pairing or P5.3 continuation. |
 
-FLINT's exact factor_no_trial caller is retrieved and inspected in the research
-receipt; the factor_smooth table alone would not establish default dispatch.
+FLINT's `factor_no_trial.c` computes the smooth-factor goal from the current
+cofactor as max(bits/3−17, 2). Its remaining <=128-bit path tries rho; at
+>=118 bits it tries four additional 1000/100000 ECM curves before qsieve.
+That caller, rather than the factor_smooth table alone, establishes dispatch.
+The thresholds refer to native arithmetic and do not become v2 defaults.
 PARI is pinned by the displayed revision plus downloaded content hash; it is
 not represented as a fetched Git checkout. Library dependencies and file-level
 license notices remain separate. Factor has no top-level license in this
