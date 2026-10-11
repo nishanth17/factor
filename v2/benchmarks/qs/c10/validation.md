@@ -68,9 +68,11 @@ source reconciliation and result documents at `a13dd3b`, a new `git archive
 HEAD` checkout ran the project PyPy 3.11.15 / gmpy2 2.3.1 suite: **615 tests,
 no failures or skips**, in 94.201 seconds reported by unittest. `make -C v2
 lint` passed; all **129 benchmark runner modules** imported and the A7 current
-loader passed. The ignored local QA ledger shows 556.360 seconds of actual QA
-across preparation and final checks, below its conservatively prepaid
-900-second aggregate charge.
+loader passed. The ignored local QA ledger showed 556.360 seconds of actual QA
+through that check. A further archive of documentation commit `ef3e6c1`
+ran **615 tests without skips or failures** in 93.490 seconds, passed lint and
+imported the same 129 modules plus A7. The ledger then totaled 656.366
+seconds, below its conservatively prepaid 900-second aggregate charge.
 
 The exact frozen source/configuration control and training selection still
 load, the new corpus's independent prime certificates verify, and each fresh
