@@ -51,6 +51,6 @@ cadence. The failed fixed 16-family ordering is a verdict on that arm alone.
 A1a, C8, C9a, the matrix/solver owners and E1 retain their own boundaries.
 
 The [integration validation](validation.md#subsequent-c9c10-default-integration-verification)
-records 721 passing committed-only PyPy/gmpy2 tests, lint, 144 live benchmark
+records 721 passing committed-only PyPy/gmpy2 tests, lint, 129 benchmark runner
 imports and complete default-path factoring of one certified fresh input per
 band. These functional calls do not enlarge the frozen timing population.

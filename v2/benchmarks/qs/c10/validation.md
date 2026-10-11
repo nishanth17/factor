@@ -98,7 +98,7 @@ The working-tree `make -C v2 test` passed 718 system-PyPy tests with nine
 optional backend skips; `make -C v2 lint` passed. A `git archive HEAD` checkout
 of `9935b3c`, with only the external project PyPy environment linked, passed
 **721 PyPy 3.11/gmpy2 tests without failures or skips**, full lint and imports
-of all 144 live benchmark modules plus the A7 loader. A first sandboxed
+of all 129 benchmark runner modules plus the A7 loader. A first sandboxed
 committed-only run had one environmental `ps` permission error in the existing
 C1 quiet-process harness; rerunning with process-list access passed. That
 error was not a factoring failure. One certified fresh 40-digit and one
