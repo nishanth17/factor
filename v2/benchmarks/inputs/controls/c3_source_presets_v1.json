@@ -1,0 +1,27 @@
+{
+  "initial_matched_groups": 54,
+  "initial_measurement_calls": 324,
+  "phase_seconds": 3600,
+  "samples": [
+    9,
+    18,
+    27
+  ],
+  "sha256": {
+    "v2/benchmarks/ecm/c3/round2_compare.py": "4710f849c8cd11025fe3fe0e0799c219158865604d37e7ff93ef1b0532b919c8",
+    "v2/benchmarks/ecm/c3/round2_report.py": "44b86773905969e3c07b16e399196e198fcf2b0c34c4d00b677914ff871d4b54",
+    "v2/benchmarks/ecm/c3/source_preset_protocol.md": "3377171e783842bf5ce34424e53004cbaa195a672fef49d90de13717ff13c15a",
+    "v2/benchmarks/ecm/c3/source_preset_study.py": "fc038cc03cce4f8bba36b9b3ec2c7dee646a72331bf5bfaca9b51b0e50ca6c3c",
+    "v2/benchmarks/ecm/c3/source_presets.md": "88613ea3f0a8bb2c56c4515edd4332f0da184eba548182b5635cf72c288980aa",
+    "v2/benchmarks/inputs/controls/c3_round2_assessment_v1.json": "4aec24cb1dafb3b1f6c67c22bf75bd3ec25a93cb4a79c434e52cd0a196eb2465",
+    "v2/benchmarks/inputs/controls/c3_round2_comparison_v2.json": "275f15621f06afeb0ff905b0621c8fcd226bad41493e62d6a75205578fe9a8e7",
+    "v2/benchmarks/inputs/controls/c3_round2_fitted_v1.json": "12a6a6254da4bb4a5321cdf276240eb4c24cc8d8ba3989f8b6948c4e62aef955",
+    "v2/benchmarks/inputs/controls/c3_round2_training_v1.json": "17c9b24b1073bc81d956833901cae52928244c74f362741ef0fa7b3a10b40a9b",
+    "v2/execution/ecm_presets.py": "31ed1f75dadae80e4e5c469f62442e6a4dd225f5b45418bb07823172119979a1",
+    "v2/tests/test_c3_presets.py": "8236676a697b95f4739a9af42e117d96744dc532a4b08ee1e01c4fb7f3e8c727",
+    "v2/tests/test_c3_source_presets_study.py": "759267b271db054c6e262b9ce75b428f9f58d2bfb0f403cb0246497fae930d7e"
+  },
+  "source_commit": "a7858cb4007b77bddd12e7e740cd4bc982a00306",
+  "status": "Frozen before first source-preset measurement",
+  "version": 1
+}

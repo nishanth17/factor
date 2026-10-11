@@ -550,3 +550,11 @@ from the earlier explicit comparison; recovered-product admission, target
 feedback and cycle-weight optimization remain untested. Only the named C9.2
 tranche is accepted. This addendum changes no frozen source/configuration or
 historical result and does not assert exhaustive adaptation or optimality.
+
+
+## Subsequent mainline integration
+
+The [11 October integration record](c9_integration.md) reconciles C3
+allocation/defaults with growing DLP and phases remaining literature transfers
+into roadmap C9a. This changes no frozen control, corpus or timing verdict;
+reproduce accepted timings from their historical source revisions.

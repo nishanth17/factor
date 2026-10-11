@@ -1,0 +1,130 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/bbuhrow/yafu/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/factor.c",
+    "file": "yafu-factor_factor.c",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/bbuhrow/yafu/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/autofactor.c",
+    "file": "yafu-factor_autofactor.c",
+    "sha256": "735f5e2d922c16eb05ef599a9f9d30e188e1ea45e348df87a01db36648c6850f",
+    "bytes": 97850
+  },
+  {
+    "url": "https://raw.githubusercontent.com/bbuhrow/yafu/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/docfile.txt",
+    "file": "yafu-docfile.txt",
+    "sha256": "32a4840774e2f1f118d84ebb62c17edb36213f56506737652ee0689cd5518712",
+    "bytes": 37183
+  },
+  {
+    "url": "https://raw.githubusercontent.com/bbuhrow/yafu/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/README",
+    "file": "yafu-README",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/bbuhrow/yafu/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/LICENSE",
+    "file": "yafu-LICENSE",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/lib.rs",
+    "file": "yama-src_lib.rs",
+    "sha256": "fdeaaa5ab8ea3bcd89328011d02725f7087750cba140037eb469fd8238549f8a",
+    "bytes": 40922
+  },
+  {
+    "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/ecm.rs",
+    "file": "yama-src_ecm.rs",
+    "sha256": "d5c88db6a0fde56c182d7f36e0ccebc1e713ab6b86817da5ba466a76752c84da",
+    "bytes": 61352
+  },
+  {
+    "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/params.rs",
+    "file": "yama-src_params.rs",
+    "sha256": "3f0e62ba404fe628cbe7ee9356e6b3f47a20386befdfae95180c8ef004f156f6",
+    "bytes": 8461
+  },
+  {
+    "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/README_ecm.md",
+    "file": "yama-README_ecm.md",
+    "sha256": "474bfb89056b2134f812e10fd08b83dadcfc4c76eb188b802574840d2b22dd83",
+    "bytes": 2326
+  },
+  {
+    "url": "https://raw.githubusercontent.com/remyoudompheng/yamaquasi/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/LICENSE",
+    "file": "yama-LICENSE",
+    "sha256": "aa19870bfcb410c161a810fa1f84a50a58284eb976af2c32b4c0053ca3ea9a9d",
+    "bytes": 1524
+  },
+  {
+    "url": "https://raw.githubusercontent.com/flintlib/flint/a4c9750d0d3d67bb01cf6d18c187591b313451c3/src/fmpz_factor/factor.c",
+    "file": "flint-src_fmpz_factor_factor.c",
+    "sha256": "1090f5080b43fc616793178d9a6328c6d92dec3749a74bdaab170c4cd07f2a40",
+    "bytes": 3565
+  },
+  {
+    "url": "https://raw.githubusercontent.com/flintlib/flint/a4c9750d0d3d67bb01cf6d18c187591b313451c3/src/fmpz_factor/factor_smooth.c",
+    "file": "flint-src_fmpz_factor_factor_smooth.c",
+    "sha256": "b955cbc11d25991628c7f0bfc2df074d196fd15841f8c05a065b2be3dc152e70",
+    "bytes": 7979
+  },
+  {
+    "url": "https://raw.githubusercontent.com/flintlib/flint/a4c9750d0d3d67bb01cf6d18c187591b313451c3/src/fmpz_factor/ecm.c",
+    "file": "flint-src_fmpz_factor_ecm.c",
+    "sha256": "eb54d4836b3c6a20121fc3531733e1fa2552dfad162d45a6ce4a02df12dba490",
+    "bytes": 13150
+  },
+  {
+    "url": "https://raw.githubusercontent.com/flintlib/flint/a4c9750d0d3d67bb01cf6d18c187591b313451c3/COPYING",
+    "file": "flint-COPYING",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "bytes": 35149
+  },
+  {
+    "url": "https://raw.githubusercontent.com/sethtroisi/gmp-ecm/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e/README",
+    "file": "gmp-README",
+    "sha256": "af711f7a184382cc6a39b0fd146769fe85b4132d78201f19604ffa6b6fc5ed1b",
+    "bytes": 38894
+  },
+  {
+    "url": "https://raw.githubusercontent.com/sethtroisi/gmp-ecm/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e/rho.c",
+    "file": "gmp-rho.c",
+    "sha256": "35cc4997fde16ebca50291f98d04b1eb58e1254c689f856b9cf61a9ae9fb5209",
+    "bytes": 28737
+  },
+  {
+    "url": "https://raw.githubusercontent.com/sethtroisi/gmp-ecm/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e/COPYING.LIB",
+    "file": "gmp-COPYING.LIB",
+    "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+    "bytes": 7639
+  },
+  {
+    "url": "https://pari.math.u-bordeaux.fr/lcov-report/basemath/ifactor1.c.gcov.html",
+    "file": "pari-ifactor.html",
+    "sha256": "1456ec0ee2a2778cdb78e6cb98e4ba028a7a43b32670e876ea09f1f109bbfd2c",
+    "bytes": 609087
+  },
+  {
+    "url": "https://members.loria.fr/PZimmermann/papers/20years.pdf",
+    "file": "20years.pdf",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://cr.yp.to/bib/1987/lenstra-fiec.pdf",
+    "file": "lenstra.pdf",
+    "sha256": "0e1e07c4bbfff73b9d36c981c3466c19e37a930412440baf38360386f81433d3",
+    "bytes": 2169352
+  },
+  {
+    "url": "https://raw.githubusercontent.com/flintlib/flint/a4c9750d0d3d67bb01cf6d18c187591b313451c3/src/fmpz_factor/factor_no_trial.c",
+    "file": "flint-factor_no_trial.c",
+    "sha256": "61aa75a9938e37606588a7b7ff53713c1cb30d017b9f4384cdacd50ef075a224",
+    "bytes": 6931
+  },
+  {
+    "url": "https://members.loria.fr/PZimmermann/papers/40760525.pdf",
+    "file": "20years-correct.pdf",
+    "sha256": "3870e50d84700229be598285e32f593fa22ee4b622a1501ffb8e1f4bca8dc986",
+    "bytes": 611682
+  }
+]

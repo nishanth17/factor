@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "v2/benchmarks/ecm/c3/round2_assessment.md": "5d09496625e2676e26a771e1bfd6e2cce211ee13893146bb5543e35f7489e83c",
+    "v2/benchmarks/ecm/c3/round2_report.py": "44b86773905969e3c07b16e399196e198fcf2b0c34c4d00b677914ff871d4b54",
+    "v2/benchmarks/inputs/controls/c3_round2_training_v1.json": "17c9b24b1073bc81d956833901cae52928244c74f362741ef0fa7b3a10b40a9b",
+    "v2/tests/test_c3_report.py": "10ae0540cf9d98d2d187e42041e5aa12ee6b2aca5b234cd3e6d253d1cfe847d7"
+  },
+  "status": "Frozen before complete comparison; training decision only",
+  "version": 1
+}

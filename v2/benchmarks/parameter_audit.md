@@ -18,6 +18,28 @@ the full mechanical inventory remain ignored under
 review artifact. C11 stays open until every performance-bearing default,
 embedded threshold, cap and duplicate entry point has a disposition.
 
+## C3 allocation disposition (10 October 2026)
+
+The [C3 mechanism review](ecm/c3/research.md) and
+[fresh decision](ecm/c3/acceptance.md) add explicit cumulative pretest ceilings,
+finite campaigns and protected fallback admission. These caller-set amounts
+are **L** finite policies, not success estimates. Default omission retains
+existing bounds/counts and budgets. Schema 12 and the allocation version are
+**I** identities; simultaneous relation/context/output caps remain owned-memory
+reservations, separate from RSS.
+
+Six jointly specified bound/count bundles reuse the first three v1 bound pairs
+and a source-supported cheap pretest. Training selects quick8 for its smaller
+bundle, but fresh cost is 51.56% higher with uneven regressions and instability;
+retain numerical defaults. The larger selection retains control. No empirical
+factor-size posterior, universal digit threshold, cross-engine work conversion
+or deeper-campaign optimum follows. C3's 500M/15B-work and 1/10-second floors
+are explicit service hypotheses; four of five smaller 2M-work probes refuse
+unfunded admission. The unchanged default is not silently enlarged.
+
+G1/E1 and continuing C11 calibration retain broader ownership. C9/C10 collector,
+residual, splitter and graph settings remain frozen in this tranche.
+
 ## Where PRAC, Lucas and CF live
 
 | Role | Current path / entry point |

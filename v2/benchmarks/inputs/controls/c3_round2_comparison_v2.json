@@ -1,0 +1,16 @@
+{
+  "matched_groups": 513,
+  "measurement_calls": 1539,
+  "phase_seconds": 3600,
+  "sha256": {
+    "v2/benchmarks/ecm/c3/round2_compare.py": "4710f849c8cd11025fe3fe0e0799c219158865604d37e7ff93ef1b0532b919c8",
+    "v2/benchmarks/ecm/c3/round2_comparison_protocol.md": "1ed30ec6899aa35595d870fd5294b4468c4fc093c95d95baa39e5bdd0361c732",
+    "v2/benchmarks/inputs/controls/c3_round2_assessment_v1.json": "4aec24cb1dafb3b1f6c67c22bf75bd3ec25a93cb4a79c434e52cd0a196eb2465",
+    "v2/benchmarks/inputs/controls/c3_round2_fitted_v1.json": "12a6a6254da4bb4a5321cdf276240eb4c24cc8d8ba3989f8b6948c4e62aef955",
+    "v2/benchmarks/inputs/controls/c3_round2_training_v1.json": "17c9b24b1073bc81d956833901cae52928244c74f362741ef0fa7b3a10b40a9b",
+    "v2/tests/test_c3_compare.py": "409524f8fd3a3639a34ccb289d28df6f0d29a52aeefca7edb151c6cbde1cf2cd"
+  },
+  "source_commit": "c157cbacf077e036378d1aeddc550e08008b6d0e",
+  "status": "Frozen before first complete-call comparison; calibration v1 unchanged",
+  "version": 2
+}

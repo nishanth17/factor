@@ -81,3 +81,37 @@ class Budget:
 
         # Refused actions leave the ledger unchanged for an exact retry.
         self.used += amount
+
+    def _consume_reserved(self, amount, reservation):
+        """Check real limits and an optional reservation before one charge.
+
+        The allocation view shares this ledger and sampled clocks. Calling
+        consume twice and reading clocks again in between made every small
+        ECM action pay for several redundant system calls. The ordinary
+        consume path stays unchanged; this path retains real cancellation
+        and deadline precedence, then checks policy before any mutation.
+        """
+        utils.require_integer(amount, "amount", 0)
+        if self.cancelled is not None and self.cancelled():
+            self.reason = "cancelled"
+            raise BudgetExhaustedError(self.reason)
+
+        wall = None
+        if self.seconds is not None or reservation.needs_wall:
+            wall = self.wall_used
+        if self.seconds is not None and wall >= self.seconds:
+            self.reason = "wall_limit"
+            raise BudgetExhaustedError(self.reason)
+
+        cpu = None
+        if self.cpu_seconds is not None or reservation.needs_cpu:
+            cpu = self.cpu_used
+        if self.cpu_seconds is not None and cpu >= self.cpu_seconds:
+            self.reason = "cpu_limit"
+            raise BudgetExhaustedError(self.reason)
+
+        reservation.check(amount, wall, cpu)
+        if amount > self.work_limit - self.used:
+            self.reason = "work_limit"
+            raise BudgetExhaustedError(self.reason)
+        self.used += amount
