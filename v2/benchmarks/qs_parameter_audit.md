@@ -27,7 +27,7 @@ and matrix rows are different resources. Normalize these before any sweep.
 | Candidate scoring and tiny primes | v2 uses conservative exact integer score bounds at 32 units per bit, 10-bit mantissa lookup, `threshold_extra=0`, no skipped small primes and 64-entry metadata chunks by default. Optional powers/fixed scores, bytearray, cutoff, bucket and resieve policies have separate R2 evidence; selected B1 uses powers/bucket. | [SymPy QS][sympy-qs] uses scaled-log candidate scoring and `ERROR_TERM=25`; [FLINT intake][flint-intake] uses byte scores and blocked scanning; [msieve sieve][msieve-release] changes unsieved-small-prime treatment with input size. These numerical thresholds are not in v2 score units. | Normalize loss/false-candidate rates under exact division. Preserve conservative coverage unless explicitly testing a lossy arm; measure threshold, prime-power and A-exception contributions, not only candidate count. |
 | Single-large-prime endpoint | v2 nested SIQS default residual limit is 10,000 (bare `SieveConfig`: 500); B1 balanced 30/40-digit controls use 9,000,000/100,000,000. C1's 40-digit DLP arm narrows SLP to 25,000,000. Residuals admitted as primes are proven. | [SymPy QS][sympy-qs] accepts a prime cofactor below `128B`; [FLINT intake][flint-intake] uses `<60B` plus a 30-bit small-cofactor gate, without v2's explicit intake proof. [msieve 1.53][msieve-release] uses bit-tiered LP multipliers (50 at 200 bits, 80 at 283). [Yamaquasi `siqs.rs`][yamaquasi-siqs] has a size-dependent multiplier. | Convert each rule to the actual `B` and certification domain. Track matched partials, unmatched occupancy, false candidates, proof cost, useful filtered rows and complete factors. |
 | DLP endpoint/product and splitting | Opt-in C1 40-digit arm uses exclusive base bound 5,000, SLP 25M, endpoint 500,000 (`100×base_bound`), product 3.2B (`128×base_bound²`), candidate bound 0 and at most 131,072 splitting calls. These multipliers are **not** exact multiples of the largest admitted prime. v2's splitter uses at most two 2,048-evaluation rho attempts per call; this is a finite allowance, not a tuned splitter. | [msieve 1.53 `sieve.c`][msieve-release] enables DLP at 282 bits and screens products at about `SLP_limit^1.8`; [Yamaquasi `siqs.rs`][yamaquasi-siqs] uses about `100B²` near 200 bits with a separate endpoint limit. [JavaMath `TDiv_QS_2LP`][javamath-tdiv] chooses Hart below 46 cofactor bits, tiny ECM below 63, rho below 64, then nested QS, admitting at most 31-bit endpoints under its usual path. [YAFU intake][yafu-tdiv] separates product/endpoint bounds and uses micro-ECM. | Test endpoint, product, candidate and splitter allowances separately first, then source-supported combinations. Retain representative rejected residuals and charge every primality/split attempt. Never infer prime certainty from a native probable-prime check. |
-| Partial/cycle retention | v2 SIQS defaults to 512 pending partials, 2,048 rows and 4,096 atoms; selected C1 40-digit DLP uses 8,192 unowned edges/rows and 32,768 atoms. `MAX_GRAPH_EDGES=65,536` and 256 atoms/cycle are safety caps; graph reservation is `32,768 + 4,096×edges` bytes. Fresh 50-digit C1 runs had median 21,504/28,672 evictions and no useful filtered matrix. | [YAFU filtering][yafu-filter] grows its relation list by 1.5× and cycle tables by 2×; [msieve 1.53 `sieve.c`/`relation.c`][msieve-release] starts its cycle table at 10,000 and doubles it, but its cycle path has a finite 100-edge-per-side heuristic. [Yamaquasi relations][yamaquasi-relations] uses dynamic partial maps and restricts DLP merges to the SLP-connected component as a yield heuristic. | C9 owns the 8,192/16,384/32,768 finite retention study with matched 256/512 MiB caps. Record peak live bytes, matching/eviction losses and post-filter rank; preserve complete all-component cycle correctness and ownership. An upstream hash-table size is not a retained-edge allowance. |
+| Partial/cycle retention | v2 SIQS defaults to 512 pending partials, 2,048 rows and 4,096 atoms; selected C1 40-digit DLP uses 8,192 unowned edges/rows and 32,768 atoms. `MAX_GRAPH_EDGES=65,536` and 256 atoms/cycle are safety caps; graph reservation is `32,768 + 4,096×edges` bytes. Fresh 50-digit C1 runs had median 21,504/28,672 evictions and no useful filtered matrix. | [YAFU filtering][yafu-filter] grows its relation list by 1.5× and cycle tables by 2×; [msieve 1.53 `sieve.c`/`relation.c`][msieve-release] starts its cycle table at 10,000 and doubles it, but its cycle path has a finite 100-edge-per-side heuristic. [Yamaquasi relations][yamaquasi-relations] uses dynamic partial maps and restricts DLP merges to the SLP-connected component as a yield heuristic. | C9 compares retention with residual opportunity, matching/cycle policy and duration. The 8,192/16,384/32,768-edge and 256/512 MiB options are initial hypotheses. Record matching/eviction losses, graph progress, post-filter rank and peak live bytes; preserve all-component correctness and ownership. An upstream hash-table size is not a retained-edge allowance. |
 | Relation target, filtering and dependencies | v2 defaults to `row_excess=2`, `filter_row_growth=1`, batch width 256 and weight-two filtering; B1/C1 selected `row_excess=32`, growth 32 and batch width 4,096. Matrix hard caps are 65,536 rows and 100,001 columns, subject to a much tighter live-memory reservation. | [SymPy QS][sympy-qs] collects at least 105% of factor-base cardinality. [Yamaquasi relations][yamaquasi-relations] asks for 48 extra kernel relations beyond covered columns; [msieve 1.53][msieve-release] uses 64 extra and targets `fb_size+96` before filtering. Those targets reflect different solvers and row quality. | Vary solve cadence/oversampling only after measuring actual post-filter rank and proper-divisor yield. Charge filtering, provenance, matrix, extraction and repeated trivial dependencies; do not promote on raw relation count. |
 | Recovery and stopping | v2 has `growth_steps=0` (so default `max_half_width=8,192` is dormant), `max_stalled=16` no-row windows and `max_trivial=128` trivial dependencies; selected B1/C1 bounds differ. These are finite stop/recovery policies, not estimated yield optima. | [Yamaquasi `siqs.rs`][yamaquasi-siqs] scales its planned A count by input bits; [FLINT QS docs][flint-docs] describe restarting with a larger base when relations are insufficient. Neither maps directly to v2's resumable work ledger. | Diagnose stalled windows versus low-quality dependencies before changing growth or stop rules. Charge repeated setup/old work and preserve resumable exhaustion semantics. |
 | Capacity, resume and score safety | v2 has hard caps including 4,096 input bits, 1e12 proven residual endpoints, 1M factor-base prime bound, 1M-position collection windows, 4,096 sieve block width, 64 Hensel lift roots, 256 atoms/cycle, 65,536 graph/matrix rows, and serialized checkpoint allowances. The SIQS default is 32 MiB owned memory and a 1 MiB checkpoint; selected B1/C1 use 256 MiB. These protect exactness, bounded work or restoration; they are not claims of economic optimality. | Native growable lists, 32-bit/64-bit cofactor limits, GPU SLP witness-table slots and v2 owned-memory reservations do not measure the same object. The current, **not yet pinned** [CUDA-MPQS guide][cuda-guide] lists a 1,048,576-slot GPU SLP witness table; it does not implement a DLP graph. | Audit every cap by role: proof, representation, or policy. Change proof/storage limits only with independent correctness, peak simultaneous-memory, cancellation and charged-resume evidence. Measure process RSS separately from owned reservations. |
@@ -42,15 +42,48 @@ The live CUDA guide must be pinned and license-checked before its settings
 enter a reproducible comparison. Native timing is contextual, not a PyPy
 prediction.
 
-The first queue is evidence-led. C9 should separate 50-digit retention loss,
-product/threshold loss and insufficient collection duration; its fresh 120 s
-runs had evictions but zero surviving matrices, so a larger graph alone has no
-established benefit. A feasible longer-window case can then compare linked
-base/interval/A schedules against SLP under one resource cap. Revisit multiplier
-selection or score policies only when their setup or candidate costs are
-material in that band's profile. Defer solve-cadence tuning until actual useful
-post-filter rows exist. These are ordered bounded gates, not an unlimited
-search or a claim about 80–100-digit outcomes.
+## Mechanisms and useful-yield research queue
+
+The first table is an inventory. C9/C10 must add an explanatory mechanism
+comparison using pinned primary papers and actual implementation paths.
+For each technique, explain its arithmetic or statistical rationale,
+applicable size/resource regime, interactions, deliberate losses and certainty
+assumptions. Map it to an existing v2 equivalent, a missing bounded algorithm,
+a configuration experiment or a justified deferral. Follow callers and
+size-dependent branches to establish the whole policy.
+
+C10 covers polynomial/multiplier quality, factor-base/interval tradeoffs,
+A selection and Gray reuse, sieve/prime-power scoring, candidate recovery and
+refinement, and collection targets. C9 follows accepted/rejected residuals
+through SLP/DLP admission, splitting, matching, graph components/cycles,
+retention and filtering into useful dependencies. Coordinate their interacting
+choices in one study. Research can identify further algorithmic gaps, but
+matrix/provenance redesign and higher-arity relation implementation retain
+their A8/B6/B7/C4 and F6 gates. More raw relations or cycles alone do not
+establish higher useful yield or faster complete factoring.
+
+The first experiment queue should separate 50-digit retention loss,
+product/threshold loss and insufficient collection duration. C1's fresh
+120-second runs are censored observations, not a future feasibility ceiling.
+The separate 141.063-second completing resume changed base/configuration and
+allowances too; it motivates longer bounded pilots without identifying one
+cause. Predeclare cumulative observation tiers, advancement/stop criteria and
+a finite total study allowance. Choose actual durations using source context
+and training progress rather than imposing a universal 120-second cutoff.
+Track residual and endpoint populations, graph degree/core/cycle development,
+singleton survival, rank/dependencies where available, and proper factors.
+Zero useful rows in a short prefix may precede useful graph/matrix formation;
+distinguish that delay from stalled collection before terminating a band.
+
+Select a few source-supported mechanisms or bundles from those diagnoses;
+graph growth is one candidate. Compare linked base/interval/A schedules and
+SLP/DLP policies under matched total resources, including unsuccessful work
+and charged continuation. Stop at the declared total cap or prespecified
+progress/resource failure and retain an inconclusive feasibility verdict when
+appropriate. Longer allowances alone do not establish a speedup. Revisit
+multiplier/scoring choices when yield or cost evidence supports them; defer
+solve-cadence tuning until useful post-filter rows exist. No larger-band
+completion or 80–100-digit capability follows from this research plan.
 
 ## Continuing experiment ledger (C10)
 
@@ -61,12 +94,14 @@ For each new feasible input band, arithmetic backend, collector or solver change
    v2 default and selected control, and the local evidence status. Update this
    table when a source or implementation changes; keep accepted old controls
    versioned rather than rewriting their evidence.
-2. Use stage attribution and representative rejected residuals to rank at
-   most a few independent parameter families by expected complete-factor
-   value. Freeze inputs/seeds, total work/wall/CPU, owned bytes, RSS reporting,
-   checkpoint size, sample count and stop rule **before** training. C9 handles
-   DLP storage/product economics; B1 is the 30/40-digit control; E1 combines
-   selected challengers; C3/G1 own portfolio handoff. No blind Cartesian grid.
+2. Use the mechanism comparison, stage attribution and representative rejected
+   residuals to rank a few algorithmic gaps or parameter families by expected
+   complete-factor value. Freeze inputs/seeds, total work/wall/CPU, owned bytes,
+   RSS reporting, checkpoint size, cumulative duration tiers, advancement criteria, sample
+   count and stop rule **before** training. C9 handles residual admission,
+   splitting, matching/cycles and DLP retention economics; B1 is the
+   30/40-digit control; E1 combines selected challengers; C3/G1 own portfolio
+   handoff. No blind Cartesian grid.
 3. Tune on training inputs only; freeze each finite bundle before fresh
    confirmation. Compare SLP/DLP and QS/MPQS/SIQS under matched total
    resources. Count setup, sieve, splitting/certification, graph/eviction,
@@ -78,8 +113,9 @@ For each new feasible input band, arithmetic backend, collector or solver change
    promotion policy with fresh complete-factor/completion evidence, exact
    reconstruction, proper divisors, certainty preservation and bounded
    checkpoint replay. Publish the chosen bundle and the rejected candidates;
-   if pilots cannot reach a useful matrix within their declared caps, stop and
-   record the limiting stage and the next concrete trigger.
+   stop at the declared cumulative study cap or prespecified progress/resource
+   failure. Record the limiting stage, any undecided feasibility and the next
+   concrete trigger; a short empty prefix alone does not settle the band.
 
 The item stays open as a maintained decision ledger. A completed experiment
 closes only its named size/workload tranche, not the whole parameter space.
