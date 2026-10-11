@@ -540,3 +540,13 @@ were handed to C10 with explicit CPU release after confirmation. C10 proceeds
 with its separate source and integrated measurement protocol.
 None of C3's subsequent changes were merged into this frozen study worktree.
 C9 changes no scoring, polynomial or candidate-recovery algorithm.
+
+## Subsequent literature verification
+
+The [11 October transfer verification](c9_literature_verification.md) checks
+current source revisions and records implemented, evaluated, deferred and
+previously unmapped mechanisms. Asymmetric ordered LP bounds were missing
+from the earlier explicit comparison; recovered-product admission, target
+feedback and cycle-weight optimization remain untested. Only the named C9.2
+tranche is accepted. This addendum changes no frozen source/configuration or
+historical result and does not assert exhaustive adaptation or optimality.

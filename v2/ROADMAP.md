@@ -2853,6 +2853,22 @@ The two stages charge 15,524.576 active seconds against the explicitly amended
 23,317.431-second bound. Only C9.2's bounded source-derived yield and adaptive-
 storage tranche closes. C10, E1, higher arity and matrix redesign retain their
 existing ownership/gates.
+The [post-acceptance literature verification](benchmarks/qs/c9/c9_literature_verification.md)
+confirms the selected transfer, not exhaustive adaptation or optimality. It
+adds the previously unmapped asymmetric endpoint policy and makes remaining
+C9 mechanisms explicit. No frozen source, configuration or outcome changes.
+
+Open C9 follow-ups, each requiring its own attribution/freeze/acceptance gates:
+
+- [ ] Coordinate C10a's solve scheduling with C9 yield-dependent retry targets;
+  preserve true final/storage-cap extraction and charged continuation.
+- [ ] Attribute wider recovered-product intake and unequal ordered endpoint
+  bounds separately, sampling rejected norms and late prefixes as well as
+  survivors; coordinate any candidate-domain/scoring change with C10.
+- [ ] Quantify cycle/provenance weight and algebraically equivalent rows before
+  shorter representations or further retention mechanisms. Matrix/provenance
+  redesign retains its existing ownership and gates.
+
 The C1 motivation below describes historical and legacy bounded controls.
 
 The broader [QS/SIQS parameter audit](benchmarks/qs_parameter_audit.md)

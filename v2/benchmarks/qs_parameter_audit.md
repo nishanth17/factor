@@ -195,3 +195,15 @@ closes only its named size/workload tranche, not the whole parameter space.
 [sympy-qs]: https://github.com/sympy/sympy/blob/2f22a5f81e2f4124380be3739a092e9ff20128de/sympy/ntheory/qs.py
 [javamath-tdiv]: https://github.com/TilmanNeumann/java-math-library/blob/088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97/src/main/java/de/tilman_neumann/jml/factor/siqs/tdiv/TDiv_QS_2LP.java
 [cuda-guide]: https://github.com/drjanosch42/cuda-mpqs/blob/main/USER_GUIDE.md
+
+## C9.2 literature-transfer verification
+
+The [11 October addendum](qs/c9/c9_literature_verification.md) rechecks all 43
+previous source-file pins, current upstream revisions and the v2 callers.
+It adds asymmetric ordered LP bounds from primary literature: a smaller
+endpoint ceiling is not equivalent to the existing symmetric endpoint/product
+envelope. Wider recovered-product intake, yield-dependent retry targets and
+cycle/provenance-weight optimization remain untested transfers. C10a owns
+solve scheduling; C9 retains residual policy and yield-dependent feedback,
+with a shared candidate-domain/scoring interface. No exhaustive-adaptation or
+optimality claim follows from the accepted bundle; its results remain unchanged.

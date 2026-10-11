@@ -38,3 +38,13 @@ admission, (3) existing reusable SLP and historical half-base combinations.
 Splitter replacement and solve-cadence redesign are deferred by current loss
 attribution. This ranking can be rejected by complete outcomes; larger graphs,
 more cycles or smaller matrices alone cannot accept a candidate.
+
+## Subsequent literature verification
+
+The [11 October transfer verification](c9_literature_verification.md) checks
+current source revisions and records implemented, evaluated, deferred and
+previously unmapped mechanisms. Asymmetric ordered LP bounds were missing
+from the earlier explicit comparison; recovered-product admission, target
+feedback and cycle-weight optimization remain untested. Only the named C9.2
+tranche is accepted. This addendum changes no frozen source/configuration or
+historical result and does not assert exhaustive adaptation or optimality.
