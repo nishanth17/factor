@@ -1130,7 +1130,39 @@ prefix, Alpertron's 20/25-digit-factor ladder prefixes, and GMP-ECM's published
 native arithmetic, curve families and stage-two methods differ, and some source
 counts describe standalone ECM rather than automatic SIQS handoff. See the
 [preset table and source qualifications](benchmarks/ecm/c3/source_presets.md).
-No preset changes numerical defaults or establishes a faster policy.
+The helper is an explicit override. The bounded defaults below reuse the
+reviewed escalating prefix following the user's promotion request.
+
+For a fresh bounded call, omitting `ecm_tiers` (or passing `None`) now resolves
+once from the absolute original input:
+
+| Input decimal digits | ECM tiers `(B1, B2, curves)` |
+| --- | --- |
+| 30 | `(2000, 50000, 64)` |
+| 40 | `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` |
+| Other sizes | `(2000, 147396, 32)` |
+
+`PortfolioConfig(...).for_input(n)` exposes that concrete selection before a
+call. Explicit tuples, including `()` and the old fixed32 tuple, take
+precedence. The bounded CLI uses the same selection when `--ecm-tier` and
+`--ecm-curves` are omitted; direct `--method siqs|qs|mpqs|sss|sssf` still selects
+its requested engine. The standalone `factorize()` API retains its explicit
+single-bound allowance.
+
+Selection preserves every other config field, executor setting, total Budget,
+SIQS/SSS setting and cumulative allocation floor. If larger ECM workspace
+cannot coexist under the current memory cap, the old fixed32 schedule remains.
+Explicit paired executors also retain their previous schedule. Children keep
+the root's concrete plan. `asdict(config)` and `dataclasses.replace(config, ...)`
+freeze its current numerical tiers; pass `ecm_tiers=None` again when constructing
+an automatic config from such a copy. Checkpoints store concrete tiers, never
+an unresolved default decision. An omitted setting on resume restores saved
+tiers for schemas 2–12; an explicit conflicting tuple is rejected.
+
+This is a user-directed promotion from the complete revealed-input screen,
+before fresh confirmation. It does not close C3's calibration gate or establish
+a speedup on every input, default service grant or backend. See the
+[decision and limitations](benchmarks/ecm/c3/default_promotion.md).
 
 Explicit policies use checkpoint schema 12, pinning the complete configuration
 and allocation identity. `factorize_bounded(..., checkpoint=..., config=None)`

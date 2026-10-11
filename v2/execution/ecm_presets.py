@@ -3,8 +3,6 @@
 from dataclasses import replace
 from types import MappingProxyType
 
-from ..portfolio import PortfolioConfig
-
 # Numerical schedules are facts transcribed from the pinned upstream review;
 # no upstream arithmetic or scheduling code is copied. Native curve families
 # and stage-two implementations differ, so these are explicit transfer presets,
@@ -38,6 +36,8 @@ def with_ecm_preset(config, name):
     SIQS storage; an unfunded preset raises rather than shrinking SIQS.
     Pretest ceilings, total run budgets and checkpoint behavior stay binding.
     """
+    from ..portfolio import PortfolioConfig
+
     if not isinstance(config, PortfolioConfig):
         raise TypeError("ECM presets require a PortfolioConfig")
     if name not in ECM_PRESETS:

@@ -3384,7 +3384,7 @@ deferred to the owners below. A10 introduces no new ECM, chain or sieve default.
 | v1 capability | Current v2 comparison | Transfer owner / decision |
 | --- | --- | --- |
 | Wider fixed-base primality tables in `v1/utils.py` | Transfer the independently verified first-12/13-prime-base bounds; the reported 23-digit prime lies in the first-12 range. Keep faster existing small-domain sets. | A10; B14 owns certificates beyond the final strict bound. Reject higher entries without a proved/computed lower bound, heuristic log rules, v1's ignored requested round counts and truthy residue shortcuts. |
-| Larger input-dependent ECM bounds and up to 10,000 curves | v2's default tier is B1/B2 2,000/147,396 with 32 curves. v1 permits more search, but extra allowance alone proves no speed or completion advantage. | A3 makes larger campaigns feasible; C3 measures bound/curve allocation and SIQS handoff; G1 combines the final policy. |
+| Larger input-dependent ECM bounds and up to 10,000 curves | v2 retains fixed32 outside the 30/40-digit bounded defaults; C3's user-directed promotion uses compact64/escalating140 in those measured bands. v1 permits more search, but extra allowance alone proves no speed or completion advantage. | A3 makes larger campaigns feasible; C3 measures bound/curve allocation and SIQS handoff; G1 combines the final policy. |
 | Stage-one schedule reuse across curves | v1 builds its stage-one exponent before its curve loop; A3 now supplies bounded opt-in packed prime/power programs. Retention saves larger schedule/finite-curve work but small complete factoring regresses; defaults remain streamed. | A3 accepted; B2 (P5.2) adds paired execution while retaining exact powers, finite storage and charged replay. |
 | PRAC and Montgomery kernels | Corrected ladder arithmetic and A4's independently checked opt-in PRAC already exist. Legacy exceptional-state failures prevent treating v1 PRAC as a ready-made faster replacement. | A4 accepted; B3 (P4.1) owns production chain routing, B4 (P4.2) whole-engine kernel costs. Reject unsafe legacy exceptional states. |
 | Atkin/Eratosthenes/segmented sieve variants | v2 retains these families with corrected boundaries and local state; no independent v1 speed advantage has been established. | E6 (P8.6) only if a validated setup/sieve bottleneck supports a challenger; retain corrected output contracts. |
@@ -3489,6 +3489,10 @@ complete result. Do not postpone CLI access until this calibration finishes.
   regress and seven cells remain unstable after the declared extensions.
   The implementation/study tranche is delivered; **C3's calibration gate stays
   open** until promotion evidence passes. G1/E1 own broader combined policy.
+  The later [user-directed default decision](benchmarks/ecm/c3/default_promotion.md)
+  adopts compact64 for 30 digits and escalating140 for 40 digits before fresh
+  confirmation. This scoped behavior change does not satisfy the remaining
+  stability/fresh gates or mark joint calibration complete.
 - [ ] Fit joint B1/B2/curve grids using measured PyPy stage costs and factor
   yield, with factor-size bands hidden from algorithms. Select a deterministic
   policy from observable input/configuration and completed-work metadata.

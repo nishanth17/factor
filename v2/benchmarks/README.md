@@ -71,6 +71,12 @@ training CPU cost than fixed32, but uncertainty remains wide. After the user rai
 a time concern, defer the prescribed extension and fresh confirmation, select no
 policy and retain defaults. Final committed-only checks pass 653 tests, lint,
 154 benchmark imports and 35 certified corpora.
+The user subsequently requested [default promotion](ecm/c3/default_promotion.md):
+use compact64 at 30 digits and the Yamaquasi escalating prefix at 40 digits,
+subject to existing workspace admission. This separate decision overrides the
+earlier defer decision; it does not alter the frozen assessment's null selection,
+pass its stability gate, or claim a measured hybrid gain. No new timing search
+or extension was initiated.
 No round-two fresh inputs exist. Frozen earlier experiments use their source
 commits; historical manifests are not repinned to newer production sources.
 

@@ -14,6 +14,12 @@
 
 ## Current development
 
+- Promote C3's size-scoped bounded defaults at the user's direction: compact64
+  at 30 decimal digits and the Yamaquasi-derived 10/30/100 escalating prefix at
+  40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
+  limits and SIQS settings; retain fixed32 for other sizes or tight workspace.
+  This promotion precedes fresh confirmation and leaves calibration open.
+
 - Complete the initial 54-group upstream ECM transfer screen: all 324 calls
   validate under unchanged SIQS settings and reserves. Escalating Yamaquasi
   and Alpertron schedules show 44.44%/47.39% lower revealed-training CPU cost

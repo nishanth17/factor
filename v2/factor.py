@@ -476,18 +476,13 @@ def main():
 
             parameters = dict(
                 backend=args.backend,
-                ecm_tiers=(
-                    (
-                        constants.ECM_B1,
-                        constants.ECM_B2,
-                        args.ecm_curves
-                        if args.ecm_curves is not None
-                        else constants.MAX_CURVES_ECM,
-                    ),
-                ),
                 memory_bytes=args.memory_mib * 1024 * 1024,
                 fermat_steps=args.fermat_steps,
             )
+            if args.ecm_curves is not None:
+                parameters["ecm_tiers"] = (
+                    (constants.ECM_B1, constants.ECM_B2, args.ecm_curves),
+                )
             if args.ecm_tier:
                 try:
                     parameters["ecm_tiers"] = tuple(
@@ -575,13 +570,17 @@ def main():
                         raise ValueError("malformed checkpoint config")
                 except (KeyError, TypeError) as error:
                     raise ValueError("malformed checkpoint") from error
+                if (
+                    args.ecm_tier is None
+                    and args.ecm_curves is None
+                    and args.method == "auto"
+                ):
+                    parameters["ecm_tiers"] = saved["ecm_tiers"]
                 if saved.get("allocation") is not None:
                     if args.ecm_policy is None:
                         parameters["allocation"] = ECMAllocation(
                             **saved["allocation"]
                         )
-                    if args.ecm_tier is None and args.ecm_curves is None:
-                        parameters["ecm_tiers"] = saved["ecm_tiers"]
                     # New policy snapshots retain the selected fallback even
                     # when a resumed CLI invocation omits its original flags.
                     if not (use_qs or use_sss):

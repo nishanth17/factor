@@ -5,7 +5,7 @@ import json
 import math
 import random
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 from . import constants
 from .common import arithmetic, prime_sieve, utils
@@ -52,9 +52,9 @@ SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 class PortfolioConfig:
     """Finite allowances; ECM tiers are (inclusive B1, B2, curve count).
 
-    Defaults retain the existing ECM bounds and serial execution. Alternative
-    tiers/cutoffs are experimental until matched held-out evidence supports
-    them. memory_bytes bounds conservative owned workspace estimates, not RSS.
+    Omitted ECM tiers resolve once from the original input via for_input().
+    Explicit tiers and saved numerical schedules retain their identity.
+    memory_bytes bounds conservative owned workspace estimates, not RSS.
     """
 
     allocation: ECMAllocation | None = field(default=None, kw_only=True)
@@ -69,7 +69,7 @@ class PortfolioConfig:
     pm1_attempts: int = 1
     pm1_b1: int = constants.PM1_B1
     pm1_b2: int = constants.PM1_B2
-    ecm_tiers: tuple = ((constants.ECM_B1, constants.ECM_B2, 32),)
+    ecm_tiers: tuple | None = None
     chunk_size: int = 16
     gcd_batch: int = constants.GCD_BATCH_SIZE
     primality_rounds: int = constants.PRIMALITY_ROUNDS
@@ -92,6 +92,18 @@ class PortfolioConfig:
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
+        # Routing intent is transient; only concrete numerical tiers enter
+        # asdict/checkpoints. Reconstructing a saved config never reselects.
+        object.__setattr__(
+            self, "_automatic_ecm_tiers", self.ecm_tiers is None
+        )
+        if self.ecm_tiers is None:
+            object.__setattr__(
+                self,
+                "ecm_tiers",
+                ((constants.ECM_B1, constants.ECM_B2, 32),),
+            )
+
         if self.allocation is not None:
             if not isinstance(self.allocation, ECMAllocation):
                 raise TypeError("allocation must be an ECMAllocation or None")
@@ -274,6 +286,15 @@ class PortfolioConfig:
             raise MemoryError(
                 "candidate/checkpoint reserve exceeds memory cap"
             )
+
+    def for_input(self, n):
+        """Resolve omitted ECM tiers once, retaining all explicit limits."""
+        utils.require_integer(n)
+        if not self._automatic_ecm_tiers:
+            return self
+        from .execution.ecm_defaults import resolve_defaults
+
+        return resolve_defaults(self, n)
 
     @property
     def max_hi(self):
@@ -1536,6 +1557,9 @@ def factorize_bounded(
                 "ecm_chain_bytes": saved_config.get("ecm_chain_bytes", 0),
                 "ecm_program_bytes": saved_config.get("ecm_program_bytes", 0),
                 "memory_bytes": saved_config.get("memory_bytes", 8_388_608),
+                "ecm_tiers": saved_config.get(
+                    "ecm_tiers", ((constants.ECM_B1, constants.ECM_B2, 32),)
+                ),
             }
         if saved_config.get("allocation") is not None:
             saved_config = dict(saved_config)
@@ -1574,6 +1598,17 @@ def factorize_bounded(
     budget = Budget() if budget is None else budget
     if abs(n).bit_length() > config.max_input_bits:
         raise ValueError("input exceeds max_input_bits")
+    if checkpoint is None:
+        config = config.for_input(n)
+    elif config._automatic_ecm_tiers:
+        # An omitted tier setting means retain the checkpoint's exact plan,
+        # including legacy fixed32; explicit tier conflicts still reject.
+        try:
+            tiers = checkpoint["payload"]["config"]["ecm_tiers"]
+        except (KeyError, TypeError) as error:
+            raise ValueError("malformed checkpoint") from error
+        config = replace(config, ecm_tiers=tiers)
+
     if checkpoint is None:
         if budget.used or budget.prior_wall or budget.prior_cpu:
             raise ValueError("a fresh run requires an unused budget")
