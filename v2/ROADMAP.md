@@ -2967,6 +2967,11 @@ confirms the selected transfer, not exhaustive adaptation or optimality. It
 adds the previously unmapped asymmetric endpoint policy and makes remaining
 C9 mechanisms explicit. No frozen source, configuration or outcome changes.
 
+The [C3/C9 integration record](benchmarks/qs/c9/c9_integration.md) verifies
+implicit growing resume and finite child ownership: 690 working and
+committed-only tests, full lint, 140 live benchmark imports and required
+loaders pass. Historical C9 controls, corpus and timing verdict are unchanged.
+
 Remaining transfers now belong to [C9a](#c9a--remaining-large-prime-yield-and-storage-transfers-open).
 C9 closes only its accepted C9.2 tranche; C9a has separate attribution, freeze
 and acceptance gates. No claim of exhaustive adaptation or optimality is made.

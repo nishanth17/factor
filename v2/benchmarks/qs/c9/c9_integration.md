@@ -46,3 +46,18 @@ combined tests, lint and committed-files-only benchmark/loaders checks.
 Useful raw C9 evidence and pinned-source captures stay ignored and are moved
 to mainline's `v2/benchmarks/results/c9/` before removing the worktree.
 Unrelated mainline edits are preserved outside the integration commits.
+
+At integration revision `6ba8cdd634364d095bd17dfa876999894179db2a`,
+`make -C v2 test` passes **690 tests**, and `make -C v2 lint` passes all
+Ruff/format/pycodestyle checks. A `git archive` of that committed revision,
+with only external PyPy dependencies, independently passes **690 tests**,
+**140 live non-package benchmark imports**, snapshot/A7/B4/C6/C1 loaders and
+the three independently certified C9 confirmation inputs. The historical C9
+timing loader correctly refuses integrated source; accepted control and
+corpus SHA-256 values remain unchanged. The temporary archive is removed.
+
+The combined checks use 206.258 wall seconds and 216.667 child CPU seconds;
+these are integration QA costs, separate from the historical C9 study's
+closed allowance. No timing comparison or new study is conducted. The final
+verification receipt update changes documentation only; runtime, tests,
+benchmark runners and source manifests remain exactly as checked.

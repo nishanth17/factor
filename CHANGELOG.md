@@ -18,6 +18,8 @@
   policy during implicit schema-12 resume and retain the finite resolved child
   allowance; reject changed policies. Cross off C9 and phase remaining
   literature transfers into C9a with separate attribution/acceptance gates.
+  Integrated working/committed-only checks pass 690 tests, full lint and
+  140 live benchmark imports plus required loaders.
 
 - Add `GrowingDoubleLargeSieveConfig` for serial SIQS with allocator-grown
   partial history and no implicit FIFO, original-atom, row or cumulative
