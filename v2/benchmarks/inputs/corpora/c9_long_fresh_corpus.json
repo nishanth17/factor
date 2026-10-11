@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "seed": 202610110619,
+  "fixtures": [
+    {
+      "id": "c9_growth_fresh_long_50_0",
+      "n": 44290265482568408360725921373980164010389364372411,
+      "factors": [
+        6645066686192441011132759,
+        6665134839744746404013629
+      ],
+      "kind": "balanced",
+      "digits": 50,
+      "split": "held_out"
+    },
+    {
+      "id": "c9_growth_fresh_long_50_1",
+      "n": 60932831513125423476023098707107108993257483314971,
+      "factors": [
+        6547568803277143377956659,
+        9306176589183415452264569
+      ],
+      "kind": "balanced",
+      "digits": 50,
+      "split": "held_out"
+    },
+    {
+      "id": "c9_growth_fresh_long_50_2",
+      "n": 66060954069111692254751506875233609287898589354809,
+      "factors": [
+        7507409846036644848509759,
+        8799433549506688054786951
+      ],
+      "kind": "balanced",
+      "digits": 50,
+      "split": "held_out"
+    }
+  ],
+  "certificates": {
+    "6911": {
+      "kind": "trial"
+    },
+    "4436863": {
+      "kind": "pocklington",
+      "q": 6911,
+      "witness": 2
+    },
+    "8494844520979": {
+      "kind": "pocklington",
+      "q": 4436863,
+      "witness": 2
+    },
+    "6645066686192441011132759": {
+      "kind": "pocklington",
+      "q": 8494844520979,
+      "witness": 2
+    },
+    "4177": {
+      "kind": "trial"
+    },
+    "4327373": {
+      "kind": "pocklington",
+      "q": 4177,
+      "witness": 2
+    },
+    "7014005217559": {
+      "kind": "pocklington",
+      "q": 4327373,
+      "witness": 2
+    },
+    "6665134839744746404013629": {
+      "kind": "pocklington",
+      "q": 7014005217559,
+      "witness": 2
+    },
+    "5437": {
+      "kind": "trial"
+    },
+    "6122063": {
+      "kind": "pocklington",
+      "q": 5437,
+      "witness": 2
+    },
+    "7769975430089": {
+      "kind": "pocklington",
+      "q": 6122063,
+      "witness": 2
+    },
+    "6547568803277143377956659": {
+      "kind": "pocklington",
+      "q": 7769975430089,
+      "witness": 2
+    },
+    "6547": {
+      "kind": "trial"
+    },
+    "6127993": {
+      "kind": "pocklington",
+      "q": 6547,
+      "witness": 2
+    },
+    "5309660814781": {
+      "kind": "pocklington",
+      "q": 6127993,
+      "witness": 2
+    },
+    "9306176589183415452264569": {
+      "kind": "pocklington",
+      "q": 5309660814781,
+      "witness": 2
+    },
+    "6679": {
+      "kind": "trial"
+    },
+    "7360259": {
+      "kind": "pocklington",
+      "q": 6679,
+      "witness": 2
+    },
+    "8370513429823": {
+      "kind": "pocklington",
+      "q": 7360259,
+      "witness": 2
+    },
+    "7507409846036644848509759": {
+      "kind": "pocklington",
+      "q": 8370513429823,
+      "witness": 2
+    },
+    "5021": {
+      "kind": "trial"
+    },
+    "8083811": {
+      "kind": "pocklington",
+      "q": 5021,
+      "witness": 2
+    },
+    "7788105193621": {
+      "kind": "pocklington",
+      "q": 8083811,
+      "witness": 2
+    },
+    "8799433549506688054786951": {
+      "kind": "pocklington",
+      "q": 7788105193621,
+      "witness": 2
+    }
+  },
+  "generation_calls": 551,
+  "generation_seconds": 0.012028500204905868,
+  "disjoint_from_inputs": 2120,
+  "selection_sha256": "751d1a767f87db4e15ad4486c1c0334f60563d784dbd98756517d8414a4bd57c",
+  "sampling": "Three independent balanced certified 50-digit products, conditioned on a large prime factor of p-1; not RSA-distributed."
+}
