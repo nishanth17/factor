@@ -202,3 +202,11 @@ loader. The frozen control/selection hashes and certified fresh corpus were
 checked again after measurement.
 The detailed [validation record](validation.md) distinguishes the earlier
 implementation check from this final committed-source check.
+
+## Subsequent integration boundary
+
+The historical retain-defaults verdict above describes this frozen first
+tranche. The user subsequently directed a [scoped automatic selection](default_promotion.md)
+of its accepted 2 MiB plan in the exact native 40/50-digit growing-DLP bundles.
+That routing is a later integration decision. It changes no first-tranche
+controls, inputs, samples, source pins, expense records or timing claims.

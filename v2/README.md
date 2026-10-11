@@ -799,8 +799,11 @@ rejected. Finite and growing collectors retain their existing quota semantics.
 The [C10 tranche 1 result](benchmarks/qs/c10/tranche1_results.md) does not
 advance this fixed 16-family ordering from training. A separate exact 2 MiB
 prime-power plan passes scoped fresh complete-factor comparisons for the
-measured 40/50-digit growing-DLP bundles. These are explicit opt-in policies;
-defaults and the CLI's existing choices are unchanged. The
+measured 40/50-digit growing-DLP bundles. The user-directed automatic selector
+enables the plan for those exact native size bands at the confirmed 1 GiB
+allowance; `SIQSConfig()` and explicit caller configurations remain unchanged.
+The [default decision](benchmarks/qs/c10/default_promotion.md) distinguishes
+this routing from a new timing claim. The
 [candidate ledger](benchmarks/qs/c10/candidate_reconciliation.md) keeps
 alternative A selection, diversity and normalized polynomials distinct.
 
@@ -1100,15 +1103,18 @@ be supplied consistently on restore. There is no new serialized relation
 format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 [bounded evidence and decision](benchmarks/qs/c9/c9_results.md).
 
-### C9 allocator-grown DLP storage
+### C9/C10 size-scoped growing-DLP defaults
 
-Fresh native 50-digit calls select the accepted C9 bundle by default through
+Fresh native 40- and 50-digit calls select the scoped bundles by default through
 `SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
 `default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
-selection; its default result exactly matches the confirmed 50-digit challenger.
-Other sizes/backends retain existing policies. This size-based promotion was
-explicitly requested by the user; complete-run evidence covers balanced inputs,
-with three independent products, and does not establish every 50-digit class.
+selection; its default result exactly matches the frozen C10 plan configuration
+in either band. The 50-digit selection adds only C10's 2 MiB plan to C9's
+confirmed bundle. The 40-digit selection uses the C9-tested growing collector
+with C10's confirmed plan; C9 did not establish a separate 40-digit growth
+gain over fixed DLP. Other sizes/backends retain existing policies. This
+size-based promotion was explicitly requested by the user; complete-run
+evidence covers balanced inputs, not every 40- or 50-digit class.
 
 Omitted limits use the confirmed finite 1 GiB SIQS allowance, 1,200 wall/CPU
 seconds and 10^13 work units. The outer automatic portfolio reserves 16 MiB
@@ -1116,15 +1122,23 @@ additional coexistence headroom. An explicit Budget or CLI resource limit wins;
 small grants can return unresolved results. Explicit SIQSConfig objects, QS
 parameter flags, explicit `siqs=None` and saved concrete configurations take
 precedence. `asdict`/`replace` copies freeze the current numerical selection.
+`PortfolioConfig` also accepts an asdict-style SIQS child mapping in its
+constructor; checked checkpoints remain the supported resume format.
 The standalone `factorize()` API remains its separately configured engine.
 
-Default 50-digit collection uses B=30,000, half-width 65,536, six A factors,
+Default 40-digit collection uses B=5,000, half-width 65,536, five A factors,
+flyer assignment, endpoint ceiling 500,000, SLP ceiling 25,000,000 and DLP
+product bound 3,200,000,000. Default 50-digit collection uses B=30,000,
+half-width 65,536, six A factors,
 flyer assignment, endpoint/SLP ceiling 3,000,000 and product bound
-115,200,000,000 with growing history. The measured peak was 326 MiB versus
+115,200,000,000 with growing history. Both bands enable the 2 MiB power plan
+only with the confirmed 1 GiB owned allowance; lower caller memory grants
+retain the growing bundle without the plan. The measured C9 50-digit peak
+before C10's plan was 326 MiB versus
 167/198 MiB for SLP/fixed DLP, and charged work increased despite lower wall/CPU.
 See [default promotion and limits](benchmarks/qs/c9/c9_default_promotion.md).
-C10 owns subsequent promotion of its separately confirmed power-plan setting;
-the selector supplies its composition point without changing frozen studies.
+The [C10 decision](benchmarks/qs/c10/default_promotion.md) records the plan's
+separate fresh results, memory delta and remaining boundaries.
 
 `GrowingDoubleLargeSieveConfig` uses growable PyPy relation containers. Its
 `max_partials`, `max_atoms`, `max_relations`, `memory_bytes` and cumulative

@@ -49,6 +49,26 @@ SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 _AUTO_SIQS = object()
 
 
+def _decode_siqs_config(values):
+    """Rebuild a concrete SIQS child from an asdict-style mapping."""
+    from .qs import (
+        DoubleLargeSieveConfig,
+        GrowingDoubleLargeSieveConfig,
+        SieveConfig,
+    )
+
+    decoded = dict(values)
+    collector = decoded["collector"]
+    if collector.get("storage_policy") == "grow":
+        collector_type = GrowingDoubleLargeSieveConfig
+    elif "large_prime_bound" in collector:
+        collector_type = DoubleLargeSieveConfig
+    else:
+        collector_type = SieveConfig
+    decoded["collector"] = collector_type(**collector)
+    return SIQSConfig(**decoded)
+
+
 @dataclass(frozen=True)
 class PortfolioConfig:
     """Finite allowances; ECM tiers are (inclusive B1, B2, curve count).
@@ -93,6 +113,9 @@ class PortfolioConfig:
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
+        if isinstance(self.siqs, dict):
+            object.__setattr__(self, "siqs", _decode_siqs_config(self.siqs))
+
         # Routing intent is transient; only concrete numerical tiers enter
         # asdict/checkpoints. Reconstructing a saved config never reselects.
         object.__setattr__(
@@ -323,11 +346,13 @@ class PortfolioConfig:
             C9_MEMORY_BYTES,
             C9_PORTFOLIO_MEMORY_BYTES,
             default_siqs_config,
-            uses_c9_defaults,
+            uses_siqs_defaults,
         )
 
         selected = resolve_defaults(self, n)
-        if self._automatic_siqs and uses_c9_defaults(n, backend=self.backend):
+        if self._automatic_siqs and uses_siqs_defaults(
+            n, backend=self.backend
+        ):
             memory = (
                 C9_PORTFOLIO_MEMORY_BYTES
                 if self._automatic_memory
@@ -1661,14 +1686,14 @@ def factorize_bounded(
                 else 64,
             )
     if budget is None:
-        from .qs.defaults import default_siqs_budget, uses_c9_defaults
+        from .qs.defaults import default_siqs_budget, uses_siqs_defaults
 
         growing = (
             config.siqs is not None
             and getattr(config.siqs.collector, "storage_policy", None)
             == "grow"
         )
-        if (config._automatic_siqs or growing) and uses_c9_defaults(
+        if (config._automatic_siqs or growing) and uses_siqs_defaults(
             n, backend=config.backend
         ):
             budget = default_siqs_budget(n, backend=config.backend)

@@ -482,7 +482,7 @@ def main():
             C9_SECONDS,
             C9_WORK_LIMIT,
             default_siqs_config,
-            uses_c9_defaults,
+            uses_siqs_defaults,
         )
 
         automatic_qs = (
@@ -491,7 +491,7 @@ def main():
             and not qs_parameters
             and args.qs_residual_bound is None
             and not args.qs_dlp
-            and uses_c9_defaults(number, backend=args.backend)
+            and uses_siqs_defaults(number, backend=args.backend)
         )
         if automatic_qs:
             use_qs = True
@@ -637,7 +637,7 @@ def main():
                 )
                 if (
                     restore_saved_qs
-                    and uses_c9_defaults(number, backend=args.backend)
+                    and uses_siqs_defaults(number, backend=args.backend)
                     and saved["siqs"]["collector"].get("storage_policy")
                     == "grow"
                 ):

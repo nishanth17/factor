@@ -1,5 +1,18 @@
 # Changelog
 
+## C10 bounded tranche integration (11 October 2026)
+
+- Route omitted native 40/50-digit SIQS through the frozen growing-DLP bundles
+  with C10's accepted 2 MiB power plan at the measured 1 GiB allowance.
+  Preserve explicit configurations, smaller memory/work/time grants, legacy
+  checkpoints and the reference `SIQSConfig()` default. Other size bands and
+  backends retain their previous policy.
+- Compose with C9's 50-digit selector without changing either frozen study.
+  Verify the production configurations against C10's versioned plan controls;
+  retain separate C1/C9/C10 timing comparisons and their balanced-input limits.
+  Close this delivered C10 tranche and phase distinct untested collection
+  mechanisms into conditional C10a gates with their original owners.
+
 ## C10 collection strategy tranche 1 (11 October 2026)
 
 - On the settled C9 growing-DLP control, the isolated existing 2 MiB

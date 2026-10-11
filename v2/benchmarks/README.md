@@ -48,12 +48,17 @@ family diversity and per-job threshold feedback retain explicit C10a gates.
 The 50-digit training extension stopped at 11/18 groups under its frozen
 whole-group reservation; the fresh 9/9 result, not that partial training
 interval, supports the scoped decision. Cold starts, profiles, work and
-memory are reported separately. C10 remains open for later tranches.
+memory are reported separately. The [C10 default decision](qs/c10/default_promotion.md)
+routes the exact 40/50-digit native bundles and plan automatically at the
+confirmed memory allowance. The six conditional follow-ups remain C10a; this
+closes the delivered C10 tranche without claiming the whole size-policy space.
 
 The subsequent [C9 default promotion](qs/c9/c9_default_promotion.md) makes its
 confirmed native 50-digit bundle automatic at the user's direction, preserving
 explicit limits/settings and saved configurations. Its finite omitted grant
 uses the confirmed resource window; this adds no new timing evidence.
+The later C10 selector composes its accepted plan with that 50-digit bundle;
+the C9 control and its default-promotion report remain historical evidence.
 
 The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
 compatibility and preserved study freezes. Remaining literature transfers are

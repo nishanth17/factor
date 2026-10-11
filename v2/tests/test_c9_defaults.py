@@ -20,6 +20,7 @@ from v2.qs.defaults import (
     C9_PORTFOLIO_MEMORY_BYTES,
     C9_SECONDS,
     C9_WORK_LIMIT,
+    C10_POWER_PLAN_BYTES,
     uses_c9_defaults,
 )
 from v2.tests.test_siqs_cli import cli
@@ -38,7 +39,13 @@ class C9DefaultTests(unittest.TestCase):
         accepted = json.loads(path.read_text())["configurations"]["50"][
             "challenger"
         ]
-        self.assertEqual(asdict(default_siqs_config(NUMBER)), accepted)
+        selected = asdict(default_siqs_config(NUMBER))
+        self.assertEqual(
+            selected["collector"]["power_plan_bytes"], C10_POWER_PLAN_BYTES
+        )
+        # C10 composes only its confirmed power plan with C9's frozen bundle.
+        selected["collector"]["power_plan_bytes"] = 0
+        self.assertEqual(selected, accepted)
         self.assertEqual(SIQSJob(NUMBER).config, default_siqs_config(NUMBER))
         explicit = SIQSConfig()
         self.assertIs(SIQSJob(NUMBER, config=explicit).config, explicit)
