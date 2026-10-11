@@ -1114,6 +1114,24 @@ A finite deeper campaign uses `--ecm-policy campaign --ecm-tier 2000,147396,8
 cannot be combined with `--ecm-curves`. Allocation options require the auto
 portfolio and explicit policy. These flags also select bounded execution.
 
+The opt-in Python helper `with_ecm_preset(config, name)` from
+`v2.execution.ecm_presets` replaces only the ECM tiers with a numerical schedule
+from the reviewed upstream implementations. It requires explicit SIQS and an
+allocation with positive work, wall and CPU fallback floors. For example,
+`config = with_ecm_preset(config, "alpertron20")` retains the exact SIQS object,
+pretest ceilings, fallback floors and outer memory cap of an existing protected
+configuration. Larger ECM workspace must coexist with the unchanged SIQS
+storage or construction raises `MemoryError`. Total run budgets still bind;
+curve counts do not authorize extra work or imply SIQS will complete.
+
+Presets include Yamaquasi's small automatic pretest and escalating ECM-only
+prefix, Alpertron's 20/25-digit-factor ladder prefixes, and GMP-ECM's published
+20/25-digit-factor parameter rows. These are explicit transfer experiments:
+native arithmetic, curve families and stage-two methods differ, and some source
+counts describe standalone ECM rather than automatic SIQS handoff. See the
+[preset table and source qualifications](benchmarks/ecm/c3/source_presets.md).
+No preset changes numerical defaults or establishes a faster policy.
+
 Explicit policies use checkpoint schema 12, pinning the complete configuration
 and allocation identity. `factorize_bounded(..., checkpoint=..., config=None)`
 restores that configuration. Explicit conflicting configurations are rejected.

@@ -14,6 +14,12 @@
 
 ## Current development
 
+- Add explicit source-derived ECM tier presets from Yamaquasi, Alpertron and
+  GMP-ECM, retaining the caller's SIQS configuration, cumulative allocation,
+  positive fallback floors and memory cap. Refuse incompatible workspace
+  instead of reducing SIQS storage. Preserve numerical defaults; performance
+  transfer and policy acceptance require matched measurements.
+
 - Continue C3 after the negative quick8 result with CADO-NFS/Alpertron source
   and probability/cost research, 57 revealed training subjects and a validated
   seven-bundle attribution pilot. Reduce duplicate reserved-charge clock
