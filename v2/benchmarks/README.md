@@ -76,7 +76,8 @@ use compact64 at 30 digits and the Yamaquasi escalating prefix at 40 digits,
 subject to existing workspace admission. This separate decision overrides the
 earlier defer decision; it does not alter the frozen assessment's null selection,
 pass its stability gate, or claim a measured hybrid gain. No new timing search
-or extension was initiated.
+or extension was initiated. Committed-only verification of the new defaults
+passes 663 tests, lint, 154 imports, 35 certified corpora and 57 training inputs.
 No round-two fresh inputs exist. Frozen earlier experiments use their source
 commits; historical manifests are not repinned to newer production sources.
 

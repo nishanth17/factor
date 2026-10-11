@@ -19,6 +19,7 @@
   40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
   limits and SIQS settings; retain fixed32 for other sizes or tight workspace.
   This promotion precedes fresh confirmation and leaves calibration open.
+  Committed-only checks pass 663 tests, lint and benchmark/input loaders.
 
 - Complete the initial 54-group upstream ECM transfer screen: all 324 calls
   validate under unchanged SIQS settings and reserves. Escalating Yamaquasi

@@ -49,3 +49,27 @@ MiB grants. It did not meet its declared interval-width gate. Fresh inputs,
 other structures/backends, default-grant economics and joint policy calibration
 remain unconfirmed. C3/G1/E1 acceptance remains open. Historical manifests are
 not repinned; reproduce the timing screen at `e73dbac`.
+
+## Verification
+
+The committed-only archive at `42075b7` passes all 663 tests, full lint, 154
+benchmark module imports, 35 certified corpora and all 57 training fixtures
+under PyPy 7.3.23 / Python 3.11.15. The existing A7 loader passes its separate
+additive source-compatibility manifest; its explicit engine settings and old
+manifests remain unchanged. Verification took 107.072 seconds under the shared
+machine lock. A legacy test fixture now copies serialized config fields rather
+than private routing metadata into the immutable mainline constructor; its
+original resume/reconstruction/work assertions remain intact.
+
+The focused checks cover exact decimal boundaries and sign, explicit/empty
+schedules, the CLI's original 80 MiB / 64 MiB SIQS headroom, tight-memory
+retention, protected fallback refusal, root-plan freezing, new/legacy numerical
+resume and direct-SIQS CLI precedence. Reproduce the required checks from a
+checkout containing only committed files with the project PyPy environment:
+
+    make -C v2 test PYTHON=.venv/bin/python
+    make -C v2 lint
+
+Raw QA receipts and logs remain ignored under
+`results/c3/default-promotion/`. No timing screen or fresh-input generation was
+run during this promotion.
