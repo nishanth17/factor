@@ -14,7 +14,8 @@
         "factor/qs/tdiv.c": "4f19aef399250a98c925ddc1f3ac64562511896c5757d463ca71c7992bcafcba",
         "factor/qs/filter.c": "3cbba701a6f85c782f61f7ee4c392a06ffa08ee5e9cc4297e0f7676749b9c1de",
         "README.md": "dc1b7e4f1931bf795095843b02a140899199d7aff2bb1b8ea9dd386867b4b104",
-        "factor/qs/tdiv_scan.c": "fd54462638631235355d7275d99f3cad0c7a2c2899c586d74dc6008649479d37"
+        "factor/qs/tdiv_scan.c": "fd54462638631235355d7275d99f3cad0c7a2c2899c586d74dc6008649479d37",
+        "top/cmdParser/cmdOptions.c": "2c7118a189ad68a93b619e49a0016e1e7fa91795208f8e07cf45c879c71136c0"
       },
       "missing_paths": [],
       "archive_sha256": "ae87be8a8b2d88b99fa3cb3bbbc35034a958793313b17b2e605947ab5b6eb71d",

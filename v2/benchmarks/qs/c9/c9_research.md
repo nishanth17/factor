@@ -64,7 +64,7 @@ are not interchangeable with it. All native byte/log thresholds need conversion.
 
 | Implementation / source path | Candidate, residual and effort policy | Matching, retention and useful dependencies | Transfer and cost |
 | --- | --- | --- | --- |
-| [**YAFU** `8110dfb`](https://github.com/bbuhrow/yafu/blob/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/qs/tdiv.c); `factor/qs/SIQS.c`, `siqs_aux.c`, `tdiv_scan*.c`, `tdiv.c`, `filter.c` | SIQS setup chooses bit/digit-dependent base, reporting thresholds and LP multiplier. Default DLP starts at 70 digits; forced paths and higher arity are separate. SLP intake is residual < L. DLP requires >B², <L^e and <64 bits; e is 1.75/1.8/1.9/1.95 across bit tiers <270/<290/<330/otherwise. Base-2 PRP rejection precedes `getfactor_uecm`; unsuccessful splitting drops the candidate. Both endpoints must be <L. This path validates divisibility, not v2-style endpoint certificates. | Buffered/savefile relation records, growable vertex hash/cycle tables, duplicate/singleton passes and cycle construction. Table doubling is vertex storage, not a fixed retained-edge count. Relation-list growth and disk records are separate. Collection starts from base cardinality +64, with progress/extra-relation updates in callers. | Common SLP/DLP L motivates endpoint alignment. Do not copy PRP rejection, unsigned limits or native micro-ECM speed claims. Growing disk-backed stores would require a new finite storage contract. |
+| [**YAFU** `8110dfb`](https://github.com/bbuhrow/yafu/blob/8110dfbd8c6f9486d93b1a02de6eb7b180e55a80/factor/qs/tdiv.c); `factor/qs/SIQS.c`, `siqs_aux.c`, `tdiv_scan*.c`, `tdiv.c`, `filter.c` | SIQS setup chooses bit/digit-dependent base, reporting thresholds and LP multiplier. Default DLP starts at 70 digits; forced paths and higher arity are separate. SLP intake is residual < L. DLP requires >B², <L^e and <64 bits; e is 1.75/1.8/1.9/1.95 across bit tiers <270/<290/<330/otherwise. Base-2 PRP rejection precedes `getfactor_uecm`; unsuccessful splitting drops the candidate. Both endpoints must be <L. This path validates divisibility, not v2-style endpoint certificates. | Buffered/savefile relation records, growable vertex hash/cycle tables, duplicate/singleton passes and cycle construction. Both vertex and in-memory relation arrays double; disk records and filtering arrays are separate. Default storage is memory below 70 digits, a savefile otherwise. Collection starts from base cardinality +64, with progress/extra-relation updates in callers. | Common SLP/DLP L motivates endpoint alignment. Do not copy PRP rejection, unsigned limits or native micro-ECM speed claims. Growing disk-backed stores would require a new finite storage contract. |
 | [**msieve** `03e0ab9`](https://github.com/MersenneForum/msieve/blob/03e0ab9e13c4862e5bb2c51a4a39718aa2500e19/mpqs/sieve.c), cross-checked with 1.53; `mpqs/mpqs.c`, `sieve.c`, `relation.c`, `sqrt.c` | Size-interpolated base/cardinality/interval/LP multiplier; report threshold derived from residual allowance. DLP starts at 282 bits. SLP first, then product about L^1.8, base-2 rejection and SQUFOF; two endpoints <L. Full squares handled. Failed split discarded. Custom multiprecision and native word arithmetic, not PyPy int. | Text savefile records persist independently of the cycle table (initial allocation 10,000, growing). Filter removes singleton/duplicate relations, roots every component, constructs and sorts cycles. Traceback arrays impose 100 edges per side. Default target is fb_size+96 (64 extra solver relations). Verification reconstructs saved relations before square root. | Common L and excluding rare large-large pairs are useful policy hypotheses. v2 already has all-component cycles and exact verification, and must retain disconnected cases rather than adopt path-loss heuristics silently. Native slots/records are not 4-KiB Python forest reservations. |
 | [**Yamaquasi** `3f95f43`](https://github.com/remyoudompheng/yamaquasi/blob/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad/src/fbase.rs); `src/siqs.rs`, `fbase.rs`, `pollard_rho.rs`, `relations.rs` | Default DLP above 256 bits with half-size base preset. L=min(B*large_factor,2³²−1); multiplier near 166 bits is floor(166*66/100)=109. Nominal DLP score allowance B²*floor(bits/2) below 256 bits. **Caller distinction:** `cofactor` does not enforce that nominal product: it admits lucky reports up to L², splitting above B² with rho then ECM fallback after a composite screen. Endpoints individually ≤L. | Packed partial hash map and ordered double maps; greedy propagation from SLP-connected component, shortest available representatives, equal-endpoint squares. Duplicate endpoint-pair map keys overwrite. All-even combined-factor rows can be discarded as a heuristic. No finite FIFO cap. `gap` requests covered columns+48 cycles; final sparse solve/extraction follows. | A score target is not an admission bound. C9 keeps conservative v2 coverage and explicit product admission. Common endpoint ceiling and retention are candidates; its ignored disconnected cycles and all-even-row discard are incompatible with supported v2 arithmetic cases. |
 | [**JavaMath** `088d01f`](https://github.com/TilmanNeumann/java-math-library/blob/088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97/src/main/java/de/tilman_neumann/jml/factor/siqs/tdiv/TDiv_QS_2LP.java); `SIQS.java`, `SieveParamsFactory02`, `TDiv_QS_2LP`, `CongruenceCollector01`, `PartialSolver01` | Factory separates sieve-hit, trial-test and smooth residual bounds using floating powers of N; callers predivide small primes. After exact division: residual 1 is smooth, residual <B² or passing PRP is SLP, normal endpoints limited to 31 bits. Composite splitting routes Hart <46 bits, tiny ECM <63, rho <64, otherwise nested SIQS; too-large/failing outcomes rejected. Repeated factors become `Smooth1LargeSquare`. | SIQS constructor actually uses Collector01, not every available CycleFinder. Factor→partial lists gather connected partial sets for a partial solver; only independent partials retained after finding a smooth combination. Dynamic Java containers. The serial CombinedFactorAlgorithm big-argument caller supplies 10 extras and block Lanczos (small arguments use TDiv_QS_Small/Gaussian elimination); after failure another 10 are requested. | Confirms splitting effort should depend on residual size, and surplus needs extraction feedback. Native/JVM backend and probable-prime semantics differ. No evidence for new v2 splitter while current split failures are zero. Related-set solve can become expensive; do not substitute it for the bounded forest. |
@@ -98,6 +98,15 @@ three at 4,096 below 48 bits, and once at 8,192 otherwise, before its ECM
 fallback. That size-dependent effort schedule is meaningful; its numerical
 limits and native ECM economics have not been calibrated for PyPy.
 
+Yamaquasi's intake does not call its general `isprime64` routine: its SLP
+branch infers primeness from complete base removal and uses a debug assertion;
+`try_factor64` rejects residuals lacking its base-2 composite witness, then
+calls semiprime-oriented rho/ECM without independent endpoint certificates in
+`cofactor`. Source comments explicitly treat rare witness failures as an
+acceptable yield loss. Its 256-bit candidate and 64-bit residual conversions,
+32-bit endpoint ceiling and semiprime premise are part of that contract.
+v2 retains explicit certification under every supported public configuration.
+
 YAFU's setup selects DLP at 70 decimal digits, ordinarily postpones TLP to
 an effectively disabled 221-digit cutoff unless forced, and then explicitly
 assigns its bit-tiered `dlp_exp` in `SIQS.c`. Suggestive exponent columns in
@@ -128,6 +137,40 @@ summing list lengths double-counts them. FLINT's partial hash table and its
 relation-array capacities are likewise separate. An LP-degree-one edge and
 a factor-base matrix singleton occur in different incidence systems. Neither
 raw record count nor LP cycle rank is a useful-dependency count.
+
+### Actual growth versus v2 eviction
+
+The native implementations do not generally evict old partials merely because
+an initial allocation fills. In YAFU, `qs_add_to_cycles` doubles the vertex
+array when another two endpoints may not fit (`filter.c:1177`), and
+`save_relation_siqs` separately doubles `in_mem_relations` (`tdiv.c:1117`).
+`SIQS.c:4906` selects memory below the configured decimal-digit cutoff;
+`top/cmdParser/cmdOptions.c:1542` defaults that cutoff to 70. The relation
+buffer starts at 32,768 records, not a maximum. Larger jobs append records to
+the savefile; filtering grows its read array by 50%. Thus saying only that
+YAFU doubles a vertex table misses its independently growing original history.
+
+msieve likewise doubles its vertex array (`mpqs/relation.c:608`), appends
+original observations to a savefile, and grows the relation read array by
+50% (`:841`). Current FLINT doubles the relation and small-factor arrays,
+grows factor storage to at least twice its old capacity (`large_prime_variant.c:86`),
+and grows partial lookup-entry storage by about 40% (`:148`). Yamaquasi uses
+Rust maps and packed representatives; it can replace an equal endpoint-pair
+entry and consume DLP entries during propagation. JavaMath uses dynamic Java
+containers and avoids adding a new partial when it has already formed a
+smooth combination. Neither has v2's fixed FIFO edge policy in these paths.
+
+This makes **finite, budget-aware growth or bounded disk retention a real
+missing storage option**, not merely a request to copy a native slot count.
+Geometric allocation amortizes resizing and retains collision history, but
+can require simultaneous old/new storage and later filtering scratch. A v2
+transfer needs explicit total reservations, cap-refusal behavior and checked
+restore/provenance. The study's 16K refusal rejects only that frozen
+reservation bundle at 256 MiB. It does not reject adaptive growth, a tighter
+representation, different row reservations, or a matched larger-resource
+study. The selected admission policy is evaluated within the existing storage
+contract; it cannot establish that this contract is optimal. No such storage
+change is silently folded into the already frozen confirmation.
 
 ## Source identities, terms and regime
 

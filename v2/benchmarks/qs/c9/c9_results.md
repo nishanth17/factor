@@ -1,6 +1,8 @@
 # C9.1 useful large-prime yield: evidence and acceptance
 
-Status: individual and joint training complete; confirmation and acceptance pending. This report
+Status: C9.1 stopped during confirmation at the user's direction; no promotion.
+C9.2 reopens implementation around growing storage and upstream strategy gaps.
+This report
 separates source-supported hypotheses, instrumented attribution and fresh
 complete-call evidence. The [research](c9_research.md) and immutable initial
 [protocol](c9_protocol.md) explain the investment and finite limits.
@@ -17,8 +19,10 @@ policy and their values already participate in configuration identity.
 
 C1's **31.73%** fresh 40-digit complete-cost improvement remains an accepted
 opt-in result with its original inputs and 29.21–33.99% interval. Its separate
-fresh 50-digit SLP/DLP comparisons completed **0/18 per arm at 120 seconds**;
-DLP median evictions were **21,504 and 28,672**. C1's half-base resume witness
+fresh 50-digit SLP/DLP comparisons completed **0/18 per arm at 120 seconds**.
+This was full-base 30,000 DLP versus the 900M SLP policy on two fresh
+balanced inputs (nine calls each); DLP median evictions were **21,504 and
+28,672**, respectively. C1's half-base resume witness
 completed in **141.063 cumulative seconds**, using 512 MiB, an 8-MiB checkpoint
 and a 300-second allowance. It changed both configuration and allowances.
 None of these is replaced by the new two-input training result below.
@@ -59,6 +63,10 @@ is also retained.
 The 16K refusal applies to the frozen 8,192-row/32,768-atom reservation
 bundle. It does not prove that 16K retention is always uneconomic: a smaller
 matrix-row reservation or different finite storage design could make it fit.
+Upstream YAFU/msieve preserve history through growing memory and/or savefiles;
+FLINT also grows relation arrays. Their initial capacities are not eviction
+limits. Budget-aware growth, packed storage and bounded disk retention remain
+unmeasured algorithm candidates; admission alignment does not settle them.
 That is an untested coordinated resource bundle, not a reason to rescue this
 arm with more memory. The two permitted follow-ups instead use the historical
 half-base configuration, supported by C1's prior useful-prefix witness.
@@ -323,4 +331,22 @@ retained atoms lie between the final count and that count plus
 `max_partials - final_unowned`. Report these as bounds, not observed peaks.
 This avoids adding a second, uncharged graph snapshot to a timed call.
 
-Fresh confirmation, acceptance and final verification are pending.
+## User-directed implementation revision
+
+The user redirected the study on 10 October 2026: implement adaptive storage,
+remove arbitrary normal-path retention/memory ceilings where the upstream
+implementations have none, and audit other consequential strategy gaps.
+The 30-digit band finished 18 matched samples, the 40-digit band nine. The
+50-digit band stopped after four complete matched samples (12 calls); the
+next DLP call was interrupted and its full 242-second reservation remains
+charged in the new ledger. All completed outputs were validated. These
+partially revealed inputs are now training/regression evidence, not fresh
+confirmation for any new implementation. No C9.1 policy is promoted.
+
+The original source/configuration freezes, receipts and raw outcomes remain
+unchanged. The revised protocol will account for all prior expenditure and
+freeze a new implementation/selection before generating different fresh
+inputs. The source-backed growth mechanism, reusable matching and arbitrary
+stopping/storage restrictions are reopened; a failed 16K reservation bundle
+is not a reason to preserve a fixed-cap production strategy.
+

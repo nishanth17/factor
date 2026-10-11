@@ -2840,7 +2840,7 @@ on the highest-value transferable gaps and a fresh complete-run decision.
 The integrated C1 settings are a tested 40-digit bundle, **not** an optimum
 by digit size. In fresh 40-digit runs the graph retained 5,801–6,163 edges
 without eviction. At 50 digits the matched 8,192-unowned-edge allowance
-had median evictions of 21,504 and 28,672 in the two input classes, despite
+had median evictions of 21,504 and 28,672 on the two fresh balanced inputs, despite
 unused atom capacity; every 120-second filtered matrix was empty. The
 independent 50-digit larger-store resume completed after 20,480 evictions.
 Neither result isolates retention from threshold, collection duration or
@@ -2862,8 +2862,10 @@ appear only after a substantial initial prefix.
 Existing pinned source review records [msieve 1.53](benchmarks/qs/c1/c1_research.md)
 enabling DLP at 282 bits with a product limit of about SLP-limit^1.8, and
 [Yamaquasi](benchmarks/qs/c1/c1_research.md) enabling it by default above 256 bits,
-halving its factor-base preset, and using about 100 B² as a product limit near
-200 bits. These are concrete candidate rules to test, not validated PyPy
+halving its factor-base preset, and using about 100 B² as a candidate-score
+target near 200 bits. The [C9 caller audit](benchmarks/qs/c9/c9_research.md)
+clarifies that recovered products can exceed that target when both endpoints
+fit its common ceiling; the target is not a hard intake limit. These are concrete candidate rules to test, not validated PyPy
 thresholds or memory capacities.
 
 - [ ] Make a pinned source-to-mechanism and parameter comparison before new
