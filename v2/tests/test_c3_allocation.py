@@ -337,13 +337,15 @@ class AllocationPortfolioTests(unittest.TestCase):
             siqs=None,
             allocation=ECMAllocation("campaign"),
             ecm_tiers=((50, 1000, 3),),
+            max_input_bits=256,
+            ecm_chain_mode="off",
         )
-        number = 1_000_003 * 1_000_033
+        number = (2**61 - 1) * (2**89 - 1)
         uninterrupted = factorize_bounded(
             number, config=config, seed=7, budget=ledger()
         )
         budget = ledger()
-        budget.cancelled = lambda: budget.used >= 3000
+        budget.cancelled = lambda: budget.used >= 8000
         first = factorize_bounded(number, config=config, seed=7, budget=budget)
         self.assertEqual(first.reason, "cancelled")
         restored = factorize_bounded(
@@ -381,24 +383,30 @@ class AllocationPortfolioTests(unittest.TestCase):
         from v2.benchmarks.ecm.c3.c3_study import baseline
 
         old = baseline()
-        native_config = configuration(siqs=None, allocation=None)
+        native_config = configuration(
+            siqs=None,
+            allocation=None,
+            max_input_bits=256,
+            ecm_chain_mode="off",
+        )
+        number = (2**61 - 1) * (2**89 - 1)
         values = dict(vars(native_config))
         values.pop("allocation")
         old_config = old.PortfolioConfig(**values)
         old_budget = sys.modules[old.__package__ + ".execution.budget"].Budget
         original = old.factorize_bounded(
-            1_000_003 * 1_000_033,
+            number,
             config=old_config,
             seed=7,
-            budget=old_budget(work_limit=3000, seconds=None, cpu_seconds=None),
+            budget=old_budget(work_limit=8000, seconds=None, cpu_seconds=None),
         )
         restored = factorize_bounded(
-            1_000_003 * 1_000_033,
+            number,
             config=native_config,
             checkpoint=original.checkpoint,
             budget=ledger(),
         )
-        self.assertEqual(restored.result.reconstruct(), 1_000_003 * 1_000_033)
+        self.assertEqual(restored.result.reconstruct(), number)
         self.assertGreater(restored.work_used, original.work_used)
 
     def test_cli_policy_resume_restores_fallback_and_rejects_override(self):
@@ -431,7 +439,7 @@ class AllocationPortfolioTests(unittest.TestCase):
                     "--resume",
                     str(path),
                     "--work-limit",
-                    "2000000",
+                    "200000000",
                     "--verbose",
                 ],
                 capture_output=True,
