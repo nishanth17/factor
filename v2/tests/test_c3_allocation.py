@@ -7,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -390,7 +390,8 @@ class AllocationPortfolioTests(unittest.TestCase):
             ecm_chain_mode="off",
         )
         number = (2**61 - 1) * (2**89 - 1)
-        values = dict(vars(native_config))
+        # Routing intent is private; legacy constructors receive saved fields.
+        values = asdict(native_config)
         values.pop("allocation")
         old_config = old.PortfolioConfig(**values)
         old_budget = sys.modules[old.__package__ + ".execution.budget"].Budget
