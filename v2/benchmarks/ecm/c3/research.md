@@ -113,6 +113,26 @@ ECM plan, context and output memory must fit the explicit cap. A reservation
 cannot manufacture a usable service allowance, so C3 exposes insufficient
 fallback admission separately from schedule exhaustion and retains defaults.
 
+## Preserved v1 policy and transfer limits
+
+At the immutable integrated base `b3b3cfb`, `v1/ecm.py:compute_bounds`
+chooses 2000/147396 through 30 digits, 11000/1873422 through 40,
+50000/12746592 through 50, then 250000/128992510, 1000000/1045563762
+and 3000000/5706890290 through 60/70/80 digits. Its final bound cap is
+430000000/20000000000. `v1/constants.py` permits 10000 curves; the
+`curves <= MAX_CURVES_ECM` loop can actually enter a 10001st attempt.
+`v1/factor.py:factorize` recursively tries trial/rho/ECM and returns failure
+when ECM fails; it has no SIQS fallback or cumulative protected allowance.
+The original implementation uses Python 2 and floating logarithms/roots in
+stage setup, so it is neither run as a PyPy 3.11 control nor copied into v2.
+
+The useful hypothesis is the joint bound pair, not a digit oracle or the large
+curve cap. C3 tests only the first three pairs, with bounded 8+2 or one-curve
+campaigns under the same total service resources. Complete factoring and
+marginal proper-factor yield can reject those transfers even if individual
+ECM attempts succeed. Higher tiers would require a new finite feasibility
+protocol; preserved v1 remains unchanged.
+
 ## Chosen tranche and deferrals
 
 Implement cumulative optional-stage ceilings, work/wall/CPU reservations,

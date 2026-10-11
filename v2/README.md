@@ -1083,8 +1083,9 @@ pretest ceiling. Each tier `(B1, B2, curves)` starts independent curves;
 changing a bound does not extend a saved curve. Either mode can protect a
 configured SIQS/SSS fallback with `fallback_work`, `fallback_seconds` and
 `fallback_cpu_seconds`. The portfolio refuses optional work before it consumes
-the reserve, records partial-attempt coverage, and hands off once. Schedules
-are prepared only if the explicit policy reaches a stage that needs them.
+the reserve, records partial-attempt coverage, and hands off once per cofactor.
+Schedules are prepared only if the explicit policy reaches a stage that needs
+them.
 Memory validation reserves simultaneous relation-engine, context/program and
 output workspace within `memory_bytes`; RSS/JIT is separate from owned memory.
 Clock reservations are cooperative and cannot interrupt one integer operation.
@@ -1125,6 +1126,10 @@ omitted; repeat other nondefault options such as `--backend` and
 
 Research, frozen controls and the acceptance decision are in
 [the C3 study](benchmarks/ecm/c3/research.md) and
-[its finite protocol](benchmarks/ecm/c3/protocol.md). Larger experimental
-service grants do not change production defaults or establish a general
-input-size dispatch rule.
+[its finite protocol](benchmarks/ecm/c3/protocol.md), with the
+[fresh acceptance decision](benchmarks/ecm/c3/acceptance.md). Fresh confirmation
+retains numerical defaults: the selected quick8 bundle costs 51.6% more on the
+declared smaller-band cohort and has uneven-factor regressions. Its service
+reserve also refuses four of five historical smaller-band inputs at the 2M
+work grant. Larger experimental service grants do not change production
+defaults or establish a general input-size dispatch rule.

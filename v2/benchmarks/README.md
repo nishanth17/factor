@@ -15,6 +15,7 @@ see [contributor guidance](../../AGENTS.md).
 | [ecm/p52/](ecm/p52/) | Programs, pairing, wheels and realistic ECM portfolios |
 | [ecm/b3/](ecm/b3/) | Production chain integration, coverage and recovery |
 | [ecm/b4/](ecm/b4/) | Kernels, integration and candidate bakeoffs |
+| [ecm/c3/](ecm/c3/) | ECM allocation research, protected handoff and frozen complete-call study |
 | [ecm/c6/](ecm/c6/) | Chain catalogs, executors and cost studies |
 | [qs/phase_three/](qs/phase_three/) | Relation engines and collector/pipeline studies |
 | [qs/p38/](qs/p38/) | Capacity, collector and matrix experiments |
@@ -34,6 +35,28 @@ provenance and missing tuning evidence under roadmap C11. QS/SIQS and DLP keep
 their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
+
+## C3 bounded ECM allocation and handoff (10 October 2026)
+
+[Research](ecm/c3/research.md), [protocol](ecm/c3/protocol.md) and
+[acceptance](ecm/c3/acceptance.md) document the new opt-in cumulative pretest,
+finite campaign and protected SIQS/SSS transition. Six bundles train on ten
+historical inputs; the selected policy is committed before 15 fresh certified
+inputs are generated. All 972 fresh calls validate and complete under matched
+10^13-work, 5/30-second, 288-MiB native service allowances.
+
+Retain numerical defaults. Training-selected quick8 costs 51.56% more on the
+smaller fresh cohort (cost-change 95% interval −5.36% to +202.05%); uneven
+controls regress and seven cells remain unstable after the frozen extensions.
+The larger band retains control at training. Explicit reservations do not make
+the default 2M grant sufficient: four of five smaller service-policy probes
+refuse unfunded fallback floors. Charged active/terminal restore checks pass.
+
+Working/committed-only checks pass 593 tests, full lint, 144 benchmark imports
+and 34 certified corpora. Required inputs are versioned; raw receipts remain
+ignored and preserved locally. Reproduction commands and all memory, seed,
+small-population and source-identity limits are in the acceptance report.
+C3 broad calibration, G1 and E1 remain open; no collector or v1 change.
 
 ## Inputs and generated evidence
 
