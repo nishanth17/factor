@@ -1,0 +1,814 @@
+{
+  "schema": 1,
+  "source": {
+    "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
+    "v2/constants.py": "efd91f88b8faa4cf96b54febdbb04e9c8b225bdec66898f5f92f521fe1c0c48b",
+    "v2/factor.py": "f3cfaa92bdae9b6b638df253339e74f8b351ec34079db639ef82b622270329dd",
+    "v2/portfolio.py": "3133c06f2c1b8fd74fc7d833a907f56fcba9dc3f8385436e22081d13dd6c359a",
+    "v2/qs/__init__.py": "33923179d5fd877f0836acd691e6a5a59b600a8b3f99fbe568714dce7737ece9",
+    "v2/qs/assignment_stream.py": "c494a33c8df3c1b0bf4c6368e0026df63a5465385bfa6c8022213087e49859ac",
+    "v2/qs/capacity.py": "670cf485920d282003a9b8a47a77fdb09e061192246ca3666113f848d2ae2a82",
+    "v2/qs/checkpoint.py": "02777a25753b367c7bdaeddaa982f7bfa41a2bee180fc576bf29d82c65c6f7b5",
+    "v2/qs/defaults.py": "dca274db4040fd399bc44c85f662be2d573a6acbb212595a07e65e46902da868",
+    "v2/qs/external_square.py": "599a972448c6886db23aa3f9ed37dd303990d72ab66c6181eb149997585ef27d",
+    "v2/qs/extraction.py": "6beb7faf3836e7ebd91b344df147ad7015b815addcc61453a4a35c1a23010f4a",
+    "v2/qs/factor_base.py": "f1596956d3faf5eee60feaf67a4982f410d146f6ae5210bafcc2f27b884623f7",
+    "v2/qs/families.py": "0f7fc0149b01b8fddd3b543dda0a88052780ef5ef48f479e101696cf5b49c6b2",
+    "v2/qs/large_prime_checkpoint.py": "4d98c9863c182e4b8908ceaf73d442a8b6cbca5a64896824beb425c510e46d32",
+    "v2/qs/large_prime_collector.py": "73bca65e020be8e7f7d3829932736e1bb18ea5f942ce67e7185f36ea7a54f243",
+    "v2/qs/large_primes.py": "9d6eca1453bb1c5d13abc56598c17cd2b267863eaec5f2e57e32078036e984c4",
+    "v2/qs/linear_algebra.py": "c49b0ad814a76decb2464906b8007323533e79393f4fee53fee72d86839fc8ce",
+    "v2/qs/multiplier.py": "1bab1c5623f0098d7a547ffe3351e747b13d71894e57347b4baa7910c4d245a1",
+    "v2/qs/parallel.py": "02de7112ee5560f6506c6b483d8e9177aa2d5f93c15950f25a95ab725d016bd9",
+    "v2/qs/pipeline.py": "59f414d9c47814c765a0ee8d0170a3e678abd5c0fa4db71eda0aa9cff0e98920",
+    "v2/qs/polynomial.py": "6026bae34b6166f97a62b7990663d12cec3b64a16b7aa9336b57c813f6bd9497",
+    "v2/qs/power_sieve.py": "015e83b169c096553c8a1dbd5b4d0ec0d8c1a7a7bcd9b198a897a5229f9abcb2",
+    "v2/qs/reference_collector.py": "885280754684034a136908eb260dbc82d2e93d623b68e50b69ed45d7b33db715",
+    "v2/qs/relations.py": "4aba47cb7df3fac44785fdbdef690f2ebdede843785331413223d1758740b4bb",
+    "v2/qs/score.py": "f9c5f4c1b1ed19bc7c1e8ab61bd9577907a1795f874c77d73bd616c1b79b4675",
+    "v2/qs/sieve_collector.py": "3833b22598eb1a4fdce6d8cab413040a47eac5dd59e8b2ee8b199a849f9c2479",
+    "v2/qs/siqs.py": "736905d6c5875e7f302cae5ddc3056fe4c3fcd440c2c5b9ade33af04415f913a",
+    "v2/qs/smooth_batch.py": "8f7cc285ee32d26a55ef6677bd130b89ecb8860da0321974dddf24b0f4ea2f69",
+    "v2/qs/sss.py": "3a6133e4fefb6de7014a4a053e72ac3cc087abea5f1cd87d9a6e6edeed3f3af4",
+    "v2/qs/sss_checkpoint.py": "0163012ba103319e2254d468913e6a1d1939c9adb6875835c065388bde5183e0",
+    "v2/qs/storage.py": "df08aa4f51254a9bc874662685e3157f1a3c412c99a526ed441dbbdf9451c4a9",
+    "v2/common/__init__.py": "32bc2d75d43b48d1c933968076623bf6e2203caee66c205da47f1ade7c043478",
+    "v2/common/arithmetic.py": "a697327e41267c875644323154108ab6e5856c4f6bdfd9538a9a23c524e458e1",
+    "v2/common/preprocessing.py": "83972727a1104908cc7f54a3955f1fa8f7e9b86c1322493ec78055adf5651d87",
+    "v2/common/prime_sieve.py": "9378c284347612a8331c3643130a8859e13a8f98b0d875ec14f8726ffdfc0429",
+    "v2/common/utils.py": "8a9809f56d3b2ec8adddd9c78ff4e1c0e144c2a920224be8adfd4341ed7b2f81",
+    "v2/execution/__init__.py": "aabc6392cceafbdc9d5feae78319dc037162ea0bc15be4809e539d8a5455c85a",
+    "v2/execution/allocation.py": "794397c456ebf0302b7da2b43071d9462c822da013dda8d82d169a8d7ee30c7b",
+    "v2/execution/budget.py": "fa2549b899792f4306b427d79f22d8aa30f42c1036c61ab6eb8c8aefac4847e5",
+    "v2/execution/ecm_defaults.py": "88cb29636195d454619e4a157d2006b4e90f1bea3f759571d67df4133cc0b7d7",
+    "v2/execution/ecm_presets.py": "265eb8a7037e4c43e248c6e1408e0d8aaae86cb6734409aef85c0795349a8cbb",
+    "v2/execution/schedules.py": "8c945259d24f8beb97de9368a5731c79fd7bd68ece2071fcd8b9494510b45468",
+    "v2/execution/stage_jobs.py": "5779fc06e6ae9a91db91f4a4ce7cf9d0de00d45d89a27418b8a7be9b3b0fd14a",
+    "v2/execution/work_budget.py": "10b9f1497fea4470e190af4806ceffd39ce9d885bccc411090d0f503a3eb95dd",
+    "v2/ecm/__init__.py": "b0333bff2fbb15f2190ed067d0243874327dbcc3fb6d9eddf0b85fd618413913",
+    "v2/ecm/chain_options.py": "a24b86162ad05f6f183d80413ed183257e622a00ffbd5f00d662c97ef38ac752",
+    "v2/ecm/chain_records.py": "9c9add832a3ab738dc26e2c3aab37f4c65d1a3b2f67a4dfc35701f6ed2e42469",
+    "v2/ecm/chains.py": "1a3c805469a3f010d3a0ba8a9374491c52a8ca8e7ab2d73c1c0add48b8acccb6",
+    "v2/ecm/core.py": "a7b8939069a65b1f3d72be8adfde1cc4b140f6c880cd40c5d768485b43da9fd2",
+    "v2/ecm/paired.py": "a6705cfa1bbb935c12a0337ab8ee7a15ba70d55e1ad91db749d51bbc96ba0bd2",
+    "v2/ecm/prac.py": "67bace08cb9bac7cf92426ed7bd8a4869d8ce85af73318946ed83bcca61828e0",
+    "v2/ecm/programs.py": "c77a2129c84b7be0d35b1ac8fdeedfe715c5e9de5867ded554161b7fc5e1b903",
+    "v2/ecm/wheel.py": "46c368cc8c1c2ae6fa887c02d04cb613d6c479d06e013b18e9a8b12a690b7bbd",
+    "v2/pm1/__init__.py": "a78175a525b2d083cdc1593e308d31c1cfa697c3d13690c597d12e451e71786c",
+    "v2/pm1/bounded.py": "6c6fb5f9cb1025cd43d0bcb38b0b7858dca9d163d00a253cf1dac3e6e502e56c",
+    "v2/pm1/core.py": "77dce6ff3efde143397c6e6dfc09db9232564ae97e905e0026437c650d6da255",
+    "v2/pm1/gaps.py": "a52e058f9474302476e907885066956fd9c474ab4b5783d76aecafe82749e6d7",
+    "v2/pm1/tuning.py": "7694ffff24e16edf861d73996c2a0eaa69b1413e584ef45908e9f06a66893e13",
+    "v2/rho/__init__.py": "03dffbdd35e8e642e70f64482f6422d929e805759fb1b5dbd1faf4f160831dfb",
+    "v2/rho/brent.py": "12ac60e381bde39e69830c6215cc29a3b5fb9522c876a9e3c7b71b2c0d54d2f2",
+    "v2/benchmarks/qs/c10a05/protocol.md": "a8bccb42b2d5d5e21b58f21f4f483f0bf81c3f4ab511d56263bfb7c9ee583bea",
+    "v2/benchmarks/inputs/controls/c10a05_sources.json": "bf0e932899b87309b42d1599e5fe39b6611e40d9894364385ad0f8a42d7da112",
+    "v2/benchmarks/__init__.py": "03b9d591ff4e6fc829edc3d4b8d55fbf8255c47b79da8faee18bd5539db997e9",
+    "v2/benchmarks/suites/build_phase_two_corpus.py": "0b6650822f0e79431cf6b11d8a8157d71f360b432132855543cdd546507cabdb",
+    "v2/benchmarks/suites/phase_two_batch_controls.py": "578865dec705600bcf1884c5524ae401f48420c09d431ec8e9e4d8a0d7c82ced",
+    "v2/benchmarks/suites/restore_p38_r1_capture.py": "2b8f1a1969e43a751a429f76c976f4535c66ee6526faeae5a2f8ad13cd2d0b73",
+    "v2/benchmarks/suites/build_phase_two_adversarial.py": "de814b8097f57f2b7fb02e5b3bc54e0b79239dd664d4397197eb569b088c481e",
+    "v2/benchmarks/suites/__init__.py": "516358ea737023b212d1a9e3952cbf434191b71e68bf9de211f4cda96044c0f7",
+    "v2/benchmarks/suites/phase_two.py": "cef73ce109a0f9a0db546ddbbc99113282de4cd05a617ea13facd6d2efdf28b4",
+    "v2/benchmarks/suites/validate_phase_one.py": "90a6e1b7428eb7e1773eea1100b7bd6af46dd64b9df37ede306c97853b56b333",
+    "v2/benchmarks/suites/regressions.py": "06784ee318ff6d574befce52f63acad4cf413e38eeecee8b00372dbcbde00405",
+    "v2/benchmarks/suites/phase_one.py": "41ea7e842fffba233e4755920876eaa5f0d4069e03be90cf098afbefead6937f",
+    "v2/benchmarks/qs/__init__.py": "5a5999e518891e677fff7f426e52c698e44dab371d275876566c114fa70077ee",
+    "v2/benchmarks/qs/c9/c9_growth_diagnostics.py": "3fd36a035f44d9fabac47ddb8e02e77292f42d97717ec617acc394f75476ba80",
+    "v2/benchmarks/qs/c9/c9_study.py": "4a73e9ebeeaa48bc4a25fe6a78006ba64a07c5e602c1061602937440469d2a71",
+    "v2/benchmarks/qs/c9/c9_selection.py": "c11b53f1e81cf0cd99ad5074d63b49ad2ab32ef7c1d056b7bfdf13a68d178749",
+    "v2/benchmarks/qs/c9/c9_diagnostics.py": "db74cb6c90d4fed0e82fb6bd73132abf7eb5cc65b0b3e455300df986ed8db9d0",
+    "v2/benchmarks/qs/c9/__init__.py": "1c29cdd32bc8d309e91a9b8957f977f4efad16a15d5f6ed649d660a8f7641e08",
+    "v2/benchmarks/qs/c9/c9_growth_confirmation.py": "6a6ea806a0540cc9d5821dc38b60051f71a3bbd874a41117cac9e7f18112ccb2",
+    "v2/benchmarks/qs/c9/c9_long_confirmation.py": "d05bf82b423a608e796a9238948bd003961f92dac8805bd034e36f4ee4a21d0f",
+    "v2/benchmarks/qs/c9/c9_census.py": "fe4c37f4801963fcebf7570943f8d10f592c1d942a54a5c9a0c9656c1278cefe",
+    "v2/benchmarks/qs/c9/c9_combinations.py": "07cc6c5207c9d3f22f5a78d466e78fdf52e9ff6912a7901f348b4bfa693aa49f",
+    "v2/benchmarks/qs/c9/c9_growth_study.py": "cefdd9a1a0a72f368492692f33231cf55ea26f791808a0428d6944c29c5268aa",
+    "v2/benchmarks/qs/c9/c9_confirmation.py": "3da83c33e7a61da6525d163f2fe1c2659402e0e72d0579b52e3674848197d46d",
+    "v2/benchmarks/qs/c10a05/diagnostics.py": "de9f930267448ef1bcd572eec6cdb5a64361d1b8b348e66f330c9bdd8cb90c98",
+    "v2/benchmarks/qs/c10a05/__init__.py": "d783bcb4b8538fae1424156bb74d7f15dc3b2892831fdd58a96269b65903d275",
+    "v2/benchmarks/qs/c10a05/diagnose.py": "9e534bc175443022e67438067674a6d9746a5f72c99a5aff4f4afda67edf17cd",
+    "v2/benchmarks/qs/c10a05/selection.py": "b161f565a8566358736f32f5f7cc82bf6469a8740b571c9d409d5920446c03db",
+    "v2/benchmarks/qs/c10a05/study.py": "00ac17c9b7b94f5016366442935d6314eb912f4642c95b42d06e2719c501e247",
+    "v2/benchmarks/qs/c1/c1_implementation.py": "8bbf46563403b3d98a6fd826309fc74900b1f03f346db259d9c29f9ae7a9234a",
+    "v2/benchmarks/qs/c1/c1_feasibility.py": "36076c5a9065a906005dc6ec4b65352c1a412c4c7101892a5a33a848ad40978c",
+    "v2/benchmarks/qs/c1/c1_followup.py": "9880d8672c05d77204ccb9063b9077ca6d4e2ae5b7cf286b0243fe1acf551edb",
+    "v2/benchmarks/qs/c1/__init__.py": "4bc22cdbb06687354c92747fda57d22ea9afdbf7452899d47d584da9c8ba4256",
+    "v2/benchmarks/qs/c1/c1_seed_stability.py": "a4312b82636e05f2270371ece292edcca0c924d6acf817a7c7b2b397bcb9bca9",
+    "v2/benchmarks/qs/c1/c1_cost_attribution.py": "0c29260d6239028535ed3a2a5d659c18d70e42200ed902bf240a809245fcf192",
+    "v2/benchmarks/qs/c1/c1_confirmation_support.py": "cc5327ef555b4c4afb359301a9aa3aa6a358dfdd5106f0a5b4b8cd0e4919ef47",
+    "v2/benchmarks/qs/c1/c1_resume_acceptance.py": "af3291518df8478e20bf49d8c8060ee5144fc1b8c5c5e6ad19ddd6169f6cc739",
+    "v2/benchmarks/qs/phase_three/build_phase_three_large_corpus.py": "e08c72a665babc46a3e709457ef4c02beb0f6a51793ce48caa6ff3199fc0bdee",
+    "v2/benchmarks/qs/phase_three/phase_three_collector.py": "f793927e6bf14a53ef6f18526a0b69863049312c96b37c5f7b03aac4e9b0d9b0",
+    "v2/benchmarks/qs/phase_three/build_phase_three_corpus.py": "c1bb7fb5100872382587664e595eb3bccfcf1f65965c6af2710faa6afa15dea0",
+    "v2/benchmarks/qs/phase_three/build_phase_three_parallel_corpus.py": "e4206527609ebf470e20d0103d5f528d1c99ccc42aa283d9ca9d739354939ec4",
+    "v2/benchmarks/qs/phase_three/phase_three_filter.py": "5a746293b2ac11280b9e66cbb04eae54ad677566c8321d819ba9d912fada15df",
+    "v2/benchmarks/qs/phase_three/phase_three_audit.py": "de727d801b4681734860fe1b220a582c639d7b0e5ce7fb12ee732edef0366182",
+    "v2/benchmarks/qs/phase_three/__init__.py": "3cbf096686da1ebfd2bc817c1fc5f1b0e634495db144d0b2f5e9f9ca7783a6f7",
+    "v2/benchmarks/qs/phase_three/phase_three_families.py": "252320eae8f7140d7eda2d8b37784fb69e67abea6360483186f36df86338138f",
+    "v2/benchmarks/qs/phase_three/phase_three_ownership.py": "bd16143cc86e4dbd95daef4b9bc3d3db6d61fec9cb98defef26ab224c79f3a6f",
+    "v2/benchmarks/qs/phase_three/phase_three_siqs.py": "b8c9a96a57420c39b372bcae1d3da1e6f4b1647c46303a8911d9c587e6869533",
+    "v2/benchmarks/qs/phase_three/phase_three_sss.py": "ee91f992ec2bb3d432d743e97e9671e7c08018346a9240329817d40bed262bfb",
+    "v2/benchmarks/qs/phase_three/phase_three_sss_upstream.py": "7980f78205d6cecf3758aedc5142c986c5f06bbab9ac600e00a78ad8866f1cac",
+    "v2/benchmarks/qs/phase_three/phase_three_pipeline.py": "ed3f6b5e1278905c6ce8a5d62158ff82f82ba1493967af4c2f9c5d41dae1a323",
+    "v2/benchmarks/qs/phase_three/phase_three_parallel.py": "a5d0a6f7fc0c595ff1d6889b31b99faf3d2ddef5457caefa236b4bed8d77fd48",
+    "v2/benchmarks/qs/phase_three/phase_three_reference.py": "40f5ee22e875cdc325c50ec7879c83e7c507e99228fb0e685530b75ebfd276d3",
+    "v2/benchmarks/qs/phase_three/phase_three_large.py": "5f905a8e08bafd386382c902b8e633825867ace4de98ae980e5c50f29e676bc8",
+    "v2/benchmarks/qs/a7/__init__.py": "a0e95a5899b2f92b91263550ded96d62e085803f1b1b4ca4255c52bc440101a0",
+    "v2/benchmarks/qs/a7/a7_r5.py": "32d786fef2699fdd33a9be6da3691897bbd24df92d23e8a31a409ef39251056e",
+    "v2/benchmarks/qs/b1/b1_timer_confirmation.py": "92415ec22121a249f60a39159f5d009c32c5a973765755ecd40eda13391d85b2",
+    "v2/benchmarks/qs/b1/__init__.py": "7955690d07b82faeaf65f4166593fdcbb3d9ba4367cabad98fb4beb2525249a1",
+    "v2/benchmarks/qs/b1/b1_40d.py": "1f36053aa4319f20966ad5f39a5f843ece2a3d7618ac9d6776aedd6fca232905",
+    "v2/benchmarks/qs/b1/b1_calibration.py": "8395f0f28c9e3f23ed2367b4370326d6aee29c98738a98316024ffba7b3756f4",
+    "v2/benchmarks/qs/b1/b1_qs_width.py": "4b149d70b37d60bee95d4dcb4d4c162c069edbd1ad7d55747684ffff1d549685",
+    "v2/benchmarks/qs/c10/oracles.py": "d8f3be8873ac22aa13d48a24ef2952c713124d356ff11561d57d1f7f84f66cf1",
+    "v2/benchmarks/qs/c10/diagnostics.py": "9bfa850a2dffed7c05fe65e21c7f452d2613d7cf25ad9fdd672d8048e97be94d",
+    "v2/benchmarks/qs/c10/__init__.py": "8f19d8379e39328f8926017a6eadb64ae8d7a795fe2f3059e9eefd046def5318",
+    "v2/benchmarks/qs/c10/selection.py": "69dffd840272dce53d9f20eee2b877abf21396743724f7a4241d62dd043713a3",
+    "v2/benchmarks/qs/c10/study.py": "b1a1e6a223654e384dfd5004bd5d6cc71d88baad56f67f30840a36b624a41ab7",
+    "v2/benchmarks/qs/p38/p38_r3_mixed.py": "0d8c10a8dec536dfd5711d903ff9f414a0ae5c318a891bdecdd4885845775f9d",
+    "v2/benchmarks/qs/p38/p38_r2_eligibility.py": "ac802f85c63be8720eef43f22992b67bff4bd1299f5303e014b6e95e43295164",
+    "v2/benchmarks/qs/p38/p38_r1_regression.py": "c40459190be49809b5b5d19ba8c6dc262f48d15b1af3ec4d13eb44f15713b119",
+    "v2/benchmarks/qs/p38/build_p38_r1_corpus.py": "5cd1d1cac04cc014e11f40fa421a520e4d098f996f15e5447032c7d8970a83af",
+    "v2/benchmarks/qs/p38/p38_r3_experiments.py": "8dfa9c124d9beac143f44e44c7de7094e18336b5c7ac8245690fd1b99d040d9c",
+    "v2/benchmarks/qs/p38/p38_r1_capacity.py": "4b2f309e2b8a653c27b3d40cc8fe7364fb9ba13ae2cb6f45743551bd2f74fa0e",
+    "v2/benchmarks/qs/p38/__init__.py": "239936b0ccc980f4dfe81d3ce2127acc4a02b3a34e278a8df55bc8debe404a92",
+    "v2/benchmarks/qs/p38/p38_r2_experiments.py": "2c316f309fc7fe2b9cee1d42af0d42cdbe133ddf2c0960942200e50a3dc59c66",
+    "v2/benchmarks/qs/p38/p38_r1_policies.py": "35eeaf24cceee60f839b84756b2d66dbdc6813684d3175036312d3707dccf614",
+    "v2/benchmarks/qs/p38/p38_r3.py": "337daa2001a662eed4ea90a67fed7e298246c1313080ff54c4ab608cb8feda4e",
+    "v2/benchmarks/qs/p38/p38_r2.py": "bd35a71b9d97de8cd15be8ba80a35f1f67a5c4d35e95329ab7421ef9a0d30c2c",
+    "v2/benchmarks/pm1/__init__.py": "a78175a525b2d083cdc1593e308d31c1cfa697c3d13690c597d12e451e71786c",
+    "v2/benchmarks/pm1/a6/a6_production_marginal.py": "114003a670296043ab106f617d4e4f9b2542701b21ab668135112fcf429a01ea",
+    "v2/benchmarks/pm1/a6/a6_production.py": "a9400a577aacb150a2dba841527284fbb235df6a691133f0dc9e9a01bf7c990e",
+    "v2/benchmarks/pm1/a6/__init__.py": "90f878f20b1f0230fd0d45bf75bf55c3cc81ebcde837f985f9dfdde13ee20583",
+    "v2/benchmarks/pm1/a6/a6_production_long.py": "17f8626fe46abcc8ceb60890daedb6eab36871932ef96417981ffeeb1cf0a3e5",
+    "v2/benchmarks/pm1/a6/a6_pm1_followup.py": "09eed26fbba46a0e70f3ba3131aacf6c24b60418feaa4a2c914bb4145e436601",
+    "v2/benchmarks/pm1/a6/a6_pm1_confirm.py": "75b1c10ec3b54bfea9f19f39736133b2bb38a1f7e899056110926acc5e9de6b0",
+    "v2/benchmarks/pm1/a6/a6_production_portfolio.py": "0d204134638b8ce0ed8ccea64c10d15c8951059357f29b255a6573c69720b511",
+    "v2/benchmarks/pm1/a6/a6_pm1.py": "72855769a72ed9bd22f894b0826394d414277605476d76b1999adebe28903891",
+    "v2/benchmarks/pm1/a6/a6_pm1_reuse.py": "eb496522bcb35306df1b668a97b610067167917b788c338d0c0461c09a6d0522",
+    "v2/benchmarks/pm1/a6/build_a6_followup_corpus.py": "130230630f65a0bb824b40a70500ce65fb2a12617e399673a110aed07de88e60",
+    "v2/benchmarks/primality/__init__.py": "3313bbd7893d5eee0093f50fd083fd9405a7f6eb12428fc3d4eb0f90a82525dc",
+    "v2/benchmarks/primality/a10/a10_inputs.py": "88565054276a41e61f6e093873b1fb02ac9e4bad001dcb41c98bb0b9e01df00c",
+    "v2/benchmarks/primality/a10/__init__.py": "c54d53f81e4ae0f97f1b7b6f049915ca201ad31d60f7c6fd44bef2ab35eebe2f",
+    "v2/benchmarks/primality/a10/a10_primality.py": "ed223aac888ff1c4f414d179e341a7ec36bcb16454123a732da2ff8b0c435674",
+    "v2/benchmarks/support/prac_oracle.py": "d656822436b8e37f156d472cbbdb79800564f1e096311e72408fd2747dcae8db",
+    "v2/benchmarks/support/paths.py": "32bba51d5a3165433366922a80af3fc82652467c2fe836c3635ad1b2a0d0acd7",
+    "v2/benchmarks/support/__init__.py": "3e6fa5bd095067bc605dadee192481713e837f7a4ffef2680f99bbf5155e5cb0",
+    "v2/benchmarks/support/qs_snapshot.py": "5fe3586bc107761631dd655b567d954c455c28ec4030eb1b281513a63883bfa5",
+    "v2/benchmarks/support/legacy_loader.py": "bd0c4b29c0691719f5f6edf6672e895db6b255f0b146ff533134d028cd37d559",
+    "v2/benchmarks/support/snapshot_loader.py": "d9f06d9ce7e74064b03fff573d60fa9f42852a00121ea384c87886328ef5898e",
+    "v2/benchmarks/infrastructure/infrastructure_experiments.py": "568ea097da3ad42d09ba31534d6463e459f31af6fbb087b2d310c76c8abdb061",
+    "v2/benchmarks/infrastructure/__init__.py": "3c0e3b40a2425e7728cff81f55b1ab803ed91213209841a9d831be5f4c8eff74",
+    "v2/benchmarks/infrastructure/parallel/__init__.py": "eff8f68ebda9786b97fa4610cc5d1be77870614a50e5e172b86ee5b8806c16f2",
+    "v2/benchmarks/infrastructure/parallel/parallel_probe.py": "18b41131b997a38b6551e953adda9a9818a33595c2ca8f49b2e402e7e2a7aa6b",
+    "v2/benchmarks/infrastructure/parallel/parallel_candidates.py": "61ff085b26a2586484438c62042a467a6a4bbee6c0012b53a9f3e6c4610033d5",
+    "v2/benchmarks/infrastructure/backends/p43_backend.py": "7b93559680f1a03d187d456b3ce0e098c75ed20554aec9e7af8eba7df6e9b2e3",
+    "v2/benchmarks/infrastructure/backends/__init__.py": "cb0a6a6306ba99031bac5db849228093b1b7721c25c46383c414251f4a0a55ea",
+    "v2/benchmarks/infrastructure/backends/p43_sizes.py": "529329a16cc8e81ae1ff107c2f8dca67b254a922c8f30d0f05788a5c6c41baef",
+    "v2/benchmarks/infrastructure/backends/p43_experiments.py": "1b601074734ddd422d476311bf45072c5eb9c3ca627dbd7041a843a7c075cbd2",
+    "v2/benchmarks/infrastructure/performance/performance_limits.py": "b5b1d36c2581120eeeed4809bcad5e4cf16994fbffbe113941767f55247f61ce",
+    "v2/benchmarks/infrastructure/performance/build_performance_audit_corpus.py": "fc95f282509b56a7d4cccc65d511b70f9ffc182225793ff7fa402723d0c9ad7d",
+    "v2/benchmarks/infrastructure/performance/__init__.py": "0d866f0291b081395ca6334cfea80ad5a8a2b8e8840a3998b89ff72fd4dc566f",
+    "v2/benchmarks/infrastructure/performance/performance_capacity.py": "abec946d5b7af9d88dd1512ba9846d88f24cb3e1653bd2070e62e049f96e08ce",
+    "v2/benchmarks/infrastructure/performance/performance_costs.py": "3992a910363c54756c60e0818b5b31cafcd078057ed1500ee7fccfe5acf51002",
+    "v2/benchmarks/infrastructure/performance/performance_followup.py": "e4bc07475e2817b85c01d39e2c97e5871528ea628ad67fec6426c581b7189a86",
+    "v2/benchmarks/infrastructure/performance/performance_summary.py": "a78d46e08458f03a99ea6c3256740d8177d499185b2df2850c51ec0d79affca6",
+    "v2/benchmarks/infrastructure/performance/performance_audit.py": "166443af83e78c1cb9b4136c7305bc7c0a279a5f6145a13bb84c878787cccbe7",
+    "v2/benchmarks/infrastructure/sieves/__init__.py": "bc4f554ae9ee99f322ec5567b8ee3d7f18bf4c951fff8a46a130bff98756d656",
+    "v2/benchmarks/infrastructure/sieves/sieve_candidates.py": "b9ac5fd3fdf9ce8fa984edc970ce826dca60546e067bcc1f9c9aafac63bce808",
+    "v2/benchmarks/ecm/__init__.py": "9df81b94d1d38c4398d64283428189fecfbd3acbc592b9a4f6b56a6535ce10ac",
+    "v2/benchmarks/ecm/b3/b3_recovery.py": "8115ffdf645cb32cdb6385ce71f1658cc225d10cc7b598752fe034dd7650104d",
+    "v2/benchmarks/ecm/b3/b3_coverage.py": "16e2bc8121541cffcdb7635217b8bf865307635e68631be863516ac7095c6486",
+    "v2/benchmarks/ecm/b3/__init__.py": "ef67c700f74c07d12ba7fae8f7559b44f6291c5d0297da53d702ea52f07b954a",
+    "v2/benchmarks/ecm/b3/b3_default.py": "a1bc0b2a734a16d84b34adf0978e884df0d26b2b83addcad6c74980ea9f686ff",
+    "v2/benchmarks/ecm/b3/b3_production.py": "ca9ad86e18b33de86da08009d6d08a37c3a362b8960226d6b7743e759b6b1fb1",
+    "v2/benchmarks/ecm/b3/build_b3_inputs.py": "954b707a225b1ce62b652e9df5c5d5705d391b76cbaf00df2f7ddd1f5e3704da",
+    "v2/benchmarks/ecm/b4/b4_kernels.py": "49fe4983e18043afb699817dca598ea7a0d78052456f9262ee5c9b442daab7f5",
+    "v2/benchmarks/ecm/b4/b4_study.py": "516e8b8530f85f6a758849afdac611bedc5e41fc99ae19041d9702dc41c875ef",
+    "v2/benchmarks/ecm/b4/__init__.py": "a135b5e186cb07644bd1239df87cecb2a585b3c0602cc821798ea7bd0ee8bafa",
+    "v2/benchmarks/ecm/b4/b4_bakeoff.py": "5dfc5f0a404fe2b60e0ba0ac31fe3a16286351a2f019944e3c13f4253ad21ab5",
+    "v2/benchmarks/ecm/b4/build_b4_bakeoff.py": "e4fc273fa6a3bb88e7e9a1bac6fc471423318a7f6f4033dd27de495bd583baaf",
+    "v2/benchmarks/ecm/b4/b4_integration.py": "201820454ebc9eb9c9261add0aa07e9e4e64715a97584dc11e7a25b6d92a2f8d",
+    "v2/benchmarks/ecm/b4/b4_common.py": "9f0e2d02ea106cf988e4b606fc0b024ac4e7863736ecc4c062159e332fafb3e8",
+    "v2/benchmarks/ecm/b4/build_b4_inputs.py": "1f8af83148b22c9b404049ea29b3a5f28f05eebdc799d9403ac15a35f73d1368",
+    "v2/benchmarks/ecm/b4/b4_report.py": "641fc09e3190f431eaec0be32d206cfe33d6538b1b01af8b5d127da3db23b64f",
+    "v2/benchmarks/ecm/b4/b4_profile.py": "53eb1ae26980e66c6bd6289d4b0bf53aebdb2ebb365d5151d454ea66ed5f67f1",
+    "v2/benchmarks/ecm/c6/c6_chains.py": "31b7236366488c2d4ad9414977d5a395a1a5693dd2c76efacd0bab013650cd4f",
+    "v2/benchmarks/ecm/c6/c6_b4_study.py": "5aba54dc2e3b620fdb20e16eaa024ecf64048b87c6ad26e28cce9c9c78cabf48",
+    "v2/benchmarks/ecm/c6/c6_cf_study.py": "62a386d9bc7dd2ce46435be8e36502cdf32817eb0895a985e1115e2a6629a074",
+    "v2/benchmarks/ecm/c6/c6_b4_costs.py": "b8635a02549077278c6c50993adf65cf2d110d4a850120a85d6161c7938438bf",
+    "v2/benchmarks/ecm/c6/__init__.py": "47eb0b903e6d3139fb253a76bebe7d1fa4031a4a3130abe7d6ba37a3b5ee3f12",
+    "v2/benchmarks/ecm/c6/build_c6_cf_inputs.py": "f65e0d2681b7a7f972985578c52b242c68d639c821c59a7276b2258b796948fb",
+    "v2/benchmarks/ecm/c6/c6_costs.py": "e86bd4f10ffa3dc3d7b52e9356850d218a33b3cf121d0bc214dd3670681194c6",
+    "v2/benchmarks/ecm/c6/c6_fast_report.py": "cf7d23506f55e203febf58511d9cd96ba8efa85635d871e31b942c8e8f914dce",
+    "v2/benchmarks/ecm/c6/build_c6_fast_inputs.py": "72dafc5d390ff0220555cc15f41daa26cbdc1af2b56c935b45f0ea7e4dfae5ea",
+    "v2/benchmarks/ecm/c6/build_c6_inputs.py": "db05e1098eba11df5432df49ff9f566214cb03e95c505c9b2b12d4a2ce2318bf",
+    "v2/benchmarks/ecm/c6/c6_jit_diagnostic.py": "f98a58a14cd66d985ffeb21cb075370ddf457ab5662c5efb00ebfcf0b25e31cd",
+    "v2/benchmarks/ecm/c6/c6_fast_costs.py": "82518f8a4e714536b8885f02f12239a9ba48b27a62d47989c52e450cbf0d60ad",
+    "v2/benchmarks/ecm/c6/c6_cf.py": "6a10a86b0941fb2b2f0d3a1b7b933015fee1afd290da74c9631457c933cb5b70",
+    "v2/benchmarks/ecm/c6/c6_fast.py": "14dfebc6b593a0858f508c9dc7c378f6a7d4b68e8c48eeff9247ad84e95449f7",
+    "v2/benchmarks/ecm/c6/c6_study.py": "971d15d5f14af00d8726a99360916b0545efaed1d738a4a07e2c0d50ea8db0f6",
+    "v2/benchmarks/ecm/c6/c6_b4.py": "6eba528ffa6ee69b3d6da5649825aa04f638c7fc89a0e600b75742fec074bdd1",
+    "v2/benchmarks/ecm/c6/c6_fast_study.py": "72d4c9625b103cdd52c623bc50ac18df28bf31ee336857fedbbd10be5c6f9747",
+    "v2/benchmarks/ecm/c6/c6_report.py": "995ac5cbd98babf736db2f198fb397b70ce921294216d097c50075a8180dc118",
+    "v2/benchmarks/ecm/p41/p41_prac.py": "51335d28093c5387d483801748a51ad85456e65e9026a1af6e1bf8f246ba9ed1",
+    "v2/benchmarks/ecm/p41/p41_campaign.py": "b2c25451b416cdf14cc5ea33560a07036946a0244ebe158f06f19276ffc9967b",
+    "v2/benchmarks/ecm/p41/__init__.py": "7c642512b9d3a66de99c14f29bad72bd5ae668a32ad83dbad1f6f018407a5274",
+    "v2/benchmarks/ecm/p41/p41_gmp.py": "e0693a1255760beb768567f043523b2e970d46d534df4f4a919f908addfedffe",
+    "v2/benchmarks/ecm/c3/round2_corpus.py": "b00ef3e61dea33d8bf47e1d03eabc5b1ce93c557f02c6c388adf3b73b7ced38b",
+    "v2/benchmarks/ecm/c3/c3_study.py": "fea1be5a01e3e98dd60854d3838a8971b05c6677757d55c496b46b18a30fe2da",
+    "v2/benchmarks/ecm/c3/round2_compare.py": "4710f849c8cd11025fe3fe0e0799c219158865604d37e7ff93ef1b0532b919c8",
+    "v2/benchmarks/ecm/c3/round2_report.py": "44b86773905969e3c07b16e399196e198fcf2b0c34c4d00b677914ff871d4b54",
+    "v2/benchmarks/ecm/c3/recover_training.py": "a2062bdccd64a6f1312c0050c4bf1473ef2ff1cd1d615bd5119f1387a08208ab",
+    "v2/benchmarks/ecm/c3/round2_confirmation_inputs.py": "5e292fbe3503537f61534bebd423141b052037dc36e1d81c094af57bf259ff04",
+    "v2/benchmarks/ecm/c3/diagnostics.py": "1fa53148ed2fa085968424101847136b56a689ccaae26b00b48ab1ba39d17192",
+    "v2/benchmarks/ecm/c3/__init__.py": "78736e7234f03ebba1a48a3c230700aefe9eed2de1e0e14e93978bfbdc87a06a",
+    "v2/benchmarks/ecm/c3/round2_train.py": "b9905d00ca61c8efd1723df5bdd7149fbd60f7cd84e96157dd840c1a3aadbb6b",
+    "v2/benchmarks/ecm/c3/source_preset_study.py": "fc038cc03cce4f8bba36b9b3ec2c7dee646a72331bf5bfaca9b51b0e50ca6c3c",
+    "v2/benchmarks/ecm/c3/round2_sequence.py": "1f3b181362dd054301c1f9c41dc766634434c084538e4ae4141db15f34e1bc61",
+    "v2/benchmarks/ecm/c3/round2_prime_proofs.py": "1a01857a1d295890d4be3be6ffce6bae6bdd14841c18dc8e6f1ee14a47900387",
+    "v2/benchmarks/ecm/c3/round2_window.py": "42fd7dc67062614bed52f9ad51e3ca51314d0b26d8aeee0d0726cee36509d64e",
+    "v2/benchmarks/ecm/c3/round2_pilot.py": "baa3ebcacddd4ccf918c692c43cd5f16e8d5c95fe0d966c0fb1d707718493b86",
+    "v2/benchmarks/ecm/c3/analyze.py": "41142ac7518e2e5a57de073628bf92d744e43f54d7bcdb49133fb20733df42cc",
+    "v2/benchmarks/ecm/p52/p52_realistic.py": "56fdcb6a682601c78363d943953d768999cf729ac4bdbbe6995c41b32adb9a7d",
+    "v2/benchmarks/ecm/p52/p52_b2.py": "918a89d6ebd7d63a0469e820593ab2469cc91c2b292b9e98726358003553e5a4",
+    "v2/benchmarks/ecm/p52/build_p52_b2_wheel_inputs.py": "57e36da92771d8a733782152a41db46a075348347b17dbbc8f884ef746a60c57",
+    "v2/benchmarks/ecm/p52/__init__.py": "5e387463c9b0e150adbd9f163215271261f8c916ac7f0f408df22d89a459689f",
+    "v2/benchmarks/ecm/p52/p52_a3.py": "6da2c0b9e1ad0df19b1c18d66425e544158664fc194b8ed89abc82a46e75e5ce",
+    "v2/benchmarks/ecm/p52/build_p52_b2_inputs.py": "71c03dd8791b55992bec511bb8700e080d8c8885b6cd517d6fdd5e8565782562",
+    "v2/benchmarks/ecm/p52/p52_b2_wheel.py": "9f91c7785eee0964349b7a093b2319bf49a3356abe64b0df2978797e7efbe8e3",
+    "v2/benchmarks/ecm/p52/p52_wider.py": "f41ba600ce8208acb682195e899ab58f7541e88f67f02c545e9906253956526c",
+    "v2/benchmarks/inputs/baselines/a6_followup_pm1_32b3c65.py": "f34705dab285acac10141391eb426e774422a7db3c03f4ed6f7acd394dcc0e7d"
+  },
+  "training_sha256": "a9afaf276728761af8b073e3e3b8f48888aab23b9ca010c27dc4363ab88d572c",
+  "choices": {
+    "40": "collection",
+    "50": "collection"
+  },
+  "rankings": {
+    "8": [
+      {
+        "arm": "control",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 0.15105641703121364
+      },
+      {
+        "arm": "collection",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 0.16044495883397758
+      }
+    ],
+    "30": [
+      {
+        "arm": "control",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 7.118153918068856
+      },
+      {
+        "arm": "collection",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 7.190943750785664
+      }
+    ],
+    "40": [
+      {
+        "arm": "collection",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 120.23286500014365
+      },
+      {
+        "arm": "control",
+        "samples": 18,
+        "complete": 18,
+        "capped_seconds": 122.79936504014768
+      }
+    ],
+    "50": [
+      {
+        "arm": "collection",
+        "samples": 9,
+        "complete": 9,
+        "capped_seconds": 840.5910879173316
+      },
+      {
+        "arm": "control",
+        "samples": 9,
+        "complete": 9,
+        "capped_seconds": 1150.5982351244893
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-00-collection.json",
+      "sha256": "e3d4f9fed9c2f61717a8a19c301bab14e27378f0d676feec07507664f8ad73d1"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-00-control.json",
+      "sha256": "d7a7afe78899197a429acf00b47863d83e27c6b20ba602d2e77f793b9cb542ab"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-01-collection.json",
+      "sha256": "9bc0f941de0a0387e97139c0ab78b55a8d619ff2574bdb61480790da04f1544e"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-01-control.json",
+      "sha256": "d76982920d7c33e1c681104398a0a2c35aeb2e4d8157389db8fd5c04e9b2b410"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-02-collection.json",
+      "sha256": "85ef8bf9ed117d007a709c967e585075de0a51cdbd9ee219150632a57ecf4e51"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-02-control.json",
+      "sha256": "531651a94d7bfd7d0f1cbae752080400ddb5ffc989b4c37ad08d484fe55f9d53"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-03-collection.json",
+      "sha256": "4856212ad4a75608313e849e4c53148729078843a3835e58014f08c6d938a999"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-03-control.json",
+      "sha256": "826340f79bd127ad5357e5613f2953ab470518858f6f2f5c9e4161a819aafbf6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-04-collection.json",
+      "sha256": "8dc4497408401e50525053b8b1e2c127bc332c4f5da06084fa61beb4d8cef5f0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-04-control.json",
+      "sha256": "1a36a92e4e59379371fc5690b653db48db1a64e4aa324d473f4ac150db0b2f90"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-05-collection.json",
+      "sha256": "b47f623347be34b485cf6730491daee4978a4903c301a0d5599314cc0d293885"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-05-control.json",
+      "sha256": "8ee98d4011d470cd4063755e1157178daf55eb8d88b2af2c0be7d3b37101ffb6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-06-collection.json",
+      "sha256": "66bff1bed82657d335620136e6fbceb5fbd6651a85857e0c0d578ff9828d769b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-06-control.json",
+      "sha256": "5ff32dc399fabc88b219a22e33787d1ae2e35370ae897c3bc9f870ed495670c7"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-07-collection.json",
+      "sha256": "b94c6e3093b9505236ead68809fd77d188417de2c36598d650ed20d823503ca4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-07-control.json",
+      "sha256": "145611cb27fafb8fb19018b85702fe90828e463edc09b7f764e85d4645d4ca59"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-08-collection.json",
+      "sha256": "3fa64d1e8606b05e4c32853eac9aa65f018ac45b030acc611637bed61253d5f5"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-08-control.json",
+      "sha256": "0aea94f51bc55804d9097a26abd05ec79713905d4cb8ea5c6078ed117d480071"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-09-collection.json",
+      "sha256": "086dfb26523caf10b660dd1de2da33f461f00dacb0200bc211f698a13c92f9ec"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-09-control.json",
+      "sha256": "7e584bcb80dba16ae5c096ce75e30465a77a65ec50968824d86145d4306d8d81"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-10-collection.json",
+      "sha256": "fe90f6d3a47456a09dd834d6fad6ba18cd1c6b965a1c42c910071341e5a1e92b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-10-control.json",
+      "sha256": "d4d8098dcd429c58acdb020a78733e5cd7fe60d780938da464f742c915528b27"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-11-collection.json",
+      "sha256": "33f9b9d6ea0c1dde553f2c1a31ef2b506d32c360355d72950a63109b66739254"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-11-control.json",
+      "sha256": "1b7a454fcbb5fe9717b24d844daf63b0ad5b89558c85d9f794173f097b608aab"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-12-collection.json",
+      "sha256": "12cf81f5441db525e5159d49894e02eed6c87444fd34cd22d5046b81413d6848"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-12-control.json",
+      "sha256": "7ab8d94c2254ff2596353456149c58aa83b6dab8bd671fe22c488f6e1ebbe3a6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-13-collection.json",
+      "sha256": "64c0c61b5d30db7cf3cbc4e53965ef070886035efa71dc9bda1be006a617b2d7"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-13-control.json",
+      "sha256": "29d6c1b2aeb0390af6360808f3a8b1b31ee41df2d8569c28285f0479b82970dd"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-14-collection.json",
+      "sha256": "8bb81f74139369bbebef438defaf73633bd12d17d0fa306a9e47bd6125128a49"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-14-control.json",
+      "sha256": "ab24a1bf2105d8344e62d2f9587313eb848f1fce96108718df70831638fe8bb3"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-15-collection.json",
+      "sha256": "958e4c935f4b0e13bb26fc2079a3240dbdc179645c493a2191115b7840d96e77"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-15-control.json",
+      "sha256": "29a920af5fddb027eb59a67cb1347550cd830e7866c60db3959e8bc1ab03d81c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-16-collection.json",
+      "sha256": "24058f0e9206fd0393ccf67e687a9979ef6c1e3419c3a4e81b53b2e8afa2c306"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-16-control.json",
+      "sha256": "d1b8c51c5e1b69231a88ce0c0de2ff0a1ed0351aa838d1210b76721c4acc69a2"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-17-collection.json",
+      "sha256": "98d2c2c06229974fc522c76689523b032ccbdb60ecb4368909ec124b5373fdf6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-8-17-control.json",
+      "sha256": "174024862e6a49523c439b977d3d80839e2c873b628226e39e034b6118e9a571"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-00-collection.json",
+      "sha256": "be1929d539fd505a6f37f02353d0e1bed120d61eb5374e827eeec458d598a14c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-00-control.json",
+      "sha256": "a055aed9789c0e332de188a63358685db1b6dad8b25a5c5a4ba581d3d5493b5b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-01-collection.json",
+      "sha256": "3e6f54c2674be6acdf28dfaf68b3d08c12e28d25f5934d19c39be062c7592fb2"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-01-control.json",
+      "sha256": "a447535d6a22e453b973cdec53e6910e77404c31f0f0e647e05730cd09641cba"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-02-collection.json",
+      "sha256": "aa6e1150078989dfe092ff0b45d55bec8297353b87ce51d88e9defb1cdf54cc6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-02-control.json",
+      "sha256": "9125f4c5932896dfc5a7ae0ce46a654dc351119a5e0bf5925e7b8d34136dfb4d"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-03-collection.json",
+      "sha256": "4b82c413c78701f64220cc1057dadfd8f4bf1d5b9776ff7fff5015a2288401a7"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-03-control.json",
+      "sha256": "c6ecda0b72a5be492dd049b7e1c4231e32bec78908dadf0163fe35f68f31b7c4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-04-collection.json",
+      "sha256": "4f18e37ff185dbe427312ac3aa2b99d56f765fc1535310614b01ff002036b611"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-04-control.json",
+      "sha256": "85b3c0f0dd51c95251274d7a4dcad4cb5c7409321829e5888e20cf74452d422d"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-05-collection.json",
+      "sha256": "3d4e2a6a08eee04310758933eea96021ea2103c8c108e7bf071b8239c35a358f"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-05-control.json",
+      "sha256": "5b2173282994885d871b669d5a797dba70a53fb1b27f73eacd944d48608e40ce"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-06-collection.json",
+      "sha256": "efe13eada752fb0edd22f12aeda2d2f2f2cd1a358a6f199602df8bf8d1daa917"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-06-control.json",
+      "sha256": "05e0dc8654f6b49ba658329a9f681238e0e8a8f84eeb5ea56527b4db6aa384c4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-07-collection.json",
+      "sha256": "02db8043e283717e133d12abc00b920c9faa61b7eecbac858755059716344530"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-07-control.json",
+      "sha256": "22ad8ca65e5c958dc10b6860ac3fe58d7de58ff700888f7ed55de4df5c8b2503"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-08-collection.json",
+      "sha256": "230e4ae99a165e65e97d115d66c01a9da0039f5b57bd416a329a27ee211c9924"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-08-control.json",
+      "sha256": "0ad817c2525d816437e4a2c91a9e743f72a86c1b647e6691df37350dc040f1d8"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-09-collection.json",
+      "sha256": "4f2fc77bdb1bfcc1295ac70428d0813723abe6da009c84e1779b04e01ec7a663"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-09-control.json",
+      "sha256": "3e454e4b6f5a32dca97f83b5e84a9c50b936a605c1b25704bd44184591054041"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-10-collection.json",
+      "sha256": "91fc8ccae1d5dcd93af4b9b77a88677d2dfac0c96fcc2c4034e5907d2e9c3c07"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-10-control.json",
+      "sha256": "7bdc0d6a702898f09aa7e28a22c281e21c65d19eb84770a1dea93a8784e91b28"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-11-collection.json",
+      "sha256": "41f59201e6d2b28acdffcd5a5ad51bdf04e15d0d2a2f1c74e0722a4910a7441c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-11-control.json",
+      "sha256": "70d9bedb6936bceb7f783997cde2353aef0adf3b31b06babed0bfcf5a37396f9"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-12-collection.json",
+      "sha256": "f7e14455cd3883e93ca4c94a0ff235ee89a1bc356859f6e49b6bb1ac288f059a"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-12-control.json",
+      "sha256": "eb86cf291194bb56adbe08474f548848248a783a03c3e77bf28af3cccab45ef0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-13-collection.json",
+      "sha256": "06557494f63d207bd1e7be2c4f0a0923cf3258c0ef63f7138f41af035d32383b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-13-control.json",
+      "sha256": "b48e378b62b0623c9f0ed3633ace013172c870d57e6195eb6309f5330a562911"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-14-collection.json",
+      "sha256": "19cc54af7861c60a010c574c8ea0aa5df2acec546b8c1e6000b29716e2179f2f"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-14-control.json",
+      "sha256": "60940dc57872917e86d4a0a713d8e7cb66a52c9945924e3eb32f37ee6e0a4b9c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-15-collection.json",
+      "sha256": "6a3b376e9c8ccc7be0ff79315c5fdd3ee06714db363c8c1ec23f9e9a1e7806cc"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-15-control.json",
+      "sha256": "ba145045826711852580ca608ad57c14a186094ea338fc71d42d4830fa699e47"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-16-collection.json",
+      "sha256": "6793c20ad8389c1c466409f2682f5f1369cdf012923ee026dae534ce890e11e4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-16-control.json",
+      "sha256": "5f811d5cd87eeb39ff4bbaf4dd37346411d5167b69884b125a15121f0088e5e6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-17-collection.json",
+      "sha256": "8b95792f2109edd7394c8103fc8f282477856cf26ad55f5beeb4846861ab5a85"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-30-17-control.json",
+      "sha256": "022c5e0cf7fb8b2289b0a3416ab535133c72a0b536b594019809e48e1d1e4259"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-00-collection.json",
+      "sha256": "69f1c9e364c9f7dcc79e8915cbb8de665f0d07fecdd7f87fe7091a499ab5cdd1"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-00-control.json",
+      "sha256": "c885a72fdf4da4edf88120df2308289f2c63922c2d24e6e06c4381421fa418c3"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-01-collection.json",
+      "sha256": "5900bd45db9351d7901c9ade2882c4341c525442c243e277640cc17800c41cf0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-01-control.json",
+      "sha256": "d739b8bf6b920de8884ca7820fc84c8dbaefa9771d7050ac2587f07f807d8d56"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-02-collection.json",
+      "sha256": "3256754a730c59f16f031d9b3e37988377bf584749dec7748858a970315bf7dd"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-02-control.json",
+      "sha256": "bf91e59a2fddd9d2c5fe870369eb001d3f03fe1cc50040ae3536fc239d4f66a8"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-03-collection.json",
+      "sha256": "f8a629dff8fd66773b094438c530437ab59982c0f332ea27b4ef1a66345b4243"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-03-control.json",
+      "sha256": "8059d1f004ff6cb60d100752e95c99c395019e6fea04b6277f6a6cf88e083f9e"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-04-collection.json",
+      "sha256": "9a08f8fce012e3ce8f7a5a768878b60745b6846b419db520efad03d0a885f393"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-04-control.json",
+      "sha256": "40f0b4efadd62ca5769615586bcde639ce9f97c35dd10c9e01ac4cacae9a1b2b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-05-collection.json",
+      "sha256": "92c7f9f37ed7e5b930d429226624daad8dc448d0606e68de50777ef850ca2da2"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-05-control.json",
+      "sha256": "8b740e49abd9a33914c89430d01342d8e30c5eae615517b0e74c2cb0b5093219"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-06-collection.json",
+      "sha256": "a52e7a94e1a5607feba21c675e92e5641c786115168791513e26e25620d5ca9b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-06-control.json",
+      "sha256": "cd68963ec16365497dd6563bedf608458c5cab25a9191052413cd656ee1ba50e"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-07-collection.json",
+      "sha256": "ad0a9f5866a874959fe26280e7b5397e04a35c5995615c14e6eba321f16537b4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-07-control.json",
+      "sha256": "e5fc11bee5ac7bbc55e19f7985b44df18b561d8ec3e441792d90a7c36def477b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-08-collection.json",
+      "sha256": "9fb85bee8784330c9bb90f5cfb9acc4453f8c6387ff938664e167f1d43ae34b0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-08-control.json",
+      "sha256": "daf47e5e9e1542b13411d8235f6ca85c26aa0d56cacb3a7d75f4c9bf3dc93101"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-09-collection.json",
+      "sha256": "73392b1edaa26aa5777ecc9c1482cd56b50b9e33c54190d91817b6a9266814e4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-09-control.json",
+      "sha256": "8f140a544f49d359e2b94c7c4ff77724582972857d4125789b71de53fae99a50"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-10-collection.json",
+      "sha256": "aaafb85a11d7e2a1db9efa468594c2a4620c746e29ff07cda605c585a3fce9e2"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-10-control.json",
+      "sha256": "fb04c0b82cd3e8db78cbbe4e91d4d2537c272f6c673ef865a39a9d74c36c45cf"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-11-collection.json",
+      "sha256": "9044918cc52f1fcf47a71aaf2c892335b148af4f7a41f0b683ce2836f1c4e374"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-11-control.json",
+      "sha256": "e8f10c512ed1b5954407befa1777d26ed786877ab41dbd49380e71e3dccebd94"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-12-collection.json",
+      "sha256": "8a6ce6e8d1d1e59162632ae25d92cc62d35049ce89738253d8f26e47ccfc567d"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-12-control.json",
+      "sha256": "b35eecb55e8bcf61895ea3571aa453aea090a4e880119654000e70f72b6ffcb6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-13-collection.json",
+      "sha256": "6042cc4199ac8d9c0dada06369e7e49f5c6778c2916225a519382491a2f7829f"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-13-control.json",
+      "sha256": "5b119e30d4b4037bd9c0946af83692885f3d706371796852ceeb0918798baaa3"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-14-collection.json",
+      "sha256": "a219da86de0902a2962326771fe1f1e0b2bea5ab322388a61cc69ad53e5f2a62"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-14-control.json",
+      "sha256": "ea92fe32378b0ff965e193ddc9485cd7ce07220f0fdd0e6d19210340c255e26c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-15-collection.json",
+      "sha256": "6e71cbb96cfa778fd9a722b6f89c322ff8d0497f42ac46004a1929fe69654f1e"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-15-control.json",
+      "sha256": "2fa7e8f2579c5562d55d783a165063c3021e21f44b0147105386473d615ed496"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-16-collection.json",
+      "sha256": "59ca02d29d216e3ee8ce05ed3705a95e0a9a86412c1a2869a145e97a03026915"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-16-control.json",
+      "sha256": "aa64c62e72224ca4e901d7307d9b7d116435eb5bd1381c54621ccceb680a958a"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-17-collection.json",
+      "sha256": "528de72873e1f42db893966d66f173de4d0da986bfb0657078a14be6fff7828f"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-40-17-control.json",
+      "sha256": "8f2d93a661ee9df06301b84ee659f7629a3813e8675341461f55f4295351af43"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-00-collection.json",
+      "sha256": "b09ed109609547f0549547ce6e9fe9ab872452210ee079052bd1e49a448e3330"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-00-control.json",
+      "sha256": "75fdd08ab4837c7b7ec107b94871d2a8c0c60dbc475e96ee854ae61f79f1bde4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-01-collection.json",
+      "sha256": "c38ce6288ca38f318a04187677136d31891f93b798fc3ef9585af73641c24d00"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-01-control.json",
+      "sha256": "d6a30996d75f0e0f139dcc700963fb6e4a0842593852f53c0deec6d772ac5cc2"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-02-collection.json",
+      "sha256": "94947ca8a85a243c3b3da2a1beb47b646e23a04b8d49383ebb69ed35f11f320c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-02-control.json",
+      "sha256": "4c708a588cd4c2eb5a73591eebc2b5e9cac51e3e76f528032c72b25280682a05"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-03-collection.json",
+      "sha256": "83a01756c14b622ac9242b70858de85ad6eaeacea759cfaf70b98d950d8a08d4"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-03-control.json",
+      "sha256": "c07b1f07e786b45c720d2296c35d354d4f1a095c1a981eef575ee7764f81fc16"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-04-collection.json",
+      "sha256": "f6789de234875f2b542dde315a42a15f842c0b4e22d1a34265452dd2fa495920"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-04-control.json",
+      "sha256": "fcab97602c2feab77e42d5851e524fce389f765b2ab2302fd41a42d676bdb735"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-05-collection.json",
+      "sha256": "fa4bfae65580bc4fbab0791ddca6012eaa399c2aaef45f9ce178c1289adfa7ff"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-05-control.json",
+      "sha256": "b6c339018034d4b68c30eb99e32228c0236ad04f2e7c79d950766acfc6d4a843"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-06-collection.json",
+      "sha256": "3459cc6079a2b94af43f82821f01d736b4166e6972153d549d1fc3619559173c"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-06-control.json",
+      "sha256": "e088c2e0b64bb5d5be252616c43ab202e622ad2fcbb743529dc28051f5423649"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-07-collection.json",
+      "sha256": "5e66aa0a127666675985a39ff534b94f1efe3c54b74df4be22fa33c3f2d1cd9f"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-07-control.json",
+      "sha256": "69e55e5a982c685203b9662eb9dbf12b1c397076c505f14f4fdb22d8fb3f3e93"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-08-collection.json",
+      "sha256": "b7adc29f9f99449f27c249a7a900e3c999c1d1149ab661879f5f0f82063091aa"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/experiment/train-50-08-control.json",
+      "sha256": "2bd04b588ef776dee9ac098e600b611b1fcea8494856053f8fe390edb2cfbd79"
+    }
+  ],
+  "limitation": "Training selection only; fresh complete outcomes required"
+}
