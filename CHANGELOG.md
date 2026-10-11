@@ -14,6 +14,13 @@
 
 ## Current development
 
+- Reduce C3's next policy-screening scope after stopping the oversized
+  513-group comparison. Preserve its 72 complete matched groups as
+  inconclusive and retain the interrupted grant. Prepare a separate 54-group
+  screen of four upstream-derived schedules against both current controls,
+  with fixed SIQS bounds and finite uncertainty extensions; no policy gain is
+  inferred from partial observations.
+
 - Add explicit source-derived ECM tier presets from Yamaquasi, Alpertron and
   GMP-ECM, retaining the caller's SIQS configuration, cumulative allocation,
   positive fallback floors and memory cap. Refuse incompatible workspace

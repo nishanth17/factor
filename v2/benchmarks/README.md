@@ -50,13 +50,21 @@ It selects 64 curves at 2000/50000 for 30 digits and 64 at 2000/147396 for
 and every calibration-capture hash are committed before comparison. These
 are training projections; no warmed policy promotion follows from the fit.
 
-The [complete-call procedure](ecm/c3/round2_comparison_protocol.md) retains
-all 57 revealed subjects, nine seeds, three arms and the 3,600-second cap.
-It warms both size bands and both SIQS implementations and reserves a whole
-matched three-arm group before admission, addressing observed session CPU
-variation. A positive paired result against both controls is required before
-new independent confirmation. See [model limits](ecm/c3/round2_model_limits.md)
-and the [prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
+The [complete-call procedure](ecm/c3/round2_comparison_protocol.md) froze
+57 revealed subjects, nine seeds and three arms. It was stopped after the user
+questioned the 513-group training scope: 72 complete matched groups (216 valid
+calls) are preserved, with no comparison decision. Its interrupted group grant
+remains charged; the protocol is permanently inconclusive and cannot resume.
+See the [scope decision](ecm/c3/round2_comparison_scope.md).
+
+The replacement [upstream transfer screen](ecm/c3/source_preset_protocol.md)
+uses six revealed subjects, nine seeds and six arms: 54 groups, 324 calls.
+It tests the protected [source presets](ecm/c3/source_presets.md), retaining the
+exact SIQS settings and admission bounds. Promising unstable results may extend
+to 18/27 samples only within the separately fixed phase cap. This screening
+cannot establish a broad default. A selected candidate still needs disjoint
+fresh confirmation. See [model limits](ecm/c3/round2_model_limits.md) and the
+[prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
 No round-two fresh inputs exist. Frozen earlier experiments use their source
 commits; historical manifests are not repinned to newer production sources.
 
