@@ -61,8 +61,12 @@ beats control on that ordering. A training selection is not adoption.
 Freeze selection, raw-evidence hashes and source/configuration identity
 BEFORE generating a new corpus. Generate three independent balanced inputs
 per selected band, disjoint from all existing corpus n values, using the
-repository's independently verified prime certificates. The population is
-conditioned on the certificate generator and is not claimed RSA-distributed.
+repository's independently verified prime certificates. Also exclude the
+50 later C3/C9 inputs recorded in the versioned
+prior-input exclusion file; its hash is part of the source manifest.
+Verify that exclusion source hashes still match at the final C9 handoff.
+The population is conditioned on the certificate generator and is not
+claimed RSA-distributed.
 No parameter changes after fresh values are revealed.
 
 Confirmation compares control with that single selected challenger, nine

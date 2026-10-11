@@ -31,5 +31,9 @@ cap is final for this tranche; rerunning cannot replenish it.
 The training runner uses known C1/C9 inputs. Selection freezes before the
 generator creates fresh certified inputs; no generation is needed for bands
 without a selected challenger. Historical C9 source manifests remain immutable.
+The versioned `c10_prior_input_exclusions.json` supplies 50 additional n values
+from C9's later long-window corpus and the primary checkout's C3 corpora.
+Their source revisions and file hashes are recorded. These are exclusions
+only, consumed by the existing generic scanner, not C10 training examples.
 The separate A7 C10 integration pin updates loader compatibility, not historical
 timing evidence. No C10 measurement is an E1 portfolio or worker comparison.

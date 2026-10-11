@@ -603,5 +603,10 @@
       "revision": "arXiv:2610.07126v1",
       "status": "Primary paper used for mechanism discovery; claims checked against pinned source, no GPU measurements reproduced"
     }
-  ]
+  ],
+  "prior_input_exclusions": {
+    "path": "v2/benchmarks/inputs/corpora/c10_prior_input_exclusions.json",
+    "sha256": "dc7028fe92f2eec0d568bb7edee2f6fc1076c0804d1bed08c62f39055caa7cee",
+    "count": 50
+  }
 }
