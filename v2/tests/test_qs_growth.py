@@ -76,6 +76,14 @@ class GrowingStorageTests(unittest.TestCase):
         )
         self.assertEqual(replace(growing, max_atoms=100000).max_atoms, 100000)
 
+    def test_growing_storage_refuses_unsupported_worker_and_sss_adapters(self):
+        from v2.qs.parallel import ParallelConfig
+        from v2.qs.sss import SSSConfig
+
+        for constructor in (ParallelConfig, SSSConfig):
+            with self.assertRaisesRegex(ValueError, "serial SIQS"):
+                constructor(collector=growing_worker().config)
+
     def test_growing_graph_preserves_complete_incidence_kernel(self):
         edges = [(1, 7), (3, 5), (5, 11), (3, 11), (13, 13), (3, 5)]
         forest, cycles = LargePrimeForest(edge_limit=None), []

@@ -1116,7 +1116,9 @@ and the documented 256-atom cycle policy remain. Collection still uses the
 configured polynomial and stopping schedule. The finite outer portfolio
 resolves an uncapped child's memory to its own remaining allowance, including
 coexisting metadata; it cannot supply uncapped storage. The existing CLI
-continues to select legacy bounded configurations.
+continues to select legacy bounded configurations. SSS and coarse-worker
+adapters reject the growing class; use `SIQSJob` or `SieveCollector` for this
+policy until those adapters have their own ownership and resume integration.
 
 Growing jobs use checkpoint schema 5. Checkpoint encoding reserves from the
 actual retained store and retains elapsed wall/CPU cost; restores charge

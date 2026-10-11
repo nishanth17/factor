@@ -207,7 +207,9 @@ class Expenses:
                 + child.ru_stime
                 - child_before
             )
-            record.update(wall=wall, cpu=used_cpu)
+            record.update(
+                wall=wall, cpu=used_cpu, actual_wall=wall, actual_cpu=used_cpu
+            )
             if record["status"] != "complete":
                 record.update(wall=max(cap, wall), cpu=max(cap, used_cpu))
             self.write()

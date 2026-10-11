@@ -11,7 +11,12 @@ from ..execution.budget import Budget, BudgetExhaustedError
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial
-from .sieve_collector import SieveCollector, SieveConfig, SieveResult
+from .sieve_collector import (
+    GrowingDoubleLargeSieveConfig,
+    SieveCollector,
+    SieveConfig,
+    SieveResult,
+)
 from .smooth_batch import SmoothBatch
 
 
@@ -80,6 +85,8 @@ class SSSConfig:
             raise ValueError("unknown SSS mode")
         if type(self.weight_two) is not bool:
             raise TypeError("weight_two must be Boolean")
+        if isinstance(self.collector, GrowingDoubleLargeSieveConfig):
+            raise ValueError("growing DLP requires the serial SIQS interface")
         if not isinstance(self.collector, SieveConfig):
             raise TypeError("collector must be a SieveConfig")
 

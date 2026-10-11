@@ -27,7 +27,11 @@ from .families import (
 from .pipeline import QSJob, QSResult
 from .polynomial import Polynomial, qs_polynomial
 from .relations import AtomicRelation, verify_atomic
-from .sieve_collector import SieveCollector, SieveConfig
+from .sieve_collector import (
+    GrowingDoubleLargeSieveConfig,
+    SieveCollector,
+    SieveConfig,
+)
 
 _PROCESS_STATE = None
 
@@ -89,6 +93,8 @@ class ParallelConfig:
             if value > high:
                 raise ValueError(f"{name} exceeds the parallel limit")
 
+        if isinstance(self.collector, GrowingDoubleLargeSieveConfig):
+            raise ValueError("growing DLP requires the serial SIQS interface")
         if not isinstance(self.collector, SieveConfig):
             raise TypeError("collector must be a SieveConfig")
         if 8 * self.checkpoint_bytes >= self.parent_memory_bytes:

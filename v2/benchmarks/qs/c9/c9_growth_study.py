@@ -11,6 +11,7 @@ import time
 from collections import Counter, deque
 from contextlib import contextmanager
 from dataclasses import asdict, replace
+from math import prod
 from pathlib import Path
 
 from .... import qs
@@ -19,16 +20,15 @@ from ....execution.budget import Budget, BudgetExhaustedError
 from ...ecm.p52.p52_realistic import check_quiet
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..b1.b1_calibration import save
-from ..c1.c1_feasibility import validate_control
 from ..c1.c1_implementation import arm_config
 from ..phase_three.phase_three_reference import _rss_bytes
 
 ROOT = Path(__file__).resolve().parents[4]
 INPUTS = ROOT / "v2/benchmarks/inputs"
-PROTOCOL = Path(__file__).with_name("c9_growth_protocol.md")
-CONTROL = INPUTS / "controls/c9_growth_training.json"
+PROTOCOL = Path(__file__).with_name("c9_growth_protocol_v2.md")
+CONTROL = INPUTS / "controls/c9_growth_training_v2.json"
 JOINT = INPUTS / "controls/c9_growth_joint.json"
-PRIOR = dict(wall=4169.706813997589, cpu=4124.095797917167)
+PRIOR = {"wall": 4634.658706497634, "cpu": 4588.290882917167}
 MEMORY = 1024 * 2**20
 ARMS = ("slp", "dlp", "grow", "grow_aligned")
 LOCK = Path("/private/tmp/factor-performance.lock")
@@ -189,6 +189,29 @@ def graph_diagnostics(collector):
     )
 
 
+def validate_result(row, fixture, memory_bytes):
+    """Check reconstruction/certainty independently under this run's cap."""
+    assert prod(row["factors"]) * prod(row["remaining"]) == fixture["n"]
+    expected = Counter(fixture["factors"])
+    assert not Counter(row["factors"]) - expected
+    assert row["complete"] == (not row["remaining"])
+    if row["complete"]:
+        assert Counter(row["factors"]) == expected
+    divisor = row["divisor"]
+    if divisor is not None:
+        assert 1 < divisor < fixture["n"] and fixture["n"] % divisor == 0
+    assert len(row["certainty"]) == len(row["factors"])
+    for factor, label in zip(row["factors"], row["certainty"]):
+        wanted = (
+            "proven_prime"
+            if factor < 3317044064679887385961981
+            else "probable_prime"
+        )
+        assert label == wanted
+    assert row["work"] <= 10**13
+    assert row["stats"].get("workspace_bytes", 0) <= memory_bytes
+
+
 def run_one(fixture, seed, config, arm, seconds, *, prefixes=False):
     """Inclusive exact outcome validation; prefixes are attribution only."""
     check_quiet({os.getpid()})
@@ -266,11 +289,33 @@ def run_one(fixture, seed, config, arm, seconds, *, prefixes=False):
         cap_seconds=seconds,
         stats=result.stats,
     )
-    validate_control(row, fixture)
     row.update(
         seconds=time.monotonic() - started,
         cpu_seconds=time.process_time() - cpu,
         rss_bytes=_rss_bytes(),
+    )
+    try:
+        validate_result(row, fixture, config.memory_limit)
+    except AssertionError:
+        # Preserve rejected reports as failures, never usable timing evidence.
+        failed = (
+            ROOT
+            / "v2/benchmarks/results/c9"
+            / f"growth-validation-failed-{time.time_ns()}.json"
+        )
+        save(
+            failed,
+            dict(
+                outcome=row,
+                fixture=fixture["id"],
+                memory_bytes=config.memory_limit,
+            ),
+        )
+        raise
+    # Inclusive timing ends only after independent output validation.
+    row.update(
+        seconds=time.monotonic() - started,
+        cpu_seconds=time.process_time() - cpu,
     )
     row["capped_seconds"] = row["seconds"] if row["complete"] else seconds
     if prefixes:
@@ -464,7 +509,9 @@ def select(output):
             "selection needs all eight individual and four joint calls"
         )
     slp_rank = rank(rows, ("slp", "graph_slp"))
-    dlp_rank = rank(rows, ("grow", "grow_aligned", "half_grow"))
+    challenger_rank = rank(
+        rows, ("grow", "grow_aligned", "half_grow", "graph_slp")
+    )
     registry = initial["configurations"] | joint["configurations"]
     old = json.loads((INPUTS / "controls/c1_selected.json").read_text())[
         "configurations"
@@ -479,9 +526,9 @@ def select(output):
             slp=asdict(slp), dlp=asdict(dlp), challenger=asdict(growing(dlp))
         )
     configs["50"] = dict(
-        slp=registry[slp_rank[0]["arm"]],
+        slp=registry["slp"],
         dlp=registry["dlp"],
-        challenger=registry[dlp_rank[0]["arm"]],
+        challenger=registry[challenger_rank[0]["arm"]],
     )
     ledger = expenses(output).data
     prior = {
@@ -494,7 +541,10 @@ def select(output):
             schema=2,
             source=confirmation.hashes(),
             configurations=configs,
-            choices={"slp": slp_rank, "dlp": dlp_rank},
+            choices={
+                "slp_diagnostic": slp_rank,
+                "challenger": challenger_rank,
+            },
             spent_before_confirmation=prior,
             evidence=[
                 dict(
@@ -515,7 +565,7 @@ def select(output):
                 for p, r in zip(paths, rows)
             ],
             scope="Growth at 30/40-digit C1 DLP bundles; selected growing DLP "
-            "bundle at 50. User-requested storage policy is separate from "
+            "challenger at 50. User-requested storage policy is separate from "
             "performance promotion. E1 and C10 remain open.",
             expense_convention="Original 14400 seconds; prior includes "
             "C9.1, interrupted-call reserve and 600 prepaid QA.",

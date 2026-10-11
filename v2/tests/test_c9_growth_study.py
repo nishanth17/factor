@@ -36,6 +36,36 @@ class GrowthProtocolTests(unittest.TestCase):
             self.assertEqual(config.memory_bytes, study.MEMORY)
             self.assertEqual(study.decode(asdict(config)), config)
 
+    def test_validator_uses_declared_memory_and_rejects_bad_arithmetic(self):
+        fixture = dict(n=21, factors=[3, 7])
+        row = dict(
+            factors=[3, 7],
+            remaining=[],
+            complete=True,
+            divisor=3,
+            certainty=["proven_prime", "proven_prime"],
+            work=100,
+            stats={"workspace_bytes": 700 * 2**20},
+        )
+        study.validate_result(row, fixture, 1024 * 2**20)
+        with self.assertRaises(AssertionError):
+            study.validate_result(row, fixture, 256 * 2**20)
+        row["divisor"] = 1
+        with self.assertRaises(AssertionError):
+            study.validate_result(row, fixture, 1024 * 2**20)
+        row["divisor"] = 3
+        row["certainty"][0] = "probable_prime"
+        with self.assertRaises(AssertionError):
+            study.validate_result(row, fixture, 1024 * 2**20)
+        row.update(
+            factors=[],
+            remaining=[21],
+            complete=False,
+            divisor=None,
+            certainty=[],
+        )
+        study.validate_result(row, fixture, 1024 * 2**20)
+
     def test_expense_restart_keeps_failed_reservation(self):
         with TemporaryDirectory() as directory:
             output = Path(directory)
