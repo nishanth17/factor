@@ -1,5 +1,9 @@
 # C9.2 longer-window diagnostic addendum
 
+Status: superseded before execution by the user-requested
+[1,200-second matched confirmation](c9_long_confirmation_protocol.md).
+No pilot measurement was run and no part of its 4,500-second allowance was spent.
+
 Declared 11 October 2026 while the frozen 360-second confirmation is running,
 following the user's explicit request to allow longer 50-digit runs. This does
 not change the existing confirmation source, configurations, outcomes or its

@@ -133,8 +133,21 @@ limits. Initial allocation is not a universal eviction policy.
 
 [The C9.2 report](qs/c9/c9_growth_results.md) keeps individual growth attribution,
 selected combinations, charged resume and fresh performance decisions distinct.
+Fresh confirmation adopts only the explicit full-base 50-digit bundle:
+`base_bound=30000`, `half_width=65536`, six A factors, common SLP/DLP endpoint
+3,000,000 and unchanged product bound 115,200,000,000, with growing storage.
+The complete configuration, including polynomial/collection settings, is
+versioned in `inputs/controls/c9_long_selected.json`. Nine matched groups on
+three independent inputs yield 9/9 complete factors per arm and 38.10%/53.08%
+less complete-call time versus calibrated SLP/fixed DLP. Owned peaks are
+325.99/166.89/198.15 MiB for growth/SLP/fixed DLP under the same 1-GiB envelope.
+Growth uses more charged work than SLP; it is not a win in every resource
+dimension. The 1,200-second comparison allowance is not a production ceiling.
+
 Legacy classes, controls, checkpoints and historical verdicts remain unchanged.
-Broader scoring/polynomial/base calibration remains C10; higher arity remains F6.
+No new 30/40-digit growth benefit is promoted. Broader scoring/polynomial/base
+calibration remains C10; combined portfolio acceptance remains E1; higher arity
+remains F6.
 
 ## Continuing experiment ledger (C10)
 
@@ -182,3 +195,15 @@ closes only its named size/workload tranche, not the whole parameter space.
 [sympy-qs]: https://github.com/sympy/sympy/blob/2f22a5f81e2f4124380be3739a092e9ff20128de/sympy/ntheory/qs.py
 [javamath-tdiv]: https://github.com/TilmanNeumann/java-math-library/blob/088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97/src/main/java/de/tilman_neumann/jml/factor/siqs/tdiv/TDiv_QS_2LP.java
 [cuda-guide]: https://github.com/drjanosch42/cuda-mpqs/blob/main/USER_GUIDE.md
+
+## C9.2 literature-transfer verification
+
+The [11 October addendum](qs/c9/c9_literature_verification.md) rechecks all 43
+previous source-file pins, current upstream revisions and the v2 callers.
+It adds asymmetric ordered LP bounds from primary literature: a smaller
+endpoint ceiling is not equivalent to the existing symmetric endpoint/product
+envelope. Wider recovered-product intake, yield-dependent retry targets and
+cycle/provenance-weight optimization remain untested transfers. C10a owns
+solve scheduling; C9 retains residual policy and yield-dependent feedback,
+with a shared candidate-domain/scoring interface. No exhaustive-adaptation or
+optimality claim follows from the accepted bundle; its results remain unchanged.

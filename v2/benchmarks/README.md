@@ -15,6 +15,7 @@ see [contributor guidance](../../AGENTS.md).
 | [ecm/p52/](ecm/p52/) | Programs, pairing, wheels and realistic ECM portfolios |
 | [ecm/b3/](ecm/b3/) | Production chain integration, coverage and recovery |
 | [ecm/b4/](ecm/b4/) | Kernels, integration and candidate bakeoffs |
+| [ecm/c3/](ecm/c3/) | ECM allocation research, protected handoff and frozen complete-call study |
 | [ecm/c6/](ecm/c6/) | Chain catalogs, executors and cost studies |
 | [qs/phase_three/](qs/phase_three/) | Relation engines and collector/pipeline studies |
 | [qs/p38/](qs/p38/) | Capacity, collector and matrix experiments |
@@ -48,6 +49,84 @@ The 50-digit training extension stopped at 11/18 groups under its frozen
 whole-group reservation; the fresh 9/9 result, not that partial training
 interval, supports the scoped decision. Cold starts, profiles, work and
 memory are reported separately. C10 remains open for later tranches.
+
+The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
+compatibility and preserved study freezes. Remaining literature transfers are
+phased into roadmap C9a; E1 and C10 remain separate.
+
+C9.2's [adaptive-storage acceptance](qs/c9/c9_growth_results.md) confirms an
+explicit balanced 50-digit bundle: 38.10% less complete-call time than calibrated
+SLP and 53.08% less than fixed DLP, with 9/9 valid completions in all arms.
+Peak owned reservation rises to 326 MiB (SLP 167, fixed DLP 198). Three
+independent inputs and three seeds per input support this narrow scope;
+30/40 recommendations, C10 calibration and E1 combined acceptance stay separate.
+
+## C3 continuing optimization
+
+[Additional primary research](ecm/c3/round2_research.md) and
+[diagnostic findings](ecm/c3/round2_findings.md) expand the search beyond quick8.
+A frozen 84-call instrumented pilot validates all outcomes and finds two
+extra-curve hits that avoid SIQS. Matched profiles identify redundant
+reservation checks; their candidate reduction passes 600 tests and lint.
+The [offline stopping fit](ecm/c3/round2_fitted.md) subsequently completes all
+2,052 validated instrumented calibration calls in 2,893.780 active seconds.
+It selects 64 curves at 2000/50000 for 30 digits and 64 at 2000/147396 for
+40 digits, with nineteen independent root-ECM entrants per band. The table
+and every calibration-capture hash are committed before comparison. These
+are training projections; no warmed policy promotion follows from the fit.
+
+The [complete-call procedure](ecm/c3/round2_comparison_protocol.md) froze
+57 revealed subjects, nine seeds and three arms. It was stopped after the user
+questioned the 513-group training scope: 72 complete matched groups (216 valid
+calls) are preserved, with no comparison decision. Its interrupted group grant
+remains charged; the protocol is permanently inconclusive and cannot resume.
+See the [scope decision](ecm/c3/round2_comparison_scope.md).
+
+The replacement [upstream transfer screen](ecm/c3/source_preset_protocol.md)
+uses six revealed subjects, nine seeds and six arms: 54 groups, 324 calls.
+It tests the protected [source presets](ecm/c3/source_presets.md), retaining the
+exact SIQS settings and admission bounds. Promising unstable results may extend
+to 18/27 samples only within the separately fixed phase cap. This screening
+cannot establish a broad default. A selected candidate still needs disjoint
+fresh confirmation. See [model limits](ecm/c3/round2_model_limits.md) and the
+[prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
+The [initial source-screen results](ecm/c3/source_preset_results.md) complete
+all 324 calls. Yamaquasi escalation and Alpertron show 44.44%/47.39% lower
+training CPU cost than fixed32, but uncertainty remains wide. After the user raised
+a time concern, defer the prescribed extension and fresh confirmation, select no
+policy and retain defaults. Final committed-only checks pass 653 tests, lint,
+154 benchmark imports and 35 certified corpora.
+The user subsequently requested [default promotion](ecm/c3/default_promotion.md):
+use compact64 at 30 digits and the Yamaquasi escalating prefix at 40 digits,
+subject to existing workspace admission. This separate decision overrides the
+earlier defer decision; it does not alter the frozen assessment's null selection,
+pass its stability gate, or claim a measured hybrid gain. No new timing search
+or extension was initiated. Committed-only verification of the new defaults
+passes 663 tests, lint, 154 imports, 35 certified corpora and 57 training inputs.
+No round-two fresh inputs exist. Frozen earlier experiments use their source
+commits; historical manifests are not repinned to newer production sources.
+
+## C3 bounded ECM allocation and handoff (10 October 2026)
+
+[Research](ecm/c3/research.md), [protocol](ecm/c3/protocol.md) and
+[acceptance](ecm/c3/acceptance.md) document the new opt-in cumulative pretest,
+finite campaign and protected SIQS/SSS transition. Six bundles train on ten
+historical inputs; the selected policy is committed before 15 fresh certified
+inputs are generated. All 972 fresh calls validate and complete under matched
+10^13-work, 5/30-second, 288-MiB native service allowances.
+
+Retain numerical defaults. Training-selected quick8 costs 51.56% more on the
+smaller fresh cohort (cost-change 95% interval −5.36% to +202.05%); uneven
+controls regress and seven cells remain unstable after the frozen extensions.
+The larger band retains control at training. Explicit reservations do not make
+the default 2M grant sufficient: four of five smaller service-policy probes
+refuse unfunded fallback floors. Charged active/terminal restore checks pass.
+
+Working/committed-only checks pass 593 tests, full lint, 144 benchmark imports
+and 34 certified corpora. Required inputs are versioned; raw receipts remain
+ignored and preserved locally. Reproduction commands and all memory, seed,
+small-population and source-identity limits are in the acceptance report.
+C3 broad calibration, G1 and E1 remain open; no collector or v1 change.
 
 ## Inputs and generated evidence
 

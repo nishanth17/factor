@@ -40,6 +40,13 @@
 
 ## Current development
 
+- Integrate accepted C9.2 with C3 allocation/defaults. Preserve growing-DLP
+  policy during implicit schema-12 resume and retain the finite resolved child
+  allowance; reject changed policies. Cross off C9 and phase remaining
+  literature transfers into C9a with separate attribution/acceptance gates.
+  Integrated working/committed-only checks pass 690 tests, full lint and
+  140 live benchmark imports plus required loaders.
+
 - Add `GrowingDoubleLargeSieveConfig` for serial SIQS with allocator-grown
   partial history and no implicit FIFO, original-atom, row or cumulative
   split-count ceiling. Standalone growing memory/checkpoint quotas default to
@@ -48,10 +55,75 @@
   square corrections. Schema 5 supports checked growing-store resume; legacy
   configurations retain schemas 3/4. Interrupted publication invalidates the
   live object while prior complete checkpoints remain recoverable.
-- Document pinned large-prime mechanisms, actual upstream limits, loss
-  attribution and the separately frozen adaptive-growth study. Performance
-  acceptance and supported scope are recorded in the C9.2 benchmark report;
-  broader C10/E1 calibration is not closed by storage support.
+- Complete the C9.2 source-derived yield/adaptive-storage tranche. Pinned
+  literature and five leading implementations motivate history retention and
+  separately tested endpoint alignment. Fresh balanced 50-digit confirmation
+  reduces complete-call time by 38.10% versus calibrated SLP and 53.08% versus
+  fixed DLP, with 9/9 validated completions in all arms. Adopt only the explicit
+  measured bundle; its owned peak is 326 MiB versus 167/198 MiB for the controls.
+  Retain 30/40 recommendations and defaults. The C9.2 report records costs,
+  uncertainty, stopped studies and limitations; C10/E1 remain open.
+
+- Integrate the delivered C3 allocation/handoff tranche and user-directed
+  30/40-digit ECM defaults into mainline. Cross off the bounded C3 roadmap
+  entry while retaining the unrun fresh/stability gates and broader joint
+  calibration under the continuing follow-ups.
+
+- Promote C3's size-scoped bounded defaults at the user's direction: compact64
+  at 30 decimal digits and the Yamaquasi-derived 10/30/100 escalating prefix at
+  40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
+  limits and SIQS settings; retain fixed32 for other sizes or tight workspace.
+  This promotion precedes fresh confirmation and leaves calibration open.
+  Committed-only checks pass 663 tests, lint and benchmark/input loaders.
+
+- Complete the initial 54-group upstream ECM transfer screen: all 324 calls
+  validate under unchanged SIQS settings and reserves. Escalating Yamaquasi
+  and Alpertron schedules show 44.44%/47.39% lower revealed-training CPU cost
+  than fixed32, with wide uncertainty. Stop this pass after the user raised
+  a time concern; defer extension/fresh confirmation and retain defaults.
+  Committed-only checks pass 653 tests, lint and all benchmark/input loaders.
+
+- Reduce C3's next policy-screening scope after stopping the oversized
+  513-group comparison. Preserve its 72 complete matched groups as
+  inconclusive and retain the interrupted grant. Prepare a separate 54-group
+  screen of four upstream-derived schedules against both current controls,
+  with fixed SIQS bounds and finite uncertainty extensions; no policy gain is
+  inferred from partial observations.
+
+- Add explicit source-derived ECM tier presets from Yamaquasi, Alpertron and
+  GMP-ECM, retaining the caller's SIQS configuration, cumulative allocation,
+  positive fallback floors and memory cap. Refuse incompatible workspace
+  instead of reducing SIQS storage. Preserve numerical defaults; performance
+  transfer and policy acceptance require matched measurements.
+
+- Continue C3 after the negative quick8 result with CADO-NFS/Alpertron source
+  and probability/cost research, 57 revealed training subjects and a validated
+  seven-bundle attribution pilot. Reduce duplicate reserved-charge clock
+  checks and reuse the allocation view, preserving the ordinary budget path
+  and shared work ledger. Differential boundaries, 600 tests and lint pass;
+  warmed policy selection and fresh confirmation remain open.
+- Complete the frozen 2,052-call instrumented stopping calibration and commit
+  the fitted compact64/wide64 table before comparison. Add complete matched
+  group reservations, warm both size bands and SIQS paths, retain interrupted
+  grants and preserve the existing comparison cap and decision gates.
+  Prepare independently checked prime certificates for possible later fresh
+  confirmation; no new policy or performance acceptance is claimed.
+
+- Add opt-in cumulative ECM pretesting and finite campaign allocation, with
+  protected work/wall/CPU admission floors for SIQS/SSS, lazy schedule setup,
+  one-way handoff and partial-attempt evidence. Preserve shared child budgets,
+  cancellation, exact reconstruction and probable/proven labels.
+- Use schema 12 for explicit allocation identity and complete-config restore;
+  charge snapshot verification/rebuilding and preserve admitted live fallback.
+  Expose policy/tier/reserve CLI flags and retain schemas 2–11 and defaults.
+- Complete pinned source/paper/blog research, a six-bundle frozen training
+  study, commit-before-generation selection and 15 fresh certified controls.
+  All 972 fresh calls complete; quick8 costs 51.56% more on the smaller cohort,
+  with uneven regressions and remaining instability, so retain both numerical
+  controls. Default-grant probes expose unfunded reserves rather than claiming
+  early-refusal speed. Charged restore, 593 working/committed-only tests, full
+  lint, 144 imports and 34 certified corpora pass. Keep broad C3/G1/E1
+  calibration open; preserve v1 and C9/C10 collector ownership.
 
 - Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
   the user's direction. Keep B4 for unsupported jobs and insufficient explicit

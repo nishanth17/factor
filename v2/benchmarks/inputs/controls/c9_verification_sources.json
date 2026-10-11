@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "verified_date": "2026-10-11",
+  "scope": "Post-C9.2 literature transfer verification; no changed runtime, accepted timing controls or acceptance inputs.",
+  "prior_manifests": {
+    "c9_source_pins.json": "aee694323ef4c5090677c052cf4b3982f760f413639bf6f00abd2e9d50595e49",
+    "c9_growth_source_pins.json": "9df82e9b93937ce428920f3efe5961a72391dc88b6abbe515ae87e9672dbbb6c"
+  },
+  "head_checks": [
+    {
+      "repo": "bbuhrow/yafu",
+      "prior_pin": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "checked_head": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "head_date": "2026-10-05T14:05:38Z",
+      "same_revision": true,
+      "pinned_file_count": 7,
+      "pinned_hashes_verified": true
+    },
+    {
+      "repo": "radii/msieve",
+      "prior_pin": "c8727d91305bdbe0972d160ef0ce61dd02ce9193",
+      "checked_head": "c8727d91305bdbe0972d160ef0ce61dd02ce9193",
+      "head_date": "2011-02-21T05:58:28Z",
+      "same_revision": true,
+      "pinned_file_count": 6,
+      "pinned_hashes_verified": true
+    },
+    {
+      "repo": "remyoudompheng/yamaquasi",
+      "prior_pin": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "checked_head": "181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+      "head_date": "2026-10-11T11:52:55Z",
+      "same_revision": false,
+      "pinned_file_count": 6,
+      "pinned_hashes_verified": true
+    },
+    {
+      "repo": "TilmanNeumann/java-math-library",
+      "prior_pin": "088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97",
+      "checked_head": "088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97",
+      "head_date": "2026-05-11T14:05:14Z",
+      "same_revision": true,
+      "pinned_file_count": 8,
+      "pinned_hashes_verified": true
+    },
+    {
+      "repo": "flintlib/flint",
+      "prior_pin": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "checked_head": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "head_date": "2026-10-09T16:42:17Z",
+      "same_revision": true,
+      "pinned_file_count": 6,
+      "pinned_hashes_verified": true
+    },
+    {
+      "repo": "MersenneForum/msieve",
+      "prior_pin": "03e0ab9e13c4862e5bb2c51a4a39718aa2500e19",
+      "checked_head": "03e0ab9e13c4862e5bb2c51a4a39718aa2500e19",
+      "head_date": "2016-10-26T19:47:27Z",
+      "same_revision": true,
+      "pinned_file_count": 6,
+      "pinned_hashes_verified": true
+    }
+  ],
+  "additional_pinned_files": [
+    {
+      "repo": "bbuhrow/yafu",
+      "revision": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "files": {
+        "factor/batch_factor.c": "53cfd660cdf2e6e68bc8c8718892e1e85b773ecc1cb192c029653d62ef857fd6",
+        "factor/gmp-ecm/microecm.c": "16a5369d92c2e241e43a9cba58ada5b07044358fdf639c9db0e094e32167cacf"
+      },
+      "file_licenses": {
+        "factor/batch_factor.c": "Public-domain notice, Jason Papadopoulos; dependencies have separate terms.",
+        "factor/gmp-ecm/microecm.c": "Dual license at user option: FreeBSD/BSD-2-Clause-style or MPL-2.0; Ben Buhrow and Jeff Hurchalla."
+      }
+    },
+    {
+      "repo": "remyoudompheng/yamaquasi",
+      "revision": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "files": {
+        "src/params.rs": "3f0e62ba404fe628cbe7ee9356e6b3f47a20386befdfae95180c8ef004f156f6"
+      },
+      "file_licenses": {
+        "src/params.rs": "BSD-3-Clause, see Yamaquasi LICENSE."
+      }
+    }
+  ],
+  "yamaquasi_delta": {
+    "base": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+    "head": "181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+    "commits": 3,
+    "relevant_policy_changes": false,
+    "finding": "Bindings/CI/dependencies/clippy cleanups; inspected fbase, relations, sieve, SIQS and remaining source patches. No new LP admission/splitting/retention/cycle/target algorithm.",
+    "compare_url": "https://github.com/remyoudompheng/yamaquasi/compare/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad...181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+    "retained_compare_sha256": "722d85d17a34d2f8223201ee2a0b000aef6cf39fbb92a3008ac64e2052e643c8"
+  },
+  "papers": [
+    {
+      "file": "bernstein-smoothparts-20040510.pdf",
+      "url": "https://cr.yp.to/factorization/smoothparts-20040510.pdf",
+      "bytes": 129464,
+      "sha256": "2ef7aa60f8133ec1125bac4a39498285b626c0f553571fb00385822377facda7",
+      "publication_rights": "Cited and summarized; PDF retained only in ignored results, not copied into repository."
+    },
+    {
+      "file": "leyland-ants2002.pdf",
+      "url": "https://infoscience.epfl.ch/bitstreams/cf37274e-b9f3-4986-8615-c751dab46f2e/download",
+      "bytes": 194799,
+      "sha256": "1ec972f875a624cd33d80dcc4dfee0043af86b7daa8fe8c4fdf05cf97c72d577",
+      "publication_rights": "Cited and summarized; PDF retained only in ignored results, not copied into repository."
+    },
+    {
+      "file": "ekkelkamp-thesis.pdf",
+      "url": "https://math.leidenuniv.nl/scripties/EkkelkampThesis.pdf",
+      "bytes": 1110753,
+      "sha256": "44c0737dc7e11c20faa804e094bab980e60deb9a7a1fc444f8d42fb8ef2979e6",
+      "sections": "3.3.2\u20133.3.3, 4.3, 4.6.3\u20134.6.4",
+      "publication_rights": "Cited and summarized; PDF retained only in ignored results, not copied into repository."
+    }
+  ]
+}

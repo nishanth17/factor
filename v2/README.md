@@ -1122,7 +1122,7 @@ config = SIQSConfig(
     ),
 )
 job = SIQSJob(n, seed=7, config=config,
-              budget=Budget(work_limit=10**13, seconds=360, cpu_seconds=360))
+              budget=Budget(work_limit=10**13, seconds=1200, cpu_seconds=1200))
 result = job.run()
 ```
 
@@ -1135,6 +1135,10 @@ coexisting metadata; it cannot supply uncapped storage. The existing CLI
 continues to select legacy bounded configurations. SSS and coarse-worker
 adapters reject the growing class; use `SIQSJob` or `SieveCollector` for this
 policy until those adapters have their own ownership and resume integration.
+
+With an explicit ECM allocation, the outer portfolio uses schema 12 and
+implicit resume restores the growing collector policy and its resolved finite
+child memory allowance. Supplying a conflicting collector policy is rejected.
 
 Growing jobs use checkpoint schema 5. Checkpoint encoding reserves from the
 actual retained store plus any live preparation/solver state, and retains
@@ -1149,5 +1153,129 @@ not recoverable without such a checkpoint. A quota refusal before publication
 leaves the checked store resumable. No disk-spill implementation is implied.
 
 See the [source and constraint audit](benchmarks/qs/c9/c9_growth_audit.md) and
-[frozen study](benchmarks/qs/c9/c9_growth_protocol.md). Adaptive storage support
-and measured performance promotion are separate decisions.
+[measured results and scope](benchmarks/qs/c9/c9_growth_results.md). The complete
+experimental configuration is versioned in
+[`c9_long_selected.json`](benchmarks/inputs/controls/c9_long_selected.json);
+the example above omits its calibrated polynomial and stopping settings.
+The 1,200-second example is a caller allowance, not an implementation ceiling.
+Adaptive storage support and measured performance promotion are separate
+decisions.
+
+### Explicit ECM allocation and handoff
+
+The bounded portfolio accepts `allocation=ECMAllocation(...)` from
+`v2.execution.allocation`. Omitting it retains the integrated defaults and
+legacy checkpoint behavior. `mode="pretest"` requires `pretest_work`, an
+absolute cumulative ceiling for optional searches. Optional wall/CPU ceilings
+use `pretest_seconds` and `pretest_cpu_seconds`. Prior preprocessing, earlier
+children, fallback work and resumed calls all count toward these ceilings.
+Classification and exact-power checks remain mandatory under the shared total
+Budget, including when the pretest ceiling is zero.
+
+`mode="campaign"` runs the caller's finite `ecm_tiers` without a separate
+pretest ceiling. Each tier `(B1, B2, curves)` starts independent curves;
+changing a bound does not extend a saved curve. Either mode can protect a
+configured SIQS/SSS fallback with `fallback_work`, `fallback_seconds` and
+`fallback_cpu_seconds`. The portfolio refuses optional work before it consumes
+the reserve, records partial-attempt coverage, and hands off once per cofactor.
+Schedules are prepared only if the explicit policy reaches a stage that needs
+them.
+Memory validation reserves simultaneous relation-engine, context/program and
+output workspace within `memory_bytes`; RSS/JIT is separate from owned memory.
+Clock reservations are cooperative and cannot interrupt one integer operation.
+A reserved charge checks cancellation once and samples each required clock
+once on the shared ledger; callback invocation counts are not an API guarantee.
+
+A reservation is an admission floor, not a completion estimate or an extra
+allowance. The selected fallback must fit the remaining total Budget before
+its first admission. Otherwise the run returns
+`insufficient_fallback_work`, `insufficient_fallback_wall` or
+`insufficient_fallback_cpu` with resumable state. With no fallback, a ceiling
+returns `pretest_exhausted`; completing finite tiers returns `exhausted`.
+Existing cancellation and actual work/time-limit reasons retain precedence.
+Once admitted, a resumed relation job does not need a fresh full reservation.
+
+For example, this explicitly reserves work for a small SIQS call:
+
+```sh
+pypy3 -m v2.factor 1000036000099 --siqs --ecm-policy pretest \
+  --pretest-work 1000000 --fallback-work 5000000 \
+  --work-limit 20000000 --seconds 30 --cpu-seconds 30 --memory-mib 80
+```
+
+A finite deeper campaign uses `--ecm-policy campaign --ecm-tier 2000,147396,8
+--ecm-tier 11000,1873422,2`. Repeat `--ecm-tier` for independent tiers; it
+cannot be combined with `--ecm-curves`. Allocation options require the auto
+portfolio and explicit policy. These flags also select bounded execution.
+
+The opt-in Python helper `with_ecm_preset(config, name)` from
+`v2.execution.ecm_presets` replaces only the ECM tiers with a numerical schedule
+from the reviewed upstream implementations. It requires explicit SIQS and an
+allocation with positive work, wall and CPU fallback floors. For example,
+`config = with_ecm_preset(config, "alpertron20")` retains the exact SIQS object,
+pretest ceilings, fallback floors and outer memory cap of an existing protected
+configuration. Larger ECM workspace must coexist with the unchanged SIQS
+storage or construction raises `MemoryError`. Total run budgets still bind;
+curve counts do not authorize extra work or imply SIQS will complete.
+
+Presets include Yamaquasi's small automatic pretest and escalating ECM-only
+prefix, Alpertron's 20/25-digit-factor ladder prefixes, and GMP-ECM's published
+20/25-digit-factor parameter rows. These are explicit transfer experiments:
+native arithmetic, curve families and stage-two methods differ, and some source
+counts describe standalone ECM rather than automatic SIQS handoff. See the
+[preset table and source qualifications](benchmarks/ecm/c3/source_presets.md).
+The helper is an explicit override. The bounded defaults below reuse the
+reviewed escalating prefix following the user's promotion request.
+
+For a fresh bounded call, omitting `ecm_tiers` (or passing `None`) now resolves
+once from the absolute original input:
+
+| Input decimal digits | ECM tiers `(B1, B2, curves)` |
+| --- | --- |
+| 30 | `(2000, 50000, 64)` |
+| 40 | `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` |
+| Other sizes | `(2000, 147396, 32)` |
+
+`PortfolioConfig(...).for_input(n)` exposes that concrete selection before a
+call. Explicit tuples, including `()` and the old fixed32 tuple, take
+precedence. The bounded CLI uses the same selection when `--ecm-tier` and
+`--ecm-curves` are omitted; direct `--method siqs|qs|mpqs|sss|sssf` still selects
+its requested engine. The standalone `factorize()` API retains its explicit
+single-bound allowance.
+
+Selection preserves every other config field, executor setting, total Budget,
+SIQS/SSS setting and cumulative allocation floor. If larger ECM workspace
+cannot coexist under the current memory cap, the old fixed32 schedule remains.
+Explicit paired executors also retain their previous schedule. Children keep
+the root's concrete plan. `asdict(config)` and `dataclasses.replace(config, ...)`
+freeze its current numerical tiers; pass `ecm_tiers=None` again when constructing
+an automatic config from such a copy. Checkpoints store concrete tiers, never
+an unresolved default decision. An omitted setting on resume restores saved
+tiers for schemas 2–12; an explicit conflicting tuple is rejected.
+
+This is a user-directed promotion from the complete revealed-input screen,
+before fresh confirmation. It does not close C3's calibration gate or establish
+a speedup on every input, default service grant or backend. See the
+[decision and limitations](benchmarks/ecm/c3/default_promotion.md).
+
+Explicit policies use checkpoint schema 12, pinning the complete configuration
+and allocation identity. `factorize_bounded(..., checkpoint=..., config=None)`
+restores that configuration. Explicit conflicting configurations are rejected.
+Resume grants are total allowances, including prior expenditure, rather than
+fresh allowances. Snapshot verification bytes, schedule rebuilding and elapsed
+verification/serialization time are charged. Abandoned partial curves are not
+silently retried after handoff. Existing schemas 2–11 keep their original policy;
+there is no automatic migration to an allocation policy. The CLI remembers
+saved allocation, tiers, relation bundle and memory when their flags are
+omitted; repeat other nondefault options such as `--backend` and
+`--fermat-steps`, and explicitly supply the intended total work/time grant.
+
+Research, frozen controls and the acceptance decision are in
+[the C3 study](benchmarks/ecm/c3/research.md) and
+[its finite protocol](benchmarks/ecm/c3/protocol.md), with the
+[fresh acceptance decision](benchmarks/ecm/c3/acceptance.md). Fresh confirmation
+retains numerical defaults: the selected quick8 bundle costs 51.6% more on the
+declared smaller-band cohort and has uneven-factor regressions. Its service
+reserve also refuses four of five historical smaller-band inputs at the 2M
+work grant. Larger experimental service grants do not change production
+defaults or establish a general input-size dispatch rule.

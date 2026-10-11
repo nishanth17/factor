@@ -1,0 +1,8 @@
+{
+  "bands": {
+    "30": "quick8",
+    "40": "control"
+  },
+  "training_sha256": "bed2e3f317a5d8d233d6da5cc26b03f762f88af5a19df3f66ddf81726671f876",
+  "protocol_sha256": "f684e280040e40dc63a8302169f8e937d679fb52bf6798fbac8d2b11b214451b"
+}
