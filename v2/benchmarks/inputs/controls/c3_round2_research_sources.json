@@ -1,0 +1,95 @@
+{
+  "inspected_utc": "2026-10-11",
+  "files": [
+    {
+      "name": "cado-revision.json",
+      "url": "https://api.github.com/repos/cado-nfs/cado-nfs/commits/master",
+      "sha256": "9676dd5ff5bfed8459aa3b7831f2702a7bd674386704115d32e203103336f2a0",
+      "bytes": 8325
+    },
+    {
+      "name": "cado-sieve_strategies_README",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/strategies/README",
+      "sha256": "ae1d494eb30e9242f78d53a43a0593a12509064ef46fcfa6cf3e1169f67b5f99",
+      "bytes": 7239
+    },
+    {
+      "name": "cado-sieve_strategies_generate_strategies.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/strategies/generate_strategies.cpp",
+      "sha256": "61b0c85babc9106f6a835ac297d63deef93bdbaffe311c70ab33862ab66cf6c4",
+      "bytes": 18829
+    },
+    {
+      "name": "cado-sieve_strategies_finding_good_strategy.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/strategies/finding_good_strategy.cpp",
+      "sha256": "74b5d5539c10eca7d5b98bb84d4506c8125986234714f4cccb81ca823c787250",
+      "bytes": 10439
+    },
+    {
+      "name": "cado-sieve_strategies_generate_factoring_method.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/strategies/generate_factoring_method.cpp",
+      "sha256": "f0abd57b85c8d915e889fdc7aa4d72da3bf9e9dd543847246ec5595d288e5ba0",
+      "bytes": 26988
+    },
+    {
+      "name": "cado-sieve_strategies_benchfm_exec.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/strategies/benchfm_exec.cpp",
+      "sha256": "b0b75ce050789c96060384ec63764712f7ee2451c9a591afddf0156e66e6f2d6",
+      "bytes": 3018
+    },
+    {
+      "name": "cado-sieve_ecm_facul.cpp",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/ecm/facul.cpp",
+      "sha256": "6485f0948983a903d6f12a760027a85fa48af98b26c8774d5cbf2945500d9389",
+      "bytes": 10582
+    },
+    {
+      "name": "cado-COPYING",
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/COPYING",
+      "sha256": "d878b79d5ff41186e865c5147907a543b2eae6d6e98fbc43bcd151a5d4b8390d",
+      "bytes": 26437
+    },
+    {
+      "name": "alpertron-revision.json",
+      "url": "https://api.github.com/repos/alpertron/calculators/commits/master",
+      "sha256": "bf2afb694dca5ac6ac08c6693882c957cf0b21ab7d3b86e9d2a487d2c648556f",
+      "bytes": 154767
+    },
+    {
+      "name": "alpertron-ecm.c",
+      "url": "https://raw.githubusercontent.com/alpertron/calculators/93c5c8189cb2f149c8dae898eb11997c5f2e7980/ecm.c",
+      "sha256": "7c4e1aaff71964bbb5967dbd5cf2aa2258b8044d56cd651d6b40631cc3e97d34",
+      "bytes": 33395
+    },
+    {
+      "name": "alpertron-factor.c",
+      "url": "https://raw.githubusercontent.com/alpertron/calculators/93c5c8189cb2f149c8dae898eb11997c5f2e7980/factor.c",
+      "sha256": "63781b1443a0a9acffa17a96d365b4d6885334dbfcd4a48ccd49c057ebf980bb",
+      "bytes": 79909
+    },
+    {
+      "name": "alpertron-README.md",
+      "url": "https://raw.githubusercontent.com/alpertron/calculators/93c5c8189cb2f149c8dae898eb11997c5f2e7980/README.md",
+      "sha256": "f9791b73135d3cb29a92dccfdc99ae580610c17271d0b405b7e85cde6aade6f5",
+      "bytes": 6589
+    },
+    {
+      "name": "alpertron-LICENSE",
+      "url": "https://raw.githubusercontent.com/alpertron/calculators/93c5c8189cb2f149c8dae898eb11997c5f2e7980/LICENSE",
+      "sha256": "53927bd0b739d38c87a0a82236fd9b070c2dfff11c0c119be50372005d5047ad",
+      "bytes": 35815
+    },
+    {
+      "name": "kleinjung2006.pdf",
+      "url": "https://www.hyperelliptic.org/tanja/SHARCS/talks06/kleinjung.pdf",
+      "sha256": "98e2cdbafd3e81eed8179c613923fd2da09bb6afaff4c5d6fc8e32df49902b23",
+      "bytes": 85797
+    },
+    {
+      "name": "kruppa2010.pdf",
+      "url": "https://docnum.univ-lorraine.fr/public/SCD_T_2010_0054_KRUPPA.pdf",
+      "sha256": "305f39b2d91b8184f0e8ffbf99d2055d715a2da1b00fb6efe49e9f93a38a5adc",
+      "bytes": 1270105
+    }
+  ]
+}
