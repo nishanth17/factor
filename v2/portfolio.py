@@ -1555,7 +1555,11 @@ def factorize_bounded(
                 values["collector"] = collector_type(**collector)
                 saved_config["siqs"] = SIQSConfig(**values)
             if saved_config.get("sss") is not None:
-                saved_config["sss"] = SSSConfig(**saved_config["sss"])
+                from .qs import SieveConfig
+
+                values = dict(saved_config["sss"])
+                values["collector"] = SieveConfig(**values["collector"])
+                saved_config["sss"] = SSSConfig(**values)
             config = PortfolioConfig(**saved_config)
         else:
             config = PortfolioConfig(

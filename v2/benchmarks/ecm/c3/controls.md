@@ -43,3 +43,15 @@ CLI/portfolio and adapter plus the new allocation module, and leaves original
 A7/B3 controls untouched. It validates current arm construction, not fresh E1
 performance. A genuine pre-C3 baseline test excludes the new optional field
 when constructing the historical dataclass. No collector or graph changes.
+
+
+Revision 5 fixes implicit SSS/SSSf configuration restoration: the nested
+collector must be decoded as SieveConfig in both Python and CLI restore.
+New real both-mode handoff/resume coverage exercises this contract. No SIQS,
+collector, curve, parameter, seed or selection rule changes. Stop v4 training
+before selection or fresh generation, retain partial rows as diagnostic,
+and charge 300 seconds (258.062 elapsed plus active-call/CPU margin) against
+its original 2400-second allowance. Restart training under a 2100-second cap.
+Original v4 source/prose/control and the A7 receipt stay immutable; a new
+chained A7 v5 integration receipt pins the repaired source. Confirmation's
+original finite allowance remains unchanged.

@@ -57,10 +57,7 @@ per kind and size, seeds 7/29. A balanced-only one-sample feasibility pilot
 has at most 900 active wall/CPU seconds. It may reject an infeasible study,
 but cannot change this candidate set or numeric settings. Training has
 three matched samples after >=3 validated warmup seconds per arm/input and
-at most 2100 active wall/CPU seconds. The stopped revision-4 training
-window consumed 258.062 wall seconds; charge 300 seconds including an active
-call/CPU allowance. Combined training remains bounded by the original 2400
-seconds. Its completed partial rows are diagnostic only. Training estimates select settings;
+at most 2400 active wall/CPU seconds. Training estimates select settings;
 they are not accepted performance comparisons.
 
 Confirmation has at most 7200 active wall/CPU seconds, inclusive of warmup.

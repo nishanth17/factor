@@ -602,7 +602,13 @@ def main():
                             values["collector"] = collector_type(**collector)
                             parameters["siqs"] = SIQSConfig(**values)
                         if saved.get("sss") is not None:
-                            parameters["sss"] = SSSConfig(**saved["sss"])
+                            from .qs import SieveConfig
+
+                            values = dict(saved["sss"])
+                            values["collector"] = SieveConfig(
+                                **values["collector"]
+                            )
+                            parameters["sss"] = SSSConfig(**values)
                     if implicit_memory:
                         parameters["memory_bytes"] = saved["memory_bytes"]
                 parameters.update(

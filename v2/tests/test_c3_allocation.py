@@ -463,6 +463,33 @@ class AllocationPortfolioTests(unittest.TestCase):
             self.assertNotEqual(invalid.returncode, 0)
             self.assertIn("incompatible", invalid.stderr)
 
+    def test_both_sss_modes_restore_nested_collector_after_handoff(self):
+        from v2.qs.sss import SSSConfig
+
+        for mode in ("sss", "sssf"):
+            config = configuration(
+                siqs=None,
+                sss=SSSConfig(
+                    mode=mode, base_bound=100, memory_bytes=32 * 2**20
+                ),
+                allocation=ECMAllocation(
+                    "pretest", pretest_work=0, fallback_work=10_000
+                ),
+            )
+            first = factorize_bounded(
+                41 * 43, config=config, budget=ledger(1000)
+            )
+            self.assertEqual(first.reason, "insufficient_fallback_work")
+            restored = factorize_bounded(
+                41 * 43, checkpoint=first.checkpoint, budget=ledger()
+            )
+            self.assertTrue(restored.result.complete)
+            self.assertEqual(restored.result.reconstruct(), 41 * 43)
+            self.assertGreater(restored.work_used, first.work_used)
+            self.assertEqual(
+                sum(e["stage"] == "handoff" for e in restored.events), 1
+            )
+
     def test_cli_explicit_campaign_and_invalid_override(self):
         command = [sys.executable, "-B", "-m", "v2.factor", "1022117"]
         result = subprocess.run(

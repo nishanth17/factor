@@ -631,7 +631,7 @@ def freeze():
             confirmation_seeds=[47, 71, 101],
             generation_seed=2026101103,
             sha256={str(p.relative_to(ROOT)): digest(p) for p in paths},
-            envelopes=dict(pilot=900, train=2400, confirm=7200),
+            envelopes=dict(pilot=900, train=2100, confirm=7200),
             sampling=[3, 9, 5, 18, 8, 27],
             max_relative_iqr=0.15,
         ),
