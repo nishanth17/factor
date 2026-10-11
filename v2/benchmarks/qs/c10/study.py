@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 import os
+import platform
 import random
 import subprocess
 import sys
@@ -14,7 +15,10 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
-from ...infrastructure.performance.performance_audit import fingerprint
+from ...infrastructure.performance.performance_audit import (
+    fingerprint,
+    verify_corpus,
+)
 from ..b1.b1_calibration import save
 from ..c9 import c9_growth_confirmation as c9_confirmation
 from ..c9 import c9_growth_study as c9
@@ -119,7 +123,20 @@ def load_control(path=CONTROL):
     value = json.loads(path.read_text())
     if value["source"] != hashes():
         raise ValueError("C10 source differs from its frozen identity")
+    if "training_sha256" in value and value["training_sha256"] != digest(
+        CONTROL
+    ):
+        raise ValueError("C10 selection belongs to different training")
     return value
+
+
+def bind_manifest(output, phase, expected):
+    """Refuse mixing a changed selection, corpus or runtime with prior rows."""
+    path = output / f"{phase}-manifest.json"
+    if path.exists() and json.loads(path.read_text()) != expected:
+        raise ValueError("output belongs to another frozen experiment")
+    if not path.exists():
+        save(path, expected)
 
 
 def expenses(output):
@@ -229,6 +246,11 @@ def measure(output, phase, digits, lease_seconds):
     from .selection import instability
 
     control = load_control()
+    expected = dict(
+        control_sha256=digest(CONTROL),
+        runtime=sys.version,
+        platform=platform.platform(),
+    )
     cap = (TRAIN_CAPS if phase == "train" else FRESH_CAPS)[digits]
     if phase == "train":
         fixtures = [f for f in control["fixtures"] if f["digits"] == digits]
@@ -238,6 +260,10 @@ def measure(output, phase, digits, lease_seconds):
         corpus = json.loads(CORPUS.read_text())
         if corpus["selection_sha256"] != digest(SELECTED):
             raise ValueError("fresh corpus belongs to a different selection")
+        verify_corpus(corpus)
+        expected.update(
+            selection_sha256=digest(SELECTED), corpus_sha256=digest(CORPUS)
+        )
         fixtures = [f for f in corpus["fixtures"] if f["digits"] == digits]
         chosen = selected["choices"].get(str(digits))
         if chosen is None:
@@ -248,11 +274,7 @@ def measure(output, phase, digits, lease_seconds):
         }
     configs = {a: c9.decode(v) for a, v in registry.items()}
     expense, started = expenses(output), time.monotonic()
-    manifest = output / "manifest.json"
-    expected = dict(control_sha256=digest(CONTROL), runtime=sys.version)
-    if manifest.exists() and json.loads(manifest.read_text()) != expected:
-        raise ValueError("output belongs to another frozen experiment")
-    save(manifest, expected)
+    bind_manifest(output, phase, expected)
     finished = output / f"{phase}-finished-{digits}.json"
     if finished.exists():
         return

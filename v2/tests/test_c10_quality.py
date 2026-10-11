@@ -5,6 +5,7 @@ import unittest
 from dataclasses import replace
 from math import prod
 
+from v2.common import arithmetic
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import (
     GrowingDoubleLargeSieveConfig,
@@ -77,6 +78,22 @@ class QualityAssignmentTests(unittest.TestCase):
             key=lambda values: (abs(prod(values) - quality.target), values),
         )
         self.assertEqual([quality[i] for i in range(len(quality))], expected)
+
+    def test_optional_gmp_preserves_exact_product_order(self):
+        try:
+            backend = arithmetic.get_backend("gmpy2-mpz")
+        except RuntimeError as error:
+            self.skipTest(str(error))
+        control = self.stream()
+        self.base = build_factor_base(
+            backend.integer(self.n), bound=500
+        ).factor_base
+        candidate = self.stream()
+        self.assertEqual(candidate.target, control.target)
+        self.assertEqual(
+            [candidate[i] for i in range(len(candidate))],
+            [control[i] for i in range(len(control))],
+        )
 
     def test_interrupted_batch_is_not_published(self):
         stream = self.stream()

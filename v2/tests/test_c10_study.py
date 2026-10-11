@@ -22,6 +22,18 @@ def row(arm, sample, seconds, complete=True):
 
 
 class C10StudyTests(unittest.TestCase):
+    def test_changed_corpus_or_selection_cannot_reuse_confirmation_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            manifest = dict(control="frozen", corpus="one", selection="plan")
+            study.bind_manifest(output, "confirm", manifest)
+            study.bind_manifest(output, "confirm", manifest)
+            for field in ("corpus", "selection", "control"):
+                changed = dict(manifest)
+                changed[field] = "changed"
+                with self.assertRaises(ValueError):
+                    study.bind_manifest(output, "confirm", changed)
+
     def test_arms_change_only_one_declared_policy(self):
         config = SIQSConfig(
             assignment_policy="flyer",
