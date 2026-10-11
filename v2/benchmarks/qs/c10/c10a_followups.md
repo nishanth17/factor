@@ -1,0 +1,27 @@
+# C10a: conditional collection-policy follow-ups
+
+C10a tracks collection choices and one runner repair left open after C10
+tranche 1. These are follow-up gates, not a second acceptance of the first tranche.
+Each future experiment needs its own frozen sources, controls, finite resources,
+matched complete outcomes and fresh confirmation. A loss by one tested arm does
+not reject the broader mechanism.
+
+| ID | C10-owned question and executable source | v2 boundary and revisit trigger |
+| --- | --- | --- |
+| C10a-01 | Discriminant-normalized SIQS and representation-coupled multiplier scoring. Yamaquasi `PolyType`/`select_siqs_factors`/`prepare_a`, JavaMath `SIQS`/`SIQSPolyGenerator`, Prague `CalculateKRoot`/`ComputeC` use related mod-8 choices; CADO `las-norms` illustrates the distinct standard form. | `Polynomial`, `PolynomialFamily`, `select_multiplier`, `prime_power_roots`, relation identities and checkpoints must jointly represent the factor of four and exceptional primes. Start only after a scoped exact-value/root cost and useful-yield case justifies the representation work; coordinate root-kernel interfaces with A1a and residual provenance with C9. Independent oracles exist, but no production normalized arm has been tested. |
+| C10a-02 | Actual A-product selection beyond a fixed 16-family permutation, and **separately** inter-family overlap. Yamaquasi `select_a` ranks small-combination products; FLINT `qsieve_init_A` uses separate core/correction classes; Prague `CreateNewAForSiqs` uses quantized log-distance and admits no two-entry diversity check; Alpertron `getFactorsOfA` checks within-A indices. | `AssignmentStream` already has an exact corrective flyer and the tested 16-family ordering. A new bounded population or spacing policy requires a measured link between exact product error or adjacent overlap and useful post-filter rows/dependencies, with setup/replay cost included. A poor result from the fixed permutation alone is not a rejection of product quality or diversity. |
+| C10a-03 | Bounded per-job threshold feedback. YAFU `siqs_sync` tests neighboring cutoffs; Prague `LineSiever::RunSieve` actively calls `ThresholdOptimizer`; CUDA-MPQS optional autotuning uses a different, large-input cost model. | `SieveCollector._bounds`/`_candidate_passes` already adapt to exact values; `threshold_extra` can lose candidates. Revisit if candidate recovery is a measured limiting cost or an exact held-out rejected-position audit shows useful surplus. Freeze pilot epochs and loss bounds, charge and checkpoint controller state, and obtain C9 coordination for any changed admission boundary. A relation-rate or residual-magnitude improvement alone is insufficient. |
+| C10a-04 | Coupled multiplier, eligible base count/value, interval, A-factor count and family pool policy. msieve `choose_multiplier`/`poly_init`, Yamaquasi `select_multiplier`/`FBase::new`, FLINT `qsieve_knuth_schroeppel`, Alpertron `FactoringSIQS` use different coupled heuristics. | `select_multiplier`, `build_factor_base`, `a_target`, `half_width`, `factor_count` and `pool_size` already expose most mechanisms. Revisit when complete cost and exact useful-yield profiles identify a remaining size-band gap after isolated policies. Include even-multiplier gcd/mod-8 branches and actual base endpoint/count; preserve B1/C1 losses. Do not copy native constants or optimize one parameter in isolation. |
+| C10a-05 | Fixed collection excess and retry cadence. FLINT `qsieve_factor_with_tune` processes relations then can grow its base; msieve and Alpertron use different base-plus-excess targets. | `QSJob._solve`, `row_excess`, `filter_row_growth` and `weight_two` control when original relations reach filtering and extraction. Revisit if measured repeated filtering/solving or overcollection dominates complete cost, using usable rows, dependencies and proper factors. C10a owns fixed scheduling policy; C9 owns yield-dependent target feedback and residual-product rules, while matrix representation, solver and storage remain with A8/B6/B7/C4/D1/D2. |
+| C10a-06 | Make repeated-lease yield markers idempotent in `c10.study.measure`. The 50-digit training extension saved all 11 matched groups and expenses, then the second lease hit `FileExistsError` saving an already present `train-yield-50.json`. | Before a later C10 measurement, allow an atomic update or lease-specific marker while retaining prior raw evidence. Test repeated lease and interruption paths under a **new** source identity; do not rewrite this tranche's frozen runner, controls, rows or captured incident. The 50-digit fresh confirmation preserved its first yield marker under a lease-specific name before resuming. |
+
+Existing owner handoffs stay outside C10a: A1a owns presieve, root-transition
+tables, derivative-inverse reuse and cross-polynomial sparse-hit kernels (including
+CUDA-MPQS's batch mechanism); C8 owns CADO's sorted CRT half-sum scheduler;
+C9/C9a/C1a own residual admission, splitting, matching, graph and retention;
+F6 owns higher-arity relations; E1 owns combined portfolio acceptance. C10a
+may use those measured results as controls but must not reimplement their work.
+The C9 literature verification (`19bb25d` on `codex/c9-large-prime-yield`,
+`v2/benchmarks/qs/c9/c9_literature_verification.md`) separately tracks
+asymmetric large-prime bounds, residual scoring and yield feedback; none of
+those are C10a proposals.

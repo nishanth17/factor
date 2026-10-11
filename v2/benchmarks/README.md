@@ -21,7 +21,7 @@ see [contributor guidance](../../AGENTS.md).
 | [qs/b1/](qs/b1/) | QS/MPQS/SIQS calibration and width studies |
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
-| [qs/c10/](qs/c10/research.md) | Pinned collection mechanisms, exact polynomial oracles and isolated A-quality / power-plan policy experiments |
+| [qs/c10/](qs/c10/tranche1_results.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
 | [qs/a7/](qs/a7/) | Frozen comparison arms and reconciliation |
 | [primality/a10/](primality/a10/) | Primality dispatch and validation |
 | [infrastructure/](infrastructure/) | Arithmetic backends, parallelism, sieves and performance audits |
@@ -36,6 +36,18 @@ provenance and missing tuning evidence under roadmap C11. QS/SIQS and DLP keep
 their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
+
+The [C10 tranche 1 report](qs/c10/tranche1_results.md) records an isolated
+2 MiB prime-power plan improvement on fresh complete factoring: 21.83% at
+40 digits (95% interval 12.47–24.88%) and 17.79% at 50 digits (16.11–19.48%),
+with nine matched validated calls per arm and three independent certified
+inputs in each band. The 30-digit control stays selected. The tested 16-family
+actual-A ordering did not advance, while normalized polynomials, independent
+family diversity and per-job threshold feedback retain explicit C10a gates.
+The 50-digit training extension stopped at 11/18 groups under its frozen
+whole-group reservation; the fresh 9/9 result, not that partial training
+interval, supports the scoped decision. Cold starts, profiles, work and
+memory are reported separately. C10 remains open for later tranches.
 
 ## Inputs and generated evidence
 

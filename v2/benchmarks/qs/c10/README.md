@@ -1,8 +1,14 @@
 # C10 collection strategy experiments
 
 Read [research and ranked gaps](research.md) and the
-[premeasurement protocol](protocol.md). C10 remains open. Experimental source
-and controls are versioned; raw captures live in ignored `results/c10/`.
+[premeasurement protocol](protocol.md). The [tranche 1 result](tranche1_results.md)
+accepts the isolated existing 2 MiB power plan for the measured 40/50-digit
+growing-DLP bundles on fresh complete-factor inputs. The tested 16-family
+actual-A ordering did not advance. The [candidate reconciliation](candidate_reconciliation.md)
+classifies all traced mechanisms and the [C10a ledger](c10a_followups.md)
+records conditional policy work without taking over other owners. C10 remains
+open. Experimental source and controls are versioned; raw captures live in
+ignored `results/c10/`.
 
 Commands from the repository root use PyPy implementing Python 3.11:
 
@@ -21,8 +27,9 @@ pypy3 -B -m v2.benchmarks.qs.c10.study confirm --digits 50 --lease-seconds 3900
 pypy3 -B -m v2.benchmarks.qs.c10.study summarize
 ```
 
-Freeze only after the C9 handoff. Measurement commands fail immediately if
-another owner holds the performance lock. Heavy QA uses that same lock.
+The freeze was committed after C9's final handoff. Measurement commands fail
+immediately if another owner holds the performance lock. Heavy QA uses that
+same lock.
 Each new process warms all active arms again; captures are resumable and
 completed groups are not rerun. Full group reservations protect matching near
 aggregate/lease limits. A pending group may require another lease. An aggregate

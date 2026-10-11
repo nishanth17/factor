@@ -5,6 +5,19 @@ keeps the stage history, accepted changes and rejected experiments concise.
 The [v2 guide](../../README.md) covers usage; the [roadmap](../../ROADMAP.md) records
 remaining acceptance gates.
 
+## C10 tranche 1 collection policies (11 October 2026)
+
+The [bounded result](../qs/c10/tranche1_results.md) accepts the isolated
+existing 2 MiB SIQS prime-power plan for explicit 40- and 50-digit growing-DLP
+bundles: fresh complete-call wall cost falls 21.83% and 17.79%, respectively,
+with nine matched validated samples and a wholly favorable three-input
+hierarchical interval in each band. The 30-digit control remains selected.
+The fixed 16-family exact A-quality ordering did not advance from training;
+this does not reject other A populations or diversity rules. The
+[candidate ledger](../qs/c10/candidate_reconciliation.md) traces source
+mechanisms and [C10a](../qs/c10/c10a_followups.md) records conditional work.
+The C10 workstream and E1 portfolio integration remain open.
+
 ## C9.2 adaptive large-prime storage (11 October 2026)
 
 [Research and implementation results](../qs/c9/c9_growth_results.md) distinguish

@@ -796,8 +796,13 @@ entire assignment space, so extending `family_count` preserves every prefix.
 One bounded cache is reserved, and its reconstruction on resume is charged.
 Its identity is distinct from `flyer`; changing policy during resume is
 rejected. Finite and growing collectors retain their existing quota semantics.
-The policy is under [C10 evaluation](benchmarks/qs/c10/protocol.md); defaults
-and the CLI's existing choices are unchanged.
+The [C10 tranche 1 result](benchmarks/qs/c10/tranche1_results.md) does not
+advance this fixed 16-family ordering from training. A separate exact 2 MiB
+prime-power plan passes scoped fresh complete-factor comparisons for the
+measured 40/50-digit growing-DLP bundles. These are explicit opt-in policies;
+defaults and the CLI's existing choices are unchanged. The
+[candidate ledger](benchmarks/qs/c10/candidate_reconciliation.md) keeps
+alternative A selection, diversity and normalized polynomials distinct.
 
 The R2 benchmark harness compares these options with conservative scoring,
 bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part

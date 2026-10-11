@@ -1,5 +1,20 @@
 # Changelog
 
+## C10 collection strategy tranche 1 (11 October 2026)
+
+- On the settled C9 growing-DLP control, the isolated existing 2 MiB
+  prime-power plan passed fresh complete-factor comparisons at 40 digits
+  (21.83% lower wall cost; 95% interval 12.47–24.88%) and 50 digits (17.79%;
+  interval 16.11–19.48%). Each band had 9/9 validated completions per arm on
+  three independent certified inputs, with stable matched samples and about
+  2 MiB additional peak owned workspace. The 30-digit control remains selected;
+  no global default or combined portfolio policy changes.
+- The fixed 16-family exact A-quality ordering did not advance from training.
+  Record the scoped loss separately from open product-population and family-
+  diversity mechanisms. Finish a nine-implementation source reconciliation,
+  normalized/mod-8 arithmetic oracles and C10a conditional follow-ups while
+  preserving A1a, C8 and C9 ownership. Keep C10 open after this bounded tranche.
+
 ## C10 collection strategy preparation (11 October 2026)
 
 - Add Python-only experimental SIQS `assignment_policy="quality"`, ordering
@@ -7,10 +22,9 @@
   batch populations, extendable prefixes and distinct checkpoint identities;
   reserve cache coexistence and charge reconstruction for finite/growing jobs.
 - Add independent normalized-polynomial/mod-8, root, reconstruction and
-  declared-threshold-loss oracles, a pinned six-implementation mechanism
+  declared-threshold-loss oracles, a pinned nine-implementation mechanism
   comparison, and a bounded isolated policy experiment harness. Existing
-  defaults remain unchanged; complete-factor performance acceptance waits
-  for the settled C9 control and C10 measurements.
+  defaults remain unchanged; the completed scoped decisions are above.
 
 ## Folder organization (10 October 2026)
 
