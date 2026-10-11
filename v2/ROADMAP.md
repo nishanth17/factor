@@ -1869,7 +1869,7 @@ flags unit mismatches: base prime *value* versus *count*, half-width versus
 full interval, hash slots versus retained edges, and probable versus proven
 residuals. No first-pass source value is an accepted PyPy optimum.
 
-- [ ] Produce a mechanism comparison from pinned primary papers and actual
+- [x] Produce a mechanism comparison from pinned primary papers and actual
   implementation paths, not only a table of constants. Trace polynomial and
   multiplier selection, factor-base/interval tradeoffs, A quality and Gray
   reuse, prime-power/tiny-prime scoring, candidate recovery and refinement,

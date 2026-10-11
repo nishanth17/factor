@@ -3,7 +3,8 @@
 Validated source: `00a9d9e`, following implementation/research commit
 `f4583cd`, on `codex/c10-collection-strategies`. C9 runtime lineage is
 `129cb09e4ca684f3eb08cbbdbea3fb43848e5d95` / frozen runtime `fbfd662`.
-No C10 integrated timing has run at this preparation stage. C9 has completed
+No C10 integrated timing had run at this preparation stage. The completed
+[tranche 1 results](tranche1_results.md) are recorded separately. C9 completed
 its 1,200-second-control study, accepted the measured 50-digit growing-DLP
 bundle and explicitly released the CPU. Its runtime and all configuration
 dictionaries match this checkout's controls. The three exclusion-source
@@ -16,7 +17,7 @@ the machine after 354.984 seconds of QA. After C9's final CPU release, another
 actual QA to 455.511 seconds. The experiment ledger conservatively prepays
 the full 900-second QA allowance, including these failures/retries.
 
-Final committed-files-only checkout:
+Preparation committed-files-only checkout:
 
 - PyPy 3.11.15 / PyPy 7.3.23 with gmpy2 2.3.1.
 - `make -C v2 test PYTHON=<project PyPy environment>/bin/python`: **615 tests,
@@ -59,3 +60,22 @@ The final C3 worktree was no longer present during the read-only status check.
 This accepts the bounded implementation's correctness checks. It does not
 establish a speedup, optimal batch/cache size, a new default, fresh complete
 factor acceptance, or completion of the continuing C10 workstream.
+
+## Final committed checkout and acceptance checks
+
+After committing the frozen controls, selected arms, certified fresh corpus,
+source reconciliation and result documents at `a13dd3b`, a new `git archive
+HEAD` checkout ran the project PyPy 3.11.15 / gmpy2 2.3.1 suite: **615 tests,
+no failures or skips**, in 94.201 seconds reported by unittest. `make -C v2
+lint` passed; all **129 benchmark runner modules** imported and the A7 current
+loader passed. The ignored local QA ledger shows 556.360 seconds of actual QA
+across preparation and final checks, below its conservatively prepaid
+900-second aggregate charge.
+
+The exact frozen source/configuration control and training selection still
+load, the new corpus's independent prime certificates verify, and each fresh
+40/50-digit comparison has nine balanced samples and passes its scoped complete
+factor gate. This final validation note and the roadmap checkbox are
+documentation-only changes after that committed-checkout run; runtime,
+benchmark Python, controls and corpora remain byte-identical. No merge or push
+was performed.

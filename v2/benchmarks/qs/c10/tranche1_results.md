@@ -172,3 +172,10 @@ factor of p−1 and is not RSA-distributed. Three independent numbers per band
 remain three independent numbers despite nine seeded calls; the hierarchical
 interval and per-input effects make that limit explicit. C10 remains a
 continuing workstream after this bounded tranche.
+
+The final committed-files-only checkout (`a13dd3b`) ran **615 PyPy 3.11 tests
+without failures or skips**, passed `make -C v2 lint`, and imported all 129
+benchmark modules plus the A7 current loader. The frozen control/selection
+hashes and certified fresh corpus were checked again after measurement.
+The detailed [validation record](validation.md) distinguishes the earlier
+implementation check from this final committed-source check.
