@@ -2836,8 +2836,11 @@ record](benchmarks/qs/c9/c9_growth_results.md), supported by the
 The new explicit policy removes implicit FIFO/count/storage ceilings while
 preserving exact endpoints, all-component cycles and checked schema-five
 resume. The selected configuration and corrected source froze before the
-new corpus. Fresh matched confirmation and final committed-only verification
-remain open; API support is separate from performance promotion. C10, E1,
+new corpus. The user-amended 1,200-second fresh 50-digit comparison remains open;
+596 tests pass in both working and committed-only trees, with lint and all
+126 benchmark imports/loaders passing. The stopped 360-second observations
+retain their original scope and cost. API support is separate from performance
+promotion. C10, E1,
 higher arity and matrix redesign retain their existing ownership/gates.
 The C1 motivation below describes historical and legacy bounded controls.
 

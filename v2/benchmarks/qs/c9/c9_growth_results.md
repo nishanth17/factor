@@ -1,7 +1,8 @@
 # C9.2 adaptive storage and useful large-prime yield
 
-Status: implementation, training and diagnostics complete. Fresh confirmation
-is in progress; no new speed promotion is claimed at this checkpoint.
+Status: implementation, training and diagnostics complete. The user-amended
+1,200-second fresh 50-digit confirmation is running; no new speed promotion
+is claimed at this checkpoint.
 
 ## Contribution and scope
 
@@ -90,12 +91,13 @@ The [original C9.2 protocol](c9_growth_protocol.md) and
 wall/CPU-second aggregate** cap, including unsuccessful studies, stopped
 confirmation, diagnostics, generation and an initial 600 prepaid QA seconds. The pre-confirmation correctness bridge
 transfers another 150 seconds from the same aggregate allowance to final QA;
-no overall cap increases. Research,
+no overall cap increased in that original stage. The later user-requested
+1,200-second amendment below has its own declared allowance. Research,
 ordinary edits and waiting for the machine lock are excluded. Interrupted or
 unpublished failed calls retain their full reserved cost. No study-cap extension
 was made for growth.
 
-All new 50-digit calls receive identical **360-second wall/CPU, 10¹³-work,
+The original C9.2 50-digit calls receive identical **360-second wall/CPU, 10¹³-work,
 1-GiB owned-memory and 3-GiB process high-water RSS** limits. The memory limit
 is a matched experimental allowance, not a new production default. Prefixes
 are 60/180/360 seconds or earlier terminal outcomes. Independent validation
@@ -227,18 +229,47 @@ timeout, conservative charge and final verification reserve transfer.
 
 ## Fresh confirmation and acceptance
 
-The 30/40-digit bands each completed 18 matched samples, with correct complete
-factors from every arm. Paired signs and repeated-cell drift remained unstable
-after the one permitted extension, so neither band receives a new growth
-speed promotion. The 50-digit comparison is still running. Fresh inputs are
-three independent balanced 50-digit, three balanced 40-digit and one 30-digit
-regression integer, disjoint from versioned corpora. Their certified-prime
-construction conditions p−1 on a large known factor; they are not RSA samples.
-Factors and certificates are used only for validation. Seeds/repetitions do
-not increase the independent-input count. The 30/40-digit challenger changes
-storage on C1's existing half-base DLP bundle; the 50-digit challenger is the
-selected full-base aligned growth configuration. All arms receive the same
-1-GiB owned memory, 3-GiB RSS, 10¹³ work and per-band 5/30/360-second caps.
+The original 30/40-digit bands each completed 18 matched samples, with correct
+complete factors from every arm. Paired signs and repeated-cell drift remained
+unstable after the one permitted extension, so neither receives a new growth
+speed promotion. Those inputs comprise one independent balanced 30-digit and
+three independent balanced 40-digit integers; repeated seeds do not increase
+that count.
+
+The original 360-second 50-digit study stopped at the user's explicit request
+to raise the comparison allowance. Its two completed matched groups remain
+preliminary observations, not acceptance. A third group's first call was
+interrupted at C3's requested QA handoff; its full 362-second reservation is
+charged, and no unpublished result is used.
+
+| Original 50-digit input / seed | SLP wall seconds | Fixed DLP wall seconds | Aligned growth wall seconds |
+| --- | ---: | ---: | ---: |
+| 0 / 7 | 129.555, complete | 186.715, complete | 90.832, complete |
+| 1 / 7 | 360.001, censored | 360.001, censored | 263.777, complete |
+
+On input 1, fixed DLP scans 408,681,517 positions and admits 69,290 atoms, but
+60,416 evictions leave only 419 combinations and a final 949-row input matrix
+that filters to zero rows. This is a time-censored observation, not a proof
+that longer collection cannot complete. The separate proposed 1,200-second
+pilot was superseded before execution and consumed no measurement allowance.
+
+The [amended confirmation protocol](c9_long_confirmation_protocol.md) changes
+the comparison itself to **1,200 seconds per arm**, preserving the selected
+collector configurations and 1-GiB owned/3-GiB RSS/10¹³-work envelope. The
+existing production source is unchanged; the new benchmark entry point also
+routes cold subprocesses to the amended identity. Source and control froze in
+`9fb5aea` before three new independent certified 50-digit inputs in `5c7b686`.
+No old confirmation input is reused in this new stage. Expected factors and
+certificates remain validation-only. Prime generation conditions p−1 on a
+large known factor; this is not an RSA sample population.
+
+The original study is charged **8,917.431 seconds**, including unsuccessful
+and unpublished reservations and its prepaid QA. The amended stage has a
+separate finite **14,400-second** allowance, including 300 prepaid QA/assessment
+seconds; the combined declared bound is **23,317.431 seconds**. This records the
+user-directed change explicitly without hiding previous search cost. No
+further parameter search or automatic study follows. The fresh nine-group
+comparison and its final acceptance decision are still pending.
 
 ## Verification and reproduction
 
@@ -252,6 +283,14 @@ working-tree `.venv`, ignored source or generated input dependency. Combined
 final verification costs 198.327 wall / 208.271 CPU seconds, charged against
 the prepaid 750-second QA reservation. The source freeze is unchanged.
 
+The amended harness and newly committed corpus at `5c7b686` independently
+pass **596 tests in both the working tree and committed-only archive**, full
+lint and **126 benchmark imports plus required loaders**. The two additional
+tests check amended cold-worker routing and restoration of the original study
+identity after interruption. This verification costs 196.843 wall / 206.613
+CPU seconds within the new 300-second prepaid allowance. Production source
+hashes remain unchanged.
+
 Graph tests compare generated cycles with an independent dense incidence
 kernel, including self-loops, parallel edges and disconnected components.
 Arithmetic tests reconstruct original atoms and square corrections. Growth
@@ -261,7 +300,13 @@ refusal, interrupted multi-container publication, dynamic checkpoint coexistence
 and repeated restore without leaking the transient reservation.
 
 From the repository root, with PyPy implementing Python 3.11 and an explicitly
-coordinated machine lease, reproduce the frozen confirmation with:
+coordinated machine lease, reproduce the original 360-second study at
+**revision `c0d4924`** with the commands below. The current amended 50-digit
+runner is `v2.benchmarks.qs.c9.c9_long_confirmation`; use a separate output
+directory and the [amended protocol commands](c9_long_confirmation_protocol.md#reproduction).
+Historical strict source checks are intentionally preserved.
+
+Original commands:
 
 ```sh
 v2/.venv/bin/python -B -m v2.benchmarks.qs.c9.c9_growth_confirmation confirm \
@@ -295,5 +340,12 @@ and test implicit allocation plus growing resume with the finite resolved child
 allowance. C9's current portfolio route requires its same explicit configuration
 on resume. C3/C9 also have separate current-source A7 manifests; reconcile their
 pins explicitly when integrating. No merge or source retuning occurred during
-these studies. No active C10 chat was present during ownership checks, and C9 changes no scoring,
-polynomial or candidate-recovery algorithm.
+these studies. No active C10 chat was present during the initial ownership checks. C10 later
+started its separate worktree pinned at `129cb09` (the same frozen C9 runtime),
+and was explicitly given ownership of A-product ordering and its metadata
+reservations, scoring/power-plan and polynomial investigations. Growing-mode
+`None` quotas and live/checkpoint/replay ownership must survive those changes.
+C10 is waiting for the settled C9 decision before integrated measurements.
+C3 subsequently reported its separate mainline integration at `d273cb8`; none
+of those changes were merged into this frozen study worktree. C9 changes no
+scoring, polynomial or candidate-recovery algorithm.

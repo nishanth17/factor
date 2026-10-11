@@ -13,7 +13,9 @@ limits. Growing serial SIQS retains partial history in PyPy containers, with
 optional explicit quotas and checked schema-five resume. Legacy bounded
 configurations remain compatible. The finite study compares complete outcomes
 at equal resources and preserves C1 and stopped C9.1 evidence; current
-confirmation status and acceptance are stated in that report. C10 collector
+confirmation status and acceptance are stated in that report. The user-amended
+50-digit comparison gives all three arms 1,200 seconds and uses three new
+independent inputs; the stopped 360-second evidence remains separate. C10 collector
 calibration and E1 combined portfolio acceptance remain separate.
 
 ## B3 user-directed native default and optional families (10 October 2026)
