@@ -105,6 +105,14 @@ high-endpoint SLP matches, while preserving and measuring the combinations
 that alignment deliberately loses. Fresh confirmation, not these diagnostics,
 determines any new promoted scope. C10 retains the broader collection study.
 
+The caller audit also distinguishes SLP's disjoint-pair matching from DLP's
+reusable pinned paths: retained SLP atoms can span more LP combinations than
+the published rows. Useful dependency and complete-call benefit from changing
+that matcher remain unmeasured. Polynomial-window finalization can force
+filter/solve work despite the configured growth/excess target; changing its
+cadence needs collection/matrix-owner coordination. Neither observation
+expands the already frozen C9.1 candidate grid.
+
 ## Continuing experiment ledger (C10)
 
 The first audit identifies the gaps; it does **not** choose larger defaults.

@@ -172,6 +172,16 @@ verification. YAFU's old `attempted_squfof` counter now measures micro-ECM calls
 its disabled (`&& 0`) DLP batch branch is not the active splitter. Source
 variable names alone are insufficient attribution.
 
+A base-2 probable-prime rejection before splitting is also a deliberate yield
+heuristic: some composite products pass that test. For example,
+2047 = 23×89 satisfies 2¹¹ ≡ 1 (mod 2047), hence the base-2 Fermat condition.
+Such a screen can discard a valid two-prime residual when both endpoints fit.
+v2 only skips splitting after its declared **proven** classification; the
+native shortcut cannot be imported as a certainty-preserving optimization.
+FLINT's equal-opaque-cofactor cancellation is a different algebraic idea:
+exact equality can make the product square without proving each cofactor
+prime, but v2 would need an explicit new relation contract to use it.
+
 Concrete example: with v2 base_bound=30,000, a prime residual 15,485,863 is
 admissible SLP under 900M but cannot touch a DLP edge bounded by 3M. It can
 still pair with another 15,485,863 partial, so discarding it is **lossy policy**,
@@ -190,6 +200,70 @@ and must not be attributed purely to residual admission.
 | 3. Endpoint/product effort shaping | Rare high endpoints tend to need more reports/splitting per useful collision. Existing explicit bounds and rho counters. | Settings initially; source product targets are not equivalent. Rejects may lose recoverable cycles. | Representative recovered/rejected census by size, current failures/endpoint rejects, then a separately frozen product arm only if diagnostic allowance and evidence justify it. |
 | 4. Smaller base plus selected policy | C1 half-base 50-digit prefix survived filtering and separate resume completed. | Joint collector setting, C10 interface. More difficult smoothness but smaller parity universe; source and target change together. | Only after individual C9 controls; new explicit freeze, charge all resources and label bundle effect. |
 | Defer: new splitter, opaque cofactors, leaf pruning, shortest-cycle replacement, disk spill | Potential savings depend on observed split cost, unsupported composites, eviction relevance or long paths. | New algorithms with certification/provenance/ownership risk. Existing splitter succeeds; graph cycles are short in C1. Leaf status in a prefix does not prove future uselessness. | Require failures/cost/lost-match attribution before implementation. F6 and matrix-owner gates remain intact. |
+
+## Frozen v2 route and remaining algorithm gaps
+
+`SieveCollector` forms a conservative block threshold and refines it against
+an exactly evaluated norm. Powers/bucket recovery divides every hit valuation
+to completion and adds the supported A exponents. For DLP, candidate allowance
+zero resolves to `max(residual_bound, large_product_bound)`. Thus alignment
+preserves this experiment's score domain because the product bound dominates
+both SLP ceilings. `divide_large_residual` then applies the separate exact
+product and SLP bounds; a prime residual above the SLP ceiling is rejected
+before graph mutation.
+
+`split_two_primes` tests a repeated square first, otherwise reserves worst-case
+work for two Brent-rho walks of at most 2,048 evaluations each (including
+recovery), batch 32, seed 7. Each endpoint must fit its bound and receive a
+**proven** classification, with exact product reconstruction. A failed walk
+never establishes primality. The 131,072-call allowance is cumulative and a
+started attempt survives cancellation/restore. Upstream probable-prime
+shortcuts are therefore not drop-in replacements.
+
+There is also a useful arithmetic explanation for this frozen residual
+population. Under the checked complete factor-base division invariant, each
+remaining prime is at least the numeric base bound B. Here B is 15,000 or
+30,000 and the product cap is 128B² < B³. Consequently an admissible composite
+cannot contain three such prime factors, counting multiplicity. This explains
+why `not_two_primes` rejection is not an expected dominant loss in these
+bundles. It does **not** remove endpoint certification or verification:
+other public configurations allow different products, and corrupted or
+incompletely recovered atoms must still be rejected.
+
+SLP-only `_admit` removes its pending representative after a match. For k
+observations at one endpoint without intervening eviction it publishes
+floor(k/2) disjoint pairs. The
+DLP forest retains pinned paths and can publish k−1 independent combinations.
+This is an existing **SLP matching-policy gap**, not a DLP correctness gap.
+The completed training captures quantify 31/38 additional LP incidence basis
+vectors among retained high-bound SLP atoms, and 104/123 among retained
+low-bound SLP atoms, beyond the published row counts. Those vectors have not
+been lifted to new factor-base dependencies or timed to complete factors.
+A reusable SLP representative is a plausible later bounded algorithm transfer;
+it requires explicit reference ownership, duplicate/restore identities and
+arithmetic-oracle tests. The fixed C9.1 grid is not enlarged after selection.
+
+DLP planning is transactional: reroot the smaller component, find its unique
+forest path, or rebuild after FIFO eviction of one eighth of the unowned
+edge allowance. Atoms used by published cycles are pinned. A closing edge
+is retained as original provenance rather than added to connectivity. The
+256-atom combination cap is an explicit yield loss; all-component paths,
+loops and parallel edges are supported. Verification, scratch/cap checks and
+a final budget poll precede publication. Full smooth atoms use the existing
+full-row path. There is no opaque-cofactor or higher-arity relation type.
+
+The pipeline prepares original-atom rows, removes recursive singletons,
+merges weight-two columns, lifts Gaussian-elimination kernels and reconstructs
+squares before both proper-divisor GCDs. Growth/excess controls are 32 in this
+freeze, but **polynomial-window finalization also forces a solve** on changed
+stores. They are not a global promise to wait for 32 surplus rows. On training
+input 0 full-base alignment prepares/filters 686 times, whereas the half-base
+bundle's smaller parity universe costs far less overall. Changing that cadence
+could help some late prefixes, but it may delay useful early dependencies;
+collection scheduling and matrix/provenance ownership gates remain separate.
+A future test should compare cumulative complete costs and preserve final
+storage-cap extraction, cancellation and charged resume, not merely reduce
+solve counts.
 
 ## Existing v2 evidence and coverage
 

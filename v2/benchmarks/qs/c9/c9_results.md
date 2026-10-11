@@ -68,7 +68,7 @@ owned memory **increased** despite fewer evictions and lower full-call cost.
 Current DLP still held 4,000/4,584 SLP atoms above its DLP endpoint at completion;
 the capacity arm held 8,607/8,581 when refused. This supports a collision-history
 and admission interaction, rather than a claim that eviction count alone
-causes failure. No split failed, no duplicate was rejected and no cycle was
+causes failure. No split failed, no duplicate was rejected and no DLP cycle was
 lost to the length cap in these runs. Certification was not weakened.
 
 Delayed graph structure matters. On input 0, current DLP had 472 rows at 60.2s
@@ -84,7 +84,11 @@ not just the acyclic spanning forest. On the two completed DLP calls, current
 retained cycle ranks were 1,587/1,610 and 2-core edge counts 2,254/2,258;
 alignment produced 1,612/1,633 and 3,185/3,235 respectively. These counts do
 not replace matrix kernel or proper-factor evidence. SLP retained incidence
-can have extra combinations which its pair matcher did not publish as rows.
+can have extra combinations which its disjoint-pair matcher did not publish:
+31/38 extra LP basis vectors for the 900M arm and 104/123 for the 3M arm.
+This measures a matching-policy opportunity, not additional useful factor-base
+dependencies or a measured speedup. Reusable SLP representatives remain a
+separate bounded C9 candidate; this study does not claim globally optimal SLP.
 
 The initial window used **1002.353 wall / 965.113 CPU seconds** including
 prefix diagnostics. One earlier attempted launch was aborted by the process
@@ -205,5 +209,118 @@ scans **137.4M** positions versus full-base alignment's **106.6M**, yet uses
 More reports or positions alone would rank those outcomes incorrectly.
 The collector and residual-policy interaction is the useful finding.
 
-Fresh confirmation, separate profile/resume costs, acceptance decision,
-verification and reproduction instructions follow after the frozen study.
+## Separate profiles, resource checks and charged restore
+
+The joint window took **438.160 wall / 436.818 CPU seconds**, including all
+four calls, the repeated census, two profiles and repeated restore. A second
+census enforces the 512-MiB simultaneous-storage reservation before graph
+publication, checks RSS and repeats independent output validation. It takes
+7.913 wall / 7.870 CPU seconds; its process maximum RSS is 707.45 MiB, below
+the separate 1-GiB abort. Both census attempts are charged. PyPy heap/JIT RSS
+is distinct from live owned reservations, and this diagnostic is not a
+256-MiB timing competitor.
+
+Both 60-second profiles are intentionally capped and uncompleted. Current
+full-base DLP spends 38.44 cumulative profile seconds in `_sieve`, including
+27.91 in `prime_power_roots`; exact residual handling takes 1.90, classification
+0.63 and splitting 0.59. Half-base alignment has corresponding sieve/root
+values 36.52/25.00 and residual/split values 0.75/0.34. These nested times
+must not be added. The profiler also magnifies the process guard (about 5.1s
+per profile), so these are qualitative attribution, not production speed
+fractions. Combined with zero failed training splits, they do not justify
+new cofactoring or a residual-certainty shortcut. Scoring/root optimization
+belongs to C10.
+
+The selected training input is paused twice and restored using the **same**
+300-second wall/CPU and 10¹³-work budget. Old stores are released before
+restore, which independently verifies atoms, graph paths and provenance.
+The 10/20-second checkpoints contain 429,090/845,045 bytes; rebuilds charge
+10,211,836/19,059,716 work units. Post-restore cumulative wall is 10.306/20.338s.
+The run completes with the expected proper divisor at **46.173 wall / 45.066
+CPU seconds**, charging 51,380,746,662 work units. Its 512-MiB owned and
+8-MiB checkpoint allowances make this a correctness/resource diagnostic only.
+The process maximum RSS is 714.38 MiB and includes preceding census/profiles;
+it is not isolated per-job RSS or a speed comparison with the 256-MiB arms.
+
+## Confirmation identity and finite accounting
+
+Selection was committed as `7085ba7` **before** generating the seven fresh
+certified inputs committed in `ff90aec`. The selected control records every
+runtime/benchmark Python hash and all collector settings. Three independent
+50-digit and three 40-digit inputs each use seeds 7/29/47; one independent
+30-digit input supplies repeated regression samples. Nine matched calls do
+not mean nine independent integers. Pocklington generation conditions primes
+on a large factor of p−1; this population is not RSA-distributed. Expected
+factors and certificates enter independent validation only.
+
+`inputs/controls/c9_accounting.json` records prior receipts and conservative
+charges: **2,310 wall / 2,270 CPU seconds** before confirmation, including the
+entire 600-second heavy-QA allowance prepaid for working and committed-only
+verification. Unused QA reservation is not refunded. The persistent ignored
+`expenses.json` adds generation, separate cold calls, every warmup and every
+confirmation/extension call; an interrupted call keeps its full reservation.
+The total remains bounded by 14,400 seconds on each resource. Lock waiting
+and ordinary source/documentation work are excluded.
+
+## Reproduction
+
+Use the committed C9 branch with PyPy 7.3.23 implementing Python 3.11.15.
+The measured host is Apple M4 (10 logical CPUs), 24 GiB, macOS 26.6.2.
+The runners acquire the machine-wide lock and publish ownership; coordinate
+with other factoring studies even for metadata-only benchmark commands.
+Do not regenerate or overwrite the frozen controls/corpus to repeat a run.
+
+```sh
+pypy3 -B -m v2.benchmarks.qs.c9.c9_study train \
+  --output v2/benchmarks/results/c9/repeat/training
+pypy3 -B -m v2.benchmarks.qs.c9.c9_combinations run \
+  --output v2/benchmarks/results/c9/repeat/combinations
+pypy3 -B -m v2.benchmarks.qs.c9.c9_confirmation confirm --digits 30 \
+  --output v2/benchmarks/results/c9/repeat/confirmation
+pypy3 -B -m v2.benchmarks.qs.c9.c9_confirmation confirm --digits 40 \
+  --output v2/benchmarks/results/c9/repeat/confirmation
+pypy3 -B -m v2.benchmarks.qs.c9.c9_confirmation confirm --digits 50 \
+  --output v2/benchmarks/results/c9/repeat/confirmation
+pypy3 -B -m v2.benchmarks.qs.c9.c9_confirmation summarize \
+  --output v2/benchmarks/results/c9/repeat/confirmation
+```
+
+These are reproducibility runs on now-public inputs, not new held-out
+confirmation. The original study's expense ceiling and selection remain
+immutable. Start another study only with its own declared resources and
+identity. The training runner accepts only its initial source hash; the
+combination runner checks its additional freeze; confirmation checks every
+runtime/benchmark Python hash. Documentation changes do not alter these
+identities. `confirm` resumes saved calls, refuses a foreign manifest and
+does not append samples to a finished band.
+
+Optional fixed-prefix replay requires the ignored C1 files
+`50-0-records.json` and `50-1-records.json` with the hashes above. Their absence
+does not prevent versioned training, confirmation, tests or imports. To
+repeat that diagnostic, supply their directory to `c9_census --retained`
+and an ignored output path. Profiles/resume use `c9_diagnostics profile` or
+`resume --config v2/benchmarks/inputs/controls/c9_combinations.json
+--arm half_aligned --output <ignored-path>/resume.json`; choose an empty
+output directory because checkpoint publication refuses replacement.
+Generated JSON, profiles, transcripts and scratch remain ignored.
+
+## Measurement limits
+
+Accepted calls omit the extra adjacency/core inspector. They retain native
+collector counters, final forest/unowned occupancy, filtering/solver/extraction
+statistics, peak owned reservations and process maximum RSS. Detailed endpoint
+degree/core/rank measurements come from instrumented training and the separate
+fixed-prefix oracle. RSS is a **cumulative process maximum within a band**,
+including warmup and earlier arms, not independently isolated arm allocation;
+the cold diagnostics use separate processes.
+
+Final retained atoms equal admitted atoms minus evictions. Exact peak atom
+and unowned occupancy are not sampled inside accepted calls. Their finite
+bounds remain explicit: peak unowned occupancy equals the configured cap
+when any eviction occurs; otherwise it lies between the final count and
+that cap. Since published rows and pinned atoms are never removed, peak
+retained atoms lie between the final count and that count plus
+`max_partials - final_unowned`. Report these as bounds, not observed peaks.
+This avoids adding a second, uncharged graph snapshot to a timed call.
+
+Fresh confirmation, acceptance and final verification are pending.
