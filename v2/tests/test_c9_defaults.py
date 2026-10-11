@@ -76,7 +76,9 @@ class C9DefaultTests(unittest.TestCase):
             (10**49 - 1, False),
             (10**49, True),
             (10**50 - 1, True),
-            (10**50, False),
+            (10**50, True),
+            (10**51 - 1, True),
+            (10**51, False),
             (10**29, False),
             (10**39, False),
         ):

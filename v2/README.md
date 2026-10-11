@@ -1145,17 +1145,21 @@ format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 
 ### C9/C10 size-scoped growing-DLP defaults
 
-Fresh native 40- and 50-digit calls select the scoped bundles by default through
+Fresh native 40-, 50- and 51-digit calls select scoped bundles by default through
 `SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
 `default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
 selection. At the confirmed 1 GiB allowance, the 40-digit result matches the
-frozen C10 plan and the 50-digit result matches C10a-05's confirmed collection
-arm. The 50-digit selection adds C10's 2 MiB plan and C10a-05's fixed pacing to
-C9's confirmed bundle. The 40-digit selection uses the C9-tested growing collector
+frozen C10 plan, the 50-digit result matches C10a-05's confirmed collection
+arm, and the 51-digit result uses that same concrete bundle after a separate
+[larger-band confirmation](benchmarks/qs/c10a05_plus/results.md). The 50/51-digit
+selection adds C10's 2 MiB plan and C10a-05's fixed pacing to C9's growing
+bundle. The 40-digit selection uses the C9-tested growing collector
 with C10's confirmed plan; C9 did not establish a separate 40-digit growth
-gain over fixed DLP. Other sizes/backends retain existing policies. This
+gain over fixed DLP. Sizes 52 digits and above and other backends retain their
+previous policies. The one-number 55-digit pilot completed with a longer grant;
+the 60-digit pilot did not complete within 1,200 seconds. This
 size-based promotion was explicitly requested by the user; complete-run
-evidence covers balanced inputs, not every 40- or 50-digit class.
+evidence covers conditioned balanced inputs, not every input in these bands.
 
 Omitted limits use the confirmed finite 1 GiB SIQS allowance, 1,200 wall/CPU
 seconds and 10^13 work units. The outer automatic portfolio reserves 16 MiB
@@ -1169,11 +1173,11 @@ The standalone `factorize()` API remains its separately configured engine.
 
 Default 40-digit collection uses B=5,000, half-width 65,536, five A factors,
 flyer assignment, endpoint ceiling 500,000, SLP ceiling 25,000,000 and DLP
-product bound 3,200,000,000. Default 50-digit collection uses B=30,000,
+product bound 3,200,000,000. Default 50/51-digit collection uses B=30,000,
 half-width 65,536, six A factors,
 flyer assignment, endpoint/SLP ceiling 3,000,000 and product bound
-115,200,000,000 with growing history. Both bands enable the 2 MiB power plan
-only with the confirmed 1 GiB owned allowance; 50-digit collection pacing has
+115,200,000,000 with growing history. These bands enable the 2 MiB power plan
+only with the confirmed 1 GiB owned allowance; 50/51-digit collection pacing has
 that same resource scope. Different caller memory grants retain window pacing
 and the growing bundle without the plan. The measured C9 50-digit peak
 before C10's plan was 326 MiB versus

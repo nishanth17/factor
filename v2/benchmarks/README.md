@@ -24,6 +24,7 @@ see [contributor guidance](../../AGENTS.md).
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
 | [qs/c10/](qs/c10/tranche1_results.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
 | [qs/c10a05/](qs/c10a05/results.md) | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
+| [qs/c10a05_plus/](qs/c10a05_plus/results.md) | Frozen 51-digit default-scope extension, 55/60-digit feasibility limits and charged fresh completion evidence |
 | [qs/a7/](qs/a7/) | Frozen comparison arms and reconciliation |
 | [primality/a10/](primality/a10/) | Primality dispatch and validation |
 | [infrastructure/](infrastructure/) | Arithmetic backends, parallelism, sieves and performance audits |
@@ -52,6 +53,21 @@ cold probes and censored profiles are separate. Reproduce the frozen runner
 at `96e2aad`; current integration intentionally changes its strict source pin.
 Other C10a items, C9a feedback and E1 remain open. These percentages are not
 additive with earlier C1/C9/C10 studies.
+
+The [larger-band follow-up](qs/c10a05_plus/results.md) checks the user's
+requested 50+ routing. Nine matched training groups on three 51-digit
+products gave 9/9 complete candidates for C9/window, C10/window and
+collection pacing, versus 0/9 for the actual 51-digit default. The direct
+C10/window-to-collection complete-cost reduction was 28.19% in training
+(95% input-cluster interval 27.43–29.07%). After committing selection,
+nine fresh matched calls on three newly generated products were 9/9 complete
+with the selected bundle versus 0/9 with the previous default. This is a
+completion gain, not a speedup against successful baseline factoring.
+Inclusive wall/CPU charge was 12,199.720/12,188.535 s, including 3,500 s
+prepaid feasibility/QA; a six-group training lease resumed without resetting
+charges. The 55-digit one-number pilot finished under a longer 1,200 s grant,
+while the 60-digit pilot was censored at that grant. Only exact 51-digit native
+routing advances; 52+ remains unchanged pending size-specific calibration.
 
 The [C10 tranche 1 report](qs/c10/tranche1_results.md) records an isolated
 2 MiB prime-power plan improvement on fresh complete factoring: 21.83% at

@@ -14,21 +14,21 @@ C10_POWER_PLAN_BYTES = 2 * 1024 * 1024
 def uses_c9_defaults(n, *, backend="python-int"):
     """Return the observable size/backend scope of fresh C9 default routing."""
     utils.require_integer(n)
-    return backend == "python-int" and 10**49 <= abs(n) < 10**50
+    return backend == "python-int" and 10**49 <= abs(n) < 10**51
 
 
 def uses_siqs_defaults(n, *, backend="python-int"):
     """Return the exact native bands with confirmed automatic bundles."""
     utils.require_integer(n)
     return backend == "python-int" and (
-        10**39 <= abs(n) < 10**40 or 10**49 <= abs(n) < 10**50
+        10**39 <= abs(n) < 10**40 or 10**49 <= abs(n) < 10**51
     )
 
 
 def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
-    """Select accepted 40/50-digit bundles without changing explicit quotas.
+    """Select accepted 40/50/51-digit bundles without changing explicit quotas.
 
-    The plan and 50-digit collection pacing use the confirmed 1 GiB owned
+    The plan and 50/51-digit collection pacing use the confirmed 1 GiB owned
     allowance. Other sizes/backends retain the reference configuration; an
     explicit memory allowance remains binding.
     """
@@ -37,8 +37,8 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
 
     forty_digits = abs(n) < 10**40
     owned_memory = C9_MEMORY_BYTES if memory_bytes is None else memory_bytes
-    # Fresh C10 comparisons isolated this plan on exactly these growing-DLP
-    # bundles. A different owned allowance is not the measured configuration.
+    # C10 isolated this plan at 40/50 digits; the later 51-digit default study
+    # confirms the same bundle. Other owned allowances were not tested.
     plan_bytes = C10_POWER_PLAN_BYTES if owned_memory == C9_MEMORY_BYTES else 0
 
     return SIQSConfig(
@@ -56,8 +56,9 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         row_excess=32,
         batch_width=4096,
         filter_row_growth=32,
-        # C10a-05 passed fresh complete-cost gates only at 50 digits. Keep
-        # legacy window pacing for the inconclusive 40-digit comparison.
+        # C10a-05 passed fresh complete-cost gates at 50 digits. The later
+        # 51-digit default study confirms this bundle's completion gain; 40
+        # digits retains window pacing after its inconclusive comparison.
         solve_policy=(
             "collection"
             if not forty_digits and owned_memory == C9_MEMORY_BYTES

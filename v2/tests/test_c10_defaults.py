@@ -19,6 +19,7 @@ from v2.tests.test_siqs_cli import cli
 ROOT = Path(__file__).resolve().parents[2]
 NUMBER_40 = 10**39 + 123
 NUMBER_50 = 10**49 + 123
+NUMBER_51 = 10**50 + 123
 
 
 def no_work():
@@ -53,7 +54,9 @@ class C10DefaultTests(unittest.TestCase):
             (10**49 - 1, False),
             (10**49, True),
             (10**50 - 1, True),
-            (10**50, False),
+            (10**50, True),
+            (10**51 - 1, True),
+            (10**51, False),
         ):
             for signed in (number, -number):
                 self.assertEqual(uses_siqs_defaults(signed), enabled)
@@ -63,7 +66,7 @@ class C10DefaultTests(unittest.TestCase):
         )
         self.assertEqual(SIQSConfig().collector.power_plan_bytes, 0)
 
-        for number in (NUMBER_40, NUMBER_50):
+        for number in (NUMBER_40, NUMBER_50, NUMBER_51):
             selected = default_siqs_config(number, memory_bytes=128 * 2**20)
             self.assertEqual(selected.memory_bytes, 128 * 2**20)
             self.assertEqual(selected.collector.power_plan_bytes, 0)
@@ -74,7 +77,7 @@ class C10DefaultTests(unittest.TestCase):
             self.assertIs(SIQSJob(number, budget=granted).budget, granted)
 
     def test_portfolio_and_checkpoint_keep_concrete_selection(self):
-        for number in (NUMBER_40, NUMBER_50):
+        for number in (NUMBER_40, NUMBER_50, NUMBER_51):
             selected = PortfolioConfig().for_input(number)
             self.assertEqual(selected.memory_bytes, 1040 * 2**20)
             self.assertEqual(

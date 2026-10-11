@@ -1984,6 +1984,20 @@ loaders pass from committed files. The conditioned balanced population is
 limited; other C10a items, C9a and E1 remain open. Earlier percentages are not
 combined into a portfolio speed claim.
 
+**Post-tranche size-scope follow-up, 11 October 2026:** The user requested
+evaluation of every 50+ digit default. The separate
+[larger-band report](benchmarks/qs/c10a05_plus/results.md) freezes 51-digit
+training/selection before fresh inputs. All nine fresh 51-digit matched calls
+completed with the accepted C9+C10+collection bundle versus zero with the
+previous default. This is a completion gain on three conditioned balanced
+products, not a speedup against successful reference calls. Route the same
+1 GiB bundle at exactly 51 digits; retain 52+ default behavior. The single
+55-digit product finished in 421.872 s under a longer grant, while the
+60-digit product remained unresolved after 1,200 s with 352 rows. The
+1,200 s automatic grant is finite rather than a universal factoring limit.
+This is a default-scope extension, not a reopening of C10a-05, C9a, other
+C10a items or E1 portfolio acceptance.
+
 A1a owns AP05–AP09 collector kernels and bounded CRT-term Gray shifts; C8
 retains the larger CRT half-sum scheduler. C9a/C1a own residual/yield/graph
 policy; A8/B6/B7/C4/D1/D2 own matrix and solver structures, F6 higher-arity

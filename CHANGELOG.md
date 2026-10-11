@@ -1,5 +1,23 @@
 # Changelog
 
+## C10a-05 larger-band default scope (11 October 2026)
+
+- Extend the accepted native 1 GiB C9+C10+collection bundle to exactly
+  51-digit inputs after a separate frozen study; preserve explicit settings,
+  saved policies, 40/50-digit behavior and the previous 52+ default.
+- Nine matched training groups on three certified 51-digit products found
+  9/9 complete calls in each candidate arm versus 0/9 in the prior default.
+  Collection pacing lowered complete training cost 28.19% versus its otherwise
+  identical window-paced arm (95% input-cluster interval 27.43–29.07%).
+  Nine held-out matched calls completed 9/9 with the selected bundle versus
+  0/9 with the prior default. This confirms completion coverage, not a
+  speedup against successful baseline calls.
+- A revealed 55-digit product completed only under a longer bounded grant;
+  a 60-digit product was censored at the existing 1,200-second automatic
+  grant. Retain 52+ routing pending separate calibration. Preserve immutable
+  C10a-05 controls and A7 history through a new chained source manifest.
+  See `v2/benchmarks/qs/c10a05_plus/results.md`.
+
 ## C10a-05 collection and solve pacing (11 October 2026)
 
 - Separate shared SIQS polynomial-window completion from genuine collection
