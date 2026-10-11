@@ -1,5 +1,5 @@
 {
-  "source_commit": "fca79442c7eba9c9c75c55dae5ae650e4dfb6279",
+  "source_commit": "d15cb1fd464aa81d0bc73d95c18fc2216370e005",
   "policies": {
     "control": [
       [
@@ -114,7 +114,7 @@
     "v2/pm1/core.py": "77dce6ff3efde143397c6e6dfc09db9232564ae97e905e0026437c650d6da255",
     "v2/pm1/gaps.py": "a52e058f9474302476e907885066956fd9c474ab4b5783d76aecafe82749e6d7",
     "v2/pm1/tuning.py": "7694ffff24e16edf861d73996c2a0eaa69b1413e584ef45908e9f06a66893e13",
-    "v2/portfolio.py": "8c31ced4c89c81055bf323fc708be4982cac1377e7201331b498102bcf67f886",
+    "v2/portfolio.py": "d65a82537520fe2e69922c5bdd7850cbdc19e0d531924664252f2a9215db53ed",
     "v2/qs/__init__.py": "d12995525a3a27f8174443d20842f17dacfd4dc26a771885aa15de0644eae8ed",
     "v2/qs/assignment_stream.py": "563782b961c4294e3bb464a2916d3e1732bd3494e8779577655983e0a780f399",
     "v2/qs/capacity.py": "b15dad537fc283aec8e44f6140e5d716574414f4aaf5ef3e75299d98b2613de8",
@@ -142,14 +142,16 @@
     "v2/qs/sss_checkpoint.py": "0163012ba103319e2254d468913e6a1d1939c9adb6875835c065388bde5183e0",
     "v2/rho/__init__.py": "03dffbdd35e8e642e70f64482f6422d929e805759fb1b5dbd1faf4f160831dfb",
     "v2/rho/brent.py": "12ac60e381bde39e69830c6215cc29a3b5fb9522c876a9e3c7b71b2c0d54d2f2",
-    "v2/benchmarks/ecm/c3/c3_study.py": "cde3e973034f4f573b2847cd56cc014df1da6223c7759507e75de9722e8ec7c2",
+    "v2/benchmarks/ecm/c3/c3_study.py": "2df7f65a175cf9da63c04988937d250dff9de713c609702e4e0131f9a7e68a35",
+    "v2/benchmarks/ecm/c3/diagnostics.py": "1fa53148ed2fa085968424101847136b56a689ccaae26b00b48ab1ba39d17192",
     "v2/benchmarks/ecm/c3/__init__.py": "78736e7234f03ebba1a48a3c230700aefe9eed2de1e0e14e93978bfbdc87a06a",
+    "v2/benchmarks/ecm/c3/analyze.py": "41142ac7518e2e5a57de073628bf92d744e43f54d7bcdb49133fb20733df42cc",
     "v2/execution/allocation.py": "bde466becaea3f7b7fbf3d55b904e63e136a9254fbef7cadcf5e3bba48b32f39",
     "v2/benchmarks/inputs/baselines/c3_mainline.json": "85328a21a6dc829dd2e991c3f42bbf3088b683355ff70a5080740b4baa5ae87f",
     "v2/benchmarks/inputs/controls/c1_selected.json": "e37f661333f0f321480635a3c45334174aa29d36204e4a0aa7323dea8036f4e7",
     "v2/benchmarks/inputs/corpora/c1_fresh_corpus.json": "efef8f91debbe82601b8b7975f5d0b1debf22e2f4775ebb2fac197e5aa14be9c",
     "v2/benchmarks/inputs/corpora/b1_held_out_corpus.json": "92447fd0305d71152699b4aae05820af8de7e1fa598aaf12de9b67ba91687367",
-    "v2/benchmarks/ecm/c3/protocol.md": "9d763091bf3df2de3872a8821f81b3055776e6eaaba5e7238dd5b057b1623411",
+    "v2/benchmarks/ecm/c3/protocol.md": "97db3678b6a7878cb5834b586c802146516de180de2b115fe2c15b6d38c36593",
     "v2/benchmarks/qs/c1/c1_implementation.py": "8bbf46563403b3d98a6fd826309fc74900b1f03f346db259d9c29f9ae7a9234a",
     "v2/benchmarks/suites/build_phase_two_corpus.py": "0b6650822f0e79431cf6b11d8a8157d71f360b432132855543cdd546507cabdb",
     "v2/benchmarks/ecm/b4/b4_common.py": "9f0e2d02ea106cf988e4b606fc0b024ac4e7863736ecc4c062159e332fafb3e8",
