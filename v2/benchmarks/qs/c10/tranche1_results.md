@@ -65,6 +65,19 @@ rerun or discarded to erase this record. The declared phase reservation
 prevents another group irrespective of that marker-writing error. The runner
 source and frozen identities were not tuned after observing data.
 
+The 30-digit plan's +3.58% is a numerical training difference, not an
+established slowdown: its paired interval crosses zero. Each of the 756
+polynomials in those matched calls covered five blocks; the corresponding
+40- and 50-digit polynomials covered 33 blocks each. The plan built 91,582
+per-prime power plans and replayed them 457,910 times at 30 digits. Control
+and plan had the same 3,780 blocks, candidate counts, relations and solver
+dependencies. Plan collection/preparation totaled 6.075/0.495 seconds,
+versus 5.913/0.437 for control. Building a per-polynomial plan has much less
+reuse opportunity in the short 30-digit interval; these accounts support an
+amortization explanation, but cannot isolate a causal time penalty from run
+noise. At 40 and 50 digits the corresponding plan replay/build ratios were
+33, and the fresh comparisons establish the scoped complete-cost benefit.
+
 The plan preserves the control's candidate, relation and final dependency
 counts on every matched training set. At 40 digits its measured collection
 time totals 113.943 versus 150.421 seconds; CPU sums 122.020 versus 156.524
@@ -78,6 +91,15 @@ is not a per-arm memory comparison.
 
 Quality ordering produces 2318 versus 2272 relations and 134 versus 98 final
 solver dependencies across the 18 30-digit calls, but complete cost is worse.
+It also sent 6,200,864 versus 5,789,002 positions through candidate recovery;
+5,969,784 versus 5,560,464 were rejected by exact refinement. Thus the
+extra candidates almost entirely failed the exact value check. Quality
+collection totaled 6.168 versus 5.913 seconds. Lazy batch sorting occurs
+inside collection, so its cost cannot be separated from the changed candidate
+work by these stage timers. Attributing the excess to sorting alone would
+ignore the measured 411,862 additional candidate checks. The ordering changes
+which early polynomials are visited before a successful stop; it does not
+prove that low product error causes useful yield.
 At 40 digits it produces 5940 versus 5924 relations and 86 versus 90 final
 dependencies, also with worse complete cost. At 50 digits its 11 groups have
 18060 versus 18048 relations and 48 versus 46 final dependencies, with near-
