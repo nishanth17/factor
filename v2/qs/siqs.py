@@ -191,13 +191,23 @@ class SIQSJob:
     """
 
     def __init__(self, n, *, seed=7, config=None, budget=None):
-        self.config = config if config is not None else SIQSConfig()
+        if config is None:
+            from .defaults import default_siqs_config
+
+            config = default_siqs_config(n)
+        self.config = config
         checked_target(n, max(1, self.config.multiplier))
         utils.require_integer(seed, "seed", 0)
         if seed >= 2**64:
             raise ValueError("seed exceeds 64 bits")
         self.n = arithmetic.get_backend(self.config.backend).integer(n)
         self.seed = seed
+        if budget is None and isinstance(
+            self.config.collector, GrowingDoubleLargeSieveConfig
+        ):
+            from .defaults import default_siqs_budget
+
+            budget = default_siqs_budget(n, backend=self.config.backend)
         self.budget = budget if budget is not None else Budget()
         self.base = self.family = self.engine = self.pending_step = None
         self.assignments = None

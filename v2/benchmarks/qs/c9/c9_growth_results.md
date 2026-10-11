@@ -558,3 +558,10 @@ The [11 October integration record](c9_integration.md) reconciles C3
 allocation/defaults with growing DLP and phases remaining literature transfers
 into roadmap C9a. This changes no frozen control, corpus or timing verdict;
 reproduce accepted timings from their historical source revisions.
+
+
+## Subsequent default promotion
+
+The user subsequently requested [50-digit default promotion](c9_default_promotion.md).
+This applies the confirmed bundle and finite omitted grant without changing
+this experiment's original defaults decision, observations or uncertainty.

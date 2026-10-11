@@ -207,3 +207,16 @@ cycle/provenance-weight optimization remain untested transfers. C10a owns
 solve scheduling; C9 retains residual policy and yield-dependent feedback,
 with a shared candidate-domain/scoring interface. No exhaustive-adaptation or
 optimality claim follows from the accepted bundle; its results remain unchanged.
+
+
+## C9 default routing — 11 October 2026
+
+The user subsequently requested [default promotion](qs/c9/c9_default_promotion.md).
+`v2.qs.default_siqs_config` reproduces every field of the accepted native
+50-digit challenger; the selector is independently compared with its frozen
+versioned control. Omitted grants use the confirmed finite 1 GiB SIQS,
+1,200-second wall/CPU and 10^13-work envelope, with 16 MiB outer headroom.
+Explicit settings/limits and checkpoint configurations win. This is an
+observable size policy from balanced evidence, not a new all-class speed or
+completion claim. Earlier source pins and timing verdicts remain immutable;
+C10's confirmed plan composition and E1 combined acceptance remain separate.

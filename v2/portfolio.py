@@ -46,6 +46,7 @@ CHECKPOINT_VERSION = 10
 OPTIONAL_CHAIN_CHECKPOINT_VERSION = 11
 ALLOCATION_CHECKPOINT_VERSION = 12
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
+_AUTO_SIQS = object()
 
 
 @dataclass(frozen=True)
@@ -81,7 +82,7 @@ class PortfolioConfig:
     max_input_bits: int = 4096
     trace_limit: int = 256
     rolling: bool = False
-    siqs: SIQSConfig | None = None
+    siqs: SIQSConfig | None = _AUTO_SIQS
     sss: SSSConfig | None = None
     ecm_program_bytes: int = 0
     ecm_chain_mode: str = field(default="auto", kw_only=True)
@@ -103,6 +104,18 @@ class PortfolioConfig:
                 "ecm_tiers",
                 ((constants.ECM_B1, constants.ECM_B2, 32),),
             )
+
+        automatic_siqs = self.siqs is _AUTO_SIQS
+        object.__setattr__(
+            self,
+            "_automatic_siqs",
+            automatic_siqs and self._automatic_ecm_tiers and self.sss is None,
+        )
+        if automatic_siqs:
+            object.__setattr__(self, "siqs", None)
+        object.__setattr__(
+            self, "_automatic_memory", self.memory_bytes is None
+        )
 
         if self.allocation is not None:
             if not isinstance(self.allocation, ECMAllocation):
@@ -306,8 +319,35 @@ class PortfolioConfig:
         if not self._automatic_ecm_tiers:
             return self
         from .execution.ecm_defaults import resolve_defaults
+        from .qs.defaults import (
+            C9_MEMORY_BYTES,
+            C9_PORTFOLIO_MEMORY_BYTES,
+            default_siqs_config,
+            uses_c9_defaults,
+        )
 
-        return resolve_defaults(self, n)
+        selected = resolve_defaults(self, n)
+        if self._automatic_siqs and uses_c9_defaults(n, backend=self.backend):
+            memory = (
+                C9_PORTFOLIO_MEMORY_BYTES
+                if self._automatic_memory
+                else self.memory_bytes
+            )
+            # Resolve at the root; children and checkpoints retain concrete
+            # settings and finite parent/child coexistence allowances.
+            child_memory = (
+                C9_MEMORY_BYTES
+                if self._automatic_memory
+                else memory - selected.workspace_reserve - 8192
+            )
+            return replace(
+                selected,
+                memory_bytes=memory,
+                siqs=default_siqs_config(
+                    n, backend=self.backend, memory_bytes=child_memory
+                ),
+            )
+        return selected
 
     @property
     def max_hi(self):
@@ -1574,11 +1614,15 @@ def factorize_bounded(
                     "ecm_tiers", ((constants.ECM_B1, constants.ECM_B2, 32),)
                 ),
             }
-        if saved_config.get("allocation") is not None:
+        if (
+            saved_config.get("allocation") is not None
+            or saved_config.get("siqs") is not None
+        ):
             saved_config = dict(saved_config)
-            saved_config["allocation"] = ECMAllocation(
-                **saved_config["allocation"]
-            )
+            if saved_config.get("allocation") is not None:
+                saved_config["allocation"] = ECMAllocation(
+                    **saved_config["allocation"]
+                )
             if saved_config.get("siqs") is not None:
                 from .qs import (
                     DoubleLargeSieveConfig,
@@ -1608,6 +1652,7 @@ def factorize_bounded(
         else:
             config = PortfolioConfig(
                 **resume_options,
+                siqs=None if checkpoint is not None else _AUTO_SIQS,
                 pm1_gap_mode=saved_config.get("pm1_gap_mode", "cached")
                 if checkpoint is not None
                 else "recurrence",
@@ -1615,7 +1660,20 @@ def factorize_bounded(
                 if checkpoint is not None
                 else 64,
             )
-    budget = Budget() if budget is None else budget
+    if budget is None:
+        from .qs.defaults import default_siqs_budget, uses_c9_defaults
+
+        growing = (
+            config.siqs is not None
+            and getattr(config.siqs.collector, "storage_policy", None)
+            == "grow"
+        )
+        if (config._automatic_siqs or growing) and uses_c9_defaults(
+            n, backend=config.backend
+        ):
+            budget = default_siqs_budget(n, backend=config.backend)
+        else:
+            budget = Budget()
     if abs(n).bit_length() > config.max_input_bits:
         raise ValueError("input exceeds max_input_bits")
     if checkpoint is None:

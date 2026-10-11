@@ -14,6 +14,13 @@
 
 ## Current development
 
+- Promote C9's confirmed native 50-digit growing-DLP bundle by default at the
+  user's direction. Route omitted SIQS/automatic/CLI selections through the
+  exact accepted configuration and finite 1 GiB / 1,200-second / 10^13-work
+  grant; preserve explicit configurations, limits and concrete checkpoint
+  settings. Measured benefit covers the balanced confirmation cohort;
+  arbitrary 50-digit classes and broader combined E1 acceptance remain open.
+
 - Integrate accepted C9.2 with C3 allocation/defaults. Preserve growing-DLP
   policy during implicit schema-12 resume and retain the finite resolved child
   allowance; reject changed policies. Cross off C9 and phase remaining

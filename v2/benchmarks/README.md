@@ -37,6 +37,11 @@ their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
 
+The subsequent [C9 default promotion](qs/c9/c9_default_promotion.md) makes its
+confirmed native 50-digit bundle automatic at the user's direction, preserving
+explicit limits/settings and saved configurations. Its finite omitted grant
+uses the confirmed resource window; this adds no new timing evidence.
+
 The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
 compatibility and preserved study freezes. Remaining literature transfers are
 phased into roadmap C9a; E1 and C10 remain separate.

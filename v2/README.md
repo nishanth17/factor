@@ -1086,6 +1086,30 @@ format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 
 ### C9 allocator-grown DLP storage
 
+Fresh native 50-digit calls select the accepted C9 bundle by default through
+`SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
+`default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
+selection; its default result exactly matches the confirmed 50-digit challenger.
+Other sizes/backends retain existing policies. This size-based promotion was
+explicitly requested by the user; complete-run evidence covers balanced inputs,
+with three independent products, and does not establish every 50-digit class.
+
+Omitted limits use the confirmed finite 1 GiB SIQS allowance, 1,200 wall/CPU
+seconds and 10^13 work units. The outer automatic portfolio reserves 16 MiB
+additional coexistence headroom. An explicit Budget or CLI resource limit wins;
+small grants can return unresolved results. Explicit SIQSConfig objects, QS
+parameter flags, explicit `siqs=None` and saved concrete configurations take
+precedence. `asdict`/`replace` copies freeze the current numerical selection.
+The standalone `factorize()` API remains its separately configured engine.
+
+Default 50-digit collection uses B=30,000, half-width 65,536, six A factors,
+flyer assignment, endpoint/SLP ceiling 3,000,000 and product bound
+115,200,000,000 with growing history. The measured peak was 326 MiB versus
+167/198 MiB for SLP/fixed DLP, and charged work increased despite lower wall/CPU.
+See [default promotion and limits](benchmarks/qs/c9/c9_default_promotion.md).
+C10 owns subsequent promotion of its separately confirmed power-plan setting;
+the selector supplies its composition point without changing frozen studies.
+
 `GrowingDoubleLargeSieveConfig` uses growable PyPy relation containers. Its
 `max_partials`, `max_atoms`, `max_relations`, `memory_bytes` and cumulative
 `split_call_limit` default to `None`. With this collector, standalone
@@ -1115,8 +1139,9 @@ Work/time allowances, exact endpoint certification, finite effort per residual
 and the documented 256-atom cycle policy remain. Collection still uses the
 configured polynomial and stopping schedule. The finite outer portfolio
 resolves an uncapped child's memory to its own remaining allowance, including
-coexisting metadata; it cannot supply uncapped storage. The existing CLI
-continues to select legacy bounded configurations. SSS and coarse-worker
+coexisting metadata; it cannot supply uncapped storage. Fresh native 50-digit
+CLI calls and omitted-config SIQS jobs now select the confirmed growing bundle
+through `default_siqs_config(n)`. SSS and coarse-worker
 adapters reject the growing class; use `SIQSJob` or `SieveCollector` for this
 policy until those adapters have their own ownership and resume integration.
 
