@@ -16,6 +16,11 @@ admission, splitting, matching, cycle construction and retention. Its final
 decision and explicit CPU handoff are prerequisites for integrated timing.
 The shared `/private/tmp/factor-performance.lock` also covers heavy QA.
 
+C9 completed its handoff at `868c26622031cddec5da61ec18e54c8b3809700b`.
+The source manifest records its final configuration/report digests. Runtime
+Python files match the C10 base; all configuration dictionaries and later
+C3/C9 corpus-exclusion hashes were verified before C10 measurement.
+
 The following evidence is not interchangeable:
 
 | Record | Established | Limitation retained |
@@ -25,7 +30,7 @@ The following evidence is not interchangeable:
 | C1 | Explicit half-base DLP 40-digit bundle reduced complete cost 31.73%, interval 29.21–33.99%. | 30-digit drift; fresh 50-digit 0/18 at 120 seconds per arm; retention evictions. Later changed-allowance/configuration completions are not isolated acceptance. |
 | A7 | Relation, worker, checkpoint and loss-policy reconciliation accepted, 503 tests at that revision. | No collector/worker performance promotion. |
 | C9.1 | Exact implementation and source/census work. | First confirmation stopped when retention direction changed; its revealed inputs are training thereafter. |
-| C9.2 | User-directed growing storage implementation; selected aligned full-base 50-digit control. | 30/40-digit extended measurements remained unstable. The original 360-second 50-digit confirmation was stopped and superseded by a separately frozen 1,200-second study. No acceptance inferred from partial results. |
+| C9.2 | User-directed growing storage implementation, followed by completed acceptance of the aligned full-base 50-digit bundle: 9/9 matched complete outcomes per arm, 38.10% lower complete wall cost than SLP and 53.08% than fixed DLP. | Three independent inputs; intervals 35.23–39.81% and 52.36–53.84%, no stability extension. Peak owned reservation 326 MiB versus 167/198 MiB. 30/40-digit extended measurements remained unstable. The original 360-second confirmation was stopped; acceptance comes from the separately frozen 1,200-second study. Global defaults remain unchanged. |
 | C3 | Source-derived ECM presets promoted at explicit user direction after screening. | 324 calls/54 groups did not pass the fresh interval-width gate. Broader portfolio and schema-12 growth integration remain separate. |
 
 References: [QS audit](../../qs_parameter_audit.md),

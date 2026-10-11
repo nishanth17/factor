@@ -608,5 +608,15 @@
     "path": "v2/benchmarks/inputs/corpora/c10_prior_input_exclusions.json",
     "sha256": "dc7028fe92f2eec0d568bb7edee2f6fc1076c0804d1bed08c62f39055caa7cee",
     "count": 50
+  },
+  "c9_handoff": {
+    "final_revision": "868c26622031cddec5da61ec18e54c8b3809700b",
+    "runtime_revision": "fbfd662",
+    "configuration_path": "v2/benchmarks/inputs/controls/c9_long_selected.json",
+    "configuration_sha256": "751d1a767f87db4e15ad4486c1c0334f60563d784dbd98756517d8414a4bd57c",
+    "report_path": "v2/benchmarks/qs/c9/c9_growth_results.md",
+    "report_sha256": "fe868afe9914366bb17ac1239c12431ee31556e879ad65c4dbafe70a6a375091",
+    "decision": "Accept the explicit aligned full-base growing-DLP bundle for the measured balanced 50-digit regime. Retain 30/40 recommendations and global defaults.",
+    "verified": "All configuration dictionaries match C10 c9_growth_selected.json; C9 runtime Python files match the C10 base revision; all prior-input exclusion source hashes match at handoff."
   }
 }
