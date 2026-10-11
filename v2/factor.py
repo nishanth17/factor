@@ -350,9 +350,24 @@ def main():
     parser.add_argument("--fermat-steps", type=int, default=0)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--ecm-curves", type=int)
     parser.add_argument(
-        "--ecm-curves", type=int, default=constants.MAX_CURVES_ECM
+        "--ecm-policy",
+        choices=("pretest", "campaign"),
+        help="explicit cumulative pretest or finite deeper ECM campaign",
     )
+    parser.add_argument(
+        "--ecm-tier",
+        action="append",
+        metavar="B1,B2,CURVES",
+        help="finite ECM tier; repeat for independent new-curve tiers",
+    )
+    parser.add_argument("--pretest-work", type=int)
+    parser.add_argument("--pretest-seconds", type=float)
+    parser.add_argument("--pretest-cpu-seconds", type=float)
+    parser.add_argument("--fallback-work", type=int)
+    parser.add_argument("--fallback-seconds", type=float)
+    parser.add_argument("--fallback-cpu-seconds", type=float)
     parser.add_argument(
         "--ecm-chain",
         choices=("auto", "off", "prac", "lucas", "cf"),
@@ -367,6 +382,27 @@ def main():
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
     if args.siqs and args.method != "auto":
         parser.error("--siqs is an auto fallback; use --method siqs alone")
+    allocation_names = (
+        "pretest_work",
+        "pretest_seconds",
+        "pretest_cpu_seconds",
+        "fallback_work",
+        "fallback_seconds",
+        "fallback_cpu_seconds",
+    )
+    allocation_options = {
+        name: getattr(args, name)
+        for name in allocation_names
+        if getattr(args, name) is not None
+    }
+    if allocation_options and args.ecm_policy is None:
+        parser.error("allocation limits require --ecm-policy")
+    if args.ecm_policy == "pretest" and args.pretest_work is None:
+        parser.error("--ecm-policy pretest requires --pretest-work")
+    if (args.ecm_policy or args.ecm_tier) and args.method != "auto":
+        parser.error("ECM policies and tiers require --method auto")
+    if args.ecm_tier and args.ecm_curves is not None:
+        parser.error("choose --ecm-tier or --ecm-curves")
     if args.ecm_chain is not None and args.method != "auto":
         parser.error("--ecm-chain requires the auto portfolio")
     if args.ecm_chain == "prac" and args.backend != "python-int":
@@ -430,7 +466,10 @@ def main():
             or use_sss
             or use_qs
             or args.ecm_chain is not None
+            or args.ecm_policy is not None
+            or args.ecm_tier is not None
         ):
+            from .execution.allocation import ECMAllocation
             from .execution.budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
             from .qs.sss import SSSConfig
@@ -438,11 +477,31 @@ def main():
             parameters = dict(
                 backend=args.backend,
                 ecm_tiers=(
-                    (constants.ECM_B1, constants.ECM_B2, args.ecm_curves),
+                    (
+                        constants.ECM_B1,
+                        constants.ECM_B2,
+                        args.ecm_curves
+                        if args.ecm_curves is not None
+                        else constants.MAX_CURVES_ECM,
+                    ),
                 ),
                 memory_bytes=args.memory_mib * 1024 * 1024,
                 fermat_steps=args.fermat_steps,
             )
+            if args.ecm_tier:
+                try:
+                    parameters["ecm_tiers"] = tuple(
+                        tuple(int(value) for value in tier.split(","))
+                        for tier in args.ecm_tier
+                    )
+                except ValueError as error:
+                    raise ValueError(
+                        "ECM tiers need integer B1,B2,CURVES"
+                    ) from error
+            if args.ecm_policy is not None:
+                parameters["allocation"] = ECMAllocation(
+                    mode=args.ecm_policy, **allocation_options
+                )
             if implicit_memory and not (use_qs or use_sss):
                 parameters.pop("memory_bytes")
             if use_qs:
@@ -516,6 +575,36 @@ def main():
                         raise ValueError("malformed checkpoint config")
                 except (KeyError, TypeError) as error:
                     raise ValueError("malformed checkpoint") from error
+                if saved.get("allocation") is not None:
+                    if args.ecm_policy is None:
+                        parameters["allocation"] = ECMAllocation(
+                            **saved["allocation"]
+                        )
+                    if args.ecm_tier is None and args.ecm_curves is None:
+                        parameters["ecm_tiers"] = saved["ecm_tiers"]
+                    # New policy snapshots retain the selected fallback even
+                    # when a resumed CLI invocation omits its original flags.
+                    if not (use_qs or use_sss):
+                        if saved.get("siqs") is not None:
+                            from .qs import (
+                                DoubleLargeSieveConfig,
+                                SieveConfig,
+                                SIQSConfig,
+                            )
+
+                            values = dict(saved["siqs"])
+                            collector = values["collector"]
+                            collector_type = (
+                                DoubleLargeSieveConfig
+                                if "large_prime_bound" in collector
+                                else SieveConfig
+                            )
+                            values["collector"] = collector_type(**collector)
+                            parameters["siqs"] = SIQSConfig(**values)
+                        if saved.get("sss") is not None:
+                            parameters["sss"] = SSSConfig(**saved["sss"])
+                    if implicit_memory:
+                        parameters["memory_bytes"] = saved["memory_bytes"]
                 parameters.update(
                     pm1_gap_mode=saved.get("pm1_gap_mode", "cached"),
                     pm1_chunk_size=saved.get("pm1_chunk_size"),
@@ -569,7 +658,9 @@ def main():
                 number,
                 args.verbose,
                 seed=args.seed,
-                ecm_curves=args.ecm_curves,
+                ecm_curves=args.ecm_curves
+                if args.ecm_curves is not None
+                else constants.MAX_CURVES_ECM,
                 backend=args.backend,
             )
     except (
