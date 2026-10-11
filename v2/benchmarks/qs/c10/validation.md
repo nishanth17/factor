@@ -1,21 +1,26 @@
 # C10 implementation validation
 
-Validated source: `a4886ee`, following implementation/research commit
+Validated source: `00a9d9e`, following implementation/research commit
 `f4583cd`, on `codex/c10-collection-strategies`. C9 runtime lineage is
 `129cb09e4ca684f3eb08cbbdbea3fb43848e5d95` / frozen runtime `fbfd662`.
-No C10 integrated timing has run at this preparation stage. C9's final
-1,200-second-control decision is still pending.
+No C10 integrated timing has run at this preparation stage. C9 has completed
+its 1,200-second-control study, accepted the measured 50-digit growing-DLP
+bundle and explicitly released the CPU. Its runtime and all configuration
+dictionaries match this checkout's controls. The three exclusion-source
+file hashes were reverified at handoff.
 
 On 11 October 2026 UTC, C9 explicitly released a bounded 900-second QA slot.
 C10 acquired the shared performance lock for each heavy command and returned
-the machine after 354.984 seconds of QA. The experiment ledger conservatively
-prepays the full 900-second QA allowance, including these failures/retries.
+the machine after 354.984 seconds of QA. After C9's final CPU release, another
+100.526 seconds covered the latest committed-only validation below, bringing
+actual QA to 455.511 seconds. The experiment ledger conservatively prepays
+the full 900-second QA allowance, including these failures/retries.
 
 Final committed-files-only checkout:
 
 - PyPy 3.11.15 / PyPy 7.3.23 with gmpy2 2.3.1.
-- `make -C v2 test PYTHON=<project PyPy environment>/bin/python`: **613 tests,
-  no failures or skips**, 93.500 seconds reported by unittest.
+- `make -C v2 test PYTHON=<project PyPy environment>/bin/python`: **615 tests,
+  no failures or skips**, 93.924 seconds reported by unittest.
 - `make -C v2 lint`: ruff checks/format and pycodestyle pass.
 - All **129 benchmark runner modules** import; the A7 current-source loader
   passes. Immutable baseline source files are loaded through their existing
@@ -42,6 +47,9 @@ rejection. Exact normalized-polynomial checks enumerate exceptional roots,
 mod-8 parity, nonsingular powers of two, signed reconstruction, multiplier
 gcd exceptions and intentionally lost threshold reports. GMP and Python-int
 produce identical product ordering.
+
+The final runner checks also reject a partial 12-sample extension and an
+unbalanced nine-sample allocation as performance acceptance evidence.
 
 Local raw logs are under ignored `v2/benchmarks/results/c10/qa/`. No merge or
 push was performed. The primary checkout changed independently during this
