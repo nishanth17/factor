@@ -40,6 +40,7 @@ class C9DefaultTests(unittest.TestCase):
             "challenger"
         ]
         selected = asdict(default_siqs_config(NUMBER))
+        self.assertEqual(selected.pop("solve_policy"), "window")
         self.assertEqual(
             selected["collector"]["power_plan_bytes"], C10_POWER_PLAN_BYTES
         )

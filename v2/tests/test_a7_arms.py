@@ -21,9 +21,10 @@ class PreparedArmTests(unittest.TestCase):
             selected = json.loads(a7_r5.PLAN.with_name(name).read_text())
             configs = a7_r5.serial_configurations(band, plan=plan)
             for mode, label in selected["selected"].items():
-                self.assertEqual(
-                    asdict(configs[mode]), selected["configurations"][label]
-                )
+                values = asdict(configs[mode])
+                if "solve_policy" in values:
+                    self.assertEqual(values.pop("solve_policy"), "window")
+                self.assertEqual(values, selected["configurations"][label])
             for config in configs.values():
                 self.assertEqual(config.memory_bytes, a7_r5.b1.MEMORY)
                 self.assertEqual(config.backend, "python-int")

@@ -61,6 +61,7 @@ class SIQSConfig:
     batch_width: int = 256
     filter_row_growth: int = 1
     tested_dependencies: bool = False
+    solve_policy: str = field(default="window", kw_only=True)
     memory_bytes: int | None = None
     checkpoint_bytes: int | None = None
     collector: SieveConfig = field(
@@ -82,6 +83,8 @@ class SIQSConfig:
                 object.__setattr__(self, "checkpoint_bytes", 1024 * 1024)
         if self.backend not in ("python-int", "gmpy2-mpz"):
             raise ValueError("unknown arithmetic backend")
+        if self.solve_policy not in ("window", "collection"):
+            raise ValueError("unknown SIQS solve policy")
 
         limits = {
             "base_bound": (3, MAX_FACTOR_BASE_BOUND),
@@ -152,6 +155,15 @@ class SIQSConfig:
             raise MemoryError(
                 "SIQS metadata/checkpoint reservation exceeds cap"
             )
+
+    @property
+    def paced_collection(self):
+        """Defer window finalization only while SIQS retains shared rows."""
+        return (
+            self.solve_policy == "collection"
+            and self.mode == "siqs"
+            and self.shared_relations
+        )
 
     @property
     def memory_limit(self):
@@ -228,6 +240,7 @@ class SIQSJob:
         self.active = False
         self.seen = set()
         self.finished_reason = self.divisor = None
+        self.pending_final_reason = None
         self.poly_start_rows = 0
         self.stats = dict(
             polynomials=0,
@@ -451,6 +464,7 @@ class SIQSJob:
                 batch_width=self.config.batch_width,
                 filter_row_growth=self.config.filter_row_growth,
                 tested_dependencies=self.config.tested_dependencies,
+                collection_continues=self.config.paced_collection,
                 collector_class=partial(
                     SieveCollector, precomputed_roots=roots
                 ),
@@ -471,6 +485,7 @@ class SIQSJob:
                 )
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
+                self.engine.zero_checked_count = 0
 
         if not self.config.streaming:
             self.seen.add(key)
@@ -508,7 +523,27 @@ class SIQSJob:
             self.stats["recoveries"] += 1
             self.active = False
         else:
+            self._stop_collection(reason)
+
+    def _stop_collection(self, reason):
+        """Commit a terminal boundary before attempting charged final work."""
+        if self.config.paced_collection and self.engine is not None:
+            self.pending_final_reason = reason
+        else:
             self.finished_reason = reason
+
+    def _finish_collection(self):
+        """Drain retained rows once; refusal leaves the stop pending."""
+        self.engine.budget = self.budget
+        self.budget.consume(0)
+        try:
+            self.divisor = self.engine._solve(True)
+            self.finished_reason = self.pending_final_reason
+        except MemoryError:
+            # A checked store survives an impossible downstream reservation;
+            # do not repeat that reservation at an unchanged terminal stop.
+            self.finished_reason = "memory_limit"
+        self.pending_final_reason = None
 
     def run(self, *, max_blocks=None):
         """Run or pause at block boundaries; all exhausted results retain n."""
@@ -524,11 +559,19 @@ class SIQSJob:
                 if max_blocks is not None and blocks >= max_blocks:
                     break
                 self.budget.consume(0)
+                if self.pending_final_reason is not None:
+                    self._finish_collection()
+                    break
                 self._setup()
                 if self.divisor is not None:
                     break
                 if not self.active:
-                    if not self._activate():
+                    try:
+                        activated = self._activate()
+                    except CoefficientExhaustedError:
+                        self._stop_collection("coefficient_limit")
+                        continue
+                    if not activated:
                         exhausted = "families_exhausted"
                         if (
                             isinstance(self.assignments, AssignmentStream)
@@ -577,12 +620,15 @@ class SIQSJob:
                     break
         except CoefficientDivisorError as found:
             self.divisor = found.divisor
-        except CoefficientExhaustedError:
-            self.finished_reason = reason = "coefficient_limit"
         except BudgetExhaustedError:
             reason = self.budget.reason
         except MemoryError:
-            self.finished_reason = reason = "memory_limit"
+            self._stop_collection("memory_limit")
+            if self.pending_final_reason is not None:
+                try:
+                    self._finish_collection()
+                except BudgetExhaustedError:
+                    reason = self.budget.reason
 
         if self.divisor is not None:
             if not utils.valid_divisor(self.divisor, self.n):

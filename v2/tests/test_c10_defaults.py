@@ -33,6 +33,7 @@ class C10DefaultTests(unittest.TestCase):
         for digits, number in (("40", NUMBER_40), ("50", NUMBER_50)):
             with self.subTest(digits=digits):
                 selected = asdict(default_siqs_config(number))
+                self.assertEqual(selected.pop("solve_policy"), "window")
                 self.assertEqual(selected, configurations[digits]["plan"])
                 selected["collector"]["power_plan_bytes"] = 0
                 self.assertEqual(selected, configurations[digits]["control"])

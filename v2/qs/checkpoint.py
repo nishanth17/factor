@@ -173,13 +173,15 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        5
+        6
+        if job.config.solve_policy != "window"
+        else 5
         if isinstance(job.config.collector, GrowingDoubleLargeSieveConfig)
         else 4
         if isinstance(job.config.collector, DoubleLargeSieveConfig)
         else VERSION
     )
-    if version == 5:
+    if isinstance(job.config.collector, GrowingDoubleLargeSieveConfig):
         _reserve_growing_checkpoint(job)
     engine = job.engine
     store = _store(engine.collector) if engine is not None else None
@@ -214,6 +216,8 @@ def pack_job(job):
                 else engine.extractor.next_dependency,
             ),
         )
+        if version == 6:
+            progress["zero_checked_count"] = engine.zero_checked_count
 
     payload = dict(
         version=version,
@@ -249,6 +253,11 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
+    if version == 6:
+        payload["pending_final_reason"] = job.pending_final_reason
+    else:
+        # Keep legacy checkpoint configuration and schema identities intact.
+        payload["config"].pop("solve_policy")
     encoder = json.JSONEncoder(
         default=arithmetic.json_integer, sort_keys=True, separators=(",", ":")
     )
@@ -466,7 +475,8 @@ def _checkpoint_restore_config(config, blob_bytes):
 
     # Reuse the existing eight-representation checkpoint reservation, sized
     # from actual input rather than inventing a fixed growing-mode ceiling.
-    return replace(config, checkpoint_bytes=blob_bytes + 1024)
+    # Empty growing-store snapshots can be smaller than the public minimum.
+    return replace(config, checkpoint_bytes=max(4096, blob_bytes + 1024))
 
 
 def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
@@ -489,6 +499,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         VERSION,
         4,
         5,
+        6,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -531,11 +542,19 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError("mixed-order checkpoint lacks row_order")
 
     values = dict(payload["config"])
+    if (values.get("solve_policy", "window") != "window") != (
+        payload["version"] == 6
+    ):
+        raise ValueError("SIQS scheduling policy disagrees with schema")
     collector_type = (
         GrowingDoubleLargeSieveConfig
         if payload["version"] == 5
+        or payload["version"] == 6
+        and values["collector"].get("storage_policy") == "grow"
         else DoubleLargeSieveConfig
         if payload["version"] == 4
+        or payload["version"] == 6
+        and "large_prime_bound" in values["collector"]
         else SieveConfig
     )
     values["collector"] = collector_type(**values["collector"])
@@ -666,6 +685,18 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     if payload["finished_reason"] not in allowed:
         raise ValueError("invalid SIQS checkpoint stop reason")
     job.finished_reason = payload["finished_reason"]
+    if payload["version"] == 6:
+        pending = payload["pending_final_reason"]
+        if pending not in allowed or (
+            pending is not None
+            and (
+                not config.paced_collection
+                or job.finished_reason is not None
+                or payload["engine"] is None
+            )
+        ):
+            raise ValueError("invalid pending SIQS collection stop")
+        job.pending_final_reason = pending
     job.multiplier = payload["multiplier"]
     if job.multiplier is not None:
         utils.require_integer(job.multiplier, "checkpoint multiplier", 1)
@@ -755,6 +786,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             batch_width=config.batch_width,
             filter_row_growth=config.filter_row_growth,
             tested_dependencies=config.tested_dependencies,
+            collection_continues=config.paced_collection,
             collector_class=partial(SieveCollector, precomputed_roots=roots),
         )
         engine = job.engine
@@ -763,6 +795,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "SIQS checkpoint relation store identity mismatch"
             )
         _restore_store(payload["store"], engine.collector, budget)
+        if payload["version"] == 6:
+            engine.zero_checked_count = utils.require_integer(
+                saved["zero_checked_count"], "zero-row cursor", 0
+            )
+            if engine.zero_checked_count > len(engine.collector._rows):
+                raise ValueError("zero-row cursor exceeds retained rows")
         for name in (
             "next_position",
             "last_count",
@@ -943,4 +981,8 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             ):
                 job.engine.storage_reason = None
                 job.engine.storage_solve_done = False
+        if reasons.get(job.pending_final_reason, False):
+            # The extended search can collect again. Any retained downstream
+            # prefix still runs before the engine admits another relation.
+            job.pending_final_reason = None
     return job

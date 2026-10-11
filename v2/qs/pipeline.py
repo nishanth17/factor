@@ -59,6 +59,7 @@ class QSJob:
         filter_row_growth=1,
         tested_dependencies=False,
         collector_class=SieveCollector,
+        collection_continues=False,
     ):
         """Build collection state; propagate setup failures."""
         utils.require_integer(batch_width, "batch_width", 1)
@@ -72,6 +73,8 @@ class QSJob:
             raise ValueError("filter_row_growth exceeds 4096")
         if type(tested_dependencies) is not bool:
             raise TypeError("tested_dependencies must be Boolean")
+        if type(collection_continues) is not bool:
+            raise TypeError("collection_continues must be Boolean")
         checked_position(lo)
         checked_position(hi)
         if not 0 <= hi - lo <= 1_000_000:
@@ -102,6 +105,8 @@ class QSJob:
         self.row_excess, self.batch_width = row_excess, batch_width
         self.filter_row_growth = filter_row_growth
         self.tested_dependencies = tested_dependencies
+        self.collection_continues = collection_continues
+        self.zero_checked_count = 0
         self.solver, self.extractor, self.prepared = None, None, None
         self.last_count = -1
         self.last_solved_count = -1
@@ -137,8 +142,23 @@ class QSJob:
                 not final or count == self.last_solved_count
             ):
                 return None
+            immediate = False
+            if self.collection_continues and not final:
+                # Inspect only newly admitted rows. A square must not wait for
+                # the cadence, but its original provenance still goes through
+                # ordinary preparation, filtering and checked extraction.
+                while self.zero_checked_count < count:
+                    row = relations[self.zero_checked_count]
+                    self.budget.consume(len(row.exponents) + 1)
+                    if row.sign > 0 and all(
+                        exponent % 2 == 0 for _, exponent in row.exponents
+                    ):
+                        immediate = True
+                        break
+                    self.zero_checked_count += 1
             if (
                 not final
+                and not immediate
                 and self.last_count >= 0
                 and count - self.last_count < self.filter_row_growth
             ):
@@ -238,6 +258,7 @@ class QSJob:
         }
         self.last_count = count
         self.last_solved_count = count
+        self.zero_checked_count = count
         self.solver, self.extractor, self.prepared = None, None, None
         return divisor
 
@@ -291,7 +312,9 @@ class QSJob:
                 if final and self.final_solve_done:
                     break
                 if self.solver is not None or self.extractor is not None:
-                    self.divisor = self._solve(final)
+                    self.divisor = self._solve(
+                        final and not self.collection_continues
+                    )
                     if self.divisor is not None:
                         break
                 if not final:
@@ -337,7 +360,9 @@ class QSJob:
                         break
 
                 final = self.next_position >= self.hi
-                self.divisor = self._solve(final)
+                self.divisor = self._solve(
+                    final and not self.collection_continues
+                )
                 if final:
                     self.final_solve_done = True
                 elif batch_limit is not None and batches >= batch_limit:

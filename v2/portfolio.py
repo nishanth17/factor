@@ -1027,6 +1027,9 @@ def _pack(state, config, budget, generator, policy):
     if config.allocation is not None:
         version = ALLOCATION_CHECKPOINT_VERSION
         configuration = asdict(config)
+    # Default scheduling keeps the legacy checkpoint identity and semantics.
+    if config.siqs is not None and config.siqs.solve_policy == "window":
+        configuration["siqs"].pop("solve_policy")
     payload = {
         "version": version,
         "primality": policy,
@@ -1251,6 +1254,12 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible primality policy")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if (
+            config.siqs is not None
+            and config.siqs.solve_policy == "window"
+            and "solve_policy" not in (payload["config"].get("siqs") or {})
+        ):
+            expected_config["siqs"].pop("solve_policy")
         legacy = config.sss is None and (
             payload["version"] == 3
             or (payload["version"] == 2 and config.siqs is None)

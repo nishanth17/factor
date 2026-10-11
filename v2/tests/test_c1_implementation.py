@@ -30,9 +30,12 @@ class ImplementationHarnessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="c1-control-test-") as root:
             baseline = load_slp(root)
             for arm in ("slp", "dlp"):
-                row = run_one(
-                    fixture, 7, arm_config(config, arm), arm, 3, baseline
-                )
+                candidate = arm_config(config, arm)
+                if arm == "slp":
+                    values = asdict(candidate)
+                    self.assertEqual(values.pop("solve_policy"), "window")
+                    candidate = decode_config(values, baseline[0])
+                row = run_one(fixture, 7, candidate, arm, 3, baseline)
                 self.assertEqual(row["factors"], [7, 13])
                 self.assertEqual(row["remaining"], [])
                 self.assertTrue(row["complete"])

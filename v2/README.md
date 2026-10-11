@@ -724,6 +724,25 @@ uncertainty, rejected experiments and size/budget limitations. A recorded
 balanced 50-digit success took **19 min 43 s**; one success does not establish
 broad coverage. There is no supported “50–60 digits within a minute” guarantee.
 
+## SIQS collection pacing
+
+`SIQSConfig(solve_policy="collection")` is an optional fixed scheduling
+policy for shared-store SIQS. Polynomial windows retain the configured
+`filter_row_growth` and post-filter `row_excess` rules. New zero-parity rows
+still trigger checked extraction; finite search/stall/trivial stops and full
+storage get a charged final attempt on retained originals. This may collect
+more relations before finding a factor. QS, MPQS and unshared stores retain
+per-window finalization. The reference default remains `"window"`.
+
+The new keyword-only option uses SIQS checkpoint schema **6**, preserving a
+pending terminal reason and zero-row cursor. Work, wall, CPU or cancellation
+refusal leaves work pending for charged resume, including matrix rebuilding.
+Pass cumulative allowances to `SIQSJob.from_checkpoint`; a resource extension
+cannot change scheduling policy. Schemas 1–5 and new window-policy snapshots
+keep their legacy semantics and configuration shape, including nested portfolio
+checkpoints. See the [design](benchmarks/qs/c10a05/design.md) and
+[study protocol](benchmarks/qs/c10a05/protocol.md).
+
 ## Development and benchmark runs
 
 Factoring needs no third-party runtime packages. Set up the local lint tools:

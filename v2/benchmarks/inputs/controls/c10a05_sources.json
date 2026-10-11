@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "starting_branch": "master",
+  "starting_commit": "16fe8a6180b3b86553cb2d2e56e7c27c9098e2ca",
+  "branch": "codex/c10a-05-pacing",
+  "prior_manifest_sha256": "71aa48d7950b43cd2e89e8ad098ff4b340c71a435e3b1d82adf7bc6cba549637",
+  "sources": [
+    {
+      "name": "yafu",
+      "revision": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "license": "Public-domain notices in inspected QS files; dependencies separate",
+      "repository": "bbuhrow/yafu",
+      "files": {
+        "factor/qs/SIQS.c": {
+          "sha256": "7529f4b46afdfb844bb24f28766486957fddcca174b6094669871249b7a75dbf",
+          "anchor": "target, siqs_sync, retry caller: 172,640,1023-1181,2853",
+          "verified_prior_pin": true
+        }
+      }
+    },
+    {
+      "name": "yamaquasi",
+      "revision": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "license": "BSD-3-Clause",
+      "repository": "remyoudompheng/yamaquasi",
+      "files": {
+        "src/siqs.rs": {
+          "sha256": "bec52e5a3e6018602d62ad09fee91b0eebec6039ad868c0164a338a08db5dc18",
+          "anchor": "siqs/sieve_a:119-234; new:1350-1351",
+          "verified_prior_pin": true
+        },
+        "src/relations.rs": {
+          "sha256": "cb9a1e52a1ba63fb0415bbccd401e50d4b7f1b2bb1e81f114953a256c235da5b",
+          "anchor": "gap:125-153",
+          "verified_prior_pin": true
+        }
+      }
+    },
+    {
+      "name": "flint",
+      "revision": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "license": "LGPL-3.0-or-later for inspected qsieve files",
+      "repository": "flintlib/flint",
+      "files": {
+        "src/qsieve/factor.c": {
+          "sha256": "f1e5395e736b26fea79ad1943851b581d7b65ed6d61f55c9e36c87907747aeb7",
+          "anchor": "qsieve_factor_with_tune:284-418",
+          "verified_prior_pin": true
+        },
+        "src/qsieve/large_prime_variant.c": {
+          "sha256": "ce107686acac68c25c0ffb1a6bcccb64fdc1e09ebccdf262675262507cc08d71",
+          "anchor": "qsieve_process_relation:457-567",
+          "verified_prior_pin": true
+        }
+      }
+    },
+    {
+      "name": "javamath",
+      "revision": "088d01fa97e7d0412c6cbbb8f463fa7e5f78ab97",
+      "license": "GPL-3.0-or-later",
+      "repository": "TilmanNeumann/java-math-library",
+      "files": {
+        "src/main/java/de/tilman_neumann/jml/factor/siqs/SIQS.java": {
+          "sha256": "9cf8b5e8256a8196c9e62921974a09d20300d6a6a0cef626cde3a0a1ee7cecba",
+          "anchor": "polynomial caller:265-301",
+          "verified_prior_pin": true
+        },
+        "src/main/java/de/tilman_neumann/jml/factor/base/congruence/CongruenceCollector01.java": {
+          "sha256": "4617462647c0071c28b3b3bb69a740ff325f7f77c160131d3019077298270ab1",
+          "anchor": "initialize/collectAndProcessAQPair:99-208; addSmooth:351-372",
+          "verified_prior_pin": true
+        }
+      }
+    },
+    {
+      "name": "official-msieve",
+      "revision": "1.53 release",
+      "license": "Public domain in inspected source; dependencies separate",
+      "archive_sha256": "c5fcbaaff266a43aa8bca55239d5b087d3e3f138d1a95d75b776c04ce4d93bb4",
+      "files": {
+        "mpqs/mpqs.c": {
+          "sha256": "df6200510829e8fe10c8b6e8d04f952c27ce3d87429fb7e4abfa5a5b9eac2386",
+          "anchor": "mpqs:65-125",
+          "verified_prior_pin": true
+        },
+        "mpqs/sieve.c": {
+          "sha256": "71ff57e26d18b6fc1a697a4bd84e04db0ce451a9c56575622aa27df082fd30ba",
+          "anchor": "do_sieving:427-487; do_sieving_internal:580-643; collect_relations:648-689",
+          "verified_prior_pin": true
+        },
+        "Readme.qs": {
+          "sha256": "0ec770a2b7a93e1d11135a82d5941118bd6854d702d908e5a73e33ed977dc512",
+          "anchor": "distributed/restart discussion",
+          "verified_prior_pin": true
+        }
+      }
+    },
+    {
+      "name": "alpertron",
+      "revision": "93c5c8189cb2f149c8dae898eb11997c5f2e7980",
+      "license": "GPL-3.0-or-later",
+      "repository": "alpertron/calculators",
+      "files": {
+        "siqs.c": {
+          "sha256": "011c0f7519743dae016891e503960c17651a302bb5cb51c772086677a40ac2fd",
+          "anchor": "target:2342-2345; InsertNewRelation:2644-2765; sieve caller:2884-2900",
+          "verified_prior_pin": true
+        },
+        "siqsLA.c": {
+          "sha256": "81fbb9014a54782bc5b901d68fdc844c0b0140aebc6eb84f473cead715ac19b6",
+          "anchor": "LinearAlgebraPhase:995-1093; EraseSingletons:842-940",
+          "verified_prior_pin": true
+        }
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-00-plan.json",
+      "sha256": "4083196108dd81102b52b630bd66b01753fb31d79f3ed7de5671d4e59b9f691a"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-01-plan.json",
+      "sha256": "cd3300db30a7f91749a2b751a90fedc56906e9871f7dbb6321a289235aad1ec3"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-02-plan.json",
+      "sha256": "adbe1d07c34f948850af85125cf7bbdc99c7878dc085825114746936059045b6"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-03-plan.json",
+      "sha256": "b27be0b9b6baf5f70d88736ead826c8b7347077b7ab61c92daec6ebc12d91dcb"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-04-plan.json",
+      "sha256": "fae373498044a947a5da39114c0f1bf4272605e15413bfc8cf00e31d382d008e"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-05-plan.json",
+      "sha256": "a0f26110cb676e7557733e4e064e72866d4226aa66ba961af20289f89abbf9ac"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-06-plan.json",
+      "sha256": "d769af27fd8cb00d6038df3efd451b9e6c04b8ee1af2d997d4ae7cc13e1052d3"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-07-plan.json",
+      "sha256": "fe25d8962623e08addcda1fd4ea5aa42006419bafed3ae9ab81021fc01e5b79a"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-40-08-plan.json",
+      "sha256": "9fc269ced99b53a7a821c3063e637845572ba7e9da576648fa34dd17c495dd09"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-00-plan.json",
+      "sha256": "da25e348e2602fb7398992f1e247bc7865cd51e8d3bf12aa149d2b9586878de0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-01-plan.json",
+      "sha256": "3c67db311f28bd416265c6689ff2d8a05b0909d413b2acacfd9ec01706387479"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-02-plan.json",
+      "sha256": "029070a707ad3f8cfa6d28bce948c009f98e3dffb1475dba76666c1093d0d5a8"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-03-plan.json",
+      "sha256": "085ba866d686d762cfea17fcb96565461384d63e512446f6aefe94b0b4b54450"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-04-plan.json",
+      "sha256": "222dbef4cfdd39b033a1337c0695a66c7963e953fbf70731b59893303f526fe0"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-05-plan.json",
+      "sha256": "dd93c401181e4e060118ef7706076310a125df3f77b3b7c46fc9152caae24a80"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-06-plan.json",
+      "sha256": "39b78a45a8ca824134a483baa79c8b1d67c33e9bb0830843b4cc4076ea710735"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-07-plan.json",
+      "sha256": "6ef5f8b8835d9d134ddefa64902feae09d4d73dc4f0c269d9af8b0cfd4e14cc7"
+    },
+    {
+      "path": "v2/benchmarks/results/c10/experiment/confirm-50-08-plan.json",
+      "sha256": "a327ebba0be1f6b934a9343014c39eb34877078f07ba530e78bad8169133908b"
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/feasibility/baseline-40.json",
+      "sha256": "8cd0b46f8ae065f34a5de460c028b3303692f6c3cdec5f65a3960edae8b15c65",
+      "instrumented": true
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/feasibility/baseline-50.json",
+      "sha256": "529a622552dd2b2a6b6acceda1c17888968175fdaf76cbad761a7fd58653cf7b",
+      "instrumented": true
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/feasibility/collection-40.json",
+      "sha256": "699170a53369572b0de707031d695748c89e87b49f4b859ad49bbcb6755d1bfb",
+      "instrumented": true
+    },
+    {
+      "path": "v2/benchmarks/results/c10a05/feasibility/collection-50.json",
+      "sha256": "a1962faca58f3da39aa4c47fc8c24b080055fff605ef2aa6f1f88dbf41ccc5ba",
+      "instrumented": true
+    }
+  ],
+  "papers": [
+    {
+      "name": "ekkelkamp-thesis.pdf",
+      "sha256": "44c0737dc7e11c20faa804e094bab980e60deb9a7a1fc444f8d42fb8ef2979e6",
+      "sections": "4.3,4.6.3,4.6.4",
+      "license": "Copyright authors/publishers; linked and paraphrased only"
+    },
+    {
+      "name": "leyland-ants2002.pdf",
+      "sha256": "1ec972f875a624cd33d80dcc4dfee0043af86b7daa8fe8c4fdf05cf97c72d577",
+      "sections": "2.3,3",
+      "license": "Copyright authors/publishers; linked and paraphrased only"
+    },
+    {
+      "name": "cavallar.pdf",
+      "sha256": "f612bcaef988228861c852b357e23579bca0e954517256f1c41aaf63962abc66",
+      "sections": "2.1-2.2",
+      "url": "https://ir.cwi.nl/pub/2078/2078D.pdf",
+      "license": "Copyright authors/publishers; linked and paraphrased only"
+    },
+    {
+      "name": "boender.pdf",
+      "sha256": "2efb9bfc1289a4f965854fcf45cf9a7b2565066417a54ca48875450e0a840a31",
+      "sections": "5-7",
+      "url": "https://ir.cwi.nl/pub/1367/1367D.pdf",
+      "license": "Copyright authors/publishers; linked and paraphrased only"
+    }
+  ],
+  "method": "Pinned executable callers read, hashes checked, targeted primary web search; no upstream code copied into runtime or upstream executable timed.",
+  "prior_literature_verification_sha256": "f220a177826880b3b70653726ea1ca1ddfeec4574ae45e0734fbd0c63811d97e"
+}
