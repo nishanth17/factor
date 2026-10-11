@@ -25,13 +25,13 @@ from .relations import (
     verify_atomic,
     verify_combined,
 )
-from .storage import require_published
 from .sieve_collector import (
     DoubleLargeSieveConfig,
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
 )
+from .storage import require_published
 
 VERSION = 3
 MAX_BLOB_BYTES = 64 * 1024 * 1024

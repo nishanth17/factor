@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "base_manifest_sha256": "aee694323ef4c5090677c052cf4b3982f760f413639bf6f00abd2e9d50595e49",
+  "repo": "bbuhrow/yafu",
+  "revision": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+  "files": {
+    "include/cofactorize.h": "7864513209ed0f846cc1f0d080e4ea3e790ebfe21321726b2e5cf5b0449065b2",
+    "factor/qs/cofactorize_siqs.c": "408d142687f63aa065b017f2b301490554ad8c7c5f48a12d850db250e45381be",
+    "factor/qs/siqs_test.c": "0e17e0901d0a473cd1dac454f0d8ccad36ffc280af6bd5bc5680bca9589829d6",
+    "factor/gpu_cofactorization.c": "06f0a5a51bf08e15b8843223156aaaaa1b97497563bbe0efc68bffc4bd60eaa7"
+  }
+}

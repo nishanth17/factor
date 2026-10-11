@@ -331,3 +331,10 @@ were zero in C1 fresh confirmation; filter loss and eviction were nonzero.
 The new [bounded protocol](c9_protocol.md) fixes longer observations and the
 initial finite experiment. Findings and decisions will be appended separately;
 this ranking is a research investment decision, not a performance claim.
+
+## Adaptive-growth follow-up
+
+The user-directed [C9.2 audit](c9_growth_audit.md) follows the relevant full
+SIQS growth paths and also records their actual limits, including YAFU tiny-QS,
+cycle traceback restrictions and Yamaquasi final-row truncation. It supersedes
+the production fixed-storage assumption without rewriting C9.1 outcomes.
