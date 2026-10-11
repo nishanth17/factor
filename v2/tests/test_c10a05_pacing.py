@@ -398,6 +398,41 @@ class PacingTests(unittest.TestCase):
                 )
                 self.assertEqual(restored.result.reconstruct(), 4001 * 5003)
 
+    def test_pending_stop_extension_keeps_solver_and_cumulative_allowance(
+        self,
+    ):
+        job = terminal_job()
+        job.pending_final_reason = "stalled_yield"
+        job.active = True
+
+        def partial(solver):
+            solver.step()
+            job.budget.reason = "work_limit"
+            raise BudgetExhaustedError("work_limit")
+
+        with patch.object(DependencySolver, "run", partial):
+            self.assertEqual(job.run().reason, "work_limit")
+        cp = json.loads(json.dumps(job.checkpoint()))
+        extended = replace(job.config, max_stalled=job.config.max_stalled + 1)
+        budget = allowance(cp["resources"]["work_used"] + 100000)
+        restored = SIQSJob.from_checkpoint(
+            cp, budget=budget, config=extended, allow_extension=True
+        )
+        self.assertIsNone(restored.pending_final_reason)
+        self.assertEqual(restored.engine.solver.next_row, 1)
+
+        for _ in range(3):
+            budget.work_limit = budget.used
+            before = budget.used
+            self.assertEqual(restored.run().reason, "work_limit")
+            self.assertEqual(budget.used, before)
+            cp = json.loads(json.dumps(restored.checkpoint()))
+            budget = allowance(cp["resources"]["work_used"] + 100000)
+            restored = SIQSJob.from_checkpoint(cp, budget=budget)
+            self.assertGreater(budget.used, before)
+        self.assertEqual(restored.run().divisor, 101)
+        self.assertLessEqual(budget.used, budget.work_limit)
+
 
 if __name__ == "__main__":
     unittest.main()

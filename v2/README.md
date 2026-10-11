@@ -734,6 +734,15 @@ storage get a charged final attempt on retained originals. This may collect
 more relations before finding a factor. QS, MPQS and unshared stores retain
 per-window finalization. The reference default remains `"window"`.
 
+Omitted native **50-digit** configurations select `"collection"` for the
+accepted C9/C10 bundle at exactly **1 GiB owned memory**. The fresh study
+reduced complete cost by 25.99% (95% interval 22.87–28.24%) on three certified
+balanced inputs and nine matched pairs. The 40-digit comparison was
+inconclusive after eighteen pairs and keeps `"window"`. Explicit settings,
+other memory allowances, backends and sizes retain their existing selection.
+This is a scoped result, not a general semiprime runtime guarantee; see the
+[results and limitations](benchmarks/qs/c10a05/results.md).
+
 The new keyword-only option uses SIQS checkpoint schema **6**, preserving a
 pending terminal reason and zero-row cursor. Work, wall, CPU or cancellation
 refusal leaves work pending for charged resume, including matrix rebuilding.
@@ -742,6 +751,15 @@ cannot change scheduling policy. Schemas 1–5 and new window-policy snapshots
 keep their legacy semantics and configuration shape, including nested portfolio
 checkpoints. See the [design](benchmarks/qs/c10a05/design.md) and
 [study protocol](benchmarks/qs/c10a05/protocol.md).
+
+The inherited 1200-second omitted grant is a finite API default, not a
+universal feasibility limit. Pass an explicit `Budget` for a different work,
+wall or CPU allowance. For experiments, choose the observation window from
+separate feasibility evidence and freeze it before confirmation; record
+timeouts as censored outcomes and preserve cumulative allowances on resume.
+This study used 360-second training and 480-second fresh 50-digit caps, with
+headroom over its pilot and historical complete calls. It did not calibrate
+runtime tails across arbitrary 50-digit inputs.
 
 ## Development and benchmark runs
 

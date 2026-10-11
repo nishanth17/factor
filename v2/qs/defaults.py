@@ -28,9 +28,9 @@ def uses_siqs_defaults(n, *, backend="python-int"):
 def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
     """Select accepted 40/50-digit bundles without changing explicit quotas.
 
-    The plan is enabled only at the confirmed 1 GiB owned allowance. Other
-    sizes/backends retain the reference configuration; an explicit memory
-    allowance remains binding and does not acquire an untested plan policy.
+    The plan and 50-digit collection pacing use the confirmed 1 GiB owned
+    allowance. Other sizes/backends retain the reference configuration; an
+    explicit memory allowance remains binding.
     """
     if not uses_siqs_defaults(n, backend=backend):
         return SIQSConfig(backend=backend, memory_bytes=memory_bytes)
@@ -56,6 +56,13 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         row_excess=32,
         batch_width=4096,
         filter_row_growth=32,
+        # C10a-05 passed fresh complete-cost gates only at 50 digits. Keep
+        # legacy window pacing for the inconclusive 40-digit comparison.
+        solve_policy=(
+            "collection"
+            if not forty_digits and owned_memory == C9_MEMORY_BYTES
+            else "window"
+        ),
         memory_bytes=owned_memory,
         checkpoint_bytes=1048576,
         collector=GrowingDoubleLargeSieveConfig(

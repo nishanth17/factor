@@ -40,11 +40,11 @@ class C9DefaultTests(unittest.TestCase):
             "challenger"
         ]
         selected = asdict(default_siqs_config(NUMBER))
-        self.assertEqual(selected.pop("solve_policy"), "window")
+        self.assertEqual(selected.pop("solve_policy"), "collection")
         self.assertEqual(
             selected["collector"]["power_plan_bytes"], C10_POWER_PLAN_BYTES
         )
-        # C10 composes only its confirmed power plan with C9's frozen bundle.
+        # C10/C10a-05 add only their confirmed plan/pacing to this bundle.
         selected["collector"]["power_plan_bytes"] = 0
         self.assertEqual(selected, accepted)
         self.assertEqual(SIQSJob(NUMBER).config, default_siqs_config(NUMBER))

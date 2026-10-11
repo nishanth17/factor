@@ -81,6 +81,10 @@ nullity is m−rank, at least m−c. Positive surplus is sufficient for kernels,
 not necessary; a zero row is already a kernel, and a kernel may give only
 trivial GCDs. Provenance lifting and proper-divisor tests remain necessary.
 
+The inspected JavaMath SIQS constructor (`SIQS.java:117`) instantiates
+`CongruenceCollector01`, linking the collection loop to the target/retry
+implementation in the table rather than assuming an unused collector applies.
+
 **Engineering inference:** preserve the current cadence and surplus at
 shared-store polynomial boundaries, while keeping immediate zero-parity and
 genuine terminal opportunities. This changes scheduling alone. An unconditional

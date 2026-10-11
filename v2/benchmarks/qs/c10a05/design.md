@@ -4,6 +4,8 @@ Keyword-only `SIQSConfig.solve_policy` defaults to `window` (legacy). `collectio
 only to shared-store SIQS. Direct QS/MPQS and SIQS with unshared stores keep
 per-window finalization. No collector arithmetic, polynomial order, residual
 admission, matrix representation or filtering algorithm changes.
+The confirmed automatic selector uses `collection` only for its native
+50-digit, 1 GiB bundle; explicit configurations keep their own policy.
 
 | State/event | Transition |
 | --- | --- |

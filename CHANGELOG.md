@@ -1,5 +1,23 @@
 # Changelog
 
+## C10a-05 collection and solve pacing (11 October 2026)
+
+- Separate shared SIQS polynomial-window completion from genuine collection
+  exhaustion. Preserve fixed cadence/surplus, immediate checked square
+  dependencies and a charged terminal attempt on retained originals. Keep
+  pending solver/extractor state, cumulative allowances and finite stopping;
+  schema 6 persists the new policy while legacy checkpoints keep window pacing.
+- Adopt collection pacing only for the accepted native 50-digit bundle at
+  exactly 1 GiB owned memory. Nine fresh matched pairs on three certified
+  inputs reduced complete cost by 25.99% (95% interval 22.87–28.24%), with
+  9/9 validated completions per arm. Retain 40-digit window pacing after its
+  inconclusive eighteen-pair extension; small/30-digit controls also stay.
+- Record six-source executable scheduling research, independent dependency
+  witnesses, repeated serialized resume and finite benchmark leases. Preserve
+  historical studies and original atoms. Close only C10a-05; C9a feedback,
+  other C10a mechanisms and E1 combined acceptance remain open. No compounded
+  portfolio speed claim. See `v2/benchmarks/qs/c10a05/results.md`.
+
 ## C10 bounded tranche integration (11 October 2026)
 
 - Route omitted native 40/50-digit SIQS through the frozen growing-DLP bundles

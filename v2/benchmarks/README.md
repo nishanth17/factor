@@ -23,6 +23,7 @@ see [contributor guidance](../../AGENTS.md).
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
 | [qs/c10/](qs/c10/tranche1_results.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
+| [qs/c10a05/](qs/c10a05/results.md) | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
 | [qs/a7/](qs/a7/) | Frozen comparison arms and reconciliation |
 | [primality/a10/](primality/a10/) | Primality dispatch and validation |
 | [infrastructure/](infrastructure/) | Arithmetic backends, parallelism, sieves and performance audits |
@@ -38,6 +39,20 @@ their [existing parameter audit](qs_parameter_audit.md) and C10a/C9a follow-up o
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
 
+The [C10a-05 report](qs/c10a05/results.md) separates polynomial windows from
+collection exhaustion. A single fixed challenger was compared against the
+current C9/C10 plan: 63 training pairs and 27 fresh pairs, 180 validated
+complete calls. Fresh 50-digit cost fell 25.99% (95% interval 22.87–28.24%)
+over nine matched pairs on three independent certified inputs. Only that
+native 1 GiB bundle adopts collection pacing; 40 digits remains on window
+pacing after its unstable eighteen-pair extension. The report includes extra
+collection, downstream stages, setup, work, storage and charged replay costs.
+The 6244.182-second inclusive study charge includes prepaid feasibility/QA;
+cold probes and censored profiles are separate. Reproduce the frozen runner
+at `96e2aad`; current integration intentionally changes its strict source pin.
+Other C10a items, C9a feedback and E1 remain open. These percentages are not
+additive with earlier C1/C9/C10 studies.
+
 The [C10 tranche 1 report](qs/c10/tranche1_results.md) records an isolated
 2 MiB prime-power plan improvement on fresh complete factoring: 21.83% at
 40 digits (95% interval 12.47–24.88%) and 17.79% at 50 digits (16.11–19.48%),
@@ -50,8 +65,9 @@ whole-group reservation; the fresh 9/9 result, not that partial training
 interval, supports the scoped decision. Cold starts, profiles, work and
 memory are reported separately. The [C10 default decision](qs/c10/default_promotion.md)
 routes the exact 40/50-digit native bundles and plan automatically at the
-confirmed memory allowance. The six conditional follow-ups remain C10a; this
+confirmed memory allowance. The six conditional follow-ups were assigned to C10a; this
 closes the delivered C10 tranche without claiming the whole size-policy space.
+The subsequent C10a-05 decision above resolves only fixed collection pacing.
 
 The subsequent [C9 default promotion](qs/c9/c9_default_promotion.md) makes its
 confirmed native 50-digit bundle automatic at the user's direction, preserving
