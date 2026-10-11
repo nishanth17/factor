@@ -297,7 +297,217 @@
           "bytes": 152398
         }
       }
+    },
+    {
+      "name": "prague-sieves",
+      "revision": "Publisher 2010/2015 source archive, retrieved 2026-10-11",
+      "url": "https://www.karlin.mff.cuni.cz/~krypto/sieves_common_files/sieves_src.tar.bz2",
+      "archive_sha256": "61cad09211add0eaf3e3b012b17d39247da4c20b15665d040e21091b2d7f4e90",
+      "license": "LGPL per publisher page; version unspecified there; inspected files contain no more specific license header",
+      "license_url": "https://www.karlin.mff.cuni.cz/~krypto/Implementace_MPQS_SIQS.html",
+      "files": {
+        "ks/ks/definitions.h": {
+          "sha256": "45ae4f120bb0d7ea74038ca89ed665155be3a88afe79e4394355a3a3cc5657be",
+          "bytes": 14827
+        },
+        "ks/ks/line_siever.cpp": {
+          "sha256": "34118b45e91f5ff957f800245329313c7f45b50b3514b136594b034179defbd7",
+          "bytes": 118923
+        },
+        "ks/ks/line_siever.h": {
+          "sha256": "c953ccb343b3bb1d71d6511eccbfd5b65e0a4394c761873a615d5cffdd727b3e",
+          "bytes": 16420
+        },
+        "ks/ks/mpqs.cpp": {
+          "sha256": "eecfc5bed10571dbbec151104d5f82a7a897f2d2658097fa9749e0570f295893",
+          "bytes": 21441
+        },
+        "ks/ks/parameter_test.cpp": {
+          "sha256": "979efac453464c5758f94c2281a7e47d519233447820e6f55e903f5344b0449a",
+          "bytes": 3681
+        },
+        "ks/ks/parameter_test.h": {
+          "sha256": "d91735ad0f91a8f8dbd83acd31f90cb5a5bfa44651def7e27d91388abb5cdaec",
+          "bytes": 980
+        },
+        "ks/ks/qs_parameter_names.h": {
+          "sha256": "c285cb66ed8eab81faec2f64392e69bd8e28c7dc8e8e3d61036f85eb055f8b9f",
+          "bytes": 1704
+        },
+        "ks/ks/qs_parameters.cpp": {
+          "sha256": "4fc9bccb6bd3c4f6c7514123044f465ed27497dda04bdfd7af2fa66eb479b8e6",
+          "bytes": 17512
+        },
+        "ks/ks/qs_parameters.h": {
+          "sha256": "735e430c753e6de8e93003c4e5e62d3c3e711dfb56a72bb41b774ce7c06d82cc",
+          "bytes": 6304
+        },
+        "ks/ks/quadratic_sieve.cpp": {
+          "sha256": "b57ae59c3be1de0158a33b27616bf7cf8c6d32b3821e8b2b505baffc46c1e8de",
+          "bytes": 474112
+        },
+        "ks/ks/quadratic_sieve.h": {
+          "sha256": "3436e4ada81a777bf90b8678c37b14c9d77329d8f8b928fbf74efa47493b7c60",
+          "bytes": 52255
+        },
+        "ks/ks/types.h": {
+          "sha256": "82373da446cb16ac1c442170913b4f38a9c9def8851aa3f55f06f1591cb21958",
+          "bytes": 10257
+        },
+        "ks/libs/abstract_sieve.cpp": {
+          "sha256": "f4a1d442a59f733e5e3b4ae5243522dbc24a5eef954b3b7d8328a2a2dafeec34",
+          "bytes": 15159
+        },
+        "ks/libs/abstract_sieve.h": {
+          "sha256": "875fc2805678aa1cb6f79826c39fe24cebb993a68ba3765203edd9d6514c45e9",
+          "bytes": 9474
+        },
+        "ks/libs/polynom_class.cpp": {
+          "sha256": "6c1ee17357d3f98619a6fa142f6569505b3d5ba0ed2969f74863500e080055cb",
+          "bytes": 92403
+        },
+        "ks/libs/polynom_class.h": {
+          "sha256": "cb638485d3896720a870af803ef787683e5a42b3ad32c069f2d575a6653c694e",
+          "bytes": 8995
+        },
+        "ks/libs/threshold_optimizer.cpp": {
+          "sha256": "ffbe41a2ee5138009946b8f313bf57d4b85a17b4b135cfb0416811b6050f94bb",
+          "bytes": 4238
+        },
+        "ks/libs/threshold_optimizer.h": {
+          "sha256": "6e2d96421c1223fe84e1b61abf06b774918d7355accbc63fea391cd36c80a91b",
+          "bytes": 1799
+        },
+        "ks/libs/types_common.h": {
+          "sha256": "47ee42d9903f84f3a08a84a4645190f04d0c1cc74ed5b34b131f1ec4cc433523",
+          "bytes": 5946
+        }
+      }
+    },
+    {
+      "name": "cuda-mpqs",
+      "repository": "drjanosch42/cuda-mpqs",
+      "revision": "99c61967585b97a71b28fbaf19690af83ac88c17",
+      "tag": "v1.0.8",
+      "license": "LGPL-3.0-only with NVIDIA CUDA Toolkit linking exception; source SPDX and LICENSE.md",
+      "files": {
+        "LICENSE.md": {
+          "sha256": "ea3b581a677c3bbf52b3a5dba33766e7944f50fe17fa4d5b7b7664ce293fd597",
+          "git_blob": "2865e8ca6f0a67f7d05e3967350f86550da94449",
+          "bytes": 8578
+        },
+        "LICENSE.GPL": {
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "git_blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+          "bytes": 35149
+        },
+        "README.md": {
+          "sha256": "19cf76097b274d1c0b6d43ebe21ccc723f685a705fcb7953c8f1dae2c6be8bec",
+          "git_blob": "f0d39ab018cb7e5c18b7ed0f6d2945fc39cbf0c6",
+          "bytes": 20614
+        },
+        "src/orchestrator/orchestrator.cpp": {
+          "sha256": "e2865fcce38864c62ae840e0ee36cbe45387ab3dd228fa3d1801368b73f889d5",
+          "git_blob": "d6eb8839fede19f1a2da801bec6f54835755b4e4",
+          "bytes": 469368
+        },
+        "src/autotune/autotune.cpp": {
+          "sha256": "0c2e9472e5494101f80f7b4ed2248ff17f8336b78dae996b6f4c69b516535f0e",
+          "git_blob": "7a40d0eaf130a56d9625d3057e713c8e9fc75c09",
+          "bytes": 62186
+        },
+        "src/autotune/autotune_projection.cpp": {
+          "sha256": "1016518cc75594c131285a242dfda2b2c4a8d14c67050232efb76c1258a88b33",
+          "git_blob": "7e1e092816647ec86b7f5ecbe5b4965ac898f17e",
+          "bytes": 18947
+        },
+        "src/autotune/sieve_optimizer.cpp": {
+          "sha256": "cec1f13b6732ae3b776af4d0e4c2517bdb3e10589fc761223960d5be0765bbe4",
+          "git_blob": "7e2cc6d0dd197c54fb5564189ee45b93a3499990",
+          "bytes": 26604
+        },
+        "src/autotune/auto_apply.cpp": {
+          "sha256": "71f9385d421e3fc837f105e569a8d681013f54b79ef6a199c910cf6a97cb64b9",
+          "git_blob": "2a21e90bd5bdc02ac9d814678ab65c3ed54707c9",
+          "bytes": 17713
+        },
+        "src/autotune/autotune_types.h": {
+          "sha256": "c102479d87c2e8193ba44e38b8dc4910059cf25641d86b2f0944147fb3b326bc",
+          "git_blob": "55e626e9d5a0067657963d3054cc394c2b63987e",
+          "bytes": 5793
+        },
+        "src/autotune/runtime_estimator.cpp": {
+          "sha256": "28b759ffdb9b9ddf9eaf6ce57974b6380c7d390e19963b0d89604f3f2c454660",
+          "git_blob": "93d201e2f53dae37dd593411b5b24863494e84cb",
+          "bytes": 12926
+        },
+        "src/sieve/device_sieving_controller.cpp": {
+          "sha256": "b401cf80dfe56d0944c8c55ff9ff846812121777c75b3fcdbc20e544ecfee5fd",
+          "git_blob": "c959757078b9add5a8b7321aa4abc0feafb0e502",
+          "bytes": 181559
+        },
+        "src/sieve/kernel.cu": {
+          "sha256": "061ee5cbf18ac60fc7596cfc410d841a77bacbc4f9b508d83b7d9302befeae51",
+          "git_blob": "cd614a6851ecc681bfb70bf3415559adb54a250f",
+          "bytes": 159450
+        },
+        "src/sieve/prime_algorithms.cu": {
+          "sha256": "88cd5659d3856d9106ef979cabce84cecd8da6f798c3a3258f8310be4feb5abd",
+          "git_blob": "4cf3a2dba5985706c95092d49683c78015f0f73e",
+          "bytes": 35379
+        },
+        "src/sieve/graycode.cuh": {
+          "sha256": "0f68aa75e1fc1ba4bc9c76a29e25be3a1f610826393a45a130801a1cf2e9f61b",
+          "git_blob": "bb77d778f32a1f6e8e5269fa6cd78444f1ddf8ac",
+          "bytes": 2982
+        },
+        "src/sieve/sieving_data_structs.h": {
+          "sha256": "d425aaa1733f43009d14e20656f3eb5e0e963de6a24385ced9442acbf2d2c6a2",
+          "git_blob": "ead3e302609675a8ff636f50b898e94f71570e0f",
+          "bytes": 17025
+        },
+        "src/sieve/README.md": {
+          "sha256": "6f3f8a27f2eff599b4ab84dbdf855af6cb1803ac8d5bcbd507103ba3e782c77c",
+          "git_blob": "92044e1d2a4b863aa7ec70a3369b442a4dfe0c6b",
+          "bytes": 3931
+        },
+        "docs/modules/autotune.md": {
+          "sha256": "502289cf3776556a81b3dae4fe86b9bc7a2ec0e3a39e1b0ea541c8850680ad09",
+          "git_blob": "e52a0052f5f3567deefdec9abe1750ae39ff4f9c",
+          "bytes": 55901
+        },
+        "docs/modules/sieve.md": {
+          "sha256": "12a4edb6dd04eae78d44766afb918d057d3c1a9928da61ab0f13ceab825ef480",
+          "git_blob": "d6fa04e08899730b744a7a8fb3af44b6cbbf78bb",
+          "bytes": 115218
+        }
+      }
     }
   ],
-  "method": "Read executable source and callers. Git blob hashes verified against pinned tree snapshots; official msieve archive verified by SHA-256. No upstream code copied into the implementation or executed."
+  "method": "Read executable source and callers. Git blob hashes verified against pinned tree snapshots; official msieve and Prague source archives verified by SHA-256. No upstream code copied into the implementation or executed.",
+  "supplement_review_date": "2026-10-11",
+  "supplemental_literature": [
+    {
+      "author": "Marian Kechlibar",
+      "title": "The Quadratic Sieve - Introduction to Theory with Regard to Implementation Issues",
+      "date": "2005-04-15",
+      "url": "https://www.karlin.mff.cuni.cz/~krypto/Implementace_MPQS_SIQS_files/main_file.pdf",
+      "sha256": "14c268f31e6cb7d3d18efb61ec59fbac8ba3759d8cdb153b09ee6f28f75379e7"
+    },
+    {
+      "author": "Colin Percival",
+      "title": "The implicit constant in the Quadratic Sieve",
+      "date": "2005-11-30",
+      "url": "https://www.daemonology.net/blog/2005-11-30-quadratic-sieve-constant.html",
+      "status": "Primary author blog used for discovery, not performance evidence"
+    },
+    {
+      "author": "Fabian Januszewski and Christoph Heinrichs",
+      "title": "CUDA-MPQS: A GPU-Resident Self-Initializing Quadratic Sieve, and the Factorization of RSA-155",
+      "date": "2026-10-05",
+      "url": "https://arxiv.org/html/2610.07126v1",
+      "revision": "arXiv:2610.07126v1",
+      "status": "Primary paper used for mechanism discovery; claims checked against pinned source, no GPU measurements reproduced"
+    }
+  ]
 }

@@ -72,6 +72,9 @@ The latter's historical SLP/DLP description does not describe the pinned
 current caller. Yamaquasi's displayed normalized-polynomial denominator omits
 A in one explanatory equation; the executable polynomial and exact identity
 below require `4A`. Informal timing/blog claims are not accepted measurements.
+The [supplemental source audit](source_supplement.md) follows Kechlibar's
+paper to the Prague implementation and a recent GPU SIQS paper to CUDA-MPQS
+v1.0.8. Both additional implementations are pinned in the same manifest.
 
 ## End-to-end transfer map
 
@@ -111,6 +114,7 @@ normalized-polynomial speedup.
 | 6 / A1a handoff, AP05–09 | Alpertron `PerformSiqsSieveStage` / root setup, YAFU dense/bucket SIMD dispatch, msieve `fill_sieve_block`; v2 `_sieve`, `_power_marks`, `_add`, family root transitions | **Missing kernels / native-only layouts.** Bounded periodic presieve, precomputed root deltas/inverses and density-aware marking are coherent kernel candidates. SIMD intrinsics and paired byte tricks are not direct PyPy transfers. Detailed handoff below; do not implement a competing kernel in C10. |
 | 7 / N06 | msieve `fill_sieve_block` / `scan_sieve_block`, JavaMath skipped-prime compensation, Alpertron `PerformTrialDivision`; v2 `_sieve`, `_resieve`, `_divide`, `small_prime_cutoff`, score backends | **Equivalent options, previous losses and uncalibrated policy.** Scanning, root-guided exact recovery and resieving exist. Tiny-prime omission needs conservative compensation or a declared loss experiment; old losses remain. Saturation must clip thresholds consistently. A smaller candidate list alone is not a win. |
 | 8 / N07 | FLINT relation-processing threshold and base-growth loop; msieve base+96 target; Alpertron max(33*base/32,base+50); v2 `QSJob._solve`, `row_excess`, `filter_row_growth`, `weight_two` | **Uncalibrated collection policy, separate solver ownership.** Cadence can avoid repeated filtering/solving or overcollection. Measure useful post-filter rows, original-row dependencies and extraction, not raw row counts. C10 may tune cadence later; matrix representation/solver changes belong to A8/B6/B7/C4/D1/D2. |
+| follow-up / N09 | CUDA-MPQS `globalMetaSieveBatchKernel` and controller batch dispatch, msieve large-prime polynomial blocks; v2 `SieveCollector._sieve`, `_set_plan_interval`, `SIQSJob._activate` | **Missing cross-polynomial sparse-hit planning; native layout not transferable.** Reuse sparse-prime loads across a bounded block of Gray polynomials. Existing v2 bucket/plan ownership is per polynomial. Defer to A1a after N04: distinguish any remaining repeated sparse setup from Hensel lifting; charge simultaneous buckets, root state and replay, and preserve assignment provenance. No benefit estimate is justified yet. |
 | separate / C9 deltas | `large_prime_collector`, `large_primes`, storage/checkpoint; native residual matching/graphs | **Owned by C9.** Keep exact certified endpoint/product domains and retention policies settled for C10. Native opaque residual matching is not equivalent to v2 certainty. No new split/match/graph changes here; C9a/C1a remain separate. |
 | separate / C8 | Gray schedules versus CRT half-sum construction; v2 `PolynomialFamily` and `sss` schedulers | **Existing Gray mechanism; separate missing scheduler.** Product ordering neither supplies family-wide CRT half-sums nor establishes SSS superiority. C8/E1 remain separate. |
 
