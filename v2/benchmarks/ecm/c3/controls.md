@@ -55,3 +55,19 @@ its original 2400-second allowance. Restart training under a 2100-second cap.
 Original v4 source/prose/control and the A7 receipt stay immutable; a new
 chained A7 v5 integration receipt pins the repaired source. Confirmation's
 original finite allowance remains unchanged.
+
+
+The user interrupted revision-5 training after 337 of 360 complete, persisted
+calls. The process exited without an aggregate; no selection or fresh inputs
+existed. `c3_training_recovery.json` is a separately committed recovery freeze:
+it pins every surviving receipt, the unchanged active protocol and an additive
+recovery runner. The prior active interval was 517.317 seconds from published
+owner start to the last receipt; conservatively charge 600 seconds, including
+an abandoned call and overhead, against the existing 2100-second grant.
+Rewarm every arm for the unfinished input for at least three validated seconds
+and execute only the 23 missing assignments, in the original order, within the
+remaining 1500 seconds. Never rerun or choose among surviving samples. This
+amendment changes only interruption recovery, not settings, sample counts,
+selection, confirmation or the original combined 2400-second training cap.
+The aggregate reports the conservative charged interval separately from the
+observed prior interval. If recovery fails, training selection remains blocked.
