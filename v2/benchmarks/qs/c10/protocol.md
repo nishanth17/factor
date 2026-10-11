@@ -72,6 +72,9 @@ hierarchical 95% bootstrap intervals resample inputs then matched samples.
 Three independent inputs do not become nine independent inputs through seeds.
 Scoped performance adoption requires no loss of completion, stable complete
 outputs and an interval wholly below zero for challenger/control cost change.
+The complete planned allocation must be present: nine or eighteen matched
+samples, balanced across the three inputs. Partial extensions remain
+descriptive resource-censored evidence even if an interim interval is negative.
 Mixed/censored/unstable evidence is deferred or rejected, never a universal
 speed claim. If no arm advances, record the negative training result and stop
 confirmation; do not spend fresh inputs merely to fish for a winner.

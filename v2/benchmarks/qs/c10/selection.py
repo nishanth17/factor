@@ -219,6 +219,13 @@ def comparison(rows, arm):
     result = dict(
         samples=len(pairs),
         independent_inputs=len(identities),
+        sample_plan_complete=(
+            len(pairs) in (9, 18)
+            and len(identities) == 3
+            and all(
+                len(group) == len(pairs) // 3 for group in by_input.values()
+            )
+        ),
         cost_change=sum(b["capped_seconds"] for a, b in pairs)
         / sum(a["capped_seconds"] for a, b in pairs)
         - 1,
@@ -239,8 +246,7 @@ def comparison(rows, arm):
         unstable=instability([r for pair in pairs for r in pair]),
     )
     result["passes_scoped_gate"] = (
-        len(pairs) >= 9
-        and len(identities) >= 3
+        result["sample_plan_complete"]
         and result["complete_challenger"]
         == result["complete_control"]
         == len(pairs)

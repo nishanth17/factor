@@ -98,6 +98,32 @@ class C10StudyTests(unittest.TestCase):
             restored = study.expenses(Path(directory))
             self.assertGreaterEqual(restored.used(), 920)
 
+    def test_partial_extension_cannot_pass_confirmation(self):
+        rows = [
+            row(a, i, 10 if a == "control" else 9)
+            for i in range(12)
+            for a in ("control", "plan")
+        ]
+        result = selection.comparison(rows, "plan")
+        self.assertFalse(result["unstable"])
+        self.assertLess(result["cost_change_interval"][1], 0)
+        self.assertFalse(result["sample_plan_complete"])
+        self.assertFalse(result["passes_scoped_gate"])
+
+    def test_unbalanced_input_allocation_cannot_pass_confirmation(self):
+        rows = [
+            row(a, i, 10 if a == "control" else 9)
+            for i in range(9)
+            for a in ("control", "plan")
+        ]
+        for value in rows:
+            if value["sample"] == 8:
+                value["id"] = "input-0"
+        result = selection.comparison(rows, "plan")
+        self.assertEqual(result["independent_inputs"], 3)
+        self.assertFalse(result["sample_plan_complete"])
+        self.assertFalse(result["passes_scoped_gate"])
+
 
 if __name__ == "__main__":
     unittest.main()
