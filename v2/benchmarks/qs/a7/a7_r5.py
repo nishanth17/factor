@@ -20,7 +20,8 @@ from ..phase_three.phase_three_sss import deserialize_config
 
 ROOT = REPOSITORY_ROOT
 PLAN = BENCHMARK_ROOT / "inputs/controls/a7_r5_e1_arms.json"
-CURRENT_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_b3_sources.json"
+CURRENT_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_c3_sources.json"
+PREVIOUS_SOURCES = BENCHMARK_ROOT / "inputs/controls/a7_r5_b3_sources.json"
 
 
 def load_plan():
@@ -34,6 +35,10 @@ def load_plan():
         integrated["schema"] != 1
         or integrated["base_control_sha256"]
         != hashlib.sha256(plan_bytes).hexdigest()
+        or integrated["previous_manifest_sha256"]
+        != hashlib.sha256(
+            source_path(PREVIOUS_SOURCES).read_bytes()
+        ).hexdigest()
         or not integrated["source_sha256"].keys()
         <= plan["source_sha256"].keys()
     ):
@@ -45,6 +50,10 @@ def load_plan():
             path = ROOT / name
             if not matches_source_pin(path, expected):
                 raise ValueError("R5 arm pin changed: " + name)
+
+    for name, expected in integrated["additional_source_sha256"].items():
+        if not matches_source_pin(ROOT / name, expected):
+            raise ValueError("R5 additional runtime pin changed: " + name)
 
     resources = plan["serial_resources"]
     if resources["work_limit"] != b1.WORK or (

@@ -35,3 +35,11 @@ is 14 digits (16 would exceed half the product size). Add envelope checks
 before warmup calls and reject incomplete training selection. The candidate
 bundles, selection rule, seeds, total resources and acceptance thresholds stay
 fixed. The earlier cold pilot remains revision-2 feasibility evidence only.
+
+
+The full-suite preflight also requires a new additive A7 integration receipt:
+`a7_r5_c3_sources.json` chains to the immutable B3 receipt, pins the changed
+CLI/portfolio and adapter plus the new allocation module, and leaves original
+A7/B3 controls untouched. It validates current arm construction, not fresh E1
+performance. A genuine pre-C3 baseline test excludes the new optional field
+when constructing the historical dataclass. No collector or graph changes.

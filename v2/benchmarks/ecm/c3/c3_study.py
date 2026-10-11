@@ -507,6 +507,18 @@ class LimitedRandom(random.Random):
 def generate():
     protocol = verify_protocol()
     selected_hash = digest(SELECTED)
+    selection = json.loads(SELECTED.read_text())
+    if selection["protocol_sha256"] != digest(CONTROL):
+        raise ValueError("selection belongs to another frozen protocol")
+    try:
+        committed = subprocess.check_output(
+            ["git", "show", "HEAD:" + str(SELECTED.relative_to(ROOT))],
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as error:
+        raise ValueError("commit selection before fresh generation") from error
+    if hashlib.sha256(committed).hexdigest() != selected_hash:
+        raise ValueError("commit selection before fresh generation")
     generator = LimitedRandom(protocol["generation_seed"])
     certificates, fixtures = {}, []
 
@@ -636,13 +648,17 @@ def main():
     parser.add_argument("--training", type=Path)
     args = parser.parse_args()
     runtime()
-    if args.mode == "freeze":
-        freeze()
-    elif args.mode == "select":
-        verify_protocol()
-        select(args.training)
-    elif args.mode == "generate":
-        generate()
+    if args.mode in ("freeze", "select", "generate"):
+        if args.mode == "select" and args.training is None:
+            parser.error("selection requires --training")
+        with machine_window():
+            if args.mode == "freeze":
+                freeze()
+            elif args.mode == "select":
+                verify_protocol()
+                select(args.training)
+            else:
+                generate()
     else:
         if args.output is None:
             parser.error("measurement requires --output")
