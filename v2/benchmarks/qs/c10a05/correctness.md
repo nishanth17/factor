@@ -11,6 +11,17 @@ and inclusive costs are in `results/c10a05/qa/`, charged to the protocol's
 1800-second QA/feasibility reservation. Committed-only verification is recorded
 with the final delivery results.
 
+The committed-only export of `f11f97dac8e401cdf0b6cac23d5802f8f229b3e3`
+also passes all **741 tests** (102.419 s test body, 103.441 s runner) using
+the external PyPy environment. All **176 live benchmark module/package
+imports** pass, as do A7 source pins and M8/M12/M25/C1/A6 snapshot loaders.
+The first broad import enumeration included a baseline source file outside
+its intended package; that harness failure is retained, and the corrected
+check uses the supported historical loaders. Required inputs are committed.
+A separate committed-only export of measured commit `96e2aad` passes strict
+runtime/helper/protocol/selection hashes and independent corpus verification.
+The closing commit changes documentation only after these checks.
+
 ## Independent witnesses and state transitions
 
 `test_c10a05_pacing.py` uses N = 10403 = 101 × 103. The atoms U = 139 and

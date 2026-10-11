@@ -733,6 +733,9 @@ still trigger checked extraction; finite search/stall/trivial stops and full
 storage get a charged final attempt on retained originals. This may collect
 more relations before finding a factor. QS, MPQS and unshared stores retain
 per-window finalization. The reference default remains `"window"`.
+The low-level `QSJob` keyword `collection_continues=False` preserves direct
+finite-window behavior. SIQS sets it only when it owns further shared-store
+collection and the eventual charged terminal drain.
 
 Omitted native **50-digit** configurations select `"collection"` for the
 accepted C9/C10 bundle at exactly **1 GiB owned memory**. The fresh study
@@ -1145,9 +1148,10 @@ format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 Fresh native 40- and 50-digit calls select the scoped bundles by default through
 `SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
 `default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
-selection; its default result exactly matches the frozen C10 plan configuration
-in either band. The 50-digit selection adds only C10's 2 MiB plan to C9's
-confirmed bundle. The 40-digit selection uses the C9-tested growing collector
+selection. At the confirmed 1 GiB allowance, the 40-digit result matches the
+frozen C10 plan and the 50-digit result matches C10a-05's confirmed collection
+arm. The 50-digit selection adds C10's 2 MiB plan and C10a-05's fixed pacing to
+C9's confirmed bundle. The 40-digit selection uses the C9-tested growing collector
 with C10's confirmed plan; C9 did not establish a separate 40-digit growth
 gain over fixed DLP. Other sizes/backends retain existing policies. This
 size-based promotion was explicitly requested by the user; complete-run
@@ -1169,8 +1173,9 @@ product bound 3,200,000,000. Default 50-digit collection uses B=30,000,
 half-width 65,536, six A factors,
 flyer assignment, endpoint/SLP ceiling 3,000,000 and product bound
 115,200,000,000 with growing history. Both bands enable the 2 MiB power plan
-only with the confirmed 1 GiB owned allowance; lower caller memory grants
-retain the growing bundle without the plan. The measured C9 50-digit peak
+only with the confirmed 1 GiB owned allowance; 50-digit collection pacing has
+that same resource scope. Different caller memory grants retain window pacing
+and the growing bundle without the plan. The measured C9 50-digit peak
 before C10's plan was 326 MiB versus
 167/198 MiB for SLP/fixed DLP, and charged work increased despite lower wall/CPU.
 See [default promotion and limits](benchmarks/qs/c9/c9_default_promotion.md).

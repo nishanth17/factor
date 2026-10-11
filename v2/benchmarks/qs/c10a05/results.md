@@ -169,6 +169,16 @@ substituted for this inclusive resource ledger. Final QA below remains within
 that prepaid reservation. Machine: Apple M4, 24 GiB, macOS 26.6.2 arm64;
 accepted measurements and heavy QA held the machine-wide performance lock.
 
+## Delivery validation
+
+`make -C v2 test` passes **741 tests** in the worktree and in a committed-only
+export of integration commit `f11f97d`. `make -C v2 lint` passes all three
+checks. The committed export imports **176 live benchmark modules/packages**
+and verifies A7 and the M8/M12/M25/C1/A6 historical loaders. Measured commit
+`96e2aad` separately passes its strict frozen source/selection/corpus checks.
+See [correctness](correctness.md) for independent witnesses and compatibility.
+All subsequent closing changes are documentation only.
+
 ## Reproduction and evidence
 
 Use PyPy implementing Python 3.11 (this study used PyPy 7.3.23 / Python 3.11.15).
