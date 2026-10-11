@@ -70,3 +70,96 @@ collection/time censoring, not whether the challenger succeeds. The original
 rule was committed in `d6f95fa` before the censored result. Exact selection,
 arm order and unchanged resource envelope are recorded in
 `inputs/controls/c9_long_window_protocol.json`.
+
+## Reproduction runner
+
+The following runner composes the already frozen, validated study functions.
+Save the Python block as an ignored local `.py` file, run it from the repository
+root with PyPy implementing Python 3.11, and use a new output directory. Its
+source digest is retained in the diagnostic manifest. It refuses to overwrite
+an earlier attempt, reserves unsuccessful calls, validates every warmup and
+outcome, and leaves the original confirmation directory untouched. The lease
+must be separately coordinated before execution.
+
+```python
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+
+ROOT = Path.cwd()
+sys.path.insert(0, str(ROOT))
+
+from v2.benchmarks.qs.c9 import c9_growth_confirmation as confirmation
+from v2.benchmarks.qs.c9 import c9_growth_study as study
+
+study.runtime()
+output = Path(sys.argv[1]).resolve()
+protocol_path = study.INPUTS / "controls/c9_long_window_protocol.json"
+protocol = json.loads(protocol_path.read_text())
+if output.exists():
+    raise RuntimeError("Preserve earlier pilot attempts; no replacement run")
+
+with study.machine_window():
+    started, cpu_started = time.monotonic(), time.process_time()
+    selection, corpus = confirmation.load()
+    assert hashlib.sha256(confirmation.SELECTED.read_bytes()).hexdigest() == (
+        protocol["selection_sha256"]
+    )
+    fixture = next(
+        case for case in corpus["fixtures"]
+        if case["id"] == protocol["fixture"]
+    )
+    output.mkdir(parents=True)
+    study.save(output / "manifest.json", dict(
+        protocol=protocol,
+        source=selection["source"],
+        runner_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        runtime=sys.version,
+    ))
+    expense = confirmation.Expenses(
+        output,
+        {"spent_before_confirmation": {"wall": 0, "cpu": 0}},
+        {"generation_seconds": 0},
+    )
+
+    def charged(label, reservation, function):
+        if expense.used() + reservation > 4500:
+            raise RuntimeError("Long diagnostic aggregate allowance")
+        return expense.call(label, reservation, function)
+
+    try:
+        for arm in protocol["arms"]:
+            config = study.decode(selection["configurations"]["50"][arm])
+            warm, wall, cpu = [], 0.0, 0.0
+            while min(wall, cpu) < 3:
+                if len(warm) == 10:
+                    raise RuntimeError("Validated warmup allowance")
+                row = charged("warmup-" + arm, 5, lambda: study.run_one(
+                    fixture, protocol["seed"], config, arm, 3.1
+                ))
+                warm.append(row)
+                wall += row["seconds"]
+                cpu += row["cpu_seconds"]
+            study.save(output / ("warmup-" + arm + ".json"), warm)
+
+            # Reserve the full call before starting. The existing runner
+            # charges collection, splitting, verification and inspection.
+            if time.monotonic() - started + 1202 > 3900:
+                raise RuntimeError("Long diagnostic machine lease")
+            row = charged(arm, 1202, lambda: study.run_one(
+                fixture, protocol["seed"], config, arm, 1200, prefixes=True
+            ))
+            study.save(output / (arm + ".json"), row)
+            print(json.dumps({key: row[key] for key in (
+                "arm", "complete", "reason", "seconds", "work"
+            )}), flush=True)
+    finally:
+        study.save(output / "receipt.json", dict(
+            wall_seconds=time.monotonic() - started,
+            cpu_seconds=time.process_time() - cpu_started,
+            charged_seconds=expense.used(),
+            interpretation="Selected-case diagnostic; no fresh speed claim",
+        ))
+```
