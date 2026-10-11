@@ -22,10 +22,14 @@
   square corrections. Schema 5 supports checked growing-store resume; legacy
   configurations retain schemas 3/4. Interrupted publication invalidates the
   live object while prior complete checkpoints remain recoverable.
-- Document pinned large-prime mechanisms, actual upstream limits, loss
-  attribution and the separately frozen adaptive-growth study. Performance
-  acceptance and supported scope are recorded in the C9.2 benchmark report;
-  broader C10/E1 calibration is not closed by storage support.
+- Complete the C9.2 source-derived yield/adaptive-storage tranche. Pinned
+  literature and five leading implementations motivate history retention and
+  separately tested endpoint alignment. Fresh balanced 50-digit confirmation
+  reduces complete-call time by 38.10% versus calibrated SLP and 53.08% versus
+  fixed DLP, with 9/9 validated completions in all arms. Adopt only the explicit
+  measured bundle; its owned peak is 326 MiB versus 167/198 MiB for the controls.
+  Retain 30/40 recommendations and defaults. The C9.2 report records costs,
+  uncertainty, stopped studies and limitations; C10/E1 remain open.
 
 - Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
   the user's direction. Keep B4 for unsupported jobs and insufficient explicit

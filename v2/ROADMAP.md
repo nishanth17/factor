@@ -315,7 +315,7 @@ implementations complete.
 | C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Low/conditional.** Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | Choose Astra for encoded-domain invariants, valid reduction ranges and GCD-preserving scaling. xhigh is warranted by subtle whole-loop correctness conditions; low expected performance return means defer the task, not lower its correctness standard. |
 | ~~C6 — P4.5 precomputed Lucas-chain experiment~~ | ~~Compare pinned prime-chain codes and compact execution with precomputed PRAC; assess bounded CF search.~~ | ~~A4; stable A2/A3 benchmark interfaces~~ | ~~**[x] Bounded study complete and experimental code integrated, 9 October 2026.** Certified batched checks, independently verified CF-family minima and 48 heldout groups establish reused native PRAC/B4 and separate GMP Lucas candidates. Fresh native construction retains the ladder. B3 bounded integration is now accepted separately; defaults retain B4.~~ | ~~Astra / **xhigh**~~ | ~~Exact scalar/projective/factor coverage, finite recovery and construction/cold accounting; no global-optimality or production-default claim.~~ |
 | C8 — P3.8-R2 family-wide CRT hit scheduling | Use calibrated whole-polynomial-interval prime/power eligibility and root costs to decide whether bounded CRT half-sum scheduling is warranted; if justified, verify every Gray/position hit, exceptional roots and table/queue limits, then compare complete factoring. | A1, B1; demonstrated family/root or eligible-prime scanning cost | **Low/conditional.** The isolated first-polynomial probe found zero eligible base primes and sparse eligible power hits. Retain the deferral until a calibrated workload supports the investment; block width is not the eligibility interval. | Astra / **xhigh** | Astra fits CRT/Gray hit coverage and exceptional-root invariants. xhigh is for exact prime-power and A-dividing-prime handling, bounded queued state and full-pipeline comparison. |
-| C9 — P5.4 source-derived large-prime yield and DLP economics | Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **C9.2 adaptive storage implemented; fresh confirmation in progress.** Pinned source/caller audit, rejected-position attribution and the complete longer-window training grid select full-base aligned growth. Preserve C1 and stopped C9.1 outcomes; close only the named tranche after its remaining gates. | Astra / **xhigh** | Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit. |
+| C9 — P5.4 source-derived large-prime yield and DLP economics | Explain how pinned leading implementations turn residuals into useful relations: admission/scoring domains, endpoint/product rules, splitting, matching, cycle construction, retention, filtering losses and collection stopping. Coordinate base/polynomial choices with C10; test the highest-value missing mechanisms or policy bundles, including justified longer bounded runs, against calibrated SLP on fresh complete-factor inputs. | C1 and B1; A7 interfaces for any SSS comparison | **[x] C9.2 bounded tranche complete, 11 October 2026.** Adopt explicit full-base aligned growing DLP for measured balanced 50-digit inputs: 38.10% less complete-call time versus calibrated SLP, 53.08% versus fixed DLP, 9/9 valid completions per arm. Higher memory cost is explicit. Retain defaults/30–40 recommendations and all historical outcomes; broader C10/E1 gates remain open. | Astra / **xhigh** | Source-derived mechanisms need exact residual, all-component graph, provenance, ownership and resume contracts as well as measured PyPy economics. More raw cycles or a larger table alone cannot establish a factoring benefit. |
 | C10 — QS/SIQS collection-strategy audit and continuing size-band calibration | Extend the [source-to-v2 audit](benchmarks/qs_parameter_audit.md) from constants to mechanisms: explain how pinned papers and leading implementations improve polynomial quality, smoothness/candidate yield and useful relations per total resource. Identify existing v2 equivalents, missing algorithms and interacting size policies; implement or route justified bounded challengers, train selected bundles and confirm fresh complete factoring. | B1/C1 controls; C9 for residual/DLP specifics; E1/D7 for combined controls | **High, continuing.** Study factor base, interval/blocking, A/family/Gray schedules, multiplier, scoring/powers, candidate recovery and relation targets together where evidence supports interaction. Reference defaults, native thresholds and C1's historical 120-second window are not optimized size policies. Each tranche predeclares duration tiers, total resources and progress/stop rules. | Astra / **xhigh** for arithmetic/collector changes; Sol / **high** for frozen configuration studies | Explain the yield mechanism and normalize units before proposing transfer. Compare useful post-filter dependencies, proper divisors and complete outcomes; preserve exact coverage or label deliberate losses, certainty, provenance and charged resume. |
 | C11 — Cross-engine constant provenance and continuing calibration | Maintain the [cross-engine parameter ledger](benchmarks/parameter_audit.md) for preprocessing/primality, rho, p−1, ECM, sieves/schedules, SSS-specific search and shared budgets. Reconcile each performance-bearing default, embedded threshold, cap and caller override against pinned implementations and primary literature; distinguish exact invariants, formats, finite policies, measured choices and uncalibrated heuristics. Profile and confirm bounded source-grounded tuning tranches. | Reuse accepted A2/A6/A10/B3/B4/C6 controls; coordinate E3/E4/C3/E6/E1/G1; C9/C10 retain QS/DLP ownership | **High, continuing.** Inherited bounds, abstract chain weights, batch sizes, duplicated standalone/portfolio settings and conservative memory coefficients are not proven optima. Begin with observed cost/yield gaps and missing provenance; retain defaults on inconclusive evidence. No repeated completed chain search or blanket Cartesian sweep. | Sol / **high** for source reconciliation and frozen configuration studies; Astra / **xhigh** for changed arithmetic, certainty or recovery proofs | Normalize units, backend costs, success targets and ownership before transferring a native recommendation. Charge unsuccessful work, preparation, recovery and reconstruction; preserve exact factors, cumulative allowances and compatible resume. See P8.6's C11 acceptance plan. |
 
@@ -2827,7 +2827,7 @@ The [report](benchmarks/qs/c1/c1_implementation_results.md) records fresh 40-dig
 benefit, lower observed proper-factor yield per extracted dependency, and
 larger unresolved results. No solver or default dispatch is promoted.
 
-#### C9 — Source-derived large-prime yield and DLP economics (C9.2 confirmation in progress)
+#### C9 — Source-derived large-prime yield and DLP economics (C9.2 bounded tranche complete)
 
 C9.2 now provides [allocator-grown serial DLP storage and a full training
 record](benchmarks/qs/c9/c9_growth_results.md), supported by the
@@ -2836,12 +2836,23 @@ record](benchmarks/qs/c9/c9_growth_results.md), supported by the
 The new explicit policy removes implicit FIFO/count/storage ceilings while
 preserving exact endpoints, all-component cycles and checked schema-five
 resume. The selected configuration and corrected source froze before the
-new corpus. The user-amended 1,200-second fresh 50-digit comparison remains open;
-596 tests pass in both working and committed-only trees, with lint and all
-126 benchmark imports/loaders passing. The stopped 360-second observations
-retain their original scope and cost. API support is separate from performance
-promotion. C10, E1,
-higher arity and matrix redesign retain their existing ownership/gates.
+new corpus. The user-amended 1,200-second comparison completes nine matched
+groups on three fresh balanced 50-digit inputs, with 9/9 validated factors in
+every arm and no remaining stability trigger. Complete-call cost falls 38.10%
+versus calibrated SLP (95% interval 35.23–39.81%) and 53.08% versus fixed DLP
+(52.36–53.84%). Adopt only the explicit full-base aligned growing-DLP bundle
+for this measured scope. Peak owned reservation is 325.99 MiB versus
+166.89/198.15 MiB for SLP/fixed DLP; charged work exceeds SLP despite lower
+CPU/wall cost. Retain runtime defaults and 30/40 recommendations.
+
+Both working and committed-only trees pass 596 tests. Full lint passes, and
+the committed-only archive passes 126 benchmark imports and required loaders;
+final source/corpus checks preserve all 209 frozen digests.
+The stopped 360-second observations retain their original scope and cost.
+The two stages charge 15,524.576 active seconds against the explicitly amended
+23,317.431-second bound. Only C9.2's bounded source-derived yield and adaptive-
+storage tranche closes. C10, E1, higher arity and matrix redesign retain their
+existing ownership/gates.
 The C1 motivation below describes historical and legacy bounded controls.
 
 The broader [QS/SIQS parameter audit](benchmarks/qs_parameter_audit.md)
@@ -2929,7 +2940,7 @@ thresholds or memory capacities.
   and resource envelopes without declaring an unsupported universal cutoff.
   Stop at the finite study cap or prespecified progress/resource failure;
   retain censored outcomes and record whether feasibility remains undecided.
-- [ ] Freeze selected configurations before fresh confirmation. Match SLP and
+- [x] Freeze selected configurations before fresh confirmation. Match SLP and
   DLP on total resources, including splitting/certification, rebuilds,
   filtering, matrix, extraction and charged resume. Report peak retained and
   unowned occupancy, evictions and lost matching opportunity, post-filter

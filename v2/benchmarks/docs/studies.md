@@ -13,10 +13,16 @@ limits. Growing serial SIQS retains partial history in PyPy containers, with
 optional explicit quotas and checked schema-five resume. Legacy bounded
 configurations remain compatible. The finite study compares complete outcomes
 at equal resources and preserves C1 and stopped C9.1 evidence; current
-confirmation status and acceptance are stated in that report. The user-amended
-50-digit comparison gives all three arms 1,200 seconds and uses three new
-independent inputs; the stopped 360-second evidence remains separate. C10 collector
-calibration and E1 combined portfolio acceptance remain separate.
+acceptance adopts the explicit full-base aligned growing-DLP bundle only for
+the measured balanced 50-digit scope. Nine matched comparisons on three new
+independent inputs complete 9/9 in every arm. Complete-call cost falls 38.10%
+versus calibrated SLP (95% interval 35.23–39.81%) and 53.08% versus fixed DLP
+(52.36–53.84%). Peak owned reservation rises to 325.99 MiB from 166.89/198.15
+MiB. The common allowance is 1,200 seconds and 1 GiB; all new calls finish
+before the cap. The stopped 360-second evidence remains separate. Retain
+30/40-digit recommendations and defaults. C10 collector calibration and E1
+combined portfolio acceptance remain separate. Both working and committed-only
+PyPy suites pass 596 tests, with lint and 126 benchmark imports/loaders passing.
 
 ## B3 user-directed native default and optional families (10 October 2026)
 

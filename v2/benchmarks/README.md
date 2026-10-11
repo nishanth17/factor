@@ -36,6 +36,13 @@ their [existing parameter audit](qs_parameter_audit.md) and C10/C9 ownership.
 These ledgers distinguish exact invariants, finite caps and measured choices
 from uncalibrated defaults; adding an audit does not change production settings.
 
+C9.2's [adaptive-storage acceptance](qs/c9/c9_growth_results.md) confirms an
+explicit balanced 50-digit bundle: 38.10% less complete-call time than calibrated
+SLP and 53.08% less than fixed DLP, with 9/9 valid completions in all arms.
+Peak owned reservation rises to 326 MiB (SLP 167, fixed DLP 198). Three
+independent inputs and three seeds per input support this narrow scope;
+30/40 recommendations, C10 calibration and E1 combined acceptance stay separate.
+
 ## Inputs and generated evidence
 
 `inputs/{baselines,controls,corpora,upstream}/` contains versioned inputs needed

@@ -1106,7 +1106,7 @@ config = SIQSConfig(
     ),
 )
 job = SIQSJob(n, seed=7, config=config,
-              budget=Budget(work_limit=10**13, seconds=360, cpu_seconds=360))
+              budget=Budget(work_limit=10**13, seconds=1200, cpu_seconds=1200))
 result = job.run()
 ```
 
@@ -1133,5 +1133,10 @@ not recoverable without such a checkpoint. A quota refusal before publication
 leaves the checked store resumable. No disk-spill implementation is implied.
 
 See the [source and constraint audit](benchmarks/qs/c9/c9_growth_audit.md) and
-[frozen study](benchmarks/qs/c9/c9_growth_protocol.md). Adaptive storage support
-and measured performance promotion are separate decisions.
+[measured results and scope](benchmarks/qs/c9/c9_growth_results.md). The complete
+experimental configuration is versioned in
+[`c9_long_selected.json`](benchmarks/inputs/controls/c9_long_selected.json);
+the example above omits its calibrated polynomial and stopping settings.
+The 1,200-second example is a caller allowance, not an implementation ceiling.
+Adaptive storage support and measured performance promotion are separate
+decisions.
