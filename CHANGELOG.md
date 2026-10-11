@@ -14,6 +14,11 @@
 
 ## Current development
 
+- Integrate the delivered C3 allocation/handoff tranche and user-directed
+  30/40-digit ECM defaults into mainline. Cross off the bounded C3 roadmap
+  entry while retaining the unrun fresh/stability gates and broader joint
+  calibration under the continuing follow-ups.
+
 - Promote C3's size-scoped bounded defaults at the user's direction: compact64
   at 30 decimal digits and the Yamaquasi-derived 10/30/100 escalating prefix at
   40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
