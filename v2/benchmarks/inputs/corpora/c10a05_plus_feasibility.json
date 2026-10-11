@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "fixtures": [
+    {
+      "id": "c10a05_plus_feas_51",
+      "n": 815353970065279429317496473514376856699642909945527,
+      "factors": [
+        25770442592573615024373401,
+        31639113963073481318283727
+      ],
+      "digits": 51,
+      "kind": "balanced",
+      "split": "inspected_feasibility"
+    },
+    {
+      "id": "c10a05_plus_feas_55",
+      "n": 2214807590465208948304518917452076393458855550027523503,
+      "factors": [
+        1365864429234617022772278661,
+        1621542770321876074886556323
+      ],
+      "digits": 55,
+      "kind": "balanced",
+      "split": "inspected_feasibility"
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "n": 972816986860544118820990349884702612124418137096910955182251,
+      "factors": [
+        924017585392283480190186821341,
+        1052812199940484125138863497511
+      ],
+      "digits": 60,
+      "kind": "balanced",
+      "split": "inspected_feasibility"
+    }
+  ],
+  "certificates": {
+    "10099": {
+      "kind": "trial"
+    },
+    "10038407": {
+      "kind": "pocklington",
+      "q": 10099,
+      "witness": 2
+    },
+    "17412560551759": {
+      "kind": "pocklington",
+      "q": 10038407,
+      "witness": 2
+    },
+    "36441970792608314960806133": {
+      "kind": "pocklington",
+      "q": 17412560551759,
+      "witness": 2
+    },
+    "10729": {
+      "kind": "trial"
+    },
+    "11952107": {
+      "kind": "pocklington",
+      "q": 10729,
+      "witness": 2
+    },
+    "8989060153631": {
+      "kind": "pocklington",
+      "q": 11952107,
+      "witness": 2
+    },
+    "36690722715422616344885219": {
+      "kind": "pocklington",
+      "q": 8989060153631,
+      "witness": 2
+    },
+    "14737": {
+      "kind": "trial"
+    },
+    "11318017": {
+      "kind": "pocklington",
+      "q": 14737,
+      "witness": 2
+    },
+    "14178532616581": {
+      "kind": "pocklington",
+      "q": 11318017,
+      "witness": 2
+    },
+    "31639113963073481318283727": {
+      "kind": "pocklington",
+      "q": 14178532616581,
+      "witness": 2
+    },
+    "11833": {
+      "kind": "trial"
+    },
+    "12566647": {
+      "kind": "pocklington",
+      "q": 11833,
+      "witness": 2
+    },
+    "11774520973003": {
+      "kind": "pocklington",
+      "q": 12566647,
+      "witness": 2
+    },
+    "25770442592573615024373401": {
+      "kind": "pocklington",
+      "q": 11774520973003,
+      "witness": 2
+    },
+    "10859": {
+      "kind": "trial"
+    },
+    "27907631": {
+      "kind": "pocklington",
+      "q": 10859,
+      "witness": 2
+    },
+    "74237647375721": {
+      "kind": "pocklington",
+      "q": 27907631,
+      "witness": 2
+    },
+    "1365864429234617022772278661": {
+      "kind": "pocklington",
+      "q": 74237647375721,
+      "witness": 2
+    },
+    "14879": {
+      "kind": "trial"
+    },
+    "20979391": {
+      "kind": "pocklington",
+      "q": 14879,
+      "witness": 2
+    },
+    "132261801279889": {
+      "kind": "pocklington",
+      "q": 20979391,
+      "witness": 2
+    },
+    "1621542770321876074886556323": {
+      "kind": "pocklington",
+      "q": 132261801279889,
+      "witness": 2
+    },
+    "49727": {
+      "kind": "trial"
+    },
+    "223771501": {
+      "kind": "pocklington",
+      "q": 49727,
+      "witness": 2
+    },
+    "2602534611053323": {
+      "kind": "pocklington",
+      "q": 223771501,
+      "witness": 2
+    },
+    "924017585392283480190186821341": {
+      "kind": "pocklington",
+      "q": 2602534611053323,
+      "witness": 2
+    },
+    "37021": {
+      "kind": "trial"
+    },
+    "260998051": {
+      "kind": "pocklington",
+      "q": 37021,
+      "witness": 2
+    },
+    "3246453489145213": {
+      "kind": "pocklington",
+      "q": 260998051,
+      "witness": 2
+    },
+    "1052812199940484125138863497511": {
+      "kind": "pocklington",
+      "q": 3246453489145213,
+      "witness": 2
+    }
+  },
+  "seed": 202610111201,
+  "sampling": "certified balanced primes conditioned on a large p-1 factor",
+  "generation_seconds": 0.015058374963700771
+}
