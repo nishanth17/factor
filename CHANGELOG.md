@@ -1,5 +1,12 @@
 # Changelog
 
+## C10a-04 calibration study freeze (11 October 2026)
+
+- C10a-04 Stage 1 adds an isolated, source-pinned coupled SIQS calibration
+  study, exact eligible-count resolution, durable cumulative accounting and
+  interruption/resume validation. It freezes a Stage 2 experiment without
+  promoting defaults, reopening completed studies or closing E1.
+
 ## Descriptive ECM preset names (11 October 2026)
 
 - Replace upstream-named preset keys with `pretest8`, `escalating140`,

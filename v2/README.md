@@ -1369,3 +1369,16 @@ declared smaller-band cohort and has uneven-factor regressions. Its service
 reserve also refuses four of five historical smaller-band inputs at the 2M
 work grant. Larger experimental service grants do not change production
 defaults or establish a general input-size dispatch rule.
+
+### C10a-04 coupled calibration study
+
+The separately frozen research runner is available with
+`pypy3 -B -m v2.benchmarks.qs.c10a04.study --help`. It targets PyPy implementing
+Python 3.11, resolves eligible-prime counts to exclusive endpoints with exact,
+charged integer arithmetic, and compares explicit 55/60/65-digit bundles.
+Production APIs, defaults and checkpoint formats are unchanged. See the
+[protocol](benchmarks/qs/c10a04/protocol.md) and
+[Stage 2 handoff](benchmarks/qs/c10a04/handoff.md) before running a campaign.
+Receipts are immutable/idempotent; lost measured calls remain censored and
+fully charged on resume. Reusing the same output directory resumes the exact
+freeze. Results belong in ignored `benchmarks/results/c10a04/`.

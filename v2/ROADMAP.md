@@ -1974,6 +1974,12 @@ negative arm and all historical pins.
   exact rejected-position audit supports a declared loss budget.
 - [ ] Consider coupled multiplier/base/interval/A-size policies only after a
   measured complete-cost gap; compare actual base endpoints and even-k cases.
+- [ ] **C10a-04:** source-derived coupled larger-band calibration. Stage 1
+  infrastructure and freeze are recorded in the
+  [research](benchmarks/qs/c10a04/research.md) and
+  [Stage 2 handoff](benchmarks/qs/c10a04/handoff.md). Keep this gate open until
+  matched training, selection and fresh complete-factor confirmation pass;
+  no larger default or E1 claim follows from diagnostic prefixes.
 - [x] **C10a-05:** separate polynomial windows from genuine collection stops
   while retaining the existing fixed cadence/excess. Complete six-source
   scheduling research, independent dependency/resume oracles and matched
