@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "observed_at_utc": "2026-10-12 01:02:43 UTC",
+  "role": "Supplemental research audit only; does not supersede or alter the experiment freeze.",
+  "experiment_freeze": "5dab76ec66c02049095ddf2f75e123f19d0d6627",
+  "heads": [
+    {
+      "repository": "bbuhrow/yafu",
+      "frozen": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "head": "8110dfbd8c6f9486d93b1a02de6eb7b180e55a80",
+      "date": "2026-10-05T14:05:38Z",
+      "same": true,
+      "message": "Merge branch 'master' of https://github.com/bbuhrow/yafu"
+    },
+    {
+      "repository": "remyoudompheng/yamaquasi",
+      "frozen": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "head": "181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+      "date": "2026-10-11T11:52:55Z",
+      "same": false,
+      "message": "chore: bump MSRV to Rust 1.80 and drop deprecated platforms from CI"
+    },
+    {
+      "repository": "flintlib/flint",
+      "frozen": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "head": "26b9bc9df973206db15616d0849a4c8be9d22059",
+      "date": "2026-10-11T18:37:46Z",
+      "same": false,
+      "message": "Merge pull request #2878 from fredrik-johansson/fmpz_factor"
+    },
+    {
+      "repository": "alpertron/calculators",
+      "frozen": "93c5c8189cb2f149c8dae898eb11997c5f2e7980",
+      "head": "93c5c8189cb2f149c8dae898eb11997c5f2e7980",
+      "date": "2026-09-13T23:46:52Z",
+      "same": true,
+      "message": "Added WebAssembly without SIMD version"
+    },
+    {
+      "repository": "drjanosch42/cuda-mpqs",
+      "frozen": null,
+      "head": "b1a9c4500da15a2bea56a59ecad7ef61cf054756",
+      "date": "2026-10-04T13:04:37Z"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "frozen": null,
+      "head": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "date": "2026-10-02T20:39:07Z"
+    }
+  ],
+  "comparisons": [
+    {
+      "repository": "yamaquasi",
+      "url": "https://github.com/remyoudompheng/yamaquasi/compare/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad...181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+      "base": "3f95f43682ed15d8c1ed206a9a702dd655d7c8ad",
+      "head": "181e282cbfcace30bd0d99c2b4bae181dee7ba69",
+      "response_sha256": "6a53f8ba7267d7563d8391ed702a06c9166b7a8976fcbc2bc31a7278f4c53154"
+    },
+    {
+      "repository": "flint",
+      "url": "https://github.com/flintlib/flint/compare/a4c9750d0d3d67bb01cf6d18c187591b313451c3...26b9bc9df973206db15616d0849a4c8be9d22059",
+      "base": "a4c9750d0d3d67bb01cf6d18c187591b313451c3",
+      "head": "26b9bc9df973206db15616d0849a4c8be9d22059",
+      "response_sha256": "e2c50db779bb7d098de57489e215086f1151daea5815cd5bdb52ee49be069c8e"
+    }
+  ],
+  "inspected_files": [
+    {
+      "repository": "flintlib/flint",
+      "revision": "26b9bc9df973206db15616d0849a4c8be9d22059",
+      "path": "src/qsieve.h",
+      "sha256": "c1093c91fc78ce4d4b72293bdd8c9e1447d07c7028b81d9837b8a032f8761e3a",
+      "git_blob": "d81aed72a97b456bbfdf8edf2ad58288e0b07fea",
+      "bytes": 21582,
+      "url": "https://raw.githubusercontent.com/flintlib/flint/26b9bc9df973206db15616d0849a4c8be9d22059/src/qsieve.h"
+    },
+    {
+      "repository": "drjanosch42/cuda-mpqs",
+      "revision": "b1a9c4500da15a2bea56a59ecad7ef61cf054756",
+      "path": "src/sieve/prime_algorithms.cu",
+      "sha256": "88cd5659d3856d9106ef979cabce84cecd8da6f798c3a3258f8310be4feb5abd",
+      "git_blob": "4cf3a2dba5985706c95092d49683c78015f0f73e",
+      "bytes": 35379,
+      "url": "https://raw.githubusercontent.com/drjanosch42/cuda-mpqs/b1a9c4500da15a2bea56a59ecad7ef61cf054756/src/sieve/prime_algorithms.cu"
+    },
+    {
+      "repository": "drjanosch42/cuda-mpqs",
+      "revision": "b1a9c4500da15a2bea56a59ecad7ef61cf054756",
+      "path": "src/autotune/sieve_optimizer.cpp",
+      "sha256": "cec1f13b6732ae3b776af4d0e4c2517bdb3e10589fc761223960d5be0765bbe4",
+      "git_blob": "7e2cc6d0dd197c54fb5564189ee45b93a3499990",
+      "bytes": 26604,
+      "url": "https://raw.githubusercontent.com/drjanosch42/cuda-mpqs/b1a9c4500da15a2bea56a59ecad7ef61cf054756/src/autotune/sieve_optimizer.cpp"
+    },
+    {
+      "repository": "drjanosch42/cuda-mpqs",
+      "revision": "b1a9c4500da15a2bea56a59ecad7ef61cf054756",
+      "path": "src/autotune/runtime_estimator.cpp",
+      "sha256": "28b759ffdb9b9ddf9eaf6ce57974b6380c7d390e19963b0d89604f3f2c454660",
+      "git_blob": "93d201e2f53dae37dd593411b5b24863494e84cb",
+      "bytes": 12926,
+      "url": "https://raw.githubusercontent.com/drjanosch42/cuda-mpqs/b1a9c4500da15a2bea56a59ecad7ef61cf054756/src/autotune/runtime_estimator.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/CMakeLists.txt",
+      "sha256": "cec591d09ad2f82b9accf1cb6772975ac6aeffd3c566f68325e6a69f119369d4",
+      "git_blob": "37eac5671f60523b0af6c4ec0771149e79670ff3",
+      "bytes": 5799,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/CMakeLists.txt"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las.cpp",
+      "sha256": "0883bd39651732f50a1f78a1c0a5334c89d76faa900e5816cada5117679a39f2",
+      "git_blob": "322bbc523ef18fd7bf632d68d453696339706390",
+      "bytes": 74118,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-config.cpp",
+      "sha256": "e91eb8a3642cc2e40392d12fcd6a510d79a93b928708b59ec38bef17a1afc171",
+      "git_blob": "3b8f4259e99f9c9361a8cdbd94f025e12554ec68",
+      "bytes": 1814,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-config.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/factor/params.qs.c60",
+      "sha256": "3b62466691cd740fdb00063c76bfd73c44c64913042e3a7e2001f482117af186",
+      "git_blob": "b7e560cf4802c7a8a971fd1ded31b5415e197538",
+      "bytes": 1684,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c60"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/factor/params.qs.c70",
+      "sha256": "54f6e0a8a91d1177b816213d4ca9b45bc3307b7027d3de6acf8fec2fb9df9aee",
+      "git_blob": "47f0090a0937089d2acb71b6894d3b5c4760e07c",
+      "bytes": 1686,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c70"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/siqs-smallsieve.cpp",
+      "sha256": "acfc5f1048b38f5cf4f0d2f3ad8d35c530412fd5755d2a6467a9dbc3d7350d0e",
+      "git_blob": "91252c82a11af1d924ee07ac20a4fd78ccf2788e",
+      "bytes": 14225,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/siqs-smallsieve.cpp"
+    }
+  ],
+  "paper": {
+    "url": "https://arxiv.org/html/2610.07126v1",
+    "version": "2610.07126v1",
+    "submitted": "2026-10-05"
+  },
+  "limitations": [
+    "CADO-NFS was screened, not fully traced.",
+    "msieve 1.53 was retained; current development-head equivalence was not checked.",
+    "No native performance claims were reproduced."
+  ]
+}

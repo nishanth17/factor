@@ -25,6 +25,13 @@ are not PyPy optima. Even-k scoring/normalized representation remain uncovered
 C10a-01 opportunities; new diversity/population, feedback, kernels and residual
 algorithms stay with their named owners.
 
+A subsequent [current-upstream review](upstream_review.md) records a material
+11 October FLINT update, newly examined CUDA-MPQS calibration, and a limited
+CADO-NFS SIQS screen. The freeze remains a bounded comparison of three bundles;
+it does not establish a comprehensive current-source or state-of-the-art
+optimum. Read that review with the original research before interpreting
+Stage 2 results.
+
 ## Mechanical campaign commands
 
 From this worktree, use the external PyPy 3.11 environment (or an equivalent
