@@ -7,8 +7,8 @@ no subagents or messages to other sessions were used.
 - Managed worktree: `/Users/nishanthmohan/.codex/worktrees/c10a04-stage1/factor`.
 - Branch: `codex/c10a04-stage1`.
 - Starting committed mainline: `e0dafa1ebce2307f1f2ac3d787af89dd54f5ecfc`.
-- Frozen experiment commit: recorded after the implementation/checks commit;
-  the final documentation annotation does not alter its hashed sources.
+- Frozen experiment commit: `5dab76ec66c02049095ddf2f75e123f19d0d6627`.
+  The final documentation annotation does not alter its hashed sources.
 - Controls: `v2/benchmarks/inputs/controls/c10a04_frozen.json` and
   `c10a04_sources.json`; training: `inputs/corpora/c10a04_training.json`.
   The control hashes runtime, all benchmark helpers, source manifest,
@@ -109,6 +109,52 @@ an audit. Work and time never reset; extended resource probes keep their own
 charged phase. Existing SIQS checkpoint compatibility/replay is validated;
 this runner deliberately does not persist every in-flight polynomial block.
 
-Final check receipts and the exact frozen commit are appended below after
-committed-files-only validation. Raw evidence remains local; Stage 2 needs
-only the committed source/control/corpus inputs to execute.
+## Completed Stage 1 checks and identities
+
+The frozen commit passed in a committed-files-only Git archive at
+`/private/tmp/factor-c10a04-committed-pydeqlyj`, with only an ignored external
+runtime symlink added. Runtime was PyPy 7.3.23 implementing Python 3.11.15.
+
+- `make -C v2 test PYTHON=/Users/nishanthmohan/code/factor/v2/.venv/bin/python`:
+  757 tests passed, including twelve study tests; 103.742 s test execution.
+- `make -C v2 lint`: Ruff check/format and pycodestyle passed (325 Python files).
+- All 185 live benchmark modules imported from committed files; frozen source
+  verification covered 249 files and independently certified all nine inputs.
+- Frozen CLI smoke/resume: two `train --digits 55 --lease-seconds 1` commands
+  with `--output v2/benchmarks/results/c10a04/smoke`; cold receipts unchanged,
+  both warmups charged, two unique yields, no measured samples started.
+- One-block setup preflight: all 27 input/arm cells passed, including exact
+  challenger counts and reachable family streams. Receipt interruption tests
+  also cover a lost extension cell and an unchanged first-nine marker.
+- The main checkout remains clean at the recorded starting commit on `master`.
+  No existing runtime Python, v1, baseline or historical study file changed.
+
+SHA-256 identities:
+
+| Versioned identity | SHA-256 |
+| --- | --- |
+| Frozen control | `29d9da0018727bd18db40f4bfcb4701afa37c5452bd34ea336336972debe90ca` |
+| Source manifest | `2c38be3a9b0e493c5a07efbdd02a03f74af5597a030311185c7d7c77837cb107` |
+| Training corpus | `31f564029964b9c8cc27a113c6b0f2b0ab551f554c12a25700ba9b2495416bc0` |
+
+All local receipts below are relative to `v2/benchmarks/results/c10a04/`.
+The source snapshots in each diagnostic retain their pre-freeze identities;
+none is accepted performance evidence. These raw files are intentionally
+absent from a committed checkout and are unnecessary for executing Stage 2.
+
+| Receipt | Completed work / charge |
+| --- | --- |
+| `research/verified.json` | 42 inherited cached files plus newly pinned YAFU auxiliary blob verified |
+| `screen-v1/ledger.json` | 15 censored calls; 1125.027 wall / 1063.013 CPU s; 146214678025 work |
+| `pilot/compact-55-600.json` and `pilot/ledger.json` | Compact 55-digit factor in 390.669 s, exact reconstruction/probable labels; pilot plus warmup charged 610 wall/CPU s and 89994602634 work |
+| `preflight/ledger.json` | 27 validated paused prefixes; 540 wall/CPU s and 328709181 work |
+| `smoke/ledger.json` | Cold/warmup only; 150 wall/CPU s and 5906663041 work, covered by Stage 1 |
+| `qa/full.log`, `qa/final-preflight.log`, `qa/preflight-2.log`, `qa/smoke.log`, `qa/committed-export.log` | Full checks, strengthened resume test, setup, CLI and committed export transcripts; earlier failed fixtures remain local |
+
+Diagnostic ledgers total 2425.027 wall / 2363.013 CPU s and 242444652881 work.
+The prepaid 3600 wall/CPU seconds and 10^14 work cover these charges and
+recorded corpus/source/QA work. The smoke ledger is a diagnostic copy and
+must not be used as the campaign output. The default `experiment/` directory,
+selection and fresh corpus are absent. Start Stage 2 with the default commands
+above; all remaining phase allowances stated earlier are intact. There is
+no accepted larger-band result or default promotion at this handoff.

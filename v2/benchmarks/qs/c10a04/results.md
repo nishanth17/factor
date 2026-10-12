@@ -98,3 +98,12 @@ reservations and 328,709,181 work units; this is setup validation, not timing
 evidence. The initial preflight asserted an incorrect name for the documented
 paused outcome; that transcript and the original idempotently reused receipt
 are retained without repeating the completed call.
+
+
+The frozen commit `5dab76ec66c02049095ddf2f75e123f19d0d6627` passed all 757
+tests and lint from a committed-files-only export; all 185 benchmark modules
+imported and all 249 source identities/nine certified inputs verified. Frozen
+CLI smoke/resume preserved cold receipts across two leases, charged fresh
+warmup, yielded twice and started no measured samples. See the handoff for
+exact identity digests, local receipt locations and remaining allowances.
+The default experiment directory, selection and fresh corpus remain absent.
