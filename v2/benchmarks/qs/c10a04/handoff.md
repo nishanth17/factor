@@ -26,11 +26,12 @@ C10a-01 opportunities; new diversity/population, feedback, kernels and residual
 algorithms stay with their named owners.
 
 A subsequent [current-upstream review](upstream_review.md) records a material
-11 October FLINT update, newly examined CUDA-MPQS calibration, and a limited
-CADO-NFS SIQS screen. The freeze remains a bounded comparison of three bundles;
-it does not establish a comprehensive current-source or state-of-the-art
+11 October FLINT update, newly examined CUDA-MPQS calibration, and the completed
+[CADO-NFS calibration trace](cado_calibration.md). The freeze remains a bounded
+comparison of three bundles; it does not establish a comprehensive current-source or state-of-the-art
 optimum. Read that review with the original research before interpreting
-Stage 2 results.
+Stage 2 results. C10a-07 separately owns the newly identified within-A
+Gray quota/traversal question; the current quota takes a Gray prefix.
 
 ## Mechanical campaign commands
 

@@ -23,7 +23,7 @@ read, not compiled, benchmarked or incorporated into v2.
 | Yamaquasi | `181e282cbfcace30bd0d99c2b4bae181dee7ba69` | Three subsequent commits; reviewed diff contains Python conversion, Clippy and build/platform maintenance, with no change to the calibrated joint policy. |
 | FLINT | `26b9bc9df973206db15616d0849a4c8be9d22059` | Material SIQS update missed by the frozen survey; detailed below. |
 | CUDA-MPQS | `b1a9c4500da15a2bea56a59ecad7ef61cf054756` | Newly inspected parameter selection and autotuning paths. |
-| CADO-NFS | `692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b` | Newly screened active SIQS build, parameter files and small sieve. |
+| CADO-NFS | `692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b` | Active factorization calibration path now traced; see the follow-up below. |
 | msieve | Release 1.53, as frozen | Retained as an established implementation reference; this audit does not establish current development-head equivalence. |
 
 [Yamaquasi comparison](https://github.com/remyoudompheng/yamaquasi/compare/3f95f43682ed15d8c1ed206a9a702dd655d7c8ad...181e282cbfcace30bd0d99c2b4bae181dee7ba69)
@@ -71,19 +71,21 @@ birthday-model large-prime correction. This is a broader search than C10a-04.
 Its native GPU cost model and projected winner are not transferred; the frozen
 study selects using complete/censored outcomes instead.
 
-## CADO-NFS: active implementation, limited review
+## CADO-NFS: completed calibration trace
 
-The pinned [build](https://github.com/cado-nfs/cado-nfs/blob/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/CMakeLists.txt)
-compiles an actual `siqs` executable with `SIQS_SIEVE`, reusing the LAS
-infrastructure and SIQS small-sieve code. Its
-[60-digit parameters](https://github.com/cado-nfs/cado-nfs/blob/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c60)
-jointly specify a prime endpoint, interval setting, eight A factors, factor
-range, residual bounds and relation target; the 70-digit file changes these
-together. Those units and the lattice representation require further
-normalization before constructing a v2 arm. This was an implementation/parameter
-screen, not a complete polynomial-generation or calibration audit. CADO-NFS
-was absent from the original survey and should not be described as covered
-there.
+The initial screen was incomplete. The subsequent
+[calibration trace](cado_calibration.md) now follows the pinned active
+factorization profile lookup, task/CLI wiring, A enumeration, CRT/Gray norms,
+base construction, residual recovery and filtering retry. Native execution
+and performance reproduction remain outside this source review.
+
+The concrete gap is smaller intervals coupled to full family reuse. CADO-NFS's
+c60 profile has half-width 8192, eight factors and 128 variants; v2's frozen
+60-digit challengers have half-width 65536/131072 and quota 64.
+The current v2 quota is a Gray-order prefix, not a demonstrated diverse
+subset. The frozen research's wording is corrected here while retaining
+its hashed bytes. C10a-07 in the public roadmap now owns quota/traversal
+research and experiments; C10a-04's identities remain unchanged.
 
 ## What the frozen experiment can establish
 
@@ -101,8 +103,8 @@ Its coverage has explicit limits:
 - Native implementations have different arithmetic representations, kernels,
   filtering/solvers and hardware cost structures. Source-derived trends are
   hypotheses; only matched v2 measurements can establish local improvement.
-- CADO-NFS is screened rather than fully traced, and the latest msieve
-  development head was not audited.
+- The latest msieve development head was not audited. Native CADO-NFS
+  performance and optional algorithm paths were not evaluated.
 
 Stage 2 may run the existing freeze to answer that narrow question. Any claim
 of comprehensive current-source calibration, or addition of new interval,

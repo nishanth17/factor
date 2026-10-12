@@ -155,6 +155,276 @@
       "git_blob": "91252c82a11af1d924ee07ac20a4fd78ccf2788e",
       "bytes": 14225,
       "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/siqs-smallsieve.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-qlattice.cpp",
+      "sha256": "6cfc0ad43cc1bc7a4baf5af1afda148870ea96516881d9a9ef097104ecb8d3a7",
+      "git_blob": "1241d7d6b81ead0766b8dae9dba99d11eac9d6ca",
+      "bytes": 11952,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-qlattice.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-qlattice.hpp",
+      "sha256": "19dd4f68e09a4dddc5b41a7845c2685bd27aa3ec183149a8a8de6e1d76e72735",
+      "git_blob": "08f8e40b06a2bb8bc40ec8b85956c3261d3144c0",
+      "bytes": 5634,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-qlattice.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-todo-list.cpp",
+      "sha256": "31f6ea1f1fdb3117ae1d2c3e25d801d7587d92d1cccea38f7ebc31d1719cf117",
+      "git_blob": "644792e43c9edd0797a2a0ce707cee07587efa20",
+      "bytes": 23737,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-todo-list.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-todo-list.hpp",
+      "sha256": "9065d84ed4c855460ca21868e2d8055ec15367c24f89e0d3e6f9d471a698bbe9",
+      "git_blob": "8dd7856950ea7a6da177bd24227bf85196349c8a",
+      "bytes": 5546,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-todo-list.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-choose-sieve-area.cpp",
+      "sha256": "4428d2aa934a82aeca14ad1cfbff4b6ab5d04da939636f70d3d749a2c30abd24",
+      "git_blob": "549db3e7b0b800344615d92ab2866a0016f0e5b5",
+      "bytes": 7181,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-choose-sieve-area.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-siever-config.cpp",
+      "sha256": "5556d554439255839ff6dffc4481c8a1c7c91cc68ac6432650745b762fd0118b",
+      "git_blob": "fbd06e93a5a541e0b33a623e3a3eecaa75ffeaac",
+      "bytes": 16450,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-siever-config.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-side-config.cpp",
+      "sha256": "6400e3b25cde2b2646a317ce041142bd80fdb3f5ac429c7a391e907a0196adbf",
+      "git_blob": "8315c52c01ba09320ec8ad4ef3a0c93969c534cb",
+      "bytes": 4519,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-side-config.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/fb.cpp",
+      "sha256": "dca373fc9b0e14cb3692ec908a453a96fcd1998ec8d51976bb7086b70075c6ec",
+      "git_blob": "11ae0a5625042df16ec4cb2803397290907f95b0",
+      "bytes": 82980,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/fb.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "utils/special-q.cpp",
+      "sha256": "0e281e1635f3be4bde12b374468c7210787bb1c4318da68da6cb0ced69eadd74",
+      "git_blob": "f64da9e08b750f1e2369a7ff46fa83e35edb25ab",
+      "bytes": 3580,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/utils/special-q.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "utils/special-q.hpp",
+      "sha256": "ab2b89bcfda187be0853474faebb9b83433de15f0a8f8e49d20ddc88645f6f76",
+      "git_blob": "dd56de50e201e3ad7362015ed7ea499b1aea32e0",
+      "bytes": 3709,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/utils/special-q.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "scripts/cadofactor/cadotask.py",
+      "sha256": "90d21fa5aa7c3bdf95e986c5f5be9e28fb4b75b8721be208f7e0bed99da780f3",
+      "git_blob": "5499a42e2680db68afefbfb88af552eb11ddc1cd",
+      "bytes": 318876,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/scripts/cadofactor/cadotask.py"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/factor/params.qs.c90",
+      "sha256": "037bdea4d80aafd94328f6a3f05c837153950e1d0a7e833fb5fce0fed4bff2f2",
+      "git_blob": "f795e389f5bbda5ad1167be0513d7dd2421ab6c6",
+      "bytes": 2076,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c90"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "scripts/cadofactor/cadoprograms.py",
+      "sha256": "7ea05563b9dcf5ac98ffd90a0c3bfb4c6c10f83e9aad50617bb36c3628e96ce8",
+      "git_blob": "8dc779b7ea393240800b55f3a4edcda0f8a97efb",
+      "bytes": 64561,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/scripts/cadofactor/cadoprograms.py"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/makefb.cpp",
+      "sha256": "1f5314bf439326f2b7214a0ef2ca6c8d9e7f62e8a5e80c653c4f10a062497dd1",
+      "git_blob": "b7312742579b6fe3f4c834e59b98e8651b926611",
+      "bytes": 15112,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/makefb.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-norms.cpp",
+      "sha256": "f970568aea29fd038a5a0eb74059a628a94c926c4e099f4f2cafb3c181776ff9",
+      "git_blob": "669bb5164121b631184ea1fca0869201282423d8",
+      "bytes": 49829,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-norms.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-norms.hpp",
+      "sha256": "bef8c5e7cf61c71fef59aff2e2dbfcfc7fa45a7f0ede0aa8894734b7976041a0",
+      "git_blob": "97fed1c2a91b0558dd465bcd8cb72624557f3448",
+      "bytes": 9889,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-norms.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-cofactor.cpp",
+      "sha256": "372f1e9686c4bb7260deff8e4b96348fe219ed81c67786e1106f291ce1c186fb",
+      "git_blob": "d2ea4fa49c64030235b956850bb0a7e3d057ec55",
+      "bytes": 9090,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-cofactor.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-sieve-shared-data.cpp",
+      "sha256": "fb28e15e1b675d07d4eef569bca236f21b4857ac6bab20cc76077e80040f05b0",
+      "git_blob": "dc231a79adaeb23d05692cc2ba016a3ebedf9674",
+      "bytes": 4415,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-sieve-shared-data.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-threads-work-data.cpp",
+      "sha256": "0dafcee43fa8e6ca5d853109f7f8bac62f12b12934caac993ef7bed713aa5e73",
+      "git_blob": "c4ea1b09836423304bd2a41c7eccf254147129bb",
+      "bytes": 15214,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-threads-work-data.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-threads-work-data.hpp",
+      "sha256": "d1ed5fbbb0885e077f95f994b91f038752ed6f2c5bb63f0aecaedd2b04bdde40",
+      "git_blob": "95cb6a54c6ca6c05602111908b1941e267d9fcea",
+      "bytes": 12598,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-threads-work-data.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-info.cpp",
+      "sha256": "e0902955a0b7c8c95f7dfce8f718c5ba0826dd90ce2496f17fa8b89bbcbbd48e",
+      "git_blob": "7f0ea0170e4ac59f7149cafc87305a7e145f7db1",
+      "bytes": 8401,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-info.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/siqs-largesieve.hpp",
+      "sha256": "6199943cd051a1b42501db8144422fb4875ab70a6ecf2c452feb2c9d7c30e729",
+      "git_blob": "ec672e579b78eb36b34ac1b065139b054193de64",
+      "bytes": 14734,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/siqs-largesieve.hpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/cl/params.qs.d90",
+      "sha256": "4ea020721819b45bc7457282aa9b99b53e941c8d18a7bd17507b78e5d832101b",
+      "git_blob": "8d1cf88bbc31ee727465e90fe0316ab2d07e44ec",
+      "bytes": 4408,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/cl/params.qs.d90"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "scripts/cadofactor/toplevel.py",
+      "sha256": "00cf7fd28a5be42de658c12210c999b5ec611693d465b1f29c9e93cdc99e4d1e",
+      "git_blob": "07e803da92537f9faa3c99bc18e122e42a81863e",
+      "bytes": 61463,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/scripts/cadofactor/toplevel.py"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/factor/params.qs.c40",
+      "sha256": "50c28899c3ca84c5cffb70c703e3cf05a1697c6a733016900605561a198000fc",
+      "git_blob": "3158136e798047371028af53dff965107434ba94",
+      "bytes": 2202,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c40"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "parameters/factor/params.qs.c80",
+      "sha256": "ccc2275b7a31ddf8ce9efff1f565dfc48b08eea48c91eb1f0e4a59a64df55409",
+      "git_blob": "7398664a4c8d9afa65ba817c934f0694ba5266e1",
+      "bytes": 1687,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/parameters/factor/params.qs.c80"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-output.cpp",
+      "sha256": "e318cdad8eaa3a589c46de97a77fb4716b869ab22d8ad53c5c8c9f795e12d4fc",
+      "git_blob": "14ad2fa06fe51fda692e537215c508be22f70540",
+      "bytes": 3112,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-output.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-process-bucket-region.cpp",
+      "sha256": "88b3881de93405af041e291143716fa2fe5b40c22141377e29bc88bacbcce9be",
+      "git_blob": "7a4273717674a5de4dc841c4eb4fbe79fd3e3882",
+      "bytes": 41144,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-process-bucket-region.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-cofac-standalone.cpp",
+      "sha256": "36f8faead29bb3e3e8ba69644e29ab636f88b9b93e95142db342658a2ef193a0",
+      "git_blob": "f18a9ad16a4595723c51f300b991587b04746840",
+      "bytes": 5171,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-cofac-standalone.cpp"
+    },
+    {
+      "repository": "cado-nfs/cado-nfs",
+      "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+      "path": "sieve/las-detached-cofac.cpp",
+      "sha256": "349b877b45197af239a832fea6350fa22984daa8ab1dfc9c8dd23840d95795a2",
+      "git_blob": "cd9864ef65f368bed9242bf353299ef5a7a4d383",
+      "bytes": 5768,
+      "url": "https://raw.githubusercontent.com/cado-nfs/cado-nfs/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/sieve/las-detached-cofac.cpp"
     }
   ],
   "paper": {
@@ -163,8 +433,64 @@
     "submitted": "2026-10-05"
   },
   "limitations": [
-    "CADO-NFS was screened, not fully traced.",
     "msieve 1.53 was retained; current development-head equivalence was not checked.",
     "No native performance claims were reproduced."
-  ]
+  ],
+  "cado_calibration_trace": {
+    "revision": "692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b",
+    "scope": "Active QS factorization profile/task/CLI/A/Gray/norm/base/residual/filter-retry path; native code not executed.",
+    "document": "v2/benchmarks/qs/c10a04/cado_calibration.md",
+    "arithmetic_checks": {
+      "toy_n": 77,
+      "checked_families": 35,
+      "checked_positions": 1540,
+      "checked_root_transform_cases": 1120,
+      "checked_combinatorial_indices": 84
+    },
+    "c60_interpreted_prime_counts": [
+      2567,
+      2544,
+      2533
+    ],
+    "local_check_script_sha256": "9cc8e39c247db1fffd4980d4cc6b4ecb41be5785893b5c4dc908a7c7dea440bd",
+    "local_check_results_sha256": "9b506bc2f7d5897dde787ce9244fe3bdc96decf3be440799ac6dd711e6ee5110",
+    "captured_source_files": 36,
+    "v2_gray_prefix_checks": {
+      "rows": [
+        {
+          "a_factors": 6,
+          "total_variants": 32,
+          "visited_variants": 32,
+          "varying_free_sign_bits": 5,
+          "fixed_free_sign_bits": 0
+        },
+        {
+          "a_factors": 7,
+          "total_variants": 64,
+          "visited_variants": 64,
+          "varying_free_sign_bits": 6,
+          "fixed_free_sign_bits": 0
+        },
+        {
+          "a_factors": 8,
+          "total_variants": 128,
+          "visited_variants": 64,
+          "varying_free_sign_bits": 6,
+          "fixed_free_sign_bits": 1
+        },
+        {
+          "a_factors": 9,
+          "total_variants": 256,
+          "visited_variants": 64,
+          "varying_free_sign_bits": 6,
+          "fixed_free_sign_bits": 2
+        }
+      ],
+      "local_results_sha256": "1ee63d8abcca70d414dcffaa7ec742c67f6e8c28036cd90af2d17fb10848486a",
+      "v2_sources": {
+        "v2/qs/families.py": "0f7fc0149b01b8fddd3b543dda0a88052780ef5ef48f479e101696cf5b49c6b2",
+        "v2/qs/siqs.py": "736905d6c5875e7f302cae5ddc3056fe4c3fcd440c2c5b9ade33af04415f913a"
+      }
+    }
+  }
 }
