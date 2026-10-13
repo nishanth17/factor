@@ -1974,6 +1974,11 @@ negative arm and all historical pins.
   exact rejected-position audit supports a declared loss budget.
 - [ ] Consider coupled multiplier/base/interval/A-size policies only after a
   measured complete-cost gap; compare actual base endpoints and even-k cases.
+The original C10a-04 Stage 2 campaign is paused and incomplete. A separate
+[user-authorized 60-digit follow-up](studies/c10a04_short.md) has a ten-hour
+budget and fixed preliminary early stops; it does not close the original
+acceptance gate, promote defaults, execute E1 or close C10a-07.
+
 - [ ] **C10a-04:** source-derived coupled larger-band calibration. Stage 1
   infrastructure and freeze are recorded in the
   [research](benchmarks/qs/c10a04/research.md) and

@@ -1,5 +1,12 @@
 # Changelog
 
+## Bounded C10a-04 follow-up (12 October 2026)
+
+- Add a separate 60-digit compact/control study with fresh certified inputs,
+  a ten-hour total budget and fixed preliminary early-stop rules. Preserve the
+  original incomplete campaign, interrupted reservations and production
+  defaults. This is experiment tooling, not a performance acceptance result.
+
 ## C10a-04 calibration study freeze (11 October 2026)
 
 - C10a-04 Stage 1 adds an isolated, source-pinned coupled SIQS calibration

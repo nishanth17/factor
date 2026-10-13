@@ -1,0 +1,69 @@
+{
+  "arms": [
+    "control",
+    "compact"
+  ],
+  "candidate": "compact",
+  "cap_seconds": 1800,
+  "checkpoints": [
+    3,
+    6,
+    9
+  ],
+  "deadline_unix": 1791888689.104388,
+  "early_saving_fraction": 0.2,
+  "generation_seed": 202610120402,
+  "implementation": "PyPy",
+  "limits": {
+    "confirm": {
+      "cpu": 34200,
+      "wall": 34200,
+      "work": 900000000000000
+    },
+    "disk_bytes": 268435456,
+    "setup": {
+      "cpu": 3600,
+      "wall": 3600,
+      "work": 100000000000000
+    },
+    "total": {
+      "cpu": 36000,
+      "wall": 36000,
+      "work": 1000000000000000
+    }
+  },
+  "nomination": "Existing five matched 60-digit pairs; exploratory only, original campaign incomplete",
+  "original_control_sha256": "29d9da0018727bd18db40f4bfcb4701afa37c5452bd34ea336336972debe90ca",
+  "prior_ledger_sha256": "5a4944c9e71916787213a747c9009e32a56cccc95a12496b8da7f3305abc2995",
+  "prior_receipts": {
+    "train-60-00-compact.json": "c7f7022f337b145422f241af5eef9ffc2a5f3a3b08d44ee5fc73068e68338d5a",
+    "train-60-00-control.json": "c10d4636b78457a6dd1d2b94a886fd3f66bd9aa15867578507d0ea816a000f1e",
+    "train-60-00-wide.json": "97aad8697872f2e0aad7d5be02cbe0216ce84e6748825d7b9c3a109382074956",
+    "train-60-01-compact.json": "e06ea2d81d0e3d101be02a73186fad47ed58f7d0baee690e1d7c5c74f1e23cbc",
+    "train-60-01-control.json": "6b9d35e7e7ce556ae8bf30b59c24a10d1b38d817d674c8bcc1964b5e989a6e68",
+    "train-60-01-wide.json": "9adc4ffb5b02c0a479ae0198ef1857ca12dada0948285774804c76f3a2615983",
+    "train-60-02-compact.json": "4793276960fc332b39e4631b3419ffce26b29e98f5e080066875d96e5290d46f",
+    "train-60-02-control.json": "96e0fccbec62c95381990e7eb8377c5c29881acb85586d0939d78e305960f617",
+    "train-60-02-wide.json": "62275ec2e4c84503323447721d1a38ee97170cb31475afe104495a66872b6f24",
+    "train-60-03-compact.json": "87203e18edd967d8de4d6d0ad86615e5183c38933fd248198ce80701aaa5bb71",
+    "train-60-03-control.json": "7e9bb1b80c59c8e363bd537316fd44962c0d117e9b0f187dc97bb226ddcbe8b3",
+    "train-60-03-wide.json": "fcb5330808f8589a9f5022855cc28c0750fa5729cb7f8552851cc3c4eed19323",
+    "train-60-04-compact.json": "2a6a2d6e846d516c6b72596e75327a2ee676bd9c1e80dcb48d760c96da866960",
+    "train-60-04-control.json": "4198d2b4df8f21152eb073da93c8c230efa72a08c4f07c3142bb9f83973f5143",
+    "train-60-04-wide.json": "70322e2fb0a18883d8e92ef5288d0e53d06bc1040578cd820363953ba8d8ee8a"
+  },
+  "runtime": "3.11.15",
+  "schema": 1,
+  "seeds": [
+    7,
+    29,
+    47
+  ],
+  "sources": {
+    "v2/studies/__init__.py": "59ca3bc4c7b977e283c4983292304ce376d3cf75aff015f6d0df91d00ad907d1",
+    "v2/studies/c10a04_short.md": "db20e48190c9eae53059aced043028a74f3e31093820e853156c112028034977",
+    "v2/studies/c10a04_short.py": "6ea6cd1318d14151ebebb91538b2b8e738e63e9eab059905f7738619072d23d0"
+  },
+  "start_unix": 1791852689.104388,
+  "study": "C10a-04 bounded 60-digit follow-up"
+}

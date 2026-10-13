@@ -5,6 +5,12 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
+The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
+compares compact with control at 60 digits, using fresh inputs and a ten-hour
+total deadline. Fixed early trend stops are preliminary below nine samples;
+they do not satisfy the ordinary accepted timing gate or promote defaults.
+The original multi-band campaign remains incomplete and its evidence intact.
+
 ## Find an experiment
 
 | Folder | Contents |
