@@ -16,6 +16,8 @@ capped time, with 31.72–40.08% saving per input. The subsequent
 [user-directed promotion](../studies/c10a04_default_promotion.md) enables
 50–60-digit routing, preserving 50/51 settings and documenting unstable 55
 training and unmeasured intermediate sizes.
+The [65-digit feasibility spike](../studies/c10a04_spike65_results.md) timed
+out in both arms at 1800 seconds; no routing above 60 is promoted.
 
 ## Find an experiment
 

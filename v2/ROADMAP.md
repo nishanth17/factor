@@ -1985,11 +1985,13 @@ training informed an explicit user-directed default promotion.
   unstable 55 training, preliminary 60 confirmation and unmeasured intermediate
   sizes. Preserve the original freeze and interrupted accounting; the full
   experiment is not claimed complete. E1 stays deferred and C10a-07 open.
-- [ ] Larger-size feasibility: run the separately authorized 65-digit spike
-  with 8500 eligible entries, nine A factors and finite matched grants. Use
-  its result before extending defaults through 65. Then consider one bounded
-  70-digit pilot to establish a practical grant and memory envelope before
-  any full matched study. No automatic runtime extension or 70-digit default.
+- [ ] Larger-size feasibility: the authorized
+  [65-digit spike](studies/c10a04_spike65_results.md) completed its one matched
+  pair with both arms timed out at 1800 seconds. Preserve all costs and retain
+  routing above 60. The 8500-entry/nine-A-factor candidate has no completed-
+  factor evidence here; 61–65 interpolation remains unvalidated. A separately
+  approved longer 65 grant or bounded 70-digit pilot must establish practical
+  completion and memory before any full study or default extension.
 - [x] **C10a-05:** separate polynomial windows from genuine collection stops
   while retaining the existing fixed cadence/excess. Complete six-source
   scheduling research, independent dependency/resume oracles and matched
