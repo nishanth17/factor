@@ -5,6 +5,20 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
+The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
+compares compact with control at 60 digits, using fresh inputs and a ten-hour
+total deadline. Fixed early trend stops are preliminary below nine samples;
+they do not satisfy the ordinary accepted timing gate or promote defaults.
+The original multi-band campaign remains incomplete and its evidence intact.
+The [completed preliminary result](../studies/c10a04_short_results.md) stopped
+after six pairs: compact completed 6/6 versus 5/6 and used 36.16% less total
+capped time, with 31.72–40.08% saving per input. The subsequent
+[user-directed promotion](../studies/c10a04_default_promotion.md) enables
+50–60-digit routing, preserving 50/51 settings and documenting unstable 55
+training and unmeasured intermediate sizes.
+The [65-digit feasibility spike](../studies/c10a04_spike65_results.md) timed
+out in both arms at 1800 seconds; no routing above 60 is promoted.
+
 ## Find an experiment
 
 | Folder | Contents |
@@ -208,3 +222,12 @@ replay them from their pinned checkout. The new
 `inputs/controls/a7_r5_preset_names_sources.json` chains the prior A7 manifest
 for the unchanged numerical defaults and renamed preset API. No new performance
 claim or measurement accompanies this naming change.
+
+## C10a-04 historical freeze
+
+The original 55/60/65-digit campaign remains paused and incomplete. Its
+frozen sources and protocols are retained in Git history at `225634b`, with
+detailed research and every attempt preserved locally. The separate 60-digit
+result informed the user-directed 50–60 default promotion; the 65-digit spike
+established no completed-factor evidence at its 1800-second grant. See the
+linked result and promotion summaries above. E1 remains deferred.

@@ -13,6 +13,33 @@
   with nine optional-backend skips; all 179 benchmark modules import. Lint
   passes, and the production AST is unchanged.
 
+## C10a-04 default promotion (12 October 2026)
+
+- At user direction, enable native growing-DLP SIQS defaults through 60 digits,
+  preserving accepted 50/51 settings. Use charged exact 2500-entry compact bases
+  at 52–55 and 5000 at 56–60, with finite budgets and saved-policy replay.
+- Record preliminary and extrapolated coverage in the
+  [promotion report](v2/studies/c10a04_default_promotion.md); close the delivered
+  roadmap tranche without claiming the original campaign completed. E1 remains
+  deferred, C10a-07 open, and 65/70 feasibility separate.
+
+## Bounded C10a-04 follow-up (12 October 2026)
+
+- Add a separate 60-digit compact/control study with fresh certified inputs,
+  a ten-hour total budget and fixed preliminary early-stop rules. Preserve the
+  original incomplete campaign, interrupted reservations and production
+  defaults. This is experiment tooling, not a performance acceptance result.
+- Record the [fresh preliminary result](v2/studies/c10a04_short_results.md):
+  the fixed six-pair trend stop passed, with 6/6 compact completions against
+  5/6 control and 36.16% lower capped time. Preserve the timeout and full
+  reservations; keep production acceptance and promotion separate.
+
+## C10a-04 calibration study freeze (11 October 2026)
+
+- C10a-04 Stage 1 adds an isolated, source-pinned coupled SIQS calibration
+  study, exact eligible-count resolution, durable cumulative accounting and
+  interruption/resume validation. It freezes a Stage 2 experiment without
+  promoting defaults, reopening completed studies or closing E1.
 
 ## Descriptive ECM preset names (11 October 2026)
 

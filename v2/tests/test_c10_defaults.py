@@ -56,7 +56,9 @@ class C10DefaultTests(unittest.TestCase):
             (10**50 - 1, True),
             (10**50, True),
             (10**51 - 1, True),
-            (10**51, False),
+            (10**51, True),
+            (10**60 - 1, True),
+            (10**60, False),
         ):
             for signed in (number, -number):
                 self.assertEqual(uses_siqs_defaults(signed), enabled)

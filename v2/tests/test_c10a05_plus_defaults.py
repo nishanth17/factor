@@ -33,7 +33,7 @@ class LargerBandDefaultTests(unittest.TestCase):
 
         self.assertEqual(default_siqs_budget(NUMBER_51).work_limit, 10**13)
         self.assertEqual(default_siqs_budget(NUMBER_51).seconds, 1200)
-        self.assertEqual(default_siqs_config(10**51), SIQSConfig())
+        self.assertEqual(default_siqs_config(10**60), SIQSConfig())
         self.assertEqual(
             default_siqs_config(NUMBER_51, backend="gmpy2-mpz").solve_policy,
             "window",

@@ -48,7 +48,7 @@ from .sieve_collector import (
     SieveConfig,
     SieveResult,
 )
-from .siqs import SIQSConfig, SIQSJob
+from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob
 
 __all__ = [
     "default_siqs_config",
@@ -72,6 +72,7 @@ __all__ = [
     "PreparedRelations",
     "QSJob",
     "QSResult",
+    "CountedSIQSConfig",
     "SIQSConfig",
     "SIQSJob",
     "SieveCollector",

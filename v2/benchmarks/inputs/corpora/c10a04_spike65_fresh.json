@@ -1,0 +1,65 @@
+{
+  "certificates": {
+    "1025706581": {
+      "kind": "pocklington",
+      "q": 74219,
+      "witness": 2
+    },
+    "120209": {
+      "kind": "pocklington",
+      "q": 683,
+      "witness": 2
+    },
+    "193646088807570473824330189080289": {
+      "kind": "pocklington",
+      "q": 69514730868005083,
+      "witness": 2
+    },
+    "249434301918743040153971346582499": {
+      "kind": "pocklington",
+      "q": 62285244388570793,
+      "witness": 2
+    },
+    "571954423": {
+      "kind": "pocklington",
+      "q": 120209,
+      "witness": 2
+    },
+    "62285244388570793": {
+      "kind": "pocklington",
+      "q": 1025706581,
+      "witness": 2
+    },
+    "683": {
+      "kind": "trial"
+    },
+    "69514730868005083": {
+      "kind": "pocklington",
+      "q": 571954423,
+      "witness": 2
+    },
+    "74219": {
+      "kind": "pocklington",
+      "q": 863,
+      "witness": 2
+    },
+    "863": {
+      "kind": "trial"
+    }
+  },
+  "control_sha256": "701a6d5818b4e4ea7b602f18424c7c16332d489abcf4e3b100351c83ef1bccc7",
+  "fixtures": [
+    {
+      "digits": 65,
+      "factors": [
+        193646088807570473824330189080289,
+        249434301918743040153971346582499
+      ],
+      "id": "c10a04_spike65_fresh_65_0",
+      "kind": "balanced",
+      "n": 48301976981011260991603818696181077401299400131885110208073262211,
+      "split": "c10a04_spike65_fresh"
+    }
+  ],
+  "schema": 1
+}

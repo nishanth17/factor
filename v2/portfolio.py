@@ -52,6 +52,7 @@ _AUTO_SIQS = object()
 def _decode_siqs_config(values):
     """Rebuild a concrete SIQS child from an asdict-style mapping."""
     from .qs import (
+        CountedSIQSConfig,
         DoubleLargeSieveConfig,
         GrowingDoubleLargeSieveConfig,
         SieveConfig,
@@ -66,7 +67,8 @@ def _decode_siqs_config(values):
     else:
         collector_type = SieveConfig
     decoded["collector"] = collector_type(**collector)
-    return SIQSConfig(**decoded)
+    config_type = CountedSIQSConfig if "base_count" in decoded else SIQSConfig
+    return config_type(**decoded)
 
 
 @dataclass(frozen=True)
@@ -1658,24 +1660,9 @@ def factorize_bounded(
                     **saved_config["allocation"]
                 )
             if saved_config.get("siqs") is not None:
-                from .qs import (
-                    DoubleLargeSieveConfig,
-                    GrowingDoubleLargeSieveConfig,
-                    SieveConfig,
+                saved_config["siqs"] = _decode_siqs_config(
+                    saved_config["siqs"]
                 )
-
-                values = dict(saved_config["siqs"])
-                collector = values["collector"]
-                # Growing quotas can be None; decode their explicit policy
-                # before constructing a legacy collector with finite quotas.
-                if collector.get("storage_policy") == "grow":
-                    collector_type = GrowingDoubleLargeSieveConfig
-                elif "large_prime_bound" in collector:
-                    collector_type = DoubleLargeSieveConfig
-                else:
-                    collector_type = SieveConfig
-                values["collector"] = collector_type(**collector)
-                saved_config["siqs"] = SIQSConfig(**values)
             if saved_config.get("sss") is not None:
                 from .qs import SieveConfig
 
