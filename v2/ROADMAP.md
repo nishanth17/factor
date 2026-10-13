@@ -1976,8 +1976,11 @@ negative arm and all historical pins.
   measured complete-cost gap; compare actual base endpoints and even-k cases.
 The original C10a-04 Stage 2 campaign is paused and incomplete. A separate
 [user-authorized 60-digit follow-up](studies/c10a04_short.md) has a ten-hour
-budget and fixed preliminary early stops; it does not close the original
-acceptance gate, promote defaults, execute E1 or close C10a-07.
+budget and fixed preliminary early stops. Its
+[completed preliminary result](studies/c10a04_short_results.md) stopped after
+six pairs: compact completed 6/6 against 5/6 control, with 36.16% lower total
+capped time and at least 20% saving on each input. This does not close the
+original acceptance gate, promote defaults, execute E1 or close C10a-07.
 
 - [ ] **C10a-04:** source-derived coupled larger-band calibration. Stage 1
   infrastructure and freeze are recorded in the

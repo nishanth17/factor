@@ -6,6 +6,10 @@
   a ten-hour total budget and fixed preliminary early-stop rules. Preserve the
   original incomplete campaign, interrupted reservations and production
   defaults. This is experiment tooling, not a performance acceptance result.
+- Record the [fresh preliminary result](v2/studies/c10a04_short_results.md):
+  the fixed six-pair trend stop passed, with 6/6 compact completions against
+  5/6 control and 36.16% lower capped time. Preserve the timeout and full
+  reservations; keep production acceptance and promotion separate.
 
 ## C10a-04 calibration study freeze (11 October 2026)
 

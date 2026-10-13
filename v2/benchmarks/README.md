@@ -10,6 +10,9 @@ compares compact with control at 60 digits, using fresh inputs and a ten-hour
 total deadline. Fixed early trend stops are preliminary below nine samples;
 they do not satisfy the ordinary accepted timing gate or promote defaults.
 The original multi-band campaign remains incomplete and its evidence intact.
+The [completed preliminary result](../studies/c10a04_short_results.md) stopped
+after six pairs: compact completed 6/6 versus 5/6 and used 36.16% less total
+capped time, with 31.72–40.08% saving per input. Defaults remain unchanged.
 
 ## Find an experiment
 
