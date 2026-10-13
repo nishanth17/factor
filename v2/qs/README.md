@@ -106,7 +106,7 @@ make -C v2 benchmark-phase-three-siqs WARMUP_SECONDS=3 REPETITIONS=9
 make -C v2 benchmark-phase-three-sss WARMUP_SECONDS=3 REPETITIONS=9
 ```
 
-The [benchmark guide](../benchmarks/docs/studies.md) summarizes measured improvements
+The benchmark guide summarizes measured improvements
 and their limits. Keep small successful cohorts, capped failures and configured
 large continuations distinct; no universal digit cutoff follows from them.
 See the [roadmap](../ROADMAP.md) for remaining acceptance gates.

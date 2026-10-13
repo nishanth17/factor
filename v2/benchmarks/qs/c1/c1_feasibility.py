@@ -42,6 +42,11 @@ def load_control():
     """Load immutable protocol and the already versioned certified corpus."""
     control = json.loads(source_path(CONTROL).read_text())
     for name, expected in control["files"].items():
+        # Prose protocols are local research, not runtime inputs.
+        # Their original hashes remain in the immutable historical manifest.
+        if name.endswith(".md"):
+            continue
+
         if (
             hashlib.sha256((source_path(HERE / name)).read_bytes()).hexdigest()
             != expected

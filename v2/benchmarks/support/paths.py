@@ -46,9 +46,6 @@ RELOCATIONS = {
     "v2/benchmarks/a6_pm1_followup.py": (
         "v2/benchmarks/pm1/a6/a6_pm1_followup.py"
     ),
-    "v2/benchmarks/a6_pm1_research.md": (
-        "v2/benchmarks/pm1/a6/a6_pm1_research.md"
-    ),
     "v2/benchmarks/a6_pm1_reuse.py": "v2/benchmarks/pm1/a6/a6_pm1_reuse.py",
     "v2/benchmarks/a6_production.py": "v2/benchmarks/pm1/a6/a6_production.py",
     "v2/benchmarks/a6_production_long.py": (
@@ -61,9 +58,6 @@ RELOCATIONS = {
         "v2/benchmarks/pm1/a6/a6_production_portfolio.py"
     ),
     "v2/benchmarks/a7_r5.py": "v2/benchmarks/qs/a7/a7_r5.py",
-    "v2/benchmarks/a7_r5_reconciliation.md": (
-        "v2/benchmarks/qs/a7/a7_r5_reconciliation.md"
-    ),
     "v2/benchmarks/b1_40d.py": "v2/benchmarks/qs/b1/b1_40d.py",
     "v2/benchmarks/b1_calibration.py": "v2/benchmarks/qs/b1/b1_calibration.py",
     "v2/benchmarks/b1_qs_width.py": "v2/benchmarks/qs/b1/b1_qs_width.py",
@@ -74,7 +68,6 @@ RELOCATIONS = {
     "v2/benchmarks/b3_default.py": "v2/benchmarks/ecm/b3/b3_default.py",
     "v2/benchmarks/b3_production.py": "v2/benchmarks/ecm/b3/b3_production.py",
     "v2/benchmarks/b3_recovery.py": "v2/benchmarks/ecm/b3/b3_recovery.py",
-    "v2/benchmarks/b3_research.md": "v2/benchmarks/ecm/b3/b3_research.md",
     "v2/benchmarks/b4_bakeoff.py": "v2/benchmarks/ecm/b4/b4_bakeoff.py",
     "v2/benchmarks/b4_common.py": "v2/benchmarks/ecm/b4/b4_common.py",
     "v2/benchmarks/b4_integration.py": (
@@ -83,10 +76,6 @@ RELOCATIONS = {
     "v2/benchmarks/b4_kernels.py": "v2/benchmarks/ecm/b4/b4_kernels.py",
     "v2/benchmarks/b4_profile.py": "v2/benchmarks/ecm/b4/b4_profile.py",
     "v2/benchmarks/b4_report.py": "v2/benchmarks/ecm/b4/b4_report.py",
-    "v2/benchmarks/b4_research.md": "v2/benchmarks/ecm/b4/b4_research.md",
-    "v2/benchmarks/b4_research_audit.md": (
-        "v2/benchmarks/ecm/b4/b4_research_audit.md"
-    ),
     "v2/benchmarks/b4_study.py": "v2/benchmarks/ecm/b4/b4_study.py",
     "v2/benchmarks/build_a6_followup_corpus.py": (
         "v2/benchmarks/pm1/a6/build_a6_followup_corpus.py"
@@ -140,46 +129,16 @@ RELOCATIONS = {
     "v2/benchmarks/c1_confirmation_support.py": (
         "v2/benchmarks/qs/c1/c1_confirmation_support.py"
     ),
-    "v2/benchmarks/c1_cost_attribution.md": (
-        "v2/benchmarks/qs/c1/c1_cost_attribution.md"
-    ),
     "v2/benchmarks/c1_cost_attribution.py": (
         "v2/benchmarks/qs/c1/c1_cost_attribution.py"
     ),
     "v2/benchmarks/c1_feasibility.py": "v2/benchmarks/qs/c1/c1_feasibility.py",
     "v2/benchmarks/c1_followup.py": "v2/benchmarks/qs/c1/c1_followup.py",
-    "v2/benchmarks/c1_followup_protocol.md": (
-        "v2/benchmarks/qs/c1/c1_followup_protocol.md"
-    ),
-    "v2/benchmarks/c1_followup_resolution.md": (
-        "v2/benchmarks/qs/c1/c1_followup_resolution.md"
-    ),
-    "v2/benchmarks/c1_followup_results.md": (
-        "v2/benchmarks/qs/c1/c1_followup_results.md"
-    ),
-    "v2/benchmarks/c1_harness_repair.md": (
-        "v2/benchmarks/qs/c1/c1_harness_repair.md"
-    ),
     "v2/benchmarks/c1_implementation.py": (
         "v2/benchmarks/qs/c1/c1_implementation.py"
     ),
-    "v2/benchmarks/c1_implementation_controls.md": (
-        "v2/benchmarks/qs/c1/c1_implementation_controls.md"
-    ),
-    "v2/benchmarks/c1_implementation_protocol.md": (
-        "v2/benchmarks/qs/c1/c1_implementation_protocol.md"
-    ),
-    "v2/benchmarks/c1_implementation_results.md": (
-        "v2/benchmarks/qs/c1/c1_implementation_results.md"
-    ),
-    "v2/benchmarks/c1_protocol.md": "v2/benchmarks/qs/c1/c1_protocol.md",
-    "v2/benchmarks/c1_research.md": "v2/benchmarks/qs/c1/c1_research.md",
-    "v2/benchmarks/c1_results.md": "v2/benchmarks/qs/c1/c1_results.md",
     "v2/benchmarks/c1_resume_acceptance.py": (
         "v2/benchmarks/qs/c1/c1_resume_acceptance.py"
-    ),
-    "v2/benchmarks/c1_seed_stability.md": (
-        "v2/benchmarks/qs/c1/c1_seed_stability.md"
     ),
     "v2/benchmarks/c1_seed_stability.py": (
         "v2/benchmarks/qs/c1/c1_seed_stability.py"
@@ -200,11 +159,7 @@ RELOCATIONS = {
     "v2/benchmarks/c6_jit_diagnostic.py": (
         "v2/benchmarks/ecm/c6/c6_jit_diagnostic.py"
     ),
-    "v2/benchmarks/c6_optimization.md": (
-        "v2/benchmarks/ecm/c6/c6_optimization.md"
-    ),
     "v2/benchmarks/c6_report.py": "v2/benchmarks/ecm/c6/c6_report.py",
-    "v2/benchmarks/c6_research.md": "v2/benchmarks/ecm/c6/c6_research.md",
     "v2/benchmarks/c6_study.py": "v2/benchmarks/ecm/c6/c6_study.py",
     "v2/benchmarks/infrastructure_experiments.py": (
         "v2/benchmarks/infrastructure/infrastructure_experiments.py"
@@ -307,16 +262,16 @@ RELOCATIONS = {
         "v2/benchmarks/qs/phase_three/phase_three_sss.py"
     ),
     "v2/benchmarks/phase_three_sss_upstream.py": (
-        "v2/benchmarks/qs/phase_three/phase_three_sss_upstream.py"
+        "v2/benchmarks/qs/phase_three/phase_three_comparison.py"
+    ),
+    "v2/benchmarks/qs/phase_three/phase_three_sss_upstream.py": (
+        "v2/benchmarks/qs/phase_three/phase_three_comparison.py"
     ),
     "v2/benchmarks/phase_two.py": "v2/benchmarks/suites/phase_two.py",
     "v2/benchmarks/phase_two_batch_controls.py": (
         "v2/benchmarks/suites/phase_two_batch_controls.py"
     ),
     "v2/benchmarks/prac_oracle.py": "v2/benchmarks/support/prac_oracle.py",
-    "v2/benchmarks/qs_gnfs_research.md": (
-        "v2/benchmarks/qs/qs_gnfs_research.md"
-    ),
     "v2/benchmarks/qs_snapshot.py": "v2/benchmarks/support/qs_snapshot.py",
     "v2/benchmarks/regressions.py": "v2/benchmarks/suites/regressions.py",
     "v2/benchmarks/restore_p38_r1_capture.py": (

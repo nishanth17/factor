@@ -42,7 +42,7 @@ def supervise(args):
     command = [
         sys.executable,
         "-m",
-        "v2.benchmarks.qs.phase_three.phase_three_sss_upstream",
+        "v2.benchmarks.qs.phase_three.phase_three_comparison",
         *sys.argv[1:],
         "--worker",
     ]

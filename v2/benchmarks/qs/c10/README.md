@@ -1,14 +1,11 @@
 # C10 collection strategy experiments
 
-Read [research and ranked gaps](research.md) and the
-[premeasurement protocol](protocol.md). The [tranche 1 result](tranche1_results.md)
-accepts the isolated existing 2 MiB power plan for the measured 40/50-digit
-growing-DLP bundles on fresh complete-factor inputs. The tested 16-family
-actual-A ordering did not advance. The [candidate reconciliation](candidate_reconciliation.md)
-classifies all traced mechanisms and the [C10a ledger](c10a_followups.md)
-records conditional policy work without taking over other owners. C10 remains
-open. Experimental source and controls are versioned; raw captures live in
-ignored `results/c10/`.
+The accepted 2 MiB prime-power plan applies to the measured 40/50-digit
+bundles on fresh complete-factor inputs. The tested 16-family actual-A
+ordering did not advance. Conditional follow-ups remain under C10a and the
+public roadmap; detailed research, protocols and reconciliation stay local
+under `v2/audit/research/qs/c10/`. Runners and required controls are versioned;
+raw captures live in ignored `results/c10/`.
 
 Commands from the repository root use PyPy implementing Python 3.11:
 

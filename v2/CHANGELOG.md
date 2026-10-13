@@ -46,8 +46,8 @@
 
 ## C6 bounded precomputed Lucas study — 9 October 2026
 
-- Reproduce pinned GMP-ECM LucasChainGenerator at B1=2,000; preserve upstream
-  licenses and independently verify every decoded/compact scalar action.
+- Reproduce pinned Lucas-chain generation at B1=2,000; preserve source
+  licenses locally and independently verify every decoded/compact scalar action.
   Add immutable bounded records, common PRAC/Lucas execution, 16-point ring
   and restricted three-point diagnostics, including factor-preserving recovery.
 - Verify prime powers, composites, nonunits, prime squares, saturation and
@@ -188,8 +188,7 @@
   canonical numeric types and cumulative work/wall/CPU allowances. No RNG is
   consumed. Preserve proper divisors, reconstruction and unresolved certainty.
   Existing direct, portfolio and ECM APIs/checkpoints remain unchanged.
-- Inspect primary papers and pinned GMP-ECM, CADO-NFS, FLINT/PARI and SymPy
-  implementations/licenses. Implement the integer identities independently;
+- Inspect primary papers and pinned reference implementations/licenses. Implement the integer identities independently;
   keep native polynomial/REDC techniques and ECM/Lucas migration separate.
 
 - Reassess the original 10% gate under the revised roadmap without retuning:
@@ -315,7 +314,7 @@ Run `make -C v2 test`, `make -C v2 lint`, or the focused regression with
   60–99-digit probes limit promotion. Defer larger calibration, combined-source
   acceptance and portfolio handoff; no DLP, CRT, matrix or GNFS expansion.
 - Verify 365 PyPy/GMP tests and selected early/deeper checkpoints. See the
-  [benchmark record](benchmarks/docs/studies.md#b1-joint-qsmpqssiqs-calibration--9-october-2026)
+  benchmark record
   for configurations, timing uncertainty, commands and remaining gates.
 
 This scoped changelog is under `v2/` to honor the B2 work boundary; the root

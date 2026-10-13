@@ -477,6 +477,11 @@
       "before_path": "v2/benchmarks/phase_three_collector.py",
       "before_sha256": "611d1f709a46792d3bfe341d91a27868d1d83a5f075340bd8293d4f8f1053a90"
     },
+    "v2/benchmarks/qs/phase_three/phase_three_comparison.py": {
+      "after_sha256": "e037d2d0cf0a1418f90f74e856307f5a267460472e1174f69594a4de7192a578",
+      "before_path": "v2/benchmarks/phase_three_sss_upstream.py",
+      "before_sha256": "f36f793be09ede7e7818d6cb9ad41008f90d67bd8a21acb063178991d8dfc855"
+    },
     "v2/benchmarks/qs/phase_three/phase_three_families.py": {
       "after_sha256": "252320eae8f7140d7eda2d8b37784fb69e67abea6360483186f36df86338138f",
       "before_path": "v2/benchmarks/phase_three_families.py",
@@ -521,11 +526,6 @@
       "after_sha256": "ee91f992ec2bb3d432d743e97e9671e7c08018346a9240329817d40bed262bfb",
       "before_path": "v2/benchmarks/phase_three_sss.py",
       "before_sha256": "1d9b2dc0908a358431278a1c16a0571b06809f846e5679d9399f734246a91fca"
-    },
-    "v2/benchmarks/qs/phase_three/phase_three_sss_upstream.py": {
-      "after_sha256": "7980f78205d6cecf3758aedc5142c986c5f06bbab9ac600e00a78ad8866f1cac",
-      "before_path": "v2/benchmarks/phase_three_sss_upstream.py",
-      "before_sha256": "f36f793be09ede7e7818d6cb9ad41008f90d67bd8a21acb063178991d8dfc855"
     },
     "v2/benchmarks/suites/build_phase_two_adversarial.py": {
       "after_sha256": "de814b8097f57f2b7fb02e5b3bc54e0b79239dd664d4397197eb569b088c481e",
