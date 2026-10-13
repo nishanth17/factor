@@ -1,0 +1,188 @@
+{
+  "certificates": {
+    "1026445647041033592214588690261": {
+      "kind": "pocklington",
+      "q": 2302119537615173,
+      "witness": 2
+    },
+    "1056367432555863885079861094071": {
+      "kind": "pocklington",
+      "q": 3002640474484069,
+      "witness": 2
+    },
+    "1060700652387187097939102177729": {
+      "kind": "pocklington",
+      "q": 2924946983908121,
+      "witness": 2
+    },
+    "1226992064288265077882435618497": {
+      "kind": "pocklington",
+      "q": 3650224166790211,
+      "witness": 2
+    },
+    "146855143": {
+      "kind": "pocklington",
+      "q": 61343,
+      "witness": 2
+    },
+    "161579507": {
+      "kind": "pocklington",
+      "q": 38453,
+      "witness": 2
+    },
+    "180511703": {
+      "kind": "pocklington",
+      "q": 41999,
+      "witness": 2
+    },
+    "189779413": {
+      "kind": "pocklington",
+      "q": 50527,
+      "witness": 2
+    },
+    "200086123": {
+      "kind": "pocklington",
+      "q": 55487,
+      "witness": 2
+    },
+    "206828441": {
+      "kind": "pocklington",
+      "q": 56821,
+      "witness": 2
+    },
+    "211681931": {
+      "kind": "pocklington",
+      "q": 57679,
+      "witness": 2
+    },
+    "2302119537615173": {
+      "kind": "pocklington",
+      "q": 161579507,
+      "witness": 2
+    },
+    "238443551": {
+      "kind": "pocklington",
+      "q": 65327,
+      "witness": 2
+    },
+    "2924946983908121": {
+      "kind": "pocklington",
+      "q": 200086123,
+      "witness": 2
+    },
+    "3002640474484069": {
+      "kind": "pocklington",
+      "q": 238443551,
+      "witness": 2
+    },
+    "3650224166790211": {
+      "kind": "pocklington",
+      "q": 211681931,
+      "witness": 2
+    },
+    "38453": {
+      "kind": "trial"
+    },
+    "3869544202217597": {
+      "kind": "pocklington",
+      "q": 206828441,
+      "witness": 2
+    },
+    "3894971183882189": {
+      "kind": "pocklington",
+      "q": 189779413,
+      "witness": 2
+    },
+    "41999": {
+      "kind": "trial"
+    },
+    "4292439254607011": {
+      "kind": "pocklington",
+      "q": 146855143,
+      "witness": 2
+    },
+    "4334731137856523": {
+      "kind": "pocklington",
+      "q": 180511703,
+      "witness": 2
+    },
+    "50527": {
+      "kind": "trial"
+    },
+    "55487": {
+      "kind": "trial"
+    },
+    "56821": {
+      "kind": "trial"
+    },
+    "57679": {
+      "kind": "trial"
+    },
+    "61343": {
+      "kind": "trial"
+    },
+    "65327": {
+      "kind": "trial"
+    },
+    "735738341348474528668327629331": {
+      "kind": "pocklington",
+      "q": 3869544202217597,
+      "witness": 2
+    },
+    "749251296962859341143796758067": {
+      "kind": "pocklington",
+      "q": 3894971183882189,
+      "witness": 2
+    },
+    "752764919556133920695023663981": {
+      "kind": "pocklington",
+      "q": 4334731137856523,
+      "witness": 2
+    },
+    "764963280182219899745944972711": {
+      "kind": "pocklington",
+      "q": 4292439254607011,
+      "witness": 2
+    }
+  },
+  "control_sha256": "46f520640270d046ae203c0815f2d12cbf3bd10c75fd3aa928cdd39a5faecf83",
+  "fixtures": [
+    {
+      "digits": 60,
+      "factors": [
+        749251296962859341143796758067,
+        1026445647041033592214588690261
+      ],
+      "id": "c10a04_short_fresh_60_0",
+      "kind": "balanced",
+      "n": 769065732307375763576163847220083207028060722642375416085487,
+      "split": "c10a04_short_fresh"
+    },
+    {
+      "digits": 60,
+      "factors": [
+        735738341348474528668327629331,
+        764963280182219899745944972711
+      ],
+      "id": "c10a04_short_fresh_60_1",
+      "kind": "balanced",
+      "n": 562812814953754865246344804825305466024578498200320118186341,
+      "split": "c10a04_short_fresh"
+    },
+    {
+      "digits": 60,
+      "factors": [
+        752764919556133920695023663981,
+        1226992064288265077882435618497
+      ],
+      "id": "c10a04_short_fresh_60_2",
+      "kind": "balanced",
+      "n": 923636582569970561377013727839714023816979846572124836256557,
+      "split": "c10a04_short_fresh"
+    }
+  ],
+  "generation_seconds": 0.017841249937191606,
+  "sampling": "certified balanced 60-digit products conditioned on a large p-1 factor; excludes prior versioned products and factors",
+  "schema": 1,
+  "seed": 202610120402
+}
