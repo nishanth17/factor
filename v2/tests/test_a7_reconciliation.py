@@ -12,7 +12,7 @@ from unittest.mock import patch
 from v2.benchmarks.infrastructure.performance.performance_audit import (
     materialize_baseline,
 )
-from v2.benchmarks.qs.phase_three.phase_three_sss_upstream import OutputCheck
+from v2.benchmarks.qs.phase_three.phase_three_comparison import OutputCheck
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs.checkpoint import _solver_digest
 from v2.qs.linear_algebra import DependencySolver, FilteredMatrix

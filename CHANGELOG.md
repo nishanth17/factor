@@ -1,5 +1,19 @@
 # Changelog
 
+## Publication cleanup — 12 October 2026
+
+- Keep detailed benchmark research and comparison reports in the local audit
+  archive. Ignore external reference sources as a complete folder, preserving
+  their source files, notices and licenses locally.
+- Retain required numerical inputs and immutable baselines. Runtime C1 loaders
+  validate numerical inputs without requiring local prose protocols; historical
+  protocol hashes remain unchanged. Rename the optional comparison harness
+  with an explicit source-migration record. Production arithmetic is unchanged.
+- Validate the candidate checkout without ignored files: 743 PyPy tests pass
+  with nine optional-backend skips; all 179 benchmark modules import. Lint
+  passes, and the production AST is unchanged.
+
+
 ## Descriptive ECM preset names (11 October 2026)
 
 - Replace upstream-named preset keys with `pretest8`, `escalating140`,
@@ -23,7 +37,7 @@
   a 60-digit product was censored at the existing 1,200-second automatic
   grant. Retain 52+ routing pending separate calibration. Preserve immutable
   C10a-05 controls and A7 history through a new chained source manifest.
-  See `v2/benchmarks/qs/c10a05_plus/results.md`.
+  See the local study record.
 
 ## C10a-05 collection and solve pacing (11 October 2026)
 
@@ -41,7 +55,7 @@
   witnesses, repeated serialized resume and finite benchmark leases. Preserve
   historical studies and original atoms. Close only C10a-05; C9a feedback,
   other C10a mechanisms and E1 combined acceptance remain open. No compounded
-  portfolio speed claim. See `v2/benchmarks/qs/c10a05/results.md`.
+  portfolio speed claim. See the local study record.
 
 ## C10 bounded tranche integration (11 October 2026)
 
@@ -133,15 +147,15 @@
   calibration under the continuing follow-ups.
 
 - Promote C3's size-scoped bounded defaults at the user's direction: compact64
-  at 30 decimal digits and the Yamaquasi-derived 10/30/100 escalating prefix at
+  at 30 decimal digits and the 10/30/100 escalating prefix at
   40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
   limits and SIQS settings; retain fixed32 for other sizes or tight workspace.
   This promotion precedes fresh confirmation and leaves calibration open.
   Committed-only checks pass 663 tests, lint and benchmark/input loaders.
 
 - Complete the initial 54-group upstream ECM transfer screen: all 324 calls
-  validate under unchanged SIQS settings and reserves. Escalating Yamaquasi
-  and Alpertron schedules show 44.44%/47.39% lower revealed-training CPU cost
+  validate under unchanged SIQS settings and reserves. The escalating140 and ladder115 schedules show
+  44.44%/47.39% lower revealed-training CPU cost
   than fixed32, with wide uncertainty. Stop this pass after the user raised
   a time concern; defer extension/fresh confirmation and retain defaults.
   Committed-only checks pass 653 tests, lint and all benchmark/input loaders.
@@ -153,13 +167,12 @@
   with fixed SIQS bounds and finite uncertainty extensions; no policy gain is
   inferred from partial observations.
 
-- Add explicit source-derived ECM tier presets from Yamaquasi, Alpertron and
-  GMP-ECM, retaining the caller's SIQS configuration, cumulative allocation,
+- Add explicit numerical ECM tier presets, retaining the caller's SIQS configuration, cumulative allocation,
   positive fallback floors and memory cap. Refuse incompatible workspace
   instead of reducing SIQS storage. Preserve numerical defaults; performance
   transfer and policy acceptance require matched measurements.
 
-- Continue C3 after the negative quick8 result with CADO-NFS/Alpertron source
+- Continue C3 after the negative quick8 result with bounded schedule
   and probability/cost research, 57 revealed training subjects and a validated
   seven-bundle attribution pilot. Reduce duplicate reserved-charge clock
   checks and reuse the allocation view, preserving the ordinary budget path
@@ -306,7 +319,7 @@
   at this study acceptance point.
 
 - Record the initial conservative C6/P4.5 Lucas-chain comparison (historical).
-  Version a pinned GMP-ECM generator/decoder and 303 independently verified
+  Preserve the pinned generator/decoder locally and 303 independently verified
   prime records; add reusable compact PRAC/Lucas, rolling and restricted
   three-point research executors with bounded nonunit/factor recovery.
 - Retain the ladder: Lucas costs 2.03x native-int and 1.22x GMP complete ECM
@@ -391,7 +404,7 @@
   18.1–21.8% more. The production-B2 portfolio bridge adds no completions
   over retained production and costs 3.6% more, so defaults/allocation stay.
 - Broaden pinned literature/source/license coverage, including current
-  official GMP-ECM and special-form implementations, without copying code
+  ECM and special-form implementations, without copying code
   or claiming exhaustive coverage. Pass 14 additional adversarial tests;
   a committed-only checkout passes all 436 PyPy/GMP tests, lint, 73 benchmark
   imports and required certificate/input/selection loaders. Preserve local
@@ -486,7 +499,7 @@
   unresolved cofactor and uncensored backend transition. Keep microbenchmarks
   separate from complete-campaign evidence.
   Preserve production ladder defaults. B3 integration remains open; defer
-  GMP-ECM precomputed Lucas chains and compact execution to the separate
+  reference ECM precomputed Lucas chains and compact execution to the separate
   P4.5/C6 experiment at the user's request.
 
 - Add P5.2 A3's opt-in immutable packed ECM prime/power blocks with bounded
@@ -594,7 +607,7 @@
   factor extraction with in-memory resume.
 - Remove redundant collector budget polling and proved-useless score marking.
   Keep experimental resieving and alternative scoring/filtering controls
-  optional; see [measurement scope](v2/benchmarks/docs/studies.md).
+  optional; see measurement scope.
 - Keep code, tests, roadmap, research and required fixtures on GitHub.
   Exclude generated run captures, logs, profiles and local development records.
 
@@ -628,7 +641,7 @@ ECM remains the default and SIQS stays opt-in. A general SIQS crossover and
 practical 60–80-digit scaling remain unestablished. The earlier M30 completion
 claim was corrected because 0.2-second probes and 24–26-bit fixtures were
 insufficient; M31 supplies the declared longer experiment and its explicit
-retain-baseline decision. See [measurements](v2/benchmarks/docs/studies.md#completed-larger-evaluation-and-filtering-repair-m31-4-october-2026).
+retain-baseline decision. See measurements.
 P4.3 arithmetic assessment and bounded GNFS remain roadmap work.
 
 PRAC optimization remains [P4.1](v2/ROADMAP.md); production currently uses
@@ -731,7 +744,7 @@ the safe Montgomery ladder.
 - Retain defaults: fixed scoring/plans remain experimental, and no candidate
   passes the declared causal training promotion gate. Family-wide CRT and
   wide-block resieve capacity remain deferred. See the
-  [R2 measurements](v2/benchmarks/docs/studies.md#p38-r2-bounded-collector-evaluation--4-october-2026)
+  R2 measurements
   for commands, uncertainty, censored outcomes and cold/profile separation.
 - Verify the isolated committed-files-only snapshot with 282 PyPy tests,
   full lint, all 45 benchmark imports and frozen-source/corpus checks.

@@ -37,5 +37,8 @@ htmlcov/
 # Optional historical candidate and measured-source evidence stays local.
 /v2/benchmarks/history/
 
+# External reference sources are local, including their notices and licenses.
+/v2/benchmarks/inputs/upstream/
+
 # Historical raw evidence remains local and recoverable.
 /.local-evidence/

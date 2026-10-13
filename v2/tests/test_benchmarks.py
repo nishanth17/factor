@@ -2,16 +2,44 @@
 
 import io
 import json
+import tempfile
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from v2.benchmarks.infrastructure.parallel import parallel_candidates
+from v2.benchmarks.qs.c1 import c1_feasibility, c1_followup
 from v2.benchmarks.suites import phase_two
 
 
 class BenchmarkTests(unittest.TestCase):
     """Reject incorrect answers even during untimed workload warmup."""
+
+    def test_local_prose_does_not_relax_numerical_input_pins(self):
+        # Both loaders must reject corrupt runtime inputs without local notes.
+        for module, loader in (
+            (c1_feasibility, c1_feasibility.load_control),
+            (c1_followup, c1_followup.load_followup),
+        ):
+            with (
+                self.subTest(loader=loader.__name__),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                control = Path(directory) / "control.json"
+                control.write_text(
+                    json.dumps(
+                        {
+                            "files": {
+                                "inputs/controls/b1_selected.json": "0" * 64
+                            }
+                        }
+                    )
+                )
+
+                with patch.object(module, "CONTROL", control):
+                    with self.assertRaisesRegex(ValueError, "changed"):
+                        loader()
 
     def test_worker_cpu_requires_every_worker(self):
         """Duplicate PIDs cannot silently omit another worker's CPU use."""

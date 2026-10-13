@@ -22,25 +22,19 @@ see [contributor guidance](../../AGENTS.md).
 | [qs/b1/](qs/b1/) | QS/MPQS/SIQS calibration and width studies |
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
-| [qs/c10/](qs/c10/tranche1_results.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
-| [qs/c10a05/](qs/c10a05/results.md) | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
-| [qs/c10a05_plus/](qs/c10a05_plus/results.md) | Frozen 51-digit default-scope extension, 55/60-digit feasibility limits and charged fresh completion evidence |
+| qs/c10/ | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
+| qs/c10a05/ | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
+| qs/c10a05_plus/ | Frozen 51-digit default-scope extension, 55/60-digit feasibility limits and charged fresh completion evidence |
 | [qs/a7/](qs/a7/) | Frozen comparison arms and reconciliation |
 | [primality/a10/](primality/a10/) | Primality dispatch and validation |
 | [infrastructure/](infrastructure/) | Arithmetic backends, parallelism, sieves and performance audits |
 | [support/](support/) | Snapshot loaders and independent arithmetic oracles |
 
-Each experiment keeps its milestone identifier, runners, builders and research
-notes together. The [study record](docs/studies.md) preserves detailed accepted
-results, rejected experiments, commands and limitations.
+Runners and builders live beside their experiments. Detailed protocols,
+research, comparisons and acceptance reports are preserved locally under
+`v2/audit/research/`. Public summaries below retain measured scope and limits.
 
-The [cross-engine parameter audit](parameter_audit.md) reconciles constant
-provenance and missing tuning evidence under roadmap C11. QS/SIQS and DLP keep
-their [existing parameter audit](qs_parameter_audit.md) and C10a/C9a follow-up ownership.
-These ledgers distinguish exact invariants, finite caps and measured choices
-from uncalibrated defaults; adding an audit does not change production settings.
-
-The [C10a-05 report](qs/c10a05/results.md) separates polynomial windows from
+The C10a-05 report separates polynomial windows from
 collection exhaustion. A single fixed challenger was compared against the
 current C9/C10 plan: 63 training pairs and 27 fresh pairs, 180 validated
 complete calls. Fresh 50-digit cost fell 25.99% (95% interval 22.87–28.24%)
@@ -54,7 +48,7 @@ at `96e2aad`; current integration intentionally changes its strict source pin.
 Other C10a items, C9a feedback and E1 remain open. These percentages are not
 additive with earlier C1/C9/C10 studies.
 
-The [larger-band follow-up](qs/c10a05_plus/results.md) checks the user's
+The larger-band follow-up checks the user's
 requested 50+ routing. Nine matched training groups on three 51-digit
 products gave 9/9 complete candidates for C9/window, C10/window and
 collection pacing, versus 0/9 for the actual 51-digit default. The direct
@@ -69,7 +63,7 @@ charges. The 55-digit one-number pilot finished under a longer 1,200 s grant,
 while the 60-digit pilot was censored at that grant. Only exact 51-digit native
 routing advances; 52+ remains unchanged pending size-specific calibration.
 
-The [C10 tranche 1 report](qs/c10/tranche1_results.md) records an isolated
+The C10 tranche 1 report records an isolated
 2 MiB prime-power plan improvement on fresh complete factoring: 21.83% at
 40 digits (95% interval 12.47–24.88%) and 17.79% at 50 digits (16.11–19.48%),
 with nine matched validated calls per arm and three independent certified
@@ -79,30 +73,24 @@ family diversity and per-job threshold feedback retain explicit C10a gates.
 The 50-digit training extension stopped at 11/18 groups under its frozen
 whole-group reservation; the fresh 9/9 result, not that partial training
 interval, supports the scoped decision. Cold starts, profiles, work and
-memory are reported separately. The [C10 default decision](qs/c10/default_promotion.md)
+memory are reported separately. The C10 default decision
 routes the exact 40/50-digit native bundles and plan automatically at the
 confirmed memory allowance. The six conditional follow-ups were assigned to C10a; this
 closes the delivered C10 tranche without claiming the whole size-policy space.
 The subsequent C10a-05 decision above resolves only fixed collection pacing.
 
-The subsequent [C9 default promotion](qs/c9/c9_default_promotion.md) makes its
+The subsequent C9 default promotion makes its
 confirmed native 50-digit bundle automatic at the user's direction, preserving
 explicit limits/settings and saved configurations. Its finite omitted grant
 uses the confirmed resource window; this adds no new timing evidence.
 The later C10 selector composes its accepted plan with that 50-digit bundle;
 the C9 control and its default-promotion report remain historical evidence.
 
-The [multi-source implementation gap audit](implementation_gap_audit.md)
-extends the [Alpertron inventory](alpertron_gap_analysis.md), distinguishes
-missing mechanisms from existing/planned work, and ranks follow-ups against
-current evidence. Roadmap A1b separately reviews remaining R2 fixed-score combinations
-against the accepted C10 plan control; it does not repeat that plan study.
-
-The [C9 integration record](qs/c9/c9_integration.md) documents C3/C9 resume
+The C9 integration record documents C3/C9 resume
 compatibility and preserved study freezes. Remaining literature transfers are
 phased into roadmap C9a; E1 and C10a remain separate.
 
-C9.2's [adaptive-storage acceptance](qs/c9/c9_growth_results.md) confirms an
+C9.2's adaptive-storage acceptance confirms an
 explicit balanced 50-digit bundle: 38.10% less complete-call time than calibrated
 SLP and 53.08% less than fixed DLP, with 9/9 valid completions in all arms.
 Peak owned reservation rises to 326 MiB (SLP 167, fixed DLP 198). Three
@@ -112,41 +100,41 @@ stay separate from the C9 result.
 
 ## C3 continuing optimization
 
-[Additional primary research](ecm/c3/round2_research.md) and
-[diagnostic findings](ecm/c3/round2_findings.md) expand the search beyond quick8.
+Additional primary research and
+diagnostic findings expand the search beyond quick8.
 A frozen 84-call instrumented pilot validates all outcomes and finds two
 extra-curve hits that avoid SIQS. Matched profiles identify redundant
 reservation checks; their candidate reduction passes 600 tests and lint.
-The [offline stopping fit](ecm/c3/round2_fitted.md) subsequently completes all
+The offline stopping fit subsequently completes all
 2,052 validated instrumented calibration calls in 2,893.780 active seconds.
 It selects 64 curves at 2000/50000 for 30 digits and 64 at 2000/147396 for
 40 digits, with nineteen independent root-ECM entrants per band. The table
 and every calibration-capture hash are committed before comparison. These
 are training projections; no warmed policy promotion follows from the fit.
 
-The [complete-call procedure](ecm/c3/round2_comparison_protocol.md) froze
+The complete-call procedure froze
 57 revealed subjects, nine seeds and three arms. It was stopped after the user
 questioned the 513-group training scope: 72 complete matched groups (216 valid
 calls) are preserved, with no comparison decision. Its interrupted group grant
 remains charged; the protocol is permanently inconclusive and cannot resume.
-See the [scope decision](ecm/c3/round2_comparison_scope.md).
+See the scope decision.
 
-The replacement [upstream transfer screen](ecm/c3/source_preset_protocol.md)
+The replacement upstream transfer screen
 uses six revealed subjects, nine seeds and six arms: 54 groups, 324 calls.
-It tests the protected [source presets](ecm/c3/source_presets.md), retaining the
+It tests the protected source presets, retaining the
 exact SIQS settings and admission bounds. Promising unstable results may extend
 to 18/27 samples only within the separately fixed phase cap. This screening
 cannot establish a broad default. A selected candidate still needs disjoint
-fresh confirmation. See [model limits](ecm/c3/round2_model_limits.md) and the
-[prepared certificate mechanism](ecm/c3/round2_confirmation_input_design.md).
-The [initial source-screen results](ecm/c3/source_preset_results.md) complete
-all 324 calls. Yamaquasi escalation and Alpertron show 44.44%/47.39% lower
+fresh confirmation. See model limits and the
+prepared certificate mechanism.
+The initial source-screen results complete
+all 324 calls. `escalating140` and `ladder115` show 44.44%/47.39% lower
 training CPU cost than fixed32, but uncertainty remains wide. After the user raised
 a time concern, defer the prescribed extension and fresh confirmation, select no
 policy and retain defaults. Final committed-only checks pass 653 tests, lint,
 154 benchmark imports and 35 certified corpora.
-The user subsequently requested [default promotion](ecm/c3/default_promotion.md):
-use compact64 at 30 digits and the Yamaquasi escalating prefix at 40 digits,
+The user subsequently requested default promotion:
+use compact64 at 30 digits and the escalating prefix at 40 digits,
 subject to existing workspace admission. This separate decision overrides the
 earlier defer decision; it does not alter the frozen assessment's null selection,
 pass its stability gate, or claim a measured hybrid gain. No new timing search
@@ -157,8 +145,8 @@ commits; historical manifests are not repinned to newer production sources.
 
 ## C3 bounded ECM allocation and handoff (10 October 2026)
 
-[Research](ecm/c3/research.md), [protocol](ecm/c3/protocol.md) and
-[acceptance](ecm/c3/acceptance.md) document the new opt-in cumulative pretest,
+Research, protocol and
+acceptance document the new opt-in cumulative pretest,
 finite campaign and protected SIQS/SSS transition. Six bundles train on ten
 historical inputs; the selected policy is committed before 15 fresh certified
 inputs are generated. All 972 fresh calls validate and complete under matched
@@ -179,9 +167,11 @@ C3 broad calibration, G1 and E1 remain open; no collector or v1 change.
 
 ## Inputs and generated evidence
 
-`inputs/{baselines,controls,corpora,upstream}/` contains versioned inputs needed
-to reproduce the experiments, including licenses and immutable source snapshots.
-Keep those historical bytes and hashes unchanged.
+`inputs/{baselines,controls,corpora}/` contains required numerical inputs,
+controls and immutable baselines. Keep those historical bytes and hashes unchanged.
+External source regeneration requires local files under folder-ignored
+`inputs/upstream/`; those files, notices and licenses are not part of a fresh
+checkout. Historical protocols still require their original pinned sources.
 
 Write captures, profiles, stdout, verification dumps and temporary experiment
 output under `results/<subject>/<experiment>/<run>/`. The entire `results/`
@@ -190,7 +180,7 @@ local journals and personal scratch work belong in `../local/`.
 
 ## Structure migration
 
-See the [verification record](docs/layout.md) for checks and reviewed differences.
+Detailed migration verification is retained in the local research archive.
 
 The folder migration changes import and command paths; it does not supply new
 performance evidence. For example:

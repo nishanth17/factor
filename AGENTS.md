@@ -54,7 +54,11 @@ Commit code, tests, documentation, independent corpora and immutable baselines
 required by test/benchmark loaders. Required inputs live in versioned
 `v2/benchmarks/inputs/`; generated evidence belongs in folder-ignored
 `results/` trees. The `v2/audit/` directory is local and Git-ignored; maintain
-the public acceptance plan in `v2/ROADMAP.md`.
+the public acceptance plan in `v2/ROADMAP.md`. Keep detailed research and
+comparison documents under `v2/audit/`, and external reference sources under
+folder-ignored `v2/benchmarks/inputs/upstream/`. Do not add individual-file
+ignore rules for study names or external projects. Public docs describe this
+project's behavior; preserve source inventories and comparison provenance locally.
 
 Keep generated captures, stdout transcripts, profiles, verification dumps,
 scratch output and the detailed `v2/local/LOG.md` journal local. Do not add those

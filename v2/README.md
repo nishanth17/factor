@@ -60,8 +60,7 @@ addition and 3M+2S for doubling. They are not runtime speed estimates.
 
 This completes the P4.1/A4 correctness tranche. `factorize_ecm` and default
 bounded jobs retain the B4 ladder; explicit B3 reuse routing is documented
-below. The [benchmark guide](
-benchmarks/docs/studies.md#p41a4-verified-prac-5-october-2026) separates kernel
+below. The benchmark guide separates kernel
 diagnostics from complete two-stage attempts on certified 40–80-digit inputs,
 including matched optional gmpy2 arms. These are experimental comparisons;
 B3 owns program composition, shared work accounting, checkpoint/replay
@@ -74,20 +73,18 @@ C6 adds reusable experimental machinery in `benchmarks.c6_chains`:
 `Executor(record, backend)` verifies once before repeated point execution.
 `build_program(B1, method, backend)` supports B1 <= 2,000 with checked PRAC,
 compact PRAC, precomputed Lucas and rolling Lucas layouts. The catalog uses
-303 independently verified prime records from a pinned GMP-ECM generator.
+303 independently verified prime records in a bounded, frozen catalog.
 `ThreePointExecutor` accepts only recognized continued-fraction records.
 These experiment APIs require the same nonsingular Montgomery curve, odd
 modulus and `(A+2)/4` convention as `multiply_prac`. Results are valid X:Z
 pairs or `NonunitPointError`; callers retain proper factors and handle retry.
 Records have at most 512 steps and 16 retained point slots; programs own at
-most 512 records, with no global point cache. See the [C6 study](
-benchmarks/ecm/c6/c6_research.md) for recovery, storage and reproducibility details.
+most 512 records, with no global point cache. See the C6 study for recovery, storage and reproducibility details.
 B3 now routes the selected records through bounded production jobs under
 its explicit reuse option; default ladder behavior is preserved. The initial
 conservative C6 study retained the
 ladder after full-stage and campaign losses; those results remain historical
-controls. The user reopened executor optimization. See the [follow-up](
-benchmarks/ecm/c6/c6_optimization.md) for its independently proved factor coverage,
+controls. The user reopened executor optimization. See the follow-up for its independently proved factor coverage,
 frozen comparisons and final decision.
 
 `benchmarks.c6_fast.load_catalog()` verifies immutable scalar and coordinate
@@ -132,7 +129,7 @@ stores, compact matrix storage and recovery. Performance repairs reduce repeated
 primality/root work, sparse exponent recovery, prime-power inversions and
 relation verification. New or untrusted data still receives exact verification.
 
-The [10 October ownership/recovery diagnosis](benchmarks/docs/studies.md#recovery-preparation-and-plan-lifetime-diagnosis-10-october-2026)
+The 10 October ownership/recovery diagnosis
 retains the accepted eager implementation and all defaults. Deferring strict
 preparation showed no reliable full-run improvement. A separately charged,
 finite owner shared across a complete cohort confirmed a native benefit, but
@@ -256,7 +253,7 @@ assert (result.divisor or 1) * result.cofactor == n
 Here `n` is the integer to split. The result preserves an explicit unresolved
 cofactor when its finite allowance ends. This preset reduced the tested
 balanced cohort's time by 36.6%; uneven-factor regressions keep it an explicit
-choice. See the [B1 measurements and limitations](benchmarks/docs/studies.md#b1-joint-qsmpqssiqs-calibration--9-october-2026).
+choice. See the B1 measurements and limitations.
 
 Select an experimental SSS engine explicitly:
 
@@ -294,7 +291,7 @@ An unavailable dependency raises an explicit error; GMP selection never falls
 back to another backend or CPython. Importing and using the integer default
 does not import gmpy2. GMP support is optional: faster individual operations
 do not establish a faster factoring engine. See the
-[matched backend study](benchmarks/docs/studies.md#p43-arithmetic-backends--5-october-2026).
+matched backend study.
 The current selectors are explicit; there is no automatic digit threshold.
 Algorithm/stage/size selection requires the separate production-bound and
 larger-QS study. Aggregate portfolio timings do not establish that policy.
@@ -449,9 +446,8 @@ and optional fallback; they do not bound process RSS.
 The bounded CLI accepts `--ecm-chain auto|off|prac|lucas|cf`; the flag also
 implies `--bounded`. `prac` selects the native default policy, `off` keeps the
 ladder, and `lucas`/`cf` select optional certified batch-16 families under the
-same support and capacity checks. The Lucas records are GMP-ECM-derived,
-executed by this repository's Python interpreter; this is not the GMP-ECM C
-binary. Native and GMP execution remain separate tracks. Automatic GMP jobs
+same support and capacity checks. This repository executes the certified
+Lucas records with its Python interpreter. Native and GMP execution remain separate tracks. Automatic GMP jobs
 retain the ladder; explicit `ecm_chain_family="lucas"` or `"cf"` can select an
 alternative, and the accepted explicit GMP `ecm_chain_mode="reuse"` route
 continues to use tuple Lucas. API family/mode/chain-cap fields are keyword-only.
@@ -459,7 +455,7 @@ continues to use tuple Lucas. API family/mode/chain-cap fields are keyword-only.
 For explicit reuse, set `ecm_chain_mode="reuse"`, `ecm_chain_bytes=8 * 2**20`,
 `ecm_program_bytes=512 * 1024` and a sufficient `memory_bytes`. To force the
 baseline, use `ecm_chain_mode="off"`. See the
-[default bridge and historical measurements](benchmarks/docs/studies.md#b3-user-directed-native-default-and-optional-families-10-october-2026).
+default bridge and historical measurements.
 
 Each invocation owns a finite LRU of immutable verified plans, shared across
 its curves and recursive cofactors. No curve point or global plan cache is
@@ -518,7 +514,7 @@ and additionally charges setup, relation verification, assignment regeneration
 and solver/extraction replay. A total grant equal to previously consumed work
 can therefore refuse reconstruction. Checkpoint byte-cap refusal leaves the
 in-memory job available; exhausted schedules do not restart on budget extension.
-See the [A7 acceptance matrix](benchmarks/qs/a7/a7_r5_reconciliation.md) for worker
+See the A7 acceptance matrix for worker
 resource limitations and the prepared E1 comparison arms.
 
 ## Optional ECM programs and explicit campaigns
@@ -597,7 +593,7 @@ execute those programs. `None` (default) preserves unpaired execution;
 caller-selected experimental setting, not a measured recommendation.
 The frozen B2 study retains all production defaults: its selected paired
 settings lose to streamed and reusable unpaired execution on held-out complete
-factoring and a finite nonsplitting campaign. See `benchmarks/README.md` for
+factoring and a finite nonsplitting campaign. See the local study record for
 the D choices, costs and coverage/segmentation limitations.
 The dense curve-private table holds even multiples through D, with a separate
 2D recurrence step. Each certified pair contributes one cross-product;
@@ -648,7 +644,7 @@ checkpoint migration and point-specific recovery remain separate work.
 This optional mode covers one nearest-center distance set. Extended sets,
 relocation and overlapping-window graph matching belong to C2, as does
 common-Z; polynomial continuation belongs to F3. No production default changes.
-The fresh wheel comparison protocol is documented in `benchmarks/README.md`.
+The fresh wheel comparison protocol is documented in the local study record.
 Its selected held-out wheel is 31.1% faster than original pairing on the medium
 cohort and 4.8% faster on the fixed nonsplitting campaign, but 44.0% slower on
 uneven inputs. Every selected wheel loses to reusable unpaired programs:
@@ -719,7 +715,7 @@ Later v2-to-v2 comparisons show where the newer work helps:
   **38.7%** against R3 cadence 1. It remains an explicit option; the default
   cadence stays 1. Parallel workers have no demonstrated universal advantage.
 
-See the [benchmark guide](benchmarks/docs/studies.md) for protocols, commands,
+See the benchmark guide for protocols, commands,
 uncertainty, rejected experiments and size/budget limitations. A recorded
 balanced 50-digit success took **19 min 43 s**; one success does not establish
 broad coverage. There is no supported “50–60 digits within a minute” guarantee.
@@ -744,7 +740,7 @@ balanced inputs and nine matched pairs. The 40-digit comparison was
 inconclusive after eighteen pairs and keeps `"window"`. Explicit settings,
 other memory allowances, backends and sizes retain their existing selection.
 This is a scoped result, not a general semiprime runtime guarantee; see the
-[results and limitations](benchmarks/qs/c10a05/results.md).
+results and limitations.
 
 The new keyword-only option uses SIQS checkpoint schema **6**, preserving a
 pending terminal reason and zero-row cursor. Work, wall, CPU or cancellation
@@ -752,8 +748,8 @@ refusal leaves work pending for charged resume, including matrix rebuilding.
 Pass cumulative allowances to `SIQSJob.from_checkpoint`; a resource extension
 cannot change scheduling policy. Schemas 1–5 and new window-policy snapshots
 keep their legacy semantics and configuration shape, including nested portfolio
-checkpoints. See the [design](benchmarks/qs/c10a05/design.md) and
-[study protocol](benchmarks/qs/c10a05/protocol.md).
+checkpoints. See the design and
+study protocol.
 
 The inherited 1200-second omitted grant is a finite API default, not a
 universal feasibility limit. Pass an explicit `Budget` for a different work,
@@ -787,7 +783,7 @@ separate cold startup from warmed execution.
 ## Files and next work
 
 `tests/` contains acceptance and arithmetic regressions; the
-[QS guide](qs/README.md) covers relation engines. [Benchmark documentation](benchmarks/docs/studies.md) holds detailed results;
+[QS guide](qs/README.md) covers relation engines. Benchmark documentation holds detailed results;
 the [roadmap](ROADMAP.md) records acceptance gates. Benchmark `inputs/`
 retain independent corpora, immutable sources, provenance and frozen controls.
 The entire `audit/` tree is Git-ignored local research and diagnostic material;
@@ -836,22 +832,22 @@ entire assignment space, so extending `family_count` preserves every prefix.
 One bounded cache is reserved, and its reconstruction on resume is charged.
 Its identity is distinct from `flyer`; changing policy during resume is
 rejected. Finite and growing collectors retain their existing quota semantics.
-The [C10 tranche 1 result](benchmarks/qs/c10/tranche1_results.md) does not
+The C10 tranche 1 result does not
 advance this fixed 16-family ordering from training. A separate exact 2 MiB
 prime-power plan passes scoped fresh complete-factor comparisons for the
 measured 40/50-digit growing-DLP bundles. The user-directed automatic selector
 enables the plan for those exact native size bands at the confirmed 1 GiB
 allowance; `SIQSConfig()` and explicit caller configurations remain unchanged.
-The [default decision](benchmarks/qs/c10/default_promotion.md) distinguishes
+The default decision distinguishes
 this routing from a new timing claim. The
-[candidate ledger](benchmarks/qs/c10/candidate_reconciliation.md) keeps
+candidate ledger keeps
 alternative A selection, diversity and normalized polynomials distinct.
 
 The R2 benchmark harness compares these options with conservative scoring,
 bucket/resieve recovery, tiny-prime corrections, scalar/batch smooth-part
 recovery and grouped hit reservations. Its independent certified inputs,
 frozen source control and separate cold/profile modes are described in
-[the benchmark guide](benchmarks/docs/studies.md). Dispatcher defaults are unchanged.
+the benchmark guide. Dispatcher defaults are unchanged.
 
 ## B4 arithmetic kernels
 
@@ -875,10 +871,10 @@ zero, so the readable GMP path remains in production.
 
 The independent affine/composite/prime-power and exact readable-formula
 controls exercise production as well as the frozen candidates. See the
-[research/proofs](benchmarks/ecm/b4/b4_research.md),
-[source/license audit](benchmarks/ecm/b4/b4_research_audit.md),
-[fresh comparison](benchmarks/docs/studies.md#fresh-bakeoff-results-and-decision) and
-[production integration](benchmarks/docs/studies.md#b4-production-integration-protocol).
+research/proofs,
+source/license audit,
+fresh comparison and
+production integration.
 The original frozen retain-baseline verdict and subsequent revised-policy
 confirmation are historical records; their source controls and certified
 inputs remain immutable. Experimental square, helper and normalized arms
@@ -937,7 +933,7 @@ construction costs ceil(isqrt(max B2)/2). Every reservation precedes mutation.
 Deadlines/cancellation are cooperative between bounded actions.
 
 The group-independent ratio helpers and precise reuse rules are documented
-in the [A6 research and contract](benchmarks/pm1/a6/a6_pm1_research.md). They unblock
+in the A6 research and contract. They unblock
 the scalar contract for later ECM work; ECM bound migration remains separate.
 
 The separate `v2.pm1.tuning.PM1TuningConfig` is an opt-in execution
@@ -948,7 +944,7 @@ review after fresh 27-sample complete-call confirmation: 1.0–2.8% less CPU
 than the frozen chunk-64 control, with positive aggregate intervals in every
 size class. Bit caps and wheels remain experimental, unpromoted alternatives;
 production defaults and allocation remain unchanged. See the
-[complete comparison and limitations](benchmarks/docs/studies.md#a6-follow-up--bit-caps-recurrence-and-exact-wheel-execution).
+complete comparison and limitations.
 
 ```python
 from v2.pm1.tuning import PM1TuningConfig
@@ -1027,8 +1023,7 @@ more than running a fresh final bound. No new continuation rung is allocated.
 
 The user explicitly requested this default promotion. Fresh complete-stage
 confirmation saves 9.73% CPU across nine cells; integer portfolio captures
-remain inconclusive after extension. The [benchmark receipt](
-benchmarks/docs/studies.md#a6-production-default-promotion--9-october-2026)
+remain inconclusive after extension. The benchmark receipt
 records both results. This is a user-directed default change, with the
 legacy executor available for reproducibility and existing resumes.
 
@@ -1054,7 +1049,7 @@ result = job.run()
 ```
 
 These illustrative bounds are not a promoted preset. The
-[C1 protocol](benchmarks/qs/c1/c1_implementation_protocol.md) governs training and
+C1 protocol governs training and
 fresh complete-factor comparison. `candidate_bound=0` covers the entire
 admissible product domain; a smaller explicit allowance must preserve SLP
 coverage and intentionally sacrifices DLP candidates. Endpoints must be proven
@@ -1120,7 +1115,7 @@ assert (result.divisor or 1) * result.cofactor == n
 
 Here `n` is the integer to split; this is not an automatic digit-based dispatch
 rule. The result retains an unresolved cofactor when the allowance ends. The
-[C1 complete-factor report](benchmarks/qs/c1/c1_implementation_results.md) records
+C1 complete-factor report records
 training, fresh confirmation, certainty labels and the separate larger-store
 resume witness. Performance belongs to the tested configuration/input class,
 not every input with the same number of digits.
@@ -1140,8 +1135,8 @@ combined rows and matrix storage have separate ownership and limits; doubling
 this value can exhaust memory before collection becomes useful. The existing
 configuration identity includes all these bounds, so a changed policy must
 be supplied consistently on restore. There is no new serialized relation
-format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
-[bounded evidence and decision](benchmarks/qs/c9/c9_results.md).
+format. See the C9 mechanism comparison and
+bounded evidence and decision.
 
 ### C9/C10 size-scoped growing-DLP defaults
 
@@ -1151,7 +1146,7 @@ Fresh native 40-, 50- and 51-digit calls select scoped bundles by default throug
 selection. At the confirmed 1 GiB allowance, the 40-digit result matches the
 frozen C10 plan, the 50-digit result matches C10a-05's confirmed collection
 arm, and the 51-digit result uses that same concrete bundle after a separate
-[larger-band confirmation](benchmarks/qs/c10a05_plus/results.md). The 50/51-digit
+larger-band confirmation. The 50/51-digit
 selection adds C10's 2 MiB plan and C10a-05's fixed pacing to C9's growing
 bundle. The 40-digit selection uses the C9-tested growing collector
 with C10's confirmed plan; C9 did not establish a separate 40-digit growth
@@ -1182,8 +1177,8 @@ that same resource scope. Different caller memory grants retain window pacing
 and the growing bundle without the plan. The measured C9 50-digit peak
 before C10's plan was 326 MiB versus
 167/198 MiB for SLP/fixed DLP, and charged work increased despite lower wall/CPU.
-See [default promotion and limits](benchmarks/qs/c9/c9_default_promotion.md).
-The [C10 decision](benchmarks/qs/c10/default_promotion.md) records the plan's
+See default promotion and limits.
+The C10 decision records the plan's
 separate fresh results, memory delta and remaining boundaries.
 
 `GrowingDoubleLargeSieveConfig` uses growable PyPy relation containers. Its
@@ -1237,8 +1232,8 @@ Restore the previous completed checkpoint with charged replay. An OS kill is
 not recoverable without such a checkpoint. A quota refusal before publication
 leaves the checked store resumable. No disk-spill implementation is implied.
 
-See the [source and constraint audit](benchmarks/qs/c9/c9_growth_audit.md) and
-[measured results and scope](benchmarks/qs/c9/c9_growth_results.md). The complete
+See the source and constraint audit and
+measured results and scope. The complete
 experimental configuration is versioned in
 [`c9_long_selected.json`](benchmarks/inputs/controls/c9_long_selected.json);
 the example above omits its calibrated polynomial and stopping settings.
@@ -1303,12 +1298,9 @@ configuration. Larger ECM workspace must coexist with the unchanged SIQS
 storage or construction raises `MemoryError`. Total run budgets still bind;
 curve counts do not authorize extra work or imply SIQS will complete.
 
-Presets include Yamaquasi's small automatic pretest and escalating ECM-only
-prefix, Alpertron's 20/25-digit-factor ladder prefixes, and GMP-ECM's published
-20/25-digit-factor parameter rows. These are explicit transfer experiments:
-native arithmetic, curve families and stage-two methods differ, and some source
-counts describe standalone ECM rather than automatic SIQS handoff. See the
-[preset table and source qualifications](benchmarks/ecm/c3/source_presets.md).
+Presets provide a small pretest, an escalating prefix, two ladder schedules
+and two single-tier schedules. They are explicit schedule experiments;
+curve counts do not establish automatic SIQS handoff or complete factoring.
 Preset names describe schedule shape and total curve count: `pretest8`,
 `escalating140`, `ladder115`, `ladder415`, `single74` and `single214`.
 These replace the former upstream-named keys; those keys now raise `ValueError`.
@@ -1346,7 +1338,7 @@ tiers for schemas 2–12; an explicit conflicting tuple is rejected.
 This is a user-directed promotion from the complete revealed-input screen,
 before fresh confirmation. It does not close C3's calibration gate or establish
 a speedup on every input, default service grant or backend. See the
-[decision and limitations](benchmarks/ecm/c3/default_promotion.md).
+decision and limitations.
 
 Explicit policies use checkpoint schema 12, pinning the complete configuration
 and allocation identity. `factorize_bounded(..., checkpoint=..., config=None)`
@@ -1361,9 +1353,9 @@ omitted; repeat other nondefault options such as `--backend` and
 `--fermat-steps`, and explicitly supply the intended total work/time grant.
 
 Research, frozen controls and the acceptance decision are in
-[the C3 study](benchmarks/ecm/c3/research.md) and
-[its finite protocol](benchmarks/ecm/c3/protocol.md), with the
-[fresh acceptance decision](benchmarks/ecm/c3/acceptance.md). Fresh confirmation
+the C3 study and
+its finite protocol, with the
+fresh acceptance decision. Fresh confirmation
 retains numerical defaults: the selected quick8 bundle costs 51.6% more on the
 declared smaller-band cohort and has uneven-factor regressions. Its service
 reserve also refuses four of five historical smaller-band inputs at the 2M
