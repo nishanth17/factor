@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "authorization": "User approved another charged warmup after competing tests exit; no measured call had started.",
+  "source_sha256": "15828a5b2790724668d9be3ca093ae699d38f59461d3c1d90f2cfd6f75373f56",
+  "original_control_sha256": "701a6d5818b4e4ea7b602f18424c7c16332d489abcf4e3b100351c83ef1bccc7",
+  "corpus_sha256": "ed386d6653d2aa0ef2a2c2ce0397f407f3c2bef3b1488d845907194dbca01687",
+  "failed_ledger_sha256": "a9877f5ada05645dbf52c437a84abe4d16ed7d420af74b86b5c682c6d4e4db79",
+  "deadline_unix": 1791874018.766065
+}
