@@ -1,5 +1,15 @@
 # Changelog
 
+## C10a-04 default promotion (12 October 2026)
+
+- At user direction, enable native growing-DLP SIQS defaults through 60 digits,
+  preserving accepted 50/51 settings. Use charged exact 2500-entry compact bases
+  at 52–55 and 5000 at 56–60, with finite budgets and saved-policy replay.
+- Record preliminary and extrapolated coverage in the
+  [promotion report](v2/studies/c10a04_default_promotion.md); close the delivered
+  roadmap tranche without claiming the original campaign completed. E1 remains
+  deferred, C10a-07 open, and 65/70 feasibility separate.
+
 ## Bounded C10a-04 follow-up (12 October 2026)
 
 - Add a separate 60-digit compact/control study with fresh certified inputs,

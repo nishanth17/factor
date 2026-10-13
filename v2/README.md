@@ -1145,7 +1145,7 @@ format. See the [C9 mechanism comparison](benchmarks/qs/c9/c9_research.md) and
 
 ### C9/C10 size-scoped growing-DLP defaults
 
-Fresh native 40-, 50- and 51-digit calls select scoped bundles by default through
+Fresh native 40- and 50–60-digit calls select scoped bundles by default through
 `SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
 `default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
 selection. At the confirmed 1 GiB allowance, the 40-digit result matches the
@@ -1155,18 +1155,26 @@ arm, and the 51-digit result uses that same concrete bundle after a separate
 selection adds C10's 2 MiB plan and C10a-05's fixed pacing to C9's growing
 bundle. The 40-digit selection uses the C9-tested growing collector
 with C10's confirmed plan; C9 did not establish a separate 40-digit growth
-gain over fixed DLP. Sizes 52 digits and above and other backends retain their
-previous policies. The one-number 55-digit pilot completed with a longer grant;
-the 60-digit pilot did not complete within 1,200 seconds. This
-size-based promotion was explicitly requested by the user; complete-run
-evidence covers conditioned balanced inputs, not every input in these bands.
+gain over fixed DLP. At user direction, 52–55 digits use compact 2500-entry
+bases, seven A factors and pool 64; 56–60 use 5000 entries, eight A factors
+and pool 64. Both select odd multipliers with half-width 65536. Eligible counts
+are resolved during charged setup below endpoint ceiling 250000. The 55-digit
+training gain remained unstable; fresh 60-digit validation stopped with a
+preliminary favorable trend. Intermediate sizes are policy extrapolations,
+not measured gains. See the [promotion and limitations](studies/c10a04_default_promotion.md).
+Sizes above 60 and other backends retain their previous policies.
 
 Omitted limits use the confirmed finite 1 GiB SIQS allowance, 1,200 wall/CPU
-seconds and 10^13 work units. The outer automatic portfolio reserves 16 MiB
+seconds (1800 at 56–60 digits) and 10^13 work units. The outer automatic
+portfolio reserves 16 MiB
 additional coexistence headroom. An explicit Budget or CLI resource limit wins;
 small grants can return unresolved results. Explicit SIQSConfig objects, QS
 parameter flags, explicit `siqs=None` and saved concrete configurations take
-precedence. `asdict`/`replace` copies freeze the current numerical selection.
+precedence. `asdict`/`replace` copies freeze the current selection. Larger bundles use
+`CountedSIQSConfig`, a `SIQSConfig` subclass with positive `base_count`;
+`base_bound` is its finite endpoint ceiling. Counted checkpoints retain this
+policy and rebuild the exact base under charged replay. Historical
+`SIQSConfig` mappings retain their existing format.
 `PortfolioConfig` also accepts an asdict-style SIQS child mapping in its
 constructor; checked checkpoints remain the supported resume format.
 The standalone `factorize()` API remains its separately configured engine.

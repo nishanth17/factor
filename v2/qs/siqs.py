@@ -7,6 +7,7 @@ from functools import partial
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
 from .assignment_stream import AssignmentStream, quality_workspace
+from .count_policy import CountPolicyRefusedError, endpoint_for_count
 from .external_square import (
     CoefficientDivisorError,
     CoefficientExhaustedError,
@@ -204,6 +205,31 @@ class SIQSConfig:
         return 65536 + 8 * (self.checkpoint_bytes or 0) + registry + quality
 
 
+@dataclass(frozen=True)
+class CountedSIQSConfig(SIQSConfig):
+    """Resolve an exact eligible count below base_bound during charged setup.
+
+    A separate config type leaves historical SIQSConfig mappings unchanged.
+    The count and ceiling remain concrete in checkpoints, while the selected
+    multiplier and rebuilt base have their existing independent identities.
+    """
+
+    base_bound: int = 250000
+    base_count: int = field(default=5000, kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        from .count_policy import ENDPOINT_CEILING
+
+        utils.require_integer(self.base_count, "base count", 1)
+        if self.base_count >= self.base_bound:
+            raise ValueError("base count must be smaller than its ceiling")
+        if self.base_bound > ENDPOINT_CEILING:
+            raise ValueError("count policy endpoint exceeds its ceiling")
+        if self.mode != "siqs" or self.backend != "python-int":
+            raise ValueError("count policies require native SIQS")
+
+
 class SIQSJob:
     """One setup-to-extraction allowance, with a shared single-prime store.
 
@@ -282,12 +308,28 @@ class SIQSJob:
                     return
 
         if self.base is None:
+            bound = self.config.base_bound
+            if isinstance(self.config, CountedSIQSConfig):
+                bound, self.divisor = self._timed(
+                    "base_count",
+                    lambda: endpoint_for_count(
+                        self.n,
+                        self.multiplier,
+                        self.config.base_count,
+                        self.budget,
+                        ceiling=self.config.base_bound,
+                        memory_bytes=self.config.memory_limit
+                        - self.config.metadata_reserve,
+                    ),
+                )
+                if self.divisor is not None:
+                    return
             setup = self._timed(
                 "base",
                 lambda: build_factor_base(
                     self.n,
                     multiplier=self.multiplier,
-                    bound=self.config.base_bound,
+                    bound=bound,
                     budget=self.budget,
                     memory_bytes=self.config.memory_limit
                     - self.config.metadata_reserve,
@@ -618,6 +660,8 @@ class SIQSJob:
                     self.finished_reason = reason
                 elif reason not in ("paused", "factor_found"):
                     break
+        except CountPolicyRefusedError:
+            self.finished_reason = reason = "configuration_refusal"
         except CoefficientDivisorError as found:
             self.divisor = found.divisor
         except BudgetExhaustedError:

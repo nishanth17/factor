@@ -668,6 +668,7 @@ def main():
                     if not (use_qs or use_sss) or restore_saved_qs:
                         if saved.get("siqs") is not None:
                             from .qs import (
+                                CountedSIQSConfig,
                                 DoubleLargeSieveConfig,
                                 GrowingDoubleLargeSieveConfig,
                                 SieveConfig,
@@ -683,7 +684,12 @@ def main():
                             else:
                                 collector_type = SieveConfig
                             values["collector"] = collector_type(**collector)
-                            parameters["siqs"] = SIQSConfig(**values)
+                            config_type = (
+                                CountedSIQSConfig
+                                if "base_count" in values
+                                else SIQSConfig
+                            )
+                            parameters["siqs"] = config_type(**values)
                         if saved.get("sss") is not None:
                             from .qs import SieveConfig
 

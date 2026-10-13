@@ -12,7 +12,10 @@ they do not satisfy the ordinary accepted timing gate or promote defaults.
 The original multi-band campaign remains incomplete and its evidence intact.
 The [completed preliminary result](../studies/c10a04_short_results.md) stopped
 after six pairs: compact completed 6/6 versus 5/6 and used 36.16% less total
-capped time, with 31.72–40.08% saving per input. Defaults remain unchanged.
+capped time, with 31.72–40.08% saving per input. The subsequent
+[user-directed promotion](../studies/c10a04_default_promotion.md) enables
+50–60-digit routing, preserving 50/51 settings and documenting unstable 55
+training and unmeasured intermediate sizes.
 
 ## Find an experiment
 

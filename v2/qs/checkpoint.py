@@ -481,7 +481,7 @@ def _checkpoint_restore_config(config, blob_bytes):
 
 def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     """Verify and rebuild charged roots, stores and solver prefixes."""
-    from .siqs import SIQSConfig, SIQSJob
+    from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob
 
     if not isinstance(checkpoint, dict) or set(checkpoint) != {
         "version",
@@ -558,7 +558,8 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         else SieveConfig
     )
     values["collector"] = collector_type(**values["collector"])
-    saved_config = SIQSConfig(**values)
+    config_type = CountedSIQSConfig if "base_count" in values else SIQSConfig
+    saved_config = config_type(**values)
     if type(allow_extension) is not bool:
         raise TypeError("allow_extension must be Boolean")
     extended = config is not None and config != saved_config
@@ -681,6 +682,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "relation_limit",
         "atom_limit",
         "memory_limit",
+        "configuration_refusal",
     )
     if payload["finished_reason"] not in allowed:
         raise ValueError("invalid SIQS checkpoint stop reason")

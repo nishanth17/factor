@@ -1974,20 +1974,22 @@ negative arm and all historical pins.
   exact rejected-position audit supports a declared loss budget.
 - [ ] Consider coupled multiplier/base/interval/A-size policies only after a
   measured complete-cost gap; compare actual base endpoints and even-k cases.
-The original C10a-04 Stage 2 campaign is paused and incomplete. A separate
-[user-authorized 60-digit follow-up](studies/c10a04_short.md) has a ten-hour
-budget and fixed preliminary early stops. Its
-[completed preliminary result](studies/c10a04_short_results.md) stopped after
-six pairs: compact completed 6/6 against 5/6 control, with 36.16% lower total
-capped time and at least 20% saving on each input. This does not close the
-original acceptance gate, promote defaults, execute E1 or close C10a-07.
+The original C10a-04 Stage 2 campaign remains paused and incomplete. Its
+[preliminary 60-digit result](studies/c10a04_short_results.md) and 55-digit
+training informed an explicit user-directed default promotion.
 
-- [ ] **C10a-04:** source-derived coupled larger-band calibration. Stage 1
-  infrastructure and freeze are recorded in the
-  [research](benchmarks/qs/c10a04/research.md) and
-  [Stage 2 handoff](benchmarks/qs/c10a04/handoff.md). Keep this gate open until
-  matched training, selection and fresh complete-factor confirmation pass;
-  no larger default or E1 claim follows from diagnostic prefixes.
+- [x] ~~**C10a-04:** source-derived coupled larger-band calibration and default
+  routing tranche.~~ [Promotion and limitations](studies/c10a04_default_promotion.md):
+  preserve accepted 50/51 settings; enable compact 2500-entry defaults at
+  52–55 and 5000-entry defaults at 56–60. Closed at user direction despite
+  unstable 55 training, preliminary 60 confirmation and unmeasured intermediate
+  sizes. Preserve the original freeze and interrupted accounting; the full
+  experiment is not claimed complete. E1 stays deferred and C10a-07 open.
+- [ ] Larger-size feasibility: run the separately authorized 65-digit spike
+  with 8500 eligible entries, nine A factors and finite matched grants. Use
+  its result before extending defaults through 65. Then consider one bounded
+  70-digit pilot to establish a practical grant and memory envelope before
+  any full matched study. No automatic runtime extension or 70-digit default.
 - [x] **C10a-05:** separate polynomial windows from genuine collection stops
   while retaining the existing fixed cadence/excess. Complete six-source
   scheduling research, independent dependency/resume oracles and matched
