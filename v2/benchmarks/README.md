@@ -223,16 +223,11 @@ replay them from their pinned checkout. The new
 for the unchanged numerical defaults and renamed preset API. No new performance
 claim or measurement accompanies this naming change.
 
-## C10a-04 Stage 1 coupled SIQS freeze
+## C10a-04 historical freeze
 
-[Research](qs/c10a04/research.md), [protocol](qs/c10a04/protocol.md),
-[diagnosis](qs/c10a04/results.md) and [Stage 2 commands](qs/c10a04/handoff.md)
-freeze three joint configurations at 55/60/65 digits without promoting defaults.
-The limited one-input/seed screen preserved 15 unresolved calls: larger bases
-retained more raw rows, but every observed filtered matrix was empty. These
-prefixes establish no time-to-factor or acceptance gain. A separate 55-digit
-compact pilot completed in 390.669 s on the revealed input; this single
-diagnostic establishes feasibility, not a matched speedup. Full correctness
-and runner checks are documented with the handoff. Required controls/corpora are versioned; raw receipts and all
-failed/pre-freeze attempts remain in ignored `results/c10a04/`. Stage 2 owns
-matched training and fresh complete-factor confirmation; E1 remains deferred.
+The original 55/60/65-digit campaign remains paused and incomplete. Its
+frozen sources and protocols are retained in Git history at `225634b`, with
+detailed research and every attempt preserved locally. The separate 60-digit
+result informed the user-directed 50–60 default promotion; the 65-digit spike
+established no completed-factor evidence at its 1800-second grant. See the
+linked result and promotion summaries above. E1 remains deferred.

@@ -1370,15 +1370,17 @@ reserve also refuses four of five historical smaller-band inputs at the 2M
 work grant. Larger experimental service grants do not change production
 defaults or establish a general input-size dispatch rule.
 
-### C10a-04 coupled calibration study
+### C10a-04 coupled calibration and default routing
 
-The separately frozen research runner is available with
-`pypy3 -B -m v2.benchmarks.qs.c10a04.study --help`. It targets PyPy implementing
-Python 3.11, resolves eligible-prime counts to exclusive endpoints with exact,
-charged integer arithmetic, and compares explicit 55/60/65-digit bundles.
-Production APIs, defaults and checkpoint formats are unchanged. See the
-[protocol](benchmarks/qs/c10a04/protocol.md) and
-[Stage 2 handoff](benchmarks/qs/c10a04/handoff.md) before running a campaign.
-Receipts are immutable/idempotent; lost measured calls remain censored and
-fully charged on resume. Reusing the same output directory resumes the exact
-freeze. Results belong in ignored `benchmarks/results/c10a04/`.
+The [user-directed promotion](studies/c10a04_default_promotion.md) preserves
+accepted 50/51 settings and enables counted compact configurations through
+60 digits. The [fresh preliminary 60-digit result](studies/c10a04_short_results.md)
+and [65-digit feasibility stop](studies/c10a04_spike65_results.md) describe the
+observed scope and limits. No routing above 60 is promoted.
+
+The original full experiment remains incomplete and paused. Its exact frozen
+sources and commands are retained in Git history at `225634b`; detailed
+research, protocols and journals are local audit evidence. Do not restart
+historical ledgers on changed runtime sources. Every receipt, timeout and
+interrupted reservation remains preserved in ignored results; E1 remains
+deferred and C10a-07 open.
