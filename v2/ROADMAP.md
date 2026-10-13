@@ -1966,6 +1966,39 @@ negative arm and all historical pins.
   yield-dependent target feedback.
 - [ ] Keep the separate C10a-06 runner tranche open. C10a-05 fixes repeated
   lease markers only in its new runner; the frozen C10 runner is unchanged.
+- [ ] **C10a-07:** investigate within-A Gray quota and traversal policy. The
+  NFS reference trace from C10a-04 identifies full `2^(r-1)` reuse with smaller
+  intervals; v2 can instead take a capped Gray prefix. Attribute setup
+  amortization, CRT-sign coverage and useful yield before selecting quota or
+  coupled quota/interval/A-factor policies. Preserve C10a-04's experiment
+  freeze; A-product population belongs to C10a-02, kernels to A1a and CRT hit
+  scheduling to C8. Fuller reuse is a hypothesis, not an accepted improvement.
+
+**C10a-07 model and execution recommendation:** use **GPT-6.1 Sol / xhigh**
+for source research, quota attribution, independent coverage checks, study
+implementation and protocol selection. Use **Sol / high** for frozen matched
+experiments and reporting. Existing prefix/full quotas already use the checked
+adjacent Gray walk; they do not require a new recurrence. Use **Astra / xhigh**
+for a separately justified new traversal or changed root/recentering/replay
+invariant. Those changes require a new tranche rather than silently expanding
+the quota comparison.
+
+Research/design can proceed alongside C10a-04 in a separate worktree. Serialize
+performance measurements with the shared lock, retain independent source and
+configuration pins, and combine accepted policies only through a later freeze.
+First compare quotas on the same deterministic A stream with fixed factor
+count, base, multiplier, interval and collector. Then consider a small set of
+joint quota/interval/A-factor bundles if attribution supports it. Enumerate
+small CRT families independently, verify modulo-sign coverage, exact roots,
+recentering and exceptional primes, and preserve charged cancellation/resume.
+Nonadjacent Gray jumps cannot reuse the existing one-flipped-sign update.
+Require matched complete-factor evaluation, fresh confirmation and the common
+warmup/sampling/uncertainty gates; raw variants, rows or fewer setups alone do
+not qualify. Keep finite cumulative allowances with justified extension stages,
+without treating any digit size or runtime as a universal ceiling. Leave this
+gate open on inconclusive evidence and keep E1 deferred under the current user
+instruction.
+
 **Delivered C10a-05:** results and decision,
 source reconciliation, and
 state/compatibility evidence.
