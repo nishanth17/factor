@@ -796,6 +796,46 @@ GNFS reference pipeline, followed by scaling and held-out dispatch experiments.
 GNFS, double-large-prime SIQS and broader parameter/parallel promotion remain
 roadmap work; existing small or configured-cohort wins do not close those gates.
 
+## A1a selected collector kernels
+
+`SieveConfig.marking` also accepts `density`, `presieve`, `scan_fused` and
+their duplicate-free combinations in that order. Explicit configurations
+retain precedence. Automatic collector selection is unchanged while the
+[mainline integration comparison](benchmarks/qs/a1a_integration/protocol.md)
+awaits execution.
+
+```python
+from dataclasses import replace
+from v2.qs import default_siqs_config
+
+config = default_siqs_config(n)
+config = replace(config, collector=replace(
+    config.collector, marking="density+presieve+scan_fused",
+))
+```
+
+Density specializes exact zero/single/dense hit ranges. On list-backed
+powers/fixed scores, presieving copies a bounded first-level score and recovery
+bit period; higher powers and exceptional fallback contributions retain their
+ordinary exact paths. Other score representations retain scalar marking.
+Fused scanning preserves `score >= threshold`, candidate order and saturation,
+charging every rejected position before committing spans of at most 64.
+Construction, rotation and simultaneous old/new scratch are reserved and
+charged. Small memory/work grants can refuse this explicit configuration.
+
+Checkpoints save the existing marking selector and cumulative allowances.
+They reverify arithmetic state and rebuild disposable periods/plans under the
+remaining resources. No trust flags or derived scan buffers are serialized;
+legacy jobs keep their saved selector.
+
+The separate completed A1a study confirmed its fixed native 50/55-digit bundles
+with 5.945%/3.214% lower complete-factor cost. Those are historical isolated
+results, not a current-mainline or additive portfolio claim. The fresh
+integration gate is separate: exactly 50/55 digits, native arithmetic and
+1 GiB owned memory. Forty digits retains control; clean 60-digit evidence is
+inconclusive, and the 65-digit pilot demonstrated no completion within its
+allowance. E1 remains deferred.
+
 ## P3.8-R2 collector experiments
 
 `SieveConfig(score_policy="fixed")` uses conservative integer bounds in

@@ -1,5 +1,15 @@
 # Changelog
 
+## A1a selected-kernel integration preparation (29 October 2026)
+
+- Add explicit density, bounded periodic presieve and fused-scan selectors,
+  preserving exact recovery, charged cancellation and saved-policy replay.
+  Port the accepted combination without the other experimental kernels.
+- Reconcile counted-base setup and historical source loaders. Prepare a frozen
+  comparison against committed pre-integration mainline on fresh 50/55-digit
+  inputs. Accepted timing and automatic adoption remain pending the manual
+  execution handoff; existing defaults and E1 status are unchanged.
+
 ## Publication cleanup — 12 October 2026
 
 - Keep detailed benchmark research and comparison reports in the local audit

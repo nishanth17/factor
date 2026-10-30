@@ -5,6 +5,17 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
+The [A1a integration protocol](qs/a1a_integration/protocol.md) compares the
+selected density+presieve+scan_fused port with committed pre-integration
+mainline at exactly 50 and 55 digits. Preparation includes an immutable owned
+baseline, independent arithmetic/resume checks and a fresh-input freeze;
+accepted measurements and automatic adoption remain pending the manual model
+switch. The completed isolated study's 5.945%/3.214% cost reductions do not
+establish integrated or additive gains. Forty digits retains control; clean
+60-digit results remain inconclusive and the 65-digit pilot showed no
+completion within its allowance. Replay that original study from `d61df6c`,
+preserving its controls and source hashes. E1 remains deferred.
+
 The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
 compares compact with control at 60 digits, using fresh inputs and a ten-hour
 total deadline. Fixed early trend stops are preliminary below nine samples;
