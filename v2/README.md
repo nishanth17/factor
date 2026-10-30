@@ -798,8 +798,9 @@ roadmap work; existing small or configured-cohort wins do not close those gates.
 
 ## A1a selected collector kernels
 
-`SieveConfig.marking` also accepts `density`, `presieve`, `scan_fused` and
-their duplicate-free combinations in that order. Explicit configurations
+`SieveConfig.marking` also accepts `density`, `presieve`, `presieve_powers`,
+`unroll4`, `scan_fused` and duplicate-free combinations in that order.
+`presieve` and `presieve_powers` are mutually exclusive. Explicit configurations
 retain precedence. Automatic collector selection is unchanged while the
 [mainline integration comparison](benchmarks/qs/a1a_integration/protocol.md)
 awaits execution.
@@ -835,6 +836,21 @@ integration gate is separate: exactly 50/55 digits, native arithmetic and
 1 GiB owned memory. Forty digits retains control; clean 60-digit evidence is
 inconclusive, and the 65-digit pilot demonstrated no completion within its
 allowance. E1 remains deferred.
+
+The bounded extension adds two opt-ins. `presieve_powers` replaces the
+first-level initializer with an exact LCM period containing a deterministic
+prefix of prime-power levels, capped by block width. It retains scalar
+exceptional/fallback contributions and first-level recovery bits, charging
+construction, rotation and disposable rebuilds. `unroll4` writes one reserved
+root in groups of four with bounded one/two/three-hit tails; reservation,
+write order and cancellation boundaries remain unchanged. Both specialize
+list-backed powers/fixed scoring and retain scalar paths otherwise.
+
+For the combined extension use
+`marking="density+presieve_powers+unroll4+scan_fused"`. Its
+[separate frozen comparison](benchmarks/qs/a1a_extension/protocol.md) uses the
+exact prior A1a source as control at 50/55 digits. Performance and automatic
+adoption are pending; neither new component has an accepted speed claim.
 
 ## P3.8-R2 collector experiments
 

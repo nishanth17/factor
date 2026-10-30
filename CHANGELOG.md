@@ -1,5 +1,15 @@
 # Changelog
 
+## A1a bounded collector extension preparation (30 October 2026)
+
+- Add opt-in selected-power periodic initialization and four-stride per-root
+  marking with exact recovery, bounded scratch and charged checkpoint rebuilds.
+  Preserve the original A1a implementation and its frozen comparison.
+- Prepare a separate combined comparison against the prior A1a source at
+  50/55 digits. Performance acceptance and automatic adoption remain pending.
+  Track quota-aware setup, reusable switch metadata and lifted-power reuse
+  under A1a; defer same-modulus root interleaving to conditional A1c.
+
 ## A1a selected-kernel integration preparation (29 October 2026)
 
 - Add explicit density, bounded periodic presieve and fused-scan selectors,

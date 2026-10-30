@@ -350,9 +350,12 @@ class SieveCollector:
         self._scratch_peak_bytes = 0
         self._omitted_allowance = 0
         self._lift_inverses = {}
-        self._presieve = (
-            kernels.Presieve() if "presieve" in self.config._kernels else None
-        )
+        if "presieve_powers" in self.config._kernels:
+            self._presieve = kernels.PowerPresieve()
+        elif "presieve" in self.config._kernels:
+            self._presieve = kernels.Presieve()
+        else:
+            self._presieve = None
         self._power_plans = {}
         self._plan_refused = set()
         self._plan_bytes = 0
@@ -627,10 +630,11 @@ class SieveCollector:
             self.config.marking == "bucket" or self.config.division == "bucket"
         )
         chunk = self.config.metadata_chunk
+        unroll = "unroll4" in self.config._kernels
+        power_period = "presieve_powers" in self.config._kernels
         density = (
-            "density" in self.config._kernels
-            and self.config.score_backend == "list"
-        )
+            "density" in self.config._kernels or unroll
+        ) and self.config.score_backend == "list"
         presieved = (
             self._presieve.apply(self, lo, hi, maximum, buckets)
             if powers and self._presieve is not None
@@ -669,12 +673,17 @@ class SieveCollector:
 
                     for modulus, lifted, power_weight in marks:
                         for root in lifted:
-                            if first_level and index in presieved:
+                            if (first_level and index in presieved) or (
+                                power_period
+                                and (index, modulus) in presieved
+                                and power_weight == weight
+                            ):
                                 hits = range(
                                     (root - lo) % modulus, width, modulus
                                 )
                                 self.budget.consume(len(hits) + 1)
-                                stats["root_hits"] += len(hits)
+                                if first_level:
+                                    stats["root_hits"] += len(hits)
                                 stats["power_hits"] += len(hits)
                                 continue
                             if density:
@@ -699,6 +708,19 @@ class SieveCollector:
                                 stats["power_hits"] += len(hits)
                                 if first_level:
                                     stats["root_hits"] += len(hits)
+                                if unroll:
+                                    kernels.add_unrolled(
+                                        self._scores,
+                                        self._hits,
+                                        offset,
+                                        width,
+                                        modulus,
+                                        power_weight,
+                                        (1 << index)
+                                        if first_level and buckets
+                                        else 0,
+                                    )
+                                    continue
                                 if first_level and buckets:
                                     # The same certified first-level hits
                                     # supply both recovery bits and scores.

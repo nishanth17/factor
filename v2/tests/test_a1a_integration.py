@@ -16,7 +16,7 @@ from v2.qs import (
     build_factor_base,
     default_siqs_config,
 )
-from v2.qs.collector_kernels import KERNELS, combine, workspace
+from v2.qs.collector_kernels import combine, workspace
 from v2.qs.count_policy import endpoint_for_count
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
 from v2.qs.polynomial import polynomial_roots
@@ -28,7 +28,9 @@ SELECTED = "density+presieve+scan_fused"
 ARMS = tuple(
     combine(parts)
     for size in range(1, 4)
-    for parts in itertools.combinations(KERNELS, size)
+    for parts in itertools.combinations(
+        ("density", "presieve", "scan_fused"), size
+    )
 )
 
 

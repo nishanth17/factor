@@ -1,9 +1,12 @@
-"""Exact density, periodic first-level scores and bounded fused scanning.
+"""Exact density, bounded periodic scores and fused scanning.
 
 Selectors are explicit; automatic adoption requires separate acceptance.
 """
 
-KERNELS = ("density", "presieve", "scan_fused")
+from ..common.arithmetic import gcd
+from .power_sieve import prime_power_roots
+
+KERNELS = ("density", "presieve", "presieve_powers", "unroll4", "scan_fused")
 SCAN_CHUNK = 64
 
 
@@ -16,6 +19,8 @@ def components(marking):
     parts = tuple(marking.split("+"))
     if not parts or parts != tuple(k for k in KERNELS if k in parts):
         raise ValueError("unknown, repeated or unordered marking kernels")
+    if "presieve" in parts and "presieve_powers" in parts:
+        raise ValueError("choose one periodic score initializer")
     return parts
 
 
@@ -24,6 +29,8 @@ def combine(parts):
     parts = tuple(parts)
     if len(set(parts)) != len(parts) or any(p not in KERNELS for p in parts):
         raise ValueError("invalid kernel combination")
+    if "presieve" in parts and "presieve_powers" in parts:
+        raise ValueError("choose one periodic score initializer")
     return "+".join(k for k in KERNELS if k in parts) or "sparse"
 
 
@@ -31,8 +38,13 @@ def workspace(marking, width, count):
     """Reserve periods and simultaneous build, rotation and scan scratch."""
     parts = components(marking)
     reserve = 0
-    if "presieve" in parts:
+    if "presieve" in parts or "presieve_powers" in parts:
         reserve += 32768 + 8 * width * (160 + (count + 7) // 8)
+    if "presieve_powers" in parts:
+        # Distinct prime powers <= width number at most width - 1. Include
+        # their tuples, sort scratch, selected keys and old/new cache sets.
+        # The lifter itself keeps only two <=64-root lists at a time.
+        reserve += 65536 + 1024 * width
     if "scan_fused" in parts:
         reserve += 32768 + 8 * width
     return reserve
@@ -90,6 +102,152 @@ class Presieve:
         return self.indices
 
 
+class PowerPresieve:
+    """Bounded LCM period for a prefix of exact prime-power mark levels."""
+
+    def __init__(self):
+        self.key, self.scores, self.hits = None, (), ()
+        self.levels = frozenset()
+        self.builds = self.replays = 0
+
+    def apply(self, collector, lo, hi, maximum, buckets):
+        if collector.config.score_backend != "list":
+            return frozenset()
+        cap = min(maximum, collector.config.block_width)
+        key = collector.polynomial, cap, buckets
+        if self.key != key:
+            steps = []
+            for index, roots in enumerate(collector._roots):
+                prime = roots.prime
+                if prime > cap:
+                    break
+                collector.budget.consume(1)
+                if prime < collector.config.small_prime_cutoff:
+                    continue
+                if not roots.roots and not roots.all_positions:
+                    continue
+                # The large universal branch emits a norm-dependent upper
+                # bound at modulus one, not ordinary log(p) contributions.
+                if roots.all_positions and prime > 64:
+                    continue
+                modulus = prime
+                while modulus <= cap:
+                    collector.budget.consume(1)
+                    steps.append((modulus, index))
+                    modulus *= prime
+
+            collector.budget.consume(len(steps) + 1)
+            steps.sort()
+            period, limits = 1, {}
+            for modulus, index in steps:
+                collector.budget.consume(1)
+                candidate = period // gcd(period, modulus) * modulus
+                if candidate > collector.config.block_width:
+                    break
+                period = candidate
+                limits[index] = modulus
+
+            collector.budget.consume(period + len(limits) + 1)
+            scores, hits, levels = [0] * period, [0] * period, set()
+            for index, limit in limits.items():
+                weight = collector._logs[index]
+                marks = prime_power_roots(
+                    collector.polynomial,
+                    collector._roots[index],
+                    limit,
+                    weight,
+                    collector.budget,
+                )
+                for modulus, residues, power_weight in marks:
+                    # Full-period lifting can reach its singular-root cap
+                    # before window-pruned lifting. Retain only its normal
+                    # levels; the original stream supplies any fallback.
+                    if power_weight != weight:
+                        break
+                    collector.budget.consume(len(residues) + 1)
+                    levels.add((index, modulus))
+                    first_level = modulus == collector._roots[index].prime
+                    for root in residues:
+                        positions = range(root, period, modulus)
+                        collector.budget.consume(len(positions) + 1)
+                        for position in positions:
+                            scores[position] += weight
+                            if first_level and buckets:
+                                hits[position] |= 1 << index
+
+            # Publish only a complete cache. Cancellation during construction
+            # leaves the old period intact and every attempted action charged.
+            collector.budget.consume(len(levels) + 1)
+            frozen_levels = frozenset(levels)
+            self.key, self.scores, self.hits, self.levels = (
+                key,
+                scores,
+                hits,
+                frozen_levels,
+            )
+            self.builds += 1
+
+        width, offset = hi - lo, lo % len(self.scores)
+        collector.budget.consume(width + 1)
+        repeats = (offset + width + len(self.scores) - 1) // len(self.scores)
+        end = offset + width
+        collector._scores[:width] = (self.scores * repeats)[offset:end]
+        collector._hits[:width] = (self.hits * repeats)[offset:end]
+        self.replays += 1
+        return self.levels
+
+
+def add_unrolled(scores, hits, offset, width, step, weight, bit):
+    """Write one already-reserved root in four-stride groups and exact tails.
+
+    Keep every write in the scalar root's order. There are no extra budget
+    polls or merged reservations: refusal/resume retains the original atomic
+    boundary. Sparse roots are handled by the caller before this function.
+    """
+    if bit:
+        while offset + 3 * step < width:
+            second, third, fourth = (
+                offset + step,
+                offset + 2 * step,
+                offset + 3 * step,
+            )
+            hits[offset] |= bit
+            scores[offset] += weight
+            hits[second] |= bit
+            scores[second] += weight
+            hits[third] |= bit
+            scores[third] += weight
+            hits[fourth] |= bit
+            scores[fourth] += weight
+            offset += 4 * step
+        if offset < width:
+            hits[offset] |= bit
+            scores[offset] += weight
+            offset += step
+            if offset < width:
+                hits[offset] |= bit
+                scores[offset] += weight
+                offset += step
+                if offset < width:
+                    hits[offset] |= bit
+                    scores[offset] += weight
+    else:
+        while offset + 3 * step < width:
+            scores[offset] += weight
+            scores[offset + step] += weight
+            scores[offset + 2 * step] += weight
+            scores[offset + 3 * step] += weight
+            offset += 4 * step
+        if offset < width:
+            scores[offset] += weight
+            offset += step
+            if offset < width:
+                scores[offset] += weight
+                offset += step
+                if offset < width:
+                    scores[offset] += weight
+
+
 def word_candidates(scores, threshold, width, budget=None):
     """Yield ordered hits using guarded packed-lane threshold comparisons.
 
@@ -145,7 +303,10 @@ def counters(collector):
     table = collector._presieve
     if table is None:
         return {}
-    return {
+    result = {
         "kernel_presieve_builds": table.builds,
         "kernel_presieve_replays": table.replays,
     }
+    if isinstance(table, PowerPresieve):
+        result["kernel_presieve_power_levels"] = len(table.levels)
+    return result

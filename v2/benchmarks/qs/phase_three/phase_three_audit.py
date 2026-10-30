@@ -28,11 +28,11 @@ SNAPSHOT = ROOT / "v2/benchmarks/inputs/baselines/qs_m26_baseline.json"
 MODULES = (
     "factor_base",
     "polynomial",
-    "collector_kernels",
     "families",
     "relations",
     "reference_collector",
     "power_sieve",
+    "collector_kernels",
     "score",
     "storage",
     "sieve_collector",
