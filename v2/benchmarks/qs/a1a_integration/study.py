@@ -596,22 +596,25 @@ def main():
                 )
                 if not final["overhead_within_prepayment"]:
                     raise RuntimeError("orchestration overrun requires audit")
-            if not final["stable_warmup"]:
-                report = dict(
-                    cost_gate_passed=False,
-                    reasons=["bounded warmup failed; retain default"],
+
+            def decide():
+                if not final["stable_warmup"]:
+                    return dict(
+                        cost_gate_passed=False,
+                        reasons=["bounded warmup failed; retain default"],
+                    )
+                return analysis.summarize(
+                    measured_rows(ledger, args.digits), stable_warmup=True
                 )
-            else:
-                report = ledger.call(
-                    "analysis",
-                    f"analysis-{args.digits}",
-                    300,
-                    0,
-                    dict(digits=args.digits),
-                    lambda: analysis.summarize(
-                        measured_rows(ledger, args.digits), stable_warmup=True
-                    ),
-                )
+
+            report = ledger.call(
+                "analysis",
+                f"analysis-{args.digits}",
+                300,
+                0,
+                dict(digits=args.digits),
+                decide,
+            )
             receipt(args.output / f"decision-{args.digits}.json", report)
             print(json.dumps(report, indent=2))
 
