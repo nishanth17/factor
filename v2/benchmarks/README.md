@@ -16,6 +16,13 @@ establish integrated or additive gains. Forty digits retains control; clean
 completion within its allowance. Replay that original study from `d61df6c`,
 preserving its controls and source hashes. E1 remains deferred.
 
+The [bounded A1a extension](qs/a1a_extension/protocol.md) separately compares
+selected-power periods plus four-stride per-root marking with the exact prior
+A1a implementation. Its original integration control, corpus and receipts
+remain unchanged. The new comparison uses a separately excluded fresh panel;
+accepted warmup/measurements await the manual Sol high switch. It makes no
+individual-component, automatic-default or additive portfolio claim.
+
 The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
 compares compact with control at 60 digits, using fresh inputs and a ten-hour
 total deadline. Fixed early trend stops are preliminary below nine samples;
