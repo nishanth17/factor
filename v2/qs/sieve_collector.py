@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from ..common import utils
 from ..common.arithmetic import gcd
 from ..execution.budget import Budget, BudgetExhaustedError
+from . import collector_kernels as kernels
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
 from .polynomial import (
@@ -94,8 +95,9 @@ class SieveConfig:
         checked_residual_bound(self.residual_bound)
         if self.score_backend not in ("list", "bytearray", "array"):
             raise ValueError("unknown score backend")
-        if self.marking not in ("dense", "sparse", "bucket"):
+        if not self.marking:
             raise ValueError("unknown marking policy")
+        object.__setattr__(self, "_kernels", kernels.components(self.marking))
         if self.division not in ("full", "roots", "bucket", "resieve"):
             raise ValueError("unknown division policy")
         if self.score_policy not in (
@@ -275,6 +277,9 @@ class SieveCollector:
         self._workspace += self.config.block_width * (128 + (count + 7) // 8)
         self._workspace += 128 * (polynomial.n_prime.bit_length() + 16384)
         self._workspace += self.config.power_plan_bytes
+        self._workspace += kernels.workspace(
+            self.config.marking, self.config.block_width, count
+        )
         if double:
             self._workspace += self._graph_reserve(0)
         if self.config.score_policy in ("powers", "fixed"):
@@ -345,6 +350,9 @@ class SieveCollector:
         self._scratch_peak_bytes = 0
         self._omitted_allowance = 0
         self._lift_inverses = {}
+        self._presieve = (
+            kernels.Presieve() if "presieve" in self.config._kernels else None
+        )
         self._power_plans = {}
         self._plan_refused = set()
         self._plan_bytes = 0
@@ -619,6 +627,15 @@ class SieveCollector:
             self.config.marking == "bucket" or self.config.division == "bucket"
         )
         chunk = self.config.metadata_chunk
+        density = (
+            "density" in self.config._kernels
+            and self.config.score_backend == "list"
+        )
+        presieved = (
+            self._presieve.apply(self, lo, hi, maximum, buckets)
+            if powers and self._presieve is not None
+            else frozenset()
+        )
 
         for start in range(0, len(self._roots), chunk):
             for index in range(start, min(start + chunk, len(self._roots))):
@@ -652,6 +669,48 @@ class SieveCollector:
 
                     for modulus, lifted, power_weight in marks:
                         for root in lifted:
+                            if first_level and index in presieved:
+                                hits = range(
+                                    (root - lo) % modulus, width, modulus
+                                )
+                                self.budget.consume(len(hits) + 1)
+                                stats["root_hits"] += len(hits)
+                                stats["power_hits"] += len(hits)
+                                continue
+                            if density:
+                                # Sparse powers have at most one hit. Keep
+                                # the scalar reservation, including empty
+                                # ranges, before touching either buffer.
+                                offset = (root - lo) % modulus
+                                if modulus >= width:
+                                    count = int(offset < width)
+                                    self.budget.consume(count + 1)
+                                    if first_level:
+                                        stats["root_hits"] += count
+                                    stats["power_hits"] += count
+                                    if count:
+                                        if first_level and buckets:
+                                            self._hits[offset] |= 1 << index
+                                        self._scores[offset] += power_weight
+                                    continue
+
+                                hits = range(offset, width, modulus)
+                                self.budget.consume(len(hits) + 1)
+                                stats["power_hits"] += len(hits)
+                                if first_level:
+                                    stats["root_hits"] += len(hits)
+                                if first_level and buckets:
+                                    # The same certified first-level hits
+                                    # supply both recovery bits and scores.
+                                    bit = 1 << index
+                                    for hit in hits:
+                                        self._hits[hit] |= bit
+                                        self._scores[hit] += power_weight
+                                else:
+                                    for hit in hits:
+                                        self._scores[hit] += power_weight
+                                continue
+
                             hits = range((root - lo) % modulus, width, modulus)
                             self.budget.consume(len(hits) + 1)
                             if first_level:
@@ -680,7 +739,10 @@ class SieveCollector:
                             self._hits[hit] |= 1 << index
                     if skipped or powers or self.config.marking == "bucket":
                         continue
-                    if self.config.marking == "sparse" and step >= width:
+                    if (
+                        self.config.marking == "sparse"
+                        or bool(self.config._kernels)
+                    ) and step >= width:
                         hits = (offset,) if offset < width else ()
                     self._add(hits, weight, stats)
 
@@ -1107,6 +1169,7 @@ class SieveCollector:
             stats.update(dict.fromkeys(self._double_counters, 0))
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
+        kernel_before = kernels.counters(self)
 
         try:
             if (
@@ -1128,9 +1191,42 @@ class SieveCollector:
                     if not self._resieve(block_lo, block_hi, threshold, stats):
                         reason = "memory_limit"
                         break
+                candidates = None
+                if "scan_fused" in self.config._kernels:
+                    self.budget.consume(block_hi - block_lo + 1)
+                    candidates = kernels.word_candidates(
+                        self._scores,
+                        threshold,
+                        block_hi - block_lo,
+                        self.budget,
+                    )
+                    next_candidate = next(candidates, -1)
                 while position < block_hi:
                     offset = position - block_lo
-                    if self._scores[offset] >= threshold:
+                    selected = (
+                        self._scores[offset] >= threshold
+                        if candidates is None
+                        else offset == next_candidate
+                    )
+                    if not selected and candidates is not None:
+                        end = (
+                            block_hi
+                            if next_candidate < 0
+                            else block_lo + next_candidate
+                        )
+                        amount = min(
+                            kernels.SCAN_CHUNK,
+                            end - position,
+                            max(1, self.budget.work_limit - self.budget.used),
+                        )
+                        # These positions are certified rejects. Reserve one
+                        # unit each before committing this bounded span; a
+                        # refused poll leaves its first position untouched.
+                        self.budget.consume(amount)
+                        position += amount
+                        stats["scanned"] += amount
+                        continue
+                    if selected:
                         # Candidate division reserves the position unit and
                         # recovery work in one atomic check. The former two
                         # adjacent polls did no intervening published work.
@@ -1151,6 +1247,10 @@ class SieveCollector:
 
                     position += 1
                     stats["scanned"] += 1
+                    # Searching another group can poll and refuse. Publish
+                    # this candidate's cursor before doing that derived work.
+                    if selected and candidates is not None:
+                        next_candidate = next(candidates, -1)
 
                 if reason != "complete":
                     break
@@ -1162,6 +1262,12 @@ class SieveCollector:
         self._resieved.clear()
         self._scratch_bytes = 0
         stats["plan_bytes"] = self._plan_bytes
+        stats.update(
+            {
+                key: value - kernel_before.get(key, 0)
+                for key, value in kernels.counters(self).items()
+            }
+        )
         return SieveResult(
             tuple(self._atoms.values()),
             tuple(self._full),
