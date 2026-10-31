@@ -801,9 +801,13 @@ roadmap work; existing small or configured-cohort wins do not close those gates.
 `SieveConfig.marking` also accepts `density`, `presieve`, `presieve_powers`,
 `unroll4`, `scan_fused` and duplicate-free combinations in that order.
 `presieve` and `presieve_powers` are mutually exclusive. Explicit configurations
-retain precedence. Automatic collector selection is unchanged while the
-[mainline integration comparison](benchmarks/qs/a1a_integration/protocol.md)
-awaits execution.
+retain precedence. Fresh native 50–55-digit jobs at the default 1 GiB owned
+allowance select `density+presieve+scan_fused`, including both endpoints.
+Other sizes/backends and different owned allowances retain their prior
+marking. Explicit configurations and saved jobs keep their chosen selector.
+This is a [user-directed promotion](studies/a1a_default_promotion.md): the
+fresh 50-digit gate passed, 55 digits remained inconclusive because of drift,
+and 51–54 digits have no separate timing confirmation.
 
 ```python
 from dataclasses import replace
@@ -849,8 +853,11 @@ list-backed powers/fixed scoring and retain scalar paths otherwise.
 For the combined extension use
 `marking="density+presieve_powers+unroll4+scan_fused"`. Its
 [separate frozen comparison](benchmarks/qs/a1a_extension/protocol.md) uses the
-exact prior A1a source as control at 50/55 digits. Performance and automatic
-adoption are pending; neither new component has an accepted speed claim.
+exact prior A1a source as control at 50/55 digits. The combined extension
+increased complete cost by 5.285%/2.994% and remains configuration-only;
+neither new component has an accepted individual speed claim. Supply the
+replaced config explicitly to `SIQSJob(n, config=config)` or as the `siqs`
+child of `PortfolioConfig`. Saved configurations preserve this opt-in.
 
 ## P3.8-R2 collector experiments
 
@@ -1199,7 +1206,10 @@ bounded evidence and decision.
 Fresh native 40- and 50–60-digit calls select scoped bundles by default through
 `SIQSJob(n)`, `factorize_bounded(n)` and the CLI's automatic or direct SIQS route.
 `default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes the
-selection. At the confirmed 1 GiB allowance, the 40-digit result matches the
+selection. A1a additionally selects `density+presieve+scan_fused` at 50–55
+digits with exactly 1 GiB owned memory, at user direction; its evidence and
+unmeasured intermediate sizes are documented above. At that allowance,
+apart from the later A1a marking, the 40-digit result matches the
 frozen C10 plan, the 50-digit result matches C10a-05's confirmed collection
 arm, and the 51-digit result uses that same concrete bundle after a separate
 larger-band confirmation. The 50/51-digit

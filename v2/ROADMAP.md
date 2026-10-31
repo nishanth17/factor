@@ -343,7 +343,8 @@ unrelated accepted improvement.
 | --- | --- | --- | --- | --- | --- |
 | C3a — source-derived ECM policy follow-up | After C3, reconcile reviewed implementations effort, curve/bound and pretest/campaign policies (AP04) with its final selection. Compare only missing source-supported alternatives, prior-work credit or handoff behavior; retain C3's frozen evidence. | C3 decision; a documented uncovered policy or changed-cost hypothesis | **Conditional follow-up.** Do not expand or repeat C3 while it runs. Existing C3 coverage can resolve candidates without another study; any new selection needs fresh complete-factor evidence. | Sol / **xhigh** | Reuses the settled allocation/state contracts; the new work is bounded policy selection and charged handoff. |
 | C9a — remaining large-prime yield, target feedback and compact storage | Attribute the literature-verification gaps: yield-dependent retry targets, wider recovered-product intake, asymmetric ordered endpoints, shorter cycles/algebraic duplicates and compact replayable partial records. Coordinate scheduling/scoring with C10a and storage/provenance proofs with B7; C1a owns anchor-only SLP. | Completed C9.2 control and transfer audit; measured affected-stage cost or useful-yield loss | **Open; ranked follow-up.** Start with target feedback/pacing attribution, then residual domains and cycle weight. Splitter/batch/disk work remains profile-gated. Freeze each selected tranche and confirm fresh complete factors under matched total resources; preserve C9 acceptance. | Astra / **xhigh** | Exact residual certainty, all-component cycles, original atoms, ownership and charged resume constrain every transfer. Native thresholds and raw yield are not PyPy optima. |
-| A1a — collector-kernel follow-up to completed R2 | Integrate density+presieve+scan_fused; evaluate the bounded selected-power-period/per-root-unrolling extension. **A1a:** quota-aware setup, reusable switch metadata and lifted-power root reuse remain explicit follow-ups with separate evidence gates. C8 owns CRT half-sums. | Completed A1 and isolated A1a confirmations; current counted-base/default reconciliation | **Frozen comparisons complete, 31 October 2026; adoption open.** The [execution report](studies/a1a_frozen_results.md) accepts integration only at 50 digits (6.008% lower cost); 55 remains inconclusive after its full drift extension. The combined two-kernel extension loses at 50/55; retain its prior integrated control. Preserve both original frozen comparisons and all observations. Setup/reuse work needs demonstrated cost at the actual Gray quota; prior cache losses remain. Automatic defaults are unchanged; 40 retains control, clean 60 is inconclusive, 65 completion is unproved and E1 stays deferred. | Sol / **xhigh** design, implementation and reconciliation; **high** frozen execution, analysis and reporting | Exact scores/recovery, exceptional roots, simultaneous scratch, quota-dependent ownership and charged rebuild/resume need coupled review. No component-level or additive gain claim; direct combined comparison and default adoption remain separate. |
+| ~~A1a — selected collector integration and bounded extension~~ | ~~Integrate density+presieve+scan_fused and evaluate selected-power periods/per-root unrolling.~~ | ~~Completed A1/R2, current mainline reconciliation and separate fresh controls~~ | ~~**[x] Delivered and adopted at user direction, 31 October 2026.** [Results](studies/a1a_frozen_results.md): integration passes at 50 digits (6.008% lower cost); 55 remains inconclusive after its full drift extension. [Adoption](studies/a1a_default_promotion.md) enables native 50–55 inclusive at 1 GiB; 51–54 are unmeasured policy extrapolations. The combined extension loses 5.285%/2.994% at 50/55 and stays opt-in. Evidence is archived before worktree cleanup; E1 stays deferred.~~ | ~~Sol / **xhigh** implementation; **high** frozen execution and reporting~~ | ~~Exact scores, finite ownership, charged rebuild/resume, explicit/saved configs and separate uncertainty labels preserved. No component-level or additive gain claim.~~ |
+| A1a — quota-aware setup and root reuse follow-ups | Quota-aware setup, reusable switch metadata and lifted-power root reuse. C8 retains CRT half-sums; C10a-07 owns Gray quota/traversal policy. | Delivered selected-kernel integration; demonstrated setup/root cost at actual consumed Gray quota | **Open, conditional.** Separate implementation and evidence gates; preserve earlier cache losses. 40 retains control, clean 60 remains inconclusive and 65 completion is unproved. | Sol / **xhigh** design, implementation and correctness/resume; **high** frozen execution and reporting | Bind reusable data to validated base/A/backend, polynomial transitions and exceptional roots; bound simultaneous storage and charge interrupted rebuilds. |
 | A1b — existing R2 fixed-score promotion review | Reassess remaining fixed-score combinations against the current streamed-score C10 plan control; preserve R2 and C10 frozen verdicts and compare complete-factor outcomes before another scoped default promotion. | Completed A1/R2 and C10; stable current mainline control | **Ready; low implementation cost.** R2 missed its old 10% training floor. Include memory/setup/resume and retain loss or inconclusive cases. Do not repeat or reattribute the accepted C10 power-plan comparison. | Sol / **high** | Existing arithmetic/options allow a focused policy comparison; changed arithmetic belongs in a separate task. |
 | A1c — same-modulus two-root interleaving | Assess one shared stride loop for two distinct roots of a prime or power, including sorted translated offsets, tails and scalar exceptional-root fallback. Specify reservation/cancellation boundaries and charged interrupted-block replay before implementation. | Settled A1a kernels and demonstrated remaining dense-marking cost | **Conditional follow-up.** Source-supported but deferred from the current two-kernel extension: interleaving changes the existing root-by-root mutation/reservation boundary. Preserve low-allowance behavior and compare complete factoring against the settled A1a control. | Sol / **xhigh** design and implementation; **high** frozen experiments; Astra / **xhigh** only for an unresolved atomicity proof | Arithmetic coverage is elementary; budget atomicity, bounded polling and exact resume are the main risks. This is distinct from the historical paired-polynomial kernel and does not reopen it. |
 | A2a — inverse-microkernel follow-up to completed backend study | Compare batched binary/Montgomery inversion and small-integer quotient shortcuts (AP32/AP33) only for newly profiled inversion-dominant sizes, against native Euclid/GMP including conversions and nonunits. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Low/conditional.** Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. | Sol / **xhigh**; targeted Astra proof review if required | Bounded backend controls already exist; changed inverse/nonunit semantics need independent arithmetic checks. |
@@ -2102,7 +2103,7 @@ relations, and E1 combined SIQS/SSS/worker acceptance. Continue the
 QS parameter ledger when a new band or
 backend is actually studied; no native constant is an accepted PyPy optimum.
 
-#### A1a — Selected collector-kernel delta (after completed A1)
+#### A1a — Selected collector-kernel delta (delivered 31 October 2026)
 
 - **A1a:** quota-aware setup, reusable switch metadata and lifted-power root
   reuse. Sol / **xhigh** for design, implementation and correctness/resume;
@@ -2123,9 +2124,14 @@ backend is actually studied; no native constant is an accepted PyPy optimum.
   integration passes at 50 digits; 55 digits remains inconclusive after the
   only permitted full stability extension. The combined extension increases
   complete cost at both sizes and retains its prior integrated control.
-- [ ] Authorize and validate any scoped default adoption separately. A direct
-  extended-versus-pre-integration comparison remains a distinct follow-up;
-  neither independent comparison establishes that claim by chaining gains.
+- [x] At user direction, adopt the integration at native 50–55 digits,
+  inclusive, with exactly 1 GiB owned memory. Preserve explicit configs and
+  saved selectors; retain the combined extension as opt-in. Record the
+  50-digit pass, inconclusive 55 and unmeasured 51–54 separately. Complete
+  mainline integration and archive evidence before task-worktree cleanup.
+- [ ] Any direct extended-versus-pre-integration comparison remains a distinct
+  conditional follow-up; the two independent studies cannot establish it by
+  chaining gains.
 - [ ] For setup/reuse follow-ups, bound initialization by the configured and
   remaining family quota without changing polynomial order or quota policy.
   Bind reusable switch metadata to the validated base/A/backend and actual B
@@ -2134,14 +2140,14 @@ backend is actually studied; no native constant is an accepted PyPy optimum.
   validation, simultaneous old/new storage, failed construction and charged
   checkpoint rebuilds. Do not serialize derived trust. C10a-07 owns changes
   to the Gray quota/traversal itself; C8 retains half-sum scheduling.
-- [ ] Freeze one C10a-justified AP05–AP09 tranche against the accepted R2 and
-  settled C9 controls. Preserve existing negative tiny-prime/batching/cache
-  decisions; state the changed mechanism/workload rather than reopening A1.
-- [ ] Independently verify periodic residues, centered-B Gray shifts and
-  exceptional roots, packed-lane independence, saturation/tails and complete
-  candidate identities. Bound tables/scratch and preserve per-position charges,
-  cancellation and resume. Compare complete factoring, including table setup
-  and replay; C8's larger CRT scheduler remains a separate optional experiment.
+- [x] Freeze and execute the selected density/presieve/fused-scan tranche
+  against current pre-integration mainline and the separate bounded extension
+  against prior A1a. Preserve earlier tiny-prime/batching/cache losses.
+- [x] Independently verify the delivered kernels' exact periodic scores,
+  exceptional roots, recovery bits, saturation/tails and candidate identities.
+  Bound scratch and preserve per-position charges, cancellation and resume;
+  include setup/replay in complete factoring. C8 scheduling and the setup/root
+  reuse follow-ups above remain separate.
 
 #### A1b — Existing fixed-score promotion follow-up (after completed A1 and C10)
 

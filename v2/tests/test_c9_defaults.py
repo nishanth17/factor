@@ -44,7 +44,11 @@ class C9DefaultTests(unittest.TestCase):
         self.assertEqual(
             selected["collector"]["power_plan_bytes"], C10_POWER_PLAN_BYTES
         )
-        # C10/C10a-05 add only their confirmed plan/pacing to this bundle.
+        self.assertEqual(
+            selected["collector"]["marking"], "density+presieve+scan_fused"
+        )
+        # Remove the later A1a marking and C10 plan/pacing deltas.
+        selected["collector"]["marking"] = "sparse"
         selected["collector"]["power_plan_bytes"] = 0
         self.assertEqual(selected, accepted)
         self.assertEqual(SIQSJob(NUMBER).config, default_siqs_config(NUMBER))

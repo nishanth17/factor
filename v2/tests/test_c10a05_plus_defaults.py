@@ -25,7 +25,13 @@ class LargerBandDefaultTests(unittest.TestCase):
         expected = control["configurations"]["collection"]
         for number in (10**50, NUMBER_51, 10**51 - 1):
             for signed in (number, -number):
-                self.assertEqual(asdict(default_siqs_config(signed)), expected)
+                selected = asdict(default_siqs_config(signed))
+                self.assertEqual(
+                    selected["collector"]["marking"],
+                    "density+presieve+scan_fused",
+                )
+                selected["collector"]["marking"] = "sparse"
+                self.assertEqual(selected, expected)
                 if signed > 0 and signed % 2:
                     self.assertEqual(
                         SIQSJob(signed).config, default_siqs_config(signed)

@@ -1,5 +1,10 @@
 # A1a frozen execution results — 31 October 2026
 
+Subsequent [user-directed adoption and cleanup](a1a_default_promotion.md)
+enables the integration at 50–55 digits. The decisions below remain the
+original frozen results. Execution-time paths identify the original worktrees;
+their ignored receipts and journals were archived locally before removal.
+
 The selected integration passes its frozen 50-digit gate. Its 55-digit result remains inconclusive because repeated-cell drift persists after the one permitted full extension. The combined selected-power-period/four-stride extension loses at both sizes; retain its prior integrated control. These decisions authorize no automatic defaults or portfolio/E1 claim.
 
 | Comparison | Digits | Mean complete wall seconds, control → selected | Change and 99.5% interval | Exact one-sided p | Decision |

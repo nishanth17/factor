@@ -38,6 +38,13 @@ class C10DefaultTests(unittest.TestCase):
                     selected.pop("solve_policy"),
                     "collection" if digits == "50" else "window",
                 )
+                self.assertEqual(
+                    selected["collector"]["marking"],
+                    "density+presieve+scan_fused"
+                    if digits == "50"
+                    else "sparse",
+                )
+                selected["collector"]["marking"] = "sparse"
                 self.assertEqual(selected, configurations[digits]["plan"])
                 selected["collector"]["power_plan_bytes"] = 0
                 self.assertEqual(selected, configurations[digits]["control"])

@@ -26,6 +26,10 @@ def template(digits, arm):
     if digits not in BANDS or arm not in ARMS:
         raise ValueError("unfrozen band or arm")
     control = default_siqs_config(10**49)
+    # Preserve this historical collector when automatic marking advances.
+    control = replace(
+        control, collector=replace(control.collector, marking="sparse")
+    )
     if arm == "control":
         return control
 

@@ -38,6 +38,13 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
 
     forty_digits = abs(n) < 10**40
     owned_memory = C9_MEMORY_BYTES if memory_bytes is None else memory_bytes
+    # A1a passed at 50; the user extends routing through 55 despite drift at
+    # 55 and unmeasured intermediate sizes. Keep the tested owned allowance.
+    selected_marking = (
+        "density+presieve+scan_fused"
+        if 10**49 <= abs(n) < 10**55 and owned_memory == C9_MEMORY_BYTES
+        else "sparse"
+    )
     # C10 isolated this plan at 40/50 digits; the later 51-digit default study
     # confirms the same bundle. Other owned allowances were not tested.
     plan_bytes = C10_POWER_PLAN_BYTES if owned_memory == C9_MEMORY_BYTES else 0
@@ -78,6 +85,7 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         memory_bytes=owned_memory,
         checkpoint_bytes=1048576,
         collector=GrowingDoubleLargeSieveConfig(
+            marking=selected_marking,
             block_width=4096,
             division="bucket",
             score_policy="powers",

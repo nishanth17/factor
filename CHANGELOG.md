@@ -1,5 +1,19 @@
 # Changelog
 
+## A1a mainline adoption (31 October 2026)
+
+- At user direction, select `density+presieve+scan_fused` for fresh native
+  50–55-digit jobs, inclusive, with the default 1 GiB owned allowance. Preserve
+  explicit configurations, other resource scopes and saved selectors.
+- Keep selected-power periods and four-stride marking opt-in after their
+  combined comparison lost at both sizes. Close the delivered integration
+  and comparison roadmap item with its results; keep setup/root reuse and
+  conditional two-root interleaving as future work.
+- The 50-digit integration gate passed; 55 digits remains inconclusive due
+  to drift, and 51–54 are policy extrapolations. Preserve the original
+  evidence and source identities locally before removing task worktrees.
+  See [adoption and replay](v2/studies/a1a_default_promotion.md).
+
 ## A1a frozen comparison decisions (31 October 2026)
 
 - Complete both separate 50/55-digit comparisons on fresh inputs. Accept the

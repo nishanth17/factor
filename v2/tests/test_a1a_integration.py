@@ -346,13 +346,16 @@ class CountedIntegrationTests(unittest.TestCase):
         complete = resumed.run()
         self.assertEqual((complete.divisor or 1) * complete.cofactor, n)
 
-    def test_defaults_explicit_configs_and_legacy_jobs_remain_unchanged(self):
+    def test_scoped_defaults_explicit_configs_and_saved_jobs(self):
         for digits in (40, *range(50, 61)):
             for memory in (None, 128 * 2**20, 2**30):
                 cfg = default_siqs_config(
                     10 ** (digits - 1), memory_bytes=memory
                 )
-                self.assertEqual(cfg.collector.marking, "sparse")
+                selected = 50 <= digits <= 55 and memory in (None, 2**30)
+                self.assertEqual(
+                    cfg.collector.marking, SELECTED if selected else "sparse"
+                )
                 self.assertNotIn("_kernels", asdict(cfg.collector))
         n = 10**54 + 123
         explicit = default_siqs_config(n)

@@ -87,6 +87,8 @@ class FrozenRunnerTests(unittest.TestCase):
         values = asdict(job.config)
         values.pop("base_count")
         values.update(base_bound=job.base.bound, multiplier=job.multiplier)
+        self.assertEqual(values["collector"]["marking"], study.SELECTED)
+        values["collector"]["marking"] = "sparse"
         self.assertEqual(values, asdict(previous))
         # Count-stage reservations are identical; the new boundary additionally
         # preflights temporary sieve memory and then constructs the same base.
@@ -130,6 +132,7 @@ class FrozenRunnerTests(unittest.TestCase):
         self,
     ):
         cfg = default_siqs_config(10**54 + 123)
+        cfg = replace(cfg, collector=replace(cfg.collector, marking="sparse"))
         job = SIQSJob(10**54 + 123, config=cfg, budget=Budget(work_limit=0))
         job.run()
         saved = job.checkpoint()
