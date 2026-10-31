@@ -32,6 +32,7 @@ MODULES = (
     "relations",
     "reference_collector",
     "power_sieve",
+    "collector_kernels",
     "score",
     "storage",
     "sieve_collector",

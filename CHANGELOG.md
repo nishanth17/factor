@@ -1,5 +1,50 @@
 # Changelog
 
+## A1a mainline adoption (31 October 2026)
+
+- At user direction, select `density+presieve+scan_fused` for fresh native
+  50–55-digit jobs, inclusive, with the default 1 GiB owned allowance. Preserve
+  explicit configurations, other resource scopes and saved selectors.
+- Keep selected-power periods and four-stride marking opt-in after their
+  combined comparison lost at both sizes. Close the delivered integration
+  and comparison roadmap item with its results; keep setup/root reuse and
+  conditional two-root interleaving as future work.
+- The 50-digit integration gate passed; 55 digits remains inconclusive due
+  to drift, and 51–54 are policy extrapolations. Preserve the original
+  evidence and source identities locally before removing task worktrees.
+  See [adoption and replay](v2/studies/a1a_default_promotion.md).
+
+## A1a frozen comparison decisions (31 October 2026)
+
+- Complete both separate 50/55-digit comparisons on fresh inputs. Accept the
+  selected integration's scoped 50-digit complete-cost gate; retain control
+  at 55 digits because drift persists after its prescribed full extension.
+- Retain the prior integrated control at both sizes for the combined
+  selected-power-period/four-stride extension: it increased complete cost.
+  Preserve all 180 measured calls, original ledgers and frozen checkouts.
+  [Report](v2/studies/a1a_frozen_results.md) gives uncertainty, per-input
+  results and protected accounts. Automatic defaults and E1 stay unchanged.
+
+## A1a bounded collector extension preparation (30 October 2026)
+
+- Add opt-in selected-power periodic initialization and four-stride per-root
+  marking with exact recovery, bounded scratch and charged checkpoint rebuilds.
+  Preserve the original A1a implementation and its frozen comparison.
+- Prepare a separate combined comparison against the prior A1a source at
+  50/55 digits. Performance acceptance and automatic adoption remain pending.
+  Track quota-aware setup, reusable switch metadata and lifted-power reuse
+  under A1a; defer same-modulus root interleaving to conditional A1c.
+
+## A1a selected-kernel integration preparation (29 October 2026)
+
+- Add explicit density, bounded periodic presieve and fused-scan selectors,
+  preserving exact recovery, charged cancellation and saved-policy replay.
+  Port the accepted combination without the other experimental kernels.
+- Reconcile counted-base setup and historical source loaders. Prepare a frozen
+  comparison against committed pre-integration mainline on fresh 50/55-digit
+  inputs. Accepted timing and automatic adoption remain pending the manual
+  execution handoff; existing defaults and E1 status are unchanged.
+
 ## Publication cleanup — 12 October 2026
 
 - Keep detailed benchmark research and comparison reports in the local audit

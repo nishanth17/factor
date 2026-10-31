@@ -16,6 +16,12 @@ def experiment_collector(module, variant):
             super().__init__(*args, **kwargs)
             self._batch_allowed = set()
             self._batch_values = {}
+            if variant == "chunks" and self.config.marking not in (
+                "dense",
+                "sparse",
+                "bucket",
+            ):
+                raise ValueError("R2 chunks require the scalar marking arm")
             if variant == "batch":
                 # Reserve the complete simultaneous tree and leaf storage,
                 # including construction, rather than subtracting base bytes.
@@ -154,11 +160,22 @@ def experiment_collector(module, variant):
                                 for r in lifted[root_index:root_index + 4]
                             )
                             self.budget.consume(amount)"""
-        if source.count(old) != 1:
-            raise ValueError("chunk experiment requires the frozen mark loop")
+        if source.count(old) == 1:
+            source = source.replace(old, new)
+        else:
+            # Keep the frozen rewrite intact. The live scalar path has new
+            # opt-in branches before this exact, unchanged range/charge pair.
+            loop = "for root in lifted:"
+            charge = old.split("\n", 1)[1].lstrip()
+            grouped = new.split("\n", 1)[1].lstrip()
+            if source.count(loop) != 1 or source.count(charge) != 1:
+                raise ValueError("chunk experiment requires the scalar loop")
+            source = source.replace(
+                loop, "for root_index, root in enumerate(lifted):"
+            ).replace(charge, grouped)
         namespace = {}
         exec(
-            compile(source.replace(old, new), __file__, "exec"),
+            compile(source, __file__, "exec"),
             module.__dict__,
             namespace,
         )

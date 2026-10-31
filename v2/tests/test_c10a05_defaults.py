@@ -23,8 +23,16 @@ class PacingDefaultTests(unittest.TestCase):
         for digits, arm in ((40, "control"), (50, "collection")):
             number = 10 ** (digits - 1) + 123
             for signed in (number, -number):
+                selected = asdict(default_siqs_config(signed))
                 self.assertEqual(
-                    asdict(default_siqs_config(signed)),
+                    selected["collector"]["marking"],
+                    "density+presieve+scan_fused"
+                    if digits == 50
+                    else "sparse",
+                )
+                selected["collector"]["marking"] = "sparse"
+                self.assertEqual(
+                    selected,
                     control[str(digits)][arm],
                 )
             self.assertEqual(
