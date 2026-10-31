@@ -9,9 +9,12 @@ The [A1a integration protocol](qs/a1a_integration/protocol.md) compares the
 selected density+presieve+scan_fused port with committed pre-integration
 mainline at exactly 50 and 55 digits. Preparation includes an immutable owned
 baseline, independent arithmetic/resume checks and a fresh-input freeze;
-accepted measurements and automatic adoption remain pending the manual model
-switch. The completed isolated study's 5.945%/3.214% cost reductions do not
-establish integrated or additive gains. Forty digits retains control; clean
+the [frozen execution report](../studies/a1a_frozen_results.md) accepts a scoped
+6.008% complete-cost reduction at 50 digits (99.5% interval: 4.373–7.795%
+lower). The 55-digit result remains inconclusive after its one full stability
+extension because repeated-cell drift persists. Automatic adoption remains
+separate. The completed isolated study's 5.945%/3.214% cost reductions do not
+establish additive gains. Forty digits retains control; clean
 60-digit results remain inconclusive and the 65-digit pilot showed no
 completion within its allowance. Replay that original study from `d61df6c`,
 preserving its controls and source hashes. E1 remains deferred.
@@ -19,9 +22,12 @@ preserving its controls and source hashes. E1 remains deferred.
 The [bounded A1a extension](qs/a1a_extension/protocol.md) separately compares
 selected-power periods plus four-stride per-root marking with the exact prior
 A1a implementation. Its original integration control, corpus and receipts
-remain unchanged. The new comparison uses a separately excluded fresh panel;
-accepted warmup/measurements await the manual Sol high switch. It makes no
-individual-component, automatic-default or additive portfolio claim.
+remain unchanged. Its separately excluded fresh panel completed all calls,
+but the combined extension cost 5.285% more at 50 digits and 2.994% more at
+55 digits (99.5% intervals: 4.008–6.245% and 2.432–3.501% higher). Both bands
+retain the prior integrated control. This tests the combined extension;
+individual-component effects and a direct extended-versus-mainline comparison
+remain unmeasured. Defaults and E1 remain unchanged.
 
 The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
 compares compact with control at 60 digits, using fresh inputs and a ten-hour

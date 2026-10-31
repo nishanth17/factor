@@ -1,5 +1,16 @@
 # Changelog
 
+## A1a frozen comparison decisions (31 October 2026)
+
+- Complete both separate 50/55-digit comparisons on fresh inputs. Accept the
+  selected integration's scoped 50-digit complete-cost gate; retain control
+  at 55 digits because drift persists after its prescribed full extension.
+- Retain the prior integrated control at both sizes for the combined
+  selected-power-period/four-stride extension: it increased complete cost.
+  Preserve all 180 measured calls, original ledgers and frozen checkouts.
+  [Report](v2/studies/a1a_frozen_results.md) gives uncertainty, per-input
+  results and protected accounts. Automatic defaults and E1 stay unchanged.
+
 ## A1a bounded collector extension preparation (30 October 2026)
 
 - Add opt-in selected-power periodic initialization and four-stride per-root
