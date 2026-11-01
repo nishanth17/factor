@@ -41,12 +41,55 @@ in `v2/`; preserve `v1/` as the original baseline.
 Use `make -C v2 test` and `make -C v2 lint` for relevant changes. Benchmark
 behavior/performance changes with matched inputs, seeds, budgets and output
 validation. Use at least three seconds of validated PyPy warmup and nine
-samples; extend unstable measurements. Separate cold startup from warmed
-execution, and instrumented profiles from performance evidence.
+samples for performance claims; extend unstable measurements only within a
+declared finite plan. Smaller feasibility screens are exploratory and cannot
+establish a speedup. Separate cold startup from warmed execution, and
+instrumented profiles from performance evidence.
 
 Document API changes in `v2/README.md`. Update roadmap completion only after
 its acceptance and experiment gates pass. Summarize accepted behavior in
 `CHANGELOG.md` and useful measurements in `v2/benchmarks/README.md`.
+
+## Experiment design and prompt review
+
+- Keep the user's optimization goal central, including useful progress toward
+  60–80-digit factoring. Before recommending a task or execution prompt, review
+  whether its admission gates and expected cost can answer that goal. Following
+  a frozen protocol does not excuse recommending an uninformative campaign.
+- Establish a small, uninstrumented feasibility baseline on representative
+  inputs before launching a large diagnostic or matched campaign. Use current
+  committed mainline for current improvement decisions; label historical
+  comparisons explicitly and create new identities for changed integrations.
+- Measure diagnostic overhead on identical work with tracing enabled and
+  disabled before committing to long instrumented runs. Prefer short targeted
+  traces or bounded counters when inner-loop observation dominates. Instrumented
+  completion times cannot stand in for clean factoring performance.
+- Separate admission from adoption. Exact arithmetic, valid outputs, checked
+  traversal/resume and feasible resource bounds govern starting a comparison.
+  An unrelated reference arm need not factor every input or produce verified
+  dependencies before a correct candidate can be measured. Missing explanatory
+  attribution is uncertainty; it is not automatically a reason to forbid a
+  direct end-to-end comparison.
+- Require matched complete-cost/completion evidence, adequate independent
+  inputs, uncertainty analysis and disjoint fresh confirmation for adoption.
+  Do not impose a universal minimum percentage gain. Treat promising exploratory
+  results as reasons to investigate, without converting them into accepted
+  improvements or counting repeated seeds as independent moduli.
+- Give each stage a concrete question, an advancement/stopping decision, an
+  estimated total runtime and finite cumulative resources. Calibrate those
+  estimates from the first informative observations. Reassess before spending
+  further hours when a stage only repeats recorder failures, times out without
+  answering its question, or blocks a useful comparison on an unrelated result.
+  Do not repeat a whole campaign with larger limits as the automatic response.
+- Distinguish diagnostic storage/event exhaustion from production memory/work
+  exhaustion. Recorder failures must be identifiable as harness failures and
+  cannot support claims about the factorer's resource needs. Validate the
+  recorder's useful observation window before scaling the campaign.
+- Preserve receipts, charges, failures and historical freezes. If a protocol is
+  flawed, document the reason and prepare a separately identified revision
+  within the user's authorized scope. Keep confirmation inference separate
+  from exploratory redesign; never selectively retry unfavorable observations,
+  relax correctness or silently rewrite a control to manufacture acceptance.
 
 ## GitHub contents
 
