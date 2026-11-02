@@ -1491,8 +1491,8 @@ coupled score, including squarefree even candidates. The new score requires
 the parity polynomial policy. Fixed multipliers bypass scoring.
 
 The stored polynomial is twice the discriminant-normalized polynomial, so
-existing exact relation and extraction semantics remain intact. Parity-only jobs use
-checkpoint schema 8 and reject incompatible arithmetic-policy substitutions;
+existing exact relation and extraction semantics remain intact. Parity-only
+jobs use checkpoint schema 8 and reject incompatible arithmetic-policy substitutions;
 legacy snapshots retain their original semantics. No automatic defaults or
 larger-size routing change. See the [arithmetic contract](studies/c10a01_arithmetic.md)
 and [bounded study protocol](benchmarks/qs/c10a01/protocol.md).

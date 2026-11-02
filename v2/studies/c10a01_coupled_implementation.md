@@ -1,7 +1,7 @@
 # C10a-01 combined implementation handoff
 
 The four nominated extensions are implemented as opt-ins on the existing
-exact parity representation. Test one combined challenger first. Independent
+exact parity representation (implementation commit `f306359`). Test one combined challenger first. Independent
 component oracles establish correctness; selective ablations can explain a
 promising or surprising bundle result. A factorial performance sweep is not
 required for admission. No new timed calibration or complete-factor pilot

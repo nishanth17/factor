@@ -2,8 +2,8 @@
 
 **Combined implementation revised, 2 November 2026:** the [combined-arm definition](c10a01_arm_revision.md)
 now includes wider coupled ranking, residue reuse, target-aware actual A
-products and guaranteed-two-power handling. Those extensions are now implemented and independently checked; see the
-[new handoff](c10a01_coupled_implementation.md). They have not been timed.
+products and guaranteed-two-power handling. Those extensions are now
+implemented and independently checked; see the [new handoff](c10a01_coupled_implementation.md). They have not been timed.
 The implementation, results and v2 freeze below describe their original
 candidate and historical checkout, not readiness of the revised bundle.
 
