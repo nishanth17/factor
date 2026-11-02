@@ -4,10 +4,12 @@ import argparse
 import hashlib
 import importlib
 import json
+import os
 import resource
 import signal
 import time
 from dataclasses import asdict
+from pathlib import Path
 
 from ....common import utils
 from ....execution.budget import BudgetExhaustedError
@@ -15,7 +17,12 @@ from ....qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSJob
 from ....qs.sieve_collector import SieveCollector
 from . import control_v4, plan_v4
 
-OUTPUT = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4-r2"
+OUTPUT = Path(
+    os.environ.get(
+        "C10A01_V4_OUTPUT",
+        plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4-r2",
+    )
+)
 
 
 def rss():

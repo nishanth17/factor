@@ -127,6 +127,11 @@ def run_worker(row):
         if process.poll() is None:
             process.kill()
             process.wait()
+    return run_worker_result(result, row)
+
+
+def run_worker_result(result, row):
+    """Check and charge a completed worker receipt."""
     before, after, measured = (
         result["before"],
         result["after"],
