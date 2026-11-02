@@ -730,5 +730,9 @@
   "uncertainty": "One exposed independent modulus per size, descriptive feasibility only. Show every outcome. Ratios only for both-complete pairs. Censored service cost is cap; not successful-factor speed. Failed drift retained and blocks performance claims, not validity of completion.",
   "extension": "None. Redesign or extensions need a separately identified prospective protocol.",
   "confirmation": "Selection must be committed before revealing disjoint confirmation inputs. At least nine independent moduli per claimed band, input-level paired uncertainty, separate repeated samples, same resources and validated warmup. No universal gain threshold.",
-  "seventy_policy": "Highest-ranked eligible k=31 forced for normalized candidate. Scored k=1 would duplicate standard control. Diagnostic chosen before complete-factor outcomes; not an automatic-selector comparison."
+  "seventy_policy": "Highest-ranked eligible k=31 forced for normalized candidate. Scored k=1 would duplicate standard control. Diagnostic chosen before complete-factor outcomes; not an automatic-selector comparison.",
+  "runtime": {
+    "version": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]",
+    "binary_sha256": "3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2"
+  }
 }

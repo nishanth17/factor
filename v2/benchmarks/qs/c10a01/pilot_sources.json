@@ -5,7 +5,7 @@
     "b666bde",
     "ce7d66f"
   ],
-  "pilot_implementation": "a4d5be3",
+  "pilot_implementation": "a4d5be3 plus runtime-pin follow-up",
   "files": {
     "v2/__init__.py": "48f4bb798f86d8c0ede3c51572c5db3d441b6c1c3e2d0ae3b1bb13f15a470b91",
     "v2/benchmarks/__init__.py": "03b9d591ff4e6fc829edc3d4b8d55fbf8255c47b79da8faee18bd5539db997e9",
@@ -145,8 +145,8 @@
     "v2/benchmarks/qs/c10a01/diagnostics.json": "e0a57006e48c72282ba020db218fe65dcc6a58a7c9b3acab540761f3e1f6b0d8",
     "v2/benchmarks/qs/c10a01/diagnostics.py": "6f5d38d61b8546d7e438c4056ad984d735ecc9537328fa3ce99823af9a605e71",
     "v2/benchmarks/qs/c10a01/inputs.py": "3d6c70869268a40afaa06200325c62cedc895284103074a9254ed1f48aab117f",
-    "v2/benchmarks/qs/c10a01/pilots.json": "47fe8559358c320b16a40c3583ad2957baa32a7a5347dc9f0693cb26f6fae610",
-    "v2/benchmarks/qs/c10a01/pilots.py": "755af99454edd4780ffdd7ea8ce1089a6481ff06acc61b17b71cd731549f0cea",
+    "v2/benchmarks/qs/c10a01/pilots.json": "0c4ea8b2bad0511ce5c54f325c8b215d7ea73b019b9d2b91129dc7696645e791",
+    "v2/benchmarks/qs/c10a01/pilots.py": "1d9e922e9a4cd00d26df01ad4101c05e27824f53cedf4d8340f84af8d34d77cd",
     "v2/benchmarks/qs/c10a01/runner.py": "b966e000baffce884f4f4670ae510e36695a919ef4b98069c12d66049e2da59a",
     "v2/benchmarks/qs/c10a01/work_model.py": "8695eaf4801a4fceaf250cb0c001bd2f283b135f2921ad36b2ca428494c48056",
     "v2/benchmarks/qs/c10a04/__init__.py": "7a7200f6621815924a036a7e9d9c3d114ccec751310a190680f7593eefef0c45",

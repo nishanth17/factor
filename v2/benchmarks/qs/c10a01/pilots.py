@@ -5,6 +5,7 @@ import fcntl
 import json
 import statistics
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -76,6 +77,12 @@ def readiness(stage_name):
     runner.runtime()
     plan = json.loads(PLAN.read_text())
     verify_plan(plan)
+    current_runtime = dict(
+        version=sys.version,
+        binary_sha256=digest(Path(sys.executable).resolve()),
+    )
+    if current_runtime != plan["runtime"]:
+        raise RuntimeError("runtime drift requires a new pilot identity")
     sources = json.loads(SOURCES.read_text())
     for name, expected in sources["files"].items():
         if digest(runner.ROOT / name) != expected:
