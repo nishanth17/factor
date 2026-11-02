@@ -1,8 +1,9 @@
 """Frozen nominee and unrun pilot resource invariants."""
 
 import unittest
+from tempfile import TemporaryDirectory
 
-from v2.benchmarks.qs.c10a01 import nominee_v4, plan_v4
+from v2.benchmarks.qs.c10a01 import nominee_v4, pilots_v4, plan_v4
 
 
 class PilotV4FreezeTests(unittest.TestCase):
@@ -41,6 +42,26 @@ class PilotV4FreezeTests(unittest.TestCase):
             self.assertEqual(
                 limits["total"]["work"],
                 sum(p["work"] for p in limits["phases"].values()),
+            )
+
+    def test_execution_ledger_accepts_first_frozen_reservation(self):
+        plan = plan_v4.build_plan()
+        call = plan["pilots"]["A"]["calls"][0]
+        limits = pilots_v4.ledger_limits(plan, "A")
+        self.assertEqual(limits["disk_bytes"], 16 * 2**20)
+        with TemporaryDirectory() as output:
+            ledger = pilots_v4.BoundedLedger(output, "test", limits)
+            self.assertTrue(ledger.room("warmup", 35, 290_000_000_000))
+            ledger.call(
+                "warmup",
+                "dry",
+                35,
+                290_000_000_000,
+                {},
+                lambda: {"work": 0},
+            )
+            self.assertTrue(
+                ledger.room("measured", call["seconds"] + 5, call["work"])
             )
 
 

@@ -5,7 +5,7 @@
     "v2/benchmarks/qs/c10a01/execute_v4_stage.py": "34ea3832b848c9dd4187c31ef1e55c71a45c39ac6596746381061ed8a7662a04",
     "v2/benchmarks/qs/c10a01/experiment_v4.json": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
     "v2/benchmarks/qs/c10a01/nominee_v4.py": "b83ce51001f3c89f3105557322c6212561e5241a97e2462026683f2ef10631c6",
-    "v2/benchmarks/qs/c10a01/pilots_v4.py": "dac7fb0ae84f553405834dfbe8fb0f899e82a11c203a12c033e4cef8235e4355"
+    "v2/benchmarks/qs/c10a01/pilots_v4.py": "485dbad5b76962bf213806291063b686966c8acce0eb547548895f98a6675e67"
   },
   "identity": "c10a01-v4-pilot-release-1",
   "nominee_sha256": "93c2d3da4eaa5a9c76b506162327a200c4b915a0a3ad3bbbde83d0de95c328ec",

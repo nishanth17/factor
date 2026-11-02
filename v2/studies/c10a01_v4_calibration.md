@@ -123,6 +123,9 @@ least three wall and CPU seconds of validated warmup, nine pre- and post-call
 sentinels when available, a finite complete-factor grant, bounded worker
 output and durable ledger reservations. A native censor stays in the record;
 no automatic retry, larger grant or adoption test is built in.
+Each later stage has a 16 MiB ledger/output allowance inside the shared
+512 MiB study ceiling. The final local archive leaves about 76 MiB of that
+ceiling available; later execution must recheck remaining space.
 
 | Stage | Calls | Per-call wall and CPU caps | Stage wall and CPU ceiling | Cumulative work ceiling | Matched tiers |
 | --- | ---: | --- | ---: | ---: | --- |

@@ -19,6 +19,24 @@ PARENT_RSS = 256 * 2**20
 SENTINEL_BLOCKS = 8 * 33
 OUTPUT_LIMIT = 64 * 1024
 RECEIPT_LIMIT = 512 * 1024
+STAGE_DISK_LIMIT = 16 * 2**20
+
+
+def ledger_limits(plan, stage):
+    """Expose the frozen phase totals to the durable accounting ledger."""
+    frozen = plan["pilots"][stage]["limits"]
+    limits = dict(frozen["phases"])
+    limits["total"] = frozen["total"]
+    limits["disk_bytes"] = STAGE_DISK_LIMIT
+    assert (
+        sum(value["wall"] for value in frozen["phases"].values())
+        == (limits["total"]["wall"])
+    )
+    assert (
+        sum(value["work"] for value in frozen["phases"].values())
+        == (limits["total"]["work"])
+    )
+    return limits
 
 
 class BoundedLedger(Ledger):
@@ -79,6 +97,7 @@ def host_admission(tier):
 def stage_check(stage, *, require_receipts=False):
     nominee, plan = source_check()
     nominee_v4.verify(require_receipts=require_receipts)
+    ledger_limits(plan, stage)
     hosts = {
         row["tier"]: host_admission(row["tier"])
         for row in nominee["calls"]
@@ -200,7 +219,7 @@ def run_cell(stage, index, nominee, plan):
     modules = execute_v4.runtime_modules(row)
     out = execute_v4.OUTPUT
     ledger = BoundedLedger(
-        out, digest(nominee_v4.FREEZE), plan["pilots"][stage]["limits"]
+        out, digest(nominee_v4.FREEZE), ledger_limits(plan, stage)
     )
     identity = {
         "stage": stage,
@@ -268,7 +287,7 @@ def stage_run(stage):
     out = ROOT / ("v2/benchmarks/results/c10a01/pilot-v4-" + stage)
     with output_lock(out):
         ledger = BoundedLedger(
-            out, digest(nominee_v4.FREEZE), plan["pilots"][stage]["limits"]
+            out, digest(nominee_v4.FREEZE), ledger_limits(plan, stage)
         )
         if ledger.data["calls"]:
             raise RuntimeError("stage already started; preserve all outcomes")
@@ -329,7 +348,7 @@ def stage_run(stage):
             )
         # Workers settle measured and warmup reservations in the ledger.
         ledger = BoundedLedger(
-            out, digest(nominee_v4.FREEZE), plan["pilots"][stage]["limits"]
+            out, digest(nominee_v4.FREEZE), ledger_limits(plan, stage)
         )
         ledger.call(
             "analysis",
