@@ -29,6 +29,10 @@ class PreparedArmTests(unittest.TestCase):
                     self.assertEqual(
                         values.pop("multiplier_policy"), "standard"
                     )
+                if "root_update_policy" in values:
+                    self.assertEqual(
+                        values.pop("root_update_policy"), "standard"
+                    )
                 if "solve_policy" in values:
                     self.assertEqual(values.pop("solve_policy"), "window")
                 self.assertEqual(

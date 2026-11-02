@@ -1509,3 +1509,29 @@ and unsupported policies retain their exact fallback. Any new selector uses
 SIQS checkpoint schema 9 and rejects legacy injection or resume substitution.
 See the [combined implementation handoff](studies/c10a01_coupled_implementation.md)
 for literal configurations, resource bounds, validation and unmeasured work.
+
+
+The next opt-in bundle adds `root_update_policy="cached"` for bounded modular
+Gray shifts, or `"batch"` for the same shifts built from small A factors and
+cached inverses. Both preserve centered B, physical trials and complete root
+verification. Tables contain only coordinates used by the configured Gray
+prefix. `assignment_policy="windowed_pair"` uses disjoint interleaved prime
+partitions and an exact core-window envelope objective, followed by closest
+pair completion. Its distinct A population differs from `paired_flyer`.
+
+`multiplier_policy="parity2_norm"` shortlists four wider-density nominees and
+ranks exact norms from four A families, up to four Gray ordinals and 17 signed
+window positions. It corrects the small-prime density contribution for A
+membership. The preview population is independent of the family-count grant;
+shorter runs can preview families beyond their execution grant. Fixed
+multipliers bypass selection. This finite surrogate predicts neither yield
+nor complete cost. Candidate refusals and exact rational score receipts appear
+in job statistics. All-candidate refusal returns `configuration_refusal`.
+
+These new policies use SIQS checkpoint schema 10, with explicit policy
+identity and charged reconstruction of disposable caches. Direct family
+checkpoints use version 4; coordinate-family tables use their v3 schema.
+Legacy snapshots preserve their encodings; policy substitutions are rejected.
+`v2.benchmarks.qs.c10a01.configuration_v4.configuration` provides the literal
+combined arm and independent component overrides. Defaults are unchanged.
+No performance claim or new experiment admission follows from implementation.

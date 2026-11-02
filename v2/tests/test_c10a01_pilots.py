@@ -39,6 +39,9 @@ class PilotIsolationTests(unittest.TestCase):
                         multiplier=call["multiplier"],
                     )
                 )
+                self.assertEqual(
+                    expected.pop("root_update_policy"), "standard"
+                )
                 expected["memory_bytes"] -= pilots.PARENT_OWNED
                 self.assertEqual(call["configuration"], expected)
         self.assertNotEqual(plan["identity"], old["identity"])

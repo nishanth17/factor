@@ -125,39 +125,33 @@ counterexample or unresolved derivation. More elapsed time, more source files or
 a longer experiment alone is not a reason to increase reasoning effort. Model
 recommendations do not replace independent oracles or matched performance evidence.
 
-### C10a-01 implementation remaining after the coverage review
+### C10a-01 implementation after the coverage review
 
-Already implemented and independently checked: parity2 normalization with
-standard fallback, wider exact multiplier ranking, per-call residue reuse,
-paired-flyer A completion and guaranteed-two-power initialization. The last
-full arithmetic suite passed: 859 tests, with nine optional-backend skips.
-The revised combined bundle still has no timed calibration or complete-factor
-result; the earlier prototype calibration is a different source identity.
+All four nominees are now opt-in: `root_update_policy="cached"` / `"batch"`
+for the same centered Gray shifts with distinct construction costs;
+`assignment_policy="windowed_pair"` for disjoint compensators and a finite
+core-window objective; `multiplier_policy="parity2_norm"` for exact actual-A
+and norm previews of four density nominees. The literal v4 combined factory
+exposes component overrides; v3 and original controls remain available.
+New policy semantics use checkpoint schema 10 with charged cache rebuilds.
+This is implementation status, not completion of the adoption gate.
 
-The next concrete implementations are:
+Structural checks cover all eight 60/62/65/70 inputs. Sampled A target misses
+are all below 0.044%, while some already-close old products become less close.
+The norm policy chooses the same k as the wider density policy on these eight
+inputs; its extra setup cost remains an explicit experiment question. Balanced
+70 still selects k=1 and standard fallback. These observations are arithmetic
+QA, not measured useful yield, speed or complete-factor feasibility results.
 
-1. **Centered modular Gray-shift cache.** Preserve the existing B and U trials;
-   include wrap correction, exceptional roots, bounded consumed-coordinate
-   tables, policy identity, construction/refusal charges and checked resume.
-2. **Better attainable A populations.** Specify and implement a finite
-   feasible-core/product-window policy beyond the current paired completion.
-   Preserve uniqueness/exhaustion and test actual reachable products against an
-   independent Cartesian oracle. The current closest pair need not be close
-   to the target for every core.
-
-Two additional alternatives belong to this workstream but still need concrete
-selection/specification: **actual-A/norm-aware multiplier ranking**, and
-**small-factor/batched-inverse root-table construction**. These are not already
-provided by wider local-density scoring or cached A inverses. Choose exact,
-bounded rules before implementing them; no prior standalone speedup is required
-for a correct, feasible opt-in experiment.
-
-Each selected change also needs integration with independent CRT/root/valuation
-checks, caches/queues/plans, compatibility/resume, ownership and work bounds.
-Then refresh the literal challenger, short-calibration protocol and later-stage
-source/work freezes. The 60/62/65/70 complete-factor pilots remain later work.
-Bernstein SIQS integration and new matrix solvers have explicit separate roadmap
-items; their completion is not a prerequisite for this arithmetic handoff.
+Remaining work is experimental: freeze the revised source/configuration/work
+accounts, run an explicitly allocated short combined/control calibration,
+then select informative root-setup and A/ranking ablations rather than all
+combinations. The original calibration is closed, and earlier source freezes
+remain historical. The 60/62/65/70 complete-factor pilots, including the funded
+70-digit pair, remain later work and require refreshed readiness. Do not run
+those pilots in the current implementation session or promote defaults.
+Bernstein SIQS integration and matrix work retain their separate roadmap IDs;
+neither is a prerequisite for testing this arithmetic arm.
 
 ## How to use the gates
 

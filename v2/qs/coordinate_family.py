@@ -2,7 +2,7 @@
 
 import json
 
-from ..common import utils
+from ..common import arithmetic, utils
 from .families import (
     PolynomialFamily,
     _checked_resources,
@@ -25,7 +25,16 @@ class CoordinateFamily:
     """
 
     def __init__(
-        self, base, a_primes, *, schedule, budget, memory_bytes, parity=False
+        self,
+        base,
+        a_primes,
+        *,
+        schedule,
+        budget,
+        memory_bytes,
+        parity=False,
+        root_update_policy="standard",
+        root_update_limit=None,
     ):
         if not isinstance(
             schedule, SignSchedule
@@ -50,6 +59,7 @@ class CoordinateFamily:
         )
         kernel.a_primes = tuple(a_primes[i] for i in order)
         kernel.identity = _checksum([kernel.identity, schedule.mapping()])
+        kernel._configure_root_updates(root_update_policy, root_update_limit)
         kernel.workspace_bytes += extra
         self._kernel = kernel
         self.a_primes = a_primes
@@ -101,6 +111,11 @@ class CoordinateFamily:
         )
         if self.parity:
             payload["parity"] = True
+        if self.root_update_policy != "standard":
+            payload["schema"] = "c10a01-coordinate-family-v3"
+            payload["backend"] = arithmetic.backend_for(self.base.n).identity
+            payload["root_update_policy"] = self.root_update_policy
+            payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
         if len(json.dumps(payload).encode()) > CHECKPOINT_BYTES:
             raise MemoryError("coordinate family checkpoint exceeds its cap")
@@ -116,7 +131,12 @@ class CoordinateFamily:
         }:
             raise ValueError("invalid coordinate family checkpoint")
         payload = checkpoint["payload"]
-        if not isinstance(payload, dict) or set(payload) - {"parity"} != {
+        if not isinstance(payload, dict) or set(payload) - {
+            "parity",
+            "root_update_policy",
+            "root_update_limit",
+            "backend",
+        } != {
             "schema",
             "base_identity",
             "a_primes",
@@ -146,6 +166,20 @@ class CoordinateFamily:
         schema = "c10a01-coordinate-family-v2" if parity else FAMILY_SCHEMA
         if type(parity) is not bool or (not parity and "parity" in payload):
             raise ValueError("invalid coordinate parity policy")
+        policy = payload.get("root_update_policy", "standard")
+        limit = payload.get("root_update_limit")
+        fields = {"root_update_policy", "root_update_limit"}
+        if fields.intersection(payload):
+            if not fields.issubset(payload) or policy == "standard":
+                raise ValueError("invalid coordinate root policy")
+            schema = "c10a01-coordinate-family-v3"
+            if (
+                payload.get("backend")
+                != arithmetic.backend_for(base.n).identity
+            ):
+                raise ValueError("coordinate root-table backend mismatch")
+        elif "backend" in payload:
+            raise ValueError("legacy coordinate schema cannot add a backend")
         if payload["schema"] != schema or payload[
             "base_identity"
         ] != _identity(base):
@@ -165,9 +199,13 @@ class CoordinateFamily:
             tuple(primes),
             schedule=schedule,
             parity=parity,
+            root_update_policy=policy,
+            root_update_limit=limit,
             budget=budget,
             memory_bytes=memory_bytes,
         )
+        if index > family.root_update_limit:
+            raise ValueError("coordinate cursor exceeds root-update prefix")
         if index:
             family.current = family._make_step(index - 1, None)
         family.next_index = index

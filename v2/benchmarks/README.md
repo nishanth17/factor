@@ -334,3 +334,13 @@ control/challenger configurations. This bundle is correctness-validated but
 unmeasured. Earlier calibration and source freezes remain historical; the old
 pilot loader rejects changed sources. No new performance call is admitted by
 the configuration helper or compatibility-manifest update.
+
+
+`configuration_v4.py` adds centered root tables, batch table construction,
+windowed-pair A selection and bounded actual-norm ranking. It retains v3 and
+literal current controls and exposes component overrides for targeted
+ablations. Structural QA covers all eight exposed 60/62/65/70 inputs; it is
+not a timing result. The original calibration allocation is closed. No revised
+calibration or later complete-factor pilot ran for this source; old frozen
+pilot readiness continues to reject changed source. Freeze new source/work
+accounts before measurements, including the separately funded 70-digit stage.

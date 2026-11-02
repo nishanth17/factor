@@ -63,6 +63,7 @@ class ExtendedRunnerTests(unittest.TestCase):
             values = asdict(new)
             self.assertEqual(values.pop("polynomial_policy"), "standard")
             self.assertEqual(values.pop("multiplier_policy"), "standard")
+            self.assertEqual(values.pop("root_update_policy"), "standard")
             self.assertEqual(values.pop("sign_policy"), "swap_high")
             self.assertEqual(
                 values["collector"].pop("sparse_queue_bytes"), 32 * 2**20

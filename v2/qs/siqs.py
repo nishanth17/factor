@@ -28,6 +28,7 @@ from .multiplier import (
     select_coupled_multiplier,
     select_multiplier,
 )
+from .norm_multiplier import PREVIEW_RECEIPT_BYTES, select_norm_multiplier
 from .pipeline import QSJob, QSResult
 from .polynomial import (
     a_target,
@@ -35,6 +36,7 @@ from .polynomial import (
     polynomial_roots,
     qs_polynomial,
 )
+from .root_updates import ROOT_UPDATE_POLICIES, root_update_workspace
 from .sieve_collector import (
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
@@ -72,6 +74,7 @@ class SIQSConfig:
     tested_dependencies: bool = False
     polynomial_policy: str = field(default="standard", kw_only=True)
     multiplier_policy: str = field(default="standard", kw_only=True)
+    root_update_policy: str = field(default="standard", kw_only=True)
     sign_policy: str = field(default="canonical", kw_only=True)
     solve_policy: str = field(default="window", kw_only=True)
     memory_bytes: int | None = None
@@ -93,14 +96,25 @@ class SIQSConfig:
             "standard",
             "parity2",
             "parity2_wide",
+            "parity2_norm",
         ):
             raise ValueError("unknown SIQS multiplier policy")
         if self.polynomial_policy != "standard" and self.mode != "siqs":
             raise ValueError("parity policy requires SIQS")
-        if self.multiplier_policy in ("parity2", "parity2_wide") and (
-            self.polynomial_policy != "parity2"
-        ):
+        if self.multiplier_policy in (
+            "parity2",
+            "parity2_wide",
+            "parity2_norm",
+        ) and (self.polynomial_policy != "parity2"):
             raise ValueError("parity score requires parity polynomials")
+        if self.root_update_policy not in ROOT_UPDATE_POLICIES:
+            raise ValueError("unknown SIQS root-update policy")
+        if self.root_update_policy != "standard" and self.mode != "siqs":
+            raise ValueError("root-update tables require SIQS")
+        if self.multiplier_policy == "parity2_norm" and (
+            self.assignment_policy == "reference"
+        ):
+            raise ValueError("norm multiplier ranking requires streaming A")
         if self.sign_policy not in ("canonical", "swap_high"):
             raise ValueError("unknown SIQS sign policy")
         growing = isinstance(self.collector, GrowingDoubleLargeSieveConfig)
@@ -164,11 +178,15 @@ class SIQSConfig:
             "flyer",
             "quality",
             "paired_flyer",
+            "windowed_pair",
         ):
             raise ValueError("unknown assignment policy")
         if self.assignment_policy != "reference" and self.mode != "siqs":
             raise ValueError("streaming A policies require SIQS")
-        if self.assignment_policy == "paired_flyer" and self.factor_count < 3:
+        if (
+            self.assignment_policy in ("paired_flyer", "windowed_pair")
+            and self.factor_count < 3
+        ):
             raise ValueError("paired flyer requires at least three factors")
         if self.external_coefficients and self.mode != "mpqs":
             raise ValueError("external square coefficients require MPQS")
@@ -236,7 +254,16 @@ class SIQSConfig:
             paired_workspace(
                 getattr(self, "base_count", self.base_bound), self.factor_count
             )
-            if self.assignment_policy == "paired_flyer"
+            if self.assignment_policy in ("paired_flyer", "windowed_pair")
+            else 0
+        )
+        root_tables = (
+            root_update_workspace(
+                getattr(self, "base_count", self.base_bound),
+                self.factor_count,
+                self.gray_limit,
+            )
+            if self.root_update_policy != "standard"
             else 0
         )
         face = 256 * 1024 if self.sign_policy != "canonical" else 0
@@ -248,6 +275,12 @@ class SIQSConfig:
             + paired
             + (32768 if self.multiplier_policy == "parity2_wide" else 0)
             + face
+            + root_tables
+            + (
+                PREVIEW_RECEIPT_BYTES
+                if self.multiplier_policy == "parity2_norm"
+                else 0
+            )
             + (4096 if self.polynomial_policy != "standard" else 0)
         )
 
@@ -280,6 +313,14 @@ class CountedSIQSConfig(SIQSConfig):
 def make_family(base, primes, *, config, budget, memory_bytes):
     """Apply saved coordinate/parity policies without global dispatch."""
     parity = config.polynomial_policy == "parity2" and base.n_prime % 4 == 1
+    root_options = dict(
+        root_update_policy=config.root_update_policy,
+        root_update_limit=(
+            config.gray_limit
+            if config.root_update_policy != "standard"
+            else None
+        ),
+    )
     if config.sign_policy == "swap_high" and len(primes) >= 3:
         from .coordinate_family import CoordinateFamily
         from .sign_schedule import schedule_for
@@ -288,12 +329,18 @@ def make_family(base, primes, *, config, budget, memory_bytes):
             base,
             primes,
             schedule=schedule_for(len(primes), "swap_high"),
+            **root_options,
             parity=parity,
             budget=budget,
             memory_bytes=memory_bytes,
         )
     return PolynomialFamily(
-        base, primes, budget=budget, memory_bytes=memory_bytes, parity=parity
+        base,
+        primes,
+        budget=budget,
+        memory_bytes=memory_bytes,
+        parity=parity,
+        **root_options,
     )
 
 
@@ -364,7 +411,16 @@ class SIQSJob:
             else:
                 choice = self._timed(
                     "multiplier",
-                    lambda: select_coupled_multiplier(
+                    lambda: select_norm_multiplier(
+                        self.n,
+                        config=self.config,
+                        seed=self.seed,
+                        budget=self.budget,
+                        memory_bytes=self.config.memory_limit
+                        - self.config.metadata_reserve,
+                    )
+                    if self.config.multiplier_policy == "parity2_norm"
+                    else select_coupled_multiplier(
                         self.n,
                         budget=self.budget,
                         memory_bytes=self.config.memory_limit
@@ -388,6 +444,12 @@ class SIQSJob:
                     choice.divisor,
                 )
                 self.stats["multiplier_scores"] = choice.scores
+                if self.config.multiplier_policy == "parity2_norm":
+                    self.stats["multiplier_density_scores"] = (
+                        choice.density_scores
+                    )
+                    self.stats["multiplier_previews"] = choice.previews
+                    self.stats["multiplier_preview_refusals"] = choice.refused
                 if self.divisor is not None:
                     return
 
@@ -494,7 +556,10 @@ class SIQSJob:
             self.stats["assignment_count"] = len(self.assignments)
             if isinstance(self.assignments, AssignmentStream):
                 self.stats["assignment_space"] = self.assignments.total
-                if self.config.assignment_policy == "paired_flyer":
+                if self.config.assignment_policy in (
+                    "paired_flyer",
+                    "windowed_pair",
+                ):
                     stream = self.assignments
                     self.stats["capacity"].update(
                         paired_completion_minimum=stream.partition_minimum,

@@ -59,11 +59,15 @@ def verify_plan(plan):
             assert call["tier"] == TIERS[call["digits"]]
             from dataclasses import asdict
 
-            assert call["configuration"] == asdict(
+            current = asdict(
                 pilot_configuration(
                     call["digits"], call["arm"], multiplier=call["multiplier"]
                 )
             )
+            # The frozen v2 config predates this disabled opt-in. Enabled
+            # policies still fail the equality; source pins remain strict.
+            assert current.pop("root_update_policy") == "standard"
+            assert call["configuration"] == current
             assert call["postprocessing"] == charges(call["digits"])
         for field in ("wall", "cpu", "work"):
             assert (

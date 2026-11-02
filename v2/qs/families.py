@@ -230,6 +230,8 @@ class PolynomialFamily:
         budget=None,
         memory_bytes=DEFAULT_MEMORY_BYTES,
         parity=False,
+        root_update_policy="standard",
+        root_update_limit=None,
     ):
         """Reserve root/CRT state, then cache exact modular inverses."""
         if type(parity) is not bool:
@@ -301,6 +303,34 @@ class PolynomialFamily:
         )
         self.count = 1 << (len(a_primes) - 1)
         self.next_index, self.current = 0, None
+        self.root_update_policy = "standard"
+        self.root_update_limit = self.count
+        self.root_updates = ()
+        self._configure_root_updates(root_update_policy, root_update_limit)
+
+    def _configure_root_updates(self, policy, limit):
+        """Publish a complete derived table only before family traversal."""
+        from .root_updates import build_root_updates
+
+        if self.next_index or self.root_update_policy != "standard":
+            raise ValueError("root policy must be set before family traversal")
+        limit = self.count if limit is None else limit
+        if policy == "standard" and limit != self.count:
+            raise ValueError("standard root policy uses the whole family")
+        table, extra = build_root_updates(self, policy, limit)
+        self.root_updates = table
+        self.root_update_policy, self.root_update_limit = policy, limit
+        self.workspace_bytes += extra
+        if policy != "standard":
+            self.identity = _checksum(
+                [
+                    self.identity,
+                    "root-updates-v1",
+                    arithmetic.backend_for(self.base.n).identity,
+                    policy,
+                    limit,
+                ]
+            )
 
     def _make_step(self, index, previous):
         """Construct privately before publishing complete roots."""
@@ -308,6 +338,8 @@ class PolynomialFamily:
             (len(self.base.entries) + len(self.terms) + 1)
             * (self.a.bit_length() + self.base.n.bit_length() + 1)
         )
+        if not 0 <= index < self.root_update_limit:
+            raise ValueError("Gray index exceeds the root-update prefix")
         gray = index ^ (index >> 1)
         changed = None
         if previous is None:
@@ -329,6 +361,9 @@ class PolynomialFamily:
         # Use the centered B difference, including any reduction modulo A,
         # so cached roots shift by exactly -delta/A at nonsingular primes.
         delta = 0 if previous is None else b - previous.polynomial.b
+        wrap = (
+            (raw - b) // self.a if self.root_update_policy != "standard" else 0
+        )
         roots = []
 
         for offset, (entry, inverse) in enumerate(
@@ -339,6 +374,17 @@ class PolynomialFamily:
                     polynomial_roots(
                         polynomial, self.base, entry, budget=self.budget
                     )
+                )
+                continue
+
+            if previous is not None and self.root_update_policy != "standard":
+                shift = old_sign * self.root_updates[bit][offset] + wrap
+                residues = tuple(
+                    (root + shift) % entry.prime
+                    for root in previous.roots[offset].roots
+                )
+                roots.append(
+                    PolynomialRoots(entry.prime, tuple(sorted(residues)))
                 )
                 continue
 
@@ -365,7 +411,7 @@ class PolynomialFamily:
         Budget refusal retains the first unpublished index and prior root
         state. Retrying charges repeated private work under the same allowance.
         """
-        if self.next_index == self.count:
+        if self.next_index == self.root_update_limit:
             return None
         step = self._make_step(self.next_index, self.current)
         self.current = step
@@ -392,6 +438,10 @@ class PolynomialFamily:
         }
         if self.parity:
             payload["parity"] = True
+        if self.root_update_policy != "standard":
+            payload["version"] = 4
+            payload["root_update_policy"] = self.root_update_policy
+            payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
         if (
             len(json.dumps(payload, default=arithmetic.json_integer).encode())
@@ -420,6 +470,8 @@ class PolynomialFamily:
         if not isinstance(payload, dict) or set(payload) - {
             "backend",
             "parity",
+            "root_update_policy",
+            "root_update_limit",
         } != {
             "version",
             "base_identity",
@@ -430,7 +482,7 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint payload")
 
         utils.require_integer(payload["version"], "checkpoint version", 1)
-        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION, 3):
+        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION, 3, 4):
             raise ValueError("unsupported family checkpoint version")
         parity = payload.get("parity", False)
         if (
@@ -439,6 +491,14 @@ class PolynomialFamily:
             or (payload["version"] < 3 and "parity" in payload)
         ):
             raise ValueError("family parity policy disagrees with schema")
+        policy = payload.get("root_update_policy", "standard")
+        limit = payload.get("root_update_limit")
+        fields = {"root_update_policy", "root_update_limit"}
+        if (payload["version"] < 4 and fields.intersection(payload)) or (
+            payload["version"] == 4
+            and (not fields.issubset(payload) or policy == "standard")
+        ):
+            raise ValueError("family root policy disagrees with schema")
         if (
             payload.get(
                 "backend", "python-int" if payload["version"] < 2 else None
@@ -498,7 +558,11 @@ class PolynomialFamily:
             budget=budget,
             memory_bytes=memory_bytes,
             parity=parity,
+            root_update_policy=policy,
+            root_update_limit=limit,
         )
+        if index > family.root_update_limit:
+            raise ValueError("family cursor exceeds its root-update prefix")
         if index:
             previous = (
                 family._make_step(index - 2, None) if index > 1 else None

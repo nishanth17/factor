@@ -173,7 +173,11 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        9
+        10
+        if job.config.root_update_policy != "standard"
+        or job.config.assignment_policy == "windowed_pair"
+        or job.config.multiplier_policy == "parity2_norm"
+        else 9
         if job.config.multiplier_policy == "parity2_wide"
         or job.config.assignment_policy == "paired_flyer"
         or "parity_two" in job.config.collector._kernels
@@ -263,6 +267,10 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
+    if version == 10:
+        payload["coupled_semantics"] = "c10a01-coupled-v4"
+    else:
+        payload["config"].pop("root_update_policy")
     if version == 9:
         payload["coupled_semantics"] = "c10a01-coupled-v3"
     if version >= 6:
@@ -521,6 +529,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         7,
         8,
         9,
+        10,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -582,6 +591,21 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         raise ValueError("legacy checkpoint cannot change arithmetic policy")
     if payload["version"] >= 8 and not policies.issubset(values):
         raise ValueError("parity checkpoint lacks its policy identity")
+    introduced_v4 = (
+        values.get("root_update_policy", "standard") != "standard"
+        or values.get("assignment_policy") == "windowed_pair"
+        or values.get("multiplier_policy") == "parity2_norm"
+    )
+    if payload["version"] < 10 and (
+        "root_update_policy" in values or introduced_v4
+    ):
+        raise ValueError("legacy checkpoint cannot change v4 coupled policy")
+    if payload["version"] == 10 and (
+        "root_update_policy" not in values
+        or not introduced_v4
+        or payload.get("coupled_semantics") != "c10a01-coupled-v4"
+    ):
+        raise ValueError("v4 checkpoint lacks its coupled policy identity")
     marking = values["collector"].get("marking", "")
     introduced = (
         values.get("multiplier_policy") == "parity2_wide"
@@ -784,6 +808,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             partial(make_family, config=config)
             if config.sign_policy != "canonical"
             or config.polynomial_policy != "standard"
+            or config.root_update_policy != "standard"
             else PolynomialFamily
         )
         job.family = family_factory(

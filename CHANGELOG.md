@@ -1,5 +1,13 @@
 # Changelog
 
+## C10a-01 root and population opt-ins (2 November 2026)
+
+- Add bounded centered Gray tables with direct or small-factor batch setup,
+  disjoint product-window A populations, and actual-norm multiplier previews.
+- Version new policy/checkpoint semantics; retain original trial streams for
+  root-only changes and preserve legacy controls and experiment freezes.
+- These options are experimental; no new timing result or default promotion.
+
 ## C10a-01 combined opt-ins (2 November 2026)
 
 - Add wider exact multiplier ranking with bounded symbol reuse, paired A-product
