@@ -6,7 +6,11 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
-from .assignment_stream import AssignmentStream, quality_workspace
+from .assignment_stream import (
+    AssignmentStream,
+    paired_workspace,
+    quality_workspace,
+)
 from .count_policy import CountPolicyRefusedError, endpoint_for_count
 from .external_square import (
     CoefficientDivisorError,
@@ -19,7 +23,11 @@ from .factor_base import (
     checked_target,
 )
 from .families import PolynomialFamily, family_assignments
-from .multiplier import PARITY_MULTIPLIERS, select_multiplier
+from .multiplier import (
+    PARITY_MULTIPLIERS,
+    select_coupled_multiplier,
+    select_multiplier,
+)
 from .pipeline import QSJob, QSResult
 from .polynomial import (
     a_target,
@@ -81,11 +89,15 @@ class SIQSConfig:
         """Bound schedules; growing DLP has no implicit storage quota."""
         if self.polynomial_policy not in ("standard", "parity2"):
             raise ValueError("unknown SIQS polynomial policy")
-        if self.multiplier_policy not in ("standard", "parity2"):
+        if self.multiplier_policy not in (
+            "standard",
+            "parity2",
+            "parity2_wide",
+        ):
             raise ValueError("unknown SIQS multiplier policy")
         if self.polynomial_policy != "standard" and self.mode != "siqs":
             raise ValueError("parity policy requires SIQS")
-        if self.multiplier_policy == "parity2" and (
+        if self.multiplier_policy in ("parity2", "parity2_wide") and (
             self.polynomial_policy != "parity2"
         ):
             raise ValueError("parity score requires parity polynomials")
@@ -151,10 +163,13 @@ class SIQSConfig:
             "nearest",
             "flyer",
             "quality",
+            "paired_flyer",
         ):
             raise ValueError("unknown assignment policy")
         if self.assignment_policy != "reference" and self.mode != "siqs":
             raise ValueError("streaming A policies require SIQS")
+        if self.assignment_policy == "paired_flyer" and self.factor_count < 3:
+            raise ValueError("paired flyer requires at least three factors")
         if self.external_coefficients and self.mode != "mpqs":
             raise ValueError("external square coefficients require MPQS")
         if self.streaming and (self.growth_steps or not self.diverse):
@@ -217,12 +232,21 @@ class SIQSConfig:
             if self.assignment_policy == "quality"
             else 0
         )
+        paired = (
+            paired_workspace(
+                getattr(self, "base_count", self.base_bound), self.factor_count
+            )
+            if self.assignment_policy == "paired_flyer"
+            else 0
+        )
         face = 256 * 1024 if self.sign_policy != "canonical" else 0
         return (
             65536
             + 8 * (self.checkpoint_bytes or 0)
             + registry
             + quality
+            + paired
+            + (32768 if self.multiplier_policy == "parity2_wide" else 0)
             + face
             + (4096 if self.polynomial_policy != "standard" else 0)
         )
@@ -340,7 +364,14 @@ class SIQSJob:
             else:
                 choice = self._timed(
                     "multiplier",
-                    lambda: select_multiplier(
+                    lambda: select_coupled_multiplier(
+                        self.n,
+                        budget=self.budget,
+                        memory_bytes=self.config.memory_limit
+                        - self.config.metadata_reserve,
+                    )
+                    if self.config.multiplier_policy == "parity2_wide"
+                    else select_multiplier(
                         self.n,
                         budget=self.budget,
                         **(
@@ -463,6 +494,19 @@ class SIQSJob:
             self.stats["assignment_count"] = len(self.assignments)
             if isinstance(self.assignments, AssignmentStream):
                 self.stats["assignment_space"] = self.assignments.total
+                if self.config.assignment_policy == "paired_flyer":
+                    stream = self.assignments
+                    self.stats["capacity"].update(
+                        paired_completion_minimum=stream.partition_minimum,
+                        paired_completion_maximum=stream.partition_maximum,
+                        paired_target_in_completion_envelope=(
+                            stream.partition_minimum
+                            <= stream.target
+                            <= stream.partition_maximum
+                        ),
+                        paired_lower_count=len(stream.lower_flyers),
+                        paired_upper_count=len(stream.upper_flyers),
+                    )
 
     def _next_step(self):
         if isinstance(self.assignments, AssignmentStream):

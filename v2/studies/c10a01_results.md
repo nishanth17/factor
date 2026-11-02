@@ -1,11 +1,11 @@
 # C10a-01 implementation and experimental handoff
 
-**Arm nomination revised, 2 November 2026:** the [combined-arm definition](c10a01_arm_revision.md)
+**Combined implementation revised, 2 November 2026:** the [combined-arm definition](c10a01_arm_revision.md)
 now includes wider coupled ranking, residue reuse, target-aware actual A
-products and guaranteed-two-power handling. Those extensions are not yet
-implemented or calibrated. The implementation, results and runnable v2 freeze
-below remain valid for their original candidate; they are not readiness
-evidence for the revised bundle.
+products and guaranteed-two-power handling. Those extensions are now implemented and independently checked; see the
+[new handoff](c10a01_coupled_implementation.md). They have not been timed.
+The implementation, results and v2 freeze below describe their original
+candidate and historical checkout, not readiness of the revised bundle.
 
 The exact parity-normalized SIQS representation and its coupled multiplier
 score are implemented **opt-in**. Standard arithmetic and defaults remain the

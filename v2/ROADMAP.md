@@ -1966,6 +1966,10 @@ negative arm and all historical pins.
   calibration are delivered. [Handoff](studies/c10a01_results.md) freezes later
   feasibility pairs, including the funded 70-digit stage. Complete factoring,
   fresh confirmation and adoption remain open; defaults are unchanged.
+  The [combined extension](studies/c10a01_coupled_implementation.md) now adds
+  wider ranking/reuse, paired actual-A completion and guaranteed-two-power
+  initialization. Its independent checks pass; new timed calibration and a
+  revised source freeze remain open. This item is not marked complete.
 - [ ] **C10a-02:** separately test a wider actual-A-product population and
   inter-family diversity only if product error or overlap predicts useful
   post-filter work. Sol / **high** for census reconciliation; **xhigh** for a

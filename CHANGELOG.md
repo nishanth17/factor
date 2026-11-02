@@ -1,5 +1,14 @@
 # Changelog
 
+## C10a-01 combined opt-ins (2 November 2026)
+
+- Add wider exact multiplier ranking with bounded symbol reuse, paired A-product
+  completion and guaranteed-two-power score initialization as explicit policies.
+- Add schema 9 with charged resume and legacy-substitution checks; preserve
+  existing policies, defaults and historical experiment freezes.
+- Verify independent component oracles and structural support at 60/62/65/70.
+  The combined arm has no new timed calibration or complete-factor result.
+
 ## C10a-01 opt-in parity arithmetic (2 November 2026)
 
 - Add parity-normalized SIQS families through the existing exact norm identity,

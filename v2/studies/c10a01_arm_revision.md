@@ -1,9 +1,10 @@
 # C10a-01 revised combined-arm nomination
 
-Decision: 2 November 2026. This revises arm membership after the user's
-clarification. It is a design decision, not a new implementation or measurement.
-The implemented/calibrated v2 candidate and its evidence remain unchanged.
-The revised bundle is not yet ready for execution under the old pilot freeze.
+Decision: 2 November 2026. The four extensions are now implemented and
+independently validated; see the [implementation handoff](c10a01_coupled_implementation.md).
+The original nomination rationale follows. The earlier v2 candidate and its
+evidence remain unchanged. The revised bundle has not been timed and cannot
+execute under the old source freeze.
 
 ## One combined challenger
 
@@ -81,9 +82,9 @@ calibration is evidence for the v2 prototype only; its 3,124 charged seconds,
 failures, source hashes and archives are unchanged. No extra calibration or
 complete-factor pilot was run for this decision.
 
-Next implementation work belongs to the same C10a-01 challenger, with a new
-serialized policy/source identity and independent oracles. After exactness,
-resource accounting and bounded new calibration, freeze one current control
+The implementation belongs to this same C10a-01 challenger, with schema 9,
+a new source identity, independent oracles and resource accounting. After
+bounded new calibration, freeze one current control
 and this combined challenger at 60/62/65/70. Preserve the funded two-arm
 complete-factor envelope as the design constraint; adding components does
 not itself multiply arms or require the optional 42,600-second C3 proposal.

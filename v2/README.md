@@ -1491,8 +1491,21 @@ coupled score, including squarefree even candidates. The new score requires
 the parity polynomial policy. Fixed multipliers bypass scoring.
 
 The stored polynomial is twice the discriminant-normalized polynomial, so
-existing exact relation and extraction semantics remain intact. New jobs use
+existing exact relation and extraction semantics remain intact. Parity-only jobs use
 checkpoint schema 8 and reject incompatible arithmetic-policy substitutions;
 legacy snapshots retain their original semantics. No automatic defaults or
 larger-size routing change. See the [arithmetic contract](studies/c10a01_arithmetic.md)
 and [bounded study protocol](benchmarks/qs/c10a01/protocol.md).
+
+
+The extended combined candidate uses `multiplier_policy="parity2_wide"`,
+`assignment_policy="paired_flyer"` and collector `marking="parity_two"` with
+`polynomial_policy="parity2"`. The wider scorer tests 61 squarefree multipliers
+through 97 against 300 primes, with exact per-call residue reuse and an 8 MiB
+scratch requirement. The paired A policy requires at least three factors and
+chooses two disjoint compensators by exact product error. `parity_two` fuses
+only certified universal score levels; other backends, periodic presieves
+and unsupported policies retain their exact fallback. Any new selector uses
+SIQS checkpoint schema 9 and rejects legacy injection or resume substitution.
+See the [combined implementation handoff](studies/c10a01_coupled_implementation.md)
+for literal configurations, resource bounds, validation and unmeasured work.

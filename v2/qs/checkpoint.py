@@ -173,7 +173,11 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        8
+        9
+        if job.config.multiplier_policy == "parity2_wide"
+        or job.config.assignment_policy == "paired_flyer"
+        or "parity_two" in job.config.collector._kernels
+        else 8
         if job.config.polynomial_policy != "standard"
         or job.config.multiplier_policy != "standard"
         else 7
@@ -259,6 +263,8 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
+    if version == 9:
+        payload["coupled_semantics"] = "c10a01-coupled-v3"
     if version >= 6:
         payload["pending_final_reason"] = job.pending_final_reason
     else:
@@ -514,6 +520,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         6,
         7,
         8,
+        9,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -573,8 +580,23 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     policies = {"polynomial_policy", "multiplier_policy"}
     if payload["version"] < 8 and policies.intersection(values):
         raise ValueError("legacy checkpoint cannot change arithmetic policy")
-    if payload["version"] == 8 and not policies.issubset(values):
+    if payload["version"] >= 8 and not policies.issubset(values):
         raise ValueError("parity checkpoint lacks its policy identity")
+    marking = values["collector"].get("marking", "")
+    introduced = (
+        values.get("multiplier_policy") == "parity2_wide"
+        or values.get("assignment_policy") == "paired_flyer"
+        or (isinstance(marking, str) and "parity_two" in marking.split("+"))
+    )
+    if payload["version"] < 9 and (
+        introduced or "coupled_semantics" in payload
+    ):
+        raise ValueError("legacy checkpoint cannot change coupled policy")
+    if payload["version"] == 9 and (
+        not introduced
+        or payload.get("coupled_semantics") != "c10a01-coupled-v3"
+    ):
+        raise ValueError("coupled checkpoint lacks its policy identity")
     collector_type = (
         GrowingDoubleLargeSieveConfig
         if payload["version"] == 5
