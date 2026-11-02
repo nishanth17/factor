@@ -167,8 +167,10 @@ def build_plan():
         remaining_prerequisites=[
             "Parent bounded worker/ledger adapters and execution release.",
             "Two generated, independently certified boundary inputs.",
-            "Freeze global nominee; validate lower-band composition and resources.",
-            "Refresh prospective work/rate admission after parent calibration.",
+            "Freeze global nominee; validate lower-band "
+            "composition and resources.",
+            "Refresh prospective work/rate admission "
+            "after parent calibration.",
         ],
     )
 

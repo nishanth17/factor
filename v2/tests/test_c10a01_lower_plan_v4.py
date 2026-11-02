@@ -8,7 +8,8 @@ import tempfile
 import unittest
 from dataclasses import asdict, replace
 
-from v2.benchmarks.qs.c10a01 import control_v4, lower_plan_v4 as plan
+from v2.benchmarks.qs.c10a01 import control_v4
+from v2.benchmarks.qs.c10a01 import lower_plan_v4 as plan
 from v2.benchmarks.suites.build_phase_two_corpus import verify_certificates
 from v2.qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSConfig
 from v2.qs.collector_kernels import workspace
