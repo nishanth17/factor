@@ -1,0 +1,462 @@
+{
+  "archive": {
+    "bytes": 6276192,
+    "creation_verification_seconds": 1.5671890419907868,
+    "manifest_sha256": "c2b92b9c19bfe7572df742413c5c341ce3613ff0fb0bb606d19d51e5bb168831",
+    "path": "/Users/nishanthmohan/code/factor/v2/audit/archives/a1b-20261102/a1b-terminal-evidence-v1.tar.gz",
+    "sha256": "72159c7ff09809027bf03945849b04f20a55e81a4ecb5c8466b6c82f567602e0",
+    "uncompressed_bytes": 55683998,
+    "verified_files": 108
+  },
+  "audit_seconds": 0.024204791989177465,
+  "bands": {
+    "50": {
+      "complete_prefix_pairs": true,
+      "geometric_cpu": 1.2734007057829,
+      "geometric_wall": 1.273335652540296,
+      "independent_inputs": 3,
+      "inputs": [
+        {
+          "cpu": 1.2574743088177844,
+          "id": "a1a_integration_50_0",
+          "ratios": {
+            "cpu": [
+              1.2574743088177844
+            ],
+            "wall": [
+              1.2575843466493082
+            ]
+          },
+          "wall": 1.2575843466493082
+        },
+        {
+          "cpu": 1.286361762226236,
+          "id": "a1a_integration_50_1",
+          "ratios": {
+            "cpu": [
+              1.286361762226236
+            ],
+            "wall": [
+              1.2862103949710881
+            ]
+          },
+          "wall": 1.2862103949710881
+        },
+        {
+          "cpu": 1.2765358498213895,
+          "id": "a1a_integration_50_2",
+          "ratios": {
+            "cpu": [
+              1.2765358498213895
+            ],
+            "wall": [
+              1.2763787331852008
+            ]
+          },
+          "wall": 1.2763787331852008
+        }
+      ],
+      "planned_independent_inputs": 3,
+      "qualifies": false,
+      "stability": true,
+      "wall_wins": 0
+    },
+    "55": {
+      "complete_prefix_pairs": false,
+      "geometric_cpu": null,
+      "geometric_wall": null,
+      "independent_inputs": 0,
+      "inputs": [
+        {
+          "cpu": null,
+          "id": "a1a_integration_55_0",
+          "ratios": {
+            "cpu": [],
+            "wall": []
+          },
+          "wall": null
+        },
+        {
+          "cpu": null,
+          "id": "a1a_integration_55_1",
+          "ratios": {
+            "cpu": [],
+            "wall": []
+          },
+          "wall": null
+        },
+        {
+          "cpu": null,
+          "id": "a1a_integration_55_2",
+          "ratios": {
+            "cpu": [],
+            "wall": []
+          },
+          "wall": null
+        }
+      ],
+      "planned_independent_inputs": 3,
+      "qualifies": false,
+      "stability": false,
+      "wall_wins": 0
+    },
+    "60": {
+      "complete_prefix_pairs": true,
+      "geometric_cpu": 1.8302946100828388,
+      "geometric_wall": 1.830224813072719,
+      "independent_inputs": 3,
+      "inputs": [
+        {
+          "cpu": 1.818739081450114,
+          "id": "c10a05_plus_feas_60",
+          "ratios": {
+            "cpu": [
+              1.8402351128535985,
+              1.818739081450114,
+              1.8095215598161352
+            ],
+            "wall": [
+              1.840056659517624,
+              1.8185431726173609,
+              1.8095086675446468
+            ]
+          },
+          "wall": 1.8185431726173609
+        },
+        {
+          "cpu": 1.8314233754535558,
+          "id": "c10a04_train_60_0",
+          "ratios": {
+            "cpu": [
+              1.8297986328513722,
+              1.8314233754535558,
+              1.8635590396084365
+            ],
+            "wall": [
+              1.8298928539652022,
+              1.8312732381795958,
+              1.8727420683136795
+            ]
+          },
+          "wall": 1.8312732381795958
+        },
+        {
+          "cpu": 1.8407883208738511,
+          "id": "c10a04_train_60_1",
+          "ratios": {
+            "cpu": [
+              1.8407883208738511,
+              1.8347479512965992,
+              1.843794861271879
+            ],
+            "wall": [
+              1.8409269363065752,
+              1.8348387902981855,
+              1.8439121530873284
+            ]
+          },
+          "wall": 1.8409269363065752
+        }
+      ],
+      "planned_independent_inputs": 3,
+      "qualifies": false,
+      "stability": true,
+      "wall_wins": 0
+    }
+  },
+  "base_commit": "4a946b8d6294d51ac5d9c36f61880cc63d5b59fd",
+  "charges": {
+    "analysis": {
+      "cpu": 60,
+      "wall": 60,
+      "work": 0
+    },
+    "diagnostic": {
+      "cpu": 90,
+      "wall": 90,
+      "work": 5098787305
+    },
+    "measured": {
+      "cpu": 750,
+      "wall": 750,
+      "work": 51526359348
+    },
+    "orchestration": {
+      "cpu": 90,
+      "wall": 90,
+      "work": 0
+    },
+    "warm": {
+      "cpu": 250,
+      "wall": 250,
+      "work": 37330110225
+    }
+  },
+  "complete_factor_calls": 0,
+  "control_candidate": "powers/list with eligible sparse queue versus fixed/list with exact direct fallback; both accepted2MiB plans and all other literal fields identical",
+  "decision": "retain",
+  "factoring_and_diagnostic_actual": {
+    "cpu": 118.93606499999999,
+    "wall": 119.0186263760294
+  },
+  "failures": [
+    {
+      "cpu": 60,
+      "error": "TypeError: object of type 'generator' has no len()",
+      "identity": {
+        "kind": "frozen band analysis"
+      },
+      "index": 51,
+      "phase": "analysis",
+      "receipt": "analysis.json",
+      "status": "failed",
+      "wall": 60,
+      "work": 0
+    }
+  ],
+  "identity": "a1b-terminal-audit-v1",
+  "maxima_bytes": {
+    "owned": 75715392,
+    "queue": 17140480,
+    "rss": 136970240
+  },
+  "meaning": "Exploratory prefixes, no complete-factor speed claim",
+  "measured_calls": 24,
+  "measured_independent_inputs": 6,
+  "measured_per_band": {
+    "50": 3,
+    "55": 0,
+    "60": 3
+  },
+  "pair_audit": [
+    {
+      "id": "a1a_integration_50_0",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "a1a_integration_50_1",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "a1a_integration_50_2",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 7,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 29,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 29,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 29,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 47,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 47,
+      "semantic_hits_equal": true
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_equal": true,
+      "retained_state_equal": true,
+      "seed": 47,
+      "semantic_hits_equal": true
+    }
+  ],
+  "planned_independent_inputs": 9,
+  "receipt_count": 51,
+  "repair": "Original analysis failed on len(generator); materialize the finite input ratios without changing any analysis rule. Read-only audit under ordinary runner-regression/reporting QA; failed analysis reservation remains charged, no new calls.",
+  "reproduction": {
+    "audit": "On an archive copy call v2.benchmarks.qs.a1b_terminal.audit() and save returned JSON to a new destination. Do not rerun timings or the failed original analyzer.",
+    "verify": "/opt/homebrew/bin/pypy3 -B -m v2.benchmarks.qs.a1b verify"
+  },
+  "screen_control_sha256": "de27a0e487285658607ed0b347b94b524dcf3b8750301f4b1ceda17ba01b22a4",
+  "selection_commit": "268ca7a",
+  "source_freeze_sha256": "965bbbf20fb55e59766769f3348e83c489b1f6429089c7a29ac9c04e3909f5d0",
+  "stage_a_remaining_wall_cpu": 230,
+  "stage_b_c_spent": 0,
+  "summaries": {
+    "50": {
+      "control": {
+        "all_paused": true,
+        "calls": 3,
+        "cpu_sum": 5.158057999999997,
+        "mean_counts": {
+          "admitted_atoms": 1408,
+          "blocks": 2146,
+          "candidates": 547035.6666666666,
+          "division_primes": 116407.33333333333,
+          "division_steps": 146221.66666666666,
+          "plan_builds": 18106,
+          "plan_refusals": 0,
+          "plan_replays": 588719.3333333334,
+          "power_hits": 30950095.666666668,
+          "queue_builds": 66,
+          "queue_hits": 1831206.3333333333,
+          "refined_rejections": 531380,
+          "root_hits": 22934885.666666668,
+          "scanned": 8523841,
+          "sparse_prime_visits_avoided": 2912122
+        },
+        "native_cpu_sum": 5.1288239999999945,
+        "native_wall_sum": 5.131221791962162,
+        "owned_max": 75715392,
+        "queue_helper_max": 11275264,
+        "rss_max": 136118272,
+        "wall_sum": 5.160463166190311,
+        "work": 15272718615
+      },
+      "fixed": {
+        "all_paused": true,
+        "calls": 3,
+        "cpu_sum": 6.565610000000021,
+        "mean_counts": {
+          "admitted_atoms": 1408,
+          "blocks": 2146,
+          "candidates": 539038.3333333334,
+          "division_primes": 55008.333333333336,
+          "division_steps": 68138.33333333333,
+          "plan_builds": 99850,
+          "plan_refusals": 7818,
+          "plan_replays": 3246719.3333333335,
+          "power_hits": 30950095.666666668,
+          "queue_builds": 0,
+          "queue_hits": 0,
+          "refined_rejections": 531971.3333333334,
+          "root_hits": 22934885.666666668,
+          "scanned": 8523841,
+          "sparse_prime_visits_avoided": 0
+        },
+        "native_cpu_sum": 6.542572000000021,
+        "native_wall_sum": 6.545317833079025,
+        "owned_max": 65077184,
+        "queue_helper_max": 0,
+        "rss_max": 136249344,
+        "wall_sum": 6.5683612080756575,
+        "work": 15315016747
+      }
+    },
+    "55": {},
+    "60": {
+      "control": {
+        "all_paused": true,
+        "calls": 9,
+        "cpu_sum": 21.846924000000012,
+        "mean_counts": {
+          "admitted_atoms": 196.77777777777777,
+          "blocks": 2146,
+          "candidates": 536311.5555555555,
+          "division_primes": 36033.333333333336,
+          "division_steps": 44338.333333333336,
+          "plan_builds": 18876,
+          "plan_refusals": 0,
+          "plan_replays": 613756,
+          "power_hits": 37652245,
+          "queue_builds": 66,
+          "queue_hits": 2820682.777777778,
+          "refined_rejections": 532233.1111111111,
+          "root_hits": 27472283.666666668,
+          "scanned": 8523841,
+          "sparse_prime_visits_avoided": 10116244
+        },
+        "native_cpu_sum": 21.813292000000004,
+        "native_wall_sum": 21.8225568337366,
+        "owned_max": 62291496,
+        "queue_helper_max": 17140480,
+        "rss_max": 116801536,
+        "wall_sum": 21.856206542812288,
+        "work": 8519489183
+      },
+      "fixed": {
+        "all_paused": true,
+        "calls": 9,
+        "cpu_sum": 40.08018200000001,
+        "mean_counts": {
+          "admitted_atoms": 196.77777777777777,
+          "blocks": 2146,
+          "candidates": 534050.7777777778,
+          "division_primes": 15324.555555555555,
+          "division_steps": 18586.666666666668,
+          "plan_builds": 99542.88888888889,
+          "plan_refusals": 230457.11111111112,
+          "plan_replays": 3236677.111111111,
+          "power_hits": 37652245,
+          "queue_builds": 0,
+          "queue_hits": 0,
+          "refined_rejections": 532384.7777777778,
+          "root_hits": 27472283.666666668,
+          "scanned": 8523841,
+          "sparse_prime_visits_avoided": 0
+        },
+        "native_cpu_sum": 40.043261000000015,
+        "native_wall_sum": 40.08221099944785,
+        "owned_max": 45706280,
+        "queue_helper_max": 0,
+        "rss_max": 116801536,
+        "wall_sum": 40.11914400034584,
+        "work": 12419134803
+      }
+    }
+  },
+  "terminal_audit_commit": "106bf04",
+  "timing_source_commit": "ac70718",
+  "total_charges": {
+    "cpu": 1240,
+    "wall": 1240,
+    "work": 93955256878
+  },
+  "uncertainty": "Descriptive only:50/60 input wall ratio ranges and60 repeated-seed pair ranges. Three independent inputs per measured band; no population slowdown or complete-factor inference.55 has zero measured inputs.",
+  "whole_proposal_remaining_wall_cpu": 21930,
+  "work": 0
+}

@@ -1,5 +1,15 @@
 # Changelog
 
+## A1b existing fixed-score review (2 November 2026 UTC)
+
+- Retain integrated SIQS defaults after the existing fixed/list bundle loses
+  all measured input comparisons at 50/60 digits. Preserve fixed scoring as
+  opt-in; 55 digits is deferred after a finite readiness harness stop.
+- Close the bounded existing-option review with no production arithmetic,
+  defaults or API change. Preserve all 24 prefix calls, failures and original
+  freezes; no complete-factor pilot or fresh campaign was justified.
+  See [decision and limitations](v2/studies/a1b_results.md).
+
 ## C10a-07 combined defaults (1 November 2026)
 
 - At explicit user direction, adopt swapped adjacent sign coordinates for fresh

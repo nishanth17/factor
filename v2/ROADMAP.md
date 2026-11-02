@@ -345,7 +345,7 @@ unrelated accepted improvement.
 | C9a — remaining large-prime yield, target feedback and compact storage | Attribute the literature-verification gaps: yield-dependent retry targets, wider recovered-product intake, asymmetric ordered endpoints, shorter cycles/algebraic duplicates and compact replayable partial records. Coordinate scheduling/scoring with C10a and storage/provenance proofs with B7; C1a owns anchor-only SLP. | Completed C9.2 control and transfer audit; measured affected-stage cost or useful-yield loss | **Open; ranked follow-up.** Start with target feedback/pacing attribution, then residual domains and cycle weight. Splitter/batch/disk work remains profile-gated. Freeze each selected tranche and confirm fresh complete factors under matched total resources; preserve C9 acceptance. | Sol / **xhigh** policy design and implementation; Astra / **xhigh** for changed residual/provenance proofs; Sol / **high** frozen execution/reporting | Existing interfaces support policy work; new admission domains, original-atom lifting or ownership invariants require deeper proof. Native thresholds and raw yield are not PyPy optima. |
 | ~~A1a — selected collector integration and bounded extension~~ | ~~Integrate density+presieve+scan_fused and evaluate selected-power periods/per-root unrolling.~~ | ~~Completed A1/R2, current mainline reconciliation and separate fresh controls~~ | ~~**[x] Delivered and adopted at user direction, 31 October 2026.** [Results](studies/a1a_frozen_results.md): integration passes at 50 digits (6.008% lower cost); 55 remains inconclusive after its full drift extension. [Adoption](studies/a1a_default_promotion.md) enables native 50–55 inclusive at 1 GiB; 51–54 are unmeasured policy extrapolations. The combined extension loses 5.285%/2.994% at 50/55 and stays opt-in. Evidence is archived before worktree cleanup; E1 stays deferred.~~ | ~~Sol / **xhigh** implementation; **high** frozen execution and reporting~~ | ~~Exact scores, finite ownership, charged rebuild/resume, explicit/saved configs and separate uncertainty labels preserved. No component-level or additive gain claim.~~ |
 | A1a follow-ups — quota-aware setup and lifted-root reuse | Bound setup by consumed quota, reuse validated switch metadata, and separately investigate prime-power roots across B transitions. Existing base-prime Gray reuse and per-polynomial plans are controls. | Delivered A1a remains closed; current evidence of material setup/lifting cost after the C10a-07 queue decision | **Conditional backlog.** Separate the two hypotheses; preserve larger-cache losses and existing C8 half-sums. No reopening of delivered A1a or current face/queue freeze. | Sol / **xhigh** design/implementation; Astra / **xhigh** only for an unresolved lifted-root/exceptional-case proof; Sol / **high** frozen execution/reporting | Derived data needs exact base/A/B/backend/power binding, simultaneous ownership and charged interrupted rebuilds. |
-| A1b — existing R2 fixed-score promotion review | Compare only still-relevant implemented fixed-score/clipping combinations against settled current scoring, keeping accepted power plans fixed. | Completed A1/R2/C10; C10a-07 terminal decision and material remaining scoring cost | **Low implementation cost; conditional measurement.** Reconcile old losses first. R2's obsolete 10% floor is not a new gate; neither is it permission to repeat its whole grid. | Sol / **high** reconciliation, runner and frozen analysis; **xhigh** only if score arithmetic or coverage changes | Existing options need scoped matched evidence. New quantization, clipping or recovery semantics require separate arithmetic/oracle work. |
+| ~~A1b — existing R2 fixed-score promotion review~~ | ~~Reconcile implemented fixed-score/clipping options against settled integrated collection, holding accepted plans fixed.~~ | Completed A1/R2/C10 and C10a-07 terminal integration | **[x] Bounded existing-option review complete.** [Decision](studies/a1b_results.md): retain defaults; fixed/list bundled prefixes lose50/60 on all three inputs per band,55 deferred after readiness allocation stop. No pilot/fresh campaign or new mechanism; fixed remains opt-in. | Sol / **high** throughout | Historical R2 loss preserved; no universal 10% floor, isolated score-arithmetic claim or complete-factor inference. |
 | A1c — same-modulus two-root interleaving | Assess one shared stride loop for two distinct roots of a prime or power, including sorted translated offsets, tails and scalar exceptional-root fallback. Specify reservation/cancellation boundaries and charged interrupted-block replay before implementation. | Settled A1a kernels and demonstrated remaining dense-marking cost | **Conditional follow-up.** Source-supported but deferred from the current two-kernel extension: interleaving changes the existing root-by-root mutation/reservation boundary. Preserve low-allowance behavior and compare complete factoring against the settled A1a control. | Sol / **xhigh** design and implementation; **high** frozen experiments; Astra / **xhigh** only for an unresolved atomicity proof | Arithmetic coverage is elementary; budget atomicity, bounded polling and exact resume are the main risks. This is distinct from the historical paired-polynomial kernel and does not reopen it. |
 | A2a — inverse-microkernel follow-up to completed backend study | Compare batched binary/Montgomery inversion and small-integer quotient shortcuts (AP32/AP33) only for newly profiled inversion-dominant sizes, against native Euclid/GMP including conversions and nonunits. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Low/conditional.** Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. | Sol / **xhigh**; targeted Astra proof review if required | Bounded backend controls already exist; changed inverse/nonunit semantics need independent arithmetic checks. |
 | A7a — SIQS worker-granularity follow-up | Compare historical SIQS family-sharing/partitioning with existing bounded QS workers (AP37), only after measured setup/coordination cost motivates the alternative. F4 integrates any selected worker result. | Completed A7; B12 contracts; stable serial control and F4 experiment gate | **Conditional.** No generic worker reimplementation or changed A7 closure. Charge shared stores, barriers, aggregate work/RSS, cancellation and restart; Java thread behavior is not PyPy evidence. | Sol / **xhigh** | Assignment identity, leases, private state and cancellation/restart accounting. |
@@ -2304,39 +2304,33 @@ shortlisting evidence, not an A1a extension adoption or a complete-cost claim.
   include setup/replay in complete factoring. C8 scheduling and the setup/root
   reuse follow-ups above remain separate.
 
-#### A1b — Existing fixed-score promotion follow-up (after completed A1 and C10)
+#### A1b — Existing fixed-score promotion review (closed bounded tranche)
 
-**Model:** GPT-6.1 Sol / **high** for source reconciliation, the existing-option
-runner, frozen execution and analysis. Escalate to **xhigh** only for a selected
-change to score arithmetic, clipping/quantization, candidate coverage or resume.
-Start after the current C10a-07 terminal decision; establish that scoring still
-has material cost under its settled collector before scheduling measurements.
+**Model:** Sol / **high** throughout reconciliation, runner, execution and
+reporting. [Terminal report](studies/a1b_results.md) and
+[numerical summary](studies/a1b_results.json) preserve the evidence and limits.
 
-This is an adoption/validation task for remaining implemented fixed-score
-options, separate from C10's closed plan study and A1a's new kernels. R2's immutable source,
-measurements and retain-defaults verdict stay unchanged. Its fixed-score plus
-plan arm showed smaller conditional gains, but missed its frozen 10% training
-floor. C10 has since selected the 2 MiB plan for two exact native bands on
-new fresh evidence; that comparison must not be repeated or attributed to
-A1b. The current promotion policy has no universal minimum percentage.
+- [x] Reconcile original R2 losses/integration, accepted C10 plans, A1a and
+  final C10a-07 production control 4a946b8. Preserve original freezes and the
+  obsolete10% historical verdict without reimposing it. Inspect effective
+  callers, backends, clipping, kernels, queue fallback, ownership and resume.
+- [x] Freeze one existing fixed/list challenger and execute its bounded
+  current-control screen:24 validated prefix calls, three independent inputs
+  each at 50/60. Both bands lose all input comparisons and fail the unchanged
+  advancement rule.55 has zero measured pairs after a finite readiness
+  allocation error; no performance verdict there. Preserve analyzer failure
+  and the separately identified reporting-only correction, all charges and
+  durable archive. No full-factor pilot or fresh confirmation is justified.
+- [x] Decide **retain current integrated defaults, fixed opt-in, defer55**.
+  Committed-only tests/lint/imports and exact integration/resume checks pass.
+  This closes the existing-option review, not a complete-factor adoption gate.
+  No arithmetic, API/default change, merge/push or E1 reopening.
 
-- [ ] Reconcile R2's retained evidence, current code/configuration changes and
-  default callers. Identify which earlier arithmetic, API and resume checks
-  remain applicable; do not reimplement scoring or repeat the whole R2 study.
-- [ ] Freeze a focused comparison of the existing streamed, fixed-score and
-  remaining fixed-score combinations on the accepted current-mainline
-  plan control where relevant, with matched
-  inputs, seeds and work/time/storage allowances. Separate fixed scoring from
-  plan setup/storage where needed. Use fresh complete-factor evidence for a
-  new current-default claim, validated PyPy 3.11 warmup, nine or more samples
-  and the shared performance lock. Include unresolved work and memory cost.
-- [ ] Decide scoped adoption, retention as opt-in, or deferral under the revised
-  end-to-end promotion policy. Check output identities/certainty, compatible
-  resume and API/default behavior; run tests/lint for any implementation or
-  default change and document the accepted scope. No arbitrary 10% floor.
-- [ ] Use settled C9/C10 selectors for a claim in their 40/50-digit bands.
-  Shared files and heavy timings need coordination; broader collector
-  mechanisms remain C10a/A1a.
+Fixed scoring bypasses current sparse queues, so this is a bundled scoring /
+scheduling result. **A1b-F1**, policy-bound fixed-score queues, is a deferred
+new integration requiring exact coverage, ownership and charged rebuild gates;
+no automatic implementation or campaign is scheduled. New quantization,
+clipping, sparse representations and normalized forms remain outside A1b.
 
 #### A1c — Same-modulus two-root interleaving (conditional)
 
