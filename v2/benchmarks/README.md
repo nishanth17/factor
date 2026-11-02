@@ -366,3 +366,8 @@ The checker is not an execution runner. Bounded worker/ledger adapters,
 readiness evidence and a post-calibration nominee release remain explicit
 prerequisites. The owned mainline control imports without Git history or
 archived worktrees; the old pilot source freeze remains unchanged.
+
+Design commit `14caea4` passed 875 tests (nine optional-backend skips), lint,
+208 benchmark/study imports and the numerical/source checker from a
+committed-files-only export. These checks include all proposed literal
+configurations and isolated-control loading; they ran no performance calls.
