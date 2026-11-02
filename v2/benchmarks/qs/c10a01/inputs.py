@@ -17,7 +17,7 @@ RESIDUES = {60: (1, 3), 62: (5, 7), 65: (3, 1), 70: (7, 5)}
 
 
 class GenerationRandom(random.Random):
-    """Bound all candidate and classifier random draws in the reused sampler."""
+    """Bound candidate and classifier draws in the reused sampler."""
 
     def __init__(self):
         super().__init__(202611020100)
@@ -37,7 +37,7 @@ class GenerationRandom(random.Random):
 
 
 def validate(corpus):
-    """Check exact input size, split, uniqueness, residues and all proof nodes."""
+    """Check sizes, splits, unique factors, residues and prime proofs."""
     verify_certificates(corpus["certificates"])
     seen = set()
     assert len(corpus["fixtures"]) == 8
@@ -78,9 +78,10 @@ def generate():
             else:
                 raise RuntimeError("finite input-cell attempts exhausted")
             used.update((p, q))
+            balance = "balanced" if index == 0 else "35_65"
             rows.append(
                 dict(
-                    id=f"c10a01_{digits}_{'balanced' if index == 0 else '35_65'}",
+                    id=f"c10a01_{digits}_{balance}",
                     digits=digits,
                     balance_index=index,
                     n=n,
@@ -96,7 +97,7 @@ def generate():
         fixtures=rows,
         certificates=certificates,
         draws=generator.draws,
-        conditioning="Pocklington shape, exact decimal size, residue and split; "
+        conditioning="Pocklington shape, decimal size, residue and split; "
         "exposed exploratory inputs, not uniform RSA or fresh confirmation",
     )
     validate(corpus)

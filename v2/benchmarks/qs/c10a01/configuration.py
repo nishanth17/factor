@@ -16,6 +16,11 @@ ATOMS = {60: 65536, 62: 98304, 65: 131072, 70: 196608}
 PARTIALS = {60: 32768, 62: 49152, 65: 65536, 70: 98304}
 
 
+def outside_job_reserve(digits):
+    """Keep assignment ownership and bounded harness state inside the tier."""
+    return 16 * 2**20 + 65536 + 512 * COUNTS[digits]
+
+
 def configuration(digits, arm, *, multiplier=0):
     """Only the selected representation and ranking differ within a pair."""
     if digits not in COUNTS or arm not in (
@@ -42,7 +47,7 @@ def configuration(digits, arm, *, multiplier=0):
         filter_row_growth=32,
         sign_policy="swap_high",
         solve_policy="collection",
-        memory_bytes=OWNED[TIERS[digits]],
+        memory_bytes=OWNED[TIERS[digits]] - outside_job_reserve(digits),
         checkpoint_bytes=1048576,
         collector=GrowingDoubleLargeSieveConfig(
             sparse_queue_bytes=32 * 2**20,

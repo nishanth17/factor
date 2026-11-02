@@ -1,0 +1,14 @@
+{
+  "identity": "c10a01-calibration-v1",
+  "prefix_polynomials": {"60": 128, "62": 128, "65": 128, "70": 128},
+  "observer_polynomials": {"60": 32, "70": 32},
+  "seed": 7,
+  "positions_per_polynomial": 131073,
+  "blocks_per_polynomial": 33,
+  "prefix_positions": 16777344,
+  "observer_positions": 4194336,
+  "max_polynomial_records_per_call": 4096,
+  "max_observer_block_records_per_call": 8192,
+  "max_receipt_bytes": 2097152,
+  "note": "Two full A families at the 64-polynomial quota; final block has one position. Forced policies and memory fixtures use separate declared records before launch."
+}
