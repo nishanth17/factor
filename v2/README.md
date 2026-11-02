@@ -5,6 +5,37 @@ Python integers or optional GMP integers. v2 repairs the
 [original v1](../v1) implementation
 and adds bounded, resumable execution and experimental relation-based engines.
 
+## Combined SIQS collection defaults
+
+Fresh automatic SIQS jobs select `sign_policy="swap_high"`: the highest two
+variable CRT-sign coordinates are swapped, preserving adjacent Gray updates.
+Native calibrated collectors also select `sparse_queue_bytes=32 * 2**20`.
+Eligible power-scoring/list/bucket collectors schedule sparse prime/power hits
+per polynomial; other score/recovery modes, singular sparse roots, unaligned
+blocks or bounded capacity refusal use ordinary exact marking. No prime hit,
+candidate check or residual validation is omitted. Reference configurations and
+existing size/routing/work limits remain in force outside calibrated bands.
+
+The queue's actual conservative reservation competes with atoms/matrix scratch
+inside the existing owned-memory limit; it is released on polynomial change and
+rebuilt with charged work after interruption/resume. No derived queue is trusted
+from a checkpoint. Face metadata has a bounded256 KiB reservation. Factory kernel,
+plan and pacing fields are chosen before helper accounting, retaining A1a.
+
+Explicit `SIQSConfig()` and `SieveConfig()` retain canonical signs and no queue.
+Opt in explicitly with `sign_policy="swap_high"` and collector
+`sparse_queue_bytes` (0 through32 MiB). Set `sign_policy="canonical"` and queue
+bytes0 for the former policies. New-policy jobs write SIQS checkpoint version7;
+versions1–6 restore their saved canonical/no-queue policies, and existing explicit
+configuration/extension compatibility checks remain binding. Portfolio and CLI
+snapshots retain their selected policies. This changes no ECM/SSS policy or
+whether a portfolio enables SIQS. Experimental workers keep explicit schedules.
+
+This is [user-directed adoption](studies/c10a07_default_promotion.md). The
+23.1% observed combined wall-cost reduction was measured on nine fresh inputs
+at50/55/60 digits, with a missing first-process drift endpoint. Other sizes,
+backends and grants are unmeasured policy extrapolations, not confirmed speedups.
+
 ## Methods
 
 | Method | Role and status |

@@ -1,160 +1,224 @@
-# C10a-07 consolidated face and queue comparison
+# C10a-07 face and queue terminal results
 
-Fresh-panel execution is in progress; nomination is complete. This is the
-existing C10a-07 task, with one bounded
-45/50/55/60-digit panel replacing execution of the two unstarted60-only screens.
-Historical controls and accounts remain unchanged. No performance acceptance,
-default change, merge, push or E1 promotion is claimed.
+Subsequent decision: [combined production defaults were adopted at explicit
+user direction](c10a07_default_promotion.md). The experimental findings, original
+recommendation and limitations below remain unchanged. Evidence has moved to
+`v2/audit/archives/c10a07-20261101/`; numerical metadata records its preserved path.
 
-Execution resumed through a separately identified warmup harness repair after
-the first12 fresh observations. All15 completed timed calls, including
-nomination, are retained without reruns. The old warmup whitelist omitted the
-native `stalled_yield` reason; it expected `stalled`. A finite audit showed the
-45-digit prefix stops normally after80 blocks in0.120 seconds, rather than
-exhausting time or memory. The repair recognizes that valid outcome during
-warmup only. Timed native results, factoring code, corpus, order, caps and all
-historical freezes remain unchanged.
+The bounded comparison is complete: **42 timed calls**, with all nine fresh
+50/55/60-digit inputs factoring correctly in every arm. Queue reduced observed
+complete wall cost by **22.4%** and CPU by **22.4%**; face+queue reduced them by
+**23.1%** and **23.0%**, respectively. These are exploratory estimates, not
+accepted default improvements: the first process lacks final drift evidence.
+Nominate **queue alone** for production integration and clean fresh confirmation;
+the combination adds only0.86% observed wall benefit beyond queue, without an
+established incremental benefit. Defaults remain unchanged; E1 stays deferred.
 
-## Fixed scope and identities
+[Exact numerical summary](c10a07_panel_results.json) contains input-level costs,
+certainty/unresolved factors, counter and evidence identities, uncertainty,
+resource accounts and archive hashes. No old quota grid, calibration or queue
+prefix campaign was repeated. The two unstarted60-only screens were superseded
+for execution; their freezes and accounts remain intact.
 
-Worktree `/Users/nishanthmohan/Documents/code/factor-c10a07-panel`, branch
-`codex/c10a07-panel`. Production source remains mainline e520ec9. New integration
-source/protocol/tests: `9757105`; control commit: `8abbf09`. Freeze SHA-256:
-`2d2564a0948411b7a3d144ff5178ed0d2d266d7109c00d1f5ab30c3679a1c5a2`.
+## Inputs and stages
 
-The existing exact queue and face implementations are reused. A study wrapper
-also supports unchanged nonstreaming reference jobs at45. Helper reservations
-now fit **inside1 GiB total ownership**, preserving the factory-selected
-marking, plan and pacing fields; this differs from the earlier fused-only queue
-prefix experiment with additional helper memory. All arms retain proper-factor,
-reconstruction, certainty and finite-budget checks. No factoring-library file
-is changed.
+Nomination used one exposed60-digit input, three calls: control1370.551s,
+complement1323.801s, swap1305.662s. All completed exactly. Selection of
+`swap_high` was committed as33bea9f before fresh generation. Those three calls
+are one independent input, not three, and supply no acceptance inference.
 
-Only exact PyPy3.11 at
+Twelve fresh moduli were generated and independently proof-validated before
+measurement: three each45/50/55/60, two balanced and one approximately35:65
+factor-bit split per size,24 distinct ordinary prime factors. Digits, achieved
+bit lengths, residues, exact products and exclusion against2237 prior moduli /
+3344 factor entries were checked. This uses the existing Pocklington-conditioned
+generator, not uniform RSA sampling. SIQS receives only N and seed; certified
+input factors do not upgrade its literal probable-prime output labels.
+
+The completed schedule contains39 fresh observations on10 independent inputs:
+36 successful active-band calls on nine inputs, plus three unresolved45 calls
+on one input. All three45 arms stop with native `stalled_yield` in under0.2s;
+this is the configured finite stop, not time or memory exhaustion. The frozen
+futility rule leaves the other two45 inputs / six cells unvisited. Queue is
+bypassed at45; combined is an exact face alias there and was never duplicated.
+There are no lost/censored timed cells, overshoots or selective timed reruns.
+
+Integration checks, nomination, committed fresh generation, matched observations,
+terminal analysis and archival are complete. The parent's native confirmation
+report was not invoked without its prerequisites. A separately identified
+continuation completed only unvisited cells. Production integration and adoption
+confirmation remain conditional, separately frozen work; no additional campaign
+was launched.
+
+## Complete cost and uncertainty
+
+Each primary queue/combined comparison has nine fresh independent inputs,
+three per active size. Ratios are input-cluster bootstrap estimates within size
+bands, with equal band weighting,50000 replicates and frozen seeds. All active
+controls already complete9/9: these are cost observations, not completion gains.
+
+| Arm versus current control | Wall ratio | Adjusted two-sided interval | CPU ratio | Completion |
+| --- | ---: | --- | ---: | --- |
+| Queue | 0.7761 | 0.7430–0.8184 | 0.7756 | 9/9 versus9/9 |
+| Face + queue | 0.7694 | 0.7392–0.8099 | 0.7696 | 9/9 versus9/9 |
+
+These99.17% intervals apply the frozen alpha0.05/6 allocation. They describe
+input sampling conditional on the recorded clocks; they do not cover missing
+temporal-drift evidence. Both arms meet the numerical wall/CPU bounds, with no
+control-only completion. **The original adoption gate does not pass.**
+
+Face's prescribed primary population has only10/12 observed inputs, including
+the unresolved45 input. Its incomplete finite-budget service-cost estimate is
+inconclusive and is not an overall factoring speedup. Active-band summaries
+below are descriptive, three inputs per row; a negative reduction means slower.
+
+| Digits | Face wall reduction | Queue wall reduction | Combined wall reduction |
+| --- | ---: | ---: | ---: |
+| 50 | -3.23% | 15.28% | 15.65% |
+| 55 | 0.09% | 26.47% | 26.97% |
+| 60 | 10.24% | 24.97% | 26.06% |
+
+The first60 face-only call's29.2% timing difference did not replicate: the other
+two60 face differences were1.8% lower and4.0% higher cost. The combination's
+incremental wall ratio to queue is0.99139 (0.86% lower), CPU0.99234. This does not
+establish that the face should accompany queue. No component percentages or
+historical-study percentages are added.
+
+Input-level wall seconds, ordinal within each size:
+
+| Digits / input | Control | Face | Queue | Combined |
+| --- | ---: | ---: | ---: | ---: |
+| 50 / 0 | 23.394 | 23.692 | 20.598 | 20.371 |
+| 50 / 1 | 38.402 | 40.248 | 32.829 | 32.951 |
+| 50 / 2 | 47.872 | 49.607 | 38.678 | 38.458 |
+| 55 / 0 | 138.561 | 137.484 | 99.227 | 99.824 |
+| 55 / 1 | 100.256 | 99.260 | 74.947 | 72.721 |
+| 55 / 2 | 112.332 | 114.038 | 83.428 | 83.722 |
+| 60 / 0 | 947.671 | 671.343 | 810.273 | 795.553 |
+| 60 / 1 | 610.513 | 599.613 | 442.456 | 432.514 |
+| 60 / 2 | 626.836 | 651.614 | 427.291 | 425.999 |
+
+## Repair, drift and correctness
+
+After12 fresh calls, the first process exited during45 warmup: its whitelist
+expected `stalled`, whereas native reference SIQS returns `stalled_yield`.
+This was an avoidable harness preparation error, not a factoring correctness or
+resource failure. A finite two-prefix audit confirmed the native stop after80
+blocks in0.120s. Its40-second reservation and the failed warm's20s /1e13 work
+reservation remain charged. The failed warm's actual clocks were not retained.
+
+Repair source/protocol/tests a46e482 and control32e73eb preserve the old freeze.
+Only warmup recognizes the valid native outcome; timed results remain literal.
+Real45 readiness then passed all three arms, >=3 validated wall AND CPU seconds
+with the original last-three stability rule. Every new measurement process
+rewarmed. No saved timed cell was repeated and no cap or arithmetic gate changed.
+The continuation makes sentinel starts durable and attempts ends on exit.
+
+| Continuation band | End/start wall | End/start CPU | Drift gate |
+| --- | ---: | ---: | --- |
+| 45 | 1.2195 | 1.2170 | Fails1.20 limit |
+| 50 | 0.9502 | 0.9584 | Pass |
+| 55 | 0.9860 | 0.9852 | Pass |
+| 60 | 1.1379 | 1.1193 | Pass |
+
+The stopped parent has no end sentinels. They cannot be reconstructed from a
+new process. Continuation-only active evidence has six inputs, not the required
+nine. Neither omitting the old observations nor silently treating missing drift
+as passed supports adoption. Retain the exploratory evidence and defaults.
+
+Every reported divisor is proper and every result reconstructs exactly,
+including unresolved cofactors. Independent final auditing checks42 receipt
+hashes, labels, ownership and unique measured cells. All18 completed
+control/queue and face/combined pairs match exact retained-state signatures and
+candidate/coverage counters. Some original automatic integration comparisons
+addressed top-level instead of nested counters; the independent audit checks
+the actual nested values and finds no discrepancy. No executable was patched
+inside either frozen identity.
+
+Observation is disabled in timed calls. Queue preserves positions, root/power
+hits, candidate refinement, admitted atoms and retained relations while avoiding
+repeated empty sparse-prime visits. This supports the throughput mechanism, not
+a better useful-relation yield. No face-level causal useful-dependency attribution
+is available. Refined rejections precede ordinary prime division; high counts
+justify no threshold relaxation. Mixed dependency touches overlap. Summed raw
+plan/queue byte gauges are not resident peaks; the checked helper high-water
+field and process RSS are reported separately.
+
+## Identities, resources and archive
+
+Runtime source remains mainline **e520ec9**, integration/protocol9757105 and
+control8abbf09; selection33bea9f and corpus/order f53a294 precede fresh timing.
+Mainline observed at reporting is090f8e5, differing only in public roadmap/study
+documents; factoring runtime is unchanged. Neither historical92543797 controls
+nor the later A1a adoption were substituted into old measurements.
+
+Exact interpreter:
 `/opt/homebrew/Cellar/pypy3.11/7.3.23_2/libexec/pypybin/pypy3.11`, SHA-256
 `3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2`.
-The runner acquires `/private/tmp/factor-performance.lock` itself. No agents or
-simultaneous performance campaigns.
 
-## Observations and advancement
+- Parent freeze: `2d2564a0948411b7a3d144ff5178ed0d2d266d7109c00d1f5ab30c3679a1c5a2`.
+- Continuation freeze: `3ed32cf987d2bb91f533ffc8beacbe83227a6bf5095b9c97a242ea4ffbf21ae8`.
+- Fresh corpus: `c4e844fff20506fa852baa3a0de6302b040cf3ad069978ba3cba073fbcab40f3`.
+- Schedule: `095d7909053ab85a8510e30b8f1e35b44cb3cad083b9cfe47ae0990b17310ee2`.
 
-1. Integration check:18 short128-block calls on existing50/55/60 inputs.
-   Each queue/combined arm matched its corresponding control's exact retained
-   state and coverage/recovery counters. Reference-mode arithmetic and resume
-   are independently tested. This is not additional timing evidence.
-2. Nomination: three complete-cost calls on the first exposed60-digit input,
-   canonical/control, complement_high and swap_high. Rank the two faces by
-   completion, capped wall, CPU and arm name. One exposed input cannot establish
-   a gain or block fresh measurement merely because control wins. Commit the
-   exact selection before generation.
-3. Fresh panel: three new independent inputs at each45/50/55/60,12 total.
-   Control/face/queue on every input, plus combined on all nine50/55/60 inputs.
-   At45 the queue hook is bypassed, so combined is an exact face alias and its
-   duplicate timed call is omitted. Maximum3+36+9=**48 measured calls**, not
-  48 plus either old screen. The12 fresh moduli are independent of nomination.
+Recorded completed-call consumption, including checks/warm/generation, is
+**13312.083 wall /13279.867 CPU seconds** (about3h42m wall). The lost warm actual
+adds between0 and20 seconds to each. Conservative cumulative charges are
+45430 wall/CPU seconds and14308059871447 work units;3950 wall/CPU seconds and
+1705691950128553 work remain in the original accounts. Remaining phase allowances
+are80s checks,3120s warm and750s unvisited confirmation; none is borrowed or spent
+to fill a cap. All measured confirmation resources stay separate from exploration.
 
-The fresh inputs use the existing independently verified Pocklington-conditioned
-generator, two balanced and one moderately uneven product per band. Exact digits,
-achieved factor lengths, residue classes, distinct factors and overlap against
-2237 earlier moduli/3344 factor entries are checked. This is not uniform RSA
-sampling or the separately proposed second sampling family. The corpus and
-exact arm order must be committed before fresh measurement.
+Committed QA recorded145.860s across the retained old, new and final source
+verification runs, plus under5s
+of local focused checks, within600s. Native analysis took1.242s within120s;
+archive creation/verification0.716s. Fresh process RSS high-water379.1 MiB overlaps
+arms; maximum reported native workspace580.6 MiB and checked queue helper peak
+16.0 MiB remain below1 GiB total logical ownership and3 GiB RSS. Raw outputs use
+1085416 bytes within512 MiB. No production memory exhaustion occurred.
 
-Nomination selected `swap_high`, committed as `33bea9f` before generation.
-All three calls completed exactly on the same exposed input:
+Durable local archive:
+`factor-c10a07-panel-continuation/v2/audit/results/c10a07_panel_continuation/terminal-evidence-v1.tar`,
+26265600 bytes,916 source/evidence files verified individually. SHA-256:
+`8635604d3d85ea8d1ea38c97499d7eae8e0994d71e1bd335cc7f017b72c4f607`;
+manifest SHA-256:
+`e96a6b41ffca2db51ad5f129595ea1dbe802a2b291640521b3e4408c9af97ca4`.
+Receipts, ledgers, failed reservation, consoles, audit, source/control/corpus and
+QA remain ignored locally and archived; none was force-added.
 
-| Arm | Wall seconds | CPU seconds |
-| --- | ---: | ---: |
-| Control | 1370.551 | 1364.678 |
-| Complement | 1323.801 | 1323.479 |
-| Swap | 1305.662 | 1305.139 |
+Committed-only32e73eb source passed857 PyPy tests (nine skipped), full lint,
+215 benchmark imports and strict loader verification with the explicitly
+retained parent evidence. One existing read-only `ps` test initially hit sandbox
+permission denial and passed on its isolated rerun. No suite was selectively
+repeated to improve performance data. Source-only tests/imports require committed
+files; resumption provenance additionally requires the archived receipts.
 
-The swapped face's4.7% wall/4.4% CPU difference is exploratory evidence from
-one independent input, not accepted performance. Exact numerical results and
-receipt hashes are committed in `c10a07_panel_nomination.json` in the execution
-branch. The control preserves historical work195193348085 and scanned
-positions1048674112; the historical cold timing is not a matched comparator.
+To reproduce analysis, restore an archive copy and the pinned source/control
+files at the documented worktree paths, then use the exact interpreter with
+`-m v2.benchmarks.qs.c10a07_panel_continuation.study verify` and `report`.
+The committed protocol supplies full execution/recovery commands. Preserve the
+original archive; analysis on a copy may have a different elapsed-time field.
+Do not rerun any measured stage to reconstruct an unfavorable observation.
 
-The12 fresh inputs and order are independently validated and committed as
-`f53a294`, before any confirmation observations. They have24 distinct prime
-factors, two balanced and one moderately uneven case per band. Corpus SHA-256:
-`c4e844fff20506fa852baa3a0de6302b040cf3ad069978ba3cba073fbcab40f3`.
-Order SHA-256:
-`095d7909053ab85a8510e30b8f1e35b44cb3cad083b9cfe47ae0990b17310ee2`.
+## Terminal decision and next priority
 
-Each new process requires >=3 validated wall AND CPU warmup seconds, with the
-declared last-three stability gate. Warmup, startup, integration checks and
-instrumentation are excluded from performance evidence. Measurements include
-validation and GC cleanup. Fixed-control warm sentinels check process drift.
+Historical quota and face studies remain scoped inconclusive with no accepted
+clean speedup; their shared three inputs cannot be pooled. The [retained recovery
+report](c10a07_recovery_results.md) records their recorder failures, limits and
+charges. This new panel supplies direct clean comparisons under its own identity.
 
-Per-call wall AND CPU caps:45=120s,50=300s,55=900s,60=1800s;1e13 work each.
-Measured reservation maximum42720s; warm6000s; integration480s; generation180s.
-Total49380 wall/CPU reservation seconds and1.72000001e15 work, separate analysis
-120s/QA600s. Expected measured4–7 hours, recalibrated from clean observations.
-No automatic cap increase or unstable-cell retry. All-arm unresolved first
-blocks close the affected band inconclusive without blocking other bands.
+The bounded C10a-07 panel and reporting are complete. **Nominate queue alone;
+retain defaults and conclude adoption inconclusive under the original gates.**
+The added face is not justified for adoption by its small incremental result.
+A checked production port and separately frozen fresh bridge are the next useful
+step if adoption is pursued, not another diagnostic or repeat of old grids.
 
-Queue and combined primary comparisons use nine fresh active-band inputs;
-45 queue cells check fallback. Face comparison uses the12-input panel. Bands
-with three inputs remain descriptive. Input-cluster uncertainty, completion,
-capped service cost versus complete cost, censoring, CPU and drift remain
-separate. Missing prescribed observations or failed drift gates prevent an
-acceptance recommendation. No percentage chaining or per-digit confirmed claim.
-
-## Verification and live evidence
-
-Repair source/tests/protocol commit `a46e482`, control commit `32e73eb`;
-continuation control SHA-256:
-`3ed32cf987d2bb91f533ffc8beacbe83227a6bf5095b9c97a242ea4ffbf21ae8`.
-The isolated continuation deducts every parent/audit charge from the original
-accounts and completes only unvisited cells. Its committed-only checkout ran
-857 tests, nine skipped. The sole initial error was sandbox denial of read-only
-`ps` in an existing test; that test passed with the required access. Full lint,
-215 benchmark imports and the pinned loaders pass. Real45 warm readiness passes
-all three arms with >=3 wall AND CPU seconds and the unchanged stability rule;
-the measurement process rewarms separately.
-
-The parent exited before its end-of-process drift checks. Those missing checks
-cannot be restored after exit, so its timings remain exploratory. Continuation
-sentinel starts are durable and ends are attempted on completion or failure.
-Composite estimates cannot pass the original adoption gate using missing parent
-drift. This limitation is retained rather than silently relaxing that gate.
-
-First fresh input per active band, wall seconds (one independent input per row,
-descriptive only):
-
-| Digits | Control | Face | Queue | Face + queue |
-| --- | ---: | ---: | ---: | ---: |
-| 50 | 23.394 | 23.692 | 20.598 | 20.371 |
-| 55 | 138.561 | 137.484 | 99.227 | 99.824 |
-| 60 | 947.671 | 671.343 | 810.273 | 795.553 |
-
-All twelve factorizations reconstruct exactly. Control/queue and face/combined
-retained state and coverage counters match. The first60 face timing difference
-is much larger than its0.8% reduction in scanned positions; a useful-yield
-improvement or causal mechanism is not established. The combination is slower
-than face alone on that input, so component percentages cannot be added.
-
-The first45 matched block completes unresolved in every arm with the native
-`stalled_yield` stop in under0.2 seconds. Only45 closes inconclusive under the
-original futility rule; its other six cells remain unvisited. This is neither
-time/memory exhaustion nor evidence about portfolio factoring. The second fresh
-60-digit block is running. At this update18 total timed calls are saved.
-
-The committed-only8abbf09 checkout passed **853 PyPy tests,9 skipped**, lint,
-214 benchmark imports and frozen-loader verification. Full tests/lint took
-95.166 seconds; generated QA stays ignored. All18 integration checks passed.
-An independent receipt audit additionally verifies the actual nested collector
-counters for all nine pairs; some automatic field comparisons addressed the
-top-level rather than nested counter dictionary. Exact-state checks were already
-effective. The frozen executable is unchanged. Per-block queue peak gauges sum
-in raw aggregates; `result.queue_reserved_peak` is the checked helper peak.
-
-Current measurement output:
-`factor-c10a07-panel/v2/benchmarks/results/c10a07_panel/`.
-Reissue the same stage command and output after interruption. Saved receipts
-settle; missing timed receipts remain censored and charged; only unvisited cells
-continue after rewarm. Arithmetic/provenance failure requires audit, not repair
-inside this freeze. The handoff/protocol in the panel worktree provide exact
-commands. Terminal numerical summary and durable evidence archive will be added
-after execution. Existing recovery/source-gap archives remain intact.
+The [reconciled follow-up design](c10a07_recovery_followup.md) proposes18 calls on
+nine fresh inputs total across50/55/60, not nine per band. It excludes every
+current input/factor and requires intact drift evidence. The24-input60-digit
+balance/residue panel with a second sampling family remains a later conditional
+generalization design. Explicit61/62 feasibility precedes any justified move
+toward65; no larger sweep is scheduled. Special forms and portfolio behavior
+remain separate. The [roadmap](../ROADMAP.md) records A1b/A1c and the other existing
+owners with model/effort recommendations; A1a remains delivered. No new default,
+merge, push, automatic follow-up campaign or E1 promotion occurred.

@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-01 America/Los_Angeles",
+  "decision": "Explicit user-directed combined default adoption; original statistical acceptance remains inconclusive",
+  "e1_deferred": true,
+  "evidence_preservation": {
+    "cleanup_sha256": "035fc61221cacfec987e67b26853e992c1898547f83bce4d162ce60803026fba",
+    "commits_retained": true,
+    "manifest": "v2/audit/archives/c10a07-20261101/manifest.json",
+    "removed_worktrees": 16,
+    "sha256": "0f81e1fd346cc34a851ee26902c047cd30fbebc45d4c17df49428e8fe5d671a9"
+  },
+  "fresh_confirmation_run": false,
+  "no_merge_or_push": true,
+  "observed_panel": {
+    "combined_cpu_reduction_percent": 23.03729575859552,
+    "combined_wall_reduction_percent": 23.05982436849489,
+    "incremental_combined_wall_reduction_percent": 0.861047983695063,
+    "independent_active_inputs": 9,
+    "queue_wall_reduction_percent": 22.39157862103373
+  },
+  "performance_campaign_run": false,
+  "qa": {
+    "benchmark_imports": 194,
+    "committed_only_source": "308a4f1",
+    "lint": "pass",
+    "prepared_loader": "pass",
+    "seconds": 49.4795095839072,
+    "skipped": 9,
+    "tests": 829
+  },
+  "qa_archive": {
+    "bytes": 317440,
+    "files": {
+      "cleanup-plan.json": "626f2acd2c000f48ed2e06217d6ed3997fba1a05d24f497c793f65cbad5cfebc",
+      "qa-0946824.json": "df823d366af7246be462ec6197aee49fa6c76b3fe9ee273299fdfe22c6db8e4b",
+      "qa-0946824.txt": "715c7801d1b838a5aae9a3df934e01d21671988ea8523c4b18044c48584950c1",
+      "qa-308a4f1.json": "1e4bf54e357cf317b815139ea7ac27cf816b3ba33d9437d7f6d5cc66b24bf3b9",
+      "qa-308a4f1.txt": "1dd5c604daa189423afae44ad12c7d34d1ec1a99315a7f652c321e95aed720e6"
+    },
+    "path": "v2/audit/archives/c10a07-20261101/adoption-qa-v1.tar",
+    "sha256": "7e31ede66b82ad2eac6dd832b1c791787ed4f86af0ffd0b858c50bc85356e95b"
+  },
+  "queue_ceiling_bytes": 33554432,
+  "schema": "c10a07-default-adoption-v1",
+  "scope": "Fresh automatic SIQS configs; exact eligible queue/fallback; explicit and saved policies retained",
+  "selected_face": "swap_high",
+  "source_commits": [
+    "0946824",
+    "308a4f1"
+  ]
+}

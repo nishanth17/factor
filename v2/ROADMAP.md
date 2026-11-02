@@ -2001,7 +2001,7 @@ training informed an explicit user-directed default promotion.
   yield-dependent target feedback.
 - [ ] Keep the separate C10a-06 runner tranche open. C10a-05 fixes repeated
   lease markers only in its new runner; the frozen C10 runner is unchanged.
-- [ ] **C10a-07:** investigate within-A Gray quota and traversal policy using
+- [x] ~~**C10a-07:**~~ investigate within-A Gray quota and traversal policy using
   current leading implementations and primary SIQS research. The
   local NFS reference trace identifies full
   2^(r-1) reuse with smaller intervals; v2 currently takes a capped Gray
@@ -2009,7 +2009,8 @@ training informed an explicit user-directed default promotion.
   few coupled quota/interval/A-factor bundles. Keep C10a-04's freeze intact,
   A-product population/overlap with C10a-02, kernels with A1a and CRT hit
   scheduling with C8. This is an open research/experiment gate, not a
-  recommendation to adopt full reuse.
+  recommendation to adopt full reuse. Closed1 November2026 with user-directed
+  combined sign-coordinate/queue adoption; see the findings below.
 
 **1 November recovery:** the [retained results and new continuation](
 studies/c10a07_recovery_results.md) supersede the original exploratory ordering
@@ -2042,8 +2043,8 @@ studies/c10a07_research_assessment.md) closes the scoped source/literature
 assessment, with existing, missing, rejected and unmeasured mechanisms recorded
 against current e520ec9 code and retained evidence. This supersedes the earlier
 partial audits as the research reference, without rewriting them. The active
-scope is finishing the prepared C10a-07/C10a-07a comparisons and terminal reports.
-Additional algorithms are backlog and cannot delay those reports. A literal
+scope was subsequently consolidated into the completed C10a-07 panel below.
+Additional algorithms remain backlog. A literal
 current-default/memory bridge is conditional on a useful nominee. In that later
 backlog, condition scoring work on remaining cost: fixed scoring already exists,
 two-root pairing is A1c, and cross-B lifted-root reuse is A1a. Normalized forms
@@ -2053,16 +2054,29 @@ already exist; SIQS batch integration is separate and outside its present hard
 domain at the 5000-prime base. Explicit 61+ configurations are required because
 selected automatic routing ends at 60. No new timing or performance acceptance.
 
-**Authorized execution:** the [consolidated45/50/55/60 panel](
+**Completed bounded execution:** the [consolidated45/50/55/60 panel](
 studies/c10a07_panel_results.md) replaces execution of both unstarted60-only
 screens, within C10a-07 and a maximum48 timed calls. Old freezes/accounts stay
 unchanged. Helper memory fits inside1 GiB total; nomination precedes committed
-fresh generation. Committed-only QA and exact integration checks pass; clean
-measurement is underway. This changes no A1a completion or library default.
+fresh generation. All42 timed calls are complete:3 nomination and39 fresh,
+including36 exact complete calls on nine active50/55/60 inputs. The first45
+block is unresolved; its remaining six cells are unvisited. Queue/combined
+observed wall costs fall22.4%/23.1%, with only0.86% incremental combined benefit.
+All18 complete coverage/state pairs pass. The parent's missing end drift and
+failed45 continuation drift prevent adoption acceptance; active50/55/60 drift
+passes. The user subsequently directs adoption of **combined**, accepting these
+limitations without the proposed18-call confirmation. Production integration,
+independent CRT/coverage, exact retained-prefix, fallback and charged-resume
+checks pass; committed-only829-test QA (nine skipped), lint and194 benchmark
+imports pass. See [adoption](studies/c10a07_default_promotion.md). The milestone
+is complete; historical unmet experimental gates remain recorded, not claimed
+passed. Other collection research stays with its existing conditional owners.
+
 
 **Post-C10a-07 research backlog, reconciled 1 November:** these are concrete
-deltas under existing owners. Finish the active panel and its terminal report
-first. Recording them does not schedule measurements, increase current accounts
+deltas under existing owners. The current panel and terminal report are complete;
+these remain conditional backlog. Recording them does not schedule measurements,
+increase current accounts,
 or create more C10a-07 submilestones. The delivered A1a integration stays closed.
 Use the [42-mechanism assessment](studies/c10a07_research_assessment.md) for the
 source/evidence map and retain its negative findings.
@@ -2091,18 +2105,27 @@ E1 remains deferred; these entries do not authorize a second campaign now.
 
 - [x] Complete the scoped collection research/disposition map and reconcile
   prior negative evidence, existing implementations and roadmap ownership.
-- [ ] Complete the selected queue's whole-factor screen, current-default
-  bridge and disjoint confirmation if warranted; all performance gates remain
-  open. Stop before the larger campaign for the requested Sol high handoff.
+- [x] Complete the selected queue's bounded current-default whole-factor
+  comparison and terminal analysis, retaining all outcomes. Nine independent
+  active inputs complete in all arms; exploratory gains nominate queue alone.
+- [x] Integrate the selected swapped face and exact sparse queues into
+  production defaults at explicit user direction. Preserve explicit/saved
+  policies, finite total memory, exact fallback and source-owned historical
+  controls. Do not treat adoption as passing the old statistical gate.
+  The optional18-call design is retained but was not run and is not required
+  to close this user-directed tranche. No new performance campaign is scheduled.
 
 - [x] Recover existing receipts/charges, preserve historical identities and
   archive the completed cold control without repeating it.
 - [x] Prepare and calibrate the current-mainline recovery runner, conservative
   collection candidate, separate recorder failure, exact coverage/resume and
   committed source/runtime/input controls. This closes preparation only.
-- [ ] Execute the admitted clean screen, retain all outcomes and decide whether
-  independent fresh confirmation or broader coverage is justified. Do not
-  automatically retry larger limits or promote a prefix result.
+- [x] Execute the admitted bounded comparison, preserve the warmup failure and
+  separately identified repair, and issue the scoped terminal decision.
+  Independent fresh confirmation is justified for a production queue nominee;
+  formal experimental acceptance remains inconclusive; user-directed adoption
+  is recorded separately. The broader panel is not scheduled.
+  No old quota grid, completed calibration or queue-prefix campaign was rerun.
 
 **C10a-07 model and execution recommendation:** use **GPT-6.1 Sol / xhigh**
 for source research, quota attribution, independent coverage checks, study
@@ -2131,7 +2154,11 @@ without treating any digit size or runtime as a universal ceiling. Leave this
 gate open on inconclusive evidence and keep E1 deferred under the current user
 instruction.
 
-**C10a-07 research and acceptance gates:**
+**C10a-07 retained historical research/acceptance gates:**
+
+C10a-07 is closed at user direction after production adoption. Unchecked items
+below record unmet or unexecuted historical gates; they are not claims of passed
+confirmation and do not schedule additional work for this closed tranche.
 
 - [x] Pin current leading reference callers in the local audit,
   adding GPU/other sources where they answer a concrete reuse gap.

@@ -1,5 +1,18 @@
 # Changelog
 
+## C10a-07 combined defaults (1 November 2026)
+
+- At explicit user direction, adopt swapped adjacent sign coordinates for fresh
+  automatic SIQS jobs and exact sparse prime/power queues in eligible collectors.
+  Preserve A1a kernels, existing parameter/routing bands, total owned memory,
+  explicit policies, legacy snapshots and charged exact fallback/resume.
+- Record23.1% observed wall /23.0% CPU reduction on nine fresh50/55/60 inputs as
+  exploratory: the original drift gate remains unmet. The additional18-call
+  confirmation was not run; adoption is a separate user decision.
+- Close C10a-07 with findings and verified production integration. Preserve
+  receipts/research/commits before removing temporary worktrees and scratch.
+  See [adoption](v2/studies/c10a07_default_promotion.md).
+
 ## A1a mainline adoption (31 October 2026)
 
 - At user direction, select `density+presieve+scan_fused` for fresh native

@@ -5,6 +5,53 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
+At explicit user direction, [combined face/queue defaults are adopted](
+../studies/c10a07_default_promotion.md) after production integration and committed
+correctness/QA checks. The timing evidence below remains exploratory; the
+optional18-call confirmation was not run. Automatic SIQS jobs use the swapped
+coordinate policy and exact queues where eligible, with bounded exact fallback.
+No new61–80 presets or portfolio stages are enabled.
+
+The [completed C10a-07 panel](../studies/c10a07_panel_results.md) retains42 timed
+calls at45/50/55/60, preserving every historical freeze. Nine fresh active inputs
+complete in every arm. Observed equal-band wall cost falls22.4% for queue and
+23.1% for face+queue, with only0.86% incremental combined benefit. Missing parent
+end drift keeps these exploratory; active continuation drift passes, while45
+is unresolved and its drift fails. The original report nominated queue alone;
+the later combined adoption is a separate user-directed decision.
+The [numerical summary](../studies/c10a07_panel_results.json) records exact costs,
+uncertainty, resource accounts and the verified26.3 MB archive. Committed-only
+857-test QA (nine skipped), lint and215 benchmark imports pass.
+
+The [C10a-07 recovery report](../studies/c10a07_recovery_results.md) retains the
+stopped historical quota/face diagnostics and the completed 24.7-minute cold
+historical control. Its new current-mainline calibration uses short exact-work
+prefixes, separately measured observer overhead and directly admitted face arms.
+At preparation it nominated the existing A1a fused collector at60; local norm
+bounds and an8 MiB power cache did not advance. Its original screen remains a
+preserved preparation artifact, superseded for execution by the completed panel
+above. It is not an instruction to run another comparison.
+
+The separate [source-gap follow-up](../studies/c10a07_source_gap_results.md)
+adapts exact sparse block scheduling from the source comparison. Nine matched
+prefix pairs on three exposed inputs show 40.4% lower median prefix cost against
+the existing fused collector, with identical exact output/coverage counters and
+an explicit separate helper reserve. This is not a complete-factoring gain.
+Its original six-call complete-cost screen remains frozen and unstarted; the
+consolidated panel superseded its execution. Do not add it to the completed
+campaign. Production integration and clean confirmation remain separate gates.
+
+The [consolidated collection assessment](../studies/c10a07_research_assessment.md)
+records 42 source/code/evidence dispositions and the resulting Phase 3 order.
+The panel's original recommendation is superseded by the combined adoption
+above. The optional [18-call design](../studies/c10a07_recovery_followup.md)
+is retained for future validation; it was not run, is not required for closure
+and schedules no new campaign. Keep normalized polynomial forms,
+cross-B power roots and residual-yield policies distinct; avoid reimplementing
+existing polling, fixed scores or batch arithmetic. Those ideas remain backlog
+and cannot delay the current study's report. This closes the scoped
+research assessment only. No new performance claim or campaign was added.
+
 The [A1a integration protocol](qs/a1a_integration/protocol.md) compares the
 selected density+presieve+scan_fused port with committed pre-integration
 mainline at exactly 50 and 55 digits. Preparation includes an immutable owned

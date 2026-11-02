@@ -1,90 +1,100 @@
 # Follow-up design after the recovery screen
 
-Design only. No fresh inputs are generated and no measurements are authorized
-by this document. Each campaign needs a new committed source/runtime/configuration,
+The user has subsequently adopted the combined production policy without this
+additional confirmation. This optional design is retained for future validation;
+it is not scheduled and does not block C10a-07 closure.
+
+Design only. This document generates no inputs and authorizes no measurements.
+Each campaign needs a new committed source/runtime/configuration,
 selection, corpus, protocol, order and cumulative-resource identity. Historical
 confirmation corpora are never modified. E1 remains deferred.
 
 The [consolidated source/literature assessment](c10a07_research_assessment.md)
-records additional mechanisms as backlog. Finish the prepared eight-call
-C10a-07 face recovery screen described below before the separately prepared
-six-call queue comparison. Both freezes remain unchanged and unstarted;
-do not run them concurrently or replace an arm in either. The queue's helper
-grant is 32 MiB+256 KiB in addition to 1 GiB native ownership. Consequently the
-future confirmation grants below cannot be inherited by that candidate without
-a new integration, total-memory reservation and freeze. Recalibrate expected
-complete costs from its screen before authorizing a large panel.
+records the research backlog. Its two unstarted60-only screens were superseded
+for execution by the bounded [45/50/55/60 panel](c10a07_panel_results.md).
+The original freezes, corpora and accounts remain intact. That panel reserves
+helpers inside1 GiB total, tests the current automatic collector including A1a
+at50/55, and measures face, queue and their combination explicitly. Do not add
+those old screens or repeat completed prefix/calibration work.
 
-The immediate executable freeze covers a maximum eight-call clean exploratory
-screen at 60 digits. Its exposed three moduli can nominate at most one policy;
-they cannot establish a speedup. The screen compares both prepared face arms
-and one collection candidate directly. A full128 dependency diagnostic is not
-an admission prerequisite. Historical quota work currently supplies no selected
-challenger. Do not combine independently promising policies without a new test.
-No additional algorithm from the research inventory is a prerequisite for
-finishing these comparisons and reporting a terminal decision. Negative or
-inconclusive results are valid terminal outcomes; the study need not keep
-expanding until it finds a winner.
+The stopped first process lacks final drift evidence. Completing the panel can
+identify a useful candidate but cannot retroactively repair that missing check.
+Choose at most one policy after the terminal analysis; a combined arm winning
+against control does not establish that adding the face improves queue alone.
+Finish and report the existing panel before implementing or measuring this
+separate design. These are proposals, not another automatically scheduled stage.
 
-## Narrow fresh confirmation
+## Smallest proposed current-mainline bridge
 
-After selection is committed, propose12 fresh independent balanced60-digit
-semiprimes with distinct prime factors across all inputs. Exclude every exposed
-N and factor from both historical studies, A1a inputs, calibration and exploratory
-screen. The exclusion inventory and its hash must be committed before generation.
-Use the existing certified p-1-conditioned generator only for this narrow
-population; do not call it uniform RSA sampling. Generation seed 202611010701;
-per-input factoring seeds cycle7,29,47. No factors or certificates enter SIQS.
+For the requested50/55/60 adoption review, propose **nine fresh independent
+moduli total: three per size, two arms,18 complete-factor calls**. This replaces
+the earlier12-input60-only proposal and the old nine-inputs-per-band assumption.
+Three-input size bands remain descriptive; this does not establish separate
+size-specific performance claims.45 queue fallback remains a compatibility
+check; its unresolved direct-SIQS observation cannot support a speed claim.
 
-Two arms only: the exact current frozen control and the one committed nominee.
-One observation per arm per input,12 matched pairs. Pair order is shuffled with
-seed 202611010702; six control-first and six nominee-first assignments are shuffled
-independently. Save the explicit schedule before running. Warm each arm inside
-each new measurement process for >=3 validated wall AND CPU seconds and the
-same last-three max/min<=1.20 fixed-work stability check, maximum 25 attempts.
-No cold-start time enters warmed evidence. No timed observation is resumed or
-selectively retried. Lost cells stay censored with retained charges.
+First port only the chosen policy into committed current production code, with
+independent arithmetic/coverage, refusal, ownership and checkpoint tests. Keep
+it opt-in until adoption. Reconcile the then-current mainline and A1a collector;
+benchmark-only monkeypatches are not production integration. Pin all source,
+runtime, configuration and analysis identities. Preserve the original total
+1 GiB ownership including helper space,3 GiB RSS ceiling, exact output checks
+and certainty labels. Never silently substitute the new baseline into old data.
 
-Per call1800 wall AND CPU seconds and 1e13 work, native1 GiB, helper256 KiB,
-observer disabled, RSS3 GiB. Exactly24 observations; no effect-driven extension.
-Reserve43320 wall/CPU seconds and 2.4e14 work for measured calls; warmup6000 seconds
-and 1e15 work; generation600 seconds/1e12 work; analysis300 seconds; disk512 MiB,
-<=512 receipts of<=1 MiB. Total50220 wall/CPU seconds, work1.3e15, plus QA<=600
-seconds. Historical cost suggests8–10 hours measured; the exploratory complete
-screen must revise that estimate before execution. These are maxima, not targets.
+Commit selection and the exclusion inventory before generation. Exclude every
+prior modulus/factor, including all12 generated current-panel inputs, historical
+studies, nomination, A1a and calibration. Each ordinary factor is distinct.
+Use the existing independently verified Pocklington-conditioned generator for
+this narrow population, with two balanced and one approximately35:65 factor-bit
+split per band; verify exact digits and achieved lengths. This is not uniform
+RSA sampling. Only N and seed enter SIQS. Generation seed202611010751; factoring
+seeds7/29/47 within each band. Shuffle the interleaved size/pair schedule with
+seed202611010752 and balance arm order overall; commit the actual schedule
+before timing. No historical confirmation corpus is edited.
 
-Futility rule: after the first four complete matched pairs, if neither arm has
-completed any input, stop inconclusive. There is no early positive acceptance.
-A provenance/arithmetic failure stops for audit. Ordinary time/work/native-memory
-exhaustion remains a measured outcome. Failures of the harness are separate.
-Persistent sentinel drift makes inference inconclusive, not grounds to rerun
-selected bad cells. No instability extension is allowed under this identity;
-a redesigned replication needs a separate freeze and retains all old evidence.
+Warm every arm/configuration in each new process for >=3 validated wall AND
+CPU seconds, last-three fixed-work max/min<=1.20 in both clocks, at most25
+attempts. Calibrate the representative work before freezing, including collector
+and extraction paths; a short stable prefix alone cannot establish whole-job
+JIT stability. Persist control sentinel starts immediately and endpoints on
+normal exit or failure; interruption retains a missing end rather than inventing
+one. No cold start, instrumentation or warmup is performance evidence. Saved
+receipts recover with charges; missing timed cells stay censored. Never retry
+selected bad observations or loosen a failed stability/correctness gate.
 
-Report completion and inclusive wall/CPU separately. A cost claim requires every
-input completed by both arms, no CPU regression evidence, and a two-sided95%
-input-cluster bootstrap interval for the paired log-cost ratio below1 (100000
-resamples, seed 202611010703). Also show exact paired sign-flip inference and the
-individual costs. Repetitions, if independently redesigned, stay within input
-clusters; twelve is the independent N. With censoring, report mean capped wall
-cost and its input-cluster interval explicitly as finite-budget service cost,
-never as uncensored factoring speed. Completion improvement uses exact paired
-discordance (McNemar/binomial), with the direction and interval reported. Control
-completion losses and CPU/cost tradeoffs remain visible. Cost acceptance also
-requires the one-sided95% CPU-ratio upper bound <=1. Completion acceptance
-requires no observed control-only completions and one-sided95% upper bounds <=1
-for both mean capped wall and CPU cost ratios. These zero-regression guards
-match the proposed faster-factorer scope; failure or uncertainty means no
-adoption. If testing either cost
-or completion as an acceptance route, reserve alpha.025 for each endpoint rather
-than selecting a favorable endpoint after observing data. There is no minimum
-percentage gain or confidence-width gate. Freeze the implemented analysis,
-observed screen cost estimates and schedule before this proposed campaign.
+Per-call wall AND CPU caps50=300s,55=900s,60=1800s;1e13 work. Exactly18 calls,
+reservation18090 wall/CPU seconds and1.8e14 work, with no effect-driven extension.
+Separate warm allowance2000 seconds/1e15 work; generation180 seconds/1e7 draws;
+analysis120 seconds/1 GiB scratch; QA600 seconds. Total20270 wall/CPU seconds
+before analysis/QA and1.18000001e15 work. Output512 MiB, at most512 receipts of
+at most1 MiB; archive128 MiB. No borrowing from any earlier ledger. Preliminary
+current clean costs suggest roughly1.25–2 hours of measured work, subject to
+port/readiness calibration; the5.025-hour measured reservation is a ceiling.
 
-The narrow result supports only the exact conditioned balanced population and
-configuration measured. It does not establish superiority across 60–80 digits.
-If the screen shows no useful candidate, do not generate this panel. Prioritize
-the dominant collection/yield mechanism instead.
+If a first matched input is unresolved in both arms, close only that size's
+remaining inputs inconclusive; continue other sizes. Missing prescribed cells
+prevent an overall recommendation. No positive early acceptance. Arithmetic or
+provenance failure stops for audit; harness failures are distinct from native
+resource exhaustion. Complete every admitted matched cell otherwise.
+
+The nine moduli are independent units. Analyse paired log wall/CPU cost with
+input-cluster bootstrap within bands and equal band weighting,100000 replicates,
+seed202611010753. Show individual and total costs. Complete-cost claims require
+all prescribed inputs to complete in both arms. Otherwise report completion
+and capped finite-budget service cost explicitly, including unresolved cases.
+Use exact paired discordance for completion, retain every control-only loss,
+and reserve alpha.025 for each of the cost/completion acceptance routes.
+Require no observed completion loss and both one-sided97.5% upper
+wall/CPU ratio bounds<=1; the cost route also needs upper wall<1, or completion
+must pass its exact test at the reserved alpha. No minimum percentage floor.
+Failed/missing drift or inadequate precision means retain control/inconclusive.
+Freeze executable analysis before measurements, not after looking at outcomes.
+
+The bridge supports only its measured conditioned population and specified
+policy across the sampled sizes. Enabling unmeasured intermediate sizes is an
+explicit policy extrapolation, not a confirmed gain. Shared-code changes need
+low-cost40/45 correctness and relevant routing-boundary checks, not another
+40/45 performance campaign. No additional measurements are authorized here.
 
 ## Broader generalization panel
 
@@ -125,8 +135,8 @@ The same warmup, exact output, cost/completion, failure and no-positive-early-st
 rules apply. With one challenger:48 calls, cap 1800 each, measured allowance86640
 wall/CPU seconds and 4.8e14 work; warmup9000 seconds/1.5e15 work; generation1800
 seconds/1e13 work; analysis600 seconds; disk1 GiB. Total98040 wall/CPU seconds,
-work2.1e15, QA<=600 seconds separately. Expected measured16–20 hours at historical
-cost, subject to screen recalibration. A second study's challenger adds24 calls,
+work2.1e15, QA<=600 seconds separately. Preliminary current complete costs suggest about6–10 measured hours
+for one challenger; recalibrate from the completed panel and production bridge. A second study's challenger adds24 calls,
 43320 seconds/2.4e14 work plus at most 3000 warmup seconds, and requires explicit
 separate resource authorization. Do not assume a day-long panel is warranted
 until a useful nominee exists. No implicit extensions or larger corpus.
@@ -139,15 +149,12 @@ particularly relevant to a portfolio comparison and must be disclosed.
 
 ## Adoption scope, routing and progression toward80 digits
 
-A60-only policy does not justify broad50/55 retesting. Check routing isolation
-and existing exact regressions; use40/45 clean checks only if an implementation
-touches shared collector code or changes portfolio dispatch. Any50–55 extension
-requires a new bridge against the committed A1a density/presieve/fused collector,
-with 9 independent inputs per proposed band and unchanged controls. Record the
-then-current mainline commit; neither old92543797 nor an old A1a report substitutes.
-If current mainline advances before adoption, the smallest60-digit bridge is
-the selected single policy integrated against that exact commit on the same
-screen inputs, then disjoint fresh evidence for its intended scope.
+Use the18-call bridge above for a policy proposed across the sampled50/55/60
+sizes; do not restore nine inputs per band or repeat old quota/prefix studies.
+The broader24-input design answers a different60-digit generalization question
+and remains conditional on a useful candidate and an explicit finite budget.
+Keep current-mainline integration, selection and fresh confirmation identities
+separate. No combined percentage or old92543797 control can substitute.
 
 The next size step is a finite feasibility stage, not a blind65–80 sweep:
 freeze explicit control and candidate configurations for every proposed size.
@@ -157,14 +164,25 @@ extension. Choose the actual base endpoint/count, interval, factor count, quota,
 multiplier and LP domain explicitly, preserving the earlier stopped 65-digit
 spike and its charges. No automatic interpolation or enlarged retry.
 
-Start with two fresh revealed exploration inputs each at 61 and 62 digits, one balanced and
-one moderately uneven, fixed seeds7/29, control and one nominee. First compare
-2146-block clean prefixes capped60 seconds (8 calls); then at most one matched
-complete pair per size capped2400 seconds per call (4 calls). Warmup maximum
-2000 seconds, measurements10140 seconds including5-second reservation margins,
-work1.2e14, generation600 seconds, disk256 MiB. Stop a size if both complete calls
-exhaust without useful evidence; inspect work/yield before any larger grant.
-Expected2–3 hours maximum from the declared call caps, to be recalibrated.
+Start with two fresh revealed exploration inputs each at61 and62 digits, one
+balanced and one moderately uneven: four independent moduli, fixed seeds7/29,
+control and one nominee. Pin generation/order/bootstrap seeds202611010761/762/763
+and the explicit schedule. Compare2146-block clean prefixes capped60 seconds
+(eight calls); then at most one matched complete pair on the predeclared first
+balanced input per size, capped2400 seconds per call (four calls). Skip that
+additional pair if both prefix calls already completed exact factorization.
+Repeated work on those inputs is not more independent moduli or confirmation.
+
+Measured reservation10140 wall/CPU seconds includes5-second margins, work1.2e14.
+Separate warm maximum2000 seconds/1e15 work; generation600 seconds/1e12 work;
+analysis120 seconds/1 GiB scratch; QA600 seconds. Cumulative13460 wall/CPU seconds
+including analysis/QA, factoring/generation work1.121e15; disk256 MiB, at most512
+receipts of at most1 MiB, archive128 MiB. The measured reservation is2.82 hours,
+not a target; the full wall/CPU ceiling is3.74 hours. Calibrate expected time
+from the completed60-digit work before freezing. Stop a size if both complete
+calls exhaust without useful evidence; inspect work/yield before a separately
+justified larger grant. No automatic extension, selective retry or second
+performance campaign follows from this design.
 
 Only a feasible signal justifies a separately frozen9-independent-input matched
 campaign at 62 or65, with per-call caps set from that stage. Declare new64/65
