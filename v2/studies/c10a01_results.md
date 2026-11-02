@@ -112,7 +112,9 @@ resource audit. Independent caps need not fit simultaneously: native admission
 refuses excess ownership. Keep the 1 GiB comparison at 60. No automatic larger
 tier retry. Measured prefixes used about 79–104 MiB owned and 100–114 MiB RSS;
 the 70 capacity fixture reached 297 MiB RSS with sparse synthetic rows.
-Host admission verified 24 GiB actual RAM and about 16.56 GiB available.
+Calibration host admission verified 24 GiB actual RAM and about 16.56 GiB
+available. Prospective v2 readiness rechecked 24 GiB and about 16.8 GiB
+available; the parent used about 57–59 MiB RSS against its 256 MiB reserve.
 RSS checks are cooperative. Large emergency checkpoint serialization has an
 existing preallocation limitation and is excluded from these pilots; small
 charged resume remains verified.
@@ -233,3 +235,14 @@ lifetime RSS could taint subsequent calls. The original `pilots.json` and
 checkout. Current commands above select `pilots_v2.json` and
 `pilot_sources_v2.json`, with separate `pilot-v2-A/B/C` output identities.
 No pilot, default promotion, merge or push has occurred.
+
+
+Validation of prospective v2 at `19c4c1b`: **847 tests pass with nine optional
+backend skips**, lint passes, and a committed-only export imports all 204
+benchmark/study package modules. An initial enumeration incorrectly attempted
+to import raw baseline snapshots as standalone modules; the corrected package
+check passes, and the retained log records both attempts. Loader tests cover
+those snapshots. Real child-process/lock/ledger tests use stubbed numerical
+calls, so they add no pilot result. Readiness-only checks pass for A/B/C,
+including source/runtime/input identity, actual host headroom and every
+numerical reservation. All complete-factor pilots remain unrun.
