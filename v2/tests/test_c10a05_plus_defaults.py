@@ -26,6 +26,10 @@ class LargerBandDefaultTests(unittest.TestCase):
         for number in (10**50, NUMBER_51, 10**51 - 1):
             for signed in (number, -number):
                 selected = asdict(default_siqs_config(signed))
+                self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(
+                    selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+                )
                 self.assertEqual(
                     selected["collector"]["marking"],
                     "density+presieve+scan_fused",
@@ -39,7 +43,9 @@ class LargerBandDefaultTests(unittest.TestCase):
 
         self.assertEqual(default_siqs_budget(NUMBER_51).work_limit, 10**13)
         self.assertEqual(default_siqs_budget(NUMBER_51).seconds, 1200)
-        self.assertEqual(default_siqs_config(10**60), SIQSConfig())
+        self.assertEqual(
+            default_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
+        )
         self.assertEqual(
             default_siqs_config(NUMBER_51, backend="gmpy2-mpz").solve_policy,
             "window",

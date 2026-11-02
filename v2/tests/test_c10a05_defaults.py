@@ -24,6 +24,10 @@ class PacingDefaultTests(unittest.TestCase):
             number = 10 ** (digits - 1) + 123
             for signed in (number, -number):
                 selected = asdict(default_siqs_config(signed))
+                self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(
+                    selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+                )
                 self.assertEqual(
                     selected["collector"]["marking"],
                     "density+presieve+scan_fused"
@@ -59,7 +63,13 @@ class PacingDefaultTests(unittest.TestCase):
 
     def test_old_50_digit_snapshots_do_not_acquire_new_default(self):
         number = 10**49 + 123
-        legacy = replace(default_siqs_config(number), solve_policy="window")
+        current = default_siqs_config(number)
+        legacy = replace(
+            current,
+            solve_policy="window",
+            sign_policy="canonical",
+            collector=replace(current.collector, sparse_queue_bytes=0),
+        )
         job = SIQSJob(number, config=legacy, budget=allowance())
         checkpoint = json.loads(json.dumps(job.checkpoint()))
         self.assertEqual(checkpoint["version"], 5)

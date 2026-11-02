@@ -24,6 +24,12 @@ class PreparedArmTests(unittest.TestCase):
                 values = asdict(configs[mode])
                 if "solve_policy" in values:
                     self.assertEqual(values.pop("solve_policy"), "window")
+                self.assertEqual(
+                    values.pop("sign_policy", "canonical"), "canonical"
+                )
+                self.assertEqual(
+                    values["collector"].pop("sparse_queue_bytes"), 0
+                )
                 self.assertEqual(values, selected["configurations"][label])
             for config in configs.values():
                 self.assertEqual(config.memory_bytes, a7_r5.b1.MEMORY)

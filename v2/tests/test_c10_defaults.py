@@ -34,6 +34,10 @@ class C10DefaultTests(unittest.TestCase):
         for digits, number in (("40", NUMBER_40), ("50", NUMBER_50)):
             with self.subTest(digits=digits):
                 selected = asdict(default_siqs_config(number))
+                self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(
+                    selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+                )
                 self.assertEqual(
                     selected.pop("solve_policy"),
                     "collection" if digits == "50" else "window",

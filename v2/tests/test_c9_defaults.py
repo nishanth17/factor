@@ -40,6 +40,10 @@ class C9DefaultTests(unittest.TestCase):
             "challenger"
         ]
         selected = asdict(default_siqs_config(NUMBER))
+        self.assertEqual(selected.pop("sign_policy"), "swap_high")
+        self.assertEqual(
+            selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+        )
         self.assertEqual(selected.pop("solve_policy"), "collection")
         self.assertEqual(
             selected["collector"]["power_plan_bytes"], C10_POWER_PLAN_BYTES

@@ -96,6 +96,16 @@ def arm_config(config, arm):
 
 def decode_config(value, module=qs):
     values = dict(value)
+    values["collector"] = dict(values["collector"])
+    if module is not qs:
+        # Owned controls predate these fields. Translate only their exact
+        # disabled values; an enabled policy cannot enter the old runtime.
+        if values.get("sign_policy", "canonical") != "canonical" or values[
+            "collector"
+        ].get("sparse_queue_bytes", 0):
+            raise ValueError("owned control cannot apply combined collection")
+        values.pop("sign_policy", None)
+        values["collector"].pop("sparse_queue_bytes", None)
     name = (
         "DoubleLargeSieveConfig"
         if "large_prime_bound" in values["collector"]

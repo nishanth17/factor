@@ -61,6 +61,10 @@ class FrozenRunnerTests(unittest.TestCase):
                 10 ** (digits - 1), "selected", self.control
             )
             values = asdict(new)
+            self.assertEqual(values.pop("sign_policy"), "swap_high")
+            self.assertEqual(
+                values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+            )
             values["collector"]["marking"] = old.collector.marking
             self.assertEqual(values, asdict(old))
             self.assertIsNot(type(old), type(new))
@@ -85,11 +89,20 @@ class FrozenRunnerTests(unittest.TestCase):
         self.assertEqual(job.base.bound, previous.base_bound)
         self.assertEqual(job.multiplier, previous.multiplier)
         values = asdict(job.config)
+        self.assertEqual(values.pop("sign_policy"), "swap_high")
+        self.assertEqual(
+            values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+        )
         values.pop("base_count")
         values.update(base_bound=job.base.bound, multiplier=job.multiplier)
         self.assertEqual(values["collector"]["marking"], study.SELECTED)
         values["collector"]["marking"] = "sparse"
-        self.assertEqual(values, asdict(previous))
+        previous_values = asdict(previous)
+        self.assertEqual(previous_values.pop("sign_policy"), "swap_high")
+        self.assertEqual(
+            previous_values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+        )
+        self.assertEqual(values, previous_values)
         # Count-stage reservations are identical; the new boundary additionally
         # preflights temporary sieve memory and then constructs the same base.
         count_budget = unlimited_budget()

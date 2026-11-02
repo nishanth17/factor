@@ -127,10 +127,11 @@ def experiment_collector(module, variant):
                     raise AssertionError("batch/scalar residual mismatch")
             return atom, divisor
 
+    mark_loop = getattr(
+        module.SieveCollector, "_sieve_direct", module.SieveCollector._sieve
+    )
     if variant == "tiny":
-        source = textwrap.dedent(
-            inspect.getsource(module.SieveCollector._sieve)
-        )
+        source = textwrap.dedent(inspect.getsource(mark_loop))
         needle = "if self.config.power_plan_bytes"
         if source.count(needle) != 1:
             raise ValueError("tiny experiment requires the frozen mark loop")
@@ -140,12 +141,10 @@ def experiment_collector(module, variant):
             module.__dict__,
             namespace,
         )
-        ExperimentCollector._sieve = namespace["_sieve"]
+        ExperimentCollector._sieve = namespace[mark_loop.__name__]
 
     if variant == "chunks":
-        source = textwrap.dedent(
-            inspect.getsource(module.SieveCollector._sieve)
-        )
+        source = textwrap.dedent(inspect.getsource(mark_loop))
         # These literal fragments select the charged mark loop exactly;
         # preserve their spelling and spacing when formatting the runner.
         old = """for root in lifted:
@@ -179,6 +178,6 @@ def experiment_collector(module, variant):
             module.__dict__,
             namespace,
         )
-        ExperimentCollector._sieve = namespace["_sieve"]
+        ExperimentCollector._sieve = namespace[mark_loop.__name__]
 
     return ExperimentCollector
