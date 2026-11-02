@@ -1961,6 +1961,11 @@ negative arm and all historical pins.
   multiplier scores. A source-derived norm/yield hypothesis justifies a bounded
   prototype; complete-factor evidence governs adoption. No copied native table
   or arithmetic change enters the current C10a-07 freeze.
+  **Implementation/design handoff, 2 November 2026:** exact opt-in parity2
+  families and coupled scoring, independent validation and bounded 60/62/65/70
+  calibration are delivered. [Handoff](studies/c10a01_results.md) freezes later
+  feasibility pairs, including the funded 70-digit stage. Complete factoring,
+  fresh confirmation and adoption remain open; defaults are unchanged.
 - [ ] **C10a-02:** separately test a wider actual-A-product population and
   inter-family diversity only if product error or overlap predicts useful
   post-filter work. Sol / **high** for census reconciliation; **xhigh** for a

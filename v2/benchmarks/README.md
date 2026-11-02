@@ -305,3 +305,19 @@ detailed research and every attempt preserved locally. The separate 60-digit
 result informed the user-directed 50–60 default promotion; the 65-digit spike
 established no completed-factor evidence at its 1800-second grant. See the
 linked result and promotion summaries above. E1 remains deferred.
+
+
+### C10a-01 normalized polynomials: calibration and design handoff
+
+The [results and commands](../studies/c10a01_results.md) report 16 scored
+fixed-position prefixes, four forced-policy diagnostics, four observer pairs
+and two capacity fixtures. These exploratory observations establish no speedup.
+The opt-in arithmetic uses current combined-policy control; all eight exposed
+inputs, certificates, literal configurations and numerical allowances are
+versioned. Detailed sources, research and raw receipts remain local.
+
+The later `qs.c10a01.pilots` runner provides readiness checks and separately
+funded complete-factor stages at 60/62, 65 and 70 digits. They were not run in
+preparation. Stage C uses an explicitly forced eligible multiplier because the
+balanced scored-selector cell otherwise repeats standard fallback. No automatic
+retry, memory escalation, default promotion or untouched-confirmation claim.
