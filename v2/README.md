@@ -1481,3 +1481,18 @@ research, protocols and journals are local audit evidence. Do not restart
 historical ledgers on changed runtime sources. Every receipt, timeout and
 interrupted reservation remains preserved in ignored results; E1 remains
 deferred and C10a-07 open.
+
+### C10a-01 parity-normalized SIQS (opt-in)
+
+Set `polynomial_policy="parity2"` on `SIQSConfig` or `CountedSIQSConfig` to
+use odd-coordinate polynomials when `k*N % 4 == 1`, with standard fallback
+otherwise. Set `multiplier_policy="parity2"` with `multiplier=0` to use the
+coupled score, including squarefree even candidates. The new score requires
+the parity polynomial policy. Fixed multipliers bypass scoring.
+
+The stored polynomial is twice the discriminant-normalized polynomial, so
+existing exact relation and extraction semantics remain intact. New jobs use
+checkpoint schema 8 and reject incompatible arithmetic-policy substitutions;
+legacy snapshots retain their original semantics. No automatic defaults or
+larger-size routing change. See the [arithmetic contract](studies/c10a01_arithmetic.md)
+and [bounded study protocol](benchmarks/qs/c10a01/protocol.md).

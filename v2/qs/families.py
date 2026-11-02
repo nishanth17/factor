@@ -229,8 +229,14 @@ class PolynomialFamily:
         *,
         budget=None,
         memory_bytes=DEFAULT_MEMORY_BYTES,
+        parity=False,
     ):
         """Reserve root/CRT state, then cache exact modular inverses."""
+        if type(parity) is not bool:
+            raise TypeError("family parity policy must be Boolean")
+        if parity and base.n_prime % 4 != 1:
+            raise ValueError("parity family requires D=1 mod 4")
+        self.parity = parity
         if not isinstance(a_primes, tuple):
             raise TypeError("A primes must be an immutable tuple")
         if not 1 <= len(a_primes) <= MAX_A_FACTORS:
@@ -245,6 +251,10 @@ class PolynomialFamily:
             raise ValueError("A primes must be nonsingular base members")
         utils.require_integer(memory_bytes, "memory_bytes", 0)
         a = arithmetic.backend_for(base.n).integer(prod(a_primes))
+        if parity:
+            # CRT terms modulo 2a are even. Adding odd a to the initial
+            # sum chooses the unique odd lift for every sign combination.
+            a *= 2
         reserve = base.workspace_bytes + 32768 + 640 * len(base.entries)
         reserve += 512 * len(a_primes) + 16 * (
             a.bit_length() + base.n.bit_length()
@@ -283,7 +293,11 @@ class PolynomialFamily:
         self.terms, self.inverses = tuple(terms), tuple(inverses)
         self.base_identity = _identity(base)
         self.identity = _checksum(
-            [self.base_identity, a_primes, "center-zero-v1"]
+            [
+                self.base_identity,
+                a_primes,
+                "center-zero-parity2-v1" if parity else "center-zero-v1",
+            ]
         )
         self.count = 1 << (len(a_primes) - 1)
         self.next_index, self.current = 0, None
@@ -298,6 +312,8 @@ class PolynomialFamily:
         changed = None
         if previous is None:
             raw = self.terms[0]
+            if self.parity:
+                raw += self.a // 2
             for bit, term in enumerate(self.terms[1:]):
                 raw += -term if gray & (1 << bit) else term
         else:
@@ -363,7 +379,7 @@ class PolynomialFamily:
         Retain consumed work/time when creating a resume Budget.
         """
         payload = {
-            "version": FAMILY_CHECKPOINT_VERSION,
+            "version": 3 if self.parity else FAMILY_CHECKPOINT_VERSION,
             "backend": arithmetic.backend_for(self.base.n).identity,
             "base_identity": self.base_identity,
             "a_primes": list(self.a_primes),
@@ -374,6 +390,8 @@ class PolynomialFamily:
                 "cpu_used": self.budget.cpu_used,
             },
         }
+        if self.parity:
+            payload["parity"] = True
         _checked_resources(payload["resources"])
         if (
             len(json.dumps(payload, default=arithmetic.json_integer).encode())
@@ -399,7 +417,10 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint envelope")
 
         payload = checkpoint["payload"]
-        if not isinstance(payload, dict) or set(payload) - {"backend"} != {
+        if not isinstance(payload, dict) or set(payload) - {
+            "backend",
+            "parity",
+        } != {
             "version",
             "base_identity",
             "a_primes",
@@ -409,8 +430,15 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint payload")
 
         utils.require_integer(payload["version"], "checkpoint version", 1)
-        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION):
+        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION, 3):
             raise ValueError("unsupported family checkpoint version")
+        parity = payload.get("parity", False)
+        if (
+            type(parity) is not bool
+            or (payload["version"] == 3 and parity is not True)
+            or (payload["version"] < 3 and "parity" in payload)
+        ):
+            raise ValueError("family parity policy disagrees with schema")
         if (
             payload.get(
                 "backend", "python-int" if payload["version"] < 2 else None
@@ -465,7 +493,11 @@ class PolynomialFamily:
             raise ValueError("resume budget must retain consumed resources")
 
         family = cls(
-            base, tuple(primes), budget=budget, memory_bytes=memory_bytes
+            base,
+            tuple(primes),
+            budget=budget,
+            memory_bytes=memory_bytes,
+            parity=parity,
         )
         if index:
             previous = (

@@ -173,7 +173,10 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        7
+        8
+        if job.config.polynomial_policy != "standard"
+        or job.config.multiplier_policy != "standard"
+        else 7
         if job.config.sign_policy != "canonical"
         or job.config.collector.sparse_queue_bytes
         else 6
@@ -261,6 +264,9 @@ def pack_job(job):
     else:
         # Keep legacy checkpoint configuration and schema identities intact.
         payload["config"].pop("solve_policy")
+    if version < 8:
+        payload["config"].pop("polynomial_policy")
+        payload["config"].pop("multiplier_policy")
     if version < 7:
         payload["config"].pop("sign_policy")
         payload["config"]["collector"].pop("sparse_queue_bytes")
@@ -507,6 +513,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         5,
         6,
         7,
+        8,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -558,11 +565,16 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "sign_policy" in values or "sparse_queue_bytes" in values["collector"]
     ):
         raise ValueError("legacy checkpoint cannot change collection policy")
-    if payload["version"] == 7 and (
+    if payload["version"] >= 7 and (
         "sign_policy" not in values
         or "sparse_queue_bytes" not in values["collector"]
     ):
         raise ValueError("collection checkpoint lacks its policy identity")
+    policies = {"polynomial_policy", "multiplier_policy"}
+    if payload["version"] < 8 and policies.intersection(values):
+        raise ValueError("legacy checkpoint cannot change arithmetic policy")
+    if payload["version"] == 8 and not policies.issubset(values):
+        raise ValueError("parity checkpoint lacks its policy identity")
     collector_type = (
         GrowingDoubleLargeSieveConfig
         if payload["version"] == 5
@@ -749,6 +761,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         family_factory = (
             partial(make_family, config=config)
             if config.sign_policy != "canonical"
+            or config.polynomial_policy != "standard"
             else PolynomialFamily
         )
         job.family = family_factory(

@@ -24,7 +24,9 @@ class CoordinateFamily:
     changes initial signs, not the initial ordinal or the root recurrence.
     """
 
-    def __init__(self, base, a_primes, *, schedule, budget, memory_bytes):
+    def __init__(
+        self, base, a_primes, *, schedule, budget, memory_bytes, parity=False
+    ):
         if not isinstance(
             schedule, SignSchedule
         ) or schedule.factor_count != len(a_primes):
@@ -34,7 +36,11 @@ class CoordinateFamily:
             raise MemoryError("coordinate view exceeds its memory allowance")
         budget.consume(len(a_primes) + 1)
         kernel = PolynomialFamily(
-            base, a_primes, budget=budget, memory_bytes=memory_bytes - extra
+            base,
+            a_primes,
+            budget=budget,
+            memory_bytes=memory_bytes - extra,
+            parity=parity,
         )
         order = (0,) + schedule.variable_order
         terms = kernel.terms
@@ -80,7 +86,9 @@ class CoordinateFamily:
 
     def checkpoint(self):
         payload = dict(
-            schema=FAMILY_SCHEMA,
+            schema="c10a01-coordinate-family-v2"
+            if self.parity
+            else FAMILY_SCHEMA,
             base_identity=self.base_identity,
             a_primes=list(self.a_primes),
             schedule=self.schedule.mapping(),
@@ -91,6 +99,8 @@ class CoordinateFamily:
                 cpu_used=self.budget.cpu_used,
             ),
         )
+        if self.parity:
+            payload["parity"] = True
         _checked_resources(payload["resources"])
         if len(json.dumps(payload).encode()) > CHECKPOINT_BYTES:
             raise MemoryError("coordinate family checkpoint exceeds its cap")
@@ -106,7 +116,7 @@ class CoordinateFamily:
         }:
             raise ValueError("invalid coordinate family checkpoint")
         payload = checkpoint["payload"]
-        if not isinstance(payload, dict) or set(payload) != {
+        if not isinstance(payload, dict) or set(payload) - {"parity"} != {
             "schema",
             "base_identity",
             "a_primes",
@@ -132,7 +142,11 @@ class CoordinateFamily:
         if index > 1 << (len(primes) - 1):
             raise ValueError("coordinate cursor exceeds its family")
         resources = _checked_resources(payload["resources"])
-        if payload["schema"] != FAMILY_SCHEMA or payload[
+        parity = payload.get("parity", False)
+        schema = "c10a01-coordinate-family-v2" if parity else FAMILY_SCHEMA
+        if type(parity) is not bool or (not parity and "parity" in payload):
+            raise ValueError("invalid coordinate parity policy")
+        if payload["schema"] != schema or payload[
             "base_identity"
         ] != _identity(base):
             raise ValueError("coordinate family target/convention mismatch")
@@ -150,6 +164,7 @@ class CoordinateFamily:
             base,
             tuple(primes),
             schedule=schedule,
+            parity=parity,
             budget=budget,
             memory_bytes=memory_bytes,
         )

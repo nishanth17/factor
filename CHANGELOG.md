@@ -1,5 +1,15 @@
 # Changelog
 
+## C10a-01 opt-in parity arithmetic (2 November 2026)
+
+- Add parity-normalized SIQS families through the existing exact norm identity,
+  with a coupled integer multiplier score and explicit standard-form fallback.
+- Version new checkpoint semantics and independently verify CRT coordinates,
+  roots, valuations, extraction, cancellation and charged resume. Existing
+  automatic policies and historical checkpoints retain their behavior.
+- Prepare bounded 60/62/65/70-digit feasibility work; no performance promotion
+  follows from arithmetic validation.
+
 ## C10a-07 combined defaults (1 November 2026)
 
 - At explicit user direction, adopt swapped adjacent sign coordinates for fresh

@@ -19,7 +19,7 @@ from .factor_base import (
     checked_target,
 )
 from .families import PolynomialFamily, family_assignments
-from .multiplier import select_multiplier
+from .multiplier import PARITY_MULTIPLIERS, select_multiplier
 from .pipeline import QSJob, QSResult
 from .polynomial import (
     a_target,
@@ -62,6 +62,8 @@ class SIQSConfig:
     batch_width: int = 256
     filter_row_growth: int = 1
     tested_dependencies: bool = False
+    polynomial_policy: str = field(default="standard", kw_only=True)
+    multiplier_policy: str = field(default="standard", kw_only=True)
     sign_policy: str = field(default="canonical", kw_only=True)
     solve_policy: str = field(default="window", kw_only=True)
     memory_bytes: int | None = None
@@ -77,6 +79,16 @@ class SIQSConfig:
 
     def __post_init__(self):
         """Bound schedules; growing DLP has no implicit storage quota."""
+        if self.polynomial_policy not in ("standard", "parity2"):
+            raise ValueError("unknown SIQS polynomial policy")
+        if self.multiplier_policy not in ("standard", "parity2"):
+            raise ValueError("unknown SIQS multiplier policy")
+        if self.polynomial_policy != "standard" and self.mode != "siqs":
+            raise ValueError("parity policy requires SIQS")
+        if self.multiplier_policy == "parity2" and (
+            self.polynomial_policy != "parity2"
+        ):
+            raise ValueError("parity score requires parity polynomials")
         if self.sign_policy not in ("canonical", "swap_high"):
             raise ValueError("unknown SIQS sign policy")
         growing = isinstance(self.collector, GrowingDoubleLargeSieveConfig)
@@ -212,6 +224,7 @@ class SIQSConfig:
             + registry
             + quality
             + face
+            + (4096 if self.polynomial_policy != "standard" else 0)
         )
 
 
@@ -241,7 +254,8 @@ class CountedSIQSConfig(SIQSConfig):
 
 
 def make_family(base, primes, *, config, budget, memory_bytes):
-    """Apply the saved coordinate policy without process-global dispatch."""
+    """Apply saved coordinate/parity policies without global dispatch."""
+    parity = config.polynomial_policy == "parity2" and base.n_prime % 4 == 1
     if config.sign_policy == "swap_high" and len(primes) >= 3:
         from .coordinate_family import CoordinateFamily
         from .sign_schedule import schedule_for
@@ -250,11 +264,12 @@ def make_family(base, primes, *, config, budget, memory_bytes):
             base,
             primes,
             schedule=schedule_for(len(primes), "swap_high"),
+            parity=parity,
             budget=budget,
             memory_bytes=memory_bytes,
         )
     return PolynomialFamily(
-        base, primes, budget=budget, memory_bytes=memory_bytes
+        base, primes, budget=budget, memory_bytes=memory_bytes, parity=parity
     )
 
 
@@ -325,7 +340,17 @@ class SIQSJob:
             else:
                 choice = self._timed(
                     "multiplier",
-                    lambda: select_multiplier(self.n, budget=self.budget),
+                    lambda: select_multiplier(
+                        self.n,
+                        budget=self.budget,
+                        **(
+                            dict(
+                                candidates=PARITY_MULTIPLIERS, policy="parity2"
+                            )
+                            if self.config.multiplier_policy == "parity2"
+                            else {}
+                        ),
+                    ),
                 )
                 self.multiplier, self.divisor = (
                     choice.multiplier,
@@ -377,7 +402,13 @@ class SIQSJob:
                     "assignments",
                     lambda: AssignmentStream(
                         self.base,
-                        self.half_width,
+                        self.half_width
+                        * (
+                            2
+                            if self.config.polynomial_policy == "parity2"
+                            and self.base.n_prime % 4 == 1
+                            else 1
+                        ),
                         factor_count=self.config.factor_count,
                         family_count=self.config.family_count,
                         pool_size=self.config.pool_size,
@@ -396,7 +427,13 @@ class SIQSJob:
                     "assignments",
                     lambda: family_assignments(
                         self.base,
-                        self.half_width,
+                        self.half_width
+                        * (
+                            2
+                            if self.config.polynomial_policy == "parity2"
+                            and self.base.n_prime % 4 == 1
+                            else 1
+                        ),
                         factor_count=self.config.factor_count,
                         family_count=count,
                         pool_size=self.config.pool_size,

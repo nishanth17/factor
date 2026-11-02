@@ -127,4 +127,4 @@ benchmark-backend-sizes:
 lint:
 	.venv/bin/ruff check --no-cache .
 	.venv/bin/ruff format --check --no-cache .
-	.venv/bin/python -m pycodestyle --exclude=audit,local,results,history,.venv .
+	.venv/bin/python -m pycodestyle --exclude=audit,local,results,history,upstream,.venv .

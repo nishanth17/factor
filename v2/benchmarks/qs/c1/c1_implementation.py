@@ -104,6 +104,9 @@ def decode_config(value, module=qs):
             "collector"
         ].get("sparse_queue_bytes", 0):
             raise ValueError("owned control cannot apply combined collection")
+        for field in ("polynomial_policy", "multiplier_policy"):
+            if values.pop(field, "standard") != "standard":
+                raise ValueError("owned control cannot apply parity policies")
         values.pop("sign_policy", None)
         values["collector"].pop("sparse_queue_bytes", None)
     name = (

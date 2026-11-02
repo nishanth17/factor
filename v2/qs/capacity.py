@@ -64,7 +64,8 @@ def capacity_report(base, config):
     """
     eligible = tuple(p for p in base.primes if p != 2 and base.n_prime % p)
     count = config.factor_count
-    target = a_target(base.n_prime, config.half_width)
+    parity = config.polynomial_policy == "parity2" and base.n_prime % 4 == 1
+    target = a_target(base.n_prime, config.half_width * (2 if parity else 1))
     enough = len(eligible) >= count
     low = prod(eligible[:count]) if enough else None
     high = prod(eligible[-count:]) if enough else None
