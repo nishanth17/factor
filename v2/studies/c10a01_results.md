@@ -62,6 +62,32 @@ target; forced 70 visited one at 0.284 times target, with the other seven near
 uncertainties remain in the handoff; no retired assignment/face/quota grid
 was repeated or parameter retuning performed.
 
+## Calibration consumption and retained failure
+
+Measured completed functions used **291.007 wall / 290.769 CPU seconds**.
+This excludes unmeasured orchestration and one failed report-aggregation call;
+those retain conservative charges. Total charged allocation is **3124 wall
+AND CPU seconds**, leaving 476 of the 3600-second ceiling unused. Charged
+work is **138632524390**, including the failed report's full 10 billion units.
+No factoring observation failed, exhausted a cap or was retried.
+
+| Phase | Calls | Charged wall AND CPU seconds | Measured wall / CPU seconds |
+| --- | ---: | ---: | --- |
+| generation | 1 | 600 | 0.097 / 0.097 |
+| warmup | 18 | 630 | 63.913 / 63.894 |
+| prefix | 16 | 980 | 95.162 / 95.108 |
+| analysis | 31 | 114 | 1.125 / 1.042 |
+| observer | 8 | 160 | 13.614 / 13.609 |
+| forced | 4 | 200 | 109.807 / 109.733 |
+| memory | 2 | 100 | 7.289 / 7.288 |
+| orchestration | 1 | 340 | conservative allowance |
+
+The aggregation error counted its own pending reservation as an incomplete
+prior call. Its failed ledger entry remains, and corrected analysis uses a new
+identity. This is distinct from native memory/work exhaustion. Recorder output
+stayed bounded; numerical observation is now closed. Research, implementation
+and ordinary correctness QA were separate from this experimental allocation.
+
 ## Resources and later stages
 
 Literal configurations hold interval, block, LP domains, plans, queues,
@@ -157,3 +183,11 @@ Detailed research, conditional resource/work proofs, raw failures and receipts
 remain under ignored `v2/audit/c10a01/` and
 `v2/benchmarks/results/c10a01/`. No merge, push, default promotion or E1 work
 was performed.
+
+Validation: `make -C v2 test` passes 841 tests (9 optional-backend skips),
+and `make -C v2 lint` passes. A committed-only export passes the same suite,
+lint and all 204 benchmark/study module imports without local audit, results
+or upstream files. Focused checks include 50/55-digit opt-in setup, routing
+boundaries, observer passivity, original-row kernels and pilot censoring rules.
+All three readiness-only commands pass source, exact PyPy binary/version,
+input, resource and independent budget checks. Pilot execution remains zero.
