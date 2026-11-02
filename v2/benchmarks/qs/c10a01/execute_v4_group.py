@@ -116,7 +116,8 @@ def group(phase, digits):
         )
     for round_index in range(9):
         if phase == "roots":
-            order = rows[round_index % 3 :] + rows[: round_index % 3]
+            offset = round_index % 3
+            order = rows[offset:] + rows[:offset]
         else:
             order = (
                 rows if (round_index + (digits == 70)) % 2 == 0 else rows[::-1]
