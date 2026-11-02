@@ -168,3 +168,24 @@ The valid terminal decision is retain defaults and fixed opt-ins after all
 three bands fail screening. No fresh complete-factor acceptance claim, default
 change, merge, push or E1 reopening occurred. A1b-F1 fixed-score queue support
 remains a separate deferred mechanism; this task implements none of it.
+
+## Mainline integration and cleanup — 2 November 2026
+
+Merge `7e7c79d` integrates the study, frozen inputs/tooling and regression tests
+with the current status/backlog/results layout. All 69 production Python files
+are byte-identical to pre-integration mainline `8034bae`; defaults are retained.
+The committed-only merge passes 843 tests (9 skipped), lint, 197 benchmark
+imports and both original/continuation source-freeze checks. Integration QA
+used 53.351 wall /55.726 CPU seconds under its separate 600-second ceiling;
+no performance observations were repeated.
+
+After verification, the A1b worktree, temporary integration worktree, three
+source-verified QA directories, task scripts and both fully merged task branches
+were removed. Other worktrees and the shared performance lock were preserved.
+Remaining local research, captures and integration QA were archived before
+removal: `v2/audit/archives/a1b-mainline-20261102/a1b-complete-local-state.tar.gz`
+in the main checkout, 15899304 bytes /177 individually verified files. SHA256:
+`c07f5d589ead24acbb7fa345bcc0fb11b8d18eafbca9b219724c18c09b02a170`.
+The original two evidence archives remain unchanged. Local `qa.json`,
+`manifest.json`, `verification.json` and `cleanup.json` preserve the integration
+and removal receipts. This cleanup establishes no additional performance claim.

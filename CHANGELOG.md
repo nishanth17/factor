@@ -13,6 +13,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   accounting repair. Update status, live backlog and results navigation without
   restoring the superseded documentation layout. See the
   [final decision](v2/studies/a1b_gap_closure.md).
+- Verify committed-only tests/lint/imports and unchanged production source;
+  archive local state before removing the A1b worktree and temporary QA state.
 
 ## README navigation cleanup (1 November 2026)
 

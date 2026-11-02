@@ -1,7 +1,7 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `8034bae40e77060d505f85582105d44b22b70c9c`.
+Reviewed mainline/base: `7e7c79d420d2c28736c59ae79b908657bffed310`.
 A1b review record: `61899a9`; production defaults are unchanged.
 
 **Target metric: TBD — user to define.**
@@ -70,6 +70,8 @@ missing historical clocks and the explicit accounting repair remain recorded.
 See the [final decision](studies/a1b_gap_closure.md) and
 [numerical evidence](studies/a1b_final_results.json). Fixed-score queue support
 is a separate deferred mechanism, not a continuation of this completed study.
+Evidence and tests are integrated in mainline; task worktrees/scratch were
+removed after archive verification. See the report's integration/cleanup record.
 
 ## Work in flight
 
@@ -93,7 +95,8 @@ carry model/effort, triggers and full gates.
    B14 does not wait for GNFS or D7. Other B rows need their stated triggers.
 3. C9a — ranked useful-yield/target attribution, then intake/cycle weight;
    C10a — remaining triggered collection questions; C11 — High, continuing
-   provenance/calibration. Existing A1a follow-ups/A1c keep their scope; A1b-F1 remains Deferred.
+   provenance/calibration. Existing A1a follow-ups/A1c keep their scope;
+   A1b-F1 remains Deferred.
 4. Downstream D7/E3–E6, selected P6 challengers, G1/H1 and I1 wait for their
    recorded predecessors. E1 remains Deferred at user direction.
 
