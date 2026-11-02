@@ -1,0 +1,28 @@
+{
+  "calls": 22,
+  "diagnostic_reservation_seconds": 1530,
+  "files": {
+    "v2/benchmarks/inputs/corpora/c10a01_exposed.json": "fd61d9ba7616174b524298a31c661d21183990657e96ac9cd6123b7b0fdaa92c",
+    "v2/benchmarks/qs/c10a01/diagnostic_v4_execution.md": "ea802124ba98dd222d9de3013c58be9e8fab983dc7acaa1ee147cb554b2e1208",
+    "v2/benchmarks/qs/c10a01/execute_v4.py": "81991f022cc42047df990089b2dd1a5ac90672302c029eae9393eb78ec78e1f5",
+    "v2/benchmarks/qs/c10a01/execute_v4_diagnostics.py": "5007afa237ef9d6803bcb7fa79322cfa21228bab042eeb76726631830b3718f8",
+    "v2/benchmarks/qs/c10a01/execute_v4_group.py": "c10d20d566c32b60c21a3785659c3f660644334064d2d9e3f6545368d2d65a74",
+    "v2/benchmarks/qs/c10a01/execute_v4_stage.py": "34ea3832b848c9dd4187c31ef1e55c71a45c39ac6596746381061ed8a7662a04",
+    "v2/benchmarks/qs/c10a01/execution_v4_sources_r2.json": "9228680d8d63bed20e0b71e16586352098d9b08b879e23fe4226570ceeaa7808",
+    "v2/benchmarks/qs/c10a01/experiment_sources_v4.json": "e749e46b24a9885995c68a652845e448b5085a9659667ab51c2f53bb4efd762a",
+    "v2/benchmarks/qs/c10a01/experiment_v4.json": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
+    "v2/tests/test_c10a01_diagnostics_v4.py": "4f252a09904ae273cd575037bfb609d5d866137535c8b48354894ba9a800e64d"
+  },
+  "groups": 16,
+  "identity": "c10a01-v4-diagnostics-1",
+  "output_raw_bytes": 41943040,
+  "plan_sha256": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
+  "prior": {
+    "ledger.json": "101e3120d869699b15846f9c3d883bdaf3bae7f534a45fb84db33d1db0bb5a1c",
+    "primary-r2-analysis.json": "635cb3709e9e7f81546fab04eeb2b7289f4fff4f5087fb1f3e80fa34f72a320a"
+  },
+  "remaining_calibration_seconds": 2020,
+  "runtime_binary_sha256": "3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2",
+  "runtime_version": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]",
+  "source_commit": "1223bd176056e06b5ab5dca76cbfde3065242a40"
+}
