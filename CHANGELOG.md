@@ -3,6 +3,14 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## README navigation cleanup (1 November 2026)
+
+- Shorten the root and v2 overviews; put CLI, API and checkpoint instructions
+  in focused guides, with package READMEs for algorithms and shared execution.
+- Move benchmark measurements into a results guide, repair stale routing and
+  module references, and retain prior detail through pinned Git history.
+  Source, defaults, tests, corpora and experimental verdicts are unchanged.
+
 ## Roadmap documentation cleanup (1 November 2026)
 
 - Split current status, live backlog and stable policy. Preserve historical

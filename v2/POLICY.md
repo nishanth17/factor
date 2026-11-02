@@ -216,8 +216,8 @@ generated evidence or create individual-file study ignore rules. Preserve
 historical archives at their recorded restoration locations and lossless
 compression manifests. Publish concise commands, findings and limitations.
 
-The [history index](history/README.md) resolves the old removed-link labels and
-records the historical Git revision, source hash and original link context.
+The [history record](history/ROADMAP_CLEANUP.md) resolves the old removed-link
+labels and records the historical Git revision, source hash and original link context.
 The source audit used
 `1272e033f889a105792cbb924bf8a12a46ac88ae`; the C-sieve review used
 `5b4afb8f344ad5f6fbd20a186cd57b36182ea710`. Their native thresholds and OpenMP

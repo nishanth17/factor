@@ -1,74 +1,39 @@
 # Factor
 
-Integer factorization in Python, targeting **PyPy implementing Python 3.11**.
-[Factor v2](v2/README.md) is the active implementation;
-[v1](v1/) preserves the original Python 2 code for baseline comparisons.
+Integer factorization in Python, running on **PyPy implementing Python 3.11**.
+The active implementation is [v2](v2/README.md); [v1 baseline](v2/history/V1_BASELINE.md) preserves
+the original Python 2 baseline.
 
-v2 combines exact preprocessing, Brent rho, Pollard p−1 and Montgomery ECM
-in a seeded, bounded, resumable portfolio. It also includes experimental
-QS/MPQS, self-initializing quadratic sieve (SIQS), Smooth Subsum Search (SSS)
-and filtered SSSf engines. Results preserve signs, multiplicities and unfinished
-cofactors, with separate probable-prime and proven-prime labels.
+Factor combines exact preprocessing, Brent rho, Pollard p−1 and Montgomery
+ECM with quadratic-sieve and experimental relation engines. Results preserve
+factor multiplicities and unfinished cofactors, and distinguish probable
+primes from proven primes.
 
-## Run
+## Quick start
 
-Install a PyPy interpreter implementing Python 3.11, then run from this directory:
+With PyPy 3.11 installed, run from the repository root:
 
 ```sh
 make -C v2 runtime
-make -C v2 run N=626100403 SEED=7
 pypy3 -m v2.factor 626100403 --bounded --seed 7 \
   --work-limit 2000000 --seconds 30 --cpu-seconds 30
-pypy3 -m v2.factor 10002200057 --method siqs --seed 7
-pypy3 -m v2.factor 10002200057 --method qs --qs-base-bound 400 --seed 7
-pypy3 -m v2.factor 10002200057 --method mpqs --qs-base-bound 400 --seed 7
-pypy3 -m v2.factor 10002200057 --siqs --ecm-curves 2 --seed 7
-make -C v2 test
 ```
 
-Omit the number for an interactive prompt. `--method qs|mpqs|siqs` selects
-that engine after exact preprocessing; `--siqs` adds SIQS after rho/p−1/ECM.
-These selections use shared limits and recursive factoring of the returned
-children.
+Omit the number for an interactive prompt. The Python-integer backend uses
+only the standard library; GMP is optional.
 
-The factoring library uses standard-library integers and needs no third-party
-runtime packages. Development lint tools have a separate local environment.
-See the [v2 guide](v2/README.md) for setup, library calls, checkpoints and
-method selection. The supported runtime is PyPy Python 3.11.
+## Documentation
 
-## What changed from v1
-
-- Corrected arithmetic, sieve boundaries, retry and saturated-batch recovery;
-  every accepted split is a proper divisor and every result reconstructs.
-- Replaced ambiguous failure values with explicit complete or partial results.
-- Added shared work/time/storage allowances, streamed schedules and checkpoints.
-- Added verified relation collection, GF(2) solving and exact factor extraction
-  for SIQS and related experimental engines.
-- Reduced repeated preprocessing, root, relation and matrix work, with
-  reproducible comparisons and independent validation.
-
-A historical PyPy comparison measured **6.6% less elapsed time** on the original
-25-factorization batch and **19.4% less** on a separate 280-factorization control.
-These small-workload results compare repaired v2 with emulated v1 on the same
-interpreter; they are not current large-number performance guarantees.
-See [benchmark scope and results](v2/README.md#benchmarks).
-
-## Repository
-
-| Path | Contents |
+| Guide | Use it for |
 | --- | --- |
-| [v2/](v2/README.md) | Current methods, API, CLI and tests |
-| [v1/](v1/) | Original baseline, preserved unchanged |
-| [Benchmarks](v2/benchmarks/README.md) | Commands, measurements and limitations |
-| [Current status](v2/STATUS.md) | Automatic defaults, work in flight, next eligible work; links to backlog, policy and history |
+| [Getting started](v2/README.md) | Setup, methods and development commands |
+| [Command line](v2/docs/CLI.md) | Engine selection and resource options |
+| [Python API](v2/docs/API.md) | Results, bounded calls and library imports |
+| [Checkpoints](v2/docs/CHECKPOINTS.md) | Saving progress and cumulative resume limits |
+| [Current status](v2/STATUS.md) | Default routing, evidence limits and next work |
+| [Benchmarks](v2/benchmarks/README.md) | Runners, measured results and reproduction |
 | [Changelog](CHANGELOG.md) | Accepted changes |
+| [Contributor guidance](AGENTS.md) | Project rules and experiment design |
 
-Benchmark `inputs/` retain reproducible corpora, immutable baselines and
-required provenance. Generated captures, profiles, checkpoints and scratch work
-belong in ignored `results/` folders. The entire `v2/audit/` tree and historical
-raw evidence stay local. See
-[contributor guidance](AGENTS.md).
-
-The next major direction is a bounded GNFS pipeline, alongside arithmetic and
-portfolio experiments. Large balanced inputs remain demanding; there is no
-universal digit cutoff or guaranteed time to factor.
+Start with `v2/` for current usage. Its package guides describe each engine
+and shared execution layer.

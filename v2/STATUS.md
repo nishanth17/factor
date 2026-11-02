@@ -33,7 +33,7 @@ fields. SSS and production workers remain opt-in/experimental.
 | Exactly 55, native | Same | Same counted bundle as 52–54 | Same [C10a-04 adoption](studies/c10a04_default_promotion.md) and [A1a adoption](studies/a1a_default_promotion.md): **user-directed**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
 | 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; scored odd multiplier; 2 MiB plan; sparse marking; collection pacing | [C10a-04 adoption](studies/c10a04_default_promotion.md): **user-directed, unmeasured interpolated bands**. |
 | Exactly 60, native | Same | Same counted bundle as 56–59 | [C10a-04 adoption](studies/c10a04_default_promotion.md): **user-directed**, preliminary fresh compact confirmation; original campaign incomplete. |
-| Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, sparse marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](README.md#c9c10-size-scoped-growing-dlp-defaults); resource variants are **unmeasured**, not additional accepted gains. |
+| Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, sparse marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
 | Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size policy; swapped signs below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](studies/c10a07_default_promotion.md). No measured promoted size default at 41–49 or 61+. |
 
 Every fresh automatic SIQS configuration selects `sign_policy="swap_high"`.
@@ -48,13 +48,13 @@ backends and grants are unmeasured policy extrapolations. See the
 Omitted calibrated SIQS grants are 10^13 work units and 1,200 wall/CPU seconds
 through 55 digits, 1,800 at 56–60. All calibrated bundles use half-width 65,536,
 flyer assignments and a 64-polynomial family prefix. Explicit limits win;
-these grants promise no completion. Detailed [configuration bounds](README.md#c9c10-size-scoped-growing-dlp-defaults)
-include residual/endpoint/product limits and charged base-count resolution.
+these grants promise no completion. The [configuration guide](qs/CONFIGURATION.md#explicit-and-automatic-selection)
+explains residual/endpoint/product controls and charged base-count resolution.
 
 | ECM / shared portfolio scope | Owned memory / eligibility | Current automatic choice | Adoption evidence and limits |
 | --- | --- | --- | --- |
-| Exactly 30 digits | Existing funded cap; retain previous plan if coexistence fails | compact64: `(2000, 50000, 64)` | [C3 decision](benchmarks/README.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026): **user-directed before fresh confirmation**; oversized comparison Inconclusive, source screen unstable. |
-| Exactly 40 digits | Same; SIQS headroom above applies | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/README.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
+| Exactly 30 digits | Existing funded cap; retain previous plan if coexistence fails | compact64: `(2000, 50000, 64)` | [C3 decision](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026): **user-directed before fresh confirmation**; oversized comparison Inconclusive, source screen unstable. |
+| Exactly 40 digits | Same; SIQS headroom above applies | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
 | Other sizes, or explicitly selected paired executors | Caller/retained cap | Retained fixed32 numerical schedule | [C3 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#calibrate-automatic-selection-and-handoff-c3-then-g1); not a measured optimum for every size/backend. |
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 user-directed adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 user-directed adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
@@ -103,6 +103,6 @@ carry model/effort, triggers and full gates.
   between unsupported conclusions. Historical contradictory instructions stay
   in the pinned Git revision and are superseded by dated closure/current code.
 - **Unresolvable references:** none among the roadmap's “local audit material”
-  labels. The [history reference register](history/README.md#local-audit-reference-register)
+  labels. The [history reference register](history/ROADMAP_CLEANUP.md#local-audit-reference-register)
   names existing local paths and the committed M17 baseline. Historical source
   links use the pinned `v2/ROADMAP.md` Git revision and its original context.
