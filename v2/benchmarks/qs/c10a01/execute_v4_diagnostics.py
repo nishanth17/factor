@@ -32,6 +32,10 @@ def check_release(*, require_prior=False):
     for name, expected in release["files"].items():
         if digest(plan_v4.ROOT / name) != expected:
             raise RuntimeError("diagnostic source drift: " + name)
+    parent_sources = json.loads(plan_v4.SOURCES.read_text())
+    for name, expected in parent_sources["files"].items():
+        if digest(plan_v4.ROOT / name) != expected:
+            raise RuntimeError("production source drift: " + name)
     prior_available = True
     for name, expected in release["prior"].items():
         path = (
@@ -196,7 +200,17 @@ def main():
         return
     OUTPUT.mkdir(parents=True, exist_ok=True)
     ledger = Ledger(OUTPUT, digest(RELEASE), limits(plan))
+    old = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4"
     for call in calls:
+        raw_bytes = sum(
+            path.stat().st_size
+            for directory in (old, PRIMARY, OUTPUT)
+            if directory.exists()
+            for path in directory.rglob("*")
+            if path.is_file()
+        )
+        if raw_bytes + 2**20 > 40 * 2**20:
+            raise RuntimeError("combined raw study output allowance exhausted")
         name = call["id"]
         if any(r["receipt"] == name + ".json" for r in ledger.data["calls"]):
             continue
