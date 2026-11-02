@@ -1,4 +1,4 @@
-# A1a user-directed mainline adoption — 31 October 2026
+# A1a mainline adoption — 31 October 2026
 
 Fresh native Python-integer jobs at exactly 50 through 55 decimal digits,
 inclusive, select `density+presieve+scan_fused` with the default 1 GiB owned
@@ -8,7 +8,7 @@ allowances/backends and saved selectors keep their prior behavior. Existing
 count/base, Gray quotas, finite work/time limits and serialized formats remain
 unchanged. Forty digits and 56–60 digits keep their previous marking.
 
-This adoption follows explicit user direction after the
+This adoption follows the
 [frozen comparisons](a1a_frozen_results.md):
 
 | Comparison | 50 digits | 55 digits |

@@ -2,7 +2,7 @@
 
 Use the [package guide](README.md) for jobs and relation invariants.
 [STATUS](../STATUS.md#current-automatic-defaults) is the single current
-size/resource routing table, including user-directed and unmeasured bands.
+size/resource routing table, including adopted and unmeasured bands.
 The selectors are [defaults.py](defaults.py) and [siqs.py](siqs.py).
 
 ## Explicit and automatic selection
@@ -95,7 +95,7 @@ singular sparse roots, unaligned blocks or capacity refusal use the ordinary
 exact path. All hits and candidate checks remain covered. Polynomial changes
 release queues; interruption/restore rebuilds them with charges.
 
-This selection was [adopted at user direction](../studies/c10a07_default_promotion.md).
+This selection was [adopted](../studies/c10a07_default_promotion.md).
 Its exploratory performance label and unmet drift/confirmation gates remain
 attached to the evidence. Other scope extensions are not confirmed gains.
 

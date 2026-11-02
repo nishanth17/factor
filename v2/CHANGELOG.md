@@ -2,8 +2,8 @@
 
 ## A6 default promotion — 9 October 2026
 
-- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
-  the user's explicit direction. Fresh complete stages save 9.73% CPU across
+- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults.
+  Fresh complete stages save 9.73% CPU across
   nine matched cells; extended integer portfolio captures remain inconclusive.
   Record that limitation without claiming sustained portfolio improvement.
 - Use portfolio checkpoint version 9 for the new executor; pin both settings,
@@ -92,7 +92,7 @@
   Keep the measured native helper unchanged after the GMP rollback; its AST
   matches the frozen bridge and the GMP loop matches the original baseline.
 - Complete the bounded B4 entry. Keep final acceptance, mainline integration
-  and user-requested worktree/temp cleanup in the benchmark record; preserve
+  and worktree/temp cleanup in the benchmark record; preserve
   required versioned corpora and all historical frozen controls. Pass 414
   committed-only PyPy/GMP tests, full lint, 76 benchmark imports and frozen
   loaders. Merge native-only integration to master; delete the B4 checkout,
@@ -218,7 +218,7 @@
   398 system-PyPy tests (three optional-GMP skips), all 67 benchmark imports
   and required A10 proof/control/protocol/v1-adapter loaders. Preserve versioned
   inputs/citations/summaries; remove the isolated worktree and generated local
-  captures after integration at the user's request.
+  captures after integration.
 
 ## B2 aligned-wheel follow-up — 9 October 2026
 

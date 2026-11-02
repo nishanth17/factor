@@ -141,7 +141,7 @@ PYTHONPATH=. /Users/nishanthmohan/code/factor/v2/.venv/bin/python -B \
 ## Verdict and promotion handoff
 
 The preliminary fresh trend favors compact for this 60-digit distribution.
-The user-authorized early stop provides the requested bounded answer without
+The authorized early stop provides the bounded answer without
 collecting the last three pairs. It does not meet the ordinary nine-sample
 accepted-timing gate, estimate sequential significance, establish global
 optimality or confirm a general production default. No confidence interval

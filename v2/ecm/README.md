@@ -29,7 +29,7 @@ curve count but no shared portfolio deadline or portable checkpoint.
 PRAC/batch16; explicit Lucas/CF alternatives use `ecm_chain_family`.
 Automatic GMP jobs keep the ladder, while explicit GMP reuse has its own
 validated route. The [status table](../STATUS.md#current-automatic-defaults)
-records current routing and the user-directed adoption boundary.
+records current routing and the adoption boundary.
 
 A plan requires compatible bounds, chunks, curve count and owned storage;
 execution is restricted to supported 40–80-digit cofactors. Unsupported jobs

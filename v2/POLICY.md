@@ -14,16 +14,16 @@ optional gmpy2 are separate tracks. Keep canonical results and backend-bound
 checked checkpoints. Missing GMP is an explicit error, never a CPython fallback.
 
 The recorded objective is general factoring below 100 decimal digits on the
-Apple M4 / 24 GiB / 10-core machine. The 1 November user direction keeps useful
+Apple M4 / 24 GiB / 10-core machine. The 1 November priority keeps useful
 progress toward 60–80 digits central. A single 50-digit cohort is not the
 objective. The target metric remains TBD in STATUS.md.
 
-E1 combined confirmation is deferred at user direction. GNFS stays deferred
+E1 combined confirmation is deferred. GNFS stays deferred
 until H1 and a subsequent coverage review activate A9. Individual accepted
 tranches may ship when their own gates pass; optional losses can settle a
 predecessor. A task ID, research note or this backlog alone authorizes no run.
-Default promotion needs the stated gates or explicit user direction; record
-the latter separately with every unmet gate and limitation.
+Default promotion requires the stated gates or an explicitly authorized,
+separately recorded exception. Record every unmet gate and limitation.
 
 ## How to use the gates
 
@@ -125,7 +125,7 @@ confirm the model names and supported effort settings.
 | Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. Coordinate relation and checkpoint edits. |
 | ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm/core.py` and `execution/stage_jobs.py` integration. |
 | Schedules/continuations | P5.2/P5.3 and p+1 coordinate `execution/schedules.py`, stage jobs, backend boundaries and checkpoint versions. |
-| CLI/dispatch | Completed A11 covers explicit QS/MPQS/SIQS access. C3a/G1 own remaining allocation/handoff deltas. Coordinate `factor.py`, configuration identity and user docs. |
+| CLI/dispatch | Completed A11 covers explicit QS/MPQS/SIQS access. C3a/G1 own remaining allocation/handoff deltas. Coordinate `factor.py`, configuration identity and usage guides. |
 | Classification/proofs | A10a/B14 coordinate `common/utils.py`, result certainty, CLI and checkpoints. Other v1 transfers retain their arithmetic, schedule or sieve owner. |
 | Evidence/integration | One integration writer reconciles shared configuration, portfolio, benchmark guide and roadmap decisions. |
 

@@ -26,7 +26,7 @@ are verified. Production arithmetic and defaults are unchanged. The study is
 terminal; do not rerun historical timing to replace outcomes.
 
 
-At explicit user direction, [combined face/queue defaults are adopted](
+[Combined face/queue defaults are adopted](
 ../studies/c10a07_default_promotion.md) after production integration and committed
 correctness/QA checks. The timing evidence below remains exploratory; the
 optional 18-call confirmation was not run. Automatic SIQS jobs use the swapped
@@ -39,7 +39,7 @@ complete in every arm. Observed equal-band wall cost falls 22.4% for queue and
 23.1% for face+queue, with only 0.86% incremental combined benefit. Missing parent
 end drift keeps these exploratory; active continuation drift passes, while 45
 is unresolved and its drift fails. The original report nominated queue alone;
-the later combined adoption is a separate user-directed decision.
+the later combined adoption is a separate policy decision.
 The [numerical summary](../studies/c10a07_panel_results.json) records exact costs,
 uncertainty, resource accounts and the verified 26.3 MB archive. Committed-only
 857-test QA (nine skipped), lint and 215 benchmark imports pass.
@@ -82,7 +82,7 @@ the [frozen execution report](../studies/a1a_frozen_results.md) accepts a scoped
 6.008% complete-cost reduction at 50 digits (99.5% interval: 4.373–7.795%
 lower). The 55-digit result remains inconclusive after its one full stability
 extension because repeated-cell drift persists. Subsequent
-[user-directed adoption](../studies/a1a_default_promotion.md) selects the
+[adoption](../studies/a1a_default_promotion.md) selects the
 integration at native 50–55 digits, inclusive, at 1 GiB owned memory; 51–54
 are unmeasured extrapolations and 55 retains its inconclusive timing label.
 The completed isolated study's 5.945%/3.214% cost reductions do not
@@ -109,7 +109,7 @@ The original multi-band campaign remains incomplete and its evidence intact.
 The [completed preliminary result](../studies/c10a04_short_results.md) stopped
 after six pairs: compact completed 6/6 versus 5/6 and used 36.16% less total
 capped time, with 31.72–40.08% saving per input. The subsequent
-[user-directed promotion](../studies/c10a04_default_promotion.md) enables
+[promotion](../studies/c10a04_default_promotion.md) enables
 50–60-digit routing, preserving 50/51 settings and documenting unstable 55
 training and unmeasured intermediate sizes.
 The [65-digit feasibility spike](../studies/c10a04_spike65_results.md) timed
@@ -131,8 +131,8 @@ at `96e2aad`; current integration intentionally changes its strict source pin.
 Other C10a items, C9a feedback and E1 remain open. These percentages are not
 additive with earlier C1/C9/C10 studies.
 
-The larger-band follow-up checks the user's
-requested 50+ routing. Nine matched training groups on three 51-digit
+The larger-band follow-up checks
+50+ routing. Nine matched training groups on three 51-digit
 products gave 9/9 complete candidates for C9/window, C10/window and
 collection pacing, versus 0/9 for the actual 51-digit default. The direct
 C10/window-to-collection complete-cost reduction was 28.19% in training
@@ -144,7 +144,7 @@ Inclusive wall/CPU charge was 12,199.720/12,188.535 s, including 3,500 s
 prepaid feasibility/QA; a six-group training lease resumed without resetting
 charges. The 55-digit one-number pilot finished under a longer 1,200 s grant,
 while the 60-digit pilot was censored at that grant. At this decision, only exact 51-digit native routing advanced; the later
-C10a-04 user-directed extension above covers 52–60 with its stated limitations.
+C10a-04 extension above covers 52–60 with its stated limitations.
 
 The C10 tranche 1 report records an isolated
 2 MiB prime-power plan improvement on fresh complete factoring: 21.83% at
@@ -163,7 +163,7 @@ closes the delivered C10 tranche without claiming the whole size-policy space.
 The subsequent C10a-05 decision above resolves only fixed collection pacing.
 
 The subsequent C9 default promotion makes its
-confirmed native 50-digit bundle automatic at the user's direction, preserving
+confirmed native 50-digit bundle automatic, preserving
 explicit limits/settings and saved configurations. Its finite omitted grant
 uses the confirmed resource window; this adds no new timing evidence.
 The later C10 selector composes its accepted plan with that 50-digit bundle;
@@ -196,8 +196,8 @@ and every calibration-capture hash are committed before comparison. These
 are training projections; no warmed policy promotion follows from the fit.
 
 The complete-call procedure froze
-57 revealed subjects, nine seeds and three arms. It was stopped after the user
-questioned the 513-group training scope: 72 complete matched groups (216 valid
+57 revealed subjects, nine seeds and three arms. It stopped after review of
+the 513-group training scope: 72 complete matched groups (216 valid
 calls) are preserved, with no comparison decision. Its interrupted group grant
 remains charged; the protocol is permanently inconclusive and cannot resume.
 See the scope decision.
@@ -212,12 +212,12 @@ fresh confirmation. See model limits and the
 prepared certificate mechanism.
 The initial source-screen results complete
 all 324 calls. `escalating140` and `ladder115` show 44.44%/47.39% lower
-training CPU cost than fixed32, but uncertainty remains wide. After the user raised
-a time concern, defer the prescribed extension and fresh confirmation, select no
-policy and retain defaults. Final committed-only checks pass 653 tests, lint,
+training CPU cost than fixed32, but uncertainty remains wide. Time concerns
+led to deferring the prescribed extension and fresh confirmation, selecting no
+policy and retaining defaults. Final committed-only checks pass 653 tests, lint,
 154 benchmark imports and 35 certified corpora.
-The user subsequently requested default promotion:
-use compact64 at 30 digits and the escalating prefix at 40 digits,
+The subsequent default promotion selects
+compact64 at 30 digits and the escalating prefix at 40 digits,
 subject to existing workspace admission. This separate decision overrides the
 earlier defer decision; it does not alter the frozen assessment's null selection,
 pass its stability gate, or claim a measured hybrid gain. No new timing search
@@ -247,14 +247,14 @@ and 34 certified corpora. Required inputs are versioned; raw receipts remain
 ignored and preserved locally. Reproduction commands and all memory, seed,
 small-population and source-identity limits are in the acceptance report.
 That tranche left broad C3 calibration, G1 and E1 open. The later
-user-directed numerical promotion is recorded in the preceding C3 section.
+numerical promotion is recorded in the preceding C3 section.
 
 ## C10a-04 historical freeze
 
 The original 55/60/65-digit campaign remains paused and incomplete. Its
 frozen sources and protocols are retained in Git history at `225634b`, with
 detailed research and every attempt preserved locally. The separate 60-digit
-result informed the user-directed 50–60 default promotion; the 65-digit spike
+result informed the 50–60 default promotion; the 65-digit spike
 established no completed-factor evidence at its 1800-second grant. See the
 linked result and promotion summaries above. E1 remains deferred.
 

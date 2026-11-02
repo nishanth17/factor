@@ -7,7 +7,7 @@ holds live work and [POLICY](../POLICY.md) holds stable rules.
 
 The [pre-cleanup roadmap at `4a946b8`](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md) preserves detailed completed-item
 narratives, every quantitative result, original decisions, limitations and
-unexecuted gates. At user direction, Git history is the historical record;
+unexecuted gates. Git history is the historical record;
 there is no duplicate full roadmap in the current tree. The completed register
 and historical heading aliases link directly to that pinned revision. New dated
 documents and current code govern live behavior. No historical freeze is rewritten.
@@ -64,11 +64,11 @@ Do not treat a diagnostic script as an acceptance test or restart old accounts.
 | --- | --- |
 | Heading dated 3–5 October despite November entries | STATUS and ROADMAP use 1 November and the reviewed mainline commit. Original dates remain in the pinned Git revision. |
 | Immediate allocation / lanes still start B1 | Mark B1's bounded tranche Done on 9 October; preserve larger feasibility and downstream owners. [Recorded B1 decision](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations). |
-| Earlier C10a-07 “open”, “finish face comparison first” and unstarted screens | The completed 42-call panel superseded both unstarted 60-only screens. User-directed closure supersedes the retain-default recommendation, with no upgraded experimental verdict. [Panel](../studies/c10a07_panel_results.md), [1 November adoption](../studies/c10a07_default_promotion.md), [changelog](../../CHANGELOG.md#c10a-07-combined-defaults-1-november-2026). |
+| Earlier C10a-07 “open”, “finish face comparison first” and unstarted screens | The completed 42-call panel superseded both unstarted 60-only screens. Closure supersedes the retain-default recommendation, with no upgraded experimental verdict. [Panel](../studies/c10a07_panel_results.md), [1 November adoption](../studies/c10a07_default_promotion.md), [changelog](../../CHANGELOG.md#c10a-07-combined-defaults-1-november-2026). |
 | A1a six-call sparse-queue screen still unchecked | Panel replaced it; production queue adoption closes that delivered work under C10a-07. Keep quota-aware setup, lifted-root reuse and distinct conditional comparisons live. Same panel/adoption sources. |
-| P3.4 says scored multipliers remain optional | Historical P3.4 decision retained. Current 52–60 defaults use scored odd multiplier (`multiplier=0`), confirmed by [selector](../qs/defaults.py), with the original [user-directed limits](../studies/c10a04_default_promotion.md). |
+| P3.4 says scored multipliers remain optional | Historical P3.4 decision retained. Current 52–60 defaults use scored odd multiplier (`multiplier=0`), confirmed by [selector](../qs/defaults.py), with the original [adoption limits](../studies/c10a04_default_promotion.md). |
 | Broad “SIQS stays opt-in” / “handoff open” language | Scope current automatic routing to native 40 and 50–60 via [portfolio](../portfolio.py) and [selector](../qs/defaults.py); joint calibration remains G1/E1. Changelog wording is explicitly historical. |
-| C6/B4/B3 ladder/default statements from separate dates | Keep isolated study verdicts; current supported native PRAC is the user-directed B3 route, with exact fallback from [eligibility code](../ecm/chain_options.py). |
+| C6/B4/B3 ladder/default statements from separate dates | Keep isolated study verdicts; current supported native PRAC is the B3 route, with exact fallback from [eligibility code](../ecm/chain_options.py). |
 | Phase 8 labelled wholly unimplemented despite A10/C3 deliveries | Show completed capability tranches separately from still-open integrated P8 work and deferred E1. [A10 acceptance](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p821--transfer-verified-v1-advantages-starting-with-primality-a10), [C3 decision](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#calibrate-automatic-selection-and-handoff-c3-then-g1). |
 | Removed local-audit links | Resolve every marked occurrence through the register above. The original Git object remains unchanged. |
 | Missing spaces around numbers | Normalize live summaries and affected guide/changelog prose. Keep math, identifiers, Git history and study reports unchanged. |
@@ -76,4 +76,4 @@ Do not treat a diagnostic script as an acceptance test or restart old accounts.
 Unresolved conflicts: none among the checked entries. No source report,
 experimental verdict, code, default, test, corpus or generated evidence was
 changed. This follow-up changes documentation storage and links only. Publishing to
-mainline is explicitly user-authorized; no new experiment is scheduled.
+mainline is explicitly authorized; no new experiment is scheduled.

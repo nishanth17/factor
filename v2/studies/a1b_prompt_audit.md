@@ -1,11 +1,11 @@
 # A1b audit against the execution request
 
-**Subsequent resolution:** the user requested gap closure. The
+**Subsequent resolution:** the
 [completed repair](a1b_gap_closure.md) supplies the six missing55 calls,
 exact-composition checks and explicitly revised accounting. All 30 calls are
 now measured. This historical audit and its original findings remain below.
 
-This addendum follows the user's challenge to the completion claim at
+This addendum follows review of the completion claim at
 566a461. **Actual experiments were run, but full compliance with the original
 request was not established.** The 50/60 prefix evidence remains valid for its
 limited purpose; the broad A1b completion claim is withdrawn pending disposition
@@ -45,7 +45,7 @@ or fresh confirmation was run.
 
 ## Requirement coverage
 
-The numbered rows below correspond to the original user request. "Covered"
+The numbered rows below correspond to the original execution request. "Covered"
 means the named work has evidence; it does not imply that later conditions
 were reached or that a universal performance claim is supported.
 

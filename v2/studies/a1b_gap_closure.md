@@ -103,7 +103,7 @@ or pooled with the new process's measurements.
 
 ## Explicit accounting resolution
 
-The user's request to close the gaps authorized a prospective Stage A repair.
+A prospective Stage A repair was authorized to close the gaps.
 The unused 30-second diagnostic allocation was explicitly reassigned before
 measurement:10 seconds retrospective omitted-analysis debit,15 new analysis,
 5 continuation orchestration. Original charges, including failed 60-second

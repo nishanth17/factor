@@ -40,7 +40,7 @@ execution when a call needs shared work/time limits or resumable progress.
 
 See [STATUS.md](STATUS.md) for automatic size/resource routing and its adoption
 limits. Explicit settings and saved configurations take precedence. Experimental
-methods and user-directed defaults retain their recorded evidence limits;
+methods and adopted defaults retain their recorded evidence limits;
 there is no general digit-based completion guarantee.
 
 ## Optional GMP backend

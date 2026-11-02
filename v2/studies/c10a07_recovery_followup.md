@@ -1,6 +1,6 @@
 # Follow-up design after the recovery screen
 
-The user has subsequently adopted the combined production policy without this
+The combined production policy was subsequently adopted without this
 additional confirmation. This optional design is retained for future validation;
 it is not scheduled and does not block C10a-07 closure.
 

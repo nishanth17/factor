@@ -63,6 +63,6 @@ integration and the selected fields in `PortfolioConfig`.
 [core.py](core.py) contains the standalone splitter, [bounded.py](bounded.py)
 the campaign state machine, [gaps.py](gaps.py) gap tables and exact extension
 ratios, and [tuning.py](tuning.py) explicit execution alternatives.
-Measurements and the user-directed adoption limits are in
+Measurements and the adoption limits are in
 [benchmark results](../benchmarks/RESULTS.md) and the
 [historical A6 documentation](https://github.com/nishanth17/factor/blob/24ff153d26ada2ec4beeead07000d183e94fd355/v2/README.md#a6-production-default-promotion--9-october-2026).

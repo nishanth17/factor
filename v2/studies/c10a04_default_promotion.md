@@ -1,9 +1,9 @@
 # C10a-04 default promotion — 12 October 2026
 
-The user explicitly requested automatic 50–60-digit routing, local mainline
-integration and closure after reviewing the evidence. This is a policy
-promotion at user direction, not completion of the original multi-band
-experiment or a claim that all its statistical gates passed.
+Automatic 50–60-digit routing was adopted and integrated into mainline after
+evidence review, closing the delivered routing tranche. This policy promotion
+does not complete the original multi-band experiment or establish that all
+its statistical gates passed.
 
 | Native input size | Fresh automatic configuration | Omitted wall/CPU grant |
 | --- | --- | --- |
@@ -63,7 +63,7 @@ Full PyPy tests, lint and committed-only benchmark imports are checked before
 merge. Raw study and QA evidence remains ignored and is preserved before
 worktree cleanup.
 
-Close the delivered C10a-04 routing tranche at user direction. The original
+Close the delivered C10a-04 routing tranche. The original
 campaign remains incomplete, E1 deferred and C10a-07 open. The separately
 requested 65-digit feasibility spike uses 8500 entries and nine A factors,
 with finite matched grants; extending defaults through 65 depends on its

@@ -41,8 +41,8 @@ were independently checked. One conditioned balanced product and seed 7,
 compact first then control, provide feasibility evidence only.
 
 The first launch stopped during warmup when another checkout ran tests;
-neither timed call had started. The user explicitly approved a new charged
-warmup using the same committed input after those tests ended. Continuation
+neither timed call had started. A new charged warmup was authorized using the
+same committed input after those tests ended. Continuation
 `d9cf145` retained the failed row, full 5-second/10^13-work reservation and
 original deadline. Both new warmups passed. Each timed call retains its full
 1805-second reservation. Final ledger totals are 4350 wall/CPU seconds and
@@ -57,5 +57,5 @@ The compact receipt is
 `ca9136f72f115e90b3549c8afdd42f46867cda08a3ad671e44cdd7f9e11050f8`;
 control is `f1aa5d1695223f4acf7c04ee1584dcc91fe6a2d02838d6be1cee0dcec5fd7710`.
 Neither this result nor progress counters justify extrapolated 61–65 defaults.
-The separate user-directed 50–60 promotion remains as documented, with E1
+The separate 50–60 promotion remains as documented, with E1
 deferred and C10a-07 open.

@@ -30,6 +30,8 @@ first, then the [live backlog](v2/ROADMAP.md) and [stable policy](v2/POLICY.md).
   explain their meaning near the formula when it is not already evident.
 - Make tests and benchmark runners easy to scan by separating setup, execution
   and validation. Keep comments focused on the case or experiment being tested.
+- Write project documentation in neutral terms. State decisions and evidence
+  limits without personal attribution.
 - Keep readability-only passes separate from behavior changes. Preserve APIs,
   algorithms, defaults, seeds, work accounting and serialized formats; leave
   immutable source snapshots and historical evidence unchanged.

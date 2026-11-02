@@ -1,8 +1,8 @@
 # C10a-07 face and queue terminal results
 
-Subsequent decision: [combined production defaults were adopted at explicit
-user direction](c10a07_default_promotion.md). The experimental findings, original
-recommendation and limitations below remain unchanged. Evidence has moved to
+Subsequent decision: [combined production defaults were adopted](c10a07_default_promotion.md).
+The experimental findings, original recommendation and limitations below
+remain unchanged. Evidence has moved to
 `v2/audit/archives/c10a07-20261101/`; numerical metadata records its preserved path.
 
 The bounded comparison is complete: **42 timed calls**, with all nine fresh

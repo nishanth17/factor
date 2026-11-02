@@ -1,8 +1,8 @@
-# C10a-07 user-directed combined adoption
+# C10a-07 combined adoption
 
-On1 November2026 the user explicitly requested the combined policy as the
-default across applicable automatic SIQS calls, without another performance
-campaign. This supersedes the terminal report's retain-default recommendation;
+On 1 November 2026 the combined policy was adopted as the default across
+applicable automatic SIQS calls, without another performance campaign. This
+supersedes the terminal report's retain-default recommendation;
 it does not change its observations or turn an unmet gate into a pass.
 
 The completed42-call study observed23.1% lower wall /23.0% lower CPU cost for
@@ -32,7 +32,7 @@ derived queues with charges; versions1–6 retain old policy and encoding. CLI,
 portfolio and count-policy snapshots restore their saved choices. Existing
 parameter bands, deadlines, certainty, proper-divisor and reconstruction checks
 remain in force. Size/backend/grant scopes outside the measured505560 panel
-are user-directed policy extrapolations; unsupported paths retain exact fallback.
+are policy extrapolations; unsupported paths retain exact fallback.
 
 ## Correctness and QA
 
@@ -53,7 +53,7 @@ controls and frozen source snapshots were not rewritten to make tests pass.
 
 ## Closure and evidence
 
-C10a-07 is complete at user direction with these findings. Formal experimental
+C10a-07 is complete with these findings. Formal experimental
 acceptance remains inconclusive; broader generalization and other collector
 mechanisms are optional work under their existing roadmap owners.
 

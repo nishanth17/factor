@@ -28,25 +28,25 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 - Split current status, live backlog and stable policy. Preserve historical
   quantitative narratives through a pinned Git revision and source/hash metadata
-  in the [history index](v2/history/README.md). At user direction, remove the
+  in the [history index](v2/history/README.md). Remove the
   duplicate full snapshot and use Git history. No experimental verdict changed.
 
 ## C10a-07 combined defaults (1 November 2026)
 
-- At explicit user direction, adopt swapped adjacent sign coordinates for fresh
+- Adopt swapped adjacent sign coordinates for fresh
   automatic SIQS jobs and exact sparse prime/power queues in eligible collectors.
   Preserve A1a kernels, existing parameter/routing bands, total owned memory,
   explicit policies, legacy snapshots and charged exact fallback/resume.
 - Record 23.1% observed wall / 23.0% CPU reduction on nine fresh 50/55/60 inputs as
   exploratory: the original drift gate remains unmet. The additional 18-call
-  confirmation was not run; adoption is a separate user decision.
+  confirmation was not run; adoption is a separate policy decision.
 - Close C10a-07 with findings and verified production integration. Preserve
   receipts/research/commits before removing temporary worktrees and scratch.
   See [adoption](v2/studies/c10a07_default_promotion.md).
 
 ## A1a mainline adoption (31 October 2026)
 
-- At user direction, select `density+presieve+scan_fused` for fresh native
+- Select `density+presieve+scan_fused` for fresh native
   50–55-digit jobs, inclusive, with the default 1 GiB owned allowance. Preserve
   explicit configurations, other resource scopes and saved selectors.
 - Keep selected-power periods and four-stride marking opt-in after their
@@ -104,7 +104,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C10a-04 default promotion (12 October 2026)
 
-- At user direction, enable native growing-DLP SIQS defaults through 60 digits,
+- Enable native growing-DLP SIQS defaults through 60 digits,
   preserving accepted 50/51 settings. Use charged exact 2500-entry compact bases
   at 52–55 and 5000 at 56–60, with finite budgets and saved-policy replay.
 - Record preliminary and extrapolated coverage in the
@@ -226,8 +226,8 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## Current development
 
-- Promote C9's confirmed native 50-digit growing-DLP bundle by default at the
-  user's direction. Route omitted SIQS/automatic/CLI selections through the
+- Promote C9's confirmed native 50-digit growing-DLP bundle by default.
+  Route omitted SIQS/automatic/CLI selections through the
   exact accepted configuration and finite 1 GiB / 1,200-second / 10^13-work
   grant; preserve explicit configurations, limits and concrete checkpoint
   settings. Measured benefit covers the balanced confirmation cohort;
@@ -257,12 +257,12 @@ below record decisions in their dated scope; later entries may supersede routes.
   Retain 30/40 recommendations and defaults. The C9.2 report records costs,
   uncertainty, stopped studies and limitations; C10/E1 remain open.
 
-- Integrate the delivered C3 allocation/handoff tranche and user-directed
+- Integrate the delivered C3 allocation/handoff tranche and
   30/40-digit ECM defaults into mainline. Cross off the bounded C3 roadmap
   entry while retaining the unrun fresh/stability gates and broader joint
   calibration under the continuing follow-ups.
 
-- Promote C3's size-scoped bounded defaults at the user's direction: compact64
+- Promote C3's size-scoped bounded defaults: compact64
   at 30 decimal digits and the 10/30/100 escalating prefix at
   40 digits. Preserve explicit tiers, numerical legacy resumes, all cumulative
   limits and SIQS settings; retain fixed32 for other sizes or tight workspace.
@@ -272,8 +272,8 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Complete the initial 54-group upstream ECM transfer screen: all 324 calls
   validate under unchanged SIQS settings and reserves. The escalating140 and ladder115 schedules show
   44.44%/47.39% lower revealed-training CPU cost
-  than fixed32, with wide uncertainty. Stop this pass after the user raised
-  a time concern; defer extension/fresh confirmation and retain defaults.
+  than fixed32, with wide uncertainty. Stop this pass over
+  runtime concerns; defer extension/fresh confirmation and retain defaults.
   Committed-only checks pass 653 tests, lint and all benchmark/input loaders.
 
 - Reduce C3's next policy-screening scope after stopping the oversized
@@ -317,8 +317,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   lint, 144 imports and 34 certified corpora pass. Keep broad C3/G1/E1
   calibration open; preserve v1 and C9/C10 collector ownership.
 
-- Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs at
-  the user's direction. Keep B4 for unsupported jobs and insufficient explicit
+- Enable native reduced PRAC/batch 16 for supported fresh bounded ECM jobs.
+  Keep B4 for unsupported jobs and insufficient explicit
   caps; select the separately approved finite 16 MiB automatic workspace only
   where supported. Preserve earlier construction/regression evidence.
 - Add optional `--ecm-chain lucas|cf` and the `ecm_chain_family` API setting;
@@ -396,8 +396,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   missing 40-digit SSS calibration and fresh combined confirmation as deferrals.
   Flag A11's prior outstanding status as stale; automatic handoff stays C3/G1.
 
-- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults at
-  the user's explicit direction. Fresh complete stages save 9.73% CPU across
+- Promote bounded p−1 recurrence and p−1-only chunk 64 to fresh defaults.
+  Fresh complete stages save 9.73% CPU across
   nine matched cells; extended integer portfolio captures remain inconclusive.
   Record that limitation without claiming sustained portfolio improvement.
 - Use portfolio checkpoint version 9 for the new executor; pin both settings,
@@ -441,7 +441,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Retain the ladder: Lucas costs 2.03x native-int and 1.22x GMP complete ECM
   campaign time with identical completion on the frozen 40–80-digit cohort.
   Record generation, amortization, storage, cold costs and the conditional
-  search stop. Apply the user's revised policy allowing confirmed sub-10%
+  search stop. Apply the revised policy allowing confirmed sub-10%
   gains without rewriting the historical protocol. B3 production routing,
   budgets and checkpoint integration remain open; v1 and kernels are unchanged.
   A committed-only archive passes 411 PyPy/GMP tests, full lint and all 72
@@ -593,8 +593,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   retain production-bound stage and larger QS measurements. Persistent mpz
   takes about 12 times native time in matched 50–100-digit bounded QS screens;
   a fivefold longer 50-digit run confirms the loss. Keep native loops as the
-  provisional default. The user ended further experiments, with disjoint
-  confirmation and automatic selection still open.
+  provisional default. Further experiments stopped; disjoint
+  confirmation and automatic selection remain open.
 - Integrate the optional GMP boundary with verified PRAC and reusable ECM
   programs. Preserve native portfolio checkpoint schemas 4/5, use version 6
   for combined GMP identity, and accept pre-integration backend snapshots.
@@ -616,7 +616,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   separate from complete-campaign evidence.
   Preserve production ladder defaults. B3 integration remains open; defer
   reference ECM precomputed Lucas chains and compact execution to the separate
-  P4.5/C6 experiment at the user's request.
+  P4.5/C6 experiment.
 
 - Add P5.2 A3's opt-in immutable packed ECM prime/power blocks with bounded
   retention, charged regeneration and curve-private arithmetic. Preserve
@@ -632,7 +632,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   finite deeper-campaign/large-bound runners with exclusive timing checks.
   Preserve exploratory completion records and verify a focused fixed-curve
   60/80-digit timing pass; defer broader timing and large-factor success claims
-  after the user ended the expanded study early. Freeze the original
+  after the expanded study ended early. Freeze the original
   control helpers separately without altering its immutable source snapshot.
 
 - Expose QS/MPQS/SIQS through `--method qs|mpqs|siqs` after exact preprocessing,

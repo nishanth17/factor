@@ -1,6 +1,6 @@
 # A1a frozen execution results — 31 October 2026
 
-Subsequent [user-directed adoption and cleanup](a1a_default_promotion.md)
+Subsequent [adoption and cleanup](a1a_default_promotion.md)
 enables the integration at 50–55 digits. The decisions below remain the
 original frozen results. Execution-time paths identify the original worktrees;
 their ignored receipts and journals were archived locally before removal.
@@ -184,7 +184,7 @@ Checked 103 hashed ledger receipts; output including the owned replay package oc
 
 Preserved worktrees are `/Users/nishanthmohan/Documents/code/factor-a1a-integration` and `/Users/nishanthmohan/Documents/code/factor-a1a-extension`. In each, durable receipts are under `v2/benchmarks/results/a1a_NAME/frozen/`: `ledger.json`, `environment.json`, per-call JSON, `base-finished-{50,55}.json`, `analysis-{50,55}.json` and `decision-{50,55}.json`. Integration also has `extension-finished-55.json` and its full extension receipts. Detailed per-input results, identity checks and account reconciliation remain ignored under each `v2/audit/a1a_NAME/execution_summary.json`; CLI logs and the sequential controller journal are in the corresponding audit execution folders.
 
-Execution used the user-approved recorded `/opt/homebrew/bin/pypy3`: PyPy 7.3.23, Python 3.11.15, macOS 26.6.2 arm64. The project venv and recorded paths resolve to the same binary, SHA-256 `3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2`. The initial venv-path invocation was rejected by the immutable executable receipt before any calibration or reservation. Its evidence and the explicit interpreter-path authorization are preserved locally; no receipt was overwritten to bypass the guard.
+Execution used the recorded `/opt/homebrew/bin/pypy3`: PyPy 7.3.23, Python 3.11.15, macOS 26.6.2 arm64. The project venv and recorded paths resolve to the same binary, SHA-256 `3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2`. The initial venv-path invocation was rejected by the immutable executable receipt before any calibration or reservation. Its evidence and the explicit interpreter-path authorization are preserved locally; no receipt was overwritten to bypass the guard.
 
 Executed sequence, with an explicit working directory for every command:
 
