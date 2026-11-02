@@ -35,13 +35,25 @@ class ExecutionPreflightTests(unittest.TestCase):
     def test_owned_control_and_challenger_validate_tiny_split(self):
         plan = json.loads(plan_v4.PLAN.read_text())
         fixture = dict(n=10403, factors=[101, 103])
-        for row in plan["calibration"]["calls"][:2]:
-            modules = execute_v4.runtime_modules(row)
-            result = execute_v4.sieve(
-                row, fixture, modules, seconds=1, work=1000000, blocks=1
-            )
-            self.assertEqual(sorted(result["factors"]), [101, 103])
-            self.assertEqual(result["reason"], "factor_found")
+        try:
+            for row in plan["calibration"]["calls"][:2]:
+                modules = execute_v4.runtime_modules(row)
+                result = execute_v4.sieve(
+                    row,
+                    fixture,
+                    modules,
+                    seconds=1,
+                    work=1000000,
+                    blocks=1,
+                )
+                self.assertEqual(sorted(result["factors"]), [101, 103])
+                self.assertEqual(result["reason"], "factor_found")
+        finally:
+            for name in tuple(sys.modules):
+                if name == execute_v4.control_v4.PACKAGE or name.startswith(
+                    execute_v4.control_v4.PACKAGE + "."
+                ):
+                    del sys.modules[name]
 
     def test_worker_output_exhaustion_is_harness_failure(self):
         process = subprocess.Popen(
