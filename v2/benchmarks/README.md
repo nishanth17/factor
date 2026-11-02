@@ -350,3 +350,19 @@ The v4 implementation passed 869 tests (nine optional-backend skips), lint and
 included rejecting the old pilot source freeze; it executed no performance
 calls. Detailed implementation/ownership proofs and retained QA failures are
 local audit evidence.
+
+
+The [v4 experiment design](qs/c10a01/protocol_v4.md) proposes a separate
+3400-second wall/CPU calibration: clean full-arm/control prefixes first,
+then targeted component diagnostics, followed by one frozen nominee. Its
+machine-readable plan preserves the 60/62/65/70 complete-factor grants and
+makes the revised whole ceiling 38600 seconds, including the original
+calibration envelope. No new experiment was run. Validate the committed
+numerical/source design with:
+
+    pypy3 -m v2.benchmarks.qs.c10a01.plan_v4 check
+
+The checker is not an execution runner. Bounded worker/ledger adapters,
+readiness evidence and a post-calibration nominee release remain explicit
+prerequisites. The owned mainline control imports without Git history or
+archived worktrees; the old pilot source freeze remains unchanged.

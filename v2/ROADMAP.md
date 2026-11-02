@@ -145,13 +145,17 @@ inputs; its extra setup cost remains an explicit experiment question. Balanced
 70 still selects k=1 and standard fallback. These observations are arithmetic
 QA, not measured useful yield, speed or complete-factor feasibility results.
 
-Remaining work is experimental: freeze the revised source/configuration/work
-accounts, run an explicitly allocated short combined/control calibration,
-then select informative root-setup and A/ranking ablations rather than all
-combinations. The original calibration is closed, and earlier source freezes
-remain historical. The 60/62/65/70 complete-factor pilots, including the funded
-70-digit pair, remain later work and require refreshed readiness. Do not run
-those pilots in the current implementation session or promote defaults.
+The [v4 experiment design](benchmarks/qs/c10a01/protocol_v4.md) now specifies
+16 clean combined/control prefixes followed by bounded root, A, ranking,
+forced-multiplier and observer diagnostics: 38 calls maximum under a separate
+3400-second wall/CPU proposal. It has a checked numerical plan and owned
+current-mainline source control; bounded execution adapters and a runtime
+release remain before running it. One nominee is frozen after calibration.
+The original calibration is closed; historical freezes remain unchanged.
+The later 60/62/65/70 pilots retain their 9200/7600/14800-second stage grants,
+including the funded 70-digit pair. No new performance call has run, and no
+adoption gate is closed. Do not execute pilots in this design session or
+promote defaults.
 Bernstein SIQS integration and matrix work retain their separate roadmap IDs;
 neither is a prerequisite for testing this arithmetic arm.
 
