@@ -7,6 +7,7 @@ inconclusive experimental gate into a pass.
 
 | Reports | Scope |
 | --- | --- |
+| [A1b final decision](a1b_gap_closure.md), [numerical evidence](a1b_final_results.json), [prompt audit](a1b_prompt_audit.md) | Completed existing-option review, retained defaults, preserved failures and explicit gap repair |
 | [A1a frozen results](a1a_frozen_results.md), [adoption](a1a_default_promotion.md) | Collector integration, separate extension losses and scoped default choice |
 | [C10a-04 preliminary result](c10a04_short_results.md), [promotion](c10a04_default_promotion.md), [65-digit spike](c10a04_spike65_results.md) | Compact larger-band evidence and routing limits |
 | [C10a-07 recovery](c10a07_recovery_results.md), [source gap](c10a07_source_gap_results.md) | Retained diagnostics and sparse scheduling investigation |

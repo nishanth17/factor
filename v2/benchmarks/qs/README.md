@@ -14,6 +14,7 @@ controls. Production behavior lives in the [QS guide](../../qs/README.md).
 | [c10a05/](c10a05/) | Fixed collection/solve pacing |
 | [c10a05_plus/](c10a05_plus/) | 51-digit routing extension and larger feasibility |
 | [c10a04/](c10a04/) | Coupled compact-base calibration and accounting |
+| [a1b_protocol.md](a1b_protocol.md), [continuation](a1b_continuation_protocol.md) | Completed fixed-score review; frozen original/repair runners and exact-composition checks |
 | [a1a_integration/](a1a_integration/) | Fresh kernel integration bridge |
 | [a1a_extension/](a1a_extension/) | Separate selected-power/unroll extension |
 | [a7/](a7/) | SSS/worker reconciliation and frozen comparison arms |

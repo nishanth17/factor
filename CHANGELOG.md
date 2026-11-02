@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## A1b mainline evidence integration (2 November 2026)
+
+- Integrate the completed fixed-score review, frozen runners/inputs and exact
+  growing-DLP regression checks. All 30 prefix calls on nine exposed moduli
+  reject the existing fixed/list bundle for advancement; retain current defaults
+  and fixed opt-ins. No complete-factor speed claim or production change.
+- Preserve original failures, missing clocks, source freezes and the explicit
+  accounting repair. Update status, live backlog and results navigation without
+  restoring the superseded documentation layout. See the
+  [final decision](v2/studies/a1b_gap_closure.md).
+
 ## README navigation cleanup (1 November 2026)
 
 - Shorten the root and v2 overviews; put CLI, API and checkpoint instructions

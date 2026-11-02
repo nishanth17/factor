@@ -1,7 +1,8 @@
 # Factor status
 
-Last updated: 1 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `4a946b8d6294d51ac5d9c36f61880cc63d5b59fd`.
+Last updated: 2 November 2026 (America/Los_Angeles).
+Reviewed mainline/base: `8034bae40e77060d505f85582105d44b22b70c9c`.
+A1b review record: `61899a9`; production defaults are unchanged.
 
 **Target metric: TBD — user to define.**
 
@@ -59,6 +60,17 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 user-directed adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 user-directed adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## Recent completed review
+
+**A1b is Done: retain integrated SIQS defaults and fixed-score opt-ins.**
+All 30 planned prefix calls on nine exposed moduli completed; fixed/list lost
+all matched pairs at 50/55/60 digits. This bundled scoring/scheduling screen
+justified no complete-factor pilot or default change. Earlier harness failures,
+missing historical clocks and the explicit accounting repair remain recorded.
+See the [final decision](studies/a1b_gap_closure.md) and
+[numerical evidence](studies/a1b_final_results.json). Fixed-score queue support
+is a separate deferred mechanism, not a continuation of this completed study.
+
 ## Work in flight
 
 These worktrees were present at review; presence establishes ownership, not an
@@ -67,7 +79,6 @@ experimental result. No other sessions were contacted.
 | ID | One-line scope | Worktree / branch |
 | --- | --- | --- |
 | C10a-01 | Coupled normalized odd/mod-8 arithmetic and multiplier hypothesis | `/Users/nishanthmohan/Documents/code/factor-c10a01` / `codex/c10a01-normalized-polynomials` |
-| A1b | Reconcile remaining fixed-score options after the queue decision | `/Users/nishanthmohan/Documents/code/factor-a1b` / `codex/a1b-fixed-score-review` |
 
 ## Next eligible items
 
@@ -82,7 +93,7 @@ carry model/effort, triggers and full gates.
    B14 does not wait for GNFS or D7. Other B rows need their stated triggers.
 3. C9a — ranked useful-yield/target attribution, then intake/cycle weight;
    C10a — remaining triggered collection questions; C11 — High, continuing
-   provenance/calibration. Existing A1a follow-ups/A1b/A1c keep their scope.
+   provenance/calibration. Existing A1a follow-ups/A1c keep their scope; A1b-F1 remains Deferred.
 4. Downstream D7/E3–E6, selected P6 challengers, G1/H1 and I1 wait for their
    recorded predecessors. E1 remains Deferred at user direction.
 

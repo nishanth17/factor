@@ -71,6 +71,19 @@ Write new captures, stdout, profiles and verification dumps under ignored
 outputs; direct runners may require an existing output folder. Do not
 force-add generated results, local journals or external source checkouts.
 
+## Completed A1b review
+
+The [final decision](../studies/a1b_gap_closure.md) retains current defaults.
+[Original protocol](qs/a1b_protocol.md) and [55-digit continuation](
+qs/a1b_continuation_protocol.md) preserve literal inputs, source freezes and
+charges, including prior failures. These are terminal historical runners;
+restore their archived evidence for audit, and do not rerun measurements.
+For source-only verification:
+
+```sh
+pypy3 -B -m v2.benchmarks.qs.a1b_continuation verify
+```
+
 ## Structural migrations
 
 [layout_migration.json](inputs/controls/layout_migration.json) records moved

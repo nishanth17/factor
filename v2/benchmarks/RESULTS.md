@@ -8,6 +8,24 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions
 
+### A1b existing fixed-score review
+
+**Retain integrated SIQS defaults and fixed-score opt-ins.** The completed
+[review and gap repair](../studies/a1b_gap_closure.md) has 30 validated prefix
+calls on nine exposed independent moduli. Fixed/list loses every pair;
+input-level geometric wall/CPU ratios are 1.273/1.273 at 50 digits,
+1.468/1.455 at 55 and 1.830/1.830 at 60. It bypasses sparse queues, so these
+are bundled scoring/scheduling findings, not isolated arithmetic effects.
+No band advances to a complete-factor pilot or fresh confirmation.
+
+The [numerical report](../studies/a1b_final_results.json) preserves the original
+24 observations plus six previously unvisited 55-digit calls, source identities,
+failures, missing historical clocks and explicitly revised phase accounts.
+Stage A charges are 1465/1470 reserved wall/CPU seconds. Both evidence archives
+are verified. Production arithmetic and defaults are unchanged. The study is
+terminal; do not rerun historical timing to replace outcomes.
+
+
 At explicit user direction, [combined face/queue defaults are adopted](
 ../studies/c10a07_default_promotion.md) after production integration and committed
 correctness/QA checks. The timing evidence below remains exploratory; the

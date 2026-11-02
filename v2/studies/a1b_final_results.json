@@ -1,0 +1,494 @@
+{
+  "analysis": {
+    "bands": {
+      "50": {
+        "geometric_cpu": 1.2734007057829,
+        "geometric_wall": 1.273335652540296,
+        "independent_inputs": 3,
+        "inputs": [
+          {
+            "cpu": 1.2574743088177844,
+            "id": "a1a_integration_50_0",
+            "pair_ratios": {
+              "cpu": [
+                1.2574743088177844
+              ],
+              "wall": [
+                1.2575843466493082
+              ]
+            },
+            "wall": 1.2575843466493082
+          },
+          {
+            "cpu": 1.286361762226236,
+            "id": "a1a_integration_50_1",
+            "pair_ratios": {
+              "cpu": [
+                1.286361762226236
+              ],
+              "wall": [
+                1.2862103949710881
+              ]
+            },
+            "wall": 1.2862103949710881
+          },
+          {
+            "cpu": 1.2765358498213895,
+            "id": "a1a_integration_50_2",
+            "pair_ratios": {
+              "cpu": [
+                1.2765358498213895
+              ],
+              "wall": [
+                1.2763787331852008
+              ]
+            },
+            "wall": 1.2763787331852008
+          }
+        ],
+        "qualifies": false,
+        "stability": true,
+        "wall_wins": 0
+      },
+      "55": {
+        "geometric_cpu": 1.455062322875018,
+        "geometric_wall": 1.4680210794678508,
+        "independent_inputs": 3,
+        "inputs": [
+          {
+            "cpu": 1.4900978483000387,
+            "id": "a1a_integration_55_0",
+            "pair_ratios": {
+              "cpu": [
+                1.4900978483000387
+              ],
+              "wall": [
+                1.490008120307597
+              ]
+            },
+            "wall": 1.490008120307597
+          },
+          {
+            "cpu": 1.3904344079156639,
+            "id": "a1a_integration_55_1",
+            "pair_ratios": {
+              "cpu": [
+                1.3904344079156639
+              ],
+              "wall": [
+                1.3778889207662661
+              ]
+            },
+            "wall": 1.3778889207662661
+          },
+          {
+            "cpu": 1.4868922300336844,
+            "id": "a1a_integration_55_2",
+            "pair_ratios": {
+              "cpu": [
+                1.4868922300336844
+              ],
+              "wall": [
+                1.5409694603463064
+              ]
+            },
+            "wall": 1.5409694603463064
+          }
+        ],
+        "qualifies": false,
+        "stability": true,
+        "wall_wins": 0
+      },
+      "60": {
+        "geometric_cpu": 1.8302946100828388,
+        "geometric_wall": 1.830224813072719,
+        "independent_inputs": 3,
+        "inputs": [
+          {
+            "cpu": 1.818739081450114,
+            "id": "c10a05_plus_feas_60",
+            "pair_ratios": {
+              "cpu": [
+                1.8402351128535985,
+                1.818739081450114,
+                1.8095215598161352
+              ],
+              "wall": [
+                1.840056659517624,
+                1.8185431726173609,
+                1.8095086675446468
+              ]
+            },
+            "wall": 1.8185431726173609
+          },
+          {
+            "cpu": 1.8314233754535558,
+            "id": "c10a04_train_60_0",
+            "pair_ratios": {
+              "cpu": [
+                1.8297986328513722,
+                1.8314233754535558,
+                1.8635590396084365
+              ],
+              "wall": [
+                1.8298928539652022,
+                1.8312732381795958,
+                1.8727420683136795
+              ]
+            },
+            "wall": 1.8312732381795958
+          },
+          {
+            "cpu": 1.8407883208738511,
+            "id": "c10a04_train_60_1",
+            "pair_ratios": {
+              "cpu": [
+                1.8407883208738511,
+                1.8347479512965992,
+                1.843794861271879
+              ],
+              "wall": [
+                1.8409269363065752,
+                1.8348387902981855,
+                1.8439121530873284
+              ]
+            },
+            "wall": 1.8409269363065752
+          }
+        ],
+        "qualifies": false,
+        "stability": true,
+        "wall_wins": 0
+      }
+    },
+    "continuation_charges_before_analysis": {
+      "cpu": 225,
+      "wall": 225,
+      "work": 20270079669
+    },
+    "decision": "retain",
+    "identity": "a1b-unvisited55-gap-repair-v1",
+    "parent_charges_preserved": 1240,
+    "source_sha256": "3a254efee6afc26a24e5aae2ace1dd4c5bdbf7f75fce6a39d109050eb4347cde",
+    "work": 0
+  },
+  "archive": {
+    "archive_verify_wall": 2.5310185418929905,
+    "bytes": 11056068,
+    "manifest_sha256": "5e6b2918711ccfdab38f5c9aa7edac9c3aab72edc2393465a90c4b0ead140000",
+    "path": "/Users/nishanthmohan/code/factor/v2/audit/archives/a1b-gap-closure-20261101/a1b-gap-closure-v1.tar.gz",
+    "sha256": "be1947e6528515e0ef36037bb39a7654feede0aad1cd2d03039c67a4972c0a52",
+    "uncompressed_bytes": 29078506,
+    "verified_files": 47
+  },
+  "bands": {
+    "50": {
+      "control": {
+        "calls": 3,
+        "counters_sum": {
+          "admitted_atoms": 4224,
+          "candidates": 1641107,
+          "division_primes": 349222,
+          "division_steps": 438665,
+          "plan_refusals": 0,
+          "queue_builds": 198,
+          "queue_hits": 5493619,
+          "refined_rejections": 1594140
+        },
+        "cpu": 5.158057999999997,
+        "owned_peak": 75715392,
+        "queue_peak": 11275264,
+        "rss_peak": 136118272,
+        "wall": 5.160463166190311,
+        "work": 15272718615
+      },
+      "fixed": {
+        "calls": 3,
+        "counters_sum": {
+          "admitted_atoms": 4224,
+          "candidates": 1617115,
+          "division_primes": 165025,
+          "division_steps": 204415,
+          "plan_refusals": 23454,
+          "queue_builds": 0,
+          "queue_hits": 0,
+          "refined_rejections": 1595914
+        },
+        "cpu": 6.565610000000021,
+        "owned_peak": 65077184,
+        "queue_peak": 0,
+        "rss_peak": 136249344,
+        "wall": 6.5683612080756575,
+        "work": 15315016747
+      }
+    },
+    "55": {
+      "control": {
+        "calls": 3,
+        "counters_sum": {
+          "admitted_atoms": 1675,
+          "candidates": 1621352,
+          "division_primes": 219143,
+          "division_steps": 286713,
+          "plan_refusals": 0,
+          "queue_builds": 198,
+          "queue_hits": 6543640,
+          "refined_rejections": 1595800
+        },
+        "cpu": 12.413246999999998,
+        "helper_peak": 3185508,
+        "owned_peak": 71463824,
+        "queue_peak": 13143040,
+        "rss_peak": 122978304,
+        "wall": 12.468979209195822,
+        "work": 6017385465
+      },
+      "fixed": {
+        "calls": 3,
+        "counters_sum": {
+          "admitted_atoms": 1675,
+          "candidates": 1607197,
+          "division_primes": 92851,
+          "division_steps": 120153,
+          "plan_refusals": 198779,
+          "queue_builds": 0,
+          "queue_hits": 0,
+          "refined_rejections": 1596836
+        },
+        "cpu": 18.049327,
+        "helper_peak": 3183270,
+        "owned_peak": 58371472,
+        "queue_peak": 0,
+        "rss_peak": 123109376,
+        "wall": 18.29254441591911,
+        "work": 6492831944
+      }
+    },
+    "60": {
+      "control": {
+        "calls": 9,
+        "counters_sum": {
+          "admitted_atoms": 1771,
+          "candidates": 4826804,
+          "division_primes": 324300,
+          "division_steps": 399045,
+          "plan_refusals": 0,
+          "queue_builds": 594,
+          "queue_hits": 25386145,
+          "refined_rejections": 4790098
+        },
+        "cpu": 21.846924000000012,
+        "owned_peak": 62291496,
+        "queue_peak": 17140480,
+        "rss_peak": 116801536,
+        "wall": 21.856206542812288,
+        "work": 8519489183
+      },
+      "fixed": {
+        "calls": 9,
+        "counters_sum": {
+          "admitted_atoms": 1771,
+          "candidates": 4806457,
+          "division_primes": 137921,
+          "division_steps": 167280,
+          "plan_refusals": 2074114,
+          "queue_builds": 0,
+          "queue_hits": 0,
+          "refined_rejections": 4791463
+        },
+        "cpu": 40.08018200000001,
+        "owned_peak": 45706280,
+        "queue_peak": 0,
+        "rss_peak": 116801536,
+        "wall": 40.11914400034584,
+        "work": 12419134803
+      }
+    }
+  },
+  "charges": {
+    "a1b_continuation_v1": {
+      "analysis": {
+        "cpu": 15,
+        "wall": 15,
+        "work": 0
+      },
+      "legacy_analysis": {
+        "cpu": 10,
+        "wall": 10,
+        "work": 0
+      },
+      "measured": {
+        "cpu": 150,
+        "wall": 150,
+        "work": 12510217409
+      },
+      "orchestration": {
+        "cpu": 5,
+        "wall": 5,
+        "work": 0
+      },
+      "warm": {
+        "cpu": 45,
+        "wall": 45,
+        "work": 7759862260
+      }
+    },
+    "a1b_screen_v1": {
+      "analysis": {
+        "cpu": 60,
+        "wall": 60,
+        "work": 0
+      },
+      "diagnostic": {
+        "cpu": 90,
+        "wall": 90,
+        "work": 5098787305
+      },
+      "measured": {
+        "cpu": 750,
+        "wall": 750,
+        "work": 51526359348
+      },
+      "orchestration": {
+        "cpu": 90,
+        "wall": 90,
+        "work": 0
+      },
+      "warm": {
+        "cpu": 250,
+        "wall": 250,
+        "work": 37330110225
+      }
+    }
+  },
+  "decision": "retain",
+  "freeze_sha256": "3a254efee6afc26a24e5aae2ace1dd4c5bdbf7f75fce6a39d109050eb4347cde",
+  "identity": "a1b-final-gap-closure",
+  "independent_moduli": 9,
+  "known_factoring_warm_diagnostic_actual": {
+    "cpu": 172.71527599999993,
+    "wall": 173.11942608372524
+  },
+  "measured_calls": 30,
+  "original_moduli_retimed": 0,
+  "pairs": [
+    {
+      "id": "a1a_integration_50_0",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "a1a_integration_50_1",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "a1a_integration_50_2",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "a1a_integration_55_0",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "a1a_integration_55_1",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "a1a_integration_55_2",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_and_atoms_equal": true,
+      "seed": 7
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_and_atoms_equal": true,
+      "seed": 29
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_and_atoms_equal": true,
+      "seed": 29
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_and_atoms_equal": true,
+      "seed": 29
+    },
+    {
+      "id": "c10a05_plus_feas_60",
+      "physical_and_atoms_equal": true,
+      "seed": 47
+    },
+    {
+      "id": "c10a04_train_60_0",
+      "physical_and_atoms_equal": true,
+      "seed": 47
+    },
+    {
+      "id": "c10a04_train_60_1",
+      "physical_and_atoms_equal": true,
+      "seed": 47
+    }
+  ],
+  "qa": {
+    "additional_qa_cap": 500,
+    "cpu": 112.005745,
+    "previous_full_qa_wall": 47.126735,
+    "results": [
+      {
+        "name": "tests",
+        "returncode": 0,
+        "wall": 99.96902745799161
+      },
+      {
+        "name": "lint",
+        "returncode": 0,
+        "wall": 5.194352542050183
+      },
+      {
+        "name": "imports",
+        "returncode": 0,
+        "wall": 0.9041427080519497
+      },
+      {
+        "name": "verify",
+        "returncode": 0,
+        "wall": 0.3831654160749167
+      }
+    ],
+    "source": "cffe8c9",
+    "wait_wall": 8.02499707788229e-05,
+    "wall": 106.72660387516953
+  },
+  "source": "cffe8c9",
+  "stage_a_ceiling": 1470,
+  "stage_a_remaining": 5,
+  "total_charges": {
+    "cpu": 1465,
+    "wall": 1465,
+    "work": 114225336547
+  },
+  "unknowns": [
+    "Historical unledgered analysis CPU and other actuals stay missing;10s conservative debit is not reconstructed evidence.",
+    "Orchestration has conservative reservations rather than complete actual clocks.",
+    "RSS is observed process high-water, not continuous enforcement."
+  ]
+}
