@@ -309,6 +309,12 @@ linked result and promotion summaries above. E1 remains deferred.
 
 ### C10a-01 normalized polynomials: calibration and design handoff
 
+The [current v4 short-calibration result](../studies/c10a01_v4_calibration.md)
+records 38 completed fixed-work cells, the frozen exploratory nominee, all
+charges and a verified but unrun 60/62/65/70 complete-factor pilot runner.
+Its 70-digit 30.340-second result is a prefix, not a factorization. The
+50/55 lower-band supplement remains unrun pending Astra xhigh design review.
+
 The [results and commands](../studies/c10a01_results.md) report 16 scored
 fixed-position prefixes, four forced-policy diagnostics, four observer pairs
 and two capacity fixtures. These exploratory observations establish no speedup.

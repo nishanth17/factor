@@ -148,13 +148,14 @@ QA, not measured useful yield, speed or complete-factor feasibility results.
 The [v4 experiment design](benchmarks/qs/c10a01/protocol_v4.md) now specifies
 16 clean combined/control prefixes followed by bounded root, A, ranking,
 forced-multiplier and observer diagnostics: 38 calls maximum under a separate
-3400-second wall/CPU proposal. It has a checked numerical plan and owned
-current-mainline source control; bounded execution adapters and a runtime
-release remain before running it. One nominee is frozen after calibration.
+3400-second wall/CPU proposal. The [terminal v4 calibration](studies/c10a01_v4_calibration.md)
+completed all 38 cells within 2910 reserved seconds and froze one nominee;
+every measured call remained a fixed-work prefix or diagnostic. The pilot
+release and source-pinned readiness runner are present.
 The original calibration is closed; historical freezes remain unchanged.
 The later 60/62/65/70 pilots retain their 9200/7600/14800-second stage grants,
-including the funded 70-digit pair. No new performance call has run, and no
-adoption gate is closed. Do not execute pilots in this design session or
+including the funded 70-digit pair. No complete-factor v4 pilot has run, and no
+adoption gate is closed. Do not execute pilots in this session or
 promote defaults.
 Bernstein SIQS integration and matrix work retain their separate roadmap IDs;
 neither is a prerequisite for testing this arithmetic arm.
@@ -4475,3 +4476,5 @@ remain enabled. The globally selected nominee is assessed for size eligibility,
 without another combination grid. These are exposed exploratory inputs;
 50/55/60 improvement claims need fresh, adequately sampled complete-factor
 comparisons. No execution or adoption is implied by this design supplement.
+The lower-band supplement was drafted with Astra high; the user's Astra xhigh
+condition for experiment design requires a separate review before executing it.

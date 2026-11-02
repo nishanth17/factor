@@ -1,5 +1,10 @@
 # C10a-01 implementation and experimental handoff
 
+**Current v4 calibration:** [38 fixed-work cells and the selected, unrun
+pilot handoff](c10a01_v4_calibration.md). The 30.340-second 70-digit observation
+is a 512-polynomial prefix and did not factor the modulus. The older v1/v2
+observations below retain their historical source and protocol identities.
+
 **Combined implementation revised, 2 November 2026:** the [combined-arm definition](c10a01_arm_revision.md)
 now includes wider coupled ranking, residue reuse, target-aware actual A
 products and guaranteed-two-power handling. Those extensions are now
