@@ -90,6 +90,75 @@ Cartesian sweep. Do not make all roadmap implementation a prerequisite for the
 existing four-size feasibility handoff, or require 65-digit completion before
 an independently valid 70-digit comparison.
 
+### Model and effort for the new QS work
+
+For these recommendations, **Astra** means `gpt-6-astra` and **Sol** means
+`gpt-6.1-sol`. Current official [model-selection guidance](https://developers.openai.com/api/docs/guides/model-selection)
+and the [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra) and
+[Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol) pages were checked
+on 2 November 2026. Both support high, xhigh and max. The assignments below are
+engineering judgments about these tasks, not results of a Factor model benchmark.
+
+**The current C10a-01 task uses Astra / xhigh throughout**, including code,
+correctness QA, calibration design and any authorized execution. Recommendations
+for other or later workstreams do not override that explicit instruction or
+switch the current session. They authorize no delegation or experiment.
+
+| Workstream | Design, implementation and correctness | Frozen execution and analysis | Reason / escalation boundary |
+| --- | --- | --- | --- |
+| C10a-01: Gray cache, attainable A population, actual-norm ranking and table setup | **Astra / xhigh** throughout | **Astra / xhigh** for this task | Coupled coordinates, arithmetic, finite population, cache ownership and resume; preserve the explicit task instruction. |
+| A1c / A1a: bulk marking, paired roots and fused switch/marking | **Sol / xhigh** | **Sol / high** | Bounded kernel changes with existing independent oracles. Use Astra / xhigh for a specifically unresolved coverage or mutation/reservation proof. |
+| A1a: cross-B lifted roots; C8: hypercube/CRT scheduling | **Astra / xhigh** for new arithmetic and its implementation | **Sol / high** after the protocol is frozen | Characteristic two, singular lifts, coordinate eligibility and table/queue identity create new mathematical obligations. |
+| F7 / C9a: SIQS direct/tree smoothness and residual batch domains | **Astra / xhigh** | **Sol / high** | Wider-base construction, complete valuations, batch ownership, pending transitions and exact LP admission are coupled. |
+| A8: matrix/operator/lifting contract and independent fixtures | **Astra / xhigh** | **Sol / high** for frozen fixture measurements | Orientation, original-kernel correction and lifetime accounting establish the validity of every solver comparison. |
+| B6 / C4: M4RI/PLE and structured filtering | **Astra / xhigh** | **Sol / high** | Rank-deficient panels, fill, compact substitution and original-relation lifting need coordinated proofs and implementation. |
+| D1 / D2: Lanczos or Wiedemann | **Astra / xhigh** | **Sol / high** | Singular-block recurrence or block polynomial generators, original-operator recovery, finite restarts and checkpoints. Reserve max for a named unresolved proof, not routine long runs. |
+| B7: compact records, provenance and checkpoint preflight | **Astra / xhigh** | **Sol / high** | Aliasing, pinned atoms, reconstruction, corruption handling and simultaneous scratch determine correctness and capacity. |
+| C9a / C10a: useful-row pacing and existing-domain policy | **Sol / xhigh** | **Sol / high** | Existing exact relation machinery supports bounded policy changes. New residual-certification, graph or provenance semantics move that subtask to Astra / xhigh. |
+| F6: higher-arity LP incidence; C9a: new splitter/certification domains | **Astra / xhigh** | **Sol / high** | General incidence is not the existing DLP edge graph; certainty, repeated factors and lifting require new contracts. |
+| C4: joint exponent products and hybrid recovery | **Astra / xhigh** for changed arithmetic/lifting; **Sol / xhigh** for an already specified kernel | **Sol / high** | Preserve sign, nonunit handling and original square identities while changing computation or representation. |
+| B12 / F4: bounded process workers | **Sol / xhigh** | **Sol / high** | Lease accounting, cancellation, in-flight ownership and aggregate CPU/RSS dominate the implementation risk. Escalate an unresolved ownership invariant to Astra / xhigh. |
+| C11 / P6.4: competitor protocol, configuration and budget selection | **Sol / xhigh** | **Sol / high** | Freeze comparable inputs/backends, censoring, warmup, work accounts and uncertainty. Use Astra / xhigh when interpreting new arithmetic or conflicting causal evidence. |
+
+For future tasks, escalation to Astra / max requires a concrete failed invariant,
+counterexample or unresolved derivation. More elapsed time, more source files or
+a longer experiment alone is not a reason to increase reasoning effort. Model
+recommendations do not replace independent oracles or matched performance evidence.
+
+### C10a-01 implementation remaining after the coverage review
+
+Already implemented and independently checked: parity2 normalization with
+standard fallback, wider exact multiplier ranking, per-call residue reuse,
+paired-flyer A completion and guaranteed-two-power initialization. The last
+full arithmetic suite passed: 859 tests, with nine optional-backend skips.
+The revised combined bundle still has no timed calibration or complete-factor
+result; the earlier prototype calibration is a different source identity.
+
+The next concrete implementations are:
+
+1. **Centered modular Gray-shift cache.** Preserve the existing B and U trials;
+   include wrap correction, exceptional roots, bounded consumed-coordinate
+   tables, policy identity, construction/refusal charges and checked resume.
+2. **Better attainable A populations.** Specify and implement a finite
+   feasible-core/product-window policy beyond the current paired completion.
+   Preserve uniqueness/exhaustion and test actual reachable products against an
+   independent Cartesian oracle. The current closest pair need not be close
+   to the target for every core.
+
+Two additional alternatives belong to this workstream but still need concrete
+selection/specification: **actual-A/norm-aware multiplier ranking**, and
+**small-factor/batched-inverse root-table construction**. These are not already
+provided by wider local-density scoring or cached A inverses. Choose exact,
+bounded rules before implementing them; no prior standalone speedup is required
+for a correct, feasible opt-in experiment.
+
+Each selected change also needs integration with independent CRT/root/valuation
+checks, caches/queues/plans, compatibility/resume, ownership and work bounds.
+Then refresh the literal challenger, short-calibration protocol and later-stage
+source/work freezes. The 60/62/65/70 complete-factor pilots remain later work.
+Bernstein SIQS integration and new matrix solvers have explicit separate roadmap
+items; their completion is not a prerequisite for this arithmetic handoff.
+
 ## How to use the gates
 
 - **Acceptance gate (A):** the observable behavior required to close a TODO. Every returned split must satisfy `1 < g < n` and `n % g == 0`.
