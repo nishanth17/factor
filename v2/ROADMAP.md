@@ -68,8 +68,8 @@ freeze before measurement; this backlog allocates no additional experiments.
 
 | Priority / owner | Concrete next deliverable | Acceptance and discriminating evidence |
 | --- | --- | --- |
-| High / C10a-01 with A1a | Precompute bounded modular Gray shifts while retaining centered B and its wrap correction. Consider small-factor batch-inverse table construction after the simple exact cache. | Same physical trials, direct CRT/brute-root checks, exceptional roots, quota-aware storage, cancellation and charged replay. Compare setup plus complete family cost. Existing inverse caching alone does not implement this. |
-| High / C10a-01 with C10a-02 | Improve the reachable A-product population beyond paired-flyer minimization within a fixed core. Specify finite feasible-core/product-window selection; retain actual-A/norm-aware multiplier ranking as a separately selected extension. | Exact target reachability, unique families, finite exhaustion and norm/useful-relation distributions. Do not repeat retired quality-order, face or quota grids. Wider local-density ranking is already implemented. |
+| High / C10a-01 with A1a | Bounded modular Gray shifts and small-factor batch construction are implemented as opt-ins, retaining centered B and wrap correction. Freeze and compare setup plus traversal. | Same physical trials, direct CRT/brute-root checks, exceptional roots, quota-aware storage, cancellation and charged replay. Compare setup plus complete family cost. Existing inverse caching alone does not implement this. |
+| High / C10a-01 with C10a-02 | Windowed-pair A selection and bounded actual-norm multiplier previews are implemented as opt-ins. Compare their coupled useful yield and complete cost. | Exact target reachability, unique families, finite exhaustion and norm/useful-relation distributions. Do not repeat retired quality-order, face or quota grids. Wider local-density ranking is already implemented. |
 | High design / F7 with C9a | Integrate exact SIQS smooth-part screening with direct-versus-tree dispatch. Separate base-product capacity from candidate-batch capacity and retain scalar exponent recovery. | Current base endpoint and tree-node limits are both barriers. Prove simultaneous ownership and pending-candidate resume; compare identical candidates against current bucket recovery, then whole cost. Residual-prime batch cofactoring is a separate domain. |
 | High / A1c with A1a/B5 | Select a Python bulk marking/scanning or dense two-root interleaving kernel; consider fused root-switch/marking without changing physical coverage. | Exact saturation, repeated roots, tails and mutation/reservation boundaries. Preserve prior unroll/presieve losses. Native SIMD and byte constants are not Python defaults. |
 | High preparation / A8 | Freeze genuine matrix/operator/lifting fixtures and packed forward/transpose products. Include current relation/preparation ownership and potential dense fill. | Independent dense-oracle products and original-relation kernel/extraction checks. Refresh representative fixtures after collector changes; synthetic capacity tests alone establish no factoring win. |
@@ -134,7 +134,9 @@ core-window objective; `multiplier_policy="parity2_norm"` for exact actual-A
 and norm previews of four density nominees. The literal v4 combined factory
 exposes component overrides; v3 and original controls remain available.
 New policy semantics use checkpoint schema 10 with charged cache rebuilds.
-This is implementation status, not completion of the adoption gate.
+This is implementation status, not completion of the adoption gate. The
+committed-files-only check passed 869 tests (nine optional-backend skips),
+lint and 206 benchmark/study imports.
 
 Structural checks cover all eight 60/62/65/70 inputs. Sampled A target misses
 are all below 0.044%, while some already-close old products become less close.

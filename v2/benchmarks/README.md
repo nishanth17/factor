@@ -344,3 +344,9 @@ not a timing result. The original calibration allocation is closed. No revised
 calibration or later complete-factor pilot ran for this source; old frozen
 pilot readiness continues to reject changed source. Freeze new source/work
 accounts before measurements, including the separately funded 70-digit stage.
+
+The v4 implementation passed 869 tests (nine optional-backend skips), lint and
+206 benchmark/study imports in a committed-files-only export. Verification
+included rejecting the old pilot source freeze; it executed no performance
+calls. Detailed implementation/ownership proofs and retained QA failures are
+local audit evidence.
