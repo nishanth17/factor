@@ -3,6 +3,15 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Study publication cleanup (2 November 2026)
+
+- Remove the selective `v2/studies/` report/result collection from the current
+  tree after exact local archival. Keep concise decisions in benchmark results
+  and link detailed historical records through pinned Git revisions.
+- Retain tested C10a-04 schedule/decision helpers under benchmarks. Retired
+  campaign orchestration replays from its original revision; numerical inputs,
+  frozen controls, production behavior and experimental verdicts are unchanged.
+
 ## A1b mainline evidence integration (2 November 2026)
 
 - Integrate the completed fixed-score review, frozen runners/inputs and exact
@@ -12,7 +21,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Preserve original failures, missing clocks, source freezes and the explicit
   accounting repair. Update status, live backlog and results navigation without
   restoring the superseded documentation layout. See the
-  [final decision](v2/studies/a1b_gap_closure.md).
+  [final decision](v2/benchmarks/RESULTS.md#a1b-existing-fixed-score-review).
 - Verify committed-only tests/lint/imports and unchanged production source;
   archive local state before removing the A1b worktree and temporary QA state.
 
@@ -42,7 +51,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   confirmation was not run; adoption is a separate policy decision.
 - Close C10a-07 with findings and verified production integration. Preserve
   receipts/research/commits before removing temporary worktrees and scratch.
-  See [adoption](v2/studies/c10a07_default_promotion.md).
+  See [adoption](v2/benchmarks/RESULTS.md#c10a-07-face-and-queue).
 
 ## A1a mainline adoption (31 October 2026)
 
@@ -56,7 +65,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 - The 50-digit integration gate passed; 55 digits remains inconclusive due
   to drift, and 51–54 are policy extrapolations. Preserve the original
   evidence and source identities locally before removing task worktrees.
-  See [adoption and replay](v2/studies/a1a_default_promotion.md).
+  See [adoption and replay](v2/benchmarks/RESULTS.md#a1a-integration-and-extension).
 
 ## A1a frozen comparison decisions (31 October 2026)
 
@@ -66,7 +75,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Retain the prior integrated control at both sizes for the combined
   selected-power-period/four-stride extension: it increased complete cost.
   Preserve all 180 measured calls, original ledgers and frozen checkouts.
-  [Report](v2/studies/a1a_frozen_results.md) gives uncertainty, per-input
+  [Report](v2/benchmarks/RESULTS.md#a1a-integration-and-extension) gives uncertainty, per-input
   results and protected accounts. Automatic defaults and E1 stay unchanged.
 
 ## A1a bounded collector extension preparation (30 October 2026)
@@ -108,7 +117,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   preserving accepted 50/51 settings. Use charged exact 2500-entry compact bases
   at 52–55 and 5000 at 56–60, with finite budgets and saved-policy replay.
 - Record preliminary and extrapolated coverage in the
-  [promotion report](v2/studies/c10a04_default_promotion.md); close the delivered
+  [promotion report](v2/benchmarks/RESULTS.md#c10a-04-larger-band-routing); close the delivered
   roadmap tranche without claiming the original campaign completed. E1 remains
   deferred, C10a-07 open, and 65/70 feasibility separate.
 
@@ -118,7 +127,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   a ten-hour total budget and fixed preliminary early-stop rules. Preserve the
   original incomplete campaign, interrupted reservations and production
   defaults. This is experiment tooling, not a performance acceptance result.
-- Record the [fresh preliminary result](v2/studies/c10a04_short_results.md):
+- Record the [fresh preliminary result](v2/benchmarks/RESULTS.md#c10a-04-larger-band-routing):
   the fixed six-pair trend stop passed, with 6/6 compact completions against
   5/6 control and 36.16% lower capped time. Preserve the timeout and full
   reservations; keep production acceptance and promotion separate.

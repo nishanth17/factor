@@ -3,7 +3,7 @@
 These are scoped historical observations, not runtime guarantees or a list of
 new experiments. [STATUS](../STATUS.md) records current automatic routing and
 its evidence limits. Use the [runner guide](README.md) for reproduction and
-[study reports](../studies/README.md) for frozen source/accounting detail.
+[pinned history](../history/README.md) for frozen source/accounting detail.
 Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions
@@ -11,40 +11,40 @@ Numbers from separate comparisons are not additive portfolio gains.
 ### A1b existing fixed-score review
 
 **Retain integrated SIQS defaults and fixed-score opt-ins.** The completed
-[review and gap repair](../studies/a1b_gap_closure.md) has 30 validated prefix
+[review and gap repair](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_gap_closure.md) has 30 validated prefix
 calls on nine exposed independent moduli. Fixed/list loses every pair;
 input-level geometric wall/CPU ratios are 1.273/1.273 at 50 digits,
 1.468/1.455 at 55 and 1.830/1.830 at 60. It bypasses sparse queues, so these
 are bundled scoring/scheduling findings, not isolated arithmetic effects.
 No band advances to a complete-factor pilot or fresh confirmation.
 
-The [numerical report](../studies/a1b_final_results.json) preserves the original
+The [numerical report](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_final_results.json) preserves the original
 24 observations plus six previously unvisited 55-digit calls, source identities,
 failures, missing historical clocks and explicitly revised phase accounts.
 Stage A charges are 1465/1470 reserved wall/CPU seconds. Both evidence archives
 are verified. Production arithmetic and defaults are unchanged. The study is
 terminal; do not rerun historical timing to replace outcomes.
 
+### C10a-07 face and queue
 
-[Combined face/queue defaults are adopted](
-../studies/c10a07_default_promotion.md) after production integration and committed
+[Combined face/queue defaults are adopted](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_default_promotion.md) after production integration and committed
 correctness/QA checks. The timing evidence below remains exploratory; the
 optional 18-call confirmation was not run. Automatic SIQS jobs use the swapped
 coordinate policy and exact queues where eligible, with bounded exact fallback.
 No new 61–80 presets or portfolio stages are enabled.
 
-The [completed C10a-07 panel](../studies/c10a07_panel_results.md) retains 42 timed
+The [completed C10a-07 panel](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_panel_results.md) retains 42 timed
 calls at 45/50/55/60, preserving every historical freeze. Nine fresh active inputs
 complete in every arm. Observed equal-band wall cost falls 22.4% for queue and
 23.1% for face+queue, with only 0.86% incremental combined benefit. Missing parent
 end drift keeps these exploratory; active continuation drift passes, while 45
 is unresolved and its drift fails. The original report nominated queue alone;
 the later combined adoption is a separate policy decision.
-The [numerical summary](../studies/c10a07_panel_results.json) records exact costs,
+The [numerical summary](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_panel_results.json) records exact costs,
 uncertainty, resource accounts and the verified 26.3 MB archive. Committed-only
 857-test QA (nine skipped), lint and 215 benchmark imports pass.
 
-The [C10a-07 recovery report](../studies/c10a07_recovery_results.md) retains the
+The [C10a-07 recovery report](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_recovery_results.md) retains the
 stopped historical quota/face diagnostics and the completed 24.7-minute cold
 historical control. Its new current-mainline calibration uses short exact-work
 prefixes, separately measured observer overhead and directly admitted face arms.
@@ -53,7 +53,7 @@ bounds and an 8 MiB power cache did not advance. Its original screen remains a
 preserved preparation artifact, superseded for execution by the completed panel
 above. It is not an instruction to run another comparison.
 
-The separate [source-gap follow-up](../studies/c10a07_source_gap_results.md)
+The separate [source-gap follow-up](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_source_gap_results.md)
 adapts exact sparse block scheduling from the source comparison. Nine matched
 prefix pairs on three exposed inputs show 40.4% lower median prefix cost against
 the existing fused collector, with identical exact output/coverage counters and
@@ -63,10 +63,10 @@ consolidated panel superseded its execution. Do not add it to the completed
 campaign. The later production adoption is recorded above; formal clean confirmation
 remains unmet.
 
-The [consolidated collection assessment](../studies/c10a07_research_assessment.md)
+The [consolidated collection assessment](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_research_assessment.md)
 records 42 source/code/evidence dispositions and the resulting Phase 3 order.
 The panel's original recommendation is superseded by the combined adoption
-above. The optional [18-call design](../studies/c10a07_recovery_followup.md)
+above. The optional [18-call design](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_recovery_followup.md)
 is retained for future validation; it was not run, is not required for closure
 and schedules no new campaign. Keep normalized polynomial forms,
 cross-B power roots and residual-yield policies distinct; avoid reimplementing
@@ -74,15 +74,17 @@ existing polling, fixed scores or batch arithmetic. Those ideas remain backlog
 and were outside the completed panel's implementation scope. The source
 assessment itself establishes no new performance claim.
 
-The [A1a integration record](../studies/a1a_frozen_results.md) compares the
+### A1a integration and extension
+
+The [A1a integration record](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1a_frozen_results.md) compares the
 selected density+presieve+scan_fused port with committed pre-integration
 mainline at exactly 50 and 55 digits. Preparation includes an immutable owned
 baseline, independent arithmetic/resume checks and a fresh-input freeze;
-the [frozen execution report](../studies/a1a_frozen_results.md) accepts a scoped
+the [frozen execution report](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1a_frozen_results.md) accepts a scoped
 6.008% complete-cost reduction at 50 digits (99.5% interval: 4.373–7.795%
 lower). The 55-digit result remains inconclusive after its one full stability
 extension because repeated-cell drift persists. Subsequent
-[adoption](../studies/a1a_default_promotion.md) selects the
+[adoption](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1a_default_promotion.md) selects the
 integration at native 50–55 digits, inclusive, at 1 GiB owned memory; 51–54
 are unmeasured extrapolations and 55 retains its inconclusive timing label.
 The completed isolated study's 5.945%/3.214% cost reductions do not
@@ -91,7 +93,7 @@ establish additive gains. Forty digits retains control; clean
 completion within its allowance. Replay that original study from `d61df6c`,
 preserving its controls and source hashes. E1 remains deferred.
 
-The [bounded A1a extension](../studies/a1a_frozen_results.md) separately compares
+The [bounded A1a extension](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1a_frozen_results.md) separately compares
 selected-power periods plus four-stride per-root marking with the exact prior
 A1a implementation. Its original integration control, corpus and receipts
 remain unchanged. Its separately excluded fresh panel completed all calls,
@@ -101,18 +103,20 @@ retain the prior integrated control. This tests the combined extension;
 individual-component effects and a direct extended-versus-mainline comparison
 remain unmeasured. The extension stays opt-in; E1 remains deferred.
 
-The separate [C10a-04 bounded follow-up](../studies/c10a04_short.md)
+### C10a-04 larger-band routing
+
+The separate [C10a-04 bounded follow-up](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a04_short.md)
 compares compact with control at 60 digits, using fresh inputs and a ten-hour
 total deadline. Fixed early trend stops are preliminary below nine samples;
 they do not satisfy the ordinary accepted timing gate or promote defaults.
 The original multi-band campaign remains incomplete and its evidence intact.
-The [completed preliminary result](../studies/c10a04_short_results.md) stopped
+The [completed preliminary result](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a04_short_results.md) stopped
 after six pairs: compact completed 6/6 versus 5/6 and used 36.16% less total
 capped time, with 31.72–40.08% saving per input. The subsequent
-[promotion](../studies/c10a04_default_promotion.md) enables
+[promotion](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a04_default_promotion.md) enables
 50–60-digit routing, preserving 50/51 settings and documenting unstable 55
 training and unmeasured intermediate sizes.
-The [65-digit feasibility spike](../studies/c10a04_spike65_results.md) timed
+The [65-digit feasibility spike](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a04_spike65_results.md) timed
 out in both arms at 1800 seconds; no routing above 60 is promoted.
 
 ## Collection pacing, DLP and integration

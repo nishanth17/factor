@@ -210,7 +210,12 @@ record the 1 November lessons from C10a-07. Keep their meaning in every design:
 Required immutable corpora, baselines and loader snapshots live in versioned
 `v2/benchmarks/inputs/`. Generated captures, stdout, profiles, verification dumps
 and scratch go in ignored `results/` trees. `v2/audit/` and `v2/local/LOG.md` are
-local. External sources stay in folder-ignored `v2/benchmarks/inputs/upstream/`;
+local. Detailed research, comparison reports and result JSON stay in these
+ignored trees; do not maintain a selective public `v2/studies/` collection.
+Keep reusable runner code under `v2/benchmarks/` and concise decisions in
+[benchmark results](benchmarks/RESULTS.md). Historical reports remain available
+through [pinned Git history](history/README.md), with original source identities.
+External sources stay in folder-ignored `v2/benchmarks/inputs/upstream/`;
 keep licenses, inventories and comparison provenance locally. Do not force-add
 generated evidence or create individual-file study ignore rules. Preserve
 historical archives at their recorded restoration locations and lossless

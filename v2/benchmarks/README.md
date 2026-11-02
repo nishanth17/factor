@@ -63,8 +63,9 @@ comparison with its own identity.
 [ECM](ecm/README.md) and [relation-engine](qs/README.md) guides explain those
 study families. [Inputs](inputs/README.md) describes versioned corpora,
 controls and immutable baselines. Detailed research stays local under
-`v2/audit/research/`; public [study reports](../studies/README.md) retain
-findings and adoption limitations.
+`v2/audit/research/`; public [results](RESULTS.md) summarize decisions,
+commands and adoption limitations. Detailed reports and generated result JSON
+stay local. Reusable runners belong here; required inputs remain versioned.
 
 Write new captures, stdout, profiles and verification dumps under ignored
 `results/<subject>/<experiment>/<run>/`. Make targets create timestamped
@@ -73,18 +74,25 @@ force-add generated results, local journals or external source checkouts.
 
 ## Completed A1b review
 
-The [final decision](../studies/a1b_gap_closure.md) retains current defaults.
+The [final decision](RESULTS.md#a1b-existing-fixed-score-review) retains current defaults.
 [Original protocol](qs/a1b_protocol.md) and [55-digit continuation](
 qs/a1b_continuation_protocol.md) preserve literal inputs, source freezes and
 charges, including prior failures. These are terminal historical runners;
 restore their archived evidence for audit, and do not rerun measurements.
-For source-only verification:
+Source-only verification requires the frozen continuation checkout at
+`cffe8c9`, including its original source paths and pinned interpreter:
 
 ```sh
 pypy3 -B -m v2.benchmarks.qs.a1b_continuation verify
 ```
 
 ## Structural migrations
+
+The former `v2/studies/` collection is preserved in
+[pinned Git history](../history/README.md). Its retired C10a-04 orchestration
+replays from the original revision with unchanged source freezes. Only the
+tested schedule and preliminary decision helpers remain in
+[c10a04](qs/c10a04/README.md); this cleanup changes no experimental verdict.
 
 [layout_migration.json](inputs/controls/layout_migration.json) records moved
 paths, source hashes and exact relocated bytes. Accepted structural migrations

@@ -7,13 +7,12 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.benchmarks.qs.c10a04 import configuration
+from v2.benchmarks.qs.c10a04 import configuration, short_decisions
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import CountedSIQSConfig, SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.count_policy import CountPolicyRefusedError, endpoint_for_count
 from v2.qs.defaults import default_siqs_budget, uses_siqs_defaults
-from v2.studies import c10a04_short
 from v2.tests.test_siqs_cli import cli
 
 
@@ -65,7 +64,7 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertEqual(limited.solve_policy, "window")
 
     def test_resolved_60_digit_bases_match_frozen_measured_bundle(self):
-        corpus = json.loads(c10a04_short.CORPUS.read_text())
+        corpus = json.loads(short_decisions.CORPUS.read_text())
         for fixture in corpus["fixtures"]:
             expected, divisor = configuration.resolve(
                 fixture["n"], 60, "compact", allowance()

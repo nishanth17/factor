@@ -81,7 +81,7 @@ are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
 Scratch coexistence, rotation, cancellation and refused work stay bounded.
 The selected-power/unroll extension remains opt-in after its combined loss;
-see [A1a evidence](../studies/a1a_frozen_results.md).
+see [A1a evidence](../benchmarks/RESULTS.md#a1a-integration-and-extension).
 
 ## Adjacent signs and sparse queues
 
@@ -95,7 +95,7 @@ singular sparse roots, unaligned blocks or capacity refusal use the ordinary
 exact path. All hits and candidate checks remain covered. Polynomial changes
 release queues; interruption/restore rebuilds them with charges.
 
-This selection was [adopted](../studies/c10a07_default_promotion.md).
+This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain
 attached to the evidence. Other scope extensions are not confirmed gains.
 

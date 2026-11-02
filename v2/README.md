@@ -69,7 +69,6 @@ See [tests](tests/README.md), [benchmark runners](benchmarks/README.md) and
 - [Current status](STATUS.md): defaults, work in flight and eligible work.
 - [Roadmap](ROADMAP.md) and [policy](POLICY.md): open gates and stable rules.
 - [Benchmark results](benchmarks/RESULTS.md): scoped measurements and decisions.
-- [Study reports](studies/README.md): frozen findings and adoption records.
 - [Changelog](../CHANGELOG.md): accepted behavior changes.
 - [History](history/README.md): pinned earlier documentation and evidence.
 

@@ -28,14 +28,14 @@ fields. SSS and production workers remain opt-in/experimental.
 | Decimal digits / scope | Owned memory allowance | Automatic SIQS selection | Adoption evidence and limits |
 | --- | --- | --- | --- |
 | Exactly 40, native | 1 GiB child; omitted outer portfolio adds 16 MiB | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; sparse marking; window pacing; multiplier 1 | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
-| Exactly 50, native | Same | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused; collection pacing; multiplier 1 | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](studies/a1a_default_promotion.md). A1a's 50-digit integration gate passed. |
+| Exactly 50, native | Same | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused; collection pacing; multiplier 1 | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
 | Exactly 51, native | Same | Same concrete bundle as 50 | [51-digit completion adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open). A1a marking at 51 is an **unmeasured interpolation**. |
-| 52–54, native | Same | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; scored odd multiplier (`multiplier=0`); 2 MiB plan; A1a marking; collection pacing | [C10a-04 adoption](studies/c10a04_default_promotion.md) and [A1a adoption](studies/a1a_default_promotion.md): **unmeasured interpolated bands**. |
-| Exactly 55, native | Same | Same counted bundle as 52–54 | Same [C10a-04 adoption](studies/c10a04_default_promotion.md) and [A1a adoption](studies/a1a_default_promotion.md): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
-| 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; scored odd multiplier; 2 MiB plan; sparse marking; collection pacing | [C10a-04 adoption](studies/c10a04_default_promotion.md): **unmeasured interpolated bands**. |
-| Exactly 60, native | Same | Same counted bundle as 56–59 | [C10a-04 adoption](studies/c10a04_default_promotion.md): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
+| 52–54, native | Same | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; scored odd multiplier (`multiplier=0`); 2 MiB plan; A1a marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
+| Exactly 55, native | Same | Same counted bundle as 52–54 | Same [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
+| 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; scored odd multiplier; 2 MiB plan; sparse marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
+| Exactly 60, native | Same | Same counted bundle as 56–59 | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
 | Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, sparse marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
-| Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size policy; swapped signs below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](studies/c10a07_default_promotion.md). No measured promoted size default at 41–49 or 61+. |
+| Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size policy; swapped signs below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No measured promoted size default at 41–49 or 61+. |
 
 Every fresh automatic SIQS configuration selects `sign_policy="swap_high"`.
 Native calibrated collectors above select a 32 MiB sparse-queue ceiling within
@@ -44,7 +44,7 @@ unsupported paths or capacity refusal. The combined C10a-07 policy is adopted.
 Its 50/55/60 panel is exploratory; drift acceptance was unmet and the additional
 18-call confirmation was not run. Other sizes,
 backends and grants are unmeasured policy extrapolations. See the
-[adoption and limitations](studies/c10a07_default_promotion.md).
+[adoption and limitations](benchmarks/RESULTS.md#c10a-07-face-and-queue).
 
 Omitted calibrated SIQS grants are 10^13 work units and 1,200 wall/CPU seconds
 through 55 digits, 1,800 at 56–60. All calibrated bundles use half-width 65,536,
@@ -67,8 +67,8 @@ All 30 planned prefix calls on nine exposed moduli completed; fixed/list lost
 all matched pairs at 50/55/60 digits. This bundled scoring/scheduling screen
 justified no complete-factor pilot or default change. Earlier harness failures,
 missing historical clocks and the explicit accounting repair remain recorded.
-See the [final decision](studies/a1b_gap_closure.md) and
-[numerical evidence](studies/a1b_final_results.json). Fixed-score queue support
+See the [final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review) and
+[numerical evidence](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_final_results.json). Fixed-score queue support
 is a separate deferred mechanism, not a continuation of this completed study.
 Evidence and tests are integrated in mainline; task worktrees/scratch were
 removed after archive verification. See the report's integration/cleanup record.

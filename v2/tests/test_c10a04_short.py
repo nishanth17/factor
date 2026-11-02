@@ -2,7 +2,7 @@
 
 import unittest
 
-from v2.studies.c10a04_short import decision, schedule
+from v2.benchmarks.qs.c10a04.short_decisions import decision, schedule
 
 
 def outcomes(count, *, compact_seconds=70, control_seconds=100):

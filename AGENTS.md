@@ -102,7 +102,10 @@ required by test/benchmark loaders. Required inputs live in versioned
 `results/` trees. The `v2/audit/` directory is local and Git-ignored; maintain
 the current entry point in `v2/STATUS.md`, the live acceptance plan in
 `v2/ROADMAP.md` and stable rules in `v2/POLICY.md`. Keep detailed research and
-comparison documents under `v2/audit/`, and external reference sources under
+comparison documents under `v2/audit/`; do not publish selective report or
+result collections in `v2/studies/` or another documentation directory.
+Keep concise decisions and limitations in `v2/benchmarks/RESULTS.md`, reusable
+runner code under `v2/benchmarks/`, and external reference sources under
 folder-ignored `v2/benchmarks/inputs/upstream/`. Do not add individual-file
 ignore rules for study names or external projects. Public docs describe this
 project's behavior; preserve source inventories and comparison provenance locally.
