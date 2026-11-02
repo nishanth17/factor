@@ -371,3 +371,11 @@ Design commit `14caea4` passed 875 tests (nine optional-backend skips), lint,
 208 benchmark/study imports and the numerical/source checker from a
 committed-files-only export. These checks include all proposed literal
 configurations and isolated-control loading; they ran no performance calls.
+
+The active design now also includes the [lower-band supplement](qs/c10a01/protocol_lower_v4.md):
+three exposed inputs each at 50/55 for complete-cost screening, plus short
+51/52/55/56 boundary checks. Its separate 3700-second wall/CPU proposal raises
+the whole envelope to 42300 seconds without reducing any 60–70 grant. It
+preserves existing lower-band presieving and requires fresh per-band evidence
+before claiming gains across 50–60. No experiments ran; pending boundary
+inputs, nominee release and execution adapters remain explicit prerequisites.

@@ -4464,3 +4464,14 @@ Read the scripts before running them: the compatibility scripts load the origina
 - reduction_bench.py (local audit material) and reduction-validation.json: arithmetic checks and kernel measurements with disclosed exclusions.
 
 The full audit report supplies research references and their limitations. Pin any external implementation before benchmarking it; re-check its contracts before adapting code.
+
+### C10a-01 lower-band experiment supplement
+
+The [lower-band design](benchmarks/qs/c10a01/protocol_lower_v4.md) adds clean
+complete-cost screens at 50/55 and short 51/52/55/56 routing checks. Its separate
+3700-second allocation keeps all 60/62/65/70 grants intact; the revised whole
+ceiling is 42300 wall AND CPU seconds. Lower-band presieving and fused marking
+remain enabled. The globally selected nominee is assessed for size eligibility,
+without another combination grid. These are exposed exploratory inputs;
+50/55/60 improvement claims need fresh, adequately sampled complete-factor
+comparisons. No execution or adoption is implied by this design supplement.
