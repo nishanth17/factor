@@ -15,7 +15,7 @@ from . import execute_v4, plan_v4
 RELEASE = Path(__file__).with_name("execution_v4_sources_r2.json")
 
 
-def check_release():
+def check_release(*, require_prior=False):
     plan = json.loads(plan_v4.PLAN.read_text())
     plan_v4.verify_plan(plan)
     sources = json.loads(plan_v4.SOURCES.read_text())
@@ -24,7 +24,15 @@ def check_release():
             raise RuntimeError("parent source drift: " + name)
     manifest = json.loads(RELEASE.read_text())
     prior = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4"
+    prior_available = True
     for name, expected in manifest["prior_receipts"].items():
+        if not (prior / name).exists():
+            prior_available = False
+            if require_prior:
+                raise RuntimeError(
+                    "prior failed-release evidence missing: " + name
+                )
+            continue
         if digest(prior / name) != expected:
             raise RuntimeError("prior failed-release evidence drift: " + name)
     for name, expected in manifest["files"].items():
@@ -39,7 +47,7 @@ def check_release():
         != manifest["runtime_binary_sha256"]
     ):
         raise RuntimeError("runtime binary drift")
-    return plan, manifest
+    return plan, manifest, prior_available
 
 
 def host_admission(tier):
@@ -183,7 +191,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("check", "primary"))
     args = parser.parse_args()
-    plan, release = check_release()
+    plan, release, prior_available = check_release(
+        require_prior=args.action == "primary"
+    )
     if args.action == "check":
         print(
             json.dumps(
