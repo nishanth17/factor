@@ -1,5 +1,10 @@
 # A1b audit against the execution request
 
+**Subsequent resolution:** the user requested gap closure. The
+[completed repair](a1b_gap_closure.md) supplies the six missing55 calls,
+exact-composition checks and explicitly revised accounting. All 30 calls are
+now measured. This historical audit and its original findings remain below.
+
 This addendum follows the user's challenge to the completion claim at
 566a461. **Actual experiments were run, but full compliance with the original
 request was not established.** The 50/60 prefix evidence remains valid for its

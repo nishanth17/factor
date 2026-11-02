@@ -1,5 +1,9 @@
 # A1b existing fixed-score decision
 
+**Final status:** [gap closure and all-band decision](a1b_gap_closure.md)
+now supersedes the pending status below. All 30 planned calls were measured;
+retain defaults in every screened band. The original report is preserved.
+
 **Subsequent prompt audit:** [requirement-by-requirement review](a1b_prompt_audit.md)
 confirms actual 24-call prefix experiments but withdraws the broad completion
 claim. The 55-digit screen, exact-composition evidence mapping and replacement

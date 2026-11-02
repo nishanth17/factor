@@ -1,5 +1,16 @@
 # Changelog
 
+## A1b remaining gaps closed (1 November 2026)
+
+- Complete only the six unvisited 55-digit comparisons under a separately
+  frozen repair. All 30 planned calls now validate on nine exposed moduli;
+  the existing fixed/list bundle loses at50/55/60. Retain current defaults
+  and fixed opt-ins; no pilot or fresh campaign is justified.
+- Add exact growing-DLP coverage/restore and harness regression checks;
+  preserve old failures and missing clocks with explicit accounting repair.
+  Keep the Stage A ceiling unchanged and archive both histories. See the
+  [final decision](v2/studies/a1b_gap_closure.md).
+
 ## A1b prompt-compliance correction
 
 - Record actual 24-call prefix experiments and retain their measured 50/60

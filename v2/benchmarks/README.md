@@ -5,19 +5,17 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
-The [A1b prompt audit](../studies/a1b_prompt_audit.md) withdraws the earlier
-full-completion claim while preserving all observed results.55 was unmeasured;
-exact-composition coverage mapping and analysis accounting remain unresolved.
-
-The [terminal A1b review](../studies/a1b_results.md) retains those integrated
-controls. Existing fixed/list scoring bypasses sparse queues: its bundled
-prefix wall/CPU ratios are 1.273/1.273 at 50 and 1.830/1.830 at 60, with three
-independent inputs each and no input wins.55 was unmeasured after a readiness
-allocation error; it remains inconclusive. All 24 measured prefixes validate;
-no complete-factor claim or default change follows. The [frozen protocol](
-qs/a1b_protocol.md) and numerical inputs preserve selection, scheduling and
-charged recovery; the separate read-only terminal audit preserves the failed
-original analyzer. Raw evidence and a verified local archive remain ignored.
+The [completed A1b gap repair](../studies/a1b_gap_closure.md) retains the
+integrated control after all 30 screen calls on nine exposed inputs. Existing
+fixed/list scoring bypasses sparse queues; geometric wall/CPU prefix ratios
+are 1.273/1.273 at50,1.468/1.455 at55 and 1.830/1.830 at60. All inputs lose;
+no band advances to a complete-factor pilot. The exact-composition checks,
+prospective accounting repair,843-test committed QA and both verified archives
+resolve the earlier prompt audit's pending scope. Preserve its failures and
+missing historical clocks. No complete-factor speed claim or default change.
+See the [continuation protocol](qs/a1b_continuation_protocol.md) and
+[final numerical report](../studies/a1b_final_results.json). The study is terminal;
+do not rerun measured stages to replace old evidence.
 
 At explicit user direction, [combined face/queue defaults are adopted](
 ../studies/c10a07_default_promotion.md) after production integration and committed
