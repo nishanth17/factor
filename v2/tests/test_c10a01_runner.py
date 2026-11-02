@@ -25,6 +25,19 @@ class CalibrationContractTests(unittest.TestCase):
         self.assertEqual(3600 + 9200 + 7600 + 14800, 35200)
         validate(json.loads(CORPUS.read_text()))
 
+    def test_capacity_fixture_kernels_and_reservation(self):
+        from v2.benchmarks.qs.c10a01.diagnostics import matrix_check
+        from v2.execution.budget import Budget
+
+        for kind in ("cycle", "sparse35"):
+            budget = Budget(work_limit=10**9, seconds=None, cpu_seconds=None)
+            result = matrix_check(
+                dict(rows=128, columns=37, kind=kind), budget
+            )
+            self.assertEqual(result["reason"], "complete")
+            self.assertTrue(result["refused_below_reserve"])
+            self.assertGreaterEqual(result["elimination"]["dependencies"], 64)
+
     def test_observer_and_direct_coordinate_replay(self):
         for arm in ("control", "parity2"):
             cfg = configuration(60, arm, multiplier=3)
