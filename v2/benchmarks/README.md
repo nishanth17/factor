@@ -319,5 +319,9 @@ versioned. Detailed sources, research and raw receipts remain local.
 The later `qs.c10a01.pilots` runner provides readiness checks and separately
 funded complete-factor stages at 60/62, 65 and 70 digits. They were not run in
 preparation. Stage C uses an explicitly forced eligible multiplier because the
-balanced scored-selector cell otherwise repeats standard fallback. No automatic
-retry, memory escalation, default promotion or untouched-confirmation claim.
+balanced scored-selector cell otherwise repeats standard fallback. The
+prospective v2 protocol isolates each cell in a fresh worker and explicitly
+suballocates parent memory from the unchanged matched tiers. Native memory
+censoring preserves the next cell. The original unrun freeze remains intact.
+No automatic retry, memory escalation, default promotion or
+untouched-confirmation claim.

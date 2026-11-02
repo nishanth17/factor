@@ -9,6 +9,8 @@
   automatic policies and historical checkpoints retain their behavior.
 - Prepare bounded 60/62/65/70-digit feasibility work; no performance promotion
   follows from arithmetic validation.
+- Isolate prospective pilot cells in fresh workers and reserve parent memory
+  within matched tiers; preserve native memory censoring and original freezes.
 
 ## C10a-07 combined defaults (1 November 2026)
 

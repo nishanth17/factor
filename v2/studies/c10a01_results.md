@@ -20,7 +20,8 @@ Primary literature includes Alford–Pomerance, Contini, Boender–te Riele,
 Carrier–Wagstaff and Bradford–Monagan–Percival, with Percival's implementation
 material and monograph support. Detailed operative callers, exact revisions,
 hashes, mechanisms, alternatives, inaccessible material and limitations are
-retained locally in `v2/audit/c10a01/research.md`. This is not exhaustive SOTA
+retained locally in `v2/audit/c10a01/research.md` and the expanded
+`v2/audit/c10a01/research_v2.md` review. This is not exhaustive SOTA
 coverage or a native-reference performance comparison.
 
 ## Short observations
@@ -93,14 +94,15 @@ and ordinary correctness QA were separate from this experimental allocation.
 Literal configurations hold interval, block, LP domains, plans, queues,
 backend, pacing and finite storage policies fixed within each pair. Memory
 never silently selects another factory default. The outside assignment and
-bounded harness reserves are suballocated from the total owned tier.
+bounded harness reserves are suballocated from the total owned tier. The
+conditional scenarios below include pilot-v2's additional 32 MiB parent reserve.
 
 | Digits, both arms | Base / A factors | Rows / atoms / partial caps | Dense nonzero capacity | Owned / RSS tier | Central conditional owned scenario |
 | --- | --- | --- | ---: | --- | ---: |
-| 60 | 5000 / 8 | 12000 / 65536 / 32768 | 60012000 | 1 / 3 GiB | 0.733 GiB |
-| 62 | 6000 / 9 | 16000 / 98304 / 49152 | 96016000 | 2 / 5 GiB | 0.888 GiB |
-| 65 | 8500 / 9 | 24000 / 131072 / 65536 | 204024000 | 2 / 5 GiB | 1.308 GiB |
-| 70 | 10500 / 10 | 32000 / 196608 / 98304 | 336032000 | 4 / 8 GiB | 1.688 GiB |
+| 60 | 5000 / 8 | 12000 / 65536 / 32768 | 60012000 | 1 / 3 GiB | 0.764 GiB |
+| 62 | 6000 / 9 | 16000 / 98304 / 49152 | 96016000 | 2 / 5 GiB | 0.919 GiB |
+| 65 | 8500 / 9 | 24000 / 131072 / 65536 | 204024000 | 2 / 5 GiB | 1.339 GiB |
+| 70 | 10500 / 10 | 32000 / 196608 / 98304 | 336032000 | 4 / 8 GiB | 1.719 GiB |
 
 The central scenarios assume about 5F atoms, 4F forest edges, 1.2F rows,
 20 exponents/atom and two source atoms/combined row; they are not RAM theorems
@@ -121,7 +123,7 @@ charged resume remains verified.
 | B: 65 | 2 | 3600 seconds | 7600 seconds | 2 |
 | C: 70 | 2 | 7200 seconds | 14800 seconds | 3 |
 
-[The executable freeze](../benchmarks/qs/c10a01/pilots.json) contains exact
+[The prospective executable freeze](../benchmarks/qs/c10a01/pilots_v2.json) contains exact
 per-call and cumulative work limits. Collection's maximum observed prefix
 rate was 0.4445 billion units/CPU second; the 60 matrix fixture reached about
 6.244 billion. The model rounds up to 8 billion, uses fourfold rate headroom,
@@ -139,6 +141,9 @@ predates that collector. Above 60 there is no calibrated completion-time law.
 ## Verified handoff and commands
 
 Base mainline: `4a946b8d6294d51ac5d9c36f61880cc63d5b59fd`.
+Mainline subsequently advanced to `8034bae` through documentation-only
+reorganization; runtime Python and numerical files are unchanged from this
+base. The task keeps its original source/control identities.
 Opt-in arithmetic: `e51b3f5`; scored-prefix freeze: `b666bde`;
 forced/capacity freeze: `ce7d66f`. Required exposed inputs and recursive
 Pocklington certificates are committed. Factor calls receive N only. Sampling
@@ -170,7 +175,12 @@ Later execution commands, **not run during this session**:
 
 Each stage takes the shared performance lock, verifies source/input/host
 readiness, reserves every call, warms both clocks and records nine short
-sentinel samples before and after each measured job. A 15% drift screen is
+sentinel samples before and, when resources permit, after each measured job.
+Each cell uses a fresh PyPy worker so lifetime RSS from one cell cannot block
+the next. Native memory/RSS censoring records missing post-drift and preserves
+the next matched cell. The parent takes 32 MiB from the unchanged owned tier;
+its 256 MiB RSS reserve is subtracted from the worker RSS guard. Algorithm
+policies and capacities remain unchanged. A 15% drift screen is
 recorded; failure prevents performance claims but does not erase outcomes.
 Arithmetic/provenance/harness failures stop for audit. Native time/work/memory
 and storage exhaustion remain censored outcomes; complete every valid matched
@@ -184,10 +194,42 @@ remain under ignored `v2/audit/c10a01/` and
 `v2/benchmarks/results/c10a01/`. No merge, push, default promotion or E1 work
 was performed.
 
-Validation: `make -C v2 test` passes 841 tests (9 optional-backend skips),
-and `make -C v2 lint` passes. A committed-only export passes the same suite,
+Historical validation at 9d1b51c: `make -C v2 test` passes 841 tests
+(9 optional-backend skips), and `make -C v2 lint` passes. A committed-only export passes the same suite,
 lint and all 204 benchmark/study module imports without local audit, results
 or upstream files. Focused checks include 50/55-digit opt-in setup, routing
 boundaries, observer passivity, original-row kernels and pilot censoring rules.
 All three readiness-only commands pass source, exact PyPy binary/version,
 input, resource and independent budget checks. Pilot execution remains zero.
+
+## Reopened research decision and prospective protocol
+
+The initial handoff overstated research readiness. The expanded review added
+primary MPQS coefficient-selection and local-density literature, traced more
+implementations through extraction, and checked current revisions against
+historical archives. Its mechanism comparison is retained locally in
+`v2/audit/c10a01/research_v2.md`; all original evidence and freezes remain.
+
+The opt-in implementation remains justified. Direct P storage has the same
+physical trials and smooth residuals as 2P; its possible gain is bookkeeping
+cost. Residue-5 normalization is valid but has no first-order 2-adic benefit.
+A wider exact multiplier search, improved actual A products, and batch
+smoothness checking are credible separate investigations. Combining them now
+would change an unmeasured arm and obscure the comparison. Existing unroll and
+presieve kernels are already available and do not require another arithmetic
+representation. No extra numerical experiment ran during this review.
+
+The most informative extra 70-digit arm would use standard polynomials with
+fixed k=31. It would separate multiplier and representation effects. A
+three-arm replacement Stage C would require 22200 wall AND CPU seconds,
+raising the whole envelope to 42600 seconds (11 hours 50 minutes). That is an
+**unfunded optional design**, described in the local `arms_v2.md`; it is not
+enabled by the runner. The funded two-arm Stage C and 35200-second total stay
+in the executable plan.
+
+Pilot-v2 supersedes the unrun v1 protocol because v1 reused a process whose
+lifetime RSS could taint subsequent calls. The original `pilots.json` and
+`pilot_sources.json` are retained unchanged and require their historical
+checkout. Current commands above select `pilots_v2.json` and
+`pilot_sources_v2.json`, with separate `pilot-v2-A/B/C` output identities.
+No pilot, default promotion, merge or push has occurred.

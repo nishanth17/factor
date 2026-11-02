@@ -82,3 +82,29 @@ matched resources, input-level paired uncertainty and fresh repeatability.
 Repeated seeds are not independent moduli. No universal percentage threshold.
 Further redesign uses exploratory evidence and cannot reuse confirmation as
 untouched data. Extension is not authorized automatically.
+
+## Prospective pilot-v2 isolation and memory amendment
+
+The closed calibration and original unrun `pilots.json` freeze remain intact.
+Current pilot commands select `pilots_v2.json` and `pilot_sources_v2.json`.
+The numerical time/work allowances and two-arm stage design are unchanged.
+Each cell executes in a fresh PyPy worker, resetting process-lifetime RSS.
+The parent holds the performance and output locks across the entire stage.
+It suballocates 32 MiB from the unchanged owned tier and 256 MiB from its RSS
+ceiling; the worker gets the remainder. Literal policies, row/atom/partial
+capacities, backends and pacing are unchanged. The parent retains at most
+four summaries of 64 KiB each; full bounded native receipts stay on disk.
+
+Native RSS/memory censoring retains its outcome and records missing post-drift;
+it does not contaminate the next matched cell. Other provenance, arithmetic
+or worker failures stop for audit without retry. A child watchdog allows the
+measured cap plus 75 seconds for two 35-second sentinel reservations and the
+5-second measured margin. Cooperative native checks can overshoot an atomic
+operation; this is not a hard physical-memory guarantee. Host admission is
+rechecked for every cell. No complete-factor pilot ran during preparation.
+
+The expanded research retains the single measured challenger. A third
+standard-k=31 arm at 70 would improve attribution, but is a separately
+identified, unfunded proposal. It is not enabled here and cannot consume the
+funded two-arm margins. See `studies/c10a01_results.md` for the handoff and
+local audit references.
