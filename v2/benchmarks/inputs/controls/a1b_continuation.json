@@ -1,0 +1,167 @@
+{
+  "accounting_revision": "User requested gap closure. Prospectively move the unused30s diagnostic allocation to10s legacy analysis debit,15s continuation analysis,5s orchestration. Preserve all1240s parent charges and failed60s analysis. No refund, increase in1470s Stage A ceiling, or use of B/C funds. Missing historical actual clocks remain unknown.",
+  "advancement": "For each input use paired wall/CPU ratios; at60 use median across7/29/47. Qualify only with no coverage/correctness violation, at least2/3 independent wall wins, geometric mean wall<1, CPU<=1, all warmup/end stability and identical physical prefix checks passed. No minimum percentage, significance threshold or selective repeats. Failed/missing readiness or incomplete prefixes retain control.",
+  "current_master": "24ff153d26ada2ec4beeead07000d183e94fd355",
+  "expected_total_wall_cpu_seconds": 35,
+  "helper_memory": "8MiB includes2MiB fixed/global/sort scratch, conservative PyPy JSON graph bounds and two <=1MiB serialization buffers. Validate<=8192 retained atoms before sorting. Resource refusal is a harness refusal; never a native memory claim.",
+  "identity": "a1b-unvisited55-gap-repair-v1",
+  "limits": {
+    "analysis": {
+      "cpu": 15,
+      "wall": 15,
+      "work": 0
+    },
+    "disk_bytes": 536870912,
+    "legacy_analysis": {
+      "cpu": 10,
+      "wall": 10,
+      "work": 0
+    },
+    "measured": {
+      "cpu": 150,
+      "wall": 150,
+      "work": 120000000000
+    },
+    "orchestration": {
+      "cpu": 5,
+      "wall": 5,
+      "work": 0
+    },
+    "total": {
+      "cpu": 230,
+      "wall": 230,
+      "work": 220000000000
+    },
+    "warm": {
+      "cpu": 50,
+      "wall": 50,
+      "work": 100000000000
+    }
+  },
+  "parent_evidence": {
+    "cell-00.json": "c783ddc76cc7bfb6a600c2fbf71accc764ad9385b139677259897824b0f70915",
+    "cell-01.json": "22f64c60f541198b41f9efb42084d3a4a4f0a3a40c79112e8f4b7c1dfda4c033",
+    "cell-02.json": "51af607598d06cb01e6939e3cc1791c0ffc713a8d117d1c67ff00d8b30906008",
+    "cell-03.json": "fd6527448bbcd747a8d95d27ee10fbd28a217a951a77a79cffec67b6d61d4c6d",
+    "cell-04.json": "0f1da7b97eff9f8fe85443dd6ce54f026f88e5f27c8da79ad817a1c657197bf1",
+    "cell-05.json": "a0ec6b4ba27b2673fe8abb8db45b4770f2c0b92103aa355d63ea83c1826fa8da",
+    "cell-06.json": "0163e18e50c9fc55d0b06f0a18d618e1bd44050db2fd1da7042ef56d8d058bb9",
+    "cell-07.json": "9b685fd44062d0c42307cccb1ff51efc89aa4ff93c1f60141caf69f052ce5c78",
+    "cell-08.json": "d384ddbaf3ad134f6d69c5b6810e9d0a72ff529874bd276e769b5879cfa00771",
+    "cell-09.json": "ba6716c4dbc82694e1b18dac48352013d8f4fcb76b9bda8438ddc591d698af20",
+    "cell-10.json": "8fa23e74bdc4d0d6efb2a0a09b955d2add0cff0663b26af02a192c1d73aa45ee",
+    "cell-11.json": "92a73a9fa14b05fc45977a3c3487d7150eccc481c6f887d4cb5ae87db2404346",
+    "cell-12.json": "947e81dcf0469e1cd1a0411fcdea0cd4b687086b5fcd72c240e2cf92b6b4c8da",
+    "cell-13.json": "058764687d1cafc9806c45fcfa2dcd1c4ae6d4d8715e175b9b5298a5cebe8ad6",
+    "cell-14.json": "213d6d9c0f8b6fa5611c373bde8af711d4c5da7803505351ffd0f110c613de17",
+    "cell-15.json": "47ffc7d1cf44f92602e0b3757d53de1396089363d3f29664945d154878df4064",
+    "cell-16.json": "6b0f26bca9e554e61033f94278e7ec159e1ac49ad69c47d0e0b30a9deec16d22",
+    "cell-17.json": "c4814bbb3425c6dc7a1bff82c24e6170c6c349f2d96846c0ee8a450d904f0b80",
+    "cell-18.json": "50b9b2301b2ad45a2685bb142e2eed6b5b5589f871c2eacec49c23dcac0e2fca",
+    "cell-19.json": "e5158fd7c08194c468f00571c4a2e122d43c71a673250ce6fd8ad69f8dfa1686",
+    "cell-20.json": "b5d094aec7e7c4741cca189a3d3fb967ad7ff46660d5accfe51a99785fc19079",
+    "cell-21.json": "0c22313aa0c3c2253aad944fd7c48aa59ac787e90839dcd6e84e49ecd1c01a08",
+    "cell-22.json": "7499496fa024034998eeb9fc81dc3105ebb6dcd9b702b7ecc71231998dcab3fa",
+    "cell-23.json": "bb1be3f8193c4ecfb55183f428eee28d68c9eeb6743b223c648735ad5b922246",
+    "end-33150-1793591188341669000-50-control-stability.json": "2fb13fb2fe23cd4c5ee8d4313e03b8a421f75fb7ad06f5820299a60c8973a986",
+    "end-33150-1793591188341669000-50-fixed-stability.json": "0bcd5a7f90e6afdf26a9a5b581a73d3c5143607866db7ad415c275f09c9424e3",
+    "end-33150-1793591188341669000-55-control-stability.json": "ee13ea69d2df76fa0aa110444a1097d74ed4b207160eab9db7354308de1c9d08",
+    "end-33150-1793591188341669000-60-control-stability.json": "012418d69df2e348cb8636764a5b8a3fc8fa42480ff0520dad1f785daf88f97c",
+    "end-33150-1793591188341669000-60-fixed-stability.json": "c99db82648e7a01fb24d7f608e4effc66ec8380d4927db983dfca860ba1b1b1d",
+    "ledger.json": "0e2b2cdac56b9ba8f228af18c221b1ef9bd49b1ca2450da8de351e287acfb04f",
+    "start-33150-1793591188341669000-50-control.json": "f60092f326d5462d5989aae90c2cbd0f7cd0a8855470660c75d00a967d99477a",
+    "start-33150-1793591188341669000-50-fixed.json": "715500f4853dba7d8f3806ca8b8d6654b8bcae304d8788221995cb03f0aa4d14",
+    "start-33150-1793591188341669000-55-control.json": "64b447a07e1018344622f3b33598950db675b340c6e037de73b1387e1217d831",
+    "start-33150-1793591188341669000-60-control.json": "2bb4eead4edbc71ccb4e5808fcb62c72281785ac924de28cbdde7236fb629622",
+    "start-33150-1793591188341669000-60-fixed.json": "b1e344f548f48d9d4a70b1e3e409f1841e560833c82690e77c2c9ed04f886c89"
+  },
+  "parent_report": "2591cd6",
+  "parent_source": "ac70718",
+  "resource_grants": {
+    "helpers": 8388608,
+    "native": 1065353216,
+    "output": 536870912,
+    "rss": 3221225472,
+    "total": 1073741824
+  },
+  "runtime_base": "4a946b8d6294d51ac5d9c36f61880cc63d5b59fd",
+  "runtime_comparison": "Current master differs in documentation only for runtime paths; no C10a-01 code.",
+  "schedule": [
+    {
+      "arm": "control",
+      "blocks": 2146,
+      "cell": 24,
+      "digits": 55,
+      "id": "a1a_integration_55_0",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    },
+    {
+      "arm": "fixed",
+      "blocks": 2146,
+      "cell": 25,
+      "digits": 55,
+      "id": "a1a_integration_55_0",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    },
+    {
+      "arm": "fixed",
+      "blocks": 2146,
+      "cell": 26,
+      "digits": 55,
+      "id": "a1a_integration_55_1",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    },
+    {
+      "arm": "control",
+      "blocks": 2146,
+      "cell": 27,
+      "digits": 55,
+      "id": "a1a_integration_55_1",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    },
+    {
+      "arm": "control",
+      "blocks": 2146,
+      "cell": 28,
+      "digits": 55,
+      "id": "a1a_integration_55_2",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    },
+    {
+      "arm": "fixed",
+      "blocks": 2146,
+      "cell": 29,
+      "digits": 55,
+      "id": "a1a_integration_55_2",
+      "margin": 5,
+      "seconds": 20,
+      "seed": 7,
+      "work": 20000000000
+    }
+  ],
+  "stop": "No retries or automatic enlargement. Incomplete readiness/endpoints or censored cells retain control. Only55 can newly advance; if eligible, freeze one band-appropriate complete pilot before execution.",
+  "warm": {
+    "blocks": 1056,
+    "cap_wall_cpu": 4,
+    "endpoint_slots": 2,
+    "margin": 1,
+    "max_calls": 10,
+    "readiness": "Unchanged parent min3 calls and >=3 wall AND CPU seconds; last3 range/median<=20%; endpoints[0.8,1.2] in same new process.",
+    "reservation": 5
+  }
+}
