@@ -1,13 +1,23 @@
 # Changelog
 
+Start with [current status](v2/STATUS.md) for present defaults and work. Entries
+below record decisions in their dated scope; later entries may supersede routes.
+
+## Roadmap documentation cleanup (1 November 2026)
+
+- Split current status, live backlog and stable policy. Preserve historical
+  quantitative narratives through a pinned Git revision and source/hash metadata
+  in the [history index](v2/history/README.md). At user direction, remove the
+  duplicate full snapshot and use Git history. No experimental verdict changed.
+
 ## C10a-07 combined defaults (1 November 2026)
 
 - At explicit user direction, adopt swapped adjacent sign coordinates for fresh
   automatic SIQS jobs and exact sparse prime/power queues in eligible collectors.
   Preserve A1a kernels, existing parameter/routing bands, total owned memory,
   explicit policies, legacy snapshots and charged exact fallback/resume.
-- Record23.1% observed wall /23.0% CPU reduction on nine fresh50/55/60 inputs as
-  exploratory: the original drift gate remains unmet. The additional18-call
+- Record 23.1% observed wall / 23.0% CPU reduction on nine fresh 50/55/60 inputs as
+  exploratory: the original drift gate remains unmet. The additional 18-call
   confirmation was not run; adoption is a separate user decision.
 - Close C10a-07 with findings and verified production integration. Preserve
   receipts/research/commits before removing temporary worktrees and scratch.
@@ -620,7 +630,8 @@
 
 - Keep research notes and diagnostic tools in the ignored local audit tree.
   Move six required source/provenance inputs into benchmark inputs and retain
-  the public acceptance plan as `v2/ROADMAP.md`.
+  the public acceptance plan as `v2/ROADMAP.md` (now reached through
+  [current status](v2/STATUS.md)).
 
 - Rewrite the repository and v2 guides around current methods, usage, result
   and resume contracts, measured comparisons and remaining work. Keep detailed
@@ -721,16 +732,19 @@
   digests and retain legacy checkpoint prefixes. A fresh balanced 50-digit
   SIQS run completes in 1,183.355 s; continuation time is recorded separately.
 
-[P3.4](v2/ROADMAP.md)'s bounded implementation/evaluation is complete;
-ECM remains the default and SIQS stays opt-in. A general SIQS crossover and
+Historical P3.4/M31 decision (3 October 2026):
+[P3.4](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p34--add-siqs-self-initialization-and-bounded-dispatch)'s
+bounded implementation/evaluation is complete; ECM remains the default and
+SIQS stays opt-in in that decision's scope. A general SIQS crossover and
 practical 60–80-digit scaling remain unestablished. The earlier M30 completion
 claim was corrected because 0.2-second probes and 24–26-bit fixtures were
 insufficient; M31 supplies the declared longer experiment and its explicit
 retain-baseline decision. See measurements.
-P4.3 arithmetic assessment and bounded GNFS remain roadmap work.
-
-PRAC optimization remains [P4.1](v2/ROADMAP.md); production currently uses
-the safe Montgomery ladder.
+At that date, P4.3 arithmetic assessment and bounded GNFS remained planned
+work. PRAC optimization remained
+[P4.1](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p41--finish-prac-repair-and-precompute-valid-chains);
+production then used the safe Montgomery ladder. See [current status](v2/STATUS.md)
+for later backend/PRAC decisions and scoped automatic SIQS routing.
 
 ## P3.8 R1 isolated capacity implementation — 4 October 2026
 

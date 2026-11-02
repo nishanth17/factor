@@ -60,7 +60,7 @@ See [benchmark scope and results](v2/README.md#benchmarks).
 | [v2/](v2/README.md) | Current methods, API, CLI and tests |
 | [v1/](v1/) | Original baseline, preserved unchanged |
 | [Benchmarks](v2/benchmarks/README.md) | Commands, measurements and limitations |
-| [Roadmap](v2/ROADMAP.md) | Acceptance gates and planned work |
+| [Current status](v2/STATUS.md) | Automatic defaults, work in flight, next eligible work; links to backlog, policy and history |
 | [Changelog](CHANGELOG.md) | Accepted changes |
 
 Benchmark `inputs/` retain reproducible corpora, immutable baselines and

@@ -4,6 +4,8 @@ Integer factorization using **PyPy implementing Python 3.11** and exact
 Python integers or optional GMP integers. v2 repairs the
 [original v1](../v1) implementation
 and adds bounded, resumable execution and experimental relation-based engines.
+Start with [current status](STATUS.md) for defaults, work in flight and next work;
+it links to the live backlog, policy and preserved history.
 
 ## Combined SIQS collection defaults
 
@@ -19,21 +21,21 @@ existing size/routing/work limits remain in force outside calibrated bands.
 The queue's actual conservative reservation competes with atoms/matrix scratch
 inside the existing owned-memory limit; it is released on polynomial change and
 rebuilt with charged work after interruption/resume. No derived queue is trusted
-from a checkpoint. Face metadata has a bounded256 KiB reservation. Factory kernel,
+from a checkpoint. Face metadata has a bounded 256 KiB reservation. Factory kernel,
 plan and pacing fields are chosen before helper accounting, retaining A1a.
 
 Explicit `SIQSConfig()` and `SieveConfig()` retain canonical signs and no queue.
 Opt in explicitly with `sign_policy="swap_high"` and collector
-`sparse_queue_bytes` (0 through32 MiB). Set `sign_policy="canonical"` and queue
-bytes0 for the former policies. New-policy jobs write SIQS checkpoint version7;
-versions1–6 restore their saved canonical/no-queue policies, and existing explicit
+`sparse_queue_bytes` (0 through 32 MiB). Set `sign_policy="canonical"` and queue
+bytes 0 for the former policies. New-policy jobs write SIQS checkpoint version 7;
+versions 1–6 restore their saved canonical/no-queue policies, and existing explicit
 configuration/extension compatibility checks remain binding. Portfolio and CLI
 snapshots retain their selected policies. This changes no ECM/SSS policy or
 whether a portfolio enables SIQS. Experimental workers keep explicit schedules.
 
 This is [user-directed adoption](studies/c10a07_default_promotion.md). The
 23.1% observed combined wall-cost reduction was measured on nine fresh inputs
-at50/55/60 digits, with a missing first-process drift endpoint. Other sizes,
+at 50/55/60 digits, with a missing first-process drift endpoint. Other sizes,
 backends and grants are unmeasured policy extrapolations, not confirmed speedups.
 
 ## Methods
@@ -48,8 +50,11 @@ backends and grants are unmeasured policy extrapolations, not confirmed speedups
 | SIQS | Shared relations across CRT/Gray polynomial families, incremental roots, filtering, GF(2) dependencies and exact extraction; selectable CLI engine or optional portfolio fallback |
 | SSS / SSSf | Experimental Smooth Subsum Search; SSSf adds an optional lossy candidate filter; explicitly selectable through the CLI |
 
-The bounded default runs preprocessing, rho, p−1 and ECM serially. SIQS and SSS
-require explicit selection; thread/process SIQS workers are experimental.
+The bounded default runs preprocessing, rho, p−1 and ECM serially. Omitted
+native configurations enable SIQS fallback at exactly 40 and 50–60 digits;
+other size/backend scopes require explicit SIQS selection. SSS and
+thread/process SIQS workers remain experimental opt-ins. See the
+[current routing and evidence](STATUS.md#current-automatic-defaults).
 The compatibility `factorize()` interface remains available but has no shared
 global deadline or resumable schedule.
 
@@ -253,8 +258,9 @@ MPQS/SIQS use finite family schedules. Wider intervals need a compatible
 maximum width. Streaming assignment (`nearest` or `flyer`) and Gray quotas
 apply only to SIQS; extended quotas require a streaming policy. Invalid
 mode/configuration combinations are rejected. These settings remain experimental.
-Use `--verbose` to inspect method outcomes and work use. Measured automatic
-handoff/default selection is open in the [roadmap](ROADMAP.md); explicit CLI
+Use `--verbose` to inspect method outcomes and work use. Joint automatic
+handoff/default calibration remains open; [current status](STATUS.md)
+records the delivered size-scoped routes and remaining gates. Explicit CLI
 usability is tracked separately under P3.4.
 
 The calibrated B1 balanced 30-digit SIQS preset is available explicitly.
@@ -815,8 +821,8 @@ separate cold startup from warmed execution.
 
 `tests/` contains acceptance and arithmetic regressions; the
 [QS guide](qs/README.md) covers relation engines. Benchmark documentation holds detailed results;
-the [roadmap](ROADMAP.md) records acceptance gates. Benchmark `inputs/`
-retain independent corpora, immutable sources, provenance and frozen controls.
+the [current status](STATUS.md) links to live acceptance gates and stable
+policy. Benchmark `inputs/` retain independent corpora, immutable sources, provenance and frozen controls.
 The entire `audit/` tree is Git-ignored local research and diagnostic material;
 its `results/` and benchmark `results/` hold generated captures, checkpoints,
 profiles and scratch work. Accepted changes go in the
@@ -1480,4 +1486,5 @@ sources and commands are retained in Git history at `225634b`; detailed
 research, protocols and journals are local audit evidence. Do not restart
 historical ledgers on changed runtime sources. Every receipt, timeout and
 interrupted reservation remains preserved in ignored results; E1 remains
-deferred and C10a-07 open.
+deferred. C10a-07 is Done for its delivered user-directed adoption; see
+[current status](STATUS.md) for its unmet experimental gates and remaining work.
