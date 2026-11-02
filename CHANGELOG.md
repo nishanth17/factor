@@ -1,5 +1,13 @@
 # Changelog
 
+## A1b prompt-compliance correction
+
+- Record actual 24-call prefix experiments and retain their measured 50/60
+  findings. Withdraw the broad task-completion claim:55 was unmeasured and
+  exact-composition evidence mapping and analysis accounting need resolution.
+  See [requirement audit](v2/studies/a1b_prompt_audit.md). No new timings or
+  defaults changed as part of this correction.
+
 ## A1b existing fixed-score review (2 November 2026 UTC)
 
 - Retain integrated SIQS defaults after the existing fixed/list bundle loses

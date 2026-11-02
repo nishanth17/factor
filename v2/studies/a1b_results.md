@@ -1,5 +1,11 @@
 # A1b existing fixed-score decision
 
+**Subsequent prompt audit:** [requirement-by-requirement review](a1b_prompt_audit.md)
+confirms actual 24-call prefix experiments but withdraws the broad completion
+claim. The 55-digit screen, exact-composition evidence mapping and replacement
+analysis accounting have unresolved gaps. The observations and historical
+report below are preserved; they do not establish full prompt compliance.
+
 **Retain current integrated SIQS defaults.** Existing fixed/list scoring loses
 the completed 50- and 60-digit prefix screens; defer 55 digits because readiness
 stopped before measurement. Fixed scoring remains opt-in. A1b's existing-option

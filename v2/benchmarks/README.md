@@ -5,6 +5,10 @@ Use `make -C v2 benchmark` for the introductory suite. Every accepted timing
 requires validated warmup, at least nine observations and output validation;
 see [contributor guidance](../../AGENTS.md).
 
+The [A1b prompt audit](../studies/a1b_prompt_audit.md) withdraws the earlier
+full-completion claim while preserving all observed results.55 was unmeasured;
+exact-composition coverage mapping and analysis accounting remain unresolved.
+
 The [terminal A1b review](../studies/a1b_results.md) retains those integrated
 controls. Existing fixed/list scoring bypasses sparse queues: its bundled
 prefix wall/CPU ratios are 1.273/1.273 at 50 and 1.830/1.830 at 60, with three
