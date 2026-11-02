@@ -1,5 +1,6 @@
 """Frozen nominee and unrun pilot resource invariants."""
 
+import subprocess
 import unittest
 from tempfile import TemporaryDirectory
 
@@ -7,6 +8,15 @@ from v2.benchmarks.qs.c10a01 import nominee_v4, pilots_v4, plan_v4
 
 
 class PilotV4FreezeTests(unittest.TestCase):
+    def test_worker_command_imports_entrypoint(self):
+        command = pilots_v4.worker_command("A", 0)
+        self.assertEqual(command[2], pilots_v4.WORKER_MODULE)
+        result = subprocess.run(
+            command + ["--help"], capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--cell-index", result.stdout)
+
     def test_nominee_configs_and_receipt_bindings(self):
         frozen = nominee_v4.verify()
         self.assertEqual(len(frozen["calls"]), 8)

@@ -20,6 +20,21 @@ SENTINEL_BLOCKS = 8 * 33
 OUTPUT_LIMIT = 64 * 1024
 RECEIPT_LIMIT = 512 * 1024
 STAGE_DISK_LIMIT = 16 * 2**20
+WORKER_MODULE = "v2.benchmarks.qs.c10a01.pilots_v4"
+
+
+def worker_command(stage, index):
+    """Use the importable module even when this parent runs as __main__."""
+    return [
+        sys.executable,
+        "-m",
+        WORKER_MODULE,
+        "worker",
+        "--stage",
+        stage,
+        "--cell-index",
+        str(index),
+    ]
 
 
 def ledger_limits(plan, stage):
@@ -294,16 +309,7 @@ def stage_run(stage):
         rows = []
         for index, call in enumerate(plan["pilots"][stage]["calls"]):
             host_admission(call["tier"])
-            command = [
-                sys.executable,
-                "-m",
-                __name__,
-                "worker",
-                "--stage",
-                stage,
-                "--cell-index",
-                str(index),
-            ]
+            command = worker_command(stage, index)
             child = subprocess.Popen(
                 command,
                 cwd=ROOT,
