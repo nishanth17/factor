@@ -15,7 +15,7 @@ from ....qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSJob
 from ....qs.sieve_collector import SieveCollector
 from . import control_v4, plan_v4
 
-OUTPUT = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4"
+OUTPUT = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4-r2"
 
 
 def rss():

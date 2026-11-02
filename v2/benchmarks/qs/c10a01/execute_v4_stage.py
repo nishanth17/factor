@@ -12,7 +12,7 @@ from pathlib import Path
 from ..c10a04.accounting import Ledger, digest
 from . import execute_v4, plan_v4
 
-RELEASE = Path(__file__).with_name("execution_v4_sources.json")
+RELEASE = Path(__file__).with_name("execution_v4_sources_r2.json")
 
 
 def check_release():
@@ -23,6 +23,10 @@ def check_release():
         if plan_v4.digest(plan_v4.ROOT / name) != expected:
             raise RuntimeError("parent source drift: " + name)
     manifest = json.loads(RELEASE.read_text())
+    prior = plan_v4.ROOT / "v2/benchmarks/results/c10a01/calibration-v4"
+    for name, expected in manifest["prior_receipts"].items():
+        if digest(prior / name) != expected:
+            raise RuntimeError("prior failed-release evidence drift: " + name)
     for name, expected in manifest["files"].items():
         if plan_v4.digest(plan_v4.ROOT / name) != expected:
             raise RuntimeError("execution source drift: " + name)
@@ -137,8 +141,14 @@ def run_worker(row):
         and measured["positions"] != row["positions"]
     ):
         raise RuntimeError("fixed-position target missed")
-    if result["total_work"] > row["work"] + 2 * warm_slot_work():
+    if result["total_work"] != (
+        before["work"] + measured["work"] + after["work"]
+    ):
+        raise RuntimeError("worker work total mismatch")
+    if result["total_work"] > row["work"] + warm_slot_work():
         raise RuntimeError("total work bound")
+    # Ledger.call settles result['work']; preserve the separate components.
+    result["work"] = result["total_work"]
     return result
 
 

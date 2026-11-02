@@ -3,10 +3,13 @@
 import json
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 from v2.benchmarks.qs.c10a01 import execute_v4, execute_v4_stage, plan_v4
+from v2.benchmarks.qs.c10a04.accounting import Ledger
 
 
 class ExecutionPreflightTests(unittest.TestCase):
@@ -54,6 +57,40 @@ class ExecutionPreflightTests(unittest.TestCase):
                     execute_v4.control_v4.PACKAGE + "."
                 ):
                     del sys.modules[name]
+
+    def test_worker_work_is_settled_by_durable_ledger(self):
+        plan = json.loads(plan_v4.PLAN.read_text())
+        row = plan["calibration"]["calls"][0]
+        result = dict(
+            before=dict(wall=4, cpu=4, work=100),
+            result=dict(
+                seconds=2,
+                cpu_seconds=2,
+                work=300,
+                reason="paused",
+                positions=row["positions"],
+            ),
+            after=dict(wall=1, cpu=1, work=200),
+            total_work=600,
+        )
+        process = type("FinishedProcess", (), {"poll": lambda self: 0})()
+        with patch.object(
+            execute_v4_stage.subprocess, "Popen", return_value=process
+        ):
+            with patch.object(
+                execute_v4_stage, "read_worker", return_value=result
+            ):
+                reported = execute_v4_stage.run_worker(row)
+        self.assertEqual(reported["work"], 600)
+        with tempfile.TemporaryDirectory() as directory:
+            limits = dict(
+                primary=dict(wall=60, cpu=60, work=1000),
+                total=dict(wall=60, cpu=60, work=1000),
+                disk_bytes=1024 * 1024,
+            )
+            ledger = Ledger(directory, "settlement-test", limits)
+            ledger.call("primary", "cell", 60, 1000, {}, lambda: reported)
+            self.assertEqual(ledger.used("primary", "work"), 600)
 
     def test_worker_output_exhaustion_is_harness_failure(self):
         process = subprocess.Popen(
