@@ -82,8 +82,9 @@ reservation is retained separately. The original calibration had already
 reserved 3,124 seconds. No failed receipt was rewritten.
 
 The fastest sustained charged-work interval in the new single-cell prefixes
-was 0.5412 billion units per CPU second. Root/setup groups have higher
-per-group rates, still below the retained 8-billion planning rate; the old
+was 0.5412 billion units per CPU second. The fastest measured root group
+member reached 1.370 billion, still below the retained 8-billion planning
+rate; the old
 matrix fixture measured 6.244 billion. No new prefix reached preparation or
 solving. Thus the already frozen pilot guards keep 4 × 8 billion units per
 CPU second, plus separately bounded setup and analytic postprocessing charges.
@@ -147,9 +148,10 @@ Later execution commands, **not run in this session**:
 
 The full original-plus-new-plus-lower design ceiling is 42,300 wall and CPU
 seconds. Including the failed release separately makes its historical maximum
-42,480 seconds. Original actual reservations plus the failed release and the
-remaining prospective new/lower/pilot ceilings total 42,004 seconds. Actual
-new reservations leave 490 seconds unused. The 70 stage is admitted on its
+42,480 seconds. Original actual reservations, the failed release, actual new
+calibration reservations and the prospective lower/pilot ceilings total
+**41,514 seconds**. The new calibration left 490 seconds unused. The 70 stage
+is admitted on its
 own arithmetic, configuration and host feasibility; it does not require 65
 to complete. Retained 60-digit complete jobs took about 426–796 seconds under
 an earlier combined policy. An old 65-digit 1,800-second failure preceded the

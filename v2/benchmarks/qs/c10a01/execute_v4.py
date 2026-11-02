@@ -12,7 +12,6 @@ from dataclasses import asdict
 from pathlib import Path
 
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
 from ....qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSJob
 from ....qs.sieve_collector import SieveCollector
 from . import control_v4, plan_v4
@@ -64,7 +63,7 @@ def instantiate(row, fixture, modules, *, seconds, work, observer=False):
     return job, budget, cfg
 
 
-def validate_result(fixture, result, budget, common):
+def validate_result(fixture, result, budget, common, exhausted_error):
     n = fixture["n"]
     assert (result.divisor or 1) * result.cofactor == n
     factors, certainty = [], []
@@ -76,7 +75,7 @@ def validate_result(fixture, result, budget, common):
             try:
                 budget.consume(factor.bit_length() ** 2)
                 certainty.append(common.classify_prime(factor).value)
-            except BudgetExhaustedError:
+            except exhausted_error:
                 certainty.append("unclassified")
     return dict(
         divisor=result.divisor,
@@ -116,7 +115,9 @@ def sieve(row, fixture, modules, *, seconds, work, blocks, observer=False):
     finally:
         if observer:
             collector._sieve = original
-    validated = validate_result(fixture, result, budget, modules[2])
+    validated = validate_result(
+        fixture, result, budget, modules[2], modules[1].BudgetExhaustedError
+    )
     positions = (
         0 if job.engine is None else job.engine.stats["collected_positions"]
     )

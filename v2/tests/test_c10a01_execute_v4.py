@@ -6,6 +6,7 @@ import sys
 import tempfile
 import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.qs.c10a01 import execute_v4, execute_v4_stage, plan_v4
@@ -13,6 +14,27 @@ from v2.benchmarks.qs.c10a04.accounting import Ledger
 
 
 class ExecutionPreflightTests(unittest.TestCase):
+    def test_isolated_control_budget_exception_keeps_unresolved(self):
+        class ControlBudgetExhaustedError(Exception):
+            pass
+
+        class ControlBudget:
+            def consume(self, amount):
+                raise ControlBudgetExhaustedError()
+
+        fixture = dict(n=10403, factors=[101, 103])
+        result = SimpleNamespace(divisor=101, cofactor=103)
+        validated = execute_v4.validate_result(
+            fixture,
+            result,
+            ControlBudget(),
+            None,
+            ControlBudgetExhaustedError,
+        )
+        self.assertEqual(validated["factors"], [101, 103])
+        self.assertEqual(validated["certainty"], ["unclassified"] * 2)
+        self.assertEqual(validated["unresolved"], [101, 103])
+
     def test_primary_reservations_fit_frozen_calibration(self):
         plan = json.loads(plan_v4.PLAN.read_text())
         limits = execute_v4_stage.limits(plan)
