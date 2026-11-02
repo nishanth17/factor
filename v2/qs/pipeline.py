@@ -87,7 +87,7 @@ class QSJob:
             config=self.config,
             budget=self.budget,
         )
-        if getattr(self.config, "power_plan_bytes", 0):
+        if self.config.power_plan_bytes or self.config.sparse_queue_bytes:
             self.collector._set_plan_interval(lo, hi)
         # Only retained rows are cached. The collector owns the reservation,
         # including while matrix scratch coexists or a polynomial is switched.

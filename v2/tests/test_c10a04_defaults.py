@@ -50,7 +50,9 @@ class LargerDefaultTests(unittest.TestCase):
                     )
         self.assertFalse(uses_siqs_defaults(10**49 - 1))
         self.assertFalse(uses_siqs_defaults(10**60))
-        self.assertEqual(default_siqs_config(10**60), SIQSConfig())
+        self.assertEqual(
+            default_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
+        )
         self.assertFalse(uses_siqs_defaults(10**59, backend="gmpy2-mpz"))
         n = 10**59 + 123
         explicit = SIQSConfig()
@@ -77,7 +79,14 @@ class LargerDefaultTests(unittest.TestCase):
             values = asdict(job.config)
             values.pop("base_count")
             values.update(base_bound=job.base.bound, multiplier=job.multiplier)
-            self.assertEqual(values, asdict(expected))
+            self.assertEqual(values.pop("sign_policy"), "swap_high")
+            self.assertEqual(
+                values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
+            )
+            legacy = asdict(expected)
+            legacy.pop("sign_policy")
+            legacy["collector"].pop("sparse_queue_bytes")
+            self.assertEqual(values, legacy)
             self.assertLess(job.budget.used, 10**10)
 
     def test_cli_checkpoint_keeps_counted_policy(self):

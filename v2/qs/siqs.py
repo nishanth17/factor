@@ -62,6 +62,7 @@ class SIQSConfig:
     batch_width: int = 256
     filter_row_growth: int = 1
     tested_dependencies: bool = False
+    sign_policy: str = field(default="canonical", kw_only=True)
     solve_policy: str = field(default="window", kw_only=True)
     memory_bytes: int | None = None
     checkpoint_bytes: int | None = None
@@ -76,6 +77,8 @@ class SIQSConfig:
 
     def __post_init__(self):
         """Bound schedules; growing DLP has no implicit storage quota."""
+        if self.sign_policy not in ("canonical", "swap_high"):
+            raise ValueError("unknown SIQS sign policy")
         growing = isinstance(self.collector, GrowingDoubleLargeSieveConfig)
         if not growing:
             if self.memory_bytes is None:
@@ -202,7 +205,14 @@ class SIQSConfig:
             if self.assignment_policy == "quality"
             else 0
         )
-        return 65536 + 8 * (self.checkpoint_bytes or 0) + registry + quality
+        face = 256 * 1024 if self.sign_policy != "canonical" else 0
+        return (
+            65536
+            + 8 * (self.checkpoint_bytes or 0)
+            + registry
+            + quality
+            + face
+        )
 
 
 @dataclass(frozen=True)
@@ -228,6 +238,24 @@ class CountedSIQSConfig(SIQSConfig):
             raise ValueError("count policy endpoint exceeds its ceiling")
         if self.mode != "siqs" or self.backend != "python-int":
             raise ValueError("count policies require native SIQS")
+
+
+def make_family(base, primes, *, config, budget, memory_bytes):
+    """Apply the saved coordinate policy without process-global dispatch."""
+    if config.sign_policy == "swap_high" and len(primes) >= 3:
+        from .coordinate_family import CoordinateFamily
+        from .sign_schedule import schedule_for
+
+        return CoordinateFamily(
+            base,
+            primes,
+            schedule=schedule_for(len(primes), "swap_high"),
+            budget=budget,
+            memory_bytes=memory_bytes,
+        )
+    return PolynomialFamily(
+        base, primes, budget=budget, memory_bytes=memory_bytes
+    )
 
 
 class SIQSJob:
@@ -443,9 +471,10 @@ class SIQSJob:
 
         while self.family_index < len(self.assignments):
             if self.family is None:
-                self.family = PolynomialFamily(
+                self.family = make_family(
                     self.base,
                     self.assignments[self.family_index],
+                    config=self.config,
                     budget=self.budget,
                     memory_bytes=self.config.memory_limit
                     - self.config.metadata_reserve,
@@ -521,7 +550,10 @@ class SIQSJob:
             self.engine.lo = self.engine.next_position = -self.half_width
             self.engine.hi = self.half_width + 1
             self.engine.final_solve_done = False
-            if self.config.collector.power_plan_bytes:
+            if (
+                self.config.collector.power_plan_bytes
+                or self.config.collector.sparse_queue_bytes
+            ):
                 self.engine.collector._set_plan_interval(
                     -self.half_width, self.half_width + 1
                 )

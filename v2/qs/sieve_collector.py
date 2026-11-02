@@ -56,6 +56,7 @@ class SieveConfig:
     small_prime_cutoff: int = 0
     threshold_extra: int = 0
     score_policy: str = "adaptive"
+    sparse_queue_bytes: int = field(default=0, kw_only=True)
     power_plan_bytes: int = field(default=0, kw_only=True)
     residual_bound: int = 500
     max_partials: int = 256
@@ -74,6 +75,7 @@ class SieveConfig:
             "max_relations": (0, MAX_STORED_ATOMS),
             "max_atoms": (0, MAX_STORED_ATOMS),
             "power_plan_bytes": (0, 16 * 1024 * 1024),
+            "sparse_queue_bytes": (0, 32 * 1024 * 1024),
         }
         for name, (minimum, maximum) in limits.items():
             value = getattr(self, name)
@@ -424,6 +426,10 @@ class SieveCollector:
             self._combined.clear()
             self._rows.clear()
 
+        if self.config.sparse_queue_bytes:
+            from .sparse_queue import clear
+
+            clear(self)
         self.polynomial, self._roots = polynomial, roots
         self._a_exponents = tuple(exponents)
         self._a_support = tuple(
@@ -596,6 +602,13 @@ class SieveCollector:
                 self._scores[index] += weight
 
     def _sieve(self, lo, hi, stats):
+        if self.config.sparse_queue_bytes:
+            from .sparse_queue import sieve
+
+            return sieve(self, lo, hi, stats)
+        return self._sieve_direct(lo, hi, stats)
+
+    def _sieve_direct(self, lo, hi, stats):
         """Mark complete root hits in bounded prime chunks, without F(x)."""
         width = hi - lo
         self._omitted_allowance = 0
@@ -1195,7 +1208,10 @@ class SieveCollector:
 
         try:
             if (
-                self.config.power_plan_bytes
+                (
+                    self.config.power_plan_bytes
+                    or self.config.sparse_queue_bytes
+                )
                 and lo < hi
                 and (
                     self._plan_window is None

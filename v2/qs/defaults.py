@@ -34,7 +34,9 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
     remains binding, including the temporary charged count-resolution sieve.
     """
     if not uses_siqs_defaults(n, backend=backend):
-        return SIQSConfig(backend=backend, memory_bytes=memory_bytes)
+        return SIQSConfig(
+            backend=backend, memory_bytes=memory_bytes, sign_policy="swap_high"
+        )
 
     forty_digits = abs(n) < 10**40
     owned_memory = C9_MEMORY_BYTES if memory_bytes is None else memory_bytes
@@ -59,6 +61,7 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         factor_count = 7 if abs(n) < 10**55 else 8
     return config_type(
         **count_policy,
+        sign_policy="swap_high",
         backend=backend,
         base_bound=250000 if larger else 5000 if forty_digits else 30000,
         multiplier=0 if larger else 1,
@@ -85,6 +88,7 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         memory_bytes=owned_memory,
         checkpoint_bytes=1048576,
         collector=GrowingDoubleLargeSieveConfig(
+            sparse_queue_bytes=32 * 1024 * 1024,
             marking=selected_marking,
             block_width=4096,
             division="bucket",

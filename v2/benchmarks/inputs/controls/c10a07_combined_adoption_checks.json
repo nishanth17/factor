@@ -1,0 +1,58 @@
+{
+  "schema": "combined-collection-production-checks-v1",
+  "source_freeze": "2d2564a0948411b7a3d144ff5178ed0d2d266d7109c00d1f5ab30c3679a1c5a2",
+  "purpose": "Retained expected arithmetic output; not new performance evidence",
+  "fixtures": [
+    {
+      "n": 98763905098911115538579853757187635499230464663689,
+      "seed": 7,
+      "digits": 50,
+      "blocks": 128,
+      "receipt_sha256": "f16e331e2684ea6942d694b12edd79982c91bcf941ef42eb3057f60859afa0ff",
+      "arithmetic_signature": "f024379d130fc43dd3236e822dd18c6a3d03620103e82cb9db90d75142f76c1b",
+      "counters": {
+        "scanned": 512003,
+        "candidates": 33736,
+        "refined_rejections": 32680,
+        "root_hits": 1281903,
+        "power_hits": 2137410,
+        "division_steps": 10502,
+        "admitted_atoms": 87
+      }
+    },
+    {
+      "n": 3553112397903207771176834566205578438266571262833866193,
+      "seed": 7,
+      "digits": 55,
+      "blocks": 128,
+      "receipt_sha256": "56f2861cc5a2a860cb24c943f84eeaca6effb2922428b6b13347491cf23ec916",
+      "arithmetic_signature": "25a8fc6f0e892c7ad020519797b355b3eafc4e17cf2d1b14cdee2ddc64bbefce",
+      "counters": {
+        "scanned": 512003,
+        "candidates": 33302,
+        "refined_rejections": 32753,
+        "root_hits": 1398258,
+        "power_hits": 2353238,
+        "division_steps": 6070,
+        "admitted_atoms": 50
+      }
+    },
+    {
+      "n": 972816986860544118820990349884702612124418137096910955182251,
+      "seed": 7,
+      "digits": 60,
+      "blocks": 128,
+      "receipt_sha256": "763522300ddbc324f36461293f3b8f3638ef4a3387529012eb3b7a2d4ff92357",
+      "arithmetic_signature": "9250f7b1050247b99f5c6921f204e318fb28de8a2282eec0f7dc35c09b3bb2b6",
+      "counters": {
+        "scanned": 512003,
+        "candidates": 33015,
+        "refined_rejections": 32756,
+        "root_hits": 1708032,
+        "power_hits": 2732575,
+        "division_steps": 3181,
+        "admitted_atoms": 19
+      }
+    }
+  ]
+}

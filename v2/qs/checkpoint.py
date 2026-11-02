@@ -173,7 +173,10 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        6
+        7
+        if job.config.sign_policy != "canonical"
+        or job.config.collector.sparse_queue_bytes
+        else 6
         if job.config.solve_policy != "window"
         else 5
         if isinstance(job.config.collector, GrowingDoubleLargeSieveConfig)
@@ -216,7 +219,7 @@ def pack_job(job):
                 else engine.extractor.next_dependency,
             ),
         )
-        if version == 6:
+        if version >= 6:
             progress["zero_checked_count"] = engine.zero_checked_count
 
     payload = dict(
@@ -253,11 +256,14 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
-    if version == 6:
+    if version >= 6:
         payload["pending_final_reason"] = job.pending_final_reason
     else:
         # Keep legacy checkpoint configuration and schema identities intact.
         payload["config"].pop("solve_policy")
+    if version < 7:
+        payload["config"].pop("sign_policy")
+        payload["config"]["collector"].pop("sparse_queue_bytes")
     encoder = json.JSONEncoder(
         default=arithmetic.json_integer, sort_keys=True, separators=(",", ":")
     )
@@ -481,7 +487,7 @@ def _checkpoint_restore_config(config, blob_bytes):
 
 def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     """Verify and rebuild charged roots, stores and solver prefixes."""
-    from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob
+    from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob, make_family
 
     if not isinstance(checkpoint, dict) or set(checkpoint) != {
         "version",
@@ -500,6 +506,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         4,
         5,
         6,
+        7,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -542,18 +549,28 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError("mixed-order checkpoint lacks row_order")
 
     values = dict(payload["config"])
-    if (values.get("solve_policy", "window") != "window") != (
-        payload["version"] == 6
+    if payload["version"] < 7 and (
+        (values.get("solve_policy", "window") != "window")
+        != (payload["version"] == 6)
     ):
         raise ValueError("SIQS scheduling policy disagrees with schema")
+    if payload["version"] < 7 and (
+        "sign_policy" in values or "sparse_queue_bytes" in values["collector"]
+    ):
+        raise ValueError("legacy checkpoint cannot change collection policy")
+    if payload["version"] == 7 and (
+        "sign_policy" not in values
+        or "sparse_queue_bytes" not in values["collector"]
+    ):
+        raise ValueError("collection checkpoint lacks its policy identity")
     collector_type = (
         GrowingDoubleLargeSieveConfig
         if payload["version"] == 5
-        or payload["version"] == 6
+        or payload["version"] >= 6
         and values["collector"].get("storage_policy") == "grow"
         else DoubleLargeSieveConfig
         if payload["version"] == 4
-        or payload["version"] == 6
+        or payload["version"] >= 6
         and "large_prime_bound" in values["collector"]
         else SieveConfig
     )
@@ -687,7 +704,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     if payload["finished_reason"] not in allowed:
         raise ValueError("invalid SIQS checkpoint stop reason")
     job.finished_reason = payload["finished_reason"]
-    if payload["version"] == 6:
+    if payload["version"] >= 6:
         pending = payload["pending_final_reason"]
         if pending not in allowed or (
             pending is not None
@@ -729,7 +746,12 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     if gray is not None:
         if job.assignments is None or job.family_index >= len(job.assignments):
             raise ValueError("SIQS checkpoint family index is exhausted")
-        job.family = PolynomialFamily(
+        family_factory = (
+            partial(make_family, config=config)
+            if config.sign_policy != "canonical"
+            else PolynomialFamily
+        )
+        job.family = family_factory(
             job.base,
             job.assignments[job.family_index],
             budget=budget,
@@ -797,7 +819,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "SIQS checkpoint relation store identity mismatch"
             )
         _restore_store(payload["store"], engine.collector, budget)
-        if payload["version"] == 6:
+        if payload["version"] >= 6:
             engine.zero_checked_count = utils.require_integer(
                 saved["zero_checked_count"], "zero-row cursor", 0
             )
