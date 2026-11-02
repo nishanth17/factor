@@ -38,6 +38,71 @@ class CalibrationContractTests(unittest.TestCase):
             self.assertTrue(result["refused_below_reserve"])
             self.assertGreaterEqual(result["elimination"]["dependencies"], 64)
 
+    def test_pilot_accounts_and_censoring_rules_without_execution(self):
+        from v2.benchmarks.qs.c10a01 import pilots
+
+        plan = json.loads(pilots.PLAN.read_text())
+        self.assertTrue(pilots.verify_plan(plan))
+        self.assertEqual(
+            {
+                c["digits"]
+                for stage in plan["stages"].values()
+                for c in stage["calls"]
+            },
+            {60, 62, 65, 70},
+        )
+        rows = [
+            dict(
+                call=dict(digits=70, arm=arm),
+                result=dict(complete=done, seconds=100, cpu_seconds=99),
+            )
+            for arm, done in (("control", False), ("parity2", True))
+        ]
+        result = pilots.analyze(rows)
+        self.assertNotIn("descriptive_wall_ratio", result["pairs"][0])
+        self.assertFalse(result["adoption"])
+
+    def test_lower_band_opt_in_and_default_boundaries(self):
+        from v2.execution.budget import Budget
+        from v2.qs import SIQSJob, default_siqs_config
+
+        files = ("c10_fresh_corpus.json", "c10a05_plus_feasibility.json")
+        for digits, name in zip((50, 55), files):
+            path = CORPUS.with_name(name)
+            fixture = next(
+                r
+                for r in json.loads(path.read_text())["fixtures"]
+                if r["digits"] == digits
+            )
+            n = fixture["n"]
+            default = default_siqs_config(n)
+            self.assertEqual(default.polynomial_policy, "standard")
+            config = replace(
+                default,
+                polynomial_policy="parity2",
+                multiplier_policy="parity2",
+            )
+            job = SIQSJob(
+                n,
+                seed=7,
+                config=config,
+                budget=Budget(work_limit=10**10, seconds=10, cpu_seconds=10),
+            )
+            result = job.run(max_blocks=1)
+            self.assertEqual(result.reason, "paused")
+            polynomial = job.engine.collector.polynomial
+            for x in (-65536, -1, 0, 65536):
+                self.assertEqual(
+                    (polynomial.a * x + polynomial.b) ** 2
+                    - polynomial.n_prime,
+                    polynomial.a * polynomial.value(x),
+                )
+        for digits in (49, 50, 51, 52, 55, 56, 60, 61):
+            for n in (10 ** (digits - 1), 10**digits - 1):
+                cfg = default_siqs_config(n)
+                self.assertEqual(cfg.polynomial_policy, "standard")
+                self.assertEqual(cfg.multiplier_policy, "standard")
+
     def test_observer_and_direct_coordinate_replay(self):
         for arm in ("control", "parity2"):
             cfg = configuration(60, arm, multiplier=3)

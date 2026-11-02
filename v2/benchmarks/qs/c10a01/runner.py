@@ -74,29 +74,35 @@ def rss():
 def state_digest(job):
     """Exclude clocks; bind exact provenance, cursors and accounting."""
     engine = job.engine
-    value = dict(
-        work=job.budget.used,
-        family=job.family_index,
-        ordinal=None if job.family is None else job.family.next_index,
-        next_position=None if engine is None else engine.next_position,
-        atoms=[] if engine is None else sorted(engine.collector._atoms),
-        rows=[]
-        if engine is None
-        else [
-            (
-                getattr(r, "relation_id", None),
-                getattr(r, "atom_ids", ()),
-                r.sign,
-                r.exponents,
-                r.u,
-                getattr(r, "square_correction", 1),
-            )
-            for r in engine.collector.matrix_relations
-        ],
+    digestor = hashlib.sha256(b"c10a01-streamed-state-v2")
+
+    def add(value):
+        digestor.update(json.dumps(value, sort_keys=True).encode())
+        digestor.update(b"\n")
+
+    add(
+        (
+            job.budget.used,
+            job.family_index,
+            None if job.family is None else job.family.next_index,
+            None if engine is None else engine.next_position,
+        )
     )
-    return hashlib.sha256(
-        json.dumps(value, sort_keys=True).encode()
-    ).hexdigest()
+    if engine is not None:
+        for identity in sorted(engine.collector._atoms):
+            add(identity)
+        for row in engine.collector.matrix_relations:
+            add(
+                (
+                    getattr(row, "relation_id", None),
+                    getattr(row, "atom_ids", ()),
+                    row.sign,
+                    row.exponents,
+                    row.u,
+                    getattr(row, "square_correction", 1),
+                )
+            )
+    return digestor.hexdigest()
 
 
 @contextmanager
@@ -147,6 +153,7 @@ def run_one(
     )
     cfg = configuration(digits, arm, multiplier=multiplier)
     job = SIQSJob(n, seed=7, config=cfg, budget=budget)
+    LAST_JOB = job
     with observe(observer) as records:
         result = job.run(max_blocks=blocks)
     assert (result.divisor or 1) * result.cofactor == n
