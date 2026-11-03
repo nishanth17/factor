@@ -64,7 +64,7 @@ def analyze(stage):
     )
     state = live_limits.read(output)
     if state["status"] == "running":
-        raise RuntimeError("stage is still running; use the live status command")
+        raise RuntimeError("stage is running; use the live status command")
     if state["identity"] != digest(freeze_path):
         raise ValueError("stage/freeze identity mismatch")
     corpus = json.loads(plan_v4.CORPUS.read_text())
