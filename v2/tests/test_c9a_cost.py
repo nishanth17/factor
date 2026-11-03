@@ -1,21 +1,29 @@
-"""Amortized panel lookup and bounded lookahead refusal regressions."""
+"""Exact early exits, cache lifetimes and bounded cost regressions."""
 
+import copy
 import unittest
 from collections import Counter
 from dataclasses import asdict
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2 import qs
 from v2.benchmarks.qs.c9a import extended
 from v2.common import utils
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs.cofactor_policy import CofactorBatch, split_cofactor, split_residual
+from v2.qs.extended_checkpoint import pack_store, restore_store
+from v2.qs.extended_collector import atom_reserve, recover
+from v2.qs.indexed_relations import IndexedFactors
 from v2.qs.linear_algebra import (
     DependencySolver,
     filter_matrix,
     verify_dependency,
 )
 from v2.qs.structured_matrix import panel_reduce
+from v2.qs.yield_memory import reserve_batch
+from v2.tests.test_c9a_bounded import worker
+from v2.tests.test_c9a_extended import atom_at
 from v2.tests.test_qs_dlp import allowance
 from v2.tests.test_qs_pipeline import dense_kernel, span
 
@@ -61,6 +69,112 @@ def lookahead_worker(limit=10000):
 
 
 class CostRegressionTests(unittest.TestCase):
+    def test_proven_floor_avoids_impossible_three_prime_recovery(self):
+        engine = worker(batch_policy="off")
+        engine._residual_floor = 11
+        engine._checked = SimpleNamespace(
+            primes={},
+            prime=lambda value, budget: False,
+            atom=lambda atom, budget: None,
+            unit=lambda value, budget: 1,
+        )
+        for residual, primes, arity in (
+            (11 * 13, (11, 13), 2),
+            (11**3, (11, 11, 11), 3),
+        ):
+            with patch(
+                "v2.qs.cofactor_policy.split_residual",
+                return_value=(primes, "double", 0),
+            ) as split:
+                atom, divisor = recover(
+                    engine, 1, residual, residual, (), Counter()
+                )
+            self.assertEqual(split.call_args.kwargs["arity"], arity)
+            self.assertEqual(atom.residual_product, residual)
+            self.assertIsNone(divisor)
+
+    def test_narrower_split_memo_restores_and_enforces_its_arity(self):
+        engine = worker()
+        key = (187, 1000, engine.config.split_policy, 2, True)
+        engine._split_memo.remember(key, ((11, 17), "double"))
+        saved = pack_store(engine)
+        clone = worker()
+        restore_store(saved, clone, clone.budget)
+        self.assertEqual(pack_store(clone), saved)
+
+        forged = copy.deepcopy(saved)
+        forged["memo"][0][0][0] = 5 * 11 * 17
+        forged["memo"][0][1] = [5, 11, 17]
+        with self.assertRaises(ValueError):
+            clone = worker()
+            restore_store(forged, clone, clone.budget)
+
+    def test_disabled_recomputation_does_not_enumerate_indexed_factors(self):
+        class CountedFactors(IndexedFactors):
+            scans = 0
+
+            def __iter__(self):
+                type(self).scans += 1
+                return super().__iter__()
+
+        engine = worker(recompute_prime_limit=0)
+        source = atom_at(engine, 1)
+        factors = CountedFactors(
+            tuple(
+                (engine.factor_base._columns[p], e)
+                for p, e in source.exponents
+            ),
+            engine.factor_base.primes,
+        )
+        atom = qs.AtomicRelation(engine.polynomial, 1, 1, factors)
+        CountedFactors.scans = 0
+        packed, _, _ = engine._arena.plan(atom, None, engine.budget)
+        self.assertEqual(CountedFactors.scans, 0)
+        self.assertEqual(tuple(packed.exponents), tuple(factors))
+
+    def test_shared_context_does_not_recompute_private_ownership(self):
+        engine = worker()
+        atom = atom_at(engine, 1)
+        engine._admit(atom, Counter())
+        with patch(
+            "v2.qs.yield_memory.polynomial_reserve",
+            side_effect=AssertionError("shared context is already owned"),
+        ):
+            self.assertGreater(
+                atom_reserve(
+                    atom,
+                    engine.config,
+                    engine.factor_base,
+                    arena=engine._arena,
+                ),
+                0,
+            )
+
+    def test_batch_bound_reuses_only_successfully_owned_high_water(self):
+        engine = worker()
+        with patch.object(engine, "_bounds", return_value=(1, 2**20)):
+            reserve_batch(engine, 0, 1)
+        used, owned = engine.budget.used, engine._batch_reserve
+        with patch.object(engine, "_bounds", return_value=(1, 2**10)):
+            reserve_batch(engine, 0, 1)
+        self.assertEqual(
+            (engine.budget.used, engine._batch_reserve), (used, owned)
+        )
+
+        bits = engine._batch_bits
+        original = engine.config
+        engine.config = SimpleNamespace(batch_size=64, memory_limit=0)
+        with patch.object(engine, "_bounds", return_value=(1, 2**40)):
+            with self.assertRaises(MemoryError):
+                reserve_batch(engine, 0, 1)
+        self.assertEqual(engine._batch_bits, bits)
+        self.assertEqual(engine._batch_reserve, owned)
+        engine.config = original
+        with patch.object(engine, "_bounds", return_value=(1, 2**40)):
+            reserve_batch(engine, 0, 1)
+        self.assertGreater(engine._batch_bits, bits)
+        self.assertGreater(engine._batch_reserve, owned)
+
     def test_cost_profile_changes_only_the_measured_expensive_choices(self):
         old = extended.configuration(
             60, admission_base_bound=103814, profile="bounded-report"

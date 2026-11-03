@@ -246,7 +246,11 @@ class RecordArena:
         )
         polynomial = self.polynomial(atom.polynomial)
         factors = atom.exponents
-        small = tuple(p for p, _ in factors if p <= self.recompute_limit)
+        small = (
+            tuple(p for p, _ in factors if p <= self.recompute_limit)
+            if self.recompute_limit
+            else ()
+        )
         if small:
             from .cold_factors import RecomputedFactors
 

@@ -50,7 +50,15 @@ def prime_power_roots(
                 polynomial.n_prime.bit_length() + 4 * modulus.bit_length() + 1
             )
 
-            derivative = 2 * (polynomial.a * root + polynomial.b) % prime
+            # The derivative modulo p is constant within an original root
+            # class. Reuse its inverse (or singular zero) across all lifts.
+            key = prime, root % prime
+            inverse = None if inverses is None else inverses.get(key)
+            if inverse is None:
+                derivative = 2 * (polynomial.a * root + polynomial.b) % prime
+                inverse = pow(derivative, -1, prime) if derivative else 0
+                if inverses is not None:
+                    inverses[key] = inverse
             # Derived lift residues are bounded by maximum, rather than the
             # public position cap. Their invariant is F(root) == 0 mod modulus.
             quotient = (
@@ -61,13 +69,7 @@ def prime_power_roots(
                 // modulus
                 % prime
             )
-            if derivative:
-                key = prime, root % prime
-                inverse = None if inverses is None else inverses.get(key)
-                if inverse is None:
-                    inverse = pow(derivative, -1, prime)
-                    if inverses is not None:
-                        inverses[key] = inverse
+            if inverse:
                 correction = -quotient * inverse % prime
                 lifted.append(root + modulus * correction)
             elif quotient == 0:

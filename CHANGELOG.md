@@ -12,6 +12,12 @@ below record decisions in their dated scope; later entries may supersede routes.
   Prepare the separate `cost-report` nominee using scalar elimination and that
   split order; preserve earlier profiles and all exact validation contracts.
 
+- Skip three-prime recovery below the proven residual-prime floor cubed, and
+  validate narrower split memos on restore. Reuse batch scratch high-water
+  bounds, avoid repeated ownership calculation and disabled recomputation
+  scans, cache singular/nonsingular Hensel derivative results, and retain the
+  dense-root view across sparse-queue blocks.
+
 - Complete a larger bounded screen: four independent exposed inputs, eight
   successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
   but raw complete time and RSS are greater in every pair. Preserve failed

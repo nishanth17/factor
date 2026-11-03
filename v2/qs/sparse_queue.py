@@ -22,7 +22,7 @@ def build(collector, window, byte_cap):
         (i for i, r in enumerate(roots) if r.prime >= width), len(roots)
     )
     count = (hi - lo + width - 1) // width
-    reserve = 65536 + 1024 * count
+    reserve = 65536 + 1024 * count + 256 + 16 * split
     collector.budget.consume(len(roots) + count + 1)
     if reserve > byte_cap or count > 256:
         return None
@@ -62,6 +62,7 @@ def clear(collector):
     """Release derived scratch only; retained relations remain untouched."""
     collector._sparse_queue_key = None
     collector._sparse_queue = None
+    collector._sparse_dense_roots = ()
     collector._workspace -= getattr(collector, "_queue_workspace", 0)
     collector._queue_workspace = 0
 
@@ -101,6 +102,9 @@ def sieve(collector, lo, hi, stats):
         collector._queue_workspace = cap
         try:
             schedule = build(collector, window, cap)
+            collector._sparse_dense_roots = (
+                collector._roots[: schedule[0]] if schedule is not None else ()
+            )
         except BaseException:
             clear(collector)
             raise
@@ -121,7 +125,7 @@ def sieve(collector, lo, hi, stats):
     entries = queues[(lo - window[0]) // cfg.block_width]
     roots = collector._roots
     try:
-        collector._roots = roots[:split]
+        collector._roots = collector._sparse_dense_roots
         threshold = collector._sieve_direct(lo, hi, stats)
     finally:
         collector._roots = roots

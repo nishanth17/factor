@@ -56,15 +56,17 @@ def recover(
             return None, None
         primes, reason, evaluations = (), "split_failed", 0
         small = config.small_prime_bound or config.large_prime_bound
-        split_eligible = residual <= small * config.large_prime_bound ** (
-            config.residual_arity - 1
+        # Complete base division leaves no prime below this proven floor.
+        # Below its cube, only a two-prime decomposition is possible; do not
+        # recursively recover a third endpoint after the two-prime test fails.
+        arity = (
+            2
+            if residual < collector._residual_floor**3
+            else config.residual_arity
         )
-        if config.residual_arity == 3 and (
-            small * config.large_prime_bound
-            < residual
-            < collector._residual_floor**3
-        ):
-            split_eligible = False
+        split_eligible = residual <= small * config.large_prime_bound ** (
+            arity - 1
+        )
         if not split_eligible:
             stats["split_domain_skips"] = (
                 stats.get("split_domain_skips", 0) + 1
@@ -79,7 +81,7 @@ def recover(
                 budget,
                 checked,
                 config.split_policy,
-                arity=config.residual_arity,
+                arity=arity,
                 hint=hint,
                 dispatch=config.split_dispatch,
                 memo=collector._split_memo,
@@ -134,10 +136,11 @@ def atom_reserve(atom, config, base, plan=None, *, arena=None):
             polynomial_reserve,
         )
 
-        context = polynomial_reserve(atom.polynomial)
         if arena is not None and atom.polynomial.identity in arena.polynomials:
             arena.polynomial(atom.polynomial)
             context = 0
+        else:
+            context = polynomial_reserve(atom.polynomial)
         # Payload objects, IDs, map entries and recomputation descriptors are
         # separate from shared encoded slabs and incidence vectors. Integer
         # digits grow by words, not by a fixed number of bytes per source bit.
@@ -221,13 +224,10 @@ def admit_retained(collector, atom, stats):
         )
     except MemoryError:
         return "memory_limit"
-    reserve = atom_reserve(
-        atom,
-        config,
-        collector.factor_base,
-        plan,
-        arena=arena if bounded else None,
-    )
+    if bounded:
+        from .yield_memory import graph_reserve
+
+        reserve += graph_reserve(plan, config.cycle_reduction_choices)
     if (
         collector._workspace
         + collector._scratch_bytes

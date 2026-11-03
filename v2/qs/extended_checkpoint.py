@@ -500,17 +500,16 @@ def restore_store(payload, collector, budget):
     ):
         raise ValueError("invalid expanded split memo")
     for key, primes, reason in payload["memo"]:
-        if len(key) != 5 or key[1:] != [
-            config.large_prime_bound,
-            config.split_policy,
-            config.residual_arity,
-            config.split_dispatch,
-        ]:
+        if (
+            len(key) != 5
+            or key[1:3] != [config.large_prime_bound, config.split_policy]
+            or type(key[3]) is not int
+            or not 2 <= key[3] <= config.residual_arity
+            or key[4] != config.split_dispatch
+        ):
             raise ValueError("split memo uses a different policy")
         product = 1
-        if not 1 <= len(primes) <= config.residual_arity or primes != sorted(
-            primes
-        ):
+        if not 1 <= len(primes) <= key[3] or primes != sorted(primes):
             raise ValueError("invalid split memo arity")
         for prime in primes:
             if (

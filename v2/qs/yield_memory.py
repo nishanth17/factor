@@ -69,6 +69,8 @@ def reserve_batch(collector, lo, hi):
         collector.polynomial.supported_a.bit_length()
         + max(1, maximum).bit_length()
     )
+    if bits <= getattr(collector, "_batch_bits", 0):
+        return
     product, support = 1, 0
     for prime in collector.factor_base.primes:
         collector.budget.consume(product.bit_length() + prime.bit_length())
@@ -87,3 +89,6 @@ def reserve_batch(collector, lo, hi):
         raise MemoryError("bounded batch scratch exceeds memory cap")
     collector._batch_reserve += delta
     collector._workspace += delta
+    # The required support and scalar storage are monotone in this bound.
+    # A smaller norm cannot exceed the already owned high-water reservation.
+    collector._batch_bits = bits
