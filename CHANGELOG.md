@@ -25,6 +25,11 @@ below record decisions in their dated scope; later entries may supersede routes.
   after exact validation and the applicable nonunit check. Budget refusal
   preserves staging; interrupted allocation requires a prior checkpoint.
 
+- Select serial recovery in the experimental `cost-report` nominee after an
+  exact-prefix check and exposed complete-call diagnostic. Preserve shared
+  batching as an option. The candidate still loses to the incumbent on this
+  input and timing screens fail; no adoption or default change follows.
+
 - Complete a larger bounded screen: four independent exposed inputs, eight
   successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
   but raw complete time and RSS are greater in every pair. Preserve failed

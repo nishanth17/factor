@@ -303,7 +303,9 @@ class CostRegressionTests(unittest.TestCase):
         )
         expected = asdict(old)
         expected["collector"].update(
-            solver_panel_bits=0, split_policy="rho-first-v3"
+            solver_panel_bits=0,
+            split_policy="rho-first-v3",
+            batch_policy="off",
         )
         self.assertEqual(asdict(new), expected)
 

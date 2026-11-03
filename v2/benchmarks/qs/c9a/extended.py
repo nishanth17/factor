@@ -222,7 +222,11 @@ def configuration(
             extension_policy="extended-v2",
         )
     if profile == "cost-report":
-        values.update(solver_panel_bits=0, split_policy="rho-first-v3")
+        values.update(
+            solver_panel_bits=0,
+            split_policy="rho-first-v3",
+            batch_policy="off",
+        )
     cls = BoundedYieldSieveConfig if bounded else ExtendedYieldSieveConfig
     return replace(config, collector=cls(**values))
 
