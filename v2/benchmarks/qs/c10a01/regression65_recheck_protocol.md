@@ -120,7 +120,9 @@ screen + 7600 for this pair = **10400 wall AND CPU seconds**. Only 660 of
 the v1 allocation was used for calls; its conditional longer stage was not
 launched. Unused reservations remain unused. The separately disclosed
 2144.422-second administrative GUI stall is additional elapsed time with
-unknown tool CPU; it is not included in the numerical-call ceiling.
+unknown tool CPU; it is not included in the numerical-call ceiling. That
+administrative failure exceeded its intended orchestration margin. The
+10400-second figure is not a verified bound on all elapsed tool activity.
 
 The complete pair adds no observers to SIQS kernels; host/canary observations
 remain in the separate before/after phases. Both arms include the same
