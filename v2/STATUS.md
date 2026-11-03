@@ -1,7 +1,7 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `971316f4c9a1ffd12264d97776ede7133d32dcda`.
+Reviewed mainline/base: `1059215`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; implementation remains in the C10a-01 worktree.
@@ -13,6 +13,9 @@ Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
 The broader portfolio follow-up adds B4a fused native ECM chunks and expands
 E3/E4/E5/E6/A10a/A2a opportunity gates. Local supporting review:
 `v2/audit/research/portfolio_review_20261102.md`. No experiment is launched.
+The subsequent QS CFFI/SIMD pass refines B5a with queue-compatible buffers,
+root/mark/scan packets and separate M4 NEON versus x86 AVX dispatch. Local
+review: `v2/audit/research/qs_cffi_simd_20261102.md`.
 
 **Target metric: TBD.**
 
@@ -117,7 +120,8 @@ Task rows retain exact scope, dependencies and fixed-session model assignments.
    continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
    neither deeper-bound savings nor a polynomial/backend crossover is measured.
 7. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Compare PyPy, optional NumPy and
-   separately selected C/CFFI tracks with exact hit/score and boundary costs.
+   CFFI scan/root/mark packets with queue-compatible buffers and exact hit/score
+   costs. M4 NEON and optional x86 AVX ports are separate targets.
    M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
 
 The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
