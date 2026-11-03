@@ -2104,6 +2104,16 @@ negative arm and all historical pins.
   **Astra / xhigh** for diagnosis design and implementation, then the selected
   execution model for the frozen measurements. This follow-up does not block
   the already admitted 70-digit pair and does not authorize default promotion.
+  **Runner continuation prerequisite:** the opt-in `pilots_live` adapter now
+  supports durable, acknowledged increases to a live wall/CPU/work grant.
+  The same job, consumed work and clock origins persist; the supervisor uses
+  the same reservation. Revision checks, bounded journals, closed-call refusal
+  and conservative interruption charges are covered by independent clocks,
+  concurrency, subprocess and exact SIQS passivity checks. See the
+  [live runner contract](benchmarks/qs/c10a01/live_protocol.md). The user explicitly
+  waived the model switch for this runner change. Full-store checkpoint/resume
+  remains deferred under its existing ownership limitation. No automatic grant
+  increases, arithmetic changes or default promotion are included.
 - [ ] **C10a-02:** separately test a wider actual-A-product population and
   inter-family diversity only if product error or overlap predicts useful
   post-filter work. Sol / **high** for census reconciliation; **xhigh** for a

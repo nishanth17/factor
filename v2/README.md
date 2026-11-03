@@ -1535,3 +1535,12 @@ Legacy snapshots preserve their encodings; policy substitutions are rejected.
 `v2.benchmarks.qs.c10a01.configuration_v4.configuration` provides the literal
 combined arm and independent component overrides. Defaults are unchanged.
 No performance claim or new experiment admission follows from implementation.
+
+### Live limits for the C10a-01 feasibility runner
+
+The opt-in `v2.benchmarks.qs.c10a01.pilots_live` runner supports explicit,
+durably reserved increases to the wall, CPU and derived work grants of an
+active job. It preserves the job and clock origins and reports worker
+acknowledgements separately from requests. See the [runner protocol](benchmarks/qs/c10a01/live_protocol.md)
+for commands, refusal semantics and limits. This does not add automatic
+extensions or full-store checkpoint serialization to library calls.
