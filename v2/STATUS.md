@@ -1,7 +1,7 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `b0813230a05396874c41c649fa01738484a1f55e`.
+Reviewed mainline/base: `971316f4c9a1ffd12264d97776ede7133d32dcda`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; implementation remains in the C10a-01 worktree.
@@ -10,6 +10,9 @@ multi-polynomial buckets and conditional F9 genus-two/Kummer research to the
 ECM/acceleration amendments. It changes no defaults and launches no runs.
 Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
 `v2/audit/research/ecm/roadmap_review_20261102.md`.
+The broader portfolio follow-up adds B4a fused native ECM chunks and expands
+E3/E4/E5/E6/A10a/A2a opportunity gates. Local supporting review:
+`v2/audit/research/portfolio_review_20261102.md`. No experiment is launched.
 
 **Target metric: TBD.**
 
@@ -95,7 +98,7 @@ Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
 for the current cross-engine ordering and its workload/uncertainty assumptions.
 Task rows retain exact scope, dependencies and fixed-session model assignments.
 
-1. **C3a/C11 current ECM cost/yield and missing-policy screen — Sol / xhigh.**
+1. **C3a/C11 current portfolio/ECM cost-yield and missing-policy screen — Sol / xhigh.**
    Start from completed C3 and existing deeper presets; select a concrete
    60–99-digit opportunity, completed-search credit or handoff delta.
 2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
@@ -104,18 +107,23 @@ Task rows retain exact scope, dependencies and fixed-session model assignments.
 3. **C9a combined useful-yield candidate — Astra / xhigh.**
    Still the first QS task. Rank wider intake/endpoints against the current
    collection cost; use late-run replays for cycle/storage/cadence hypotheses.
-4. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
+4. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
+   Price complete setup/conversion/recovery and scalar execution before SIMD
+   or new reducers. A CFFI wrapper alone is no measured gain.
+5. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
    are polynomial-local; amortize prime/root traversal across a funded Gray
    batch, retaining exact coverage and charging unused preparation.
-5. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
+6. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
    continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
    neither deeper-bound savings nor a polynomial/backend crossover is measured.
-6. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Compare PyPy, optional NumPy and
+7. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Compare PyPy, optional NumPy and
    separately selected C/CFFI tracks with exact hit/score and boundary costs.
    M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
 
 The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
-initial opportunities, with explicit capacity/profile triggers. B14 remains
+initial opportunities, with explicit capacity/profile triggers. E3/A10a/E4/E5/
+E6 can screen a named current cheap-path or overhead gap without restarting
+E1/D7; integrated tuning retains its prerequisites. B14 remains
 High for requested prime certification; accounting/correctness repairs take
 precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 stays in flight and E1
 remains Deferred. Do not restart the stopped broad backend study or duplicate

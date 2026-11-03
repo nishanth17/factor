@@ -34,9 +34,9 @@ not supersede exact local invariants or demonstrated counterexamples. Preserve
 read-depth/access limitations in the local source ledger; a downloaded tree
 is not proof of an exhaustive implementation audit.
 
-B5/B5a may investigate separately selected NumPy or native C/CFFI bulk-kernel
-tracks. Keep the default algorithms in Python on PyPy and label accelerated
-results, dependencies and resources explicitly. A native feasibility result
+B4a/B5/B5a may investigate separately selected NumPy, fused native arithmetic
+or C/CFFI bulk-kernel tracks. Keep the default algorithms in Python on PyPy
+and label accelerated results, dependencies and resources explicitly. A native feasibility result
 neither changes the default implementation rule nor authorizes a wholesale
 rewrite. Kernel and parallel speedups cannot be multiplied into an unmeasured
 whole-factor claim.
@@ -101,10 +101,11 @@ The plan includes two kinds of edge:
   before spending on a more expensive challenger. These are labeled in the
   reason column; they are not mathematical necessities.
 
-E1's deferral does not bar isolated ECM policy, curve-family, polynomial
-continuation or worker feasibility under current committed controls. Those
-components require their selected exactness, ownership and measurement
-contracts; later combined portfolio acceptance retains its E1 dependencies.
+E1's deferral does not bar justified isolated ECM, native-boundary,
+preprocessing/classification, rho, continuation, context or worker feasibility
+under current committed controls. Those components require their selected
+exactness, ownership and measurement contracts; later integrated portfolio
+tuning retains D7 and combined acceptance retains E1.
 Source bounds, expected curves, SIMD instruction support and core counts are
 selection evidence, not proof of a local performance benefit.
 
