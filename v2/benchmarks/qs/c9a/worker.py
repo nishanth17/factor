@@ -77,10 +77,19 @@ def warm_once(qs, budgets, template, deadline):
             ):
                 values[key] = selected[key]
             if selected.get("extension_policy"):
-                from ....qs.extended_policy import EXTENSION_FIELDS
+                from ....qs.extended_policy import (
+                    BOUNDED_FIELDS,
+                    EXTENSION_FIELDS,
+                )
 
                 values.update({key: selected[key] for key in EXTENSION_FIELDS})
-                collector = qs.ExtendedYieldSieveConfig(**values)
+                if selected["extension_policy"] == "extended-v2":
+                    values.update(
+                        {key: selected[key] for key in BOUNDED_FIELDS}
+                    )
+                    collector = qs.BoundedYieldSieveConfig(**values)
+                else:
+                    collector = qs.ExtendedYieldSieveConfig(**values)
             else:
                 collector = qs.CombinedYieldSieveConfig(**values)
         else:

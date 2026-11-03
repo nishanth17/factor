@@ -125,8 +125,24 @@ def recover(
     return atom, None
 
 
-def atom_reserve(atom, config, base):
+def atom_reserve(atom, config, base, plan=None):
     """Retained ownership; construction scratch is reserved separately."""
+    if config.extension_policy == "extended-v2":
+        from .opaque_staging import context_bits
+        from .yield_memory import graph_reserve
+
+        # One worst-case 4 KiB slab per record plus payload/map overhead;
+        # incidence ownership is separate from temporary lifting workspace.
+        return (
+            8192
+            + (0 if config.spill_bytes else 512 * len(atom.exponents))
+            + 32 * context_bits(atom, base)
+            + (
+                0
+                if plan is None
+                else graph_reserve(plan, config.cycle_reduction_choices)
+            )
+        )
     return (
         32768
         + (0 if config.spill_bytes else 512 * len(atom.exponents))
@@ -135,6 +151,16 @@ def atom_reserve(atom, config, base):
 
 
 def admit(collector, atom, stats):
+    if collector.config.extension_policy == "extended-v2":
+        from .opaque_staging import route
+
+        handled, refusal = route(collector, atom, stats)
+        if handled:
+            return refusal
+    return admit_retained(collector, atom, stats)
+
+
+def admit_retained(collector, atom, stats):
     require_published(collector)
     config, budget, arena = (
         collector.config,
@@ -177,6 +203,15 @@ def admit(collector, atom, stats):
             atom, arena.next_slot, config, budget
         )
     except MemoryError:
+        return "memory_limit"
+    reserve = atom_reserve(atom, config, collector.factor_base, plan)
+    if (
+        collector._workspace
+        + collector._scratch_bytes
+        + reserve
+        + construction
+        > config.memory_limit
+    ):
         return "memory_limit"
     row = None
     if plan.cycle is not None:

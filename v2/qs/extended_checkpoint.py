@@ -44,24 +44,26 @@ def pack_store(collector):
     require_published(collector)
     atoms = list(collector._atoms.values())
     indices = {atom.relation_id: i for i, atom in enumerate(atoms)}
-    encoded = []
-    for atom in atoms:
+
+    def encode_atom(atom):
         poly = atom.polynomial
-        encoded.append(
-            [
-                [poly.a, poly.b, poly.square_coefficient],
-                atom.position,
-                atom.sign,
-                pack_factors(atom.exponents, collector.factor_base),
-                list(atom.residual_primes)
-                if getattr(atom, "opaque", None) is None
-                else [],
-                getattr(atom, "opaque", None),
-            ]
-        )
+        return [
+            [poly.a, poly.b, poly.square_coefficient],
+            atom.position,
+            atom.sign,
+            pack_factors(atom.exponents, collector.factor_base),
+            list(atom.residual_primes)
+            if getattr(atom, "opaque", None) is None
+            else [],
+            getattr(atom, "opaque", None),
+        ]
+
+    encoded = [encode_atom(atom) for atom in atoms]
     spill = collector._arena.spill
-    return {
-        "extended_store": 1,
+    result = {
+        "extended_store": 2
+        if collector.config.extension_policy == "extended-v2"
+        else 1,
         "atoms": encoded,
         "rows": [
             [indices[i] for i in row.atom_ids] for row in collector._rows
@@ -81,6 +83,11 @@ def pack_store(collector):
         "canonical": [indices[i] for i in collector._checked.canonical_ids],
         "spill": None if spill is None else spill.manifest(),
     }
+    if collector.config.extension_policy == "extended-v2":
+        result["opaque_staging"] = [
+            encode_atom(a) for a in collector._opaque_staging.atoms.values()
+        ]
+    return result
 
 
 def restore_factors(
@@ -142,10 +149,13 @@ def restore_store(payload, collector, budget):
         "conversion_events",
         "conversion_attempts",
     }
+    bounded = config.extension_policy == "extended-v2"
+    if bounded:
+        keys.add("opaque_staging")
     if (
         not isinstance(payload, dict)
         or set(payload) != keys
-        or payload["extended_store"] != 1
+        or payload["extended_store"] != (2 if bounded else 1)
     ):
         raise ValueError("invalid expanded store identity")
     if collector._atoms or collector._rows:
@@ -190,7 +200,12 @@ def restore_store(payload, collector, budget):
         return count
 
     scratch = 65536
-    for record in atoms:
+    staged = payload["opaque_staging"] if bounded else []
+    if not isinstance(staged, list) or (
+        bounded and len(staged) > config.opaque_cache_entries
+    ):
+        raise ValueError("opaque staging count exceeds its cap")
+    for record in atoms + staged:
         if not isinstance(record, list) or len(record) != 6:
             raise ValueError("invalid expanded atom shape")
         scratch += 32768 + 512 * factor_count(record[3])
@@ -311,7 +326,7 @@ def restore_store(payload, collector, budget):
         plan = kernel.plan_atom(atom, handle, config, budget)
         from .extended_collector import atom_reserve
 
-        cost = atom_reserve(atom, config, base)
+        cost = atom_reserve(atom, config, base, plan)
         if plan.cycle is not None:
             leaves = tuple(
                 atom if i == handle else arena.atoms[i] for i in plan.cycle
@@ -413,6 +428,37 @@ def restore_store(payload, collector, budget):
         checked.remember(atom, key=key)
     if len(checked.canonical) != len(canonical):
         raise MemoryError("saved canonical cache exceeds its allowance")
+    staging = None
+    if bounded:
+        from .opaque_staging import OpaqueStaging, entry_bytes
+
+        staging = OpaqueStaging(config, base)
+        for coefficients, position, sign, factors, primes, opaque in staged:
+            if primes or type(opaque) is not int or opaque in staging.atoms:
+                raise ValueError("invalid opaque staging identity")
+            if (
+                opaque in kernel.resolutions
+                or frozenset(((True, opaque),)) in kernel.direct
+            ):
+                raise ValueError(
+                    "staged opaque already belongs to retained incidence"
+                )
+            poly = Polynomial(base.n, base.multiplier, *coefficients)
+            decoded = restore_factors(
+                factors, base, poly, position, config, spill, budget
+            )
+            atom = IndexedResidualAtom(
+                ResidualAtom(poly, position, sign, (), opaque=opaque), decoded
+            )
+            if atom.relation_id in store:
+                raise ValueError("staged opaque repeats retained atom")
+            checked.atom(atom, budget)
+            if checked.unit(opaque, budget) != 1:
+                raise ValueError("nonunit staged opaque")
+            staging.used += entry_bytes(atom, base)
+            if staging.used > config.opaque_cache_bytes:
+                raise MemoryError("opaque staging bytes exceed their cap")
+            staging.atoms[opaque] = atom
     original_reporting = collector._reporting
     reporting = type(original_reporting)(
         original_reporting.lower,
@@ -442,6 +488,8 @@ def restore_store(payload, collector, budget):
         reserve - collector._workspace - sum(sizes.values())
     )
     collector._workspace = reserve
+    if bounded:
+        collector._opaque_staging = staging
     cache = getattr(collector, "_preparation_cache", None)
     if cache is not None:
         cache.checked = checked

@@ -114,6 +114,11 @@ automatic Cartesian sweep or extra multi-hour campaign.
 its literal configuration, identity and fresh confirmation preserve that choice.
 Observed credits are a screening aid; changed admission can change graph
 closures, and a wider population must be measured before selecting it.
+The separately identified `--profile bounded-report` challenger retains the
+incumbent reporting allowance, proven three-prime admission and the expanded
+mechanisms, while selecting bounded opaque staging and shape-based ownership.
+It requires a new integration freeze; it does not revise the historical full
+reporting receipts or increase their grants.
 
 The primary configuration uses serial recovery and in-memory storage. Threaded
 hints and persistent spill are implemented selectable capabilities; exercising

@@ -86,6 +86,15 @@ the same closed-row counts with substantially less accounted ownership or
 charged work. Limits stay unchanged; retention/reporting and record-shaped
 reservations need revision. See `v2/audit/c9a/opaque-investigation-12.md`.
 
+That revision is implemented as the opt-in `BoundedYieldSieveConfig`, schema 14
+and `bounded-report` experimental profile. Unmatched opaque atoms use a capped
+FIFO outside retained incidence; exact matches promote their original records.
+Shape-based graph ownership and norm-bounded batch scratch replace blanket
+reservations in this variant. Reporting returns to the incumbent allowance,
+with proven three-prime recovery retained and no grant increase. All 1,040 unit
+tests (9 skipped) and lint pass; a new committed-source four-call feasibility
+screen is pending. No performance acceptance or default change follows.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and

@@ -103,7 +103,11 @@ def replay(
     # original bounds for independent verification; change only replayable
     # mechanisms. This avoids presenting missing I/E atoms as an ablation.
     cls = (
-        qs.ExtendedYieldSieveConfig
+        qs.BoundedYieldSieveConfig
+        if extended
+        and getattr(source.collector, "extension_policy", None)
+        == "extended-v2"
+        else qs.ExtendedYieldSieveConfig
         if extended
         else qs.CombinedYieldSieveConfig
         if combined and arm != "C0"
@@ -146,7 +150,7 @@ def replay(
         ):
             values[key] = getattr(candidate.collector, key)
     if extended:
-        from ....qs.extended_policy import EXTENSION_FIELDS
+        from ....qs.extended_policy import BOUNDED_FIELDS, EXTENSION_FIELDS
 
         values.update(
             {
@@ -154,6 +158,13 @@ def replay(
                 for key in EXTENSION_FIELDS
             }
         )
+        if cls is qs.BoundedYieldSieveConfig:
+            values.update(
+                {
+                    key: getattr(candidate.collector, key)
+                    for key in BOUNDED_FIELDS
+                }
+            )
     collector = cls(**values)
     built = qs.build_factor_base(
         cell["n"],

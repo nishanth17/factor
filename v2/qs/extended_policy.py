@@ -48,7 +48,12 @@ class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
         ):
             raise ValueError("invalid expanded residual arity")
         super().__post_init__()
-        if self.extension_policy != "extended-v1":
+        expected = (
+            "extended-v2"
+            if isinstance(self, BoundedYieldSieveConfig)
+            else "extended-v1"
+        )
+        if self.extension_policy != expected:
             raise ValueError("unknown extension policy")
         for name in (
             "lazy_cycles",
@@ -104,3 +109,27 @@ class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
 EXTENSION_FIELDS = frozenset(
     ExtendedYieldSieveConfig.__dataclass_fields__
 ) - frozenset(CombinedYieldSieveConfig.__dataclass_fields__)
+
+
+@dataclass(frozen=True)
+class BoundedYieldSieveConfig(ExtendedYieldSieveConfig):
+    """Stage opaque atoms separately and reserve by retained shape."""
+
+    extension_policy: str = field(default="extended-v2", kw_only=True)
+    opaque_cache_entries: int = field(default=256, kw_only=True)
+    opaque_cache_bytes: int = field(default=4 * 2**20, kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        for name, maximum in (
+            ("opaque_cache_entries", 4096),
+            ("opaque_cache_bytes", 64 * 2**20),
+        ):
+            utils.require_integer(getattr(self, name), name, 0)
+            if getattr(self, name) > maximum:
+                raise ValueError(name + " exceeds its finite cap")
+
+
+BOUNDED_FIELDS = frozenset(
+    BoundedYieldSieveConfig.__dataclass_fields__
+) - frozenset(ExtendedYieldSieveConfig.__dataclass_fields__)

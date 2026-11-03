@@ -901,6 +901,12 @@ class SIQSJob:
                     opaque_conversions=len(graph.resolutions),
                     split_calls=self.engine.collector._split_calls,
                 )
+                if self.config.collector.extension_policy == "extended-v2":
+                    staging = self.engine.collector._opaque_staging
+                    self.stats["large_prime_graph"].update(
+                        staged_opaque_atoms=len(staging.atoms),
+                        staged_opaque_bytes=staging.used,
+                    )
             elif graph is not None:
                 self.stats["large_prime_graph"] = dict(
                     forest_edges=len(graph.edges),

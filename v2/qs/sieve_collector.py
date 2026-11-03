@@ -524,6 +524,16 @@ class SieveCollector:
                 if self.config.batch_policy == "shared-v2"
                 else 0
             )
+            if (
+                getattr(self.config, "extension_policy", None) == "extended-v2"
+                and self.config.batch_policy == "shared-v2"
+            ):
+                from .yield_memory import base_batch_reserve
+
+                self._batch_base = base_batch_reserve(
+                    factor_base, self.config.batch_size, self.budget
+                )
+                self._batch_reserve = self._batch_base
             self._workspace += self._batch_reserve
             if self._workspace > self.config.memory_limit:
                 raise MemoryError("combined-yield helpers exceed memory_bytes")
@@ -559,6 +569,13 @@ class SieveCollector:
                     else 0
                 )
                 self._workspace += self.config.incremental_bytes
+                if self.config.extension_policy == "extended-v2":
+                    from .opaque_staging import OpaqueStaging
+
+                    self._opaque_staging = OpaqueStaging(
+                        self.config, factor_base
+                    )
+                    self._workspace += self.config.opaque_cache_bytes
                 self._workspace += 16 * 2**20 * self.config.recovery_workers
                 if self._workspace > self.config.memory_limit:
                     raise MemoryError("expanded helpers exceed memory_bytes")
@@ -650,6 +667,12 @@ class SieveCollector:
                     self._conversion_events = []
                     self._workspace -= self._conversion_bytes
                     self._conversion_bytes = 0
+                    if self.config.extension_policy == "extended-v2":
+                        from .opaque_staging import OpaqueStaging
+
+                        self._opaque_staging = OpaqueStaging(
+                            self.config, self.factor_base
+                        )
             cache = getattr(self, "_preparation_cache", None)
             if cache is not None:
                 cache.clear()
@@ -848,6 +871,13 @@ class SieveCollector:
                 self._scores[index] += weight
 
     def _sieve(self, lo, hi, stats):
+        if (
+            getattr(self.config, "extension_policy", None) == "extended-v2"
+            and self.config.batch_policy == "shared-v2"
+        ):
+            from .yield_memory import reserve_batch
+
+            reserve_batch(self, lo, hi)
         self._piecewise_thresholds = None
         if self.config.sparse_queue_bytes:
             from .sparse_queue import sieve

@@ -294,6 +294,38 @@ class ExpandedArithmeticTests(unittest.TestCase):
 
 
 class ExpandedKernelTests(unittest.TestCase):
+    def test_sparse_light_view_with_unsorted_weights_matches_dense_oracle(
+        self,
+    ):
+        generator = random.Random(519)
+        for _ in range(40):
+            rows = tuple(generator.randrange(64) for _ in range(12))
+            columns = 0
+            for row in rows:
+                columns |= row
+            kept = max(sum(row == 0 for row in rows), columns.bit_count())
+            chosen = sorted(
+                range(len(rows)), key=lambda i: (rows[i].bit_count(), i)
+            )[:kept]
+            allowed = sum(1 << i for i in chosen)
+            expected = {
+                mask for mask in dense_kernel(rows) if not mask & ~allowed
+            }
+            for sparse in (False, True):
+                matrix = filter_matrix(
+                    rows,
+                    budget=allowance(),
+                    weight_two=True,
+                    light_rows=True,
+                    surplus=0,
+                    merge_policy="fill-v2",
+                    merge_weight=4,
+                    merge_fill=2,
+                    sparse_incidence=sparse,
+                )
+                result = DependencySolver(matrix, budget=allowance()).run()
+                self.assertEqual(span(result), expected)
+
     def test_incidence_kernel_matches_dense_oracle_for_mixed_arities(self):
         generator = random.Random(822)
         config = policy(cycle_reduction_choices=4)

@@ -43,6 +43,7 @@ def parser():
             "three-prime",
             "adaptive-report",
             "balanced-endpoints",
+            "bounded-report",
         ),
     )
     selection = commands.add_parser("select-confirmation")
@@ -224,7 +225,7 @@ def execute(args):
                     args.arm,
                     combined=frozen["plan"].get("early_cells") == 32,
                     extended=frozen["plan"].get("extension_policy")
-                    == "extended-v1",
+                    in ("extended-v1", "extended-v2"),
                 ),
             )
         else:

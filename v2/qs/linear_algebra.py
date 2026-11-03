@@ -213,7 +213,14 @@ def filter_matrix(
     budget.consume(len(rows) + input_nonzeros * word_cost)
     incidence = {}
 
-    for index, (row, _) in active.items():
+    if sparse_incidence:
+        # Lighter-row selection orders by payload weight. Sparse segments
+        # must instead start in row-number order for later bisect toggles.
+        budget.consume(len(active) * (len(active).bit_length() + 1))
+        initial_rows = sorted(active.items())
+    else:
+        initial_rows = active.items()
+    for index, (row, _) in initial_rows:
         budget.consume(0)
         bits = row
         while bits:

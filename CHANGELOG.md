@@ -5,6 +5,12 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Add a separately versioned bounded-yield variant with capped opaque staging,
+  exact promotion, shape-based incidence ownership and norm-bounded batch
+  scratch. Preserve FIFO state in schema 14 and retain the incumbent reporting
+  allowance in the new experimental profile. Fix sparse incidence ordering
+  after light-row selection and preserve completed divisors across restore.
+
 - Make the measurement warmup exercise selected coupled arithmetic. Complete
   the four-call matched feasibility screen; retain candidate ownership-cap
   stops and failed drift checks without a speedup claim. Pause larger runs

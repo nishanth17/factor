@@ -4,10 +4,16 @@ import hashlib
 import json
 from dataclasses import asdict
 from functools import partial
+from itertools import chain
 
 from ..common import arithmetic, utils
 from .assignment_stream import assignment_identity
-from .extended_policy import EXTENSION_FIELDS, ExtendedYieldSieveConfig
+from .extended_policy import (
+    BOUNDED_FIELDS,
+    EXTENSION_FIELDS,
+    BoundedYieldSieveConfig,
+    ExtendedYieldSieveConfig,
+)
 from .extraction import DependencyExtractor, _prepare_relations
 from .families import (
     PolynomialFamily,
@@ -141,7 +147,15 @@ def _reserve_growing_checkpoint(job):
         return
     encoded_bound = 65536
     if collector is not None:
-        for atom in collector._atoms.values():
+        atomic_sources = collector._atoms.values()
+        if (
+            getattr(collector.config, "extension_policy", None)
+            == "extended-v2"
+        ):
+            atomic_sources = chain(
+                atomic_sources, collector._opaque_staging.atoms.values()
+            )
+        for atom in atomic_sources:
             encoded_bound += 2048 + 128 * len(atom.exponents)
             encoded_bound += 8 * (
                 atom.polynomial.a.bit_length()
@@ -201,7 +215,9 @@ def pack_job(job):
     config_values = asdict(job.config)
     arithmetic_version = _arithmetic_version(config_values)
     version = (
-        13
+        14
+        if isinstance(job.config.collector, BoundedYieldSieveConfig)
+        else 13
         if isinstance(job.config.collector, ExtendedYieldSieveConfig)
         else 12
         if isinstance(job.config.collector, CombinedYieldSieveConfig)
@@ -257,12 +273,12 @@ def pack_job(job):
         )
         if version >= 6:
             progress["zero_checked_count"] = engine.zero_checked_count
-        if version == 13 and solver is not None:
+        if version in (13, 14) and solver is not None:
             progress["solver"]["incremental_modes"] = [
                 solver.matrix.stats.get("incremental_survivors", False),
                 solver.matrix.stats.get("incremental_core", False),
             ]
-        if version in (11, 12, 13):
+        if version in (11, 12, 13, 14):
             progress["yield_progress"] = {
                 "pair_checked_count": 0
                 if engine._pair_index is None
@@ -582,6 +598,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         11,
         12,
         13,
+        14,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -644,7 +661,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "filter_policy",
         "extraction_policy",
     }
-    if payload["version"] in (11, 12, 13):
+    if payload["version"] in (11, 12, 13, 14):
         if present != ordered_fields or (
             values["collector"].get("yield_policy")
             != ("yield-v2" if payload["version"] >= 12 else "yield-v1")
@@ -658,9 +675,17 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     ):
         raise ValueError("combined checkpoint lacks its policy identity")
     if EXTENSION_FIELDS.intersection(values["collector"]) != (
-        EXTENSION_FIELDS if payload["version"] == 13 else set()
+        EXTENSION_FIELDS if payload["version"] in (13, 14) else set()
     ):
         raise ValueError("expanded checkpoint lacks its policy identity")
+    if BOUNDED_FIELDS.intersection(values["collector"]) != (
+        BOUNDED_FIELDS if payload["version"] == 14 else set()
+    ):
+        raise ValueError("bounded checkpoint lacks its policy identity")
+    if payload["version"] in (13, 14) and values["collector"].get(
+        "extension_policy"
+    ) != ("extended-v2" if payload["version"] == 14 else "extended-v1"):
+        raise ValueError("bounded checkpoint policy differs from schema")
     if payload["version"] < 7 and (
         (values.get("solve_policy", "window") != "window")
         != (payload["version"] == 6)
@@ -719,7 +744,9 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     ):
         raise ValueError("coupled checkpoint lacks its policy identity")
     collector_type = (
-        ExtendedYieldSieveConfig
+        BoundedYieldSieveConfig
+        if payload["version"] == 14
+        else ExtendedYieldSieveConfig
         if payload["version"] == 13
         else CombinedYieldSieveConfig
         if payload["version"] == 12
@@ -982,7 +1009,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "SIQS checkpoint relation store identity mismatch"
             )
         _restore_store(payload["store"], engine.collector, budget)
-        if payload["version"] in (11, 12, 13):
+        if payload["version"] in (11, 12, 13, 14):
             progress = saved.get("yield_progress")
             expected = {"pair_checked_count"}
             if payload["version"] >= 12:
@@ -1076,7 +1103,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         prefix = saved["solver"]
         if prefix is not None:
             incremental_modes = prefix.get("incremental_modes", [False, False])
-            if payload["version"] == 13 and (
+            if payload["version"] in (13, 14) and (
                 not isinstance(incremental_modes, list)
                 or len(incremental_modes) != 2
                 or any(type(flag) is not bool for flag in incremental_modes)
@@ -1131,7 +1158,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 else None,
                 _component_contractions=incremental_modes[1],
             )
-            if payload["version"] == 13 and incremental_modes != [
+            if payload["version"] in (13, 14) and incremental_modes != [
                 matrix.stats.get("incremental_survivors", False),
                 matrix.stats.get("incremental_core", False),
             ]:
@@ -1268,4 +1295,8 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             # The extended search can collect again. Any retained downstream
             # prefix still runs before the engine admits another relation.
             job.pending_final_reason = None
+    # Setup rebuilds the factor base and may reset the result field. A saved
+    # completed split was independently checked above and must survive it.
+    if payload["divisor"] is not None:
+        job.divisor = payload["divisor"]
     return job

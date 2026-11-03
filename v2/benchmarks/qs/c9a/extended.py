@@ -4,7 +4,7 @@ import hashlib
 import json
 from dataclasses import asdict, replace
 
-from ....qs import ExtendedYieldSieveConfig
+from ....qs import BoundedYieldSieveConfig, ExtendedYieldSieveConfig
 from . import combined
 from .configuration import SIZES
 from .configuration import configuration as baseline
@@ -211,11 +211,18 @@ def configuration(
     if arm == "C0" or digits not in SIZES:
         return config
     choices = profiles(admission_base_bound, config.collector)
-    if profile not in choices:
+    bounded = profile == "bounded-report"
+    if profile not in choices and not bounded:
         raise ValueError("unknown joint parameter profile")
     values = asdict(config.collector)
-    values.update(choices[profile])
-    return replace(config, collector=ExtendedYieldSieveConfig(**values))
+    values.update(choices["three-prime" if bounded else profile])
+    if bounded:
+        values.update(
+            candidate_bound=choices["fixed-report"]["candidate_bound"],
+            extension_policy="extended-v2",
+        )
+    cls = BoundedYieldSieveConfig if bounded else ExtendedYieldSieveConfig
+    return replace(config, collector=cls(**values))
 
 
 def convert(cell, *, incumbent=None, profile=None):
@@ -245,7 +252,9 @@ def build(corpus, resolved, *, profile="three-prime"):
         identity=IDENTITY
         if profile == "three-prime"
         else IDENTITY + "-" + profile,
-        extension_policy="extended-v1",
+        extension_policy="extended-v2"
+        if profile == "bounded-report"
+        else "extended-v1",
         cells=[convert(cell, profile=profile) for cell in plan["cells"]],
         primary_profile=profile,
         parameter_status=(

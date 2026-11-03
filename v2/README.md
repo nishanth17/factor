@@ -160,6 +160,20 @@ report retained atoms, residual rank, unowned atoms, closed relations, opaque
 conversions and split calls. Ordinary collector forest statistics retain
 their existing fields.
 
+`qs.BoundedYieldSieveConfig` (`extended-v2`) is a separate experimental variant.
+It stages unmatched opaque atoms in a FIFO capped by `opaque_cache_entries`
+(default 256) and `opaque_cache_bytes` (default 4 MiB), outside retained incidence.
+Exact repeats or proven factorizations promote the older atom before processing
+the incoming one. Refusal preserves any completed promotion; closed rows keep
+their original atoms. FIFO eviction can lose future pairing opportunities.
+
+This variant charges graph vectors and lifting by their retained dimensions.
+Its batch scratch uses exact norm/prime-product bounds, with a high-water
+reservation established before each block. Work, memory and spill grants stay
+binding. Schema 14 checkpoints save FIFO order and independently validate staged
+arithmetic, caps and ownership on restore. Earlier variants/schemas remain
+available. A completed checkpoint divisor survives factor-base reconstruction.
+
 ## Development
 
 ```sh
