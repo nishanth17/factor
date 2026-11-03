@@ -178,6 +178,11 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
+B12/F4 branch preparation adds opt-in bounded ECM processes and a prospective
+protocol from committed `066456a`; runtime arithmetic/process/full-checkout QA
+and all measurements remain NOT RUN. No worker/default adoption or task closure.
+Local handoff: `v2/audit/b12_f4/HANDOFF.md`. C9a retains the performance window.
+
 ## Known gaps and unresolved conflicts
 
 - **Deferred:** E1 combined portfolio confirmation. Individual accepted

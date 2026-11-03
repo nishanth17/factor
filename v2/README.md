@@ -77,3 +77,52 @@ See [tests](tests/README.md), [benchmark runners](benchmarks/README.md) and
 
 Generated captures, profiles and scratch stay in ignored `results/` folders.
 Research and detailed journals remain local under `audit/` and `local/`.
+
+### Experimental bounded ECM workers (B12/F4 preparation)
+
+`v2.execution.ecm_workers.ECMExecutor` is an opt-in context for independent
+curves using explicit `spawn` and PyPy implementing Python 3.11. This preparation
+has not passed runtime arithmetic, multiprocessing or complete-checkout QA and
+has no performance result. Automatic routing and worker defaults are unchanged.
+
+The component accepts a resolved `PortfolioConfig`, a finite `Budget`, an
+original/cofactor lineage string and an optional drained checkpoint. It returns
+a checked divisor, reason, checkpoint and resource receipt. `WorkerSettings`
+exposes 1/2/4 workers and finite work, CPU, memory, frame, checkpoint, startup and
+drain limits. Only python-int is admitted initially. Full schedule eligibility
+is retained in each worker; private program/chain stores are reused and bounded.
+The caller owns `close()` or the context manager lifetime. One call may be
+active per context. Process entry points must be protected by a main guard.
+
+`factorize_bounded(..., ecm_executor=context)` is the narrow portfolio seam.
+Its worker parent-memory reserve must include the literal portfolio allowance.
+The context is borrowed; the caller closes it. Omit it for incumbent behavior.
+No stock CLI worker flag is added. The experimental benchmark driver provides
+fresh CLI measurements after runtime admission.
+
+`EngagementRule` requires a matching schedule cost key, finite per-tier serial
+costs and cold/warm thresholds. Missing/invalid calibration or unfunded startup
+selects equivalent-manifest serial execution. `force_workers=True` is a separate
+diagnostic arm. Neither supplies calibrated automatic settings. Rule estimates
+use observable plans and pool readiness, not factor labels or future outcomes.
+
+The opt-in search has versioned per-curve seeds independent of slot/count/order;
+it differs from the incumbent shared RNG stream. ECM draws no longer move later
+fallback seeds within the opt-in semantics. Sigma collisions are retained and
+reported; IDs do not prove statistical independence. First-factor winners may
+race. Checkpoints bind executor/rule/settings (including worker count), full
+manifest, attempts, acknowledged results and cumulative charges. Resume rejects
+a missing/different executor. Only drained checkpoints are supported; unfinished
+curves restart setup with the same ID and retained prior charges, up to the
+finite attempt cap (at most three attempts/curve and 32 drained runs per
+cofactor search). These bounds also fund retained lease history. A parent-memory acknowledgement becomes durable only when
+the caller atomically saves the returned checkpoint.
+
+Missing reports consume full leases. Work units, observed CPU and conservative
+CPU reservations are distinct. Shutdown CPU is reserved in full before spawn;
+process RSS is an observation, not an owned-payload theorem. Cancellation polls
+at existing stage actions; bigint operations and OS waits are cooperative.
+Private channels are drained, then owned processes are terminated/killed with
+finite joins. Runtime behavior, response tails and resource estimates remain
+queued for validation. A zero/unfunded output allowance may refuse checkpoint
+construction explicitly. No arithmetic state or live process handles are saved.

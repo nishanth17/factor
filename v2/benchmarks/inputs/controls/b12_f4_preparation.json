@@ -1,0 +1,211 @@
+{
+  "identity": "b12-f4-preparation-v1",
+  "status": "PROSPECTIVE: runtime QA, calibration and execution freeze NOT RUN",
+  "control_commit": "066456ada27d45e45d25f166ab65358664b8b313",
+  "runtime": "PyPy Python 3.11; python-int; explicit spawn; inner threads 1",
+  "qa": {
+    "wall": 1800,
+    "cpu": 1800,
+    "harness_wall_debit": 0,
+    "harness_cpu_debit": 0
+  },
+  "stage_a": {
+    "wall": 1800,
+    "cpu": 7200,
+    "reserved_wall": 1380,
+    "reserved_cpu": 5520
+  },
+  "seeds": [
+    7919
+  ],
+  "prefix": [
+    [
+      2000,
+      147396,
+      8
+    ]
+  ],
+  "inputs": {
+    "I60": {
+      "corpus": "b3_corpus.json",
+      "id": "small10_60d",
+      "split": "training",
+      "exposure": "historical training; not fresh"
+    },
+    "I80": {
+      "corpus": "b3_corpus.json",
+      "id": "small10_80d",
+      "split": "training",
+      "exposure": "historical training; not fresh"
+    }
+  },
+  "cells": [
+    {
+      "id": "A01",
+      "input": "I60",
+      "arm": "S0",
+      "mode": "cold",
+      "workers": 0,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 20,
+      "pool": "fresh-A01"
+    },
+    {
+      "id": "A02",
+      "input": "I60",
+      "arm": "S1",
+      "mode": "cold",
+      "workers": 1,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 20,
+      "pool": "fresh-A02"
+    },
+    {
+      "id": "A03",
+      "input": "I60",
+      "arm": "P2",
+      "mode": "cold",
+      "workers": 2,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 20,
+      "pool": "fresh-A03"
+    },
+    {
+      "id": "A04",
+      "input": "I60",
+      "arm": "P4",
+      "mode": "cold",
+      "workers": 4,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 20,
+      "pool": "fresh-A04"
+    },
+    {
+      "id": "A05",
+      "input": "I80",
+      "arm": "S0",
+      "mode": "cold",
+      "workers": 0,
+      "wall": 150,
+      "cpu": 600,
+      "startup_warmup_wall": 30,
+      "pool": "fresh-A05"
+    },
+    {
+      "id": "A06",
+      "input": "I80",
+      "arm": "P4",
+      "mode": "cold",
+      "workers": 4,
+      "wall": 150,
+      "cpu": 600,
+      "startup_warmup_wall": 30,
+      "pool": "fresh-A06"
+    },
+    {
+      "id": "A07",
+      "input": "I60",
+      "arm": "S1",
+      "mode": "warm",
+      "workers": 1,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 25,
+      "pool": "retained-A07"
+    },
+    {
+      "id": "A08",
+      "input": "I60",
+      "arm": "P2",
+      "mode": "warm",
+      "workers": 2,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 25,
+      "pool": "retained-A08"
+    },
+    {
+      "id": "A09",
+      "input": "I60",
+      "arm": "P4",
+      "mode": "warm",
+      "workers": 4,
+      "wall": 120,
+      "cpu": 480,
+      "startup_warmup_wall": 25,
+      "pool": "retained-A09"
+    }
+  ],
+  "overhead_reservation": {
+    "wall": 240,
+    "cpu": 960,
+    "includes": "three 20-wall/80-CPU cold pool start probes; validation; controller; preflight warmup"
+  },
+  "memory": {
+    "machine_rss_ceiling": 8589934592,
+    "parent_interpreter_estimate": 1073741824,
+    "worker_interpreter_estimate": 1610612736,
+    "parent_owned": 1090519040,
+    "worker_owned": 67108864,
+    "evidence_bytes": 2147483648,
+    "cell_output_bytes": 2097152
+  },
+  "later_ceiling": {
+    "wall": 43200,
+    "cpu": 172800,
+    "evidence_bytes": 2147483648
+  },
+  "confirmation": {
+    "minimum_independent_moduli": 12,
+    "seeds": [
+      104729,
+      130363
+    ],
+    "timing_repetitions": 9,
+    "warmup_seconds": 3,
+    "bootstrap_modulus_clusters": 4000,
+    "bootstrap_seed": 193001
+  },
+  "startup_probe_cells": [
+    {
+      "id": "A-start-1",
+      "input": "I60",
+      "arm": "S1",
+      "mode": "cold",
+      "workers": 1,
+      "wall": 20,
+      "cpu": 80,
+      "startup_warmup_wall": 20,
+      "pool": "probe-1",
+      "endpoint": "startup"
+    },
+    {
+      "id": "A-start-2",
+      "input": "I60",
+      "arm": "P2",
+      "mode": "cold",
+      "workers": 2,
+      "wall": 20,
+      "cpu": 80,
+      "startup_warmup_wall": 20,
+      "pool": "probe-2",
+      "endpoint": "startup"
+    },
+    {
+      "id": "A-start-4",
+      "input": "I60",
+      "arm": "P4",
+      "mode": "cold",
+      "workers": 4,
+      "wall": 20,
+      "cpu": 80,
+      "startup_warmup_wall": 20,
+      "pool": "probe-4",
+      "endpoint": "startup"
+    }
+  ]
+}

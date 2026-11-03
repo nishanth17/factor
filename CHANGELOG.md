@@ -3,6 +3,14 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 experimental preparation (3 November 2026)
+
+- Add an opt-in spawn executor for independent ECM curves, versioned manifests,
+  parent leases, checked publication and drained restart; retain serial defaults.
+- Add queued correctness/failure tests and prospective finite benchmark support.
+  Arithmetic/process/full-suite QA and performance measurements are NOT RUN;
+  B12/F4 remain open and this branch is not adopted or merged.
+
 ## C10a-01 mainline and automatic defaults (3 November 2026)
 
 - Integrate exact parity polynomials, coupled odd/even multiplier ranking,

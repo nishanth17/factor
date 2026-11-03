@@ -642,7 +642,15 @@ def _admit_fallback(current, config, budget):
 
 
 def _advance(
-    state, config, budget, context, generator, siqs_runtime, programs, policy
+    state,
+    config,
+    budget,
+    context,
+    generator,
+    siqs_runtime,
+    programs,
+    policy,
+    ecm_executor=None,
 ):
     """Commit one portfolio transition or one resumable candidate action."""
     if state["current"] is None:
@@ -875,6 +883,44 @@ def _advance(
         return
 
     kind = current["stage"]
+    if kind == "ecm" and ecm_executor is not None:
+        from .execution.worker_contract import LeaseRefusedError
+
+        if current["tier"] >= len(config.ecm_tiers):
+            _handoff(state, config, budget, "schedule_exhausted")
+            return
+        if ecm_executor.settings.parent_memory < config.memory_bytes:
+            raise ValueError(
+                "worker parent reserve must include portfolio ownership"
+            )
+        try:
+            outcome = ecm_executor.run(
+                int(n),
+                config=config,
+                budget=budget,
+                lineage=f"{state['original']}/{n}/{current['mult']}",
+                checkpoint=current.get("worker_checkpoint"),
+            )
+        except LeaseRefusedError as error:
+            raise BudgetExhaustedError(str(error)) from error
+        current["worker_checkpoint"] = outcome.checkpoint
+        _event(
+            state,
+            config,
+            stage="ecm_workers",
+            n=n,
+            outcome=outcome.reason,
+            stats=outcome.stats,
+        )
+        if outcome.divisor is not None:
+            _split(state, outcome.divisor)
+        elif outcome.reason == "curves_exhausted":
+            current.update(tier=len(config.ecm_tiers), attempt=0)
+            current.pop("worker_checkpoint", None)
+        else:
+            raise BudgetExhaustedError(outcome.reason)
+        return
+
     if kind == "rho":
         attempts, b1, b2 = config.rho_attempts, 0, 0
     elif kind == "pm1":
@@ -1610,6 +1656,7 @@ def factorize_bounded(
     budget=None,
     checkpoint=None,
     stop_after_split=False,
+    ecm_executor=None,
 ):
     """Factor under one budget, retaining exact state on pause/exhaustion.
 
@@ -1737,6 +1784,16 @@ def factorize_bounded(
         budget.prior_wall = payload["wall_used"]
         budget.prior_cpu = payload["cpu_used"]
 
+    # Opt-in search semantics never impersonate the incumbent RNG/checkpoint.
+    saved_executor = state.get("ecm_worker_identity")
+    supplied_executor = None if ecm_executor is None else ecm_executor.identity
+    if checkpoint is not None and saved_executor != supplied_executor:
+        raise ValueError(
+            "ECM worker checkpoint requires its original executor/rule"
+        )
+    if ecm_executor is not None:
+        state["ecm_worker_identity"] = supplied_executor
+
     _promote_state(state, config.backend)
 
     reason = "exhausted"
@@ -1820,6 +1877,7 @@ def factorize_bounded(
                     siqs_runtime,
                     programs,
                     policy,
+                    ecm_executor,
                 )
             except HandoffRequiredError as error:
                 # Any retained chunk is already atomic and charged. Do not

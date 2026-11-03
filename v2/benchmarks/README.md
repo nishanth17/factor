@@ -122,3 +122,11 @@ above. For syntax without a measurement, use a runner's `--help`.
 
 The [earlier guide](https://github.com/nishanth17/factor/blob/24ff153d26ada2ec4beeead07000d183e94fd355/v2/benchmarks/README.md)
 preserves older command/layout notes and numerical summaries.
+
+B12/F4 preparation provides `ecm/b12_f4/runner.py`, `inputs.py` and the prospective
+`inputs/controls/b12_f4_preparation.json`. No measurements have run. The driver
+requires a later runtime-admitted freeze and separates fresh CLI complete cost
+from retained-context calls. S0 uses the pinned committed incumbent; S1/P2/P4
+expose the new executor and M0 is its separate serial manifest equivalent.
+Detailed source review, protocol, budgets and queued QA handoff are local under
+`v2/audit/b12_f4/`. Runtime QA is the next phase; B12/F4 and E1 remain open.
