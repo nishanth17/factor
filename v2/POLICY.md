@@ -83,6 +83,23 @@ documented retain-baseline/defer/reject decision**. If a required mathematical
 capability is missing, its dependent implementation stays deferred. A recorded
 deferral cannot stand in for a correctness proof.
 
+Task owners identify arithmetic, API and storage/provenance responsibilities;
+they do not require separate chats or isolated successful performance studies.
+A coherent workstream may select independently flagged mechanisms and compare
+one combined candidate with the current control once every selected path is
+exact and feasible under declared finite resources. Settle the relevant
+interface/proof contract within that workstream; an unrelated global milestone
+or standalone speedup is not an admission prerequisite.
+
+Freeze the selected combination and a small targeted ablation plan before its
+measurements. Use fixed-work prefixes or candidate/residual/relation replays
+for concrete mechanism questions, preserving meaningful compatible flags.
+Add whole-factor ablations when they resolve important interaction uncertainty;
+do not automatically run every flag combination. Changed admission populations
+need declared coverage checks rather than identical outputs. Adoption still
+requires matched complete-cost/completion evidence and fresh independent-input
+confirmation. Preserve old freezes, failures and scoped verdicts.
+
 Priority means expected return per engineering/measurement effort, inferred
 from current evidence, not a promised speedup. **High** gets the next available
 slot; **medium** is useful independent work; **conditional** requires its stated
@@ -107,8 +124,8 @@ existing configuration; these recommendations apply to new tasks.
 Use Sol for bounded implementation, measurement and integration; use Astra
 for difficult algebraic/provenance invariants and new solver designs. `high`
 fits controlled execution and reconciliation; `xhigh` fits coupled correctness
-or selection decisions. Escalate to `max` only for a named unresolved proof or
-repeatedly failing design, not as the default for a long benchmark run.
+or selection decisions. Escalate to `max` only for a named unresolved proof,
+failed invariant or derivation, not as the default for a long benchmark run.
 
 These assignments are engineering recommendations, not results of a model
 benchmark on Factor. They follow the general distinctions in
@@ -117,12 +134,22 @@ The [Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol) and
 [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra) model pages
 confirm the model names and supported effort settings.
 
+The roadmap's task rows are the source of truth for scope-specific assignments.
+Use a fixed model/effort for the requested chat phase; these recommendations do
+not assume autonomous model switching or authorize delegation. A later,
+separately requested frozen-execution chat may use Sol / high when the row
+allows it. C10a-01 retains Astra / xhigh throughout its current workstream,
+including authorized execution. Expanded C9a admission/graph/storage research,
+implementation and correctness use Astra / xhigh; Sol / xhigh remains suitable
+for a separately scoped existing-policy cadence task. Reserve Astra / max for
+a named unresolved invariant or derivation, not elapsed time or source volume.
+
 ## Parallel execution and ownership
 
 | Lane | Scope and collision rule |
 | --- | --- |
-| QS collector | Use the settled B1/C9/C10/A1a/C10a-07 decisions and current committed control. C10a/C9a and conditional A1a/A1b/A1c own their deltas; B13 capacity and C8 CRT retain their triggers. Coordinate shared collector edits. |
-| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. Coordinate relation and checkpoint edits. |
+| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. C10a/C9a/A1a/A1c own their stated scopes; preserve the active C10a-01 freeze. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector edits. |
+| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected C9a compact-record implementation may satisfy its B7 contract within the same workstream. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
 | ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm/core.py` and `execution/stage_jobs.py` integration. |
 | Schedules/continuations | P5.2/P5.3 and p+1 coordinate `execution/schedules.py`, stage jobs, backend boundaries and checkpoint versions. |
 | CLI/dispatch | Completed A11 covers explicit QS/MPQS/SIQS access. C3a/G1 own remaining allocation/handoff deltas. Coordinate `factor.py`, configuration identity and usage guides. |

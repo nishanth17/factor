@@ -1,9 +1,10 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `41997da5f4b1e2b15f65141ba4736d1fa99a1465`.
+Reviewed mainline/base: `0076e256871722d52d849ab344152e0a7535c2ce`.
 A1b review record: `61899a9`; production defaults are unchanged.
-QS roadmap review: `4d65d33`; implementation remains in the C10a-01 worktree.
+QS roadmap review: `4d65d33`, consolidated into existing task scopes on
+2 November; implementation remains in the C10a-01 worktree.
 
 **Target metric: TBD.**
 
@@ -81,29 +82,41 @@ experimental result. No other sessions were contacted.
 
 | ID | One-line scope | Worktree / branch |
 | --- | --- | --- |
-| C10a-01 | Checked opt-in arithmetic/coupled bundle; Gray cache and attainable A population next. Worktree code is not integrated into mainline; see the [review](ROADMAP.md#c10a-01-implementation-remaining-after-the-coverage-review). | `/Users/nishanthmohan/Documents/code/factor-c10a01` / `codex/c10a01-normalized-polynomials` |
+| C10a-01 | Checked opt-in polynomial/multiplier/A-population/root-table bundle; v4 calibration and current 60/62/65/70 feasibility stay under their versioned freezes. Code is not integrated into mainline; see the [current scope](ROADMAP.md#c10a-01--coupled-polynomial-multiplier-a-population-and-root-setup). | `/Users/nishanthmohan/Documents/code/factor-c10a01` / `codex/c10a01-normalized-polynomials` |
 
 ## Next eligible items
 
-Use the [2 November QS coverage review](ROADMAP.md#qs-optimization-priorities--coverage-reconciliation-2-november-2026)
-for updated priorities and preparation dependencies; these entries schedule no
-measurements. [Execution rows](ROADMAP.md#open-and-conditional-execution-items)
-carry model/effort, triggers and full gates.
+The [existing execution rows](ROADMAP.md#open-and-conditional-execution-items)
+now include the QS review's scopes, dependencies and model/effort assignments.
+For current QS progress, prioritize the following work; this schedules no runs.
 
-1. A5 Williams p+1 binary baseline — Medium, independent coverage. A8 matrix
-   control is High preparation for genuine operator/lifting fixtures. B6/C4
-   dense/filtering challengers and D1 sparse preparation use that contract;
-   unrelated comparison success is not required.
-2. B12 worker-contract preparation — Medium; B14 independent prime certificates
-   — High for certified results. Both have settled foundation predecessors;
-   B14 does not wait for GNFS or D7. Other B rows need their stated triggers.
-3. C9a — ranked useful-yield/target attribution, then intake/cycle weight;
-   C10a — remaining triggered collection questions; C11 — High, continuing
-   provenance/calibration. Existing A1a follow-ups/A1c keep their scope;
-   A1b-F1 remains Deferred. F7 SIQS direct/tree screening is High design
-   priority; isolated F6/F7 feasibility does not wait for deferred E1.
-4. Downstream D7/E3–E6, selected P6 challengers, G1/H1 and I1 wait for their
-   recorded predecessors. E1 remains Deferred.
+1. **C9a combined useful-yield/admission/cycle/storage candidate — Astra / xhigh.**
+   Select justified independently flagged mechanisms and targeted ablations.
+   Cadence-only existing-policy work is a smaller Sol / xhigh scope. B7/C10a
+   supply contracts within the workstream; isolated component wins and separate
+   chats are unnecessary. Preserve exactness and require fresh whole-factor
+   confirmation for adoption.
+2. **A1c bulk marking/scanning or paired-root kernel — Sol / xhigh.**
+   Retain queue eligibility and prior kernel losses; select a bounded prototype.
+   **F7 SIQS direct/tree screening — Astra / xhigh** is the next larger
+   research/implementation candidate with explicit wider-base and batch proofs.
+3. **A1a checked transitions — Sol / xhigh; cross-B lifting — Astra / xhigh.**
+   Reuse the implemented C10a-01 Gray tables instead of duplicating them.
+4. **A8 operator/lifting fixtures, then C4/B7/B6/D1 — Astra / xhigh.**
+   Preparation is eligible now. Stronger filtering is independent of a Four
+   Russians win; sparse designs need A8's contract rather than unrelated
+   experimental success. C11/P6.4 competitor protocol design uses Sol / xhigh.
+5. A5 Williams p+1, B12 worker contracts and B14 prime certificates retain
+   their independent predecessors and model assignments. B14 is High for
+   certification. A1b-F1 remains Deferred; current C10a-01 feasibility already
+   covers the selected larger-size probes.
+6. D7/E3–E6, integrated F4 workers, G1/H1 and I1 retain their recorded
+   predecessors. E1 remains Deferred.
+
+Separate worktrees isolate source changes. Keep current C10a-01 timing freezes
+unchanged; parallel research/design and light edits can proceed, while heavy QA
+and measurements share one serialized performance window. A later separately
+requested execution chat may use Sol / high where its task row permits it.
 
 ## Known gaps and unresolved conflicts
 
@@ -112,9 +125,10 @@ carry model/effort, triggers and full gates.
   still precede GNFS activation.
 - **Inconclusive/unmeasured:** the adoption limitations are attached to the
   tables above. No broad SIQS crossover or practical general 60–80-digit
-  completion has been established. The 65-digit spike timed out both arms;
-  [explicit 61/62 feasibility](ROADMAP.md#collection-subtranches-and-retained-follow-ups)
-  remains Conditional, with no promoted 61–80 route.
+  completion has been established. The historical 65-digit spike timed out
+  under an older collector; current C10a-01 60/62/65/70 feasibility is in flight.
+  Consume its scoped results before a duplicate larger-size study; there is
+  no promoted 61–80 route.
 - **Open:** C10a-06 runner work; R3 general cadence/storage proofs; B14 proofs;
   final SSS/worker comparisons and upstream-license clarification. See the
   [live catalogue](ROADMAP.md#numbered-phase-catalogue-and-acceptance-gates).
