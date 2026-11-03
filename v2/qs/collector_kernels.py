@@ -6,7 +6,14 @@ Selectors are explicit; automatic adoption requires separate acceptance.
 from ..common.arithmetic import gcd
 from .power_sieve import prime_power_roots
 
-KERNELS = ("density", "presieve", "presieve_powers", "unroll4", "scan_fused")
+KERNELS = (
+    "density",
+    "presieve",
+    "presieve_powers",
+    "unroll4",
+    "scan_fused",
+    "parity_two",
+)
 SCAN_CHUNK = 64
 
 
@@ -37,7 +44,7 @@ def combine(parts):
 def workspace(marking, width, count):
     """Reserve periods and simultaneous build, rotation and scan scratch."""
     parts = components(marking)
-    reserve = 0
+    reserve = 4096 if "parity_two" in parts else 0
     if "presieve" in parts or "presieve_powers" in parts:
         reserve += 32768 + 8 * width * (160 + (count + 7) // 8)
     if "presieve_powers" in parts:
@@ -48,6 +55,37 @@ def workspace(marking, width, count):
     if "scan_fused" in parts:
         reserve += 32768 + 8 * width
     return reserve
+
+
+def parity_two_initial(collector, maximum):
+    """Return certified universal 2-power levels, score and recovery bit.
+
+    Periodic initializers already supply these levels and keep their own
+    exact path. A sparse-queue slice may have removed 2 from this root view.
+    No higher roots or conservative overmarks are replaced by this helper.
+    """
+    cfg = collector.config
+    roots = collector._roots
+    if (
+        cfg.score_backend != "list"
+        or cfg.score_policy not in ("powers", "fixed")
+        or cfg.small_prime_cutoff > 2
+        or collector._presieve is not None
+        or not roots
+        or roots[0].prime != 2
+        or not roots[0].all_positions
+    ):
+        return 0, 0, 0
+    polynomial = collector.polynomial
+    collector.budget.consume(polynomial.n_prime.bit_length() + 1)
+    if polynomial.a % 4 != 2 or polynomial.b % 2 != 1:
+        return 0, 0, 0
+    residue = polynomial.n_prime % 8
+    if residue not in (1, 5):
+        return 0, 0, 0
+    levels = min(2 if residue == 1 else 1, max(0, maximum.bit_length() - 1))
+    bit = int(levels > 0 and cfg.division == "bucket")
+    return levels, levels * collector._logs[0], bit
 
 
 class Presieve:

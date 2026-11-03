@@ -1,0 +1,15 @@
+{
+  "allowed_phase": "primary",
+  "files": {
+    "v2/benchmarks/qs/c10a01/execute_v4.py": "c60122c9141790896a6e03dd2f5a1e5d2192c46525ea3a58d07681fdfba0355c",
+    "v2/benchmarks/qs/c10a01/execute_v4_stage.py": "1ccfffe291fe366007f35797f643163c864d9c0f9d97c9a5f09f843583702b2b",
+    "v2/tests/test_c10a01_execute_v4.py": "5559c08a87f24d9b66454a703e03c4c608db89a44d6b25d535474abb4d2f9000"
+  },
+  "identity": "c10a01-primary-execution-v4-2",
+  "measurement_calls": 16,
+  "output_limit_bytes": 67108864,
+  "plan_sha256": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
+  "runtime_binary_sha256": "3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2",
+  "runtime_version": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]",
+  "source_commit": "ebc5606463f19ab57076048280336761eab3deac"
+}

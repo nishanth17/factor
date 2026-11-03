@@ -1,0 +1,23 @@
+{
+  "allowed_phase": "primary",
+  "combined_study_ceiling_seconds": 42480,
+  "files": {
+    "v2/benchmarks/qs/c10a01/execute_v4.py": "db2b7baabf456fe37f2332aa324fa948dbf0d34b15291c8b721cabbbf91f93e9",
+    "v2/benchmarks/qs/c10a01/execute_v4_stage.py": "fdab218dddc95e5d0bb0b9322d6eb65d57502cabe97dcfd978829ceb38131eff",
+    "v2/benchmarks/qs/c10a01/execution_v4_r2.md": "d74aad40fd8c7a45c363d1853fcf8e529f2e0f1a23fe456aba79dff5d82382ba",
+    "v2/tests/test_c10a01_execute_v4.py": "9d556db1dd9a4fb9dfa30f0bf881bc4656d7d80fc5f1f60b95b0a20b9f9c28a9"
+  },
+  "identity": "c10a01-primary-execution-v4-r2b",
+  "measurement_calls": 16,
+  "phase_ceiling_seconds": 3400,
+  "plan_sha256": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
+  "prior_failed_release_charged_seconds": 180,
+  "prior_receipts": {
+    "ledger.json": "69bbfc64267fd7a846f42128876661097cb4e45a3d1092d87633e52b32b1854b",
+    "primary-60-balanced-control.json": "f6ce68b5e080499dd87438f5852efcce12077e0cdc3198739e8bed1dc76f07c9",
+    "primary-60-balanced-full.json": "f4c6f748c7a3e8add86609168a9cba0a2e7ab6e8060f853891c401a77f9e1d5a"
+  },
+  "runtime_binary_sha256": "3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2",
+  "runtime_version": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]",
+  "source_commit": "f9095f7aa6e37bce640279c6f1d57a7f85c30044"
+}

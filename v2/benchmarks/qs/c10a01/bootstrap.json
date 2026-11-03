@@ -1,0 +1,30 @@
+{
+  "identity": "c10a01-bootstrap-v1",
+  "base": "4a946b8d6294d51ac5d9c36f61880cc63d5b59fd",
+  "rate_units_per_cpu_second": 2000000000,
+  "headroom_factor": 4,
+  "setup_atomic_allowance": 10000000000,
+  "prefix": {
+    "60": {"calls": 4, "seconds": 30, "work": 250000000000},
+    "62": {"calls": 4, "seconds": 45, "work": 370000000000},
+    "65": {"calls": 4, "seconds": 60, "work": 490000000000},
+    "70": {"calls": 4, "seconds": 90, "work": 730000000000}
+  },
+  "diagnostics": {
+    "observer": {"calls": 18, "seconds": 15, "work": 130000000000},
+    "forced": {"calls": 4, "seconds": 45, "work": 370000000000},
+    "memory": {"calls": 2, "seconds": 45, "work": 370000000000}
+  },
+  "limits": {
+    "total": {"wall": 3600, "cpu": 3600, "work": 20520000000000},
+    "prefix": {"wall": 980, "cpu": 980, "work": 7360000000000},
+    "observer": {"wall": 360, "cpu": 360, "work": 2340000000000},
+    "forced": {"wall": 200, "cpu": 200, "work": 1480000000000},
+    "memory": {"wall": 100, "cpu": 100, "work": 740000000000},
+    "warmup": {"wall": 900, "cpu": 900, "work": 7500000000000},
+    "generation": {"wall": 600, "cpu": 600, "work": 100000000000},
+    "analysis": {"wall": 120, "cpu": 120, "work": 1000000000000},
+    "orchestration": {"wall": 340, "cpu": 340, "work": 0},
+    "disk_bytes": 536870912
+  }
+}

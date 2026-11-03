@@ -35,6 +35,11 @@ class C10DefaultTests(unittest.TestCase):
             with self.subTest(digits=digits):
                 selected = asdict(default_siqs_config(number))
                 self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(selected.pop("polynomial_policy"), "standard")
+                self.assertEqual(selected.pop("multiplier_policy"), "standard")
+                self.assertEqual(
+                    selected.pop("root_update_policy"), "standard"
+                )
                 self.assertEqual(
                     selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
                 )

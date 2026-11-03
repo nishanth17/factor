@@ -22,6 +22,17 @@ class PreparedArmTests(unittest.TestCase):
             configs = a7_r5.serial_configurations(band, plan=plan)
             for mode, label in selected["selected"].items():
                 values = asdict(configs[mode])
+                if "polynomial_policy" in values:
+                    self.assertEqual(
+                        values.pop("polynomial_policy"), "standard"
+                    )
+                    self.assertEqual(
+                        values.pop("multiplier_policy"), "standard"
+                    )
+                if "root_update_policy" in values:
+                    self.assertEqual(
+                        values.pop("root_update_policy"), "standard"
+                    )
                 if "solve_policy" in values:
                     self.assertEqual(values.pop("solve_policy"), "window")
                 self.assertEqual(

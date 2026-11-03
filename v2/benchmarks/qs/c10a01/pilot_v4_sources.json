@@ -1,0 +1,14 @@
+{
+  "files": {
+    "v2/benchmarks/qs/c10a01/control_v4.py": "9db54a1ad3d80c6cd6c50ea33b57549acba75df939def6d0058529efd9e69026",
+    "v2/benchmarks/qs/c10a01/execute_v4.py": "a16fe5d44544e9dbc362d604ad844347d45dcc364d06b8c45a6b54dd1af742ab",
+    "v2/benchmarks/qs/c10a01/execute_v4_stage.py": "34ea3832b848c9dd4187c31ef1e55c71a45c39ac6596746381061ed8a7662a04",
+    "v2/benchmarks/qs/c10a01/experiment_v4.json": "79c327c28c9e766216ec601b3339acb6c7fa9d4fbed3e682b31125d244060569",
+    "v2/benchmarks/qs/c10a01/nominee_v4.py": "b83ce51001f3c89f3105557322c6212561e5241a97e2462026683f2ef10631c6",
+    "v2/benchmarks/qs/c10a01/pilots_v4.py": "9eb7e4b6b8d1e557c0adf3ed9d4bb0b56c842f12eac9662415b3eb1c80e5c12e"
+  },
+  "identity": "c10a01-v4-pilot-release-2",
+  "nominee_sha256": "93c2d3da4eaa5a9c76b506162327a200c4b915a0a3ad3bbbde83d0de95c328ec",
+  "runtime_binary_sha256": "3c45fc49fa01571d19bac1594495d7300c30589c79c0cad2c5bee8d59f9e5ef2",
+  "runtime_version": "3.11.15 (194f9f44b505, Aug 22 2026, 08:59:40)\n[PyPy 7.3.23 with GCC Apple LLVM 21.0.0 (clang-2100.1.1.101)]"
+}

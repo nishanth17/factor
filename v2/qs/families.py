@@ -229,8 +229,16 @@ class PolynomialFamily:
         *,
         budget=None,
         memory_bytes=DEFAULT_MEMORY_BYTES,
+        parity=False,
+        root_update_policy="standard",
+        root_update_limit=None,
     ):
         """Reserve root/CRT state, then cache exact modular inverses."""
+        if type(parity) is not bool:
+            raise TypeError("family parity policy must be Boolean")
+        if parity and base.n_prime % 4 != 1:
+            raise ValueError("parity family requires D=1 mod 4")
+        self.parity = parity
         if not isinstance(a_primes, tuple):
             raise TypeError("A primes must be an immutable tuple")
         if not 1 <= len(a_primes) <= MAX_A_FACTORS:
@@ -245,6 +253,10 @@ class PolynomialFamily:
             raise ValueError("A primes must be nonsingular base members")
         utils.require_integer(memory_bytes, "memory_bytes", 0)
         a = arithmetic.backend_for(base.n).integer(prod(a_primes))
+        if parity:
+            # CRT terms modulo 2a are even. Adding odd a to the initial
+            # sum chooses the unique odd lift for every sign combination.
+            a *= 2
         reserve = base.workspace_bytes + 32768 + 640 * len(base.entries)
         reserve += 512 * len(a_primes) + 16 * (
             a.bit_length() + base.n.bit_length()
@@ -283,10 +295,42 @@ class PolynomialFamily:
         self.terms, self.inverses = tuple(terms), tuple(inverses)
         self.base_identity = _identity(base)
         self.identity = _checksum(
-            [self.base_identity, a_primes, "center-zero-v1"]
+            [
+                self.base_identity,
+                a_primes,
+                "center-zero-parity2-v1" if parity else "center-zero-v1",
+            ]
         )
         self.count = 1 << (len(a_primes) - 1)
         self.next_index, self.current = 0, None
+        self.root_update_policy = "standard"
+        self.root_update_limit = self.count
+        self.root_updates = ()
+        self._configure_root_updates(root_update_policy, root_update_limit)
+
+    def _configure_root_updates(self, policy, limit):
+        """Publish a complete derived table only before family traversal."""
+        from .root_updates import build_root_updates
+
+        if self.next_index or self.root_update_policy != "standard":
+            raise ValueError("root policy must be set before family traversal")
+        limit = self.count if limit is None else limit
+        if policy == "standard" and limit != self.count:
+            raise ValueError("standard root policy uses the whole family")
+        table, extra = build_root_updates(self, policy, limit)
+        self.root_updates = table
+        self.root_update_policy, self.root_update_limit = policy, limit
+        self.workspace_bytes += extra
+        if policy != "standard":
+            self.identity = _checksum(
+                [
+                    self.identity,
+                    "root-updates-v1",
+                    arithmetic.backend_for(self.base.n).identity,
+                    policy,
+                    limit,
+                ]
+            )
 
     def _make_step(self, index, previous):
         """Construct privately before publishing complete roots."""
@@ -294,10 +338,14 @@ class PolynomialFamily:
             (len(self.base.entries) + len(self.terms) + 1)
             * (self.a.bit_length() + self.base.n.bit_length() + 1)
         )
+        if not 0 <= index < self.root_update_limit:
+            raise ValueError("Gray index exceeds the root-update prefix")
         gray = index ^ (index >> 1)
         changed = None
         if previous is None:
             raw = self.terms[0]
+            if self.parity:
+                raw += self.a // 2
             for bit, term in enumerate(self.terms[1:]):
                 raw += -term if gray & (1 << bit) else term
         else:
@@ -313,6 +361,9 @@ class PolynomialFamily:
         # Use the centered B difference, including any reduction modulo A,
         # so cached roots shift by exactly -delta/A at nonsingular primes.
         delta = 0 if previous is None else b - previous.polynomial.b
+        wrap = (
+            (raw - b) // self.a if self.root_update_policy != "standard" else 0
+        )
         roots = []
 
         for offset, (entry, inverse) in enumerate(
@@ -323,6 +374,17 @@ class PolynomialFamily:
                     polynomial_roots(
                         polynomial, self.base, entry, budget=self.budget
                     )
+                )
+                continue
+
+            if previous is not None and self.root_update_policy != "standard":
+                shift = old_sign * self.root_updates[bit][offset] + wrap
+                residues = tuple(
+                    (root + shift) % entry.prime
+                    for root in previous.roots[offset].roots
+                )
+                roots.append(
+                    PolynomialRoots(entry.prime, tuple(sorted(residues)))
                 )
                 continue
 
@@ -349,7 +411,7 @@ class PolynomialFamily:
         Budget refusal retains the first unpublished index and prior root
         state. Retrying charges repeated private work under the same allowance.
         """
-        if self.next_index == self.count:
+        if self.next_index == self.root_update_limit:
             return None
         step = self._make_step(self.next_index, self.current)
         self.current = step
@@ -363,7 +425,7 @@ class PolynomialFamily:
         Retain consumed work/time when creating a resume Budget.
         """
         payload = {
-            "version": FAMILY_CHECKPOINT_VERSION,
+            "version": 3 if self.parity else FAMILY_CHECKPOINT_VERSION,
             "backend": arithmetic.backend_for(self.base.n).identity,
             "base_identity": self.base_identity,
             "a_primes": list(self.a_primes),
@@ -374,6 +436,12 @@ class PolynomialFamily:
                 "cpu_used": self.budget.cpu_used,
             },
         }
+        if self.parity:
+            payload["parity"] = True
+        if self.root_update_policy != "standard":
+            payload["version"] = 4
+            payload["root_update_policy"] = self.root_update_policy
+            payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
         if (
             len(json.dumps(payload, default=arithmetic.json_integer).encode())
@@ -399,7 +467,12 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint envelope")
 
         payload = checkpoint["payload"]
-        if not isinstance(payload, dict) or set(payload) - {"backend"} != {
+        if not isinstance(payload, dict) or set(payload) - {
+            "backend",
+            "parity",
+            "root_update_policy",
+            "root_update_limit",
+        } != {
             "version",
             "base_identity",
             "a_primes",
@@ -409,8 +482,23 @@ class PolynomialFamily:
             raise ValueError("invalid family checkpoint payload")
 
         utils.require_integer(payload["version"], "checkpoint version", 1)
-        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION):
+        if payload["version"] not in (1, FAMILY_CHECKPOINT_VERSION, 3, 4):
             raise ValueError("unsupported family checkpoint version")
+        parity = payload.get("parity", False)
+        if (
+            type(parity) is not bool
+            or (payload["version"] == 3 and parity is not True)
+            or (payload["version"] < 3 and "parity" in payload)
+        ):
+            raise ValueError("family parity policy disagrees with schema")
+        policy = payload.get("root_update_policy", "standard")
+        limit = payload.get("root_update_limit")
+        fields = {"root_update_policy", "root_update_limit"}
+        if (payload["version"] < 4 and fields.intersection(payload)) or (
+            payload["version"] == 4
+            and (not fields.issubset(payload) or policy == "standard")
+        ):
+            raise ValueError("family root policy disagrees with schema")
         if (
             payload.get(
                 "backend", "python-int" if payload["version"] < 2 else None
@@ -465,8 +553,16 @@ class PolynomialFamily:
             raise ValueError("resume budget must retain consumed resources")
 
         family = cls(
-            base, tuple(primes), budget=budget, memory_bytes=memory_bytes
+            base,
+            tuple(primes),
+            budget=budget,
+            memory_bytes=memory_bytes,
+            parity=parity,
+            root_update_policy=policy,
+            root_update_limit=limit,
         )
+        if index > family.root_update_limit:
+            raise ValueError("family cursor exceeds its root-update prefix")
         if index:
             previous = (
                 family._make_step(index - 2, None) if index > 1 else None
