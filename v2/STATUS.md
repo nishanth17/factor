@@ -1,7 +1,7 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `1059215`.
+Reviewed mainline/base: `5dd6a5c`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; implementation remains in the C10a-01 worktree.
@@ -17,12 +17,26 @@ The subsequent QS CFFI/SIMD pass refines B5a with queue-compatible buffers,
 root/mark/scan packets and separate M4 NEON versus x86 AVX dispatch. Local
 review: `v2/audit/research/qs_cffi_simd_20261102.md`.
 
-**Target metric: TBD.**
+**Target: complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
+machine; all cores are available.** Choose worker counts by measured latency
+and aggregate memory, with total CPU reported as a secondary cost.
+
+**Primary workload: uniformly sampled random integers at 60, 80 and 100 decimal
+digits, with equal weight across the three size bands.** Report median and p90
+complete-factorization time and completion rates for each band. Balanced
+semiprime completion at 60 and 70 digits is a must-not-regress constraint.
+
+**Native code is allowed as an optional backend; a working pure-Python/PyPy
+fallback must remain available.** Select one justified implementation per
+task; NumPy and CFFI are alternatives, not mandatory twin developments.
+These are planning and acceptance objectives, not implemented default changes.
+See [metric and resource rules](POLICY.md#scope-and-standing-directions).
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 Full historical results and gates remain in the [history index](history/README.md).
-The current objective includes useful progress toward 60–80-digit factoring;
-practical general completion there remains unestablished.
+Useful progress toward 60–80-digit factoring remains the immediate focus;
+100 digits is also a measurement target, with completion feasibility still
+unestablished. Existing experiments retain their frozen scopes and budgets.
 
 ## Current automatic defaults
 
@@ -98,30 +112,36 @@ experimental result. No other sessions were contacted.
 ## Next eligible items
 
 Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
-for the current cross-engine ordering and its workload/uncertainty assumptions.
+for the ordering under the wall-time objective and declared workloads above.
 Task rows retain exact scope, dependencies and fixed-session model assignments.
 
 1. **C3a/C11 current portfolio/ECM cost-yield and missing-policy screen — Sol / xhigh.**
    Start from completed C3 and existing deeper presets; select a concrete
-   60–99-digit opportunity, completed-search credit or handoff delta.
+   60–100-digit opportunity, completed-search credit or handoff delta.
 2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
    Prepare stable RNG/lease/restart contracts. Isolated ECM feasibility does
-   not wait for E1; later combined acceptance retains it.
-3. **C9a combined useful-yield candidate — Astra / xhigh.**
-   Still the first QS task. Rank wider intake/endpoints against the current
-   collection cost; use late-run replays for cycle/storage/cadence hypotheses.
-4. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
+   not wait for E1; measure 1/2/4 workers before wider M4 occupancy.
+3. **A7a current-collector parallel QS collection — Sol / xhigh.**
+   Reuse A7 workers, adapting growing-DLP and current collector identities
+   before measuring 1/2/4-worker complete factoring at 60/70 digits. Existing
+   workers reject growing DLP and cap windows below the calibrated serial
+   width. Family-sharing alternatives are a later measured subquestion.
+4. **C9a combined useful-yield candidate — Astra / xhigh.**
+   Ranked next after parallel collection; research need not wait for a worker
+   result. Rank intake/endpoints against current collection cost; use late-run
+   replays for cycle/storage/cadence hypotheses.
+5. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
    Price complete setup/conversion/recovery and scalar execution before SIMD
    or new reducers. A CFFI wrapper alone is no measured gain.
-5. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
+6. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
    are polynomial-local; amortize prime/root traversal across a funded Gray
    batch, retaining exact coverage and charging unused preparation.
-6. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
+7. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
    continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
    neither deeper-bound savings nor a polynomial/backend crossover is measured.
-7. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Compare PyPy, optional NumPy and
-   CFFI scan/root/mark packets with queue-compatible buffers and exact hit/score
-   costs. M4 NEON and optional x86 AVX ports are separate targets.
+8. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Select a PyPy, NumPy or CFFI
+   scan/root/mark packet with queue-compatible buffers and exact hit/score
+   costs; retain the Python fallback. M4 NEON and x86 AVX are separate targets.
    M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
 
 The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these

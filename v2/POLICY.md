@@ -8,23 +8,51 @@ preserved in the [history index](history/README.md); they are not rewritten.
 ## Scope and standing directions
 
 Work in `v2/`; preserve `v1/` and historical captures as provenance. Use PyPy
-implementing Python 3.11 only. Keep factoring algorithms in Python, exact
-integer arithmetic, integer roots and checked inversion. Native integers and
-optional gmpy2 are separate tracks. Keep canonical results and backend-bound
-checked checkpoints. Missing GMP is an explicit error, never a CPython fallback.
+implementing Python 3.11 only, with exact integer arithmetic, integer roots
+and checked inversion. Optional native kernels/backends are allowed; retain
+a working pure-Python implementation on PyPy. Python integers, gmpy2 and fused
+native kernels remain distinct measured configurations. Keep canonical results
+and backend-bound checked checkpoints. An explicit unavailable backend request
+is an error, never a silent backend substitution or CPython fallback.
 
-The recorded objective is general factoring below 100 decimal digits on the
-Apple M4 / 24 GiB / 10-core machine. The 1 November priority keeps useful
-progress toward 60–80 digits central. A single 50-digit cohort is not the
-objective. The target metric remains TBD in STATUS.md.
+The objective is minimum complete-factorization wall time on the Apple M4 /
+24 GiB / 10-core machine, with all cores available. Select useful concurrency
+from measurements; using every core is permitted, not a requirement when
+coordination, heterogeneous cores or memory pressure makes fewer faster.
+Aggregate CPU time, peak memory and startup/cancellation waste are secondary
+costs and finite resource constraints. Increased CPU consumption does not by
+itself invalidate a confirmed wall-time gain.
 
-The workload distribution is also undeclared. Report ordinary integers,
-trial-sifted survivors, uneven smaller-factor strata, recursive composites and
-balanced hard inputs separately, including preprocessing exits and conditional
-ECM entrants. Do not optimize an assumed random-integer average and present it
-as a universal below-100-digit result. Weighting scenarios must be explicit.
-The roadmap's ranked queue expresses expected benefit per effort, with
-class-specific uncertainty; it is not a list of measured speedups.
+The primary workload is uniformly sampled integers in each exact decimal-size
+band: 60, 80 and 100 digits, with equal weight (one third each) across bands.
+Do not condition this population on compositeness, parity, trial survival or
+known factor size. Include prime and preprocessing exits with the same result
+certainty contract in every arm. Freeze corpora and seeds before measurement;
+publish per-band median and p90 time to complete factorization and completion
+rates. Report equal-weight summaries without hiding a band behind easy inputs
+from another. Repeated seeds do not supply independent moduli or reliable
+tail estimates by themselves; size the fresh input cohort for p90 uncertainty.
+
+Balanced-semiprime completion at 60 and 70 digits is a must-not-regress
+constraint under matched declared grants. No completion-loss allowance from
+the general promotion policy overrides this constraint. Prespecify its paired
+completion/uncertainty decision and report balanced latency as well. Missing
+or inconclusive guardrail evidence cannot be described as a passed guardrail;
+retain the baseline or keep an improvement scoped and opt-in until resolved.
+This governs adoption, not admission: a timed-out control does not bar a
+correct, feasible candidate comparison under declared finite grants.
+Near-term useful progress through 60–80 digits remains central; targeting
+100 digits does not establish current feasibility or authorize a large run.
+
+Timeouts and unresolved cofactors are incomplete outcomes, not fast completed
+calls. Include them in completion denominators and retain their charges.
+Use a prespecified censoring-aware quantile analysis; if a quantile is not
+identified within the grant, report its bound or that it is unestablished,
+not the median/p90 of successful calls alone. Report trial-sifted survivors,
+uneven smaller-factor strata and recursive composites separately for diagnosis;
+their oversampling must not change the primary random-integer weights.
+The roadmap ranks expected benefit per effort under these choices, not measured
+speedups. Existing historical verdicts and active freezes are unchanged.
 
 For source-derived work, distinguish implemented controls, active worktree
 coverage, retained losses and uncovered deltas. Trace the caller and build
@@ -34,12 +62,13 @@ not supersede exact local invariants or demonstrated counterexamples. Preserve
 read-depth/access limitations in the local source ledger; a downloaded tree
 is not proof of an exhaustive implementation audit.
 
-B4a/B5/B5a may investigate separately selected NumPy, fused native arithmetic
-or C/CFFI bulk-kernel tracks. Keep the default algorithms in Python on PyPy
-and label accelerated results, dependencies and resources explicitly. A native feasibility result
-neither changes the default implementation rule nor authorizes a wholesale
-rewrite. Kernel and parallel speedups cannot be multiplied into an unmeasured
-whole-factor claim.
+B4a/B5/B5a may select NumPy, fused native arithmetic or C/CFFI bulk kernels.
+Choose one justified implementation with an exact Python fallback; do not
+require parallel NumPy and CFFI projects. Label accelerated results,
+dependencies and resources explicitly. Native code is authorized as an optional
+backend, with production/default promotion subject to the same gates; a
+feasibility result does not adopt it or authorize a wholesale rewrite. Kernel
+and parallel speedups cannot be multiplied into an unmeasured whole-factor claim.
 
 E1 combined confirmation is deferred. GNFS stays deferred
 until H1 and a subsequent coverage review activate A9. Individual accepted
@@ -55,10 +84,16 @@ separately recorded exception. Record every unmet gate and limitation.
 - **Phase exit:** the condition for moving the dependent production work into the next phase. Independent research spikes may proceed once their stated prerequisites exist.
 - **Evidence:** store the implementation commit, command, corpus identifier, seeds, environment, raw results, and decision in a separate artifact for each task. Preserve the original audit JSON as historical evidence.
 
-**Performance promotion policy for Phases 3–8 — revised 9 October 2026:**
+**Performance promotion policy for Phases 3–8 — revised 9 October 2026;
+wall-time objective and balanced guardrail clarified 2 November 2026:**
 require zero correctness failures and the same finite work, wall/CPU time,
-memory and storage limits. A repeatable reduction in complete-run median time
-or increase in completion within budget can qualify at any percentage.
+memory and storage ceilings within a matched comparison. For latency studies,
+freeze a machine-wide aggregate CPU allowance appropriate to the permitted
+concurrency and available cores; both arms receive that allowance even if a
+serial arm cannot consume it before the wall deadline. CPU consumption need
+not be equal. Compare equal-CPU efficiency separately when making that claim.
+A repeatable reduction in complete-run wall-time median/p90 or increase in
+completion within budget can qualify at any percentage.
 Confirm the effect on fresh held-out inputs with repeated seeds, stable
 samples and a prespecified uncertainty analysis, normally a 95% confidence
 interval supporting a positive improvement. Account for run-to-run noise,
@@ -66,8 +101,9 @@ measurement order and drift; a positive point estimate alone is insufficient.
 Include setup, conversion, timeout, recovery and output-validation costs.
 
 Report absolute and relative benefits, per-class time/completion results and
-uncertainty. Allow no more than a 5-percentage-point completion regression in
-another declared class; explain any time, completion or resource regression
+uncertainty. Outside the protected 60/70-digit balanced-semiprime classes,
+allow no more than a 5-percentage-point completion regression in another
+declared class; explain any time, completion or resource regression
 and narrow the promoted scope where warranted. Weigh the confirmed benefit
 against implementation complexity, maintenance and arithmetic/resume risk.
 Small, simple improvements can be worthwhile; more invasive changes need a
@@ -101,8 +137,8 @@ The plan includes two kinds of edge:
   before spending on a more expensive challenger. These are labeled in the
   reason column; they are not mathematical necessities.
 
-E1's deferral does not bar justified isolated ECM, native-boundary,
-preprocessing/classification, rho, continuation, context or worker feasibility
+E1's deferral does not bar justified isolated ECM, current-collector QS workers,
+native boundaries, preprocessing/classification, rho, continuation or context work
 under current committed controls. Those components require their selected
 exactness, ownership and measurement contracts; later integrated portfolio
 tuning retains D7 and combined acceptance retains E1.
@@ -179,7 +215,7 @@ a named unresolved invariant or derivation, not elapsed time or source volume.
 
 | Lane | Scope and collision rule |
 | --- | --- |
-| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. C10a/C9a/A1a/A1c own their stated scopes; preserve the active C10a-01 freeze. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector edits. |
+| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. A7a owns adapting existing workers to that collector; C10a/C9a/A1a/A1c retain their scopes. Preserve the active C10a-01 freeze. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector, relation and checkpoint edits. |
 | Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected C9a compact-record implementation may satisfy its B7 contract within the same workstream. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
 | ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm/core.py` and `execution/stage_jobs.py` integration. |
 | Schedules/continuations | P5.2/P5.3 and p+1 coordinate `execution/schedules.py`, stage jobs, backend boundaries and checkpoint versions. |
@@ -200,7 +236,7 @@ eligible row at once. Current allocation belongs in STATUS.md.
    smaller-factor bands and smooth/close/power controls. Feasibility probes
    choose finite allowances before fresh confirmation; they are not held-out
    performance evidence. Do not substitute a single 50-digit target for the
-   general below-100-digit objective.
+   primary 60/80/100-digit workload or its 60/70-digit balanced guardrail.
 2. **Require exact outputs and finite resources.** Preserve proper divisors,
    complete reconstruction including unresolved cofactors, certainty labels,
    nonunit recovery, cumulative work/time/storage and checked resume. Add
@@ -216,8 +252,10 @@ eligible row at once. Current allocation belongs in STATUS.md.
    failures and a repeatable complete-run time or completion improvement
    supported by fresh confirmation and uncertainty beyond measurement noise.
    There is no universal minimum percentage gain. Keep the same finite
-   resource limits, report per-class regressions, retain the 5-percentage-point
-   completion-regression ceiling and weigh benefit against maintenance/risk.
+   resource ceilings and the declared parallel CPU allowance; report per-class
+   regressions, preserve the 60/70 balanced completion guardrail and the
+   5-percentage-point ceiling for other classes, and weigh benefit against
+   maintenance/risk.
    Faster refusal, microkernel throughput, extra rows and synthetic matrix
    capacity alone do not establish a factoring win.
 5. **Run relevant checks.** Implementation changes use `make -C v2 test` and
