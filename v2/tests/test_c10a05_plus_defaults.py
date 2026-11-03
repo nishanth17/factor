@@ -9,6 +9,7 @@ from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES, default_siqs_budget
+from v2.tests.qs_default_controls import previous_siqs_config
 
 ROOT = Path(__file__).resolve().parents[2]
 NUMBER_51 = 10**50 + 123
@@ -25,8 +26,13 @@ class LargerBandDefaultTests(unittest.TestCase):
         expected = control["configurations"]["collection"]
         for number in (10**50, NUMBER_51, 10**51 - 1):
             for signed in (number, -number):
-                selected = asdict(default_siqs_config(signed))
+                selected = asdict(previous_siqs_config(signed))
                 self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(selected.pop("polynomial_policy"), "standard")
+                self.assertEqual(selected.pop("multiplier_policy"), "standard")
+                self.assertEqual(
+                    selected.pop("root_update_policy"), "standard"
+                )
                 self.assertEqual(
                     selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
                 )
@@ -44,7 +50,7 @@ class LargerBandDefaultTests(unittest.TestCase):
         self.assertEqual(default_siqs_budget(NUMBER_51).work_limit, 10**13)
         self.assertEqual(default_siqs_budget(NUMBER_51).seconds, 1200)
         self.assertEqual(
-            default_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
+            previous_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
         )
         self.assertEqual(
             default_siqs_config(NUMBER_51, backend="gmpy2-mpz").solve_policy,

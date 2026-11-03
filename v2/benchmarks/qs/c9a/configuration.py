@@ -9,7 +9,7 @@ from ....qs import (
     SIQSConfig,
     YieldSieveConfig,
 )
-from ....qs.defaults import default_siqs_config
+from .control import control_modules
 
 BASE_COMMIT = "b0813230a05396874c41c649fa01738484a1f55e"
 IDENTITY = "c9a-full-yield-v2"
@@ -89,7 +89,20 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
     if digits <= 60 or digits == 61:
         # The exact 1 GiB factory input selects marking, plan and pacing.
         # Subtracting helpers before this call would silently change C0.
-        config = default_siqs_config(10 ** (digits - 1), memory_bytes=owned)
+        # Historical v2/v3/v4 cells bind the immutable factory. A current
+        # mainline comparison supplies explicit incumbents to the separate
+        # integration builder; it must not silently rewrite these controls.
+        from .... import qs
+
+        control, _ = control_modules()
+        config = decode(
+            asdict(
+                control.default_siqs_config(
+                    10 ** (digits - 1), memory_bytes=owned
+                )
+            ),
+            qs,
+        )
     else:
         values = dict(
             base_bound=250000
@@ -190,4 +203,15 @@ def decode(values, qs):
     )
     values["collector"] = getattr(qs, name)(**collector)
     cls = qs.CountedSIQSConfig if "base_count" in values else qs.SIQSConfig
+    for key in (
+        "polynomial_policy",
+        "multiplier_policy",
+        "root_update_policy",
+    ):
+        if key in values and key not in cls.__dataclass_fields__:
+            if values[key] != "standard":
+                raise ValueError(
+                    "target runtime cannot implement coupled policy " + key
+                )
+            values.pop(key)
     return cls(**values)

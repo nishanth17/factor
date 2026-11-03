@@ -23,6 +23,7 @@ from v2.qs.defaults import (
     C10_POWER_PLAN_BYTES,
     uses_c9_defaults,
 )
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_siqs_cli import cli
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,8 +40,11 @@ class C9DefaultTests(unittest.TestCase):
         accepted = json.loads(path.read_text())["configurations"]["50"][
             "challenger"
         ]
-        selected = asdict(default_siqs_config(NUMBER))
+        selected = asdict(previous_siqs_config(NUMBER))
         self.assertEqual(selected.pop("sign_policy"), "swap_high")
+        self.assertEqual(selected.pop("polynomial_policy"), "standard")
+        self.assertEqual(selected.pop("multiplier_policy"), "standard")
+        self.assertEqual(selected.pop("root_update_policy"), "standard")
         self.assertEqual(
             selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
         )

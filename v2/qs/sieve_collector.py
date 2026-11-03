@@ -891,10 +891,23 @@ class SieveCollector:
         width = hi - lo
         self._omitted_allowance = 0
         self.budget.consume(width)
+        two_levels, initial_score, initial_hit = 0, 0, 0
+        parity_two = "parity_two" in self.config._kernels
+        if parity_two:
+            lower, maximum = self._bounds(lo, hi)
+            two_levels, initial_score, initial_hit = (
+                kernels.parity_two_initial(self, maximum)
+            )
         for index in range(width):
-            self._scores[index] = 0
-            self._hits[index] = 0
-        lower, maximum = self._bounds(lo, hi)
+            self._scores[index] = initial_score
+            self._hits[index] = initial_hit
+        if not parity_two:
+            lower, maximum = self._bounds(lo, hi)
+        if two_levels:
+            stats["parity_two_blocks"] = stats.get("parity_two_blocks", 0) + 1
+            stats["parity_two_seeded_hits"] = (
+                stats.get("parity_two_seeded_hits", 0) + two_levels * width
+            )
         lower_threshold = max(0, lower.bit_length() - 1)
         lower_threshold -= (self._candidate_bound - 1).bit_length()
         if (
@@ -963,6 +976,22 @@ class SieveCollector:
                     )
 
                     for modulus, lifted, power_weight in marks:
+                        if (
+                            index == 0
+                            and two_levels
+                            and power_weight == weight
+                            and modulus in (2, 4)
+                            and modulus <= (1 << two_levels)
+                        ):
+                            # Universal normal levels were fused into buffer
+                            # initialization. Keep semantic hit counters; never
+                            # skip a later conservative singular overmark.
+                            self.budget.consume(1)
+                            if first_level:
+                                stats["root_hits"] += width
+                            stats["power_hits"] += width
+                            first_level = False
+                            continue
                         for root in lifted:
                             if (first_level and index in presieved) or (
                                 power_period

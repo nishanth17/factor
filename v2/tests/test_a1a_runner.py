@@ -16,6 +16,7 @@ from v2.benchmarks.qs.c10a04.accounting import Ledger
 from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_siqs_cli import cli
 
@@ -61,6 +62,9 @@ class FrozenRunnerTests(unittest.TestCase):
                 10 ** (digits - 1), "selected", self.control
             )
             values = asdict(new)
+            self.assertEqual(values.pop("polynomial_policy"), "standard")
+            self.assertEqual(values.pop("multiplier_policy"), "standard")
+            self.assertEqual(values.pop("root_update_policy"), "standard")
             self.assertEqual(values.pop("sign_policy"), "swap_high")
             self.assertEqual(
                 values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
@@ -83,7 +87,9 @@ class FrozenRunnerTests(unittest.TestCase):
         previous, divisor = configuration.resolve(n, 55, "compact", budget)
         self.assertIsNone(divisor)
         prior_work = budget.used
-        job = SIQSJob(n, budget=unlimited_budget())
+        job = SIQSJob(
+            n, config=previous_siqs_config(n), budget=unlimited_budget()
+        )
         job._setup()
         self.assertEqual(len(job.base.entries), 2500)
         self.assertEqual(job.base.bound, previous.base_bound)

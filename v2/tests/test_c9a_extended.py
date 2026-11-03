@@ -1,6 +1,7 @@
 """Independent arithmetic, kernel and fault oracles for the expanded arm."""
 
 import copy
+import hashlib
 import json
 import random
 import tempfile
@@ -14,10 +15,12 @@ from unittest.mock import patch
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
+    CombinedYieldSieveConfig,
     ExtendedYieldSieveConfig,
     SieveCollector,
     SIQSConfig,
     SIQSJob,
+    YieldSieveConfig,
     build_factor_base,
     qs_polynomial,
     verify_atomic,
@@ -607,6 +610,9 @@ class ExpandedResourceTests(unittest.TestCase):
         )
         checkpoint = json.loads(json.dumps(job.checkpoint()))
         self.assertEqual(checkpoint["version"], 13)
+        self.assertNotIn(
+            "polynomial_policy", json.loads(checkpoint["blob"])["config"]
+        )
         restored = SIQSJob.from_checkpoint(
             checkpoint, config=config, budget=allowance()
         )
@@ -626,6 +632,84 @@ class ExpandedResourceTests(unittest.TestCase):
                 ),
                 budget=allowance(),
             )
+
+    def test_coupled_arithmetic_composes_with_each_yield_checkpoint(self):
+        for config_class, version in (
+            (YieldSieveConfig, 11),
+            (CombinedYieldSieveConfig, 12),
+            (ExtendedYieldSieveConfig, 13),
+        ):
+            with self.subTest(schema=version):
+                values = asdict(policy(large_product_bound=10**6))
+                if version == 11:
+                    values.update(
+                        yield_policy="yield-v1",
+                        preparation_policy="target-v1",
+                        cycle_policy="short-v1",
+                        record_policy="packed-v1",
+                    )
+                selected = config_class(
+                    **{
+                        key: value
+                        for key, value in values.items()
+                        if key in config_class.__dataclass_fields__
+                    }
+                )
+                config = SIQSConfig(
+                    base_bound=100,
+                    multiplier=3,
+                    half_width=64,
+                    max_half_width=64,
+                    family_count=2,
+                    pool_size=8,
+                    polynomials_per_family=4,
+                    memory_bytes=128 * 2**20,
+                    polynomial_policy="parity2",
+                    multiplier_policy="parity2_wide",
+                    assignment_policy="windowed_pair",
+                    root_update_policy="batch",
+                    collector=replace(
+                        selected, marking="parity_two", score_policy="powers"
+                    ),
+                )
+                job = SIQSJob(
+                    10007 * 10009, seed=73, config=config, budget=allowance()
+                )
+                job.run(max_blocks=1)
+                checkpoint = job.checkpoint()
+                payload = json.loads(checkpoint["blob"])
+                self.assertEqual(checkpoint["version"], version)
+                self.assertEqual(
+                    payload["coupled_semantics"], "c10a01-coupled-v4"
+                )
+                restored = SIQSJob.from_checkpoint(
+                    checkpoint, budget=allowance()
+                )
+                self.assertEqual(restored.config, config)
+                self.assertEqual(
+                    restored.engine.next_position, job.engine.next_position
+                )
+                original_result = job.run(max_blocks=1)
+                resumed_result = restored.run(max_blocks=1)
+                self.assertEqual(
+                    original_result.divisor, resumed_result.divisor
+                )
+                self.assertEqual(
+                    original_result.next_position, resumed_result.next_position
+                )
+
+                bad = copy.deepcopy(checkpoint)
+                payload.pop("coupled_semantics")
+                bad["blob"] = json.dumps(
+                    payload, sort_keys=True, separators=(",", ":")
+                )
+                bad["sha256"] = hashlib.sha256(
+                    bad["blob"].encode()
+                ).hexdigest()
+                with self.assertRaisesRegex(
+                    ValueError, "coupled policy identity"
+                ):
+                    SIQSJob.from_checkpoint(bad, budget=allowance())
 
     def test_no_production_default_is_replaced(self):
         self.assertNotIn("extension_policy", asdict(SIQSConfig().collector))

@@ -13,6 +13,7 @@ from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import CountedSIQSConfig, SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.count_policy import CountPolicyRefusedError, endpoint_for_count
 from v2.qs.defaults import default_siqs_budget, uses_siqs_defaults
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_siqs_cli import cli
 
 
@@ -50,7 +51,7 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertFalse(uses_siqs_defaults(10**49 - 1))
         self.assertFalse(uses_siqs_defaults(10**60))
         self.assertEqual(
-            default_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
+            previous_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
         )
         self.assertFalse(uses_siqs_defaults(10**59, backend="gmpy2-mpz"))
         n = 10**59 + 123
@@ -63,14 +64,18 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertEqual(limited.collector.power_plan_bytes, 0)
         self.assertEqual(limited.solve_policy, "window")
 
-    def test_resolved_60_digit_bases_match_frozen_measured_bundle(self):
+    def test_explicit_previous_60_digit_bundle_matches_frozen_control(self):
         corpus = json.loads(short_decisions.CORPUS.read_text())
         for fixture in corpus["fixtures"]:
             expected, divisor = configuration.resolve(
                 fixture["n"], 60, "compact", allowance()
             )
             self.assertIsNone(divisor)
-            job = SIQSJob(fixture["n"], budget=allowance())
+            job = SIQSJob(
+                fixture["n"],
+                config=previous_siqs_config(fixture["n"]),
+                budget=allowance(),
+            )
             job.run(max_blocks=1)
             self.assertEqual(len(job.base.entries), 5000)
             self.assertEqual(job.base.bound, expected.base_bound)

@@ -39,7 +39,10 @@ factoring. The unbounded compatibility API remains available. Use bounded
 execution when a call needs shared work/time limits or resumable progress.
 
 See [STATUS.md](STATUS.md) for automatic size/resource routing and its adoption
-limits. Explicit settings and saved configurations take precedence. Experimental
+limits. Fresh automatic SIQS uses the C10a-01 coupled polynomial/multiplier/A/root
+bundle at every size; see the [configuration semantics](qs/CONFIGURATION.md#coupled-polynomial-policies).
+Existing size parameters, finite grants and portfolio routing remain scoped.
+Explicit settings and saved configurations take precedence. Experimental
 methods and adopted defaults retain their recorded evidence limits;
 there is no general digit-based completion guarantee.
 
@@ -143,6 +146,10 @@ Pending solver checkpoints bind whether incremental contractions were used;
 restore reproduces that choice. Panel solver `xors` counts logical reduction
 actions, including one action for a whole panel; table construction and
 primitive work are charged separately to the work budget.
+Yield schemas 11–13 compose with the coupled polynomial policies by binding
+their arithmetic marker and policy fields separately. Earlier yield checkpoints
+retain standard arithmetic. Decoding into a historical runtime permits absent
+standard policy fields and rejects unsupported coupled policies explicitly.
 
 The expanded implementation remains experimental. Its unit tests pass under
 PyPy3.11; committed-only checks and performance runs remain pending. Unit

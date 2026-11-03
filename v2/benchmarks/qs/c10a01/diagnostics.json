@@ -1,0 +1,59 @@
+{
+  "identity": "c10a01-diagnostics-v1",
+  "calibration_source": "b666bde",
+  "forced": [
+    {
+      "id": "residue5-control",
+      "digits": 60,
+      "arm": "control",
+      "multiplier": 5,
+      "polynomials": 768
+    },
+    {
+      "id": "residue5-parity2",
+      "digits": 60,
+      "arm": "parity2",
+      "multiplier": 5,
+      "polynomials": 768
+    },
+    {
+      "id": "even-fallback",
+      "digits": 62,
+      "arm": "parity2",
+      "multiplier": 2,
+      "polynomials": 640
+    },
+    {
+      "id": "eligible70",
+      "digits": 70,
+      "arm": "parity2",
+      "multiplier": 31,
+      "polynomials": 512
+    }
+  ],
+  "memory": [
+    {
+      "id": "matrix60",
+      "digits": 60,
+      "rows": 5000,
+      "columns": 5001,
+      "kind": "sparse35"
+    },
+    {
+      "id": "matrix70",
+      "digits": 70,
+      "rows": 32000,
+      "columns": 10501,
+      "kind": "cycle"
+    }
+  ],
+  "seconds": 45,
+  "margin": 5,
+  "work": 370000000000,
+  "warm_seconds": 35,
+  "warm_work": 290000000000,
+  "selection": "The balanced 70-digit scored arms both choose k=1 and standard fallback. k=31 is the highest parity2-ranked eligible multiplier, selected before complete-factor outcomes. This diagnostic and the planned 70 pilot are forced-policy exploration, not evidence about the scored selector.",
+  "position_calibration": "Observed 128-polynomial controls took 4.84, 5.29, 7.28 seconds at 60, 62, 70. Chosen 768, 640, 512 polynomials target approximately 29, 26, 29 seconds. Changed multiplier/setup may vary; no time extension.",
+  "matrix_scope": "One actual prefix-store preparation per fixture, followed by one synthetic capacity/solver check. Synthetic rows do not predict factoring populations. sparse35 uses seed 2026110201 and 64 known duplicate dependencies; cycle has independently known repeated-cycle dependencies.",
+  "max_receipt_bytes": 2097152
+}

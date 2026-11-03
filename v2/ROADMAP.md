@@ -1,9 +1,9 @@
 # Factor live backlog
 
 Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
-eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 2 November
-2026 against committed mainline `0076e25`, integrating the C10a-01 coverage
-review into existing milestones and the combined C9a scope.
+eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 3 November
+2026 for C10a-01 integration from `d37b809` onto mainline `99a2943`, retaining the QS coverage,
+portfolio and native-boundary reviews and the declared wall-time objective.
 
 Status vocabulary: **Done**, **Open**, **Conditional** (requires its trigger),
 **Deferred**, **Rejected**, **Inconclusive**. Done describes the delivered scope;
@@ -19,19 +19,134 @@ opt-in, and closure are recorded explicitly.
 The 2 November QS coverage review (`4d65d33`, with `1d21bbf` and
 `f306359`) is incorporated into the existing execution and P-phase owners
 below. Detailed source inventories and research remain local; historical
-gates stay pinned in Git. C10a-01 worktree implementation is not mainline
-integration or adoption. This roadmap allocates no new experiments.
+gates stay pinned in Git. C10a-01 is integrated and its selected bundle is
+promoted for every fresh automatic SIQS configuration by explicit user direction
+on 3 November, before fresh confirmation. The [results](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults)
+retain the evidence exceptions. This roadmap allocates no new experiments.
 
-The QS objective is the fastest practical Python implementation under declared
-correctness, runtime and resource conditions, with useful progress through
-60–80 digits. Task rows hold the current scopes, dependencies and model/effort
-recommendations; preparation priority is not evidence of a speedup. The
+The objective is complete-factorization wall time on the M4 using available
+cores: median/p90 on equally weighted random-integer bands at 60, 80 and
+100 digits, with balanced-semiprime completion at 60/70 protected. Native
+backends are allowed with a working Python/PyPy fallback. Useful progress
+through 60–80 digits remains central; feasibility at 100 is unestablished.
+Task rows hold scopes, dependencies and
+model/effort recommendations; preparation priority is not evidence of a speedup. The
 [stable policy](POLICY.md#dependencies-and-priority) defines combined candidates
 and targeted ablations, and its [model key](POLICY.md#model-and-effort-key)
 explains fixed-session assignments.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>
+
+## Ranked next work — expected benefit and cost
+
+This is the authoritative preparation queue as of 2 November under the
+[declared workload and wall-time objective](STATUS.md). C10a-01 keeps its
+existing freeze. The short C3a/C11 screen comes first for broad routing value
+at low initial cost; ECM workers are the next major implementation, followed
+by current-collector QS workers just ahead of QS yield research. Both worker
+paths can prepare independently once their own contracts are settled.
+Ranking weighs reachable latency/completion benefit, workload coverage and
+engineering/measurement cost. These are judgments, **not measured gains**.
+
+| Rank | Existing owner / next deliverable | Perceived benefit and why this position | Confidence / cost and next decision |
+| --- | --- | --- | --- |
+| 1 | **C3a + C11: current portfolio/ECM opportunity screen, then one missing policy delta** | Broad leverage across ordinary, uneven and recursive inputs; excessive ECM also delays hard-tail fallback. Current 60–100-digit routing still uses fixed32, while source-derived deeper presets already exist. Check joint B1/B2/count, completed-work credit and observable-cost handoff before buying new arithmetic. C11 also attributes preprocessing, classification, rho/PM1, polling and setup so the broader queue follows actual complete costs. | High confidence in a coverage gap; medium confidence in a winning policy. Small initial screen, medium implementation. Sol / xhigh; stop or narrow after the cost/yield decision. |
+| 2 | **B12 → F4: opt-in independent ECM curve workers** | Main broad-workload concurrency lever: independent curves can reduce the long ECM portion of random-integer calls. Rank for wall latency while reporting total CPU, startup and cancelled work. | High confidence in parallelizable work, medium in complete-factor benefit; medium ownership/resume cost. Sol / xhigh. Measure 1/2/4 workers, then wider M4 occupancy if funded and useful. |
+| 3 | **A7a: current-collector parallel QS relation collection** | Main concurrency lever for the protected balanced tail, where long collection can amortize process cost. Reuse A7 leases/merge/resume rather than rebuilding workers. Existing workers reject growing DLP and constrain windows, so compatibility with the strongest serial collector comes before scaling claims. | High confidence in parallelizable collection, unmeasured current complete-factor gain; medium/high integration cost. Sol / xhigh. Compare current serial, adapted one-worker and 2/4-worker runs at 60/70; price parent admission, filtering and aggregate memory. |
+| 4 | **C9a: combined useful-yield/intake candidate** | Next QS algorithmic priority. Wider intake/asymmetric endpoints can reduce dominant collection work in both serial and worker execution; cadence, cycles, duplicate handling and compact records are costed enablers. | Medium confidence in benefit; high math/storage cost. Astra / xhigh. Current cost/yield breakdown and late-run replay determine which flags enter the nominee. |
+| 5 | **B4a: fused native ECM chunks through CFFI, optional backend** | Move one bounded existing ladder/verified-program chunk into native code so arithmetic stays behind one call. Current GMP representation still runs operator loops in Python; this is a distinct opportunity from a backend toggle or a per-multiply wrapper. It may also enable native worker threads. | High confidence in the boundary gap, unmeasured local gain; medium engineering/ownership cost. Sol / xhigh with unchanged formulas and existing oracles. First compare scalar native execution including conversion and recovery; SIMD/new reducers require their own evidence. |
+| 6 | **A1d: prime-major multi-polynomial bucket generation** | Concrete new scheduling gap: current queues are polynomial-local; YAFU builds large-prime buckets across a bounded Gray-code polynomial batch. Amortize prime/root traversal while retaining the existing queue and C10a-01 tables. This differs from C8's CRT half-sum search. | High confidence in the code gap, medium in payoff; medium integration/storage cost. Sol / xhigh. Count actual root/prime visits and charge preparation plus consumed polynomials before complete-factor comparison. |
+| 7 | **B3a: selected larger-bound stage-one chain coverage** | A concrete uncovered delta: accepted plans and automatic eligibility stop at B1 = 2,000. Deeper 10,000/11,000/50,000 presets use the ladder. Reusing checked chains may make those bounds economical before a new curve family is needed. | High confidence in the gap, medium in benefit; medium cost if existing verification suffices. Sol / xhigh. Advance only where C3a shows worthwhile larger-bound stage-one cost. |
+| 8 | **F3: exact polynomial ECM stage-two feasibility** | Highest-upside ECM algorithmic research for larger continuation bounds and roughly 20–35-digit factors inside 60–99-digit composites. Product/remainder trees and packed multiplication may change the cost curve; they have no local crossover evidence yet. | Medium opportunity confidence; high implementation/proof cost. Astra / xhigh. Compare complete continuation against the actual classical control; research/prototype need not wait for E1 or a C2 win. |
+| 9 | **A1c, with B5/B5a as separately labeled alternatives: bulk marking/scanning** | Attacks QS hot-loop cost. Test existing PyPy kernels first; a coarse NumPy or C/CFFI scan, root-update or queue/mark packet can quantify the acceleration tradeoff. Preserve accepted queue eligibility and price buffer conversion. Native speedups remain a separate implementation track. | Medium confidence; low initial scan screen, medium integration. Sol / xhigh. Rank the candidate by measured hot-loop share and complete boundary cost, not a speculative 5–20× kernel gain. |
+| 10 | **C2: common-Z/coordinate and selected classical continuation changes** | Smaller experiment than F3; can reduce repeated cross-product work. Current stage two already uses baby/giant steps and inversion-free terms, and earlier pairing losses remain relevant. | Medium confidence in opportunity, lower in a win; medium cost. Astra / xhigh. Keep geometry and coordinate changes separately attributable. |
+| 11 | **F2: complete torsion/curve/formula packages** | Potentially improves success per CPU second through both curve distribution and execution. Suyama already has favorable divisibility; merely selecting a curve with 12-torsion is not a new advantage. | Medium opportunity confidence; high proof and statistical cost. Astra / xhigh. Compare setup, stage one, stage-two maps and success, not multiplication counts alone. |
+| 12 | **F7: SIQS direct/tree smooth-part screening** | Algorithmic leverage if candidate recovery/division materially costs the current larger-base collector. Exact product/remainder primitives may be shared with F3 after domain-specific proofs. | Medium/conditional benefit; high proof/integration cost. Astra / xhigh. The previous narrower-domain loss remains a control. |
+| 13 | **A1a remaining transitions/setup; then A8 → C4/B7/B6/D1/D2** | Reusing trusted metadata can be inexpensive. Matrix/filtering work has strong capacity value but a smaller immediate time ceiling while collection dominates; a demonstrated memory/solve wall moves the matrix branch up. | Setup medium confidence; solver payoff conditional on real fixtures. Sol / xhigh for checked metadata; Astra / xhigh for lifting/filtering/solver proofs. |
+| 14 | **A5 → B8: Williams p+1 and selected starts/chains** | Adds complementary coverage, particularly smooth p+1 factors. Expected broad benefit is less established than improving existing ECM/collection paths. | Medium coverage confidence, low quantified portfolio confidence; medium/high cost. Sol / xhigh binary control, Astra / xhigh new starts/chains. |
+| 15 | **F8: specialized fast P−1/P+1 continuation** | Important distinct polynomial algorithm at large bounds, but improves a narrower smoothness class. Reuse verified kernels where useful; ECM continuation is not its correctness template. | Conditional on measured PM1/PP1 continuation cost; high cost. Astra / xhigh; A5 is required only for PP1. |
+| 16 | **Other triggered deltas: E3/E4/E5/E6, A10a/A2a/C5, C10a-02/-03, C1a/C8, F5/F6/F9** | Select only an uncovered, observed cost/capacity/certainty gap. Rho/PM1 and cheap-path work can matter greatly in their own strata; their current complete-cost share or useful success must justify expansion. Existing losses and C10a-01 overlap argue against blanket sweeps. | Profile/capacity-dependent; task rows retain assignments. C11 reconciles source provenance without turning every reference mechanism into an implementation project. |
+
+Required correctness, accounting and requested-proof work takes precedence over
+this optimization queue: B14 remains High for certified results; C10a-06 and
+any discovered invalid result/charge are repairs. A11a is optional product work.
+E1 stays Deferred; D7/E3/E4/G1/H1/I1 retain their integrated acceptance
+dependencies, and GNFS stays Deferred. Component C3a/A7a/F2/F3/F4 work does
+not silently resume E1.
+
+All M4 cores are available, with 1/2/4-worker screens preceding a justified
+wider configuration. Optimize latency within declared aggregate grants and
+report CPU/memory cost; neither ten workers nor a tenfold gain is assumed.
+Select one justified Python, NumPy or native kernel candidate per task while
+retaining the Python fallback. Refresh this order from current complete-cost
+evidence and the balanced completion guardrail, not hypothetical workload changes.
+
+## Broader portfolio opportunities and relative value
+
+The whole-portfolio review extends the same ranked queue; it does not create a
+second list or resume deferred E1. C11 supplies a small current cost atlas
+before choosing one uncovered implementation. The new B4a is a specific native
+ECM chunk experiment, alongside B5a's QS buffer kernels; accelerated and
+Python-fallback results remain distinct. These constant-factor candidates do
+not replace algorithmic yield, coverage or probability improvements.
+
+| Area | Useful remaining techniques / owner | Expected benefit and limiting evidence |
+| --- | --- | --- |
+| Coarse native arithmetic | B4a: fused ECM ladder/verified-program chunk, persistent native scratch; B5a: QS buffer kernels; F3: exact packed polynomial multiplication | Strong candidate where Python operator/loop cost dominates. CFFI alone provides no gain; per-operation calls, conversion, allocation and recovery can erase it. Native SIMD and fixed-modulus reducers are later selected variants. |
+| Rho | E4: remaining batch/walk/restart/effort calibration and a justified native whole-batch path | Useful for smaller factors and residuals. Brent, batched GCD, finite replay and local loops already exist. Small-factor savings can matter across many ordinary inputs, but rho's square-root-in-factor growth does not make it a balanced 60–80-digit engine. |
+| p−1 / p+1 | C11/G1: marginal effort and handoff; A5/B8: p+1 coverage; F8: specialized high-bound continuation | Property-specific high potential, including large factors with smooth p−1 or p+1. PM1 chunked pow, gap recurrence and bound extension already exist. Repeated bases are correlated; current complete portfolio evidence remains limited. |
+| Trial division, powers and structure | E3: inherited completed-trial coverage, exact power-exponent bounds, valuation-aware removal and selected product-tree/structured-form tests | Broad cheap-path opportunity with modest absolute time on slow QS calls. Restore/lineage proofs matter; prior primorial losses and already implemented modular power screens remain controls. Hart/Lehman/SQUFOF have narrower size/structure domains. |
+| Classification and arithmetic helpers | A10a: proper-factor recovery from MR residues, BPSW rejection or a costed native witness batch; A2a/C5: selected inverse/GCD/quotient/reduction helpers | Primality-heavy children or large packed operands can justify targeted work. GCD already uses native math/GMP; one native pow/GCD wrapper is not a new algorithm. Preserve deterministic bounds, requested rounds, RNG and probable/proven labels. |
+| Polling, allocation and reusable state | E5/E6 with C11: bounded clock/charge fusion, exact recovery trees, compact objects, lazy immutable metadata and warm worker contexts | Cross-cutting only when current costs justify it. Existing C3 clock/reservation repairs and rho batching remain baseline. Charge unused setup, cold/warm differences, retained memory, checkpoints and reconstruction; no blanket validation removal or GC flags. |
+| Parallel and multi-input services | B12/F4: independent curves; A7a: current-collector QS workers; possible native threads after B4a; G1: later mixed-engine racing; E6: amortized contexts | Wall latency is primary; CPU efficiency and throughput remain separate results. Verify GIL/library behavior and private state; preserve aggregate grants/cancellation. Shared-prime batch GCD is a separate multi-input workload. |
+
+The inspected standalone PyPy has CFFI and a discoverable GMP development
+library, but no gmpy2 package in that environment. This is a preflight fact,
+not a compiled-kernel or backend-performance result. No dependency was
+installed. Retain explicit missing-backend errors and current native controls.
+Detailed literature/source provenance remains in the local portfolio review.
+
+## Coverage decisions from the expanded source review
+
+The 2 November review covers both pipelines from setup through exact factor
+extraction, with a local mechanism-by-mechanism ledger against committed code,
+completed losses and C10a-01's delivered scope. It adds A1d and F9 and refines
+existing owners; finding a mechanism in a paper does not make it a new gap.
+The earlier ECM/acceleration changes above are included in this revision.
+No new run, default promotion or C10a-01 freeze change is authorized here.
+
+| Mechanism family | Current disposition / actionable owner |
+| --- | --- |
+| Suyama X:Z, bounded PRAC/program reuse, BSGS, GCD recovery | Already implemented with scoped eligibility; B3a covers selected larger bounds. Reopening optimal-chain search, generic reducers or the stopped backend sweep needs a new cost hypothesis. |
+| Source-derived ECM effort, recursion and workers | Existing presets/C3 evidence are controls; C3a owns missing policy/credit/RNG work and B12/F4 own independent curves. Curve batching, shared inversions and stage-separated packets are optional costed candidates, not presumed wins. |
+| Exact polynomial continuation and specialized P±1 | F3 owns ECM product/remainder/multipoint and backend crossover. F8 owns distinct reciprocal-Laurent/geometric P±1; verified primitives may be shared only with matching domains. |
+| Curve/formula alternatives | F2 includes small-parameter packages, mixed Edwards/Montgomery, Suyama-11 and a screened JKL twisted-Hessian candidate with its actual field/torsion conditions. F9 records separate genus-two/Kummer research at Low/conditional priority. |
+| SIQS CRT/Gray, multiplier/normalization and A population | Baseline CRT/Gray exists; selected normalization, multiplier, reachable-A and modular tables are already C10a-01 work. Broader diversity remains C10a-02; do not duplicate the active implementation. |
+| Polynomial-local queues versus polynomial batching | Existing sparse queue is implemented; new A1d transposes selected prime/polynomial loops. C8 remains the distinct sorted CRT half-sum/hypercube mechanism, conditional on eligible primes. |
+| Powers, presieving, unrolling, root interleaving and scans | Already implemented or tested in scoped forms. A1c/B5/B5a select changed kernels/representations with real cost evidence. Recent four-stride pseudocode is unrolling, not a new asymptotic method. Preserve earlier unroll, presieve and fixed/list losses. |
+| Score width and compact hit layouts | Saturating bytearray/array controls already exist. Queue-compatible packed layouts or native kernels still need a separate exact width/threshold and metadata contract under A1c/B5a/B7. Do not copy wrapping updates or silent bucket overflow from upstream. |
+| Wider intake, endpoint bounds, splitter portfolios and batching | C9a owns useful admission and its explicit splitter certainty. F7 supplies the separately specified residual-batch domain. Existing rho/square splitting is a control; absent current failed splits, micro-ECM/Hart/SQUFOF replacement stays conditional. |
+| Graph growth, shorter cycles, duplicates and compact records | C9a/B7 already own these gaps. Test self-matches versus distinct equal-parity relations, all components and original identities; native hash tags/PRP endpoints do not replace exact validation. |
+| Filtering, packed products and stronger solvers | A8/C4/B7/B6/D1/D2 own fill-aware/MST-style merges, compact lifting, dense-prefix/sparse-tail products, Four Russians and genuine Lanczos/Wiedemann. D2 includes a generator/lingen cost model and later subquadratic alternatives; improving SpMV alone is not a whole solver. |
+| Square-root/extraction work | FLINT's bit-plane/Horner product is a real missing C4 option, currently low until extraction costs enough. Preserve both GCD signs, nonunits and original exponent/correction checks. |
+| SSS, distributed artifacts and accelerator ports | SSS is already implemented; existing benchmark claims need current competitors. A7a/F4/B7 own useful work exchange/records. CUDA code is a design reference; a Metal/GPU port is a separate later backend project after CPU/bulk-boundary evidence. |
+
+Newer sources also strengthen the experiment gates. Short prefixes do not
+estimate mature LP matching or late filtering/storage effects; use retained
+complete streams or a separately authorized full pilot. Charge tuning/setup
+and account for whether reuse can amortize it. Measure dependency usefulness
+and trivial-GCD rates, not only cycle counts. A source's reported SLP failure
+threshold, probability of overflowing a bucket, GPU geometry or matrix cutoff
+is not a project theorem or a default. Our existing smaller-input SLP successes
+already rule out transplanting a blanket no-SLP-below-85-digits claim.
+
+The local audit records exact pins, primary links, inspected functions,
+read-depth/access limits and candidate dispositions. Official GMP-ECM HEAD
+was inaccessible; its pinned mirror is not represented as the official tip.
+The inspected msieve GitHub mirror is historical; retained official-release
+research and current YAFU solver sources provide additional controls. A
+repository inventory or downloaded file is not an audit of every line.
 
 ## Open and conditional execution items
 
@@ -46,17 +161,20 @@ research. The [history index](history/README.md) supplies local research paths.
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
 | A5 — P5.1 Williams p+1 binary baseline | Implement exact binary Lucas stages 1 and 2, bounded parameter trials, discriminant checks, saturation recovery and checkpoints. | Existing P2 bounded recovery | **Open.** Priority / trigger: Medium, complementary coverage. This is independent of SIQS and PRAC. Binary Lucas supplies the correctness control required before optimized Lucas chains or special starts are ranked. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) |
-| A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **Open; High preparation.** Shared foundation for C4/B6/D1/D2, with current solve/filter/extraction costs and capacity observations. Synthetic fixtures establish correctness/capacity only. A capacity case can justify sparse work before solve CPU dominates; unrelated comparison success is unnecessary. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) |
+| A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **Open; High preparation.** Shared foundation for C4/B6/D1/D2, with current solve/filter/extraction costs and capacity observations. Synthetic fixtures establish correctness/capacity only. A capacity case can justify sparse work before solve CPU dominates; unrelated comparison success is unnecessary. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) |
 
 ### Execution phase B — exploit the settled controls
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
-| B5 — P3.7 optional NumPy spike | Compare bounded NumPy score/root-hit updates and extraction with A1c's PyPy list/bytearray/array controls. Verify usable PyPy support, exact overflow/duplicate accumulation and full conversion/import costs; native SIMD or GPU lanes remain separate backend tracks. | A1 and a measured remaining array bottleneck; coordinate bulk kernels with A1c | **Conditional.** Preserve dependency-free controls and prior losses; no NumPy requirement for Phase 3 exit. | Sol / **xhigh**; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
+| B3a — P4.1 larger-bound reuse of checked ECM chains | Extend existing verified plan/executor machinery only to selected useful bounds beyond B1 = 2,000. Compare streamed/ladder, fresh and reused plans with setup amortization, prime-power/frontier validation, strict saturation recovery, finite cache ownership and resume identities. This is a follow-up; completed B3/C6 decisions stay closed. | C3a/C11 establish material stage-one cost at a worthwhile larger bound; existing B3/C6 oracles | **Conditional; high-value opportunity check.** Larger bounds currently fall back to the ladder. Do not run a universal optimal-chain search or automatically enlarge catalogues; unchanged arithmetic and checked generation are the first candidate. | Sol / **xhigh** existing verified machinery; Astra / **xhigh** only for separately selected new chain mathematics; optional separate Sol / **high** frozen execution | [current ECM gates](#ecm-opportunity-and-continuation-gates) |
+| B4a — P4.2 fused native ECM chunk boundary | Design one opt-in out-of-line CFFI executor for an unchanged bounded ECM ladder or verified-program chunk, using persistent private native/GMP scratch and canonical boundary state. Compare native-int PyPy with a scalar compiled chunk before new SIMD/reducer formulas; an optional installed GMP control is useful but its absence does not block a valid comparison. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **Open opportunity design; conditional prototype/adoption.** A narrow new native track, not resumption of the stopped broad backend sweep. CFFI is an interface, not a speedup guarantee. Charge setup, conversions, strict GCD/recovery and unused work. Coordinate B12/F4 native-thread feasibility without requiring their prior win. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) |
+| B5 — P3.7 optional NumPy bulk-kernel spike | Compare one coarse threshold/offset scan first, then justified bulk mark/root-hit updates against A1c. Verify an installable PyPy 3.11/arm64 build, actual SIMD dispatch, exact dtype/overflow/duplicate semantics and zero-copy/copy costs. Keep reusable arrays and avoid one call per sparse prime. | Current collector cost share and exact A1c oracle; select B5 or B5a from boundary/toolchain evidence, not both by default | **Conditional; cheap screen eligible.** Native NumPy kernels can use ARM SIMD although PyPy calls cross cpyext. No assumed gain and no dependency-free default change. Full conversion, hit metadata and whole-factor cost govern advancement. | Sol / **xhigh** design/implementation; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
+| B5a — optional C/CFFI bulk kernels and ARM SIMD | Select a coarse QS CFFI packet: contiguous threshold/offset scan, modular root updates, sparse queue application, or a justified fused mark/scan combination. Compare scalar C, compiler-vectorized and explicit NEON on M4. Keep x86 AVX2/AVX-512 as separately dispatched/tested ports; preserve queue eligibility, score/metadata semantics and checked fallback. | Current measured kernel share and exact A1a/A1c/A1d oracle; declared buffer/ownership ABI and queue-compatible representation; actual PyPy 3.11/arm64 toolchain | **Open investigation; conditional prototype/adoption.** Include list-to-buffer copies or keep a funded persistent representation. The current sparse queue requires list scores; a new buffer must not silently disable it. No native speedup, SIMD multiplier or global default migration is assumed. | Sol / **xhigh** boundary/design/implementation; separately selected new arithmetic requires Astra / **xhigh**; optional separate Sol / **high** frozen execution | [current acceleration gates](#bulk-kernels-pypy-numpy-and-optional-native-acceleration); [ARM intrinsics](https://arm-software.github.io/acle/neon_intrinsics/advsimd.html) |
 | B6 — P3.8 Python-int Four Russians/PLE | Implement one bounded panel-table/PLE challenger against Python-int bitset elimination. Check rank-deficient panels, free-variable recovery and original kernels; charge finite 2**k tables, conversion, pivot search, full provenance, lifting and all simultaneous scratch. | A8 operator/lifting contract and representative fixtures; C4 filtering can proceed independently | **Open; High challenger preparation.** First dense-kernel comparison by evaluation preference. Select panel sizes from local evidence; native widths and digit cutoffs are references. Compare complete preparation-to-extraction cost and factoring impact. No R4/R5, NumPy or prior filtering win is required. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
 | B7 — P3.8-R3 compact records, provenance and checkpoint bounds | Implement selected compact atom/exponent/partial/provenance records, bounded replay and merge histories; preflight or stream checkpoint encoding before oversized intermediate allocation. Verify original identities, exact lifting, corruption handling, pinned aliases, eviction and interrupted restore with simultaneous scratch. | Existing exact stores/checkpoints; A8 for matrix representations; C9a's contract for a selected partial-store integration | **Open; High design.** A C9a bundle may include its scoped storage implementation under this contract without completing all B7 or a separate speedup study. A global format change needs its own identity. Lower reservation coefficients or encoded-size quotas alone are insufficient; retain nonunit recovery. | Astra / **xhigh** research, design, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
 | B8 — Williams p+1 starts (P5.1) / Lucas optimization (P5.3) | Compare bounded rational/seeded p+1 starts and validated Lucas-chain execution against the binary control; validate p+1 bound extension separately from ordinary powering. | A5, A4; A6's schedule-ratio contract | **Conditional.** Priority / trigger: Medium/conditional. Binary correctness and verified chain machinery must exist first. This targets marginal p+1 coverage; the ECM recurrence is not a drop-in Lucas implementation. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
-| B12 — P6.3 worker-contract preparation | Specify stable assignments, immutable schedules, parent-owned leases, bounded family packets, aggregate CPU/RSS, cancellation waste and restart. Reconcile existing QS workers; preserve disjoint committed work rather than reimplement generic workers or copy native threads. | A2, A3, A7; A7a for any selected family-granularity delta | **Open; Medium preparation.** Contracts and fixtures can proceed now; production comparisons retain F4's settled serial-control gate. | Sol / **xhigh** design, implementation and contracts; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
+| B12 — P6.3 ECM/QS worker contracts | Specify stable method/assignment IDs, independent RNG streams, immutable schedules, parent-owned leases, aggregate CPU/RSS, bounded packets, cancellation waste and restart. Reuse A7 infrastructure for F4 ECM and A7a current-collector QS; settle only the contract needed by each workstream. | A2/A3/A7 retained contracts; current committed serial identity for the selected engine; no cross-engine worker dependency | **Open; High for wall latency.** Isolated ECM and QS preparation can proceed independently without E1. Aggregate resources, parent bottlenecks and first/full-factor cancellation determine value; measure 1/2/4 workers before a funded wider-core configuration. | Sol / **xhigh** design, implementation and contracts; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
 | B13 — P3.8-R2 wide-block resieve capacity | Reuse the accepted sparse resieve support bound. Only if a new calibrated workload still refuses setup, prove a bound for its actual scratch/storage representation, verify coverage and refusal/resume, and compare complete bucket/resieve runs under matched budgets. | A1; a new calibrated wide-block capacity refusal | **Conditional.** Priority / trigger: Deferred unless newly triggered. The combined 30-digit bridge resolves the isolated refusal with the accepted repair. A larger workload needs new evidence and a proof; unrelated feasible collection work proceeds independently. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
 | B14 — P8.2.2 checked prime certificates | Add bounded n−1/Pocklington certificate generation and a separate exact verifier beyond deterministic ranges, with recursive work/storage caps and requested-proof CLI/resume. Record historical APRT-CLE (AP28) as a later coverage candidate only if this first tranche leaves a measured gap; distinguish its probabilistic fallback. | A10; existing shared-budget/checkpoint controls | **Open.** Priority / trigger: High for certified results. Proof is an explicit capability beyond v1 parity. Start after the range contract settles, without waiting for GNFS; certify supported cases rather than claiming arbitrary-size proof from extra probable-prime rounds. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-b--exploit-the-settled-controls) |
 
@@ -64,27 +182,77 @@ research. The [history index](history/README.md) supplies local research paths.
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
-| C2 — P5.2 advanced pairing/common-Z | Separately compare extended distances, relocation/matching and coverage pruning with reference ECM/other pinned references; compare projective terms, the calculator reference-style affine differences, derived batch inversion and no-inversion common-Z tables (AP29). | B2 aligned-cell decision plus remaining schedule/product cost | **Conditional.** Priority / trigger: Conditional. Coordinate geometry and coordinate choices without conflating them. Bound planning, tables, inversions and replay; independently certify prime coverage and nonunit recovery. Prior B2 losses remain the control; polynomial continuation stays F3. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
-| C4 — P3.8 structured filtering, hybrid cores and extraction | Implement fill-aware bounded higher-weight elimination with compact reverse substitution; compare components, ordering and sparse-to-dense cores. Preserve rank/nullity and lift to original relations. Joint exponent-product/Horner extraction is an optional exact subtranche, preserving both GCD signs and nonunit handling. | A8 contract/fixtures; settle the selected B7 representation contract within any changed-provenance implementation | **Open; High preparation.** Stronger filtering need not wait for B6 to win. B6 remains the first dense-kernel comparison. Measure dimension and weight together, including preparation, fill, retained substitution history, solver, lifting and extraction; fewer rows alone are insufficient. | Astra / **xhigh** changed filtering/provenance/extraction; Sol / **xhigh** only for a separately specified existing kernel; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
-| C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Conditional.** Priority / trigger: Low/conditional. Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
+| C2 — P5.2 advanced pairing/common-Z | Compare selected distances/relocation/matching/coverage pruning and independent coordinate choices: current projective cross-products, affine/batch inversion and CADO-style inversion-free common-Z tables (AP29). Cost prefix/suffix normalization against saved term multiplications and bounded block/table reuse. | B2 aligned-cell retain/loss decision; current bound-specific continuation cost; coordinate C3a/F3 | **Conditional; medium ECM challenger.** Current stage two already has baby/giant steps; paired executors are retained opt-ins after scoped losses. Certify coverage, nonunit/saturation recovery, storage and replay. Neither a C2 win nor affine inversion is a prerequisite for F3 feasibility. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
+| C4 — P3.8 structured filtering, hybrid cores and extraction | Implement fill-aware bounded higher-weight elimination, including a selected minimum-weight merge-tree/MST heuristic, with compact reverse substitution; compare components, ordering and sparse-to-dense cores. Preserve rank/nullity and lift to original relations. Joint exponent-product/Horner extraction is an optional exact subtranche, preserving both GCD signs and nonunit handling. | A8 contract/fixtures; settle the selected B7 representation contract within any changed-provenance implementation | **Open; High preparation.** Stronger filtering need not wait for B6 to win. B6 remains the first dense-kernel comparison. Measure dimension and weight together, including preparation, fill, retained substitution history, solver, lifting and extraction; fewer rows alone are insufficient. | Astra / **xhigh** changed filtering/provenance/extraction; Sol / **xhigh** only for a separately specified existing kernel; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers); [merge-tree reference](https://github.com/cado-nfs/cado-nfs/blob/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/mst.c) |
+| C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Conditional.** Priority / trigger: Low/conditional. Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. A B4a fused native context is a different cost regime; settle its scalar baseline before selecting new Montgomery/Barrett arithmetic. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
 | C8 — P3.8-R2 family-wide CRT/hypercube hit scheduling | Assess whole-polynomial-interval prime/power eligibility and occupancy before bounded CRT half-sum or hypercube scheduling. Verify every Gray/position hit, exceptional roots, recentering, finite tables/queues and charged replay; retain compact hit-layout alternatives with B7. | A1/B1 and a concrete family/root or eligible-prime scanning hypothesis | **Conditional; Low/conditional.** The old first-polynomial probe found zero eligible base primes and sparse eligible powers. Block width is not the eligibility interval. Existing per-polynomial queues/plans are controls, not this family-wide mechanism. | Astra / **xhigh** arithmetic, implementation and ownership; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
-| C10a — collection representation, population and scheduling | Own C10a-01/-02/-03/-06 and explicit larger-size feasibility below. Coordinate useful-row preparation/filter scheduling and score/recovery domains with the combined C9a workstream; A1a/A1c retain transition/kernel ownership. | Closed C10 tranche; current committed control and explicit shared policy/source identities | **Open.** C10a-04/-05/-07 remain Done for delivered scopes. C10a-01's selected worktree bundle and four-size pilots are in flight; no duplicate A/root/multiplier project. Correct, feasible components may share a bundle without prior isolated wins. | Astra / **xhigh** throughout C10a-01; Sol / **xhigh** separately scoped existing-policy design; optional separate Sol / **high** frozen execution for other scopes | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
-| C11 — parameter provenance, calibration and competitor protocol | Maintain parameter/caller provenance against pinned primary implementations and prepare current Python competitor complete-cost comparisons with P6.4/I1. Separate PyPy native-int, optional GMP, native wrappers and worker tracks; include cold/warm setup, CPU, RSS, completion/censoring and independent moduli. Route arithmetic/allocation deltas to their existing owners. | Accepted A2/A6/A10/B3/B4/C6 controls; coordinate C3a/A10a/A2a/E5/G1 and C9a/C10a | **Open; High continuing calibration/protocol design.** Start from observed cost/yield gaps, not a blanket Cartesian sweep. AP34/AP35 native limb/FFT/NTT references do not authorize a Python limb engine. Early competitor feasibility/design can precede I1; final fastest or comparative claims retain its confirmation/publication gates. | Sol / **xhigh** protocol/selection design; Sol / **high** source reconciliation or separately frozen execution; Astra / **xhigh** for separately selected new arithmetic/certainty proofs | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
+| C10a — collection representation, population and scheduling | Own C10a-01/-02/-03/-06 and explicit larger-size feasibility below. Coordinate useful-row preparation/filter scheduling and score/recovery domains with the combined C9a workstream; A1a/A1c retain transition/kernel ownership; A1d owns multi-polynomial bucket scheduling. | Closed C10 tranche; current committed control and explicit shared policy/source identities | **Open.** C10a-04/-05/-07 remain Done for delivered scopes. C10a-01's selected bundle is integrated/default and its four-size exploratory feasibility is terminal; no duplicate A/root/multiplier project. Correct, feasible components may share a bundle without prior isolated wins. | Astra / **xhigh** throughout C10a-01; Sol / **xhigh** separately scoped existing-policy design; optional separate Sol / **high** frozen execution for other scopes | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
+| C11 — workload/cost atlas, parameter provenance and competitor protocol | Maintain pinned parameter/caller provenance and a small current complete-cost/yield atlas stratified by modulus size, smaller-factor size and input distribution. Attribute preprocessing/classification, rho/PM1/ECM/QS, polling, allocation, setup and native-boundary costs separately. Use the equal-weight 60/80/100 random-integer workload and 60/70 balanced guardrail; report rough survivors and recursive multiprimes separately. Reconcile current chains and continuation before selecting C3a/B3a/F2/F3/F4. Prepare Python competitor complete-cost comparisons with P6.4/I1. | Current committed controls; existing C3 findings and source presets; coordinate C3a/B12/B3a/B4a and QS A7a/C9a/C10a | **Open; High targeted selection.** This atlas supports rank 1 and does not mandate a full Cartesian campaign. Native-int, GMP, NumPy/native kernels, wrappers and worker counts remain separate tracks; source tables are hypotheses. A specifically selected F3 backend spike does not restart the stopped broad P4.3 study. Final comparative claims retain I1 gates. | Sol / **xhigh** protocol/selection design; Sol / **high** source reconciliation or separately frozen execution; Astra / **xhigh** separately selected new arithmetic/proofs | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
 
 #### New source-derived deltas — separate follow-up items
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
-| C3a — source-derived ECM policy follow-up | After C3, reconcile reviewed implementations effort, curve/bound and pretest/campaign policies (AP04) with its final selection. Compare only missing source-supported alternatives, prior-work credit or handoff behavior; retain C3's frozen evidence. | C3 decision; a documented uncovered policy or changed-cost hypothesis | **Conditional.** Priority / trigger: Conditional follow-up. Existing C3 coverage can resolve candidates without another study; any new selection needs fresh complete-factor evidence. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+| C3a — current ECM effort, recursive credit and handoff delta | Reconcile completed C3 first; profile the current control and select at most one uncovered joint B1/B2/count, completed-search credit or observable-cost handoff hypothesis. Separate ECM/SIQS/classification RNG streams with B12 so changed curve counts do not silently change fallback seeds. Specify valid descendant credit for completed work, finite fallback floors and exact checkpoint lineage. | C3 final decisions; C11 targeted current feasibility/cost evidence; a named uncovered delta; no E1 prerequisite for component work | **Open; High screen/design; implementation conditional on opportunity.** Existing C3 already covers empirical survival/cost scheduling and several deeper presets. Preserve its negative, unstable and early-adoption outcomes. A failed curve is evidence conditional on a workload prior, not a posterior factor-size certificate. Global budget carry-over already exists; descendant search credit and same-curve extension are different mechanisms. | Sol / **xhigh** existing-arithmetic policy/lineage design and implementation; Astra / **xhigh** only for a separately selected new probability/arithmetic proof; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | C9a — combined useful-yield, admission, cycles and compact records | Select a coherent combined candidate spanning yield-aware preparation/filtering cadence, wider recovered-product intake, ordered asymmetric endpoints, shorter cycle/algebraic-duplicate policies and compact replayable records. Give mechanisms independently selectable, checkpoint-bound flags; C10a coordinates scoring/scheduling and B7 supplies the selected storage/provenance contract. C1a retains anchor-only SLP. | Completed C9.2 and current committed collector; reconcile C10a-01's source and results; a concrete current cost/yield hypothesis | **Open; High.** One expanded workstream may implement justified mechanisms and compare control versus one combined nominee with targeted ablations. No isolated speedup, separate chat or completed global B7 is a prerequisite. Research may retain/reject/defer components. Preserve C9 evidence; full fresh confirmation governs adoption. | Astra / **xhigh** for the expanded research, design, implementation and correctness scope; Sol / **xhigh** only for a separately scoped cadence/existing-policy task; optional separate Sol / **high** frozen execution | [current combined scope and gates](#c9a--combined-useful-yield-and-storage-workstream); [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | A1a follow-ups — checked transitions, quota-aware setup and lifted roots | Reuse validated switch metadata/internal certificates without removing public root verification; bound setup by consumed quota. Investigate cross-B lifted-power roots and fused/paired-polynomial switching as explicit alternatives. Coordinate existing C10a-01 Gray tables and A1c kernels to avoid duplicate implementation. | Delivered A1a stays closed; current setup/lifting hypothesis and current C10a-01 integration identity | **Open design.** Compare setup plus actual consumed traversal; preserve larger-cache and presieve/unroll losses. Bind certificates/caches to base, A/B, representation and backend; prove characteristic-two/singular cases, invalidation, old/new coexistence and charged refusal/rebuild. Derived trust is rebuilt on resume. | Sol / **xhigh** checked metadata/fused kernel work; Astra / **xhigh** cross-B lifting arithmetic and its implementation; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | A1b-F1 — fixed-score sparse-queue integration | A separate mechanism: policy-bound fixed-score queue weights/eligibility, exact threshold/power coverage, scratch refusal and charged rebuild. Do not modify historical A1b controls. | Completed A1b existing-option decision; a new credible cost hypothesis and separately frozen design | **Deferred.** The implemented fixed/list bundle lost all 50/55/60 screens. No queue extension or additional campaign is admitted by that result. | Sol / **xhigh** integration/ownership; **high** frozen evaluation | [A1b decision and boundary](benchmarks/RESULTS.md#a1b-existing-fixed-score-review) |
-| A1c — bulk marking/scanning and same-modulus two-root interleaving | Select a bounded PyPy bulk mark/scan or paired-root kernel; consider fused root-switch/marking with A1a. Verify sorted translated offsets, tails, duplicate/singular roots, saturation, hit metadata and reservation/cancellation/interrupted-block replay. Two roots and two polynomials are distinct hypotheses. | Settled A1a/queue controls, exact kernel oracles and a current marking/scanning cost hypothesis | **Open; High design/implementation.** Keep queue eligibility and backend consequences explicit, preserving low-allowance behavior and physical coverage. Native SIMD/byte constants are references. Retain prior unroll/presieve losses and compare complete factoring after a bounded identical-work screen. | Sol / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen execution; a named unresolved proof requires a separately selected Astra / **xhigh** scope | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
-| A2a — inverse-microkernel follow-up to completed backend study | Compare batched binary/Montgomery inversion and small-integer quotient shortcuts (AP32/AP33) only for newly profiled inversion-dominant sizes, against native Euclid/GMP including conversions and nonunits. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Conditional.** Priority / trigger: Low/conditional. Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. | Sol / **xhigh**; targeted Astra proof review if required | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
-| A7a — SIQS worker-granularity follow-up | Compare historical SIQS family-sharing/partitioning with existing bounded QS workers (AP37), only after measured setup/coordination cost motivates the alternative. F4 integrates any selected worker result. | Completed A7; B12 contracts; stable serial control and F4 experiment gate | **Conditional.** Priority / trigger: Conditional. No generic worker reimplementation or changed A7 closure. Charge shared stores, barriers, aggregate work/RSS, cancellation and restart; Java thread behavior is not PyPy evidence. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
-| A10a — classification follow-up to completed primality transfer | Evaluate MR-residue proper-factor recovery, optional BPSW composite rejection and grouped small-prime remainders (AP25–AP27) only where E3/C11 profiles identify an uncovered benefit. | Completed A10; E3 frozen control or a justified isolated oracle spike; classification-cost evidence | **Conditional.** Priority / trigger: Conditional. Preserve deterministic ranges, requested MR rounds, RNG/work identity and certainty. A BPSW pass is not proof; prior primorial losses remain the control. B14 retains certificate ownership. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+| A1c — bulk marking/scanning and same-modulus two-root interleaving | Select a bounded PyPy bulk mark/scan or paired-root kernel; consider fused root-switch/marking with A1a. A1d owns prime-major multi-polynomial scheduling. Verify sorted translated offsets, tails, duplicate/singular roots, saturation, hit metadata and reservation/cancellation/interrupted-block replay. Two roots and two polynomials are distinct hypotheses. | Settled A1a/queue controls, exact kernel oracles and a current marking/scanning cost hypothesis | **Open; High design/implementation.** Keep queue eligibility and backend consequences explicit, preserving low-allowance behavior and physical coverage. Native SIMD/byte constants are references. Retain prior unroll/presieve losses and compare complete factoring after a bounded identical-work screen. | Sol / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen execution; a named unresolved proof requires a separately selected Astra / **xhigh** scope | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+| A1d — prime-major multi-polynomial buckets | Build a bounded batch of exact sparse schedules across several Gray polynomials with prime-major traversal, separate from current polynomial-local queues and C8 CRT search. Reuse C10a-01 modular tables/A1a metadata where compatible; retain dense marking and exact recovery. | Current queue/control, current family/Gray identity and selected C10a-01 table interface; source/policy identity fixed before measurements | **Open design; medium/high opportunity.** Verify identical per-polynomial hit coverage, ordering, tails/powers/exceptions, quota/cancellation and charged rebuild. Reserve only funded batches, charge unused precomputation and compare build plus consumed traversal. No C8 win or new polynomial representation is required. | Sol / **xhigh** design/implementation/ownership; Astra / **xhigh** only for a separately selected new arithmetic proof; optional separate Sol / **high** frozen execution | [current batching gates](#a1d--prime-major-bucket-generation-across-polynomials); [pinned executor](https://github.com/bbuhrow/yafu/blob/c7d90283972820f99b3b4920bfc1eff05c1f6342/factor/qs/update_poly_roots_32k.c#L2747) |
+| A2a — scoped inverse/GCD/quotient helper follow-up | Select one profiled helper: batched binary/Montgomery inversion or small-quotient shortcuts (AP32/AP33) against current PyPy Euclid/GMP, or a scoped native GCD helper against math.gcd/GMP. Include conversion, allocation, operand-size class and nonunit recovery; packed/tree operands differ from scalar moduli. | Completed A2/B4; C11 profile and a changed workload/cost hypothesis | **Conditional.** Priority / trigger: Low/conditional. Preserve backend/reducer losses. Native fixed-limb/SIMD/FFT/NTT references (AP34/AP35) remain deferred C11/C5 dispositions, not a new Python limb engine. Current GCD already uses math.gcd/GMP; optimized native internals are the control, and large packed/tree operands differ from 60–99-digit scalar moduli. | Sol / **xhigh**; targeted Astra proof review if required | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+| A7a — current-collector parallel SIQS collection | Adapt existing A7 workers to the strongest current serial collector, including selected growing-DLP admission and current assignment/window/base/multiplier/queue identities. Compare serial, adapted one-worker and 2/4-worker complete factoring at 60/70 digits; then consider wider M4 occupancy. Historical family-sharing/partitioning (AP37) remains a conditional granularity alternative. | Completed A7; selected B12 lease/RNG/resource contract; current serial feasibility and C10a-01 integration identity when available; no F4 win or E1 prerequisite for isolated QS work | **Open; High, rank 3.** Reuse checked merge/resume; do not duplicate generic workers or reopen A7 closure. Growing DLP is currently rejected and worker windows are smaller than current serial defaults. Price parent admission, graph/filter/solve, transport, lost work, aggregate RSS and startup. | Sol / **xhigh** implementation, ownership and experiment design; separately selected new graph/provenance mathematics uses Astra / **xhigh**; optional separate Sol / **high** frozen execution | [current parallel QS gates](#a7a--current-collector-parallel-relation-collection); [A7 framework](qs/parallel.py) |
+| A10a — classification follow-up to completed primality transfer | Evaluate MR-residue proper-factor recovery, optional BPSW composite rejection and grouped small-prime remainders (AP25–AP27), or a scoped native witness batch after pricing early rejection only where E3/C11 profiles identify an uncovered benefit. | Completed A10; E3 frozen control or a justified isolated oracle spike; classification-cost evidence | **Conditional.** Priority / trigger: Conditional. Preserve deterministic ranges, requested MR rounds, RNG/work identity and certainty. A BPSW pass is not proof; native library repetitions are not automatically the requested MR-round contract; prior primorial losses remain the control. B14 retains certificate ownership. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | A11a — optional input/browser follow-up | Separately select validated factor hints/opt-in lookup, bounded batch/expression input or browser progress/offline/save-continue (AP38–AP40). Give each selected subtranche its own API and acceptance boundary. | Completed A11; explicit product selection, outside the optimization critical path | **Conditional.** Priority / trigger: Optional; no factoring speed claim. Preserve quiet library APIs, exact reconstruction, certainty, finite input/output/network allowances and checked checkpoints. | Sol / **high**; **xhigh** for changed accounting/resume | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | C1a — cheaper SLP anchor reuse follow-up | Compare an anchor-only SLP implementation or changed retention regime (AP01) with ordinary SLP and the existing graph-SLP/DLP controls. Prove residual cancellation and bounded pinned ownership without adopting source dependency-discard policies. | Completed C1; C9 decision; a new cost/retention hypothesis | **Conditional.** Priority / trigger: Low/conditional. C1 graph-SLP training totaled 20.055 s versus 20.160 s for SLP, with no established win; DLP already retains anchors. Do not repeat that arm or promote on raw cancellation counts. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+
+#### A7a — current-collector parallel relation collection
+
+The wall-time objective makes this an immediate QS workstream, just above
+C9a. Completed P3.6/A7 supplied bounded workers, stable assignments, checked
+parent admission, drained checkpoints and cancellation accounting; their
+historical losses and experimental status remain. The missing deliverable is
+current-collector compatibility and a fresh complete-factor latency comparison.
+
+Current `ParallelConfig` rejects `GrowingDoubleLargeSieveConfig`, caps
+half-width at 8,192 and total owned memory at 1 GiB, and the pool permits at
+most four workers. Current calibrated serial collectors use growing DLP and
+half-width 65,536. These are integration gaps, not evidence that merging is
+intrinsically expensive or that current workers already accelerate that control.
+Do not weaken the serial control to fit historical worker limits.
+
+Reconcile the selected current base/multiplier, assignment/flyer, root, score,
+queue and graph identities before building. Reuse A7's task transport and
+parent-owned leases; keep exact atom provenance, cross-worker partial matching,
+duplicate/repeated-prime handling, bounded publication and restart. Fund
+worker-private state, pending batches, parent graph/filter/solve and checkpoint
+coexistence. A selected compact-record contract can be settled with B7 within
+this workstream; a global storage rewrite is not a prerequisite.
+
+Start from a small uninstrumented serial feasibility baseline at 60 and, when
+informative under a declared grant, 70 digits. Consume compatible C10a-01
+evidence without changing its active freeze or duplicating its size study.
+Use current serial and an adapted one-worker arm to expose integration cost,
+then 2/4 workers to measure scaling. Preserve a deterministic assignment stream
+for fixed-work checks and declare complete-factor seeds/order separately.
+If collection policy must change, label the bundle; its gain does not isolate
+the effect of concurrency. A historical exporter cannot stand in for the
+strongest current serial comparison.
+
+Freeze a finite staged campaign after feasibility: each stage names its
+question, admission/stop decision, runtime estimate and cumulative wall/CPU,
+memory/work/storage allowances. Complete-factor latency includes parent work,
+merge/filter/solve, process/JIT startup, copies, cancelled work and draining.
+Check parent throughput with short diagnostics before buying long scaling
+runs. Fixed-work throughput is exploratory, not a complete-factor speedup.
+Above four workers requires explicit pool/resource-limit changes and new
+ownership checks; all ten cores are available, with useful occupancy measured.
+
+Promotion uses fresh independent inputs and the 60/70 balanced completion
+guardrail. Historical family-sharing or alternate chunk sizes enter only if
+current coordination/setup evidence motivates them. F4 later composes selected
+worker results; it does not gate isolated QS feasibility or require an ECM win.
+Keep current C9a/C10a source identities explicit and integrate shared edits
+sequentially. No campaign is launched by this roadmap change.
 
 #### C9a — combined useful-yield and storage workstream
 
@@ -125,6 +293,20 @@ follow many preparation/filter passes. Preserve immediate square checks,
 unsuccessful work, true final/storage-cap extraction and charged continuation;
 less frequent filtering can also delay finding a factor.
 
+Before the decision note, rank mechanisms by the current cost/yield ceiling.
+Wider intake and endpoint choices can reduce dominant collection work;
+cadence/cycle/duplicate changes chiefly address measured preparation or matrix
+cost, while compact records need actual or anticipated intake/storage pressure.
+Do not give all six equal priority or assume a storage saving helps an
+unevicted, unconstrained control.
+
+Short collection prefixes can screen intake/endpoints but cannot establish
+late graph, duplicate, storage or filtering-cadence benefit. First seek a
+retained complete-run admitted-atom capture from C9 or C10a-07 and validate its
+domain/recorder coverage for replay. If none exists, defer those late-effect
+claims to the first separately authorized complete pilot; do not launch a long
+capture implicitly or forbid a valid direct intake comparison for lack of it.
+
 Use control versus one frozen combined nominee as the primary complete-factor
 comparison. Predeclare a small set of targeted leave-one-out or incremental
 ablations for concrete interaction questions; do not automatically execute all
@@ -156,6 +338,26 @@ that is a smaller task, not a mid-task model switch. A later independently
 requested frozen-execution chat may use **Sol / high**. Preserve historical
 C9 freezes and scoped accepted results; E1 remains deferred.
 
+#### A1d — prime-major bucket generation across polynomials
+
+The current sparse schedule key contains one polynomial identity and the
+collector releases it on a polynomial switch. YAFU's explicit polybatch root
+executor nests a polynomial batch inside a prime block; this is a concrete
+alternative to repeatedly loading the same prime/root metadata. It differs
+from a larger single-polynomial queue, two-root interleaving, C10a-01's modular
+Gray tables and C8's sorted half-sum search for family-wide eligible primes.
+
+Select a small funded batch and exact enumeration order. Compare prime/root
+visits, root-update/setup work, bucket generation/application and consumed
+positions against the current queue; include unused precomputation when
+factoring stops early. Prototype native Python storage first or explicitly
+label a B5a accelerated boundary. Prove all per-polynomial hits, signed windows,
+powers, singular roots, A/multiplier exceptions and family boundaries. Pending
+atoms must identify the right polynomial; quota refusal/cancellation/resume
+must neither publish future rows early nor repeat completed work. Derived
+buckets may rebuild under charged bounds. Do not inherit probabilistic bucket
+capacity or dropped-overflow policies from native references.
+
 #### A1a follow-ups — checked transitions and lifted roots
 
 Internal certificates may reuse already validated metadata while public root
@@ -179,7 +381,7 @@ See the [retained decisions](benchmarks/RESULTS.md#c10a-07-face-and-queue).
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
 | D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **Open; High preparation.** First sparse candidate by scheduling preference. Compare all recurrence/recovery/restart and retained-vector costs with feasible dense/hybrid controls. Capacity may justify work before solve CPU dominates; native solver names or SpMV throughput are insufficient. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) |
-| D2 — P3.8 block Wiedemann | Implement a genuine projected Krylov/block-polynomial-generator/reconstruction path using pinned primary references. Verify original kernels, independent sequences and bounded I/O/checkpoints; compare retained state, generator, reconstruction and failure costs. | A8 operator/lifting contract; B6/C4 are comparison controls, not required successes | **Conditional alternative to D1; no D1 dependency.** Prefer Lanczos for the current single-machine tranche unless capacity, sequence parallelism or restart evidence favors Wiedemann. Begin with an exact base-case generator; the calculator reference does not supply this solver. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) |
+| D2 — P3.8 block Wiedemann | Implement a genuine projected Krylov, block-polynomial-generator/lingen and reconstruction path. Verify original kernels, independent sequences and bounded I/O/checkpoints; cost retained state, sequence, generator, reconstruction and failures together. Select a subquadratic approximant/generator only when the simpler exact generator is material; mod-2 polynomial arithmetic has a separate domain from F3 mod-N kernels. | A8 operator/lifting contract; B6/C4 are comparison controls, not required successes | **Conditional alternative to D1; no D1 dependency.** Prefer Lanczos for the current single-machine tranche unless capacity, sequence parallelism or restart evidence favors Wiedemann. Begin with an exact base-case generator; the calculator reference does not supply this solver. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives); [generator algorithm](https://members.loria.fr/EThome/files/jsc.pdf) |
 
 ### Execution phase E — current-engine acceptance, control freeze and P8 experiments
 
@@ -187,26 +389,28 @@ See the [retained decisions](benchmarks/RESULTS.md#c10a-07-face-and-queue).
 | --- | --- | --- | --- | --- | --- |
 | E1 — final R1/R5 and P4/P5 acceptance | Integrate selected changes, including accepted A10/B14 capabilities and A11 CLI integration; reconcile v1 transfer decisions and recalibrate affected SIQS/ECM/p±1 parameters; freeze selections; run fresh complete-factor comparisons, R5 SSS/worker challengers, resume checks and clean-checkout validation; publish adopt/defer/reject decisions. | A1, A7, A10, A11 and chosen P3.7/P3.8/P4/P5 predecessor decisions; B14 if proof support is selected; B13/C8 and other unchosen branches have recorded deferrals | Deferred; resumption requires explicit authorization. Original combined confirmation and all unrun gates remain required for experimental acceptance. | Sol / **xhigh**; targeted Astra / **xhigh** review for new arithmetic/provenance | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
 | D7 — P8.1 fresh portfolio control | Freeze the accepted current SIQS/MPQS, rho, ECM and p±1 portfolio with certified training/untouched confirmation inputs; profile separately and retain source/configuration identity for every later challenger. | E1; existing SIQS/P2 controls | **Open.** Priority / trigger: High enabling value, bounded scope. P8 tuning uses the accepted current engines before GNFS. Keep this control immutable; future GNFS requires a separately versioned extension and crossover evaluation. | Sol / **high**; **xhigh** for protocol decisions | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
-| E3 — P8.2 preprocessing | Compare bounded multiplier Fermat/Lehman, shared power screens, inherited trial coverage and high-valuation extraction (AP18/AP22–AP24). Separately evaluate opt-in algebraic a^k±1, sums/differences of powers and historical Fibonacci/Lucas families (AP19–AP21); A10a owns AP25–AP27 classification implementation. Reuse accepted A10/B14 certainty controls. | D7 | **Conditional.** Priority / trigger: Medium; profile-gated. Broad cheap-path savings may help, but prior repair decisions are retained. Full integrated evaluation now has the right control; a justified isolated oracle spike could occur earlier. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
-| E4 — P8.3 rho calibration | Tune bounded batch/walk/restart policies under identical total budgets and assigned seeds; measure first-factor and complete runs including saturation recovery. | D7 | **Open.** Priority / trigger: Medium. Parameter tuning is relatively contained, but must show marginal portfolio value on the new workload. It reuses current Brent/local-loop controls rather than rebuilding rho. | Sol / **high**; **xhigh** for changed recovery semantics | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
-| E5 — P8.5 recovery/polling/checkpoint costs | Separate polling, atomic commits, saturation recovery, durable writes and JSON verification; compare source-derived ECM GCD cadence/replay (AP31) and bounded recovery trees only where profiles justify them. Preserve strict local factor recovery, deadlines and charged resume. | D7 | **Conditional.** Priority / trigger: Medium; conditional on changed cost. Existing repair gains remain the starting point. Revisit only unresolved or newly dominant overhead, preserving validation and disclosing work-unit changes. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
-| E6 — P8.6 contexts/schedules for changed workloads | Reuse C10-diagnosed/A1a-implemented periodic presieve, paired-polynomial, bulk-mask, density kernels and Gray-shift tables (AP05–AP09); avoid duplicate implementation. Test changed-workload shared contexts, lazy setup/private buffers and hit prefilters against accepted exact controls and prior cache/wheel losses. | D7 | **Conditional.** Priority / trigger: Conditional. This is workload-specific tuning after control freeze, not another implementation of P5.2 pairing. Retain prior cache/wheel/rolling and small-prime-skipping decisions unless new evidence overturns them. | Sol / **high**; **xhigh** for ownership/rejection changes | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
+| E3 — P8.2 preprocessing | Compare inherited negative trial coverage, its exact bound on possible power exponents, high-valuation removal and same-integer valuation-gcd pruning before costlier Fermat/Lehman/Hart/SQUFOF or structured a^k±1, power-sum/difference and historical Fibonacci/Lucas candidates (AP18–AP24). A10a owns classification deltas. Parent non-power/compositeness results do not automatically hold for children; C3a coordinates lineage. | Current committed preprocessing/classification oracle and observed cheap-path opportunity for isolated design/feasibility; D7 for integrated portfolio tuning | **Conditional; medium/profile-gated.** Keep prior primorial/root/pretest losses. Use ordinary integers, rough survivors, powers, small residuals and close/special-form strata; prevent cheaper screening from delaying expensive-path completion. No restart of E1/D7 is implied. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
+| E4 — P8.3 rho calibration | Tune existing Brent batch/walk/restart and finite effort under identical total budgets/seeds; compare a selected native whole-batch kernel only if rho cost matters. Include local saturation replay, smaller-factor strata, failure expenditure and the next engine. Existing Brent/local loops are controls. | Current committed rho/recovery control for isolated screening; D7 for integrated portfolio tuning | **Open preparation; medium/conditional experiments.** Rho has useful small-factor and residual coverage, not a practical balanced 60–80-digit growth path. Independent-walk parallelism has different scaling from ECM curves. Bigger iteration counts and a new kernel each need marginal complete-cost evidence. | Sol / **high**; **xhigh** for changed recovery semantics | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
+| E5 — P8.5 recovery/polling/checkpoint costs | Attribute polling, atomic state commits, replay, result validation, serialization and durable I/O separately. Reuse existing C3 reservation/clock repairs and rho chunking; select only remaining overhead. Fund bounded chunks, preserve deadline/cancel precedence, refusal states, strict factor recovery and charged resume; native buffers need deterministic release. | Current committed boundary/accounting contracts and a measured remaining cost for isolated feasibility; D7 for integrated portfolio tuning | **Conditional; medium/profile-gated.** A smaller clock-call count or larger atomic unit is not a free win if it changes responsiveness, work coverage or validation. Price checkpoint policy and restoration honestly; no automatic rewrite of the shared budget API. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
+| E6 — P8.6 contexts/schedules and bundled prime generation | Select reusable immutable prime/power/product metadata, lazy setup, compact allocation, warm worker contexts or a source-bundled C11/CFFI prime-batch provider. Reuse existing wheel-30/segmented context and sorted-output machinery; adapt it to finite Factor packets. Separate modulus state, cache ownership, native buffers and semantic identity; preserve prior Python wheel/cache/rolling losses. A1/A1d/C10a retain QS kernels. | Current context/cache contracts and C11 prime-generation/consumption cost evidence; D7 for integrated tuning; coordinate B4a/B12/F4/A7a | **Conditional; cheap opportunity screen eligible.** Bundle source/build adapter with a Python fallback; no sibling-runtime or external prime-sieve-library dependency. Price setup, extraction/copies, memory and unused preparation. Native threads start at one inside factoring workers; wider prime generation needs its own complete-cost evidence and aggregate grant. | Sol / **high** cost screen; **xhigh** native ABI, ownership, rejection/resume and implementation; optional separate Sol / **high** frozen execution | [prime-provider gates](#e6--self-contained-native-prime-generation); [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
 
 ### Execution phase F — independent P6 challengers
 
-Use a current committed control for independent F6/F7 feasibility; deferred
-E1 is not their prerequisite. Other P6 rows retain their stated predecessors.
-Choose challengers with concrete cost/yield hypotheses and finite designs.
+Use current committed controls for isolated F2/F3/F4/F6/F7 feasibility;
+deferred E1 is not a blanket prerequisite. The rows retain their exactness and
+engine-specific contracts; later combined acceptance keeps E1. Choose
+challengers with concrete cost/yield hypotheses and finite designs.
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
-| F2 — P6.1 Edwards/windowed/torsion-aware ECM | Compare complete curve-family/stage-one packages from reference ECM and other pinned references with accepted Suyama, including the calculator reference different rational Montgomery family (AP30), Edwards/windowed variants, validated stage-two conversion and setup costs. | E1; A2/B3/B4 accepted contracts or retained controls | **Conditional.** Priority / trigger: Conditional. First establish how far ordinary backend/chain/kernel improvements go. Curve-order torsion, chosen-point order and exceptional maps need whole-engine evidence, not operation counts. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
-| F3 — P6.2 polynomial ECM continuation | Choose a justified reference ECM/primary-source Brent–Suyama, product/remainder-tree or multipoint continuation challenger. Assess required exact polynomial kernels, cached reciprocal reduction and coefficient/storage bounds using AP36 references; the calculator reference polynomial calculator is not an implemented polynomial ECM engine. | E1, B2; C2 decision and a remaining continuation bottleneck | **Conditional.** Priority / trigger: Conditional, potentially important at larger targets. Paired classical stage two is the baseline. Advance when per-prime continuation remains the limiting algorithm, not merely because larger bounds are available. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
-| F4 — P6.3 production ECM/portfolio workers | Reuse B12 leases, stable disjoint assignments, bounded family packets, cancellation/restart and settled QS worker/A7a decisions. Compare 1/2/4 production workers on fixed work and first-factor latency, including in-flight waste, total CPU and aggregate RSS. | E1, B12; E2 if GNFS jobs are included | **Conditional production comparisons.** Stable serial controls precede credible worker claims. Native persistent threads or prior fixed-work throughput do not establish a first-factor win; B12 contract preparation can proceed independently. | Sol / **xhigh** implementation/ownership; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
+| F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **Open opportunity design; conditional implementation.** Isolated feasibility may precede E1. Baseline Suyama already biases divisibility; distinguish rational torsion, reduction group order and chosen-point order. Require success per complete CPU/wall cost, finite family exhaustion and close-factor saturation recovery, not a promised free B1 increase. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) |
+| F3 — P6.2 exact polynomial ECM continuation | Select bounded product/remainder-tree and multipoint continuation from GMP-ECM and Yamaquasi. Compare schoolbook/Karatsuba and exact Kronecker packing on native ints, with optional coarse GMP multiplication as a separate track. Include monic reciprocal reduction, blocked/tree storage, exact evaluation/recovery and a separately flagged Brent–Suyama power/Dickson extension; see the current gates below. | Current B2/classical control and C11/C3a bound-specific opportunity; selected polynomial oracles/contracts; E1 only for combined acceptance; C2 win unnecessary | **Open; High algorithmic feasibility, conditional full integration.** Target useful 20–35-digit smaller factors within 60–99-digit inputs. Current production is classical baby/giant continuation, not a promoted paired executor. Establish a whole-continuation crossover before enlarging B2 or claiming GMP FFT pays off. | Astra / **xhigh** research, implementation, exactness and experiment design; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
+| F4 — P6.3 opt-in ECM workers and integrated portfolio parallelism | Reuse B12 leases and stable disjoint curve IDs for opt-in process-level ECM. Compare 1/2/4 workers on fixed committed curves and first-factor latency, charging startup/JIT, cancellation, in-flight waste, total CPU and aggregate RSS; only then consider additional heterogeneous cores. After B4a, compare native-thread execution only when GIL release and thread-private state are verified. Later budgeted mixed-engine racing retains QS/A7a/G1 and engine-specific contracts. | B12 selected lease/RNG/checkpoint contract and current committed serial control for ECM; E1 for later combined portfolio acceptance; E2 only if GNFS included | **Open; High ECM latency preparation; conditional production adoption.** Isolated ECM feasibility need not wait for E1 or a new curve family. Fixed-work throughput does not establish first-factor or full-factor gains. Match total CPU for efficiency claims; report wall-latency experiments under their declared parallel CPU grant. | Sol / **xhigh** implementation/ownership and design; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
 | F5 — P6.2 cross-family A=A0*q polynomial reuse | Compare bounded reuse across QS families with calibrated factor-base-smooth A, explicitly carrying any external q exponent, partial-relation role and duplicate policy. | E1; B1 calibrated QS control | **Conditional.** Priority / trigger: Conditional on polynomial/root setup cost. This changes relation semantics and is not a drop-in root cache. Ordinary families and the R1 external-square distinction provide the control, not a correctness shortcut. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
 | F6 — P6.2 higher-arity large-prime QS relations | Specify a genuine sparse LP-incidence/provenance domain, exact repeated-factor corrections and bounded residual splitting for a selected 3LP/general relation challenger. Compare useful dependencies and complete factors against calibrated DLP. | C1/current DLP control and an explicit higher-arity domain/capacity design; E1 is unnecessary for isolated feasibility | **Low/conditional investigation.** A residual census may nominate work; native 135-digit results do not establish a local crossover. Additional splitting/storage/certification must be charged. A two-endpoint cycle forest does not represent general higher arity. | Astra / **xhigh** research, design, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
 | F7 — P6.2 SIQS direct/tree smooth-part screening | Integrate existing Bernstein smooth-part arithmetic into SIQS with bounded direct-versus-remainder-tree dispatch and scalar exact exponent recovery. Separate factor-base radical construction from candidate-batch limits; prove signed/zero/duplicate values, A/normalization contributions, pending-state ownership and charged replay. | Current committed bucket/queue collector, a larger-basis cost hypothesis and the selected SIQS-domain ownership contract; E1 is unnecessary | **Open; High design.** Compare identical candidate captures against current bucket recovery, then whole latency/storage/completion. Preserve the old R2 loss in its narrower domain. Residual-prime batch cofactoring has a distinct C9a/F7 domain and may join a justified combined candidate; new solvers and higher arity keep their owners. | Astra / **xhigh** research, design, implementation and correctness; optional separate Sol / **high** frozen execution | [current integration gates](#f7--siqs-directtree-screening-and-distinct-residual-batches); [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
-| F8 — P6.2 specialized fast P−1/P+1 continuation | Investigate Montgomery–Kruppa reciprocal-Laurent-polynomial construction and geometric-progression evaluation through pinned reference ECM the implementation, separately from F3's ECM/Brent–Suyama continuation. | A6 control and measured remaining PM1 stage-two cost; E1 for integrated acceptance; A5 only for the P+1 arm | **Conditional.** Priority / trigger: Conditional, later algorithmic challenger. Potentially useful at larger continuation bounds, with exact polynomial/backend and storage costs established first. No C2 geometry dependency and no native speedup extrapolation. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
+| F8 — P6.2 specialized fast P−1/P+1 continuation | Investigate Montgomery–Kruppa reciprocal-Laurent-polynomial construction and geometric-progression evaluation through pinned GMP-ECM pm1fs2.c, separately from F3 ECM/Brent–Suyama. Reuse verified polynomial kernels only where their exact domains agree; do not transfer ECM extension or bound semantics blindly. | A6 control and measured remaining PM1 stage-two cost; A5 only for PP1; selected polynomial contracts; E1 only for combined acceptance | **Conditional; later algorithmic challenger.** Larger-bound smoothness coverage may justify it. Compare complete construction/evaluation, backend and storage cost; C2 geometry is not a dependency. Generic polynomial ECM continuation is not a substitute for this specialized family. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) |
+| F9 — P6.2 decomposable genus-two/Kummer factoring | Screen Cosset/GMP-HECM: special decomposable Jacobians represent two elliptic searches through Kummer arithmetic. Require exact parameter generation, exceptional maps, both image curves, bounded recovery/checkpoints and probability per complete cost. | A separately selected larger-factor opportunity after cheaper B3a/F2/F3 controls; independent oracles and a plausible local cost model | **Low/conditional research; implementation not selected.** A historical native HECM win does not establish a PyPy crossover at 20–35-digit factors. Treat this as a distinct algorithm, not ordinary Edwards ECM or a reason to port Python limbs. | Astra / **xhigh** if explicitly selected; optional separate Sol / **high** frozen execution | [current coverage](#coverage-decisions-from-the-expanded-source-review); [Cosset](https://arxiv.org/abs/0905.2325) |
 
 #### F7 — SIQS direct/tree screening and distinct residual batches
 
@@ -232,6 +436,244 @@ governs adoption. Residual-prime-product batch cofactoring uses a different
 prime domain, latency and certainty contract, owned with C9a. It may enter a
 justified combined candidate under that explicit contract; it is not supplied
 by the existing base-smoothness routine. Higher arity remains F6.
+
+#### ECM opportunity and continuation gates
+
+C3a/C11 start from the actual committed engine: Suyama Montgomery X:Z,
+classical baby/giant continuation with projective cross-products, optional
+paired/wheel executors after scoped losses, and reused PRAC only for the
+supported B1 = 2,000 schedule. Other-size automatic ECM remains
+`(2000, 147396, 32)`; deeper explicit presets already exist. Completed C3
+already investigated cost/survival and joint depth/count policies at smaller
+sizes. Its unstable results and promotion before fresh confirmation stay
+recorded. None establishes a current optimal 60–99-digit policy.
+
+**Opportunity before implementation.** Reuse valid retained costs first;
+otherwise design a small uninstrumented current feasibility screen, then
+targeted identical-work attribution with measured observer overhead. Separate
+planning/setup, stage one, continuation, recovery, repeated child work and
+fallback. A fraction f of serial cost bounds the saving from eliminating that
+component to f; a hypothetical kernel speedup r gives total speedup
+`1 / ((1 - f) + f / r)` only when coverage and the remaining cost are unchanged.
+Policy, success-probability and worker changes require their own model. State
+which gap can plausibly change completion before scheduling a large campaign.
+
+**Workloads and models.** Use 60/80/99-digit ordinary integers, declared
+trial-sifted survivors, recursive composites with several medium factors,
+and planted smaller factors around 15/20/25/30/35 digits at compatible total
+sizes. Include 60–80-digit balanced controls, prime/power/close-factor cases
+and roughly 35:65 splits; these are strata, not a mandatory Cartesian grid.
+Report preprocessing exits and conditional ECM entrants separately. Hidden
+factor sizes label offline evidence, never runtime dispatch. Give median,
+tail/mean cost, complete reconstruction and censored completion by class;
+do not quote a random-integer asymptotic as the measured service distribution.
+Author ECM parameter tables are version/backend/curve-family dependent and
+guide a local grid; their expected curves are not native-PyPy promises.
+
+**Policy and recursion.** Distinguish completed-search credit from cumulative
+resource charges, which already survive a split. Record completed bounds,
+curves/families and child lineage before deciding what credit is justified;
+an interrupted or factor-producing curve need not have completed the same
+search on both children. Do not inherit parent compositeness, reset budgets,
+or silently skip necessary child classification. A prior plus an appropriate
+failure likelihood is needed for a posterior; absent a defensible prior,
+use a declared empirical observable-state policy and sensitivity analysis.
+Current shared random draws couple curve counts to fallback seeds: a new
+method-stream identity/checkpoint version must be explicit, with old restore
+semantics preserved. Compare completed policies under fresh independent
+inputs, not isolated curve timings or revealed training winners.
+
+**Same-curve extension is a distinct conditional C3a/P5.2 delta.** Reusing a
+stage-one point at a larger B1 needs the exact lcm-exponent ratio, checked
+prime powers, nonunit/saturation recovery and funded migration. Extending B2
+needs exact already-covered intervals and resumable continuation state.
+Neither descendant effort credit nor existing p−1 extension proves this.
+Implement only when saved preparation/point work justifies the state cost.
+
+**F3 exactness and cost.** Begin with degree-one continuation, matched against
+the current classical coverage oracle. Separately flag power/Dickson
+Brent–Suyama extensions and label additional success outside literal prime
+coverage. Compare blocked product accumulation modulo a baby polynomial,
+monic reciprocal/remainder trees and direct or transposed multipoint
+evaluation; select from actual degree/bound costs, not a full implementation
+of every variant. For nonnegative canonical coefficients and lengths a,b,
+each convolution coefficient is at most
+`min(a, b) * (N - 1)**2`; choose a packing base strictly above that bound.
+Prove any signed/truncated/reciprocal variant independently. Monic division
+works over the composite-modulus ring; arbitrary coefficients need not be
+units. Preserve denominator/GCD recovery, saturated products and exact replay.
+
+Native Python-int packing is a valid control; optional coarse gmpy2 packing
+may benefit from GMP's Toom/FFT dispatch only at suitable measured sizes.
+Count packing/unpacking, conversion, multiplication, reduction, tree build,
+evaluation, validation and recovery. A fast multiplication alone is no F3
+acceptance. Compare retained/rebuilt/blocked trees with simultaneous scratch,
+owned-memory and RSS bounds; keep this analysis proportionate to the selected
+sizes. Disk-backed trees are optional only when a real memory wall warrants
+their I/O and checkpoint contract. Direct NTT/CRT or floating convolution is
+a later selected backend with an exact reconstruction proof, not a necessary
+first implementation. F8's reciprocal-Laurent/geometric algorithm is distinct.
+
+For every selected stage, follow POLICY.md for validity and write the
+question, admission/advance/stop rule, expected runtime and finite cumulative
+CPU/wall/work/storage grants before execution. Calibrate larger-bound work
+charges and memory from the actual algorithm; do not make an accounting cap
+silently bind before the intended time allowance. A valid candidate can be
+compared even if an unrelated reference fails. This review launches no runs.
+
+#### B4a — coarse native arithmetic and whole-portfolio costs
+
+CFFI supplies a boundary, not an arithmetic algorithm or automatic SIMD.
+Current optional GMP values remain in their backend through Python operator
+loops; a useful native challenger moves a bounded ladder/program chunk behind
+one call, keeping scratch and modular state native. Avoid a call per modular
+multiply, a Python callback per point operation, or casting interpreter-private
+bigint layouts. Do not downcast modular values or combined exponents into C
+words. Serialize canonically at checked boundaries and compare the
+same program/coverage, including strict frontier/GCD recovery. A ladder-only
+microcontrol does not replace the current eligible PRAC production control
+for whole-factor comparisons; label any executor change. Native wrappers
+around another factorer remain C11 reference tracks rather than this kernel.
+
+Start with scalar compiled arithmetic and existing exact algorithms. A native
+Montgomery/Barrett context is a later C5 candidate under a changed cost regime;
+previous Python reducer losses remain historical controls. ECM's many point
+operations make it the first selected boundary candidate. PM1 stage one already
+combines a prime-power chunk into one modular pow; rho already uses Brent
+batches and local variables. Both can improve, but merely adding their existing
+optimizations or wrapping one pow/GCD is not a new gain.
+
+Preflight the actual PyPy/CFFI/compiler/GMP build before selecting a kernel.
+The reviewed standalone PyPy 3.11 binary finds CFFI and GMP headers/library;
+it does not find gmpy2 in that interpreter's environment. Other study
+environments have separate identities. No package was installed here. Do not
+claim documentation-only native APIs, thread release or zero-copy behavior
+were measured locally. Persistent native state requires exact serialization,
+owned allocation/RSS bounds, explicit cleanup, refused allocation handling,
+finite atomic latency and cumulative work/CPU charges. Separate funded
+preflight refusal from native allocator/process death: the latter recovers
+from a last committed checkpoint, not an assumed native rollback. GC pressure
+hints do not enforce a memory quota. B12/F4 may test native threads after verifying
+thread-private state, release behavior and shared-ledger CPU semantics.
+
+C11's initial cost atlas includes ordinary/easy exits, rough survivors,
+prime-heavy children, smooth p±1, small-factor rho, close/power/special-form
+controls and balanced hard inputs. PM1 is property-specific rather than
+uniformly low potential: smooth p−1 can make even a large balanced factor
+accessible. Repeated PM1 bases are correlated. Rho's work grows roughly with
+the square root of the factor; tune marginal effort without promising it
+will replace ECM/QS on large balanced composites.
+
+E3/A10a/E4/E5/E6 may design and screen a justified isolated delta against
+current committed contracts before deferred E1/D7; integrated acceptance
+retains D7. Recoverable completed trial coverage can pass to child divisors,
+whereas parent compositeness and non-power results cannot. If all primes up to
+B were excluded for the tested n, a nontrivial power n = a**k requires
+`(B + 1)**k <= n`; use exact comparisons to prune exponents. Valuation-gcd
+pruning applies only to the same tested integer, not a cofactor after those
+small factors were removed. Validate and charge restored coverage evidence. Trial-product
+or perfect-power algorithms must beat current screens on their actual size/
+reuse class, including setup. Keep native witness batching's early-rejection
+waste, requested MR rounds, certainty and RNG prefix visible. Context/cache,
+polling, validation and checkpoint changes need observed whole-cost headroom;
+do not weaken exactness or quietly change cancellation responsiveness.
+
+The broad review does not restart the stopped backend sweep, select every
+cheap-path candidate or authorize a campaign. Follow the existing stage gates,
+clean feasibility, observer calibration, finite cumulative grants and fresh
+confirmation rules for whichever single hypothesis is selected next.
+
+#### E6 — self-contained native prime generation
+
+Use the existing C11 wheel-30 segmented implementation as the first native
+prime-provider candidate. Bundle a pinned source adaptation, header and CFFI
+adapter in Factor when selected; runtime use must not require a sibling
+repository or external prime-sieve library. Retain the current Python stream.
+This direct native boundary is distinct from earlier Python ports and their
+recorded losses; its current complete-factor benefit remains unmeasured.
+
+Return bounded packed batches with explicit status and capacity. Adapt the
+inclusive C range endpoint to Factor's half-open contract, distinguish empty
+output from allocation/range failure, preserve integer widths and fund native
+workspace plus output/copy coexistence. Size reusable buffers for the selected
+packet, not a broad materialization workload. Check cancellation and cumulative
+work at bounded boundaries and resume from canonical checked positions.
+Contexts are private to one caller. Use one inner thread inside ECM/QS workers
+unless a separately funded concurrency plan shows a benefit; the standalone
+CLI's adaptive OpenMP policy is not a library or Factor policy. C11 attributes
+generation, repeated setup and consumption before raising this conditional
+item above the current worker and factoring-kernel priorities.
+
+#### Bulk kernels: PyPy, NumPy and optional native acceleration
+
+B5/B5a/A1c share the exact current kernel/capture oracle and stay separate
+implementation tracks. The reviewed host reports Apple M4/arm64 with NEON,
+SME and SME2; x86 AVX/AVX-512 implementations are algorithm/layout references,
+not runnable acceleration for this host. The inspected PyPy AArch64 JIT lacks
+the vector backend found in its x86/zarch sources. Do not claim that changing
+a JIT flag will vectorize these sieve loops, or that Python bigints become
+packed SIMD lanes. ARM features being present does not establish useful SME
+compiler/OS integration or a suitable algorithm for it.
+
+Select a cheap contiguous threshold/offset scan first when its current cost
+share warrants it. The existing packed-word scan and sparse queue are controls;
+this is not an untouched Python element loop. Keep original score values,
+conservative thresholds, sorted offsets, duplicate/singular roots, exact hit
+metadata, tails, saturated/wide scores, cancellation and charged replay.
+Bulk marking is a separate next candidate: dense small-prime strides and
+sparse irregular updates have different SIMD/memory behavior. Do not silently
+replace arbitrary-width hit masks or exact scores with wrapping fixed dtypes.
+
+B5a is a QS native-kernel task as well as an instruction-set investigation.
+Choose one useful coarse boundary from current cost evidence:
+
+| Candidate | Plausible benefit | Required comparison and integration boundary |
+| --- | --- | --- |
+| Contiguous scan and offset compaction | Regular loads/comparisons are a natural SIMD target | Compare the actual configured scan and available packed-word control; include list packing/copy, output conversion, thresholds and tails. A tiny scan share cannot justify a large project. |
+| Batched modular root shifts | Contiguous root/prime/delta arrays permit lane-wise add/subtract and conditional reduction | Reuse A1a/A1d/C10a tables; prove lane bounds, exceptional primes and exact roots. Repacking dataclasses every polynomial may erase the gain. |
+| Sparse queue application or dense marking | Scalar compiled loops can remove Python event/update overhead even without SIMD | Keep exact repeated-offset accumulation, power weights and first-level factor hits. Irregular scatter is not automatically a vector win. |
+| Fused marking/queue application/scan | Persistent buffers can amortize conversions across stages | A justified combined packet may proceed without each isolated kernel winning. Charge all sidecars, synchronization, unused preparation and native-to-Python recovery. |
+
+The current sparse queue explicitly requires powers/list/bucket settings and
+updates scores with ordinary list addition. Changing only the backend flag or
+relaxing the eligibility guard is insufficient: fixed-width buffers need their
+proved update/clipping rules, and exact factor-hit masks have arbitrary width.
+Preserve the accepted queue or label and measure a combined scheduling change
+against the actual production control. Use funded full-width bitsets or a
+separately checked sparse/replayed hit sidecar; never truncate prime metadata.
+A scan view may clip safely, while a persistent clipped score used by later
+norm refinement needs its own threshold/coverage argument.
+
+On M4, compare scalar C, compiler vectorization and NEON. Contiguous scans and
+root shifts are different from irregular score writes. Duplicate destination
+offsets make naive gather-add-scatter lose updates; serialize, combine or
+prove conflict handling. Unsigned saturation, signed comparisons and wrapping
+byte arithmetic are different semantics. Test threshold/width boundaries,
+misalignment, tails and coincident roots against exact oracles.
+
+AVX2/AVX-512 are optional x86 ports, not M4 accelerators. Keep a baseline
+translation unit and verify the needed CPU/OS feature subsets before dispatch;
+one AVX flag does not imply all AVX-512 byte/conflict operations. SIMDe or a
+similar portability layer is optional source reuse, with generated code and
+whole-cost behavior checked on each target. Do not extrapolate vector-width
+ratios, run x86 assembly as an ARM benchmark or require an unavailable x86
+machine before measuring the valid M4 candidate. SME remains later and
+separately justified. Packed matrix/SpMV kernels retain A8/B6/D1/D2 ownership.
+
+For B5, verify an actually usable NumPy build on PyPy 3.11/arm64. Its native
+loops may use ARM SIMD despite cpyext call overhead; include import, reusable
+array/buffer views, dtype width, copies, temporary masks and output conversion.
+No one-call-per-prime design or assumption that every operation is vectorized.
+
+For B5a, select a coarse CFFI buffer ABI and compare compiled scalar C,
+compiler-vectorized C and justified explicit NEON. Inspect compiler reports
+or generated instructions to establish vectorization. Price buffer pinning,
+copies, FFI, build/startup, scratch, cleanup and bounded interruption; an unsafe
+overflowing kernel is not a control. Reuse exact Python recovery and validation.
+An optional kernel prototype does not authorize replacing the complete engine
+with C or changing dependency-free defaults. Match backend/worker resources
+and report whole-factor consequences before any adoption decision. GPU/SME
+and hand-written multiprecision SIMD remain later profile-driven investigations.
 
 ### Execution phase G — integrated portfolio allocation
 
@@ -273,11 +715,11 @@ by the existing base-smoothness routine. Higher arity remains F6.
 
 | ID / scope | Status and trigger | Predecessors and boundary | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- |
-| C10a-01 — coupled polynomial, multiplier, A-population and root setup | **Open; active worktree feasibility.** Normalized forms, wider residue-reusing ranking, guaranteed-two scoring, modular Gray/batch tables and reachable A-product selection are implemented as opt-ins. V4 short calibration selected a bundle; current 60/62/65/70 pilots are in progress. Mainline integration, scoped confirmation and adoption remain open. | Closed C10/C10a-07 control; explicit source/configuration/resource identity. A1a transitions, A1c kernels, C8 family scheduling and C9a intake retain their boundaries. | Astra / **xhigh** throughout this workstream | [Gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open); [42-mechanism assessment](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_research_assessment.md); [current scope and acceptance](#c10a-01--coupled-polynomial-multiplier-a-population-and-root-setup) |
+| C10a-01 — coupled polynomial, multiplier, A-population and root setup | **Done for research, implementation, calibration, feasibility and integration; default promotion by explicit direction, 3 November.** Exact parity forms, wider coupled ranking, guaranteed-two scoring, modular Gray/batch tables and reachable paired A selection are integrated. V4 selected one bundle; 60/62/65/70 feasibility is terminal. Fresh confirmation and all-size performance remain unmeasured; retain failed drift/censored outcomes. | Closed C10/C10a-07 control; explicit source/configuration/resource identity. A1a transitions, A1c kernels, C8 family scheduling and C9a intake retain their boundaries. | Astra / **xhigh** throughout this workstream | [Gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open); [42-mechanism assessment](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/c10a07_research_assessment.md); [current scope and acceptance](#c10a-01--coupled-polynomial-multiplier-a-population-and-root-setup) |
 | C10a-02 — actual-A population and inter-family diversity | **Conditional uncovered delta.** C10a-01 now owns the implemented reachable-window/paired A population and norm-preview experiments. Reconcile those results before proposing broader product/diversity changes; the old 128-A census and rejected ordering retain their scopes. | Require a distinct product/norm/overlap hypothesis and useful post-filter evidence. Preserve unique families, deterministic finite exhaustion and resume prefixes; do not repeat retired quality-order, face or quota grids. | Sol / **xhigh** a separately scoped selector/census design; Astra / **xhigh** coupled arithmetic remaining within C10a-01; optional separate Sol / **high** frozen execution | [Gates and census](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open) |
 | C10a-03 — conservative pre-norm screening and bounded threshold feedback | **Conditional.** Investigate cheaper exact pre-norm rejection on captures including rejected positions, or explicitly selected threshold feedback with a declared coverage/loss contract. Preserve exact refinement and scoped local-bound losses. | Current collector; C9a retains residual admission/target policy. High refined-rejection counts do not prove division dominates or authorize omissions; saturation and small-prime heuristics need independent coverage checks. | Sol / **xhigh** existing-bound design/implementation; Astra / **xhigh** a separately selected new rejection proof; optional separate Sol / **high** frozen execution | [Gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open) |
 | C10a-06 — separate runner/accounting tranche | **Open.** Reconcile repeated lease-marker handling in the separate runner; C10a-05 fixed its own new runner only. Preserve frozen C10 sources and historical failures. | C10/C10a-05; new protocol/source identity for a changed runner. Runner repair establishes no collection-policy promotion. | Sol / **xhigh** accounting changes; Sol / **high** separately frozen execution | [Recorded open item](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open) |
-| C10a-04/G1 — larger-size feasibility after delivered routing | **Conditional follow-up after current C10a-01 feasibility.** Consume its literal 60/62/65/70 results before scheduling duplicate larger-size probes. One exposed modulus gives feasibility, not general calibration or promoted routing. | Automatic routing still ends at 60. The historical 65 spike timed out under an older collector; unvalidated 61–80 interpolation is not a default. A valid 70 comparison does not require 65 completion; subsequent studies need explicit finite grants. | Sol / **xhigh** a separately selected design/configuration task; optional separate Sol / **high** frozen execution; current C10a-01 remains Astra / **xhigh** throughout | [65 spike](benchmarks/RESULTS.md#c10a-04-larger-band-routing); [retained scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open) |
+| C10a-04/G1 — larger-size feasibility after delivered routing | **Conditional follow-up after delivered C10a-01 feasibility.** Consume its literal 60/62/65/70 results before scheduling duplicate larger-size probes. One exposed modulus gives feasibility, not general calibration or promoted routing. | Automatic routing still ends at 60. The historical 65 spike timed out under an older collector; unvalidated 61–80 interpolation is not a default. A valid 70 comparison does not require 65 completion; subsequent studies need explicit finite grants. | Sol / **xhigh** a separately selected design/configuration task; optional separate Sol / **high** frozen execution; current C10a-01 remains Astra / **xhigh** throughout | [65 spike](benchmarks/RESULTS.md#c10a-04-larger-band-routing); [retained scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open) |
 | A1a — direct extended versus pre-integration comparison | Conditional on a useful distinct hypothesis and new freeze; independent studies cannot establish this comparison by chaining gains. | Delivered A1a stays Done; selected-power-period/unroll4 extension remains opt-in after its losses. | Sol / high frozen comparison; xhigh only for changed semantics | [Open gate](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#a1a--selected-collector-kernel-delta-delivered-31-october-2026) |
 
 
@@ -285,43 +727,51 @@ by the existing base-smoothness routine. Higher arity remains F6.
 
 ### C10a-01 — coupled polynomial, multiplier, A-population and root setup
 
-The selected worktree v4 bundle combines `polynomial_policy="parity2"`,
+**Done for the delivered scope; integrated and promoted by explicit user
+direction on 3 November 2026 before fresh confirmation.** The selected v4
+bundle combines `polynomial_policy="parity2"`,
 `multiplier_policy="parity2_wide"`, `assignment_policy="windowed_pair"`,
-`root_update_policy="batch"` and guaranteed-two-power marking. Modular Gray
-tables, batched table construction, reachable A populations and actual-norm
-preview are implemented opt-ins in that worktree, not missing mainline
-deliverables to duplicate. Short v4 calibration selected the wide-density
-ranking; norm preview remains an alternative after matching its winners on
-the exposed inputs while adding setup cost. No global equivalence is proved.
+`root_update_policy="batch"` and `parity_two` marking. Fresh automatic SIQS
+uses it at every size, composing existing kernels. Size presets, grants and
+portfolio eligibility remain unchanged; no tuned 61+ preset is claimed.
 
-Preserve the exact polynomial/norm/original-relation/extraction map, odd/mod-8
-eligibility and standard/even-multiplier fallback. Test characteristic two,
-A/multiplier divisors, singular roots, signs and tails independently. Modular
-Gray shifts must retain centered-B wrap correction and the same physical U
-trials. Bind quota-aware tables to base, A, representation, coordinate/sign
-order and backend; charge private construction, coexistence, refusal and
-rebuild. Existing A-inverse caching alone is not the modular-delta table.
+Delivered work includes broad source/literature reconciliation, exact
+polynomial and original-relation identities, odd/even multiplier semantics,
+independent Cartesian CRT/brute-root/valuation/extraction checks, finite paired
+A selection, modular Gray updates with centered-B corrections, and bounded
+queue/plan/table ownership and charged compatible resume. Legacy checkpoints
+and literal reference configurations retain their original policies. Norm
+preview, narrower ranking and alternative root/A policies remain explicit
+opt-ins; v4 selected wider density ranking after norm preview matched exposed
+winners while adding setup cost. No global equivalence is proved.
 
-For reachable-product/windowed selection, independently verify finite feasible
-populations, Cartesian completion minima, unique A families, deterministic ties
-and exhaustion/resume prefixes. Continuous envelope reachability does not prove
-a small discrete product error. Any further norm-aware ranking needs a fixed
-sampling objective, exact comparisons and complete setup charges; a better
-surrogate score alone is not adoption evidence. Generic A diversification
-beyond this implemented delta retains C10a-02 ownership.
+The [terminal results](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults)
+record 38 v4 calibration cells and complete-call exploratory results on one
+exposed balanced modulus each at 60/62/65/70. Candidate completes all four.
+Both arms complete through 65; the 70 control is user-censored after the
+four-hour restart. The deep 65 follow-up reproduces exact non-timing counters
+and identifies a Low Power Mode transition during the original slow candidate.
+The rerun candidate is faster in raw elapsed time, but the control native
+canary fails the frozen drift gate. No arithmetic fix or clean confirmed
+speedup is established. Host-state guards and their diagnostics are retained.
 
-Current authorized 60/62/65/70 feasibility is in progress under its versioned
-source/configuration/resource freezes. Earlier prototype observations retain
-their own identities. Complete-cost interpretation, any integrated comparison,
-fresh independent-input confirmation and adoption remain open. A valid 70-digit
-stage has its own admission; 65 completion and new matrix/batch work are not
-prerequisites. Do not alter an executing freeze or add unallocated ablations.
+The default decision does not convert these observations into fresh
+confirmation. Lower 50/55 performance, general all-size gains and the native
+proxy's instability remain uncertainties for a separately selected follow-up;
+no automatic repeat or new campaign is scheduled. Broader A diversity remains
+C10a-02; useful intake/storage remains C9a; cross-B lifting remains A1a;
+multi-polynomial buckets remain A1d. Do not duplicate delivered A/root/ranking
+mechanisms or reopen E1.
 
-Independent CRT/root/valuation/extraction oracles, exceptional paths, bounded
-ownership and compatible charged checkpoints apply to every selected policy.
-This workstream retains **Astra / xhigh throughout**, including authorized
-execution. These worktree statements do not merge code, change defaults or
-reopen E1; [STATUS.md](STATUS.md#work-in-flight) identifies the active branch.
+Candidate `4b9a616`, literal control
+`0076e256871722d52d849ab344152e0a7535c2ce` and terminal handoff `d37b809`
+remain reachable in Git. Detailed comparisons, primary-source hashes, exact
+resource/work derivations, unsuccessful outcomes and evidence-chain receipts
+are archived locally at `v2/audit/archives/c10a01-20261103/`. The task worktree
+and temporary state are removed only after hash-verified preservation.
+Historical freezes and their original model/effort assignments remain
+unchanged. Later execution and host-hook requirements were explicitly relaxed
+in the session; no new experimentation is part of this integration.
 
 ## Numbered phase catalogue and acceptance gates
 
@@ -357,7 +807,7 @@ Done for the bounded core; see the completed register below.
 
 | ID | Status | Execution owner / predecessors | Remaining scope and trigger | Full gates and evidence |
 | --- | --- | --- | --- | --- |
-| P3.7 | Deferred | B5 | Measured remaining array bottleneck and usable PyPy dependency required; exact overflow/duplicate-hit and conversion controls. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p37--optional-numpy-spike-for-bounded-siqs-sieve-arrays) |
+| P3.7 | Conditional | B5/B5a | Measured remaining array bottleneck and usable PyPy dependency required; exact overflow/duplicate-hit and conversion controls. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p37--optional-numpy-spike-for-bounded-siqs-sieve-arrays) |
 | P3.8 | Open | A8/B6/B7/C4/D1/D2; C9a/C10a collection interfaces | Real original-relation fixtures and exact forward/transpose products support fill-aware filtering, bounded Python-int Four Russians/PLE and genuine packed sparse solvers. Preserve compact substitution/provenance and original lifting. A8 is required; a B6/C4 win is not. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 
 ### Phase 4 — Optimize ECM chains and arithmetic after coverage exists
@@ -366,7 +816,7 @@ Done for the bounded core; see the completed register below.
 
 | ID | Status | Execution owner / predecessors | Remaining scope and trigger | Full gates and evidence |
 | --- | --- | --- | --- | --- |
-| P4.2 | Conditional | B4/C11 | Bounded B4 is Done. Wider 64–1024-bit formula/reduction/normalization comparisons need a remaining arithmetic bottleneck, fresh whole-engine evidence and exact a24/width/checkpoint/nonunit controls. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p42--compare-fused-and-normalized-montgomery-kernels) |
+| P4.2 | Conditional | B4/B4a/C11 | Bounded B4 is Done; B4a is a separate optional fused native boundary. Wider 64–1024-bit formula/reduction/normalization comparisons need a remaining arithmetic bottleneck, fresh whole-engine evidence and exact a24/width/checkpoint/nonunit controls. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p42--compare-fused-and-normalized-montgomery-kernels) |
 | P4.3 | Deferred | A2/A2a/C11 | Foundation and stopped study are Done. Further experiments stopped; independent 3–100-digit stage/size confirmation, selective GMP-helper policy and automatic backend selection remain unsettled. Resume only as a separately selected tranche. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p43--compare-pypy-python-integers-and-optional-gmpmpz) |
 | P4.4 | Conditional | C5 | Remaining reduction bottleneck after A2/B4; exact encoded-domain/unit-scaling, intermediate-width and recovery proofs before whole-loop comparison. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p44--keep-barrettmontgomery-reducers-experimental-until-measured) |
 
@@ -377,7 +827,7 @@ Done for the bounded core; see the completed register below.
 | ID | Status | Execution owner / predecessors | Remaining scope and trigger | Full gates and evidence |
 | --- | --- | --- | --- | --- |
 | P5.1 | Open | A5 then B8 | Binary Lucas stages 1/2, discriminant/parameter checks, exact powers, genuine stage two, bounded trials/saturation/resume; prove marginal portfolio value. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p51--implement-williams-p1-with-binary-lucas-evaluation) |
-| P5.2 | Conditional | C2/C3a/F3; G1 allocation | A3/B2 delivered programs/pairing retain scoped decisions; increased-B1 ECM points, advanced pruning/common-Z, polynomial continuation and allocation remain separate. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p52--pair-ecm-stage-2-primes-and-tune-table-size) |
+| P5.2 | Conditional | C2/C3a/B3a/F3; G1 allocation | Existing classical and optional paired decisions remain controls. Joint bounds/count, descendant search credit, selected higher-bound chains, old-point extension and polynomial continuation have distinct proofs; component feasibility does not wait for E1. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p52--pair-ecm-stage-2-primes-and-tune-table-size) |
 | P5.3 | Open | B8/F8; G1 allocation | A6 p−1 tranche is Done. Production-bound p−1 B2/B1 and gap/cache calibration remain with C11/G1; Lucas recurrence, p+1 extension and ECM old-point migration need independent composition/ratio/checkpoint proofs. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently) |
 | P5.4 | Open | Combined C9a with C10a/B7; C1a; A8/C4 | C1/C9 delivered DLP tranches remain Done. Select independently flagged yield/cadence, intake, endpoint, cycle and compact-record mechanisms in one feasible bundle; targeted ablations and fresh whole-factor evidence govern adoption. Higher arity remains F6. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p54--add-double-large-prime-siqs-and-stronger-filtering) |
 
@@ -387,9 +837,9 @@ Done for the bounded core; see the completed register below.
 
 | ID | Status | Execution owner / predecessors | Remaining scope and trigger | Full gates and evidence |
 | --- | --- | --- | --- | --- |
-| P6.1 | Conditional | F2 | E1 and whole curve-family/stage-one cost/yield justification; distinguish curve torsion from selected-point order and validate stage-two maps. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p61--compare-edwardswindowed-and-torsion-aware-ecm) |
-| P6.2 | Open selected F7 design; other scopes Conditional | F3/F5/F6/F7/F8 | F7 owns SIQS direct/tree screening and its wider-base/pending-state proof; C9a/F7 residual batching and F6 higher arity need explicit domains. Isolated F6/F7 feasibility does not wait for E1; other polynomial/cross-family/fast-P±1 branches retain their gates. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p62--investigate-polynomial-continuations-and-richer-relation-collectors) |
-| P6.3 | Conditional | B12/A7a/F4 | Stable serial control and worker contracts; compare 1/2/4 workers, fixed work and first-factor latency under aggregate limits. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
+| P6.1 | Conditional | F2 | Whole curve-family/stage-one cost/yield, nonunit maps and chosen-point order; isolated feasibility can precede E1, which remains for combined acceptance. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p61--compare-edwardswindowed-and-torsion-aware-ecm) |
+| P6.2 | Open selected F3/F7 design; other implementations Conditional | F3/F5/F6/F7/F8/F9 | F3 owns exact polynomial ECM kernels/trees; F8 owns distinct fast P±1; F9 is the conditional genus-two branch. F7 and C9a own their SIQS/batch domains; F6 higher arity has its own proof. Isolated F2/F3/F4/F6/F7 feasibility uses current controls without E1; later combined acceptance and F5 retain their gates. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p62--investigate-polynomial-continuations-and-richer-relation-collectors) |
+| P6.3 | Open preparation; conditional adoption | B12/A7a/F4 | Independent ECM and current-collector QS worker workstreams can prepare before E1. Reuse A7; settle growing-DLP/current-policy compatibility for QS. Compare 1/2/4 workers, then justified wider M4 occupancy, with total CPU, aggregate memory and first/full-factor wall time; later integrated acceptance retains E1. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
 | P6.4 | Open | C11 protocol preparation; I1 final publication | Prepare comparable pinned Python competitor feasibility now, separating runtime/backend/worker classes and complete versus factor-one outcomes. Final claims retain H1, selected P6 decisions, committed-only validation and fresh matched confirmation. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p64--publish-reproducible-workload-specific-results) |
 
 ### Phase 7 — Implement and scale GNFS
@@ -415,18 +865,18 @@ Done for the bounded core; see the completed register below.
 | P8.1 | Open | D7 | Deferred E1 must settle before freezing accepted current engines and untouched evaluation; preserve M12–M17 evidence. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p81--freeze-the-new-control-and-untouched-evaluation-data) |
 | P8.2 | Open | E3/A10a; A10 Done; B14 open | D7 for integrated tuning; justified isolated oracle spikes may precede it. Preserve exact rejection/certainty and prior losses. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p82--reduce-preprocessing-work-with-exact-rejection-proofs) |
 | P8.2.2 | Open | B14 | A10 is settled; start n−1/Pocklington with independent verification, bounded recursive proof/search/storage and requested-proof resume. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p822--generate-and-independently-verify-prime-certificates-b14) |
-| P8.3 | Open | E4 | D7; identical total grants/seeds, full recovery and resume; demonstrate marginal first-factor/complete value. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p83--calibrate-bounded-rho-batches-walks-and-restarts) |
+| P8.3 | Open | E4 | Current committed control for isolated screening; D7 for integrated tuning. Match total grants/seeds, full recovery/resume and marginal complete value. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p83--calibrate-bounded-rho-batches-walks-and-restarts) |
 | P8.4 | Open | G1/C3a; C3 Done | D7/E1 and selected decisions; charge prior work and fit only observable metadata, with matched fresh confirmation. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p84--tune-ecmp1-allocation-and-relation-engine-handoff) |
-| P8.5 | Conditional | E5 | D7 and changed cost; preserve deadlines, saturation recovery, atomic commits, charged replay and corrupt-state checks. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p85--measure-recovery-polling-and-checkpoint-costs-separately) |
-| P8.6 | Conditional | E6/C11/A2a | D7 for changed-workload tuning; continue parameter provenance without repeating accepted chains/kernels or copying native thresholds. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p86--revisit-context-setup-and-schedules-only-for-changed-workloads) |
+| P8.5 | Conditional | E5 | Current committed contracts and observed cost for isolated screening; D7 for integrated tuning. Preserve deadlines, saturation recovery, atomic commits and charged replay. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p85--measure-recovery-polling-and-checkpoint-costs-separately) |
+| P8.6 | Conditional | E6/C11/A2a/B4a | Current contracts for isolated context/boundary screening; D7 for integrated tuning. Preserve prior cache/wheel losses and complete cold/warm costs. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p86--revisit-context-setup-and-schedules-only-for-changed-workloads) |
 | P8.7 | Open | H1 | G1 and E3–E6/selected P6 decisions; integrate confirmed winners and reconcile each historical P2 gate on untouched data. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p87--integrate-accepted-winners-and-close-the-reconciliation) |
 
 ### P3.8 carry-over and mathematical boundaries
 
 | Existing ID | Status / next scope | Trigger, predecessors and owner | Evidence |
 | --- | --- | --- | --- |
-| P3.8-R1 | Open beyond completed B1 calibration: larger feasible calibration and independent corpus/runner coverage; reconcile C10a-01's implemented A/root/multiplier bundle before new population work. | C10a-01 owns its active four-size feasibility; C10a-02 keeps uncovered product/diversity hypotheses. Coordinate C3a/G1 and stratified factor balance; no native crossover threshold or duplicate larger-size campaign. Astra / xhigh for current C10a-01; Sol / xhigh separate selection. | [Original carry-over](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
-| P3.8-R2 | Conditional B13/C8 capacity and whole-interval CRT; bounded A1 integration is Done. | New calibrated refusal or eligible-prime/root-cost evidence. Astra / xhigh. | [R2 and deferrals](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
+| P3.8-R1 | Open beyond completed B1 calibration: larger feasible calibration and independent corpus/runner coverage; reconcile C10a-01's implemented A/root/multiplier bundle before new population work. | C10a-01 retains its completed four-size feasibility; C10a-02 keeps uncovered product/diversity hypotheses. Coordinate C3a/G1 and stratified factor balance; no native crossover threshold or duplicate larger-size campaign. Astra / xhigh for current C10a-01; Sol / xhigh separate selection. | [Original carry-over](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
+| P3.8-R2 | Open A1d batching design; conditional B13/C8 capacity and whole-interval CRT. Bounded A1 integration stays Done. | A1d exact queue/family contract and current traversal-cost hypothesis: Sol / xhigh. B13/C8 require their distinct refusal/eligibility evidence: Astra / xhigh. | [R2 and deferrals](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R3 | Open combined C9a cadence/storage and A8/B7/C4 filtering/provenance preparation. Delivered mixed-row/cadence-32 scope and old cadence-8/layout losses stay recorded. | Use current preparation/filter/solve counters and useful progress; no automatic old-campaign repeat. Selected representations need exact bounds, original-row lifting and simultaneous ownership. Astra / xhigh expanded C9a/storage; Sol / xhigh separately scoped pacing. | [R3 gates and rejected layouts](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R4 | Conditional residual-classification/certification reuse after delivered C1; preserve certainty. | Profile must show repeated intake/atomic primality cost. A base-squared shortcut needs complete eligible-prime coverage including A/multiplier exceptions; opaque composite cofactors need a separate type/checkpoint proof. C9a/E3 coordinate; Astra / xhigh changed proof. | [R4 gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R5 | Deferred E1 final SSS/worker/current-control comparison after Done A7 reconciliation. | Worker flyer/large-interval compatibility and 40-digit SSS calibration need explicit decisions. Clarify upstream root license before further adaptation; use assignment IDs for seeds, include transport/conversion/loss/replay costs. Sol / high reconciliation; xhigh accounting. | [R5/E1 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#a1c--same-modulus-two-root-interleaving-conditional); [pinned arms](benchmarks/inputs/controls/a7_r5_e1_arms.json) |

@@ -1,17 +1,43 @@
 # Factor status
 
-Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `0076e256871722d52d849ab344152e0a7535c2ce`.
+Last updated: 3 November 2026 (America/Los_Angeles).
+Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
-2 November; implementation remains in the C10a-01 worktree.
+2 November; C10a-01 is now integrated with the selected policies enabled
+for every fresh automatic SIQS configuration by explicit user direction.
+The expanded 2 November ECM/QS literature and source review adds A1d
+multi-polynomial buckets and conditional F9 genus-two/Kummer research to the
+ECM/acceleration amendments. It changes no defaults and launches no runs.
+Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
+`v2/audit/research/ecm/roadmap_review_20261102.md`.
+The broader portfolio follow-up adds B4a fused native ECM chunks and expands
+E3/E4/E5/E6/A10a/A2a opportunity gates. Local supporting review:
+`v2/audit/research/portfolio_review_20261102.md`. No experiment is launched.
+The subsequent QS CFFI/SIMD pass refines B5a with queue-compatible buffers,
+root/mark/scan packets and separate M4 NEON versus x86 AVX dispatch. Local
+review: `v2/audit/research/qs_cffi_simd_20261102.md`.
 
-**Target metric: TBD.**
+**Target: complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
+machine; all cores are available.** Choose worker counts by measured latency
+and aggregate memory, with total CPU reported as a secondary cost.
+
+**Primary workload: uniformly sampled random integers at 60, 80 and 100 decimal
+digits, with equal weight across the three size bands.** Report median and p90
+complete-factorization time and completion rates for each band. Balanced
+semiprime completion at 60 and 70 digits is a must-not-regress constraint.
+
+**Native code is allowed as an optional backend; a working pure-Python/PyPy
+fallback must remain available.** Select one justified implementation per
+task; NumPy and CFFI are alternatives, not mandatory twin developments.
+These are planning and acceptance objectives, not implemented default changes.
+See [metric and resource rules](POLICY.md#scope-and-standing-directions).
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 Full historical results and gates remain in the [history index](history/README.md).
-The current objective includes useful progress toward 60–80-digit factoring;
-practical general completion there remains unestablished.
+Useful progress toward 60–80-digit factoring remains the immediate focus;
+100 digits is also a measurement target, with completion feasibility still
+unestablished. Existing experiments retain their frozen scopes and budgets.
 
 C9a preparation on `codex/c9a-combined-yield-review` starts from committed
 `b0813230a05396874c41c649fa01738484a1f55e`. Its opt-in bundle implements
@@ -40,6 +66,13 @@ tests (9 skipped), after fixing expanded incidence statistics and tuple-only
 legacy loader compatibility. See `v2/audit/c9a/verification-09.json` for receipts;
 feasibility and performance execution remain pending.
 
+The C9a branch now merges master through `066456a`, including the C10a-01
+implementation and fresh automatic policies. The resolved merge passes 1,029
+unit tests (9 skipped), including coupled arithmetic with yield checkpoints.
+The initial feasibility run was paused before any worker started. Its older
+freeze remains historical; a current-mainline comparison must bind the same
+coupled policies in both arms under a new matched configuration identity.
+
 ## Current automatic defaults
 
 These are current committed behavior, not claims that every routed band passed
@@ -56,17 +89,25 @@ fields. SSS and production workers remain opt-in/experimental.
 
 | Decimal digits / scope | Owned memory allowance | Automatic SIQS selection | Adoption evidence and limits |
 | --- | --- | --- | --- |
-| Exactly 40, native | 1 GiB child; omitted outer portfolio adds 16 MiB | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; sparse marking; window pacing; multiplier 1 | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
-| Exactly 50, native | Same | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused; collection pacing; multiplier 1 | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
+| Exactly 40, native | 1 GiB child; omitted outer portfolio adds 16 MiB | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; parity_two marking; window pacing; coupled scored multiplier | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
+| Exactly 50, native | Same | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused+parity_two; collection pacing; coupled scored multiplier | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
 | Exactly 51, native | Same | Same concrete bundle as 50 | [51-digit completion adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open). A1a marking at 51 is an **unmeasured interpolation**. |
-| 52–54, native | Same | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; scored odd multiplier (`multiplier=0`); 2 MiB plan; A1a marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
+| 52–54, native | Same | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; coupled odd/even scored multiplier (`multiplier=0`); 2 MiB plan; A1a marking plus parity_two; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
 | Exactly 55, native | Same | Same counted bundle as 52–54 | Same [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
-| 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; scored odd multiplier; 2 MiB plan; sparse marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
+| 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; coupled scored multiplier; 2 MiB plan; parity_two marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
 | Exactly 60, native | Same | Same counted bundle as 56–59 | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
-| Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, sparse marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
-| Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size policy; swapped signs below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No measured promoted size default at 41–49 or 61+. |
+| Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, parity_two marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
+| Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size parameters with the coupled policies below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No calibrated size preset at 41–49 or 61+; the coupled-policy promotion below still applies. |
 
-Every fresh automatic SIQS configuration selects `sign_policy="swap_high"`.
+Every fresh automatic SIQS configuration at every supported size/backend
+selects `sign_policy="swap_high"`, `polynomial_policy="parity2"`,
+`multiplier_policy="parity2_wide"`, `multiplier=0`,
+`assignment_policy="windowed_pair"`, `root_update_policy="batch"` and composed
+`parity_two` marking. The C10a-01 all-size promotion is an explicit policy
+decision before fresh confirmation; the [results and limits](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults)
+retain the 65-digit failed canary and censored 70-digit control. Other sizes
+keep generic reference parameters and grants with these selected policies;
+there are no new calibrated 61+ presets or portfolio bands.
 Native calibrated collectors above select a 32 MiB sparse-queue ceiling within
 the existing owned allowance, with charged rebuild and exact fallback for
 unsupported paths or capacity refusal. The combined C10a-07 policy is adopted.
@@ -77,7 +118,7 @@ backends and grants are unmeasured policy extrapolations. See the
 
 Omitted calibrated SIQS grants are 10^13 work units and 1,200 wall/CPU seconds
 through 55 digits, 1,800 at 56–60. All calibrated bundles use half-width 65,536,
-flyer assignments and a 64-polynomial family prefix. Explicit limits win;
+windowed paired assignments and a 64-polynomial family prefix. Explicit limits win;
 these grants promise no completion. The [configuration guide](qs/CONFIGURATION.md#explicit-and-automatic-selection)
 explains residual/endpoint/product controls and charged base-count resolution.
 
@@ -102,47 +143,73 @@ is a separate deferred mechanism, not a continuation of this completed study.
 Evidence and tests are integrated in mainline; task worktrees/scratch were
 removed after archive verification. See the report's integration/cleanup record.
 
-## Work in flight
+## C10a-01 delivered integration
 
-These worktrees were present at review; presence establishes ownership, not an
-experimental result. No other sessions were contacted.
+The coupled arithmetic, finite multiplier/A selection, modular root updates,
+independent exceptional-root/reconstruction oracles and versioned charged
+resume are integrated. The all-size default decision follows the completed
+60/62/65/70 exploratory feasibility work and the deep 65-digit host-state
+investigation. No arithmetic regression was found; timing and confirmation
+limits remain explicit in [results](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
 
-| ID | One-line scope | Worktree / branch |
-| --- | --- | --- |
-| C10a-01 | Checked opt-in polynomial/multiplier/A-population/root-table bundle; v4 calibration and current 60/62/65/70 feasibility stay under their versioned freezes. Code is not integrated into mainline; see the [current scope](ROADMAP.md#c10a-01--coupled-polynomial-multiplier-a-population-and-root-setup). | `/Users/nishanthmohan/Documents/code/factor-c10a01` / `codex/c10a01-normalized-polynomials` |
+Research, raw receipts, failures and sealed evidence are retained locally at
+`v2/audit/archives/c10a01-20261103/`. Task worktree and temporary-state cleanup
+is verified against the archive manifests. Source history and frozen controls
+are retained; no E1 campaign or remote push accompanies this integration.
 
 ## Next eligible items
 
-The [existing execution rows](ROADMAP.md#open-and-conditional-execution-items)
-now include the QS review's scopes, dependencies and model/effort assignments.
-For current QS progress, prioritize the following work; this schedules no runs.
+Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
+for the ordering under the wall-time objective and declared workloads above.
+Task rows retain exact scope, dependencies and fixed-session model assignments.
 
-1. **C9a combined useful-yield/admission/cycle/storage candidate — Astra / xhigh.**
-   Select justified independently flagged mechanisms and targeted ablations.
-   Cadence-only existing-policy work is a smaller Sol / xhigh scope. B7/C10a
-   supply contracts within the workstream; isolated component wins and separate
-   chats are unnecessary. Preserve exactness and require fresh whole-factor
-   confirmation for adoption.
-2. **A1c bulk marking/scanning or paired-root kernel — Sol / xhigh.**
-   Retain queue eligibility and prior kernel losses; select a bounded prototype.
-   **F7 SIQS direct/tree screening — Astra / xhigh** is the next larger
-   research/implementation candidate with explicit wider-base and batch proofs.
-3. **A1a checked transitions — Sol / xhigh; cross-B lifting — Astra / xhigh.**
-   Reuse the implemented C10a-01 Gray tables instead of duplicating them.
-4. **A8 operator/lifting fixtures, then C4/B7/B6/D1 — Astra / xhigh.**
-   Preparation is eligible now. Stronger filtering is independent of a Four
-   Russians win; sparse designs need A8's contract rather than unrelated
-   experimental success. C11/P6.4 competitor protocol design uses Sol / xhigh.
-5. A5 Williams p+1, B12 worker contracts and B14 prime certificates retain
-   their independent predecessors and model assignments. B14 is High for
-   certification. A1b-F1 remains Deferred; current C10a-01 feasibility already
-   covers the selected larger-size probes.
-6. D7/E3–E6, integrated F4 workers, G1/H1 and I1 retain their recorded
-   predecessors. E1 remains Deferred.
+1. **C3a/C11 current portfolio/ECM cost-yield and missing-policy screen — Sol / xhigh.**
+   Start from completed C3 and existing deeper presets; select a concrete
+   60–100-digit opportunity, completed-search credit or handoff delta.
+2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
+   Prepare stable RNG/lease/restart contracts. Isolated ECM feasibility does
+   not wait for E1; measure 1/2/4 workers before wider M4 occupancy.
+3. **A7a current-collector parallel QS collection — Sol / xhigh.**
+   Reuse A7 workers, adapting growing-DLP and current collector identities
+   before measuring 1/2/4-worker complete factoring at 60/70 digits. Existing
+   workers reject growing DLP and cap windows below the calibrated serial
+   width. Family-sharing alternatives are a later measured subquestion.
+4. **C9a combined useful-yield candidate — Astra / xhigh.**
+   Ranked next after parallel collection; research need not wait for a worker
+   result. Rank intake/endpoints against current collection cost; use late-run
+   replays for cycle/storage/cadence hypotheses.
+5. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
+   Price complete setup/conversion/recovery and scalar execution before SIMD
+   or new reducers. A CFFI wrapper alone is no measured gain.
+6. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
+   are polynomial-local; amortize prime/root traversal across a funded Gray
+   batch, retaining exact coverage and charging unused preparation.
+7. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
+   continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
+   neither deeper-bound savings nor a polynomial/backend crossover is measured.
+8. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Select a PyPy, NumPy or CFFI
+   scan/root/mark packet with queue-compatible buffers and exact hit/score
+   costs; retain the Python fallback. M4 NEON and x86 AVX are separate targets.
+   M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
 
-Separate worktrees isolate source changes. Keep current C10a-01 timing freezes
-unchanged; parallel research/design and light edits can proceed, while heavy QA
-and measurements share one serialized performance window. A later separately
+The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
+initial opportunities, with explicit capacity/profile triggers. E3/A10a/E4/E5/
+E6 can screen a named current cheap-path or overhead gap without restarting
+E1/D7; integrated tuning retains its prerequisites. B14 remains
+High for requested prime certification; accounting/correctness repairs take
+precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 is integrated and E1
+remains Deferred. Do not restart the stopped broad backend study or duplicate the completed
+C10a-01 exploratory feasibility.
+
+E6's prime-generation candidate is a source-bundled adaptation of the existing
+C11 wheel-30 sieve through CFFI, with finite batches and a Python fallback.
+It must not depend on a sibling checkout or an external prime-sieve library;
+see the [native prime-provider gates](ROADMAP.md#e6--self-contained-native-prime-generation).
+Local source review: `v2/audit/research/prime_provider_20261102.md`.
+
+Separate worktrees isolate source changes. Preserve C10a-01 historical timing
+freezes; later comparisons need a new committed source identity. Heavy QA and
+measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
 ## Known gaps and unresolved conflicts
@@ -153,8 +220,9 @@ requested execution chat may use Sol / high where its task row permits it.
 - **Inconclusive/unmeasured:** the adoption limitations are attached to the
   tables above. No broad SIQS crossover or practical general 60–80-digit
   completion has been established. The historical 65-digit spike timed out
-  under an older collector; current C10a-01 60/62/65/70 feasibility is in flight.
-  Consume its scoped results before a duplicate larger-size study; there is
+  under an older collector; C10a-01 now records exploratory completions at all four sizes, with
+  the 65 rerun drift failure and censored 70 control. Consume those scoped
+  results before a duplicate larger-size study; there is
   no promoted 61–80 route.
 - **Open:** C10a-06 runner work; R3 general cadence/storage proofs; B14 proofs;
   final SSS/worker comparisons and upstream-license clarification. See the

@@ -173,8 +173,33 @@ def _reserve_growing_checkpoint(job):
         raise MemoryError("growing checkpoint encoding exceeds memory_bytes")
 
 
+def _arithmetic_version(values):
+    """Identify coupled arithmetic independently of the collector schema."""
+    if (
+        values.get("root_update_policy", "standard") != "standard"
+        or values.get("assignment_policy") == "windowed_pair"
+        or values.get("multiplier_policy") == "parity2_norm"
+    ):
+        return 10
+    marking = values["collector"].get("marking", "")
+    if (
+        values.get("multiplier_policy") == "parity2_wide"
+        or values.get("assignment_policy") == "paired_flyer"
+        or (isinstance(marking, str) and "parity_two" in marking.split("+"))
+    ):
+        return 9
+    if (
+        values.get("polynomial_policy", "standard") != "standard"
+        or values.get("multiplier_policy", "standard") != "standard"
+    ):
+        return 8
+    return 0
+
+
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
+    config_values = asdict(job.config)
+    arithmetic_version = _arithmetic_version(config_values)
     version = (
         13
         if isinstance(job.config.collector, ExtendedYieldSieveConfig)
@@ -182,6 +207,8 @@ def pack_job(job):
         if isinstance(job.config.collector, CombinedYieldSieveConfig)
         else 11
         if isinstance(job.config.collector, YieldSieveConfig)
+        else arithmetic_version
+        if arithmetic_version
         else 7
         if job.config.sign_policy != "canonical"
         or job.config.collector.sparse_queue_bytes
@@ -260,7 +287,7 @@ def pack_job(job):
         backend=arithmetic.get_backend(job.config.backend).identity,
         n=job.n,
         seed=job.seed,
-        config=asdict(job.config),
+        config=config_values,
         multiplier=job.multiplier,
         base_identity=None if job.base is None else _identity(job.base),
         assignment_identity=None
@@ -289,11 +316,20 @@ def pack_job(job):
         store=store,
         store_identity=_checksum(store),
     )
+    if arithmetic_version == 10:
+        payload["coupled_semantics"] = "c10a01-coupled-v4"
+    else:
+        payload["config"].pop("root_update_policy")
+    if arithmetic_version == 9:
+        payload["coupled_semantics"] = "c10a01-coupled-v3"
     if version >= 6:
         payload["pending_final_reason"] = job.pending_final_reason
     else:
         # Keep legacy checkpoint configuration and schema identities intact.
         payload["config"].pop("solve_policy")
+    if arithmetic_version < 8:
+        payload["config"].pop("polynomial_policy")
+        payload["config"].pop("multiplier_policy")
     if version < 7:
         payload["config"].pop("sign_policy")
         payload["config"]["collector"].pop("sparse_queue_bytes")
@@ -540,6 +576,9 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         5,
         6,
         7,
+        8,
+        9,
+        10,
         11,
         12,
         13,
@@ -631,11 +670,54 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "sign_policy" in values or "sparse_queue_bytes" in values["collector"]
     ):
         raise ValueError("legacy checkpoint cannot change collection policy")
-    if payload["version"] in (7, 11, 12, 13) and (
+    if payload["version"] >= 7 and (
         "sign_policy" not in values
         or "sparse_queue_bytes" not in values["collector"]
     ):
         raise ValueError("collection checkpoint lacks its policy identity")
+    policies = {"polynomial_policy", "multiplier_policy"}
+    # C9a schemas11–13 predate coupled-policy fields. Old checkpoints keep
+    # standard arithmetic; new combinations bind the C10a marker separately
+    # without losing the collector's indexed/provenance/resume schema.
+    arithmetic_version = (
+        _arithmetic_version(values)
+        if payload["version"] >= 11
+        else payload["version"]
+    )
+    if arithmetic_version < 8 and policies.intersection(values):
+        raise ValueError("legacy checkpoint cannot change arithmetic policy")
+    if arithmetic_version >= 8 and not policies.issubset(values):
+        raise ValueError("parity checkpoint lacks its policy identity")
+    introduced_v4 = (
+        values.get("root_update_policy", "standard") != "standard"
+        or values.get("assignment_policy") == "windowed_pair"
+        or values.get("multiplier_policy") == "parity2_norm"
+    )
+    if arithmetic_version < 10 and (
+        "root_update_policy" in values or introduced_v4
+    ):
+        raise ValueError("legacy checkpoint cannot change v4 coupled policy")
+    if arithmetic_version == 10 and (
+        "root_update_policy" not in values
+        or not introduced_v4
+        or payload.get("coupled_semantics") != "c10a01-coupled-v4"
+    ):
+        raise ValueError("v4 checkpoint lacks its coupled policy identity")
+    marking = values["collector"].get("marking", "")
+    introduced = (
+        values.get("multiplier_policy") == "parity2_wide"
+        or values.get("assignment_policy") == "paired_flyer"
+        or (isinstance(marking, str) and "parity_two" in marking.split("+"))
+    )
+    if arithmetic_version < 9 and (
+        introduced or "coupled_semantics" in payload
+    ):
+        raise ValueError("legacy checkpoint cannot change coupled policy")
+    if arithmetic_version == 9 and (
+        not introduced
+        or payload.get("coupled_semantics") != "c10a01-coupled-v3"
+    ):
+        raise ValueError("coupled checkpoint lacks its policy identity")
     collector_type = (
         ExtendedYieldSieveConfig
         if payload["version"] == 13
@@ -828,6 +910,8 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         family_factory = (
             partial(make_family, config=config)
             if config.sign_policy != "canonical"
+            or config.polynomial_policy != "standard"
+            or config.root_update_policy != "standard"
             else PolynomialFamily
         )
         job.family = family_factory(

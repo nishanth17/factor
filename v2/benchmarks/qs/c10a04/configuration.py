@@ -28,7 +28,13 @@ def template(digits, arm):
     control = default_siqs_config(10**49)
     # Preserve this historical collector when automatic marking advances.
     control = replace(
-        control, collector=replace(control.collector, marking="sparse")
+        control,
+        multiplier=1,
+        assignment_policy="flyer",
+        polynomial_policy="standard",
+        multiplier_policy="standard",
+        root_update_policy="standard",
+        collector=replace(control.collector, marking="sparse"),
     )
     if arm == "control":
         return control

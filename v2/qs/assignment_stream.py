@@ -8,6 +8,7 @@ from ..common import utils
 from ..common.arithmetic import gcd
 from .families import MAX_A_FACTORS, _checksum, _identity
 from .polynomial import a_target
+from .product_window import feasible_core_window
 
 QUALITY_BATCH_SIZE = 16
 
@@ -15,6 +16,45 @@ QUALITY_BATCH_SIZE = 16
 def quality_workspace(factor_count):
     """Reserve a fixed batch, sort keys and old/new cache coexistence."""
     return 4096 + 2 * QUALITY_BATCH_SIZE * (512 + 256 * factor_count)
+
+
+def paired_workspace(base_count, factor_count):
+    """Reserve disjoint completion lists and scan/rebuild scratch."""
+    return 8192 + 64 * base_count + 256 * factor_count
+
+
+def nearest_factor_pair(lower, upper, product, target, budget):
+    """Minimize exact product error over sorted positive disjoint sets.
+
+    A below-target corner discards its smaller row; an above-target corner
+    discards its larger column. At most len(lower)+len(upper)-1 steps suffice.
+    The caller certifies sorted prime sets. Nothing mutable is published.
+    """
+    if not lower or not upper:
+        raise ValueError("paired flyer needs both completion sets")
+    left, right, best = 0, len(upper) - 1, None
+    charge = (
+        max(
+            target.bit_length(),
+            product.bit_length()
+            + 2 * max(lower[-1].bit_length(), upper[-1].bit_length()),
+        )
+        + 3
+    )
+    while left < len(lower) and right >= 0:
+        budget.consume(charge)
+        p, q = lower[left], upper[right]
+        value = product * p * q
+        key = abs(value - target), p, q
+        if best is None or key < best:
+            best = key
+        if value == target:
+            break
+        if value < target:
+            left += 1
+        else:
+            right -= 1
+    return best[1:]
 
 
 def unrank_combination(size, count, rank):
@@ -66,8 +106,16 @@ class AssignmentStream:
             if value > high:
                 raise ValueError(f"{name} exceeds the stream limit")
 
-        if policy not in ("nearest", "flyer", "quality"):
+        if policy not in (
+            "nearest",
+            "flyer",
+            "quality",
+            "paired_flyer",
+            "windowed_pair",
+        ):
             raise ValueError("unknown streaming A policy")
+        if policy in ("paired_flyer", "windowed_pair") and factor_count < 3:
+            raise ValueError("paired flyer requires at least three factors")
         self.policy = policy
         self._quality_start = -1
         self._quality_values = ()
@@ -76,22 +124,60 @@ class AssignmentStream:
         )
         if policy == "quality":
             self.workspace_bytes += quality_workspace(factor_count)
+        if policy in ("paired_flyer", "windowed_pair"):
+            self.workspace_bytes += paired_workspace(
+                len(base.entries), factor_count
+            )
         if self.workspace_bytes > memory_bytes:
             raise MemoryError("assignment stream exceeds memory_bytes")
         self.budget = budget
         self.target = a_target(base.n_prime, half_width)
         budget.consume(len(base.entries) * (factor_count + 1))
         eligible = tuple(p for p in base.primes if p != 2 and base.n_prime % p)
+        # Keep one prime at either extreme outside a paired core pool.
+        pool_candidates = (
+            eligible[1:-1] if policy == "paired_flyer" else eligible
+        )
         self.pool = tuple(
             sorted(
-                eligible, key=lambda p: (abs(p**factor_count - self.target), p)
+                pool_candidates,
+                key=lambda p: (abs(p**factor_count - self.target), p),
             )[:pool_size]
         )
         self.core_count = factor_count - (
             policy in ("flyer", "quality") and factor_count > 1
         )
         self.flyers = ()
-        if self.core_count < factor_count:
+        self.lower_flyers = self.upper_flyers = ()
+        if policy == "windowed_pair":
+            self.core_count = factor_count - 2
+            self.lower_flyers = eligible[1::3]
+            self.upper_flyers = eligible[2::3]
+            window, self.envelope_miss = feasible_core_window(
+                eligible[::3],
+                self.lower_flyers,
+                self.upper_flyers,
+                self.core_count,
+                pool_size,
+                self.target,
+                budget,
+            )
+            self.pool = tuple(
+                sorted(
+                    window,
+                    key=lambda p: (abs(p**factor_count - self.target), p),
+                )
+            )
+        elif policy == "paired_flyer":
+            self.core_count = factor_count - 2
+            if len(self.pool) < self.core_count:
+                raise ValueError("too few primes for a paired core pool")
+            low, high = min(self.pool), max(self.pool)
+            self.lower_flyers = tuple(p for p in eligible if p < low)
+            self.upper_flyers = tuple(p for p in eligible if p > high)
+            if not self.lower_flyers or not self.upper_flyers:
+                raise ValueError("paired flyer needs both completion sets")
+        elif self.core_count < factor_count:
             core = set(self.pool)
             self.flyers = tuple(p for p in eligible if p not in core)
             if not self.flyers:
@@ -101,6 +187,18 @@ class AssignmentStream:
 
         if len(self.pool) < self.core_count:
             raise ValueError("too few nonsingular primes for the requested A")
+        if policy in ("paired_flyer", "windowed_pair"):
+            budget.consume(len(self.pool) * (factor_count + 1))
+            ordered = sorted(self.pool)
+            smallest = ordered[: self.core_count]
+            start = len(ordered) - self.core_count
+            largest = ordered[start:]
+            self.partition_minimum = (
+                prod(smallest) * self.lower_flyers[0] * self.upper_flyers[0]
+            )
+            self.partition_maximum = (
+                prod(largest) * self.lower_flyers[-1] * self.upper_flyers[-1]
+            )
         self.total = comb(len(self.pool), self.core_count)
         self.count = min(family_count, self.total)
         generator = random.Random(seed)
@@ -118,7 +216,11 @@ class AssignmentStream:
 
         self.identity = _checksum(
             [
-                "assignment-stream-quality-16-v1"
+                "assignment-stream-windowed-pair-v1"
+                if policy == "windowed_pair"
+                else "assignment-stream-paired-v1"
+                if policy == "paired_flyer"
+                else "assignment-stream-quality-16-v1"
                 if policy == "quality"
                 else "assignment-stream-v1",
                 _identity(base),
@@ -154,7 +256,17 @@ class AssignmentStream:
             self.pool[i]
             for i in unrank_combination(len(self.pool), self.core_count, rank)
         ]
-        if self.flyers:
+        if self.policy in ("paired_flyer", "windowed_pair"):
+            values.extend(
+                nearest_factor_pair(
+                    self.lower_flyers,
+                    self.upper_flyers,
+                    prod(values),
+                    self.target,
+                    self.budget,
+                )
+            )
+        elif self.flyers:
             product = prod(values)
             position = bisect_left(
                 self.flyers, (self.target + product - 1) // product

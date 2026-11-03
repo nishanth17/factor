@@ -13,6 +13,7 @@ from v2.benchmarks.qs.c9a.__main__ import execution_cells
 from v2.benchmarks.qs.c9a.accounting import StudyLedger
 from v2.benchmarks.qs.c9a.configuration import configuration, decode
 from v2.benchmarks.qs.c9a.confirmation import input_prefix
+from v2.benchmarks.qs.c9a.control import control_modules
 from v2.benchmarks.qs.c9a.journal import atom_record, canonical
 from v2.benchmarks.qs.c9a.plan import limits
 from v2.benchmarks.qs.c9a.preparation import INPUTS
@@ -20,6 +21,19 @@ from v2.tests.test_c9a_extended import atom_at, collector
 
 
 class ExpandedProtocolTests(unittest.TestCase):
+    def test_legacy_decoder_rejects_coupled_policy_downgrades(self):
+        control, _ = control_modules()
+        config = qs.SIQSConfig()
+        restored = decode(asdict(config), control)
+        self.assertEqual(restored.mode, config.mode)
+        self.assertNotIn("polynomial_policy", restored.__dataclass_fields__)
+        with self.assertRaisesRegex(
+            ValueError, "cannot implement coupled policy"
+        ):
+            decode(
+                asdict(replace(config, polynomial_policy="parity2")), control
+            )
+
     def test_initial_stop_continuation_and_exact_receipt_reuse(self):
         corpus = json.loads((INPUTS / "corpus.json").read_text())
         resolved = json.loads((INPUTS / "structural.json").read_text())[

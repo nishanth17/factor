@@ -5,6 +5,10 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Merge current C10a-01 mainline policies into the C9a branch. Preserve
+  coupled arithmetic markers alongside yield schemas 11–13 and keep historical
+  control decoding explicit; add combined checkpoint/resume regression cases.
+
 - Fix expanded SIQS result statistics to report residual incidence without
   ordinary-forest attributes. Keep tuple-based legacy loaders independent of
   opt-in residual/storage imports. The PyPy unit suite passes 942 tests with
@@ -34,6 +38,22 @@ below record decisions in their dated scope; later entries may supersede routes.
   an immutable mainline control, certified exposed inputs and bounded staged
   experiment tooling. Automatic defaults and routing are unchanged; no C9a
   performance campaign or adoption is included.
+
+## C10a-01 mainline and automatic defaults (3 November 2026)
+
+- Integrate exact parity polynomials, coupled odd/even multiplier ranking,
+  reachable paired A selection, bounded modular root tables and guaranteed
+  powers-of-two marking. Fresh automatic SIQS configurations at every size use
+  the selected bundle, composing existing collector kernels. Exact standard
+  fallbacks, explicit configurations and legacy checkpoints are preserved.
+- Retain existing size parameters, finite grants and portfolio eligibility;
+  this adds no calibrated 61+ preset. The all-size promotion is an explicit
+  user-directed decision before fresh confirmation. Record exposed 60/62/65/70
+  completions, the 65-digit host-state diagnosis and failed canary gate, and
+  the user-censored 70-digit control in [results](v2/benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
+- Preserve source freezes, failed outcomes and research in the verified local
+  archive before removing the task worktree and temporary state. No push or E1
+  campaign is part of this integration.
 
 ## Study publication cleanup (2 November 2026)
 

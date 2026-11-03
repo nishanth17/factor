@@ -8,6 +8,7 @@ from pathlib import Path
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_siqs import allowance
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,8 +24,13 @@ class PacingDefaultTests(unittest.TestCase):
         for digits, arm in ((40, "control"), (50, "collection")):
             number = 10 ** (digits - 1) + 123
             for signed in (number, -number):
-                selected = asdict(default_siqs_config(signed))
+                selected = asdict(previous_siqs_config(signed))
                 self.assertEqual(selected.pop("sign_policy"), "swap_high")
+                self.assertEqual(selected.pop("polynomial_policy"), "standard")
+                self.assertEqual(selected.pop("multiplier_policy"), "standard")
+                self.assertEqual(
+                    selected.pop("root_update_policy"), "standard"
+                )
                 self.assertEqual(
                     selected["collector"].pop("sparse_queue_bytes"), 32 * 2**20
                 )
@@ -63,7 +69,7 @@ class PacingDefaultTests(unittest.TestCase):
 
     def test_old_50_digit_snapshots_do_not_acquire_new_default(self):
         number = 10**49 + 123
-        current = default_siqs_config(number)
+        current = previous_siqs_config(number)
         legacy = replace(
             current,
             solve_policy="window",

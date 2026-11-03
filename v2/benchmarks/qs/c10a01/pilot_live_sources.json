@@ -1,0 +1,11 @@
+{
+  "files": {
+    "v2/benchmarks/qs/c10a01/live_limits.py": "8a80e20c47c37f66a9a6a92ff06cf808ea1258b6652876a2adfb761f833bc36d",
+    "v2/benchmarks/qs/c10a01/live_protocol.md": "6e5db66682544175fb1c3c58fca690eae0fc878110a2c9b3b6f7b6b328fb3563",
+    "v2/benchmarks/qs/c10a01/pilot_v4_sources.json": "002d16a614e76b98aa2bd21d6199b289023bb81fae583235ea062c418a6d2449",
+    "v2/benchmarks/qs/c10a01/pilots_live.py": "2e6d6c60d3846eeca8da94ded7b0e1be06041e7f68a176c1d1c03bda348f2d75",
+    "v2/tests/test_c10a01_live_limits.py": "713ee79bc12bc6bd11637c6a15cd221cf867b6b9e5a3223bf8f7aea05f36bb05"
+  },
+  "freeze_sha256": "7a920b9b6653a564572bd6f5e5b55ac434f2f73ffa680e9b73c47d3f3e4cb8ab",
+  "identity": "c10a01-live-four-hour-restart-1"
+}
