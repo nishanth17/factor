@@ -5,6 +5,12 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Fix repeated pivot sorting/table invalidation in panel elimination and bound
+  cofactor lookahead checks in prepaid chunks. Add a rho-first split policy with
+  retained SQUFOF fallback and reuse of paid splits for three-prime recovery.
+  Prepare the separate `cost-report` nominee using scalar elimination and that
+  split order; preserve earlier profiles and all exact validation contracts.
+
 - Complete a larger bounded screen: four independent exposed inputs, eight
   successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
   but raw complete time and RSS are greater in every pair. Preserve failed

@@ -113,6 +113,9 @@ def filter_matrix(
         columns = union.bit_count()
     reserve = matrix_workspace(len(rows), columns)
     if panel_bits:
+        # Cached pivot order plus a coexisting sorted replacement. Its keys
+        # share the immutable pivot integers already covered by fill-in.
+        reserve += 64 * columns
         reserve += (1 << panel_bits) * (
             512 + 8 * ((len(rows) + columns + 7) // 8)
         )

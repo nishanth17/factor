@@ -211,7 +211,7 @@ def configuration(
     if arm == "C0" or digits not in SIZES:
         return config
     choices = profiles(admission_base_bound, config.collector)
-    bounded = profile == "bounded-report"
+    bounded = profile in ("bounded-report", "cost-report")
     if profile not in choices and not bounded:
         raise ValueError("unknown joint parameter profile")
     values = asdict(config.collector)
@@ -221,6 +221,8 @@ def configuration(
             candidate_bound=choices["fixed-report"]["candidate_bound"],
             extension_policy="extended-v2",
         )
+    if profile == "cost-report":
+        values.update(solver_panel_bits=0, split_policy="rho-first-v3")
     cls = BoundedYieldSieveConfig if bounded else ExtendedYieldSieveConfig
     return replace(config, collector=cls(**values))
 
@@ -253,7 +255,7 @@ def build(corpus, resolved, *, profile="three-prime"):
         if profile == "three-prime"
         else IDENTITY + "-" + profile,
         extension_policy="extended-v2"
-        if profile == "bounded-report"
+        if profile in ("bounded-report", "cost-report")
         else "extended-v1",
         cells=[convert(cell, profile=profile) for cell in plan["cells"]],
         primary_profile=profile,

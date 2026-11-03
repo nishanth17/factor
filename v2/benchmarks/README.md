@@ -124,6 +124,11 @@ census, followed by exact store replay. Its accounted-byte comparison holds
 helper reservations constant; replay RSS and encoded snapshot size are not
 factoring memory or speed measurements. Current in-memory bounded storage
 charges shared slabs/contexts once and keeps packing/restore scratch explicit.
+The separately identified `--profile cost-report` nominee keeps that envelope
+and ownership policy, selects scalar XOR elimination, and uses `rho-first-v3`
+with SQUFOF as a bounded fallback. It follows real-matrix and observed-cofactor
+cost checks; it does not revise earlier `bounded-report` configurations or
+establish a factoring win. Both methods remain selectable for future comparisons.
 
 The primary configuration uses serial recovery and in-memory storage. Threaded
 hints and persistent spill are implemented selectable capabilities; exercising

@@ -76,7 +76,7 @@ and the schema-11 policies above retain their defaults.
 | --- | --- |
 | `preparation_policy="active-v2"` | Count occupied columns, share checked row metadata and derive bounded top-ups from the filtered deficit. `fixed` retains ordinary cadence. |
 | `recovery_policy="checked-v2"` | Exact impossible-domain rejection and bounded private atom/endpoint proofs. Full payload and provenance comparisons govern reuse; public checks and checkpoint admission remain independent. `reference` repeats arithmetic checks. |
-| `split_policy="portfolio-v2"` | Bounded SQUFOF followed, only on failure, by two bounded Brent walks. Alternatives are `reference`, `rho-v2`, and `ecm-v2` (one finite existing ECM fallback). All successful endpoints are proven and reconstructed. |
+| `split_policy="portfolio-v2"` | Bounded SQUFOF followed, only on failure, by two bounded Brent walks. Alternatives are `reference`, `rho-v2`, `ecm-v2` (one finite existing ECM fallback), and `rho-first-v3` (the two walks precede bounded SQUFOF fallback). All successful endpoints are proven and reconstructed. |
 | `batch_policy="shared-v2"` | Batch GCD hints and a bounded certified-endpoint product. At most `batch_size=64` selected positions are looked ahead within a block. Alternatives are `known-v2` and `off`. Admissions remain in physical order. |
 | `cycle_policy="short-v2"` | Direct-edge and minimal-path early exits, bounded two-frontier search and deterministic payload tie-breaking. `forest` retains the original path. |
 | `duplicate_policy="congruence-v2"` | Exact unit-normalized congruence deduplication plus checked equal-parity pairs. Distinct square roots are preserved. `identity` disables both auxiliary indices. |
@@ -183,6 +183,17 @@ file references are preserved; older checkpoints do not encode cold references
 for derived rows, so that restore path reserves resident row exponents instead.
 Historical schema 14 payloads remain readable; internal ownership is recomputed
 under the current implementation rather than treated as a serialized byte count.
+
+`rho-first-v3` also retains a proper split found while classifying a two-prime
+residual, so a three-prime retry can reuse it. Failure still proves no primality
+claim; endpoint certification, work/time limits and split memo identities remain
+binding. Shared lookahead prepays at most 64 cheap score comparisons per chunk;
+an early full batch may leave up to 63 unused comparisons charged. Derived
+lookahead never advances the committed position on refusal.
+
+Panel elimination caches sorted pivot order and reuses its table until the
+selected immutable pivot keys change. It preserves elimination action order,
+provenance and checkpoint digests; sorted-index work and scratch are reserved.
 
 ## Development
 

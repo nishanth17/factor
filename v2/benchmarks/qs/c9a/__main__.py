@@ -44,6 +44,7 @@ def parser():
             "adaptive-report",
             "balanced-endpoints",
             "bounded-report",
+            "cost-report",
         ),
     )
     selection = commands.add_parser("select-confirmation")

@@ -278,7 +278,13 @@ class CombinedYieldSieveConfig(YieldSieveConfig):
             ("recovery_policy", ("reference", "checked-v2")),
             (
                 "split_policy",
-                ("reference", "rho-v2", "portfolio-v2", "ecm-v2"),
+                (
+                    "reference",
+                    "rho-v2",
+                    "portfolio-v2",
+                    "ecm-v2",
+                    "rho-first-v3",
+                ),
             ),
             ("batch_policy", ("off", "known-v2", "shared-v2")),
             ("filter_policy", ("reference", "fill-v2", "light-v2")),

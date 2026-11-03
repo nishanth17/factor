@@ -165,6 +165,7 @@ def split_cofactor(
     hint=None,
     square_checked=False,
     dispatch=False,
+    _divisors=None,
 ):
     """One resolved finite schedule, with endpoint proofs shared privately."""
     if policy == "reference":
@@ -223,6 +224,14 @@ def split_cofactor(
             budget.consume(0)
             if divisor is not None:
                 break
+    if (
+        divisor is None
+        and policy == "rho-first-v3"
+        and (not dispatch or 32 < bits < 80)
+    ):
+        # Native small-integer rho commonly resolves these short cofactors.
+        # Pay for Python-level SQUFOF only after both bounded walks fail.
+        divisor = squfof(residual, budget, steps=512 if dispatch else 1024)
     if divisor is None and policy == "ecm-v2":
         from ..ecm.core import factorize_ecm
 
@@ -243,6 +252,8 @@ def split_cofactor(
         return (), "split_failed", evaluations
     if not utils.valid_divisor(divisor, residual):
         raise ArithmeticError("cofactor method returned an invalid divisor")
+    if _divisors is not None:
+        _divisors.append(int(divisor))
     pair = tuple(sorted((int(divisor), int(residual // divisor))))
     if pair[-1] > bound:
         return (), "endpoint_bound", evaluations
@@ -315,6 +326,7 @@ def split_residual(
         return factors, reason, evaluations
 
     pair, reason, evaluations = (), "not_two_primes", 0
+    divisors = [] if policy == "rho-first-v3" else None
     if residual <= bound**2:
         pair, reason, evaluations = split_cofactor(
             residual,
@@ -324,9 +336,14 @@ def split_residual(
             policy,
             hint=hint,
             dispatch=dispatch,
+            **({"_divisors": divisors} if divisors is not None else {}),
         )
     if pair or arity == 2:
         return finished(pair, reason, evaluations)
+    if divisors:
+        # A paid proper split can expose a composite endpoint of a 3LP atom.
+        # Reuse that split instead of restarting rho on the original value.
+        hint = divisors[0]
     pending, factors = [residual], []
     for attempt in range(2 * arity - 1):
         if not pending:
@@ -398,13 +415,21 @@ class CofactorBatch:
                 collector._divide_double = capture
                 block_lo = position - offset
                 positions = []
-                for x in range(position, block_hi):
-                    collector.budget.consume(1)
-                    if collector._scores[x - block_lo] < threshold:
-                        continue
-                    if not collector._piecewise_passes(x - block_lo):
-                        continue
-                    positions.append(x)
+                # Lookahead is derived work: it commits no physical cursor.
+                # Prepay bounded chunks instead of reading wall/CPU clocks
+                # for every score. An early full batch may leave up to63
+                # prepaid comparisons unused; these are never refunded.
+                for begin in range(position, block_hi, 64):
+                    end = min(block_hi, begin + 64)
+                    collector.budget.consume(end - begin)
+                    for x in range(begin, end):
+                        if collector._scores[x - block_lo] < threshold:
+                            continue
+                        if not collector._piecewise_passes(x - block_lo):
+                            continue
+                        positions.append(x)
+                        if len(positions) == self.size:
+                            break
                     if len(positions) == self.size:
                         break
                 dense = getattr(collector.config, "smooth_batch_size", 0)
