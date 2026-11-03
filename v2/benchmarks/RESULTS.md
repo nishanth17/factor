@@ -10,6 +10,17 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The larger `7feeca4` screen completes all eight calls on four exposed inputs,
+one seed each. At 50/55/60 uneven/62 digits, C0 versus C1 wall seconds are
+24.6/49.7, 77.3/135.3, 236.3/375.3 and 777.9/1,059.6. Every factorization
+matches independent certificates. Candidate terminal sieve coverage is lower
+by about 6.1/8.2/15.3/20.9%, but raw time and process RSS are greater in every
+pair. All eight timing gates fail; no clean speed ratio or population benefit
+follows. Stage timers identify collection/elimination cost as the next questions.
+Stop after this bounded tranche and retain the incumbent. Charges are 7,390
+wall/CPU seconds; actual worker lifecycle totals are 2,769.7 wall / 2,787.6 CPU
+seconds. Local details: `v2/audit/c9a/complete-screen-19-results.md`.
+
 The repaired pair on `bb0764a` completes both 60-digit calls under the same
 900-second and memory grants. C1 uses 764.0M positions and 618.4s; C0 uses
 911.4M and 405.9s. Both factorizations match independent certificates. C1

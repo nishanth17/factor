@@ -126,6 +126,15 @@ The repair establishes feasibility on this input; no complete-cost advantage
 or adoption is demonstrated. Stop after the pair and analysis. See
 `v2/audit/c9a/feasibility-18.md`.
 
+The larger bounded screen on `7feeca4` completes eight calls on four exposed
+moduli at 50/55/60/62 digits (60 uneven). All factorizations verify. C1 uses
+less terminal coverage but greater raw complete time and RSS in every pair;
+all eight timing gates fail. C0/C1 seconds are 24.6/49.7, 77.3/135.3,
+236.3/375.3 and 777.9/1,059.6. Stop after this tranche and retain the incumbent;
+collection and elimination costs need investigation before further scaling.
+No adoption or fresh confirmation follows. Details:
+`v2/audit/c9a/complete-screen-19-results.md`.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and

@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Complete a larger bounded screen: four independent exposed inputs, eight
+  successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
+  but raw complete time and RSS are greater in every pair. Preserve failed
+  calibration gates and retain the incumbent pending targeted cost work.
+
 - Complete the repaired 60-digit matched pair under the original 900-second
   and memory grants. Both factor successfully; C9a uses fewer sieve positions
   but greater observed complete time, RSS and charged work. Preserve failed
