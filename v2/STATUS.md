@@ -150,6 +150,20 @@ calibration remain open. Local source review and receipts:
 `v2/audit/c9a/cost-review-30.md`, `cost-investigation-20-40.md` and
 `nominee-binding-42.json` in the same audit directory.
 
+The bounded 60-digit follow-up on `f0a5791` completes both arms: C0 in 411.0s
+and C1 in 487.1s, with independently verified factors. C1 uses 764.1M versus
+911.4M positions but remains slower; both timing gates fail. Collection is
+400.5/287.5s for C1/C0, while elimination is about one second in both. Short
+calibration supports GC/JIT-state sensitivity in the sentinel; it changes no
+threshold or historical classification. The conditional record replay identifies
+unused cumulative snapshots at the internal collection boundary as the next
+target. Each return copies retained arrays and expands partial IDs, although
+the internal caller consumes only progress/status. Preserve full public
+snapshots; a private progress-only path remains to be implemented. Stop after
+the pair and bounded diagnostics, retaining the incumbent without adoption.
+Evidence: `v2/audit/c9a/followup-43.md`, `verification-44.json` and
+`verification-48.json` in that audit directory.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and

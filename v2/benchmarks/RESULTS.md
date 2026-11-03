@@ -10,6 +10,20 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The subsequent bounded 60-digit pair on `f0a5791` completes with C0/C1 raw
+wall times of 411.0/487.1s. Both factors verify; both timing checks fail.
+C1 uses 764.1M positions / 4,977 rows versus C0's 911.4M / 4,994, with
+476.2/342.9MB process RSS. Collection remains the gap at 400.5/287.5s;
+elimination is about one second in both. No adoption or independent-input
+campaign follows. The diagnostic stage uses 83.6 seconds of its 180-second
+allowance. On an actual mature 60-digit store, a cumulative snapshot takes
+0.459ms and translates 24,196 partial IDs; the internal caller discards these
+record arrays. This supports implementing a private progress-only collection
+path while preserving public snapshots, not a measured full-factor gain.
+Suppressing reporting counters showed no benefit. Short sentinel calibration
+supports investigating rewarming under a separately identified protocol;
+all original failures remain unchanged. Details: `v2/audit/c9a/followup-43.md`.
+
 The cost follow-up prepares `cost-report` with scalar solving, rho-first
 splitting and serial recovery, after removing repeated sorting, storage work
 and impossible recovery. Source `e0acc17` passes 1,065 tests (9 skips), lint
