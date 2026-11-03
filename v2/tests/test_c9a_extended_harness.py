@@ -2,6 +2,7 @@
 
 import json
 import tempfile
+import time
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -21,6 +22,33 @@ from v2.tests.test_c9a_extended import atom_at, collector
 
 
 class ExpandedProtocolTests(unittest.TestCase):
+    def test_warmup_exercises_the_selected_coupled_arithmetic(self):
+        from v2.benchmarks.qs.c9a import worker
+        from v2.qs.defaults import _coupled_policies
+
+        for config in (
+            qs.SIQSConfig(),
+            qs.SIQSConfig(collector=collector().config),
+        ):
+            template = asdict(_coupled_policies(config))
+            with patch.object(
+                worker.candidate, "SIQSJob", wraps=qs.SIQSJob
+            ) as job:
+                signature, work = worker.warm_once(
+                    worker.candidate,
+                    worker.candidate_budget,
+                    template,
+                    time.monotonic() + 10,
+                )
+            selected = job.call_args.kwargs["config"]
+            self.assertEqual(selected.polynomial_policy, "parity2")
+            self.assertEqual(selected.multiplier_policy, "parity2_wide")
+            self.assertEqual(selected.assignment_policy, "windowed_pair")
+            self.assertEqual(selected.root_update_policy, "batch")
+            self.assertIn("parity_two", selected.collector._kernels)
+            self.assertTrue(signature)
+            self.assertGreater(work, 0)
+
     def test_legacy_decoder_rejects_coupled_policy_downgrades(self):
         control, _ = control_modules()
         config = qs.SIQSConfig()

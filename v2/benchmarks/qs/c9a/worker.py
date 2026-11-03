@@ -87,6 +87,22 @@ def warm_once(qs, budgets, template, deadline):
             collector = qs.YieldSieveConfig(**values)
     else:
         collector = qs.GrowingDoubleLargeSieveConfig(**values)
+    arithmetic = {
+        key: template[key]
+        for key in (
+            "polynomial_policy",
+            "multiplier_policy",
+            "root_update_policy",
+        )
+        if template.get(key, "standard") != "standard"
+    }
+    if arithmetic:
+        arithmetic["assignment_policy"] = template["assignment_policy"]
+        arithmetic["multiplier"] = 0
+        if "parity_two" in selected["marking"].split("+"):
+            collector = type(collector)(
+                **dict(asdict(collector), marking="parity_two")
+            )
     config = qs.SIQSConfig(
         base_bound=200,
         half_width=128,
@@ -95,6 +111,7 @@ def warm_once(qs, budgets, template, deadline):
         collector=collector,
         sign_policy="swap_high",
         solve_policy="collection",
+        **arithmetic,
     )
     budget = budgets.Budget(
         work_limit=10**9,
