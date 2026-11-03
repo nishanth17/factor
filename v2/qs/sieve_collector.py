@@ -193,6 +193,51 @@ class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
 
 
 @dataclass(frozen=True)
+class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
+    """Independent useful-yield policies with checked original provenance.
+
+    For proven endpoints p <= q, require p <= small_prime_bound and
+    q <= large_prime_bound, including p == q. The product ceiling remains
+    binding. This changes admission only; it never widens reporting itself.
+    """
+
+    small_prime_bound: int | None = field(default=None, kw_only=True)
+    yield_policy: str = field(default="yield-v1", kw_only=True)
+    preparation_policy: str = field(default="fixed", kw_only=True)
+    cycle_policy: str = field(default="forest", kw_only=True)
+    cycle_search_edges: int = field(default=4096, kw_only=True)
+    duplicate_policy: str = field(default="identity", kw_only=True)
+    duplicate_bytes: int = field(default=16 * 2**20, kw_only=True)
+    record_policy: str = field(default="objects", kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.yield_policy != "yield-v1":
+            raise ValueError("unknown useful-yield policy")
+        if self.small_prime_bound is not None:
+            utils.require_integer(
+                self.small_prime_bound, "small_prime_bound", 2
+            )
+            if self.small_prime_bound > self.large_prime_bound:
+                raise ValueError("smaller endpoint bound exceeds larger bound")
+        for name, choices in (
+            ("preparation_policy", ("fixed", "target-v1")),
+            ("cycle_policy", ("forest", "short-v1")),
+            ("duplicate_policy", ("identity", "pair-v1")),
+            ("record_policy", ("objects", "packed-v1")),
+        ):
+            if getattr(self, name) not in choices:
+                raise ValueError("unknown " + name)
+        for name, maximum in (
+            ("cycle_search_edges", 65536),
+            ("duplicate_bytes", 64 * 2**20),
+        ):
+            utils.require_integer(getattr(self, name), name, 0)
+            if getattr(self, name) > maximum:
+                raise ValueError(name + " exceeds its finite cap")
+
+
+@dataclass(frozen=True)
 class SieveResult:
     """Cumulative checked store and per-call diagnostics for [lo,hi).
 
@@ -237,6 +282,7 @@ class SieveCollector:
         if double and type(self) is not SieveCollector:
             raise ValueError("DLP supports the serial SieveCollector only")
         self._graph = None
+        self._short_cycles = None
         if double:
             # Keep ordinary SLP and owned historic loader dependencies intact.
             from .large_prime_collector import (
@@ -284,6 +330,14 @@ class SieveCollector:
         )
         if double:
             self._workspace += self._graph_reserve(0)
+        if getattr(self.config, "cycle_policy", "forest") == "short-v1":
+            from .short_cycles import ShortCycleIndex
+
+            self._short_cycles = ShortCycleIndex(
+                self.config.cycle_search_edges
+            )
+            self._workspace += self._short_cycles.scratch_reserve
+            self._workspace += self._short_cycles.edge_reserve(0)
         if self.config.score_policy in ("powers", "fixed"):
             # Two capped root lists coexist while lifting; coefficients and
             # positions have finite bit bounds even far from zero.
@@ -414,6 +468,10 @@ class SieveCollector:
             if cache is not None:
                 cache.clear()
             self._workspace -= sum(self._atom_bytes.values())
+            if self._short_cycles is not None:
+                self._workspace -= 2048 * len(self._short_cycles.edges)
+                self._short_cycles.edges.clear()
+                self._short_cycles.neighbors.clear()
             if self._graph is not None:
                 self._workspace -= self._graph_reserve(
                     len(self._graph.edges)
@@ -1128,6 +1186,10 @@ class SieveCollector:
                     "previously checked unit residual changed"
                 )
 
+        if getattr(self.config, "record_policy", "objects") == "packed-v1":
+            from .packed_relations import pack_relation
+
+            atom = pack_relation(atom, self.budget)
         self.budget.consume(len(atom.exponents) + 1)
         # A failed insertion must not expose a partially published smooth
         # row (or legacy SLP match) as a resumable memory-limit result.

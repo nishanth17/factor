@@ -43,6 +43,28 @@ limits. Explicit settings and saved configurations take precedence. Experimental
 methods and adopted defaults retain their recorded evidence limits;
 there is no general digit-based completion guarantee.
 
+## Explicit useful-yield policies
+
+`qs.YieldSieveConfig` extends `GrowingDoubleLargeSieveConfig` with independent
+experimental options. Pass it as `SIQSConfig(collector=...)`; automatic
+configurations retain their existing policies.
+
+| Field | Opt-in behavior |
+| --- | --- |
+| `preparation_policy="target-v1"` | Prepare at base-column count plus row excess; use bounded 5% top-ups after unsuccessful attempts. Immediate squares, equal-parity checks and final/storage-cap extraction remain available. |
+| `large_product_bound=P`, `candidate_bound=C` | Admit recovered products up to P while holding the reporting allowance C fixed. `candidate_bound=0` instead derives reporting from the configured admission domain. |
+| `small_prime_bound=S` | Require proven ordered endpoints p≤q with p≤S, q≤`large_prime_bound` and pq≤P, including equality and squares. SLP admission retains its separate `residual_bound`. |
+| `cycle_policy="short-v1"` | Search all retained components for shorter exact paths, including earlier closing edges. `cycle_search_edges` bounds visits (default 4096, maximum 65536); the original forest path remains the fallback. |
+| `duplicate_policy="pair-v1"` | Check equal-parity two-row dependencies before ordinary preparation. Keep both rows; bound representatives by `duplicate_bytes` (default 16 MiB, maximum 64 MiB). |
+| `record_policy="packed-v1"` | Retain immutable packed exponent bytes with exact original identities, provenance and checked interchange. Existing conservative storage reservations remain in force. |
+
+All new fields default to disabled policies. Useful-yield checkpoints use
+schema 11 and bind the complete configuration; legacy checkpoints remain
+readable. Restoring cannot silently change these policies. Packed records can
+reduce payload storage but add decoding work; no performance or capacity gain
+is established. The [C9a runner](benchmarks/qs/c9a/) prepares matched explicit
+experiments without changing production routing.
+
 ## Optional GMP backend
 
 Install GMP support into a PyPy 3.11 environment with

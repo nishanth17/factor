@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## C9a useful-yield preparation (3 November 2026)
+
+- Add independent opt-ins for useful-row preparation targets, asymmetric
+  proven large-prime endpoints, shorter exact cycles, immediate equal-parity
+  dependencies and immutable packed exponent records. Preserve separate
+  reporting/admission controls, original provenance and finite reservations.
+- Add policy-bound schema-11 checkpoints, independent correctness oracles,
+  an immutable mainline control, certified exposed inputs and bounded staged
+  experiment tooling. Automatic defaults and routing are unchanged; no C9a
+  performance campaign or adoption is included.
+
 ## Study publication cleanup (2 November 2026)
 
 - Remove the selective `v2/studies/` report/result collection from the current

@@ -56,11 +56,14 @@ def _decode_siqs_config(values):
         DoubleLargeSieveConfig,
         GrowingDoubleLargeSieveConfig,
         SieveConfig,
+        YieldSieveConfig,
     )
 
     decoded = dict(values)
     collector = decoded["collector"]
-    if collector.get("storage_policy") == "grow":
+    if "yield_policy" in collector or "small_prime_bound" in collector:
+        collector_type = YieldSieveConfig
+    elif collector.get("storage_policy") == "grow":
         collector_type = GrowingDoubleLargeSieveConfig
     elif "large_prime_bound" in collector:
         collector_type = DoubleLargeSieveConfig

@@ -13,6 +13,15 @@ Full historical results and gates remain in the [history index](history/README.m
 The current objective includes useful progress toward 60–80-digit factoring;
 practical general completion there remains unestablished.
 
+C9a preparation on `codex/c9a-combined-yield-review` starts from committed
+`b0813230a05396874c41c649fa01738484a1f55e`. Its opt-in bundle implements
+independent preparation, product/endpoint admission, shorter cycles,
+equal-parity dependencies and packed records. Correctness preparation and a
+numerical staged handoff are separate from performance acceptance. C9a remains
+Open; no campaign or default change is included. Local research and the
+execution handoff start at `v2/audit/c9a/README.md`. Any later C10a integration
+requires a new matched source identity for both arms.
+
 ## Current automatic defaults
 
 These are current committed behavior, not claims that every routed band passed

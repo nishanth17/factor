@@ -88,6 +88,14 @@ research. The [history index](history/README.md) supplies local research paths.
 
 #### C9a — combined useful-yield and storage workstream
 
+The current preparation implements independent P/I/E/G/D/S opt-ins through
+`YieldSieveConfig`, with exact oracles, checked schema-11 resume, immutable
+mainline control and certified exposed inputs under `benchmarks/inputs/c9a/`.
+The staged runner is `benchmarks/qs/c9a/`. This is preparation, not adoption:
+early feasibility, useful complete cost, mature attribution where informative,
+regressions and one fresh confirmation band remain open. Detailed decisions,
+source coverage and the numerical handoff remain local in `audit/c9a/`.
+
 C9a may select cadence, wider recovered-product intake, ordered endpoint
 asymmetry, shorter cycle/algebraic-duplicate policies and compact replayable
 records in one coherent candidate. These mechanisms can interact: wider

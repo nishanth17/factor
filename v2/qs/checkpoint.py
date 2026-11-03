@@ -30,6 +30,7 @@ from .sieve_collector import (
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
+    YieldSieveConfig,
 )
 from .storage import require_published
 
@@ -173,7 +174,9 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        7
+        11
+        if isinstance(job.config.collector, YieldSieveConfig)
+        else 7
         if job.config.sign_policy != "canonical"
         or job.config.collector.sparse_queue_bytes
         else 6
@@ -221,6 +224,12 @@ def pack_job(job):
         )
         if version >= 6:
             progress["zero_checked_count"] = engine.zero_checked_count
+        if version == 11:
+            progress["yield_progress"] = {
+                "pair_checked_count": 0
+                if engine._pair_index is None
+                else engine._pair_index.checked_count
+            }
 
     payload = dict(
         version=version,
@@ -507,6 +516,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         5,
         6,
         7,
+        11,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -549,6 +559,25 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
             raise ValueError("mixed-order checkpoint lacks row_order")
 
     values = dict(payload["config"])
+    ordered_fields = {
+        "yield_policy",
+        "small_prime_bound",
+        "preparation_policy",
+        "cycle_policy",
+        "cycle_search_edges",
+        "duplicate_policy",
+        "duplicate_bytes",
+        "record_policy",
+    }
+    present = ordered_fields.intersection(values["collector"])
+    if payload["version"] == 11:
+        if present != ordered_fields or (
+            values["collector"].get("yield_policy") != "yield-v1"
+            or values["collector"].get("storage_policy") != "grow"
+        ):
+            raise ValueError("yield checkpoint lacks its policy identity")
+    elif present:
+        raise ValueError("legacy checkpoint cannot change admission policy")
     if payload["version"] < 7 and (
         (values.get("solve_policy", "window") != "window")
         != (payload["version"] == 6)
@@ -558,13 +587,15 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "sign_policy" in values or "sparse_queue_bytes" in values["collector"]
     ):
         raise ValueError("legacy checkpoint cannot change collection policy")
-    if payload["version"] == 7 and (
+    if payload["version"] in (7, 11) and (
         "sign_policy" not in values
         or "sparse_queue_bytes" not in values["collector"]
     ):
         raise ValueError("collection checkpoint lacks its policy identity")
     collector_type = (
-        GrowingDoubleLargeSieveConfig
+        YieldSieveConfig
+        if payload["version"] == 11
+        else GrowingDoubleLargeSieveConfig
         if payload["version"] == 5
         or payload["version"] >= 6
         and values["collector"].get("storage_policy") == "grow"
@@ -819,6 +850,24 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "SIQS checkpoint relation store identity mismatch"
             )
         _restore_store(payload["store"], engine.collector, budget)
+        if payload["version"] == 11:
+            progress = saved.get("yield_progress")
+            if not isinstance(progress, dict) or set(progress) != {
+                "pair_checked_count"
+            }:
+                raise ValueError(
+                    "yield checkpoint lacks its progress identity"
+                )
+            count = progress["pair_checked_count"]
+            if engine._pair_index is None:
+                if type(count) is not int or count != 0:
+                    raise ValueError("disabled duplicate policy has progress")
+            else:
+                engine._pair_index.rebuild(
+                    engine.collector._rows, count, job.base, budget
+                )
+        elif "yield_progress" in saved:
+            raise ValueError("legacy checkpoint cannot change yield progress")
         if payload["version"] >= 6:
             engine.zero_checked_count = utils.require_integer(
                 saved["zero_checked_count"], "zero-row cursor", 0

@@ -47,6 +47,7 @@ from .sieve_collector import (
     SieveCollector,
     SieveConfig,
     SieveResult,
+    YieldSieveConfig,
 )
 from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob
 
@@ -55,6 +56,7 @@ __all__ = [
     "AtomicRelation",
     "DoubleLargeSieveConfig",
     "GrowingDoubleLargeSieveConfig",
+    "YieldSieveConfig",
     "CollectionResult",
     "CombinationResult",
     "CombinedRelation",

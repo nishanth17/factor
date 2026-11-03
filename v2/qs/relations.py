@@ -121,6 +121,7 @@ def verify_atomic(
     residual_bound=1,
     large_prime_bound=0,
     large_product_bound=0,
+    small_prime_bound=None,
     budget=None,
 ):
     """Return True for an exact relation; reject invalid math with ValueError.
@@ -131,6 +132,10 @@ def verify_atomic(
     BudgetExhaustedError propagates; no partially checked atom is admitted.
     """
     checked_residual_bound(residual_bound)
+    if small_prime_bound is not None:
+        utils.require_integer(small_prime_bound, "small_prime_bound", 2)
+        if small_prime_bound > large_prime_bound:
+            raise ValueError("smaller endpoint bound exceeds larger bound")
     polynomial = relation.polynomial
     if (polynomial.n, polynomial.multiplier) != (
         factor_base.n,
@@ -172,6 +177,8 @@ def verify_atomic(
         if (
             remaining > large_product_bound
             or relation.large_primes[-1] > large_prime_bound
+            or small_prime_bound is not None
+            and relation.large_primes[0] > small_prime_bound
         ):
             raise ValueError("two-prime residual exceeds its bounds")
     if relation.residual > residual_bound:

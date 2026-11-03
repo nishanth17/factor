@@ -106,6 +106,16 @@ class QSJob:
         self.filter_row_growth = filter_row_growth
         self.tested_dependencies = tested_dependencies
         self.collection_continues = collection_continues
+        self._pair_index = None
+        if getattr(self.config, "duplicate_policy", "identity") == "pair-v1":
+            from .equal_parity import EqualParityIndex
+
+            available = max(
+                0, self.config.memory_limit - self.collector._workspace - 65536
+            )
+            reserve = min(self.config.duplicate_bytes, available)
+            self._pair_index = EqualParityIndex(reserve)
+            self.collector._workspace += reserve
         self.zero_checked_count = 0
         self.solver, self.extractor, self.prepared = None, None, None
         self.last_count = -1
@@ -138,6 +148,15 @@ class QSJob:
         relations = self.collector.matrix_relations
         count = len(relations)
         if self.solver is None and self.extractor is None:
+            if self._pair_index is not None:
+                divisor = self._timed(
+                    "equal_parity",
+                    lambda: self._pair_index.probe(
+                        relations, self.collector, self.budget, self.stats
+                    ),
+                )
+                if divisor is not None:
+                    return divisor
             if count == self.last_count and (
                 not final or count == self.last_solved_count
             ):
@@ -163,6 +182,27 @@ class QSJob:
                 and count - self.last_count < self.filter_row_growth
             ):
                 return None
+
+            if (
+                not final
+                and not immediate
+                and self.collection_continues
+                and getattr(self.config, "preparation_policy", "fixed")
+                == "target-v1"
+            ):
+                # Full rows plus independent graph cycles are sufficient for
+                # an initial surplus. Later checked but unsuccessful attempts
+                # use a finite 5% top-up, not an arbitrary fixed 128-row pace.
+                target = (
+                    len(self.collector.factor_base.entries)
+                    + 1
+                    + self.row_excess
+                    if self.last_count < 0
+                    else self.last_count
+                    + max(self.filter_row_growth, (self.last_count + 19) // 20)
+                )
+                if count < target:
+                    return None
 
             store = dict(self.collector._atoms)
             prepared = self._timed(

@@ -38,7 +38,7 @@ def pack_store(collector):
         )
     rows = collector._full + collector._combined
     order = {id(row): i for i, row in enumerate(rows)}
-    return dict(
+    payload = dict(
         polynomials=polynomials,
         atoms=encoded,
         full=[indices[a.relation_id] for a in collector._full],
@@ -56,6 +56,15 @@ def pack_store(collector):
         forest=[indices[i] for i in collector._graph.edges],
         split_calls=collector._split_calls,
     )
+    if getattr(collector.config, "record_policy", "objects") == "packed-v1":
+        from .packed_relations import export_exponents
+
+        payload["record_policy"] = "packed-v1"
+        for record, atom in zip(payload["atoms"], atoms):
+            record[3] = export_exponents(atom)
+        for record, row in zip(payload["combined"], collector._combined):
+            record[3] = export_exponents(row)
+    return payload
 
 
 def _index(value, size):
@@ -68,14 +77,17 @@ def _index(value, size):
 def restore_store(payload, collector, budget):
     """Rebuild only after bounded shape checks; publish a fully checked store.
 
-    Every combined row has exactly one distinct closing edge, and its other
-    IDs must equal the unique path in the retained forest. Owned paths cannot
-    have been evicted. This also reconstructs FIFO order without trusting an
-    encoded union-find cache, and verifies disconnected cycles and loops.
+    Each row has a distinct newest closing edge. Legacy rows use the retained
+    forest path; shortcut rows may use earlier closing edges in a checked
+    simple path. Owned paths cannot have been evicted. Rebuild FIFO order
+    without trusting an encoded union-find cache, including all components.
     """
     if collector._atoms or collector._rows or collector._graph.edges:
         raise ValueError("DLP restoration requires an empty collector")
-    if not isinstance(payload, dict) or set(payload) != {
+    packed = (
+        getattr(collector.config, "record_policy", "objects") == "packed-v1"
+    )
+    keys = {
         "polynomials",
         "atoms",
         "full",
@@ -83,7 +95,10 @@ def restore_store(payload, collector, budget):
         "row_order",
         "forest",
         "split_calls",
-    }:
+    }
+    if packed:
+        keys.add("record_policy")
+    if not isinstance(payload, dict) or set(payload) != keys:
         raise ValueError("invalid DLP checkpoint store shape")
     config, base = collector.config, collector.factor_base
     for name, cap in (
@@ -96,6 +111,23 @@ def restore_store(payload, collector, budget):
     ):
         if not isinstance(payload[name], list) or len(payload[name]) > cap:
             raise ValueError("DLP checkpoint exceeds its store cap")
+    if packed:
+        from .packed_relations import import_exponents
+
+        if payload["record_policy"] != "packed-v1":
+            raise ValueError("packed checkpoint policy mismatch")
+        decoded = dict(payload)
+        for name, size in (("atoms", 6), ("combined", 5)):
+            decoded[name] = []
+            for record in payload[name]:
+                if not isinstance(record, list) or len(record) != size:
+                    raise ValueError("invalid packed relation record")
+                record = list(record)
+                record[3] = import_exponents(
+                    record[3], len(base.entries), budget
+                )
+                decoded[name].append(record)
+        payload = decoded
     calls = payload["split_calls"]
     utils.require_integer(calls, "split_calls", 0)
     if calls > config.split_limit:
@@ -172,6 +204,8 @@ def restore_store(payload, collector, budget):
     reserve += collector._graph_reserve(
         len(forest_indices)
     ) - collector._graph_reserve(0)
+    if collector._short_cycles is not None:
+        reserve += 2048 * (count - len(payload["full"]))
     if reserve > config.memory_limit:
         raise MemoryError(
             "restored DLP provenance and graph exceed memory cap"
@@ -203,6 +237,7 @@ def restore_store(payload, collector, budget):
             residual_bound=config.residual_bound,
             large_prime_bound=config.large_prime_bound,
             large_product_bound=config.large_product_bound,
+            small_prime_bound=getattr(config, "small_prime_bound", None),
             budget=budget,
         )
         if atom.relation_id in store:
@@ -233,10 +268,15 @@ def restore_store(payload, collector, budget):
     scratch_peak = 0
     for record, row_bytes in zip(payload["combined"], combined_bytes):
         indices, u, sign, exponents, correction = record
-        closing = set(indices) - forest
-        if len(closing) != 1:
-            raise ValueError("DLP cycle must have one closing edge")
-        closing = closing.pop()
+        if collector._short_cycles is None:
+            closing = set(indices) - forest
+            if len(closing) != 1:
+                raise ValueError("DLP cycle must have one closing edge")
+            closing = closing.pop()
+        else:
+            closing = max(indices)
+            if closing in forest:
+                raise ValueError("shortcut cycle lacks its new closing edge")
         if (
             closing in closing_edges
             or closing != max(indices)
@@ -247,13 +287,23 @@ def restore_store(payload, collector, budget):
         if atom.residual_product == 1:
             raise ValueError("full atom is marked as a DLP cycle")
         endpoints = atom.large_primes or (1, atom.residual)
-        try:
-            path = graph.path(*endpoints, budget)
-        except CycleTooLongError as error:
-            raise ValueError("checkpoint DLP cycle exceeds its cap") from error
-        expected = {atoms[i].relation_id for i in indices if i != closing}
-        if path is None or set(path) != expected:
-            raise ValueError("DLP cycle differs from its retained forest path")
+        if collector._short_cycles is None:
+            try:
+                path = graph.path(*endpoints, budget)
+            except CycleTooLongError as error:
+                raise ValueError(
+                    "checkpoint DLP cycle exceeds its cap"
+                ) from error
+            expected = {atoms[i].relation_id for i in indices if i != closing}
+            if path is None or set(path) != expected:
+                raise ValueError(
+                    "DLP cycle differs from its retained forest path"
+                )
+        else:
+            from .short_cycles import check_prior_path
+
+            check_prior_path(indices, atoms, closing, budget)
+            path = tuple(atoms[i].relation_id for i in indices if i != closing)
         selected = tuple(atoms[i] for i in indices)
         scratch = (
             _combination_workspace(selected, base, config.memory_limit)
@@ -282,10 +332,33 @@ def restore_store(payload, collector, budget):
         raise ValueError("DLP checkpoint has unowned overflow or orphan atoms")
     rows = full + combined
     ordered_rows = [rows[i] for i in order]
+    shortcuts = None
+    if collector._short_cycles is not None:
+        from .short_cycles import ShortCycleIndex
+
+        shortcuts = ShortCycleIndex(config.cycle_search_edges)
+        for atom in atoms:
+            if atom.residual_product != 1:
+                budget.consume(4)
+                shortcuts.add(
+                    atom.relation_id,
+                    *(atom.large_primes or (1, atom.residual)),
+                )
+    if packed:
+        from .packed_relations import pack_relation
+
+        store = {
+            key: pack_relation(atom, budget) for key, atom in store.items()
+        }
+        full = [store[atom.relation_id] for atom in full]
+        combined = [pack_relation(row, budget) for row in combined]
+        rows = full + combined
+        ordered_rows = [rows[i] for i in order]
     budget.consume(count + row_count + 1)
     collector._atoms, collector._atom_bytes = store, sizes
     collector._full, collector._combined = full, combined
     collector._rows = ordered_rows
     collector._graph, collector._split_calls = graph, calls
+    collector._short_cycles = shortcuts
     collector._workspace = reserve
     collector._scratch_peak_bytes = scratch_peak

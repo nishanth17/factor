@@ -8,6 +8,16 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions
 
+### C9a preparation
+
+The independently selectable useful-yield, admission, cycle, duplicate and
+packed-record bundle is experimental. Retained complete-call evidence motivates
+the comparison but does not measure this implementation. Current preparation
+includes certified inputs, structural multiplier/base resolution, immutable
+control and bounded runners. No new performance calls or complete-run captures
+have executed; no speedup, larger-band feasibility or adoption is claimed.
+See [runner commands](README.md#c9a-preparation-and-staged-execution).
+
 ### A1b existing fixed-score review
 
 **Retain integrated SIQS defaults and fixed-score opt-ins.** The completed

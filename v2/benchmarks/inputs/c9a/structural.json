@@ -1,0 +1,257 @@
+{
+  "resolved": {
+    "exposed_50_0": {
+      "base_workspace_bytes": 1929512,
+      "bound": 30000,
+      "entries": 1652,
+      "kn_mod8": 1,
+      "multiplier": 1,
+      "n_mod8": 1,
+      "work": 1571627
+    },
+    "exposed_50_1": {
+      "base_workspace_bytes": 1929512,
+      "bound": 30000,
+      "entries": 1597,
+      "kn_mod8": 3,
+      "multiplier": 1,
+      "n_mod8": 3,
+      "work": 1558744
+    },
+    "exposed_55_0": {
+      "base_workspace_bytes": 3098304,
+      "bound": 48260,
+      "entries": 2500,
+      "kn_mod8": 1,
+      "multiplier": 5,
+      "n_mod8": 5,
+      "work": 3942214
+    },
+    "exposed_55_1": {
+      "base_workspace_bytes": 3133504,
+      "bound": 48810,
+      "entries": 2500,
+      "kn_mod8": 1,
+      "multiplier": 7,
+      "n_mod8": 7,
+      "work": 3970688
+    },
+    "exposed_60_0": {
+      "base_workspace_bytes": 6653880,
+      "bound": 103814,
+      "entries": 5000,
+      "kn_mod8": 1,
+      "multiplier": 3,
+      "n_mod8": 3,
+      "work": 8322172
+    },
+    "exposed_60_1": {
+      "base_workspace_bytes": 6771368,
+      "bound": 105650,
+      "entries": 5000,
+      "kn_mod8": 1,
+      "multiplier": 1,
+      "n_mod8": 1,
+      "work": 8414263
+    },
+    "exposed_62_0": {
+      "base_workspace_bytes": 8217088,
+      "bound": 128238,
+      "entries": 6000,
+      "kn_mod8": 5,
+      "multiplier": 11,
+      "n_mod8": 7,
+      "work": 10275720
+    },
+    "exposed_62_1": {
+      "base_workspace_bytes": 8180328,
+      "bound": 127664,
+      "entries": 6000,
+      "kn_mod8": 5,
+      "multiplier": 1,
+      "n_mod8": 5,
+      "work": 10216762
+    },
+    "exposed_65_0": {
+      "base_workspace_bytes": 11961560,
+      "bound": 186744,
+      "entries": 8500,
+      "kn_mod8": 1,
+      "multiplier": 17,
+      "n_mod8": 1,
+      "work": 15351021
+    },
+    "exposed_65_1": {
+      "base_workspace_bytes": 12080952,
+      "bound": 188610,
+      "entries": 8500,
+      "kn_mod8": 3,
+      "multiplier": 1,
+      "n_mod8": 3,
+      "work": 15395950
+    },
+    "exposed_70_0": {
+      "base_workspace_bytes": 15288376,
+      "bound": 238724,
+      "entries": 10500,
+      "kn_mod8": 5,
+      "multiplier": 1,
+      "n_mod8": 5,
+      "work": 19876159
+    },
+    "exposed_70_1": {
+      "base_workspace_bytes": 15180880,
+      "bound": 237044,
+      "entries": 10500,
+      "kn_mod8": 5,
+      "multiplier": 3,
+      "n_mod8": 7,
+      "work": 19853341
+    },
+    "exposed_75_0": {
+      "base_workspace_bytes": 25610192,
+      "bound": 400000,
+      "entries": 16873,
+      "kn_mod8": 5,
+      "multiplier": 7,
+      "n_mod8": 3,
+      "work": 25715583
+    },
+    "exposed_75_1": {
+      "base_workspace_bytes": 25610208,
+      "bound": 400000,
+      "entries": 17048,
+      "kn_mod8": 1,
+      "multiplier": 17,
+      "n_mod8": 1,
+      "work": 25815628
+    },
+    "exposed_80_0": {
+      "base_workspace_bytes": 38410328,
+      "bound": 600000,
+      "entries": 24671,
+      "kn_mod8": 1,
+      "multiplier": 7,
+      "n_mod8": 7,
+      "work": 40153908
+    },
+    "exposed_80_1": {
+      "base_workspace_bytes": 38410328,
+      "bound": 600000,
+      "entries": 24624,
+      "kn_mod8": 1,
+      "multiplier": 5,
+      "n_mod8": 5,
+      "work": 40182524
+    },
+    "regression_50_0": {
+      "base_workspace_bytes": 1929512,
+      "bound": 30000,
+      "entries": 1601,
+      "kn_mod8": 1,
+      "multiplier": 1,
+      "n_mod8": 1,
+      "work": 1559589
+    },
+    "regression_50_1": {
+      "base_workspace_bytes": 1929504,
+      "bound": 30000,
+      "entries": 1613,
+      "kn_mod8": 3,
+      "multiplier": 1,
+      "n_mod8": 3,
+      "work": 1558943
+    },
+    "regression_50_2": {
+      "base_workspace_bytes": 1929512,
+      "bound": 30000,
+      "entries": 1680,
+      "kn_mod8": 5,
+      "multiplier": 1,
+      "n_mod8": 5,
+      "work": 1578105
+    },
+    "regression_55_0": {
+      "base_workspace_bytes": 3125056,
+      "bound": 48678,
+      "entries": 2500,
+      "kn_mod8": 5,
+      "multiplier": 5,
+      "n_mod8": 1,
+      "work": 3968266
+    },
+    "regression_55_1": {
+      "base_workspace_bytes": 3149384,
+      "bound": 49058,
+      "entries": 2500,
+      "kn_mod8": 5,
+      "multiplier": 7,
+      "n_mod8": 3,
+      "work": 3995724
+    },
+    "regression_55_2": {
+      "base_workspace_bytes": 3118288,
+      "bound": 48572,
+      "entries": 2500,
+      "kn_mod8": 5,
+      "multiplier": 17,
+      "n_mod8": 5,
+      "work": 3971656
+    },
+    "routing_40": {
+      "base_workspace_bytes": 329240,
+      "bound": 5000,
+      "entries": 345,
+      "kn_mod8": 7,
+      "multiplier": 1,
+      "n_mod8": 7,
+      "work": 238641
+    },
+    "routing_51": {
+      "base_workspace_bytes": 1929544,
+      "bound": 30000,
+      "entries": 1577,
+      "kn_mod8": 7,
+      "multiplier": 1,
+      "n_mod8": 7,
+      "work": 1567119
+    },
+    "routing_52": {
+      "base_workspace_bytes": 3113464,
+      "bound": 48498,
+      "entries": 2500,
+      "kn_mod8": 3,
+      "multiplier": 5,
+      "n_mod8": 7,
+      "work": 3862343
+    },
+    "routing_56": {
+      "base_workspace_bytes": 6835784,
+      "bound": 106658,
+      "entries": 5000,
+      "kn_mod8": 7,
+      "multiplier": 1,
+      "n_mod8": 7,
+      "work": 8229049
+    },
+    "routing_59": {
+      "base_workspace_bytes": 6638496,
+      "bound": 103574,
+      "entries": 5000,
+      "kn_mod8": 5,
+      "multiplier": 3,
+      "n_mod8": 7,
+      "work": 8249100
+    },
+    "routing_61": {
+      "base_workspace_bytes": 73800,
+      "bound": 1000,
+      "entries": 97,
+      "kn_mod8": 7,
+      "multiplier": 1,
+      "n_mod8": 7,
+      "work": 58449
+    }
+  },
+  "work": 289453288
+}

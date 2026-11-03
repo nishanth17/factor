@@ -50,6 +50,7 @@ comparison with its own identity.
 | [qs/b1/](qs/b1/) | QS/MPQS/SIQS calibration and width studies |
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
+| [qs/c9a/](qs/c9a/) | Independent useful-yield/admission/graph/record policies, immutable control, bounded captures/replays and staged complete-cost preparation |
 | [qs/c10/](qs/c10/README.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
 | [qs/c10a05/](qs/c10a05/) | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
 | [qs/c10a05_plus/](qs/c10a05_plus/) | Frozen 51-digit default-scope extension, 55/60-digit feasibility limits and charged fresh completion evidence |
@@ -71,6 +72,35 @@ Write new captures, stdout, profiles and verification dumps under ignored
 `results/<subject>/<experiment>/<run>/`. Make targets create timestamped
 outputs; direct runners may require an existing output folder. Do not
 force-add generated results, local journals or external source checkouts.
+
+## C9a preparation and staged execution
+
+Preparation delivers code and certified inputs without running A/B/M/R/F/C.
+The literal configurations and actual input multiplier/base bounds live in
+`qs/c9a/configuration.py` and `inputs/c9a/structural.json`. Detailed research,
+the decision note and a concrete execution handoff are local in `audit/c9a/`.
+
+```sh
+pypy3 -m v2.benchmarks.qs.c9a --help
+pypy3 -m v2.benchmarks.qs.c9a freeze \
+  --output v2/benchmarks/results/c9a/execution-freeze.json
+```
+
+Freezing requires committed, clean preparation and never starts a campaign.
+A separately authorized execution uses `run --stage A --freeze PATH
+--output DIRECTORY --decision DECISION.json`, then a recorded usefulness/cost
+decision for each later stage. There is no run-all command or full 80-digit
+cell. `observer` performs nine matched one-block overhead pairs; optional
+`replay` uses a maximum of two validated complete streams and eight slots.
+Captured fixed populations cannot establish additional I/E yield.
+
+The runner reserves warmup/end work, lifecycle time and output storage before
+each worker, validates factors against parent-held certificates, preserves
+censored/lost cells and separates recorder exhaustion from native limits.
+`select-confirmation`, `prepare-confirmation` and `freeze-confirmation` select
+one band before fresh sampling and preserve earlier charges. Fresh required
+inputs are committed before their freeze. These commands do not grant
+permission to execute the preparation-only task's future campaigns.
 
 ## Completed A1b review
 

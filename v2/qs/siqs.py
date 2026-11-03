@@ -560,6 +560,8 @@ class SIQSJob:
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
                 self.engine.zero_checked_count = 0
+                if self.engine._pair_index is not None:
+                    self.engine._pair_index.clear()
 
         if not self.config.streaming:
             self.seen.add(key)

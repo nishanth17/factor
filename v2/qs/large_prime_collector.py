@@ -1,5 +1,7 @@
 """Opt-in DLP intake and atomic publication into the relation store."""
 
+from dataclasses import replace
+
 from ..common import utils
 from ..common.arithmetic import gcd
 from .large_primes import CycleTooLongError, split_two_primes
@@ -41,10 +43,23 @@ def divide_large_residual(
         collector.factor_base,
     )
     pair, scalar = (), remaining
+    small_bound = getattr(config, "small_prime_bound", None)
+    endpoint_product = (
+        None if small_bound is None else small_bound * config.large_prime_bound
+    )
     if remaining > max(config.residual_bound, config.large_product_bound):
         stats["product_rejections"] += 1
         return None, None
     if remaining != 1:
+        if endpoint_product is not None:
+            budget.consume(1)
+            # p<=S and q<=L implies pq<=SL. Preserve the independent SLP
+            # allowance: a prime above SL may still be a valid scalar atom.
+            if remaining > max(config.residual_bound, endpoint_product):
+                stats["endpoint_product_rejections"] = (
+                    stats.get("endpoint_product_rejections", 0) + 1
+                )
+                return None, None
         budget.consume(remaining.bit_length() ** 2)
         prime = utils.classify_prime(remaining) is utils.Primality.PROVEN
         if prime:
@@ -55,6 +70,11 @@ def divide_large_residual(
             stats["composite_residuals"] += 1
             if remaining > config.large_product_bound:
                 stats["product_rejections"] += 1
+                return None, None
+            if endpoint_product is not None and remaining > endpoint_product:
+                stats["endpoint_product_rejections"] = (
+                    stats.get("endpoint_product_rejections", 0) + 1
+                )
                 return None, None
             if collector._split_calls >= config.split_limit:
                 stats["split_quota_rejections"] += 1
@@ -73,6 +93,14 @@ def divide_large_residual(
             if not pair:
                 stats[reason] += 1
                 return None, None
+            # Reporting and recovered-product admission are separate. An
+            # ordered policy pays for the exact split before rejecting its
+            # smaller endpoint; it cannot publish an unchecked square loop.
+            if small_bound is not None and pair[0] > small_bound:
+                stats["small_endpoint_rejections"] = (
+                    stats.get("small_endpoint_rejections", 0) + 1
+                )
+                return None, None
             stats["double_residuals"] += 1
             stats["square_residuals"] += pair[0] == pair[1]
             scalar = 1
@@ -90,6 +118,7 @@ def divide_large_residual(
         residual_bound=config.residual_bound,
         large_prime_bound=config.large_prime_bound,
         large_product_bound=config.large_product_bound,
+        small_prime_bound=getattr(config, "small_prime_bound", None),
         budget=budget,
     )
     for prime in atom.residual_primes:
@@ -127,6 +156,12 @@ def admit_large_relation(collector, atom, stats):
     ):
         return "memory_limit"
     endpoints = atom.large_primes or (1, atom.residual)
+    shortcuts = collector._short_cycles
+    if shortcuts is not None and (
+        collector._workspace + collector._scratch_bytes + reserve + 6144
+        > config.memory_limit
+    ):
+        return "memory_limit"
     try:
         plan = graph.plan(
             *endpoints, atom.relation_id, config.max_partials, budget
@@ -138,8 +173,29 @@ def admit_large_relation(collector, atom, stats):
             else "memory_limit"
         )
     except CycleTooLongError:
-        stats["long_cycle_rejections"] += 1
-        return None
+        if shortcuts is None:
+            stats["long_cycle_rejections"] += 1
+            return None
+        from .large_primes import GraphPlan
+
+        plan = GraphPlan(cycle=None)
+    if shortcuts is not None and (
+        plan.cycle is not None
+        or (plan.link is None and plan.rebuilt is None and not plan.dropped)
+    ):
+        path, visits = shortcuts.shorter_path(*endpoints, plan.cycle, budget)
+        stats["shortcut_visits"] = stats.get("shortcut_visits", 0) + visits
+        if path is None:
+            stats["long_cycle_rejections"] += 1
+            return None
+        saved = len(plan.cycle) - len(path) if plan.cycle is not None else 0
+        stats["shortcut_atoms_saved"] = (
+            stats.get("shortcut_atoms_saved", 0) + saved
+        )
+        stats["shortcut_cycles"] = stats.get("shortcut_cycles", 0) + (
+            path != plan.cycle
+        )
+        plan = replace(plan, cycle=path)
     if plan.dropped:
         stats["dropped_partials"] += 1
         return None
@@ -153,6 +209,8 @@ def admit_large_relation(collector, atom, stats):
     graph_delta = collector._graph_reserve(
         new_edges
     ) - collector._graph_reserve(old_edges)
+    if shortcuts is not None:
+        graph_delta += 2048 * (1 - len(plan.evicted))
     combination, atoms, scratch = None, (), 0
     if accepted:
         atoms = tuple(collector._atoms[i] for i in plan.cycle) + (atom,)
@@ -187,7 +245,18 @@ def admit_large_relation(collector, atom, stats):
         )
         if combination.divisor is not None:
             raise ArithmeticError("previously checked unit residual changed")
+    if getattr(config, "record_policy", "objects") == "packed-v1":
+        from .packed_relations import pack_relation
+
+        atom = pack_relation(atom, budget)
+        if combination is not None:
+            combination = replace(
+                combination,
+                relation=pack_relation(combination.relation, budget),
+            )
     budget.consume(len(atom.exponents) + len(atoms) + len(plan.evicted) + 1)
+    if shortcuts is not None:
+        budget.consume(4 * (1 + len(plan.evicted)))
     released = sum(collector._atom_bytes[i] for i in plan.evicted)
     # Containers allocate during insertion. If the allocator fails midway,
     # old external checkpoints remain valid, but this live store must never
@@ -195,6 +264,10 @@ def admit_large_relation(collector, atom, stats):
     collector._publication_failed = True
     try:
         graph.commit(plan)
+        if shortcuts is not None:
+            for identity in plan.evicted:
+                shortcuts.remove(identity)
+            shortcuts.add(atom.relation_id, *endpoints)
         for identity in plan.evicted:
             del collector._atoms[identity]
             del collector._atom_bytes[identity]
