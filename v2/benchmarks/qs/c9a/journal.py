@@ -148,7 +148,7 @@ def records(path, *, require_complete=True, budget=None):
 
 def atom_record(atom):
     polynomial = atom.polynomial
-    return dict(
+    record = dict(
         id=atom.relation_id,
         polynomial=[
             int(polynomial.a),
@@ -161,6 +161,10 @@ def atom_record(atom):
         residual=int(atom.residual),
         large_primes=atom.large_primes,
     )
+    if hasattr(atom, "opaque"):
+        record["opaque"] = atom.opaque
+        record["residual_contract"] = "extended-v1"
+    return record
 
 
 @contextmanager

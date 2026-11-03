@@ -130,7 +130,12 @@ class QSJob:
         if getattr(self.config, "preparation_policy", "fixed") == "active-v2":
             from .yield_support import UsefulTarget
 
-            self._useful_target = UsefulTarget()
+            if getattr(self.config, "outcome_feedback", False):
+                from .yield_feedback import OutcomeTarget
+
+                self._useful_target = OutcomeTarget()
+            else:
+                self._useful_target = UsefulTarget()
         self._full_view = self._retry_full_view = self._selected_subset = False
         self.solver, self.extractor, self.prepared = None, None, None
         self.last_count = -1
@@ -163,7 +168,7 @@ class QSJob:
         return self._solve_impl(final)
 
     def _solve_impl(self, final):
-        """Keep a reversible subset retry inside one observed solve boundary."""
+        """Keep a reversible subset retry inside one solve boundary."""
         relations = self.collector.matrix_relations
         count = len(relations)
         if self.solver is None and self.extractor is None:
@@ -295,6 +300,15 @@ class QSJob:
                         and not self._full_view
                     ),
                     surplus=self.row_excess,
+                    merge_weight=getattr(self.config, "merge_weight", 2),
+                    merge_fill=getattr(self.config, "merge_fill", 0),
+                    sparse_incidence=getattr(
+                        self.config, "sparse_incidence", False
+                    ),
+                    panel_bits=getattr(self.config, "solver_panel_bits", 0),
+                    _incremental=self.collector._incremental
+                    if getattr(self.config, "incremental_bytes", 0)
+                    else None,
                 ),
             )
             self._workspace_peak = max(
@@ -358,6 +372,17 @@ class QSJob:
         self.budget.consume(0)
         divisor = self._timed("extraction", self.extractor.run)
         skipped = getattr(self.extractor, "cache_skips", 0)
+        if self._useful_target is not None and getattr(
+            self.config, "outcome_feedback", False
+        ):
+            self._useful_target.extracted(
+                count,
+                self.extractor.trials,
+                skipped,
+                divisor,
+                self.filter_row_growth,
+                self.config.relation_limit,
+            )
         self.stats["trivial_dependencies"] += skipped + sum(
             trial.divisor is None for trial in self.extractor.trials
         )

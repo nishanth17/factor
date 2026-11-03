@@ -176,7 +176,9 @@ def decode(values, qs):
     values = dict(values)
     collector = values["collector"]
     name = (
-        "CombinedYieldSieveConfig"
+        "ExtendedYieldSieveConfig"
+        if collector.get("extension_policy") == "extended-v1"
+        else "CombinedYieldSieveConfig"
         if collector.get("yield_policy") == "yield-v2"
         else "YieldSieveConfig"
         if "yield_policy" in collector

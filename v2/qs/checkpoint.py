@@ -7,6 +7,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from .assignment_stream import assignment_identity
+from .extended_policy import EXTENSION_FIELDS, ExtendedYieldSieveConfig
 from .extraction import DependencyExtractor, _prepare_relations
 from .families import (
     PolynomialFamily,
@@ -175,7 +176,9 @@ def _reserve_growing_checkpoint(job):
 def pack_job(job):
     """Snapshot immutable provenance once, with bounded encoded output."""
     version = (
-        12
+        13
+        if isinstance(job.config.collector, ExtendedYieldSieveConfig)
+        else 12
         if isinstance(job.config.collector, CombinedYieldSieveConfig)
         else 11
         if isinstance(job.config.collector, YieldSieveConfig)
@@ -227,13 +230,18 @@ def pack_job(job):
         )
         if version >= 6:
             progress["zero_checked_count"] = engine.zero_checked_count
-        if version in (11, 12):
+        if version == 13 and solver is not None:
+            progress["solver"]["incremental_modes"] = [
+                solver.matrix.stats.get("incremental_survivors", False),
+                solver.matrix.stats.get("incremental_core", False),
+            ]
+        if version in (11, 12, 13):
             progress["yield_progress"] = {
                 "pair_checked_count": 0
                 if engine._pair_index is None
                 else engine._pair_index.checked_count
             }
-            if version == 12:
+            if version >= 12:
                 progress["yield_progress"].update(
                     active_target=None
                     if engine._useful_target is None
@@ -534,6 +542,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         7,
         11,
         12,
+        13,
     ):
         raise ValueError("unsupported SIQS checkpoint version")
 
@@ -596,19 +605,23 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "filter_policy",
         "extraction_policy",
     }
-    if payload["version"] in (11, 12):
+    if payload["version"] in (11, 12, 13):
         if present != ordered_fields or (
             values["collector"].get("yield_policy")
-            != ("yield-v2" if payload["version"] == 12 else "yield-v1")
+            != ("yield-v2" if payload["version"] >= 12 else "yield-v1")
             or values["collector"].get("storage_policy") != "grow"
         ):
             raise ValueError("yield checkpoint lacks its policy identity")
     elif present:
         raise ValueError("legacy checkpoint cannot change admission policy")
     if combined_fields.intersection(values["collector"]) != (
-        combined_fields if payload["version"] == 12 else set()
+        combined_fields if payload["version"] >= 12 else set()
     ):
         raise ValueError("combined checkpoint lacks its policy identity")
+    if EXTENSION_FIELDS.intersection(values["collector"]) != (
+        EXTENSION_FIELDS if payload["version"] == 13 else set()
+    ):
+        raise ValueError("expanded checkpoint lacks its policy identity")
     if payload["version"] < 7 and (
         (values.get("solve_policy", "window") != "window")
         != (payload["version"] == 6)
@@ -618,13 +631,15 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "sign_policy" in values or "sparse_queue_bytes" in values["collector"]
     ):
         raise ValueError("legacy checkpoint cannot change collection policy")
-    if payload["version"] in (7, 11, 12) and (
+    if payload["version"] in (7, 11, 12, 13) and (
         "sign_policy" not in values
         or "sparse_queue_bytes" not in values["collector"]
     ):
         raise ValueError("collection checkpoint lacks its policy identity")
     collector_type = (
-        CombinedYieldSieveConfig
+        ExtendedYieldSieveConfig
+        if payload["version"] == 13
+        else CombinedYieldSieveConfig
         if payload["version"] == 12
         else YieldSieveConfig
         if payload["version"] == 11
@@ -883,10 +898,10 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 "SIQS checkpoint relation store identity mismatch"
             )
         _restore_store(payload["store"], engine.collector, budget)
-        if payload["version"] in (11, 12):
+        if payload["version"] in (11, 12, 13):
             progress = saved.get("yield_progress")
             expected = {"pair_checked_count"}
-            if payload["version"] == 12:
+            if payload["version"] >= 12:
                 expected.update(("active_target", "solve_view"))
             if not isinstance(progress, dict) or set(progress) != expected:
                 raise ValueError(
@@ -900,7 +915,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 engine._pair_index.rebuild(
                     engine.collector._rows, count, job.base, budget
                 )
-            if payload["version"] == 12:
+            if payload["version"] >= 12:
                 if engine._useful_target is None:
                     if progress["active_target"] is not None:
                         raise ValueError("disabled useful target has progress")
@@ -976,7 +991,15 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         engine.stats = saved["stats"]
         prefix = saved["solver"]
         if prefix is not None:
-            if payload["version"] == 12 and (
+            incremental_modes = prefix.get("incremental_modes", [False, False])
+            if payload["version"] == 13 and (
+                not isinstance(incremental_modes, list)
+                or len(incremental_modes) != 2
+                or any(type(flag) is not bool for flag in incremental_modes)
+                or (incremental_modes[1] and not incremental_modes[0])
+            ):
+                raise ValueError("invalid incremental solver modes")
+            if payload["version"] >= 12 and (
                 type(prefix.get("light_rows")) is not bool
                 or prefix["light_rows"] != engine._selected_subset
             ):
@@ -992,7 +1015,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 max_rows=collector_config.max_relations,
                 max_atoms=collector_config.max_atoms,
                 verification_cache=engine.collector._preparation_cache
-                if payload["version"] == 12
+                if payload["version"] >= 12
                 else None,
             )
             live = (
@@ -1012,7 +1035,25 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 else "reference",
                 light_rows=engine._selected_subset,
                 surplus=config.row_excess,
+                merge_weight=getattr(collector_config, "merge_weight", 2),
+                merge_fill=getattr(collector_config, "merge_fill", 0),
+                sparse_incidence=getattr(
+                    collector_config, "sparse_incidence", False
+                ),
+                panel_bits=getattr(collector_config, "solver_panel_bits", 0),
+                _incremental=engine.collector._incremental
+                if getattr(collector_config, "incremental_bytes", 0)
+                and incremental_modes[0]
+                else None,
+                _component_contractions=incremental_modes[1],
             )
+            if payload["version"] == 13 and incremental_modes != [
+                matrix.stats.get("incremental_survivors", False),
+                matrix.stats.get("incremental_core", False),
+            ]:
+                raise MemoryError(
+                    "incremental solver replay exceeds its allowance"
+                )
             solver = DependencySolver(matrix, budget=budget)
             actions = utils.require_integer(
                 prefix["actions"], "solver actions", 0

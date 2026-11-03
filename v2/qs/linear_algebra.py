@@ -1,5 +1,6 @@
 """Bounded row-oriented GF(2) filtering with original-row provenance."""
 
+from array import array
 from dataclasses import dataclass
 from heapq import heapify, heappop, heappush
 
@@ -49,6 +50,13 @@ def filter_matrix(
     merge_policy="reference",
     light_rows=False,
     surplus=32,
+    merge_weight=2,
+    merge_fill=0,
+    sparse_incidence=False,
+    panel_bits=0,
+    survivor_mask=None,
+    _incremental=None,
+    _component_contractions=True,
 ):
     """Remove singleton constraints and optionally eliminate weight two.
 
@@ -60,6 +68,16 @@ def filter_matrix(
     """
     if merge_policy not in ("reference", "fill-v2"):
         raise ValueError("unknown weight-two merge policy")
+    for name, value, maximum in (
+        ("merge_weight", merge_weight, 8),
+        ("merge_fill", merge_fill, 4096),
+        ("panel_bits", panel_bits, 8),
+    ):
+        utils.require_integer(value, name, 0)
+        if value > maximum:
+            raise ValueError(name + " exceeds its finite cap")
+    if merge_weight < 2 or type(sparse_incidence) is not bool:
+        raise ValueError("invalid structured filtering policy")
     if type(light_rows) is not bool:
         raise TypeError("light_rows must be Boolean")
     utils.require_integer(surplus, "matrix surplus", 0)
@@ -67,6 +85,12 @@ def filter_matrix(
         raise ValueError("matrix surplus exceeds its bound")
     if not isinstance(rows, tuple):
         raise TypeError("rows must be an immutable tuple")
+    if survivor_mask is not None and (
+        type(survivor_mask) is not int
+        or survivor_mask < 0
+        or survivor_mask.bit_length() > len(rows)
+    ):
+        raise ValueError("invalid incremental singleton mask")
     if len(rows) > storage_limit(max_rows):
         raise ValueError("matrix row cap exceeded")
     for row in rows:
@@ -88,6 +112,10 @@ def filter_matrix(
     if compact:
         columns = union.bit_count()
     reserve = matrix_workspace(len(rows), columns)
+    if panel_bits:
+        reserve += (1 << panel_bits) * (
+            512 + 8 * ((len(rows) + columns + 7) // 8)
+        )
     if compact:
         # The original wide bitsets coexist with remapped rows and the
         # index map. Reserve them explicitly, without dense wide fill-in.
@@ -97,6 +125,8 @@ def filter_matrix(
     if reserve > memory_bytes:
         raise MemoryError("matrix fill-in/provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
+    if _incremental is not None:
+        survivor_mask = _incremental.observe(rows, budget)
     working_rows = rows
     if compact:
         nonzeros = sum(row.bit_count() for row in rows)
@@ -127,26 +157,51 @@ def filter_matrix(
                 bits ^= bit
             working_rows.append(remapped)
 
-        del indices
-
     active = {
         index: (row, one_bit << index)
         for index, row in enumerate(working_rows)
+        if survivor_mask is None or survivor_mask & (1 << index)
     }
-    selected_count = len(active)
+    selected_count = len(rows)
     if light_rows and len(active) > active_columns + surplus:
         budget.consume(
             len(active) * (1 + len(active).bit_length() + (columns + 63) // 64)
         )
-        selected_count = max(
+        kept_count = max(
             sum(not row for row, _ in active.values()),
             active_columns + surplus,
         )
+        selected_count = len(rows) - len(active) + kept_count
         selected = sorted(active, key=lambda i: (active[i][0].bit_count(), i))[
-            :selected_count
+            :kept_count
         ]
         active = {i: active[i] for i in selected}
-    zero, singletons, merges, rounds = [], 0, 0, 0
+    zero, singletons, merges, rounds = [], len(rows) - len(active), 0, 0
+    incremental_core = False
+    if (
+        _incremental is not None
+        and _component_contractions
+        and weight_two
+        and selected_count == len(rows)
+    ):
+        core = _incremental.weight_two_core(budget, merge_policy)
+        if core is not None:
+            incremental_core = True
+            pairs, zeros, singletons, merges = core
+            active = {}
+            for index, (row, mask) in enumerate(pairs):
+                budget.consume(row.bit_count() + mask.bit_count() + 1)
+                if compact:
+                    mapped, bits = zero_bit, row
+                    while bits:
+                        bit = bits & -bits
+                        mapped |= one_bit << indices[bit.bit_length() - 1]
+                        bits ^= bit
+                    row = mapped
+                active[index] = row, mask
+            zero = list(zeros)
+    if compact:
+        del indices
     input_nonzeros = sum(row.bit_count() for row in rows)
     peak_nonzeros = input_nonzeros
     # Column incidence uses row-index bitsets. The existing worst-case
@@ -164,18 +219,35 @@ def filter_matrix(
         while bits:
             bit = bits & -bits
             column = bit.bit_length() - 1
-            incidence[column] = incidence.get(column, zero_bit) | (
-                one_bit << index
-            )
+            if sparse_incidence:
+                incidence.setdefault(column, array("I")).append(index)
+            else:
+                incidence[column] = incidence.get(column, zero_bit) | (
+                    one_bit << index
+                )
             bits ^= bit
 
+    def count(mask):
+        return len(mask) if sparse_incidence else mask.bit_count()
+
+    def members(mask):
+        if sparse_incidence:
+            return tuple(mask)
+        result = []
+        while mask:
+            bit = mask & -mask
+            result.append(bit.bit_length() - 1)
+            mask ^= bit
+        return tuple(result)
+
+    empty = array("I") if sparse_incidence else zero_bit
     single_columns = {
-        column for column, mask in incidence.items() if mask.bit_count() == 1
+        column for column, mask in incidence.items() if count(mask) == 1
     }
     pair_columns = [
         column
         for column, mask in incidence.items()
-        if weight_two and mask.bit_count() == 2
+        if weight_two and count(mask) == 2
     ]
     heapify(pair_columns)
     queued_pairs = set(pair_columns)
@@ -190,30 +262,36 @@ def filter_matrix(
             bit = bits & -bits
             column = bit.bit_length() - 1
             budget.consume(word_cost)
-            mask = incidence.get(column, zero_bit) ^ row_bit
+            if sparse_incidence:
+                from .structured_matrix import incidence_add
+
+                previous = incidence.get(column, empty)
+                budget.consume(len(previous) + 1)
+                mask = incidence_add(previous, index)
+            else:
+                mask = incidence.get(column, zero_bit) ^ row_bit
             if mask:
                 incidence[column] = mask
             else:
                 incidence.pop(column, None)
-            count = mask.bit_count()
-            if count == 1:
+            degree = count(mask)
+            if degree == 1:
                 single_columns.add(column)
             else:
                 single_columns.discard(column)
-            if weight_two and count == 2 and column not in queued_pairs:
+            if weight_two and degree == 2 and column not in queued_pairs:
                 heappush(pair_columns, column)
                 queued_pairs.add(column)
             bits ^= bit
 
+    structured_merges = 0
     while active:
         budget.consume(0)
         rounds += 1
         for index in pending_zeros:
             zero.append(active.pop(index)[1])
         pending_zeros = []
-        forced = {
-            incidence[column].bit_length() - 1 for column in single_columns
-        }
+        forced = {members(incidence[column])[0] for column in single_columns}
         if forced:
             for index in forced:
                 row, _ = active.pop(index)
@@ -228,13 +306,9 @@ def filter_matrix(
         while pair_columns:
             column = heappop(pair_columns)
             queued_pairs.remove(column)
-            mask = incidence.get(column, zero_bit)
-            if mask.bit_count() == 2:
-                first_bit = mask & -mask
-                candidate = (
-                    first_bit.bit_length() - 1,
-                    (mask ^ first_bit).bit_length() - 1,
-                )
+            mask = incidence.get(column, empty)
+            if count(mask) == 2:
+                candidate = members(mask)
                 if merge_policy == "reference":
                     pair = candidate
                     break
@@ -261,6 +335,37 @@ def filter_matrix(
                     queued_pairs.add(proposal[2])
 
         if pair is None:
+            from .structured_matrix import spanning_merges
+
+            proposals = []
+            if merge_weight > 2:
+                for column in sorted(incidence):
+                    budget.consume(1)
+                    degree = count(incidence[column])
+                    if not 3 <= degree <= merge_weight:
+                        continue
+                    indices = members(incidence[column])
+                    edges = spanning_merges(indices, active, budget)
+                    old_weight = sum(active[i][0].bit_count() for i in indices)
+                    delta = sum(r.bit_count() for r, _ in edges) - old_weight
+                    if delta <= merge_fill:
+                        proposals.append((delta, column, indices, edges))
+                    if len(proposals) >= 8:
+                        break
+                if proposals:
+                    delta, _, indices, edges = min(proposals)
+                    for index in indices:
+                        row, _ = active.pop(index)
+                        toggle(index, row)
+                    for index, (row, mask) in zip(indices, edges):
+                        active[index] = row, mask
+                        toggle(index, row)
+                        if not row:
+                            pending_zeros.append(index)
+                    nonzeros += delta
+                    peak_nonzeros = max(peak_nonzeros, nonzeros)
+                    structured_merges += 1
+                    continue
             break
         first, second = pair
         left, left_mask = active[first]
@@ -300,6 +405,17 @@ def filter_matrix(
     if merge_policy != "reference" or light_rows:
         stats.update(
             input_active_columns=active_columns, selected_rows=selected_count
+        )
+    if merge_weight > 2 or sparse_incidence or panel_bits:
+        stats.update(
+            structured_merges=structured_merges,
+            panel_bits=panel_bits,
+            sparse_incidence=sparse_incidence,
+        )
+    if _incremental is not None:
+        stats.update(
+            incremental_survivors=survivor_mask is not None,
+            incremental_core=incremental_core,
         )
     return FilteredMatrix(
         rows,
@@ -385,7 +501,14 @@ class DependencySolver:
         else:
             # Carry the XOR through provenance so a reduced zero row still
             # selects a kernel of the original, unfiltered matrix.
-            self.pending = row ^ previous[0], mask ^ previous[1]
+            from .structured_matrix import panel_reduce
+
+            reduced = panel_reduce(self, row, mask)
+            self.pending = (
+                reduced
+                if reduced is not None
+                else (row ^ previous[0], mask ^ previous[1])
+            )
             self.xors += 1
 
     def run(self):

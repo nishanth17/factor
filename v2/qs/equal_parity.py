@@ -84,14 +84,16 @@ class EqualParityIndex:
                             raise MemoryError(
                                 "checked pair extraction scratch"
                             )
-                        parities = tuple(
+                        # The incoming row was checked immediately above;
+                        # only the retained representative needs a new witness.
+                        parities = (
                             collector._checked.row(
-                                r,
+                                selected[0],
                                 collector._atoms,
                                 budget,
                                 collector.config.memory_limit,
-                            )
-                            for r in selected
+                            ),
+                            bits,
                         )
                         prepared = PreparedRelations(
                             selected,

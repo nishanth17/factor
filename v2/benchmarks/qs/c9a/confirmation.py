@@ -20,6 +20,21 @@ from .preparation import (
 )
 
 
+def input_prefix(selection):
+    protocol = selection.get("protocol", "")
+    if protocol == "c9a-expanded-yield-v4":
+        return "expanded_confirmation_"
+    if protocol.startswith("c9a-expanded-yield-v4-"):
+        return (
+            "expanded_confirmation_"
+            + hashlib.sha256(protocol.encode()).hexdigest()[:16]
+            + "_"
+        )
+    if protocol == "c9a-combined-yield-v3":
+        return "combined_confirmation_"
+    return "confirmation_"
+
+
 def select(freeze_path, output, band, decision):
     started, cpu = time.monotonic(), time.process_time()
     frozen = load_freeze(freeze_path)
@@ -82,6 +97,10 @@ def select(freeze_path, output, band, decision):
             source=frozen["source"],
             parent_output=str(output.resolve()),
             protocol=frozen["plan"]["identity"],
+            integrated_incumbents=frozen["plan"].get("integrated_incumbents"),
+            primary_profile=frozen["plan"].get(
+                "primary_profile", "three-prime"
+            ),
         )
         receipt(output / "confirmation-selection.json", selection)
         return selection
@@ -92,11 +111,7 @@ def fresh(selection_path, exclusions):
     parent = Path(selection["parent_output"])
     if digest(parent / "ledger.json") != selection["ledger_sha256"]:
         raise ValueError("exposed ledger changed after fresh selection")
-    prefix = (
-        "combined_confirmation_"
-        if selection.get("protocol") == "c9a-combined-yield-v3"
-        else "confirmation_"
-    )
+    prefix = input_prefix(selection)
     output = INPUTS / (prefix + str(selection["band"]))
     # Include the entire exposed corpus plus every certified factor. This
     # supplements, rather than replaces, the historical overlap inventory.
@@ -124,7 +139,11 @@ def fresh(selection_path, exclusions):
             10**13,
             {"kind": "fresh_generation"},
             lambda: prepare(
-                combined, band=selection["band"], output=output, seconds=990
+                combined,
+                band=selection["band"],
+                output=output,
+                seconds=990,
+                configurations=selection.get("integrated_incumbents"),
             ),
         )
 
@@ -151,25 +170,53 @@ def freeze_confirmation(selection_path, output):
         raise ValueError("confirmation interpreter changed")
     band = selection["band"]
     combined = selection.get("protocol") == "c9a-combined-yield-v3"
-    prefix = "combined_confirmation_" if combined else "confirmation_"
+    extended = selection.get("protocol", "").startswith(
+        "c9a-expanded-yield-v4"
+    )
+    prefix = input_prefix(selection)
     corpus_path = INPUTS / (prefix + str(band)) / "corpus.json"
     corpus = json.loads(corpus_path.read_text())
     validate(corpus, band=band)
     resolved = json.loads(
         corpus_path.with_name("structural.json").read_text()
     )["resolved"]
-    if combined:
+    if extended:
+        from .extended import confirmation_cells as combined_cells
+    elif combined:
         from .combined import confirmation_cells as combined_cells
     plan = dict(
-        identity=("c9a-combined-yield-v3" if combined else "c9a-full-yield-v2")
+        identity=selection.get("protocol", "c9a-full-yield-v2")
         + "-fresh-"
         + str(band),
-        cells=(combined_cells if combined else confirmation_cells)(
+        cells=(combined_cells if combined or extended else confirmation_cells)(
             corpus, resolved, band
         ),
         confirmation_band=band,
         parent_selection=selection,
     )
+    if extended:
+        plan["cells"] = combined_cells(
+            corpus,
+            resolved,
+            band,
+            profile=selection.get("primary_profile", "three-prime"),
+        )
+    if selection.get("integrated_incumbents"):
+        from .... import qs
+        from .configuration import decode
+
+        incumbent = decode(selection["integrated_incumbents"][str(band)], qs)
+        plan["cells"] = combined_cells(
+            corpus,
+            resolved,
+            band,
+            incumbent=incumbent,
+            profile=selection.get("primary_profile", "three-prime"),
+        )
+        for cell in plan["cells"]:
+            cell["source"] = "candidate"
+            cell["protocol"] = plan["identity"]
+        plan["integrated_incumbents"] = selection["integrated_incumbents"]
     resources = limits(plan, confirmation_band=band)
     prep = json.loads(
         (parent / "confirmation-preparation/ledger.json").read_text()

@@ -19,6 +19,7 @@ def replay(
     work_limit=10**13,
     require_mature=True,
     combined=False,
+    extended=False,
 ):
     """Replay G/D/S/P on a fixed admission population, not an I/E experiment.
 
@@ -37,7 +38,10 @@ def replay(
         if record["kind"] == "header":
             header = record["data"]
         terminal = record
-    if header is None or header.get("format") != "c9a-atoms-v1":
+    if header is None or header.get("format") not in (
+        "c9a-atoms-v1",
+        "c9a-atoms-v2",
+    ):
         raise ValueError("unsupported journal format")
     if (
         require_mature
@@ -48,7 +52,32 @@ def replay(
         )
     cell = header["cell"]
     source = decode(cell["configuration"], qs)
-    if combined:
+    if extended and arm == "C0":
+        if getattr(source.collector, "extension_policy", None):
+            raise ValueError(
+                "a DLP incumbent cannot replay "
+                "an expanded admission population"
+            )
+        extended = combined = False
+    if extended:
+        from .extended import configuration as expanded_configuration
+
+        if arm not in ("C0", "C1"):
+            raise ValueError(
+                "expanded grouped diagnosis requires "
+                "a separately identified literal policy"
+            )
+        candidate = (
+            source
+            if getattr(source.collector, "extension_policy", None)
+            else expanded_configuration(
+                cell["digits"],
+                "C1",
+                admission_base_bound=cell["resolved"]["bound"],
+                incumbent=source,
+            )
+        )
+    elif combined:
         from .combined import configuration as combined_configuration
 
         candidate = combined_configuration(
@@ -74,7 +103,9 @@ def replay(
     # original bounds for independent verification; change only replayable
     # mechanisms. This avoids presenting missing I/E atoms as an ablation.
     cls = (
-        qs.CombinedYieldSieveConfig
+        qs.ExtendedYieldSieveConfig
+        if extended
+        else qs.CombinedYieldSieveConfig
         if combined and arm != "C0"
         else qs.YieldSieveConfig
     )
@@ -99,9 +130,11 @@ def replay(
         }
     )
     values["yield_policy"] = (
-        "yield-v2" if cls is qs.CombinedYieldSieveConfig else "yield-v1"
+        "yield-v2"
+        if issubclass(cls, qs.CombinedYieldSieveConfig)
+        else "yield-v1"
     )
-    if cls is qs.CombinedYieldSieveConfig:
+    if issubclass(cls, qs.CombinedYieldSieveConfig):
         for key in (
             "recovery_policy",
             "split_policy",
@@ -112,6 +145,15 @@ def replay(
             "extraction_policy",
         ):
             values[key] = getattr(candidate.collector, key)
+    if extended:
+        from ....qs.extended_policy import EXTENSION_FIELDS
+
+        values.update(
+            {
+                key: getattr(candidate.collector, key)
+                for key in EXTENSION_FIELDS
+            }
+        )
     collector = cls(**values)
     built = qs.build_factor_base(
         cell["n"],
@@ -175,9 +217,7 @@ def replay(
                     if job._pair_index is not None:
                         job._pair_index.clear()
                     if job._useful_target is not None:
-                        from ....qs.yield_support import UsefulTarget
-
-                        job._useful_target = UsefulTarget()
+                        job._useful_target = type(job._useful_target)()
                     job._full_view = job._retry_full_view = (
                         job._selected_subset
                     ) = False
@@ -189,14 +229,26 @@ def replay(
             )
             if polynomial != job.collector.polynomial:
                 raise ValueError("atom is outside its recorded polynomial")
-            atom = qs.AtomicRelation(
-                polynomial,
-                data["position"],
-                data["sign"],
-                tuple(tuple(pair) for pair in data["exponents"]),
-                data["residual"],
-                large_primes=tuple(data["large_primes"]),
-            )
+            if data.get("residual_contract") == "extended-v1":
+                from ....qs.residual_relations import ResidualAtom
+
+                atom = ResidualAtom(
+                    polynomial,
+                    data["position"],
+                    data["sign"],
+                    tuple(tuple(pair) for pair in data["exponents"]),
+                    primes=tuple(data["large_primes"]),
+                    opaque=data["opaque"],
+                )
+            else:
+                atom = qs.AtomicRelation(
+                    polynomial,
+                    data["position"],
+                    data["sign"],
+                    tuple(tuple(pair) for pair in data["exponents"]),
+                    data["residual"],
+                    large_primes=tuple(data["large_primes"]),
+                )
             if atom.relation_id != data["id"]:
                 raise ValueError("original replay atom identity changed")
             qs.verify_atomic(
@@ -207,6 +259,8 @@ def replay(
                 large_product_bound=collector.large_product_bound,
                 small_prime_bound=collector.small_prime_bound,
                 budget=budget,
+                residual_arity=getattr(collector, "residual_arity", 2),
+                opaque_pairs=getattr(collector, "opaque_pairs", False),
             )
             # _admit's counters have a closed schema in ordinary collection.
             counters = defaultdict(int, counts)

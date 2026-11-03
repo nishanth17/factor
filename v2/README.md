@@ -106,6 +106,48 @@ Install GMP support into a PyPy 3.11 environment with
 The [shared arithmetic guide](common/README.md#arithmetic-backends) explains
 backend and checkpoint compatibility.
 
+`qs.ExtendedYieldSieveConfig` adds the separately versioned expanded
+experimental arm. It preserves `CombinedYieldSieveConfig` and automatic
+defaults. Its integer-handle incidence collector supports up to three proven
+endpoints and explicitly typed opaque cofactor pairing. Opaque values are not
+prime certificates; exact paired products and later proven endpoint conversion
+retain original atoms. `verify_atomic` requires explicit `residual_arity=3`
+and/or `opaque_pairs=True` to validate those extended contracts.
+
+The expanded configuration includes deferred cycle arithmetic, direct indexed
+recovery, exact piecewise reporting refinement, bounded reporting adaptation,
+outcome-aware top-ups, component-local singleton/weight-two reuse, conditioned cofactor
+splitting and memoization, dense-candidate base recovery, bounded cycle-basis
+reduction, cheap-factor recomputation, sparse incidence, weight3–8 tree merges
+and a bounded Four Russians pivot-panel solver. Original rows and exact lifting
+remain available. A lighter view retries the full store when necessary.
+
+`recovery_workers=1` enables one finite background hint task with a separately
+reserved work allowance and a join on interruption; the default is serial.
+Persistent cold factor records require an absolute existing `spill_directory`
+and positive `spill_bytes`. The default uses no files. The spill cap is separate
+from diagnostic output storage, survives relation resets and resume, and counts
+orphaned partial writes. Files persist for external checkpoints; explicit
+`SpillStore.cleanup()` invalidates those checkpoints. Missing, truncated or
+corrupt referenced records are errors. Spilling reduces retained atom payload
+ownership; construction/decode scratch and graph/solver ownership remain capped.
+
+Expanded checkpoints use schema13. They serialize structural provenance
+without forcing lazy modular arithmetic during emergency encoding. Restore
+checks original arithmetic, incidence/conversion history, all policy fields,
+reporting/outcome progress and pending solver/view continuation. Derived proof,
+incremental and panel caches rebuild with charged work. Successful split proofs
+are restored independently; volatile failed-split memo entries are discarded,
+while earlier work and split-attempt charges remain consumed.
+Pending solver checkpoints bind whether incremental contractions were used;
+restore reproduces that choice. Panel solver `xors` counts logical reduction
+actions, including one action for a whole panel; table construction and
+primitive work are charged separately to the work budget.
+
+This expanded implementation is unvalidated preparation. Its executable tests,
+complete lint gate, committed-only checks and all performance runs remain
+pending; source presence establishes neither correctness acceptance nor a win.
+
 ## Development
 
 ```sh

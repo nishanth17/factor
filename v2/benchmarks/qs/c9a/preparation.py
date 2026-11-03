@@ -10,7 +10,7 @@ from pathlib import Path
 from .... import qs
 from ....execution.budget import Budget
 from ..c10a04.accounting import atomic, digest
-from .configuration import BASE_COMMIT, SEEDS, configuration
+from .configuration import BASE_COMMIT, SEEDS, configuration, decode
 from .control import MANIFEST
 from .inputs import generate, validate
 from .plan import build, limits
@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[4]
 INPUTS = ROOT / "v2/benchmarks/inputs/c9a"
 
 
-def structural(corpus):
+def structural(corpus, *, configurations=None):
     """Resolve multiplier, base and assignments without sieving."""
     resolved, work = {}, 0
     for row in corpus["fixtures"]:
@@ -28,7 +28,11 @@ def structural(corpus):
         job = qs.SIQSJob(
             row["n"],
             seed=SEEDS[0],
-            config=configuration(row["digits"]),
+            config=(
+                configuration(row["digits"])
+                if configurations is None
+                else decode(configurations[str(row["digits"])], qs)
+            ),
             budget=budget,
         )
         job._setup()
@@ -53,7 +57,9 @@ def structural(corpus):
     return dict(resolved=resolved, work=work)
 
 
-def prepare(exclusions, *, band=None, output=INPUTS, seconds=590):
+def prepare(
+    exclusions, *, band=None, output=INPUTS, seconds=590, configurations=None
+):
     """Generate once, retain proof inputs, then resolve literal arm domains."""
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
@@ -67,7 +73,7 @@ def prepare(exclusions, *, band=None, output=INPUTS, seconds=590):
     corpus = generate(data["integers"], band=band, seconds=seconds)
     corpus["overlap_manifest_sha256"] = digest(Path(exclusions))
     atomic(output / "corpus.json", corpus)
-    resolved = structural(corpus)
+    resolved = structural(corpus, configurations=configurations)
     atomic(output / "structural.json", resolved)
     return dict(
         work=corpus["work"] + resolved["work"], moduli=len(corpus["fixtures"])
@@ -109,13 +115,55 @@ def require_clean():
         raise RuntimeError("commit preparation before freezing execution")
 
 
-def freeze(output, *, combined=False):
+def freeze(
+    output,
+    *,
+    combined=False,
+    extended=False,
+    integration=None,
+    profile="three-prime",
+):
     """Freeze an execution identity from committed preparation."""
     require_clean()
     corpus = json.loads((INPUTS / "corpus.json").read_text())
     validate(corpus)
     resolved = json.loads((INPUTS / "structural.json").read_text())["resolved"]
-    if combined:
+    source = source_manifest()
+    integration_data = None
+    if integration is not None:
+        if not extended:
+            raise ValueError("integration requires the expanded protocol")
+        integration_data = json.loads(Path(integration).read_text())
+        if set(integration_data) != {
+            "source_commit",
+            "corpus_sha256",
+            "incumbents",
+            "resolved",
+        }:
+            raise ValueError("invalid integration preparation")
+        if integration_data["source_commit"] != source["commit"] or (
+            integration_data["corpus_sha256"] != digest(INPUTS / "corpus.json")
+        ):
+            raise ValueError("integration source or population changed")
+        resolved = integration_data["resolved"]
+    if extended:
+        from .extended import build as build_extended
+        from .extended import validate as validate_extended
+
+        plan = build_extended(corpus, resolved, profile=profile)
+        if integration_data is not None:
+            from .extended import integrate
+
+            plan = integrate(
+                plan,
+                source["commit"],
+                {
+                    key: decode(value, qs)
+                    for key, value in integration_data["incumbents"].items()
+                },
+            )
+        validate_extended(plan)
+    elif combined:
         from .combined import (
             build as build_combined,
         )
@@ -131,7 +179,8 @@ def freeze(output, *, combined=False):
     data = dict(
         plan=plan,
         limits=limits(plan),
-        source=source_manifest(),
+        source=source,
+        integration_preparation=integration_data,
         corpus_sha256=digest(INPUTS / "corpus.json"),
     )
     data["sha256"] = hashlib.sha256(

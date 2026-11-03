@@ -10,6 +10,12 @@ from .relations import AtomicRelation
 def divide_yield_residual(
     collector, position, value, remaining, exponents, stats, *, hint=None
 ):
+    if getattr(collector.config, "extension_policy", None):
+        from .extended_collector import recover
+
+        return recover(
+            collector, position, value, remaining, exponents, stats, hint=hint
+        )
     config, checked, budget = (
         collector.config,
         collector._checked,
@@ -110,7 +116,9 @@ def divide_yield_residual(
         collector.polynomial,
         position,
         -1 if value < 0 else 1,
-        tuple(exponents),
+        exponents
+        if getattr(config, "indexed_recovery", False)
+        else tuple(exponents),
         scalar,
         large_primes=pair,
     )

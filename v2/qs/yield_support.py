@@ -5,6 +5,7 @@ from collections import OrderedDict
 from ..common import prime_sieve, utils
 from ..common.arithmetic import gcd, pow
 from .indexed_relations import FactorRecord
+from .lazy_relations import LazyCombinedRelation
 from .relations import (
     AtomicRelation,
     CombinationResult,
@@ -23,6 +24,8 @@ def payload_snapshot(row):
     Packed bytes are copied into the witness; an ID, digest or a `verified`
     attribute is never sufficient to reuse a previous arithmetic check.
     """
+    if isinstance(row, LazyCombinedRelation):
+        return row.structural_snapshot()
     factors = row.exponents
     exponents = (
         (factors._primes, len(factors), factors.encoded())
@@ -45,12 +48,13 @@ def payload_snapshot(row):
             exponents,
             row.residual,
             row.large_primes,
+            getattr(row, "opaque", None),
         )
     return row.atom_ids, row.u, row.sign, exponents, row.square_correction
 
 
 class CheckedStore:
-    """Collector-private proofs; restored or foreign objects start unchecked."""
+    """Private proofs; restored or foreign objects start unchecked."""
 
     def __init__(self, base, config):
         self.base, self.config = base, config
@@ -158,6 +162,8 @@ class CheckedStore:
             large_prime_bound=self.config.large_prime_bound,
             large_product_bound=self.config.large_product_bound,
             small_prime_bound=self.config.small_prime_bound,
+            residual_arity=getattr(self.config, "residual_arity", 2),
+            opaque_pairs=getattr(self.config, "opaque_pairs", False),
             budget=budget,
             prime_check=(
                 self.prime
@@ -180,19 +186,27 @@ class CheckedStore:
                     return CombinationResult(None, divisor)
                 if divisor != 1:
                     raise ValueError("nonunit residual has no proper split")
-        budget.consume(
-            sum(len(a.exponents) + 1 for a in atoms)
-            * (self.base.n.bit_length() + 1)
-        )
-        row = CombinedRelation(
-            identities, *_combined_values(atoms, self.base.n)
-        )
+        if getattr(self.config, "lazy_cycles", False):
+            row = LazyCombinedRelation(atoms, self.base.n, budget)
+        else:
+            budget.consume(
+                sum(len(a.exponents) + 1 for a in atoms)
+                * (self.base.n.bit_length() + 1)
+            )
+            row = CombinedRelation(
+                identities, *_combined_values(atoms, self.base.n)
+            )
         # Exact atomic identities and even residual multiplicities establish
-        # the combined identity directly. Public verification stays independent.
+        # the combined identity. Public verification stays independent.
         self._record(row, atoms=atoms)
         return CombinationResult(row, None)
 
     def row(self, row, store, budget, memory_bytes):
+        if (
+            isinstance(row, LazyCombinedRelation)
+            and row._modulus != self.base.n
+        ):
+            raise ValueError("lazy relation belongs to a different target")
         record = (
             self._known(row, budget)
             if self.config.recovery_policy == "checked-v2"
@@ -201,7 +215,8 @@ class CheckedStore:
         if isinstance(row, AtomicRelation):
             if row.residual_product != 1:
                 raise ValueError("partial atom is not a matrix row")
-            self.atom(row, budget)
+            if record is None:
+                self.atom(row, budget)
         else:
             atoms = tuple(store.get(i) for i in row.atom_ids)
             budget.consume(
@@ -222,7 +237,12 @@ class CheckedStore:
                         raise ValueError("missing checked provenance")
                     self.atom(atom, budget)
                 _combination_workspace(atoms, self.base, memory_bytes)
-                _verify_combined_values(row, self.base, atoms, budget)
+                if isinstance(row, LazyCombinedRelation):
+                    row.verify_structure(atoms, budget)
+                else:
+                    _verify_combined_values(row, self.base, atoms, budget)
+            if isinstance(row, LazyCombinedRelation):
+                row.bind_budget(budget)
         if record is not None and record[2] is not None:
             return record[2]
         bits = parity_bits(row, self.base)

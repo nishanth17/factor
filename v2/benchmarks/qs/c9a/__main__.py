@@ -31,6 +31,20 @@ def parser():
     frozen = commands.add_parser("freeze")
     frozen.add_argument("--output", type=Path, required=True)
     frozen.add_argument("--combined", action="store_true")
+    frozen.add_argument("--extended", action="store_true")
+    frozen.add_argument("--integration", type=Path)
+    frozen.add_argument(
+        "--profile",
+        default="three-prime",
+        choices=(
+            "fixed-report",
+            "wide-report",
+            "wide-slp",
+            "three-prime",
+            "adaptive-report",
+            "balanced-endpoints",
+        ),
+    )
     selection = commands.add_parser("select-confirmation")
     selection.add_argument("--freeze", type=Path, required=True)
     selection.add_argument("--output", type=Path, required=True)
@@ -75,6 +89,23 @@ def parser():
     return result
 
 
+def execution_cells(plan, stage, continue_early, decision, ledger):
+    """Keep initial names stable so continuation reuses exact receipts."""
+    selected = [cell for cell in plan["cells"] if cell["stage"] == stage]
+    initial = plan.get("initial_cells")
+    initial_only = initial and stage == "A" and not continue_early
+    if initial_only:
+        selected = selected[:initial]
+    elif initial and stage == "A":
+        if len(outcomes(ledger, "A")) < initial or not decision.get(
+            "feasibility_review"
+        ):
+            raise RuntimeError(
+                "review the four clean initial cells before enlarging A"
+            )
+    return selected, "-initial" if initial_only else ""
+
+
 def execute(args):
     started, cpu = time.monotonic(), time.process_time()
     frozen = load_freeze(args.freeze)
@@ -110,23 +141,13 @@ def execute(args):
                 )
             decision = json.loads(args.decision.read_text())
             admit(args.stage, decision, frozen, ledger)
-            selected = [
-                c for c in frozen["plan"]["cells"] if c["stage"] == args.stage
-            ]
-            initial = frozen["plan"].get("initial_cells")
-            initial_only = (
-                initial and args.stage == "A" and not args.continue_early
+            selected, suffix = execution_cells(
+                frozen["plan"],
+                args.stage,
+                args.continue_early,
+                decision,
+                ledger,
             )
-            if initial_only:
-                selected = selected[:initial]
-            elif initial and args.stage == "A":
-                if len(outcomes(ledger, "A")) < initial or not decision.get(
-                    "feasibility_review"
-                ):
-                    raise RuntimeError(
-                        "review the four clean initial cells before enlarging A"
-                    )
-            suffix = "-initial" if initial_only else ""
             receipt(
                 args.output / (args.stage + suffix + "-decision.json"),
                 decision,
@@ -202,6 +223,8 @@ def execute(args):
                     args.stream,
                     args.arm,
                     combined=frozen["plan"].get("early_cells") == 32,
+                    extended=frozen["plan"].get("extension_policy")
+                    == "extended-v1",
                 ),
             )
         else:
@@ -237,7 +260,13 @@ def main():
             capture_path=None if capture is None else Path(capture),
         )
     elif args.command == "freeze":
-        result = freeze(args.output, combined=args.combined)
+        result = freeze(
+            args.output,
+            combined=args.combined,
+            extended=args.extended,
+            integration=args.integration,
+            profile=args.profile,
+        )
         result = dict(freeze=result["sha256"], output=str(args.output))
     elif args.command == "freeze-confirmation":
         result = freeze_confirmation(args.selection, args.output)

@@ -13,9 +13,51 @@ from collections.abc import Sequence
 from dataclasses import FrozenInstanceError
 
 from .relations import AtomicRelation, CombinedRelation, _check_exponents
+from .residual_relations import ResidualAtom
 
 BLOCK_BYTES = 4096
 HANDLE = struct.Struct(">Q")
+
+
+class IndexedFactors(Sequence):
+    """Immutable recovery output retaining factor-base columns directly."""
+
+    __slots__ = ("indices", "primes")
+
+    def __init__(self, indices, primes):
+        if not isinstance(primes, tuple):
+            raise TypeError("indexed recovery requires immutable base primes")
+        indices = tuple(indices)
+        previous = 0
+        for index, exponent in indices:
+            if type(index) is not int or not previous < index <= len(primes):
+                raise ValueError("recovered indices must increase in the base")
+            if type(exponent) is not int or not 1 <= exponent < 2**32:
+                raise ValueError("invalid recovered exponent")
+            previous = index
+        object.__setattr__(self, "indices", indices)
+        object.__setattr__(self, "primes", primes)
+
+    def __setattr__(self, name, value):
+        raise FrozenInstanceError("indexed recovery is immutable")
+
+    def __delattr__(self, name):
+        raise FrozenInstanceError("indexed recovery is immutable")
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __iter__(self):
+        return ((self.primes[i - 1], e) for i, e in self.indices)
+
+    def __getitem__(self, index):
+        return tuple(self)[index]
+
+    def __eq__(self, other):
+        return tuple(self) == tuple(other)
+
+    def __hash__(self):
+        return hash(tuple(self))
 
 
 def _uint(value):
@@ -45,11 +87,16 @@ def _read_uint(data, offset, end):
 
 def encode_factors(exponents, base):
     """Delta-code base indices; exponent one has no additional field."""
-    exponents = tuple(exponents)
-    _check_exponents(exponents)
+    if isinstance(exponents, IndexedFactors):
+        if exponents.primes is not base.primes:
+            raise ValueError("recovery indices belong to a different base")
+        pairs = exponents.indices
+    else:
+        exponents = tuple(exponents)
+        _check_exponents(exponents)
+        pairs = tuple((base._columns.get(p), e) for p, e in exponents)
     data, previous = bytearray(), 0
-    for prime, exponent in exponents:
-        index = base._columns.get(prime)
+    for index, exponent in pairs:
         if index is None:
             raise ValueError("compact prime is outside its factor base")
         data.extend(_uint(2 * (index - previous) + (exponent != 1)))
@@ -141,15 +188,34 @@ class FactorRecord(Sequence):
 class RecordArena:
     """Slabs for factors and stable integer handles for owned provenance."""
 
-    def __init__(self, base):
+    def __init__(self, base, *, config=None, budget=None):
         self.base = base
         self.block, self.used = bytearray(), 0
         self.slots, self.atoms = {}, {}
         self.next_slot = 0
+        self.recompute_limit = getattr(config, "recompute_prime_limit", 0)
+        self.spill = None
+        if getattr(config, "spill_bytes", 0):
+            from .cold_factors import SpillStore
+
+            self.spill = SpillStore(
+                config.spill_directory,
+                config.spill_bytes,
+                config.spill_cache_bytes,
+                budget,
+            )
 
     def factors(self, exponents, budget):
         budget.consume(4 * len(exponents) + 1)
         data = encode_factors(exponents, self.base)
+        if self.spill is not None:
+            from .cold_factors import ColdFactors
+
+            self.spill.budget = budget
+            reference = self.spill.append(data)
+            return ColdFactors(
+                self.spill, reference, self.base.primes, len(exponents)
+            )
         if len(data) > len(self.block) - self.used:
             self.block = bytearray(max(BLOCK_BYTES, len(data)))
             self.used = 0
@@ -164,23 +230,65 @@ class RecordArena:
         """Allocate unpublished records; no handle becomes visible yet."""
         if atom.relation_id in self.slots or self.next_slot >= 2**64:
             raise ValueError("duplicate or exhausted compact handle")
-        packed_atom = IndexedAtomicRelation(
-            atom, self.factors(atom.exponents, budget)
+        from .residual_relations import ResidualAtom
+
+        cls = (
+            IndexedResidualAtom
+            if isinstance(atom, ResidualAtom)
+            else IndexedAtomicRelation
         )
+        factors = atom.exponents
+        small = tuple(p for p, _ in factors if p <= self.recompute_limit)
+        if small:
+            from .cold_factors import RecomputedFactors
+
+            remaining = (
+                IndexedFactors(
+                    tuple(
+                        (i, e)
+                        for i, e in factors.indices
+                        if self.base.primes[i - 1] > self.recompute_limit
+                    ),
+                    self.base.primes,
+                )
+                if isinstance(factors, IndexedFactors)
+                else tuple(
+                    (p, e) for p, e in factors if p > self.recompute_limit
+                )
+            )
+            retained = self.factors(remaining, budget)
+            stored = RecomputedFactors(
+                atom.polynomial, atom.position, small, retained, len(factors)
+            )
+        else:
+            stored = self.factors(factors, budget)
+        packed_atom = cls(atom, stored)
         slot = self.next_slot
         packed_row = None
         if row is not None:
+            from .lazy_relations import LazyCombinedRelation
+
             ids = tuple(
                 slot if identity == atom.relation_id else self.slots[identity]
                 for identity in row.atom_ids
             )
             budget.consume(len(ids))
-            packed_row = IndexedCombinedRelation(
-                row,
-                self.factors(row.exponents, budget),
-                self,
-                b"".join(HANDLE.pack(i) for i in ids),
-            )
+            if isinstance(row, LazyCombinedRelation):
+                leaves = tuple(
+                    packed_atom if i == slot else self.atoms[i] for i in ids
+                )
+                packed_row = row._with_storage(
+                    leaves,
+                    self.factors(row.exponents, budget),
+                    budget,
+                )
+            else:
+                packed_row = IndexedCombinedRelation(
+                    row,
+                    self.factors(row.exponents, budget),
+                    self,
+                    b"".join(HANDLE.pack(i) for i in ids),
+                )
         return packed_atom, packed_row, slot
 
     def commit(self, atom, slot):
@@ -191,6 +299,14 @@ class RecordArena:
         self.next_slot += 1
 
     def row(self, row, budget):
+        from .lazy_relations import LazyCombinedRelation
+
+        if isinstance(row, LazyCombinedRelation):
+            return row._with_storage(
+                tuple(self.atoms[self.slots[i]] for i in row.atom_ids),
+                self.factors(row.exponents, budget),
+                budget,
+            )
         budget.consume(len(row.atom_ids))
         handles = b"".join(HANDLE.pack(self.slots[i]) for i in row.atom_ids)
         return IndexedCombinedRelation(
@@ -226,6 +342,12 @@ class IndexedAtomicRelation(_IndexedPayload, AtomicRelation):
         ):
             object.__setattr__(self, name, getattr(source, name))
         object.__setattr__(self, "_factors", factors)
+
+
+class IndexedResidualAtom(_IndexedPayload, ResidualAtom):
+    def __init__(self, source, factors):
+        IndexedAtomicRelation.__init__(self, source, factors)
+        object.__setattr__(self, "opaque", source.opaque)
 
 
 class IndexedCombinedRelation(_IndexedPayload, CombinedRelation):

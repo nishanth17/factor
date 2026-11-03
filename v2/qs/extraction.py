@@ -310,11 +310,19 @@ def extract_dependency(
     x, correction, sign = 1, 1, 1
 
     for relation in selected:
-        x = x * relation.u % base.n
+        from .lazy_relations import LazyCombinedRelation
+
+        if isinstance(relation, LazyCombinedRelation):
+            relation.bind_budget(budget)
+            root, square = relation.materialize()
+        else:
+            root, square = (
+                relation.u,
+                getattr(relation, "square_correction", 1),
+            )
+        x = x * root % base.n
         sign *= relation.sign
-        correction = (
-            correction * getattr(relation, "square_correction", 1) % base.n
-        )
+        correction = correction * square % base.n
         for prime, exponent in relation.exponents:
             totals[prime] += exponent
 

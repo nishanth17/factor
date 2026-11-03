@@ -18,6 +18,10 @@ from .storage import require_published
 
 def pack_store(collector):
     require_published(collector)
+    if getattr(collector.config, "extension_policy", None):
+        from .extended_checkpoint import pack_store as pack_extended
+
+        return pack_extended(collector)
     atoms = list(collector._atoms.values())
     indices = {a.relation_id: i for i, a in enumerate(atoms)}
     polynomials, lookup, encoded = [], {}, []
@@ -99,6 +103,10 @@ def restore_store(payload, collector, budget):
     simple path. Owned paths cannot have been evicted. Rebuild FIFO order
     without trusting an encoded union-find cache, including all components.
     """
+    if getattr(collector.config, "extension_policy", None):
+        from .extended_checkpoint import restore_store as restore_extended
+
+        return restore_extended(payload, collector, budget)
     if collector._atoms or collector._rows or collector._graph.edges:
         raise ValueError("DLP restoration requires an empty collector")
     record_policy = getattr(collector.config, "record_policy", "objects")

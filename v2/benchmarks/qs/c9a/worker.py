@@ -76,7 +76,13 @@ def warm_once(qs, budgets, template, deadline):
                 "extraction_policy",
             ):
                 values[key] = selected[key]
-            collector = qs.CombinedYieldSieveConfig(**values)
+            if selected.get("extension_policy"):
+                from ....qs.extended_policy import EXTENSION_FIELDS
+
+                values.update({key: selected[key] for key in EXTENSION_FIELDS})
+                collector = qs.ExtendedYieldSieveConfig(**values)
+            else:
+                collector = qs.CombinedYieldSieveConfig(**values)
         else:
             collector = qs.YieldSieveConfig(**values)
     else:
@@ -96,6 +102,22 @@ def warm_once(qs, budgets, template, deadline):
         cpu_seconds=5,
     )
     job = qs.SIQSJob(WARM_N, seed=7, config=config, budget=budget)
+    try:
+        return _validated_warm_job(qs, job, selected, values, budget)
+    finally:
+        # Warmup publishes no checkpoints. Explicitly retire its owned cold
+        # files so repeated sentinel calls cannot accumulate orphaned stores.
+        engine = job.engine
+        arena = (
+            None
+            if engine is None
+            else getattr(engine.collector, "_arena", None)
+        )
+        if arena is not None and getattr(arena, "spill", None) is not None:
+            arena.spill.cleanup()
+
+
+def _validated_warm_job(qs, job, selected, values, budget):
     result = job.run(max_blocks=2)
     checked_split(WARM_N, result.divisor)
     if result.reason not in ("paused", "factor_found"):
@@ -114,6 +136,11 @@ def warm_once(qs, budgets, template, deadline):
         )
         if "yield_policy" in selected:
             options["small_prime_bound"] = values["small_prime_bound"]
+        if selected.get("extension_policy"):
+            options.update(
+                residual_arity=selected["residual_arity"],
+                opaque_pairs=selected["opaque_pairs"],
+            )
         qs.verify_atomic(atom, job.base, **options)
     signature = hashlib.sha256(
         canonical(
@@ -234,7 +261,12 @@ def run(cell, *, capture_path=None):
         if capture_path is not None:
             writer = Journal(
                 capture_path,
-                dict(cell=cell, format="c9a-atoms-v1"),
+                dict(
+                    cell=cell,
+                    format="c9a-atoms-v2"
+                    if getattr(config.collector, "extension_policy", None)
+                    else "c9a-atoms-v1",
+                ),
                 byte_limit=cell.get("observer_byte_limit", 256 * 2**20),
                 work_limit=cell["observer_work_limit"],
             )

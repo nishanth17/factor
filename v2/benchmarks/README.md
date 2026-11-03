@@ -75,16 +75,53 @@ force-add generated results, local journals or external source checkouts.
 
 ## C9a preparation and staged execution
 
+The new expanded arm is prepared by `freeze --extended` under
+`c9a-expanded-yield-v4`, after executable correctness and committed-only checks.
+The v2 and v3 protocols retain their identities. The expanded primary remains
+one C0/C1 comparison with the same first-four-prefix stop and cumulative stage
+ceilings; no run has been launched. Eight input sizes remain 50–80 digits, and
+80 still has no complete-factor cell.
+
+`qs/c9a/extended.py` provides six separately named reporting/SLP/endpoint/product
+profiles, base/interval alternatives, a bounded observed-population Pareto
+ranking function and a matched future-integration builder. Its initial
+three-prime envelope admits the geometric B,2B,4B example within 8B³; this is a
+populated starting hypothesis, not a calibrated optimum. Wider unobserved
+reporting remains unknown in ranking. Changed bases and intervals require
+their own resolved literals and eligible populations. Optional parameter work
+uses a new decision/identity within the existing diagnostic allocation, not an
+automatic Cartesian sweep or extra multi-hour campaign.
+`freeze --extended --profile NAME` selects one of the six joint hypotheses;
+its literal configuration, identity and fresh confirmation preserve that choice.
+Observed credits are a screening aid; changed admission can change graph
+closures, and a wider population must be measured before selecting it.
+
+The primary configuration uses serial recovery and in-memory storage. Threaded
+hints and persistent spill are implemented selectable capabilities; exercising
+them needs a separately frozen configuration and finite production-disk grant
+in addition to diagnostic output caps. A DLP incumbent cannot replay a 3LP or
+opaque stream as though it admitted that population. Future C10a integration
+binds the same supplied committed base to both arms under a new identity; it
+does not alter the active C10a worktree or adopt its current nominee.
+`freeze --extended --integration PATH` accepts a preparation containing the
+exact current `source_commit`, `corpus_sha256`, per-fixture serialized
+`incumbents` and independently resolved `resolved` metadata. Both arms then
+execute that same committed runtime with their literal configurations; C0 does
+not load the historical control archive. `preparation.structural` accepts
+per-size configurations for resolving that geometry, and fresh confirmation
+uses the same per-size incumbent and a distinct input identity. These helpers
+have not been executed for a C10a integration.
+
 Preparation delivers code and certified inputs without running A/B/M/R/F/C.
 The literal configurations and actual input multiplier/base bounds live in
-`qs/c9a/combined.py` and `inputs/c9a/structural.json`. The former
+`qs/c9a/extended.py` and `inputs/c9a/structural.json`. The former
 `configuration.py` plan retains its historical identity. Detailed research,
 the decision note and a concrete execution handoff are local in `audit/c9a/`.
 
 ```sh
 pypy3 -m v2.benchmarks.qs.c9a --help
-pypy3 -m v2.benchmarks.qs.c9a freeze --combined \
-  --output v2/benchmarks/results/c9a/combined-v3-freeze.json
+pypy3 -m v2.benchmarks.qs.c9a freeze --extended \
+  --output v2/benchmarks/results/c9a/expanded-v4-freeze.json
 ```
 
 Run the queued correctness and committed-only checks before freezing. This

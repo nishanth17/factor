@@ -5,6 +5,14 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Prepare the separate expanded arm with lazy cycle arithmetic, integer
+  incidence/provenance, three-prime and opaque residual contracts, bounded
+  conversion/reduction, adaptive reporting and extraction-outcome feedback.
+  Add recomputation/spill capabilities, finite asynchronous hints, sparse and
+  structured filtering, a bounded panel solver, schema13 restore and a v4
+  two-arm/parameter-selection protocol. New executable validation is pending;
+  this records opt-in preparation, not acceptance or a performance result.
+
 - Extend the opt-in combined challenger with occupied-column feedback, private
   checked-proof reuse, exact early rejection, bounded cofactor splitting and
   batch hints, direct/bidirectional cycle shortcuts, canonical congruences,

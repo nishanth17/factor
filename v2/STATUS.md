@@ -29,6 +29,14 @@ feasibility/performance execution. The reviewed mainline
 `99a2943aa9ba681091184007d6dd8aa7171969a2` changes documentation only from the
 immutable control's base; its runtime sources are identical.
 
+The subsequent expanded preparation adds `ExtendedYieldSieveConfig`, schema13
+and `c9a-expanded-yield-v4`, including previously conditional admission,
+storage, recovery, filtering and solver capabilities. These remain opt-in and
+unvalidated. Local scope/coverage and the queued verification plan are recorded
+under `v2/audit/c9a/`; no acceptance gate, default, C10a source or historical
+freeze has changed. Lock-dependent correctness and all measurement execution
+remain deferred by instruction.
+
 ## Current automatic defaults
 
 These are current committed behavior, not claims that every routed band passed
