@@ -10,6 +10,16 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The repaired pair on `bb0764a` completes both 60-digit calls under the same
+900-second and memory grants. C1 uses 764.0M positions and 618.4s; C0 uses
+911.4M and 405.9s. Both factorizations match independent certificates. C1
+needs 16.2% less terminal sieve coverage on this input but has greater raw time,
+RSS and charged work. Accounted workspace is 586.6/629.4MB and RSS is
+546.8/339.7MB for C1/C0. Both drift gates fail; no clean speed ratio or
+population benefit follows. Stop after the pair, charging 2,010 wall/CPU
+seconds; actual worker lifecycle totals are 1,032.7 wall / 1,039.4 CPU seconds.
+No adoption follows. Local details: `v2/audit/c9a/feasibility-18.md`.
+
 An actual-data audit reproduces the long-run memory stop exactly: 26,862 atoms,
 2,666 rows and 579,211,587 positions. Packed factors occupy 158 slabs / 647KB,
 while blanket exponent/context charges alone total 559.5MB. The `09a3a05`

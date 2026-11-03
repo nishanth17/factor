@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Complete the repaired 60-digit matched pair under the original 900-second
+  and memory grants. Both factor successfully; C9a uses fewer sieve positions
+  but greater observed complete time, RSS and charged work. Preserve failed
+  timing gates and stop after the pair without adoption.
+
 - Audit the actual 26,862-atom ownership stop. Charge shared slabs and polynomial
   contexts once, integer digit storage explicitly, and packing scratch separately.
   Rebuild compact in-memory records on restore and preserve cold-file identities.

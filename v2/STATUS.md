@@ -118,6 +118,14 @@ imports. This corrects ownership accounting; no fresh full factoring result,
 RAM reduction, speedup or adoption is claimed. Details:
 `v2/audit/c9a/ownership-audit-15-17.md`.
 
+The authorized rerun on `bb0764a` completes both 60-digit arms under the same
+900-second and memory grants. C1 factors in 618.4s versus C0's 405.9s, covering
+764.0M versus 911.4M positions. Candidate accounted workspace is 586.6MB and
+RSS 546.8MB; control values are 629.4MB / 339.7MB. Both timing gates fail.
+The repair establishes feasibility on this input; no complete-cost advantage
+or adoption is demonstrated. Stop after the pair and analysis. See
+`v2/audit/c9a/feasibility-18.md`.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
