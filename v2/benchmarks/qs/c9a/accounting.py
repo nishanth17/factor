@@ -2,8 +2,31 @@
 
 from ..c10a04.accounting import Ledger
 
+CONTROLLER_SECONDS = dict(A=340, B1=120, B2=240, M=110, R=120, F=150, C=360)
+
 
 class StudyLedger(Ledger):
+    def call_controller(self, stage, seconds, work, function):
+        """Bound cumulative controller starts, including selection reads."""
+        used = sum(
+            row["wall"]
+            for row in self.data["calls"]
+            if row["phase"] == stage
+            and row.get("identity", {}).get("kind") == "controller"
+        )
+        if used + seconds > CONTROLLER_SECONDS[stage]:
+            raise RuntimeError(
+                "cumulative orchestration reservation exhausted"
+            )
+        return self.call_operation(
+            stage,
+            f"{stage}-controller-{len(self.data['calls']):04}",
+            seconds,
+            work,
+            {"kind": "controller"},
+            function,
+        )
+
     def storage_room(self, stage, reservation):
         used = sum(
             row.get("identity", {}).get("output_byte_reservation", 0)

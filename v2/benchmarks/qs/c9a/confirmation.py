@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import time
 from pathlib import Path
 
 from ..c10a04.accounting import atomic, digest, output_lock, receipt
@@ -20,12 +21,27 @@ from .preparation import (
 
 
 def select(freeze_path, output, band, decision):
+    started, cpu = time.monotonic(), time.process_time()
     frozen = load_freeze(freeze_path)
     if band not in CONFIRMATION_SECONDS:
         raise ValueError("unfrozen confirmation band")
     output = Path(output)
     with output_lock(output):
         ledger = StudyLedger(output, frozen["sha256"], frozen["limits"])
+        if (output / "confirmation-selection.json").exists():
+            raise ValueError("confirmation selection already exists")
+        # Selection closes the exposed screen. Charge its source validation
+        # to the B2 orchestration pool before binding the final ledger hash.
+        read_bytes = sum(
+            (ROOT / name).stat().st_size for name in frozen["source"]["files"]
+        )
+        read_bytes += Path(frozen["source"]["interpreter"]).stat().st_size
+        ledger.call_controller(
+            "B2",
+            max(10, time.monotonic() - started, time.process_time() - cpu),
+            10**10,
+            lambda: dict(work=8 * read_bytes, checked_source=frozen["sha256"]),
+        )
         if (
             len(outcomes(ledger, "B1")) != 4
             or len(outcomes(ledger, "B2")) != 20
@@ -48,6 +64,12 @@ def select(freeze_path, output, band, decision):
             raise ValueError(
                 "selection lacks its exposed cost/completion assessment"
             )
+        estimate = decision["expected_seconds"]
+        if (
+            type(estimate) is not int
+            or not 0 < estimate <= CONFIRMATION_SECONDS[band]
+        ):
+            raise ValueError("confirmation estimate exceeds its ceiling")
         selection = dict(
             parent_freeze=frozen["sha256"],
             band=band,

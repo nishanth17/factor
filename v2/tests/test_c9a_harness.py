@@ -113,6 +113,20 @@ class PlanningTests(unittest.TestCase):
 
 
 class AccountingTests(unittest.TestCase):
+    def test_controller_restarts_reserve_pool_before_execution(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = StudyLedger(directory, "oracle", resource_limits())
+            with patch.dict(
+                "v2.benchmarks.qs.c9a.accounting.CONTROLLER_SECONDS", A=15
+            ):
+                ledger.call_controller("A", 10, 100, lambda: dict(work=40))
+                with self.assertRaises(RuntimeError):
+                    ledger.call_controller(
+                        "A", 10, 100, lambda: self.fail("executed")
+                    )
+            self.assertEqual(ledger.used(), 10)
+            self.assertEqual(ledger.used(field="work"), 40)
+
     def test_work_settlement_and_missing_work_preserve_charge(self):
         with tempfile.TemporaryDirectory() as directory:
             ledger = StudyLedger(directory, "oracle", resource_limits())

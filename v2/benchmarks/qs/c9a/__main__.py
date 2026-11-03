@@ -87,18 +87,7 @@ def execute(args):
     with output_lock(args.output):
         ledger = StudyLedger(args.output, frozen["sha256"], frozen["limits"])
         stage = args.stage if args.command in ("run", "analyze") else "A"
-        orchestration = dict(A=340, B1=120, B2=240, M=110, R=120, F=150, C=360)
-        used = sum(
-            row["wall"]
-            for row in ledger.data["calls"]
-            if row["phase"] == stage
-            and row.get("identity", {}).get("kind") == "controller"
-        )
         grant = max(10, time.monotonic() - started, time.process_time() - cpu)
-        if used + grant > orchestration[stage]:
-            raise RuntimeError(
-                "cumulative orchestration reservation exhausted"
-            )
         # Source/interpreter hashing and input validation precede launch but
         # still consume resources. Charge their entire invocation allowance,
         # including repeated controller starts after an interruption.
@@ -106,12 +95,10 @@ def execute(args):
             (ROOT / name).stat().st_size for name in frozen["source"]["files"]
         )
         read_bytes += Path(frozen["source"]["interpreter"]).stat().st_size
-        ledger.call_operation(
+        ledger.call_controller(
             stage,
-            f"{stage}-controller-{len(ledger.data['calls']):04}",
             grant,
             10**10,
-            {"kind": "controller"},
             lambda: dict(work=8 * read_bytes, checked_source=frozen["sha256"]),
         )
         if args.command == "run":

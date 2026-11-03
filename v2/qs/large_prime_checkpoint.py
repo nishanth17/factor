@@ -111,11 +111,31 @@ def restore_store(payload, collector, budget):
     ):
         if not isinstance(payload[name], list) or len(payload[name]) > cap:
             raise ValueError("DLP checkpoint exceeds its store cap")
+    decode_scratch = 0
     if packed:
         from .packed_relations import import_exponents
 
         if payload["record_policy"] != "packed-v1":
             raise ValueError("packed checkpoint policy mismatch")
+        # The encoded caller payload, decoded pairs and constructed records
+        # coexist. Refuse their bounded expansion before decoding any bytes.
+        # Valid base64 contributes at most two padding bytes to this bound.
+        decode_scratch = 65536
+        for name, size in (("atoms", 6), ("combined", 5)):
+            for record in payload[name]:
+                budget.consume(1)
+                if not isinstance(record, list) or len(record) != size:
+                    raise ValueError("invalid packed relation record")
+                encoded = record[3]
+                if not isinstance(encoded, dict) or set(encoded) != {"u32be64"}:
+                    raise ValueError("invalid packed exponent encoding")
+                text = encoded["u32be64"]
+                maximum = 4 * ((8 * len(base.entries) + 2) // 3)
+                if not isinstance(text, str) or len(text) > maximum:
+                    raise ValueError("packed exponent text exceeds its bound")
+                decode_scratch += 512 + 512 * ((3 * len(text) // 4) // 8)
+        if collector._workspace + decode_scratch > config.memory_limit:
+            raise MemoryError("packed checkpoint expansion exceeds memory cap")
         decoded = dict(payload)
         for name, size in (("atoms", 6), ("combined", 5)):
             decoded[name] = []
@@ -206,7 +226,7 @@ def restore_store(payload, collector, budget):
     ) - collector._graph_reserve(0)
     if collector._short_cycles is not None:
         reserve += 2048 * (count - len(payload["full"]))
-    if reserve > config.memory_limit:
+    if reserve + decode_scratch > config.memory_limit:
         raise MemoryError(
             "restored DLP provenance and graph exceed memory cap"
         )
@@ -310,7 +330,7 @@ def restore_store(payload, collector, budget):
             - base.workspace_bytes
         )
         scratch_peak = max(scratch_peak, scratch)
-        if reserve + scratch > config.memory_limit:
+        if reserve + decode_scratch + scratch > config.memory_limit:
             raise MemoryError("restored DLP verification scratch exceeds cap")
         item = CombinedRelation(
             tuple(a.relation_id for a in selected),
@@ -361,4 +381,4 @@ def restore_store(payload, collector, budget):
     collector._graph, collector._split_calls = graph, calls
     collector._short_cycles = shortcuts
     collector._workspace = reserve
-    collector._scratch_peak_bytes = scratch_peak
+    collector._scratch_peak_bytes = decode_scratch + scratch_peak

@@ -66,18 +66,25 @@ class AdmissionTests(unittest.TestCase):
     def test_endpoint_product_rejection_precedes_split_but_keeps_slp(self):
         from v2.qs.large_prime_collector import divide_large_residual
 
-        target = collector(small_prime_bound=2, large_prime_bound=5,
-                           large_product_bound=25, residual_bound=41)
+        target = collector(
+            small_prime_bound=2,
+            large_prime_bound=5,
+            large_product_bound=25,
+            residual_bound=41,
+        )
         counts = Counter()
         # x=1 gives30=2*15. The composite15 cannot have p<=2 and q<=5,
         # even though it lies below the independent scalar allowance41.
-        self.assertEqual(divide_large_residual(target, 1, 30, 15,
-                                              ((2, 1),), counts), (None, None))
+        self.assertEqual(
+            divide_large_residual(target, 1, 30, 15, ((2, 1),), counts),
+            (None, None),
+        )
         self.assertEqual(target._split_calls, 0)
         self.assertEqual(counts["endpoint_product_rejections"], 1)
         # x=-7 gives-82=-2*41; a scalar prime41 remains admissible.
-        atom, divisor = divide_large_residual(target, -7, -82, 41,
-                                              ((2, 1),), counts)
+        atom, divisor = divide_large_residual(
+            target, -7, -82, 41, ((2, 1),), counts
+        )
         self.assertIsNone(divisor)
         self.assertEqual(atom.residual, 41)
 
@@ -200,6 +207,22 @@ class AdmissionTests(unittest.TestCase):
 
 
 class GraphAndRecordTests(unittest.TestCase):
+    def test_packed_restore_reserves_expansion_before_decoding(self):
+        source = collector(record_policy="packed-v1")
+        admit(source, -5, (3, 11))
+        saved = store_json(source)
+        target = collector(record_policy="packed-v1")
+        target.config = replace(
+            target.config, memory_bytes=target._workspace + 1024
+        )
+        with patch(
+            "v2.qs.packed_relations.import_exponents",
+            side_effect=AssertionError("decoded before reservation"),
+        ):
+            with self.assertRaises(MemoryError):
+                restore_store(saved, target, allowance())
+        self.assertFalse(target._atoms)
+
     def test_interrupted_shortcut_publication_requires_prior_checkpoint(self):
         target = collector(cycle_policy="short-v1", record_policy="packed-v1")
         saved = store_json(target)
