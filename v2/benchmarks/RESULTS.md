@@ -10,6 +10,17 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+A subsequent 60-digit pair on `e4dec4a` (identical runtime to `44b1f94`)
+grants 900 seconds each, a higher block ceiling and unchanged memory. C0
+finds independently verified factors in 407.8s, with 4,994 closed rows. C1
+stops at accounted memory after 362.4s with 2,666 rows and no matrix solve,
+using 1.040GB accounted workspace / 349.5MB RSS. Both timing screens fail;
+one modulus and unequal terminal coverage establish no yield or speed ratio.
+The current candidate fails full-run feasibility under this grant where C0
+completes. Stop after the pair. Charges are 2,010 wall/CPU seconds; actual
+worker lifecycle totals are 778.5 wall / 783.6 CPU seconds. See local
+`v2/audit/c9a/feasibility-14.md`; no adoption or default change follows.
+
 The bounded-retention repair on `44b1f94` passes 1,040 unit tests (9 skips),
 lint and committed-only checks. Its new four-call C10a-matched screen finishes
 all 67,109,376-position prefixes under unchanged grants. At 60/65 digits the

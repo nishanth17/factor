@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Extend one matched 60-digit comparison to 900 seconds per arm under unchanged
+  memory grants. C0 factors the input; C1 stops at accounted memory before a
+  matrix solve. Preserve failed timing screens and the remaining storage limit;
+  stop after the pair without adoption or a default change.
+
 - Add a separately versioned bounded-yield variant with capped opaque staging,
   exact promotion, shape-based incidence ownership and norm-bounded batch
   scratch. Preserve FIFO state in schema 14 and retain the incumbent reporting

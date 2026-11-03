@@ -99,6 +99,14 @@ stop. Candidate ownership is 210.8/192.4MB at 60/65 digits; closed-row counts
 fail again. Stop after these four calls; longer-horizon yield remains unknown.
 See `v2/audit/c9a/feasibility-13.md`. No default or adoption gate changes.
 
+The subsequently authorized 60-digit pair grants 900 seconds per arm and a
+higher block ceiling under source `e4dec4a` (identical runtime to `44b1f94`).
+C0 factors the input in 407.8s. C1 stops at accounted memory after 362.4s,
+with 2,666 closed rows and no matrix solve; workspace is 1.040GB and RSS
+349.5MB. Both timing screens fail. This exposes remaining full-run storage
+limits despite the short-prefix repair. Stop after the pair; no retry, grant
+increase or adoption follows. Details: `v2/audit/c9a/feasibility-14.md`.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
