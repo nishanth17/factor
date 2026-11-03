@@ -18,6 +18,29 @@ Apple M4 / 24 GiB / 10-core machine. The 1 November priority keeps useful
 progress toward 60–80 digits central. A single 50-digit cohort is not the
 objective. The target metric remains TBD in STATUS.md.
 
+The workload distribution is also undeclared. Report ordinary integers,
+trial-sifted survivors, uneven smaller-factor strata, recursive composites and
+balanced hard inputs separately, including preprocessing exits and conditional
+ECM entrants. Do not optimize an assumed random-integer average and present it
+as a universal below-100-digit result. Weighting scenarios must be explicit.
+The roadmap's ranked queue expresses expected benefit per effort, with
+class-specific uncertainty; it is not a list of measured speedups.
+
+For source-derived work, distinguish implemented controls, active worktree
+coverage, retained losses and uncovered deltas. Trace the caller and build
+configuration before treating an upstream option as production behavior.
+Upstream overflow probabilities, digit cutoffs, torsion or success claims do
+not supersede exact local invariants or demonstrated counterexamples. Preserve
+read-depth/access limitations in the local source ledger; a downloaded tree
+is not proof of an exhaustive implementation audit.
+
+B5/B5a may investigate separately selected NumPy or native C/CFFI bulk-kernel
+tracks. Keep the default algorithms in Python on PyPy and label accelerated
+results, dependencies and resources explicitly. A native feasibility result
+neither changes the default implementation rule nor authorizes a wholesale
+rewrite. Kernel and parallel speedups cannot be multiplied into an unmeasured
+whole-factor claim.
+
 E1 combined confirmation is deferred. GNFS stays deferred
 until H1 and a subsequent coverage review activate A9. Individual accepted
 tranches may ship when their own gates pass; optional losses can settle a
@@ -77,6 +100,13 @@ The plan includes two kinds of edge:
 - **Evidence/order gate:** a deliberate choice to evaluate a cheaper control
   before spending on a more expensive challenger. These are labeled in the
   reason column; they are not mathematical necessities.
+
+E1's deferral does not bar isolated ECM policy, curve-family, polynomial
+continuation or worker feasibility under current committed controls. Those
+components require their selected exactness, ownership and measurement
+contracts; later combined portfolio acceptance retains its E1 dependencies.
+Source bounds, expected curves, SIMD instruction support and core counts are
+selection evidence, not proof of a local performance benefit.
 
 An experimental predecessor is settled by an accepted implementation **or a
 documented retain-baseline/defer/reject decision**. If a required mathematical

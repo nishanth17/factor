@@ -1,10 +1,15 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `0076e256871722d52d849ab344152e0a7535c2ce`.
+Reviewed mainline/base: `b0813230a05396874c41c649fa01738484a1f55e`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; implementation remains in the C10a-01 worktree.
+The expanded 2 November ECM/QS literature and source review adds A1d
+multi-polynomial buckets and conditional F9 genus-two/Kummer research to the
+ECM/acceleration amendments. It changes no defaults and launches no runs.
+Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
+`v2/audit/research/ecm/roadmap_review_20261102.md`.
 
 **Target metric: TBD.**
 
@@ -86,32 +91,35 @@ experimental result. No other sessions were contacted.
 
 ## Next eligible items
 
-The [existing execution rows](ROADMAP.md#open-and-conditional-execution-items)
-now include the QS review's scopes, dependencies and model/effort assignments.
-For current QS progress, prioritize the following work; this schedules no runs.
+Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
+for the current cross-engine ordering and its workload/uncertainty assumptions.
+Task rows retain exact scope, dependencies and fixed-session model assignments.
 
-1. **C9a combined useful-yield/admission/cycle/storage candidate — Astra / xhigh.**
-   Select justified independently flagged mechanisms and targeted ablations.
-   Cadence-only existing-policy work is a smaller Sol / xhigh scope. B7/C10a
-   supply contracts within the workstream; isolated component wins and separate
-   chats are unnecessary. Preserve exactness and require fresh whole-factor
-   confirmation for adoption.
-2. **A1c bulk marking/scanning or paired-root kernel — Sol / xhigh.**
-   Retain queue eligibility and prior kernel losses; select a bounded prototype.
-   **F7 SIQS direct/tree screening — Astra / xhigh** is the next larger
-   research/implementation candidate with explicit wider-base and batch proofs.
-3. **A1a checked transitions — Sol / xhigh; cross-B lifting — Astra / xhigh.**
-   Reuse the implemented C10a-01 Gray tables instead of duplicating them.
-4. **A8 operator/lifting fixtures, then C4/B7/B6/D1 — Astra / xhigh.**
-   Preparation is eligible now. Stronger filtering is independent of a Four
-   Russians win; sparse designs need A8's contract rather than unrelated
-   experimental success. C11/P6.4 competitor protocol design uses Sol / xhigh.
-5. A5 Williams p+1, B12 worker contracts and B14 prime certificates retain
-   their independent predecessors and model assignments. B14 is High for
-   certification. A1b-F1 remains Deferred; current C10a-01 feasibility already
-   covers the selected larger-size probes.
-6. D7/E3–E6, integrated F4 workers, G1/H1 and I1 retain their recorded
-   predecessors. E1 remains Deferred.
+1. **C3a/C11 current ECM cost/yield and missing-policy screen — Sol / xhigh.**
+   Start from completed C3 and existing deeper presets; select a concrete
+   60–99-digit opportunity, completed-search credit or handoff delta.
+2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
+   Prepare stable RNG/lease/restart contracts. Isolated ECM feasibility does
+   not wait for E1; later combined acceptance retains it.
+3. **C9a combined useful-yield candidate — Astra / xhigh.**
+   Still the first QS task. Rank wider intake/endpoints against the current
+   collection cost; use late-run replays for cycle/storage/cadence hypotheses.
+4. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
+   are polynomial-local; amortize prime/root traversal across a funded Gray
+   batch, retaining exact coverage and charging unused preparation.
+5. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
+   continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
+   neither deeper-bound savings nor a polynomial/backend crossover is measured.
+6. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Compare PyPy, optional NumPy and
+   separately selected C/CFFI tracks with exact hit/score and boundary costs.
+   M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
+
+The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
+initial opportunities, with explicit capacity/profile triggers. B14 remains
+High for requested prime certification; accounting/correctness repairs take
+precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 stays in flight and E1
+remains Deferred. Do not restart the stopped broad backend study or duplicate
+C10a-01 feasibility under this review.
 
 Separate worktrees isolate source changes. Keep current C10a-01 timing freezes
 unchanged; parallel research/design and light edits can proceed, while heavy QA
