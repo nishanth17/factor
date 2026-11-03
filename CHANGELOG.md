@@ -1,5 +1,12 @@
 # Changelog
 
+## C10a-01 benchmark host-state checks (3 November 2026)
+
+- Add source-pinned host-audited rechecks with separate power, runtime and
+  native-canary receipts, reusing acknowledged finite live-budget extensions.
+- Preserve the original 65-digit comparison and its documented mid-run host
+  power-mode change. Factoring arithmetic and automatic defaults are unchanged.
+
 ## C10a-01 root and population opt-ins (2 November 2026)
 
 - Add bounded centered Gray tables with direct or small-factor batch setup,

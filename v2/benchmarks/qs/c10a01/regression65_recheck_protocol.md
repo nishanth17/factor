@@ -93,6 +93,44 @@ at most 512 KiB, pipes 64 KiB, and each new stage at most 16 MiB within the
 cumulative 512 MiB evidence cap. Refuse recorder exhaustion distinctly.
 No production/default change or adoption is implied by repairing measurement.
 
+## Admitted complete pair
+
+All four v2 prefixes finished their exact physical work; within-arm work
+and atom digests matched. Host states matched and both SIQS/native-canary
+15% drift screens passed. The new pair therefore uses the original
+3600-second wall AND CPU cap for **each** arm, candidate first. The screen
+rate suggests roughly 60–80 minutes for both calls, with substantial
+uncertainty from relation growth and downstream work. This is a planning
+estimate, not a scaling law. A native limit remains an informative retained
+outcome and does not authorize a retry.
+
+| Pair reservation | Wall AND CPU seconds |
+| --- | ---: |
+| Two 3600-second calls plus 5-second margins | 7210 |
+| Process-local warmup and before/after checks | 300 |
+| Analysis | 60 |
+| Orchestration | 30 |
+| Total | 7600 |
+
+`regression65_pair_v2.json` contains each numerical work allowance, inherited
+setup/postprocessing bounds, exact configs, source hashes and active power
+mode 0. Both arms retain Tier 2. The finite numerical follow-up allocation
+is 2190 for v1 diagnosis + 80 for the power probe + 530 for the repaired
+screen + 7600 for this pair = **10400 wall AND CPU seconds**. Only 660 of
+the v1 allocation was used for calls; its conditional longer stage was not
+launched. Unused reservations remain unused. The separately disclosed
+2144.422-second administrative GUI stall is additional elapsed time with
+unknown tool CPU; it is not included in the numerical-call ceiling.
+
+The complete pair is uninstrumented inside SIQS; host/canary observations
+remain in the separate before/after phases. Preserve all factors, work,
+time-limit outcomes and drift failures. Inspect both returned results even
+if one fails a timing screen; no result is selected away. Verify original
+semantic counters/digests where the deterministic traversal reproduces.
+No promotion, fresh-confirmation claim or arithmetic change follows from
+one exposed modulus. Restoration of the original power setting is required
+after the authorized follow-up; it must not interrupt a measured call.
+
 Commands:
 
 ```sh

@@ -309,6 +309,14 @@ linked result and promotion summaries above. E1 remains deferred.
 
 ### C10a-01 normalized polynomials: calibration and design handoff
 
+Current complete-factor outcomes and the retained 65-digit host-confound
+diagnosis are summarized in [benchmark decisions](RESULTS.md). The
+[host-audited recheck protocol](qs/c10a01/regression65_recheck_protocol.md)
+preserves the original observations, records power/runtime state and a native
+canary, and admits a separate finite pair. The earlier unrun statements below
+describe their original source freezes; they are historical, not current
+campaign status. No defaults are promoted.
+
 The [current v4 short-calibration result](../studies/c10a01_v4_calibration.md)
 records 38 completed fixed-work cells, the frozen exploratory nominee, all
 charges and a verified but unrun 60/62/65/70 complete-factor pilot runner.

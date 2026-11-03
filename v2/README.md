@@ -1544,3 +1544,9 @@ active job. It preserves the job and clock origins and reports worker
 acknowledgements separately from requests. See the [runner protocol](benchmarks/qs/c10a01/live_protocol.md)
 for commands, refusal semantics and limits. This does not add automatic
 extensions or full-store checkpoint serialization to library calls.
+
+The [host-audited 65-digit recheck](benchmarks/qs/c10a01/regression65_recheck_protocol.md)
+reuses that supervisor and adds separate before/after power-state, runtime
+and native-canary receipts. A power-mode mismatch refuses measurement before
+the job starts. Host changes and failed drift checks retain factoring results
+but invalidate a clean timing comparison. SIQS library arithmetic is unchanged.
