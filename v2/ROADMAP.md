@@ -2085,6 +2085,25 @@ negative arm and all historical pins.
   reachable A-population work to the next arm nomination, with actual-norm
   ranking and cheaper table construction as explicit design alternatives.
   The current task uses Astra / **xhigh** throughout.
+- [ ] **C10a-01 follow-up: explain and address the 65-digit regression.**
+  The exploratory balanced-input pilot completed in 1572.906 seconds for
+  control and 2310.505 seconds for the selected candidate. Both returned the
+  expected factors. Candidate pre/post identical-work sentinel CPU drift was
+  2.504 times, failing the timing screen; arithmetic-policy attribution is
+  unresolved. Preserve this result and the original receipts. No rerun is
+  added to the active campaign.
+  Investigate the drift and the candidate's higher collection, preparation
+  and filtering costs despite fewer sieved positions. Distinguish process/JIT,
+  GC and host effects from policy work before changing arithmetic or tuning
+  A populations. Start with retained counters and short passive diagnostics;
+  use a separately frozen finite allocation for any new measurement.
+  Acceptance requires an evidenced cause, an independently validated fix
+  where justified, and a clean matched complete-factor comparison without
+  discarding the original regression. Check lower and larger bands for harm;
+  fresh confirmation remains separate from exploratory diagnosis. Use
+  **Astra / xhigh** for diagnosis design and implementation, then the selected
+  execution model for the frozen measurements. This follow-up does not block
+  the already admitted 70-digit pair and does not authorize default promotion.
 - [ ] **C10a-02:** separately test a wider actual-A-product population and
   inter-family diversity only if product error or overlap predicts useful
   post-filter work. Sol / **high** for census reconciliation; **xhigh** for a
