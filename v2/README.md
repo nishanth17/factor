@@ -144,9 +144,14 @@ restore reproduces that choice. Panel solver `xors` counts logical reduction
 actions, including one action for a whole panel; table construction and
 primitive work are charged separately to the work budget.
 
-This expanded implementation is unvalidated preparation. Its executable tests,
-complete lint gate, committed-only checks and all performance runs remain
-pending; source presence establishes neither correctness acceptance nor a win.
+The expanded implementation remains experimental. Its unit tests pass under
+PyPy3.11; committed-only checks and performance runs remain pending. Unit
+coverage establishes neither performance acceptance nor a measured win.
+
+Expanded `large_prime_graph` result statistics identify `incidence-v1` and
+report retained atoms, residual rank, unowned atoms, closed relations, opaque
+conversions and split calls. Ordinary collector forest statistics retain
+their existing fields.
 
 ## Development
 

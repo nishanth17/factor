@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Fix expanded SIQS result statistics to report residual incidence without
+  ordinary-forest attributes. Keep tuple-based legacy loaders independent of
+  opt-in residual/storage imports. The PyPy unit suite passes 942 tests with
+  9 skips after these repairs; performance acceptance remains pending.
+
 - Prepare the separate expanded arm with lazy cycle arithmetic, integer
   incidence/provenance, three-prime and opaque residual contracts, bounded
   conversion/reduction, adaptive reporting and extraction-outcome feedback.

@@ -742,7 +742,20 @@ class SIQSJob:
             )
             self.stats["partials"] = len(self.engine.collector.partial_ids)
             graph = self.engine.collector._graph
-            if graph is not None:
+            if getattr(self.config.collector, "extension_policy", None):
+                # Generalized residual incidence is not an ordinary forest.
+                # Report its retained atoms and rank without constructing a
+                # redundant adjacency/component view solely for statistics.
+                self.stats["large_prime_graph"] = dict(
+                    representation="incidence-v1",
+                    retained_atoms=len(graph.edges),
+                    residual_rank=len(graph.pivots),
+                    unowned_atoms=len(graph.unowned),
+                    closed_relations=len(self.engine.collector._rows),
+                    opaque_conversions=len(graph.resolutions),
+                    split_calls=self.engine.collector._split_calls,
+                )
+            elif graph is not None:
                 self.stats["large_prime_graph"] = dict(
                     forest_edges=len(graph.edges),
                     forest_vertices=len(graph.adjacency),

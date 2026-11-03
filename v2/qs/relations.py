@@ -25,13 +25,14 @@ def checked_residual_bound(bound):
 
 def _check_exponents(exponents):
     """Validate immutable, sorted sparse positive prime/exponent pairs."""
-    from .indexed_relations import IndexedFactors
-
-    if isinstance(exponents, IndexedFactors):
-        # Revalidate shape independently of a public constructor invocation.
-        IndexedFactors(exponents.indices, exponents.primes)
-        return
     if not isinstance(exponents, tuple):
+        # Tuple-only snapshot loaders do not include the opt-in storage
+        # modules. Import them only when the new representation is present.
+        from .indexed_relations import IndexedFactors
+
+        if isinstance(exponents, IndexedFactors):
+            IndexedFactors(exponents.indices, exponents.primes)
+            return
         raise TypeError("exponents must be a tuple")
     previous = 1
 
@@ -168,11 +169,13 @@ def _verify_atomic(
 ):
     """Private checker; only a collector-owned cache may reuse prime proofs."""
     checked_residual_bound(residual_bound)
-    from .residual_relations import ResidualAtom
-
     if type(residual_arity) is not int or residual_arity not in (2, 3):
         raise ValueError("invalid residual arity")
-    extended = isinstance(relation, ResidualAtom)
+    extended = False
+    if hasattr(relation, "opaque"):
+        from .residual_relations import ResidualAtom
+
+        extended = isinstance(relation, ResidualAtom)
     opaque = extended and relation.opaque is not None
     if not isinstance(relation.large_primes, tuple) or len(
         relation.large_primes
@@ -285,15 +288,16 @@ def parity_bits(relation, factor_base):
         int(relation.sign < 0)
     )
     columns = factor_base._columns
-    from .indexed_relations import IndexedFactors
+    if not isinstance(relation.exponents, tuple):
+        from .indexed_relations import IndexedFactors
 
-    if isinstance(relation.exponents, IndexedFactors):
-        if relation.exponents.primes is not factor_base.primes:
-            raise ValueError("indexed parity uses a different base")
-        for index, exponent in relation.exponents.indices:
-            if exponent % 2:
-                bits |= 1 << index
-        return bits
+        if isinstance(relation.exponents, IndexedFactors):
+            if relation.exponents.primes is not factor_base.primes:
+                raise ValueError("indexed parity uses a different base")
+            for index, exponent in relation.exponents.indices:
+                if exponent % 2:
+                    bits |= 1 << index
+            return bits
     for prime, exponent in relation.exponents:
         if prime not in columns:
             raise ValueError("exponent prime is outside the factor base")

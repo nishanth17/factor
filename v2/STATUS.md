@@ -32,10 +32,13 @@ immutable control's base; its runtime sources are identical.
 The subsequent expanded preparation adds `ExtendedYieldSieveConfig`, schema13
 and `c9a-expanded-yield-v4`, including previously conditional admission,
 storage, recovery, filtering and solver capabilities. These remain opt-in and
-unvalidated. Local scope/coverage and the queued verification plan are recorded
+experimental. Local scope/coverage and the verification plan are recorded
 under `v2/audit/c9a/`; no acceptance gate, default, C10a source or historical
 freeze has changed. Lock-dependent correctness and all measurement execution
-remain deferred by instruction.
+were initially deferred. Subsequent authorized unit validation passed all 942
+tests (9 skipped), after fixing expanded incidence statistics and tuple-only
+legacy loader compatibility. See `v2/audit/c9a/verification-09.json` for receipts;
+feasibility and performance execution remain pending.
 
 ## Current automatic defaults
 

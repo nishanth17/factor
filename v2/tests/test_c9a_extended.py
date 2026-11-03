@@ -596,6 +596,15 @@ class ExpandedResourceTests(unittest.TestCase):
             10007 * 10009, seed=73, config=config, budget=allowance()
         )
         job.run(max_blocks=1)
+        graph_stats = job.stats["large_prime_graph"]
+        self.assertEqual(graph_stats["representation"], "incidence-v1")
+        self.assertEqual(
+            graph_stats["retained_atoms"], len(job.engine.collector._atoms)
+        )
+        self.assertEqual(
+            graph_stats["residual_rank"],
+            len(job.engine.collector._graph.pivots),
+        )
         checkpoint = json.loads(json.dumps(job.checkpoint()))
         self.assertEqual(checkpoint["version"], 13)
         restored = SIQSJob.from_checkpoint(
