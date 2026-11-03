@@ -338,6 +338,39 @@ def split_residual(
             dispatch=dispatch,
             **({"_divisors": divisors} if divisors is not None else {}),
         )
+    if (
+        not pair
+        and arity == 2
+        and policy == "rho-first-v3"
+        and (reason == "split_failed")
+    ):
+        # The former 3LP traversal also supplied this last 2LP walk. Keep
+        # that useful attempt when a proven floor excludes three endpoints;
+        # a failed endpoint classification needs no such retry.
+        budget.consume(2048 * residual.bit_length() ** 2)
+        stats = RhoStats()
+        divisor = factorize_rho(
+            residual,
+            seed=23,
+            max_attempts=1,
+            max_evaluations=2048,
+            batch_size=32,
+            recovery_limit=32,
+            stats=stats,
+            _known_composite=True,
+        )
+        evaluations += stats.evaluations
+        budget.consume(0)
+        if divisor is not None:
+            pair, reason, _ = split_cofactor(
+                residual,
+                bound,
+                budget,
+                checked,
+                policy,
+                hint=divisor,
+                square_checked=True,
+            )
     if pair or arity == 2:
         return finished(pair, reason, evaluations)
     if divisors:

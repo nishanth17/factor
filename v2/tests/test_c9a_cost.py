@@ -23,7 +23,7 @@ from v2.qs.linear_algebra import (
 from v2.qs.storage import RelationPublicationError
 from v2.qs.structured_matrix import panel_reduce
 from v2.qs.yield_memory import reserve_batch
-from v2.tests.test_c9a_bounded import worker
+from v2.tests.test_c9a_bounded import bounded, worker
 from v2.tests.test_c9a_extended import atom_at
 from v2.tests.test_qs_dlp import allowance
 from v2.tests.test_qs_pipeline import dense_kernel, span
@@ -70,6 +70,76 @@ def lookahead_worker(limit=10000):
 
 
 class CostRegressionTests(unittest.TestCase):
+    def test_proven_prime_hole_rejects_before_hints_or_primality(self):
+        base = qs.build_factor_base(1009 * 1013, bound=100).factor_base
+        engine = qs.SieveCollector(
+            qs.qs_polynomial(base),
+            base,
+            config=bounded(residual_bound=10),
+            budget=allowance(),
+        )
+        found = False
+        for position in range(1, 20):
+            value = engine.polynomial.value(position)
+            residual, factors = abs(value), []
+            for prime in base.primes:
+                exponent = 0
+                while residual % prime == 0:
+                    residual //= prime
+                    exponent += 1
+                if exponent:
+                    factors.append((prime, exponent))
+            if not 10 < residual < engine._residual_floor**2:
+                continue
+            with (
+                patch.object(
+                    engine._checked, "prime", side_effect=AssertionError
+                ),
+                patch.object(
+                    engine._endpoints, "divisor", side_effect=AssertionError
+                ),
+            ):
+                self.assertEqual(
+                    recover(
+                        engine,
+                        position,
+                        value,
+                        residual,
+                        tuple(factors),
+                        Counter(),
+                    ),
+                    (None, None),
+                )
+            found = True
+            break
+        self.assertTrue(found)
+
+    def test_two_prime_floor_keeps_the_last_useful_rho_attempt(self):
+        checked = SimpleNamespace(
+            prime=lambda p, budget: utils.classify_prime(p)
+            is utils.Primality.PROVEN
+        )
+        with (
+            patch("v2.qs.cofactor_policy.squfof", return_value=None),
+            patch(
+                "v2.qs.cofactor_policy.factorize_rho",
+                side_effect=(None, None, 11),
+            ) as rho,
+        ):
+            factors, _, _ = split_residual(
+                11 * 17,
+                100,
+                allowance(),
+                checked,
+                "rho-first-v3",
+                arity=2,
+                dispatch=False,
+            )
+        self.assertEqual(factors, (11, 17))
+        self.assertEqual(
+            [call.kwargs["seed"] for call in rho.call_args_list], [7, 11, 23]
+        )
+
     def test_unmatched_staging_skips_unused_congruence_and_keeps_fifo(self):
         engine = worker(
             opaque_cache_entries=1, duplicate_policy="congruence-v2"
@@ -119,7 +189,7 @@ class CostRegressionTests(unittest.TestCase):
             engine._admit(atom_at(engine, 2, opaque=True), Counter())
 
     def test_proven_floor_avoids_impossible_three_prime_recovery(self):
-        engine = worker(batch_policy="off")
+        engine = worker(batch_policy="off", split_policy="rho-first-v3")
         engine._residual_floor = 11
         engine._checked = SimpleNamespace(
             primes={},

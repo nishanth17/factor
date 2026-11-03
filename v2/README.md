@@ -196,8 +196,11 @@ without sorting, and reuses its table until the selected immutable keys change.
 It preserves elimination action order, provenance and checkpoint digests;
 presence-mask work and scratch are reserved.
 
-Expanded recovery uses the proven residual-prime floor to avoid a three-prime
-attempt below its cube. Successful two-prime memo entries remain valid under
+Expanded recovery rejects an oversized single-prime residual below the proven
+residual-prime floor squared before hints or primality testing. The rho-first
+policy avoids impossible three-prime recovery below the floor cubed while
+retaining the final bounded rho walk when earlier splitting fails.
+Successful two-prime memo entries remain valid under
 a three-prime configuration; restore checks each entry's narrower arity and
 exact endpoint proofs. Batch scratch bounds reuse their owned high-water mark.
 Hensel lifting caches both invertible and singular derivative classes within

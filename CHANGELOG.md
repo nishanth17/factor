@@ -12,7 +12,9 @@ below record decisions in their dated scope; later entries may supersede routes.
   Prepare the separate `cost-report` nominee using scalar elimination and that
   split order; preserve earlier profiles and all exact validation contracts.
 
-- Skip three-prime recovery below the proven residual-prime floor cubed, and
+- Reject proven single-prime domain holes before hints/primality testing.
+  Skip rho-first three-prime recovery below the proven residual-prime floor
+  cubed while retaining the final useful two-prime rho walk, and
   validate narrower split memos on restore. Reuse batch scratch high-water
   bounds, avoid repeated ownership calculation and disabled recomputation
   scans, cache singular/nonsingular Hensel derivative results, and retain the

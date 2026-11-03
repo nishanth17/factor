@@ -23,6 +23,14 @@ def recover(
     if residual > max(config.residual_bound, config.large_product_bound):
         stats["product_rejections"] += 1
         return None, None
+    if config.residual_bound < residual < collector._residual_floor**2:
+        # A completely divided norm below this square must be prime. It
+        # already exceeds the single-prime ceiling, so neither primality
+        # testing nor cofactor hints can make it admissible.
+        stats["domain_hole_rejections"] = (
+            stats.get("domain_hole_rejections", 0) + 1
+        )
+        return None, None
     known_prime = checked.primes.get(residual) is True
     if residual > 1 and hint is None and not known_prime:
         if config.batch_policy != "off":
@@ -61,7 +69,8 @@ def recover(
         # recursively recover a third endpoint after the two-prime test fails.
         arity = (
             2
-            if residual < collector._residual_floor**3
+            if config.split_policy == "rho-first-v3"
+            and residual < collector._residual_floor**3
             else config.residual_arity
         )
         split_eligible = residual <= small * config.large_prime_bound ** (
