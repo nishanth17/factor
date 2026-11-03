@@ -137,6 +137,11 @@ def divide_yield_residual(
 def prepare_admission(collector, atom, stats):
     checked, budget = collector._checked, collector.budget
     checked.atom(atom, budget)
+    if getattr(collector.config, "extension_policy", None) == "extended-v2":
+        from .opaque_staging import stage_unmatched
+
+        if stage_unmatched(collector, atom, stats):
+            return False
     key = None
     if collector.config.duplicate_policy == "congruence-v2":
         key, divisor = checked.congruence(atom, budget)

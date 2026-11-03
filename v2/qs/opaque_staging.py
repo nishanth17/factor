@@ -2,6 +2,9 @@
 
 from collections import OrderedDict
 
+from ..common import utils
+from .storage import RelationPublicationError
+
 
 def context_bits(atom, base):
     poly = atom.polynomial
@@ -26,7 +29,7 @@ class OpaqueStaging:
         self.atoms = OrderedDict()
         self.used = 0
 
-    def stage(self, atom, budget, stats):
+    def stage(self, atom, budget, stats, collector):
         cost = entry_bytes(atom, self.base)
         if (
             not self.config.opaque_cache_entries
@@ -36,26 +39,39 @@ class OpaqueStaging:
                 stats.get("opaque_staging_rejections", 0) + 1
             )
             return
-        budget.consume(len(atom.exponents) + len(self.atoms) + 1)
-        pending = OrderedDict(self.atoms)
-        used = self.used
-        pending[atom.opaque] = atom
-        used += cost
-        evictions = 0
-        while (
-            len(pending) > self.config.opaque_cache_entries
-            or used > self.config.opaque_cache_bytes
-        ):
-            _, old = pending.popitem(last=False)
+        budget.consume(len(atom.exponents) + 1)
+        if atom.opaque in self.atoms:
+            raise ValueError("opaque staging requires a new residual")
+        used, count, retired = self.used + cost, len(self.atoms) + 1, []
+        for residual, old in self.atoms.items():
+            if count <= self.config.opaque_cache_entries and (
+                used <= self.config.opaque_cache_bytes
+            ):
+                break
+            budget.consume(1)
             used -= entry_bytes(old, self.base)
-            evictions += 1
-        # The configured cache grant covers retained records. The global
-        # construction scratch covers these two small coexisting FIFO maps.
-        self.atoms, self.used = pending, used
-        stats["opaque_staged"] = stats.get("opaque_staged", 0) + 1
-        stats["opaque_staging_evictions"] = (
-            stats.get("opaque_staging_evictions", 0) + evictions
-        )
+            count -= 1
+            retired.append(residual)
+        # Planning/refusal leaves the FIFO unchanged. Publication performs
+        # only the insertion and actual evictions, without copying the map.
+        # Unexpected allocation failure poisons the owner, as retained-atom
+        # publication does; recovery then starts from a checked checkpoint.
+        collector._publication_failed = True
+        try:
+            self.atoms[atom.opaque] = atom
+            for residual in retired:
+                del self.atoms[residual]
+            self.used = used
+            stats["opaque_staged"] = stats.get("opaque_staged", 0) + 1
+            stats["opaque_staging_evictions"] = stats.get(
+                "opaque_staging_evictions", 0
+            ) + len(retired)
+        except MemoryError as error:
+            raise RelationPublicationError(
+                "opaque staging publication failed"
+            ) from error
+        else:
+            collector._publication_failed = False
 
     def discard(self, residual):
         atom = self.atoms.pop(residual)
@@ -101,6 +117,31 @@ def route(collector, atom, stats):
         and residual not in collector._graph.resolutions
         and frozenset(((True, residual),)) not in collector._graph.direct
     ):
-        staging.stage(atom, collector.budget, stats)
+        staging.stage(atom, collector.budget, stats, collector)
         return True, None
     return False, None
+
+
+def stage_unmatched(collector, atom, stats):
+    """Stage an already verified atom before building an unused exact key."""
+    opaque = getattr(atom, "opaque", None)
+    if (
+        opaque is None
+        or opaque in collector._opaque_staging.atoms
+        or opaque in collector._graph.resolutions
+        or frozenset(((True, opaque),)) in collector._graph.direct
+    ):
+        return False
+    # Congruence normalization would first expose this nonunit. Preserve that
+    # check even though an unmatched staged record needs no canonical key.
+    if collector.config.duplicate_policy == "congruence-v2":
+        divisor = collector._checked.unit(
+            atom.square_correction, collector.budget
+        )
+        if utils.valid_divisor(divisor, collector.factor_base.n):
+            raise ValueError(
+                "proper divisor must be returned before admission"
+            )
+    collector._incoming_key = None
+    collector._opaque_staging.stage(atom, collector.budget, stats, collector)
+    return True

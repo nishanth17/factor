@@ -2,7 +2,7 @@
 
 import copy
 import unittest
-from collections import Counter
+from collections import Counter, OrderedDict
 from dataclasses import asdict
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -20,6 +20,7 @@ from v2.qs.linear_algebra import (
     filter_matrix,
     verify_dependency,
 )
+from v2.qs.storage import RelationPublicationError
 from v2.qs.structured_matrix import panel_reduce
 from v2.qs.yield_memory import reserve_batch
 from v2.tests.test_c9a_bounded import worker
@@ -69,6 +70,54 @@ def lookahead_worker(limit=10000):
 
 
 class CostRegressionTests(unittest.TestCase):
+    def test_unmatched_staging_skips_unused_congruence_and_keeps_fifo(self):
+        engine = worker(
+            opaque_cache_entries=1, duplicate_policy="congruence-v2"
+        )
+        original = engine._opaque_staging.atoms
+        with patch.object(
+            engine._checked,
+            "congruence",
+            side_effect=AssertionError("unmatched staging needs no exact key"),
+        ):
+            engine._admit(atom_at(engine, 1, opaque=True), Counter())
+            engine._admit(atom_at(engine, 2, opaque=True), Counter())
+        self.assertIs(engine._opaque_staging.atoms, original)
+        self.assertEqual(list(original), [53])
+
+    def test_staging_eviction_refusal_preserves_every_original_entry(self):
+        engine = worker(opaque_cache_entries=1)
+        engine._admit(atom_at(engine, 1, opaque=True), Counter())
+        staging = engine._opaque_staging
+        prior, used = dict(staging.atoms), staging.used
+        atom = atom_at(engine, 2, opaque=True)
+        with self.assertRaises(BudgetExhaustedError):
+            staging.stage(
+                atom,
+                ChunkAllowance(len(atom.exponents) + 1),
+                Counter(),
+                engine,
+            )
+        self.assertEqual(dict(staging.atoms), prior)
+        self.assertEqual(staging.used, used)
+        self.assertFalse(engine._publication_failed)
+
+    def test_failed_staging_publication_cannot_be_reused_or_serialized(self):
+        class FailingMap(OrderedDict):
+            def __setitem__(self, key, value):
+                super().__setitem__(key, value)
+                raise MemoryError("injected after insertion")
+
+        engine = worker()
+        engine._opaque_staging.atoms = FailingMap()
+        with self.assertRaises(RelationPublicationError):
+            engine._admit(atom_at(engine, 1, opaque=True), Counter())
+        self.assertTrue(engine._publication_failed)
+        with self.assertRaises(RelationPublicationError):
+            pack_store(engine)
+        with self.assertRaises(RelationPublicationError):
+            engine._admit(atom_at(engine, 2, opaque=True), Counter())
+
     def test_proven_floor_avoids_impossible_three_prime_recovery(self):
         engine = worker(batch_policy="off")
         engine._residual_floor = 11

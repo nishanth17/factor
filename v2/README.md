@@ -202,6 +202,10 @@ a three-prime configuration; restore checks each entry's narrower arity and
 exact endpoint proofs. Batch scratch bounds reuse their owned high-water mark.
 Hensel lifting caches both invertible and singular derivative classes within
 one polynomial; sparse queues retain their dense-root view until invalidation.
+Unmatched opaque staging avoids an unused canonical duplicate key and copies
+no FIFO map. Refused planning preserves every entry; an allocation failure
+during publication poisons the collector and requires a prior checkpoint,
+as retained relation publication does.
 
 ## Development
 

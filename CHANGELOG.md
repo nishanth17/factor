@@ -18,6 +18,11 @@ below record decisions in their dated scope; later entries may supersede routes.
   scans, cache singular/nonsingular Hensel derivative results, and retain the
   dense-root view across sparse-queue blocks.
 
+- Publish bounded opaque staging with only actual FIFO evictions instead of
+  copying its map. Skip canonical-key construction for unmatched staged atoms
+  after exact validation and the applicable nonunit check. Budget refusal
+  preserves staging; interrupted allocation requires a prior checkpoint.
+
 - Complete a larger bounded screen: four independent exposed inputs, eight
   successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
   but raw complete time and RSS are greater in every pair. Preserve failed
