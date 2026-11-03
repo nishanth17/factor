@@ -7,7 +7,7 @@ import time
 import unittest
 from dataclasses import replace
 from math import gcd, prod
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
@@ -19,7 +19,12 @@ from v2.execution.budget import Budget
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
 from v2.execution.stage_jobs import advance_job, new_job
-from v2.execution.worker_contract import Manifest, WorkerSettings
+from v2.execution.worker_contract import (
+    LeaseRefusedError,
+    Ledger,
+    Manifest,
+    WorkerSettings,
+)
 from v2.portfolio import PortfolioConfig, _execution_context, factorize_bounded
 from v2.tests.test_ecm_programs import primes_between
 
@@ -312,7 +317,189 @@ def oversize_then_crash(channel, frame_bytes, startup_work):
     _fake_worker(channel, frame_bytes, startup_work, "oversized")
 
 
+def exit_during_startup(channel, frame_bytes, startup_work):
+    os._exit(23)
+
+
+class StartupOwnershipTests(unittest.TestCase):
+    """Fake startup; queued here because this module imports arithmetic."""
+
+    def prepare(self, workers=4, startup_seconds=10):
+        executor = ECMExecutor(
+            settings=WorkerSettings(
+                workers=workers, startup_seconds=startup_seconds
+            )
+        )
+        events, processes = [], []
+
+        def process_factory(**options):
+            index = len(processes)
+            process = Mock()
+            process.start.side_effect = lambda: events.append(index)
+            process.is_alive.return_value = True
+            processes.append(process)
+            return process
+
+        context = Mock()
+        context.get_start_method.return_value = "spawn"
+        context.Process.side_effect = process_factory
+        return executor, context, events, processes
+
+    def test_launches_overlap_and_ready_reports_can_arrive_out_of_order(self):
+        executor, context, started, _ = self.prepare()
+        ledger = Ledger(20_000_000, 100)
+        reads = []
+
+        def read(slot):
+            self.assertEqual(started, [0, 1, 2, 3])
+            reads.append(slot["index"])
+            if reads == [0]:
+                return None
+            return dict(kind="ready", work=1_000_000, cpu=0.125, rss=1)
+
+        with (
+            patch(
+                "v2.execution.ecm_workers.multiprocessing.get_context",
+                return_value=context,
+            ),
+            patch(
+                "v2.execution.ecm_workers.socket.socketpair",
+                side_effect=lambda: (Mock(), Mock()),
+            ),
+            patch.object(executor, "_read", side_effect=read),
+        ):
+            executor._spawn(ledger, time.monotonic() + 60, lambda: None)
+
+        self.assertEqual(reads, [0, 1, 2, 3, 0])
+        self.assertFalse(ledger.active)
+        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(
+            ledger.cpu, 4 * (0.125 + executor.settings.shutdown_cpu)
+        )
+        self.assertEqual(
+            [s["reported_cpu"] for s in executor.slots], [0.125] * 4
+        )
+        executor.slots.clear()  # Mock handles only; no children were started.
+
+    def test_bad_ready_keeps_every_unreported_startup_lease(self):
+        executor, context, _, _ = self.prepare()
+        ledger = Ledger(20_000_000, 100)
+        with (
+            patch(
+                "v2.execution.ecm_workers.multiprocessing.get_context",
+                return_value=context,
+            ),
+            patch(
+                "v2.execution.ecm_workers.socket.socketpair",
+                side_effect=lambda: (Mock(), Mock()),
+            ),
+            patch.object(executor, "_read", return_value=dict(kind="result")),
+        ):
+            with self.assertRaisesRegex(ValueError, "ready report"):
+                executor._spawn(ledger, time.monotonic() + 60, lambda: None)
+
+        self.assertFalse(ledger.active)
+        self.assertEqual(ledger.lost, 4)
+        self.assertEqual(ledger.cpu, 4 * (10 + executor.settings.shutdown_cpu))
+        self.assertEqual(ledger.work, 4_000_000)
+        executor.slots.clear()
+
+    def test_one_ready_report_refunds_only_that_child_before_peer_failure(
+        self,
+    ):
+        executor, context, _, _ = self.prepare()
+        ledger = Ledger(20_000_000, 100)
+        messages = [
+            dict(kind="ready", work=1_000_000, cpu=0.125, rss=1),
+            dict(kind="result"),
+        ]
+        with (
+            patch(
+                "v2.execution.ecm_workers.multiprocessing.get_context",
+                return_value=context,
+            ),
+            patch(
+                "v2.execution.ecm_workers.socket.socketpair",
+                side_effect=lambda: (Mock(), Mock()),
+            ),
+            patch.object(executor, "_read", side_effect=messages),
+        ):
+            with self.assertRaisesRegex(ValueError, "ready report"):
+                executor._spawn(ledger, time.monotonic() + 60, lambda: None)
+
+        self.assertFalse(ledger.active)
+        self.assertEqual(ledger.lost, 3)
+        self.assertEqual(
+            ledger.cpu, 0.125 + 30 + 4 * executor.settings.shutdown_cpu
+        )
+        self.assertEqual(ledger.work, 4_000_000)
+        executor.slots.clear()
+
+    def test_startup_deadline_is_not_reset_after_launching_other_workers(self):
+        executor, context, _, processes = self.prepare(
+            workers=2, startup_seconds=1
+        )
+        ledger = Ledger(20_000_000, 100)
+        clock = [0.0]
+        factory = context.Process.side_effect
+
+        def slow_start(**options):
+            process = factory(**options)
+
+            def advance_clock():
+                clock[0] += 0.6
+
+            process.start.side_effect = advance_clock
+            return process
+
+        context.Process.side_effect = slow_start
+        with (
+            patch(
+                "v2.execution.ecm_workers.multiprocessing.get_context",
+                return_value=context,
+            ),
+            patch(
+                "v2.execution.ecm_workers.socket.socketpair",
+                side_effect=lambda: (Mock(), Mock()),
+            ),
+            patch(
+                "v2.execution.ecm_workers.time.monotonic",
+                side_effect=lambda: clock[0],
+            ),
+            patch.object(executor, "_read") as read,
+        ):
+            with self.assertRaisesRegex(LeaseRefusedError, "startup_timeout"):
+                executor._spawn(ledger, 60, lambda: None)
+
+        self.assertEqual(len(processes), 2)
+        read.assert_not_called()
+        self.assertEqual(ledger.lost, 2)
+        self.assertFalse(ledger.active)
+        executor.slots.clear()
+
+
 class ProcessFailureTests(unittest.TestCase):
+    def test_peer_startup_exit_closes_all_owned_children(self):
+        original = {p.pid for p in multiprocessing.active_children()}
+        settings = WorkerSettings(workers=4)
+        with patch("v2.execution.ecm_worker.worker_main", exit_during_startup):
+            with ECMExecutor(
+                settings=settings, force_workers=True
+            ) as executor:
+                result = executor.run(
+                    35, config=configuration(), budget=allowance()
+                )
+        self.assertEqual(result.reason, "worker_failure")
+        self.assertEqual(result.stats["worker_dispatches"], 0)
+        self.assertGreaterEqual(result.stats["lost_reports"], 4)
+        self.assertGreaterEqual(
+            result.stats["charged_child_cpu"],
+            4 * (settings.startup_seconds + settings.shutdown_cpu),
+        )
+        self.assertEqual(
+            {p.pid for p in multiprocessing.active_children()}, original
+        )
+
     def test_process_failures_drain_and_conservatively_charge(self):
         original = {p.pid for p in multiprocessing.active_children()}
         for target in (

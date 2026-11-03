@@ -183,6 +183,12 @@ protocol from committed `066456a`; runtime arithmetic/process/full-checkout QA
 and all measurements remain NOT RUN. No worker/default adoption or task closure.
 Local handoff: `v2/audit/b12_f4/HANDOFF.md`. C9a retains the performance window.
 
+The worker follow-up overlaps startup and retains explicit decisions for
+batching, polling, metadata reuse, drain costs and stage-boundary queues.
+Separate task ownership does not require standalone speedup studies before
+combining correct mechanisms.
+Local follow-up: `v2/audit/b12_f4/OPTIMIZATION_FOLLOWUP.md`.
+
 ## Known gaps and unresolved conflicts
 
 - **Deferred:** E1 combined portfolio confirmation. Individual accepted

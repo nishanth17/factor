@@ -208,70 +208,83 @@ class ECMExecutor:
         context = multiprocessing.get_context("spawn")
         if context.get_start_method() != "spawn":
             raise RuntimeError("explicit spawn context unavailable")
-        for index in range(self.settings.workers):
-            poll()
-            startup = ledger.reserve(
-                "startup",
-                self.settings.startup_work,
-                self.settings.startup_seconds,
-            )
-            shutdown = ledger.reserve(
-                "shutdown", 0, self.settings.shutdown_cpu
-            )
-            # Pay unreported teardown now, including retained-pool calls.
-            ledger.settle(shutdown, "shutdown", 0, self.settings.shutdown_cpu)
-            parent, child = socket.socketpair()
-            parent.settimeout(0.01)
-            process = context.Process(
-                target=worker_main,
-                args=(
-                    child,
-                    self.settings.frame_bytes,
+        startup_tokens, pending = [], []
+        try:
+            # Start all funded children before collecting ready reports.
+            # Waiting after each start serializes interpreter/import costs.
+            for index in range(self.settings.workers):
+                poll()
+                startup = ledger.reserve(
+                    "startup",
                     self.settings.startup_work,
-                ),
-                daemon=True,
-            )
-            names = (
-                "OMP_NUM_THREADS",
-                "OPENBLAS_NUM_THREADS",
-                "MKL_NUM_THREADS",
-                "VECLIB_MAXIMUM_THREADS",
-                "NUMEXPR_NUM_THREADS",
-            )
-            previous = {name: os.environ.get(name) for name in names}
-            try:
-                for name in names:
-                    os.environ[name] = "1"
-                process.start()
-            except BaseException:
-                parent.close()
+                    self.settings.startup_seconds,
+                )
+                startup_tokens.append(startup)
+                shutdown = ledger.reserve(
+                    "shutdown", 0, self.settings.shutdown_cpu
+                )
+                # Pay unreported teardown now, including retained-pool calls.
+                ledger.settle(
+                    shutdown, "shutdown", 0, self.settings.shutdown_cpu
+                )
+                parent, child = socket.socketpair()
+                parent.settimeout(0.01)
+                process = context.Process(
+                    target=worker_main,
+                    args=(
+                        child,
+                        self.settings.frame_bytes,
+                        self.settings.startup_work,
+                    ),
+                    daemon=True,
+                )
+                names = (
+                    "OMP_NUM_THREADS",
+                    "OPENBLAS_NUM_THREADS",
+                    "MKL_NUM_THREADS",
+                    "VECLIB_MAXIMUM_THREADS",
+                    "NUMEXPR_NUM_THREADS",
+                )
+                previous = {name: os.environ.get(name) for name in names}
+                end = min(
+                    deadline,
+                    time.monotonic() + self.settings.startup_seconds,
+                )
+                try:
+                    for name in names:
+                        os.environ[name] = "1"
+                    process.start()
+                except BaseException:
+                    parent.close()
+                    child.close()
+                    raise
+                finally:
+                    for name, value in previous.items():
+                        if value is None:
+                            os.environ.pop(name, None)
+                        else:
+                            os.environ[name] = value
                 child.close()
-                ledger.lose(startup)
-                raise
-            finally:
-                for name, value in previous.items():
-                    if value is None:
-                        os.environ.pop(name, None)
-                    else:
-                        os.environ[name] = value
-            child.close()
-            slot = dict(
-                process=process,
-                channel=parent,
-                decoder=Decoder(self.settings.frame_bytes),
-                schedule=None,
-                active=None,
-                rss=0,
-                reported_cpu=0.0,
-                index=index,
-            )
-            self.slots.append(slot)
-            end = min(
-                deadline, time.monotonic() + self.settings.startup_seconds
-            )
-            try:
-                while True:
+                slot = dict(
+                    process=process,
+                    channel=parent,
+                    decoder=Decoder(self.settings.frame_bytes),
+                    schedule=None,
+                    active=None,
+                    rss=0,
+                    reported_cpu=0.0,
+                    index=index,
+                )
+                self.slots.append(slot)
+                pending.append((slot, startup, end))
+
+            while pending:
+                progress = False
+                for entry in tuple(pending):
+                    slot, startup, end = entry
                     poll()
+                    # Each child keeps its launch deadline; scanning another
+                    # child or receiving a fragment cannot extend that grant.
                     if time.monotonic() >= end:
                         raise LeaseRefusedError("startup_timeout")
                     message = self._read(slot)
@@ -284,14 +297,19 @@ class ECMExecutor:
                         )
                         slot["rss"] = message["rss"]
                         slot["reported_cpu"] = message["cpu"]
-                        break
-                    if not process.is_alive():
+                        pending.remove(entry)
+                        progress = True
+                    elif not slot["process"].is_alive():
                         raise EOFError("worker exited during startup")
+                if pending and not progress:
                     time.sleep(0.001)
-            except BaseException:
+        except BaseException:
+            # Every launched child without a checked report keeps its full
+            # lease, even if a different child's startup caused the failure.
+            for startup in startup_tokens:
                 if startup in ledger.active:
                     ledger.lose(startup)
-                raise
+            raise
 
     def start(self, *, budget):
         """Measure cold pool readiness separately; no curve or plan is run."""

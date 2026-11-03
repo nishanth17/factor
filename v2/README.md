@@ -91,6 +91,9 @@ a checked divisor, reason, checkpoint and resource receipt. `WorkerSettings`
 exposes 1/2/4 workers and finite work, CPU, memory, frame, checkpoint, startup and
 drain limits. Only python-int is admitted initially. Full schedule eligibility
 is retained in each worker; private program/chain stores are reused and bounded.
+Funded workers start before the parent collects readiness reports, so interpreter
+imports may overlap. Every child retains its own startup deadline and lease;
+unreported startups keep their full charges if a peer fails. This is unmeasured.
 The caller owns `close()` or the context manager lifetime. One call may be
 active per context. Process entry points must be protected by a main guard.
 
