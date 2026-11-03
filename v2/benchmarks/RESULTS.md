@@ -10,6 +10,17 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+An actual-data audit reproduces the long-run memory stop exactly: 26,862 atoms,
+2,666 rows and 579,211,587 positions. Packed factors occupy 158 slabs / 647KB,
+while blanket exponent/context charges alone total 559.5MB. The `09a3a05`
+repair charges shared slabs/contexts and integer digit storage explicitly.
+Exact store replay with the original helper allowances reduces accounted
+workspace from 1,040.1MB to 367.9MB, preserving all records and independently
+verifying every closed row. The committed-only checkout passes 1,048 tests
+(9 skips), lint and 241 imports. This is an accounting repair, not a measured
+RAM reduction or factoring win. No new full comparison is run. Local evidence:
+`v2/audit/c9a/ownership-audit-15-17.md`.
+
 A subsequent 60-digit pair on `e4dec4a` (identical runtime to `44b1f94`)
 grants 900 seconds each, a higher block ceiling and unchanged memory. C0
 finds independently verified factors in 407.8s, with 4,994 closed rows. C1

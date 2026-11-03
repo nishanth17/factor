@@ -107,6 +107,17 @@ with 2,666 closed rows and no matrix solve; workspace is 1.040GB and RSS
 limits despite the short-prefix repair. Stop after the pair; no retry, grant
 increase or adoption follows. Details: `v2/audit/c9a/feasibility-14.md`.
 
+The subsequent actual-data ownership audit reproduces that stop exactly and
+finds only 158 packed slabs (647KB) and 4,411 shared polynomial contexts.
+The repair on `09a3a05` charges shared allocations once, scalar digit storage
+explicitly, and packing/restore scratch separately. The exact captured store
+replays at 367.9MB accounted workspace versus 1,040.1MB with matched helper
+allowances; all 26,862 atoms and 2,666 independently verified rows are preserved.
+The committed-only checkout passes 1,048 tests (9 skips), lint and 241 benchmark
+imports. This corrects ownership accounting; no fresh full factoring result,
+RAM reduction, speedup or adoption is claimed. Details:
+`v2/audit/c9a/ownership-audit-15-17.md`.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
