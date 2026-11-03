@@ -92,8 +92,12 @@ FIFO outside retained incidence; exact matches promote their original records.
 Shape-based graph ownership and norm-bounded batch scratch replace blanket
 reservations in this variant. Reporting returns to the incumbent allowance,
 with proven three-prime recovery retained and no grant increase. All 1,040 unit
-tests (9 skipped) and lint pass; a new committed-source four-call feasibility
-screen is pending. No performance acceptance or default change follows.
+tests (9 skipped), lint and committed-only checks pass. The four-call screen
+on `44b1f94` finishes all matched 67,109,376-position prefixes without a memory
+stop. Candidate ownership is 210.8/192.4MB at 60/65 digits; closed-row counts
+125/111 match the controls, with greater charged work. All timing drift checks
+fail again. Stop after these four calls; longer-horizon yield remains unknown.
+See `v2/audit/c9a/feasibility-13.md`. No default or adoption gate changes.
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),

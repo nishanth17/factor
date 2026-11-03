@@ -10,6 +10,9 @@ below record decisions in their dated scope; later entries may supersede routes.
   scratch. Preserve FIFO state in schema 14 and retain the incumbent reporting
   allowance in the new experimental profile. Fix sparse incidence ordering
   after light-row selection and preserve completed divisors across restore.
+  The four-call rerun finishes matched prefixes under unchanged grants; early
+  closed-row yield matches C0, charged work is greater and drift gates fail.
+  Keep the variant experimental and stop before a larger campaign.
 
 - Make the measurement warmup exercise selected coupled arithmetic. Complete
   the four-call matched feasibility screen; retain candidate ownership-cap

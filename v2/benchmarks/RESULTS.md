@@ -10,6 +10,18 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The bounded-retention repair on `44b1f94` passes 1,040 unit tests (9 skips),
+lint and committed-only checks. Its new four-call C10a-matched screen finishes
+all 67,109,376-position prefixes under unchanged grants. At 60/65 digits the
+candidate uses 210.8/192.4MB accounted workspace and 160.2/153.2MB process RSS,
+without a memory stop. Its 125/111 closed relations match C0, while measured
+charged work is 62.28/55.06 billion versus 7.88/7.92 billion for C0. No staged
+opaque record is promoted or converted in these prefixes. All four timing
+checks fail again; no complete factorization, speedup or adoption is claimed.
+The run stops after four cells and analysis, charging 550 wall/CPU seconds;
+actual worker lifecycle totals are 145.0 wall and 146.0 CPU seconds. Longer
+yield remains uncertain. Local details: `v2/audit/c9a/feasibility-13.md`.
+
 A follow-up used six short, equal-work prefixes (4,067,359 positions each)
 at 60/65 digits, preserving the original memory grants. Full C1 retained
 4,430/3,382 unique opaque cofactors: none repeated, converted or contributed
