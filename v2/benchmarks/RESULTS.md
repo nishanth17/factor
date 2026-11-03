@@ -10,6 +10,17 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The first matched C10a/C9a screen completed four calls on source `7fa31cb`
+after 1,030 unit tests (9 skips), lint and committed-only checks passed.
+Both arms used coupled arithmetic. At 60/65 digits C0 finished the fixed-work
+prefixes with 125/111 closed relations; C1 stopped at its accounted memory caps
+with 33/72 relations over shorter coverage. Opaque cofactors made up about
+95–97% of C1's retained atoms. Process RSS stayed below those ownership grants.
+All four canary drift checks failed; no clean timing ratio or speedup follows.
+Stop before a larger campaign to investigate opaque retention and ownership
+accounting. Detailed receipts and the finite decision remain local under
+`v2/audit/c9a/feasibility-11.md` and `benchmarks/results/c9a/`.
+
 The independently selectable useful-yield, admission, cycle, duplicate and
 packed-record bundle is experimental. Retained complete-call evidence motivates
 the comparison but does not measure this implementation. Current preparation

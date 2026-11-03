@@ -75,6 +75,12 @@ coupled policies in both arms under a new matched configuration identity.
 
 ## Current automatic defaults
 
+C9a subsequently completed its four-call matched C10a feasibility screen on
+`7fa31cb`. The candidate reached accounted memory caps at 60/65 digits; both
+controls finished their fixed-work prefixes. All timing drift checks failed.
+Further campaign execution stops pending review of opaque retention and memory
+accounting. See `v2/audit/c9a/feasibility-11.md`; no speedup is accepted.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and

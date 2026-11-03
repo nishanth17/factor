@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Make the measurement warmup exercise selected coupled arithmetic. Complete
+  the four-call matched feasibility screen; retain candidate ownership-cap
+  stops and failed drift checks without a speedup claim. Pause larger runs
+  for opaque-retention and memory-accounting review.
+
 - Merge current C10a-01 mainline policies into the C9a branch. Preserve
   coupled arithmetic markers alongside yield schemas 11–13 and keep historical
   control decoding explicit; add combined checkpoint/resume regression cases.
