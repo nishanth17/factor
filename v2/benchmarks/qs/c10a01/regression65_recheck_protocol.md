@@ -122,8 +122,10 @@ launched. Unused reservations remain unused. The separately disclosed
 2144.422-second administrative GUI stall is additional elapsed time with
 unknown tool CPU; it is not included in the numerical-call ceiling.
 
-The complete pair is uninstrumented inside SIQS; host/canary observations
-remain in the separate before/after phases. Preserve all factors, work,
+The complete pair adds no observers to SIQS kernels; host/canary observations
+remain in the separate before/after phases. Both arms include the same
+existing live-budget poller. Its complete cost is included; its standalone
+overhead was not isolated here. Preserve all factors, work,
 time-limit outcomes and drift failures. Inspect both returned results even
 if one fails a timing screen; no result is selected away. Verify original
 semantic counters/digests where the deterministic traversal reproduces.

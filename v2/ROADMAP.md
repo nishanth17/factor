@@ -2110,8 +2110,13 @@ negative arm and all historical pins.
   native-code canary. The benchmark repair records host state and native
   drift; no production arithmetic change is supported. New finite rechecks
   retain the old pair and every censored diagnostic. The user explicitly
-  authorized the current model for this follow-up. A clean matched rerun
-  remains the next gate; this item stays open pending its evidence.
+  authorized the current model for this follow-up. The new pair completed in
+  1703.859 seconds for candidate and 2007.330 for control, with every non-timing
+  SIQS statistic reproduced. Both SIQS drift checks passed; control's additional
+  native-canary gate failed. Short native warmup probes did not stabilize that
+  signal. No arithmetic fix is justified. Keep the clean-comparison acceptance
+  gate open, without an automatic repeated pair or default promotion.
+  Native-canary suitability remains an unresolved measurement question.
   **Runner continuation prerequisite:** the opt-in `pilots_live` adapter now
   supports durable, acknowledged increases to a live wall/CPU/work grant.
   The same job, consumed work and clock origins persist; the supervisor uses

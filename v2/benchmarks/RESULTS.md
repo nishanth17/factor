@@ -34,3 +34,13 @@ thread QoS, GC/JIT environment and native-canary drift. No arithmetic repair
 is justified by that evidence. A separately identified, source-pinned
 [host-audited recheck](qs/c10a01/regression65_recheck_protocol.md) preserves
 the original results and all censored diagnostics; defaults remain unchanged.
+
+The 65-digit recheck completed in 1703.859 seconds for the candidate and
+2007.330 for control. Both reproduced their original work, relation digest
+and every non-timing SIQS statistic, and both passed SIQS drift checks with
+stable recorded power mode. The candidate's elapsed time was 15.1% lower on
+this exposed modulus. Control failed the additional native-canary gate
+(post/pre CPU ratio 0.695), so this is qualified exploratory evidence, not
+a clean accepted performance gain. Two short native-only probes showed
+that three seconds of native warmup did not eliminate canary variability.
+The failed gate is preserved; no additional full pair or default change follows.
