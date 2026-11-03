@@ -131,6 +131,17 @@ No promotion, fresh-confirmation claim or arithmetic change follows from
 one exposed modulus. Restoration of the original power setting is required
 after the authorized follow-up; it must not interrupt a measured call.
 
+After a stage returns, the independent receipt verifier checks reference
+hashes, policy identity, factor reconstruction, cumulative charges and the
+combined host/SIQS/native-canary validity rule. It does not rewrite the
+historical supervisor's narrower `drift_pass` field. The separate verified
+report is the timing-validity verdict for this follow-up:
+
+```sh
+/opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.c10a01.regression65_analysis --stage screen
+/opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.c10a01.regression65_analysis --stage pair
+```
+
 Commands:
 
 ```sh
