@@ -10,6 +10,19 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+A follow-up used six short, equal-work prefixes (4,067,359 positions each)
+at 60/65 digits, preserving the original memory grants. Full C1 retained
+4,430/3,382 unique opaque cofactors: none repeated, converted or contributed
+to a closed row. Disabling opaque retention preserved 6/7 closed rows and
+reduced accounted ownership from 393.8/416.6MB to 185.6/252.3MB. Restoring only
+the incumbent reporting bound also preserved those row counts, while reducing
+charged factoring work by about 4.7/5.3 times. Cold diagnostic times are not
+speed evidence; longer-horizon yield remains uncertain. The decision is to
+revise opaque retention, reporting and conservative per-atom reservations
+before raising limits or launching a larger campaign. The linked diagnostic
+reserved another 130 wall/CPU seconds within Stage A's existing allocation;
+details remain local in `v2/audit/c9a/opaque-investigation-12.md`.
+
 The first matched C10a/C9a screen completed four calls on source `7fa31cb`
 after 1,030 unit tests (9 skips), lint and committed-only checks passed.
 Both arms used coupled arithmetic. At 60/65 digits C0 finished the fixed-work

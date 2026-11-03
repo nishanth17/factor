@@ -80,6 +80,11 @@ C9a subsequently completed its four-call matched C10a feasibility screen on
 controls finished their fixed-work prefixes. All timing drift checks failed.
 Further campaign execution stops pending review of opaque retention and memory
 accounting. See `v2/audit/c9a/feasibility-11.md`; no speedup is accepted.
+The follow-up equal-work diagnostics found no repeated or useful opaque atoms
+in their short prefixes. No-opaque and narrower-reporting variants retained
+the same closed-row counts with substantially less accounted ownership or
+charged work. Limits stay unchanged; retention/reporting and record-shaped
+reservations need revision. See `v2/audit/c9a/opaque-investigation-12.md`.
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
