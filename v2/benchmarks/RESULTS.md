@@ -10,6 +10,20 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The cost follow-up prepares `cost-report` with scalar solving, rho-first
+splitting and serial recovery, after removing repeated sorting, storage work
+and impossible recovery. Source `e0acc17` passes 1,065 tests (9 skips), lint
+and committed-only imports. Runtime/configuration equivalence is checked
+against the serial diagnostic on `193b57c`. On the exposed 50-digit input,
+C0/C1 take 24.2/36.2 raw seconds and both factor correctly. C1 uses 66.6M
+positions / 1,678 rows versus C0's 71.0M / 1,704, with greater RSS. Serial C1
+matches the shared candidate's terminal coverage/rows and charges less work;
+all timing gates fail. A representative/late cofactor replay rejects shortened
+rho effort: it loses eight useful decompositions and takes longer. No clean
+overall speedup, larger-input acceptance or adoption follows. Stop after these
+bounded checks; retain the incumbent. Local detailed evidence and source
+dispositions: `v2/audit/c9a/cost-investigation-20-40.md` and `cost-review-30.md`.
+
 The larger `7feeca4` screen completes all eight calls on four exposed inputs,
 one seed each. At 50/55/60 uneven/62 digits, C0 versus C1 wall seconds are
 24.6/49.7, 77.3/135.3, 236.3/375.3 and 777.9/1,059.6. Every factorization

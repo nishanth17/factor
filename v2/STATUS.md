@@ -135,6 +135,21 @@ collection and elimination costs need investigation before further scaling.
 No adoption or fresh confirmation follows. Details:
 `v2/audit/c9a/complete-screen-19-results.md`.
 
+The cost investigation removes pivot sorting, repeated ownership/FIFO work,
+unused opaque duplicate keys and proven-impossible recovery. It reuses Hensel
+derivative results, dense-root views and owned batch bounds. The experimental
+`cost-report` nominee selects scalar solving, rho-first splitting and serial
+recovery. Final source `e0acc17` passes 1,065 tests (9 skips), lint and 241
+committed-only imports. Its factoring runtime and emitted configuration match
+the serial diagnostic on `193b57c`: C1 factors the exposed 50-digit input in
+36.2s versus C0's 24.2s, with 6.1% fewer positions but greater RSS. Both timing
+gates fail; no incumbent win or adoption follows. A whole-run cofactor sample
+rejects shorter rho effort because it is slower and loses useful splits.
+Stop after these bounded checks; further larger-input usefulness and timing
+calibration remain open. Local source review and receipts:
+`v2/audit/c9a/cost-review-30.md`, `cost-investigation-20-40.md` and
+`nominee-binding-42.json` in the same audit directory.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
