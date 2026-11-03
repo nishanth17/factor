@@ -127,4 +127,7 @@ benchmark-backend-sizes:
 lint:
 	.venv/bin/ruff check --no-cache .
 	.venv/bin/ruff format --check --no-cache .
-	.venv/bin/python -m pycodestyle --exclude=audit,local,results,history,.venv .
+	# Preserve pycodestyle defaults; E203 conflicts with Ruff's slice spacing.
+	.venv/bin/python -m pycodestyle \
+	  --exclude=audit,local,results,history,.venv,upstream \
+	  --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203 .

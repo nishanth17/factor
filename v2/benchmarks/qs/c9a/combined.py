@@ -85,9 +85,16 @@ def build(corpus, resolved):
         initial_cells=4,
         early_cells=32,
         current_mainline=CURRENT_MAINLINE,
-        ablation_reuse="none required; targeted diagnosis needs a new decision",
-        feasibility_question="Does the clean combined arm make useful progress within matched resources?",
-        parameter_status="domain-derived starting hypothesis; not a measured optimum",
+        ablation_reuse=(
+            "none required; targeted diagnosis needs a new decision"
+        ),
+        feasibility_question=(
+            "Does the clean combined arm make useful progress "
+            "within matched resources?"
+        ),
+        parameter_status=(
+            "domain-derived starting hypothesis; not a measured optimum"
+        ),
     )
     return plan
 
