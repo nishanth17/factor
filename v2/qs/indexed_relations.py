@@ -3,7 +3,7 @@
 Published slab ranges are never overwritten. Records own their slab, so a
 snapshot remains valid after collector eviction or replacement of the arena.
 Only the current slab is additionally pinned by the allocator. Conservative
-collector reservations cover a 4 KiB slab per record plus construction copies.
+collector reservations cover slabs and construction copies separately.
 """
 
 import base64
@@ -16,6 +16,7 @@ from .relations import AtomicRelation, CombinedRelation, _check_exponents
 from .residual_relations import ResidualAtom
 
 BLOCK_BYTES = 4096
+BLOCK_OVERHEAD = 256
 HANDLE = struct.Struct(">Q")
 
 
@@ -191,6 +192,11 @@ class RecordArena:
     def __init__(self, base, *, config=None, budget=None):
         self.base = base
         self.block, self.used = bytearray(), 0
+        self.allocated_bytes = 0
+        self.shared_contexts = (
+            getattr(config, "extension_policy", None) == "extended-v2"
+        )
+        self.polynomials = {}
         self.slots, self.atoms = {}, {}
         self.next_slot = 0
         self.recompute_limit = getattr(config, "recompute_prime_limit", 0)
@@ -218,6 +224,7 @@ class RecordArena:
             )
         if len(data) > len(self.block) - self.used:
             self.block = bytearray(max(BLOCK_BYTES, len(data)))
+            self.allocated_bytes += BLOCK_OVERHEAD + len(self.block)
             self.used = 0
         offset = self.used
         self.block[offset : offset + len(data)] = data
@@ -237,6 +244,7 @@ class RecordArena:
             if isinstance(atom, ResidualAtom)
             else IndexedAtomicRelation
         )
+        polynomial = self.polynomial(atom.polynomial)
         factors = atom.exponents
         small = tuple(p for p, _ in factors if p <= self.recompute_limit)
         if small:
@@ -258,11 +266,12 @@ class RecordArena:
             )
             retained = self.factors(remaining, budget)
             stored = RecomputedFactors(
-                atom.polynomial, atom.position, small, retained, len(factors)
+                polynomial, atom.position, small, retained, len(factors)
             )
         else:
             stored = self.factors(factors, budget)
         packed_atom = cls(atom, stored)
+        object.__setattr__(packed_atom, "polynomial", polynomial)
         slot = self.next_slot
         packed_row = None
         if row is not None:
@@ -294,9 +303,29 @@ class RecordArena:
     def commit(self, atom, slot):
         if slot != self.next_slot or atom.relation_id in self.slots:
             raise ValueError("stale compact publication")
+        if self.shared_contexts:
+            self.polynomials[atom.polynomial.identity] = atom.polynomial
         self.slots[atom.relation_id] = slot
         self.atoms[slot] = atom
         self.next_slot += 1
+
+    def polynomial(self, polynomial):
+        """Reuse a context only after checking all polynomial fields."""
+        if not self.shared_contexts:
+            return polynomial
+        previous = self.polynomials.get(polynomial.identity)
+        if previous is not None and previous != polynomial:
+            raise ValueError(
+                "polynomial identity has conflicting coefficients"
+            )
+        return polynomial if previous is None else previous
+
+    def allocation_bound(self, counts):
+        """Preflight worst-case new slabs before any encoding allocation."""
+        if self.spill is not None:
+            return 0
+        # Each index/exponent occupies at most two canonical u32 varints.
+        return sum(BLOCK_OVERHEAD + max(BLOCK_BYTES, 10 * n) for n in counts)
 
     def row(self, row, budget):
         from .lazy_relations import LazyCombinedRelation

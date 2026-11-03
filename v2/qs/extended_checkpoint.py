@@ -205,10 +205,80 @@ def restore_store(payload, collector, budget):
         bounded and len(staged) > config.opaque_cache_entries
     ):
         raise ValueError("opaque staging count exceeds its cap")
+    factor_counts = []
     for record in atoms + staged:
         if not isinstance(record, list) or len(record) != 6:
             raise ValueError("invalid expanded atom shape")
-        scratch += 32768 + 512 * factor_count(record[3])
+        count = factor_count(record[3])
+        factor_counts.append(count)
+        if bounded:
+            from .yield_memory import integer_reserve
+
+            coefficients = record[0]
+            if (
+                not isinstance(coefficients, list)
+                or len(coefficients) != 3
+                or any(type(v) is not int for v in coefficients + [record[1]])
+            ):
+                raise ValueError("invalid expanded polynomial shape")
+            # Encoded dictionaries/strings coexist with packed output, but
+            # only one atom's decoded pairs are live during checked packing.
+            scratch += (
+                4096
+                + 64 * count
+                + sum(integer_reserve(v) for v in coefficients + [record[1]])
+            )
+        else:
+            scratch += 32768 + 512 * count
+    if bounded:
+        from .relations import MAX_COMBINED_ATOMS
+
+        largest_decode = max(factor_counts, default=0)
+        for row in rows:
+            if (
+                not isinstance(row, list)
+                or not 1 <= len(row) <= MAX_COMBINED_ATOMS
+                or any(
+                    type(i) is not int or not 0 <= i < len(atoms) for i in row
+                )
+            ):
+                raise ValueError("invalid expanded row handles")
+            scratch += 256 + 64 * len(row)
+            largest_decode = max(
+                largest_decode, sum(factor_counts[i] for i in row)
+            )
+        saved_kernel = payload["kernel"]
+        if not isinstance(saved_kernel, dict) or set(saved_kernel) != {
+            "pivots",
+            "cycles",
+            "unowned",
+        }:
+            raise ValueError("invalid expanded kernel shape")
+        if any(not isinstance(v, list) for v in saved_kernel.values()) or (
+            len(saved_kernel["pivots"]) > len(atoms)
+            or len(saved_kernel["unowned"]) > len(atoms)
+            or len(saved_kernel["cycles"]) > config.cycle_reduction_choices
+        ):
+            raise ValueError("expanded kernel extent exceeds its atom bounds")
+        for pivot in saved_kernel["pivots"]:
+            if (
+                not isinstance(pivot, list)
+                or len(pivot) != 3
+                or not (
+                    isinstance(pivot[1], list)
+                    and isinstance(pivot[2], list)
+                    and len(pivot[1]) <= 3 * MAX_COMBINED_ATOMS
+                    and len(pivot[2]) <= MAX_COMBINED_ATOMS
+                )
+            ):
+                raise ValueError("invalid expanded pivot shape")
+            scratch += 1024 + 256 * (len(pivot[1]) + len(pivot[2]))
+        for cycle in saved_kernel["cycles"]:
+            if not isinstance(cycle, list) or len(cycle) > MAX_COMBINED_ATOMS:
+                raise ValueError("invalid expanded cycle shape")
+            scratch += 256 + 64 * len(cycle)
+        scratch += 64 * len(saved_kernel["unowned"]) + 512 * largest_decode
+    budget.consume(len(atoms) + len(staged) + len(rows) + 1)
     if collector._workspace + scratch > config.memory_limit:
         raise MemoryError("expanded restore coexistence exceeds memory cap")
     spill = None
@@ -228,6 +298,7 @@ def restore_store(payload, collector, budget):
     kernel = type(collector._graph)()
     checked = type(collector._checked)(base, config)
     reserve = collector._workspace
+    slab_bytes = 0
     events = payload["conversion_events"]
     attempts = payload["conversion_attempts"]
     if (
@@ -255,7 +326,7 @@ def restore_store(payload, collector, budget):
     event_index = 0
 
     def convert_prefix():
-        nonlocal event_index, kernel, reserve, rebuilt_rows
+        nonlocal event_index, kernel, reserve, rebuilt_rows, slab_bytes
         from .opaque_conversion import convert
 
         while event_index < len(events) and events[event_index][0] == len(
@@ -273,6 +344,7 @@ def restore_store(payload, collector, budget):
                 _workspace=reserve,
                 _conversion_attempts=event_index,
                 _conversion_events=events[:event_index],
+                _slab_bytes=slab_bytes,
             )
             old_count = len(rebuilt_rows)
             if not convert(
@@ -284,6 +356,7 @@ def restore_store(payload, collector, budget):
                 staged._workspace,
                 staged._rows,
             )
+            slab_bytes = staged._slab_bytes
             for index in range(old_count, len(rebuilt_rows)):
                 expected = sorted(
                     arena.slots[i] for i in rebuilt_rows[index].atom_ids
@@ -326,7 +399,10 @@ def restore_store(payload, collector, budget):
         plan = kernel.plan_atom(atom, handle, config, budget)
         from .extended_collector import atom_reserve
 
-        cost = atom_reserve(atom, config, base, plan)
+        cost = atom_reserve(
+            atom, config, base, plan, arena=arena if bounded else None
+        )
+        row = None
         if plan.cycle is not None:
             leaves = tuple(
                 atom if i == handle else arena.atoms[i] for i in plan.cycle
@@ -342,11 +418,51 @@ def restore_store(payload, collector, budget):
                 raise ValueError(
                     "expanded cycle differs from exact incidence replay"
                 )
-            rebuilt_rows.append(row)
-            cost += 8192 + 512 * sum(len(a.exponents) for a in leaves)
+            if bounded and not config.spill_bytes:
+                from .yield_memory import row_reserve
+
+                cost += row_reserve(leaves, base)
+            else:
+                cost += 8192 + 512 * sum(len(a.exponents) for a in leaves)
         reserve += cost
-        if reserve + scratch > config.memory_limit:
+        slab_bound = (
+            arena.allocation_bound(
+                [len(atom.exponents)]
+                + ([] if row is None else [len(row.exponents)])
+            )
+            if bounded
+            else 0
+        )
+        if reserve + scratch + slab_bound > config.memory_limit:
             raise MemoryError("expanded restored ownership exceeds memory cap")
+        if bounded and not config.spill_bytes:
+            before = arena.allocated_bytes
+            atom, row, _ = arena.plan(atom, row, budget)
+            delta = arena.allocated_bytes - before
+            reserve += delta
+            slab_bytes += delta
+        elif bounded:
+            # Existing cold extents are immutable checkpoint identities. Keep
+            # their references rather than appending duplicate disk records.
+            # Rebuilt row exponents remain resident and use the larger charge
+            # above because old schemas did not save their cold references.
+            polynomial = arena.polynomial(atom.polynomial)
+            if isinstance(atom.exponents, RecomputedFactors):
+                factors = atom.exponents
+                object.__setattr__(
+                    atom,
+                    "_factors",
+                    RecomputedFactors(
+                        polynomial,
+                        atom.position,
+                        factors.small,
+                        factors.retained,
+                        len(factors),
+                    ),
+                )
+            object.__setattr__(atom, "polynomial", polynomial)
+        if row is not None:
+            rebuilt_rows.append(row)
         arena.commit(atom, handle)
         kernel.commit_atom(plan, atom, config.cycle_reduction_choices)
         store[atom.relation_id], sizes[atom.relation_id] = atom, cost
@@ -485,10 +601,11 @@ def restore_store(payload, collector, budget):
     collector._reporting = reporting
     collector._candidate_bound = collector._reporting.bound
     collector._conversion_bytes = (
-        reserve - collector._workspace - sum(sizes.values())
+        reserve - collector._workspace - sum(sizes.values()) - slab_bytes
     )
     collector._workspace = reserve
     if bounded:
+        collector._slab_bytes = slab_bytes
         collector._opaque_staging = staging
     cache = getattr(collector, "_preparation_cache", None)
     if cache is not None:

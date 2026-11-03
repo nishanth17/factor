@@ -2,6 +2,7 @@
 
 import copy
 import json
+import tempfile
 import unittest
 from collections import Counter
 from dataclasses import asdict, replace
@@ -12,6 +13,9 @@ from v2.benchmarks.qs.c9a import extended
 from v2.benchmarks.qs.c9a.configuration import configuration, decode
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs.extended_checkpoint import pack_store, restore_store
+from v2.qs.indexed_relations import FactorRecord
+from v2.qs.residual_relations import ResidualAtom
+from v2.qs.yield_memory import integer_reserve
 from v2.tests.test_c9a_extended import atom_at, policy
 from v2.tests.test_qs_dlp import allowance
 
@@ -33,6 +37,154 @@ def worker(**changes):
 
 
 class BoundedYieldTests(unittest.TestCase):
+    def test_shared_slabs_and_contexts_remain_packed_after_restore(self):
+        engine = worker(recompute_prime_limit=0)
+        first = atom_at(engine, 1)
+        second = atom_at(engine, -21)
+        second = ResidualAtom(
+            replace(second.polynomial),
+            second.position,
+            second.sign,
+            tuple(second.exponents),
+            primes=second.residual_primes,
+        )
+        self.assertIsNot(first.polynomial, second.polynomial)
+
+        engine._admit(first, Counter())
+        first_slab_bytes = engine._slab_bytes
+        engine._admit(second, Counter())
+        self.assertEqual(engine._slab_bytes, first_slab_bytes)
+        self.assertEqual(engine._slab_bytes, engine._arena.allocated_bytes)
+        self.assertEqual(len(engine._arena.polynomials), 1)
+        saved = json.loads(json.dumps(pack_store(engine)))
+        clone = worker(recompute_prime_limit=0)
+        restore_store(saved, clone, clone.budget)
+
+        self.assertEqual(pack_store(clone), saved)
+        self.assertEqual(clone._workspace, engine._workspace)
+        self.assertEqual(clone._slab_bytes, engine._slab_bytes)
+        context = next(iter(clone._atoms.values())).polynomial
+        for atom in clone._atoms.values():
+            self.assertIs(atom.polynomial, context)
+            self.assertIsInstance(atom.exponents, FactorRecord)
+        self.assertIsInstance(clone._rows[0].exponents, FactorRecord)
+        qs.verify_combined(
+            clone._rows[0], clone.factor_base, clone._atoms, budget=allowance()
+        )
+
+    def test_slab_allocation_is_charged_after_unpublished_budget_refusal(self):
+        engine = worker(recompute_prime_limit=0)
+        atom = atom_at(engine, 1)
+        original = engine._arena.plan
+        workspace = engine._workspace
+
+        def stop_after_packing(*args):
+            original(*args)
+            raise BudgetExhaustedError()
+
+        with patch.object(
+            engine._arena, "plan", side_effect=stop_after_packing
+        ):
+            with self.assertRaises(BudgetExhaustedError):
+                engine._admit(atom, Counter())
+        self.assertFalse(engine._atoms)
+        self.assertGreater(engine._slab_bytes, 0)
+        self.assertEqual(engine._workspace, workspace + engine._slab_bytes)
+
+        slabs = engine._slab_bytes
+        engine._admit(atom, Counter())
+        self.assertEqual(len(engine._atoms), 1)
+        self.assertEqual(engine._slab_bytes, slabs)
+
+    def test_memory_refusal_precedes_any_slab_allocation(self):
+        engine = worker()
+        engine.config = replace(
+            engine.config,
+            memory_bytes=(engine._workspace + engine._scratch_bytes + 1),
+        )
+        workspace = engine._workspace
+
+        self.assertEqual(
+            engine._admit(atom_at(engine, 1), Counter()), "memory_limit"
+        )
+        self.assertFalse(engine._atoms)
+        self.assertEqual(engine._arena.allocated_bytes, 0)
+        self.assertEqual(engine._workspace, workspace)
+
+    def test_conversion_rows_are_packed_and_restore_ownership_matches(self):
+        engine = worker()
+        engine._admit(atom_at(engine, 1, opaque=True), Counter())
+        engine._admit(atom_at(engine, -21), Counter())
+        self.assertTrue(engine._conversion_events)
+        self.assertIsInstance(engine._rows[0].exponents, FactorRecord)
+        saved = json.loads(json.dumps(pack_store(engine)))
+        clone = worker()
+        restore_store(saved, clone, clone.budget)
+        self.assertEqual(pack_store(clone), saved)
+        self.assertEqual(clone._workspace, engine._workspace)
+        self.assertEqual(clone._slab_bytes, engine._slab_bytes)
+
+    def test_integer_ownership_remains_finite_and_scales_with_digit_storage(
+        self,
+    ):
+        small = integer_reserve(1)
+        large = integer_reserve(1 << 100000)
+        self.assertGreater(large, 100 * small)
+        self.assertLess(large, 100000)
+
+    def test_reset_releases_slab_and_context_ownership(self):
+        engine = worker(recompute_prime_limit=0)
+        initial = engine._workspace
+        engine._admit(atom_at(engine, 1), Counter())
+        engine._admit(atom_at(engine, -21), Counter())
+        self.assertGreater(engine._slab_bytes, 0)
+
+        engine.set_polynomial(
+            engine.polynomial, engine._roots, retain_relations=False
+        )
+        self.assertFalse(engine._atoms)
+        self.assertFalse(engine._arena.polynomials)
+        self.assertEqual(engine._slab_bytes, 0)
+        self.assertEqual(engine._workspace, initial)
+
+    def test_context_interning_checks_coefficients_after_identity_match(self):
+        engine = worker()
+        engine._admit(atom_at(engine, 1), Counter())
+        polynomial = engine.polynomial
+        forged = qs.Polynomial(
+            polynomial.n,
+            polynomial.multiplier,
+            polynomial.a,
+            polynomial.b + polynomial.a,
+            polynomial.square_coefficient,
+        )
+        object.__setattr__(forged, "identity", polynomial.identity)
+
+        with self.assertRaises(ValueError):
+            engine._arena.polynomial(forged)
+        self.assertEqual(len(engine._arena.polynomials), 1)
+
+    def test_cold_restore_preserves_existing_file_extents(self):
+        with tempfile.TemporaryDirectory() as directory:
+            engine = worker(spill_directory=directory, spill_bytes=2**20)
+            engine._admit(atom_at(engine, 1, opaque=True), Counter())
+            engine._admit(atom_at(engine, -21), Counter())
+            saved = json.loads(json.dumps(pack_store(engine)))
+            used = engine._arena.spill.used
+            clone = worker(spill_directory=directory, spill_bytes=2**20)
+
+            restore_store(saved, clone, clone.budget)
+            self.assertEqual(pack_store(clone), saved)
+            self.assertEqual(clone._arena.spill.used, used)
+            qs.verify_combined(
+                clone._rows[0],
+                clone.factor_base,
+                clone._atoms,
+                budget=allowance(),
+            )
+            clone._arena.spill.close()
+            engine._arena.spill.close()
+
     def test_fifo_staging_does_not_fill_incidence_and_pair_promotion_is_exact(
         self,
     ):

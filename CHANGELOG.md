@@ -5,6 +5,13 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Audit the actual 26,862-atom ownership stop. Charge shared slabs and polynomial
+  contexts once, integer digit storage explicitly, and packing scratch separately.
+  Rebuild compact in-memory records on restore and preserve cold-file identities.
+  The same captured state replays at 367.9MB accounted workspace with matched
+  helper allowances, versus 1,040.1MB previously. This is an ownership correction,
+  not a measured RAM reduction, factoring speedup or default promotion.
+
 - Extend one matched 60-digit comparison to 900 seconds per arm under unchanged
   memory grants. C0 factors the input; C1 stops at accounted memory before a
   matrix solve. Preserve failed timing screens and the remaining storage limit;

@@ -168,11 +168,21 @@ the incoming one. Refusal preserves any completed promotion; closed rows keep
 their original atoms. FIFO eviction can lose future pairing opportunities.
 
 This variant charges graph vectors and lifting by their retained dimensions.
+Packed slabs are charged once when allocated, with conservative object
+overhead; polynomial contexts are shared only after exact field comparison.
+Integer ownership follows digit storage, with separate bounds for atom/row
+metadata and temporary packing. Allocations remain charged after an interrupted
+packing operation, and resetting retained history releases its arena charges.
 Its batch scratch uses exact norm/prime-product bounds, with a high-water
 reservation established before each block. Work, memory and spill grants stay
 binding. Schema 14 checkpoints save FIFO order and independently validate staged
 arithmetic, caps and ownership on restore. Earlier variants/schemas remain
 available. A completed checkpoint divisor survives factor-base reconstruction.
+In-memory restore rebuilds packed factors and shared contexts. Existing cold
+file references are preserved; older checkpoints do not encode cold references
+for derived rows, so that restore path reserves resident row exponents instead.
+Historical schema 14 payloads remain readable; internal ownership is recomputed
+under the current implementation rather than treated as a serialized byte count.
 
 ## Development
 

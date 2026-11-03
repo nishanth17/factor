@@ -125,18 +125,28 @@ def recover(
     return atom, None
 
 
-def atom_reserve(atom, config, base, plan=None):
+def atom_reserve(atom, config, base, plan=None, *, arena=None):
     """Retained ownership; construction scratch is reserved separately."""
     if config.extension_policy == "extended-v2":
-        from .opaque_staging import context_bits
-        from .yield_memory import graph_reserve
+        from .yield_memory import (
+            graph_reserve,
+            integer_reserve,
+            polynomial_reserve,
+        )
 
-        # One worst-case 4 KiB slab per record plus payload/map overhead;
-        # incidence ownership is separate from temporary lifting workspace.
+        context = polynomial_reserve(atom.polynomial)
+        if arena is not None and atom.polynomial.identity in arena.polynomials:
+            arena.polynomial(atom.polynomial)
+            context = 0
+        # Payload objects, IDs, map entries and recomputation descriptors are
+        # separate from shared encoded slabs and incidence vectors. Integer
+        # digits grow by words, not by a fixed number of bytes per source bit.
         return (
-            8192
-            + (0 if config.spill_bytes else 512 * len(atom.exponents))
-            + 32 * context_bits(atom, base)
+            4096
+            + context
+            + integer_reserve(atom.position)
+            + sum(integer_reserve(p) for p in atom.residual_primes)
+            + 64 * len(atom.exponents)
             + (
                 0
                 if plan is None
@@ -167,6 +177,7 @@ def admit_retained(collector, atom, stats):
         collector.budget,
         collector._arena,
     )
+    bounded = config.extension_policy == "extended-v2"
     if atom.relation_id in collector._atoms:
         stats["duplicates"] += 1
         return None
@@ -186,15 +197,21 @@ def admit_retained(collector, atom, stats):
         and len(collector._rows) >= config.relation_limit
     ):
         return "relation_limit"
-    # Covers incidence vectors/lifting up to512 handles, simultaneous packing,
-    # optional recomputation descriptors and a maximum-sized flat lazy node.
-    reserve = atom_reserve(atom, config, collector.factor_base)
-    construction = 512 * len(atom.exponents) if config.spill_bytes else 0
+    reserve = atom_reserve(
+        atom, config, collector.factor_base, arena=arena if bounded else None
+    )
+    slab_bound = (
+        arena.allocation_bound((len(atom.exponents),)) if bounded else 0
+    )
+    construction = (
+        512 * len(atom.exponents) if bounded or config.spill_bytes else 0
+    )
     if (
         collector._workspace
         + collector._scratch_bytes
         + reserve
         + construction
+        + slab_bound
         > config.memory_limit
     ):
         return "memory_limit"
@@ -204,12 +221,19 @@ def admit_retained(collector, atom, stats):
         )
     except MemoryError:
         return "memory_limit"
-    reserve = atom_reserve(atom, config, collector.factor_base, plan)
+    reserve = atom_reserve(
+        atom,
+        config,
+        collector.factor_base,
+        plan,
+        arena=arena if bounded else None,
+    )
     if (
         collector._workspace
         + collector._scratch_bytes
         + reserve
         + construction
+        + slab_bound
         > config.memory_limit
     ):
         return "memory_limit"
@@ -221,9 +245,27 @@ def admit_retained(collector, atom, stats):
             atom if i == arena.next_slot else arena.atoms[i]
             for i in plan.cycle
         )
-        extra = 8192 + 512 * sum(len(a.exponents) for a in leaves)
+        exponent_count = sum(len(a.exponents) for a in leaves)
+        extra = 8192 + 512 * exponent_count
+        row_scratch = 0
+        row_global_scratch = 0
+        if bounded:
+            from .yield_memory import row_reserve
+
+            extra = row_reserve(leaves, collector.factor_base)
+            row_scratch = 512 * exponent_count
+            row_global_scratch = collector._scratch_bytes
+            slab_bound = arena.allocation_bound(
+                (len(atom.exponents), exponent_count)
+            )
         if (
-            collector._workspace + reserve + extra + construction
+            collector._workspace
+            + row_global_scratch
+            + reserve
+            + extra
+            + construction
+            + row_scratch
+            + slab_bound
             > config.memory_limit
         ):
             return "memory_limit"
@@ -234,7 +276,14 @@ def admit_retained(collector, atom, stats):
             raise ArithmeticError("checked unit residual changed")
         row = result.relation
         reserve += extra
-    packed, row, slot = arena.plan(atom, row, budget)
+    if bounded:
+        from .yield_memory import pack_owned
+
+        packed, row, slot = pack_owned(
+            collector, lambda: arena.plan(atom, row, budget)
+        )
+    else:
+        packed, row, slot = arena.plan(atom, row, budget)
     budget.consume(len(atom.exponents) + len(plan.provenance) + 1)
     collector._publication_failed = True
     try:

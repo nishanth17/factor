@@ -576,6 +576,7 @@ class SieveCollector:
                         self.config, factor_base
                     )
                     self._workspace += self.config.opaque_cache_bytes
+                    self._slab_bytes = 0
                 self._workspace += 16 * 2**20 * self.config.recovery_workers
                 if self._workspace > self.config.memory_limit:
                     raise MemoryError("expanded helpers exceed memory_bytes")
@@ -652,6 +653,12 @@ class SieveCollector:
                 if self._arena is not None:
                     # Old public snapshots keep their original arena alive.
                     spill = self._arena.spill
+                    if (
+                        getattr(self.config, "extension_policy", None)
+                        == "extended-v2"
+                    ):
+                        self._workspace -= self._slab_bytes
+                        self._slab_bytes = 0
                     self._arena = RecordArena(
                         self.factor_base,
                         config=self.config,

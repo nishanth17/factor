@@ -1,6 +1,51 @@
 """Shape bounds for bounded-yield ownership and shared recovery scratch."""
 
 
+def integer_reserve(value):
+    """Bound a private integer header, digit array and allocator alignment.
+
+    PyPy stores large integers in machine-word digits, using at least 31 bits
+    per digit. Sixteen bytes per digit and 256 bytes of fixed overhead cover
+    both digit storage and its object/array owners on the supported runtime.
+    This is a conservative logical bound, not a sys.getsizeof/RSS estimate.
+    """
+    return 256 + 16 * ((abs(value).bit_length() + 30) // 31)
+
+
+def polynomial_reserve(polynomial):
+    # The arena owns one immutable context and one index entry per identity.
+    # Shared n/multiplier integers are conservatively counted per context.
+    return 1024 + sum(
+        integer_reserve(getattr(polynomial, name))
+        for name in ("n", "multiplier", "a", "b", "c", "square_coefficient")
+    )
+
+
+def row_reserve(leaves, base):
+    # Packed factors have a separate slab owner. These charges cover the row
+    # object, leaf/identity tuples, residual metadata and materialized scalars.
+    return (
+        4096
+        + 512 * len(leaves)
+        + 128 * sum(len(a.residual_primes) for a in leaves)
+        + 2 * integer_reserve(base.n_prime)
+    )
+
+
+def pack_owned(collector, operation):
+    """Keep allocated slabs charged when a later packing step refuses."""
+    arena = collector._arena
+    before = arena.allocated_bytes
+    try:
+        return operation()
+    finally:
+        # A failed plan may leave the current slab pinned by the allocator.
+        # Keep that allocation charged; do not hide it in an uncommitted atom.
+        delta = arena.allocated_bytes - before
+        collector._workspace += delta
+        collector._slab_bytes += delta
+
+
 def graph_reserve(plan, choices):
     # Token tuples/integers, hash-table slots, lifting handles and per-handle
     # cycle-index growth. Original token objects are shared through XORs.

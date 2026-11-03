@@ -119,6 +119,11 @@ incumbent reporting allowance, proven three-prime admission and the expanded
 mechanisms, while selecting bounded opaque staging and shape-based ownership.
 It requires a new integration freeze; it does not revise the historical full
 reporting receipts or increase their grants.
+The subsequent ownership audit uses one unchanged reproduction and an end-state
+census, followed by exact store replay. Its accounted-byte comparison holds
+helper reservations constant; replay RSS and encoded snapshot size are not
+factoring memory or speed measurements. Current in-memory bounded storage
+charges shared slabs/contexts once and keeps packing/restore scratch explicit.
 
 The primary configuration uses serial recovery and in-memory storage. Threaded
 hints and persistent spill are implemented selectable capabilities; exercising
