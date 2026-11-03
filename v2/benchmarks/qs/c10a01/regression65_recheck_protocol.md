@@ -144,6 +144,25 @@ report is the timing-validity verdict for this follow-up:
 
 Commands:
 
+The returned pair retained a failed native-canary drift check for control,
+despite stable power metadata and passing SIQS sentinels. This is not relaxed
+or replaced by later diagnostics. One additional prospective native-only
+probe (`canary_probe`) admits two fresh processes, each at most 15 wall AND
+CPU seconds with a 5-second margin, plus 10 seconds analysis and 10 seconds
+orchestration: **60 wall AND CPU seconds**, increasing the numerical follow-up
+ceiling to **10460 seconds**. No additional factoring call is admitted.
+Each process compares nine short native samples with nine samples after at
+least three validated wall AND CPU seconds of the same native workload.
+At most 500 warmup calls plus 18 samples, each 200000 iterations, bound work
+to 103600000 iterations; the per-call guard is 110000000 units. Total work
+guard is 221000000 including analysis. This asks whether native warmup is a
+missing requirement; it does not reconstruct the old run or rescue a failed
+comparison. Unresolved native variability remains uncertainty.
+
+```sh
+/opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.c10a01.canary_probe run
+```
+
 ```sh
 /opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.c10a01.regression65_recheck --stage screen check
 /opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.c10a01.regression65_recheck --stage screen run
