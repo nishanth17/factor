@@ -30,6 +30,7 @@ def parser():
     preparation.add_argument("--exclusions", type=Path, required=True)
     frozen = commands.add_parser("freeze")
     frozen.add_argument("--output", type=Path, required=True)
+    frozen.add_argument("--combined", action="store_true")
     selection = commands.add_parser("select-confirmation")
     selection.add_argument("--freeze", type=Path, required=True)
     selection.add_argument("--output", type=Path, required=True)
@@ -48,6 +49,7 @@ def parser():
         command.add_argument("--freeze", type=Path, required=True)
         command.add_argument("--output", type=Path, required=True)
         if name == "run":
+            command.add_argument("--continue-early", action="store_true")
             command.add_argument(
                 "--stage",
                 choices=("A", "B1", "B2", "M", "R", "F", "C"),
@@ -108,10 +110,27 @@ def execute(args):
                 )
             decision = json.loads(args.decision.read_text())
             admit(args.stage, decision, frozen, ledger)
-            receipt(args.output / (args.stage + "-decision.json"), decision)
             selected = [
                 c for c in frozen["plan"]["cells"] if c["stage"] == args.stage
             ]
+            initial = frozen["plan"].get("initial_cells")
+            initial_only = (
+                initial and args.stage == "A" and not args.continue_early
+            )
+            if initial_only:
+                selected = selected[:initial]
+            elif initial and args.stage == "A":
+                if len(outcomes(ledger, "A")) < initial or not decision.get(
+                    "feasibility_review"
+                ):
+                    raise RuntimeError(
+                        "review the four clean initial cells before enlarging A"
+                    )
+            suffix = "-initial" if initial_only else ""
+            receipt(
+                args.output / (args.stage + suffix + "-decision.json"),
+                decision,
+            )
             if not selected:
                 raise ValueError(
                     "no frozen cells; confirmation needs its fresh freeze"
@@ -129,7 +148,9 @@ def execute(args):
                     ),
                 )
         elif args.command == "observer":
-            if len(outcomes(ledger, "A")) < 40:
+            if len(outcomes(ledger, "A")) < frozen["plan"].get(
+                "early_cells", 40
+            ):
                 raise RuntimeError(
                     "clean representative prefixes precede instrumentation"
                 )
@@ -177,7 +198,11 @@ def execute(args):
                     stream=str(args.stream.resolve()),
                     arm=args.arm,
                 ),
-                lambda: replay(args.stream, args.arm),
+                lambda: replay(
+                    args.stream,
+                    args.arm,
+                    combined=frozen["plan"].get("early_cells") == 32,
+                ),
             )
         else:
             results = outcomes(ledger, args.stage)
@@ -212,7 +237,7 @@ def main():
             capture_path=None if capture is None else Path(capture),
         )
     elif args.command == "freeze":
-        result = freeze(args.output)
+        result = freeze(args.output, combined=args.combined)
         result = dict(freeze=result["sha256"], output=str(args.output))
     elif args.command == "freeze-confirmation":
         result = freeze_confirmation(args.selection, args.output)

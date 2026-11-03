@@ -77,20 +77,31 @@ force-add generated results, local journals or external source checkouts.
 
 Preparation delivers code and certified inputs without running A/B/M/R/F/C.
 The literal configurations and actual input multiplier/base bounds live in
-`qs/c9a/configuration.py` and `inputs/c9a/structural.json`. Detailed research,
+`qs/c9a/combined.py` and `inputs/c9a/structural.json`. The former
+`configuration.py` plan retains its historical identity. Detailed research,
 the decision note and a concrete execution handoff are local in `audit/c9a/`.
 
 ```sh
 pypy3 -m v2.benchmarks.qs.c9a --help
-pypy3 -m v2.benchmarks.qs.c9a freeze \
-  --output v2/benchmarks/results/c9a/execution-freeze.json
+pypy3 -m v2.benchmarks.qs.c9a freeze --combined \
+  --output v2/benchmarks/results/c9a/combined-v3-freeze.json
 ```
 
-Freezing requires committed, clean preparation and never starts a campaign.
+Run the queued correctness and committed-only checks before freezing. This
+expanded bundle's executable QA is deferred until C10a finishes. Freezing
+requires committed, clean preparation and never starts a campaign.
 A separately authorized execution uses `run --stage A --freeze PATH
 --output DIRECTORY --decision DECISION.json`, then a recorded usefulness/cost
 decision for each later stage. There is no run-all command or full 80-digit
-cell. `observer` performs nine matched one-block overhead pairs; optional
+cell. In the combined protocol, the first A invocation stops after four clean
+60/65-digit anchor prefixes (410 seconds maximum worker lifecycle total).
+`--continue-early` requires their recorded feasibility review and reuses them
+inside the 32-call 50–80-digit primary screen. B1 can follow the four initial
+calls directly; it does not wait for every larger prefix or a successful
+control. The complete 60/62-digit B1 anchors, broader B2, regression R,
+conditional 75-digit F and disjoint one-band confirmation remain separately
+decided stages. No component-by-component wins are prerequisites.
+`observer` performs nine matched one-block overhead pairs; optional
 `replay` uses a maximum of two validated complete streams and eight slots.
 Captured fixed populations cannot establish additional I/E yield.
 
@@ -101,6 +112,16 @@ censored/lost cells and separates recorder exhaustion from native limits.
 one band before fresh sampling and preserve earlier charges. Fresh required
 inputs are committed before their freeze. These commands do not grant
 permission to execute the preparation-only task's future campaigns.
+
+The combined envelope preserves the incumbent domain and proposes
+`S=max(floor(sqrt(P0)),4B)`, `L=max(L0,16B)`, and `P=max(P0,32B²)`, clipped only
+to the exact ordered endpoint product. SLP has a separate allowance and
+reporting retains the incumbent ceiling. Each cell records resolved literals.
+These settings make the boundaries explicit; no measured optimum is claimed.
+The current mainline/control runtime equivalence is recorded in
+`inputs/c9a/control_equivalence.json`. A later runtime integration needs a new
+matched identity. This QS study is not global portfolio acceptance for uniform
+60/80/100-digit integers; balanced 60/70-digit completion must not regress.
 
 ## Completed A1b review
 

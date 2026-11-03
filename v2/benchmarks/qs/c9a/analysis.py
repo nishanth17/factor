@@ -76,6 +76,12 @@ def summarize(results, *, nominee="C1", samples=4096):
             observed_completion_regression_over_5pp=bool(
                 completion and statistics.mean(completion) < -0.05
             ),
+            balanced_60_70_completion_regression=bool(
+                digits in (60, 70)
+                and not uneven
+                and completion
+                and statistics.mean(completion) < 0
+            ),
         )
         for name, values in (
             ("completion_difference", completion),

@@ -81,6 +81,7 @@ def select(freeze_path, output, band, decision):
             },
             source=frozen["source"],
             parent_output=str(output.resolve()),
+            protocol=frozen["plan"]["identity"],
         )
         receipt(output / "confirmation-selection.json", selection)
         return selection
@@ -91,7 +92,12 @@ def fresh(selection_path, exclusions):
     parent = Path(selection["parent_output"])
     if digest(parent / "ledger.json") != selection["ledger_sha256"]:
         raise ValueError("exposed ledger changed after fresh selection")
-    output = INPUTS / ("confirmation_" + str(selection["band"]))
+    prefix = (
+        "combined_confirmation_"
+        if selection.get("protocol") == "c9a-combined-yield-v3"
+        else "confirmation_"
+    )
+    output = INPUTS / (prefix + str(selection["band"]))
     # Include the entire exposed corpus plus every certified factor. This
     # supplements, rather than replaces, the historical overlap inventory.
     excluded = json.loads(Path(exclusions).read_text())
@@ -144,15 +150,23 @@ def freeze_confirmation(selection_path, output):
     ):
         raise ValueError("confirmation interpreter changed")
     band = selection["band"]
-    corpus_path = INPUTS / ("confirmation_" + str(band)) / "corpus.json"
+    combined = selection.get("protocol") == "c9a-combined-yield-v3"
+    prefix = "combined_confirmation_" if combined else "confirmation_"
+    corpus_path = INPUTS / (prefix + str(band)) / "corpus.json"
     corpus = json.loads(corpus_path.read_text())
     validate(corpus, band=band)
     resolved = json.loads(
         corpus_path.with_name("structural.json").read_text()
     )["resolved"]
+    if combined:
+        from .combined import confirmation_cells as combined_cells
     plan = dict(
-        identity="c9a-full-yield-v2-fresh-" + str(band),
-        cells=confirmation_cells(corpus, resolved, band),
+        identity=("c9a-combined-yield-v3" if combined else "c9a-full-yield-v2")
+        + "-fresh-"
+        + str(band),
+        cells=(combined_cells if combined else confirmation_cells)(
+            corpus, resolved, band
+        ),
         confirmation_band=band,
         parent_selection=selection,
     )

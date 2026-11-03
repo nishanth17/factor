@@ -46,6 +46,9 @@ def filter_matrix(
     budget=None,
     memory_bytes=DEFAULT_MEMORY_BYTES,
     max_rows=MAX_MATRIX_ROWS,
+    merge_policy="reference",
+    light_rows=False,
+    surplus=32,
 ):
     """Remove singleton constraints and optionally eliminate weight two.
 
@@ -55,6 +58,13 @@ def filter_matrix(
     of the surviving matrix lift exactly to kernels of the original matrix.
     Refusal raises before publishing a result; caller input is never mutated.
     """
+    if merge_policy not in ("reference", "fill-v2"):
+        raise ValueError("unknown weight-two merge policy")
+    if type(light_rows) is not bool:
+        raise TypeError("light_rows must be Boolean")
+    utils.require_integer(surplus, "matrix surplus", 0)
+    if surplus > 4096:
+        raise ValueError("matrix surplus exceeds its bound")
     if not isinstance(rows, tuple):
         raise TypeError("rows must be an immutable tuple")
     if len(rows) > storage_limit(max_rows):
@@ -72,6 +82,7 @@ def filter_matrix(
     for row in rows:
         union |= row
     original_columns = union.bit_length()
+    active_columns = union.bit_count()
     columns = original_columns
     compact = columns > 2 * union.bit_count()
     if compact:
@@ -122,6 +133,19 @@ def filter_matrix(
         index: (row, one_bit << index)
         for index, row in enumerate(working_rows)
     }
+    selected_count = len(active)
+    if light_rows and len(active) > active_columns + surplus:
+        budget.consume(
+            len(active) * (1 + len(active).bit_length() + (columns + 63) // 64)
+        )
+        selected_count = max(
+            sum(not row for row, _ in active.values()),
+            active_columns + surplus,
+        )
+        selected = sorted(active, key=lambda i: (active[i][0].bit_count(), i))[
+            :selected_count
+        ]
+        active = {i: active[i] for i in selected}
     zero, singletons, merges, rounds = [], 0, 0, 0
     input_nonzeros = sum(row.bit_count() for row in rows)
     peak_nonzeros = input_nonzeros
@@ -156,7 +180,7 @@ def filter_matrix(
     heapify(pair_columns)
     queued_pairs = set(pair_columns)
     pending_zeros = [index for index, (row, _) in active.items() if not row]
-    nonzeros = input_nonzeros
+    nonzeros = sum(row.bit_count() for row, _ in active.values())
 
     def toggle(index, bits):
         """Update affected columns; queues contain at most one copy each."""
@@ -200,17 +224,41 @@ def filter_matrix(
 
         pair = None
 
+        proposals = []
         while pair_columns:
             column = heappop(pair_columns)
             queued_pairs.remove(column)
             mask = incidence.get(column, zero_bit)
             if mask.bit_count() == 2:
                 first_bit = mask & -mask
-                pair = (
+                candidate = (
                     first_bit.bit_length() - 1,
                     (mask ^ first_bit).bit_length() - 1,
                 )
-                break
+                if merge_policy == "reference":
+                    pair = candidate
+                    break
+                budget.consume(3 * word_cost)
+                left, right = (active[i][0] for i in candidate)
+                weight = (left ^ right).bit_count()
+                proposals.append(
+                    (
+                        weight - left.bit_count() - right.bit_count(),
+                        weight,
+                        column,
+                        candidate,
+                    )
+                )
+                if len(proposals) == 8:
+                    break
+
+        if proposals:
+            chosen = min(proposals)
+            pair = chosen[3]
+            for proposal in proposals:
+                if proposal is not chosen:
+                    heappush(pair_columns, proposal[2])
+                    queued_pairs.add(proposal[2])
 
         if pair is None:
             break
@@ -249,6 +297,10 @@ def filter_matrix(
         "zero_dependencies": len(zero),
         "rounds": rounds,
     }
+    if merge_policy != "reference" or light_rows:
+        stats.update(
+            input_active_columns=active_columns, selected_rows=selected_count
+        )
     return FilteredMatrix(
         rows,
         output_rows,

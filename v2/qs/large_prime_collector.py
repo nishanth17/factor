@@ -163,9 +163,38 @@ def admit_large_relation(collector, atom, stats):
     ):
         return "memory_limit"
     try:
-        plan = graph.plan(
-            *endpoints, atom.relation_id, config.max_partials, budget
-        )
+        direct = None
+        if (
+            shortcuts is not None
+            and shortcuts.strategy == "short-v2"
+            and shortcuts.edge_visits
+        ):
+            budget.consume(1)
+            direct = shortcuts.neighbors.get(endpoints[0], {}).get(
+                endpoints[1]
+            )
+        if direct or (
+            shortcuts is not None
+            and shortcuts.strategy == "short-v2"
+            and endpoints[0] == endpoints[1]
+        ):
+            from .large_primes import GraphPlan
+
+            path = (
+                ()
+                if endpoints[0] == endpoints[1]
+                else (shortcuts._representative(direct, budget),)
+            )
+            # This edge already closes a cycle. Avoid walking the original
+            # forest merely to rediscover a direct prior edge or square loop.
+            plan = GraphPlan(cycle=path)
+            stats["direct_cycle_shortcuts"] = (
+                stats.get("direct_cycle_shortcuts", 0) + 1
+            )
+        else:
+            plan = graph.plan(
+                *endpoints, atom.relation_id, config.max_partials, budget
+            )
     except MemoryError:
         return (
             "atom_limit"
@@ -237,15 +266,27 @@ def admit_large_relation(collector, atom, stats):
         collector._scratch_peak_bytes = max(
             collector._scratch_peak_bytes, collector._scratch_bytes + scratch
         )
-        combination = combine_relations(
-            atoms,
-            collector.factor_base,
-            budget=budget,
-            memory_bytes=config.memory_limit,
+        combination = (
+            collector._checked.combine(atoms, budget, config.memory_limit)
+            if collector._checked is not None
+            and config.recovery_policy == "checked-v2"
+            else combine_relations(
+                atoms,
+                collector.factor_base,
+                budget=budget,
+                memory_bytes=config.memory_limit,
+            )
         )
         if combination.divisor is not None:
             raise ArithmeticError("previously checked unit residual changed")
-    if getattr(config, "record_policy", "objects") == "packed-v1":
+    compact_slot = None
+    if collector._arena is not None:
+        atom, row, compact_slot = collector._arena.plan(
+            atom, None if combination is None else combination.relation, budget
+        )
+        if combination is not None:
+            combination = replace(combination, relation=row)
+    elif getattr(config, "record_policy", "objects") == "packed-v1":
         from .packed_relations import pack_relation
 
         atom = pack_relation(atom, budget)
@@ -263,15 +304,28 @@ def admit_large_relation(collector, atom, stats):
     # masquerade as a resumable resource refusal or publish a partial row.
     collector._publication_failed = True
     try:
+        evicted_atoms = tuple(collector._atoms[i] for i in plan.evicted)
         graph.commit(plan)
         if shortcuts is not None:
             for identity in plan.evicted:
                 shortcuts.remove(identity)
-            shortcuts.add(atom.relation_id, *endpoints)
+            shortcuts.add(
+                atom.relation_id, *endpoints, weight=(len(atom.exponents),)
+            )
         for identity in plan.evicted:
             del collector._atoms[identity]
             del collector._atom_bytes[identity]
         collector._atoms[atom.relation_id] = atom
+        if collector._checked is not None:
+            from .yield_collector import publish_auxiliary
+
+            publish_auxiliary(
+                collector,
+                atom,
+                None if combination is None else combination.relation,
+                compact_slot,
+                evicted_atoms,
+            )
         collector._atom_bytes[atom.relation_id] = reserve
         collector._workspace += reserve - released + graph_delta
         stats["admitted_atoms"] += 1

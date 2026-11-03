@@ -5,6 +5,14 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Extend the opt-in combined challenger with occupied-column feedback, private
+  checked-proof reuse, exact early rejection, bounded cofactor splitting and
+  batch hints, direct/bidirectional cycle shortcuts, canonical congruences,
+  base-index slabs and integer provenance handles. Add fill-aware filtering,
+  reversible lighter-row attempts, joint extraction and schema-12 restore.
+- Prepare a separately identified two-arm protocol with a four-call clean
+  feasibility checkpoint. Expanded correctness checks are written but their
+  execution is deferred until the shared quiet window; no new campaign ran.
 - Add independent opt-ins for useful-row preparation targets, asymmetric
   proven large-prime endpoints, shorter exact cycles, immediate equal-parity
   dependencies and immutable packed exponent records. Preserve separate

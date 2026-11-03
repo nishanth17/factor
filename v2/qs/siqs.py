@@ -28,6 +28,7 @@ from .polynomial import (
     qs_polynomial,
 )
 from .sieve_collector import (
+    CombinedYieldSieveConfig,
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
@@ -87,6 +88,13 @@ class SIQSConfig:
                 object.__setattr__(self, "checkpoint_bytes", 1024 * 1024)
         if self.backend not in ("python-int", "gmpy2-mpz"):
             raise ValueError("unknown arithmetic backend")
+        if (
+            isinstance(self.collector, CombinedYieldSieveConfig)
+            and self.backend != "python-int"
+        ):
+            raise ValueError(
+                "combined useful-yield policies require native integers"
+            )
         if self.solve_policy not in ("window", "collection"):
             raise ValueError("unknown SIQS solve policy")
 
@@ -560,6 +568,12 @@ class SIQSJob:
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
                 self.engine.zero_checked_count = 0
+                if self.engine._useful_target is not None:
+                    self.engine._useful_target = type(
+                        self.engine._useful_target
+                    )()
+                self.engine._full_view = self.engine._retry_full_view = False
+                self.engine._selected_subset = False
                 if self.engine._pair_index is not None:
                     self.engine._pair_index.clear()
 

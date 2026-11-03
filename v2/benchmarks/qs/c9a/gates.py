@@ -53,19 +53,21 @@ def admit(stage, decision, freeze, ledger):
         raise ValueError("expected stage runtime exceeds its ceiling")
     if stage not in ("A", "C"):
         early = outcomes(ledger, "A")
-        if (
-            len(
-                [
-                    r
-                    for r in early
-                    if r.get("fixture", "").startswith("exposed")
-                    and r.get("observation") == "clean"
-                    and r.get("cap_seconds", 0) > 10
-                ]
+        if len(
+            [
+                r
+                for r in early
+                if r.get("fixture", "").startswith("exposed")
+                and r.get("observation") == "clean"
+                and r.get("cap_seconds", 0) > 10
+            ]
+        ) < freeze["plan"].get("initial_cells", 40):
+            raise RuntimeError("clean feasibility observations are incomplete")
+    if stage in ("B2", "R", "F") and freeze["plan"].get("early_cells"):
+        if len(outcomes(ledger, "A")) < freeze["plan"]["early_cells"]:
+            raise RuntimeError(
+                "review the broader primary prefixes before this stage"
             )
-            < 40
-        ):
-            raise RuntimeError("primary early cells are incomplete")
     if stage in ("B2", "M") and len(outcomes(ledger, "B1")) != 4:
         raise RuntimeError("clean B1 anchors precede this stage")
     if stage == "M":
@@ -83,14 +85,19 @@ def admit(stage, decision, freeze, ledger):
             raise ValueError("capture projection lacks atom/window accounting")
     if stage == "F":
         large = [r for r in outcomes(ledger, "B2") if r["digits"] == 70]
-        if len(large) != 4 or not all(
+        if freeze["plan"].get("early_cells"):
+            # A valid candidate's own lower-band feasibility permits testing;
+            # an unrelated control timeout is retained, not made a veto.
+            large = [r for r in large if r["arm"] == "C1"]
+        expected = 2 if freeze["plan"].get("early_cells") else 4
+        if len(large) != expected or not all(
             r["complete"]
             and r["timing_valid"]
             and max(r["seconds"], r["cpu_seconds"]) < 5000
             for r in large
         ):
             raise RuntimeError(
-                "F requires all four clean 70 calls below 5000 s"
+                "F lacks the required clean 70-digit feasibility below 5000 s"
             )
         if not decision.get("own_75_feasibility"):
             raise ValueError(

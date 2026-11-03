@@ -212,8 +212,22 @@ class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        if self.yield_policy != "yield-v1":
+        if self.yield_policy not in ("yield-v1", "yield-v2"):
             raise ValueError("unknown useful-yield policy")
+        if self.yield_policy == "yield-v1" and any(
+            getattr(self, name).endswith("v2")
+            for name in (
+                "preparation_policy",
+                "cycle_policy",
+                "duplicate_policy",
+                "record_policy",
+            )
+        ):
+            raise ValueError("combined policies require yield-v2")
+        if self.yield_policy == "yield-v2" and not isinstance(
+            self, CombinedYieldSieveConfig
+        ):
+            raise ValueError("yield-v2 requires the combined configuration")
         if self.small_prime_bound is not None:
             utils.require_integer(
                 self.small_prime_bound, "small_prime_bound", 2
@@ -221,10 +235,10 @@ class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
             if self.small_prime_bound > self.large_prime_bound:
                 raise ValueError("smaller endpoint bound exceeds larger bound")
         for name, choices in (
-            ("preparation_policy", ("fixed", "target-v1")),
-            ("cycle_policy", ("forest", "short-v1")),
-            ("duplicate_policy", ("identity", "pair-v1")),
-            ("record_policy", ("objects", "packed-v1")),
+            ("preparation_policy", ("fixed", "target-v1", "active-v2")),
+            ("cycle_policy", ("forest", "short-v1", "short-v2")),
+            ("duplicate_policy", ("identity", "pair-v1", "congruence-v2")),
+            ("record_policy", ("objects", "packed-v1", "indexed-v2")),
         ):
             if getattr(self, name) not in choices:
                 raise ValueError("unknown " + name)
@@ -234,6 +248,48 @@ class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
         ):
             utils.require_integer(getattr(self, name), name, 0)
             if getattr(self, name) > maximum:
+                raise ValueError(name + " exceeds its finite cap")
+
+
+@dataclass(frozen=True)
+class CombinedYieldSieveConfig(YieldSieveConfig):
+    """Versioned combined challenger; every auxiliary path has a finite cap."""
+
+    yield_policy: str = field(default="yield-v2", kw_only=True)
+    preparation_policy: str = field(default="active-v2", kw_only=True)
+    cycle_policy: str = field(default="short-v2", kw_only=True)
+    duplicate_policy: str = field(default="congruence-v2", kw_only=True)
+    record_policy: str = field(default="indexed-v2", kw_only=True)
+    recovery_policy: str = field(default="checked-v2", kw_only=True)
+    split_policy: str = field(default="portfolio-v2", kw_only=True)
+    batch_policy: str = field(default="shared-v2", kw_only=True)
+    batch_size: int = field(default=64, kw_only=True)
+    checked_bytes: int = field(default=8 * 2**20, kw_only=True)
+    filter_policy: str = field(default="light-v2", kw_only=True)
+    extraction_policy: str = field(default="joint-v2", kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.yield_policy != "yield-v2":
+            raise ValueError("combined policies require yield-v2")
+        for name, choices in (
+            ("recovery_policy", ("reference", "checked-v2")),
+            (
+                "split_policy",
+                ("reference", "rho-v2", "portfolio-v2", "ecm-v2"),
+            ),
+            ("batch_policy", ("off", "known-v2", "shared-v2")),
+            ("filter_policy", ("reference", "fill-v2", "light-v2")),
+            ("extraction_policy", ("reference", "joint-v2")),
+        ):
+            if getattr(self, name) not in choices:
+                raise ValueError("unknown " + name)
+        for name, low, high in (
+            ("batch_size", 2, 256),
+            ("checked_bytes", 0, 64 * 2**20),
+        ):
+            utils.require_integer(getattr(self, name), name, low)
+            if getattr(self, name) > high:
                 raise ValueError(name + " exceeds its finite cap")
 
 
@@ -278,6 +334,13 @@ class SieveCollector:
     ):
         """Reserve metadata/buffers and validate A's factor-base support."""
         self.config = config if config is not None else SieveConfig()
+        if (
+            isinstance(self.config, CombinedYieldSieveConfig)
+            and type(factor_base.n) is not int
+        ):
+            raise ValueError(
+                "combined useful-yield policies require native integers"
+            )
         double = isinstance(self.config, DoubleLargeSieveConfig)
         if double and type(self) is not SieveCollector:
             raise ValueError("DLP supports the serial SieveCollector only")
@@ -330,11 +393,15 @@ class SieveCollector:
         )
         if double:
             self._workspace += self._graph_reserve(0)
-        if getattr(self.config, "cycle_policy", "forest") == "short-v1":
+        if getattr(self.config, "cycle_policy", "forest") in (
+            "short-v1",
+            "short-v2",
+        ):
             from .short_cycles import ShortCycleIndex
 
             self._short_cycles = ShortCycleIndex(
-                self.config.cycle_search_edges
+                self.config.cycle_search_edges,
+                strategy=self.config.cycle_policy,
             )
             self._workspace += self._short_cycles.scratch_reserve
             self._workspace += self._short_cycles.edge_reserve(0)
@@ -419,6 +486,46 @@ class SieveCollector:
         self._atoms, self._pending = {}, {}
         self._full, self._combined, self._rows = [], [], []
         self._atom_bytes = {}
+        self._checked = self._arena = self._endpoints = None
+        if isinstance(self.config, CombinedYieldSieveConfig):
+            from .cofactor_policy import KnownEndpoints
+            from .indexed_relations import RecordArena
+            from .yield_collector import divide_yield_residual
+            from .yield_support import CheckedStore, residual_floor
+
+            self._workspace += self.config.checked_bytes + 65536
+            if self.config.duplicate_policy == "congruence-v2":
+                self._workspace += self.config.duplicate_bytes // 2
+            # Lookahead norms, exponents and product/remainder temporaries
+            # coexist with scoring buffers and retained graph/row ownership.
+            self._batch_reserve = (
+                self.config.batch_size
+                * (
+                    8192
+                    + 256 * len(factor_base.entries)
+                    + 16 * (MAX_COEFFICIENT_BITS + 2 * MAX_POSITION_BITS + 4)
+                )
+                if self.config.batch_policy == "shared-v2"
+                else 0
+            )
+            self._workspace += self._batch_reserve
+            if self._workspace > self.config.memory_limit:
+                raise MemoryError("combined-yield helpers exceed memory_bytes")
+            self._checked = CheckedStore(factor_base, self.config)
+            self._endpoints = KnownEndpoints()
+            if self.config.record_policy == "indexed-v2":
+                self._arena = RecordArena(factor_base)
+            self._divide_double = divide_yield_residual
+            self._residual_floor = (
+                residual_floor(
+                    factor_base,
+                    self.budget,
+                    self.config.memory_limit - self._workspace,
+                )
+                if self.config.recovery_policy == "checked-v2"
+                else 2
+            )
+            self._incoming_key = None
 
     @property
     def matrix_relations(self):
@@ -464,6 +571,13 @@ class SieveCollector:
             getattr(self, "_switch_peak", 0), self._workspace + extra
         )
         if not retain_relations:
+            if self._checked is not None:
+                from .indexed_relations import RecordArena
+
+                self._checked.clear()
+                if self._arena is not None:
+                    # Old public snapshots keep their original arena alive.
+                    self._arena = RecordArena(self.factor_base)
             cache = getattr(self, "_preparation_cache", None)
             if cache is not None:
                 cache.clear()
@@ -472,6 +586,7 @@ class SieveCollector:
                 self._workspace -= 2048 * len(self._short_cycles.edges)
                 self._short_cycles.edges.clear()
                 self._short_cycles.neighbors.clear()
+                self._short_cycles.weights.clear()
             if self._graph is not None:
                 self._workspace -= self._graph_reserve(
                     len(self._graph.edges)
@@ -1111,6 +1226,11 @@ class SieveCollector:
         untouched, so the same position can be retried with a new Budget.
         """
         require_published(self)
+        if self._checked is not None:
+            from .yield_collector import prepare_admission
+
+            if not prepare_admission(self, atom, stats):
+                return None
         if self._graph is not None and atom.residual_product != 1:
             return self._admit_double(self, atom, stats)
         if atom.relation_id in self._atoms:
@@ -1186,7 +1306,10 @@ class SieveCollector:
                     "previously checked unit residual changed"
                 )
 
-        if getattr(self.config, "record_policy", "objects") == "packed-v1":
+        compact_slot = None
+        if self._arena is not None:
+            atom, _, compact_slot = self._arena.plan(atom, None, self.budget)
+        elif getattr(self.config, "record_policy", "objects") == "packed-v1":
             from .packed_relations import pack_relation
 
             atom = pack_relation(atom, self.budget)
@@ -1195,6 +1318,7 @@ class SieveCollector:
         # row (or legacy SLP match) as a resumable memory-limit result.
         self._publication_failed = True
         try:
+            evicted_atoms = (self._atoms[evicted],) if evicted else ()
             if evicted:
                 del self._pending[self._atoms[evicted].residual]
                 del self._atoms[evicted]
@@ -1202,6 +1326,12 @@ class SieveCollector:
                 stats["evictions"] += 1
 
             self._atoms[atom.relation_id] = atom
+            if self._checked is not None:
+                from .yield_collector import publish_auxiliary
+
+                publish_auxiliary(
+                    self, atom, None, compact_slot, evicted_atoms
+                )
             self._atom_bytes[atom.relation_id] = reserve
             self._workspace += reserve - released
             stats["admitted_atoms"] += 1
@@ -1267,6 +1397,14 @@ class SieveCollector:
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
         kernel_before = kernels.counters(self)
+        batcher = None
+        if (
+            self._checked is not None
+            and self.config.batch_policy == "shared-v2"
+        ):
+            from .cofactor_policy import CofactorBatch
+
+            batcher = CofactorBatch(self.config.batch_size)
 
         try:
             if (
@@ -1286,6 +1424,9 @@ class SieveCollector:
             while position < hi:
                 block_lo = position
                 block_hi = min(hi, block_lo + self.config.block_width)
+                if batcher is not None:
+                    batcher.records.clear()
+                    batcher.hints.clear()
                 threshold = self._sieve(block_lo, block_hi, stats)
                 if self.config.division == "resieve":
                     if not self._resieve(block_lo, block_hi, threshold, stats):
@@ -1330,7 +1471,18 @@ class SieveCollector:
                         # Candidate division reserves the position unit and
                         # recovery work in one atomic check. The former two
                         # adjacent polls did no intervening published work.
-                        atom, divisor = self._divide(position, offset, stats)
+                        atom, divisor = (
+                            self._divide(position, offset, stats)
+                            if batcher is None
+                            else batcher.recover(
+                                self,
+                                position,
+                                offset,
+                                block_hi,
+                                threshold,
+                                stats,
+                            )
+                        )
                         if divisor is not None:
                             position += 1
                             stats["scanned"] += 1

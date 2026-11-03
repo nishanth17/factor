@@ -42,6 +42,7 @@ from .relations import (
     verify_combined,
 )
 from .sieve_collector import (
+    CombinedYieldSieveConfig,
     DoubleLargeSieveConfig,
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
@@ -57,6 +58,7 @@ __all__ = [
     "DoubleLargeSieveConfig",
     "GrowingDoubleLargeSieveConfig",
     "YieldSieveConfig",
+    "CombinedYieldSieveConfig",
     "CollectionResult",
     "CombinationResult",
     "CombinedRelation",

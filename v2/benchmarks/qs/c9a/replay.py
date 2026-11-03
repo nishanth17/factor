@@ -11,7 +11,15 @@ from .configuration import ARMS, configuration, decode
 from .journal import records
 
 
-def replay(path, arm, *, seconds=180, work_limit=10**13, require_mature=True):
+def replay(
+    path,
+    arm,
+    *,
+    seconds=180,
+    work_limit=10**13,
+    require_mature=True,
+    combined=False,
+):
     """Replay G/D/S/P on a fixed admission population, not an I/E experiment.
 
     Validate the entire stream before publication. Read it again while
@@ -40,28 +48,71 @@ def replay(path, arm, *, seconds=180, work_limit=10**13, require_mature=True):
         )
     cell = header["cell"]
     source = decode(cell["configuration"], qs)
-    candidate = configuration(
-        cell["digits"], arm, admission_base_bound=cell["resolved"]["bound"]
-    )
+    if combined:
+        from .combined import configuration as combined_configuration
+
+        candidate = combined_configuration(
+            cell["digits"],
+            "C0" if arm == "C0" else "C1",
+            admission_base_bound=cell["resolved"]["bound"],
+        )
+        changes = {
+            "noP": dict(preparation_policy="fixed"),
+            "noG": dict(cycle_policy="forest"),
+            "noD": dict(duplicate_policy="identity"),
+            "noS": dict(record_policy="objects"),
+        }
+        candidate = replace(
+            candidate,
+            collector=replace(candidate.collector, **changes.get(arm, {})),
+        )
+    else:
+        candidate = configuration(
+            cell["digits"], arm, admission_base_bound=cell["resolved"]["bound"]
+        )
     # Admission is already fixed by the source stream. Preserve its exact
     # original bounds for independent verification; change only replayable
     # mechanisms. This avoids presenting missing I/E atoms as an ablation.
-    collector = qs.YieldSieveConfig(
-        **{
-            **asdict(source.collector),
-            **{
-                key: getattr(candidate.collector, key, default)
-                for key, default in (
-                    ("preparation_policy", "fixed"),
-                    ("cycle_policy", "forest"),
-                    ("cycle_search_edges", 4096),
-                    ("duplicate_policy", "identity"),
-                    ("duplicate_bytes", 16 * 2**20),
-                    ("record_policy", "objects"),
-                )
-            },
+    cls = (
+        qs.CombinedYieldSieveConfig
+        if combined and arm != "C0"
+        else qs.YieldSieveConfig
+    )
+    # Encoded admission bounds belong to the source stream. Only the chosen
+    # structural policies change; recovery cannot invent absent input atoms.
+    values = {
+        key: value
+        for key, value in asdict(source.collector).items()
+        if key in cls.__dataclass_fields__
+    }
+    values.update(
+        {
+            key: getattr(candidate.collector, key, default)
+            for key, default in (
+                ("preparation_policy", "fixed"),
+                ("cycle_policy", "forest"),
+                ("cycle_search_edges", 4096),
+                ("duplicate_policy", "identity"),
+                ("duplicate_bytes", 16 * 2**20),
+                ("record_policy", "objects"),
+            )
         }
     )
+    values["yield_policy"] = (
+        "yield-v2" if cls is qs.CombinedYieldSieveConfig else "yield-v1"
+    )
+    if cls is qs.CombinedYieldSieveConfig:
+        for key in (
+            "recovery_policy",
+            "split_policy",
+            "batch_policy",
+            "batch_size",
+            "checked_bytes",
+            "filter_policy",
+            "extraction_policy",
+        ):
+            values[key] = getattr(candidate.collector, key)
+    collector = cls(**values)
     built = qs.build_factor_base(
         cell["n"],
         bound=cell["resolved"]["bound"],
@@ -123,6 +174,13 @@ def replay(path, arm, *, seconds=180, work_limit=10**13, require_mature=True):
                     job.zero_checked_count = 0
                     if job._pair_index is not None:
                         job._pair_index.clear()
+                    if job._useful_target is not None:
+                        from ....qs.yield_support import UsefulTarget
+
+                        job._useful_target = UsefulTarget()
+                    job._full_view = job._retry_full_view = (
+                        job._selected_subset
+                    ) = False
         elif kind == "atom_begin":
             if job is None:
                 raise ValueError("atom precedes polynomial activation")

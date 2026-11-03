@@ -157,7 +157,7 @@ def atom_record(atom):
         ],
         position=int(atom.position),
         sign=atom.sign,
-        exponents=atom.exponents,
+        exponents=tuple(atom.exponents),
         residual=int(atom.residual),
         large_primes=atom.large_primes,
     )

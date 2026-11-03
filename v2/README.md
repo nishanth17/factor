@@ -58,12 +58,45 @@ configurations retain their existing policies.
 | `duplicate_policy="pair-v1"` | Check equal-parity two-row dependencies before ordinary preparation. Keep both rows; bound representatives by `duplicate_bytes` (default 16 MiB, maximum 64 MiB). |
 | `record_policy="packed-v1"` | Retain immutable packed exponent bytes with exact original identities, provenance and checked interchange. Existing conservative storage reservations remain in force. |
 
-All new fields default to disabled policies. Useful-yield checkpoints use
+These `YieldSieveConfig` fields default to disabled policies. Its checkpoints use
 schema 11 and bind the complete configuration; legacy checkpoints remain
 readable. Restoring cannot silently change these policies. Packed records can
 reduce payload storage but add decoding work; no performance or capacity gain
 is established. The [C9a runner](benchmarks/qs/c9a/) prepares matched explicit
 experiments without changing production routing.
+
+`qs.CombinedYieldSieveConfig` is the separate native-integer challenger. Selecting
+this class enables the following combined policies; ordinary configurations
+and the schema-11 policies above retain their defaults.
+
+| Field / selected value | Behavior and reference alternative |
+| --- | --- |
+| `preparation_policy="active-v2"` | Count occupied columns, share checked row metadata and derive bounded top-ups from the filtered deficit. `fixed` retains ordinary cadence. |
+| `recovery_policy="checked-v2"` | Exact impossible-domain rejection and bounded private atom/endpoint proofs. Full payload and provenance comparisons govern reuse; public checks and checkpoint admission remain independent. `reference` repeats arithmetic checks. |
+| `split_policy="portfolio-v2"` | Bounded SQUFOF followed, only on failure, by two bounded Brent walks. Alternatives are `reference`, `rho-v2`, and `ecm-v2` (one finite existing ECM fallback). All successful endpoints are proven and reconstructed. |
+| `batch_policy="shared-v2"` | Batch GCD hints and a bounded certified-endpoint product. At most `batch_size=64` selected positions are looked ahead within a block. Alternatives are `known-v2` and `off`. Admissions remain in physical order. |
+| `cycle_policy="short-v2"` | Direct-edge and minimal-path early exits, bounded two-frontier search and deterministic payload tie-breaking. `forest` retains the original path. |
+| `duplicate_policy="congruence-v2"` | Exact unit-normalized congruence deduplication plus checked equal-parity pairs. Distinct square roots are preserved. `identity` disables both auxiliary indices. |
+| `record_policy="indexed-v2"` | Base-index delta encoding, implicit exponent one, append-only slabs and integer provenance handles. `objects` retains ordinary records. |
+| `filter_policy="light-v2"` | Fill-aware weight-two ordering and a reversible lighter-row view. Unsuccessful subset extraction retries the complete retained set. `fill-v2` uses all rows; `reference` keeps the original ordering. |
+| `extraction_policy="joint-v2"` | Joint exponent products with bounded modular accumulation. `reference` uses independent prime powers. |
+
+The proof cache defaults to `checked_bytes=8 MiB` (maximum 64 MiB); the two
+duplicate indices share `duplicate_bytes`. Batch sizes range from 2 through
+256. These are finite experimental settings, not measured optima. Every helper
+and its construction scratch is reserved within the existing owned allowance.
+Compact `exponents` expose an immutable sequence with cheap `len` and iteration;
+use `tuple(row.exponents)` when a concrete tuple is needed. External relation IDs
+remain stable. Export through the checked checkpoint interface instead of
+serializing implementation-specific dataclass fields directly.
+
+Combined checkpoints use schema 12, bind all policy fields, and independently
+rebuild records, graph ownership, endpoint proofs and solver progress. Batch
+lookahead is disposable scratch: interruption preserves the first uncommitted
+position and charged work; resume may repeat discarded lookahead. Combined
+arithmetic is still materialized eagerly; the representation boundary does not
+claim a lazy provenance solver. Correctness execution for this expanded bundle
+is queued for a quiet machine window; no performance acceptance is implied.
 
 ## Optional GMP backend
 

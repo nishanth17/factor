@@ -17,6 +17,9 @@ includes certified inputs, structural multiplier/base resolution, immutable
 control and bounded runners. No new performance calls or complete-run captures
 have executed; no speedup, larger-band feasibility or adoption is claimed.
 See [runner commands](README.md#c9a-preparation-and-staged-execution).
+The expanded combined bundle has source-level oracles and a revised two-arm
+protocol. Its new tests and committed-only verification have not executed;
+they are explicitly queued until C10a releases the shared quiet window.
 
 ### A1b existing fixed-score review
 

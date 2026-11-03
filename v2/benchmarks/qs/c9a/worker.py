@@ -65,7 +65,20 @@ def warm_once(qs, budgets, template, deadline):
         values["small_prime_bound"] = (
             1000 if selected["small_prime_bound"] else None
         )
-        collector = qs.YieldSieveConfig(**values)
+        if selected["yield_policy"] == "yield-v2":
+            for key in (
+                "recovery_policy",
+                "split_policy",
+                "batch_policy",
+                "batch_size",
+                "checked_bytes",
+                "filter_policy",
+                "extraction_policy",
+            ):
+                values[key] = selected[key]
+            collector = qs.CombinedYieldSieveConfig(**values)
+        else:
+            collector = qs.YieldSieveConfig(**values)
     else:
         collector = qs.GrowingDoubleLargeSieveConfig(**values)
     config = qs.SIQSConfig(
@@ -106,7 +119,18 @@ def warm_once(qs, budgets, template, deadline):
         canonical(
             dict(
                 divisor=result.divisor,
-                atoms=[asdict(a) for a in atoms],
+                atoms=[
+                    dict(
+                        polynomial=asdict(a.polynomial),
+                        position=a.position,
+                        sign=a.sign,
+                        exponents=tuple(a.exponents),
+                        residual=a.residual,
+                        large_primes=a.large_primes,
+                        relation_id=a.relation_id,
+                    )
+                    for a in atoms
+                ],
                 position=result.next_position,
             )
         )

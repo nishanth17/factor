@@ -20,7 +20,14 @@ equal-parity dependencies and packed records. Correctness preparation and a
 numerical staged handoff are separate from performance acceptance. C9a remains
 Open; no campaign or default change is included. Local research and the
 execution handoff start at `v2/audit/c9a/README.md`. Any later C10a integration
-requires a new matched source identity for both arms.
+requires a new matched source identity for both arms. The expanded
+`CombinedYieldSieveConfig` bundle and `c9a-combined-yield-v3` protocol include
+bounded cofactor recovery, checked reuse, compact indexed records and
+filter/extraction refinements. Its executable correctness checks remain pending
+the shared quiet window; preparation stops before those checks and all
+feasibility/performance execution. The reviewed mainline
+`99a2943aa9ba681091184007d6dd8aa7171969a2` changes documentation only from the
+immutable control's base; its runtime sources are identical.
 
 ## Current automatic defaults
 

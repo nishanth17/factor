@@ -109,14 +109,25 @@ def require_clean():
         raise RuntimeError("commit preparation before freezing execution")
 
 
-def freeze(output):
+def freeze(output, *, combined=False):
     """Freeze an execution identity from committed preparation."""
     require_clean()
     corpus = json.loads((INPUTS / "corpus.json").read_text())
     validate(corpus)
     resolved = json.loads((INPUTS / "structural.json").read_text())["resolved"]
-    plan = build(corpus, resolved)
-    validate_plan(plan)
+    if combined:
+        from .combined import (
+            build as build_combined,
+        )
+        from .combined import (
+            validate as validate_combined,
+        )
+
+        plan = build_combined(corpus, resolved)
+        validate_combined(plan)
+    else:
+        plan = build(corpus, resolved)
+        validate_plan(plan)
     data = dict(
         plan=plan,
         limits=limits(plan),

@@ -46,11 +46,12 @@ class _VerificationCache:
     A cache entry is published only after full exact verification succeeds.
     """
 
-    def __init__(self, memory_bytes):
+    def __init__(self, memory_bytes, *, checked=None):
         self.memory_bytes = memory_bytes
         self.records = {}
         self.tested_dependencies = set()
         self.used = self.hits = self.misses = 0
+        self.checked = checked
 
     def clear(self):
         self.records.clear()
@@ -58,6 +59,10 @@ class _VerificationCache:
         self.used = 0
 
     def check(self, relation, base, store, budget, memory_bytes):
+        if self.checked is not None:
+            if self.checked.base is not base:
+                raise ValueError("checked preparation uses a foreign base")
+            return self.checked.row(relation, store, budget, memory_bytes)
         record = self.records.get(id(relation))
         atoms = (
             tuple(store.get(identity) for identity in relation.atom_ids)
@@ -279,13 +284,17 @@ class CongruenceResult:
     divisor: int | None
 
 
-def extract_dependency(prepared, mask, *, budget=None):
+def extract_dependency(
+    prepared, mask, *, budget=None, product_policy="reference"
+):
     """Check original-row parity and even totals before modular extraction.
 
     Only bounded modular products are formed, including residual square
     corrections. Try both GCD signs and return only a checked proper divisor.
     Budget refusal raises without modifying prepared rows or extraction state.
     """
+    if product_policy not in ("reference", "joint-v2"):
+        raise ValueError("unknown exponent-product policy")
     verify_dependency(mask, prepared.rows)
     base = prepared.factor_base
     budget = budget if budget is not None else Budget()
@@ -311,9 +320,16 @@ def extract_dependency(prepared, mask, *, budget=None):
 
     if sign != 1 or any(exponent % 2 for exponent in totals.values()):
         raise ValueError("dependency exponent totals are not all even")
-    y = correction
-    for prime, exponent in sorted(totals.items()):
-        y = y * pow(prime, exponent // 2, base.n) % base.n
+    if product_policy == "joint-v2":
+        y = (
+            correction
+            * joint_exponent_product(totals, base.n, budget)
+            % base.n
+        )
+    else:
+        y = correction
+        for prime, exponent in sorted(totals.items()):
+            y = y * pow(prime, exponent // 2, base.n) % base.n
     if x * x % base.n != y * y % base.n:
         raise ValueError("dependency square congruence failed")
     # Either sign can expose a split when the other GCD is trivial.
@@ -329,6 +345,28 @@ def extract_dependency(prepared, mask, *, budget=None):
     return CongruenceResult(mask, x, y, minus, plus, divisor)
 
 
+def joint_exponent_product(totals, modulus, budget):
+    """Bit-plane Horner product with an explicitly bounded accumulator."""
+    powers = tuple(
+        (p, exponent // 2) for p, exponent in sorted(totals.items())
+    )
+    width = max((exponent.bit_length() for _, exponent in powers), default=0)
+    cap, result = max(256, 2 * modulus.bit_length()), 1
+    for bit in range(width - 1, -1, -1):
+        budget.consume(modulus.bit_length() ** 2 + len(powers))
+        result = result * result % modulus
+        product = 1
+        for prime, exponent in powers:
+            if (exponent >> bit) & 1:
+                budget.consume(product.bit_length() * prime.bit_length())
+                if product.bit_length() + prime.bit_length() > cap:
+                    result = result * product % modulus
+                    product = 1
+                product *= prime
+        result = result * product % modulus
+    return result
+
+
 class DependencyExtractor:
     """Try finite dependencies, retaining position after trivial GCDs."""
 
@@ -340,6 +378,7 @@ class DependencyExtractor:
         budget=None,
         tested_cache=None,
         max_dependencies=MAX_MATRIX_ROWS,
+        product_policy="reference",
     ):
         """Honor an optional trial-count limit; validate each mask exactly."""
         if not isinstance(dependencies, tuple):
@@ -352,6 +391,7 @@ class DependencyExtractor:
         self.trials = []
         self.tested_cache = tested_cache
         self.cache_skips = 0
+        self.product_policy = product_policy
 
     def run(self):
         """Return a proper divisor or None; refusal preserves the trial."""
@@ -372,6 +412,7 @@ class DependencyExtractor:
                 self.prepared,
                 self.dependencies[self.next_dependency],
                 budget=self.budget,
+                product_policy=self.product_policy,
             )
             if key is not None and result.divisor is None:
                 self.tested_cache.remember_dependency(key)

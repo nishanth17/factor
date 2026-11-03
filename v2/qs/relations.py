@@ -131,6 +131,29 @@ def verify_atomic(
     Exponent bounds are checked before powers to avoid unbounded allocation.
     BudgetExhaustedError propagates; no partially checked atom is admitted.
     """
+    return _verify_atomic(
+        relation,
+        factor_base,
+        residual_bound=residual_bound,
+        large_prime_bound=large_prime_bound,
+        large_product_bound=large_product_bound,
+        small_prime_bound=small_prime_bound,
+        budget=budget,
+    )
+
+
+def _verify_atomic(
+    relation,
+    factor_base,
+    *,
+    residual_bound=1,
+    large_prime_bound=0,
+    large_product_bound=0,
+    small_prime_bound=None,
+    budget=None,
+    prime_check=None,
+):
+    """Private checker; only a collector-owned cache may reuse prime proofs."""
     checked_residual_bound(residual_bound)
     if small_prime_bound is not None:
         utils.require_integer(small_prime_bound, "small_prime_bound", 2)
@@ -143,11 +166,12 @@ def verify_atomic(
     ):
         raise ValueError("relation target differs from the factor base")
 
-    if len(relation.exponents) > len(factor_base.entries):
+    exponents = relation.exponents
+    if len(exponents) > len(factor_base.entries):
         raise ValueError("relation has too many factor-base exponents")
     budget = budget if budget is not None else Budget()
     value = polynomial.a * polynomial.value(relation.position)
-    budget.consume((len(relation.exponents) + 1) * abs(value).bit_length())
+    budget.consume((len(exponents) + 1) * abs(value).bit_length())
     if relation.u * relation.u - factor_base.n_prime != value:
         raise ValueError("polynomial identity failed")
     if value == 0:
@@ -157,7 +181,7 @@ def verify_atomic(
     remaining = arithmetic.divexact(abs(value), relation.square_correction**2)
     primes = factor_base._columns
 
-    for prime, exponent in relation.exponents:
+    for prime, exponent in exponents:
         if prime not in primes:
             raise ValueError("exponent prime is outside the factor base")
         if exponent * (prime.bit_length() - 1) > remaining.bit_length():
@@ -186,8 +210,12 @@ def verify_atomic(
     for residual in relation.residual_primes:
         if residual in primes:
             raise ValueError("factor-base exponents must be fully recovered")
-        budget.consume(residual.bit_length() ** 2)
-        if utils.classify_prime(residual) != utils.Primality.PROVEN:
+        if prime_check is None:
+            budget.consume(residual.bit_length() ** 2)
+            proven = utils.classify_prime(residual) == utils.Primality.PROVEN
+        else:
+            proven = prime_check(residual, budget)
+        if not proven:
             raise ValueError("residual must be a proven prime")
     return True
 
@@ -383,6 +411,15 @@ def verify_combined(
             large_product_bound=MAX_RESIDUAL**2,
             budget=budget,
         )
+    return _verify_combined_values(relation, factor_base, atoms, budget)
+
+
+def _verify_combined_values(relation, factor_base, atoms, budget):
+    """Reconstruct from independently checked atoms without repeating them."""
+    if not 1 <= len(atoms) <= MAX_COMBINED_ATOMS or len(
+        {atom.relation_id for atom in atoms}
+    ) != len(atoms):
+        raise ValueError("combined provenance repeats or exceeds its limit")
     budget.consume(len(atoms) * (len(factor_base.entries) + 1))
     values = _combined_values(atoms, factor_base.n)
     if values != (
