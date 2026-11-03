@@ -485,23 +485,24 @@ def main():
             uses_siqs_defaults,
         )
 
+        calibrated_qs = uses_siqs_defaults(number, backend=args.backend)
         automatic_qs = (
             checkpoint is None
             and args.method in ("auto", "siqs")
             and not qs_parameters
             and args.qs_residual_bound is None
             and not args.qs_dlp
-            and uses_siqs_defaults(number, backend=args.backend)
+            and (calibrated_qs or use_qs)
         )
         if automatic_qs:
             use_qs = True
-            if implicit_memory:
+            if implicit_memory and calibrated_qs:
                 args.memory_mib = 1040
-            if implicit_work:
+            if implicit_work and calibrated_qs:
                 args.work_limit = C9_WORK_LIMIT
-            if implicit_seconds:
+            if implicit_seconds and calibrated_qs:
                 args.seconds = C9_SECONDS
-            if implicit_cpu_seconds:
+            if implicit_cpu_seconds and calibrated_qs:
                 args.cpu_seconds = C9_SECONDS
 
         if (

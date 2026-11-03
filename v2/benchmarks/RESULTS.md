@@ -8,6 +8,63 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions
 
+### C10a-01 coupled polynomial defaults
+
+**Integrated and enabled for fresh automatic SIQS at every size on 3 November
+2026 by explicit user direction, before fresh confirmation.** The selected
+bundle is parity2 polynomials, parity2_wide coupled ranking, windowed_pair A
+selection, batch root updates and parity_two marking composed with existing
+kernels. Standard/even-discriminant fallback, exact extraction, explicit
+controls and legacy saved policies remain supported. Existing size parameters,
+grants and portfolio bands remain unchanged; no calibrated 61+ route is added.
+The [configuration guide](../qs/CONFIGURATION.md#coupled-polynomial-policies)
+documents the API and checkpoint semantics.
+
+One exposed balanced semiprime per size was used for complete-call feasibility,
+with explicit larger-size configurations. These observations do not establish
+a population speedup or performance of every automatic preset.
+
+| Digits / comparison | Control wall seconds | Candidate wall seconds | Outcome and limitation |
+| --- | ---: | ---: | --- |
+| 60 | 432.656 | 204.734 | Both complete; exploratory. |
+| 62 | 935.933 | 708.487 | Both complete; exploratory. |
+| 65, original | 1,572.906 | 2,310.505 | Both complete; Low Power Mode enabled during candidate. |
+| 65, matched rerun | 2,007.330 | 1,703.859 | Both complete; candidate raw cost 15.1% lower, control native canary drift fails. |
+| 70, four-hour restart | User-stopped at 12,705.021 elapsed | 7,603.072 | Candidate complete; control censored. No successful-factor speed ratio. |
+
+Returned factors reconstruct every completed input and match independent
+corpus certificates. Runtime certainty remains probable-prime, not upgraded
+by the corpus proofs. The 65-digit rerun reproduces every non-timing SIQS
+statistic in both arms, including work, positions, families and matrix counts.
+The original candidate's SIQS sentinel slows by 2.504 times; the system log
+places the power-state change inside that run. No arithmetic regression was
+identified. Rerun SIQS canaries pass, but control native post/pre is 0.695,
+outside the frozen 15% drift gate. That failed check remains a limitation.
+Native-only warmup diagnostics did not resolve the proxy's variability.
+
+V4 short calibration comprises 38 cells, with 2,910 reserved wall/CPU seconds
+and 414,862,762,264 settled work units. Earlier calibration, a failed revised
+protocol, interrupted 70-digit launches and charged stops remain separate.
+The completed 65 follow-up settles 8,930 reserved seconds and 841,500,280,597
+work units; recorded numerical phases consume 4,339.326 wall and 4,337.977 CPU
+seconds. An additional 2,144.422-second administrative GUI stall is recorded
+separately; its CPU is unknown. No factor job was active during the stall.
+Matched operational tiers were 1 GiB owned / 3 GiB RSS at 60, 2 / 5 GiB at
+62/65 and 4 / 8 GiB at 70. They are grants, not digit-only memory theorems.
+
+Fresh independent-input confirmation, the lower 50/55 supplement and general
+all-size performance remain unmeasured. Censoring and the failed canary forbid
+a confirmed speed claim. The all-size default decision is a policy promotion
+with those evidence exceptions, not a relabeling of the experimental gates.
+No further campaign or E1 execution is implied.
+
+Candidate source `4b9a616`, literal control
+`0076e256871722d52d849ab344152e0a7535c2ce`, and terminal handoff
+`d37b809104c9bfd727c0ba0994121c9060a322ec` remain in Git history. Detailed
+research, raw results, resource derivations and the verified archive chain are
+local under `v2/audit/archives/c10a01-20261103/`; v12 SHA-256 is
+`9d6aed9749b21dd6e177d626423862ab4de95a7897e3ea2240be308802ae2d89`.
+
 ### A1b existing fixed-score review
 
 **Retain integrated SIQS defaults and fixed-score opt-ins.** The completed

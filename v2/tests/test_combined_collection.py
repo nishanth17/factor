@@ -16,6 +16,7 @@ from v2.qs.coordinate_family import CoordinateFamily
 from v2.qs.defaults import default_siqs_config
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.sign_schedule import schedule_for
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
 from v2.tests.test_siqs import allowance, configuration
@@ -28,7 +29,10 @@ class CombinedCollectionTests(unittest.TestCase):
         )
         for fixture in json.loads(path.read_text())["fixtures"]:
             job = SIQSJob(
-                fixture["n"], seed=fixture["seed"], budget=allowance(10**13)
+                fixture["n"],
+                config=previous_siqs_config(fixture["n"]),
+                seed=fixture["seed"],
+                budget=allowance(10**13),
             )
             result = job.run(max_blocks=fixture["blocks"])
             self.assertEqual(result.reason, "paused")

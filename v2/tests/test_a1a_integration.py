@@ -354,7 +354,8 @@ class CountedIntegrationTests(unittest.TestCase):
                 )
                 selected = 50 <= digits <= 55 and memory in (None, 2**30)
                 self.assertEqual(
-                    cfg.collector.marking, SELECTED if selected else "sparse"
+                    cfg.collector.marking,
+                    SELECTED + "+parity_two" if selected else "parity_two",
                 )
                 self.assertNotIn("_kernels", asdict(cfg.collector))
         n = 10**54 + 123

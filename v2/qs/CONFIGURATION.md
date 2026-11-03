@@ -7,7 +7,7 @@ The selectors are [defaults.py](defaults.py) and [siqs.py](siqs.py).
 
 ## Explicit and automatic selection
 
-`SIQSJob(n)` can select a size-scoped bundle. Supplying `SIQSConfig(...)`
+`SIQSJob(n)` selects coupled policies with the existing size-scoped parameters. Supplying `SIQSConfig(...)`
 uses its explicit reference fields. `default_siqs_config` exposes automatic
 selection; `CountedSIQSConfig` adds a positive eligible `base_count` below its
 finite endpoint ceiling. Base resolution and restore are charged.
@@ -16,6 +16,51 @@ Explicit settings, CLI parameter overrides and saved concrete configurations
 win over automatic choices. `asdict`/`replace` copies freeze the selected
 values. Direct QS/MPQS controls and other backends retain their documented
 scope. A finite default grant does not promise completion.
+
+## Coupled polynomial policies
+
+Fresh `default_siqs_config(n)` and unconfigured SIQS jobs select
+`polynomial_policy="parity2"`, `multiplier_policy="parity2_wide"`,
+`multiplier=0`, `assignment_policy="windowed_pair"` and
+`root_update_policy="batch"`. `parity_two` marking is composed with the
+previous collector kernels. This applies at every supported size and backend;
+performance outside the measured scope is unconfirmed. Size parameters,
+owned allowances and finite grants are retained. The automatic portfolio still
+introduces SIQS only at native 40 and 50–60 digits. Direct CLI `--method siqs`
+or `--siqs` without QS parameter overrides uses these policies at other sizes
+with the existing generic grants, not a newly tuned larger-size preset.
+
+For `kN` congruent to 1 modulo 4, the parity family uses `A = 2a` for an odd
+squarefree A product `a`, and odd centered `B`. The exact existing identity
+`U(x)^2 - kN = A*F(x)` remains authoritative: `F(x) = A*x*x + 2*B*x + C`,
+`C = (B*B-kN)/A` and `U(x) = A*x+B`. All integer x in the declared inclusive
+window are admissible. Factor-base recovery retains the A contribution and
+exact powers of two. Other discriminants, including even multipliers, use the
+standard family. Multiplier ranking includes finite odd and even squarefree
+candidates with representation-aware weights and size penalties; it may return
+an exceptional proper GCD before collection. Supplying a positive multiplier
+fixes k instead of invoking selection. Standard odd-only ranking remains
+available with `multiplier_policy="standard"`.
+
+`windowed_pair` searches a finite reachable product population with paired
+completion; it can change the A population. `root_update_policy="cached"`
+and `"batch"` preserve the selected physical trials while preparing bounded
+modular Gray updates; batch construction is limited by the consumed family
+quota. Refusal, cancellation and derived-state rebuild remain charged.
+`parity_two` initializes guaranteed two-adic contributions only on supported
+score paths and otherwise uses exact existing scoring. The narrower
+`"parity2"` and norm-preview `"parity2_norm"` multiplier policies, and
+`"paired_flyer"` assignments, remain explicit alternatives; norm preview is
+not the selected default.
+
+`SIQSConfig()` still constructs the literal standard reference policies.
+Restoring a saved configuration never invokes today's automatic selector.
+Checkpoint schemas 8/9/10 explicitly version the additional semantics; the
+selected bundle uses schema 10. Incompatible representation, multiplier,
+assignment or root-policy substitutions are rejected even when granting a
+budget extension. Tables, queues and plans rebuild with their original policy
+identities and charges. Legacy schemas retain their original arithmetic.
+See the [promotion evidence and limits](../benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
 
 ## Collector families
 
@@ -47,7 +92,7 @@ complete-factor benefit.
 ## Assignment and stopping
 
 `mode="qs"`, `"mpqs"` and `"siqs"` select polynomial construction. SIQS
-`assignment_policy` supports bounded reference, nearest and flyer streams;
+`assignment_policy` supports bounded reference, nearest, flyer, paired_flyer and windowed_pair streams;
 `family_count` and `polynomials_per_family` govern finite search and consumed
 Gray prefixes. `assignment_policy="quality"` is an explicit fixed-batch
 actual-A ordering, not a proven diversity policy.
@@ -76,7 +121,7 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused` in valid duplicate-free combinations. The two presieve selectors
+`scan_fused` and `parity_two` in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
 Scratch coexistence, rotation, cancellation and refused work stay bounded.

@@ -12,6 +12,7 @@ from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.tests.test_siqs_cli import cli
 
 SELECTED = "density+presieve+scan_fused"
+DEFAULT_SELECTED = SELECTED + "+parity_two"
 EXTENSION = "density+presieve_powers+unroll4+scan_fused"
 
 
@@ -36,13 +37,13 @@ class A1aDefaultTests(unittest.TestCase):
                         )
                         self.assertEqual(
                             config.collector.marking,
-                            SELECTED if selected else "sparse",
+                            DEFAULT_SELECTED if selected else "parity_two",
                         )
         for digits in range(50, 56):
             config = default_siqs_config(
                 10 ** (digits - 1), backend="gmpy2-mpz"
             )
-            self.assertEqual(config.collector.marking, "sparse")
+            self.assertEqual(config.collector.marking, "parity_two")
 
     def test_explicit_and_parent_configs_take_precedence(self):
         n = 10**54 + 123
@@ -51,7 +52,8 @@ class A1aDefaultTests(unittest.TestCase):
         self.assertEqual(explicit.collector.marking, "sparse")
         self.assertIsNone(PortfolioConfig(siqs=None).for_input(n).siqs)
         self.assertEqual(
-            PortfolioConfig().for_input(n).siqs.collector.marking, SELECTED
+            PortfolioConfig().for_input(n).siqs.collector.marking,
+            DEFAULT_SELECTED,
         )
 
     def test_default_cli_and_saved_selector_survive_resume(self):
@@ -68,7 +70,9 @@ class A1aDefaultTests(unittest.TestCase):
             )
             self.assertEqual(first.returncode, 1, first.stderr)
             saved = json.loads(path.read_text())["payload"]["config"]
-            self.assertEqual(saved["siqs"]["collector"]["marking"], SELECTED)
+            self.assertEqual(
+                saved["siqs"]["collector"]["marking"], DEFAULT_SELECTED
+            )
             resumed = cli(
                 "--resume", path, "--work-limit", 0, "--checkpoint", path
             )
@@ -83,7 +87,7 @@ class A1aDefaultTests(unittest.TestCase):
         extended = replace(
             default, collector=replace(default.collector, marking=EXTENSION)
         )
-        self.assertEqual(default.collector.marking, SELECTED)
+        self.assertEqual(default.collector.marking, DEFAULT_SELECTED)
         config = PortfolioConfig(siqs=extended, memory_bytes=1040 * 2**20)
         self.assertEqual(PortfolioConfig(**asdict(config)).siqs, extended)
 

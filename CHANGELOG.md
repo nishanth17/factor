@@ -3,6 +3,22 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## C10a-01 mainline and automatic defaults (3 November 2026)
+
+- Integrate exact parity polynomials, coupled odd/even multiplier ranking,
+  reachable paired A selection, bounded modular root tables and guaranteed
+  powers-of-two marking. Fresh automatic SIQS configurations at every size use
+  the selected bundle, composing existing collector kernels. Exact standard
+  fallbacks, explicit configurations and legacy checkpoints are preserved.
+- Retain existing size parameters, finite grants and portfolio eligibility;
+  this adds no calibrated 61+ preset. The all-size promotion is an explicit
+  user-directed decision before fresh confirmation. Record exposed 60/62/65/70
+  completions, the 65-digit host-state diagnosis and failed canary gate, and
+  the user-censored 70-digit control in [results](v2/benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
+- Preserve source freezes, failed outcomes and research in the verified local
+  archive before removing the task worktree and temporary state. No push or E1
+  campaign is part of this integration.
+
 ## Study publication cleanup (2 November 2026)
 
 - Remove the selective `v2/studies/` report/result collection from the current

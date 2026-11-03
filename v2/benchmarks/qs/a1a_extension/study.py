@@ -19,6 +19,7 @@ from pathlib import Path
 
 from ....common import utils
 from ....execution import budget as live_budget
+from ....portfolio import _decode_siqs_config
 from ....qs import defaults, siqs
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..c9 import c9_growth_study as c9
@@ -167,11 +168,17 @@ def configuration(n, arm, control_runtime):
     digits = len(str(abs(n)))
     if digits not in CAPS or arm not in ARMS:
         raise ValueError("outside frozen band/arm")
-    cfg = (
-        control_runtime[0].default_siqs_config(n)
-        if arm == "control"
-        else defaults.default_siqs_config(n)
-    )
+    # Decode the owned historical control into current classes. Inheriting
+    # today's factory would change more than the frozen marking treatment.
+    cfg = control_runtime[0].default_siqs_config(n)
+    if arm == "selected":
+        cfg = _decode_siqs_config(asdict(cfg))
+        # Retain the previously integrated face/queue compatibility delta.
+        cfg = replace(
+            cfg,
+            sign_policy="swap_high",
+            collector=replace(cfg.collector, sparse_queue_bytes=32 * 2**20),
+        )
     if cfg.backend != "python-int" or cfg.memory_bytes != 2**30:
         raise ValueError("outside frozen native/owned-memory envelope")
     if arm == "selected":

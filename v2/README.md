@@ -39,7 +39,10 @@ factoring. The unbounded compatibility API remains available. Use bounded
 execution when a call needs shared work/time limits or resumable progress.
 
 See [STATUS.md](STATUS.md) for automatic size/resource routing and its adoption
-limits. Explicit settings and saved configurations take precedence. Experimental
+limits. Fresh automatic SIQS uses the C10a-01 coupled polynomial/multiplier/A/root
+bundle at every size; see the [configuration semantics](qs/CONFIGURATION.md#coupled-polynomial-policies).
+Existing size parameters, finite grants and portfolio routing remain scoped.
+Explicit settings and saved configurations take precedence. Experimental
 methods and adopted defaults retain their recorded evidence limits;
 there is no general digit-based completion guarantee.
 

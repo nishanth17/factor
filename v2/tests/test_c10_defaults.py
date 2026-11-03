@@ -14,6 +14,7 @@ from v2.qs.defaults import (
     default_siqs_budget,
     uses_siqs_defaults,
 )
+from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.test_siqs_cli import cli
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,7 +34,7 @@ class C10DefaultTests(unittest.TestCase):
 
         for digits, number in (("40", NUMBER_40), ("50", NUMBER_50)):
             with self.subTest(digits=digits):
-                selected = asdict(default_siqs_config(number))
+                selected = asdict(previous_siqs_config(number))
                 self.assertEqual(selected.pop("sign_policy"), "swap_high")
                 self.assertEqual(selected.pop("polynomial_policy"), "standard")
                 self.assertEqual(selected.pop("multiplier_policy"), "standard")

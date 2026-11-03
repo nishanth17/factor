@@ -1,6 +1,7 @@
 """Diagnostic continuation, semantic-work and reservation checks."""
 
 import copy
+import json
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -63,7 +64,7 @@ class RegressionDiagnosticTests(unittest.TestCase):
         self.assertEqual(observed["chunks"][0]["stages"]["roots"], 0)
 
     def test_frozen_phase_totals_and_literal_policy_match(self):
-        plan = regression65.check()
+        plan = json.loads(regression65.PLAN.read_text())
         for field in ("wall", "cpu", "work"):
             expected = sum(
                 plan["limits"][phase][field]
@@ -81,6 +82,10 @@ class RegressionDiagnosticTests(unittest.TestCase):
             rows = [r for r in plan["rows"] if r["arm"] == arm]
             expected = copy.deepcopy(rows[0]["configuration"])
             self.assertTrue(all(r["configuration"] == expected for r in rows))
+
+    def test_retired_runtime_guard_rejects_promoted_defaults(self):
+        with self.assertRaisesRegex(RuntimeError, "source drift"):
+            regression65.check()
 
 
 if __name__ == "__main__":

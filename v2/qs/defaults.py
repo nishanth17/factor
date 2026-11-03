@@ -1,6 +1,9 @@
-"""Size-scoped SIQS defaults; explicit configurations win."""
+"""Coupled SIQS policies with retained size/resource presets."""
+
+from dataclasses import replace
 
 from ..common import utils
+from .collector_kernels import combine, components
 from .sieve_collector import GrowingDoubleLargeSieveConfig
 from .siqs import CountedSIQSConfig, SIQSConfig
 
@@ -18,24 +21,47 @@ def uses_c9_defaults(n, *, backend="python-int"):
 
 
 def uses_siqs_defaults(n, *, backend="python-int"):
-    """Return native bands selected for fresh automatic jobs."""
+    """Return the calibrated preset/portfolio bands, not the policy scope."""
     utils.require_integer(n)
     return backend == "python-int" and (
         10**39 <= abs(n) < 10**40 or 10**49 <= abs(n) < 10**60
     )
 
 
-def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
-    """Select 40 and 50–60-digit bundles without changing explicit quotas.
+def _coupled_policies(config):
+    """Apply the selected C10a-01 bundle only to a fresh automatic config.
 
-    The user-directed 52–60 extension uses compact count policies; only 55
-    training and preliminary fresh 60-digit evidence cover that extension.
-    Other sizes/backends retain the reference configuration. Explicit memory
-    remains binding, including the temporary charged count-resolution sieve.
+    Explicit constructors and saved configurations retain their own fields.
+    Parity arithmetic and the two-power initializer keep exact fallbacks for
+    unsupported discriminants, backends and existing score/kernel choices.
+    """
+    marking = combine((*components(config.collector.marking), "parity_two"))
+    return replace(
+        config,
+        multiplier=0,
+        polynomial_policy="parity2",
+        multiplier_policy="parity2_wide",
+        assignment_policy="windowed_pair",
+        root_update_policy="batch",
+        collector=replace(config.collector, marking=marking),
+    )
+
+
+def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
+    """Select coupled policies at every size without enlarging grants.
+
+    The existing 40 and 50–60-digit parameter/resource presets remain intact.
+    Other sizes/backends use the reference parameters with the same coupled
+    policies; those parameters are not calibrated larger-size presets.
+    Explicit memory remains binding, including metadata and charged setup.
     """
     if not uses_siqs_defaults(n, backend=backend):
-        return SIQSConfig(
-            backend=backend, memory_bytes=memory_bytes, sign_policy="swap_high"
+        return _coupled_policies(
+            SIQSConfig(
+                backend=backend,
+                memory_bytes=memory_bytes,
+                sign_policy="swap_high",
+            )
         )
 
     forty_digits = abs(n) < 10**40
@@ -59,7 +85,7 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
     factor_count = 5 if forty_digits else 6
     if larger:
         factor_count = 7 if abs(n) < 10**55 else 8
-    return config_type(
+    config = config_type(
         **count_policy,
         sign_policy="swap_high",
         backend=backend,
@@ -99,6 +125,7 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
             large_product_bound=3200000000 if forty_digits else 115200000000,
         ),
     )
+    return _coupled_policies(config)
 
 
 def default_siqs_budget(n, *, backend="python-int"):

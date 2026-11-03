@@ -62,9 +62,10 @@ class CalibrationContractTests(unittest.TestCase):
         self.assertNotIn("descriptive_wall_ratio", result["pairs"][0])
         self.assertFalse(result["adoption"])
 
-    def test_lower_band_opt_in_and_default_boundaries(self):
+    def test_lower_band_explicit_control_and_promoted_default_boundaries(self):
         from v2.execution.budget import Budget
         from v2.qs import SIQSJob, default_siqs_config
+        from v2.tests.qs_default_controls import previous_siqs_config
 
         files = ("c10_fresh_corpus.json", "c10a05_plus_feasibility.json")
         for digits, name in zip((50, 55), files):
@@ -75,7 +76,7 @@ class CalibrationContractTests(unittest.TestCase):
                 if r["digits"] == digits
             )
             n = fixture["n"]
-            default = default_siqs_config(n)
+            default = previous_siqs_config(n)
             self.assertEqual(default.polynomial_policy, "standard")
             config = replace(
                 default,
@@ -100,8 +101,8 @@ class CalibrationContractTests(unittest.TestCase):
         for digits in (49, 50, 51, 52, 55, 56, 60, 61):
             for n in (10 ** (digits - 1), 10**digits - 1):
                 cfg = default_siqs_config(n)
-                self.assertEqual(cfg.polynomial_policy, "standard")
-                self.assertEqual(cfg.multiplier_policy, "standard")
+                self.assertEqual(cfg.polynomial_policy, "parity2")
+                self.assertEqual(cfg.multiplier_policy, "parity2_wide")
 
     def test_observer_and_direct_coordinate_replay(self):
         for arm in ("control", "parity2"):

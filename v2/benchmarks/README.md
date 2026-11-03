@@ -33,6 +33,25 @@ a new campaign. Historical protocols retain their original source pins and
 accounts. Replay from the pinned revision, or freeze a new current-source
 comparison with its own identity.
 
+## C10a-01 integrated handoff
+
+The [coupled-default decision](RESULTS.md#c10a-01-coupled-polynomial-defaults)
+records calibration, complete-call feasibility and limitations. Reusable runners
+and protocols live in `qs/c10a01/`; required numerical inputs and literal
+controls remain versioned. Historical measurements use candidate `4b9a616`
+and control `0076e256871722d52d849ab344152e0a7535c2ce`; the 65-digit terminal
+handoff is `d37b809104c9bfd727c0ba0994121c9060a322ec`. Replay a frozen
+experiment from its pinned checkout. Its source guards intentionally reject
+current automatic-default substitutions. The separate A7 compatibility
+manifest preserves explicit E1 arms and grants; it launches no E1 execution.
+
+Detailed research, source inventories, raw results, interrupted calls and
+cleanup manifests are retained locally at
+`v2/audit/archives/c10a01-20261103/`. This archive includes the verified evidence
+chain, relocated upstream material and temporary-state captures. Historical
+paths in sealed receipts are preserved; the relocation manifest maps them to
+the archive. Worktree deletion does not discard that evidence.
+
 ## Find an experiment
 
 | Folder | Contents |
