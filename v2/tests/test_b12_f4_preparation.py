@@ -1,10 +1,12 @@
 """Queued runner/corpus/analyser QA; not the narrow scheduler-only harness."""
 
+import json
 import unittest
 
 from v2.benchmarks.ecm.b12_f4.inputs import random_integers, retained
 from v2.benchmarks.ecm.b12_f4.runner import (
     clustered_interval,
+    forced_arm,
     load_freeze,
     paired_survival_interval,
     quantile_with_censoring,
@@ -23,6 +25,24 @@ class PreparationTests(unittest.TestCase):
         self.assertTrue(
             all(len(str(row["n"])) == row["digits"] for row in rows)
         )
+
+    def test_option_catalog_is_prospective_and_arm_counts_are_explicit(self):
+        path = (
+            REPOSITORY_ROOT
+            / "v2/benchmarks/inputs/controls/b12_f4_options_preparation.json"
+        )
+        data = json.loads(path.read_text())
+        self.assertEqual(data["mechanism_comparisons"]["wall"], 720)
+        self.assertEqual(data["mechanism_comparisons"]["cpu"], 2880)
+        self.assertFalse(data["wider_counts"]["funded"])
+        with self.assertRaises(ValueError):
+            load_freeze(path)
+        self.assertTrue(forced_arm("P4", 4))
+        self.assertTrue(forced_arm("P8", 8))
+        self.assertFalse(forced_arm("N", 4))
+        for arm, workers in (("S0", 4), ("S1", 4), ("P4", 2), ("N", 0)):
+            with self.assertRaises(ValueError):
+                forced_arm(arm, workers)
 
     def test_censored_quantiles_do_not_report_successes_only(self):
         self.assertIsNone(

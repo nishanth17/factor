@@ -9,6 +9,8 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from v2.execution.worker_contract import (
+    RESIDUE_VERSION,
+    CostRow,
     Decoder,
     EngagementRule,
     LeaseRefusedError,
@@ -17,6 +19,7 @@ from v2.execution.worker_contract import (
     Search,
     WorkerSettings,
     canonical,
+    checked_residue,
     digest,
     frame,
 )
@@ -267,6 +270,255 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(
             rule.engages(plan, ready=False), rule.engages(plan, ready=False)
         )
+
+
+def boundary(search, position, token):
+    assignment = search.manifest.assignment(position)
+    payload = dict(
+        version=RESIDUE_VERSION,
+        id=assignment["id"],
+        metadata=search.manifest.metadata,
+        n=assignment["n"],
+        b1=assignment["b1"],
+        b2=assignment["b2"],
+        sigma=assignment["sigma"],
+        value=[2, 3],
+        a24=12,
+        chain_chunks=0,
+    )
+    return dict(
+        message(search, position, token, reason="boundary"),
+        stage="stage_one",
+        phase="stage_two_setup",
+        sigma=assignment["sigma"],
+        residue=dict(payload, sha256=digest(payload)),
+    )
+
+
+class StagedContractTests(unittest.TestCase):
+    def test_queue_capacity_includes_inflight_and_preserves_tier_barriers(
+        self,
+    ):
+        search = Search(
+            manifest(),
+            WorkerSettings(
+                workers=2, stage_policy="staged", residue_capacity=2
+            ),
+            fixed_work=True,
+        )
+        search.dispatch(0, 1)
+        search.dispatch(1, 2)
+        self.assertIsNone(search.next())
+        with self.assertRaises(LeaseRefusedError):
+            search.dispatch(2, 3)
+        search.receive(1, 2, boundary(search, 1, 2))
+        self.assertEqual(search.next(), 1)
+        search.receive(0, 1, boundary(search, 0, 1))
+        search.dispatch(0, 3)
+        done = dict(
+            message(search, 0, 3, factor=5),
+            stage="stage_two",
+            attempt=search.continuation_attempts[0],
+            boundary_sha256=search.boundaries[0]["sha256"],
+        )
+        search.receive(0, 3, done)
+        self.assertEqual(search.next(), 2)
+        self.assertNotIn(0, search.boundaries)
+        self.assertNotIn(4, search.active)
+
+    def test_checked_boundary_restart_retries_only_unfinished_continuation(
+        self,
+    ):
+        search = Search(
+            manifest(),
+            WorkerSettings(stage_policy="staged", residue_capacity=1),
+        )
+        search.dispatch(0, 1)
+        search.receive(0, 1, boundary(search, 0, 1))
+        search.dispatch(0, 2)
+        del search.active[
+            0
+        ]  # Crash: lease remains charged in the outer ledger.
+        resumed = Search.restore(
+            json.loads(canonical(search.snapshot())),
+            search.manifest,
+            search.settings,
+        )
+        self.assertEqual(resumed.next(), 0)
+        self.assertEqual(resumed.stage(0), "stage_two")
+        self.assertEqual(resumed.attempts[0], 1)
+        resumed.dispatch(0, 3)
+        self.assertEqual(resumed.continuation_attempts[0], 2)
+        bad = dict(
+            message(resumed, 0, 3),
+            stage="stage_two",
+            attempt=2,
+            boundary_sha256="0" * 64,
+        )
+        with self.assertRaises(ValueError):
+            resumed.receive(0, 3, bad)
+        self.assertIn(0, resumed.active)
+
+    def test_bad_residue_never_acknowledges_or_consumes_queue_capacity(self):
+        for changes in (
+            dict(value=[2, 5]),
+            dict(value=[True, 3]),
+            dict(a24=35),
+            dict(b1=11),
+            dict(sigma=17),
+            dict(baby=[]),
+            dict(value=[2]),
+        ):
+            search = Search(manifest(), WorkerSettings(stage_policy="staged"))
+            search.dispatch(0, 1)
+            msg = boundary(search, 0, 1)
+            raw = dict(msg["residue"], **changes)
+            raw["sha256"] = digest(
+                {k: v for k, v in raw.items() if k != "sha256"}
+            )
+            with self.assertRaises(ValueError):
+                search.receive(0, 1, dict(msg, residue=raw))
+            self.assertIn(0, search.active)
+            self.assertFalse(search.boundaries)
+        search = Search(manifest(), WorkerSettings())
+        search.dispatch(0, 1)
+        with self.assertRaises(ValueError):
+            search.receive(0, 1, boundary(search, 0, 1))
+        with self.assertRaises(ValueError):
+            checked_residue(
+                {}, manifest().assignment(0), manifest().metadata, 1024
+            )
+
+    def test_restart_rejects_unpaid_boundaries_and_reset_charges(self):
+        search = Search(
+            manifest(),
+            WorkerSettings(stage_policy="staged", residue_capacity=1),
+        )
+        ledger = Ledger(100, 2)
+        token = ledger.reserve(search.manifest.assignment(0)["id"], 50, 1)
+        search.dispatch(0, token)
+        msg = boundary(search, 0, token)
+        search.receive(0, token, msg)
+        ledger.settle(token, msg["id"], 7, 0.2)
+        ledger.receipts[0].update(
+            stage="stage_one",
+            attempt=1,
+            reason="boundary",
+            boundary_sha256=msg["residue"]["sha256"],
+        )
+        search.check_leases(ledger.receipts, dict(work=7, cpu=0.2))
+        for saved in (dict(work=0, cpu=0.2), dict(work=7, cpu=0)):
+            with self.assertRaises(ValueError):
+                search.check_leases(ledger.receipts, saved)
+        with self.assertRaises(ValueError):
+            search.check_leases([], dict(work=7, cpu=0.2))
+        with self.assertRaises(ValueError):
+            search.check_leases(ledger.receipts * 2, dict(work=14, cpu=0.4))
+
+    def test_old_checkpoint_version_and_future_tier_issue_are_rejected(self):
+        search = Search(manifest(), WorkerSettings())
+        saved = search.snapshot()
+        saved["payload"]["version"] = "b12-f4-v1"
+        saved["sha256"] = digest(saved["payload"])
+        with self.assertRaises(ValueError):
+            Search.restore(saved, search.manifest, search.settings)
+        saved = search.snapshot()
+        saved["payload"]["attempts"][4] = 1
+        saved["sha256"] = digest(saved["payload"])
+        with self.assertRaises(ValueError):
+            Search.restore(saved, search.manifest, search.settings)
+
+
+class OptimizationContractTests(unittest.TestCase):
+    def test_math_identity_stays_v1_and_metadata_is_modulus_independent(self):
+        first, second = manifest(n=35), manifest(n=1009)
+        expected = digest(
+            ["b12-f4-v1", first.n, first.seed, first.lineage, first.options]
+        )
+        self.assertEqual(first.identity, expected)
+        self.assertEqual(first.metadata, second.metadata)
+        self.assertNotEqual(first.schedule, second.schedule)
+        assignment = first.assignment(0)
+        assignment["seed"] = 0
+        self.assertNotEqual(first.assignment(0)["seed"], 0)
+
+    def test_explicit_wider_workers_and_simultaneous_cache_ownership(self):
+        with self.assertRaises(ValueError):
+            WorkerSettings(workers=6)
+        with self.assertRaises(MemoryError):
+            WorkerSettings(workers=10, allow_wide_workers=True)
+        settings = WorkerSettings(
+            workers=10,
+            allow_wide_workers=True,
+            memory_bytes=2**31,
+            metadata_slots=2,
+            decoded_cache_bytes=2**20,
+        )
+        self.assertLessEqual(settings.owned_bytes, settings.memory_bytes)
+        for changes in (
+            dict(packet_curves=5),
+            dict(poll_every=65),
+            dict(metadata_slots=3),
+            dict(parent_poll_seconds=1),
+            dict(stage_policy="unknown"),
+        ):
+            with self.assertRaises(ValueError):
+                WorkerSettings(**changes)
+
+    def test_cost_table_distinguishes_cold_pool_and_metadata_warmth(self):
+        plan = manifest()
+        row = CostRow(
+            plan.schedule,
+            10,
+            1,
+            (1, 1),
+            pool_seconds=5,
+            seconds_per_stage_two=(0.2, 0.2),
+        )
+        rule = EngagementRule(cost_table=(row,))
+        self.assertFalse(rule.engages(plan, ready=False))
+        self.assertTrue(rule.engages(plan, ready=False, pool_started=True))
+        self.assertTrue(rule.engages(plan, ready=True))
+        self.assertFalse(
+            rule.engages(
+                plan, ready=True, remaining=(0, 0), remaining_stage_two=(2, 0)
+            )
+        )
+        no_stage_cost = EngagementRule(plan.schedule, 1, 1, (1, 1))
+        self.assertFalse(
+            no_stage_cost.engages(
+                plan, ready=True, remaining=(0, 0), remaining_stage_two=(1, 0)
+            )
+        )
+        invalid = EngagementRule(
+            cost_table=(
+                {
+                    "schedule": plan.schedule,
+                    "seconds_per_curve": [float("nan")],
+                },
+            )
+        )
+        self.assertFalse(invalid.engages(plan, ready=True))
+        self.assertFalse(
+            EngagementRule(cost_table=(row, row)).engages(plan, ready=True)
+        )
+        self.assertFalse(
+            EngagementRule(cost_table=(row,) * 33).engages(plan, ready=True)
+        )
+
+    def test_decoder_recognizes_buffered_and_invalid_following_frames(self):
+        raw = frame(dict(a=1), 1024)
+        decoder = Decoder(1024)
+        self.assertEqual(decoder.feed(raw + raw), dict(a=1))
+        self.assertTrue(decoder.complete)
+        self.assertEqual(decoder.feed(b""), dict(a=1))
+        self.assertFalse(decoder.complete)
+        self.assertEqual(
+            decoder.feed(raw + struct.pack("!I", 2048)), dict(a=1)
+        )
+        self.assertTrue(decoder.complete)
+        with self.assertRaises(ValueError):
+            decoder.feed(b"")
 
 
 if __name__ == "__main__":

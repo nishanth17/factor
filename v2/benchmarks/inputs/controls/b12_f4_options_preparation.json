@@ -1,0 +1,64 @@
+{
+  "identity": "b12-f4-options-preparation-v1",
+  "status": "PROSPECTIVE: all runtime QA and measurements NOT RUN",
+  "parent_preparation": "b12_f4_preparation.json",
+  "implementation_base": "878e8885cd3a44fb6b4b15a215a919532aa1310c",
+  "mathematical_stream": "b12-f4-v1",
+  "wire_checkpoint": "b12-f4-v2",
+  "defaults": {
+    "packet_curves": 1,
+    "poll_every": 1,
+    "metadata_slots": 1,
+    "decoded_cache_bytes": 0,
+    "stage_policy": "whole",
+    "parent_poll_seconds": 0.01
+  },
+  "candidate_flags": {
+    "packets": {
+      "packet_curves": 4
+    },
+    "polling": {
+      "poll_every": 8
+    },
+    "reuse": {
+      "metadata_slots": 2,
+      "decoded_cache_bytes": 1048576
+    },
+    "stages": {
+      "stage_policy": "staged",
+      "residue_capacity": 16
+    }
+  },
+  "initial_worker_counts": [
+    1,
+    2,
+    4
+  ],
+  "wider_counts": {
+    "candidates": [
+      6,
+      8,
+      10
+    ],
+    "funded": false,
+    "requires": "allow_wide_workers plus separately justified literal resources"
+  },
+  "mechanism_comparisons": {
+    "maximum_selected": 2,
+    "wall": 720,
+    "cpu": 2880,
+    "included_in": "existing Stage B 3600 wall / 14400 CPU ceiling; not additional"
+  },
+  "qa": {
+    "wall": 1800,
+    "cpu": 1800,
+    "harness_debit_wall": 0,
+    "harness_debit_cpu": 0
+  },
+  "campaign": {
+    "wall": 43200,
+    "cpu": 172800,
+    "evidence_bytes": 2147483648
+  },
+  "gate": "Released-window locked runtime Q first; select literal flags/cells after clean A and before B execution; no automatic matrix."
+}

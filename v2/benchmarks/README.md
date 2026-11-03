@@ -130,3 +130,11 @@ from retained-context calls. S0 uses the pinned committed incumbent; S1/P2/P4
 expose the new executor and M0 is its separate serial manifest equivalent.
 Detailed source review, protocol, budgets and queued QA handoff are local under
 `v2/audit/b12_f4/`. Runtime QA is the next phase; B12/F4 and E1 remain open.
+
+B12/F4 option preparation now includes bounded packet size, action polling,
+private metadata/decoded caches and checked stage queues. The runner accepts
+explicit per-cell `settings`/`rule` overrides from a later pinned freeze;
+`P<count>` forced diagnostics must match that cell's declared count. Wider
+counts still require explicit settings and a separately funded protocol.
+`inputs/controls/b12_f4_options_preparation.json` is prospective and cannot be
+executed by the runner. Runtime Q precedes any option comparison.

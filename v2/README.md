@@ -103,29 +103,70 @@ The context is borrowed; the caller closes it. Omit it for incumbent behavior.
 No stock CLI worker flag is added. The experimental benchmark driver provides
 fresh CLI measurements after runtime admission.
 
-`EngagementRule` requires a matching schedule cost key, finite per-tier serial
-costs and cold/warm thresholds. Missing/invalid calibration or unfunded startup
-selects equivalent-manifest serial execution. `force_workers=True` is a separate
-diagnostic arm. Neither supplies calibrated automatic settings. Rule estimates
-use observable plans and pool readiness, not factor labels or future outcomes.
+`WorkerSettings` additionally exposes bounded optimization choices:
 
-The opt-in search has versioned per-curve seeds independent of slot/count/order;
-it differs from the incumbent shared RNG stream. ECM draws no longer move later
-fallback seeds within the opt-in semantics. Sigma collisions are retained and
-reported; IDs do not prove statistical independence. First-factor winners may
-race. Checkpoints bind executor/rule/settings (including worker count), full
-manifest, attempts, acknowledged results and cumulative charges. Resume rejects
-a missing/different executor. Only drained checkpoints are supported; unfinished
-curves restart setup with the same ID and retained prior charges, up to the
-finite attempt cap (at most three attempts/curve and 32 drained runs per
-cofactor search). These bounds also fund retained lease history. A parent-memory acknowledgement becomes durable only when
-the caller atomically saves the returned checkpoint.
+- `packet_curves=1..4` batches commands while every job retains its own lease
+  and streamed result. Admission shares ready work/grants among idle workers.
+- `poll_every=1..64` controls clock/socket checks; work is checked on every
+  reservation. Stage changes, handoff and publication force real checks.
+  `parent_poll_seconds` bounds result-wait polling to 1–50 ms (default 10 ms).
+- `metadata_slots=1..2` retains modulus-independent contexts in a private LRU.
+  Optional `decoded_cache_bytes` retains immutable prime/power tuples, capped
+  at 16 MiB/context and 64 blocks; refusal uses ordinary packed programs.
+- `stage_policy="staged"` enables a bounded clean-boundary residue queue;
+  `residue_capacity` includes in-flight stage-one jobs. Available stage-one
+  trials have priority within a tier; continuations run when capacity fills.
+- Workers outside 1/2/4, up to ten, require `allow_wide_workers=True` and funded
+  ownership. This adds no wider-worker experiment allocation or automatic count.
 
-Missing reports consume full leases. Work units, observed CPU and conservative
-CPU reservations are distinct. Shutdown CPU is reserved in full before spawn;
-process RSS is an observation, not an owned-payload theorem. Cancellation polls
-at existing stage actions; bigint operations and OS waits are cooperative.
-Private channels are drained, then owned processes are terminated/killed with
-finite joins. Runtime behavior, response tails and resource estimates remain
-queued for validation. A zero/unfunded output allowance may refuse checkpoint
-construction explicitly. No arithmetic state or live process handles are saved.
+Defaults remain one job/packet, polling every action, one metadata context,
+no decoded cache and whole curves. These are unmeasured candidates. Full-tier
+PRAC eligibility remains intact; extra caches are separately funded rather than
+shrinking arithmetic ownership. Metadata replaces/evicts before new allocation;
+curve points never enter its cache. Every new process begins with empty caches.
+
+`EngagementRule` accepts one row or a bounded `cost_table` of `CostRow` values.
+Rows bind `Manifest.schedule` and the matching executor's `cost_identity` in
+`execution`; missing/mismatched execution keys select serial. Literal committed
+source/configuration pins are also required by the experiment freeze. Each row
+provides finite per-tier serial costs and cold/warm thresholds; optional
+`pool_seconds` distinguishes an already spawned pool without matching metadata.
+Staged remaining work additionally needs `seconds_per_stage_two`. Missing,
+invalid or unfunded estimates select equivalent-manifest serial execution.
+`force_workers=True` is a separate diagnostic arm. No calibration is supplied.
+The decision receipt reports cold/pool/warm state, estimate and threshold.
+
+The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
+slot/count/order; it differs from the incumbent shared RNG stream. The extended
+wire/executor/checkpoint contract is `b12-f4-v2`; v1 checkpoints are rejected.
+ECM draws do not move later fallback seeds within the opt-in semantics. Sigma
+collisions are retained; distinct IDs do not prove independence. First-factor
+winners and staged search order can differ legitimately. Fixed-work runs retain
+the same declared curves and existing exact stage arithmetic.
+
+Checkpoints bind settings/count/rule, manifest, stage attempts, acknowledged
+residues/results and cumulative charges. Worker-count changes remain rejected.
+Only drained checkpoints are supported: unfinished whole/stage-one jobs restart
+setup; unfinished continuations restart from the checked pre-table point. The
+attempt cap is per curve-stage (maximum three), with at most 32 drained runs per
+cofactor. Canonical residues bind identity, sigma, bounds, point and curve
+parameter with a digest and range/unitness checks. These checks detect malformed
+transport/state; they do not independently recompute stage one. Arithmetic
+oracles and real-process validation remain queued. Acknowledgements become
+durable only when the caller atomically saves the returned checkpoint.
+
+Missing reports consume full leases, including queued packet jobs. Work units,
+observed CPU and conservative CPU reservations are distinct. Shutdown CPU is
+reserved before spawn. Healthy fully drained pools can survive ordinary factor
+cancellation; idle workers block. Closing broadcasts each stop phase and uses a
+single pool-wide deadline for its joins. Bigint/OS waits and deferred polling
+remain cooperative: response is bounded in charged actions plus an atomic
+operation/wait, not a hard elapsed-time theorem. Owned memory includes retained
+contexts, decoded caches, transport, residues and checkpoints; it is not an RSS
+theorem. A possible runtime-managed spawn helper gets one additional worker
+memory reserve and a full startup+shutdown CPU/work allowance per context. Its
+CPU is explicitly unobserved in worker receipts; library close does not inspect
+or stop shared multiprocessing internals. `checkpoint_bound` may refuse a large schedule before dispatch; increase
+its explicit funded allowance rather than silently dropping history. A zero
+output-work allowance may refuse checkpoint construction. No live process
+handles or interpreter internals are serialized.

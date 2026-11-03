@@ -55,7 +55,7 @@ def task(plan, position, attempt=1):
     return dict(
         assignment=plan.assignment(position),
         options=plan.options,
-        schedule=plan.schedule,
+        schedule=plan.metadata,
         token=position + 1,
         attempt=attempt,
         work=100_000_000,
@@ -276,6 +276,8 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
         job = read_message(channel, decoder, block=True)
     if job is None:
         os._exit(19)
+    packet = job
+    job = packet["jobs"][0]
     if mode == "truncated":
         channel.sendall(b"\x00\x00\x00\x50{")
     elif mode == "oversized":
@@ -285,6 +287,10 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
             frame(
                 dict(
                     kind="result",
+                    packet=packet["packet"],
+                    stage=job["stage"],
+                    prepared_schedule=packet["schedule"],
+                    metadata_cache=[packet["schedule"]],
                     id=job["assignment"]["id"],
                     token=job["token"],
                     attempt=job["attempt"],
@@ -301,23 +307,31 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
     os._exit(17)
 
 
-def crash_before_report(channel, frame_bytes, startup_work):
+def crash_before_report(
+    channel, frame_bytes, startup_work, settings_data=None
+):
     _fake_worker(channel, frame_bytes, startup_work, "crash")
 
 
-def publish_then_crash(channel, frame_bytes, startup_work):
+def publish_then_crash(channel, frame_bytes, startup_work, settings_data=None):
     _fake_worker(channel, frame_bytes, startup_work, "ack")
 
 
-def truncate_then_crash(channel, frame_bytes, startup_work):
+def truncate_then_crash(
+    channel, frame_bytes, startup_work, settings_data=None
+):
     _fake_worker(channel, frame_bytes, startup_work, "truncated")
 
 
-def oversize_then_crash(channel, frame_bytes, startup_work):
+def oversize_then_crash(
+    channel, frame_bytes, startup_work, settings_data=None
+):
     _fake_worker(channel, frame_bytes, startup_work, "oversized")
 
 
-def exit_during_startup(channel, frame_bytes, startup_work):
+def exit_during_startup(
+    channel, frame_bytes, startup_work, settings_data=None
+):
     os._exit(23)
 
 
@@ -372,14 +386,37 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertEqual(reads, [0, 1, 2, 3, 0])
         self.assertFalse(ledger.active)
-        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(ledger.work, 5_000_000)
         self.assertEqual(
-            ledger.cpu, 4 * (0.125 + executor.settings.shutdown_cpu)
+            ledger.cpu, 14 + 4 * (0.125 + executor.settings.shutdown_cpu)
         )
         self.assertEqual(
             [s["reported_cpu"] for s in executor.slots], [0.125] * 4
         )
         executor.slots.clear()  # Mock handles only; no children were started.
+
+    def test_constructor_failure_closes_the_unlaunched_socket_pair(self):
+        executor, context, _, _ = self.prepare()
+        context.Process.side_effect = OSError("injected construction failure")
+        parent, child = Mock(), Mock()
+        ledger = Ledger(20_000_000, 100)
+        with (
+            patch(
+                "v2.execution.ecm_workers.multiprocessing.get_context",
+                return_value=context,
+            ),
+            patch(
+                "v2.execution.ecm_workers.socket.socketpair",
+                return_value=(parent, child),
+            ),
+        ):
+            with self.assertRaises(OSError):
+                executor._spawn(ledger, time.monotonic() + 60, lambda: None)
+        parent.close.assert_called_once()
+        child.close.assert_called_once()
+        self.assertFalse(executor.slots)
+        self.assertEqual(ledger.lost, 1)
+        self.assertFalse(ledger.active)
 
     def test_bad_ready_keeps_every_unreported_startup_lease(self):
         executor, context, _, _ = self.prepare()
@@ -400,8 +437,10 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 4)
-        self.assertEqual(ledger.cpu, 4 * (10 + executor.settings.shutdown_cpu))
-        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(
+            ledger.cpu, 14 + 4 * (10 + executor.settings.shutdown_cpu)
+        )
+        self.assertEqual(ledger.work, 5_000_000)
         executor.slots.clear()
 
     def test_one_ready_report_refunds_only_that_child_before_peer_failure(
@@ -430,9 +469,9 @@ class StartupOwnershipTests(unittest.TestCase):
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 3)
         self.assertEqual(
-            ledger.cpu, 0.125 + 30 + 4 * executor.settings.shutdown_cpu
+            ledger.cpu, 14 + 0.125 + 30 + 4 * executor.settings.shutdown_cpu
         )
-        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(ledger.work, 5_000_000)
         executor.slots.clear()
 
     def test_startup_deadline_is_not_reset_after_launching_other_workers(self):

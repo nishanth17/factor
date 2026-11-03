@@ -82,6 +82,10 @@ def main():
                 "v2.portfolio",
                 "v2.execution.ecm_worker",
                 "v2.execution.ecm_workers",
+                "v2.execution.ecm_worker_state",
+                "v2.execution.budget",
+                "v2.execution.stage_jobs",
+                "v2.common",
             )
             if any(
                 name == prefix or name.startswith(prefix + ".")

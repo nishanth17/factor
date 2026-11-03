@@ -32,6 +32,24 @@ def write_new(path, value):
         stream.write("\n")
 
 
+def forced_arm(arm, workers):
+    """Reject misleading control/count labels before any runtime launch."""
+    if type(workers) is not int or not 0 <= workers <= 10:
+        raise ValueError("invalid arm worker count")
+    if arm == "S0" and workers == 0:
+        return False
+    if arm == "M0" and workers in (0, 1):
+        return False
+    if arm == "S1" and workers == 1:
+        return True
+    if arm == "N" and 1 <= workers <= 10:
+        return False
+    if isinstance(arm, str) and arm.startswith("P") and arm[1:].isdigit():
+        if int(arm[1:]) == workers and 2 <= workers <= 10:
+            return True
+    raise ValueError("arm label and worker count disagree")
+
+
 def load_freeze(path):
     """Refuse preparation manifests and any missing QA/source/input gate."""
     freeze = json.loads(Path(path).read_text())
@@ -61,6 +79,8 @@ def load_freeze(path):
             text=True,
         ):
             raise ValueError("dirty execution checkout")
+    for cell in freeze["cells"]:
+        forced_arm(cell["arm"], cell["workers"])
     return freeze
 
 
@@ -111,13 +131,13 @@ def run_cell(freeze, cell, directory):
                 )
             },
             entry=time.monotonic(),
-            settings=freeze["settings"],
+            settings=dict(freeze["settings"], **cell.get("settings", {})),
             config=freeze.get("configurations", {}).get(
                 cell["input"], freeze.get("config", {})
             ),
             seed=freeze["seed"],
             n=freeze["inputs"][cell["input"]]["n"],
-            rule=freeze.get("rule"),
+            rule=cell.get("rule", freeze.get("rule")),
             endpoint=cell.get("endpoint", freeze.get("endpoint", "complete")),
             work=freeze["work_limit"],
         )
@@ -244,6 +264,7 @@ def child(request_path, source_root):
 
         options["allocation"] = ECMAllocation(**options["allocation"])
     config = PortfolioConfig(**options)
+    forced = forced_arm(request["arm"], request["workers"])
     executor = None
     if request["arm"] != "S0":
         from v2.execution.ecm_workers import ECMExecutor
@@ -254,7 +275,7 @@ def child(request_path, source_root):
             seed=request["seed"],
             settings=WorkerSettings(**settings),
             rule=EngagementRule(**(request.get("rule") or {})),
-            force_workers=request["arm"] in ("S1", "P2", "P4"),
+            force_workers=forced,
         )
     charged_children, total_work = 0.0, 0
     warmup = 0.0
@@ -377,6 +398,11 @@ def child(request_path, source_root):
         + usage.ru_stime
         + children.ru_utime
         + children.ru_stime,
+        aggregate_cpu_coverage="self + reaped children; helper unobserved",
+        runtime_helper_cpu_observed=None,
+        aggregate_cpu_charged=usage.ru_utime
+        + usage.ru_stime
+        + charged_children,
         parent_peak_rss=usage.ru_maxrss,
         child_peak_rss=children.ru_maxrss,
         rss_units="bytes" if sys.platform == "darwin" else "KiB",

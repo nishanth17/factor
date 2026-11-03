@@ -9,6 +9,10 @@ below record decisions in their dated scope; later entries may supersede routes.
   parent leases, checked publication and drained restart; retain serial defaults.
 - Overlap funded worker startup with per-child deadlines and conservative
   failure accounting; add queued startup ownership tests. No speedup is claimed.
+- Add opt-in bounded packets, deferred polling, private metadata/decoding reuse,
+  pool-wide shutdown, checked stage-boundary queues and bounded engagement tables.
+  Preserve mathematical v1 curve identities; version the extended wire/checkpoint
+  contract as v2. Explicit wider-worker admission adds no measurement allowance.
 - Add queued correctness/failure tests and prospective finite benchmark support.
   Arithmetic/process/full-suite QA and performance measurements are NOT RUN;
   B12/F4 remain open and this branch is not adopted or merged.
