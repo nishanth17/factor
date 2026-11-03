@@ -191,8 +191,9 @@ binding. Shared lookahead prepays at most 64 cheap score comparisons per chunk;
 an early full batch may leave up to 63 unused comparisons charged. Derived
 lookahead never advances the committed position on refusal.
 
-Panel elimination caches sorted pivot order and reuses its table until the
-selected immutable pivot keys change. It preserves elimination action order,
+Panel elimination maintains a pivot-presence bitset, selects ordered keys
+without sorting, and reuses its table until the selected immutable keys change.
+It preserves elimination action order,
 provenance and checkpoint digests; sorted-index work and scratch are reserved.
 
 ## Development

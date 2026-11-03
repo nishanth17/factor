@@ -1,7 +1,7 @@
 """Bounded sparse incidence, tree elimination and panel-table kernels."""
 
 from array import array
-from bisect import bisect_left, bisect_right
+from bisect import bisect_left
 
 
 def incidence_add(mask, index):
@@ -54,20 +54,24 @@ def panel_reduce(solver, row, mask):
         if solver.pivot == "highest"
         else row & -row
     )
-    # Pivots only grow and their rows never change. Sorting all keys on every
-    # XOR made panel selection much more expensive than scalar elimination.
-    order = getattr(solver, "_panel_order", None)
-    if order is None or len(order) != len(solver.pivots):
-        count = len(solver.pivots)
-        solver.budget.consume(count * (count.bit_length() + 1))
-        order = sorted(solver.pivots)
-        solver._panel_order = order
+    # A pivot key is one column bit. The incrementally maintained presence
+    # mask selects ordered keys directly, without sorting or scanning pivots.
+    solver.budget.consume(width * (solver.matrix.stats["working_columns"] + 1))
+    bits = solver._panel_pivots
     if solver.pivot == "highest":
-        end = bisect_right(order, leading)
-        keys = tuple(reversed(order[max(0, end - width) : end]))
+        bits &= (leading << 1) - 1
     else:
-        start = bisect_left(order, leading)
-        keys = tuple(order[start : start + width])
+        bits &= -leading
+    selected = []
+    while bits and len(selected) < width:
+        bit = (
+            1 << (bits.bit_length() - 1)
+            if solver.pivot == "highest"
+            else bits & -bits
+        )
+        selected.append(bit)
+        bits ^= bit
+    keys = tuple(selected)
     if len(keys) < 2:
         return None
     # New pivots outside this panel cannot invalidate its immutable table.

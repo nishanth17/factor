@@ -131,12 +131,13 @@ class CostRegressionTests(unittest.TestCase):
         self.assertEqual(primes, (3, 11, 41))
         self.assertEqual(inputs, [1353, 451])
 
-    def test_panel_index_is_reused_until_pivots_grow(self):
+    def test_panel_presence_avoids_scanning_or_sorting_pivots(self):
         pivots = CountingPivots(
             {1: (1, 1), 2: (3, 2), 8: (10, 4), 32: (34, 8), 128: (130, 16)}
         )
         solver = SimpleNamespace(
             pivots=pivots,
+            _panel_pivots=171,
             pivot="highest",
             budget=allowance(),
             matrix=SimpleNamespace(
@@ -148,11 +149,12 @@ class CostRegressionTests(unittest.TestCase):
         table = solver._panel_cache
         for _ in range(100):
             self.assertEqual(panel_reduce(solver, 171, 7), expected)
-        self.assertEqual(pivots.scans, 1)
+        self.assertEqual(pivots.scans, 0)
 
         pivots[512] = (512, 32)
+        solver._panel_pivots |= 512
         self.assertEqual(panel_reduce(solver, 171, 7), expected)
-        self.assertEqual(pivots.scans, 2)
+        self.assertEqual(pivots.scans, 0)
         self.assertIs(solver._panel_cache, table)
 
     def test_noncontiguous_panels_match_independent_dense_kernels(self):
@@ -162,6 +164,7 @@ class CostRegressionTests(unittest.TestCase):
             matrix = filter_matrix(rows, panel_bits=3, budget=allowance())
             solver = DependencySolver(matrix, pivot=pivot, budget=allowance())
             dependencies = solver.run()
+            self.assertEqual(solver._panel_pivots, sum(solver.pivots))
             self.assertEqual(span(dependencies), expected)
             for mask in dependencies:
                 verify_dependency(mask, rows)

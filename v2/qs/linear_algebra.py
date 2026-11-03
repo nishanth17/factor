@@ -113,9 +113,8 @@ def filter_matrix(
         columns = union.bit_count()
     reserve = matrix_workspace(len(rows), columns)
     if panel_bits:
-        # Cached pivot order plus a coexisting sorted replacement. Its keys
-        # share the immutable pivot integers already covered by fill-in.
-        reserve += 64 * columns
+        # Pivot presence and coexisting masks used for ordered panel lookup.
+        reserve += 512 + 32 * ((columns + 7) // 8)
         reserve += (1 << panel_bits) * (
             512 + 8 * ((len(rows) + columns + 7) // 8)
         )
@@ -471,6 +470,7 @@ class DependencySolver:
         for mask in self.dependencies:
             verify_dependency(mask, matrix.original_rows)
         self.pivots = {}
+        self._panel_pivots = 0
         self.next_row = 0
         self.pending = None
         self.xors = 0
@@ -503,6 +503,9 @@ class DependencySolver:
         )
         previous = self.pivots.get(bit)
         if previous is None:
+            if self.matrix.stats.get("panel_bits", 0):
+                self.budget.consume(self.matrix.stats["working_columns"] + 1)
+                self._panel_pivots |= bit
             self.pivots[bit] = row, mask
             self.pivot_nonzeros += row.bit_count()
             self.peak_nonzeros = max(self.peak_nonzeros, self.pivot_nonzeros)

@@ -5,7 +5,8 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
-- Fix repeated pivot sorting/table invalidation in panel elimination and bound
+- Remove pivot sorting with an incrementally maintained presence bitset, avoid
+  unnecessary panel-table invalidation, and bound
   cofactor lookahead checks in prepaid chunks. Add a rho-first split policy with
   retained SQUFOF fallback and reuse of paid splits for three-prime recovery.
   Prepare the separate `cost-report` nominee using scalar elimination and that
