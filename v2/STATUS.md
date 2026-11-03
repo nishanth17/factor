@@ -1,7 +1,7 @@
 # Factor status
 
 Last updated: 2 November 2026 (America/Los_Angeles).
-Reviewed mainline/base: `5dd6a5c`.
+Reviewed mainline/base: `b6b1dc1`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; implementation remains in the C10a-01 worktree.
@@ -152,6 +152,12 @@ High for requested prime certification; accounting/correctness repairs take
 precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 stays in flight and E1
 remains Deferred. Do not restart the stopped broad backend study or duplicate
 C10a-01 feasibility under this review.
+
+E6's prime-generation candidate is a source-bundled adaptation of the existing
+C11 wheel-30 sieve through CFFI, with finite batches and a Python fallback.
+It must not depend on a sibling checkout or an external prime-sieve library;
+see the [native prime-provider gates](ROADMAP.md#e6--self-contained-native-prime-generation).
+Local source review: `v2/audit/research/prime_provider_20261102.md`.
 
 Separate worktrees isolate source changes. Keep current C10a-01 timing freezes
 unchanged; parallel research/design and light edits can proceed, while heavy QA

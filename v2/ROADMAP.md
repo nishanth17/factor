@@ -2,7 +2,7 @@
 
 Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
 eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 2 November
-2026 against committed mainline `5dd6a5c`, incorporating the QS coverage,
+2026 against committed mainline `b6b1dc1`, incorporating the QS coverage,
 portfolio and native-boundary reviews and the declared wall-time objective.
 
 Status vocabulary: **Done**, **Open**, **Conditional** (requires its trigger),
@@ -382,7 +382,7 @@ See the [retained decisions](benchmarks/RESULTS.md#c10a-07-face-and-queue).
 | E3 — P8.2 preprocessing | Compare inherited negative trial coverage, its exact bound on possible power exponents, high-valuation removal and same-integer valuation-gcd pruning before costlier Fermat/Lehman/Hart/SQUFOF or structured a^k±1, power-sum/difference and historical Fibonacci/Lucas candidates (AP18–AP24). A10a owns classification deltas. Parent non-power/compositeness results do not automatically hold for children; C3a coordinates lineage. | Current committed preprocessing/classification oracle and observed cheap-path opportunity for isolated design/feasibility; D7 for integrated portfolio tuning | **Conditional; medium/profile-gated.** Keep prior primorial/root/pretest losses. Use ordinary integers, rough survivors, powers, small residuals and close/special-form strata; prevent cheaper screening from delaying expensive-path completion. No restart of E1/D7 is implied. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
 | E4 — P8.3 rho calibration | Tune existing Brent batch/walk/restart and finite effort under identical total budgets/seeds; compare a selected native whole-batch kernel only if rho cost matters. Include local saturation replay, smaller-factor strata, failure expenditure and the next engine. Existing Brent/local loops are controls. | Current committed rho/recovery control for isolated screening; D7 for integrated portfolio tuning | **Open preparation; medium/conditional experiments.** Rho has useful small-factor and residual coverage, not a practical balanced 60–80-digit growth path. Independent-walk parallelism has different scaling from ECM curves. Bigger iteration counts and a new kernel each need marginal complete-cost evidence. | Sol / **high**; **xhigh** for changed recovery semantics | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
 | E5 — P8.5 recovery/polling/checkpoint costs | Attribute polling, atomic state commits, replay, result validation, serialization and durable I/O separately. Reuse existing C3 reservation/clock repairs and rho chunking; select only remaining overhead. Fund bounded chunks, preserve deadline/cancel precedence, refusal states, strict factor recovery and charged resume; native buffers need deterministic release. | Current committed boundary/accounting contracts and a measured remaining cost for isolated feasibility; D7 for integrated portfolio tuning | **Conditional; medium/profile-gated.** A smaller clock-call count or larger atomic unit is not a free win if it changes responsiveness, work coverage or validation. Price checkpoint policy and restoration honestly; no automatic rewrite of the shared budget API. | Sol / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
-| E6 — P8.6 contexts/schedules for changed workloads | Select reusable immutable prime/power/product metadata, lazy setup, compact allocation and warm worker contexts only for a changed workload. Separate per-modulus state, cache admission/eviction, thread-private native buffers and semantic configuration identity; preserve prior wheel/cache/rolling losses. Current A1/A1d/C10a kernels retain their owners. | Current committed context/cache contracts for isolated screening; D7 for integrated portfolio tuning; coordinate B4a/B12/F4 | **Conditional.** Cold single calls, warm services and batches of inputs are separate claims. Setup amortization, retained memory, GC/native allocation and restart count enter whole cost. Cache only valid shared data; no cross-modulus point/residue reuse or hidden training-factor credit. | Sol / **high**; **xhigh** for ownership/rejection changes | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
+| E6 — P8.6 contexts/schedules and bundled prime generation | Select reusable immutable prime/power/product metadata, lazy setup, compact allocation, warm worker contexts or a source-bundled C11/CFFI prime-batch provider. Reuse existing wheel-30/segmented context and sorted-output machinery; adapt it to finite Factor packets. Separate modulus state, cache ownership, native buffers and semantic identity; preserve prior Python wheel/cache/rolling losses. A1/A1d/C10a retain QS kernels. | Current context/cache contracts and C11 prime-generation/consumption cost evidence; D7 for integrated tuning; coordinate B4a/B12/F4/A7a | **Conditional; cheap opportunity screen eligible.** Bundle source/build adapter with a Python fallback; no sibling-runtime or external prime-sieve-library dependency. Price setup, extraction/copies, memory and unused preparation. Native threads start at one inside factoring workers; wider prime generation needs its own complete-cost evidence and aggregate grant. | Sol / **high** cost screen; **xhigh** native ABI, ownership, rejection/resume and implementation; optional separate Sol / **high** frozen execution | [prime-provider gates](#e6--self-contained-native-prime-generation); [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-e--current-engine-acceptance-control-freeze-and-p8-experiments) |
 
 ### Execution phase F — independent P6 challengers
 
@@ -572,6 +572,27 @@ The broad review does not restart the stopped backend sweep, select every
 cheap-path candidate or authorize a campaign. Follow the existing stage gates,
 clean feasibility, observer calibration, finite cumulative grants and fresh
 confirmation rules for whichever single hypothesis is selected next.
+
+#### E6 — self-contained native prime generation
+
+Use the existing C11 wheel-30 segmented implementation as the first native
+prime-provider candidate. Bundle a pinned source adaptation, header and CFFI
+adapter in Factor when selected; runtime use must not require a sibling
+repository or external prime-sieve library. Retain the current Python stream.
+This direct native boundary is distinct from earlier Python ports and their
+recorded losses; its current complete-factor benefit remains unmeasured.
+
+Return bounded packed batches with explicit status and capacity. Adapt the
+inclusive C range endpoint to Factor's half-open contract, distinguish empty
+output from allocation/range failure, preserve integer widths and fund native
+workspace plus output/copy coexistence. Size reusable buffers for the selected
+packet, not a broad materialization workload. Check cancellation and cumulative
+work at bounded boundaries and resume from canonical checked positions.
+Contexts are private to one caller. Use one inner thread inside ECM/QS workers
+unless a separately funded concurrency plan shows a benefit; the standalone
+CLI's adaptive OpenMP policy is not a library or Factor policy. C11 attributes
+generation, repeated setup and consumption before raising this conditional
+item above the current worker and factoring-kernel priorities.
 
 #### Bulk kernels: PyPy, NumPy and optional native acceleration
 

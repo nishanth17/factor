@@ -70,6 +70,13 @@ backend, with production/default promotion subject to the same gates; a
 feasibility result does not adopt it or authorize a wholesale rewrite. Kernel
 and parallel speedups cannot be multiplied into an unmeasured whole-factor claim.
 
+Keep a selected native prime-generation backend self-contained in Factor:
+bundle its C sources and build adapter instead of depending on a sibling
+checkout or an installed external prime-sieve library. Compiler/CFFI and any
+optional OpenMP runtime remain explicit accelerated-backend requirements;
+the Python/PyPy fallback must work without the native extension. Preserve the
+source pin and adaptation record locally and validate the bundled source.
+
 E1 combined confirmation is deferred. GNFS stays deferred
 until H1 and a subsequent coverage review activate A9. Individual accepted
 tranches may ship when their own gates pass; optional losses can settle a
