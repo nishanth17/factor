@@ -2104,6 +2104,14 @@ negative arm and all historical pins.
   **Astra / xhigh** for diagnosis design and implementation, then the selected
   execution model for the frozen measurements. This follow-up does not block
   the already admitted 70-digit pair and does not authorize default promotion.
+  **3 November diagnosis:** unified power-daemon history records AC Low Power
+  Mode changing from 0 to 1 at 15:58:20 during the candidate, after the control
+  completed. A short controlled power-mode probe affected both SIQS and a
+  native-code canary. The benchmark repair records host state and native
+  drift; no production arithmetic change is supported. New finite rechecks
+  retain the old pair and every censored diagnostic. The user explicitly
+  authorized the current model for this follow-up. A clean matched rerun
+  remains the next gate; this item stays open pending its evidence.
   **Runner continuation prerequisite:** the opt-in `pilots_live` adapter now
   supports durable, acknowledged increases to a live wall/CPU/work grant.
   The same job, consumed work and clock origins persist; the supervisor uses

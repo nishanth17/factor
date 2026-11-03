@@ -17,3 +17,20 @@ opt-in [live-limit runner](qs/c10a01/live_protocol.md) adds acknowledged,
 journaled extensions before that restart. The frozen input, arithmetic,
 policies and matched tier remain unchanged. Detailed receipts and failures
 are retained under ignored results/audit directories. Defaults are unchanged.
+
+The four-hour 70-digit candidate subsequently completed in 7603.072 wall
+seconds (2 hours 6 minutes 43 seconds), with verified factors. The control was
+explicitly user-interrupted after about 3 hours 31 minutes 45 seconds of
+measured elapsed time. It has no returned factor or final runtime; its full
+reservation remains charged. This is user censoring, not a four-hour timeout
+or an identified successful-factoring speed ratio.
+
+The 65-digit follow-up found a macOS power-daemon record switching Low Power
+Mode from off to on during the original candidate, after control completion.
+The old timing comparison therefore crossed a host-condition change. Short
+same-work probes confirmed a substantial host-mode effect in both SIQS and
+a native-code canary. The benchmark now records power source/mode, requested
+thread QoS, GC/JIT environment and native-canary drift. No arithmetic repair
+is justified by that evidence. A separately identified, source-pinned
+[host-audited recheck](qs/c10a01/regression65_recheck_protocol.md) preserves
+the original results and all censored diagnostics; defaults remain unchanged.

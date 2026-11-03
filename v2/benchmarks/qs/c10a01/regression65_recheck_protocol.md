@@ -10,11 +10,11 @@ work would not resolve the question.
 
 The Mac was on AC power with `lowpowermode 1`, no reported thermal warning,
 24 GiB physical RAM and 72% reported free memory. The original pilot has no
-power-state receipt. Retained power-management logs did not establish a
-mode transition during the original candidate. Low Power Mode is therefore
-a concrete current host variable and a hypothesis for the old drift, not a
-proved retrospective cause. No system setting is changed without the
-requested authorization; absence of a reply means it remains unchanged.
+power-state receipt. A targeted unified-log query subsequently established
+a transition from mode 0 to mode 1 at 15:58:20.810 on 2 November, during the
+candidate and after the control ended at 15:50:49. The old pair therefore
+crossed a documented host-condition change. This establishes a confound;
+it does not identify a counterfactual full-run time for either arm.
 
 The user subsequently authorized temporary disable and restoration. Before
 changing AC mode, `power_probe.json` reserves exactly two 35-second calls
@@ -25,6 +25,18 @@ CPU seconds**, 581000000000 total work units. Each probe has a finite
 neither is overwritten. This tests a host mechanism on identical work, not
 independent-input factoring performance. Restore the original AC setting
 after the authorized follow-up, retaining battery settings throughout.
+The command-line change required administrator authentication, so the user
+disabled the setting in System Settings. A GUI-automation attempt stalled
+for 2144.422 wall seconds with no factoring process active; that administrative
+failure is retained separately, with tool CPU unavailable. It is not a
+successful numerical call or hidden measured cost. Restoration also requires
+the user's OS-authenticated action if administrator access remains unavailable.
+
+The paired short power probes measured median SIQS CPU times of 0.940781
+seconds in mode 1 and 0.546851 in mode 0 (same work and atom digest), a factor
+of about 1.720. Native-canary medians were 0.031495 and 0.020032 seconds,
+about 1.572 times. These are causal host-mode diagnostics on one execution
+per mode, not a portable scaling law or an adjusted original factoring time.
 
 The supported repair is to the benchmark: record active power source/mode,
 requested native thread QoS, PyPy nursery and explicit GC/JIT environment,
