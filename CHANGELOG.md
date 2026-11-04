@@ -5,6 +5,15 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield continuation (4 November 2026)
 
+- Remove the uncalibrated 15% canary veto from new C9a analyses, observer
+  comparisons and feasibility admission. Retain legacy flags as diagnostics
+  and provide explicit historical analysis replay. Keep instrumented runs and
+  actual resource/recorder failures distinct; future performance judgments
+  require measured variability and uncertainty rather than a universal cutoff.
+- Integrate the tested C9a bundle into mainline and close the delivered stream
+  by explicit direction. Keep the performance verdict exploratory and policy
+  classes opt-in. Replace C9a in the ranked queue with C9b for current-mainline
+  timing validation and a bounded remaining-headroom analysis.
 - Mark bucket recovery metadata in bounded 60-bit integer words with block
   epochs; materialize exact wide masks only for selected candidates. Charge
   construction, periodic stamp copies and internal reads, keep mandatory

@@ -2,7 +2,8 @@
 
 Last updated: 4 November 2026 (America/Los_Angeles).
 
-Current C9a follow-up: source `c8168dc` passes the committed-only 1,113-test
+C9a is integrated into mainline and the delivered stream is Done by explicit
+closure direction on 4 November. Source `c8168dc` passes the committed-only 1,113-test
 suite (9 skipped), lint and 243 benchmark imports. It includes bounded
 same-A prime-power root transfers, native-width recovery bits, fused marking,
 additive queues, exact proof reuse and unchanged refusal/resume validation.
@@ -16,13 +17,18 @@ source `891eda5`: C9a/C0 take 1842.1/2742.1s, with exact proven reconstruction,
 34.3% fewer C9a positions and 10.1% lower peak RSS. C9a's timing screen fails;
 C0's passes. This is one exposed modulus/seed and compares policies on the
 optimized runtime; the later root/word changes have no full70 result.
-The raw differences remain exploratory, with no population speedup or adoption.
+The raw differences remain exploratory because each size has one exposed input
+and no fresh confirmation. The historical 15% canary tolerance was uncalibrated;
+new analysis reports its flags as warnings and retains validated timings.
+Actual resource/recorder failures stay distinct. C9b will calibrate variability
+and quantify uncertainty rather than imposing a universal percentage cutoff.
 One calibrated whole-factor CPU profile and mature heap identify marking,
 queue construction and GC costs; traced time is diagnostic only. Detailed
 local evidence starts at `v2/audit/c9a/optimization-83-89.md`, the final finite
 plan at `v2/audit/c9a/plan-89.json`, and verified evidence at
-`v2/audit/c9a/verification-89.json`. C9a remains Open. This bounded phase is
-complete; no additional campaign or policy/default promotion follows.
+`v2/audit/c9a/verification-89.json`. Evidence is preserved locally before task
+worktree cleanup. C9b now owns timing validation and remaining headroom
+analysis; no new campaign or policy/default promotion follows this integration.
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
@@ -60,6 +66,10 @@ Full historical results and gates remain in the [history index](history/README.m
 Useful progress toward 60–80-digit factoring remains the immediate focus;
 100 digits is also a measurement target, with completion feasibility still
 unestablished. Existing experiments retain their frozen scopes and budgets.
+
+The following C9a paragraphs retain the earlier preparation chronology;
+their then-open gates are superseded by the scoped closure above, while
+their experimental failures and adoption limitations remain historical.
 
 C9a preparation on `codex/c9a-combined-yield-review` starts from committed
 `b0813230a05396874c41c649fa01738484a1f55e`. Its opt-in bundle implements
@@ -315,10 +325,11 @@ Task rows retain exact scope, dependencies and fixed-session model assignments.
    before measuring 1/2/4-worker complete factoring at 60/70 digits. Existing
    workers reject growing DLP and cap windows below the calibrated serial
    width. Family-sharing alternatives are a later measured subquestion.
-4. **C9a combined useful-yield candidate — Astra / xhigh.**
-   Ranked next after parallel collection; research need not wait for a worker
-   result. Rank intake/endpoints against current collection cost; use late-run
-   replays for cycle/storage/cadence hypotheses.
+4. **C9b mainline timing validation and remaining QS headroom — Sol / xhigh.**
+   C9a is Done and integrated. First diagnose unchanged-code A/A timing and
+   establish the current baseline, then screen queue construction, recovery
+   allocation and family-wide reuse within a new finite plan. Coordinate
+   existing A1d/C8/B5a owners; fresh confirmation remains separate.
 5. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
    Price complete setup/conversion/recovery and scalar execution before SIMD
    or new reducers. A CFFI wrapper alone is no measured gain.
@@ -332,6 +343,10 @@ Task rows retain exact scope, dependencies and fixed-session model assignments.
    scan/root/mark packet with queue-compatible buffers and exact hit/score
    costs; retain the Python fallback. M4 NEON and x86 AVX are separate targets.
    M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
+
+- [x] **C9a combined useful-yield, admission and storage:** delivered and
+  integrated; performance evidence remains exploratory. Removed from active
+  ranked work and replaced by the separately scoped C9b item.
 
 The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
 initial opportunities, with explicit capacity/profile triggers. E3/A10a/E4/E5/

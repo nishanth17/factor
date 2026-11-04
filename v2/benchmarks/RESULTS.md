@@ -32,8 +32,11 @@ C9a uses 34.3% fewer positions and 10.1% lower peak RSS, while its reserved
 workspace is higher. The policy comparison uses the optimized shared runtime,
 not a fresh master call. Earlier 900s outcomes and all charges remain preserved.
 Each size has one exposed modulus/seed; repeated component samples are not
-independent inputs. Failed timing gates remain failed, paired gains are not
-multiplied, and no population speedup or adoption follows. Final committed-only
+independent inputs. Historical timing flags are preserved, but the uncalibrated
+15% heuristic is no longer a veto in new analyses: warnings accompany retained
+validated observations. Independent-input variability and fresh confirmation
+remain unmeasured. Paired gains are not multiplied into a population speedup.
+Final committed-only
 checks pass 1,113 tests (9 skipped), lint and 243 benchmark imports.
 
 One calibrated whole-factor sample on `ebb35fa` attributes substantial cost
@@ -43,7 +46,10 @@ dominators or allocation rates. Diagnostic timing is separate from clean
 evidence. Local detail: `v2/audit/c9a/optimization-83-89.md` and
 `verification-89.json`; generated data: `results/c9a/hit-words-89/`, with
 earlier worktree locations recorded in the local report. The bounded phase
-stops here; acceptance remains Open.
+stops here. The delivered C9a stream is integrated and closed by explicit
+direction on 4 November; failed timing/fresh-confirmation gates remain unmet.
+C9b owns subsequent validation and headroom analysis. Existing C9a policy
+classes remain opt-in.
 
 The final shared-source flat-queue pair on `180576c` factors the same exposed
 60-digit input in 268.8/230.4s for incumbent/C9a: 14.3% lower raw candidate time.

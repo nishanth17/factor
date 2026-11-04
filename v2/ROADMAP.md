@@ -1,8 +1,8 @@
 # Factor live backlog
 
 Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
-eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 3 November
-2026 for C10a-01 integration from `d37b809` onto mainline `99a2943`, retaining the QS coverage,
+eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 4 November
+2026 for C9a mainline integration and scoped closure, retaining the QS coverage,
 portfolio and native-boundary reviews and the declared wall-time objective.
 
 Status vocabulary: **Done**, **Open**, **Conditional** (requires its trigger),
@@ -40,12 +40,12 @@ explains fixed-session assignments.
 
 ## Ranked next work — expected benefit and cost
 
-This is the authoritative preparation queue as of 2 November under the
+This is the authoritative preparation queue as of 4 November under the
 [declared workload and wall-time objective](STATUS.md). C10a-01 keeps its
 existing freeze. The short C3a/C11 screen comes first for broad routing value
 at low initial cost; ECM workers are the next major implementation, followed
-by current-collector QS workers just ahead of QS yield research. Both worker
-paths can prepare independently once their own contracts are settled.
+by current-collector QS workers and the separate C9b validation/headroom item.
+Both worker paths can prepare independently once their contracts are settled.
 Ranking weighs reachable latency/completion benefit, workload coverage and
 engineering/measurement cost. These are judgments, **not measured gains**.
 
@@ -54,7 +54,7 @@ engineering/measurement cost. These are judgments, **not measured gains**.
 | 1 | **C3a + C11: current portfolio/ECM opportunity screen, then one missing policy delta** | Broad leverage across ordinary, uneven and recursive inputs; excessive ECM also delays hard-tail fallback. Current 60–100-digit routing still uses fixed32, while source-derived deeper presets already exist. Check joint B1/B2/count, completed-work credit and observable-cost handoff before buying new arithmetic. C11 also attributes preprocessing, classification, rho/PM1, polling and setup so the broader queue follows actual complete costs. | High confidence in a coverage gap; medium confidence in a winning policy. Small initial screen, medium implementation. Sol / xhigh; stop or narrow after the cost/yield decision. |
 | 2 | **B12 → F4: opt-in independent ECM curve workers** | Main broad-workload concurrency lever: independent curves can reduce the long ECM portion of random-integer calls. Rank for wall latency while reporting total CPU, startup and cancelled work. | High confidence in parallelizable work, medium in complete-factor benefit; medium ownership/resume cost. Sol / xhigh. Measure 1/2/4 workers, then wider M4 occupancy if funded and useful. |
 | 3 | **A7a: current-collector parallel QS relation collection** | Main concurrency lever for the protected balanced tail, where long collection can amortize process cost. Reuse A7 leases/merge/resume rather than rebuilding workers. Existing workers reject growing DLP and constrain windows, so compatibility with the strongest serial collector comes before scaling claims. | High confidence in parallelizable collection, unmeasured current complete-factor gain; medium/high integration cost. Sol / xhigh. Compare current serial, adapted one-worker and 2/4-worker runs at 60/70; price parent admission, filtering and aggregate memory. |
-| 4 | **C9a: combined useful-yield/intake candidate** | Next QS algorithmic priority. Wider intake/asymmetric endpoints can reduce dominant collection work in both serial and worker execution; cadence, cycles, duplicate handling and compact records are costed enablers. | Medium confidence in benefit; high math/storage cost. Astra / xhigh. Current cost/yield breakdown and late-run replay determine which flags enter the nominee. |
+| 4 | **C9b: mainline timing validation and remaining QS headroom** | C9a is integrated and closed. Establish an unchanged-code A/A timing baseline, then price remaining queue construction, cofactor-recovery allocation and family-wide reuse on the final mainline collector. Coordinate existing A1d/C8/B5a owners rather than duplicating their implementations. | Medium confidence in remaining opportunity; its size is unmeasured after the final hit-word change. Sol / xhigh for bounded attribution/protocol work; separately scoped arithmetic changes retain their owners. Stop after a small informative screen unless a concrete full-cost hypothesis advances. Fresh inputs and uncertainty govern performance confirmation. |
 | 5 | **B4a: fused native ECM chunks through CFFI, optional backend** | Move one bounded existing ladder/verified-program chunk into native code so arithmetic stays behind one call. Current GMP representation still runs operator loops in Python; this is a distinct opportunity from a backend toggle or a per-multiply wrapper. It may also enable native worker threads. | High confidence in the boundary gap, unmeasured local gain; medium engineering/ownership cost. Sol / xhigh with unchanged formulas and existing oracles. First compare scalar native execution including conversion and recovery; SIMD/new reducers require their own evidence. |
 | 6 | **A1d: prime-major multi-polynomial bucket generation** | Concrete new scheduling gap: current queues are polynomial-local; YAFU builds large-prime buckets across a bounded Gray-code polynomial batch. Amortize prime/root traversal while retaining the existing queue and C10a-01 tables. This differs from C8's CRT half-sum search. | High confidence in the code gap, medium in payoff; medium integration/storage cost. Sol / xhigh. Count actual root/prime visits and charge preparation plus consumed polynomials before complete-factor comparison. |
 | 7 | **B3a: selected larger-bound stage-one chain coverage** | A concrete uncovered delta: accepted plans and automatic eligibility stop at B1 = 2,000. Deeper 10,000/11,000/50,000 presets use the ladder. Reusing checked chains may make those bounds economical before a new curve family is needed. | High confidence in the gap, medium in benefit; medium cost if existing verification suffices. Sol / xhigh. Advance only where C3a shows worthwhile larger-bound stage-one cost. |
@@ -67,6 +67,11 @@ engineering/measurement cost. These are judgments, **not measured gains**.
 | 14 | **A5 → B8: Williams p+1 and selected starts/chains** | Adds complementary coverage, particularly smooth p+1 factors. Expected broad benefit is less established than improving existing ECM/collection paths. | Medium coverage confidence, low quantified portfolio confidence; medium/high cost. Sol / xhigh binary control, Astra / xhigh new starts/chains. |
 | 15 | **F8: specialized fast P−1/P+1 continuation** | Important distinct polynomial algorithm at large bounds, but improves a narrower smoothness class. Reuse verified kernels where useful; ECM continuation is not its correctness template. | Conditional on measured PM1/PP1 continuation cost; high cost. Astra / xhigh; A5 is required only for PP1. |
 | 16 | **Other triggered deltas: E3/E4/E5/E6, A10a/A2a/C5, C10a-02/-03, C1a/C8, F5/F6/F9** | Select only an uncovered, observed cost/capacity/certainty gap. Rho/PM1 and cheap-path work can matter greatly in their own strata; their current complete-cost share or useful success must justify expansion. Existing losses and C10a-01 overlap argue against blanket sweeps. | Profile/capacity-dependent; task rows retain assignments. C11 reconciles source provenance without turning every reference mechanism into an implementation project. |
+
+- [x] **C9a combined useful-yield, admission and storage stream:** implemented,
+  explored and integrated into mainline on 4 November. Scoped closure is
+  explicitly authorized; historical canary warnings and missing fresh confirmation
+  remain recorded. C9b owns further validation/headroom analysis.
 
 Required correctness, accounting and requested-proof work takes precedence over
 this optimization queue: B14 remains High for certified results; C10a-06 and
@@ -194,7 +199,8 @@ research. The [history index](history/README.md) supplies local research paths.
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
 | --- | --- | --- | --- | --- | --- |
 | C3a — current ECM effort, recursive credit and handoff delta | Reconcile completed C3 first; profile the current control and select at most one uncovered joint B1/B2/count, completed-search credit or observable-cost handoff hypothesis. Separate ECM/SIQS/classification RNG streams with B12 so changed curve counts do not silently change fallback seeds. Specify valid descendant credit for completed work, finite fallback floors and exact checkpoint lineage. | C3 final decisions; C11 targeted current feasibility/cost evidence; a named uncovered delta; no E1 prerequisite for component work | **Open; High screen/design; implementation conditional on opportunity.** Existing C3 already covers empirical survival/cost scheduling and several deeper presets. Preserve its negative, unstable and early-adoption outcomes. A failed curve is evidence conditional on a workload prior, not a posterior factor-size certificate. Global budget carry-over already exists; descendant search credit and same-curve extension are different mechanisms. | Sol / **xhigh** existing-arithmetic policy/lineage design and implementation; Astra / **xhigh** only for a separately selected new probability/arithmetic proof; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
-| C9a — combined useful-yield, admission, cycles and compact records | Select a coherent combined candidate spanning yield-aware preparation/filtering cadence, wider recovered-product intake, ordered asymmetric endpoints, shorter cycle/algebraic-duplicate policies and compact replayable records. Give mechanisms independently selectable, checkpoint-bound flags; C10a coordinates scoring/scheduling and B7 supplies the selected storage/provenance contract. C1a retains anchor-only SLP. | Completed C9.2 and current committed collector; reconcile C10a-01's source and results; a concrete current cost/yield hypothesis | **Open; High.** One expanded workstream may implement justified mechanisms and compare control versus one combined nominee with targeted ablations. No isolated speedup, separate chat or completed global B7 is a prerequisite. Research may retain/reject/defer components. Preserve C9 evidence; full fresh confirmation governs adoption. | Astra / **xhigh** for the expanded research, design, implementation and correctness scope; Sol / **xhigh** only for a separately scoped cadence/existing-policy task; optional separate Sol / **high** frozen execution | [current combined scope and gates](#c9a--combined-useful-yield-and-storage-workstream); [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
+| C9a — combined useful-yield, admission, cycles and compact records | Delivered independently selectable yield/cadence, product/endpoint admission, cycle/duplicate and compact-record policies, bounded recovery, exact reuse, root transfers and native-width hit metadata. Preserve checked resume, independent validation and finite ownership/work. | C9 and integrated C10a-01; final tested runtime `c8168dc` | **Done for the delivered stream and mainline integration, 4 November, by explicit closure direction.** Correctness and exploratory complete60/70 comparisons are recorded; timing calibration and fresh confirmation remain limited. Retained policies stay opt-in; this closure does not assert a population speedup or promote C9a defaults. Further work belongs to C9b and existing mechanism owners. | Delivered scope closed | [scope and closure](#c9a--combined-useful-yield-and-storage-workstream); [results and limitations](benchmarks/RESULTS.md#c9a-preparation) |
+| C9b — mainline timing validation and remaining QS headroom | Diagnose unchanged-code A/A timing stability, establish an uninstrumented current-mainline baseline, then selectively attribute queue construction, recovery allocations and family-wide reuse. Compare any justified change at complete cost, including setup, unused preparation, memory and exact validation. | Integrated C9a; existing A1d/C8/B5a/F7 ownership; a newly declared finite protocol | **Open; ranked 4.** The earlier whole profile predates the final hit-word optimization. Measure current bottlenecks before selecting another implementation. Preserve historical observations and flags; use independent inputs, uncertainty and disjoint confirmation for adoption. No run is authorized by this roadmap item alone. | Sol / **xhigh** for attribution/protocol and existing-code work; arithmetic/proof extensions retain their existing task assignments | [current follow-up scope](#c9b--mainline-validation-and-remaining-headroom) |
 | A1a follow-ups — checked transitions, quota-aware setup and lifted roots | Reuse validated switch metadata/internal certificates without removing public root verification; bound setup by consumed quota. Investigate cross-B lifted-power roots and fused/paired-polynomial switching as explicit alternatives. Coordinate existing C10a-01 Gray tables and A1c kernels to avoid duplicate implementation. | Delivered A1a stays closed; current setup/lifting hypothesis and current C10a-01 integration identity | **Open design.** Compare setup plus actual consumed traversal; preserve larger-cache and presieve/unroll losses. Bind certificates/caches to base, A/B, representation and backend; prove characteristic-two/singular cases, invalidation, old/new coexistence and charged refusal/rebuild. Derived trust is rebuilt on resume. | Sol / **xhigh** checked metadata/fused kernel work; Astra / **xhigh** cross-B lifting arithmetic and its implementation; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 | A1b-F1 — fixed-score sparse-queue integration | A separate mechanism: policy-bound fixed-score queue weights/eligibility, exact threshold/power coverage, scratch refusal and charged rebuild. Do not modify historical A1b controls. | Completed A1b existing-option decision; a new credible cost hypothesis and separately frozen design | **Deferred.** The implemented fixed/list bundle lost all 50/55/60 screens. No queue extension or additional campaign is admitted by that result. | Sol / **xhigh** integration/ownership; **high** frozen evaluation | [A1b decision and boundary](benchmarks/RESULTS.md#a1b-existing-fixed-score-review) |
 | A1c — bulk marking/scanning and same-modulus two-root interleaving | Select a bounded PyPy bulk mark/scan or paired-root kernel; consider fused root-switch/marking with A1a. A1d owns prime-major multi-polynomial scheduling. Verify sorted translated offsets, tails, duplicate/singular roots, saturation, hit metadata and reservation/cancellation/interrupted-block replay. Two roots and two polynomials are distinct hypotheses. | Settled A1a/queue controls, exact kernel oracles and a current marking/scanning cost hypothesis | **Open; High design/implementation.** Keep queue eligibility and backend consequences explicit, preserving low-allowance behavior and physical coverage. Native SIMD/byte constants are references. Retain prior unroll/presieve losses and compare complete factoring after a bounded identical-work screen. | Sol / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen execution; a named unresolved proof requires a separately selected Astra / **xhigh** scope | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
@@ -256,15 +262,20 @@ sequentially. No campaign is launched by this roadmap change.
 
 #### C9a — combined useful-yield and storage workstream
 
-The current preparation implements independent P/I/E/G/D/S opt-ins through
-`YieldSieveConfig`, with exact oracles, checked schema-11 resume, immutable
-mainline control and certified exposed inputs under `benchmarks/inputs/c9a/`.
-The staged runner is `benchmarks/qs/c9a/`. This is preparation, not adoption:
-early feasibility, useful complete cost, mature attribution where informative,
-regressions and one fresh confirmation band remain open. Detailed decisions,
-source coverage and the numerical handoff remain local in `audit/c9a/`.
+**Done for the delivered research, implementation, exploratory comparison and
+mainline integration, 4 November 2026.** Scoped closure and publication are
+explicitly authorized. The final runtime passes 1,113 tests (9 skipped), lint
+and 243 benchmark imports in a committed-only checkout. Exact complete60/70
+results retain legacy canary warnings, one exposed modulus per size and no
+disjoint fresh confirmation; closure does not establish a population speedup.
+Existing automatic selection is unchanged; C9a policy classes remain opt-in.
+The [results](benchmarks/RESULTS.md#c9a-preparation) preserve the evidence limits.
+Local audit and generated evidence are retained in mainline's ignored C9a
+archive; the current entry point is `audit/c9a/optimization-83-89.md`.
+The contract below records the delivered scope. Remaining validation and
+headroom analysis move to [C9b](#c9b--mainline-validation-and-remaining-headroom).
 
-C9a may select cadence, wider recovered-product intake, ordered endpoint
+C9a implemented selectable cadence, wider recovered-product intake, ordered endpoint
 asymmetry, shorter cycle/algebraic-duplicate policies and compact replayable
 records in one coherent candidate. These mechanisms can interact: wider
 intake increases partial-store pressure; compact records and shorter
@@ -337,6 +348,37 @@ A separately scoped existing-policy cadence task can use **Sol / xhigh**;
 that is a smaller task, not a mid-task model switch. A later independently
 requested frozen-execution chat may use **Sol / high**. Preserve historical
 C9 freezes and scoped accepted results; E1 remains deferred.
+
+#### C9b — mainline validation and remaining headroom
+
+**Open.** Start from the final integrated C9a collector, retaining its exact
+mathematical work and validation. The existing whole-factor profile predates
+the last hit-metadata optimization, so its percentages cannot establish the
+remaining performance ceiling.
+
+First investigate the changing timing baseline with unchanged-code A/A checks
+and representative uninstrumented work. Distinguish engine/JIT warmup from
+host variability. The historical 15% engineering heuristic is not a new
+acceptance gate: retain its observations/flags, report warnings, and derive
+any future rejection rule from measured variability and uncertainty. Declare
+the question, stopping decision, expected runtime and finite
+cumulative CPU/wall/storage limits before execution; no campaign starts here.
+
+Then screen queue construction, cofactor-recovery bookkeeping and allocation,
+buffer reuse, and polynomial-family root/bucket preparation against current
+complete costs. Price setup, unused precomputation, memory, cancellation and
+checked resume. Advance only a measured concrete hypothesis; retain a finite
+fallback when a cache or batch is unfunded. A1d owns multi-polynomial buckets,
+C8 family-wide CRT/hypercube scheduling, B5a native kernels and F7 smoothness
+screening; C9b coordinates attribution and selection rather than duplicating
+those workstreams.
+
+Further adoption needs matched complete-cost/completion evidence on independent
+inputs, uncertainty and disjoint fresh confirmation, including the 60/70-digit
+balanced guardrail. Keep component, diagnostic and whole-factor claims
+separate; the 80-digit band first needs a feasible uninstrumented baseline.
+An unrelated control failure must not block measuring a valid candidate.
+Stop when a screen is uninformative rather than enlarging it automatically.
 
 #### A1d — prime-major bucket generation across polynomials
 
@@ -829,7 +871,7 @@ Done for the bounded core; see the completed register below.
 | P5.1 | Open | A5 then B8 | Binary Lucas stages 1/2, discriminant/parameter checks, exact powers, genuine stage two, bounded trials/saturation/resume; prove marginal portfolio value. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p51--implement-williams-p1-with-binary-lucas-evaluation) |
 | P5.2 | Conditional | C2/C3a/B3a/F3; G1 allocation | Existing classical and optional paired decisions remain controls. Joint bounds/count, descendant search credit, selected higher-bound chains, old-point extension and polynomial continuation have distinct proofs; component feasibility does not wait for E1. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p52--pair-ecm-stage-2-primes-and-tune-table-size) |
 | P5.3 | Open | B8/F8; G1 allocation | A6 p−1 tranche is Done. Production-bound p−1 B2/B1 and gap/cache calibration remain with C11/G1; Lucas recurrence, p+1 extension and ECM old-point migration need independent composition/ratio/checkpoint proofs. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently) |
-| P5.4 | Open | Combined C9a with C10a/B7; C1a; A8/C4 | C1/C9 delivered DLP tranches remain Done. Select independently flagged yield/cadence, intake, endpoint, cycle and compact-record mechanisms in one feasible bundle; targeted ablations and fresh whole-factor evidence govern adoption. Higher arity remains F6. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p54--add-double-large-prime-siqs-and-stronger-filtering) |
+| P5.4 | Open follow-ups; C9a delivered stream Done | C9b with C10a/B7; C1a; A8/C4 | C1/C9 and the integrated C9a stream remain Done in their scopes. C9b owns current-mainline timing/headroom analysis and fresh performance confirmation; broader matrix/storage and higher arity retain their owners. C9a policies remain opt-in and its experimental gates remain unmet. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p54--add-double-large-prime-siqs-and-stronger-filtering) |
 
 ### Phase 6 — Research options, parallel execution, and claims
 
@@ -877,7 +919,7 @@ Done for the bounded core; see the completed register below.
 | --- | --- | --- | --- |
 | P3.8-R1 | Open beyond completed B1 calibration: larger feasible calibration and independent corpus/runner coverage; reconcile C10a-01's implemented A/root/multiplier bundle before new population work. | C10a-01 retains its completed four-size feasibility; C10a-02 keeps uncovered product/diversity hypotheses. Coordinate C3a/G1 and stratified factor balance; no native crossover threshold or duplicate larger-size campaign. Astra / xhigh for current C10a-01; Sol / xhigh separate selection. | [Original carry-over](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R2 | Open A1d batching design; conditional B13/C8 capacity and whole-interval CRT. Bounded A1 integration stays Done. | A1d exact queue/family contract and current traversal-cost hypothesis: Sol / xhigh. B13/C8 require their distinct refusal/eligibility evidence: Astra / xhigh. | [R2 and deferrals](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
-| P3.8-R3 | Open combined C9a cadence/storage and A8/B7/C4 filtering/provenance preparation. Delivered mixed-row/cadence-32 scope and old cadence-8/layout losses stay recorded. | Use current preparation/filter/solve counters and useful progress; no automatic old-campaign repeat. Selected representations need exact bounds, original-row lifting and simultaneous ownership. Astra / xhigh expanded C9a/storage; Sol / xhigh separately scoped pacing. | [R3 gates and rejected layouts](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
+| P3.8-R3 | Delivered C9a cadence/storage Done; A8/B7/C4 filtering/provenance follow-ups remain Open. Old cadence-8/layout losses stay recorded. | C9b owns further attribution on the integrated collector. Use current preparation/filter/solve counters and useful progress; no automatic old-campaign repeat. Changed representations retain exact bounds, original-row lifting and simultaneous ownership. Existing owner assignments govern new mechanisms. | [R3 gates and rejected layouts](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R4 | Conditional residual-classification/certification reuse after delivered C1; preserve certainty. | Profile must show repeated intake/atomic primality cost. A base-squared shortcut needs complete eligible-prime coverage including A/multiplier exceptions; opaque composite cofactors need a separate type/checkpoint proof. C9a/E3 coordinate; Astra / xhigh changed proof. | [R4 gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p38--evaluate-gf2-matrix-and-filtering-optimizations) |
 | P3.8-R5 | Deferred E1 final SSS/worker/current-control comparison after Done A7 reconciliation. | Worker flyer/large-interval compatibility and 40-digit SSS calibration need explicit decisions. Clarify upstream root license before further adaptation; use assignment IDs for seeds, include transport/conversion/loss/replay costs. Sol / high reconciliation; xhigh accounting. | [R5/E1 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#a1c--same-modulus-two-root-interleaving-conditional); [pinned arms](benchmarks/inputs/controls/a7_r5_e1_arms.json) |
 
@@ -1202,7 +1244,8 @@ for the original narrative; STATUS and the live rows above govern current work.
 
 <a id="c9a--remaining-large-prime-yield-and-storage-transfers-open"></a>
 
-- C9a — Remaining large-prime yield and storage transfers (open) — [Detail](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9a--remaining-large-prime-yield-and-storage-transfers-open).
+- [x] C9a — Useful-yield, admission and storage stream (Done; integrated) — [scope and evidence limits](#c9a--combined-useful-yield-and-storage-workstream).
+- [ ] C9b — Mainline validation and remaining headroom — [scope](#c9b--mainline-validation-and-remaining-headroom).
 
 <a id="c1a--cheaper-slp-anchor-delta-after-c9"></a>
 

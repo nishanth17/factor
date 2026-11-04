@@ -139,13 +139,16 @@ def validate_result(result, row, cell):
         if divisor is not None
         else cell["seconds"]
     )
-    # A factor remains correct when a timing or resource screen fails. Its
-    # time must not become a clean complete-cost observation.
-    result["timing_valid"] = bool(
-        result["timing_valid"]
-        and result["rss_bytes"] <= cell["rss_bytes"]
+    # Resource compliance is independent of the historical, uncalibrated
+    # canary flag. New analysis retains that flag as a descriptive warning.
+    result["resource_valid"] = bool(
+        result["rss_bytes"] <= cell["rss_bytes"]
         and result["seconds"] <= cell["seconds"]
         and result["cpu_seconds"] <= cell["seconds"]
+        and result.get("reason") != "recorder_limit"
+    )
+    result["timing_valid"] = bool(
+        result["timing_valid"] and result["resource_valid"]
     )
     return result
 

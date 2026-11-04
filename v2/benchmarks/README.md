@@ -120,6 +120,15 @@ evidence locations are in local `v2/audit/c9a/optimization-83-89.md`;
 final generated evidence is under `results/c9a/hit-words-89/`. Immutable
 identities must not be reused. This continuation launches no further campaign.
 
+New C9a analyses use `observational-v2`: the old `timing_valid` field retains
+its historical 15% heuristic for provenance but is a diagnostic warning,
+not a veto on otherwise validated timings. `resource_valid` separately records
+real production resource/recorder compliance; instrumented data stays separate.
+`summarize(..., legacy_timing=True)` explicitly reproduces the historical
+analysis exclusion. New reports retain canary-warning counts, independent-modulus
+uncertainty and all failures. Calibrate future timing decisions with unchanged
+code and matched references; no universal percentage replaces that analysis.
+
 The final `180576c` matched pair uses flat queues in both arms and the literal
 prior incumbent/`cost-report` configurations. On one exposed 60-digit input,
 raw C0/C1 times are 268.807/230.364s. Both exact factorizations finish within the

@@ -93,7 +93,19 @@ separately recorded exception. Record every unmet gate and limitation.
 
 **Performance promotion policy for Phases 3–8 — revised 9 October 2026;
 wall-time objective and balanced guardrail clarified 2 November 2026:**
-require zero correctness failures and the same finite work, wall/CPU time,
+The 4 November timing correction removes universal percentage-based canary
+vetoes from new performance decisions. The historical C9a 15% tolerance was
+an engineering heuristic, not a threshold derived from host variability.
+Preserve its raw observations and recorded flags for historical replay;
+report the flags as diagnostic warnings in new analysis rather than discarding
+otherwise validated timings. Actual correctness, resource and recorder
+failures remain distinct. Calibrate variability with unchanged-code A/A and
+matched references, quantify uncertainty, and justify any future rejection
+rule prospectively from those measurements. A descriptive canary warning
+alone neither proves nor disproves a speedup. Independent inputs and fresh
+confirmation below still govern adoption.
+
+Require zero correctness failures and the same finite work, wall/CPU time,
 memory and storage ceilings within a matched comparison. For latency studies,
 freeze a machine-wide aggregate CPU allowance appropriate to the permitted
 concurrency and available cores; both arms receive that allowance even if a

@@ -208,6 +208,8 @@ def sentinel(qs, budgets, template, deadline, expected=None):
 
 
 def drift(before, after):
+    # Preserve the frozen C9a flag for replay. Its 15% engineering tolerance
+    # is an uncalibrated diagnostic, not a general performance acceptance gate.
     def spread(values):
         ordered = sorted(values)
         return (ordered[6] - ordered[2]) / statistics.median(ordered)

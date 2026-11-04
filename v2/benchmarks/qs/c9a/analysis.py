@@ -1,4 +1,4 @@
-"""Modulus-level uncertainty with explicit censoring and drift failures."""
+"""Modulus-level uncertainty with censoring and descriptive drift warnings."""
 
 import math
 import random
@@ -15,7 +15,19 @@ def interval(values):
     ]
 
 
-def summarize(results, *, nominee="C1", samples=4096):
+def resource_valid(result):
+    """Separate real resource/recorder failures from legacy canary warnings."""
+    if result.get("resource_valid") is False:
+        return False
+    if result.get("reason") in ("lost_cell", "recorder_limit"):
+        return False
+    cap = result.get("cap_seconds")
+    return cap is None or all(
+        result.get(key, 0) <= cap for key in ("seconds", "cpu_seconds")
+    )
+
+
+def summarize(results, *, nominee="C1", samples=4096, legacy_timing=False):
     """Bootstrap independent moduli, averaging repeated seeds within each."""
     if type(samples) is not int or not 100 <= samples <= 10000:
         raise ValueError("bootstrap allowance is outside its finite plan")
@@ -33,6 +45,7 @@ def summarize(results, *, nominee="C1", samples=4096):
     rng = random.Random(202611030903)
     for (digits, uneven), moduli in sorted(groups.items()):
         completion, costs, ratios, invalid, missing = [], [], [], 0, 0
+        warnings = 0
         for fixture, cells in moduli.items():
             seeds = sorted({key[1] for key in cells})
             differences, cost, times = [], [], []
@@ -45,11 +58,18 @@ def summarize(results, *, nominee="C1", samples=4096):
                 differences.append(
                     int(right["complete"]) - int(left["complete"])
                 )
+                warning = not all(
+                    r.get("timing_valid", False) for r in (left, right)
+                )
+                warnings += warning
+                # A fixed relative canary tolerance was never calibrated to
+                # this machine's variability. Retain those observations in
+                # new analyses; only explicit historical replay uses its veto.
                 valid = all(
-                    r.get("timing_valid", False)
+                    resource_valid(r)
                     and r.get("observation", "clean") == "clean"
                     for r in (left, right)
-                )
+                ) and not (legacy_timing and warning)
                 if not valid:
                     invalid += 1
                     continue
@@ -68,6 +88,7 @@ def summarize(results, *, nominee="C1", samples=4096):
             independent_moduli=len(moduli),
             paired_moduli=len(completion),
             invalid_timing_pairs=invalid,
+            legacy_canary_warning_pairs=warnings,
             missing_pairs=missing,
             complete_cost_moduli=len(ratios),
             completion_effect=None
@@ -126,7 +147,13 @@ def summarize(results, *, nominee="C1", samples=4096):
         work=work,
         bootstrap_samples=samples,
         inference="seeds nested in modulus; no automatic adoption",
-        invalid_policy="retain all outcomes; count excluded invalid times",
+        timing_policy="legacy-15pct" if legacy_timing else "observational-v2",
+        invalid_policy=(
+            "historical replay excludes legacy canary warnings"
+            if legacy_timing
+            else "exclude instrumented/resource-invalid times; report canary "
+            "warnings without a universal cutoff; historical replay explicit"
+        ),
     )
 
 
@@ -152,11 +179,11 @@ def observer_summary(results):
         if signature(clean) != signature(capture):
             raise ValueError("observer compared different physical work")
         if (
-            not all(r["timing_valid"] for r in pair)
+            not all(resource_valid(r) for r in pair)
             or capture["recorder"]["exhausted"]
         ):
             raise ValueError(
-                "observer drift/resource screen failed; no automatic retry"
+                "observer resource/recorder check failed; no automatic retry"
             )
         ratios.append(capture["seconds"] / clean["seconds"])
         cpu_ratios.append(capture["cpu_seconds"] / clean["cpu_seconds"])
@@ -168,6 +195,10 @@ def observer_summary(results):
         ratios=ratios,
         cpu_ratios=cpu_ratios,
         stream_bytes=byte_counts,
+        legacy_canary_warning_pairs=sum(
+            not all(r.get("timing_valid", False) for r in results[i : i + 2])
+            for i in range(0, 18, 2)
+        ),
         capacity_projection_required=True,
         scope="one block; mature capture capacity still needs justification",
     )

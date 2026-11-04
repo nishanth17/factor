@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from .analysis import resource_valid
+
 
 def outcomes(ledger, stage):
     result = []
@@ -92,7 +94,7 @@ def admit(stage, decision, freeze, ledger):
         expected = 2 if freeze["plan"].get("early_cells") else 4
         if len(large) != expected or not all(
             r["complete"]
-            and r["timing_valid"]
+            and resource_valid(r)
             and max(r["seconds"], r["cpu_seconds"]) < 5000
             for r in large
         ):

@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.qs.c9a.accounting import StudyLedger
-from v2.benchmarks.qs.c9a.analysis import summarize
+from v2.benchmarks.qs.c9a.analysis import observer_summary, summarize
 from v2.benchmarks.qs.c9a.configuration import admission_envelope
 from v2.benchmarks.qs.c9a.gates import outcomes
 from v2.benchmarks.qs.c9a.inputs import specification
@@ -107,6 +107,11 @@ class PlanningTests(unittest.TestCase):
             cpu_seconds=1,
         )
         self.assertTrue(validate_result(result, row, selected)["complete"])
+        warning = validate_result(
+            dict(result, timing_valid=False), row, selected
+        )
+        self.assertTrue(warning["resource_valid"])
+        self.assertFalse(warning["timing_valid"])
         bad = dict(result, factors=[101, 107])
         with self.assertRaises(ArithmeticError):
             validate_result(bad, row, selected)
@@ -356,8 +361,49 @@ class UncertaintyTests(unittest.TestCase):
         self.assertGreater(result["zero_event_regression_upper95"], 0.05)
         results[0]["timing_valid"] = False
         changed = summarize(results, samples=100)["classes"][0]
-        self.assertEqual(changed["invalid_timing_pairs"], 1)
-        self.assertEqual(changed["complete_cost_moduli"], 2)
+        self.assertEqual(changed["invalid_timing_pairs"], 0)
+        self.assertEqual(changed["legacy_canary_warning_pairs"], 1)
+        self.assertEqual(changed["complete_cost_moduli"], 3)
+        historical = summarize(results, samples=100, legacy_timing=True)
+        self.assertEqual(historical["classes"][0]["invalid_timing_pairs"], 1)
+        self.assertEqual(historical["classes"][0]["complete_cost_moduli"], 2)
+
+        results[0]["resource_valid"] = False
+        invalid = summarize(results, samples=100)["classes"][0]
+        self.assertEqual(invalid["invalid_timing_pairs"], 1)
+        self.assertEqual(invalid["complete_cost_moduli"], 2)
+
+    def test_observer_keeps_canary_warnings_and_rejects_recorder_failures(
+        self,
+    ):
+        results = []
+        for _ in range(9):
+            for observation, seconds in (("clean", 1), ("capture", 2)):
+                results.append(
+                    dict(
+                        observation=observation,
+                        seconds=seconds,
+                        cpu_seconds=seconds,
+                        divisor=101,
+                        reason="factor_found",
+                        next_position=17,
+                        measured_work=100,
+                        stats={},
+                        timing_valid=False,
+                        resource_valid=True,
+                        recorder=dict(exhausted=False, bytes=200),
+                    )
+                )
+        result = observer_summary(results)
+        self.assertEqual(result["overhead_ratio"], 2)
+        self.assertEqual(result["legacy_canary_warning_pairs"], 9)
+        results[1]["resource_valid"] = False
+        with self.assertRaises(ValueError):
+            observer_summary(results)
+        results[1]["resource_valid"] = True
+        results[1]["recorder"]["exhausted"] = True
+        with self.assertRaises(ValueError):
+            observer_summary(results)
 
 
 class WorkerFailureTests(unittest.TestCase):
