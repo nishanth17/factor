@@ -464,11 +464,18 @@ class QSJob:
                 if not final:
                     self.collector.budget = self.budget
                     stop = min(self.hi, self.next_position + self.batch_width)
+                    collect = self.collector.collect
+                    if (
+                        type(self.collector) is SieveCollector
+                        and getattr(collect, "__func__", None)
+                        is SieveCollector.collect
+                    ):
+                        # Injected collectors and instance overrides retain
+                        # their public dispatch and snapshot contract.
+                        collect = self.collector._collect_progress
                     result = self._timed(
                         "collection",
-                        lambda: self.collector.collect(
-                            self.next_position, stop
-                        ),
+                        lambda: collect(self.next_position, stop),
                     )
                     counts = self.stats["collector_counts"]
                     for key, value in result.stats.items():

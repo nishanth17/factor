@@ -48,6 +48,13 @@ there is no general digit-based completion guarantee.
 
 ## Explicit useful-yield policies
 
+The built-in QS/SIQS pipeline consumes private collection progress without
+copying the cumulative relation store after each batch. Public
+`SieveCollector.collect()` still returns complete owned snapshots; callers
+must release old snapshots to exclude those references from collector-owned
+memory. Injected collector classes and overridden `collect` methods retain
+their public dispatch. Checkpoints continue to encode the full checked store.
+
 `qs.YieldSieveConfig` extends `GrowingDoubleLargeSieveConfig` with independent
 experimental options. Pass it as `SIQSConfig(collector=...)`; automatic
 configurations retain their existing policies.

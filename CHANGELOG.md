@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Avoid copying cumulative atom/relation arrays and expanding partial IDs on
+  every built-in QS/SIQS collection batch. Share the same traversal, exact
+  publication and refusal/resume path with public collection; preserve full
+  public snapshots, collector overrides and serialized checkpoint formats.
+
 - Remove pivot sorting with an incrementally maintained presence bitset, avoid
   unnecessary panel-table invalidation, and bound
   cofactor lookahead checks in prepaid chunks. Add a rho-first split policy with

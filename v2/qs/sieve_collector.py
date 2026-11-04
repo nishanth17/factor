@@ -323,6 +323,17 @@ class SieveResult:
     workspace_bytes: int
 
 
+@dataclass(frozen=True)
+class _CollectionProgress:
+    """Internal status without references to the cumulative relation store."""
+
+    divisor: int | None
+    next_position: int
+    reason: str
+    stats: dict
+    workspace_bytes: int
+
+
 class SieveCollector:
     """Cache one polynomial's roots/logs and reuse bounded working blocks.
 
@@ -1578,6 +1589,14 @@ class SieveCollector:
         scratch may change on refusal; accepted store state never does.
         Eviction and thresholds may lose yield only as documented in config.
         """
+        return self._collect(lo, hi, snapshot=True)
+
+    def _collect_progress(self, lo, hi):
+        """Collect for an internal caller that already owns the live store."""
+        return self._collect(lo, hi, snapshot=False)
+
+    def _collect(self, lo, hi, *, snapshot):
+        """Share validation, traversal and publication for both results."""
         require_published(self)
         checked_position(lo)
         checked_position(hi)
@@ -1761,6 +1780,16 @@ class SieveCollector:
                 for key, value in kernels.counters(self).items()
             }
         )
+        if not snapshot:
+            # QSJob consumes status only. Expanding cumulative records here
+            # copies a growing history after every bounded collection batch.
+            return _CollectionProgress(
+                divisor,
+                position,
+                reason,
+                stats,
+                self._workspace + self._scratch_peak_bytes,
+            )
         return SieveResult(
             tuple(self._atoms.values()),
             tuple(self._full),
