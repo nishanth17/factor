@@ -6,7 +6,8 @@ from math import isqrt
 from .power_sieve import prime_power_roots
 
 HELPER_BYTES = 32 * 2**20
-ENTRY_BYTES = 32
+# Four copies of a three-word entry cover buffer growth and coexistence.
+ENTRY_BYTES = 12 * array("I").itemsize
 
 
 def build(collector, window, byte_cap):
@@ -31,14 +32,11 @@ def build(collector, window, byte_cap):
     # which depend on the observation window. Keep the native route for them.
     if any(collector.polynomial.n_prime % r.prime == 0 for r in roots[split:]):
         return None
-    index_bits = max(1, (len(roots) - 1).bit_length())
-    weight_bits = max(
-        1, (max(1, maximum.bit_length()) * max(collector._logs)).bit_length()
-    )
-    metadata_bits = index_bits + weight_bits + 1
-    if metadata_bits + (width - 1).bit_length() > 64:
+    word_max = (1 << (8 * array("I").itemsize)) - 1
+    weight_max = max(1, maximum.bit_length()) * max(collector._logs)
+    if max(width - 1, len(roots) - 1, (weight_max << 1) | 1) > word_max:
         return None
-    queues = [array("Q") for _ in range(count)]
+    queues = [array("I") for _ in range(count)]
     for index in range(split, len(roots)):
         root = roots[index]
         marks = prime_power_roots(
@@ -61,18 +59,14 @@ def build(collector, window, byte_cap):
                         return None
                     reserve += ENTRY_BYTES
                     block, offset = divmod(position - lo, width)
-                    # One unsigned word replaces a tuple plus boxed offsets.
-                    # The reservation covers array growth/coexistence; all
-                    # fields are bounded before publication or use.
-                    packed = (
-                        (offset << metadata_bits)
-                        | (index << (weight_bits + 1))
-                        | (weight << 1)
-                        | first
+                    # Flat words avoid tuple allocation and the bit-field
+                    # decoding cost at every replay. Bounds above admit all
+                    # fields before any schedule can be published.
+                    queues[block].extend(
+                        (offset, index, (weight << 1) | first)
                     )
-                    queues[block].append(packed)
     collector.budget.consume(count + 1)
-    return split, tuple(queues), reserve, (index_bits, weight_bits)
+    return split, tuple(queues), reserve
 
 
 def clear(collector):
@@ -138,7 +132,7 @@ def sieve(collector, lo, hi, stats):
     schedule = collector._sparse_queue
     if schedule is None:
         return collector._sieve_direct(lo, hi, stats)
-    split, queues, reserve, (index_bits, weight_bits) = schedule
+    split, queues, reserve = schedule
     entries = queues[(lo - window[0]) // cfg.block_width]
     roots = collector._roots
     try:
@@ -146,21 +140,22 @@ def sieve(collector, lo, hi, stats):
         threshold = collector._sieve_direct(lo, hi, stats)
     finally:
         collector._roots = roots
-    collector.budget.consume(len(entries) + 1)
+    hits = len(entries) // 3
+    collector.budget.consume(hits + 1)
     first_count = 0
-    metadata_bits = index_bits + weight_bits + 1
-    index_mask, weight_mask = (1 << index_bits) - 1, (1 << weight_bits) - 1
-    for packed in entries:
-        offset = packed >> metadata_bits
-        index = (packed >> (weight_bits + 1)) & index_mask
-        weight, first = (packed >> 1) & weight_mask, packed & 1
-        collector._scores[offset] += weight
-        if first:
+    for entry in range(0, len(entries), 3):
+        offset, index, weight = (
+            entries[entry],
+            entries[entry + 1],
+            entries[entry + 2],
+        )
+        collector._scores[offset] += weight >> 1
+        if weight & 1:
             collector._hits[offset] |= 1 << index
             first_count += 1
-    stats["power_hits"] += len(entries)
+    stats["power_hits"] += hits
     stats["root_hits"] += first_count
-    stats["queue_hits"] = stats.get("queue_hits", 0) + len(entries)
+    stats["queue_hits"] = stats.get("queue_hits", 0) + hits
     stats["queue_reserved_peak"] = max(
         stats.get("queue_reserved_peak", 0), reserve
     )

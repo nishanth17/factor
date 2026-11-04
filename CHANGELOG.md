@@ -5,6 +5,10 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Replace slower packed-field queue replay with measured flat unsigned-word
+  triples. Add the separate experimental `scan-report` nominee to activate
+  exact fused scanning while preserving existing kernel and admission choices.
+
 - Implement shared SIQS polling, checked same-A metadata reuse, packed sparse
   queues, redundant-refinement avoidance and compact residual coordinates.
   Preserve immediate work refusal, cancellation publication boundaries and

@@ -70,6 +70,42 @@ def lookahead_worker(limit=10000):
 
 
 class CostRegressionTests(unittest.TestCase):
+    def test_scan_nominee_preserves_admission_and_all_existing_kernels(self):
+        for marking in (
+            "parity_two",
+            "density+presieve+scan_fused+parity_two",
+        ):
+            incumbent = qs.SIQSConfig(
+                memory_bytes=2**30,
+                collector=qs.GrowingDoubleLargeSieveConfig(marking=marking),
+            )
+            plain = extended.configuration(
+                60,
+                admission_base_bound=100000,
+                profile="cost-report",
+                incumbent=incumbent,
+            )
+            fused = extended.configuration(
+                60,
+                admission_base_bound=100000,
+                profile="scan-report",
+                incumbent=incumbent,
+            )
+            left, right = asdict(plain), asdict(fused)
+            left["collector"].pop("marking")
+            right["collector"].pop("marking")
+            self.assertEqual(left, right)
+            self.assertIn("scan_fused", fused.collector._kernels)
+            self.assertTrue(
+                set(plain.collector._kernels) <= set(fused.collector._kernels)
+            )
+            self.assertIs(
+                extended.configuration(
+                    60, "C0", profile="scan-report", incumbent=incumbent
+                ),
+                incumbent,
+            )
+
     def test_proven_prime_hole_rejects_before_hints_or_primality(self):
         base = qs.build_factor_base(1009 * 1013, bound=100).factor_base
         engine = qs.SieveCollector(

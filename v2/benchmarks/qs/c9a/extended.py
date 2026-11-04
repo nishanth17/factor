@@ -5,6 +5,7 @@ import json
 from dataclasses import asdict, replace
 
 from ....qs import BoundedYieldSieveConfig, ExtendedYieldSieveConfig
+from ....qs.collector_kernels import combine, components
 from . import combined
 from .configuration import SIZES
 from .configuration import configuration as baseline
@@ -211,7 +212,7 @@ def configuration(
     if arm == "C0" or digits not in SIZES:
         return config
     choices = profiles(admission_base_bound, config.collector)
-    bounded = profile in ("bounded-report", "cost-report")
+    bounded = profile in ("bounded-report", "cost-report", "scan-report")
     if profile not in choices and not bounded:
         raise ValueError("unknown joint parameter profile")
     values = asdict(config.collector)
@@ -221,12 +222,16 @@ def configuration(
             candidate_bound=choices["fixed-report"]["candidate_bound"],
             extension_policy="extended-v2",
         )
-    if profile == "cost-report":
+    if profile in ("cost-report", "scan-report"):
         values.update(
             solver_panel_bits=0,
             split_policy="rho-first-v3",
             batch_policy="off",
         )
+    if profile == "scan-report":
+        kernels = components(values["marking"])
+        if "scan_fused" not in kernels:
+            values["marking"] = combine((*kernels, "scan_fused"))
     cls = BoundedYieldSieveConfig if bounded else ExtendedYieldSieveConfig
     return replace(config, collector=cls(**values))
 
@@ -259,7 +264,7 @@ def build(corpus, resolved, *, profile="three-prime"):
         if profile == "three-prime"
         else IDENTITY + "-" + profile,
         extension_policy="extended-v2"
-        if profile in ("bounded-report", "cost-report")
+        if profile in ("bounded-report", "cost-report", "scan-report")
         else "extended-v1",
         cells=[convert(cell, profile=profile) for cell in plan["cells"]],
         primary_profile=profile,

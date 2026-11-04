@@ -108,6 +108,20 @@ These component gains are not additive. Local receipts:
 pypy3 -B v2/audit/c9a/measure-waste-67.py` under the shared quiet lock.
 The receipt name is immutable and cannot be reused.
 
+The subsequent whole60 comparison on `359e935` finds correct factorizations
+in316.0/295.6/250.5s for the archived incumbent, optimized incumbent and C9a.
+Both incumbent screens pass the revised timing policy; C9a's stable post-run
+sentinel is17.4% faster and fails the unchanged15% drift gate. Its raw result
+remains qualified. A targeted actual-event queue replay then rejects packed
+64-bit fields:77.4ms versus42.2ms for tuples. Flat unsigned-word triples take
+41.3ms with compact storage and replace that representation.
+The distinct experimental `--profile scan-report` adds the existing exact
+fused scanner to `cost-report` while preserving its other settings and all
+pre-existing kernels. `cost-report` and automatic configurations retain their
+policies. The combined flat-queue/scan configuration awaits its own measurement.
+Local records: `results/c9a/whole-cost-70/`, `queue-replay-73/` and
+`v2/audit/c9a/integration-74-plan.json`.
+
 The worker also supports the separately selected `timing_policy` value
 `retire-rewarm-v1`. It preserves the immediate legacy post-run sentinel,
 then releases the completed job, collects garbage and performs at least
