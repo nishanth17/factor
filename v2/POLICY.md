@@ -3,7 +3,7 @@
 Start with [status](STATUS.md), then the [live backlog](ROADMAP.md).
 Stable rules below retain the roadmap's promotion policy revised 9 October
 2026 and its acceptance contracts. Historical protocols and verdicts are
-preserved in the [history index](history/README.md); they are not rewritten.
+preserved in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md); they are not rewritten.
 
 ## Scope and standing directions
 
@@ -329,14 +329,14 @@ local. Detailed research, comparison reports and result JSON stay in these
 ignored trees; do not maintain a selective public `v2/studies/` collection.
 Keep reusable runner code under `v2/benchmarks/` and concise decisions in
 [benchmark results](benchmarks/RESULTS.md). Historical reports remain available
-through [pinned Git history](history/README.md), with original source identities.
+through [pinned Git history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md), with original source identities.
 External sources stay in folder-ignored `v2/benchmarks/inputs/upstream/`;
 keep licenses, inventories and comparison provenance locally. Do not force-add
 generated evidence or create individual-file study ignore rules. Preserve
 historical archives at their recorded restoration locations and lossless
 compression manifests. Publish concise commands, findings and limitations.
 
-The [history record](history/ROADMAP_CLEANUP.md) resolves the old removed-link
+The [history record](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/ROADMAP_CLEANUP.md) resolves the old removed-link
 labels and records the historical Git revision, source hash and original link context.
 The source audit used
 `1272e033f889a105792cbb924bf8a12a46ac88ae`; the C-sieve review used

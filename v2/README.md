@@ -7,7 +7,7 @@ Results preserve multiplicities, signs and unresolved cofactors, and distinguish
 probable primes from proven primes.
 
 The default Python-integer backend uses only the standard library. The active
-implementation lives here; [v1](history/V1_BASELINE.md) is the preserved
+implementation lives here; [v1](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/V1_BASELINE.md) is the preserved
 Python 2 baseline.
 
 ## Setup and first run
@@ -106,7 +106,6 @@ for compatible configurations and checkpoints.
 | [docs/](docs/) | CLI, API and checkpoint guides. |
 | [tests/](tests/README.md) | Arithmetic, ownership, continuation and integration checks. |
 | [benchmarks/](benchmarks/README.md) | Reusable runners, versioned inputs and measurement summaries. |
-| [history/](history/README.md) | Pinned earlier documentation and baseline references. |
 
 Collector configuration and storage contracts live in
 [QS configuration](qs/CONFIGURATION.md) and [collector policies](qs/COLLECTORS.md).

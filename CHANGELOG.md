@@ -222,7 +222,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 - Split current status, live backlog and stable policy. Preserve historical
   quantitative narratives through a pinned Git revision and source/hash metadata
-  in the [history index](v2/history/README.md). Remove the
+  in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md). Remove the
   duplicate full snapshot and use Git history. No experimental verdict changed.
 
 ## C10a-07 combined defaults (1 November 2026)

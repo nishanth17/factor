@@ -159,7 +159,7 @@ The rows below state the current priorities and predecessor contracts.
 A predecessor settles through an accepted result or recorded retain/defer/reject
 decision, subject to the [policy](POLICY.md#dependencies-and-priority).
 Each live row links its complete original gates, quantitative context and
-research. The [history index](history/README.md) supplies local research paths.
+research. The [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md) supplies local research paths.
 
 ### Execution phase A — independent foundations that can proceed now
 

@@ -3,7 +3,7 @@
 These are scoped historical observations, not runtime guarantees or a list of
 new experiments. [STATUS](../STATUS.md) records current automatic routing and
 its evidence limits. Use the [runner guide](README.md) for reproduction and
-[pinned history](../history/README.md) for frozen source/accounting detail.
+[pinned history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md) for frozen source/accounting detail.
 Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions

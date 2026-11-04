@@ -1,7 +1,7 @@
 # Factor
 
 Integer factorization in Python, running on **PyPy implementing Python 3.11**.
-The active implementation is [v2](v2/README.md); [v1 baseline](v2/history/V1_BASELINE.md) preserves
+The active implementation is [v2](v2/README.md); [v1 baseline](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/V1_BASELINE.md) preserves
 the original Python 2 baseline.
 
 Factor combines exact preprocessing, Brent rho, Pollard p−1 and Montgomery

@@ -322,7 +322,7 @@ pypy3 -B -m v2.benchmarks.qs.a1b_continuation verify
 ## Structural migrations
 
 The former `v2/studies/` collection is preserved in
-[pinned Git history](../history/README.md). Its retired C10a-04 orchestration
+[pinned Git history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md). Its retired C10a-04 orchestration
 replays from the original revision with unchanged source freezes. Only the
 tested schedule and preliminary decision helpers remain in
 [c10a04](qs/c10a04/README.md); this cleanup changes no experimental verdict.

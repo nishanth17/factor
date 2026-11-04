@@ -66,7 +66,7 @@ These are planning and acceptance objectives, not implemented default changes.
 See [metric and resource rules](POLICY.md#scope-and-standing-directions).
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
-Full historical results and gates remain in the [history index](history/README.md).
+Full historical results and gates remain in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md).
 Useful progress toward 60–80-digit factoring remains the immediate focus;
 100 digits is also a measurement target, with completion feasibility still
 unestablished. Existing experiments retain their frozen scopes and budgets.
@@ -391,6 +391,6 @@ requested execution chat may use Sol / high where its task row permits it.
   between unsupported conclusions. Historical contradictory instructions stay
   in the pinned Git revision and are superseded by dated closure/current code.
 - **Unresolvable references:** none among the roadmap's “local audit material”
-  labels. The [history reference register](history/ROADMAP_CLEANUP.md#local-audit-reference-register)
+  labels. The [history reference register](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/ROADMAP_CLEANUP.md#local-audit-reference-register)
   names existing local paths and the committed M17 baseline. Historical source
   links use the pinned `v2/ROADMAP.md` Git revision and its original context.
