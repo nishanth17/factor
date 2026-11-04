@@ -3,6 +3,7 @@
 import json
 import multiprocessing
 import unittest
+from unittest.mock import patch
 
 from v2.benchmarks.ecm.b12_f4.profile_runner import signature
 from v2.execution.ecm_workers import ECMExecutor
@@ -64,3 +65,35 @@ class SixteenWorkerTests(unittest.TestCase):
         self.assertEqual(
             {child.pid for child in multiprocessing.active_children()}, before
         )
+
+
+class FixedWorkTerminationTests(unittest.TestCase):
+    def test_a_factor_does_not_hide_an_incomplete_fixed_work_search(self):
+        calls = []
+
+        def report(engine, task, **kwargs):
+            calls.append(task["assignment"]["id"])
+            first = len(calls) == 1
+            return dict(
+                id=task["assignment"]["id"],
+                token=task["token"],
+                attempt=task["attempt"],
+                stage=task["stage"],
+                factor=5 if first else None,
+                reason="complete" if first else "cpu_limit",
+                work=1,
+            )
+
+        with patch("v2.execution.ecm_worker.CurveEngine.execute", report):
+            with ECMExecutor(force_workers=False) as owner:
+                run = owner.run(
+                    35,
+                    config=configuration(),
+                    budget=allowance(),
+                    fixed_work=True,
+                )
+        self.assertEqual(run.divisor, 5)
+        self.assertEqual(run.reason, "factor_found")
+        self.assertEqual(run.stats["termination_reason"], "cpu_limit")
+        self.assertEqual(run.stats["completed_after"], 1)
+        self.assertEqual(len(calls), 2)
