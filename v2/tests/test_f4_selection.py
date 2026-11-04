@@ -14,6 +14,7 @@ from v2.benchmarks.ecm.b12_f4.selection_child import (
     summarize_stages,
     validate_reconstruction,
 )
+from v2.benchmarks.ecm.b12_f4.selection_fixed_child import retained_growth
 from v2.benchmarks.ecm.b12_f4.selection_inputs import (
     smaller_sizes,
     uniform_panel,
@@ -100,6 +101,19 @@ class SelectionTests(unittest.TestCase):
 
 
 class InputPlanTests(unittest.TestCase):
+    def test_retention_plateau_distinguishes_refusal_from_new_inserts(self):
+        self.assertEqual(
+            retained_growth(dict(decode_misses=10, decode_refusals=10)), 0
+        )
+        self.assertGreater(
+            retained_growth(dict(decode_misses=10, decode_refusals=9)), 0
+        )
+        self.assertGreater(
+            retained_growth(dict(stage_two_build_bytes=1024)), 0
+        )
+        with self.assertRaises(ValueError):
+            retained_growth(dict(decode_misses=1, decode_refusals=2))
+
     def test_factor_strata_are_mathematically_possible(self):
         for digits in (30, 40, 50, 60, 70, 80, 100):
             self.assertEqual(len(smaller_sizes(digits)), 4)
