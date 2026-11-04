@@ -4,7 +4,7 @@
 
 Runtime source `8a2bff7` passes 987 tests (9 optional skips), full lint and
 committed-only validation. The exposed 60/80-digit, ten-digit-smaller-factor
-screen uses eight curves at `(2000,147396)`. All cells complete; M0/S1/P2/P4
+screen uses eight curves at `(2000,147396)`. All cells complete; the 60-digit M0/S1/P2/P4 arms
 retain identical curves/results and full-tier PRAC/program eligibility.
 
 One corrected cold CLI observation at 60 digits: S0 0.294 s, equivalent-manifest
