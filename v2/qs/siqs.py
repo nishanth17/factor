@@ -6,6 +6,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from .assignment_stream import (
     AssignmentStream,
     paired_workspace,
@@ -652,6 +653,9 @@ class SIQSJob:
             self.pending_step = self._timed("roots", self._next_step)
         if self.pending_step is None:
             return False
+        # Root generation may install cancellation. Keep the generated step
+        # pending until the stop check admits its publication to the collector.
+        self.budget.consume(0)
         polynomial, roots = self.pending_step
         key = (
             polynomial.a,
@@ -783,6 +787,29 @@ class SIQSJob:
 
     def run(self, *, max_blocks=None):
         """Run or pause at block boundaries; all exhausted results retain n."""
+        original = self.budget
+        if not isinstance(original, PollingBudget):
+            self.budget = PollingBudget(original)
+        if isinstance(self.assignments, AssignmentStream):
+            self.assignments.budget = self.budget
+        if self.family is not None:
+            self.family.budget = self.budget
+        try:
+            return self._run(max_blocks=max_blocks)
+        finally:
+            # Derived producers can survive a pause. Restore their caller
+            # ledger as well, so a later allowance cannot retain an old view.
+            self.budget = original
+            if isinstance(self.assignments, AssignmentStream):
+                self.assignments.budget = original
+            if self.family is not None:
+                self.family.budget = original
+            if self.engine is not None:
+                self.engine.budget = original
+                self.engine.collector.budget = original
+
+    def _run(self, *, max_blocks=None):
+        """Share one polling cadence across setup, switches and collection."""
         if self.engine is not None:
             require_published(self.engine.collector)
         if max_blocks is not None:
@@ -926,6 +953,12 @@ class SIQSJob:
                 )
             )
 
+        if max_blocks != 0:
+            try:
+                self.budget.consume(0)
+            except BudgetExhaustedError:
+                if self.divisor is None:
+                    reason = self.budget.reason
         self.stats["work_used"] = self.budget.used
         return QSResult(
             self.divisor,

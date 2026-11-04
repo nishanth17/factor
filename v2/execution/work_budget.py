@@ -23,6 +23,14 @@ class PollingBudget:
     def __getattr__(self, name):
         return getattr(self.budget, name)
 
+    def __setattr__(self, name, value):
+        # Public ledger updates, including cancellation installed during a
+        # callback, must reach the shared Budget rather than shadow its fields.
+        if name in ("budget", "interval", "poll", "_remaining"):
+            object.__setattr__(self, name, value)
+        else:
+            setattr(self.budget, name, value)
+
     def consume(self, amount=1):
         """Refuse an overdraw immediately, even between external polls."""
         utils.require_integer(amount, "amount", 0)

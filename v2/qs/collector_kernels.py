@@ -302,13 +302,27 @@ def word_candidates(scores, threshold, width, budget=None):
     lane_bits = 8 * lane_bytes
     high = 1 << (lane_bits - 1)
     lanes = max(1, SCAN_CHUNK // lane_bytes)
+    if width <= 0:
+        return
+    full_count = min(lanes, width)
+    ones = ((1 << (lane_bits * full_count)) - 1) // ((1 << lane_bits) - 1)
+    full_high_mask = high * ones
+    full_low_mask = (high - 1) * ones
+    full_subtrahend = (threshold & (high - 1)) * ones
     for start in range(0, width, lanes):
         if budget is not None:
             budget.consume(0)
         stop = min(width, start + lanes)
         count = stop - start
-        if lane_bytes == 1 and isinstance(scores, bytearray):
-            packed = int.from_bytes(scores[start:stop], "little")
+        if lane_bytes == 1:
+            data = (
+                scores[start:stop]
+                if isinstance(scores, bytearray)
+                else bytes(
+                    min(scores[i], threshold) for i in range(start, stop)
+                )
+            )
+            packed = int.from_bytes(data, "little")
         else:
             # Clipping only this temporary scan view is exact: score >= T
             # iff min(score,T) >= T. Stored scores and thresholds are intact.
@@ -319,12 +333,14 @@ def word_candidates(scores, threshold, width, budget=None):
                 ),
                 "little",
             )
-        ones = ((1 << (lane_bits * count)) - 1) // ((1 << lane_bits) - 1)
-        high_mask = high * ones
-        low_mask = (high - 1) * ones
-        low_pass = (
-            ((packed & low_mask) | high_mask) - (threshold & (high - 1)) * ones
-        ) & high_mask
+        if count == full_count:
+            high_mask, low_mask = full_high_mask, full_low_mask
+            subtrahend = full_subtrahend
+        else:
+            ones = ((1 << (lane_bits * count)) - 1) // ((1 << lane_bits) - 1)
+            high_mask, low_mask = high * ones, (high - 1) * ones
+            subtrahend = (threshold & (high - 1)) * ones
+        low_pass = (((packed & low_mask) | high_mask) - subtrahend) & high_mask
         selected = (
             low_pass & packed
             if threshold & high

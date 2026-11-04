@@ -1,11 +1,12 @@
 """Bounded exact sparse hit schedules; derived state is rebuilt on resume."""
 
+from array import array
 from math import isqrt
 
 from .power_sieve import prime_power_roots
 
 HELPER_BYTES = 32 * 2**20
-ENTRY_BYTES = 384
+ENTRY_BYTES = 32
 
 
 def build(collector, window, byte_cap):
@@ -30,7 +31,14 @@ def build(collector, window, byte_cap):
     # which depend on the observation window. Keep the native route for them.
     if any(collector.polynomial.n_prime % r.prime == 0 for r in roots[split:]):
         return None
-    queues = [[] for _ in range(count)]
+    index_bits = max(1, (len(roots) - 1).bit_length())
+    weight_bits = max(
+        1, (max(1, maximum.bit_length()) * max(collector._logs)).bit_length()
+    )
+    metadata_bits = index_bits + weight_bits + 1
+    if metadata_bits + (width - 1).bit_length() > 64:
+        return None
+    queues = [array("Q") for _ in range(count)]
     for index in range(split, len(roots)):
         root = roots[index]
         marks = prime_power_roots(
@@ -53,9 +61,18 @@ def build(collector, window, byte_cap):
                         return None
                     reserve += ENTRY_BYTES
                     block, offset = divmod(position - lo, width)
-                    queues[block].append((offset, index, weight, first))
+                    # One unsigned word replaces a tuple plus boxed offsets.
+                    # The reservation covers array growth/coexistence; all
+                    # fields are bounded before publication or use.
+                    packed = (
+                        (offset << metadata_bits)
+                        | (index << (weight_bits + 1))
+                        | (weight << 1)
+                        | first
+                    )
+                    queues[block].append(packed)
     collector.budget.consume(count + 1)
-    return split, tuple(tuple(q) for q in queues), reserve
+    return split, tuple(queues), reserve, (index_bits, weight_bits)
 
 
 def clear(collector):
@@ -121,7 +138,7 @@ def sieve(collector, lo, hi, stats):
     schedule = collector._sparse_queue
     if schedule is None:
         return collector._sieve_direct(lo, hi, stats)
-    split, queues, reserve = schedule
+    split, queues, reserve, (index_bits, weight_bits) = schedule
     entries = queues[(lo - window[0]) // cfg.block_width]
     roots = collector._roots
     try:
@@ -131,7 +148,12 @@ def sieve(collector, lo, hi, stats):
         collector._roots = roots
     collector.budget.consume(len(entries) + 1)
     first_count = 0
-    for offset, index, weight, first in entries:
+    metadata_bits = index_bits + weight_bits + 1
+    index_mask, weight_mask = (1 << index_bits) - 1, (1 << weight_bits) - 1
+    for packed in entries:
+        offset = packed >> metadata_bits
+        index = (packed >> (weight_bits + 1)) & index_mask
+        weight, first = (packed >> 1) & weight_mask, packed & 1
         collector._scores[offset] += weight
         if first:
             collector._hits[offset] |= 1 << index

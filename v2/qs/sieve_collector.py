@@ -487,6 +487,8 @@ class SieveCollector:
         self._a_support = tuple(
             i for i, value in enumerate(a_exponents) if value
         )
+        self._a_factor_value = polynomial.supported_a
+        self._a_factor_primes = factor_base.primes
         self._skipped = tuple(
             i
             for i, roots in enumerate(self._roots)
@@ -647,18 +649,32 @@ class SieveCollector:
         verify_polynomial_roots(
             polynomial, self.factor_base, roots, budget=self.budget
         )
-        remaining, exponents = polynomial.supported_a, []
+        supported_a = polynomial.supported_a
+        primes = self.factor_base.primes
+        if (
+            supported_a == self._a_factor_value
+            and primes == self._a_factor_primes
+        ):
+            # Gray steps change B but retain A. The immutable exponent tuple
+            # is already checked against exactly this supported A and base.
+            self.budget.consume(1)
+            exponents, support = self._a_exponents, self._a_support
+        else:
+            remaining, exponents = supported_a, []
+            for entry in self.factor_base.entries:
+                self.budget.consume(polynomial.a.bit_length() + 1)
+                exponent = 0
+                while remaining % entry.prime == 0:
+                    remaining //= entry.prime
+                    exponent += 1
+                exponents.append(exponent)
 
-        for entry in self.factor_base.entries:
-            self.budget.consume(polynomial.a.bit_length() + 1)
-            exponent = 0
-            while remaining % entry.prime == 0:
-                remaining //= entry.prime
-                exponent += 1
-            exponents.append(exponent)
-
-        if remaining != 1:
-            raise ValueError("A must factor completely over the factor base")
+            if remaining != 1:
+                raise ValueError(
+                    "A must factor completely over the factor base"
+                )
+            exponents = tuple(exponents)
+            support = tuple(i for i, value in enumerate(exponents) if value)
         self._switch_peak = max(
             getattr(self, "_switch_peak", 0), self._workspace + extra
         )
@@ -724,10 +740,8 @@ class SieveCollector:
 
             clear(self)
         self.polynomial, self._roots = polynomial, roots
-        self._a_exponents = tuple(exponents)
-        self._a_support = tuple(
-            i for i, value in enumerate(exponents) if value
-        )
+        self._a_exponents, self._a_support = exponents, support
+        self._a_factor_value, self._a_factor_primes = supported_a, primes
         self._lift_inverses.clear()
         self._power_plans.clear()
         self._plan_refused.clear()
@@ -895,6 +909,7 @@ class SieveCollector:
                 self._scores[index] += weight
 
     def _sieve(self, lo, hi, stats):
+        self._block_norm_bits = None
         if (
             getattr(self.config, "extension_policy", None) == "extended-v2"
             and self.config.batch_policy == "shared-v2"
@@ -915,6 +930,13 @@ class SieveCollector:
             and self.config.score_policy in ("candidate", "powers")
             and not self._skipped
         ):
+            if (
+                self._block_norm_bits is not None
+                and self._block_norm_bits[0] == self._block_norm_bits[1]
+            ):
+                # Every subwindow has the same norm bit length, so the
+                # refined threshold cannot exceed this block's threshold.
+                return threshold
             refined = []
             for start in range(lo, hi, width):
                 self.budget.consume(
@@ -957,6 +979,7 @@ class SieveCollector:
             self._hits[index] = initial_hit
         if not parity_two:
             lower, maximum = self._bounds(lo, hi)
+        self._block_norm_bits = lower.bit_length(), maximum.bit_length()
         if two_levels:
             stats["parity_two_blocks"] = stats.get("parity_two_blocks", 0) + 1
             stats["parity_two_seeded_hits"] = (

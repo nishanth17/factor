@@ -1,6 +1,6 @@
 """Finite transactional conversion of opaque factors into endpoints."""
 
-from .residual_kernel import ResidualKernel
+from .residual_kernel import ResidualKernel, opaque_key
 
 
 def convert(collector, residual, primes, budget, *, replay=False):
@@ -13,7 +13,7 @@ def convert(collector, residual, primes, budget, *, replay=False):
     ):
         return False
     budget.consume(1)
-    if frozenset(((True, residual),)) not in collector._graph.direct:
+    if opaque_key(residual) not in collector._graph.direct:
         return False
     collector._conversion_attempts += 1
     product = 1

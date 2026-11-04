@@ -433,7 +433,8 @@ class CompatibilityTests(unittest.TestCase):
             ),
             memory_bytes=64 * 2**20,
         )
-        outcomes = []
+        outcomes, charges = [], []
+        avoided = 0
         for module in (current, control):
             budget = (
                 allowance(10**9)
@@ -450,17 +451,28 @@ class CompatibilityTests(unittest.TestCase):
             )
             result = job.run(max_blocks=3)
             store = job.engine.collector
+            charges.append(budget.used)
+            if module is current:
+                # The shared A cache removes this repeated factorization;
+                # experimental-policy equivalence still covers all math and
+                # collector counts against the unchanged immutable source.
+                self.assertEqual(job.family_index, 0)
+                avoided = (result.stats["polynomials"] - 1) * (
+                    len(job.base.entries)
+                    * (store.polynomial.a.bit_length() + 1)
+                    - 1
+                )
             outcomes.append(
                 (
                     result.divisor,
                     result.reason,
-                    budget.used,
                     [asdict(a) for a in store._atoms.values()],
                     [asdict(r) for r in store._rows],
                     result.stats["engine"]["collector_counts"],
                 )
             )
         self.assertEqual(*outcomes)
+        self.assertEqual(charges[1] - charges[0], avoided)
 
     def test_policy_bound_resume_and_corrupt_or_legacy_schema(self):
         config = SIQSConfig(

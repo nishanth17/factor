@@ -546,6 +546,7 @@ def restore_store(payload, collector, budget):
     staging = None
     if bounded:
         from .opaque_staging import OpaqueStaging, entry_bytes
+        from .residual_kernel import opaque_key
 
         staging = OpaqueStaging(config, base)
         for coefficients, position, sign, factors, primes, opaque in staged:
@@ -553,7 +554,7 @@ def restore_store(payload, collector, budget):
                 raise ValueError("invalid opaque staging identity")
             if (
                 opaque in kernel.resolutions
-                or frozenset(((True, opaque),)) in kernel.direct
+                or opaque_key(opaque) in kernel.direct
             ):
                 raise ValueError(
                     "staged opaque already belongs to retained incidence"

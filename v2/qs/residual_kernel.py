@@ -4,7 +4,23 @@ from collections import Counter
 from dataclasses import dataclass
 from heapq import nsmallest
 
-from .relations import MAX_COMBINED_ATOMS
+from .relations import MAX_COMBINED_ATOMS, MAX_RESIDUAL, AtomicRelation
+
+# Preserve the ordering (prime tokens, then opaque tokens) without retaining
+# a tagged Python tuple at every endpoint. Prime endpoints are <=MAX_RESIDUAL.
+OPAQUE_OFFSET = MAX_RESIDUAL + 1
+
+
+def opaque_key(residual):
+    return frozenset((OPAQUE_OFFSET + residual,))
+
+
+def _external_token(value):
+    return (
+        [True, value - OPAQUE_OFFSET]
+        if value >= OPAQUE_OFFSET
+        else [False, value]
+    )
 
 
 @dataclass(frozen=True)
@@ -24,14 +40,34 @@ def tokens(atom, resolutions=None):
         and resolutions is not None
         and opaque in resolutions
     ):
-        return frozenset(
-            (False, p)
-            for p, count in Counter(resolutions[opaque]).items()
-            if count % 2
+        values = resolutions[opaque]
+    elif isinstance(atom, AtomicRelation):
+        if opaque is not None:
+            return opaque_key(opaque)
+        values = atom.residual_primes
+    else:
+        values = getattr(atom, "incidence_tokens", None)
+        values = (
+            atom.residual_primes
+            if values is None
+            else tuple(OPAQUE_OFFSET + p if tag else p for tag, p in values)
         )
-    values = getattr(atom, "incidence_tokens", None)
-    if values is None:
-        values = tuple((False, p) for p in atom.residual_primes)
+    # Production incidence has at most three endpoints. Cancel repeated
+    # endpoints directly instead of allocating a counting dictionary per atom.
+    count = len(values)
+    if count <= 1:
+        return frozenset(values)
+    if count == 2:
+        return frozenset() if values[0] == values[1] else frozenset(values)
+    if count == 3:
+        a, b, c = values
+        if a == b:
+            return frozenset((c,))
+        if a == c:
+            return frozenset((b,))
+        if b == c:
+            return frozenset((a,))
+        return frozenset(values)
     return frozenset(p for p, count in Counter(values).items() if count % 2)
 
 
@@ -177,7 +213,11 @@ class ResidualKernel:
     def state(self):
         return {
             "pivots": [
-                [list(key), [list(v) for v in sorted(vector)], sorted(ids)]
+                [
+                    _external_token(key),
+                    [_external_token(v) for v in sorted(vector)],
+                    sorted(ids),
+                ]
                 for key, (vector, ids) in sorted(self.pivots.items())
             ],
             "cycles": [sorted(ids) for ids in self.cycles],

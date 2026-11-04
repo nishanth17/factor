@@ -2,7 +2,6 @@
 
 import hashlib
 import platform
-import resource
 import statistics
 import time
 from contextlib import nullcontext
@@ -10,12 +9,14 @@ from dataclasses import asdict
 
 from .... import qs as candidate
 from ....execution import budget as candidate_budget
+from ...support.resources import PeakRSSReader
 from .configuration import decode
 from .control import control_modules
 from .journal import Journal, RecorderExhaustedError, canonical, observe
 
 VALIDATION_WORK = 10**7
 WARM_N = 1000000007 * 1000000087
+_RSS_READER = PeakRSSReader()
 
 
 def runtime():
@@ -26,8 +27,7 @@ def runtime():
 
 
 def rss():
-    value = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    return int(value if platform.system() == "Darwin" else value * 1024)
+    return _RSS_READER()
 
 
 def checked_split(n, divisor):
@@ -362,6 +362,7 @@ def run(cell, *, capture_path=None):
         process_wall=time.monotonic() - launch_wall,
         process_cpu=time.process_time() - launch_cpu,
         rss_bytes=rss(),
+        rss_observer=_RSS_READER.identity,
         stats=stats,
         sentinel_before=before,
         sentinel_after=after,

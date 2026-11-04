@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Implement shared SIQS polling, checked same-A metadata reuse, packed sparse
+  queues, redundant-refinement avoidance and compact residual coordinates.
+  Preserve immediate work refusal, cancellation publication boundaries and
+  independent checkpoint validation. Measurements remain pending.
+
 - Complete the shared progress-path 60-digit pair: raw C9a time 320.9s versus
   incumbent 356.3s, with both timing gates failed. Add bounded CPU/heap evidence
   and identify resource-observer cost; retain exploratory scope without a

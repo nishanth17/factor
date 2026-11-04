@@ -3,6 +3,7 @@
 from collections import OrderedDict
 
 from ..common import utils
+from .residual_kernel import opaque_key
 from .storage import RelationPublicationError
 
 
@@ -115,7 +116,7 @@ def route(collector, atom, stats):
     if (
         opaque is not None
         and residual not in collector._graph.resolutions
-        and frozenset(((True, residual),)) not in collector._graph.direct
+        and opaque_key(residual) not in collector._graph.direct
     ):
         staging.stage(atom, collector.budget, stats, collector)
         return True, None
@@ -129,7 +130,7 @@ def stage_unmatched(collector, atom, stats):
         opaque is None
         or opaque in collector._opaque_staging.atoms
         or opaque in collector._graph.resolutions
-        or frozenset(((True, opaque),)) in collector._graph.direct
+        or opaque_key(opaque) in collector._graph.direct
     ):
         return False
     # Congruence normalization would first expose this nonunit. Preserve that

@@ -269,6 +269,26 @@ class BoundedYieldTests(unittest.TestCase):
         self.assertIn(first.relation_id, engine._atoms)
         self.assertFalse(engine._opaque_staging.atoms)
         saved = pack_store(engine)
+        # A staged duplicate of the retained opaque must fail independently
+        # of the original record's identity, including compact token keys.
+        bad = copy.deepcopy(saved)
+        bad["opaque_staging"] = [
+            [
+                [
+                    incoming.polynomial.a,
+                    incoming.polynomial.b,
+                    incoming.polynomial.square_coefficient,
+                ],
+                incoming.position,
+                incoming.sign,
+                saved["atoms"][0][3],
+                [],
+                incoming.opaque,
+            ]
+        ]
+        with self.assertRaisesRegex(ValueError, "retained incidence"):
+            clone = worker()
+            restore_store(bad, clone, clone.budget)
         clone = worker()
         restore_store(saved, clone, clone.budget)
         clone._admit(incoming, Counter())
