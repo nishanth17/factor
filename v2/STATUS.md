@@ -179,8 +179,8 @@ measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
 B12/F4 committed arithmetic source `f9473f0` passes 1,026 tests (9 optional
-skips) and full lint. Observer source `27fb6c0` adds 11 passing targeted tests
-with byte-identical arithmetic/execution sources. The opt-in v5 resource and
+skips) and full lint. Final recorder source `9065fca` passes 12 targeted tests and full lint,
+with 25 arithmetic/execution/portfolio files byte-identical to that full-suite source. The opt-in v5 resource and
 checkpoint contract adds bounded streamed/compact metadata reuse, parent
 manifest reuse, lightweight worker imports and existing reduced stage-two
 kernels; mathematical v1 identities and automatic defaults stay unchanged.

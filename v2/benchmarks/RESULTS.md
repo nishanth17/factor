@@ -7,8 +7,8 @@ compact packed backing, parent manifest reuse, lightweight worker imports and
 the existing reduced stage-two point kernels. Mathematical v1 curves, exact
 arithmetic, stage-one acceptance guards and serial defaults remain unchanged.
 Full committed arithmetic source `f9473f0` passes 1,026 tests (9 optional skips)
-and full lint. Observer additions have separate targeted checks; arithmetic
-sources are byte-identical. Earlier failed QA/recorder/allocation receipts stay
+and full lint. Final recorder source `9065fca` passes 12 targeted checks and full lint;
+25 arithmetic/execution/portfolio files are byte-identical to the full-suite source. Earlier failed QA/recorder/allocation receipts stay
 charged and retained.
 
 Nine fresh CLI samples per arm use identical declared curves and include
