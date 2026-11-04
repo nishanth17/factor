@@ -128,6 +128,8 @@ real production resource/recorder compliance; instrumented data stays separate.
 analysis exclusion. New reports retain canary-warning counts, independent-modulus
 uncertainty and all failures. Calibrate future timing decisions with unchanged
 code and matched references; no universal percentage replaces that analysis.
+Post-correction mainline publication checks pass 1,114 tests (9 skipped), lint
+and all 243 benchmark imports from committed files only.
 
 The final `180576c` matched pair uses flat queues in both arms and the literal
 prior incumbent/`cost-report` configurations. On one exposed 60-digit input,

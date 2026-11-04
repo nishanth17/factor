@@ -10,6 +10,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   and provide explicit historical analysis replay. Keep instrumented runs and
   actual resource/recorder failures distinct; future performance judgments
   require measured variability and uncertainty rather than a universal cutoff.
+  Post-correction committed-only mainline passes 1,114 tests (9 skipped), lint
+  and all 243 benchmark imports; measured factoring arithmetic is unchanged.
 - Integrate the tested C9a bundle into mainline and close the delivered stream
   by explicit direction. Keep the performance verdict exploratory and policy
   classes opt-in. Replace C9a in the ranked queue with C9b for current-mainline

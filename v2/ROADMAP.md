@@ -264,7 +264,7 @@ sequentially. No campaign is launched by this roadmap change.
 
 **Done for the delivered research, implementation, exploratory comparison and
 mainline integration, 4 November 2026.** Scoped closure and publication are
-explicitly authorized. The final runtime passes 1,113 tests (9 skipped), lint
+explicitly authorized. Post-correction mainline passes 1,114 tests (9 skipped), lint
 and 243 benchmark imports in a committed-only checkout. Exact complete60/70
 results retain legacy canary warnings, one exposed modulus per size and no
 disjoint fresh confirmation; closure does not establish a population speedup.
@@ -275,8 +275,8 @@ archive; the current entry point is `audit/c9a/optimization-83-89.md`.
 The contract below records the delivered scope. Remaining validation and
 headroom analysis move to [C9b](#c9b--mainline-validation-and-remaining-headroom).
 
-C9a implemented selectable cadence, wider recovered-product intake, ordered endpoint
-asymmetry, shorter cycle/algebraic-duplicate policies and compact replayable
+C9a implemented selectable cadence, wider recovered-product intake, ordered
+endpoint asymmetry, shorter cycle/algebraic-duplicate policies and compact replayable
 records in one coherent candidate. These mechanisms can interact: wider
 intake increases partial-store pressure; compact records and shorter
 representatives can change its economics. Research must distinguish already

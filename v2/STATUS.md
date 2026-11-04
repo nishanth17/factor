@@ -2,6 +2,10 @@
 
 Last updated: 4 November 2026 (America/Los_Angeles).
 
+Mainline publication checks after the timing-analysis correction pass 1,114
+tests (9 skipped), lint and all 243 benchmark imports in a committed-only
+checkout. Factoring arithmetic is unchanged from the measured runtime below.
+
 C9a is integrated into mainline and the delivered stream is Done by explicit
 closure direction on 4 November. Source `c8168dc` passes the committed-only 1,113-test
 suite (9 skipped), lint and 243 benchmark imports. It includes bounded
