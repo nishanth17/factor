@@ -63,27 +63,35 @@ def prime_power_roots(
         initial = tuple(range(prime))
 
     modulus, current = prime, initial
+    target_bits = None
 
     while current and modulus <= maximum:
+        modulus_bits = modulus.bit_length()
         if lo is not None:
-            budget.consume(len(current) * (modulus.bit_length() + 1))
+            budget.consume(len(current) * (modulus_bits + 1))
             # Every higher lift is in this residue class. A class without
             # a hit in this window cannot acquire one at a higher power.
-            current = tuple(
-                root for root in current if lo + (root - lo) % modulus < hi
-            )
-            if not current:
-                break
+            # A complete period contains every residue; retain the original
+            # tuple instead of filtering and copying it in that case.
+            if hi - lo < modulus:
+                current = tuple(
+                    root for root in current if lo + (root - lo) % modulus < hi
+                )
+                if not current:
+                    break
 
         yield modulus, current, log
-        if modulus > maximum // prime:
+        # Python integers are exact. The temporary is bounded by maximum's
+        # bit length plus one prime and replaces a division at every level.
+        next_modulus = modulus * prime
+        if next_modulus > maximum:
             break
+        if target_bits is None:
+            target_bits = polynomial.n_prime.bit_length()
         lifted = []
 
         for root in current:
-            budget.consume(
-                polynomial.n_prime.bit_length() + 4 * modulus.bit_length() + 1
-            )
+            budget.consume(target_bits + 4 * modulus_bits + 1)
 
             # The derivative modulo p is constant within an original root
             # class. Reuse its inverse (or singular zero) across all lifts.
@@ -125,4 +133,4 @@ def prime_power_roots(
                 )
 
         current = tuple(lifted)
-        modulus *= prime
+        modulus = next_modulus

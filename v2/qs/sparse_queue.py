@@ -2,6 +2,7 @@
 
 from array import array
 
+from ..execution.work_budget import PollingBudget
 from .power_sieve import prime_power_roots
 
 HELPER_BYTES = 32 * 2**20
@@ -34,6 +35,8 @@ def build(collector, window, byte_cap):
     if max(width - 1, len(roots) - 1, (weight_max << 1) | 1) > word_max:
         return None
     queues = [array("I") for _ in range(count)]
+    budget = collector.budget
+    grouped = isinstance(budget, PollingBudget)
     for index in range(split, len(roots)):
         root = roots[index]
         marks = prime_power_roots(
@@ -48,21 +51,47 @@ def build(collector, window, byte_cap):
             shared_inverses=collector._shared_lift_inverses,
         )
         for modulus, residues, weight in marks:
+            encoded_weight = (weight << 1) | (modulus == root.prime)
             for residue in residues:
                 hits = range(lo + (residue - lo) % modulus, hi, modulus)
-                first = modulus == root.prime
-                for position in hits:
-                    collector.budget.consume(4)
-                    if reserve + ENTRY_BYTES > byte_cap:
-                        return None
-                    reserve += ENTRY_BYTES
-                    block, offset = divmod(position - lo, width)
-                    # Flat words avoid tuple allocation and the bit-field
-                    # decoding cost at every replay. Bounds above admit all
-                    # fields before any schedule can be published.
-                    queues[block].extend(
-                        (offset, index, (weight << 1) | first)
-                    )
+                hit_count = len(hits)
+                if not hit_count:
+                    continue
+                if reserve + ENTRY_BYTES * hit_count > byte_cap:
+                    return None
+                reserve += ENTRY_BYTES * hit_count
+                block, offset = divmod(hits.start - lo, width)
+                block_step, offset_step = (
+                    divmod(modulus, width) if hit_count > 1 else (0, 0)
+                )
+                emitted = 0
+                while emitted < hit_count:
+                    if grouped:
+                        remaining = budget._remaining or budget.interval
+                        affordable = max(
+                            1,
+                            (budget.budget.work_limit - budget.budget.used)
+                            // 4,
+                        )
+                        chunk = min(hit_count - emitted, remaining, affordable)
+                        if chunk == 1:
+                            budget.consume(4)
+                        else:
+                            budget.consume_actions(chunk, 4)
+                    else:
+                        chunk = 1
+                        budget.consume(4)
+                    for _ in range(chunk):
+                        # Advance quotient/remainder by addition. Sparse
+                        # moduli visit each block at most once; emitted words
+                        # and the root traversal order remain unchanged.
+                        queues[block].extend((offset, index, encoded_weight))
+                        block += block_step
+                        offset += offset_step
+                        if offset >= width:
+                            block += 1
+                            offset -= width
+                    emitted += chunk
     collector.budget.consume(count + 1)
     return split, tuple(queues), reserve
 

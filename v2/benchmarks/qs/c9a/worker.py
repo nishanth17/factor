@@ -54,6 +54,7 @@ def warm_once(qs, budgets, template, deadline):
         power_plan_bytes=2**20,
     )
     selected = template["collector"]
+    values["marking"] = selected["marking"]
     if "yield_policy" in selected:
         for key in (
             "preparation_policy",
@@ -110,10 +111,6 @@ def warm_once(qs, budgets, template, deadline):
     if arithmetic:
         arithmetic["assignment_policy"] = template["assignment_policy"]
         arithmetic["multiplier"] = 0
-        if "parity_two" in selected["marking"].split("+"):
-            collector = type(collector)(
-                **dict(asdict(collector), marking="parity_two")
-            )
     config = qs.SIQSConfig(
         base_bound=200,
         half_width=128,

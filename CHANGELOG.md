@@ -5,6 +5,13 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Fuse exact dense hit/score updates, skip initialization overwritten by
+  periodic scores, and replace repeated sparse-queue division with additive
+  offsets and grouped reservations. Preserve event order, complete charges
+  and cooperative polling. Avoid tiny root sorts and redundant lifting
+  arithmetic while retaining independent polynomial-root verification.
+  Benchmark warmup now retains every selected marking kernel.
+
 - Remove repeated compact-factor decoding in private proof checks and exact
   canonical keys; retire obsolete raw proofs after packed publication. Reuse
   bounded Hensel inverse information and recovery masks across polynomials,

@@ -116,6 +116,13 @@ unit work accounting, committed cursor/reporting state and the cooperative
 polling bound. These implementation changes do not adopt the C9a policies or
 alter automatic routing.
 
+Dense bucket marking combines hit and score updates when the list backend
+supports it. Periodic initializers own their complete active buffer slices.
+Sparse queue construction uses exact additive offsets and grouped reservations
+that retain each event's work and the original polling gap. Native root pairs
+avoid sorting, but every polynomial root still receives independent arithmetic
+verification. Benchmark warmup preserves the selected marking kernels.
+
 The proof cache defaults to `checked_bytes=8 MiB` (maximum 64 MiB); the two
 duplicate indices share `duplicate_bytes`. Batch sizes range from 2 through
 256. These are finite experimental settings, not measured optima. Every helper

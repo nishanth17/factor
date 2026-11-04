@@ -1023,15 +1023,24 @@ class SieveCollector:
         self._omitted_allowance = 0
         self.budget.consume(width)
         two_levels, initial_score, initial_hit = 0, 0, 0
+        powers = self.config.score_policy in ("powers", "fixed")
         parity_two = "parity_two" in self.config._kernels
         if parity_two:
             lower, maximum = self._bounds(lo, hi)
             two_levels, initial_score, initial_hit = (
                 kernels.parity_two_initial(self, maximum)
             )
-        for index in range(width):
-            self._scores[index] = initial_score
-            self._hits[index] = initial_hit
+        period_initializes = (
+            powers
+            and self._presieve is not None
+            and self.config.score_backend == "list"
+        )
+        # Both periodic implementations replace the full active slices,
+        # including empty-prime periods. Avoid clearing those slices first.
+        if not period_initializes:
+            for index in range(width):
+                self._scores[index] = initial_score
+                self._hits[index] = initial_hit
         if not parity_two:
             lower, maximum = self._bounds(lo, hi)
         self._block_norm_bits = lower.bit_length(), maximum.bit_length()
@@ -1059,7 +1068,6 @@ class SieveCollector:
             )
             return 0
 
-        powers = self.config.score_policy in ("powers", "fixed")
         weights = self._logs if powers else self._weights(maximum)
         omitted = 0
         buckets = (
@@ -1191,12 +1199,24 @@ class SieveCollector:
                             self.budget.consume(len(hits) + 1)
                             if first_level:
                                 stats["root_hits"] += len(hits)
-                                if buckets:
-                                    for hit in hits:
-                                        self._hits[hit] |= recovery_mask
 
                             stats["power_hits"] += len(hits)
-                            self._add(hits, power_weight, stats)
+                            if (
+                                first_level
+                                and buckets
+                                and self.config.score_backend == "list"
+                            ):
+                                # Both writes use the same certified range;
+                                # avoid traversing all first-level hits twice.
+                                scores, hit_masks = self._scores, self._hits
+                                for hit in hits:
+                                    hit_masks[hit] |= recovery_mask
+                                    scores[hit] += power_weight
+                            else:
+                                if first_level and buckets:
+                                    for hit in hits:
+                                        self._hits[hit] |= recovery_mask
+                                self._add(hits, power_weight, stats)
 
                         first_level = False
 
@@ -1714,6 +1734,7 @@ class SieveCollector:
         span_budget = (
             self.budget if isinstance(self.budget, PollingBudget) else None
         )
+        span_ledger = None if span_budget is None else span_budget.budget
         reporting = (
             self._reporting
             if getattr(self.config, "extension_policy", None)
@@ -1783,14 +1804,15 @@ class SieveCollector:
                         else offset == next_candidate
                     )
                     if not selected and candidates is None and span_budget:
-                        affordable = span_budget.work_limit - span_budget.used
-                        stop = min(
-                            block_hi - block_lo,
-                            offset
-                            + max(
-                                1, min(64, span_budget._remaining, affordable)
-                            ),
-                        )
+                        affordable = span_ledger.work_limit - span_ledger.used
+                        # Remaining is already bounded by64. Cache the
+                        # ledger reference, never its mutable limit or usage.
+                        amount = span_budget._remaining
+                        if amount > affordable:
+                            amount = affordable
+                        if amount < 1:
+                            amount = 1
+                        stop = min(block_hi - block_lo, offset + amount)
                         end = offset + 1
                         while end < stop and self._scores[end] < threshold:
                             end += 1

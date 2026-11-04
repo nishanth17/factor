@@ -6,6 +6,7 @@ import time
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2 import qs
@@ -22,6 +23,41 @@ from v2.tests.test_c9a_extended import atom_at, collector
 
 
 class ExpandedProtocolTests(unittest.TestCase):
+    def test_warmup_preserves_every_selected_marking_kernel(self):
+        from v2.benchmarks.qs.c9a import worker
+        from v2.qs.defaults import _coupled_policies
+
+        for config in (
+            qs.SIQSConfig(),
+            qs.SIQSConfig(collector=collector().config),
+        ):
+            template = asdict(_coupled_policies(config))
+            for marking in (
+                "density+presieve+parity_two",
+                "density+presieve_powers+parity_two",
+                "presieve+unroll4+parity_two",
+            ):
+                template["collector"]["marking"] = marking
+                with (
+                    patch.object(
+                        worker.candidate,
+                        "SIQSJob",
+                        return_value=SimpleNamespace(engine=None),
+                    ) as job,
+                    patch.object(
+                        worker, "_validated_warm_job", return_value=("ok", 1)
+                    ),
+                ):
+                    worker.warm_once(
+                        worker.candidate,
+                        worker.candidate_budget,
+                        template,
+                        time.monotonic() + 5,
+                    )
+
+                selected = job.call_args.kwargs["config"].collector
+                self.assertEqual(selected.marking, marking)
+
     def test_warmup_exercises_the_selected_coupled_arithmetic(self):
         from v2.benchmarks.qs.c9a import worker
         from v2.qs.defaults import _coupled_policies

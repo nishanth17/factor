@@ -69,3 +69,27 @@ class PollingBudget:
         else:
             self.budget.used += amount
             self._remaining -= amount
+
+    def consume_actions(self, count, work_each):
+        """Reserve a group while counting every original logical action.
+
+        Derived queue construction groups already counted events. Each event
+        keeps its charge and contributes to the polling gap. A refused group
+        changes neither the ledger nor any caller-owned event buffer.
+        """
+        utils.require_integer(count, "action count", 1)
+        utils.require_integer(work_each, "work per action", 1)
+        if count > self.interval:
+            raise ValueError("group exceeds the cooperative polling interval")
+        amount = count * work_each
+        if (
+            count > self._remaining
+            or amount > self.budget.work_limit - self.budget.used
+        ):
+            if self.poll is not None:
+                self.poll(self.budget)
+            self.budget.consume(amount)
+            self._remaining = self.interval - count
+        else:
+            self.budget.used += amount
+            self._remaining -= count
