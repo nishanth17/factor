@@ -114,7 +114,7 @@ class DiagnosticTests(unittest.TestCase):
 
     def test_component_count_labels_cannot_silently_select_serial(self):
         self.assertFalse(component_arm("M0", 1))
-        for workers in (4, 6, 8):
+        for workers in (4, 6, 8, 10, 12, 14, 16):
             self.assertTrue(component_arm("P" + str(workers), workers))
         for arm, workers in (("S0", 1), ("P8", 4), ("M0", 8)):
             with self.assertRaises(ValueError):

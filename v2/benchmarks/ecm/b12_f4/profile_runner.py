@@ -18,6 +18,10 @@ from .diagnostics import (
 )
 
 
+class ResourceTrialStoppedError(RuntimeError):
+    """Finite production allowance stopped a diagnostic call."""
+
+
 def signature(checkpoint, n, curves):
     """Independently check every result and retain exact replay identities."""
     raw = checkpoint["search"]["payload"]["completed"]
@@ -122,7 +126,7 @@ def child(path):
         wall = request["wall"] - (time.monotonic() - request["entry"]) - 4
         cpu = request["cpu"] - time.process_time() - charged_children
         if wall <= 0 or cpu <= 0:
-            raise RuntimeError("diagnostic cell allowance exhausted")
+            raise ResourceTrialStoppedError("cell_allowance")
         budget = Budget(
             work_limit=10**12 - work_used,
             seconds=wall,
@@ -136,8 +140,13 @@ def child(path):
         duration = time.monotonic() - started
         work_used += budget.used
         charged_children += budget.prior_cpu
-        if run.reason not in ("curves_exhausted", "factor_found"):
-            raise RuntimeError("fixed work incomplete: " + run.reason)
+        termination = run.stats.get("termination_reason", run.reason)
+        if termination != "curves_exhausted":
+            with (directory / "stopped-checkpoint.json").open("x") as stream:
+                json.dump(run.checkpoint, stream)
+            if termination == "worker_failure":
+                raise RuntimeError("worker failure: " + str(run.stats))
+            raise ResourceTrialStoppedError(termination)
         try:
             rows = signature(run.checkpoint, request["n"], curves)
         except ValueError:
@@ -151,9 +160,10 @@ def child(path):
         return duration, dict(run.stats)
 
     started = time.monotonic()
+    warmup, measured, stop_reason = 0.0, 0.0, None
     try:
         if request["mode"] == "warm":
-            for _ in range(128):
+            for _ in range(2048):
                 invoke()
                 warmup_calls += 1
                 if time.monotonic() - started >= 3:
@@ -180,6 +190,8 @@ def child(path):
         measured = time.monotonic() - measured
         if capture is not None:
             capture.stop_profile()
+    except ResourceTrialStoppedError as error:
+        stop_reason = str(error)
     finally:
         executor.close()
         if sampler is not None:
@@ -194,7 +206,8 @@ def child(path):
     usage = resource.getrusage(resource.RUSAGE_SELF)
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     result = dict(
-        complete=True,
+        complete=stop_reason is None,
+        stop_reason=stop_reason,
         n=request["n"],
         arm=request["arm"],
         mode=request["mode"],
@@ -224,7 +237,8 @@ def child(path):
     print(
         json.dumps(
             dict(
-                complete=True,
+                complete=stop_reason is None,
+                stop_reason=stop_reason,
                 signature=digest,
                 measured_wall=measured,
                 calls=calls,

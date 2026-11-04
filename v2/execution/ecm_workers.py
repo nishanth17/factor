@@ -896,6 +896,9 @@ class ECMExecutor:
                 lost_reports=ledger.lost,
                 elapsed=time.monotonic() - started,
             )
+        # A proper factor may coexist with an interrupted fixed-work search.
+        # Keep the public factor outcome and expose the actual traversal stop.
+        stats["termination_reason"] = reason
         stats["engagement_selected"] = stats["engaged"]
         stats["engaged"] = stats["worker_dispatches"] > 0
         stats["total_call_seconds"] = time.monotonic() - call_started
@@ -990,7 +993,12 @@ class ECMExecutor:
         limit = min(
             self.settings.packet_curves, max(1, (count + peers - 1) // peers)
         )
-        cpu_share = (ledger.cpu_limit - ledger.cpu - ledger.parent_cpu) / peers
+        remaining_cpu = ledger.cpu_limit - ledger.cpu - ledger.parent_cpu
+        # Pending leases must leave CPU for polling, validation and draining.
+        # This is withheld capacity, not a charge; actual parent CPU is charged
+        # by poll(). Preserve the serial assignment grant path.
+        parent_room = 0 if serial else min(1.0, remaining_cpu / 8)
+        cpu_share = max(0, remaining_cpu - parent_room) / peers
         work_share = (ledger.work_limit - ledger.work) // peers
         for _ in range(limit):
             position = search.next(slot["index"])

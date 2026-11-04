@@ -8,7 +8,7 @@ import struct
 from dataclasses import asdict, dataclass
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v2"
+VERSION = "b12-f4-v3"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -70,7 +70,7 @@ class WorkerSettings:
     parent_poll_seconds: float = 0.01
 
     def __post_init__(self):
-        integer(self.workers, "workers", 1, 10)
+        integer(self.workers, "workers", 1, 16)
         if type(self.allow_wide_workers) is not bool:
             raise ValueError("wider-worker opt-in must be Boolean")
         if self.workers not in (1, 2, 4) and not self.allow_wide_workers:
@@ -888,8 +888,13 @@ class Search:
             fixed_work=self.fixed_work,
             attempts=self.attempts,
             continuation_attempts=self.continuation_attempts,
-            boundaries=self.boundaries,
-            completed=self.completed,
+            # Normalize before hashing: JSON decodes position keys as strings.
+            boundaries={
+                str(key): value for key, value in self.boundaries.items()
+            },
+            completed={
+                str(key): value for key, value in self.completed.items()
+            },
             factor=self.factor,
             retired=self.retired,
         )
@@ -929,6 +934,12 @@ class Search:
         if len(data["boundaries"]) > settings.residue_capacity:
             raise ValueError("oversized boundary queue")
         for key, boundary in data["boundaries"].items():
+            if (
+                not isinstance(key, str)
+                or not key.isdecimal()
+                or str(int(key)) != key
+            ):
+                raise ValueError("noncanonical checkpoint position")
             position = integer(
                 int(key), "boundary position", 0, len(result.attempts) - 1
             )
@@ -945,6 +956,12 @@ class Search:
                 settings.residue_bytes,
             )
         for key, message in data["completed"].items():
+            if (
+                not isinstance(key, str)
+                or not key.isdecimal()
+                or str(int(key)) != key
+            ):
+                raise ValueError("noncanonical checkpoint position")
             position = integer(
                 int(key), "completed position", 0, len(result.attempts) - 1
             )

@@ -34,7 +34,7 @@ def write_new(path, value):
 
 def forced_arm(arm, workers):
     """Reject misleading control/count labels before any runtime launch."""
-    if type(workers) is not int or not 0 <= workers <= 10:
+    if type(workers) is not int or not 0 <= workers <= 16:
         raise ValueError("invalid arm worker count")
     if arm == "S0" and workers == 0:
         return False
@@ -42,10 +42,10 @@ def forced_arm(arm, workers):
         return False
     if arm == "S1" and workers == 1:
         return True
-    if arm == "N" and 1 <= workers <= 10:
+    if arm == "N" and 1 <= workers <= 16:
         return False
     if isinstance(arm, str) and arm.startswith("P") and arm[1:].isdigit():
-        if int(arm[1:]) == workers and 2 <= workers <= 10:
+        if int(arm[1:]) == workers and 2 <= workers <= 16:
             return True
     raise ValueError("arm label and worker count disagree")
 

@@ -476,3 +476,34 @@ class RetainedPoolTests(unittest.TestCase):
         self.assertEqual(
             {child.pid for child in multiprocessing.active_children()}, before
         )
+
+
+class ParentHeadroomTests(unittest.TestCase):
+    def test_live_leases_leave_parent_cpu_to_process_results(self):
+        settings = WorkerSettings(workers=4, memory_bytes=2**31)
+        owner = ECMExecutor(settings=settings)
+        plan = Manifest(
+            35,
+            7,
+            "root",
+            arithmetic_options(
+                configuration(ecm_tiers=((10, 100, 4),)),
+                settings,
+            ),
+        )
+        search = Search(plan, settings, fixed_work=True)
+        ledger = Ledger(10**8, 5)
+        for slot in range(4):
+            packet, issued = owner._packet(
+                plan,
+                search,
+                ledger,
+                10**9,
+                dict(index=slot, metadata_cache=[]),
+                peers=4 - slot,
+            )
+            self.assertEqual(len(issued), 1)
+            self.assertEqual(len(packet["jobs"]), 1)
+        self.assertEqual(len(ledger.active), 4)
+        ledger.charge(parent_cpu=0.01)
+        self.assertLess(ledger.cpu + ledger.parent_cpu, ledger.cpu_limit)

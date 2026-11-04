@@ -116,7 +116,7 @@ fresh CLI measurements after runtime admission.
 - `stage_policy="staged"` enables a bounded clean-boundary residue queue;
   `residue_capacity` includes in-flight stage-one jobs. Available stage-one
   trials have priority within a tier; continuations run when capacity fills.
-- Workers outside 1/2/4, up to ten, require `allow_wide_workers=True` and funded
+- Workers outside 1/2/4, up to sixteen, require `allow_wide_workers=True` and funded
   ownership. This adds no wider-worker experiment allocation or automatic count.
 
 Defaults remain one job/packet, polling every action, one metadata context,
@@ -139,7 +139,10 @@ The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
 slot/count/order; it differs from the incumbent shared RNG stream. The extended
-wire/executor/checkpoint contract is `b12-f4-v2`; v1 checkpoints are rejected.
+wire/executor/checkpoint contract is `b12-f4-v3`; v1/v2 checkpoints are rejected.
+Pinned older sources remain available for those checkpoints. Version 3 fixes
+JSON position-key hashing and withholds CPU for parent progress. Counts above
+ten explicitly oversubscribe this M4; support does not establish a useful count.
 ECM draws do not move later fallback seeds within the opt-in semantics. Sigma
 collisions are retained; distinct IDs do not prove independence. First-factor
 winners and staged search order can differ legitimately. Fixed-work runs retain

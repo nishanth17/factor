@@ -521,5 +521,70 @@ class OptimizationContractTests(unittest.TestCase):
             decoder.feed(b"")
 
 
+class DurablePositionTests(unittest.TestCase):
+    def test_double_digit_positions_survive_actual_json_round_trip(self):
+        plan = manifest(((10, 100, 16),))
+        settings = WorkerSettings(checkpoint_bytes=2**21)
+        search = Search(plan, settings, fixed_work=True)
+        for position in range(16):
+            token = position + 1
+            search.dispatch(position, token)
+            search.receive(position, token, message(search, position, token))
+        encoded = json.dumps(search.snapshot())
+        restored = Search.restore(
+            json.loads(encoded), plan, settings, fixed_work=True
+        )
+        self.assertEqual(set(restored.completed), set(range(16)))
+        self.assertEqual(restored.attempts, search.attempts)
+
+    def test_noncanonical_position_is_rejected_after_resealing(self):
+        plan = manifest(((10, 100, 16),))
+        settings = WorkerSettings(checkpoint_bytes=2**21)
+        search = Search(plan, settings, fixed_work=True)
+        search.dispatch(0, 1)
+        search.receive(0, 1, message(search, 0, 1))
+        saved = search.snapshot()
+        saved["payload"]["completed"]["00"] = saved["payload"][
+            "completed"
+        ].pop("0")
+        saved["sha256"] = digest(saved["payload"])
+        with self.assertRaisesRegex(ValueError, "noncanonical"):
+            Search.restore(saved, plan, settings, fixed_work=True)
+
+    def test_sixteen_slot_traversal_round_trip_keeps_remaining_identity(self):
+        settings = WorkerSettings(
+            workers=16,
+            allow_wide_workers=True,
+            memory_bytes=4 * 2**30,
+            checkpoint_bytes=4 * 2**20,
+        )
+        plan = manifest(((10, 100, 32),))
+        search = Search(plan, settings, fixed_work=True)
+        issued = []
+        for slot in range(16):
+            position = search.next(slot)
+            token = slot + 1
+            search.dispatch(position, token)
+            issued.append((position, token))
+        for position, token in reversed(issued):
+            search.receive(position, token, message(search, position, token))
+        restored = Search.restore(
+            json.loads(json.dumps(search.snapshot())),
+            plan,
+            settings,
+            fixed_work=True,
+        )
+        self.assertEqual(restored.next(0), 16)
+        self.assertEqual(set(restored.completed), set(range(16)))
+        self.assertEqual(restored.manifest.assignment(16), plan.assignment(16))
+        for count in (10, 12, 14, 16):
+            with self.assertRaises(ValueError):
+                WorkerSettings(workers=count)
+        with self.assertRaises(ValueError):
+            WorkerSettings(workers=17, allow_wide_workers=True)
+        with self.assertRaises(MemoryError):
+            WorkerSettings(workers=16, allow_wide_workers=True)
+
+
 if __name__ == "__main__":
     unittest.main()
