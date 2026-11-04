@@ -1,5 +1,41 @@
 # Benchmark results and decisions
 
+## B12/F4 larger-work headroom screen (4 November 2026)
+
+Runtime candidate `8a2bff7` and current incumbent `a2af71b` were pinned in
+separate committed checkouts. These are exposed/enriched exploratory inputs,
+with one observation per cell, explicit spawn and identical candidate manifests.
+All 18 revised cells completed, including fresh CLI startup/output validation
+and separate retained contexts with at least three validated warmup seconds.
+
+| Input / fixed work | Cold M0 serial | Cold P4 | Warm M0 | Warm P4 |
+| --- | ---: | ---: | ---: | ---: |
+| 60 digits, smaller factor 18 digits; 128 curves, B1=2,000/B2=200,000 | 1.910 s | 1.106 s | 1.588 s | 0.508 s |
+| 80 digits, smaller factor 20 digits; 32 curves, B1=11,000/B2=1,100,000 | 3.123 s | 1.414 s | 2.701 s | 0.811 s |
+
+Cold incumbent S0 observations were 1.896/3.011 s, with different curve streams.
+M0/S1/P2/P4 preserve all curve identities, splits, phases and chain counts.
+The 60-digit manifest found a divisor on one curve; the 80-digit manifest found
+none. Fixed-work differences do not establish first-factor or complete-factor latency.
+Full-tier PRAC remains eligible at B1=2,000; every deeper-bound arm uses the
+existing ladder path. The missing cheap warm M0 observation was 0.0591 s.
+
+P4 cold observed CPU was 2.04/1.62 times M0. Warm child CPU counters indicate
+about 3.9 active CPU equivalents; parent CPU was small. Helper CPU remains
+incompletely observed and conservatively charged. Largest summed worker HWM
+was 344 MB and parent HWM 89 MB, not simultaneous aggregate RSS. These results
+justify a bounded first-factor/complete-call follow-up, without selecting a
+production threshold or proving median/p90 or portfolio gains. Profiling and
+heap dumps were not needed for this headroom decision and were not run.
+
+Two initial refusals remain recorded: insufficient checkpoint ownership at
+128 curves, then CPU leases filling the envelope without parent headroom.
+The revised settings fund a 2 MiB checkpoint and cap individual curves at two
+CPU seconds. These are scoped diagnostic settings, not new defaults. All
+revisions and charges remain within 600 wall/2,400 aggregate CPU seconds.
+Local freezes, detailed costs and limitations: `v2/audit/b12_f4/HEADROOM_REPORT.md`.
+B12/F4 remain open; no merge, default adoption or E1 campaign accompanies this.
+
 ## B12/F4 runtime QA and initial process screen (3 November 2026)
 
 Runtime source `8a2bff7` passes 987 tests (9 optional skips), full lint and

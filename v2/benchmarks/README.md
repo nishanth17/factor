@@ -124,12 +124,21 @@ The [earlier guide](https://github.com/nishanth17/factor/blob/24ff153d26ada2ec4b
 preserves older command/layout notes and numerical summaries.
 
 B12/F4 preparation provides `ecm/b12_f4/runner.py`, `inputs.py` and the prospective
-`inputs/controls/b12_f4_preparation.json`. No measurements have run. The driver
+`inputs/controls/b12_f4_preparation.json`. The driver
 requires a later runtime-admitted freeze and separates fresh CLI complete cost
 from retained-context calls. S0 uses the pinned committed incumbent; S1/P2/P4
 expose the new executor and M0 is its separate serial manifest equivalent.
 Detailed source review, protocol, budgets and queued QA handoff are local under
-`v2/audit/b12_f4/`. Runtime QA is the next phase; B12/F4 and E1 remain open.
+`v2/audit/b12_f4/`. Runtime source `8a2bff7` passed QA and exploratory startup
+and larger-work screens; B12/F4 and E1 remain open. See the scoped observations
+in [RESULTS](RESULTS.md#b12f4-larger-work-headroom-screen-4-november-2026).
+
+`python -m v2.benchmarks.ecm.b12_f4.headroom FREEZE RECEIPT_DIRECTORY` analyses
+fixed-work receipts without importing factoring code. It checks declared curve
+coverage, proper divisors and equivalent search results, and keeps warm-call
+latency separate from whole-cell CPU including warmup. Failed/missing cells
+remain visible. It does not turn a one-observation screen into a performance
+claim. Use PyPy 3.11 for the runtime driver.
 
 B12/F4 option preparation now includes bounded packet size, action polling,
 private metadata/decoded caches and checked stage queues. The runner accepts

@@ -3,6 +3,15 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 larger-work headroom screen (4 November 2026)
+
+- Add a pure receipt analyser with independent corruption/coverage tests.
+- Record exploratory cold/warm scaling on 60/80-digit enriched inputs under
+  larger fixed workloads. Four workers amortize startup in these observations;
+  complete-factorization benefit and engagement thresholds remain unestablished.
+- Retain checkpoint/CPU-lease admission refusals and finite charges. Executor,
+  arithmetic and automatic defaults are unchanged; B12/F4 remain open.
+
 ## B12/F4 runtime QA and initial screen (3 November 2026)
 
 - Pass 987 committed-checkout tests (9 optional skips), full lint and bounded

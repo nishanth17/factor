@@ -181,11 +181,14 @@ requested execution chat may use Sol / high where its task row permits it.
 B12/F4 runtime source `8a2bff7` passes 987 committed-checkout tests (9 optional
 skips), full lint and the initial bounded 1/2/4-worker screen. Cheap cold
 8-curve calls remain better served serially in the exploratory panel; retained
-pool scaling needs warm-serial and larger-work calibration before selecting a
-count/engagement rule. Production defaults and B12/F4 open status are unchanged.
+pool scaling now has a separate 4 November warm-serial/larger-work headroom
+screen: cold P4 improved the exploratory fixed-work observations at 60/80 digits,
+with complete-call benefit and engagement calibration still unestablished.
+Production defaults and B12/F4 open status are unchanged.
 See [scoped observations](benchmarks/RESULTS.md#b12f4-runtime-qa-and-initial-process-screen-3-november-2026)
 and local `v2/audit/b12_f4/RUNTIME_HANDOFF.md`. C9a's release was explicitly
-confirmed; all runtime work used the shared lock and has stopped.
+confirmed; all runtime work used the shared lock and has stopped. Latest local headroom
+results and resource/admission limitations: `v2/audit/b12_f4/HEADROOM_REPORT.md`.
 
 ## Known gaps and unresolved conflicts
 
