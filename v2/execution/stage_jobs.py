@@ -391,7 +391,7 @@ def _stage_two(job, budget, context, config):
         if prime > job["center"] + step:
             budget.consume(2)
             giant = list(
-                ecm.point_add(
+                getattr(context, "point_add", ecm.point_add)(
                     *job["giant"], *job["baby"][-1], *job["previous"], n
                 )
             )
@@ -483,7 +483,11 @@ def advance_job(job, budget, context, config):
             distance=distance,
             baby=[
                 None,
-                list(ecm.point_double(*job["value"], job["n"], job["a24"])),
+                list(
+                    getattr(context, "point_double", ecm.point_double)(
+                        *job["value"], job["n"], job["a24"]
+                    )
+                ),
             ],
             phase="baby_steps",
         )
@@ -493,9 +497,11 @@ def advance_job(job, budget, context, config):
         index = len(job["baby"])
         budget.consume(2)
         if index == 2:
-            point = ecm.point_double(*job["baby"][1], job["n"], job["a24"])
+            point = getattr(context, "point_double", ecm.point_double)(
+                *job["baby"][1], job["n"], job["a24"]
+            )
         else:
-            point = ecm.point_add(
+            point = getattr(context, "point_add", ecm.point_add)(
                 *job["baby"][-1],
                 *job["baby"][1],
                 *job["baby"][-2],

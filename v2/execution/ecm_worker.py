@@ -52,7 +52,10 @@ class CurveEngine:
         self.decode_hits = self.decode_misses = self.decode_refusals = 0
 
     def _prepare(self, message, budget):
-        from ..portfolio import PortfolioConfig, _execution_context
+        if self.settings.worker_imports == "ecm":
+            from .portfolio_config import PortfolioConfig, _execution_context
+        else:
+            from ..portfolio import PortfolioConfig, _execution_context
         from .ecm_worker_state import DecodedPrograms
 
         identity = message["schedule"]
@@ -76,10 +79,15 @@ class CurveEngine:
                 self.cache_evictions += 1
             config = PortfolioConfig(**options)
             context, programs = _execution_context({}, config, budget)
-            if programs is not None and self.settings.decoded_cache_bytes:
+            if self.settings.decoded_cache_bytes:
                 programs = DecodedPrograms(
-                    programs, self.settings.decoded_cache_bytes
+                    programs or context, self.settings.decoded_cache_bytes
                 )
+            if self.settings.stage_two_kernel == "reduced":
+                from ..ecm.chains import point_add, point_double
+
+                active = programs or context
+                active.point_add, active.point_double = point_add, point_double
             self.contexts[identity] = (config, context, programs)
             self.preparations += 1
         self.identity = identity
@@ -231,8 +239,6 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
     channel.settimeout(0.01)
     decoder = Decoder(frame_bytes)
     try:
-        from .. import portfolio  # noqa: F401
-
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
             3,
             11,
@@ -241,6 +247,10 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
                 "ECM workers require PyPy implementing Python 3.11"
             )
         settings = WorkerSettings(**(settings_data or {}))
+        if settings.worker_imports == "ecm":
+            from . import portfolio_config  # noqa: F401
+        else:
+            from .. import portfolio  # noqa: F401
         engine = CurveEngine(settings)
         previous_cpu = time.process_time()
         channel.sendall(

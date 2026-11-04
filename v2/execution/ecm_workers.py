@@ -7,6 +7,7 @@ import socket
 import sys
 import threading
 import time
+from collections import OrderedDict
 from dataclasses import asdict, dataclass, replace
 
 from .worker_contract import (
@@ -107,6 +108,8 @@ class ECMExecutor:
         self.closed = False
         self.lock = threading.Lock()
         self.serial_engine = None
+        self.manifests = OrderedDict()
+        self.manifest_bytes = 0
         self.last_stats = {}
         self.stats_history = []
         self.lifetime_stats = {}
@@ -140,6 +143,8 @@ class ECMExecutor:
             "decode_hits",
             "decode_misses",
             "decode_refusals",
+            "manifest_cache_hits",
+            "manifest_cache_misses",
         ):
             self.lifetime_stats[key] = self.lifetime_stats.get(
                 key, 0
@@ -243,6 +248,8 @@ class ECMExecutor:
             started = time.monotonic()
             self._destroy()
             self.serial_engine = None
+            self.manifests.clear()
+            self.manifest_bytes = 0
             self.closed = True
             self.last_stats["close_seconds"] = time.monotonic() - started
             self.lifetime_stats["close_seconds"] = (
@@ -481,6 +488,40 @@ class ECMExecutor:
         finally:
             self.lock.release()
 
+    def _manifest(self, n, config, lineage):
+        """Reuse identities only, with independent per-call search state."""
+        options = arithmetic_options(config, self.settings)
+        cap = self.settings.manifest_cache_bytes
+        if not cap:
+            return Manifest(n, self.seed, lineage, options), False
+        key = (n, lineage, canonical(options))
+        if key in self.manifests:
+            self.manifests.move_to_end(key)
+            return self.manifests[key][0], True
+
+        # Reserve every possible assignment before retaining a lazy manifest.
+        # This includes its duplicate canonical key/options and integer IDs.
+        reserve = (
+            65536
+            + 2048 * sum(tier[2] for tier in options["ecm_tiers"])
+            + 4 * len(key[2])
+            + 4 * len(lineage)
+            + n.bit_length()
+        )
+        retain = reserve <= cap
+        if retain:
+            while self.manifests and (
+                self.manifest_bytes + reserve > cap
+                or len(self.manifests) >= 16
+            ):
+                _, (_, owned) = self.manifests.popitem(last=False)
+                self.manifest_bytes -= owned
+        result = Manifest(n, self.seed, lineage, options)
+        if retain:
+            self.manifests[key] = (result, reserve)
+            self.manifest_bytes += reserve
+        return result, False
+
     def _run(self, n, config, budget, lineage, checkpoint, fixed_work):
         from .budget import BudgetExhaustedError
         from .ecm_worker import CurveEngine
@@ -491,9 +532,7 @@ class ECMExecutor:
             raise ValueError("finite wall/CPU grants required")
         if n.bit_length() > config.max_input_bits:
             raise ValueError("cofactor exceeds configured input bound")
-        manifest = Manifest(
-            n, self.seed, lineage, arithmetic_options(config, self.settings)
-        )
+        manifest, manifest_hit = self._manifest(n, config, lineage)
         search = Search(manifest, self.settings, fixed_work=fixed_work)
         if checkpoint is not None:
             payload = dict(checkpoint)
@@ -591,6 +630,11 @@ class ECMExecutor:
         stats = dict(
             decision_seconds=time.monotonic() - decision_started,
             planning_seconds=decision_started - call_started,
+            manifest_cache_hits=int(manifest_hit),
+            manifest_cache_misses=int(
+                bool(self.settings.manifest_cache_bytes) and not manifest_hit
+            ),
+            manifest_cache_bytes=self.manifest_bytes,
             worker_dispatches=0,
             packets_dispatched=0,
             funded=funded,

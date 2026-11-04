@@ -8,7 +8,7 @@ import struct
 from dataclasses import asdict, dataclass
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v3"
+VERSION = "b12-f4-v4"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -63,6 +63,9 @@ class WorkerSettings:
     poll_every: int = 1
     metadata_slots: int = 1
     decoded_cache_bytes: int = 0
+    manifest_cache_bytes: int = 0
+    worker_imports: str = "portfolio"
+    stage_two_kernel: str = "legacy"
     stage_policy: str = "whole"
     residue_capacity: int = 16
     residue_bytes: int = 8192
@@ -103,6 +106,11 @@ class WorkerSettings:
         integer(self.parent_memory, "parent_memory", 2**20, 4 * 2**30)
         integer(self.memory_bytes, "memory_bytes", 2**20, 24 * 2**30)
         integer(self.decoded_cache_bytes, "decoded cache", 0, 16 * 2**20)
+        integer(self.manifest_cache_bytes, "manifest cache", 0, 16 * 2**20)
+        if self.worker_imports not in ("portfolio", "ecm"):
+            raise ValueError("unknown worker import path")
+        if self.stage_two_kernel not in ("legacy", "reduced"):
+            raise ValueError("unknown stage-two kernel")
         if self.assignment_policy not in ("dynamic", "static"):
             raise ValueError("unknown curve assignment policy")
         if self.stage_policy not in ("whole", "staged"):
@@ -128,6 +136,7 @@ class WorkerSettings:
         )
         return (
             self.parent_memory
+            + self.manifest_cache_bytes
             + contexts * (self.worker_memory + self.decoded_cache_bytes)
             + self.worker_memory  # Possible runtime-managed spawn helper.
             + self.workers

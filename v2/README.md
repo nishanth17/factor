@@ -139,10 +139,22 @@ The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
 slot/count/order; it differs from the incumbent shared RNG stream. The extended
-wire/executor/checkpoint contract is `b12-f4-v3`; v1/v2 checkpoints are rejected.
+wire/executor/checkpoint contract is `b12-f4-v4`; v1/v2/v3 checkpoints are rejected.
 Pinned older sources remain available for those checkpoints. Version 3 fixes
 JSON position-key hashing and withholds CPU for parent progress. Counts above
 ten explicitly oversubscribe this M4; support does not establish a useful count.
+Optional `decoded_cache_bytes` now reuses immutable primes/powers for streamed
+bounds as well as packed programs. A funded prefix remains cached when a full
+schedule cannot fit; there is no repeated scan eviction. `manifest_cache_bytes`
+(0–16 MiB) separately bounds up to 16 parent identity manifests, with fresh
+search/results on every call. Both default to zero and refuse retention safely.
+`worker_imports="ecm"` uses the same configuration/context implementation while
+avoiding unrelated relation-engine imports. `stage_two_kernel="reduced"` selects
+the already-verified early-reduction point kernels for baby/giant steps. Defaults
+remain `"portfolio"` and `"legacy"`; numerical schedules, curve streams, stage-one
+eligibility and modulus-dependent state ownership stay unchanged. These choices
+require separate complete-cost calibration; they are not automatic defaults.
+
 ECM draws do not move later fallback seeds within the opt-in semantics. Sigma
 collisions are retained; distinct IDs do not prove independence. First-factor
 winners and staged search order can differ legitimately. Fixed-work runs retain
