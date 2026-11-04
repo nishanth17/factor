@@ -172,3 +172,11 @@ are in [results](RESULTS.md#b12f4-bounded-metadata-and-import-reuse-4-november-2
 without rewriting production manifest identity. `parent_profile` bounds coarse
 observation and must be paired with a clean arm. Censored diagnostic calls keep
 elapsed durations and failure charges; they never rank as fast complete calls.
+
+For capture coverage audits, `dump_analysis.heap_summary(..., limit=None)` and
+`cpu_summary(..., limit=None)` retain every histogram entry within the existing
+input-size bound. Default summaries still display 25 entries and now expose
+`omitted_gc_bytes` / `omitted_leaf_samples`; a truncated display cannot silently
+stand in for a full histogram. These counts do not resolve inlined JIT operations,
+allocation lifetimes or heap-root ownership. The current local coverage record is
+`v2/audit/b12_f4/capture_coverage_v1/REPORT.md`.

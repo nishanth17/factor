@@ -204,6 +204,15 @@ and local `v2/audit/b12_f4/headroom_opt_v1/HANDOFF.md`. Earlier source-pinned
 profiles/counts remain under `profiles-v1/` and `counts16_v1/`. E5a records the
 separate serialization follow-up; it is not pursued in this headroom phase.
 
+The follow-up capture audit reconciles all 189 retained CPU/heap files and
+100 JIT summaries, including 11 current-source diagnostic cells. It fills
+representative L/H60/80/100 arithmetic coverage, retains inconclusive copied-
+budget diagnostics and identifies remaining F4 JIT/work-accounting, stage-two
+metadata and packet2 questions. Complete capture coverage does not close these
+optimization opportunities or establish whole-factor gains. Local current entry:
+`v2/audit/b12_f4/capture_coverage_v1/REPORT.md`; see the
+[capture findings](benchmarks/RESULTS.md#b12f4-complete-capture-and-current-source-headroom-audit-4-november-2026).
+
 ## Known gaps and unresolved conflicts
 
 - **Deferred:** E1 combined portfolio confirmation. Individual accepted

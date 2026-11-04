@@ -214,3 +214,42 @@ class DiagnosticTests(unittest.TestCase):
             self.assertGreater(data["measured_wall"], 0)
             self.assertLess(data["measured_wall"], 1)
             self.assertEqual(closed, [True])
+
+    def test_full_heap_histogram_reconciles_the_displayed_tail(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "many-types.heap"
+            words = [0, 0, 0, -1]
+            for kind in range(30):
+                words.extend([kind + 1, kind, 32 + kind, -1])
+            path.write_bytes(array.array("l", words).tobytes())
+
+            short = heap_summary(path)
+            complete = heap_summary(path, limit=None)
+
+            self.assertEqual(short["type_count"], 30)
+            self.assertEqual(short["omitted_gc_bytes"], 170)
+            self.assertEqual(len(complete["types"]), 30)
+            self.assertEqual(complete["omitted_gc_bytes"], 0)
+            self.assertEqual(complete["gc_object_bytes"], 1395)
+            self.assertEqual(
+                sum(row["bytes"] for row in complete["types"]), 1395
+            )
+
+    def test_full_cpu_histogram_reconciles_samples_outside_top_entries(self):
+        class Assembler(int):
+            pass
+
+        profiles = [([kind], kind, 0, 0) for kind in range(1, 31)]
+        symbols = {kind: str(kind) for kind in range(1, 31)}
+
+        short = sample_summary(profiles, symbols, Assembler)
+        complete = sample_summary(profiles, symbols, Assembler, limit=None)
+
+        self.assertEqual(short["leaf_count"], 30)
+        self.assertEqual(short["omitted_leaf_samples"], 15)
+        self.assertEqual(len(complete["leaf"]), 30)
+        self.assertEqual(complete["weighted_samples"], 465)
+        self.assertEqual(complete["omitted_leaf_samples"], 0)
+        self.assertAlmostEqual(
+            sum(row["percent"] for row in complete["leaf"]), 100
+        )

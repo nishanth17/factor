@@ -6,12 +6,15 @@ import importlib.util
 from pathlib import Path
 
 
-def heap_summary(path, maximum=32 * 2**20):
+def heap_summary(path, maximum=32 * 2**20, *, limit=25):
     """Check native-word RPython records and summarize GC-managed live types.
 
     This format is documented by gc.dump_rpy_heap. Raw allocations, allocator
     freelists and JIT code require the separate process/GC statistics.
+    Set limit=None to retain every type; omitted bytes remain explicit.
     """
+    if limit is not None and (type(limit) is not int or limit < 1):
+        raise ValueError("histogram limit must be positive or None")
     path = Path(path)
     size = path.stat().st_size
     values = array.array("l")
@@ -54,9 +57,12 @@ def heap_summary(path, maximum=32 * 2**20):
     typeids = path.parent / "typeids.txt"
     if typeids.exists():
         names = dict(enumerate(typeids.read_text().splitlines()))
+    selected = sizes.most_common(limit)
     return dict(
         file=str(path),
         bytes=size,
+        type_count=len(sizes),
+        omitted_gc_bytes=live - sum(value for _, value in selected),
         objects=objects,
         references=references,
         gc_object_bytes=live,
@@ -67,7 +73,7 @@ def heap_summary(path, maximum=32 * 2**20):
                 count=counts[k],
                 bytes=value,
             )
-            for k, value in sizes.most_common(25)
+            for k, value in selected
         ],
         largest=[
             dict(bytes=value, typeid=k, name=names.get(k, "unknown"))
@@ -77,7 +83,7 @@ def heap_summary(path, maximum=32 * 2**20):
     )
 
 
-def cpu_summary(path, reader_path, maximum=32 * 2**20):
+def cpu_summary(path, reader_path, maximum=32 * 2**20, *, limit=25):
     """Use a separately pinned upstream pure reader, without native imports."""
     path = Path(path)
     if path.stat().st_size > maximum:
@@ -88,7 +94,10 @@ def cpu_summary(path, reader_path, maximum=32 * 2**20):
     with path.open("rb") as stream:
         state = reader._read_prof(stream)
     result = sample_summary(
-        state.profiles, dict(state.virtual_ips), reader.AssemblerCode
+        state.profiles,
+        dict(state.virtual_ips),
+        reader.AssemblerCode,
+        limit=limit,
     )
     result.update(
         file=str(path),
@@ -99,13 +108,15 @@ def cpu_summary(path, reader_path, maximum=32 * 2**20):
     return result
 
 
-def sample_summary(profiles, symbols, assembler_type):
+def sample_summary(profiles, symbols, assembler_type, *, limit=25):
     """Count logical PyPy frames, retaining compiled-code coverage separately.
 
     VMProf emits an AssemblerCode PC after a JittedCode logical frame. The PC
     is not another Python function; counting it as the leaf hides the logical
     caller. Inlined operations inside a JIT scope remain unattributed.
     """
+    if limit is not None and (type(limit) is not int or limit < 1):
+        raise ValueError("histogram limit must be positive or None")
     leaf, inclusive = collections.Counter(), collections.Counter()
     weighted, compiled = 0.0, 0.0
     for trace, weight, _, _ in profiles:
@@ -127,16 +138,19 @@ def sample_summary(profiles, symbols, assembler_type):
     if not weighted:
         return dict(weighted_samples=0, leaf=[], inclusive=[])
     unknown = sum(v for k, v in leaf.items() if k.startswith("unknown:"))
+    selected = leaf.most_common(limit)
     return dict(
         weighted_samples=weighted,
+        leaf_count=len(leaf),
+        omitted_leaf_samples=weighted - sum(count for _, count in selected),
         jit_compiled_percent=100 * compiled / weighted,
         unmapped_logical_leaf_percent=100 * unknown / weighted,
         leaf=[
             dict(function=name, percent=100 * count / weighted)
-            for name, count in leaf.most_common(25)
+            for name, count in selected
         ],
         inclusive=[
             dict(function=name, percent=100 * count / weighted)
-            for name, count in inclusive.most_common(25)
+            for name, count in inclusive.most_common(limit)
         ],
     )

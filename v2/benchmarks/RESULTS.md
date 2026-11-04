@@ -1,5 +1,45 @@
 # Benchmark results and decisions
 
+## B12/F4 complete capture and current-source headroom audit (4 November 2026)
+
+The initial 62 CPU profiles and 83 heap dumps all had prior parsed summaries;
+this audit reconciles their full histogram tails and adds 11 targeted current-
+source diagnostic cells. All 189 retained raw captures (100 CPU / 89 heap) and
+100 JIT-summary logs are now accounted for. No raw evidence or historical freeze
+was overwritten. New cells validate identical declared curve results and drain
+all their owned groups. Full capture coverage does not establish exhausted
+headroom or an optimal configuration for every input.
+
+Current-source CPU scopes cover L/H at 60/80/100 digits; P8 supplies four cases
+and equivalent-manifest M0 supplies L80/H60 arithmetic. PRAC remains limited to
+its accepted bounds/modulus guard. Current `consume` logical scopes occupy
+roughly 24–37% of arithmetic samples, predominantly compiled JIT scopes; that
+is not a removable-overhead estimate. All current trace-too-long aborts belong
+to parallel parents, with none observed in arithmetic workers. A blanket global
+JIT-limit increase is therefore not supported as an arithmetic optimization.
+
+Two current M0 heap lanes show about 1.4/2.1 MB released across close and
+0.1/0.3 MB live stage-two deltas at L60/H80. M0 parents retain portfolio imports;
+these are cache/arithmetic snapshots, not the slim worker's exact import heap.
+The full type tail does not identify a dominant missed allocation. Allocation
+churn, inlined operation costs and memory bandwidth remain unresolved.
+
+A deterministic budget prototype comparison fails its unchanged-clone timing
+control. Its synthetic ratios are inconclusive for production cost; no budget
+implementation or global default was changed. The retained receipts include an
+initial adapter error and all unfavorable/null-control results. Remaining F4
+candidates include an exact-source checked-budget comparison, immutable
+stage-two index/group preparation, context lookup reuse and packet2. These
+remain separate from B3a chains, B4a native/SIMD and parked E5a serde work.
+
+New diagnostics use three measured calls after validated warmup (one at the
+serial arithmetic probes), so no new speedup/p90/whole-factor claim follows.
+The earlier nine-sample cold reuse result remains separately scoped. Maximum
+cumulative booking is 1,610.21 wall / 11,947.36 CPU seconds within the unchanged
+1,800 / 12,000 envelope; prior QA/failure charges remain. Local detailed coverage,
+full per-file hashes and next decisions: `v2/audit/b12_f4/capture_coverage_v1/`.
+B12/F4 remain open; no merge, defaults or E1 campaign.
+
 ## B12/F4 bounded metadata and import reuse (4 November 2026)
 
 Opt-in resource/checkpoint v5 adds bounded decoded reuse for streamed schedules,
