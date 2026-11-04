@@ -135,7 +135,12 @@ class Presieve:
         repeats = (offset + width + period - 1) // period
         end = offset + width
         collector._scores[:width] = (self.scores * repeats)[offset:end]
-        collector._hits[:width] = (self.hits * repeats)[offset:end]
+        initial = (self.hits * repeats)[offset:end]
+        words = getattr(collector, "_word_hits", None)
+        if words is not None and collector._hits is words:
+            words.assign_prefix(initial, collector.budget)
+        else:
+            collector._hits[:width] = initial
         self.replays += 1
         return self.indices
 
@@ -233,7 +238,12 @@ class PowerPresieve:
         repeats = (offset + width + len(self.scores) - 1) // len(self.scores)
         end = offset + width
         collector._scores[:width] = (self.scores * repeats)[offset:end]
-        collector._hits[:width] = (self.hits * repeats)[offset:end]
+        initial = (self.hits * repeats)[offset:end]
+        words = getattr(collector, "_word_hits", None)
+        if words is not None and collector._hits is words:
+            words.assign_prefix(initial, collector.budget)
+        else:
+            collector._hits[:width] = initial
         self.replays += 1
         return self.levels
 

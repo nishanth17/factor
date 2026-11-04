@@ -10,6 +10,7 @@ from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
+from .hit_words import MAX_HIT_BYTES, WordHits
 from .polynomial import (
     MAX_COEFFICIENT_BITS,
     MAX_POSITION_BITS,
@@ -662,6 +663,25 @@ class SieveCollector:
             self._reuse_workspace += transfer_bytes
             self._power_transfers = RootTransfers(transfer_bytes)
             self._power_transfers.bind(polynomial)
+        self._word_hits = None
+        hit_bytes = WordHits.reservation(count, width)
+        hit_work = WordHits.construction_work(count, width)
+        if (
+            count > 60
+            and self.config.score_backend == "list"
+            and self.config.division == "bucket"
+            and self.config.score_policy in ("powers", "fixed")
+            and hit_bytes <= MAX_HIT_BYTES
+            and self._workspace + hit_bytes + switch_bytes
+            <= self.config.memory_limit
+            and hit_work <= self.budget.work_limit - self.budget.used
+        ):
+            # Existing helpers keep priority. Construction and lazy reads
+            # have explicit extra work; scarce memory keeps the list path.
+            self._word_hits = WordHits(count, self._hits, self.budget)
+            self._hits = self._word_hits
+            self._workspace += hit_bytes
+            self._reuse_workspace += hit_bytes
         self._sparse_split = None
         if self.config.sparse_queue_bytes:
             target = polynomial.n_prime
@@ -998,6 +1018,8 @@ class SieveCollector:
             threshold = sieve(self, lo, hi, stats)
         else:
             threshold = self._sieve_direct(lo, hi, stats)
+        if self._word_hits is not None and self._hits is self._word_hits:
+            self._word_hits.seal()
         width = getattr(self.config, "refinement_width", 0)
         if (
             width
@@ -1054,12 +1076,16 @@ class SieveCollector:
             and self._presieve is not None
             and self.config.score_backend == "list"
         )
+        words = self._word_hits if self._hits is self._word_hits else None
+        if words is not None:
+            words.begin(initial_hit, self.budget)
         # Both periodic implementations replace the full active slices,
         # including empty-prime periods. Avoid clearing those slices first.
         if not period_initializes:
             for index in range(width):
                 self._scores[index] = initial_score
-                self._hits[index] = initial_hit
+                if words is None:
+                    self._hits[index] = initial_hit
         if not parity_two:
             lower, maximum = self._bounds(lo, hi)
         self._block_norm_bits = lower.bit_length(), maximum.bit_length()
@@ -1168,6 +1194,17 @@ class SieveCollector:
                                     stats["root_hits"] += len(hits)
                                 stats["power_hits"] += len(hits)
                                 continue
+                            if first_level and buckets and words is not None:
+                                hits = range(
+                                    (root - lo) % modulus, width, modulus
+                                )
+                                self.budget.consume(len(hits) + 1)
+                                stats["root_hits"] += len(hits)
+                                stats["power_hits"] += len(hits)
+                                words.add(
+                                    index, hits, self._scores, power_weight
+                                )
+                                continue
                             if density:
                                 # Sparse powers have at most one hit. Keep
                                 # the scalar reservation, including empty
@@ -1251,8 +1288,11 @@ class SieveCollector:
                     self.budget.consume(len(hits) + 1)
                     stats["root_hits"] += len(hits)
                     if buckets:
-                        for hit in hits:
-                            self._hits[hit] |= recovery_mask
+                        if words is not None:
+                            words.add(index, hits)
+                        else:
+                            for hit in hits:
+                                self._hits[hit] |= recovery_mask
                     if skipped or powers or self.config.marking == "bucket":
                         continue
                     if (
@@ -1475,7 +1515,13 @@ class SieveCollector:
         if self.config.division == "resieve":
             indices = ()
         elif self.config.division == "bucket":
-            bits = self._hits[offset]
+            hit_bits = (
+                self._word_hits.mask(offset, self.budget)
+                if self._word_hits is not None
+                and self._hits is self._word_hits
+                else self._hits[offset]
+            )
+            bits = hit_bits
             for index in self._a_support:
                 bits |= self._recovery_mask(index)
             indices = []
@@ -1494,7 +1540,7 @@ class SieveCollector:
             if self.config.division == "full":
                 hit = True
             elif self.config.division == "bucket":
-                hit = bool(self._hits[offset] & self._recovery_mask(index))
+                hit = bool(hit_bits & self._recovery_mask(index))
             else:
                 hit = roots.all_positions or position % prime in roots.roots
 

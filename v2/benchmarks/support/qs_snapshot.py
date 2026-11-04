@@ -54,6 +54,7 @@ def load_qs_arm(name, changes=()):
     names.insert(names.index("qs.sieve_collector"), "qs.score")
     names.insert(names.index("qs.sieve_collector"), "qs.storage")
     if "qs.sieve_collector" in changes:
+        names.insert(names.index("qs.sieve_collector"), "qs.hit_words")
         names.insert(names.index("qs.sieve_collector"), "qs.power_reuse")
         names.insert(names.index("qs.sieve_collector"), "qs.collector_kernels")
     names += ["qs.linear_algebra", "qs.extraction", "qs.pipeline"]

@@ -175,6 +175,9 @@ def sieve(collector, lo, hi, stats):
     first_count = 0
     masks = collector._hit_masks
     mask_count = len(masks)
+    words = getattr(collector, "_word_hits", None)
+    if collector._hits is not words:
+        words = None
     for entry in range(0, len(entries), 3):
         offset, index, weight = (
             entries[entry],
@@ -183,8 +186,11 @@ def sieve(collector, lo, hi, stats):
         )
         collector._scores[offset] += weight >> 1
         if weight & 1:
-            mask = masks[index] if index < mask_count else 1 << index
-            collector._hits[offset] |= mask
+            if words is not None:
+                words.add_one(index, offset)
+            else:
+                mask = masks[index] if index < mask_count else 1 << index
+                collector._hits[offset] |= mask
             first_count += 1
     stats["power_hits"] += hits
     stats["root_hits"] += first_count

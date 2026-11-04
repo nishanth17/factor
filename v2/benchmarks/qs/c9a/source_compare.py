@@ -148,6 +148,7 @@ def prefix_cost(qs, budgets, cell, *, blocks=128, seconds=20):
         )
     )
     transfers = getattr(collector, "_power_transfers", None)
+    hit_words = getattr(collector, "_word_hits", None)
     return dict(
         wall=wall,
         cpu=spent,
@@ -162,6 +163,7 @@ def prefix_cost(qs, budgets, cell, *, blocks=128, seconds=20):
         transfer_replays=0 if transfers is None else transfers.replays,
         transfer_work=0 if transfers is None else transfers.extra_work,
         transfer_reserved=0 if transfers is None else transfers.used,
+        hit_words_work=0 if hit_words is None else hit_words.work,
     )
 
 
