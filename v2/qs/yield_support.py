@@ -4,7 +4,8 @@ from collections import OrderedDict
 
 from ..common import prime_sieve, utils
 from ..common.arithmetic import gcd, pow
-from .indexed_relations import FactorRecord
+from .factor_witness import factor_snapshot
+from .indexed_relations import FactorRecord, encode_factors
 from .lazy_relations import LazyCombinedRelation
 from .relations import (
     AtomicRelation,
@@ -26,12 +27,7 @@ def payload_snapshot(row):
     """
     if isinstance(row, LazyCombinedRelation):
         return row.structural_snapshot()
-    factors = row.exponents
-    exponents = (
-        (factors._primes, len(factors), factors.encoded())
-        if isinstance(factors, FactorRecord)
-        else tuple(factors)
-    )
+    exponents = factor_snapshot(row.exponents)
     if isinstance(row, AtomicRelation):
         poly = row.polynomial
         return (
@@ -254,17 +250,32 @@ class CheckedStore:
     def congruence(self, atom, budget):
         """Return an exact key or a divisor before any duplicate is dropped."""
         correction = atom.square_correction
-        divisor = self.unit(correction, budget)
+        if correction == 1:
+            self._same_base()
+            divisor = 1
+        else:
+            divisor = self.unit(correction, budget)
         if utils.valid_divisor(divisor, self.base.n):
             return None, divisor
         if divisor != 1:
             return None, None
         budget.consume(self.base.n.bit_length() ** 2 + len(atom.exponents))
-        root = atom.u * pow(correction, -1, self.base.n) % self.base.n
+        root = (
+            atom.u % self.base.n
+            if correction == 1
+            else atom.u * pow(correction, -1, self.base.n) % self.base.n
+        )
+        factors = atom.exponents
+        encoded = (
+            factors.encoded()
+            if type(factors) is FactorRecord
+            and factors._primes is self.base.primes
+            else encode_factors(factors, self.base)
+        )
         key = (
             min(root, self.base.n - root),
             atom.sign,
-            tuple(atom.exponents),
+            encoded,
             atom.residual_primes,
         )
         return key, None
@@ -292,14 +303,18 @@ class CheckedStore:
                 self.canonical_used += reserve
 
     def forget(self, atom):
-        record = self.records.pop(id(atom), None)
-        if record is not None:
-            self.used -= record[3]
+        self.retire_proof(atom)
         entry = self.canonical_ids.pop(atom.relation_id, None)
         if entry is not None:
             key, reserve = entry
             self.canonical.pop(key, None)
             self.canonical_used -= reserve
+
+    def retire_proof(self, row):
+        """Release an obsolete witness without removing its successor."""
+        record = self.records.pop(id(row), None)
+        if record is not None:
+            self.used -= record[3]
 
 
 def residual_floor(base, budget, memory_bytes):

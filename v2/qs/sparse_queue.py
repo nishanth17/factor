@@ -1,7 +1,6 @@
 """Bounded exact sparse hit schedules; derived state is rebuilt on resume."""
 
 from array import array
-from math import isqrt
 
 from .power_sieve import prime_power_roots
 
@@ -20,9 +19,7 @@ def build(collector, window, byte_cap):
     lo, hi, maximum = window
     width = collector.config.block_width
     roots = collector._roots
-    split = next(
-        (i for i, r in enumerate(roots) if r.prime >= width), len(roots)
-    )
+    split = collector._sparse_split
     count = (hi - lo + width - 1) // width
     reserve = 65536 + 1024 * count + 256 + 16 * split
     collector.budget.consume(len(roots) + count + 1)
@@ -30,7 +27,7 @@ def build(collector, window, byte_cap):
         return None
     # Sparse singular roots may trigger conservative universal overmarks
     # which depend on the observation window. Keep the native route for them.
-    if any(collector.polynomial.n_prime % r.prime == 0 for r in roots[split:]):
+    if collector._sparse_singular:
         return None
     word_max = (1 << (8 * array("I").itemsize)) - 1
     weight_max = max(1, maximum.bit_length()) * max(collector._logs)
@@ -48,6 +45,7 @@ def build(collector, window, byte_cap):
             lo=lo,
             hi=hi,
             inverses=collector._lift_inverses,
+            shared_inverses=collector._shared_lift_inverses,
         )
         for modulus, residues, weight in marks:
             for residue in residues:
@@ -91,8 +89,7 @@ def sieve(collector, lo, hi, stats):
         or not window
         or (lo - window[0]) % cfg.block_width
         or hi != min(window[1], lo + cfg.block_width)
-        or isqrt(collector.polynomial.n_prime) ** 2
-        == collector.polynomial.n_prime
+        or collector._sparse_square
     ):
         return collector._sieve_direct(lo, hi, stats)
     key = (
@@ -143,6 +140,8 @@ def sieve(collector, lo, hi, stats):
     hits = len(entries) // 3
     collector.budget.consume(hits + 1)
     first_count = 0
+    masks = collector._hit_masks
+    mask_count = len(masks)
     for entry in range(0, len(entries), 3):
         offset, index, weight = (
             entries[entry],
@@ -151,7 +150,8 @@ def sieve(collector, lo, hi, stats):
         )
         collector._scores[offset] += weight >> 1
         if weight & 1:
-            collector._hits[offset] |= 1 << index
+            mask = masks[index] if index < mask_count else 1 << index
+            collector._hits[offset] |= mask
             first_count += 1
     stats["power_hits"] += hits
     stats["root_hits"] += first_count

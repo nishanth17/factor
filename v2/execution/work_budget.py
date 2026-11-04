@@ -47,3 +47,25 @@ class PollingBudget:
             # Skip only the external poll; the reservation still costs work.
             self.budget.used += amount
             self._remaining -= 1
+
+    def consume_span(self, amount):
+        """Reserve up to one interval of certified unit-cost actions.
+
+        Unlike consume(amount), this counts each unit as a separate action.
+        Poll early when the whole span would cross the next polling boundary.
+        A failed reservation leaves the shared ledger and caller cursor intact.
+        """
+        utils.require_integer(amount, "span amount", 1)
+        if amount > self.interval:
+            raise ValueError("span exceeds the cooperative polling interval")
+        if (
+            amount > self._remaining
+            or amount > self.budget.work_limit - self.budget.used
+        ):
+            if self.poll is not None:
+                self.poll(self.budget)
+            self.budget.consume(amount)
+            self._remaining = self.interval - amount
+        else:
+            self.budget.used += amount
+            self._remaining -= amount

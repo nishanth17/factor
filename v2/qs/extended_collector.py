@@ -285,6 +285,7 @@ def admit_retained(collector, atom, stats):
             raise ArithmeticError("checked unit residual changed")
         row = result.relation
         reserve += extra
+    raw_row = row
     if bounded:
         from .yield_memory import pack_owned
 
@@ -320,4 +321,9 @@ def admit_retained(collector, atom, stats):
         ) from error
     else:
         collector._publication_failed = False
+    # Packing publishes distinct objects. Keep raw witnesses through the
+    # transaction, then release them without touching canonical relation IDs.
+    collector._checked.retire_proof(atom)
+    if raw_row is not None:
+        collector._checked.retire_proof(raw_row)
     return None

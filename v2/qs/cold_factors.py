@@ -34,7 +34,11 @@ class RecomputedFactors(Sequence):
 
     def __iter__(self):
         value = abs(self.polynomial.a * self.polynomial.value(self.position))
-        value, remainder = divmod(value, self.polynomial.square_coefficient**2)
+        correction = self.polynomial.square_coefficient
+        if correction == 1:
+            remainder = 0
+        else:
+            value, remainder = divmod(value, correction**2)
         if not value or remainder:
             raise ValueError("invalid recomputation provenance")
         for prime in self.small:

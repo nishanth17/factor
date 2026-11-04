@@ -5,6 +5,13 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Remove repeated compact-factor decoding in private proof checks and exact
+  canonical keys; retire obsolete raw proofs after packed publication. Reuse
+  bounded Hensel inverse information and recovery masks across polynomials,
+  hoist fixed-target queue eligibility, and batch scalar reject accounting
+  with unchanged finite polling and exact refusal/resume. Keep the existing
+  recomputation default and automatic routing pending matched measurements.
+
 - Validate the final flat-queue bundle with 1,084 tests (9 skips), lint and 242
   committed benchmark imports. The matched exposed 60-digit incumbent/C9a pair
   finishes in 268.8/230.4s; both timing screens fail, so preserve the raw 14.3%

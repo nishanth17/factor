@@ -4,8 +4,9 @@ from array import array
 from dataclasses import dataclass, field
 
 from ..common import utils
-from ..common.arithmetic import gcd
+from ..common.arithmetic import gcd, isqrt
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
@@ -15,7 +16,7 @@ from .polynomial import (
     checked_position,
     polynomial_roots,
 )
-from .power_sieve import prime_power_roots
+from .power_sieve import HenselInverses, prime_power_roots
 from .relations import (
     AtomicRelation,
     _combination_workspace,
@@ -617,6 +618,58 @@ class SieveCollector:
                     self.config.threshold_epochs,
                 )
 
+        # Optional derived helpers compete for the same owned allowance.
+        # Their refusal preserves the original exact arithmetic/shift paths.
+        self._shared_lift_inverses = None
+        self._reuse_workspace = 0
+        inverse_bytes = 256 + 512 * count
+        if (
+            self.config.score_policy in ("powers", "fixed")
+            and inverse_bytes <= 8 * 2**20
+            and self._workspace + inverse_bytes <= self.config.memory_limit
+        ):
+            self._workspace += inverse_bytes
+            self._reuse_workspace += inverse_bytes
+            self._shared_lift_inverses = HenselInverses(count)
+        self._hit_masks = ()
+        if self.config.division in ("bucket", "resieve"):
+            cap = min(4 * 2**20, self.config.memory_limit - self._workspace)
+            masks, reserved = [], 256
+            for index in range(count):
+                size = 120 + 8 * ((index + 63) // 64)
+                if reserved + size > cap:
+                    break
+                self.budget.consume(1 + (index + 63) // 64)
+                masks.append(1 << index)
+                reserved += size
+            if masks:
+                self._hit_masks = tuple(masks)
+                # Include the temporary list during construction as well.
+                self._workspace += reserved
+                self._reuse_workspace += reserved
+        self._sparse_split = None
+        if self.config.sparse_queue_bytes:
+            target = polynomial.n_prime
+            self.budget.consume(count + target.bit_length() ** 2 + 1)
+            self._sparse_split = next(
+                (
+                    i
+                    for i, entry in enumerate(factor_base.entries)
+                    if entry.prime >= self.config.block_width
+                ),
+                count,
+            )
+            self._sparse_singular = any(
+                target % entry.prime == 0
+                for entry in factor_base.entries[self._sparse_split :]
+            )
+            self._sparse_square = isqrt(target) ** 2 == target
+
+    def _recovery_mask(self, index):
+        """Reuse a funded immutable prefix; larger indices stay exact."""
+        masks = self._hit_masks
+        return masks[index] if index < len(masks) else 1 << index
+
     @property
     def matrix_relations(self):
         """Return an immutable prefix in mixed full/matched admission order."""
@@ -773,6 +826,7 @@ class SieveCollector:
                     lo=window_lo,
                     hi=window_hi,
                     inverses=self._lift_inverses,
+                    shared_inverses=self._shared_lift_inverses,
                 ):
                     modulus, residues, _ = mark
                     words = (modulus.bit_length() + 7) // 8
@@ -811,6 +865,7 @@ class SieveCollector:
             lo=lo,
             hi=hi,
             inverses=self._lift_inverses,
+            shared_inverses=self._shared_lift_inverses,
         )
 
     def _set_plan_interval(self, lo, hi):
@@ -1026,6 +1081,7 @@ class SieveCollector:
             for index in range(start, min(start + chunk, len(self._roots))):
                 roots, weight = self._roots[index], weights[index]
                 prime = roots.prime
+                recovery_mask = self._recovery_mask(index) if buckets else 0
                 skipped = prime < self.config.small_prime_cutoff
                 if skipped:
                     # Power scores recover skipped valuations exactly at the
@@ -1049,6 +1105,7 @@ class SieveCollector:
                             lo=lo,
                             hi=hi,
                             inverses=self._lift_inverses,
+                            shared_inverses=self._shared_lift_inverses,
                         )
                     )
 
@@ -1096,7 +1153,7 @@ class SieveCollector:
                                     stats["power_hits"] += count
                                     if count:
                                         if first_level and buckets:
-                                            self._hits[offset] |= 1 << index
+                                            self._hits[offset] |= recovery_mask
                                         self._scores[offset] += power_weight
                                     continue
 
@@ -1113,7 +1170,7 @@ class SieveCollector:
                                         width,
                                         modulus,
                                         power_weight,
-                                        (1 << index)
+                                        recovery_mask
                                         if first_level and buckets
                                         else 0,
                                     )
@@ -1121,7 +1178,7 @@ class SieveCollector:
                                 if first_level and buckets:
                                     # The same certified first-level hits
                                     # supply both recovery bits and scores.
-                                    bit = 1 << index
+                                    bit = recovery_mask
                                     for hit in hits:
                                         self._hits[hit] |= bit
                                         self._scores[hit] += power_weight
@@ -1136,7 +1193,7 @@ class SieveCollector:
                                 stats["root_hits"] += len(hits)
                                 if buckets:
                                     for hit in hits:
-                                        self._hits[hit] |= 1 << index
+                                        self._hits[hit] |= recovery_mask
 
                             stats["power_hits"] += len(hits)
                             self._add(hits, power_weight, stats)
@@ -1155,7 +1212,7 @@ class SieveCollector:
                     stats["root_hits"] += len(hits)
                     if buckets:
                         for hit in hits:
-                            self._hits[hit] |= 1 << index
+                            self._hits[hit] |= recovery_mask
                     if skipped or powers or self.config.marking == "bucket":
                         continue
                     if (
@@ -1380,7 +1437,7 @@ class SieveCollector:
         elif self.config.division == "bucket":
             bits = self._hits[offset]
             for index in self._a_support:
-                bits |= 1 << index
+                bits |= self._recovery_mask(index)
             indices = []
             while bits:
                 bit = bits & -bits
@@ -1397,7 +1454,7 @@ class SieveCollector:
             if self.config.division == "full":
                 hit = True
             elif self.config.division == "bucket":
-                hit = bool(self._hits[offset] & (1 << index))
+                hit = bool(self._hits[offset] & self._recovery_mask(index))
             else:
                 hit = roots.all_positions or position % prime in roots.roots
 
@@ -1654,6 +1711,14 @@ class SieveCollector:
             stats.update(dict.fromkeys(self._double_counters, 0))
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
+        span_budget = (
+            self.budget if isinstance(self.budget, PollingBudget) else None
+        )
+        reporting = (
+            self._reporting
+            if getattr(self.config, "extension_policy", None)
+            else None
+        )
         kernel_before = kernels.counters(self)
         batcher = None
         if (
@@ -1717,6 +1782,28 @@ class SieveCollector:
                         if candidates is None
                         else offset == next_candidate
                     )
+                    if not selected and candidates is None and span_budget:
+                        affordable = span_budget.work_limit - span_budget.used
+                        stop = min(
+                            block_hi - block_lo,
+                            offset
+                            + max(
+                                1, min(64, span_budget._remaining, affordable)
+                            ),
+                        )
+                        end = offset + 1
+                        while end < stop and self._scores[end] < threshold:
+                            end += 1
+                        amount = end - offset
+                        # Publish only affordable certified rejects. The
+                        # adapter counts these logical actions individually,
+                        # so batching cannot enlarge its 64-action poll gap.
+                        span_budget.consume_span(amount)
+                        position += amount
+                        stats["scanned"] += amount
+                        if reporting is not None:
+                            reporting.record(amount, 0, 0)
+                        continue
                     if not selected and candidates is not None:
                         end = (
                             block_hi

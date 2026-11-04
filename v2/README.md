@@ -101,6 +101,21 @@ and the schema-11 policies above retain their defaults.
 | `filter_policy="light-v2"` | Fill-aware weight-two ordering and a reversible lighter-row view. Unsuccessful subset extraction retries the complete retained set. `fill-v2` uses all rows; `reference` keeps the original ordering. |
 | `extraction_policy="joint-v2"` | Joint exponent products with bounded modular accumulation. `reference` uses independent prime powers. |
 
+Checked compact records use exact byte/representation witnesses, including
+the recomputation descriptor's own provenance, while public verification and
+restore remain independent. Canonical duplicate keys retain the full exact
+factor vector in base-index encoding. Expanded collectors retire raw proofs
+only after successful packed publication. Serialized checkpoint formats are
+unchanged. `recompute_prime_limit=0` retains every factor in the packed record;
+the existing default remains 13 pending complete-cost comparison.
+
+Power scoring may reserve a bounded cross-polynomial derivative-inverse cache
+and an immutable recovery-mask prefix within the caller's memory allowance;
+unfunded helpers keep exact uncached arithmetic. Scalar reject spans retain
+unit work accounting, committed cursor/reporting state and the cooperative
+polling bound. These implementation changes do not adopt the C9a policies or
+alter automatic routing.
+
 The proof cache defaults to `checked_bytes=8 MiB` (maximum 64 MiB); the two
 duplicate indices share `duplicate_bytes`. Batch sizes range from 2 through
 256. These are finite experimental settings, not measured optima. Every helper

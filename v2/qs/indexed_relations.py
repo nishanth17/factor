@@ -28,7 +28,7 @@ class IndexedFactors(Sequence):
     def __init__(self, indices, primes):
         if not isinstance(primes, tuple):
             raise TypeError("indexed recovery requires immutable base primes")
-        indices = tuple(indices)
+        indices = tuple((index, exponent) for index, exponent in indices)
         previous = 0
         for index, exponent in indices:
             if type(index) is not int or not previous < index <= len(primes):

@@ -10,6 +10,7 @@ from dataclasses import FrozenInstanceError
 from math import isqrt
 
 from ..common.arithmetic import pow
+from .factor_witness import factor_snapshot
 from .relations import MAX_COMBINED_ATOMS, CombinedRelation
 
 
@@ -129,7 +130,7 @@ class LazyCombinedRelation(CombinedRelation):
         return (
             self.atom_ids,
             self.sign,
-            tuple(self.exponents),
+            factor_snapshot(self.exponents),
             self._modulus,
             self._residuals,
             tuple(id(a) for a in self._leaves),
