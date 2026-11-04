@@ -201,6 +201,26 @@ component gains into a portfolio claim. Refresh representative matrices after
 collection changes before promoting a solver. A timeout or zero useful rows
 alone does not justify DLP or a more elaborate solver.
 
+## Phase checkpoints
+
+[Original phase exit gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#phase-checkpoints).
+
+| Phase | Concrete deliverable | Exit decision |
+| --- | --- | --- |
+| 1 | Native Python 3 repairs, result/certainty contracts, regression suite | All counterexamples and failure paths pass; freeze corrected baseline |
+| 2 | Budgeted portfolio, bounded schedules, recovery/resume, corpus/runner | Time/memory limits and reproducibility demonstrated |
+| 3 | Verified relation pipeline, SIQS, SSS comparison | Balanced-composite completion improves under equal limits |
+| 4 | Validated PRAC/kernel/backend/reducer experiments | Promote measured winners; retain baseline for losses |
+| 5 | p+1, paired/recoverable continuations, double-large-prime SIQS | Complementary completion gain without resource regression |
+| 6 | Curve-family/research decisions, fixed-core workers, evidence-backed README | Held-out results support every adopted default and claim |
+| 7 | Bounded GNFS reference, scaling pipeline, SIQS/GNFS crossover | Separate correctness, scaling and held-out dispatch gates |
+| 8 | Reconciled Phase 2 calibration, preprocessing and overhead experiments | Fresh held-out promotion or explicit retain/defer/reject decisions |
+
+Execution priority after Phase 3 is current-engine calibration, selected
+P4–P6 improvements and fresh Phase 8 portfolio confirmation. Existing phase
+numbers preserve references. GNFS remains deferred until H1 and a coverage
+review justify activating the later tranche.
+
 ## Model and effort key
 
 For **new** tasks, **Sol** means **GPT-6.1 Sol** (`gpt-6.1-sol`) and **Astra**
@@ -224,9 +244,9 @@ The roadmap's task rows are the source of truth for scope-specific assignments.
 Use a fixed model/effort for the requested chat phase; these recommendations do
 not assume autonomous model switching or authorize delegation. A later,
 separately requested frozen-execution chat may use Sol / high when the row
-allows it. C10a-01 retains Astra / xhigh throughout its current workstream,
-including authorized execution. Expanded C9a admission/graph/storage research,
-implementation and correctness use Astra / xhigh; Sol / xhigh remains suitable
+allows it. Historical C10a-01 used Astra / xhigh throughout its workstream,
+including execution. The delivered C9a admission/graph/storage research,
+implementation and correctness used Astra / xhigh; Sol / xhigh remains suitable
 for a separately scoped existing-policy cadence task. Reserve Astra / max for
 a named unresolved invariant or derivation, not elapsed time or source volume.
 
@@ -234,8 +254,8 @@ a named unresolved invariant or derivation, not elapsed time or source volume.
 
 | Lane | Scope and collision rule |
 | --- | --- |
-| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. A7a owns adapting existing workers to that collector; C10a/C9a/A1a/A1c retain their scopes. Preserve the active C10a-01 freeze. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector, relation and checkpoint edits. |
-| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected C9a compact-record implementation may satisfy its B7 contract within the same workstream. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
+| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. A7a owns adapting existing workers to that collector; remaining C10a/C9b/A1a/A1c retain their scopes. Preserve historical C9a/C10a-01 freezes; new comparisons use current committed code. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector, relation and checkpoint edits. |
+| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected partial-store implementation may satisfy its B7 contract within the same workstream; delivered C9a records remain the control. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
 | ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm/core.py` and `execution/stage_jobs.py` integration. |
 | Schedules/continuations | P5.2/P5.3 and p+1 coordinate `execution/schedules.py`, stage jobs, backend boundaries and checkpoint versions. |
 | CLI/dispatch | Completed A11 covers explicit QS/MPQS/SIQS access. C3a/G1 own remaining allocation/handoff deltas. Coordinate `factor.py`, configuration identity and usage guides. |

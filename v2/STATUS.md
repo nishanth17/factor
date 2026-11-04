@@ -1,234 +1,24 @@
 # Factor status
 
-Last updated: 4 November 2026 (America/Los_Angeles).
-
-Mainline publication checks after the timing-analysis correction pass 1,114
-tests (9 skipped), lint and all 243 benchmark imports in a committed-only
-checkout. Factoring arithmetic is unchanged from the measured runtime below.
-
-C9a is integrated into mainline and the delivered stream is Done by explicit
-closure direction on 4 November. Source `c8168dc` passes the committed-only 1,113-test
-suite (9 skipped), lint and 243 benchmark imports. It includes bounded
-same-A prime-power root transfers, native-width recovery bits, fused marking,
-additive queues, exact proof reuse and unchanged refusal/resume validation.
-The latest same-C9a 60-digit pair takes 159.5/132.2s before/after the hit change,
-17.1% less raw time with identical factors, positions, rows and polynomials.
-Both timing screens fail; peak RSS rises 1.5%. Nine warmed collector samples
-favor the change at both 60/70 digits, with 12.8%/17.4% lower median prefix time.
-
-The explicitly extended 9,000s-per-arm 70-digit comparison completes on shared
-source `891eda5`: C9a/C0 take 1842.1/2742.1s, with exact proven reconstruction,
-34.3% fewer C9a positions and 10.1% lower peak RSS. C9a's timing screen fails;
-C0's passes. This is one exposed modulus/seed and compares policies on the
-optimized runtime; the later root/word changes have no full70 result.
-The raw differences remain exploratory because each size has one exposed input
-and no fresh confirmation. The historical 15% canary tolerance was uncalibrated;
-new analysis reports its flags as warnings and retains validated timings.
-Actual resource/recorder failures stay distinct. C9b will calibrate variability
-and quantify uncertainty rather than imposing a universal percentage cutoff.
-One calibrated whole-factor CPU profile and mature heap identify marking,
-queue construction and GC costs; traced time is diagnostic only. Detailed
-local evidence starts at `v2/audit/c9a/optimization-83-89.md`, the final finite
-plan at `v2/audit/c9a/plan-89.json`, and verified evidence at
-`v2/audit/c9a/verification-89.json`. Evidence is preserved locally before task
-worktree cleanup. C9b now owns timing validation and remaining headroom
-analysis; no new campaign or policy/default promotion follows this integration.
-Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
-A1b review record: `61899a9`; production defaults are unchanged.
-QS roadmap review: `4d65d33`, consolidated into existing task scopes on
-2 November; C10a-01 is now integrated with the selected policies enabled
-for every fresh automatic SIQS configuration by explicit user direction.
-The expanded 2 November ECM/QS literature and source review adds A1d
-multi-polynomial buckets and conditional F9 genus-two/Kummer research to the
-ECM/acceleration amendments. It changes no defaults and launches no runs.
-Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
-`v2/audit/research/ecm/roadmap_review_20261102.md`.
-The broader portfolio follow-up adds B4a fused native ECM chunks and expands
-E3/E4/E5/E6/A10a/A2a opportunity gates. Local supporting review:
-`v2/audit/research/portfolio_review_20261102.md`. No experiment is launched.
-The subsequent QS CFFI/SIMD pass refines B5a with queue-compatible buffers,
-root/mark/scan packets and separate M4 NEON versus x86 AVX dispatch. Local
-review: `v2/audit/research/qs_cffi_simd_20261102.md`.
-
-**Target: complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
-machine; all cores are available.** Choose worker counts by measured latency
-and aggregate memory, with total CPU reported as a secondary cost.
-
-**Primary workload: uniformly sampled random integers at 60, 80 and 100 decimal
-digits, with equal weight across the three size bands.** Report median and p90
-complete-factorization time and completion rates for each band. Balanced
-semiprime completion at 60 and 70 digits is a must-not-regress constraint.
-
-**Native code is allowed as an optional backend; a working pure-Python/PyPy
-fallback must remain available.** Select one justified implementation per
-task; NumPy and CFFI are alternatives, not mandatory twin developments.
-These are planning and acceptance objectives, not implemented default changes.
-See [metric and resource rules](POLICY.md#scope-and-standing-directions).
+Last updated: 4 November 2026 (America/Los_Angeles). Reviewed mainline:
+`7a3ca71c435bd5c5967da5737af728aa5b9bfb01`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
-Full historical results and gates remain in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md).
-Useful progress toward 60–80-digit factoring remains the immediate focus;
-100 digits is also a measurement target, with completion feasibility still
-unestablished. Existing experiments retain their frozen scopes and budgets.
+[Results](benchmarks/RESULTS.md) hold numerical evidence; the
+[completed register](ROADMAP.md#completed-register) holds delivered milestones.
 
-The following C9a paragraphs retain the earlier preparation chronology;
-their then-open gates are superseded by the scoped closure above, while
-their experimental failures and adoption limitations remain historical.
+## Target metric and workload
 
-C9a preparation on `codex/c9a-combined-yield-review` starts from committed
-`b0813230a05396874c41c649fa01738484a1f55e`. Its opt-in bundle implements
-independent preparation, product/endpoint admission, shorter cycles,
-equal-parity dependencies and packed records. Correctness preparation and a
-numerical staged handoff are separate from performance acceptance. C9a remains
-Open; no campaign or default change is included. Local research and the
-execution handoff start at `v2/audit/c9a/README.md`. Any later C10a integration
-requires a new matched source identity for both arms. The expanded
-`CombinedYieldSieveConfig` bundle and `c9a-combined-yield-v3` protocol include
-bounded cofactor recovery, checked reuse, compact indexed records and
-filter/extraction refinements. Its executable correctness checks remain pending
-the shared quiet window; preparation stops before those checks and all
-feasibility/performance execution. The reviewed mainline
-`99a2943aa9ba681091184007d6dd8aa7171969a2` changes documentation only from the
-immutable control's base; its runtime sources are identical.
-
-The subsequent expanded preparation adds `ExtendedYieldSieveConfig`, schema13
-and `c9a-expanded-yield-v4`, including previously conditional admission,
-storage, recovery, filtering and solver capabilities. These remain opt-in and
-experimental. Local scope/coverage and the verification plan are recorded
-under `v2/audit/c9a/`; no acceptance gate, default, C10a source or historical
-freeze has changed. Lock-dependent correctness and all measurement execution
-were initially deferred. Subsequent authorized unit validation passed all 942
-tests (9 skipped), after fixing expanded incidence statistics and tuple-only
-legacy loader compatibility. See `v2/audit/c9a/verification-09.json` for receipts;
-feasibility and performance execution remain pending.
-
-The C9a branch now merges master through `066456a`, including the C10a-01
-implementation and fresh automatic policies. The resolved merge passes 1,029
-unit tests (9 skipped), including coupled arithmetic with yield checkpoints.
-The initial feasibility run was paused before any worker started. Its older
-freeze remains historical; a current-mainline comparison must bind the same
-coupled policies in both arms under a new matched configuration identity.
+Minimum complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
+machine. All cores are available; report total CPU, peak memory and startup/
+cancellation cost. Use equally weighted uniformly sampled 60/80/100-digit
+integers, with median/p90 time and completion per band. Balanced-semiprime
+completion at 60/70 is a must-not-regress constraint. Feasibility at 100 is
+unestablished. Optional native backends retain a working pure-Python/PyPy
+fallback. These declared objectives and censoring rules are in
+[policy](POLICY.md#scope-and-standing-directions).
 
 ## Current automatic defaults
-
-C9a subsequently completed its four-call matched C10a feasibility screen on
-`7fa31cb`. The candidate reached accounted memory caps at 60/65 digits; both
-controls finished their fixed-work prefixes. All timing drift checks failed.
-Further campaign execution stops pending review of opaque retention and memory
-accounting. See `v2/audit/c9a/feasibility-11.md`; no speedup is accepted.
-The follow-up equal-work diagnostics found no repeated or useful opaque atoms
-in their short prefixes. No-opaque and narrower-reporting variants retained
-the same closed-row counts with substantially less accounted ownership or
-charged work. Limits stay unchanged; retention/reporting and record-shaped
-reservations need revision. See `v2/audit/c9a/opaque-investigation-12.md`.
-
-That revision is implemented as the opt-in `BoundedYieldSieveConfig`, schema 14
-and `bounded-report` experimental profile. Unmatched opaque atoms use a capped
-FIFO outside retained incidence; exact matches promote their original records.
-Shape-based graph ownership and norm-bounded batch scratch replace blanket
-reservations in this variant. Reporting returns to the incumbent allowance,
-with proven three-prime recovery retained and no grant increase. All 1,040 unit
-tests (9 skipped), lint and committed-only checks pass. The four-call screen
-on `44b1f94` finishes all matched 67,109,376-position prefixes without a memory
-stop. Candidate ownership is 210.8/192.4MB at 60/65 digits; closed-row counts
-125/111 match the controls, with greater charged work. All timing drift checks
-fail again. Stop after these four calls; longer-horizon yield remains unknown.
-See `v2/audit/c9a/feasibility-13.md`. No default or adoption gate changes.
-
-The subsequently authorized 60-digit pair grants 900 seconds per arm and a
-higher block ceiling under source `e4dec4a` (identical runtime to `44b1f94`).
-C0 factors the input in 407.8s. C1 stops at accounted memory after 362.4s,
-with 2,666 closed rows and no matrix solve; workspace is 1.040GB and RSS
-349.5MB. Both timing screens fail. This exposes remaining full-run storage
-limits despite the short-prefix repair. Stop after the pair; no retry, grant
-increase or adoption follows. Details: `v2/audit/c9a/feasibility-14.md`.
-
-The subsequent actual-data ownership audit reproduces that stop exactly and
-finds only 158 packed slabs (647KB) and 4,411 shared polynomial contexts.
-The repair on `09a3a05` charges shared allocations once, scalar digit storage
-explicitly, and packing/restore scratch separately. The exact captured store
-replays at 367.9MB accounted workspace versus 1,040.1MB with matched helper
-allowances; all 26,862 atoms and 2,666 independently verified rows are preserved.
-The committed-only checkout passes 1,048 tests (9 skips), lint and 241 benchmark
-imports. This corrects ownership accounting; no fresh full factoring result,
-RAM reduction, speedup or adoption is claimed. Details:
-`v2/audit/c9a/ownership-audit-15-17.md`.
-
-The authorized rerun on `bb0764a` completes both 60-digit arms under the same
-900-second and memory grants. C1 factors in 618.4s versus C0's 405.9s, covering
-764.0M versus 911.4M positions. Candidate accounted workspace is 586.6MB and
-RSS 546.8MB; control values are 629.4MB / 339.7MB. Both timing gates fail.
-The repair establishes feasibility on this input; no complete-cost advantage
-or adoption is demonstrated. Stop after the pair and analysis. See
-`v2/audit/c9a/feasibility-18.md`.
-
-The larger bounded screen on `7feeca4` completes eight calls on four exposed
-moduli at 50/55/60/62 digits (60 uneven). All factorizations verify. C1 uses
-less terminal coverage but greater raw complete time and RSS in every pair;
-all eight timing gates fail. C0/C1 seconds are 24.6/49.7, 77.3/135.3,
-236.3/375.3 and 777.9/1,059.6. Stop after this tranche and retain the incumbent;
-collection and elimination costs need investigation before further scaling.
-No adoption or fresh confirmation follows. Details:
-`v2/audit/c9a/complete-screen-19-results.md`.
-
-The cost investigation removes pivot sorting, repeated ownership/FIFO work,
-unused opaque duplicate keys and proven-impossible recovery. It reuses Hensel
-derivative results, dense-root views and owned batch bounds. The experimental
-`cost-report` nominee selects scalar solving, rho-first splitting and serial
-recovery. Final source `e0acc17` passes 1,065 tests (9 skips), lint and 241
-committed-only imports. Its factoring runtime and emitted configuration match
-the serial diagnostic on `193b57c`: C1 factors the exposed 50-digit input in
-36.2s versus C0's 24.2s, with 6.1% fewer positions but greater RSS. Both timing
-gates fail; no incumbent win or adoption follows. A whole-run cofactor sample
-rejects shorter rho effort because it is slower and loses useful splits.
-Stop after these bounded checks; further larger-input usefulness and timing
-calibration remain open. Local source review and receipts:
-`v2/audit/c9a/cost-review-30.md`, `cost-investigation-20-40.md` and
-`nominee-binding-42.json` in the same audit directory.
-
-The bounded 60-digit follow-up on `f0a5791` completes both arms: C0 in 411.0s
-and C1 in 487.1s, with independently verified factors. C1 uses 764.1M versus
-911.4M positions but remains slower; both timing gates fail. Collection is
-400.5/287.5s for C1/C0, while elimination is about one second in both. Short
-calibration supports GC/JIT-state sensitivity in the sentinel; it changes no
-threshold or historical classification. The conditional record replay identifies
-unused cumulative snapshots at the internal collection boundary as the next
-target. Each return copies retained arrays and expands partial IDs, although
-the internal caller consumes only progress/status. Preserve full public
-snapshots; that follow-up stops before implementing a private progress path.
-The pair and bounded diagnostics retain the incumbent without adoption.
-Evidence: `v2/audit/c9a/followup-43.md`, `verification-44.json` and
-`verification-48.json` in that audit directory.
-
-The subsequent collection change on `5b3a6cf` adds that private progress path
-for built-in QS/SIQS, sharing traversal and publication with the full public
-snapshot API. Custom collector dispatch and checkpoint formats are preserved.
-All 1,070 tests (9 skips), lint and 241 committed-only benchmark imports pass.
-On the captured 26,862-atom store, median empty-return cost is 0.848ms with
-snapshots versus 0.000899ms with progress; progress samples vary with runtime
-state. Matched 256-block prefixes have identical work, stores and statistics,
-but show no benefit: raw C0 snapshot/progress medians are 0.324/0.346s, C1
-0.394/0.412s. A separate JIT-off fixed-store check holds post-GC live memory
-at approximately 108MB through 4,000 calls in each mode; snapshot repetition
-creates temporary allocation/GC work without growing retained state in this
-check. No full-factor speedup, general leak diagnosis or RSS reduction is
-established. Stop after these bounded checks and retain the incumbent without
-adoption. Details: `v2/audit/c9a/snapshot-50.md` and `verification-55.json`.
-
-The authorized current-source pair on `636484b` completes with C0/C1 raw
-times of 356.3/320.9s: a 9.9% exploratory C9a advantage on one exposed
-60-digit modulus. Both timing gates fail. Exact work, coverage, relation and
-collector counts match each arm's historical pre-fix result; those historical
-times are not matched current-source evidence. Collection is now 237.5/234.7s;
-RSS is 290.3/350.2MB. Native PyPy sampling covers bounded 50/60/70/80 prefixes
-and a checked 60-digit growing-store replay. Two bounded heaps at 0/10,097
-atoms identify container, integer, tuple and runtime-metadata growth without
-establishing a leak. The RSS callback costs about 16% of a matched short prefix
-in a separate diagnostic intervention; production observation is unchanged.
-Investigate cheaper resource observation, polling and polynomial-switch reuse
-before scaling. Stop after these checks; no adoption or default change.
-Local evidence: `v2/audit/c9a/profiling-56.md`, `verification-62.json` and
-`verification-64.json`.
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
@@ -285,112 +75,61 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## Work in flight
+
+| ID | Current scope and state | Worktree / branch |
+| --- | --- | --- |
+| B12/F4 | **Open; ongoing.** ECM worker ownership, RNG/leases, diagnostics and latency evaluation. Completion and integration are not established by worktree presence. Preserve its active protocol and resource grants. | `/Users/nishanthmohan/Documents/code/factor-b12-f4` / `codex/b12-f4-ecm-workers` |
+
+C9a and C10a-01 are delivered mainline scopes; they are not active worktrees.
+No other ongoing work is inferred from an old preparation note.
+
 ## Recent completed review
 
-**A1b is Done: retain integrated SIQS defaults and fixed-score opt-ins.**
-All 30 planned prefix calls on nine exposed moduli completed; fixed/list lost
-all matched pairs at 50/55/60 digits. This bundled scoring/scheduling screen
-justified no complete-factor pilot or default change. Earlier harness failures,
-missing historical clocks and the explicit accounting repair remain recorded.
-See the [final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review) and
-[numerical evidence](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_final_results.json). Fixed-score queue support
-is a separate deferred mechanism, not a continuation of this completed study.
-Evidence and tests are integrated in mainline; task worktrees/scratch were
-removed after archive verification. See the report's integration/cleanup record.
+- **C9a — Done, 4 November:** delivered and integrated; policies remain opt-in.
+  Complete60/70 evidence is exploratory; one exposed input per size and no
+  disjoint fresh confirmation establish no population speedup.
+  [Completion and evidence](ROADMAP.md#c9a-completion).
+- **C10a-01 — Done, 3 November:** integrated coupled policies are adopted for
+  fresh automatic SIQS before fresh confirmation. The failed 65 canary,
+  censored 70 control and unmeasured all-size gains remain explicit.
+  [Completion and evidence](ROADMAP.md#c10a-01-completion).
+- **A1b — Done, 2 November integration:** retain defaults after the fixed/list
+  screen lost at 50/55/60; no complete-factor claim.
+  [Final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review).
 
-## C10a-01 delivered integration
-
-The coupled arithmetic, finite multiplier/A selection, modular root updates,
-independent exceptional-root/reconstruction oracles and versioned charged
-resume are integrated. The all-size default decision follows the completed
-60/62/65/70 exploratory feasibility work and the deep 65-digit host-state
-investigation. No arithmetic regression was found; timing and confirmation
-limits remain explicit in [results](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
-
-Research, raw receipts, failures and sealed evidence are retained locally at
-`v2/audit/archives/c10a01-20261103/`. Task worktree and temporary-state cleanup
-is verified against the archive manifests. Source history and frozen controls
-are retained; no E1 campaign or remote push accompanies this integration.
+<a id="c10a-01-delivered-integration"></a>
 
 ## Next eligible items
 
-Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
-for the ordering under the wall-time objective and declared workloads above.
-Task rows retain exact scope, dependencies and fixed-session model assignments.
+The [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost) is the
+single preparation order: C3a/C11, ongoing B12/F4, A7a, C9b, B4a, A1d, B3a,
+F3, A1c/B5/B5a, then its remaining triggered rows. It is an expected-benefit
+judgment, not measured gains or permission to start a campaign.
 
-1. **C3a/C11 current portfolio/ECM cost-yield and missing-policy screen — Sol / xhigh.**
-   Start from completed C3 and existing deeper presets; select a concrete
-   60–100-digit opportunity, completed-search credit or handoff delta.
-2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
-   Prepare stable RNG/lease/restart contracts. Isolated ECM feasibility does
-   not wait for E1; measure 1/2/4 workers before wider M4 occupancy.
-3. **A7a current-collector parallel QS collection — Sol / xhigh.**
-   Reuse A7 workers, adapting growing-DLP and current collector identities
-   before measuring 1/2/4-worker complete factoring at 60/70 digits. Existing
-   workers reject growing DLP and cap windows below the calibrated serial
-   width. Family-sharing alternatives are a later measured subquestion.
-4. **C9b mainline timing validation and remaining QS headroom — Sol / xhigh.**
-   C9a is Done and integrated. First diagnose unchanged-code A/A timing and
-   establish the current baseline, then screen queue construction, recovery
-   allocation and family-wide reuse within a new finite plan. Coordinate
-   existing A1d/C8/B5a owners; fresh confirmation remains separate.
-5. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
-   Price complete setup/conversion/recovery and scalar execution before SIMD
-   or new reducers. A CFFI wrapper alone is no measured gain.
-6. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
-   are polynomial-local; amortize prime/root traversal across a funded Gray
-   batch, retaining exact coverage and charging unused preparation.
-7. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
-   continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
-   neither deeper-bound savings nor a polynomial/backend crossover is measured.
-8. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Select a PyPy, NumPy or CFFI
-   scan/root/mark packet with queue-compatible buffers and exact hit/score
-   costs; retain the Python fallback. M4 NEON and x86 AVX are separate targets.
-   M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
-
-- [x] **C9a combined useful-yield, admission and storage:** delivered and
-  integrated; performance evidence remains exploratory. Removed from active
-  ranked work and replaced by the separately scoped C9b item.
-
-The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
-initial opportunities, with explicit capacity/profile triggers. E3/A10a/E4/E5/
-E6 can screen a named current cheap-path or overhead gap without restarting
-E1/D7; integrated tuning retains its prerequisites. B14 remains
-High for requested prime certification; accounting/correctness repairs take
-precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 is integrated and E1
-remains Deferred. Do not restart the stopped broad backend study or duplicate the completed
-C10a-01 exploratory feasibility.
-
-E6's prime-generation candidate is a source-bundled adaptation of the existing
-C11 wheel-30 sieve through CFFI, with finite batches and a Python fallback.
-It must not depend on a sibling checkout or an external prime-sieve library;
-see the [native prime-provider gates](ROADMAP.md#e6--self-contained-native-prime-generation).
-Local source review: `v2/audit/research/prime_provider_20261102.md`.
-
-Separate worktrees isolate source changes. Preserve C10a-01 historical timing
-freezes; later comparisons need a new committed source identity. Heavy QA and
-measurements share one serialized performance window. A later separately
-requested execution chat may use Sol / high where its task row permits it.
+A7a processes can prepare independently of B5a native packets; native threads
+remain a conditional alternative. C9b owns current timing/headroom, preserving
+closed C9a results and existing mechanism owners. Correctness/accounting repairs,
+C10a-06 and requested B14 certification take precedence. E1 remains Deferred;
+later integrated portfolio tuning retains its prerequisites.
 
 ## Known gaps and unresolved conflicts
 
-- **Deferred:** E1 combined portfolio confirmation. Individual accepted
-  components do not establish a compounded win. H1 and its coverage review
-  still precede GNFS activation.
-- **Inconclusive/unmeasured:** the adoption limitations are attached to the
-  tables above. No broad SIQS crossover or practical general 60–80-digit
-  completion has been established. The historical 65-digit spike timed out
-  under an older collector; C10a-01 now records exploratory completions at all four sizes, with
-  the 65 rerun drift failure and censored 70 control. Consume those scoped
-  results before a duplicate larger-size study; there is
-  no promoted 61–80 route.
-- **Open:** C10a-06 runner work; R3 general cadence/storage proofs; B14 proofs;
-  final SSS/worker comparisons and upstream-license clarification. See the
-  [live catalogue](ROADMAP.md#numbered-phase-catalogue-and-acceptance-gates).
-- **Unresolved conflicts:** none of the checked stale claims requires choosing
-  between unsupported conclusions. Historical contradictory instructions stay
-  in the pinned Git revision and are superseded by dated closure/current code.
-- **Unresolvable references:** none among the roadmap's “local audit material”
-  labels. The [history reference register](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/ROADMAP_CLEANUP.md#local-audit-reference-register)
-  names existing local paths and the committed M17 baseline. Historical source
-  links use the pinned `v2/ROADMAP.md` Git revision and its original context.
+- **Deferred:** E1 combined confirmation; GNFS until H1 and its coverage review.
+- **Unmeasured/Inconclusive:** no general all-size speedup or broad crossover
+  is established. Coupled SIQS policies apply at every size, but tuned size
+  presets and automatic portfolio SIQS eligibility still end at 60. Other
+  sizes/backends/grants retain the stated extrapolation and feasibility limits.
+- **Open:** C9b timing variability and fresh confirmation; C10a-06 runner work;
+  general R3/provenance and B14 proof scopes; current-worker/SSS comparison and
+  upstream-license clarification. B12/F4 remains ongoing.
+- **Resolved:** C9a's historical preparation/campaign instructions are superseded
+  by scoped closure. Its uncalibrated 15% canary flags remain historical warnings;
+  future judgments require measured variability and uncertainty.
+- **Unresolved conflicts:** none found in the checked current behavior/closure
+  records. No conflicting experimental verdict was upgraded.
+- **Local references:** earlier C9a preparation files are preserved under
+  `v2/audit/c9a/archive-20261104/base/c9a/`, with former worktree roots recorded
+  in `v2/audit/c9a/archive-20261104/relocations.json`. Detailed chronology and prior
+  quantitative records remain in [pinned history](ROADMAP.md#documentation-history-and-local-evidence).
+  No missing audit reference was discarded.
