@@ -195,6 +195,8 @@ def run_cell(freeze, cell, directory):
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait(timeout=1)
         elapsed = time.monotonic() - started
+        process_wall = elapsed
+        validation_started = time.monotonic()
         data = None
         failure = None
         if (
@@ -217,12 +219,16 @@ def run_cell(freeze, cell, directory):
             except (ValueError, KeyError) as error:
                 failure = str(error)
                 data = None
+        validation_seconds = time.monotonic() - validation_started
+        elapsed = time.monotonic() - started
         record = dict(
             identity=freeze["identity"],
             endpoint=request["endpoint"],
             cell=cell,
             source_root=source,
             wall=elapsed,
+            process_wall=process_wall,
+            validation_seconds=validation_seconds,
             child=data,
             timed_out=timed_out,
             returncode=process.returncode,

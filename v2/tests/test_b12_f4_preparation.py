@@ -1,8 +1,12 @@
 """Queued runner/corpus/analyser QA; not the narrow scheduler-only harness."""
 
 import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import Mock, patch
 
+from v2.benchmarks.ecm.b12_f4 import runner
 from v2.benchmarks.ecm.b12_f4.inputs import random_integers, retained
 from v2.benchmarks.ecm.b12_f4.runner import (
     clustered_interval,
@@ -43,6 +47,66 @@ class PreparationTests(unittest.TestCase):
         for arm, workers in (("S0", 4), ("S1", 4), ("P4", 2), ("N", 0)):
             with self.assertRaises(ValueError):
                 forced_arm(arm, workers)
+
+    def test_cold_endpoint_includes_external_result_validation(self):
+        clock = [0.0]
+        output = dict(
+            n=35,
+            reconstruct=35,
+            factors=[[5, 1, "proven_prime"], [7, 1, "proven_prime"]],
+            remaining=[],
+            factorization_complete=True,
+            aggregate_cpu=0,
+        )
+
+        def launch(*args, **kwargs):
+            kwargs["stdout"].write(json.dumps(output).encode())
+            kwargs["stdout"].flush()
+            return Mock(returncode=0)
+
+        original = runner.validate_output
+
+        def validate(*args):
+            clock[0] += 2
+            original(*args)
+
+        cell = dict(
+            id="endpoint",
+            arm="S1",
+            mode="cold",
+            workers=1,
+            wall=10,
+            cpu=10,
+            startup_warmup_wall=1,
+            pool="fresh",
+            input="one",
+        )
+        freeze = dict(
+            identity="fake",
+            wall_limit=20,
+            cpu_limit=20,
+            settings={},
+            seed=7,
+            inputs={"one": dict(n=35)},
+            work_limit=100,
+            pypy="unused",
+            candidate_root="unused",
+        )
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            (
+                patch.object(runner.fcntl, "flock"),
+                patch.object(runner.subprocess, "Popen", side_effect=launch),
+                patch.object(
+                    runner.time, "monotonic", side_effect=lambda: clock[0]
+                ),
+                patch.object(runner, "validate_output", side_effect=validate),
+            ),
+        ):
+            record = runner.run_cell(freeze, cell, Path(directory))
+        self.assertEqual(record["process_wall"], 0)
+        self.assertEqual(record["validation_seconds"], 2)
+        self.assertEqual(record["wall"], 2)
 
     def test_censored_quantiles_do_not_report_successes_only(self):
         self.assertIsNone(
