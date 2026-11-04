@@ -113,9 +113,9 @@ prioritizes current acceleration and shorter later experiment turnaround:
 4. **B5a:** QS C/CFFI and ARM NEON, with A1c/B5 controls — Sol / xhigh.
 5. **E6:** bundled native prime batches/reusable-context opportunity screen —
    Sol / high screen, Sol / xhigh ABI and implementation.
-6. **E4/A10a/A2a/C5:** selected native helper/SIMD opportunity screens —
-   Sol / high attribution, Sol / xhigh selected native work; existing new-math
-   Astra assignments remain.
+6. **B15:** native helper/SIMD opportunity selection across E4/A10a/A2a/C5 —
+   Sol / high evidence review; Sol / xhigh for boundary/protocol design. Deliver
+   at most one justified candidate or a no-go; implementation retains its owner.
 7. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
    Sol / xhigh. Reuse accelerator receipts rather than repeating broad studies.
 
@@ -126,7 +126,8 @@ can start before every conditional native port is settled.
 A7a can prepare alongside B12 with pinned shared contracts; timed execution
 uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
 saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
-Ranks 5–6 are conditional screens, not a requirement to port all helpers.
+E6/B15 at ranks 5–6 are conditional screens. B15 is not a C3a prerequisite;
+its selected helper implementation does not inherit rank 6 automatically.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
 native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
 this priority increase. Small cost/A/A checks belong in each task; C9b is not
