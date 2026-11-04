@@ -94,6 +94,30 @@ force-add generated results, local journals or external source checkouts.
 
 ## C9a preparation and staged execution
 
+The waste-removal bundle on `f28fd61` has matched, validated component
+measurements against its parent `57b40ad`. After at least three seconds of
+warmup per mode, nine samples of 128-block prefixes at 50/60/70/80 digits
+have 22–32% lower median whole-prefix time and identical serialized stores,
+positions and divisors. The 80-digit prefix has no retained atoms; this does
+not establish useful large-input yield or complete-factor improvement.
+An actual-score scan has 55% lower median cost; the 26,862-atom historical
+graph replay has 23% lower median time and about 1.2 MB less live GC memory.
+These component gains are not additive. Local receipts:
+`results/c9a/waste-components-67/`; reproduction:
+`pypy3 v2/audit/c9a/run_optimization65.py measurement components-67 680
+pypy3 -B v2/audit/c9a/measure-waste-67.py` under the shared quiet lock.
+The receipt name is immutable and cannot be reused.
+
+The worker also supports the separately selected `timing_policy` value
+`retire-rewarm-v1`. It preserves the immediate legacy post-run sentinel,
+then releases the completed job, collects garbage and performs at least
+three seconds of validated warmup before a second nine-sample sentinel.
+Both screens, all warm work and cleanup costs are recorded. The original
+15% drift/spread rule remains unchanged. Historical freezes retain the
+legacy policy; a revised policy requires a new prospective freeze and a
+matched harness for every source. The optional launcher `execution_root`
+permits a verified archived library with that same shared harness.
+
 The new expanded arm is prepared by `freeze --extended` under
 `c9a-expanded-yield-v4`, after executable correctness and committed-only checks.
 The v2 and v3 protocols retain their identities. The expanded primary remains

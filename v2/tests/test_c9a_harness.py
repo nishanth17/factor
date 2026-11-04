@@ -361,6 +361,71 @@ class UncertaintyTests(unittest.TestCase):
 
 
 class WorkerFailureTests(unittest.TestCase):
+    def test_rewarm_policy_preserves_the_original_failed_screen_and_result(
+        self,
+    ):
+        from v2.benchmarks.qs.c9a import worker
+
+        config = SIQSConfig(collector=policy(), memory_bytes=64 * 2**20)
+        selected = dict(
+            worker_cell(),
+            source="candidate",
+            configuration=asdict(config),
+            warm_seconds=30,
+            end_reserve=10,
+            warm_work_limit=10**6,
+            work_limit=10**9,
+            max_blocks=1,
+            rss_bytes=3 * 2**30,
+            timing_policy="retire-rewarm-v1",
+        )
+        checked = dict(work=10, signature="checked", wall=[1] * 9, cpu=[1] * 9)
+        drifted = dict(checked, wall=[2] * 9, cpu=[2] * 9)
+        result = SimpleNamespace(
+            divisor=101,
+            reason="factor_found",
+            stats={"blocks": 1},
+            next_position=17,
+        )
+        job = SimpleNamespace(
+            multiplier=3,
+            base=SimpleNamespace(bound=40),
+            engine=None,
+            run=lambda **kwargs: result,
+        )
+        clock = 0
+
+        def tick():
+            nonlocal clock
+            clock += 0.01
+            return clock
+
+        with (
+            patch.object(
+                worker,
+                "time",
+                SimpleNamespace(monotonic=tick, process_time=tick),
+            ),
+            patch.object(worker, "warm_once", return_value=("checked", 1)),
+            patch.object(
+                worker, "sentinel", side_effect=[checked, drifted, checked]
+            ),
+            patch.object(worker.candidate, "SIQSJob", return_value=job),
+            patch.object(worker.gc, "collect") as collect,
+        ):
+            output = worker.run(selected)
+
+        self.assertFalse(output["legacy_drift"]["valid"])
+        self.assertTrue(output["timing_valid"])
+        self.assertEqual(output["factors"], [101, 103])
+        self.assertEqual(output["next_position"], 17)
+        self.assertEqual(output["actual_multiplier"], 3)
+        self.assertEqual(output["actual_base_bound"], 40)
+        self.assertGreaterEqual(output["retirement"]["rewarm_wall"], 3)
+        self.assertGreaterEqual(output["retirement"]["rewarm_cpu"], 3)
+        self.assertGreater(output["warm_work"], 30)
+        collect.assert_called_once()
+
     def test_small_warm_fixture_is_checked_in_both_runtime_paths(self):
         from v2.benchmarks.qs.c9a import worker
         from v2.benchmarks.qs.c9a.control import control_modules

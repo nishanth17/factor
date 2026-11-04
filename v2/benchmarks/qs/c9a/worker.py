@@ -1,11 +1,13 @@
 """One bounded PyPy worker, warmed and drift-checked in the same process."""
 
+import gc
 import hashlib
 import platform
 import statistics
 import time
 from contextlib import nullcontext
 from dataclasses import asdict
+from pathlib import Path
 
 from .... import qs as candidate
 from ....execution import budget as candidate_budget
@@ -231,6 +233,9 @@ def drift(before, after):
 
 def run(cell, *, capture_path=None):
     runtime()
+    timing_policy = cell.get("timing_policy", "legacy")
+    if timing_policy not in ("legacy", "retire-rewarm-v1"):
+        raise ValueError("unknown worker timing policy")
     launch_wall, launch_cpu = time.monotonic(), time.process_time()
     qs, budgets = (
         control_modules()
@@ -323,6 +328,12 @@ def run(cell, *, capture_path=None):
     observer_work = 0 if writer is None else writer.work
     if exceeded:
         reason = "process_rss_limit"
+    actual_multiplier = None if job is None else job.multiplier
+    actual_base_bound = (
+        None if job is None or job.base is None else job.base.bound
+    )
+    next_position = None if result is None else result.next_position
+    production_rss = rss()
     end_start, end_cpu = time.monotonic(), time.process_time()
     after = sentinel(
         qs,
@@ -332,6 +343,55 @@ def run(cell, *, capture_path=None):
         signature,
     )
     warm_work += after["work"]
+    legacy_after = after
+    retirement = None
+    if timing_policy == "retire-rewarm-v1":
+        # Preserve the immediate old screen, then measure the sentinel in a
+        # separately declared, comparable post-retirement warm state. The
+        # factoring interval above excludes all of this diagnostic overhead.
+        cleanup_start, cleanup_cpu = time.monotonic(), time.process_time()
+        engine = None if job is None else job.engine
+        arena = (
+            None
+            if engine is None
+            else getattr(engine.collector, "_arena", None)
+        )
+        if arena is not None and getattr(arena, "spill", None) is not None:
+            arena.spill.cleanup()
+        job = result = engine = arena = None
+        gc.collect()
+        retirement = dict(
+            wall=time.monotonic() - cleanup_start,
+            cpu=time.process_time() - cleanup_cpu,
+        )
+        rewarm_start, rewarm_cpu = time.monotonic(), time.process_time()
+        end_deadline = end_start + cell["end_reserve"]
+        while (
+            min(
+                time.monotonic() - rewarm_start,
+                time.process_time() - rewarm_cpu,
+            )
+            < 3
+        ):
+            if (
+                time.monotonic() >= end_deadline
+                or warm_work >= cell["warm_work_limit"]
+            ):
+                raise RuntimeError("post-retirement warmup exhausted")
+            found, used = warm_once(
+                qs, budgets, cell["configuration"], end_deadline
+            )
+            if found != signature:
+                raise ArithmeticError("post-retirement signature changed")
+            warm_work += used
+        retirement.update(
+            rewarm_wall=time.monotonic() - rewarm_start,
+            rewarm_cpu=time.process_time() - rewarm_cpu,
+        )
+        after = sentinel(
+            qs, budgets, cell["configuration"], end_deadline, signature
+        )
+        warm_work += after["work"]
     if (
         time.monotonic() - end_start > cell["end_reserve"]
         or time.process_time() - end_cpu > cell["end_reserve"]
@@ -362,11 +422,17 @@ def run(cell, *, capture_path=None):
         process_wall=time.monotonic() - launch_wall,
         process_cpu=time.process_time() - launch_cpu,
         rss_bytes=rss(),
+        production_rss_bytes=production_rss,
         rss_observer=_RSS_READER.identity,
         stats=stats,
         sentinel_before=before,
         sentinel_after=after,
         drift=screen,
+        timing_policy=timing_policy,
+        library_root=str(Path(qs.__file__).resolve().parents[1]),
+        legacy_sentinel_after=legacy_after,
+        legacy_drift=drift(before, legacy_after),
+        retirement=retirement,
         timing_valid=screen["valid"] and reason != "recorder_limit",
         observation="capture" if writer else "clean",
         recorder=None
@@ -374,9 +440,7 @@ def run(cell, *, capture_path=None):
         else dict(
             bytes=writer.bytes, work=writer.work, exhausted=writer.exhausted
         ),
-        actual_multiplier=None if job is None else job.multiplier,
-        actual_base_bound=None
-        if job is None or job.base is None
-        else job.base.bound,
-        next_position=None if result is None else result.next_position,
+        actual_multiplier=actual_multiplier,
+        actual_base_bound=actual_base_bound,
+        next_position=next_position,
     )

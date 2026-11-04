@@ -1,6 +1,14 @@
 # Factor status
 
 Last updated: 3 November 2026 (America/Los_Angeles).
+
+Current C9a follow-up: committed waste-removal bundle `f28fd61` passes 1,082
+tests (9 skipped) and lint. Nine-sample matched component/prefix checks show
+lower costs with exact stores/progress preserved; full-factor measurement
+is pending. The finite follow-up covers switching, polling/RSS observation,
+scans/refinement, sparse queues and incidence storage. Detailed local scope
+and receipts start at `v2/audit/c9a/optimization-65-plan.json` and
+`v2/benchmarks/results/c9a/waste-components-67/`. C9a remains Open.
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on

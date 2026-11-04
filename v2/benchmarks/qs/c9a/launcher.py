@@ -150,7 +150,7 @@ def validate_result(result, row, cell):
     return result
 
 
-def launch(cell, row, directory, name):
+def launch(cell, row, directory, name, *, execution_root=None):
     """No automatic retry; a missing output becomes a charged censored cell."""
     host = host_admission(cell["rss_bytes"])
     directory = Path(directory)
@@ -189,7 +189,16 @@ def launch(cell, row, directory, name):
             stderr=subprocess.PIPE,
             start_new_session=True,
             preexec_fn=child_limits,
-            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            cwd=execution_root,
+            env={
+                **os.environ,
+                "PYTHONDONTWRITEBYTECODE": "1",
+                **(
+                    {"PYTHONPATH": str(Path(execution_root).resolve())}
+                    if execution_root is not None
+                    else {}
+                ),
+            },
         )
         reason = collect_output(
             process, out, err, started + allowance, cell["rss_bytes"]
