@@ -37,3 +37,9 @@ only the standard library; GMP is optional.
 
 Start with `v2/` for current usage. Its package guides describe each engine
 and shared execution layer.
+
+## License
+
+Active v2 project code and documentation use the [MIT License](v2/LICENSE).
+External dependencies and linked papers keep their own terms. The preserved v1
+baseline is outside this new grant; its original provenance is unchanged.

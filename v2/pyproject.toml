@@ -3,6 +3,8 @@ name = "factor-v2"
 version = "0.1.0"
 description = "Python integer factorization with explicit partial results"
 requires-python = ">=3.11,<3.12"
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = ["Programming Language :: Python :: Implementation :: PyPy"]
 
 [tool.ruff]

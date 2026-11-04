@@ -19,9 +19,9 @@ pypy3 -m v2.factor --help
 | Engine | Role |
 | --- | --- |
 | QS | Fixed-polynomial reference collector |
-| MPQS | Independent polynomials, including external-square coefficients |
-| SIQS | CRT/Gray families, reused roots and shared verified relations |
-| SSS | CRT collision candidates and exact smoothness recovery |
+| MPQS | Independent polynomials, including external-square coefficients; [Silverman, *The Multiple Polynomial Quadratic Sieve* (1987)](https://doi.org/10.1090/S0025-5718-1987-0866119-8). |
+| SIQS | CRT/Gray families, reused roots and shared verified relations; [Alford–Pomerance, *Implementing the Self Initializing Quadratic Sieve on a Distributed Network*](https://math.dartmouth.edu/~carlp/implementing.pdf). |
+| SSS | CRT collision candidates and exact smoothness recovery; [Hittmeir, *Smooth Subsum Search* (2023)](https://arxiv.org/abs/2301.10529v2). |
 | SSSf | SSS with an optional lossy candidate filter |
 
 The CLI accepts `--method qs|mpqs|siqs|sss|sssf`; `--siqs` enables portfolio
@@ -48,19 +48,22 @@ Jobs return a split and remaining cofactor. Recursive terminal classification
 belongs to [`factorize_bounded`](../docs/API.md). Omitting the SIQS configuration
 uses automatic selection; explicit `SIQSConfig()` keeps reference fields.
 The [configuration guide](CONFIGURATION.md) describes defaults, optional
-policies and supported combinations.
+policies and supported combinations; [collector policies](COLLECTORS.md)
+document the detailed intake, storage and checkpoint contracts.
 
 ## Techniques
 
-The engines combine exact arithmetic with bounded collection and reuse:
+The engines combine exact arithmetic with bounded collection and reuse.
+The papers linked here describe algorithmic foundations; buffer layouts,
+resource accounting and policy combinations are specific to this implementation.
 
 | Area | Techniques available |
 | --- | --- |
 | Polynomial setup | Exact factor-base roots and eligible-prime counts; parity-aware polynomial forms; coupled multiplier scoring and optional norm previews; streamed A assignments with reachable product windows and paired completion; CRT/Gray families and adjacent sign schedules. |
 | Root reuse | Bounded modular Gray-update tables, derivative-inverse reuse, cached prime-power plans and complete same-A higher-root transfers, with ordinary exact lifting for exceptional or unfunded cases. |
 | Sieving | Conservative integer/fixed-point scores, prime-power marking, periodic presieves, guaranteed two-adic initialization, density/unrolled kernels, fused score/hit updates and candidate scanning. Flat sparse queues use additive offsets; native-width hit words and epochs defer wide-mask construction to selected candidates. |
-| Recovery and admission | Separate reporting/product/endpoint bounds; exact impossible-domain rejection; bounded splitter portfolios, batch-GCD and known-endpoint hints, split memoization and candidate-only smooth-part recovery. Admissions reconstruct residuals and verify their declared types. |
-| Relation graphs | Single/double-large-prime matching, optional three-endpoint and opaque-residual policies, incidence elimination, shorter-cycle searches, congruence deduplication and checked equal-parity dependencies. Original atoms, repeated primes and square corrections remain recoverable. |
+| Recovery and admission | Separate reporting/product/endpoint bounds; exact impossible-domain rejection; bounded splitter portfolios, batch-GCD and known-endpoint hints, split memoization and candidate-only smooth-part recovery using product/remainder trees ([Bernstein, *How to Find Smooth Parts of Integers*, 2004](https://cr.yp.to/factorization/smoothparts-20040510.pdf)). Admissions reconstruct residuals and verify their declared types. |
+| Relation graphs | Single/double-large-prime matching ([Lenstra–Manasse, *Factoring with Two Large Primes*, 1994](https://doi.org/10.1090/S0025-5718-1994-1250773-9)), optional three-endpoint and opaque-residual policies, incidence elimination, shorter-cycle searches, congruence deduplication and checked equal-parity dependencies. Original atoms, repeated primes and square corrections remain recoverable. |
 | Records and ownership | Packed/base-index exponents, append-only slabs, integer provenance, lazy combined rows, exact representation witnesses and checked proof reuse. Optional bounded opaque staging/conversion, cheap-factor recomputation and disk-backed cold records control retained ownership. |
 | Filtering and extraction | Useful-row/deficit targets and collection-aware solve cadence; duplicate, singleton and weight-two filtering; reversible sparse/component views, fill-aware merges and optional panel kernels; joint exponent products and exact congruence/GCD extraction. |
 | Execution | Reused buffers, progress-only internal collection, grouped work reservations and bounded cooperative polling. SSS uses CRT collisions and product/remainder trees; experimental serial/thread/process family workers verify returned relations centrally. |
