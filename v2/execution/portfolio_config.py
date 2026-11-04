@@ -25,6 +25,7 @@ def _decode_siqs_config(values):
         CountedSIQSConfig,
         DoubleLargeSieveConfig,
         GrowingDoubleLargeSieveConfig,
+        SIQSConfig,
         SieveConfig,
     )
 

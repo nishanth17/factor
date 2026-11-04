@@ -368,3 +368,17 @@ class ReuseProcessTests(unittest.TestCase):
             {p.pid for p in multiprocessing.active_children()}, before
         )
         self.assertFalse(pool.manifests)
+
+
+class ConfigurationCompatibilityTests(unittest.TestCase):
+    def test_lazy_config_decoder_preserves_reference_relation_configuration(
+        self,
+    ):
+        from dataclasses import asdict
+        from v2.execution.portfolio_config import _decode_siqs_config
+        from v2.portfolio import PortfolioConfig
+        from v2.qs import SIQSConfig
+
+        config = SIQSConfig()
+        self.assertEqual(_decode_siqs_config(asdict(config)), config)
+        self.assertEqual(PortfolioConfig(siqs=asdict(config)).siqs, config)
