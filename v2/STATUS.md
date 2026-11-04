@@ -184,7 +184,7 @@ checkpoint v6 adds checked budget and stage-two preparation candidates, context
 binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
 accepted PRAC guards and global serial defaults are unchanged.
 
-A 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
+The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
 tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the
 prior F4 incumbent, 4.3% versus new-source options-off. Individual budget/index
 settings help selected regimes; their effects do not add. The 81 fresh CLI
@@ -194,6 +194,17 @@ refuses unfunded checkpoint ownership before worker launch; its charge is
 retained and subsequent cells are NOT RUN. No engagement threshold or default
 adoption is established; B12/F4 stay open. See [current results](benchmarks/RESULTS.md#b12f4-checked-fast-paths-and-complete-cost-screen-4-november-2026)
 and local `v2/audit/b12_f4/headroom_impl_v2/HANDOFF.md`.
+
+The resource-valid 512-curve follow-up now completes 45 invocations on one
+exposed 80-digit modulus with matching curve results. Index preparation lowers
+warm time 6.2% versus packets alone; cold time is conditionally lower versus
+current options-off, but improvement over the prior optimized F4 control remains
+inconclusive. The 5 MiB checkpoint, spawn and owned-resource checks pass. A
+transient recorder proof failure stays fully charged, with exit independently
+proved before continuation. New-phase booking is 269.18 wall / 3,425.99 CPU
+seconds under 600 / 4,800. All groups exit and the lock is released. No routing
+or default changes. Current local entry: `v2/audit/b12_f4/long_quota_v2/HANDOFF.md`;
+see [larger-quota results](benchmarks/RESULTS.md#b12f4-512-curve-cache-amortization-4-november-2026).
 
 The earlier 4/6/8/10/12/14/16-worker screen and metadata/import reuse evidence
 remain separately source-pinned. The observed cold leader is eight workers;

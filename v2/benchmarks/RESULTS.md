@@ -1,5 +1,68 @@
 # Benchmark results and decisions
 
+## B12/F4 512-curve cache amortization (4 November 2026)
+
+A resource-valid follow-up uses the unchanged committed runtime `b62ac7a` and
+prior optimized F4 control `344f8f1`, with 5 MiB checkpoint ownership in every
+arm. Pure checks in both sources confirm spawn and the 4,423,680-byte checkpoint
+bound, including simultaneous buffers. Full committed QA remains 1,046 tests
+(9 optional skips) and lint; no arithmetic/executor/default changes accompany
+this measurement phase.
+
+One exposed 80-digit modulus with a 20-digit smaller prime uses 512 identical
+curves at `(2000,200000)`, seed 7919 and eight spawn workers. N0 is the prior F4
+component control; K0 is current options-off; T adds tail-aware packet2; MT adds
+2 MiB index preparation to T. N0 is not production S0. Every call checks all
+512 curve identities/results. Two declared curves return proper divisors; this
+fixed-work search continues after factor discovery.
+
+Five retained-pool blocks include a repeated N0 drift anchor. Each validates
+at least three warmup seconds before nine samples. The primary component CLI
+comparison has nine interleaved fresh-process samples per arm, including all
+startup/JIT/preparation, validation and shutdown costs. A blocking wait replaces
+the earlier 50 ms controller polling grid.
+
+| Arm | Warm median | Fresh component CLI median | Mean observed cold CPU |
+| --- | ---: | ---: | ---: |
+| N0 | 1.48508 s | 2.40574 s | 16.706 s |
+| K0 | 1.55182 s | 2.48399 s | 16.945 s |
+| T | 1.52758 s | 2.33625 s | 16.761 s |
+| MT | 1.43326 s | 2.35565 s | 16.628 s |
+
+Index preparation lowers warm time 6.2% versus T and 7.6% versus K0, with zero
+measured index rebuilding after warmup. The warm gain versus N0 is only 3.5%,
+while the end anchor drifts +3.3%; source/JIT/block effects remain visible.
+
+Cold MT/K0 has matched timing-block ratio **0.96070**, conditional 95% interval
+**[0.93870, 0.98646]**. MT/T is 0.98691 [0.95413, 1.01096]; MT/N0 is 0.98582
+[0.94927, 1.01978]. The latter two include parity. Thus the new options-off
+comparison supports a scoped cold improvement, but improvement over the actual
+prior F4 incumbent remains inconclusive. K0's slower control must not manufacture
+an incumbent gain. One exposed modulus supplies no independent-input, population
+p90, first-factor or complete-factor claim, and the count is not a universal optimum.
+
+Owned reservations are 1.799–1.818 GB within the 4 GiB executor ceiling, plus
+128 MiB controller. Separate cold parent/worker high-water observations are
+about 84–86 MB and 638–649 MB summed worker HWMs, not simultaneous aggregate RSS.
+Worker readiness is about 0.17 s; whole interpreter/JIT costs remain in the CLI
+endpoint. Normal close is about 4 ms; early-factor cancellation is unmeasured.
+
+All 45 invocations return matching arithmetic results. One feasibility recorder
+breaks on a transient group-proof permission error; an own-PGID-only late check
+proves exit. Its full 20-wall/160-CPU grant remains charged and its failed timing
+is excluded. The revised bounded proof passes normal, deadline and deterministic
+transient-error checks; only unissued feasibility cells continue. All groups
+exit and the lock is released. All earlier refused/failure receipts stay intact.
+
+New-phase booking is 269.18 wall / 3,425.99 aggregate CPU seconds within 600 / 4,800;
+observed runtime is 181.24 wall / 1,327.87 CPU seconds, with helper CPU partly
+unobserved and conservatively reserved. Prior ledgers remain unchanged. Evidence
+is about 3.4 MB under 128 MiB. No default promotion, merge, B12/F4 closure or E1.
+The next gate is a small root-lineage-aware first/complete-CLI feasibility and
+observable serial/pool engagement calibration. Existing component factor hits
+do not guarantee identical portfolio search or completion. Detailed current
+report, freezes and handoff: `v2/audit/b12_f4/long_quota_v2/`.
+
 ## B12/F4 checked fast paths and complete-cost screen (4 November 2026)
 
 Committed executor source `b62ac7a` passes 1,046 PyPy tests (9 optional skips)

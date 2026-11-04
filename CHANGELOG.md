@@ -3,6 +3,14 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 larger-quota follow-up (4 November 2026)
+
+- Validate the 512-curve checkpoint/resource contract and matched spawn execution
+  without arithmetic or default changes. Record 6.2% lower warm time from cached
+  indices versus packets alone; cold improvement over the prior F4 incumbent is
+  inconclusive. Preserve the recorder failure, late exit proof and finite charges.
+- Keep complete-factor and engagement confirmation open; no default promotion.
+
 ## B12/F4 checked worker fast paths (4 November 2026)
 
 - Add opt-in prospective work accounting, bounded immutable stage-two indices,

@@ -191,3 +191,13 @@ separate warm component gains from inconclusive cold CLI and the small factoring
 pilot. Before increasing curve quotas, preflight `settings.checkpoint_bound(count)`
 and simultaneous owned buffers; a large time/work grant cannot fund a missing
 checkpoint reservation. Historical freezes and refused cells are immutable.
+
+
+The larger-quota follow-up is recorded at `v2/audit/b12_f4/long_quota_v2/HANDOFF.md`.
+It uses the same committed runtime with a checked 5 MiB checkpoint grant and
+blocking-wait cold timing. [Scoped results](RESULTS.md#b12f4-512-curve-cache-amortization-4-november-2026)
+keep the prior F4 control, current options-off and packet/cache arms separate.
+A recorder permission error remains fully charged, with explicit late exit proof;
+no unfavorable timing is selectively rerun. Warm reuse benefits do not establish
+first-factor or complete-factor latency gains. Root-lineage-aware complete-call
+feasibility precedes engagement calibration and fresh confirmation.
