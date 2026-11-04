@@ -27,7 +27,7 @@ class StageTwoSchedule:
     def __init__(self, segment_size, memory_bytes):
         self.segment_size = integer(segment_size, "segment size", 1)
         self.memory_bytes = integer(
-            memory_bytes, "index memory", 0, 16 * 2**20
+            memory_bytes, "index memory", 0, 64 * 2**20
         )
         self.used_bytes = 4096 + 256 * segment_size
         if self.used_bytes > memory_bytes:

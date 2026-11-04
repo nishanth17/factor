@@ -8,7 +8,7 @@ import struct
 from dataclasses import asdict, dataclass
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v6"
+VERSION = "b12-f4-v7"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -110,10 +110,10 @@ class WorkerSettings:
         integer(self.worker_memory, "worker_memory", 2**20, 2**30)
         integer(self.parent_memory, "parent_memory", 2**20, 4 * 2**30)
         integer(self.memory_bytes, "memory_bytes", 2**20, 24 * 2**30)
-        integer(self.decoded_cache_bytes, "decoded cache", 0, 16 * 2**20)
+        integer(self.decoded_cache_bytes, "decoded cache", 0, 64 * 2**20)
         integer(self.packed_cache_bytes, "packed cache", 0, 16 * 2**20)
         integer(self.manifest_cache_bytes, "manifest cache", 0, 16 * 2**20)
-        integer(self.stage_two_cache_bytes, "stage-two cache", 0, 16 * 2**20)
+        integer(self.stage_two_cache_bytes, "stage-two cache", 0, 64 * 2**20)
         if self.budget_mode not in ("legacy", "prospective"):
             raise ValueError("unknown worker budget mode")
         if type(self.bind_context) is not bool:

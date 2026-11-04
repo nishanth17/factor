@@ -149,6 +149,12 @@ existing program store without replacing accepted chains. An unfunded scratch
 cap refuses before dispatch. It defaults to zero and adds separate ownership
 for every retained context; its cold construction cost must be measured.
 
+Decoded and stage-two index capacities may be explicitly funded up to 64 MiB
+per retained context. Packed and manifest caches retain their 16 MiB maxima.
+Larger requests must still fit simultaneous parent/worker/helper ownership;
+resource/checkpoint v7 rejects v6 checkpoints and cost rows. Mathematical v1
+curve identities and ordinary zero-cache defaults are unchanged.
+
 Optional `decoded_cache_bytes` now reuses immutable primes/powers for streamed
 bounds as well as packed programs. A funded prefix remains cached when a full
 schedule cannot fit; there is no repeated scan eviction. `manifest_cache_bytes`
@@ -162,7 +168,7 @@ eligibility and modulus-dependent state ownership stay unchanged. These choices
 require separate complete-cost calibration; they are not automatic defaults.
 
 Optional worker settings `budget_mode="prospective"`, `bind_context=True` and
-`stage_two_cache_bytes` (0–16 MiB) are headroom candidates, with defaults
+`stage_two_cache_bytes` (0–64 MiB) are headroom candidates, with defaults
 `"legacy"`, `False` and zero. The prospective budget preserves every exact work
 check and the existing clock/cancellation cadence. Binding retains compatible
 schedule references once per context, never curve state; 4 KiB per context is
@@ -179,7 +185,7 @@ ready quota is at most twice the worker count; `"fixed"` remains the default.
 Packet sizes 1–4 retain per-job leases and bounded frames/results. New stage-two
 hit/miss/refusal counters and `stage_two_build_bytes` are cumulative preparation
 observations. Build bytes include repeated allocations after context replacement;
-they are not live memory or aggregate RSS. All flags bind the v6 executor/cost
+they are not live memory or aggregate RSS. All flags bind the v7 executor/cost
 identity; mathematical v1 manifests and curve streams remain unchanged. These
 options need matched complete-cost evidence and are not adopted defaults.
 
