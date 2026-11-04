@@ -44,6 +44,12 @@ def arithmetic_options(config, settings):
         allocation=None,
         memory_bytes=settings.worker_memory,
     )
+    if (
+        settings.packed_cache_bytes
+        and not selected.ecm_program_bytes
+        and settings.packed_cache_bytes < 4096 + 256 * selected.segment_size
+    ):
+        raise MemoryError("packed worker cache scratch refused")
     return asdict(selected)
 
 

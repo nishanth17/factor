@@ -79,6 +79,16 @@ class CurveEngine:
                 self.cache_evictions += 1
             config = PortfolioConfig(**options)
             context, programs = _execution_context({}, config, budget)
+            if self.settings.packed_cache_bytes:
+                if programs is None:
+                    from ..ecm.programs import ECMPrograms
+
+                    programs = ECMPrograms(
+                        context, memory_bytes=self.settings.packed_cache_bytes
+                    )
+                else:
+                    # Add funded retention without replacing accepted chains.
+                    programs.memory_bytes += self.settings.packed_cache_bytes
             if self.settings.decoded_cache_bytes:
                 programs = DecodedPrograms(
                     programs or context, self.settings.decoded_cache_bytes

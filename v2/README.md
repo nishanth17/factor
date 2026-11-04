@@ -139,10 +139,16 @@ The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
 slot/count/order; it differs from the incumbent shared RNG stream. The extended
-wire/executor/checkpoint contract is `b12-f4-v4`; v1/v2/v3 checkpoints are rejected.
+wire/executor/checkpoint contract is `b12-f4-v5`; v1/v2/v3/v4 checkpoints are rejected.
 Pinned older sources remain available for those checkpoints. Version 3 fixes
 JSON position-key hashing and withholds CPU for parent progress. Counts above
 ten explicitly oversubscribe this M4; support does not establish a useful count.
+Optional `packed_cache_bytes` (0–16 MiB) adds lazy compact prime/power retention
+independently of chain eligibility. It backs streamed bounds or adds to an
+existing program store without replacing accepted chains. An unfunded scratch
+cap refuses before dispatch. It defaults to zero and adds separate ownership
+for every retained context; its cold construction cost must be measured.
+
 Optional `decoded_cache_bytes` now reuses immutable primes/powers for streamed
 bounds as well as packed programs. A funded prefix remains cached when a full
 schedule cannot fit; there is no repeated scan eviction. `manifest_cache_bytes`

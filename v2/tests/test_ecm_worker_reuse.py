@@ -342,6 +342,7 @@ class ReuseProcessTests(unittest.TestCase):
             worker_imports="ecm",
             stage_two_kernel="reduced",
             decoded_cache_bytes=2**20,
+            packed_cache_bytes=2**20,
             manifest_cache_bytes=2**20,
             packet_curves=2,
             poll_every=16,
@@ -388,3 +389,61 @@ class ConfigurationCompatibilityTests(unittest.TestCase):
             ).siqs,
             config,
         )
+
+
+class PackedBackingTests(unittest.TestCase):
+    def test_deep_program_backing_keeps_stream_and_reuses_blocks(self):
+        config = configuration(ecm_tiers=((3000, 9000, 3),))
+        settings = WorkerSettings(
+            packed_cache_bytes=2**20, worker_imports="ecm"
+        )
+        cached, ordinary = CurveEngine(settings), CurveEngine()
+        plan = Manifest(
+            2**89 - 1, 7919, "root", arithmetic_options(config, settings)
+        )
+        self.assertEqual(plan.options["ecm_program_bytes"], 0)
+        for position in range(3):
+            request = task(plan, position)
+            left = cached.execute(request, cancelled=lambda: False)
+            right = ordinary.execute(request, cancelled=lambda: False)
+            for key in (
+                "id",
+                "factor",
+                "reason",
+                "phase",
+                "sigma",
+                "chain_chunks",
+            ):
+                self.assertEqual(left[key], right[key])
+        self.assertGreater(cached.programs.hits, 0)
+        self.assertLessEqual(
+            cached.programs.used_bytes, settings.packed_cache_bytes
+        )
+        self.assertIsNone(cached.programs.chains)
+
+    def test_existing_accepted_program_store_gets_additive_retention(self):
+        config = configuration(ecm_program_bytes=65536)
+        settings = WorkerSettings(packed_cache_bytes=2**20)
+        engine = CurveEngine(settings)
+        plan = Manifest(
+            2**61 - 1, 7919, "root", arithmetic_options(config, settings)
+        )
+        result = engine.execute(task(plan, 0), cancelled=lambda: False)
+        self.assertEqual(result["reason"], "complete")
+        self.assertEqual(engine.programs.memory_bytes, 65536 + 2**20)
+        self.assertEqual(plan.options["ecm_program_bytes"], 65536)
+        self.assertEqual(engine.preparations, 1)
+
+    def test_unfunded_scratch_refuses_before_dispatch(
+        self,
+    ):
+        settings = WorkerSettings(packed_cache_bytes=4096)
+        with ECMExecutor(settings=settings, force_workers=True) as owner:
+            with self.assertRaisesRegex(
+                MemoryError, "packed worker cache scratch"
+            ):
+                owner.run(35, config=configuration(), budget=allowance())
+            self.assertFalse(owner.slots)
+        base = WorkerSettings()
+        extra = WorkerSettings(packed_cache_bytes=2**20)
+        self.assertEqual(extra.owned_bytes - base.owned_bytes, 2 * 2**20)

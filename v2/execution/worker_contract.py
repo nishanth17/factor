@@ -8,7 +8,7 @@ import struct
 from dataclasses import asdict, dataclass
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v4"
+VERSION = "b12-f4-v5"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -63,6 +63,7 @@ class WorkerSettings:
     poll_every: int = 1
     metadata_slots: int = 1
     decoded_cache_bytes: int = 0
+    packed_cache_bytes: int = 0
     manifest_cache_bytes: int = 0
     worker_imports: str = "portfolio"
     stage_two_kernel: str = "legacy"
@@ -106,6 +107,7 @@ class WorkerSettings:
         integer(self.parent_memory, "parent_memory", 2**20, 4 * 2**30)
         integer(self.memory_bytes, "memory_bytes", 2**20, 24 * 2**30)
         integer(self.decoded_cache_bytes, "decoded cache", 0, 16 * 2**20)
+        integer(self.packed_cache_bytes, "packed cache", 0, 16 * 2**20)
         integer(self.manifest_cache_bytes, "manifest cache", 0, 16 * 2**20)
         if self.worker_imports not in ("portfolio", "ecm"):
             raise ValueError("unknown worker import path")
@@ -137,7 +139,12 @@ class WorkerSettings:
         return (
             self.parent_memory
             + self.manifest_cache_bytes
-            + contexts * (self.worker_memory + self.decoded_cache_bytes)
+            + contexts
+            * (
+                self.worker_memory
+                + self.decoded_cache_bytes
+                + self.packed_cache_bytes
+            )
             + self.worker_memory  # Possible runtime-managed spawn helper.
             + self.workers
             * (12 * self.frame_bytes + RESULT_BYTES * self.packet_curves)
