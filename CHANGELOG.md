@@ -3,6 +3,22 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## C9a useful-yield continuation (4 November 2026)
+
+- Mark bucket recovery metadata in bounded 60-bit integer words with block
+  epochs; materialize exact wide masks only for selected candidates. Charge
+  construction, periodic stamp copies and internal reads, keep mandatory
+  polynomial-switch scratch funded, and retain the ordinary-list fallback.
+  Checkpoint formats and mathematical collection order are unchanged.
+- The extended 70-digit comparison completes both policies within 9,000s each:
+  C9a/C0 take 1842.1/2742.1s on shared source `891eda5`. The final same-C9a
+  hit-metadata full60 pair takes 159.5/132.2s on `ebb35fa`/`c8168dc`.
+  Mixed/failed timing screens and one exposed modulus per band limit these
+  raw differences to exploratory observations. No default adoption follows.
+- Validate the final committed-only checkout with 1,113 tests (9 skipped),
+  lint and all 243 benchmark imports. Calibrated whole-factor sampling and a
+  complete mature heap inform the implementation; they are diagnostic data.
+
 ## C9a useful-yield preparation (3 November 2026)
 
 - Prepare bounded complete prime-power root transfer across same-A

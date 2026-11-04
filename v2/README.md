@@ -130,6 +130,16 @@ ordinary lifting. Additional inverse construction remains charged. This helper
 keeps polynomial-switch scratch funded, clears on target/A provenance changes
 and rebuilds cold after restore. Its reservation is not an RSS estimate.
 
+List-backed power scoring with bucket recovery may reserve another bounded
+helper, up to 32 MiB after existing helpers and mandatory switch scratch.
+For bases exceeding 60 entries, it marks recovery bits in 60-bit integer
+words with block epochs and assembles exact wide masks only for selected
+candidates. The word width keeps marking values in PyPy's native integer-list
+range; it never truncates mathematical masks or changes admission bounds.
+Construction, periodic stamp copies and internal materialization have explicit
+work charges. Unfunded memory/work keeps ordinary lists; checkpoint restore
+reconstructs derived scratch cold. No configuration field or schema is added.
+
 The proof cache defaults to `checked_bytes=8 MiB` (maximum 64 MiB); the two
 duplicate indices share `duplicate_bytes`. Batch sizes range from 2 through
 256. These are finite experimental settings, not measured optima. Every helper

@@ -10,6 +10,41 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The bounded 4 November continuation has three separate matched observations:
+
+| Comparison | Previous/control seconds | New/C9a seconds | Timing screens |
+| --- | ---: | ---: | --- |
+| Same-C9a full60, root transfer (`891eda5` / `ebb35fa`) | 168.974 | 157.717 | false / true |
+| Same-C9a full60, hit words (`ebb35fa` / `c8168dc`) | 159.519 | 132.247 | false / false |
+| Full70 policies, shared optimized `891eda5` | 2742.095 | 1842.083 | true / false |
+
+Both same-C9a full60 pairs retain 764,077,765 positions, 4,977 rows, 5,830
+polynomials and exact factors; additional helper construction/read work stays
+charged. The final hit pair has 17.1% lower raw time and 1.5% higher peak RSS
+(347,127,808/352,403,456 bytes). Nine warmed 2,048-block collector samples have
+12.8%/17.4% lower median cost at 60/70 digits, favorable 9/9 at both sizes,
+with identical stores/progress and explained extra work. This is component
+evidence; no full70 word-helper result is available.
+
+The separate extended full70 freeze grants 9,000 production seconds per arm,
+4 GiB owned storage and 5 GiB process RSS. Both complete with proven factors.
+C9a uses 34.3% fewer positions and 10.1% lower peak RSS, while its reserved
+workspace is higher. The policy comparison uses the optimized shared runtime,
+not a fresh master call. Earlier 900s outcomes and all charges remain preserved.
+Each size has one exposed modulus/seed; repeated component samples are not
+independent inputs. Failed timing gates remain failed, paired gains are not
+multiplied, and no population speedup or adoption follows. Final committed-only
+checks pass 1,113 tests (9 skipped), lint and 243 benchmark imports.
+
+One calibrated whole-factor sample on `ebb35fa` attributes substantial cost
+to marking, queue construction and GC (37.102s, 23.4% of traced wall). Its
+complete mature heap census describes shallow categories, not retained
+dominators or allocation rates. Diagnostic timing is separate from clean
+evidence. Local detail: `v2/audit/c9a/optimization-83-89.md` and
+`verification-89.json`; generated data: `results/c9a/hit-words-89/`, with
+earlier worktree locations recorded in the local report. The bounded phase
+stops here; acceptance remains Open.
+
 The final shared-source flat-queue pair on `180576c` factors the same exposed
 60-digit input in 268.8/230.4s for incumbent/C9a: 14.3% lower raw candidate time.
 Collection is 215.3/202.8s, filtering 9.07/0.90s and preparation 16.49/0.67s.

@@ -1,23 +1,28 @@
 # Factor status
 
-Last updated: 3 November 2026 (America/Los_Angeles).
+Last updated: 4 November 2026 (America/Los_Angeles).
 
-Current C9a follow-up: waste-removal source `180576c` passes the committed-only
-1,084-test suite (9 skipped), lint and 242 benchmark imports. Switching,
-polling/RSS observation, scans/refinement, queues and incidence storage have
-matched component checks with exact stores/progress preserved. A slower
-packed-field queue layout was replaced by flat unsigned-word triples after
-actual-event replay; the separate `scan-report` option remains unselected
-after mixed integration timings. The final current-source pair factors the
-exposed 60-digit input in 268.8/230.4s for incumbent/C9a, 14.3% less raw C9a
-time. Both timing screens fail (control spread; C9a post-run ratio 0.775), so
-no clean speedup or adoption is established. Collection is 215.3/202.8s; terminal
-work, progress, rows and semantic counters match each arm's prior packed-queue
-run. Detailed local evidence starts at
-`v2/audit/c9a/optimization-65.md` and the finite current plan at
-`v2/audit/c9a/final-pair-76-plan.json`; exact verification is
-`v2/audit/c9a/verification-77.json`. C9a remains Open. Stop after this bounded
-phase; no campaign, production admission change or default promotion follows.
+Current C9a follow-up: source `c8168dc` passes the committed-only 1,113-test
+suite (9 skipped), lint and 243 benchmark imports. It includes bounded
+same-A prime-power root transfers, native-width recovery bits, fused marking,
+additive queues, exact proof reuse and unchanged refusal/resume validation.
+The latest same-C9a 60-digit pair takes 159.5/132.2s before/after the hit change,
+17.1% less raw time with identical factors, positions, rows and polynomials.
+Both timing screens fail; peak RSS rises 1.5%. Nine warmed collector samples
+favor the change at both 60/70 digits, with 12.8%/17.4% lower median prefix time.
+
+The explicitly extended 9,000s-per-arm 70-digit comparison completes on shared
+source `891eda5`: C9a/C0 take 1842.1/2742.1s, with exact proven reconstruction,
+34.3% fewer C9a positions and 10.1% lower peak RSS. C9a's timing screen fails;
+C0's passes. This is one exposed modulus/seed and compares policies on the
+optimized runtime; the later root/word changes have no full70 result.
+The raw differences remain exploratory, with no population speedup or adoption.
+One calibrated whole-factor CPU profile and mature heap identify marking,
+queue construction and GC costs; traced time is diagnostic only. Detailed
+local evidence starts at `v2/audit/c9a/optimization-83-89.md`, the final finite
+plan at `v2/audit/c9a/plan-89.json`, and verified evidence at
+`v2/audit/c9a/verification-89.json`. C9a remains Open. This bounded phase is
+complete; no additional campaign or policy/default promotion follows.
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on

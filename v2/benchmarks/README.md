@@ -94,6 +94,32 @@ force-add generated results, local journals or external source checkouts.
 
 ## C9a preparation and staged execution
 
+`qs.c9a.source_compare` supports matched committed-library comparisons through
+the same external harness. `archive_library` records runtime file hashes and
+`load_library` verifies bytes before private-package imports; `prefix_cost`
+includes setup, collection, checked stores and helper work. `measure_rotating`
+requires at least three CPU/wall seconds of warmup per mode and retains nine
+rotated samples. Complete calls use `launch_pinned`; the worker entry point is
+`pypy3 -B -m v2.benchmarks.qs.c9a.source_compare --worker REQUEST.json`.
+The request contains the frozen cell and optional archived library; the driver
+binds source identity and validates results against the fixture. Do not
+substitute current code into a historical identity. Run performance work only
+under the shared quiet lock and a declared finite cumulative ledger.
+
+The final continuation uses the versioned C9a corpus, exposed_60_0/exposed_70_0,
+seed 104729, list scores, `presieve+unroll4+parity_two` and the frozen C9a
+configuration with recompute_prime_limit=0. Its new 2,048-block comparison
+(`ebb35fa` / `c8168dc`) has nine favorable samples at both sizes; the full60
+pair takes 159.519/132.247s with identical mathematical counters. Both timing
+screens fail, so the raw difference is exploratory. The separate 9,000s-per-arm
+full70 policy comparison on shared `891eda5` completes in 2742.095/1842.083s
+(C0/C9a), with mixed timing validity. Neither is population confirmation.
+Final checks: 1,113 tests (9 skipped), lint and 243 benchmark imports.
+Prospective plans, exact invocation receipts, pinned settings and worktree
+evidence locations are in local `v2/audit/c9a/optimization-83-89.md`;
+final generated evidence is under `results/c9a/hit-words-89/`. Immutable
+identities must not be reused. This continuation launches no further campaign.
+
 The final `180576c` matched pair uses flat queues in both arms and the literal
 prior incumbent/`cost-report` configurations. On one exposed 60-digit input,
 raw C0/C1 times are 268.807/230.364s. Both exact factorizations finish within the
