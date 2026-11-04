@@ -5,6 +5,11 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Complete the shared progress-path 60-digit pair: raw C9a time 320.9s versus
+  incumbent 356.3s, with both timing gates failed. Add bounded CPU/heap evidence
+  and identify resource-observer cost; retain exploratory scope without a
+  production observation-policy change or adoption.
+
 - Avoid copying cumulative atom/relation arrays and expanding partial IDs on
   every built-in QS/SIQS collection batch. Share the same traversal, exact
   publication and refusal/resume path with public collection; preserve full

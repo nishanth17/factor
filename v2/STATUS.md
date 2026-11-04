@@ -179,6 +179,21 @@ check. No full-factor speedup, general leak diagnosis or RSS reduction is
 established. Stop after these bounded checks and retain the incumbent without
 adoption. Details: `v2/audit/c9a/snapshot-50.md` and `verification-55.json`.
 
+The authorized current-source pair on `636484b` completes with C0/C1 raw
+times of 356.3/320.9s: a 9.9% exploratory C9a advantage on one exposed
+60-digit modulus. Both timing gates fail. Exact work, coverage, relation and
+collector counts match each arm's historical pre-fix result; those historical
+times are not matched current-source evidence. Collection is now 237.5/234.7s;
+RSS is 290.3/350.2MB. Native PyPy sampling covers bounded 50/60/70/80 prefixes
+and a checked 60-digit growing-store replay. Two bounded heaps at 0/10,097
+atoms identify container, integer, tuple and runtime-metadata growth without
+establishing a leak. The RSS callback costs about 16% of a matched short prefix
+in a separate diagnostic intervention; production observation is unchanged.
+Investigate cheaper resource observation, polling and polynomial-switch reuse
+before scaling. Stop after these checks; no adoption or default change.
+Local evidence: `v2/audit/c9a/profiling-56.md`, `verification-62.json` and
+`verification-64.json`.
+
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and

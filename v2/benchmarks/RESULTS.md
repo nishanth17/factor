@@ -10,6 +10,22 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The subsequent current-source clean pair on `636484b` completes with C0/C1
+raw times of 356.3/320.9s, about 9.9% less wall time for C9a on the exposed
+balanced 60-digit modulus. Both timing gates fail; no adoption follows.
+Collection is 237.5/234.7s, RSS 290.3/350.2MB, and each arm preserves its
+historical exact work, coverage, rows and collector counts. Earlier pre-fix
+times remain historical rather than matched causal estimates. Separate native
+sampling at 50/60/70/80 and a 10,097-atom checked replay highlight polling,
+scanning/marking, queue construction and polynomial switches. Two bounded
+heap dumps show about 32.1MB incremental live GC memory, with no leak proof.
+A nine-sample matched prefix diagnostic measures 0.385s with the RSS callback
+versus 0.324s with a constant-false callback. That intervention preserves work
+and outputs but is not a production resource-policy change or full-factor
+attribution. Stop after bounded analysis; investigate observer cost before a
+larger comparison. Details: `v2/audit/c9a/profiling-56.md`,
+`verification-62.json` and `verification-64.json`.
+
 The private progress-only collection path on `5b3a6cf` passes 1,070 tests
 (9 skips), lint and committed-only benchmark imports. Nine alternating matched
 samples after at least three seconds of warmup per mode reduce median

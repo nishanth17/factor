@@ -139,6 +139,14 @@ establish a whole-factor gain; short almost-empty prefixes showed no benefit.
 Keep JIT-off retention checks and explicit GC observations separate from
 uninstrumented timings. See [scoped observations](RESULTS.md#c9a-preparation).
 
+Subsequent diagnostics use PyPy's built-in statistical sampler with Python/JIT
+frames and a pinned local reader. Calibrate overhead on identical work and
+retain the resulting signatures; sampling shares are not removable-cost bounds.
+Keep heap dumps, explicit GC and resource-observer interventions separate from
+clean performance calls. A growing heap needs object/lifetime attribution;
+RSS high-water alone does not establish a leak. The measured callback cost and
+failed timing gates remain attached to the current scoped results.
+
 The primary configuration uses serial recovery and in-memory storage. Threaded
 hints and persistent spill are implemented selectable capabilities; exercising
 them needs a separately frozen configuration and finite production-disk grant
