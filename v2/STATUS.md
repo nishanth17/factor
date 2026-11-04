@@ -2,13 +2,22 @@
 
 Last updated: 3 November 2026 (America/Los_Angeles).
 
-Current C9a follow-up: committed waste-removal bundle `f28fd61` passes 1,082
-tests (9 skipped) and lint. Nine-sample matched component/prefix checks show
-lower costs with exact stores/progress preserved; full-factor measurement
-is pending. The finite follow-up covers switching, polling/RSS observation,
-scans/refinement, sparse queues and incidence storage. Detailed local scope
-and receipts start at `v2/audit/c9a/optimization-65-plan.json` and
-`v2/benchmarks/results/c9a/waste-components-67/`. C9a remains Open.
+Current C9a follow-up: waste-removal source `180576c` passes the committed-only
+1,084-test suite (9 skipped), lint and 242 benchmark imports. Switching,
+polling/RSS observation, scans/refinement, queues and incidence storage have
+matched component checks with exact stores/progress preserved. A slower
+packed-field queue layout was replaced by flat unsigned-word triples after
+actual-event replay; the separate `scan-report` option remains unselected
+after mixed integration timings. The final current-source pair factors the
+exposed 60-digit input in 268.8/230.4s for incumbent/C9a, 14.3% less raw C9a
+time. Both timing screens fail (control spread; C9a post-run ratio 0.775), so
+no clean speedup or adoption is established. Collection is 215.3/202.8s; terminal
+work, progress, rows and semantic counters match each arm's prior packed-queue
+run. Detailed local evidence starts at
+`v2/audit/c9a/optimization-65.md` and the finite current plan at
+`v2/audit/c9a/final-pair-76-plan.json`; exact verification is
+`v2/audit/c9a/verification-77.json`. C9a remains Open. Stop after this bounded
+phase; no campaign, production admission change or default promotion follows.
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on

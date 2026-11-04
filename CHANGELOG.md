@@ -5,6 +5,12 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Validate the final flat-queue bundle with 1,084 tests (9 skips), lint and 242
+  committed benchmark imports. The matched exposed 60-digit incumbent/C9a pair
+  finishes in 268.8/230.4s; both timing screens fail, so preserve the raw 14.3%
+  difference without adoption. Keep fused scanning optional after mixed
+  prefix evidence and retain every failed/rejected measurement.
+
 - Replace slower packed-field queue replay with measured flat unsigned-word
   triples. Add the separate experimental `scan-report` nominee to activate
   exact fused scanning while preserving existing kernel and admission choices.

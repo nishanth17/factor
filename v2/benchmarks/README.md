@@ -94,6 +94,19 @@ force-add generated results, local journals or external source checkouts.
 
 ## C9a preparation and staged execution
 
+The final `180576c` matched pair uses flat queues in both arms and the literal
+prior incumbent/`cost-report` configurations. On one exposed 60-digit input,
+raw C0/C1 times are 268.807/230.364s. Both exact factorizations finish within the
+same 900s/work/storage grants; unchanged terminal semantic counters and work
+are verified against each arm's prior run. Both timing screens fail, so the
+14.3% raw difference is qualified and is not adoption evidence. See
+`results/c9a/final-pair-76/` and `v2/audit/c9a/verification-77.json`.
+Historical invocation under the shared quiet lock:
+`pypy3 v2/audit/c9a/run_optimization65.py execution final-pair-76 1900
+pypy3 -B v2/audit/c9a/final-pair-76.py`.
+The immutable identity cannot be reused. Final committed-only checks pass
+1,084 tests (9 skips), lint and 242 imports. No additional campaign follows.
+
 The waste-removal bundle on `f28fd61` has matched, validated component
 measurements against its parent `57b40ad`. After at least three seconds of
 warmup per mode, nine samples of 128-block prefixes at 50/60/70/80 digits
@@ -108,17 +121,23 @@ These component gains are not additive. Local receipts:
 pypy3 -B v2/audit/c9a/measure-waste-67.py` under the shared quiet lock.
 The receipt name is immutable and cannot be reused.
 
-The subsequent whole60 comparison on `359e935` finds correct factorizations
-in316.0/295.6/250.5s for the archived incumbent, optimized incumbent and C9a.
+The subsequent whole 60-digit comparison on `359e935` finds correct factorizations
+in 316.0/295.6/250.5s for the archived incumbent, optimized incumbent and C9a.
 Both incumbent screens pass the revised timing policy; C9a's stable post-run
-sentinel is17.4% faster and fails the unchanged15% drift gate. Its raw result
+sentinel is 17.4% faster and fails the unchanged 15% drift gate. Its raw result
 remains qualified. A targeted actual-event queue replay then rejects packed
-64-bit fields:77.4ms versus42.2ms for tuples. Flat unsigned-word triples take
+64-bit fields: 77.4ms versus 42.2ms for tuples. Flat unsigned-word triples take
 41.3ms with compact storage and replace that representation.
 The distinct experimental `--profile scan-report` adds the existing exact
 fused scanner to `cost-report` while preserving its other settings and all
 pre-existing kernels. `cost-report` and automatic configurations retain their
-policies. The combined flat-queue/scan configuration awaits its own measurement.
+policies. Nine warmed integration samples at each size preserve exact stores,
+positions and divisors. At 60 digits flat queues improve 8/9 observations over
+packed fields; adding fused scanning improves 7/9 over flat-only, while its 70-digit
+median is worse. Its declared selection gate fails and is preserved. Keep
+`scan-report` optional; the final current-source pair uses `cost-report` with
+flat queues in both incumbent and candidate. This shared change requires a new
+matched pair rather than comparing a flat candidate to an old packed control.
 Local records: `results/c9a/whole-cost-70/`, `queue-replay-73/` and
 `v2/audit/c9a/integration-74-plan.json`.
 

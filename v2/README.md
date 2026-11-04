@@ -60,7 +60,8 @@ polling adapter. Every work reservation remains immediate; publication checks
 poll explicitly, and callback changes reach the original budget. Switching
 reuses checked factorization metadata only for the same supported A and
 immutable factor-base primes, after validating all supplied roots. Sparse hit
-queues and residual incidence use compact private coordinates; checkpoint
+queues use flat unsigned-word triples and residual incidence uses compact
+private coordinates; checkpoint
 formats and independent restore validation remain unchanged. These changes
 are under measurement and do not establish a factoring speedup.
 

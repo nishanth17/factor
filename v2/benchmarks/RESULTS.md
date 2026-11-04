@@ -10,6 +10,22 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The final shared-source flat-queue pair on `180576c` factors the same exposed
+60-digit input in 268.8/230.4s for incumbent/C9a: 14.3% lower raw candidate time.
+Collection is 215.3/202.8s, filtering 9.07/0.90s and preparation 16.49/0.67s.
+Peak process RSS is 289.0/331.1MB; accounted workspace is 615.0/567.7MB. Both use
+the same 900s production allowance, work grant, input/seed and observer.
+Exact reconstruction and independent proven-corpus agreement pass; terminal
+work, positions, rows and semantic counters match each arm's earlier packed
+queue run. Both revised timing screens fail: control samples are unstable;
+C9a's stable post-run ratio is 0.775. Preserve these failures: the raw difference
+does not establish a clean population speedup or adoption. Committed-only
+1,084 tests (9 skipped), lint and 242 imports pass. Packed-field replay is
+replaced by faster flat words; fused scanning remains optional after mixed
+integration evidence. Local verification: `v2/audit/c9a/verification-77.json`;
+full scope/retained and rejected changes: `v2/audit/c9a/optimization-65.md`.
+No further run or quota/default change follows this finite phase.
+
 The subsequent current-source clean pair on `636484b` completes with C0/C1
 raw times of 356.3/320.9s, about 9.9% less wall time for C9a on the exposed
 balanced 60-digit modulus. Both timing gates fail; no adoption follows.
