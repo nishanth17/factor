@@ -100,7 +100,9 @@ def shortlist(rows, *, target=4, relative_band=0.15):
         if row not in winners:
             winners.append(row)
     count_position = WORKER_COUNTS.index(best["count"])
-    neighbors = WORKER_COUNTS[max(0, count_position - 1) : count_position + 2]
+    neighbor_start = max(0, count_position - 1)
+    neighbor_stop = count_position + 2
+    neighbors = WORKER_COUNTS[neighbor_start:neighbor_stop]
     # Neighbor coverage is a declared expansion, not an automatic rejection.
     for count in neighbors:
         choices = [row for row in ranked if row["count"] == count]
