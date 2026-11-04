@@ -94,14 +94,12 @@ class PreparationTests(unittest.TestCase):
         )
         with (
             tempfile.TemporaryDirectory() as directory,
-            (
-                patch.object(runner.fcntl, "flock"),
-                patch.object(runner.subprocess, "Popen", side_effect=launch),
-                patch.object(
-                    runner.time, "monotonic", side_effect=lambda: clock[0]
-                ),
-                patch.object(runner, "validate_output", side_effect=validate),
+            patch.object(runner.fcntl, "flock"),
+            patch.object(runner.subprocess, "Popen", side_effect=launch),
+            patch.object(
+                runner.time, "monotonic", side_effect=lambda: clock[0]
             ),
+            patch.object(runner, "validate_output", side_effect=validate),
         ):
             record = runner.run_cell(freeze, cell, Path(directory))
         self.assertEqual(record["process_wall"], 0)
