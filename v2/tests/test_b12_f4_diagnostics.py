@@ -1,10 +1,17 @@
 """Independent diagnostic-format and factor-publication checks."""
 
 import array
+import contextlib
+import io
+import itertools
+import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
+from v2.benchmarks.ecm.b12_f4 import profile_runner
 from v2.benchmarks.ecm.b12_f4.dump_analysis import (
     heap_summary,
     sample_summary,
@@ -119,3 +126,91 @@ class DiagnosticTests(unittest.TestCase):
         for arm, workers in (("S0", 1), ("P8", 4), ("M0", 8)):
             with self.assertRaises(ValueError):
                 component_arm(arm, workers)
+
+    def test_refused_first_call_records_elapsed_time_and_closes(self):
+        closed = []
+
+        class RefusedExecutor:
+            lifetime_stats = {}
+
+            def __init__(self, **kwargs):
+                pass
+
+            def run(self, *args, **kwargs):
+                return SimpleNamespace(
+                    stats={"termination_reason": "cpu_limit"},
+                    reason="cpu_limit",
+                    checkpoint={},
+                )
+
+            def close(self):
+                closed.append(True)
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            request = dict(
+                observer="none",
+                capture=str(root / "capture"),
+                config={"ecm_tiers": [[2, 3, 1]]},
+                settings={"workers": 1},
+                seed=7,
+                arm="S1",
+                n=35,
+                wall=100,
+                cpu=100,
+                entry=1_000_000,
+                mode="cold",
+                repetitions=1,
+            )
+            path = root / "request.json"
+            path.write_text(json.dumps(request))
+            ticks = itertools.count(1_000_000, 0.001)
+            original_stat = profile_runner.os.stat
+            lock_identity = SimpleNamespace(st_dev=1, st_ino=2)
+
+            def stat(name, *args, **kwargs):
+                if str(name) == "/private/tmp/factor-performance.lock":
+                    return lock_identity
+                return original_stat(name, *args, **kwargs)
+
+            # This is a fake resource refusal: no curve or process is run.
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(
+                    patch(
+                        "v2.execution.ecm_workers.ECMExecutor", RefusedExecutor
+                    )
+                )
+                stack.enter_context(
+                    patch.dict("os.environ", FACTOR_DIAGNOSTIC_LOCK_FD="1")
+                )
+                stack.enter_context(
+                    patch.object(profile_runner.os, "stat", side_effect=stat)
+                )
+                stack.enter_context(
+                    patch.object(
+                        profile_runner.os, "fstat", return_value=lock_identity
+                    )
+                )
+                stack.enter_context(
+                    patch.object(profile_runner.fcntl, "flock")
+                )
+                stack.enter_context(
+                    patch.object(profile_runner.resource, "setrlimit")
+                )
+                stack.enter_context(
+                    patch.object(
+                        profile_runner.time,
+                        "monotonic",
+                        side_effect=lambda: next(ticks),
+                    )
+                )
+                stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                profile_runner.child(path)
+
+            data = json.loads((root / "capture/result.json").read_text())
+            self.assertFalse(data["complete"])
+            self.assertEqual(data["stop_reason"], "cpu_limit")
+            self.assertEqual(data["calls"], [])
+            self.assertGreater(data["measured_wall"], 0)
+            self.assertLess(data["measured_wall"], 1)
+            self.assertEqual(closed, [True])

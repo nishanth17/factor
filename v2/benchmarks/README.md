@@ -163,3 +163,12 @@ It is a separate diagnostic contract, preserving the production RNG stream.
 planning and repeated metadata work; compare its observer cost on identical
 work before interpreting it. Instrumented times are not performance evidence.
 Both tools require a held inherited performance lock and frozen finite requests.
+
+B12/F4 reuse evidence separates genuinely fresh component CLI lifetime from
+retained-pool calls. Its local entry point is
+`v2/audit/b12_f4/headroom_opt_v1/HANDOFF.md`; concise measurements and limitations
+are in [results](RESULTS.md#b12f4-bounded-metadata-and-import-reuse-4-november-2026).
+`kernel_replay` preserves explicit common curve seeds across parameter changes
+without rewriting production manifest identity. `parent_profile` bounds coarse
+observation and must be paired with a clean arm. Censored diagnostic calls keep
+elapsed durations and failure charges; they never rank as fast complete calls.

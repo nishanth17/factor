@@ -178,28 +178,31 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 runtime source `a32b9f0` passes 1,004 committed-checkout tests (9
-optional skips) and full lint, including real 16-worker spawn/drained restart.
-Later analyser/adversarial regressions pass in committed-only checkouts. The
-opt-in v3 resource/checkpoint contract repairs durable position hashing and
-leaves CPU for parent publication; mathematical streams and defaults stay fixed.
+B12/F4 committed arithmetic source `f9473f0` passes 1,026 tests (9 optional
+skips) and full lint. Observer source `27fb6c0` adds 11 passing targeted tests
+with byte-identical arithmetic/execution sources. The opt-in v5 resource and
+checkpoint contract adds bounded streamed/compact metadata reuse, parent
+manifest reuse, lightweight worker imports and existing reduced stage-two
+kernels; mathematical v1 identities and automatic defaults stay unchanged.
 
-The 4/6/8/10/12/14/16-worker screen covers substantial fixed work at 60/80/100
-digits: eight is the leading cold candidate, while warm nominees vary by work
-and size. Cheap cold calls stay serial. All 288 new timing/diagnostic cells
-validate; CPU/heap evidence points to arithmetic cost, with stage two dominant,
-rather than observed memory capacity pressure. Close count rankings and timing
-drift remain uncertain. These are exposed component inputs; complete-factor,
-balanced-tail and independent-input confirmation remain NOT RUN. No engagement
-threshold is adopted and B12/F4 remain open.
+The 4/6/8/10/12/14/16-worker screen is followed by a narrowed reuse/parameter
+study at 60/80/100 digits. Combined settings reduce selected fresh fixed-curve
+CLI medians by 18–20% versus off settings on the same source; optimized serial
+still wins cheap calls. Deeper-bound compact backing improves warm prefix
+replay 16–17%. Warm count candidates vary10–16, while close rankings remain
+uncertain. These are exposed/enriched component inputs; first-factor,
+complete-call, balanced-tail and fresh independent-input confirmation remain
+NOT RUN. PRAC's existing modulus guard excludes the 100-digit cases.
 
-C9a's release was explicitly confirmed. Runtime work used the shared lock,
-all owned groups exited, and the lock is released. See the
-[scoped results](benchmarks/RESULTS.md#b12f4-wider-worker-cpu-and-heap-screen-4-november-2026)
-and local `v2/audit/b12_f4/counts16_v1/HANDOFF.md`. Detailed prior profiles:
-`v2/audit/b12_f4/profiles-v1/REPORT.md`. The cumulative QA ledger and all failed
-or wrong-source validation charges remain preserved. E5a records the separate
-serialization follow-up; it is not pursued within this CPU/headroom phase.
+No engagement threshold or default adoption is established; B12/F4 stay open.
+C9a's release was explicitly confirmed and runtime uses the shared lock.
+The new phase retains all failed QA, recorder and refused-allocation charges;
+the earlier feasibility group-exit acknowledgement remains unknown/full charged,
+with normal worker joins reported. New successful lanes drain their owned groups.
+See [reuse results](benchmarks/RESULTS.md#b12f4-bounded-metadata-and-import-reuse-4-november-2026)
+and local `v2/audit/b12_f4/headroom_opt_v1/HANDOFF.md`. Earlier source-pinned
+profiles/counts remain under `profiles-v1/` and `counts16_v1/`. E5a records the
+separate serialization follow-up; it is not pursued in this headroom phase.
 
 ## Known gaps and unresolved conflicts
 

@@ -3,6 +3,20 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 bounded reuse and worker imports (4 November 2026)
+
+- Add opt-in, separately funded decoded and compact metadata retention for
+  streamed schedules, bounded parent manifest reuse and lightweight worker
+  imports using the shared configuration implementation. Curve state stays private.
+- Reuse existing reduced point kernels optionally in stage two. Preserve exact
+  formulas, mathematical v1 streams, accepted PRAC guards and serial defaults;
+  resource/checkpoint v5 rejects older resource contracts.
+- Add independent cache/refusal/ownership tests and bounded common-seed parameter
+  replay and parent-attribution tools. Full committed arithmetic QA passes 1,026
+  tests (9 optional skips) and lint; diagnostic timing refusals retain elapsed
+  durations. Record scoped cold/warm gains, losses and finite charges separately
+  from unrun first-factor/full-factor/fresh-confirmation gates. B12/F4 remain open.
+
 ## B12/F4 wider-worker contracts and diagnostics (4 November 2026)
 
 - Permit explicit, funded spawn configurations through 16 workers, retaining

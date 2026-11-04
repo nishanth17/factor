@@ -161,6 +161,7 @@ def child(path):
 
     started = time.monotonic()
     warmup, measured, stop_reason = 0.0, 0.0, None
+    measured_started = None
     try:
         if request["mode"] == "warm":
             for _ in range(2048):
@@ -182,15 +183,17 @@ def child(path):
                 and request["settings"]["workers"] > 1
             ):
                 capture.dump("parent_retained_pool")
-        measured = time.monotonic()
+        measured_started = time.monotonic()
         for _ in range(request["repetitions"]):
             duration, last = invoke()
             calls.append(duration)
             stats.append(last)
-        measured = time.monotonic() - measured
+        measured = time.monotonic() - measured_started
         if capture is not None:
             capture.stop_profile()
     except ResourceTrialStoppedError as error:
+        if measured_started is not None:
+            measured = time.monotonic() - measured_started
         stop_reason = str(error)
     finally:
         executor.close()

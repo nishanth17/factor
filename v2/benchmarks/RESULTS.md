@@ -1,11 +1,68 @@
 # Benchmark results and decisions
 
+## B12/F4 bounded metadata and import reuse (4 November 2026)
+
+Opt-in resource/checkpoint v5 adds bounded decoded reuse for streamed schedules,
+compact packed backing, parent manifest reuse, lightweight worker imports and
+the existing reduced stage-two point kernels. Mathematical v1 curves, exact
+arithmetic, stage-one acceptance guards and serial defaults remain unchanged.
+Full committed arithmetic source `f9473f0` passes 1,026 tests (9 optional skips)
+and full lint. Observer additions have separate targeted checks; arithmetic
+sources are byte-identical. Earlier failed QA/recorder/allocation receipts stay
+charged and retained.
+
+Nine fresh CLI samples per arm use identical declared curves and include
+imports, spawn/JIT, preparation, validation and shutdown. B8 uses previous/off
+settings on the same source; X8 combines slim imports, decoded 2 MiB L / 8 MiB H,
+manifest 1 MiB, reduced point kernels and poll 64. M0 uses the same optimized
+settings serially, a distinct equivalent-manifest control rather than incumbent
+S0's legacy RNG stream.
+
+| Case | Optimized M0 | B8 | X8 |
+| --- | ---: | ---: | ---: |
+|L60|1.881 s|1.130 s|0.924 s|
+|L80|2.201 s|1.205 s|0.975 s|
+|H100|3.118 s|1.451 s|1.168 s|
+|C80|0.369 s|—|0.468 s|
+
+X8 reduces the substantial fixed-curve CLI medians by 18–20% versus B8, using
+about 2.4–2.9 times observed CPU versus optimized M0. Cheap C80 remains faster
+serial. These are enriched, exposed fixtures with 20-digit smaller primes
+(10 digits at C80), not uniformly sampled random integers. Only three independent
+substantial moduli are covered; repeated timings are not independent inputs.
+Conditional timing-block intervals support the scoped comparison, not population
+p90, first-factor or complete-factorization gains.
+
+At deeper `(50000,5000000)` bounds, one-curve common-seed warm replays improve
+16–17% with compact metadata backing. Normal-bound segment/GCD changes are mostly
+small; larger segments add little after backing exists. Packets and stage
+splitting do not help the selected ablations. Optimized warm count candidates
+still vary 10–16; close rankings and block variation remain unresolved. A 2/4/8
+MiB nursery bracket yields no clear wall-time gain despite lower GC cost with
+8 MiB; observed parent-plus-worker RSS is 1.26/1.55 GB in the 2/8 MiB counter
+lanes, excluding controller/helper.
+
+Eligibility clarification: PRAC requires both the accepted B1 schedule and
+`10**39 <= n < 10**80`. L60/L80 use it; L100 uses the ladder. Residual profiles
+put stage one near 43% and stage two near 55% of counter-phase CPU. Logical JIT
+scope samples do not establish how much work-accounting cost is removable.
+Warm prime-power recomputation is eliminated; scalar products and remaining
+parent planning are small. Global serialization remains E5a.
+
+The finite phase records 214 validated runtime cells and three fully charged
+recorder/allocation failures; corrected designs use new identities. Including
+retained QA/analysis maxima, booking is 1,310.21 wall / 11,147.36 aggregate CPU
+seconds within 1,800 / 12,000; original QA and earlier phase ledgers are unchanged.
+No calibrated engagement rule, defaults, merge, B12/F4 closure or E1 campaign.
+Independent-input first-factor/complete-CLI comparisons and balanced guardrails
+remain NOT RUN. Local report/review/handoff: `v2/audit/b12_f4/headroom_opt_v1/`.
+
 ## B12/F4 wider-worker CPU and heap screen (4 November 2026)
 
 Runtime source `a32b9f0` uses explicit spawn processes and unchanged exact ECM.
 The bounded screen covers 4/6/8/10/12/14/16 workers at 60/80/100 digits, with
-20-digit smaller primes. L uses 128 curves at `(2000,200000)` and retains PRAC;
-H uses 32 curves at `(11000,1100000)` and the existing ladder. L/H share a
+20-digit smaller primes. L uses 128 curves at `(2000,200000)` and retains PRAC within the existing
+40–80-digit modulus guard; L100 uses the ladder. H uses 32 curves at `(11000,1100000)` and the existing ladder. L/H share a
 modulus at each size: three exposed substantial moduli, not six independent
 inputs. All candidate arms preserve identical curves and results.
 
