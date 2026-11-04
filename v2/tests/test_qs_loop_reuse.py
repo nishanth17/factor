@@ -75,6 +75,41 @@ def enumerated_queue(worker, window, budget):
 
 
 class QueueLoopTests(unittest.TestCase):
+    def test_poll_mutation_of_shared_limit_keeps_refused_event_exact(self):
+        observations = []
+        for grouped in (False, True):
+            worker = queue_worker(7)
+            lo, hi = -63, 66
+            maximum = max(
+                abs(worker.polynomial.value(x)) for x in range(lo, hi)
+            )
+            calls = []
+            ledger = unlimited_budget()
+
+            def shorten_limit(shared):
+                calls.append(shared.used)
+                # Change the limit during the first event poll after setup.
+                # A group must not reserve multiple events before seeing it.
+                if len(calls) == 3:
+                    shared.work_limit = shared.used + 4
+
+            budget = PollingBudget(ledger, interval=7, poll=shorten_limit)
+            try:
+                if grouped:
+                    worker.budget = budget
+                    build(worker, (lo, hi, maximum), 2**20)
+                else:
+                    enumerated_queue(worker, (lo, hi, maximum), budget)
+            except BudgetExhaustedError:
+                refused = True
+            else:
+                refused = False
+
+            observations.append((ledger.used, ledger.reason, calls, refused))
+
+        self.assertEqual(observations[0], observations[1])
+        self.assertTrue(observations[0][-1])
+
     def test_flat_event_order_and_complete_work_match_position_enumeration(
         self,
     ):

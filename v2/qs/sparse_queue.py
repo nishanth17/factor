@@ -67,7 +67,10 @@ def build(collector, window, byte_cap):
                 emitted = 0
                 while emitted < hit_count:
                     if grouped:
-                        remaining = budget._remaining or budget.interval
+                        # A polling callback may change the shared work
+                        # limit. Keep its first event separate, then group
+                        # only the remaining already-polled actions.
+                        remaining = budget._remaining or 1
                         affordable = max(
                             1,
                             (budget.budget.work_limit - budget.budget.used)
