@@ -147,9 +147,15 @@ def main():
         ).hexdigest()
         with arguments.output.open("x") as stream:
             json.dump(corpus, stream, indent=2, allow_nan=False)
-        print(json.dumps(dict(enriched=len(corpus["fixtures"]),
-                              uniform=len(corpus["uniform"]),
-                              draws=corpus["random_draws"])))
+        print(
+            json.dumps(
+                dict(
+                    enriched=len(corpus["fixtures"]),
+                    uniform=len(corpus["uniform"]),
+                    draws=corpus["random_draws"],
+                )
+            )
+        )
 
 
 if __name__ == "__main__":

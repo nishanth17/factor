@@ -55,13 +55,18 @@ def validate_reconstruction(row):
 
 def summarize_stages(events, dropped, seconds):
     """Use existing bounded events; missing attribution remains unknown."""
-    ecm = [event for event in events
-           if event.get("stage") in ("ecm", "ecm_workers")]
-    success = any(event.get("outcome") in ("factor", "factor_found")
-                  for event in ecm)
+    ecm = [
+        event
+        for event in events
+        if event.get("stage") in ("ecm", "ecm_workers")
+    ]
+    success = any(
+        event.get("outcome") in ("factor", "factor_found") for event in ecm
+    )
     engaged = any(event.get("stats", {}).get("engaged") for event in ecm)
     return dict(
-        ecm_reached=bool(ecm) or any(
+        ecm_reached=bool(ecm)
+        or any(
             key.startswith("ecm") and value > 0
             for key, value in seconds.items()
         ),
@@ -69,7 +74,8 @@ def summarize_stages(events, dropped, seconds):
         engaged=True if engaged else None if dropped else False,
         fallback_reached=any(
             event.get("stage") in ("siqs", "sss") for event in events
-        ) or any(
+        )
+        or any(
             key.startswith(("siqs", "sss")) and value > 0
             for key, value in seconds.items()
         ),
@@ -115,8 +121,7 @@ def child(request_path, source_root):
             seed=request["seed"],
             settings=WorkerSettings(**request["settings"]),
             rule=EngagementRule(**(request.get("rule") or {})),
-            force_workers=request["arm"] != "M0"
-            and request["arm"] != "N",
+            force_workers=request["arm"] != "M0" and request["arm"] != "N",
         )
     charged_children = 0.0
     work_used = 0
@@ -127,12 +132,10 @@ def child(request_path, source_root):
 
     def invoke():
         nonlocal charged_children, work_used
-        remaining_wall = request["wall"] - (
-            time.monotonic() - request["entry"]
-        ) - 3
-        remaining_cpu = (
-            request["cpu"] - time.process_time() - charged_children
+        remaining_wall = (
+            request["wall"] - (time.monotonic() - request["entry"]) - 3
         )
+        remaining_cpu = request["cpu"] - time.process_time() - charged_children
         if remaining_wall <= 0 or remaining_cpu <= 0:
             raise TimeoutError("whole-cell allowance exhausted")
         call_seconds = request["call_seconds"]
@@ -147,7 +150,8 @@ def child(request_path, source_root):
             cpu_seconds=remaining_cpu,
         )
         before_executor_work = (
-            0 if executor is None
+            0
+            if executor is None
             else executor.lifetime_stats.get("charged_work", 0)
         )
         started = time.monotonic()
@@ -173,8 +177,7 @@ def child(request_path, source_root):
             reconstruct=run.result.reconstruct(),
             factorization_complete=run.result.complete,
             complete=any(
-                1 < divisor < request["n"]
-                and request["n"] % divisor == 0
+                1 < divisor < request["n"] and request["n"] % divisor == 0
                 for divisor in [factor[0] for factor in factors]
                 + list(run.result.remaining)
             )
@@ -187,12 +190,13 @@ def child(request_path, source_root):
             work=budget.used,
             charged_child_cpu=budget.prior_cpu,
             executor_stats={}
-            if executor is None or executor.lifetime_stats.get(
-                "charged_work", 0
-            ) == before_executor_work
+            if executor is None
+            or executor.lifetime_stats.get("charged_work", 0)
+            == before_executor_work
             else dict(executor.last_stats),
             stage_summary=summarize_stages(
-                run.events, run.dropped_events,
+                run.events,
+                run.dropped_events,
                 run.checkpoint["payload"]["state"]["stage_seconds"],
             ),
         )

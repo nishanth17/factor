@@ -53,7 +53,10 @@ def matched_ratio(candidate, control, *, seed=20261108, draws=4000):
     )
     return dict(
         ratio=math.exp(statistics.mean(logs)),
-        interval=[samples[int(0.025 * draws)], samples[int(0.975 * draws) - 1]],
+        interval=[
+            samples[int(0.025 * draws)],
+            samples[int(0.975 * draws) - 1],
+        ],
         blocks=len(logs),
         scope="conditional timing blocks, not independent moduli",
     )
@@ -89,16 +92,15 @@ def shortlist(rows, *, target=4, relative_band=0.15):
     ranked = sorted(valid, key=lambda row: (row["seconds"], row["count"]))
     best = ranked[0]
     winners = [
-        row for row in ranked
+        row
+        for row in ranked
         if row["seconds"] <= best["seconds"] * (1 + relative_band)
     ]
     for row in ranked[:target]:
         if row not in winners:
             winners.append(row)
     count_position = WORKER_COUNTS.index(best["count"])
-    neighbors = WORKER_COUNTS[
-        max(0, count_position - 1) : count_position + 2
-    ]
+    neighbors = WORKER_COUNTS[max(0, count_position - 1) : count_position + 2]
     # Neighbor coverage is a declared expansion, not an automatic rejection.
     for count in neighbors:
         choices = [row for row in ranked if row["count"] == count]

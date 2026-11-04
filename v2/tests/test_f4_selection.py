@@ -110,8 +110,9 @@ class InputPlanTests(unittest.TestCase):
         rows = uniform_panel(2026110902, 12, 4)
         self.assertEqual(rows, uniform_panel(2026110902, 12, 4))
         self.assertEqual({row["n"] % 2 for row in rows}, {0, 1})
-        self.assertEqual({row["digits"] for row in rows},
-                         {30, 40, 50, 60, 70, 80, 100})
+        self.assertEqual(
+            {row["digits"] for row in rows}, {30, 40, 50, 60, 70, 80, 100}
+        )
         self.assertTrue(
             all(len(str(row["n"])) == row["digits"] for row in rows)
         )
@@ -126,8 +127,13 @@ class StageAttributionTests(unittest.TestCase):
         self.assertIsNone(result["engaged"])
 
     def test_success_and_fallback_are_independent_of_trace_tail(self):
-        events = [dict(stage="ecm_workers", outcome="factor_found",
-                       stats=dict(engaged=True))]
+        events = [
+            dict(
+                stage="ecm_workers",
+                outcome="factor_found",
+                stats=dict(engaged=True),
+            )
+        ]
         result = summarize_stages(events, 10, {"siqs": 1})
         self.assertEqual(result["ecm_success"], "success")
         self.assertTrue(result["engaged"])
@@ -158,14 +164,22 @@ class RawResultTests(unittest.TestCase):
             validate_reconstruction(row)
 
     def test_prime_power_can_expose_a_proper_divisor(self):
-        row = dict(self.row(), n=9, reconstruct=9, remaining=[],
-                   factorization_complete=True)
+        row = dict(
+            self.row(),
+            n=9,
+            reconstruct=9,
+            remaining=[],
+            factorization_complete=True,
+        )
         validate_reconstruction(row)
 
     def test_prime_exit_is_not_a_proper_divisor(self):
         row = dict(
-            self.row(), n=3, reconstruct=3,
-            factors=[[3, 1, "proven_prime"]], remaining=[],
+            self.row(),
+            n=3,
+            reconstruct=3,
+            factors=[[3, 1, "proven_prime"]],
+            remaining=[],
             factorization_complete=True,
         )
         with self.assertRaises(ValueError):
