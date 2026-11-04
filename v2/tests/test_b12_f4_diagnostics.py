@@ -5,7 +5,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from v2.benchmarks.ecm.b12_f4.dump_analysis import heap_summary
+from v2.benchmarks.ecm.b12_f4.dump_analysis import (
+    heap_summary,
+    sample_summary,
+)
 from v2.benchmarks.ecm.b12_f4.profile_runner import signature
 
 
@@ -82,3 +85,29 @@ class DiagnosticTests(unittest.TestCase):
             checkpoint = {"search": {"payload": {"completed": rows}}}
             with self.assertRaises(ValueError):
                 signature(checkpoint, 35, 1)
+
+    def test_jit_machine_pc_does_not_hide_its_logical_python_frame(self):
+        class Assembler(int):
+            pass
+
+        profiles = [([1, 2, Assembler(99)], 4, 0, 0), ([1, 1], 1, 0, 0)]
+        summary = sample_summary(
+            profiles, {1: "caller", 2: "kernel"}, Assembler
+        )
+        self.assertEqual(
+            summary["leaf"][0], dict(function="kernel", percent=80)
+        )
+        self.assertEqual(summary["jit_compiled_percent"], 80)
+        self.assertEqual(summary["unmapped_logical_leaf_percent"], 0)
+        self.assertEqual(
+            summary["inclusive"][0], dict(function="caller", percent=100)
+        )
+
+    def test_unmapped_logical_frames_stay_visible(self):
+        class Assembler(int):
+            pass
+
+        summary = sample_summary(
+            [([12, Assembler(99)], 1, 0, 0)], {}, Assembler
+        )
+        self.assertEqual(summary["unmapped_logical_leaf_percent"], 100)

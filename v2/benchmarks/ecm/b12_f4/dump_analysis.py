@@ -87,28 +87,50 @@ def cpu_summary(path, reader_path, maximum=32 * 2**20):
     spec.loader.exec_module(reader)
     with path.open("rb") as stream:
         state = reader._read_prof(stream)
-    symbols = dict(state.virtual_ips)
+    result = sample_summary(
+        state.profiles, dict(state.virtual_ips), reader.AssemblerCode
+    )
+    result.update(
+        file=str(path),
+        samples=state.n_samples,
+        period_us=state.period,
+        format=state.version,
+    )
+    return result
+
+
+def sample_summary(profiles, symbols, assembler_type):
+    """Count logical PyPy frames, retaining compiled-code coverage separately.
+
+    VMProf emits an AssemblerCode PC after a JittedCode logical frame. The PC
+    is not another Python function; counting it as the leaf hides the logical
+    caller. Inlined operations inside a JIT scope remain unattributed.
+    """
     leaf, inclusive = collections.Counter(), collections.Counter()
-    weighted = 0.0
-    for trace, weight, _, _ in state.profiles:
-        names = [
-            symbols.get(int(pc), "unknown:" + type(pc).__name__)
-            for pc in trace
-        ]
+    weighted, compiled = 0.0, 0.0
+    for trace, weight, _, _ in profiles:
+        names = []
+        has_assembler = False
+        for pc in trace:
+            if isinstance(pc, assembler_type):
+                has_assembler = True
+                continue
+            names.append(symbols.get(int(pc), "unknown:" + type(pc).__name__))
         if not names:
             continue
         weighted += weight
+        if has_assembler:
+            compiled += weight
         leaf[names[-1]] += weight
         for name in set(names):
             inclusive[name] += weight
     if not weighted:
-        return dict(file=str(path), samples=0, leaf=[], inclusive=[])
+        return dict(weighted_samples=0, leaf=[], inclusive=[])
+    unknown = sum(v for k, v in leaf.items() if k.startswith("unknown:"))
     return dict(
-        file=str(path),
-        samples=state.n_samples,
         weighted_samples=weighted,
-        period_us=state.period,
-        format=state.version,
+        jit_compiled_percent=100 * compiled / weighted,
+        unmapped_logical_leaf_percent=100 * unknown / weighted,
         leaf=[
             dict(function=name, percent=100 * count / weighted)
             for name, count in leaf.most_common(25)
