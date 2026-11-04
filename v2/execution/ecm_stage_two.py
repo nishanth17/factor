@@ -36,7 +36,7 @@ class StageTwoSchedule:
         self.hits = self.misses = self.refusals = self.build_bytes = 0
 
     def take(self, cursor, b1, b2, distance, center, limit, budget):
-        """Return one unchanged giant/GCD group, or decline retention."""
+        """Return a group end and the immutable full block, or decline."""
         values, start = cursor["values"], cursor["index"]
         lo, hi = cursor["left"], cursor["next"]
         if distance < 2 or not 0 <= start < len(values) or limit < 1:
@@ -111,7 +111,7 @@ class StageTwoSchedule:
         if block.centers[group] != center:
             raise ValueError("stage-two giant cursor changed")
         end = min(start + limit, block.ends[group])
-        return end, block.offsets[start:end]
+        return end, block.offsets
 
 
 def advance_prepared_job(job, budget, context, config):
@@ -165,8 +165,8 @@ def advance_prepared_job(job, budget, context, config):
     budget.consume(2 * (end - cursor["index"]))
     giant_x, giant_z = job["giant"]
     baby, terms, product = job["baby"], job["terms"], job["product"]
-    for index in offsets:
-        bx, bz = baby[index]
+    for position in range(cursor["index"], end):
+        bx, bz = baby[offsets[position]]
         term = (giant_x * bz - bx * giant_z) % n
         terms.append(term)
         product = product * term % n

@@ -82,13 +82,25 @@ class PreparedIndexTests(unittest.TestCase):
                             quota,
                             allowance(),
                         )
-                        self.assertEqual(list(actual), expected)
+                        self.assertEqual(list(actual[start:end]), expected)
                         self.assertEqual(end, start + len(expected))
                         seen.extend(values[start:end])
                         cursor["index"] = end
                 self.assertEqual(seen, trial_primes(b1 + 1, b2 + 1))
             self.assertGreater(schedule.hits, 0)
             self.assertLessEqual(schedule.used_bytes, schedule.memory_bytes)
+
+    def test_group_reads_reuse_one_immutable_block_without_slice_allocation(
+        self,
+    ):
+        schedule = StageTwoSchedule(16, 65536)
+        cursor = dict(left=8, next=40, values=trial_primes(8, 40), index=0)
+        short_end, short = schedule.take(cursor, 7, 45, 3, 7, 1, allowance())
+        full_end, full = schedule.take(cursor, 7, 45, 3, 7, 128, allowance())
+        self.assertIs(short, full)
+        self.assertEqual(short_end, 1)
+        self.assertEqual(full_end, 2)
+        self.assertEqual(short[:full_end], (2, 3))
 
     def test_interrupted_build_never_publishes_partial_metadata(self):
         schedule = StageTwoSchedule(16, 65536)
