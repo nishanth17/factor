@@ -159,10 +159,25 @@ threshold or historical classification. The conditional record replay identifies
 unused cumulative snapshots at the internal collection boundary as the next
 target. Each return copies retained arrays and expands partial IDs, although
 the internal caller consumes only progress/status. Preserve full public
-snapshots; a private progress-only path remains to be implemented. Stop after
-the pair and bounded diagnostics, retaining the incumbent without adoption.
+snapshots; that follow-up stops before implementing a private progress path.
+The pair and bounded diagnostics retain the incumbent without adoption.
 Evidence: `v2/audit/c9a/followup-43.md`, `verification-44.json` and
 `verification-48.json` in that audit directory.
+
+The subsequent collection change on `5b3a6cf` adds that private progress path
+for built-in QS/SIQS, sharing traversal and publication with the full public
+snapshot API. Custom collector dispatch and checkpoint formats are preserved.
+All 1,070 tests (9 skips), lint and 241 committed-only benchmark imports pass.
+On the captured 26,862-atom store, median empty-return cost is 0.848ms with
+snapshots versus 0.000899ms with progress; progress samples vary with runtime
+state. Matched 256-block prefixes have identical work, stores and statistics,
+but show no benefit: raw C0 snapshot/progress medians are 0.324/0.346s, C1
+0.394/0.412s. A separate JIT-off fixed-store check holds post-GC live memory
+at approximately 108MB through 4,000 calls in each mode; snapshot repetition
+creates temporary allocation/GC work without growing retained state in this
+check. No full-factor speedup, general leak diagnosis or RSS reduction is
+established. Stop after these bounded checks and retain the incumbent without
+adoption. Details: `v2/audit/c9a/snapshot-50.md` and `verification-55.json`.
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),

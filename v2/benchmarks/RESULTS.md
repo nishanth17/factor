@@ -10,6 +10,22 @@ Numbers from separate comparisons are not additive portfolio gains.
 
 ### C9a preparation
 
+The private progress-only collection path on `5b3a6cf` passes 1,070 tests
+(9 skips), lint and committed-only benchmark imports. Nine alternating matched
+samples after at least three seconds of warmup per mode reduce median
+empty-return cost on the captured 26,862-atom / 24,196-partial store from
+0.848ms for full snapshots to 0.000899ms for progress. Progress samples vary;
+this is a return-cost observation, not whole-factor attribution. Matched
+256-block exposed60 prefixes preserve exact serialized stores, work and stable
+statistics but show no runtime benefit: C0 snapshot/progress medians are
+0.324/0.346s, C1 0.394/0.412s. A separate JIT-off fixed-store retention check
+returns to approximately 108MB post-GC live memory through 4,000 calls per
+mode. Snapshot calls add allocation/GC work; retained store size does not grow.
+This does not rule out growing-run retention issues or establish an RSS or
+factoring speedup. Stop after these scoped checks; no adoption follows.
+Details: `v2/audit/c9a/snapshot-50.md`, `verification-55.json`; raw replay and
+retention evidence remain under `benchmarks/results/c9a/`.
+
 The subsequent bounded 60-digit pair on `f0a5791` completes with C0/C1 raw
 wall times of 411.0/487.1s. Both factors verify; both timing checks fail.
 C1 uses 764.1M positions / 4,977 rows versus C0's 911.4M / 4,994, with

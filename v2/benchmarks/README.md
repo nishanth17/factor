@@ -131,6 +131,14 @@ observed-cofactor and shared/serial recovery
 cost checks; it does not revise earlier `bounded-report` configurations or
 establish a factoring win. Shared batching and panel solving remain selectable.
 
+Built-in QS/SIQS now consumes private progress after each collection batch;
+the public collector still provides full owned snapshots. The scoped return
+replay compares these entry points under the same committed runtime and checks
+identical stores, work and progress. Its mature-store cost reduction does not
+establish a whole-factor gain; short almost-empty prefixes showed no benefit.
+Keep JIT-off retention checks and explicit GC observations separate from
+uninstrumented timings. See [scoped observations](RESULTS.md#c9a-preparation).
+
 The primary configuration uses serial recovery and in-memory storage. Threaded
 hints and persistent spill are implemented selectable capabilities; exercising
 them needs a separately frozen configuration and finite production-disk grant
