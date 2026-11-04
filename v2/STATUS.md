@@ -178,9 +178,9 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 last fully validated executor source `b62ac7a` passes 1,046 PyPy tests
+B12/F4 validated executor source `787190a` passes 1,067 PyPy tests
 (9 optional skips) and full lint in a committed-only checkout. Opt-in resource/
-checkpoint v6 adds checked budget and stage-two preparation candidates, context
+checkpoint v7 retains checked budget and stage-two preparation candidates, context
 binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
 accepted PRAC guards and global serial defaults are unchanged.
 
@@ -188,11 +188,13 @@ The active selection campaign now covers 30 explicit size/schedule regimes at
 30/40/50/60/70/80/100 digits. All 600 cold count screens and 260 warm blocks
 complete with matching curves. Joint parameter refinement and complete-call
 selection continue; this is not a final optimum or performance promotion.
-The new source-isolated selection tools pass 16 targeted tests, full lint and
+The new source-isolated selection tools pass 17 targeted tests, full lint and
 six real S0/M0/P2 cold/warm smoke cases in a committed checkout. Detailed current
 plan/state: `v2/audit/b12_f4/regime_selection_v1/PLAN.md` and `ACTIVE_STATE.md`.
-A bounded v7 cache-capacity extension is awaiting full runtime QA; it addresses
+The bounded v7 cache-capacity extension passes full runtime QA and addresses
 measured manifest/decode/index retention refusals without changing arithmetic.
+A separate lazy measured-profile selector and its tests are being prepared;
+its integrated runtime validation and confirmation remain pending.
 
 The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
 tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the

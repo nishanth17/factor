@@ -1,0 +1,58 @@
+"""Independent censoring and modulus-clustering analysis oracles."""
+
+import unittest
+
+from v2.benchmarks.ecm.b12_f4.selection_analysis import compare_cohort
+
+
+def row(seconds, complete=True):
+    return dict(seconds=seconds, complete=complete, grant=10)
+
+
+class CohortAnalysisTests(unittest.TestCase):
+    def test_known_scale_and_repeated_seeds_do_not_create_moduli(self):
+        control = {i: [row(2), row(2)] for i in range(6)}
+        candidate = {i: [row(1), row(1)] for i in range(6)}
+        result = compare_cohort(candidate, control, draws=100)
+        self.assertEqual(result["independent_moduli"], 6)
+        self.assertEqual(result["repetitions_per_modulus"], 2)
+        self.assertEqual(result["restricted_ratio_interval"], [0.5, 0.5])
+        self.assertEqual(result["completion_interval"], [0, 0])
+
+    def test_fast_refusals_cannot_improve_a_latency_endpoint(self):
+        control = {i: [row(1)] for i in range(5)}
+        candidate = {i: [row(0.01, False)] for i in range(5)}
+        result = compare_cohort(candidate, control, draws=100)
+        self.assertEqual(result["restricted_latency_ratio"], 10)
+        self.assertEqual(result["completion_difference"], -1)
+        self.assertIsNone(result["arms"]["candidate"]["median"]["seconds"])
+        self.assertEqual(result["arms"]["candidate"]["p90"]["lower_bound"], 10)
+
+    def test_mixed_samples_remain_in_the_declared_population(self):
+        control = {i: [row(2), row(2)] for i in range(4)}
+        candidate = {i: [row(1), row(0.01, False)] for i in range(4)}
+        result = compare_cohort(candidate, control, draws=100)
+        self.assertEqual(result["arms"]["candidate"]["completion"], 0.5)
+        self.assertEqual(result["restricted_latency_ratio"], 2.75)
+        self.assertIsNone(result["arms"]["candidate"]["p90"]["seconds"])
+
+    def test_unmatched_moduli_grants_repetitions_and_invalid_draws_reject(
+        self,
+    ):
+        control = {i: [row(2)] for i in range(3)}
+        with self.assertRaises(ValueError):
+            compare_cohort({0: [row(1)]}, control)
+        candidate = {i: [row(1)] for i in range(3)}
+        candidate[0][0]["grant"] = 20
+        with self.assertRaises(ValueError):
+            compare_cohort(candidate, control)
+        with self.assertRaises(ValueError):
+            compare_cohort(control, control, draws=10**8)
+        candidate = {i: [row(1)] for i in range(3)}
+        candidate[0].append(row(1))
+        with self.assertRaises(ValueError):
+            compare_cohort(candidate, control)
+
+
+if __name__ == "__main__":
+    unittest.main()

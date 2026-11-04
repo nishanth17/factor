@@ -113,7 +113,16 @@ def child(request_path, source_root):
 
     config = PortfolioConfig(**request["config"])
     executor = None
-    if request["arm"] != "S0":
+    if request["arm"] == "POLICY":
+        from v2.execution.ecm_selection import SelectedECMContext
+
+        executor = SelectedECMContext(
+            request["selection_profile"],
+            request["selection_profile_sha256"],
+            seed=request["seed"],
+            prefer_warm=request.get("prefer_warm", False),
+        )
+    elif request["arm"] != "S0":
         from v2.execution.ecm_workers import ECMExecutor
         from v2.execution.worker_contract import EngagementRule, WorkerSettings
 

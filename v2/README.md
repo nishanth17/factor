@@ -139,7 +139,7 @@ The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
 slot/count/order; it differs from the incumbent shared RNG stream. The extended
-wire/executor/checkpoint contract is `b12-f4-v6`; v1/v2/v3/v4/v5 checkpoints are rejected.
+wire/executor/checkpoint contract is `b12-f4-v7`; v1–v6 checkpoints are rejected.
 Pinned older sources remain available for those checkpoints. Version 3 fixes
 JSON position-key hashing and withholds CPU for parent progress. Counts above
 ten explicitly oversubscribe this M4; support does not establish a useful count.
@@ -220,3 +220,34 @@ or stop shared multiprocessing internals. `checkpoint_bound` may refuse a large 
 its explicit funded allowance rather than silently dropping history. A zero
 output-work allowance may refuse checkpoint construction. No live process
 handles or interpreter internals are serialized.
+
+
+### Measured ECM selection context (experimental preparation)
+
+`v2.execution.ecm_selection.SelectedECMContext(profile_path, profile_sha256,
+seed=..., prefer_warm=False)` adapts the existing opt-in portfolio executor
+interface. Use it as a context manager and pass it as `ecm_executor` to
+`factorize_bounded`. Resolve an omitted configuration with
+`PortfolioConfig().for_input(n)` before constructing explicit numerical settings;
+this retains the production SIQS fallback. Use a finite shared `Budget`.
+
+The adapter reads no profile and imports no multiprocessing machinery until
+actual ECM is reached. A bounded, source-checked measured profile selects one
+configuration at that first cofactor; the count stays fixed for the context
+lifetime. Decisions use decimal size, exact mathematical options, remaining
+quota and actual pool readiness. `prefer_warm=True` chooses the retained-library
+candidate, while its first call still pays and checks cold startup. Unknown or
+invalid cost estimates remain equivalent-manifest serial. This explicitly
+versioned serial stream differs from legacy production ECM; production serial
+remains the incumbent comparison. No automatic route or default is changed.
+
+The profile is limited to 256 KiB and 256 rows. The parent separately funds
+4 MiB decoded ownership, bounded input/hash scratch and three 16 KiB checkpoint
+headers alongside native executor ownership. Source hashing streams small
+buffers. Header work is reserved before arithmetic. Drained checkpoints bind
+the profile, selected settings, native checkpoint and prior charges; changing
+policy or worker count is rejected. Fresh contexts repay profile preparation
+and process startup. Retained contexts reject incompatible ownership rather
+than resizing their pools. No measured selection profile or adoption is implied
+by this API; integrated runtime QA and configuration confirmation are separate
+gates in the active selection campaign.
