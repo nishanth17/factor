@@ -53,3 +53,32 @@ class DiagnosticTests(unittest.TestCase):
             signature(checkpoint, 35, 1)
         with self.assertRaises(ValueError):
             signature(checkpoint, 35, 2)
+
+    def test_live_integer_keys_and_json_string_keys_have_the_same_identity(
+        self,
+    ):
+        result = dict(
+            id="curve",
+            sigma=17,
+            factor=5,
+            reason="complete",
+            phase="stage_two",
+            chain_chunks=0,
+        )
+        live = {"search": {"payload": {"completed": {0: result}}}}
+        encoded = {"search": {"payload": {"completed": {"0": result}}}}
+        self.assertEqual(signature(live, 35, 1), signature(encoded, 35, 1))
+
+    def test_alias_positions_cannot_hide_a_duplicate_result(self):
+        result = dict(
+            id="curve",
+            sigma=17,
+            factor=5,
+            reason="complete",
+            phase="stage_two",
+            chain_chunks=0,
+        )
+        for rows in ({0: result, "0": result}, {"00": result}):
+            checkpoint = {"search": {"payload": {"completed": rows}}}
+            with self.assertRaises(ValueError):
+                signature(checkpoint, 35, 1)

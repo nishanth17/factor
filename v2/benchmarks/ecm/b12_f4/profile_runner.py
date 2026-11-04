@@ -20,7 +20,20 @@ from .diagnostics import (
 
 def signature(checkpoint, n, curves):
     """Independently check every result and retain exact replay identities."""
-    completed = checkpoint["search"]["payload"]["completed"]
+    raw = checkpoint["search"]["payload"]["completed"]
+    completed = {}
+    for position, result in raw.items():
+        if type(position) is int:
+            key = str(position)
+        elif isinstance(position, str) and position.isdecimal():
+            key = str(int(position))
+            if key != position:
+                raise ValueError("noncanonical curve position")
+        else:
+            raise ValueError("invalid curve position")
+        if key in completed:
+            raise ValueError("duplicate canonical curve position")
+        completed[key] = result
     if set(completed) != {str(i) for i in range(curves)}:
         raise ValueError("fixed-work curve set is incomplete")
     rows, ids = [], set()
@@ -114,7 +127,12 @@ def child(path):
         charged_children += budget.prior_cpu
         if run.reason not in ("curves_exhausted", "factor_found"):
             raise RuntimeError("fixed work incomplete: " + run.reason)
-        rows = signature(run.checkpoint, request["n"], curves)
+        try:
+            rows = signature(run.checkpoint, request["n"], curves)
+        except ValueError:
+            with (directory / "failure-checkpoint.json").open("x") as stream:
+                json.dump(run.checkpoint, stream)
+            raise
         if reference is None:
             reference = rows
         elif rows != reference:
