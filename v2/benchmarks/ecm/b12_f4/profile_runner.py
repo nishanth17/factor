@@ -59,6 +59,15 @@ def signature(checkpoint, n, curves):
     return rows
 
 
+def component_arm(arm, workers):
+    """Validate forced component labels without changing production routing."""
+    from .runner import forced_arm
+
+    if arm == "S0":
+        raise ValueError("incumbent stream requires the incumbent runner")
+    return forced_arm(arm, workers)
+
+
 def child(path):
     """Run a frozen cell; observer output is never performance evidence."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -70,7 +79,7 @@ def child(path):
         raise RuntimeError("inherited lock identity changed")
     fcntl.flock(inherited, fcntl.LOCK_EX | fcntl.LOCK_NB)
     request = json.loads(path.read_text())
-    if request["observer"] not in ("none", "cpu", "counters", "heap"):
+    if request["observer"] not in ("none", "cpu", "counters", "heap", "rss"):
         raise ValueError("unknown observer")
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     output_cap = (32 if request["observer"] == "heap" else 4) * 2**20
@@ -79,7 +88,7 @@ def child(path):
     directory = Path(request["capture"])
     directory.mkdir(exist_ok=False)
     capture = None
-    if request["observer"] != "none":
+    if request["observer"] in ("cpu", "counters", "heap"):
         capture = Capture(request, "parent")
     from ....execution.budget import Budget
     from ....execution.ecm_workers import ECMExecutor
@@ -96,10 +105,12 @@ def child(path):
     executor = ECMExecutor(
         seed=request["seed"],
         settings=WorkerSettings(**request["settings"]),
-        force_workers=request["arm"] == "P4",
+        force_workers=component_arm(
+            request["arm"], request["settings"]["workers"]
+        ),
     )
     sampler = None
-    if request["observer"] in ("counters", "heap"):
+    if request["observer"] in ("counters", "heap", "rss"):
         sampler = RSSSampler(executor)
         sampler.thread.start()
     charged_children, work_used, warmup_calls = 0.0, 0, 0
@@ -156,7 +167,10 @@ def child(path):
         if capture is not None:
             if request["observer"] == "cpu":
                 capture.start_profile()
-            elif request["observer"] == "heap" and request["arm"] == "P4":
+            elif (
+                request["observer"] == "heap"
+                and request["settings"]["workers"] > 1
+            ):
                 capture.dump("parent_retained_pool")
         measured = time.monotonic()
         for _ in range(request["repetitions"]):

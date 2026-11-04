@@ -9,7 +9,7 @@ from v2.benchmarks.ecm.b12_f4.dump_analysis import (
     heap_summary,
     sample_summary,
 )
-from v2.benchmarks.ecm.b12_f4.profile_runner import signature
+from v2.benchmarks.ecm.b12_f4.profile_runner import component_arm, signature
 
 
 class DiagnosticTests(unittest.TestCase):
@@ -111,3 +111,11 @@ class DiagnosticTests(unittest.TestCase):
             [([12, Assembler(99)], 1, 0, 0)], {}, Assembler
         )
         self.assertEqual(summary["unmapped_logical_leaf_percent"], 100)
+
+    def test_component_count_labels_cannot_silently_select_serial(self):
+        self.assertFalse(component_arm("M0", 1))
+        for workers in (4, 6, 8):
+            self.assertTrue(component_arm("P" + str(workers), workers))
+        for arm, workers in (("S0", 1), ("P8", 4), ("M0", 8)):
+            with self.assertRaises(ValueError):
+                component_arm(arm, workers)
