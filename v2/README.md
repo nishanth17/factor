@@ -123,6 +123,13 @@ that retain each event's work and the original polling gap. Native root pairs
 avoid sorting, but every polynomial root still receives independent arithmetic
 verification. Benchmark warmup preserves the selected marking kernels.
 
+Power scoring may also reserve up to 32 MiB for complete nonsingular odd-prime
+root pairs across same-A polynomials. The exact B-shift preserves the original
+root-class order; characteristic two, singular primes and unfunded caches use
+ordinary lifting. Additional inverse construction remains charged. This helper
+keeps polynomial-switch scratch funded, clears on target/A provenance changes
+and rebuilds cold after restore. Its reservation is not an RSS estimate.
+
 The proof cache defaults to `checked_bytes=8 MiB` (maximum 64 MiB); the two
 duplicate indices share `duplicate_bytes`. Batch sizes range from 2 through
 256. These are finite experimental settings, not measured optima. Every helper

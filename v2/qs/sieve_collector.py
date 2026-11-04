@@ -16,6 +16,7 @@ from .polynomial import (
     checked_position,
     polynomial_roots,
 )
+from .power_reuse import MAX_TRANSFER_BYTES, RootTransfers
 from .power_sieve import HenselInverses, prime_power_roots
 from .relations import (
     AtomicRelation,
@@ -647,6 +648,20 @@ class SieveCollector:
                 # Include the temporary list during construction as well.
                 self._workspace += reserved
                 self._reuse_workspace += reserved
+        self._power_transfers = None
+        transfer_bytes = min(MAX_TRANSFER_BYTES, 65536 + 4096 * count)
+        switch_bytes = 512 * count + 32768
+        if (
+            self.config.score_policy in ("powers", "fixed")
+            and self._workspace + transfer_bytes + switch_bytes
+            <= self.config.memory_limit
+        ):
+            # Leave the mandatory old/new polynomial metadata coexistence
+            # funded; an optional cache must not prevent the next switch.
+            self._workspace += transfer_bytes
+            self._reuse_workspace += transfer_bytes
+            self._power_transfers = RootTransfers(transfer_bytes)
+            self._power_transfers.bind(polynomial)
         self._sparse_split = None
         if self.config.sparse_queue_bytes:
             target = polynomial.n_prime
@@ -793,6 +808,8 @@ class SieveCollector:
 
             clear(self)
         self.polynomial, self._roots = polynomial, roots
+        if self._power_transfers is not None:
+            self._power_transfers.bind(polynomial)
         self._a_exponents, self._a_support = exponents, support
         self._a_factor_value, self._a_factor_primes = supported_a, primes
         self._lift_inverses.clear()
@@ -827,6 +844,7 @@ class SieveCollector:
                     hi=window_hi,
                     inverses=self._lift_inverses,
                     shared_inverses=self._shared_lift_inverses,
+                    root_transfers=self._power_transfers,
                 ):
                     modulus, residues, _ = mark
                     words = (modulus.bit_length() + 7) // 8
@@ -866,6 +884,7 @@ class SieveCollector:
             hi=hi,
             inverses=self._lift_inverses,
             shared_inverses=self._shared_lift_inverses,
+            root_transfers=self._power_transfers,
         )
 
     def _set_plan_interval(self, lo, hi):
@@ -1114,6 +1133,7 @@ class SieveCollector:
                             hi=hi,
                             inverses=self._lift_inverses,
                             shared_inverses=self._shared_lift_inverses,
+                            root_transfers=self._power_transfers,
                         )
                     )
 

@@ -18,7 +18,7 @@ from v2.tests.test_qs import unlimited_budget
 def queue_worker(width):
     base = build_factor_base(1009 * 1013, bound=100).factor_base
     polynomial = Polynomial(base.n, 1, 1, 0)
-    return SieveCollector(
+    worker = SieveCollector(
         polynomial,
         base,
         budget=unlimited_budget(),
@@ -30,6 +30,10 @@ def queue_worker(width):
             memory_bytes=64 * 2**20,
         ),
     )
+    # This oracle isolates event grouping charges from optional higher-root
+    # cache construction, whose extra inverse work is tested independently.
+    worker._power_transfers = None
+    return worker
 
 
 def enumerated_queue(worker, window, budget):

@@ -49,6 +49,7 @@ def build(collector, window, byte_cap):
             hi=hi,
             inverses=collector._lift_inverses,
             shared_inverses=collector._shared_lift_inverses,
+            root_transfers=collector._power_transfers,
         )
         for modulus, residues, weight in marks:
             encoded_weight = (weight << 1) | (modulus == root.prime)

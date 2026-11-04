@@ -147,6 +147,7 @@ def prefix_cost(qs, budgets, cell, *, blocks=128, seconds=20):
             divisor=result.divisor,
         )
     )
+    transfers = getattr(collector, "_power_transfers", None)
     return dict(
         wall=wall,
         cpu=spent,
@@ -157,6 +158,10 @@ def prefix_cost(qs, budgets, cell, *, blocks=128, seconds=20):
         positions=job.engine.stats["collected_positions"],
         workspace=collector._workspace,
         helper_bytes=getattr(collector, "_reuse_workspace", 0),
+        transfer_builds=0 if transfers is None else transfers.builds,
+        transfer_replays=0 if transfers is None else transfers.replays,
+        transfer_work=0 if transfers is None else transfers.extra_work,
+        transfer_reserved=0 if transfers is None else transfers.used,
     )
 
 

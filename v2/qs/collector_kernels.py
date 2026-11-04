@@ -195,6 +195,9 @@ class PowerPresieve:
                     limit,
                     weight,
                     collector.budget,
+                    inverses=collector._lift_inverses,
+                    shared_inverses=collector._shared_lift_inverses,
+                    root_transfers=collector._power_transfers,
                 )
                 for modulus, residues, power_weight in marks:
                     # Full-period lifting can reach its singular-root cap

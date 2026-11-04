@@ -42,6 +42,7 @@ def prime_power_roots(
     hi=None,
     inverses=None,
     shared_inverses=None,
+    root_transfers=None,
 ):
     """Yield modulus/root/ceil-log marks covering every p-adic valuation.
 
@@ -64,6 +65,12 @@ def prime_power_roots(
 
     modulus, current = prime, initial
     target_bits = None
+    transferable = (
+        root_transfers is not None
+        and prime > 2
+        and not roots.all_positions
+        and len(initial) == 2
+    )
 
     while current and modulus <= maximum:
         modulus_bits = modulus.bit_length()
@@ -88,10 +95,18 @@ def prime_power_roots(
             break
         if target_bits is None:
             target_bits = polynomial.n_prime.bit_length()
+        cost = target_bits + 4 * modulus_bits + 1
+        if transferable and len(current) == 2:
+            shifted = root_transfers.shifted(
+                polynomial, prime, next_modulus, initial, cost, budget
+            )
+            if shifted is not None:
+                current, modulus = shifted, next_modulus
+                continue
         lifted = []
 
         for root in current:
-            budget.consume(target_bits + 4 * modulus_bits + 1)
+            budget.consume(cost)
 
             # The derivative modulo p is constant within an original root
             # class. Reuse its inverse (or singular zero) across all lifts.
@@ -132,5 +147,10 @@ def prime_power_roots(
                     root + modulus * offset for offset in range(prime)
                 )
 
+        complete_pair = transferable and len(current) == len(lifted) == 2
         current = tuple(lifted)
+        if complete_pair:
+            root_transfers.remember(
+                polynomial, modulus, next_modulus, current, budget
+            )
         modulus = next_modulus

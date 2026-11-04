@@ -5,6 +5,12 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## C9a useful-yield preparation (3 November 2026)
 
+- Prepare bounded complete prime-power root transfer across same-A
+  polynomials, with independent uncached/modular-enumeration oracles. Preserve
+  root traversal order and exceptional lifting; charge inverse construction,
+  retain polynomial-switch scratch and discard derived caches on restore.
+  Correctness and performance gates remain separate from adoption.
+
 - Fuse exact dense hit/score updates, skip initialization overwritten by
   periodic scores, and replace repeated sparse-queue division with additive
   offsets and grouped reservations. Preserve event order, complete charges
