@@ -178,42 +178,40 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 committed arithmetic source `f9473f0` passes 1,026 tests (9 optional
-skips) and full lint. Final recorder source `9065fca` passes 12 targeted tests and full lint,
-with 25 arithmetic/execution/portfolio files byte-identical to that full-suite source. The opt-in v5 resource and
-checkpoint contract adds bounded streamed/compact metadata reuse, parent
-manifest reuse, lightweight worker imports and existing reduced stage-two
-kernels; mathematical v1 identities and automatic defaults stay unchanged.
+B12/F4 current committed executor source `b62ac7a` passes 1,046 PyPy tests
+(9 optional skips) and full lint in a committed-only checkout. Opt-in resource/
+checkpoint v6 adds checked budget and stage-two preparation candidates, context
+binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
+accepted PRAC guards and global serial defaults are unchanged.
 
-The 4/6/8/10/12/14/16-worker screen is followed by a narrowed reuse/parameter
-study at 60/80/100 digits. Combined settings reduce selected fresh fixed-curve
-CLI medians by 18–20% versus off settings on the same source; optimized serial
-still wins cheap calls. Deeper-bound compact backing improves warm prefix
-replay 16–17%. Warm count candidates vary10–16, while close rankings remain
-uncertain. These are exposed/enriched component inputs; first-factor,
-complete-call, balanced-tail and fresh independent-input confirmation remain
-NOT RUN. PRAC's existing modulus guard excludes the 100-digit cases.
+A 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
+tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the
+prior F4 incumbent, 4.3% versus new-source options-off. Individual budget/index
+settings help selected regimes; their effects do not add. The 81 fresh CLI
+calls show no convincing new cold gain. A small first/complete pilot validates
+outputs but demonstrates no complete-factor improvement. A 512-curve extension
+refuses unfunded checkpoint ownership before worker launch; its charge is
+retained and subsequent cells are NOT RUN. No engagement threshold or default
+adoption is established; B12/F4 stay open. See [current results](benchmarks/RESULTS.md#b12f4-checked-fast-paths-and-complete-cost-screen-4-november-2026)
+and local `v2/audit/b12_f4/headroom_impl_v2/HANDOFF.md`.
 
-No engagement threshold or default adoption is established; B12/F4 stay open.
-C9a's release was explicitly confirmed and runtime uses the shared lock.
-The new phase retains all failed QA, recorder and refused-allocation charges;
-the earlier feasibility group-exit acknowledgement remains unknown/full charged,
-with normal worker joins reported. New successful lanes drain their owned groups.
-See [reuse results](benchmarks/RESULTS.md#b12f4-bounded-metadata-and-import-reuse-4-november-2026)
-and local `v2/audit/b12_f4/headroom_opt_v1/HANDOFF.md`. Earlier source-pinned
-profiles/counts remain under `profiles-v1/` and `counts16_v1/`. E5a records the
-separate serialization follow-up; it is not pursued in this headroom phase.
+The earlier 4/6/8/10/12/14/16-worker screen and metadata/import reuse evidence
+remain separately source-pinned. The observed cold leader is eight workers;
+warm nominees from 10 to 16 are scoped observations, not universal count choices. Original reuse source `f9473f0`
+passes 1,026 tests (9 optional skips); recorder `9065fca` preserves those runtime
+bytes. The capture audit reconciles all 189 CPU/heap files and 100 JIT summaries;
+analyser `6a2e36b` passes 14 targeted tests and lint. Complete capture coverage does
+not establish exhausted headroom. Detailed historical entries remain under
+`headroom_opt_v1/`, `capture_coverage_v1/`, `counts16_v1/` and `profiles-v1/`.
 
-The follow-up capture audit reconciles all 189 retained CPU/heap files and
-100 JIT summaries, including 11 current-source diagnostic cells. Full-histogram
-analyser source `6a2e36b` passes 14 targeted tests and full lint in a committed
-checkout; arithmetic/executor bytes are unchanged. It fills
-representative L/H60/80/100 arithmetic coverage, retains inconclusive copied-
-budget diagnostics and identifies remaining F4 JIT/work-accounting, stage-two
-metadata and packet2 questions. Complete capture coverage does not close these
-optimization opportunities or establish whole-factor gains. Local current entry:
-`v2/audit/b12_f4/capture_coverage_v1/REPORT.md`; see the
-[capture findings](benchmarks/RESULTS.md#b12f4-complete-capture-and-current-source-headroom-audit-4-november-2026).
+C9a's release was explicitly confirmed and runtime uses the shared lock. New
+successful lanes drain their owned groups; all failed QA, recorder and refused-
+allocation charges remain. The earlier feasibility group-exit acknowledgement
+remains unknown/full charged. New-phase booking 1,075.20 wall / 11,635.99 CPU is
+separate from all earlier ledgers. E5a owns the parked serialization follow-up;
+native/SIMD remains B4a. No merge, push, default promotion or E1 accompanies this
+work. Larger-work feasibility and calibrated engagement precede a fresh matched
+complete-CLI comparison and protected balanced 60/70 completion.
 
 ## Known gaps and unresolved conflicts
 

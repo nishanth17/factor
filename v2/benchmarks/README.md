@@ -180,3 +180,14 @@ input-size bound. Default summaries still display 25 entries and now expose
 stand in for a full histogram. These counts do not resolve inlined JIT operations,
 allocation lifetimes or heap-root ownership. The current local coverage record is
 `v2/audit/b12_f4/capture_coverage_v1/REPORT.md`.
+
+
+The current F4 fast-path evidence uses resource/checkpoint v6 and the existing
+explicit per-cell settings interface: `budget_mode`, `stage_two_cache_bytes`,
+`bind_context`, `packet_curves` and `packet_policy`. All default off/reference.
+Current source `b62ac7a` passes full committed QA. The local current entry is
+`v2/audit/b12_f4/headroom_impl_v2/HANDOFF.md`; [results](RESULTS.md#b12f4-checked-fast-paths-and-complete-cost-screen-4-november-2026)
+separate warm component gains from inconclusive cold CLI and the small factoring
+pilot. Before increasing curve quotas, preflight `settings.checkpoint_bound(count)`
+and simultaneous owned buffers; a large time/work grant cannot fund a missing
+checkpoint reservation. Historical freezes and refused cells are immutable.

@@ -1,5 +1,82 @@
 # Benchmark results and decisions
 
+## B12/F4 checked fast paths and complete-cost screen (4 November 2026)
+
+Committed executor source `b62ac7a` passes 1,046 PyPy tests (9 optional skips)
+and full lint in a committed-only checkout. Opt-in resource/checkpoint v6 adds
+prospective checked work accounting, immutable stage-two index/group preparation,
+context binding and tail-aware two-curve packets. Cached indices are read without
+per-group tuple copies. Exact arithmetic, mathematical v1 streams, accepted PRAC
+eligibility and global serial defaults remain unchanged. All new flags default off.
+
+N0 is prior F4 component source `344f8f1` with previously selected X8 settings;
+K0 is the new source with the new flags off. Neither is production S0. T uses
+packet2 with singleton tails; M prepares bounded stage-two indices; B uses the
+prospective budget. All comparisons here use eight spawn processes. The earlier
+4–16-worker results remain separate; this phase does not establish a new count
+optimum.
+
+Nine warm calls per cell follow at least three validated warmup seconds. L uses
+128 curves at `(2000,200000)`; H uses 32 at `(11000,1100000)`. L/H share one exposed
+modulus per size, each with a 20-digit smaller prime. Only L60/L80 use accepted
+PRAC; L100 and H retain the ladder.
+
+| Case | N0 warm median | K0 warm median | T warm median |
+| --- | ---: | ---: | ---: |
+| L60 | 0.33935 s | 0.33745 s | 0.30594 s |
+| H60 | 0.43721 s | 0.43203 s | 0.40565 s |
+| L80 | 0.41476 s | 0.41555 s | 0.40790 s |
+| H80 | 0.51893 s | 0.52522 s | 0.49291 s |
+| L100 | 0.52538 s | 0.47147 s | 0.47406 s |
+| H100 | 0.61679 s | 0.61982 s | 0.60268 s |
+
+T's equal-weight geometric ratio is 0.93979 versus N0 and 0.95669 versus K0:
+about 6.0% and 4.3% lower warm fixed-work time. B at L60 and M at L80 lower
+new-source medians about 11.8% and 15.3%, respectively. Combining all options
+adds little: 2.2% below N0 and 0.45% below K0; binding alone loses 2.1% versus K0.
+L100's source/control difference must not be credited to the packet policy.
+Later metadata/packet combination blocks are exploratory. Nine timing repeats
+on three moduli do not establish independent-input improvement or population p90.
+
+The primary endpoint uses 81 fresh CLI invocations, nine samples per arm/case,
+including interpreter/imports, spawn/JIT, preparation, validation and shutdown:
+
+| Case | N0 cold median | T cold median | Additional challenger |
+| --- | ---: | ---: | ---: |
+| L60 | 0.92732 s | 0.92407 s | M+T: 0.95633 s |
+| L80 | 1.03327 s | 1.03378 s | M: 1.04356 s |
+| H100 | 1.20523 s | 1.20822 s | M+T: 1.22050 s |
+
+All T conditional paired timing-block intervals include parity. The controller's
+50 ms exit polling also limits small differences. **No convincing new cold-CLI
+gain is established.** Extra preparation loses on these short calls. Observed
+cold CPU is roughly 5.6/6.2/7.6 seconds; conservative charges retain unpublished
+startup/helper/shutdown CPU. Separate parent/worker high-water observations are
+about 80 MB and 613–623 MB summed worker HWMs; these are not simultaneous aggregate
+RSS. Owned reservations span 1.80–1.93 GB within the 4 GiB executor ceiling, plus
+128 MiB controller ownership. Warm reuse eliminates measured index rebuilding.
+
+An eight-call ECM-only first/complete pilot validates certified outputs and
+unresolved reconstruction. Both arms complete the 10-/70-digit 80-digit fixture
+in about 0.49 s. Both exhaust the exposed 18-/42-digit 60-digit search without a
+split. These single observations establish no complete-factor gain; SIQS/SSS
+are explicitly disabled, so this is not unchanged-production-fallback evidence.
+
+All 161 runtime cells validate and drain. A separately frozen 512-curve probe is
+refused before worker launch: its checkpoint needs 4,423,680 bytes against 4 MiB
+funded. This preparation error retains its full 35-wall/240-CPU grant; five later
+cells remain NOT RUN. A future resource-valid freeze needs at least 5 MiB and
+must reprice simultaneous checkpoint ownership before a new finite allocation.
+The earlier failed focused schema check also stays retained/full charged.
+
+New-phase maximum booking is 1,075.20 wall / 11,635.99 CPU seconds within the
+1,800 / 12,000 envelope, separately from all previous phases. Observed QA/runtime
+CPU lower bounds are about 166/3,861 seconds; helper publication remains incomplete.
+No calibrated engagement rule, default adoption, merge, B12/F4 closure or E1.
+Larger-quota amortization, matched production complete CLI, balanced 60/70 controls,
+uniform random panels and fresh independent-input confirmation remain pending.
+Detailed freezes, receipts, report and handoff: `v2/audit/b12_f4/headroom_impl_v2/`.
+
 ## B12/F4 complete capture and current-source headroom audit (4 November 2026)
 
 The initial 62 CPU profiles and 83 heap dumps all had prior parsed summaries;

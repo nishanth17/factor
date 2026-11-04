@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 checked worker fast paths (4 November 2026)
+
+- Add opt-in prospective work accounting, bounded immutable stage-two indices,
+  compatible context binding and singleton-tail packet scheduling. Preserve exact
+  arithmetic, mathematical v1 identities and accepted serial PRAC eligibility.
+- Avoid per-group cached-index copies. Charge preparation and scratch, retain
+  finite cache prefixes, and use exact existing paths on refusal/recovery.
+  Resource/checkpoint v6 rejects older resource identities; defaults stay off.
+- Add independent traversal/term/budget oracles, interrupted/refused preparation,
+  schema/version checks and real spawn/drained restart tests. Full committed QA
+  passes 1,046 tests (9 optional skips) and lint.
+- Record warm component gains alongside inconclusive fresh CLI comparisons,
+  incomplete factoring outcomes and the stopped larger-quota checkpoint refusal.
+  No complete-factor speedup, engagement/default adoption or B12/F4 closure.
+
 ## B12/F4 bounded reuse and worker imports (4 November 2026)
 
 - Add opt-in, separately funded decoded and compact metadata retention for
