@@ -122,7 +122,7 @@ class ArithmeticWorkerTests(unittest.TestCase):
 
     def test_setup_factor_retry_both_stages_and_saturation(self):
         engine = CurveEngine()
-        config = configuration()
+        config = configuration(gcd_batch=2)
         plan = Manifest(
             35, 7919, "setup", arithmetic_options(config, WorkerSettings())
         )

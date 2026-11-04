@@ -90,7 +90,7 @@ class PollingAndCacheTests(unittest.TestCase):
     ):
         settings = WorkerSettings(metadata_slots=2, decoded_cache_bytes=65536)
         engine = CurveEngine(settings)
-        config = configuration()
+        config = configuration(ecm_program_bytes=65536)
         first = Manifest(1000003, 7, "a", arithmetic_options(config, settings))
         second = Manifest(10000019, 7, "b", first.options)
         for plan in (first, second, first):
