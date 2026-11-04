@@ -38,6 +38,41 @@ class ActionBudget(Budget):
         self.until_poll -= 1
 
 
+class ProspectiveActionBudget(ActionBudget):
+    """Same checked contract with one prospective exact work sum."""
+
+    def consume(self, amount=1):
+        integer(amount, "atomic work")
+        prospective_used = self.used + amount
+        if self.until_poll <= 0 or prospective_used > self.work_limit:
+            Budget.consume(self, amount)
+            self.until_poll = self.poll_every
+        else:
+            self.used = prospective_used
+        self.until_poll -= 1
+
+
+class BoundContext:
+    """Bind compatible schedule references once; never retain curve state."""
+
+    def __init__(self, source):
+        from ..ecm import core
+
+        self.source = source
+        self.segment_size = source.segment_size
+        self.base_primes = source.base_primes
+        self.chains = getattr(source, "chains", None)
+        self.program_segment = getattr(source, "program_segment", None)
+        self.power_values = getattr(source, "power_values", None)
+        self.prime_segment = getattr(source, "prime_segment", None)
+        self.point_add = getattr(source, "point_add", core.point_add)
+        self.point_double = getattr(source, "point_double", core.point_double)
+        self.stage_two_schedule = getattr(source, "stage_two_schedule", None)
+
+    def __getattr__(self, name):
+        return getattr(self.source, name)
+
+
 class DecodedPrograms:
     """Bounded immutable prime/power tuples shared only inside one worker.
 

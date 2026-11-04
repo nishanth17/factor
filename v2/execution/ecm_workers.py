@@ -50,6 +50,11 @@ def arithmetic_options(config, settings):
         and settings.packed_cache_bytes < 4096 + 256 * selected.segment_size
     ):
         raise MemoryError("packed worker cache scratch refused")
+    if (
+        settings.stage_two_cache_bytes
+        and settings.stage_two_cache_bytes < 4096 + 256 * selected.segment_size
+    ):
+        raise MemoryError("stage-two worker cache scratch refused")
     return asdict(selected)
 
 
@@ -149,6 +154,10 @@ class ECMExecutor:
             "decode_hits",
             "decode_misses",
             "decode_refusals",
+            "stage_two_hits",
+            "stage_two_misses",
+            "stage_two_refusals",
+            "stage_two_build_bytes",
             "manifest_cache_hits",
             "manifest_cache_misses",
         ):
@@ -672,6 +681,10 @@ class ECMExecutor:
             "decode_hits",
             "decode_misses",
             "decode_refusals",
+            "stage_two_hits",
+            "stage_two_misses",
+            "stage_two_refusals",
+            "stage_two_build_bytes",
         )
         serial_before = {
             key: getattr(self.serial_engine, key, 0) for key in counter_names
@@ -729,6 +742,10 @@ class ECMExecutor:
                 "decode_hits",
                 "decode_misses",
                 "decode_refusals",
+                "stage_two_hits",
+                "stage_two_misses",
+                "stage_two_refusals",
+                "stage_two_build_bytes",
             ):
                 value = integer(message.get(key, 0), key)
                 previous = slot["counters"].get(key, 0)
@@ -1043,6 +1060,12 @@ class ECMExecutor:
         limit = min(
             self.settings.packet_curves, max(1, (count + peers - 1) // peers)
         )
+        if (
+            not serial
+            and self.settings.packet_policy == "tail_one"
+            and count <= 2 * self.settings.workers
+        ):
+            limit = 1
         remaining_cpu = ledger.cpu_limit - ledger.cpu - ledger.parent_cpu
         # Pending leases must leave CPU for polling, validation and draining.
         # This is withheld capacity, not a charge; actual parent CPU is charged

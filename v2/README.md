@@ -139,7 +139,7 @@ The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
 slot/count/order; it differs from the incumbent shared RNG stream. The extended
-wire/executor/checkpoint contract is `b12-f4-v5`; v1/v2/v3/v4 checkpoints are rejected.
+wire/executor/checkpoint contract is `b12-f4-v6`; v1/v2/v3/v4/v5 checkpoints are rejected.
 Pinned older sources remain available for those checkpoints. Version 3 fixes
 JSON position-key hashing and withholds CPU for parent progress. Counts above
 ten explicitly oversubscribe this M4; support does not establish a useful count.
@@ -160,6 +160,28 @@ the already-verified early-reduction point kernels for baby/giant steps. Default
 remain `"portfolio"` and `"legacy"`; numerical schedules, curve streams, stage-one
 eligibility and modulus-dependent state ownership stay unchanged. These choices
 require separate complete-cost calibration; they are not automatic defaults.
+
+Optional worker settings `budget_mode="prospective"`, `bind_context=True` and
+`stage_two_cache_bytes` (0–16 MiB) are headroom candidates, with defaults
+`"legacy"`, `False` and zero. The prospective budget preserves every exact work
+check and the existing clock/cancellation cadence. Binding retains compatible
+schedule references once per context, never curve state; 4 KiB per context is
+separately reserved. The stage-two cache owns a funded prefix of immutable baby
+indices and giant-group ends, with `4096 + 256 * segment_size` scratch and a
+4,096-block ceiling. Unfunded scratch refuses before dispatch; full retention
+falls back to the original continuation. Compilation checks cancellation every
+256 primes and publishes only complete blocks. Each giant action, term order,
+GCD batch and recovery path is preserved. Direct-scalar/paired/wheel paths keep
+their existing implementation. Global serial execution is unchanged.
+
+`packet_policy="tail_one"` optionally uses singleton packets when remaining
+ready quota is at most twice the worker count; `"fixed"` remains the default.
+Packet sizes 1–4 retain per-job leases and bounded frames/results. New stage-two
+hit/miss/refusal counters and `stage_two_build_bytes` are cumulative preparation
+observations. Build bytes include repeated allocations after context replacement;
+they are not live memory or aggregate RSS. All flags bind the v6 executor/cost
+identity; mathematical v1 manifests and curve streams remain unchanged. These
+options need matched complete-cost evidence and are not adopted defaults.
 
 ECM draws do not move later fallback seeds within the opt-in semantics. Sigma
 collisions are retained; distinct IDs do not prove independence. First-factor

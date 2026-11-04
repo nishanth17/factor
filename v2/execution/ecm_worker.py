@@ -50,13 +50,17 @@ class CurveEngine:
         self.contexts = OrderedDict()
         self.preparations = self.cache_hits = self.cache_evictions = 0
         self.decode_hits = self.decode_misses = self.decode_refusals = 0
+        self.stage_two_hits = self.stage_two_misses = (
+            self.stage_two_refusals
+        ) = 0
+        self.stage_two_build_bytes = 0
 
     def _prepare(self, message, budget):
         if self.settings.worker_imports == "ecm":
             from .portfolio_config import PortfolioConfig, _execution_context
         else:
             from ..portfolio import PortfolioConfig, _execution_context
-        from .ecm_worker_state import DecodedPrograms
+        from .ecm_worker_state import BoundContext, DecodedPrograms
 
         identity = message["schedule"]
         options = message.get("options")
@@ -98,6 +102,15 @@ class CurveEngine:
 
                 active = programs or context
                 active.point_add, active.point_double = point_add, point_double
+            if self.settings.stage_two_cache_bytes:
+                from .ecm_stage_two import StageTwoSchedule
+
+                active = programs or context
+                active.stage_two_schedule = StageTwoSchedule(
+                    active.segment_size, self.settings.stage_two_cache_bytes
+                )
+            if self.settings.bind_context:
+                programs = BoundContext(programs or context)
             self.contexts[identity] = (config, context, programs)
             self.preparations += 1
         self.identity = identity
@@ -105,14 +118,19 @@ class CurveEngine:
 
     def execute(self, message, *, cancelled, previous_cpu=None):
         from .budget import BudgetExhaustedError
-        from .ecm_worker_state import ActionBudget
+        from .ecm_worker_state import ActionBudget, ProspectiveActionBudget
         from .stage_jobs import advance_job, new_job, prime_cursor
 
         assignment = message["assignment"]
         stage = message.get("stage", "curve")
         if stage not in ("curve", "stage_one", "stage_two"):
             raise ValueError("invalid worker stage")
-        budget = ActionBudget(
+        budget_type = (
+            ActionBudget
+            if self.settings.budget_mode == "legacy"
+            else ProspectiveActionBudget
+        )
+        budget = budget_type(
             poll_every=self.settings.poll_every,
             work_limit=message["work"],
             seconds=max(0, message["deadline"] - time.monotonic()),
@@ -131,6 +149,8 @@ class CurveEngine:
         reason, failure, residue = "complete", None, None
         boundary_hash = None
         tracked, before_decode = None, (0, 0, 0)
+        schedule, before_stage_two = None, (0, 0, 0, 0)
+        advance = advance_job
         try:
             budget.poll()
             self._prepare(message, budget)
@@ -141,6 +161,17 @@ class CurveEngine:
                     tracked.misses,
                     tracked.refusals,
                 )
+            if self.settings.stage_two_cache_bytes:
+                from .ecm_stage_two import advance_prepared_job
+
+                schedule = (self.programs or self.context).stage_two_schedule
+                before_stage_two = (
+                    schedule.hits,
+                    schedule.misses,
+                    schedule.refusals,
+                    schedule.build_bytes,
+                )
+                advance = advance_prepared_job
             if stage == "stage_two":
                 budget.consume(self.settings.residue_bytes)
                 boundary = checked_residue(
@@ -182,7 +213,7 @@ class CurveEngine:
                     )
                     reason = "boundary"
                     break
-                advance_job(
+                advance(
                     job, budget, self.programs or self.context, self.config
                 )
             # Real checks always precede a factor or boundary publication.
@@ -204,6 +235,13 @@ class CurveEngine:
             self.decode_hits += tracked.hits - before_decode[0]
             self.decode_misses += tracked.misses - before_decode[1]
             self.decode_refusals += tracked.refusals - before_decode[2]
+        if schedule is not None:
+            self.stage_two_hits += schedule.hits - before_stage_two[0]
+            self.stage_two_misses += schedule.misses - before_stage_two[1]
+            self.stage_two_refusals += schedule.refusals - before_stage_two[2]
+            self.stage_two_build_bytes += (
+                schedule.build_bytes - before_stage_two[3]
+            )
         result = dict(
             id=assignment["id"],
             token=message["token"],
@@ -226,6 +264,10 @@ class CurveEngine:
             decode_hits=self.decode_hits,
             decode_misses=self.decode_misses,
             decode_refusals=self.decode_refusals,
+            stage_two_hits=self.stage_two_hits,
+            stage_two_misses=self.stage_two_misses,
+            stage_two_refusals=self.stage_two_refusals,
+            stage_two_build_bytes=self.stage_two_build_bytes,
         )
         if boundary_hash is not None:
             result["boundary_sha256"] = boundary_hash

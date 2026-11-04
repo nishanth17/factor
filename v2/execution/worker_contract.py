@@ -8,7 +8,7 @@ import struct
 from dataclasses import asdict, dataclass
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v5"
+VERSION = "b12-f4-v6"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -67,6 +67,10 @@ class WorkerSettings:
     manifest_cache_bytes: int = 0
     worker_imports: str = "portfolio"
     stage_two_kernel: str = "legacy"
+    stage_two_cache_bytes: int = 0
+    budget_mode: str = "legacy"
+    bind_context: bool = False
+    packet_policy: str = "fixed"
     stage_policy: str = "whole"
     residue_capacity: int = 16
     residue_bytes: int = 8192
@@ -109,6 +113,13 @@ class WorkerSettings:
         integer(self.decoded_cache_bytes, "decoded cache", 0, 16 * 2**20)
         integer(self.packed_cache_bytes, "packed cache", 0, 16 * 2**20)
         integer(self.manifest_cache_bytes, "manifest cache", 0, 16 * 2**20)
+        integer(self.stage_two_cache_bytes, "stage-two cache", 0, 16 * 2**20)
+        if self.budget_mode not in ("legacy", "prospective"):
+            raise ValueError("unknown worker budget mode")
+        if type(self.bind_context) is not bool:
+            raise ValueError("context binding must be Boolean")
+        if self.packet_policy not in ("fixed", "tail_one"):
+            raise ValueError("unknown packet policy")
         if self.worker_imports not in ("portfolio", "ecm"):
             raise ValueError("unknown worker import path")
         if self.stage_two_kernel not in ("legacy", "reduced"):
@@ -144,6 +155,8 @@ class WorkerSettings:
                 self.worker_memory
                 + self.decoded_cache_bytes
                 + self.packed_cache_bytes
+                + self.stage_two_cache_bytes
+                + 4096 * self.bind_context
             )
             + self.worker_memory  # Possible runtime-managed spawn helper.
             + self.workers
@@ -642,6 +655,10 @@ class Search:
             "decode_hits",
             "decode_misses",
             "decode_refusals",
+            "stage_two_hits",
+            "stage_two_misses",
+            "stage_two_refusals",
+            "stage_two_build_bytes",
         }
         limit = RESULT_BYTES + (
             self.settings.residue_bytes
@@ -665,6 +682,10 @@ class Search:
             "decode_hits",
             "decode_misses",
             "decode_refusals",
+            "stage_two_hits",
+            "stage_two_misses",
+            "stage_two_refusals",
+            "stage_two_build_bytes",
         ):
             if key in message:
                 integer(message[key], key)
