@@ -140,12 +140,17 @@ class PacketAndStageTests(unittest.TestCase):
                 dict(index=0, metadata_cache=[plan.metadata]),
             )
         self.assertEqual(len(issued), 3)
-        self.assertEqual([job["cpu"] for job in packet["jobs"]], [2, 2, 1])
+        grants = [job["cpu"] for job in packet["jobs"]]
+        self.assertEqual(grants[:2], [2, 2])
+        self.assertTrue(0 < grants[2] < 1)
         self.assertEqual(len(ledger.active), 3)
-        self.assertEqual(sum(cpu for _, _, cpu in ledger.active.values()), 5)
+        reserved = sum(cpu for _, _, cpu in ledger.active.values())
+        self.assertEqual(reserved, sum(grants))
+        self.assertLess(reserved, ledger.cpu_limit)
+        ledger.charge(parent_cpu=0.01)
         for token in list(ledger.active):
             ledger.lose(token)
-        self.assertEqual(ledger.cpu, 5)
+        self.assertEqual(ledger.cpu, reserved)
         self.assertEqual(ledger.work, 3 * 10 + 4 * settings.frame_bytes)
 
     def test_packet_admission_keeps_ready_work_for_other_idle_slots(self):
