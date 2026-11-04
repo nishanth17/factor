@@ -53,6 +53,31 @@ def validate_reconstruction(row):
             raise ValueError("first-factor result has no split")
 
 
+def summarize_stages(events, dropped, seconds):
+    """Use existing bounded events; missing attribution remains unknown."""
+    ecm = [event for event in events
+           if event.get("stage") in ("ecm", "ecm_workers")]
+    success = any(event.get("outcome") in ("factor", "factor_found")
+                  for event in ecm)
+    engaged = any(event.get("stats", {}).get("engaged") for event in ecm)
+    return dict(
+        ecm_reached=bool(ecm) or any(
+            key.startswith("ecm") and value > 0
+            for key, value in seconds.items()
+        ),
+        ecm_success="success" if success else "unknown" if dropped else "none",
+        engaged=True if engaged else None if dropped else False,
+        fallback_reached=any(
+            event.get("stage") in ("siqs", "sss") for event in events
+        ) or any(
+            key.startswith(("siqs", "sss")) and value > 0
+            for key, value in seconds.items()
+        ),
+        dropped_events=dropped,
+        coarse_stage_seconds=seconds,
+    )
+
+
 def child(request_path, source_root):
     """Measure cold CLI or repeated calls with one retained executor."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -121,6 +146,10 @@ def child(request_path, source_root):
             seconds=min(remaining_wall, call_seconds),
             cpu_seconds=remaining_cpu,
         )
+        before_executor_work = (
+            0 if executor is None
+            else executor.lifetime_stats.get("charged_work", 0)
+        )
         started = time.monotonic()
         kwargs = {} if executor is None else {"ecm_executor": executor}
         run = factorize_bounded(
@@ -157,7 +186,15 @@ def child(request_path, source_root):
             seconds=duration,
             work=budget.used,
             charged_child_cpu=budget.prior_cpu,
-            executor_stats={} if executor is None else dict(executor.last_stats),
+            executor_stats={}
+            if executor is None or executor.lifetime_stats.get(
+                "charged_work", 0
+            ) == before_executor_work
+            else dict(executor.last_stats),
+            stage_summary=summarize_stages(
+                run.events, run.dropped_events,
+                run.checkpoint["payload"]["state"]["stage_seconds"],
+            ),
         )
         validate_reconstruction(row)
         return row

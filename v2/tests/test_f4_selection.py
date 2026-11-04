@@ -10,7 +10,10 @@ from v2.benchmarks.ecm.b12_f4.selection import (
     regime_key,
     shortlist,
 )
-from v2.benchmarks.ecm.b12_f4.selection_child import validate_reconstruction
+from v2.benchmarks.ecm.b12_f4.selection_child import (
+    summarize_stages,
+    validate_reconstruction,
+)
 from v2.benchmarks.ecm.b12_f4.selection_inputs import (
     smaller_sizes,
     uniform_panel,
@@ -59,7 +62,7 @@ class SelectionTests(unittest.TestCase):
             dict(count=8, seconds=0.01, status="censored"),
             dict(count=16, seconds=0.001, status="recorder_failure"),
         ]
-        result = shortlist(rows, maximum=2)
+        result = shortlist(rows, target=2)
         self.assertEqual(result[0]["count"], 4)
         self.assertIn(0, [row["count"] for row in result])
         self.assertNotIn(8, [row["count"] for row in result])
@@ -70,8 +73,15 @@ class SelectionTests(unittest.TestCase):
             dict(count=count, seconds=seconds, status="ok")
             for count, seconds in [(0, 10), (4, 2), (6, 1), (8, 2)]
         ]
-        result = shortlist(rows, maximum=1)
+        result = shortlist(rows, target=1)
         self.assertEqual({row["count"] for row in result}, {0, 4, 6, 8})
+
+    def test_near_ties_are_not_truncated_at_the_screen_target(self):
+        rows = [
+            dict(count=count, seconds=1 + index / 1000, status="ok")
+            for index, count in enumerate((0, 1, 2, 4, 6, 8, 10, 12, 14, 16))
+        ]
+        self.assertEqual(len(shortlist(rows, target=2)), 10)
 
     def test_invalid_timings_and_boolean_counts(self):
         for value in (0, -1, math.inf, math.nan):
@@ -102,8 +112,26 @@ class InputPlanTests(unittest.TestCase):
         self.assertEqual({row["n"] % 2 for row in rows}, {0, 1})
         self.assertEqual({row["digits"] for row in rows},
                          {30, 40, 50, 60, 70, 80, 100})
-        self.assertTrue(all(len(str(row["n"])) == row["digits"] for row in rows))
+        self.assertTrue(
+            all(len(str(row["n"])) == row["digits"] for row in rows)
+        )
         self.assertEqual(len(rows), 52)
+
+
+class StageAttributionTests(unittest.TestCase):
+    def test_dropped_trace_does_not_become_no_ecm_success(self):
+        result = summarize_stages([], 10, {"ecm": 0.1})
+        self.assertTrue(result["ecm_reached"])
+        self.assertEqual(result["ecm_success"], "unknown")
+        self.assertIsNone(result["engaged"])
+
+    def test_success_and_fallback_are_independent_of_trace_tail(self):
+        events = [dict(stage="ecm_workers", outcome="factor_found",
+                       stats=dict(engaged=True))]
+        result = summarize_stages(events, 10, {"siqs": 1})
+        self.assertEqual(result["ecm_success"], "success")
+        self.assertTrue(result["engaged"])
+        self.assertTrue(result["fallback_reached"])
 
 
 class RawResultTests(unittest.TestCase):

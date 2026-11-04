@@ -59,13 +59,14 @@ def matched_ratio(candidate, control, *, seed=20261108, draws=4000):
     )
 
 
-def shortlist(rows, *, maximum=4, relative_band=0.15):
+def shortlist(rows, *, target=4, relative_band=0.15):
     """Keep fast candidates and adjacent counts for interaction checking.
 
+    Near ties expand beyond the target rather than being silently truncated.
     Three-sample screens cannot justify tight statistical elimination. Failed
     and censored candidates remain explicit, never fast successful medians.
     """
-    if type(maximum) is not int or not 1 <= maximum <= 16:
+    if type(target) is not int or not 1 <= target <= 16:
         raise ValueError("finite shortlist size required")
     if not 0 <= relative_band <= 1:
         raise ValueError("invalid exploration band")
@@ -87,12 +88,13 @@ def shortlist(rows, *, maximum=4, relative_band=0.15):
         return []
     ranked = sorted(valid, key=lambda row: (row["seconds"], row["count"]))
     best = ranked[0]
-    winners = [best]
-    for row in ranked[1:]:
-        if row["seconds"] <= best["seconds"] * (1 + relative_band):
+    winners = [
+        row for row in ranked
+        if row["seconds"] <= best["seconds"] * (1 + relative_band)
+    ]
+    for row in ranked[:target]:
+        if row not in winners:
             winners.append(row)
-        if len(winners) >= maximum:
-            break
     count_position = WORKER_COUNTS.index(best["count"])
     neighbors = WORKER_COUNTS[
         max(0, count_position - 1) : count_position + 2
