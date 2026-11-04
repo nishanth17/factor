@@ -375,6 +375,7 @@ class ConfigurationCompatibilityTests(unittest.TestCase):
         self,
     ):
         from dataclasses import asdict
+
         from v2.execution.portfolio_config import _decode_siqs_config
         from v2.portfolio import PortfolioConfig
         from v2.qs import SIQSConfig
