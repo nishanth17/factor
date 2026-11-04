@@ -1,5 +1,29 @@
 # Benchmark results and decisions
 
+## B12/F4 runtime QA and initial process screen (3 November 2026)
+
+Runtime source `8a2bff7` passes 987 tests (9 optional skips), full lint and
+committed-only validation. The exposed 60/80-digit, ten-digit-smaller-factor
+screen uses eight curves at `(2000,147396)`. All cells complete; M0/S1/P2/P4
+retain identical curves/results and full-tier PRAC/program eligibility.
+
+One corrected cold CLI observation at 60 digits: S0 0.294 s, equivalent-manifest
+M0 0.298 s, S1 0.507 s, P2 0.456 s, P4 0.457 s. S0 uses different serial seeds.
+Separate warmed library calls were 0.0606/0.0374/0.0248 s for S1/P2/P4 after
+validated retained-context warmup. Pure warm dispatch overhead and warm M0
+remain unmeasured. This short prefix does not justify cold worker engagement;
+warm scaling warrants targeted calibration, without adopting a count/threshold.
+These single observations establish no speedup, complete-factorization benefit,
+median/p90 or balanced-tail acceptance. Production defaults remain unchanged.
+
+The first cold endpoint omitted external decoding/validation. Its freeze and
+charges remain; a tested correction and separate five-arm cold freeze include
+those costs. Earlier QA fixture/pin failures are retained. Historical A7 arms
+remain intact through new chained source manifests. Local evidence and next
+steps: `v2/audit/b12_f4/RUNTIME_REPORT.md` and `RUNTIME_HANDOFF.md`. No B–E or E1
+campaign, wider-worker run, merge or push accompanies this screen.
+
+
 These are scoped historical observations, not runtime guarantees or a list of
 new experiments. [STATUS](../STATUS.md) records current automatic routing and
 its evidence limits. Use the [runner guide](README.md) for reproduction and

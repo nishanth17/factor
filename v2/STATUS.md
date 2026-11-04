@@ -178,17 +178,14 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 branch preparation adds opt-in bounded ECM processes and a prospective
-protocol from committed `066456a`; runtime arithmetic/process/full-checkout QA
-and all measurements remain NOT RUN. No worker/default adoption or task closure.
-Local handoff: `v2/audit/b12_f4/HANDOFF.md`. C9a retains the performance window.
-
-The worker follow-up implements optional bounded packets, polling, metadata
-reuse, pool-wide drain/close and checked stage-boundary queues.
-Separate task ownership does not require standalone speedup studies before
-combining correct mechanisms.
-Local follow-up: `v2/audit/b12_f4/OPTIMIZATION_FOLLOWUP.md`; current interface
-and pending QA: `v2/audit/b12_f4/GAPS_HANDOFF.md`. All runtime checks remain queued.
+B12/F4 runtime source `8a2bff7` passes 987 committed-checkout tests (9 optional
+skips), full lint and the initial bounded 1/2/4-worker screen. Cheap cold
+8-curve calls remain better served serially in the exploratory panel; retained
+pool scaling needs warm-serial and larger-work calibration before selecting a
+count/engagement rule. Production defaults and B12/F4 open status are unchanged.
+See [scoped observations](benchmarks/RESULTS.md#b12f4-runtime-qa-and-initial-process-screen-3-november-2026)
+and local `v2/audit/b12_f4/RUNTIME_HANDOFF.md`. C9a's release was explicitly
+confirmed; all runtime work used the shared lock and has stopped.
 
 ## Known gaps and unresolved conflicts
 

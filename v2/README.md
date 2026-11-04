@@ -82,8 +82,8 @@ Research and detailed journals remain local under `audit/` and `local/`.
 
 `v2.execution.ecm_workers.ECMExecutor` is an opt-in context for independent
 curves using explicit `spawn` and PyPy implementing Python 3.11. This preparation
-has not passed runtime arithmetic, multiprocessing or complete-checkout QA and
-has no performance result. Automatic routing and worker defaults are unchanged.
+passes runtime arithmetic, multiprocessing and committed-checkout QA on the
+current PyPy/macOS build. Initial scaling observations remain exploratory. Automatic routing and worker defaults are unchanged.
 
 The component accepts a resolved `PortfolioConfig`, a finite `Budget`, an
 original/cofactor lineage string and an optional drained checkpoint. It returns
@@ -120,7 +120,8 @@ fresh CLI measurements after runtime admission.
   ownership. This adds no wider-worker experiment allocation or automatic count.
 
 Defaults remain one job/packet, polling every action, one metadata context,
-no decoded cache and whole curves. These are unmeasured candidates. Full-tier
+no decoded cache and whole curves. These remain opt-in candidates; only the reference worker configuration has
+initial scaling observations. Full-tier
 PRAC eligibility remains intact; extra caches are separately funded rather than
 shrinking arithmetic ownership. Metadata replaces/evicts before new allocation;
 curve points never enter its cache. Every new process begins with empty caches.
@@ -152,7 +153,7 @@ attempt cap is per curve-stage (maximum three), with at most 32 drained runs per
 cofactor. Canonical residues bind identity, sigma, bounds, point and curve
 parameter with a digest and range/unitness checks. These checks detect malformed
 transport/state; they do not independently recompute stage one. Arithmetic
-oracles and real-process validation remain queued. Acknowledgements become
+oracles and selected real-process cases pass; broader performance gates remain. Acknowledgements become
 durable only when the caller atomically saves the returned checkpoint.
 
 Missing reports consume full leases, including queued packet jobs. Work units,

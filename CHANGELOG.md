@@ -3,6 +3,15 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 runtime QA and initial screen (3 November 2026)
+
+- Pass 987 committed-checkout tests (9 optional skips), full lint and bounded
+  startup/fixed-work/cold/warm screens; preserve failed QA receipts and charges.
+- Correct two test fixtures, add chained A7 compatibility source identities,
+  and include external result validation in the cold CLI measurement endpoint.
+- Retain serial defaults: cold startup dominates the short screened prefix;
+  warm scaling remains exploratory with engagement calibration pending.
+
 ## B12/F4 experimental preparation (3 November 2026)
 
 - Add an opt-in spawn executor for independent ECM curves, versioned manifests,
