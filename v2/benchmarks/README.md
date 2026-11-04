@@ -155,3 +155,11 @@ instrumented arms from selection. Repeated timings on one modulus do not create
 independent inputs or establish a portfolio optimum. `profile_runner.py` requires
 an inherited held performance-lock descriptor; observers and clean timings have
 separate identities. Detailed local CPU/heap findings: `audit/b12_f4/profiles-v1/`.
+
+`ecm/b12_f4/kernel_replay.py` compares selected GCD/segment/kernel settings on
+common explicit curve seeds while binding replay IDs to both configurations.
+It is a separate diagnostic contract, preserving the production RNG stream.
+`parent_profile.py` records bounded coarse inclusive/exclusive times for parent
+planning and repeated metadata work; compare its observer cost on identical
+work before interpreting it. Instrumented times are not performance evidence.
+Both tools require a held inherited performance lock and frozen finite requests.
