@@ -3,6 +3,19 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 wider-worker contracts and diagnostics (4 November 2026)
+
+- Permit explicit, funded spawn configurations through 16 workers, retaining
+  serial automatic defaults. Counts above ten are oversubscription experiments.
+- Version the resource/checkpoint contract as v3 while preserving mathematical
+  v1 curve identities. Normalize durable position keys before hashing and reject
+  noncanonical aliases; retain old source pins rather than migrating checkpoints.
+- Leave CPU for parent publication when issuing process leases, and expose the
+  actual traversal termination reason even when an earlier factor was found.
+- Add bounded CPU, GC, heap and RSS diagnostics, independent result oracles and
+  cold/warm worker-count analysis. Full committed runtime QA passes on `a32b9f0`;
+  wider scaling remains exploratory and B12/F4 remain open.
+
 ## B12/F4 larger-work headroom screen (4 November 2026)
 
 - Add a pure receipt analyser with independent corruption/coverage tests.

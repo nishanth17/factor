@@ -147,3 +147,11 @@ explicit per-cell `settings`/`rule` overrides from a later pinned freeze;
 counts still require explicit settings and a separately funded protocol.
 `inputs/controls/b12_f4_options_preparation.json` is prospective and cannot be
 executed by the runner. Runtime Q precedes any option comparison.
+
+`python -m v2.benchmarks.ecm.b12_f4.worker_sweep RECEIPT_DIRECTORY --output FILE`
+keeps cold CLI lifetime and warm per-call results separate when selecting
+exploratory count nominees. It retains failed/censored rows and excludes
+instrumented arms from selection. Repeated timings on one modulus do not create
+independent inputs or establish a portfolio optimum. `profile_runner.py` requires
+an inherited held performance-lock descriptor; observers and clean timings have
+separate identities. Detailed local CPU/heap findings: `audit/b12_f4/profiles-v1/`.
