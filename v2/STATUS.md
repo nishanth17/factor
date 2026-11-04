@@ -1,7 +1,8 @@
 # Factor status
 
 Last updated: 4 November 2026 (America/Los_Angeles). Reviewed mainline:
-`7a3ca71c435bd5c5967da5737af728aa5b9bfb01`.
+`963d9cd8dd4f8a99c5ec8d093b0c28bad080ba2d`; acceleration-first planning revision
+changes no implementation, defaults or active experimental grants.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -102,16 +103,40 @@ No other ongoing work is inferred from an old preparation note.
 
 ## Next eligible items
 
-The [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost) is the
-single preparation order: C3a/C11, ongoing B12/F4, A7a, C9b, B4a, A1d, B3a,
-F3, A1c/B5/B5a, then its remaining triggered rows. It is an expected-benefit
-judgment, not measured gains or permission to start a campaign.
+The [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost) now
+prioritizes current acceleration and shorter later experiment turnaround:
 
-A7a processes can prepare independently of B5a native packets; native threads
-remain a conditional alternative. C9b owns current timing/headroom, preserving
-closed C9a results and existing mechanism owners. Correctness/accounting repairs,
-C10a-06 and requested B14 certification take precedence. E1 remains Deferred;
-later integrated portfolio tuning retains its prerequisites.
+1. **B12/F4:** finish the active ECM worker stream — Sol / xhigh.
+2. **A7a:** current-collector parallel QS preparation — Sol / xhigh.
+3. **B4a:** coarse ECM C/CFFI, then selected native SIMD/threads — Sol / xhigh;
+   separately selected new arithmetic proofs retain Astra / xhigh.
+4. **B5a:** QS C/CFFI and ARM NEON, with A1c/B5 controls — Sol / xhigh.
+5. **E6:** bundled native prime batches/reusable-context opportunity screen —
+   Sol / high screen, Sol / xhigh ABI and implementation.
+6. **E4/A10a/A2a/C5:** selected native helper/SIMD opportunity screens —
+   Sol / high attribution, Sol / xhigh selected native work; existing new-math
+   Astra assignments remain.
+7. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
+   Sol / xhigh. Reuse accelerator receipts rather than repeating broad studies.
+
+Then A1d, B3a, F3, broader C9b and the remaining ranked rows. F3 is the first
+substantial Astra / xhigh algorithmic research choice; a concrete opportunity
+can start before every conditional native port is settled.
+
+A7a can prepare alongside B12 with pinned shared contracts; timed execution
+uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
+saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
+Ranks 5–6 are conditional screens, not a requirement to port all helpers.
+Parallel latency gains do not imply lower CPU cost or higher batch throughput;
+native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
+this priority increase. Small cost/A/A checks belong in each task; C9b is not
+a gate on preparation. The local pressure test is
+`v2/audit/research/acceleration_priority_20261104.md`.
+
+This order is an expected-benefit judgment, not measured gains or campaign
+authorization. Correctness/accounting repairs, C10a-06 and requested B14 proof
+work take precedence. E1 remains Deferred and integrated tuning retains its
+prerequisites. Closed C9a/C10a-01 evidence and active grants are unchanged.
 
 ## Known gaps and unresolved conflicts
 
