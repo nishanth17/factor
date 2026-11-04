@@ -2,25 +2,32 @@
 
 QS/MPQS, self-initializing quadratic sieve (SIQS), experimental Smooth Subsum
 Search (SSS/SSSf), and shared relation/filtering/extraction machinery for
-PyPy implementing Python 3.11.
+PyPy implementing Python 3.11. The Python-integer backend needs no third-party
+packages.
 
-## Choose a route
+## Setup and run
+
+Run from the repository root with a PyPy installation implementing Python 3.11:
+
+```sh
+make -C v2 runtime
+pypy3 -m v2.factor 626100403 --method siqs --bounded --seed 7 \
+  --work-limit 2000000 --seconds 30 --cpu-seconds 30
+pypy3 -m v2.factor --help
+```
 
 | Engine | Role |
 | --- | --- |
 | QS | Fixed-polynomial reference collector |
-| MPQS | Multiple independently chosen polynomials, including external-square coefficients |
+| MPQS | Independent polynomials, including external-square coefficients |
 | SIQS | CRT/Gray families, reused roots and shared verified relations |
 | SSS | CRT collision candidates and exact smoothness recovery |
 | SSSf | SSS with an optional lossy candidate filter |
 
-The CLI exposes `--method qs|mpqs|siqs|sss|sssf` and `--siqs` portfolio fallback.
-Native omitted configurations also enable automatic SIQS in the scoped bands
-shown in [STATUS](../STATUS.md#current-automatic-defaults). Double-large-prime
-collection is implemented; worker export and SSS support retain their narrower
-contracts. GNFS remains deferred roadmap work.
+The CLI accepts `--method qs|mpqs|siqs|sss|sssf`; `--siqs` enables portfolio
+fallback. See the [CLI guide](../docs/CLI.md) for resource and checkpoint flags.
 
-## Run a job
+For a bounded library job:
 
 ```python
 from v2.execution.budget import Budget
@@ -37,153 +44,51 @@ assert (result.divisor or 1) * result.cofactor == n
 print(result.reason)
 ```
 
-A job returns a split/cofactor result; recursive terminal classification belongs
-to [`factorize_bounded`](../docs/API.md). `QSJob` works on an explicit polynomial
-and signed half-open window. `SIQSConfig(mode="qs")` or `mode="mpqs"` selects reference
-controls through the SIQS job interface.
+Jobs return a split and remaining cofactor. Recursive terminal classification
+belongs to [`factorize_bounded`](../docs/API.md). Omitting the SIQS configuration
+uses automatic selection; explicit `SIQSConfig()` keeps reference fields.
+The [configuration guide](CONFIGURATION.md) describes defaults, optional
+policies and supported combinations.
 
-`default_siqs_config(n, backend="python-int", memory_bytes=None)` exposes fresh
-automatic selection. An explicit `SIQSConfig()` uses reference fields, while
-omitting it allows size selection. The [configuration guide](CONFIGURATION.md)
-explains collectors, kernels, quotas and exact fallback.
+## Techniques
 
-## C10a polynomial, collection and scheduling techniques
+The engines combine exact arithmetic with bounded collection and reuse:
 
-Fresh automatic SIQS selects the coupled C10a-01 policies below. Explicit
-`SIQSConfig()` constructors keep reference choices, and saved configurations
-keep their original identities. Automatic portfolio eligibility remains native
-40 and 50–60 digits; selecting coupled policies at other sizes does not supply
-a calibrated larger-size preset. See [configuration semantics](CONFIGURATION.md)
-and [current defaults](../STATUS.md#current-automatic-defaults).
-
-| Technique | Implementation and selection |
+| Area | Techniques available |
 | --- | --- |
-| Parity-aware polynomials | `polynomial_policy="parity2"` uses `A=2a` and odd centered `B` when the target `kN` is 1 modulo 4. The exact identity `(A*x+B)^2-kN=A*F(x)` retains the supported-A contribution and powers of two in recovery; unsupported discriminants use the standard family. |
-| Coupled multiplier ranking | `multiplier_policy="parity2_wide"`, with `multiplier=0`, scores a finite odd/even squarefree population using representation-aware root weights and size costs. Exceptional proper GCDs can finish setup early. A positive explicit multiplier fixes the choice. |
-| Reachable A products | `assignment_policy="windowed_pair"` uses bounded product windows and paired completion to search reachable factor-base products. It changes the A population; it is distinct from the explicit `quality` ordering and `paired_flyer` alternatives. |
-| Bounded Gray-root tables | `root_update_policy="batch"` prepares modular coordinate deltas only for the consumed family prefix, reusing existing A inverses. `cached` is an explicit alternative. Physical trial order, exceptional roots and independent root verification are preserved. |
-| Guaranteed two-adic scores | `parity_two` fuses certified universal two-power contributions into supported list-backed score initialization, with exact ordinary scoring elsewhere. It composes with existing marking kernels. |
-| Adjacent sign faces | C10a-07's `sign_policy="swap_high"` changes the adjacent Gray-coordinate ordering while retaining one-sign root transitions. Reference configurations keep `canonical`; incompatible saved schedules are rejected. |
-| Sparse prime/power queues | Bounded per-polynomial queues reuse exact hit schedules across aligned blocks. Calibrated automatic collectors select a 32 MiB ceiling; unsupported paths, singular sparse roots or capacity refusal fall back to ordinary marking. Rebuilds and replay remain charged. |
-| Counted bases and collection pacing | C10a-04 resolves exact eligible-prime counts under an endpoint ceiling for larger calibrated bands. C10a-05's `solve_policy="collection"` separates polynomial-window exhaustion from genuine collection exhaustion, preserving immediate square checks and charged terminal extraction. Their size/resource selection is documented in STATUS. |
+| Polynomial setup | Exact factor-base roots and eligible-prime counts; parity-aware polynomial forms; coupled multiplier scoring and optional norm previews; streamed A assignments with reachable product windows and paired completion; CRT/Gray families and adjacent sign schedules. |
+| Root reuse | Bounded modular Gray-update tables, derivative-inverse reuse, cached prime-power plans and complete same-A higher-root transfers, with ordinary exact lifting for exceptional or unfunded cases. |
+| Sieving | Conservative integer/fixed-point scores, prime-power marking, periodic presieves, guaranteed two-adic initialization, density/unrolled kernels, fused score/hit updates and candidate scanning. Flat sparse queues use additive offsets; native-width hit words and epochs defer wide-mask construction to selected candidates. |
+| Recovery and admission | Separate reporting/product/endpoint bounds; exact impossible-domain rejection; bounded splitter portfolios, batch-GCD and known-endpoint hints, split memoization and candidate-only smooth-part recovery. Admissions reconstruct residuals and verify their declared types. |
+| Relation graphs | Single/double-large-prime matching, optional three-endpoint and opaque-residual policies, incidence elimination, shorter-cycle searches, congruence deduplication and checked equal-parity dependencies. Original atoms, repeated primes and square corrections remain recoverable. |
+| Records and ownership | Packed/base-index exponents, append-only slabs, integer provenance, lazy combined rows, exact representation witnesses and checked proof reuse. Optional bounded opaque staging/conversion, cheap-factor recomputation and disk-backed cold records control retained ownership. |
+| Filtering and extraction | Useful-row/deficit targets and collection-aware solve cadence; duplicate, singleton and weight-two filtering; reversible sparse/component views, fill-aware merges and optional panel kernels; joint exponent products and exact congruence/GCD extraction. |
+| Execution | Reused buffers, progress-only internal collection, grouped work reservations and bounded cooperative polling. SSS uses CRT collisions and product/remainder trees; experimental serial/thread/process family workers verify returned relations centrally. |
 
-`parity2_norm` multiplier previews, alternative assignment policies and marking
-kernels remain explicit choices. C10a-02/-03 and broader scheduling questions
-remain scoped roadmap work; this list does not mark every C10a proposal
-implemented or adopted. The [C10a-01](../benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults)
-and [C10a-07](../benchmarks/RESULTS.md#c10a-07-face-and-queue) records retain
-confirmation limits and unmeasured extrapolations.
+Some techniques are explicit policy choices. Extra reporting thresholds and
+SSSf filters can deliberately lose candidates; growing-DLP and expanded
+collectors have narrower worker/SSS compatibility. Public `collect()` returns
+owned snapshots while internal jobs can retain the live store.
 
-## Verified relation pipeline
+Every admitted relation retains checked sign, exponents and provenance. Parity
+alone is insufficient: dependencies lift to original relations, both GCD signs
+remain available, and every returned split must satisfy `1 < g < n` and divide
+n exactly. Trivial dependencies permit finite further collection.
 
-1. Build the factor base and exact modular roots, checking setup divisors.
-2. Construct polynomials with `B² ≡ h*n (mod A)` and check the norm identity.
-3. Recover every candidate's sign and exponents, then verify residual admission.
-4. Match single-large-prime partials or combine checked DLP graph cycles while
-   retaining original atoms and square corrections.
-5. Filter duplicates/singletons/weight-two rows and solve parity dependencies.
-6. Lift to original relations, reconstruct a congruence of squares and validate
-   proper GCD splits. Trivial dependencies permit finite further collection.
+## Resume and resource bounds
 
-Parity alone does not verify a relation. Original exponents, atoms, row
-identities and square corrections remain checkable through filtering and
-extraction. Every split must satisfy `1 < g < n` and divide n exactly.
+`job.run(max_blocks=...)` pauses at block boundaries. Save with
+`job.checkpoint()` and restore with `SIQSJob.from_checkpoint(...)`, supplying
+the total allowance. Restore verifies arithmetic, provenance and saved policy
+identities; compatible extensions use `allow_extension=True` and retain consumed
+work and traversal progress. `QSJob` supports in-memory continuation; SSS has
+its own checked serializer.
 
-## C9a useful-yield and storage techniques
-
-C9a is integrated and its delivered stream is closed. Its policy classes
-remain opt-in through `SIQSConfig(collector=...)`: `YieldSieveConfig` exposes
-independent mechanisms, `CombinedYieldSieveConfig` combines the checked
-recovery/storage policies, and `ExtendedYieldSieveConfig` and
-`BoundedYieldSieveConfig` add explicit expanded intake and ownership controls.
-The [policy reference](../README.md#explicit-useful-yield-policies) lists fields,
-alternatives and checkpoint schemas. Selecting a class does not imply that
-every implemented mechanism is the measured nominee or an automatic default.
-
-| Technique | Exact behavior |
-| --- | --- |
-| Useful-row preparation | Targets can use occupied columns and the filtered deficit, with bounded top-ups after unsuccessful extraction. Preparation, filtering and elimination remain separate costs; immediate square checks and final/storage-cap attempts are retained. |
-| Separate reporting and admission | Candidate reporting, recovered-product admission, ordered asymmetric endpoints and SLP bounds have separate controls. Exact impossible-domain checks reject hopeless residuals before splitter work; successful splits reconstruct the residual and certify endpoints under the selected contract. |
-| Bounded cofactor recovery | Selectable finite splitter portfolios, known-endpoint products, batch-GCD hints, split memoization and candidate-only smooth-part recovery reduce repeated work. Hints undergo exact checks, and batched admissions retain physical candidate order. |
-| Shorter cycles and duplicates | Direct-edge/minimal-path exits and bounded searches cover retained graph components. Full congruence keys and equal-parity pair checks preserve original identities and distinct square roots; equal parity alone does not justify deleting a useful dependency. |
-| Compact exact records | Packed/base-index exponent encodings, implicit exponent one, append-only slabs, integer provenance and lazy combined rows reduce repeated object construction. Representation witnesses permit checked private proof reuse; public and restore validation remain independent. Obsolete raw proofs retire only after packed publication. |
-| Expanded residual ownership | Explicit policies support three proven endpoints and separately typed opaque residuals, incidence elimination, bounded opaque staging/conversion, cheap-factor recomputation and disk-backed cold records. Opaque residuals are not relabeled as proven primes; byte limits include simultaneous construction/replay scratch. |
-| Filtering and extraction | Reversible lighter-row/component views, incremental singleton work and optional panel kernels preserve lifting to original rows. Joint exponent-product extraction keeps exact modular accumulation, both GCD signs and nonunit handling. |
-
-Shared collector optimizations also apply to supported existing configurations:
-
-- **Avoid repeated snapshots and scans.** Internal QS/SIQS collection consumes
-  private progress while retaining the live store; public `collect()` still
-  returns complete owned snapshots. Scalar reject spans and grouped queue
-  reservations retain exact work, the cooperative polling bound and the first
-  uncommitted position on refusal.
-- **Fuse and reuse marking work.** List-backed first-level score/hit writes
-  share a traversal, periodic initializers replace redundant clears, and
-  sparse queues use flat unsigned-word triples with additive offsets. Small
-  root pairs avoid sorting while independent polynomial checks remain.
-- **Reuse exact roots.** Funded derivative inverses and recovery-mask prefixes
-  avoid recomputation. Complete nonsingular odd-prime root pairs transfer
-  across same-A polynomials by `-(B_new-B_old)/A` modulo each prime power.
-  Root-class order is preserved; pruned subsets, characteristic two, singular
-  cases and unfunded caches retain ordinary lifting.
-- **Keep marking metadata native-width.** Supported list/power/bucket paths
-  with more than 60 base entries use bounded 60-bit word lists and block
-  epochs, assembling full exact masks only for selected candidate recovery.
-  The width avoids wide-integer allocation at every hit; it does not truncate
-  masks or impose an admission limit. Construction, stamp copies and internal
-  materialization are charged. Root-transfer and hit-word helpers each have
-  a 32 MiB ceiling, preserve switch scratch and use exact unfunded fallbacks.
-
-These are implemented techniques, not additive performance guarantees.
-[Results](../benchmarks/RESULTS.md#c9a-preparation) distinguish same-work
-optimizations from changed intake/yield and record the exposed-input limits.
-C9b owns further headroom and variability analysis. The historical 15% canary
-heuristic is descriptive in new analysis; calibrated uncertainty and fresh
-independent inputs govern broader performance conclusions.
-
-## Resume and storage
-
-`job.run(max_blocks=...)` pauses at SIQS block boundaries; `job.checkpoint()`
-produces portable state. Restore with `SIQSJob.from_checkpoint(checkpoint,
-budget=total_allowance, config=...)`. Exact relation, provenance and policy
-verification plus reconstruction consume the cumulative allowance. Disposable
-plans, presieve buffers, sparse queues and root/hit helpers are rebuilt with
-charges. Optional helpers leave mandatory switch coexistence funded and keep
-exact uncached paths when their memory/work reservation cannot be met.
-
-Direct compatible quota extensions require `allow_extension=True`; they
-preserve the modulus, family/collector identity and consumed prefix. An
-exhausted local schedule does not restart merely because a timer increases.
-`QSJob` supports in-memory continuation; SSS has its own checked serializer.
-
-Fixed-store collectors have explicit row/atom/partial limits. Growing DLP
-uses allocator-grown containers and optional quotas, with finite work/time
-and per-residual split bounds. The outer portfolio resolves uncapped child
-memory against its finite remaining allowance. Unsupported SSS/worker adapters
-reject the growing collector rather than weakening ownership checks.
-
-A quota refusal before publication remains resumable. Actual allocator failure
-during publication raises `RelationPublicationError` and invalidates that live
-object; restore the previous completed checkpoint. An OS kill requires an
-already saved checkpoint. Expanded policies can explicitly select bounded
-disk-backed cold factor records; this does not enable automatic spilling of
-the growing relation graph.
-
-## SSS and workers
-
-`SSSJob` and `SSSConfig` live in `sss.py`. Positive SSSf `filter_bound`
-deliberately loses candidates; zero keeps two-stage smoothness without that
-cutoff. Collision trees inspect forced-divisor quotients, while admission
-recovers exponents from the original norm.
-
-In-memory SSS continuation extends its original budget; serialized restore
-uses an unused total allowance and preserves backend/configuration and saved
-solver encoding. Assignment regeneration and solver replay are charged.
-
-`parallel.py` supplies bounded serial/thread/spawned-process family workers.
-They centrally verify returned relations, use stable assignments and account
-for aggregate resources and cancellation. Workers remain experimental; use
-existing measured evidence rather than assuming extra workers improve factoring.
+Work, time and owned storage remain finite. Derived root tables, presieves,
+queues and hit helpers rebuild with charges and exact fallbacks. A refusal
+before publication is resumable. `RelationPublicationError` invalidates the
+live store; restore its previous completed checkpoint. Explicit cold-record
+storage does not automatically spill the growing relation graph.
 
 ## Source map
 
@@ -213,6 +118,6 @@ existing measured evidence rather than assuming extra workers improve factoring.
 | [sss.py](sss.py), [smooth_batch.py](smooth_batch.py), [sss_checkpoint.py](sss_checkpoint.py) | SSS/SSSf collision search, exact smooth-part trees and checked SSS continuation |
 | [parallel.py](parallel.py) | Experimental bounded family workers and central result verification |
 
-[QS benchmarks](../benchmarks/qs/README.md) map studies to runners.
-[Results](../benchmarks/RESULTS.md) retain quantitative scope and limitations;
-[STATUS](../STATUS.md) and [ROADMAP](../ROADMAP.md) govern current work.
+[QS benchmarks](../benchmarks/qs/README.md) describe the runners.
+[Results](../benchmarks/RESULTS.md) retain measurement scope;
+[STATUS](../STATUS.md) and [ROADMAP](../ROADMAP.md) track current work.
