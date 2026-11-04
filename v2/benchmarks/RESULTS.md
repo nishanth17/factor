@@ -1,5 +1,59 @@
 # Benchmark results and decisions
 
+## B12/F4 wider-worker CPU and heap screen (4 November 2026)
+
+Runtime source `a32b9f0` uses explicit spawn processes and unchanged exact ECM.
+The bounded screen covers 4/6/8/10/12/14/16 workers at 60/80/100 digits, with
+20-digit smaller primes. L uses 128 curves at `(2000,200000)` and retains PRAC;
+H uses 32 curves at `(11000,1100000)` and the existing ladder. L/H share a
+modulus at each size: three exposed substantial moduli, not six independent
+inputs. All candidate arms preserve identical curves and results.
+
+Cold component CLI medians below use nine fresh interpreters per arm, including
+startup, factoring the declared curve set, validation and draining. M0 is the
+serial equivalent-manifest arm, distinct from incumbent S0's RNG stream.
+
+| Digits | L: M0 / P8 | H: M0 / P8 |
+| --- | ---: | ---: |
+| 60 | 2.138 / 1.284 s | 2.800 / 1.437 s |
+| 80 | 2.549 / 1.279 s | 3.340 / 1.533 s |
+| 100 | 3.025 / 1.364 s | 3.839 / 1.625 s |
+
+P6 marginally wins L60's median, with unresolved P6/P8 timing uncertainty.
+Other close count comparisons mostly remain unresolved; P8 is the leading cold
+candidate, with roughly 2.3–3.1 times observed CPU versus M0. Cheap eight-curve
+controls remain faster serial from a fresh CLI. Warm discovery winners vary
+10–16 by size/bounds; close rankings and between-block variation prevent a
+global optimum claim. H100's separate clean recheck favors P10 over P16
+(0.650 versus 0.694 s mean), paying 5.26 versus 6.16 worker CPU seconds/call.
+
+At H100, heap-observed P10/P16 parent-plus-worker RSS peaks are 0.95/1.46 GB,
+excluding
+controller and spawn helper. Stage two uses about 62% of measured compute CPU;
+parent orchestration is about 0.5% of aggregate CPU samples. Heap-lane GC is
+about 2.9%/5.1%, with roughly 26 MB live GC-managed heaps per worker. Capacity
+pressure and parent JSON are not the observed dominant warm bottlenecks.
+CPU/heap observation costs were measured separately; instrumented timings do
+not rank candidates. JIT inlining limits operation-level attribution.
+
+All 288 timing/diagnostic cells validate and leave no owned groups. Observed
+cell totals: 942.59 wall / 5,362.38 aggregate CPU seconds; conservative cell CPU
+charges 15,029.45 seconds. Observed CPU is a lower bound; unobserved helper
+and teardown allowances remain charged. The separately funded ceiling is 3,600 wall / 33,000
+CPU seconds with 2 GiB evidence, including previous profiles. Failed QA and a
+wrong-ref validation attempt remain recorded and excluded from timing evidence.
+Exact runtime-source full QA passes 1,004 tests (9 optional skips); later
+analyser/adversarial tests and full lint pass in committed-only checkouts.
+
+The opt-in contract now permits funded counts through 16 and versions resource
+checkpoints as v3, repairing durable position-key hashing and parent CPU room.
+Mathematical v1 identities and serial defaults remain unchanged. First-factor,
+complete-portfolio, balanced-tail and fresh independent-input confirmation are
+NOT RUN. No calibrated engagement policy or default adoption follows. Detailed
+local report, all count tables and handoff: `v2/audit/b12_f4/counts16_v1/REPORT.md`;
+preceding CPU/heap phase: `v2/audit/b12_f4/profiles-v1/REPORT.md`.
+B12/F4 and E1 retain their open/deferred status.
+
 ## B12/F4 larger-work headroom screen (4 November 2026)
 
 Runtime candidate `8a2bff7` and current incumbent `a2af71b` were pinned in

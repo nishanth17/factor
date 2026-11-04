@@ -1,6 +1,6 @@
 # Factor status
 
-Last updated: 3 November 2026 (America/Los_Angeles).
+Last updated: 4 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
@@ -178,17 +178,28 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 runtime source `8a2bff7` passes 987 committed-checkout tests (9 optional
-skips), full lint and the initial bounded 1/2/4-worker screen. Cheap cold
-8-curve calls remain better served serially in the exploratory panel; retained
-pool scaling now has a separate 4 November warm-serial/larger-work headroom
-screen: cold P4 improved the exploratory fixed-work observations at 60/80 digits,
-with complete-call benefit and engagement calibration still unestablished.
-Production defaults and B12/F4 open status are unchanged.
-See [scoped observations](benchmarks/RESULTS.md#b12f4-runtime-qa-and-initial-process-screen-3-november-2026)
-and local `v2/audit/b12_f4/RUNTIME_HANDOFF.md`. C9a's release was explicitly
-confirmed; all runtime work used the shared lock and has stopped. Latest local headroom
-results and resource/admission limitations: `v2/audit/b12_f4/HEADROOM_REPORT.md`.
+B12/F4 runtime source `a32b9f0` passes 1,004 committed-checkout tests (9
+optional skips) and full lint, including real 16-worker spawn/drained restart.
+Later analyser/adversarial regressions pass in committed-only checkouts. The
+opt-in v3 resource/checkpoint contract repairs durable position hashing and
+leaves CPU for parent publication; mathematical streams and defaults stay fixed.
+
+The 4/6/8/10/12/14/16-worker screen covers substantial fixed work at 60/80/100
+digits: eight is the leading cold candidate, while warm nominees vary by work
+and size. Cheap cold calls stay serial. All 288 new timing/diagnostic cells
+validate; CPU/heap evidence points to arithmetic cost, with stage two dominant,
+rather than observed memory capacity pressure. Close count rankings and timing
+drift remain uncertain. These are exposed component inputs; complete-factor,
+balanced-tail and independent-input confirmation remain NOT RUN. No engagement
+threshold is adopted and B12/F4 remain open.
+
+C9a's release was explicitly confirmed. Runtime work used the shared lock,
+all owned groups exited, and the lock is released. See the
+[scoped results](benchmarks/RESULTS.md#b12f4-wider-worker-cpu-and-heap-screen-4-november-2026)
+and local `v2/audit/b12_f4/counts16_v1/HANDOFF.md`. Detailed prior profiles:
+`v2/audit/b12_f4/profiles-v1/REPORT.md`. The cumulative QA ledger and all failed
+or wrong-source validation charges remain preserved. E5a records the separate
+serialization follow-up; it is not pursued within this CPU/headroom phase.
 
 ## Known gaps and unresolved conflicts
 
