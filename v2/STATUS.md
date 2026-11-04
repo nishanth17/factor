@@ -205,7 +205,9 @@ profiles/counts remain under `profiles-v1/` and `counts16_v1/`. E5a records the
 separate serialization follow-up; it is not pursued in this headroom phase.
 
 The follow-up capture audit reconciles all 189 retained CPU/heap files and
-100 JIT summaries, including 11 current-source diagnostic cells. It fills
+100 JIT summaries, including 11 current-source diagnostic cells. Full-histogram
+analyser source `6a2e36b` passes 14 targeted tests and full lint in a committed
+checkout; arithmetic/executor bytes are unchanged. It fills
 representative L/H60/80/100 arithmetic coverage, retains inconclusive copied-
 budget diagnostics and identifies remaining F4 JIT/work-accounting, stage-two
 metadata and packet2 questions. Complete capture coverage does not close these
