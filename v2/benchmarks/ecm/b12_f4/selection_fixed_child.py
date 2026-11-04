@@ -1,4 +1,4 @@
-"""Source-isolated fixed curves with validated, stabilized retained metadata."""
+"""Source-isolated fixed curves with stabilized retained metadata."""
 
 import argparse
 import fcntl
