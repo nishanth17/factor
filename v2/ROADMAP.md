@@ -196,7 +196,7 @@ authorizes no runtime experiment or native dependency installation.
 | --- | --- | --- | --- | --- | --- |
 | C2 — P5.2 advanced pairing/common-Z | Compare selected distances/relocation/matching/coverage pruning and independent coordinate choices: current projective cross-products, affine/batch inversion and CADO-style inversion-free common-Z tables (AP29). Cost prefix/suffix normalization against saved term multiplications and bounded block/table reuse. | B2 aligned-cell retain/loss decision; current bound-specific continuation cost; coordinate C3a/F3 | **Conditional; medium ECM challenger.** Current stage two already has baby/giant steps; paired executors are retained opt-ins after scoped losses. Certify coverage, nonunit/saturation recovery, storage and replay. Neither a C2 win nor affine inversion is a prerequisite for F3 feasibility. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
 | C4 — P3.8 structured filtering, hybrid cores and extraction | Implement fill-aware bounded higher-weight elimination, including a selected minimum-weight merge-tree/MST heuristic, with compact reverse substitution; compare components, ordering and sparse-to-dense cores. Preserve rank/nullity and lift to original relations. Joint exponent-product/Horner extraction is an optional exact subtranche, preserving both GCD signs and nonunit handling. | A8 contract/fixtures; settle the selected B7 representation contract within any changed-provenance implementation | **Open; High preparation.** Stronger filtering need not wait for B6 to win. B6 remains the first dense-kernel comparison. Measure dimension and weight together, including preparation, fill, retained substitution history, solver, lifting and extraction; fewer rows alone are insufficient. | Astra / **xhigh** changed filtering/provenance/extraction; Sol / **xhigh** only for a separately specified existing kernel; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers); [merge-tree reference](https://github.com/cado-nfs/cado-nfs/blob/692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b/filter/mst.c) |
-| C5 — P4.4 reducers | Revisit persistent Barrett/Montgomery contexts only in actual fused engine loops, with exact encoded identities, width bounds and canonical exits. | A2, B4 plus a remaining reduction bottleneck | **Conditional; native-context candidate selection through B15 (rank 6), after B4a scalar evidence.** Other reducer changes retain their trigger. Earlier reducers lost near 166–200 bits. Backend/kernel results must provide a reason to reopen them; native `%` remains the default if the whole-run gate fails. A B4a fused native context is a different cost regime; settle its scalar baseline before selecting new Montgomery/Barrett arithmetic. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
+| C5 — P4.4 native Montgomery/REDC residue contexts | Research and select a persistent Montgomery multiplication/reduction context in B4a's actual fused ECM loop, with Barrett as a justified alternative. Preserve exact encoded identities, carry/width bounds, GCD recovery and canonical exits. | A2/B4 oracles; B4a scalar native baseline and current evidence that modular multiplication/reduction has useful headroom | **Conditional implementation; explicit B4a follow-up.** Research/specification can accompany B4a; select arithmetic implementation after its scalar baseline. Earlier Python reducers lost near 166–200 bits and remain historical controls. Native GMP arithmetic is a different cost regime. Distinguish small-limb MODMULN-style Montgomery arithmetic from GMP-ECM's specifically named large-input REDC backend. B15 can select this candidate but is not an additional gate when B4a already establishes it. No automatic default or whole-factor speedup follows. | Astra / **xhigh** encoded-domain design, proof and implementation; optional separate Sol / **high** frozen execution | [native residue scope and gates](#c5--native-montgomeryredc-residue-contexts); [GMP-ECM representations](https://github.com/sethtroisi/gmp-ecm/blob/8ea5e214fdf2f0ddf9415141b8dc039ed6f5874e/README.lib) |
 | C8 — P3.8-R2 family-wide CRT/hypercube hit scheduling | Assess whole-polynomial-interval prime/power eligibility and occupancy before bounded CRT half-sum or hypercube scheduling. Verify every Gray/position hit, exceptional roots, recentering, finite tables/queues and charged replay; retain compact hit-layout alternatives with B7. | A1/B1 and a concrete family/root or eligible-prime scanning hypothesis | **Conditional; Low/conditional.** The old first-polynomial probe found zero eligible base primes and sparse eligible powers. Block width is not the eligibility interval. Existing per-polynomial queues/plans are controls, not this family-wide mechanism. | Astra / **xhigh** arithmetic, implementation and ownership; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
 | C10a — collection representation, population and scheduling | Own C10a-01/-02/-03/-06 and explicit larger-size feasibility below. Coordinate useful-row preparation/filter scheduling and score/recovery domains with the integrated C9a collector and C9b follow-up; A1a/A1c retain transition/kernel ownership; A1d owns multi-polynomial bucket scheduling. | Closed C10 tranche; current committed control and explicit shared policy/source identities | **Open.** C10a-04/-05/-07 remain Done for delivered scopes. C10a-01's selected bundle is integrated/default and its four-size exploratory feasibility is terminal; no duplicate A/root/multiplier project. Correct, feasible components may share a bundle without prior isolated wins. | Astra / **xhigh** throughout C10a-01; Sol / **xhigh** separately scoped existing-policy design; optional separate Sol / **high** frozen execution for other scopes | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
 | C11 — workload/cost atlas, parameter provenance and competitor protocol | Maintain pinned parameter/caller provenance and a small current complete-cost/yield atlas stratified by modulus size, smaller-factor size and input distribution. Attribute preprocessing/classification, rho/PM1/ECM/QS, polling, allocation, setup and native-boundary costs separately. Use the equal-weight 60/80/100 random-integer workload and 60/70 balanced guardrail; report rough survivors and recursive multiprimes separately. Reconcile current chains and continuation before selecting C3a/B3a/F2/F3/F4. Prepare Python competitor complete-cost comparisons with P6.4/I1. | Current committed controls; existing C3 findings and source presets; coordinate C3a/B12/B3a/B4a and QS A7a/C9a/C10a | **Open; High targeted selection.** Small cost checks support ranks 1–6, with B15 coordinating native-helper selection; the broader policy/atlas screen is rank 7 after the relevant worker identity settles. No full Cartesian campaign is required. Native-int, GMP, NumPy/native kernels, wrappers and worker counts remain separate tracks; source tables are hypotheses. A specifically selected F3 backend spike does not restart the stopped broad P4.3 study. Final comparative claims retain I1 gates. | Sol / **xhigh** protocol/selection design; Sol / **high** source reconciliation or separately frozen execution; Astra / **xhigh** separately selected new arithmetic/proofs | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-c--measured-current-engine-challengers) |
@@ -549,9 +549,12 @@ microcontrol does not replace the current eligible PRAC production control
 for whole-factor comparisons; label any executor change. Native wrappers
 around another factorer remain C11 reference tracks rather than this kernel.
 
-Start with scalar compiled arithmetic and existing exact algorithms. A native
-Montgomery/Barrett context is a later C5 candidate under a changed cost regime;
-previous Python reducer losses remain historical controls. ECM's many point
+Start with scalar compiled arithmetic and existing exact algorithms. Research
+the [C5 native Montgomery/REDC context](#c5--native-montgomeryredc-residue-contexts)
+alongside this boundary, then select its implementation from scalar native
+evidence. A weak `mpz_mul` plus `mpz_mod` result alone does not reject native
+residue arithmetic or the whole native architecture. Previous Python reducer
+losses remain historical controls. ECM's many point
 operations make it the first selected boundary candidate. PM1 stage one already
 combines a prime-power chunk into one modular pow; rho already uses Brent
 batches and local variables. Both can improve, but merely adding their existing
@@ -569,6 +572,19 @@ preflight refusal from native allocator/process death: the latter recovers
 from a last committed checkpoint, not an assumed native rollback. GC pressure
 hints do not enforce a memory quota. B12/F4 may test native threads after verifying
 thread-private state, release behavior and shared-ledger CPU semantics.
+
+For threading, start from one coarse multi-curve CFFI entry point whose native
+team never accesses Python objects or calls back into Python. Its primary
+cold-CLI hypothesis is avoiding per-worker interpreter spawn, imports, JIT
+warmup and duplicated heaps; measure directly against B12 P2/P4 cold, with
+warm-pool results separate. Evaluate a minimal pthread queue if OpenMP needs
+an unavailable runtime or system changes. This avoids an additional OpenMP
+runtime, not the selected CFFI/GMP/compiler dependencies. For a few coarse,
+variable-cost curves on heterogeneous cores, begin with dynamic assignment
+of one curve at a time and cooperative early cancellation. Research must
+confirm or refute that simple queue; more elaborate loop schedules need a
+concrete workload reason. Do not implement two threading runtimes merely
+to populate a comparison table.
 
 C11's initial cost atlas includes ordinary/easy exits, rough survivors,
 prime-heavy children, smooth p±1, small-factor rho, close/power/special-form
@@ -596,6 +612,45 @@ The broad review does not restart the stopped backend sweep, select every
 cheap-path candidate or authorize a campaign. Follow the existing stage gates,
 clean feasibility, observer calibration, finite cumulative grants and fresh
 confirmation rules for whichever single hypothesis is selected next.
+
+#### C5 — native Montgomery/REDC residue contexts
+
+Montgomery curve form and X:Z coordinates do not establish Montgomery residue
+arithmetic. C5 owns the latter: encode once into a checked modulus context,
+reuse it through the funded native point/program packet, then decode at
+canonical publication/checkpoint boundaries. Research/specification belongs
+in B4a's source pass; a new encoded-domain implementation follows the scalar
+native baseline and a useful current modular-arithmetic opportunity. It need
+not wait for B12 adoption or an independent B15 selection. Preserve the
+previous Python-reducer losses rather than treating them as native evidence.
+
+Trace GMP-ECM's representation selection and actual small-limb multiply/square
+paths. Its MODMULN and REDC names distinguish quadratic and subquadratic
+Montgomery implementations; MPZ and special-base paths also exist. For this
+project's 30–100-digit moduli, select from actual limb counts and local costs,
+not an assumption that a large-input backend or upstream threshold transfers.
+Montgomery arithmetic is a credible optimization, not an attributed main
+explanation for GMP-ECM's complete performance. An ordinary GMP multiply/mod
+baseline cannot answer whether persistent Montgomery residues would win.
+
+Specify the odd-modulus domain, radix and encoded one/constants, multiplication
+and squaring, additions/subtractions, normalization and carry/correction bounds.
+Bind every program/point/context to its representation and modulus; prove
+proper-factor and saturated-product recovery, nonunit handling, canonical
+conversion, checkpoint/replay and budget semantics. Keep worker scratch
+private and shared contexts immutable. Reuse documented supported GMP
+interfaces where suitable; copying private layouts, assembly assumptions or
+unlicensed source is not an implementation plan. Native limbs/SIMD require
+their own exact width, aliasing and overflow proof.
+
+Compare the same accepted PRAC/ladder and continuation coverage against B4a
+scalar GMP, including context setup, conversions, unused preparation, recovery,
+cold CLI and per-thread memory. Use a short exact fixed-work screen before
+any complete-factor campaign. A selected Barrett control is optional, not a
+mandatory second reducer project. Arithmetic tests and kernel gains admit
+measurement; current complete-cost evidence, uncertainty and fresh confirmation
+govern adoption under POLICY.md. Keep the Python fallback and defaults until
+those gates justify a scoped change. This planning scope launches no run.
 
 #### E6 — self-contained native prime generation
 

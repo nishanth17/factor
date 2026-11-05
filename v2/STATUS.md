@@ -126,6 +126,12 @@ can start before every conditional native port is settled.
 A7a can prepare alongside B12 with pinned shared contracts; timed execution
 uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
 saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
+C5 is B4a's explicit native Montgomery/REDC residue-arithmetic follow-up:
+research it during boundary design, then select implementation from scalar
+native costs. Existing Montgomery curves do not supply that residue backend;
+earlier Python-reducer losses do not settle the native question. B4a's native
+thread screen centers on cold-CLI startup/heap savings against B12 processes,
+using a C-side multi-curve team and a pthread alternative when OpenMP is absent.
 E6/B15 at ranks 5–6 are conditional screens. B15 is not a C3a prerequisite;
 its selected helper implementation does not inherit rank 6 automatically.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
