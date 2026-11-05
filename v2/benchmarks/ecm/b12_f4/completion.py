@@ -11,7 +11,7 @@ import sys
 from dataclasses import asdict, replace
 
 
-def configuration(n, source_root):
+def configuration(n, source_root, *, funded=True):
     """Retain each source's ECM defaults and use a common funded QS child."""
     sys.path.insert(0, str(source_root))
     from v2.portfolio import PortfolioConfig
@@ -20,6 +20,8 @@ def configuration(n, source_root):
     if digits not in (60, 70):
         raise ValueError("balanced completion preparation supports 60/70 only")
     config = PortfolioConfig().for_input(n)
+    if not funded:
+        return config
     if digits == 60:
         if config.siqs is None:
             raise ValueError(
@@ -86,11 +88,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", required=True)
     parser.add_argument("--n", type=int, required=True)
+    parser.add_argument(
+        "--resources", choices=("funded", "stock"), default="funded"
+    )
     arguments = parser.parse_args()
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
     print(
-        json.dumps(asdict(configuration(arguments.n, arguments.source_root)))
+        json.dumps(
+            asdict(
+                configuration(
+                    arguments.n,
+                    arguments.source_root,
+                    funded=arguments.resources == "funded",
+                )
+            )
+        )
     )
 
 

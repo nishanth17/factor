@@ -74,6 +74,22 @@ class CompletionStudyTests(unittest.TestCase):
             funded.siqs.memory_bytes, original.siqs.memory_bytes
         )
 
+    def test_stock_configuration_preserves_actual_default_resource_policy(
+        self,
+    ):
+        from dataclasses import asdict
+        from v2.portfolio import PortfolioConfig
+
+        n = 10**59 + 123
+        root = Path(__file__).resolve().parents[2]
+        actual = configuration(n, root, funded=False)
+        self.assertEqual(
+            asdict(actual), asdict(PortfolioConfig().for_input(n))
+        )
+        self.assertEqual(actual.siqs.memory_bytes, 2**30)
+        self.assertEqual(actual.siqs.checkpoint_bytes, 2**20)
+        self.assertIsNone(configuration(10**69 + 123, root, funded=False).siqs)
+
     def test_seventy_digit_fallback_is_an_explicit_common_configuration(self):
         from v2.portfolio import PortfolioConfig
 
