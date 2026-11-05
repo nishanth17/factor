@@ -198,3 +198,62 @@ def compare_pool_timings(candidate, control, *, seed=20261113, draws=2000):
         independent_moduli=1,
         scope="conditional timings; independently resampled pool lifetimes",
     )
+
+
+def cohort_median_interval(candidate, control, *, seed=20261116, draws=2000):
+    """Bound paired modulus-bootstrap median ratios under common censoring.
+
+    Unidentified medians contribute bounds rather than successful-only
+    estimates. Repetitions and algorithm seeds stay inside their modulus
+    cluster. The interval is a small-sample bootstrap, not a precise tail
+    guarantee or a substitute for independent moduli.
+    """
+    _validate_arms(candidate, control)
+    identities = sorted(candidate)
+    if len(identities) < 3:
+        raise ValueError("at least three independent moduli required")
+    if type(draws) is not int or not 100 <= draws <= 10_000:
+        raise ValueError("finite bootstrap draw count required")
+    counts = {
+        len(rows) for arm in (candidate, control) for rows in arm.values()
+    }
+    if len(counts) != 1:
+        raise ValueError("equal repetitions required for pooled medians")
+
+    def bounds(chosen):
+        medians = [
+            censored_quantile(
+                [row for identity in chosen for row in arm[identity]], 0.5
+            )
+            for arm in (candidate, control)
+        ]
+        left, right = (median["seconds"] for median in medians)
+        if left is not None and right is not None:
+            if right <= 0:
+                raise ValueError("zero control median cannot define a ratio")
+            return left / right, left / right
+        if left is None and right is None:
+            return 0.0, math.inf
+        if left is None:
+            if right <= 0:
+                raise ValueError("zero control median cannot define a ratio")
+            return medians[0]["lower_bound"] / right, math.inf
+        return 0.0, left / medians[1]["lower_bound"]
+
+    point = bounds(identities)
+    generator = random.Random(seed)
+    intervals = [
+        bounds(generator.choices(identities, k=len(identities)))
+        for _ in range(draws)
+    ]
+    lower = sorted(pair[0] for pair in intervals)[int(0.025 * draws)]
+    upper = sorted(pair[1] for pair in intervals)[int(0.975 * draws) - 1]
+    return dict(
+        independent_moduli=len(identities),
+        repetitions_per_modulus=counts.pop(),
+        ratio=point[0] if point[0] == point[1] else None,
+        ratio_bounds=[point[0], point[1] if math.isfinite(point[1]) else None],
+        interval=[lower, upper if math.isfinite(upper) else None],
+        upper_unbounded=not math.isfinite(upper),
+        scope="paired modulus-cluster median bootstrap with censoring bounds",
+    )

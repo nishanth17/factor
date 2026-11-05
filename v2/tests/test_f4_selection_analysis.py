@@ -3,6 +3,7 @@
 import unittest
 
 from v2.benchmarks.ecm.b12_f4.selection_analysis import (
+    cohort_median_interval,
     compare_cohort,
     compare_pool_timings,
 )
@@ -86,6 +87,34 @@ class PoolTimingTests(unittest.TestCase):
                 compare_pool_timings(candidate, control, draws=100)
         with self.assertRaises(ValueError):
             compare_pool_timings(control, control, draws=100_000)
+
+
+class CensoredMedianTests(unittest.TestCase):
+    def test_exact_scale_and_modulus_cluster_count(self):
+        control = {i: [row(2)] * 9 for i in range(6)}
+        candidate = {i: [row(1)] * 9 for i in range(6)}
+        result = cohort_median_interval(candidate, control, draws=100)
+        self.assertEqual(result["ratio"], 0.5)
+        self.assertEqual(result["interval"], [0.5, 0.5])
+        self.assertEqual(result["independent_moduli"], 6)
+        self.assertEqual(result["repetitions_per_modulus"], 9)
+
+    def test_fast_failed_calls_keep_unbounded_median(self):
+        control = {i: [row(2)] for i in range(4)}
+        candidate = {i: [row(0.01, False)] for i in range(4)}
+        result = cohort_median_interval(candidate, control, draws=100)
+        self.assertIsNone(result["ratio"])
+        self.assertEqual(result["ratio_bounds"], [5, None])
+        self.assertEqual(result["interval"], [5, None])
+        self.assertTrue(result["upper_unbounded"])
+
+    def test_failed_control_gives_a_bound_without_inventing_a_ratio(self):
+        control = {i: [row(0.01, False)] for i in range(4)}
+        candidate = {i: [row(1)] for i in range(4)}
+        result = cohort_median_interval(candidate, control, draws=100)
+        self.assertIsNone(result["ratio"])
+        self.assertEqual(result["ratio_bounds"], [0, 0.1])
+        self.assertEqual(result["interval"], [0, 0.1])
 
 
 if __name__ == "__main__":
