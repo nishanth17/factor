@@ -3,6 +3,19 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 measured opt-in catalogue (4 November 2026)
+
+- Add lazy, source-checked selection for 33 exact mathematical regimes with
+  separately calibrated cold/started/warm thresholds and explicit retained-pool
+  intent. Preserve exact ECM arithmetic, SEARCHv1 identity, finite v7 ownership,
+  actual incumbent control and automatic serial defaults.
+- Version reproducible configuration snapshots, a disjoint certified/uniform
+  corpus and censor-aware cluster analysis. Retain full failures and charges.
+- Record repeated fixed-work scaling and 448 held-out complete calls, including
+  median uncertainty, the 80-digit regression, explicit matched QS checkpoint
+  funding and the pending balanced guardrail. No production adoption or closure;
+  final committed-checkout tooling QA remains queued with the lock released.
+
 ## B12/F4 larger-quota follow-up (4 November 2026)
 
 - Validate the 512-curve checkpoint/resource contract and matched spawn execution

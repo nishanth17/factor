@@ -201,3 +201,25 @@ A recorder permission error remains fully charged, with explicit late exit proof
 no unfavorable timing is selectively rerun. Warm reuse benefits do not establish
 first-factor or complete-factor latency gains. Root-lineage-aware complete-call
 feasibility precedes engagement calibration and fresh confirmation.
+
+
+Current configuration-selection entry point:
+`v2/audit/b12_f4/regime_selection_v1/REPORT.md` and `HANDOFF.md`.
+The reusable `ecm/b12_f4/selection_calibration.py` fits separate cold/started/warm
+costs from observable planned work; `selection_analysis.py` resamples pool or
+modulus clusters and preserves censoring bounds for latency quantiles.
+`selection_inputs.py` generates bounded, certified enriched inputs separately
+from unconditioned uniform panels after a source/configuration freeze.
+
+Committed loader inputs are `inputs/controls/b12_f4_selection_v1.json`, the
+fully resolved `b12_f4_selection_resolved_v1.json`, the prospective-then-frozen
+`b12_f4_confirmation_v1.json`, and
+`inputs/corpora/b12_f4_confirmation_v1.json`. Preserve their identities; revise
+under new names rather than retuning fresh outcomes. Source-current repeated
+work and 448 held-out complete calls are summarized in
+[results](RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026),
+including the explicit matched 64 MiB QS checkpoint scope, the 80-digit loss,
+median uncertainty and unresolved balanced guardrail. The catalogue is opt-in;
+S0, same-manifest serial M0 and policy serial decisions are separate controls.
+Final full committed-checkout validation of the latest tooling remains queued
+while the computation lock is released. No new campaign is the next step.

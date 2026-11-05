@@ -93,7 +93,8 @@ drain limits. Only python-int is admitted initially. Full schedule eligibility
 is retained in each worker; private program/chain stores are reused and bounded.
 Funded workers start before the parent collects readiness reports, so interpreter
 imports may overlap. Every child retains its own startup deadline and lease;
-unreported startups keep their full charges if a peer fails. This is unmeasured.
+unreported startups keep their full charges if a peer fails. Startup costs are
+recorded separately from useful execution.
 The caller owns `close()` or the context manager lifetime. One call may be
 active per context. Process entry points must be protected by a main guard.
 
@@ -120,9 +121,9 @@ fresh CLI measurements after runtime admission.
   ownership. This adds no wider-worker experiment allocation or automatic count.
 
 Defaults remain one job/packet, polling every action, one metadata context,
-no decoded cache and whole curves. These remain opt-in candidates; only the reference worker configuration has
-initial scaling observations. Full-tier
-PRAC eligibility remains intact; extra caches are separately funded rather than
+no decoded cache and whole curves. These remain opt-in choices with
+source-pinned count/parameter measurements. Full-tier PRAC eligibility remains
+intact; extra caches are separately funded rather than
 shrinking arithmetic ownership. Metadata replaces/evicts before new allocation;
 curve points never enter its cache. Every new process begins with empty caches.
 
@@ -134,7 +135,8 @@ provides finite per-tier serial costs and cold/warm thresholds; optional
 `pool_seconds` distinguishes an already spawned pool without matching metadata.
 Staged remaining work additionally needs `seconds_per_stage_two`. Missing,
 invalid or unfunded estimates select equivalent-manifest serial execution.
-`force_workers=True` is a separate diagnostic arm. No calibration is supplied.
+`force_workers=True` is a separate diagnostic arm. The optional measured
+catalogue below supplies source-specific calibration.
 The decision receipt reports cold/pool/warm state, estimate and threshold.
 
 The mathematical manifest/curve stream remains `b12-f4-v1`, independent of
@@ -248,6 +250,38 @@ buffers and binds shared runtime imports, including the QS fallback. Header work
 the profile, selected settings, native checkpoint and prior charges; changing
 policy or worker count is rejected. Fresh contexts repay profile preparation
 and process startup. Retained contexts reject incompatible ownership rather
-than resizing their pools. No measured selection profile or adoption is implied
-by this API; integrated runtime QA and configuration confirmation are separate
-gates in the active selection campaign.
+than resizing their pools. The optional measured catalogue below is a separate explicit input. It implies
+no automatic adoption; runtime QA and configuration confirmation retain their
+separate scopes.
+
+
+### Measured opt-in ECM selection
+
+`v2.execution.ecm_selection.SelectedECMContext(profile, profile_sha256, seed=0,
+prefer_warm=False)` loads a bounded, source-checked catalogue lazily when ECM is
+reached. Pass it as `factorize_bounded(..., ecm_executor=context)` and close it
+with a context manager under a protected process entry point. The committed
+catalogue is `benchmarks/inputs/controls/b12_f4_selection_v1.json`, SHA256
+`1dc664ac2d8c2b22eee39d53efe9212a9efd2d8e98e8f8668ad38501d9615ecc`.
+It binds 99 runtime files and 33 exact digit/mathematical-option regimes;
+source incompatibility is rejected. It is optional experimental configuration,
+with no change to automatic routing or the stock CLI.
+
+Cold intent requires expected remaining serial ECM work above both a fitted
+complete-cost crossover and a one-second minimum, with a nominal dispatch-wave
+floor. Separate thresholds cover a started pool and compatible retained metadata.
+`prefer_warm=True` selects an explicitly declared horizon of at least 64
+compatible ECM-reaching calls. Actual first-call startup remains cold and fully
+charged. Short or uncertain reuse should use cold intent. A context retains its
+first worker settings; mixed-regime pool resizing is not implemented. Unknown
+regimes, invalid estimates and unsupported continuation estimates stay serial
+under SEARCHv1. Omitting the context retains the legacy production S0 stream.
+
+Full constructor snapshots for reproducing the catalogue's mathematical regimes
+live in `benchmarks/inputs/controls/b12_f4_selection_resolved_v1.json`. These
+snapshots define measured caller configurations rather than new portfolio
+presets. In particular, caller140 at 60/80/100 digits is explicit. The complete
+comparison funded 64 MiB QS checkpoints equally in both arms after a retained
+stock 1 MiB checkpoint failure; this resource variant is not adopted by default.
+See [results](benchmarks/RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026)
+for gains, losses and unresolved acceptance gates.

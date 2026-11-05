@@ -1,5 +1,93 @@
 # Benchmark results and decisions
 
+## B12/F4 configuration selection and held-out completion (4 November 2026)
+
+Runtime `fc6fea3` includes committed production fallback `01d00f2`. It passes
+1,270 PyPy tests (9 optional skips), lint and 261 benchmark imports from a
+committed-only checkout. Subsequent benchmark analysis/input changes pass their
+focused checks; final full committed-checkout QA is queued. Exact arithmetic,
+SEARCHv1 identities, parent leases and serial defaults remain unchanged.
+
+A finite campaign screens 0/1/2/4/6/8/10/12/14/16 workers and bounded reuse,
+polling, packet, stage and budget options across 33 explicit size/schedule
+regimes at 30/40/50/60/70/80/100 digits. Repeated finalists comprise 1,188
+invocations; a targeted decoded-cache ablation adds 108, and missing-state cost
+calibration adds 95. Cold timings use fresh interpreters/pools; warm timings use
+three independent pool lifetimes with validated warmup and three samples each.
+Timing-block labels do not establish temporal pairs: uncertainty resamples
+independent processes/pool clusters. These are conditional work measurements,
+with near ties, rather than a proof of a global optimum.
+
+Cold cheap calls stay serial under the selected policy. Heavier cold nominees
+usually use 4–12 workers; many retained-pool nominees use 12–16. Exactly 140
+escalating curves at 60/80/100 select ten workers in both intents. For example,
+80/100-digit caller140 fixed-work cold medians are 1.790/1.961 seconds versus
+5.985/7.083 serial; warm medians are 1.120/1.382 versus 5.501/6.538. Mathematical
+options and curves match within these work comparisons. Counts above ten
+oversubscribe the M4; worker IDs imply no physical core class. Dropping the
+near-tied 32 MiB stage-two index cache for the 80-digit deep warm nominee lowers
+retained state; it does not establish that indexing is generally harmful.
+
+Before fresh generation, the source-pinned catalogue, engagement rule, seeds,
+exclusions and 12-modulus scope were frozen. Expected remaining serial ECM work
+must exceed fitted cold/started/warm thresholds and a dispatch-wave floor;
+cold intent has a one-second minimum. Retained intent assumes 64 compatible
+ECM-reaching calls while paying actual first-call startup. Unknown regimes stay
+SEARCHv1 serial, distinct from incumbent S0. Full configuration snapshots and the
+frozen catalogue are versioned loader inputs.
+
+All 448 fresh calls return checked results with source/seed/request hashes and
+owned-group exit proofs. The primary selected scope has 12 independent moduli,
+60/80/100 digits with 15/17/18/20-digit smaller factors, and nine fresh cold CLI
+timings per modulus/arm. It uses explicit caller140 and matched **64 MiB QS
+checkpoint funding**, labeled S0[R64]/POLICY[R64]. A prior unchanged stock
+1 MiB QS checkpoint serialization failure remains charged and visible. The
+larger grant changes neither numerical fallback settings nor the codec, and
+these results do not describe stock resource defaults.
+
+| Cold CLI endpoint | S0[R64] | POLICY[R64] |
+| --- | ---: | ---: |
+| Complete independent moduli | 10/12 | 11/12 |
+| Median latency | 2.920 s | 0.937 s |
+| Mean latency restricted at 20 s, preserving noncompletion | 5.343 s | 2.496 s |
+
+The median ratio is 0.321 with modulus-cluster 95% interval **[0.179, 1.110]**:
+the 3.12× point improvement does not establish a general median gain. The
+prespecified finite-horizon mean ratio is 0.467 [0.140, 0.867]; the completion
+difference is +1/12 [0, 3/12]. Four moduli per band give candidate/control
+medians 0.688/0.848 seconds at 60, **1.272/1.048 at 80**, and 0.672/5.161 at 100.
+The 80-digit regression remains part of the result. The 100-digit subgroup
+cannot be selected retrospectively as a newly confirmed scope. Twelve moduli
+support only descriptive, uncertain p90 reporting; repeated timings are not
+independent inputs. The extra algorithm seed is exploratory and inconclusive.
+
+The same-manifest M0 comparison uses only three timings per modulus and remains
+diagnostic. A 52-input unconditioned uniform panel and 28 other enriched inputs
+have one timing each: exploratory completion is 35/52 versus 31/52 and 15/28
+versus 12/28 respectively. Uniform bands remain separate, with equal-weight
+60/80/100 summaries; the pooled auxiliary-size panel is not portfolio acceptance.
+
+Across the same 200 primary/exploratory calls per arm, observed aggregate CPU
+is 896.52 seconds for POLICY versus 465.57 for S0. Conservative charges are
+7,957.39/865.57 seconds, including retained startup/helper/shutdown allowances;
+charges are not measured CPU consumption. Four separately priced RSS probes on
+14–16-worker warm configurations observe simultaneous parent-plus-worker peaks
+of 1.19–1.50 GiB, versus 2.24–2.83 GiB owned reservations. These omit separately
+reserved helpers/controller; sampled RSS and payload bounds are not an exact
+whole-process RSS theorem. Instrumented timings do not rank candidates.
+
+Both balanced 60/70-digit pilots remain unresolved: 60 reaches the common
+12-second body limit in QS, while 70 exhausts its numerical schedule without
+a QS fallback. Both policy calls stay serial. This cannot pass the balanced
+completion guardrail. No default promotion, B12/F4 closure, broad portfolio
+claim, merge or E1 campaign follows. The current campaign books 14,499.59 wall
+and 165,825.32 aggregate CPU seconds under finite 18,000/216,000 ceilings;
+bookings retain failures and unused reservations rather than claiming actual
+runtime. Earlier phases have separate preserved ledgers. The computation lock
+is released; final tooling QA is queued for a later window. Detailed research,
+all 33 regime choices/near ties, receipts, budgets and handoff remain local at
+`v2/audit/b12_f4/regime_selection_v1/`.
+
 ## B12/F4 512-curve cache amortization (4 November 2026)
 
 A resource-valid follow-up uses the unchanged committed runtime `b62ac7a` and

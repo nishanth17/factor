@@ -178,26 +178,33 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 pre-synchronization source `28239d6` passes 1,084 PyPy tests
-(9 optional skips) and full lint in a committed-only checkout. Opt-in resource/
-checkpoint v7 retains checked budget and stage-two preparation candidates, context
-binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
-accepted PRAC guards and global serial defaults are unchanged.
+B12/F4 implements opt-in spawn processes with stable SEARCHv1 curve identities,
+parent-owned leases, bounded metadata reuse and resource/checkpoint v7. Current
+runtime `fc6fea3` includes committed mainline `01d00f2` fallback behavior and passes
+1,270 PyPy tests (9 optional skips), full lint and 261 benchmark imports in a
+committed-only checkout. Later calibration/analysis/input changes have focused
+tests; their final full committed-checkout pass remains queued. No defaults change.
 
-The active selection campaign now covers 30 explicit size/schedule regimes at
-30/40/50/60/70/80/100 digits. All 600 cold count screens and 260 warm blocks
-complete with matching curves. Joint parameter refinement and complete-call
-selection continue; this is not a final optimum or performance promotion.
-The new source-isolated selection tools pass 17 targeted tests, full lint and
-six real S0/M0/P2 cold/warm smoke cases in a committed checkout. Detailed current
-plan/state: `v2/audit/b12_f4/regime_selection_v1/PLAN.md` and `ACTIVE_STATE.md`.
-The bounded v7 cache-capacity extension passes full runtime QA and addresses
-measured manifest/decode/index retention refusals without changing arithmetic.
-The lazy measured-profile selector passes its integrated runtime tests.
-Before whole-call comparisons, the isolated candidate imports the current
-committed C9a fallback from mainline `01d00f2`; focused checks and 261 benchmark
-imports pass, with full committed-checkout QA pending. Historical measurements
-retain their exact sources. No C9a experiment or E1 confirmation is reopened.
+The completed configuration campaign covers 33 explicit size/schedule regimes
+at 30/40/50/60/70/80/100 digits, with worker counts through 16. Repeated finalists
+include 1,188 invocations: nine fresh cold processes or three retained pools
+with three timed calls each after validated warmup. A frozen source-checked
+catalogue selects observable-cost thresholds and one bundle per exact regime.
+Cheap cold calls stay serial; retained-context choices explicitly assume 64
+compatible ECM-reaching calls. Unknown regimes use equivalent-manifest serial
+SEARCHv1, which remains distinct from incumbent S0. See the
+[configuration and confirmation results](benchmarks/RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026).
+
+All 448 held-out calls validate. In the prespecified 12-modulus caller140 scope
+at 60/80/100 digits, nine cold CLI timings per modulus give completion 11/12
+versus 10/12 and median 0.937 versus 2.920 seconds. The modulus-bootstrap median
+ratio interval includes parity; the 80-digit subgroup regresses. Both arms
+explicitly fund 64 MiB QS checkpoints after a retained stock-cap failure, so
+these are not stock-default resource results. The balanced completion guardrail
+remains pending. No B12/F4 closure, default promotion or E1 campaign follows.
+Detailed report and next-step handoff: `v2/audit/b12_f4/regime_selection_v1/REPORT.md`
+and `HANDOFF.md`. The computation lock is released; final full QA is queued
+until a later shared performance window.
 
 The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
 tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the
