@@ -17,6 +17,7 @@ from v2.execution.ecm_auto import (
     DEFAULT_MEMORY_BYTES,
     POLICY_PATH,
     POLICY_SHA256,
+    SELECTOR_OWNERSHIP,
     AutomaticECMOwner,
 )
 from v2.execution.ecm_defaults import ESCALATING140
@@ -158,6 +159,53 @@ class AutomaticTests(unittest.TestCase):
                 )
             self.assertEqual(run.result.reconstruct(), 1009 * 1013)
 
+    def test_parent_limit_includes_selector_coexistence_before_loading(self):
+        # A 4 GiB fallback parent remains valid, but cannot also own a selector
+        # inside the worker contract's separate 4 GiB parent ceiling.
+        maximum = 4 * 2**30 - SELECTOR_OWNERSHIP
+        for parent in (maximum + 1, 4 * 2**30):
+            with (
+                self.subTest(parent=parent),
+                patch(
+                    "v2.execution.ecm_selection.SelectedECMContext",
+                    side_effect=AssertionError("unadmitted selector"),
+                ),
+            ):
+                settings = config(memory_bytes=parent)
+                generator = random.Random(7)
+                before = generator.getstate()
+                with AutomaticECMOwner(
+                    seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
+                ) as owner:
+                    owner.configure(
+                        settings, generator, None, automatic_memory=False
+                    )
+                    result = owner.run_portfolio(
+                        1009 * 1013, config=settings, budget=budget()
+                    )
+                    self.assertIsNone(result)
+                    self.assertTrue(owner.last_stats["legacy_serial"])
+                    self.assertEqual(
+                        owner.last_stats["engagement"]["reason"],
+                        "worker_ownership_refused",
+                    )
+                self.assertEqual(generator.getstate(), before)
+
+        with patch(
+            "v2.execution.ecm_selection.SelectedECMContext", FakeSelected
+        ):
+            settings = config(memory_bytes=maximum)
+            with AutomaticECMOwner(
+                seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
+            ) as owner:
+                owner.configure(
+                    settings, random.Random(7), None, automatic_memory=False
+                )
+                result = owner.run_portfolio(
+                    1009 * 1013, config=settings, budget=budget()
+                )
+                self.assertEqual(result.divisor, 1009)
+
     def test_unmeasured_sizes_do_not_import_or_load_the_selector(self):
         with (
             patch("v2.execution.ecm_auto._size_supported", return_value=False),
@@ -276,6 +324,7 @@ class AutomaticTests(unittest.TestCase):
         with SelectedECMContext(
             POLICY_PATH,
             POLICY_SHA256,
+            SELECTOR_OWNERSHIP,
             parent_memory=settings.memory_bytes,
             memory_bytes=400 * 2**20,
         ) as owner:

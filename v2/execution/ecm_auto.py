@@ -183,7 +183,7 @@ class AutomaticECMOwner:
             ):
                 reason = "insufficient_automatic_startup_allowance"
             if reason is None and (
-                self.parent_memory > 4 * 2**30
+                self.settings.parent_memory > 4 * 2**30
                 or self.memory_bytes
                 < self.settings.parent_memory + 5 * 64 * 2**20
             ):

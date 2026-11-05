@@ -1,3 +1,7 @@
+Automatic ECM now includes selector bookkeeping in the worker parent-memory
+admission ceiling; large valid fallback grants decline workers safely before
+loading the selector.
+
 # Changelog
 
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
