@@ -361,8 +361,15 @@ class AutomaticTests(unittest.TestCase):
             self.assertTrue(owner.last_stats["legacy_serial"])
             # Loading and validating metadata was real work, despite refusal.
             self.assertGreater(ledger.used, 0)
+        # Component and portfolio modes intentionally require distinct owners.
+        with SelectedECMContext(
+            POLICY_PATH,
+            POLICY_SHA256,
+            parent_memory=4 * 2**30,
+            memory_bytes=DEFAULT_MEMORY_BYTES,
+        ) as component:
             with self.assertRaisesRegex(MemoryError, "parent ownership"):
-                owner.run(n, config=settings, budget=budget())
+                component.run(n, config=settings, budget=budget())
 
     def test_borrowed_context_is_not_closed(self):
         class Borrowed:
