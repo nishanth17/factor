@@ -450,10 +450,8 @@ def main():
                     base_order = list(ARMS)
                     generator.shuffle(base_order)
                     for cycle in range(cell["samples"]):
-                        order = (
-                            base_order[cycle % len(ARMS) :]
-                            + base_order[: cycle % len(ARMS)]
-                        )
+                        position = cycle % len(ARMS)
+                        order = base_order[position:] + base_order[:position]
                         if cycle % 2:
                             order.reverse()
                         for arm in order:
