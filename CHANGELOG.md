@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 actual-master comparison (5 November 2026)
+
+- Preserve benchmark work/CPU accounting through result/checkpoint construction
+  failures; add three regression tests and finite censored refusal recording.
+  Production arithmetic, resource limits and automatic defaults are unchanged.
+- Version fresh independent certified/uniform inputs, the stock-master comparison
+  policy and a separately frozen caller140 supplement/resource continuation.
+- Record all 33 regimes, cold CLI and warm context outcomes: primary uniform
+  completion is 18/36 versus master's 19/36 on the default schedule, or 24/36 with
+  explicit caller140. Median uncertainty, the 80-digit losses, sparse actual
+  worker engagement and pending balanced guardrail preclude default adoption.
+- Runtime/benchmark `538462a` passes full PyPy QA; final report/input committed
+  checkout validation is queued. Detailed receipts remain local. No B12/F4
+  closure, merge or E1 campaign.
+
 ## B12/F4 measured opt-in catalogue (4 November 2026)
 
 - Add lazy, source-checked selection for 33 exact mathematical regimes with

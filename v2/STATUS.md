@@ -1,6 +1,6 @@
 # Factor status
 
-Last updated: 4 November 2026 (America/Los_Angeles).
+Last updated: 5 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
@@ -178,43 +178,31 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-A new actual-default comparison is running against committed master `0efaba1`,
-using candidate runtime/benchmark source `538462a`. It preserves stock QS
-checkpoint/fallback settings and covers all 33 recommended ECM regimes, with
-cold CLI and warm-library endpoints. New independent certified/uniform inputs
-are committed; the supplementary primary-uniform caller140 comparison is
-separately frozen without tuning settings. Current code passes 1,287 PyPy tests
-(9 optional skips), lint and 262 benchmark imports. This ongoing experiment has
-no final performance verdict. Live state and finite limits:
-`v2/audit/b12_f4/master_comparison_v1/ACTIVE_STATE.md` and `PLAN.md`.
+The actual-master comparison is complete against committed `0efaba1`, using
+candidate runtime/benchmark source `538462a` (native runtime `fc6fea3`). All 4,384
+process cells and 6,568 timed calls validate. On 36 independent equal-weight
+60/80/100-digit uniform inputs, the default-schedule policy completes 18/36
+versus 19/36. Explicit caller140 completes 24/36; finite-horizon mean latency
+ratios are 0.761 cold [0.554, 0.946] and 0.787 warm [0.586, 0.976], while median
+uncertainty includes parity and 80-digit medians regress. Stock QS checkpoint
+settings are retained; the caller140 panel is a separately frozen supplement.
 
-B12/F4 implements opt-in spawn processes with stable SEARCHv1 curve identities,
-parent-owned leases, bounded metadata reuse and resource/checkpoint v7. Current
-runtime `fc6fea3` includes committed mainline `01d00f2` fallback behavior and passes
-1,270 PyPy tests (9 optional skips), full lint and 261 benchmark imports in a
-committed-only checkout. Later calibration/analysis/input changes have focused
-tests; their final full committed-checkout pass remains queued. No defaults change.
+All 33 recommended regimes at 30/40/50/60/70/80/100 digits have cold/warm complete
+comparisons, with enriched, uniform and cheap-exit populations kept separate.
+The catalogue often misses actual postprocessing cofactor sizes: caller140
+engages workers on only 2/36 cold uniform moduli. Broader completion gains mix
+quota, SEARCHv1 stream and serial/pool choices; they are not pure scaling gains.
+The balanced 60/70 completion guardrail remains pending. Keep the executor opt-in,
+serial defaults unchanged, B12/F4 open and E1 deferred. See the
+[actual-master results](benchmarks/RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026).
 
-The completed configuration campaign covers 33 explicit size/schedule regimes
-at 30/40/50/60/70/80/100 digits, with worker counts through 16. Repeated finalists
-include 1,188 invocations: nine fresh cold processes or three retained pools
-with three timed calls each after validated warmup. A frozen source-checked
-catalogue selects observable-cost thresholds and one bundle per exact regime.
-Cheap cold calls stay serial; retained-context choices explicitly assume 64
-compatible ECM-reaching calls. Unknown regimes use equivalent-manifest serial
-SEARCHv1, which remains distinct from incumbent S0. See the
-[configuration and confirmation results](benchmarks/RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026).
-
-All 448 held-out calls validate. In the prespecified 12-modulus caller140 scope
-at 60/80/100 digits, nine cold CLI timings per modulus give completion 11/12
-versus 10/12 and median 0.937 versus 2.920 seconds. The modulus-bootstrap median
-ratio interval includes parity; the 80-digit subgroup regresses. Both arms
-explicitly fund 64 MiB QS checkpoints after a retained stock-cap failure, so
-these are not stock-default resource results. The balanced completion guardrail
-remains pending. No B12/F4 closure, default promotion or E1 campaign follows.
-Detailed report and next-step handoff: `v2/audit/b12_f4/regime_selection_v1/REPORT.md`
-and `HANDOFF.md`. The computation lock is released; final full QA is queued
-until a later shared performance window.
+B12/F4 implements explicit spawn processes, stable SEARCHv1 identities,
+parent-owned leases, bounded metadata reuse and resource/checkpoint v7.
+Runtime/benchmark source `538462a` passes 1,287 PyPy tests (9 optional skips), lint
+and 262 benchmark imports in a committed-only checkout. Final report/input
+checkout QA is queued. Complete local report, all-regime tables, ledger and
+handoff: `v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and
+`HANDOFF.md`. Earlier R64 evidence and freezes remain historical resource variants.
 
 The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
 tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the

@@ -203,23 +203,31 @@ first-factor or complete-factor latency gains. Root-lineage-aware complete-call
 feasibility precedes engagement calibration and fresh confirmation.
 
 
-Current configuration-selection entry point:
-`v2/audit/b12_f4/regime_selection_v1/REPORT.md` and `HANDOFF.md`.
-The reusable `ecm/b12_f4/selection_calibration.py` fits separate cold/started/warm
-costs from observable planned work; `selection_analysis.py` resamples pool or
-modulus clusters and preserves censoring bounds for latency quantiles.
-`selection_inputs.py` generates bounded, certified enriched inputs separately
-from unconditioned uniform panels after a source/configuration freeze.
+Current complete-cost comparison entry point:
+`v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and `HANDOFF.md`.
+All 33 recommended regimes were compared with committed master `0efaba1` using
+candidate runtime/benchmark `538462a`. Stock numerical fallback and QS checkpoint
+settings remain literal. Separate cold CLI and retained-context endpoints cover
+4,384 process cells / 6,568 timed calls, preserving refusals and uncertainty.
+See [results](RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026).
 
-Committed loader inputs are `inputs/controls/b12_f4_selection_v1.json`, the
-fully resolved `b12_f4_selection_resolved_v1.json`, the prospective-then-frozen
-`b12_f4_confirmation_v1.json`, and
-`inputs/corpora/b12_f4_confirmation_v1.json`. Preserve their identities; revise
-under new names rather than retuning fresh outcomes. Source-current repeated
-work and 448 held-out complete calls are summarized in
-[results](RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026),
-including the explicit matched 64 MiB QS checkpoint scope, the 80-digit loss,
-median uncertainty and unresolved balanced guardrail. The catalogue is opt-in;
-S0, same-manifest serial M0 and policy serial decisions are separate controls.
-Final full committed-checkout validation of the latest tooling remains queued
-while the computation lock is released. No new campaign is the next step.
+Reusable `ecm/b12_f4/selection_calibration.py` fits cold/started/warm costs;
+`selection_analysis.py` resamples pool/modulus clusters and preserves censored
+quantiles. `selection_inputs.py` generates bounded certified enriched inputs
+separately from unconditioned uniform panels. `selection_child.py` runs the
+source-pinned process request and preserves work/CPU charges even when result
+construction raises. Optional benchmark refusal recording reconstructs the whole
+input as unresolved rather than inventing partial progress. Runtime remains PyPy
+3.11; controllers and text analysis are separate from factoring measurements.
+
+Committed loader inputs include `inputs/controls/b12_f4_selection_v1.json`,
+`b12_f4_selection_resolved_v1.json`, `b12_f4_master_comparison_v1.json`,
+`b12_f4_master_uniform140_v1.json`, `b12_f4_master_uniform140_resource_r2.json`,
+and `inputs/corpora/b12_f4_master_comparison_v1.json`. The resource revision
+preserves prior charges and changes no per-call treatment. Preserve earlier
+confirmation/R64 inputs and evidence under their original identities.
+
+Final committed-checkout QA is queued under the shared nonblocking performance
+lock, using the finite command in the local handoff. No additional performance
+campaign or default promotion is queued by this report. B12/F4 remain open and
+E1 stays deferred; exact-cofactor coverage and the balanced guardrail are unresolved.

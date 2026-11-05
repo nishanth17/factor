@@ -1,5 +1,112 @@
 # Benchmark results and decisions
 
+## B12/F4 actual-master complete-cost comparison (5 November 2026)
+
+The completed comparison uses actual committed master `0efaba1` and candidate
+runtime/benchmark source `538462a`; its 99 factorer runtime files remain those
+of `fc6fea3`. The control resolves stock numerical ECM, SIQS fallback and 1 MiB
+QS checkpoint settings. Candidate arms replace only their declared ECM options
+and use the frozen source-checked selection catalogue. Both arms receive the
+same explicit machine-wide time/CPU/work/memory ceilings. This supersedes the
+earlier R64 result for claims about stock settings; historical receipts remain.
+
+All 4,384 process cells and 6,568 timed calls pass reconstruction, source/request
+hash and owned-process cleanup checks. There are nine fresh cold CLI timings per
+ordinary modulus/arm; warm execution uses three independent homogeneous context
+lifetimes, each with at least three validated warmup seconds and three timings.
+Cold latency includes interpreter/import/spawn, result construction and shutdown;
+warm call latency is secondary, with preparation/warmup/close separately charged.
+The cold factoring deadline starts at CLI entry (8 s), with a 16 s whole-call
+censor/cleanup horizon; warm calls have 8 s and a 60 s whole-pool guard. Refused,
+failed and incomplete outcomes remain in denominators and censored quantiles.
+
+The unconditioned uniform panel has 12 independent moduli at each primary size
+60/80/100, and four at auxiliary sizes 30/40/50/70. Completion counts below agree
+across cold/warm endpoints. Medians include noncompletion; ≥16/≥8 are unidentified
+cold/warm medians within the respective horizon. Repetitions do not add inputs.
+
+| Digits | Cold master → policy (s) | Warm master → policy (s) | Completion master → policy |
+| --- | ---: | ---: | ---: |
+| 30 | 0.1611 → 0.1773 | 0.0004 → 0.0004 | 4/4→4/4 |
+| 40 | 0.1731 → 0.1799 | 0.0012 → 0.0010 | 4/4→4/4 |
+| 50 | 0.1862 → 0.1979 | 0.0052 → 0.0015 | 4/4→4/4 |
+| 60 | 0.6348 → 0.9162 | 0.1449 → 0.2339 | 6/12→6/12 |
+| 70 | ≥16 → ≥16 | ≥8 → ≥8 | 0/4→1/4 |
+| 80 | 0.5589 → ≥16 | 0.1832 → ≥8 | 7/12→5/12 |
+| 100 | 0.6112 → 0.4754 | 0.1193 → 0.1049 | 6/12→7/12 |
+
+On the equal-weight primary population, the default-schedule policy completes
+18/36 versus master's 19/36. Cold median is 0.916 versus 0.586 s; warm median is
+0.256 versus 0.183 s. Its restricted-mean latency ratios are 1.059 cold
+(95% modulus-cluster interval [0.889, 1.296]) and 1.058 warm [0.884, 1.301].
+There is no broad improvement, and the 80-digit completion/latency loss matters.
+
+A separately frozen supplementary panel applies the previously selected explicit
+140-curve escalating schedule at all 36 primary uniform inputs. It was added
+after some core outcomes were visible, without retuning its settings; it is a
+supplementary comparison, not a pristine independent confirmation.
+
+| Digits | Cold master → policy (s) | Warm master → policy (s) | Completion master → policy |
+| --- | ---: | ---: | ---: |
+| 60 | 0.6348 → 0.3555 | 0.1449 → 0.0463 | 6/12→9/12 |
+| 80 | 0.5589 → 0.8683 | 0.1832 → 0.4477 | 7/12→8/12 |
+| 100 | 0.6112 → 0.4344 | 0.1193 → 0.1341 | 6/12→7/12 |
+
+Together, caller140 completes 24/36 versus 19/36. Cold median is 0.497 versus
+0.586 s; warm median is 0.171 versus 0.183 s. Those point improvements are
+uncertain: median-ratio intervals are [0, 3.315] cold and [0, 7.693] warm.
+Finite-horizon mean latency is lower: 5.872 versus 7.720 s cold, ratio 0.761
+[0.554, 0.946]; 2.996 versus 3.807 s warm, ratio 0.787 [0.586, 0.976]. The paired
+completion difference is +5/36, interval [1/36, 9/36]. These are scoped,
+censoring-aware comparisons, not an exact median speedup or a p90 claim.
+Primary p90 remains beyond the 16/8 s horizons in both arms. The 80-digit
+caller140 median regresses despite one additional completion.
+
+The separate certified ECM-enriched panel (four independent inputs per size,
+15/17/18/20-digit smaller factors) gives caller140 completion 4/4 versus 1/4 at
+60, 4/4 versus 0/4 at 80, and 3/4 versus 0/4 at 100. Candidate cold medians are
+1.004/0.808/1.321 s and warm medians 0.220/0.083/0.715 s. Control medians are
+unidentified within these grants, so no exact speedup multiple is established.
+All 33 recommended regimes were also compared on four other certified enriched
+inputs per regime, including every loss. Larger schedules improve several
+conditional 70/80/100-digit cells; they do not supply universal winners.
+
+An integration limitation remains: exact-digit/options catalogue lookup often
+misses the cofactor produced by preprocessing/recursion and falls back to SEARCHv1
+serial. Caller140 engages on only 2/36 cold uniform moduli (18/324 timings),
+including none at 100 digits; its warm panel has 9 engaged, 288 serial and 27
+refusal rows without a decision receipt. The default panel has zero engaged
+cold timings and nine warm. Thus quota/stream changes, serial choices and
+parallel execution are bundled; these completion gains cannot be attributed to
+workers alone. The opt-in serial SEARCHv1 stream differs from incumbent S0.
+
+Matched primary cold observed aggregate CPU is 578.4 s for S0, 591.2 s for the
+default-schedule policy and 912.5 s for caller140 (324 calls each); conservative
+charged CPU is 1,226.4/1,239.2/2,532.1 s. Warm whole-context observed CPU is
+941.2/1,000.5/1,272.4 s for 108 contexts per arm, including variable validated
+warmup work, so it is not equal-work CPU efficiency. All measurement cells total
+15,765.3 wall, 33,369.9 observed CPU and 112,869.3 conservatively charged CPU
+seconds. Peak declared owned memory is 2.819 GiB. Parent/one-child high-water
+marks (296/89.8 MiB) are not simultaneous aggregate RSS. Earlier separate
+14–16-worker probes observed about 1.19–1.50 GiB parent-plus-worker RSS. Full
+startup/shutdown is in endpoint/cell wall time; selected-wrapper close attribution
+is missing, and native counters alone cannot establish total cancellation cost.
+
+One cumulative supplementary reservation refused before dispatch; all 418
+acknowledged cells stayed charged. A prospectively committed resource-only
+revision raised that lane from 2,000 to 3,000 cumulative wall seconds within the
+unchanged 18,000-wall/480,000-CPU campaign ceiling. It completed the remaining
+14 cells without reruns or treatment changes. Stock checkpoint refusals remain
+censored outcomes; no R64 substitution or successful-only analysis was used.
+The 60/70 balanced probes remain incomplete: the protected guardrail is pending.
+No default change, global optimum, B12/F4 closure or E1 campaign follows.
+
+Runtime/benchmark source `538462a` passes 1,287 PyPy tests (9 optional skips), lint
+and 262 benchmark imports from committed files. Final report/input checkout QA
+is queued. Detailed all-regime tables, corpus proofs, receipts, uncertainty and
+resource ledger are local under `v2/audit/b12_f4/master_comparison_v1/REPORT.md`,
+`ALL_REGIMES.md`, `summary.json`, `cost-summary.json` and `HANDOFF.md`.
+
 ## B12/F4 configuration selection and held-out completion (4 November 2026)
 
 Runtime `fc6fea3` includes committed production fallback `01d00f2`. It passes

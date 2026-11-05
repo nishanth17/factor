@@ -280,8 +280,15 @@ under SEARCHv1. Omitting the context retains the legacy production S0 stream.
 Full constructor snapshots for reproducing the catalogue's mathematical regimes
 live in `benchmarks/inputs/controls/b12_f4_selection_resolved_v1.json`. These
 snapshots define measured caller configurations rather than new portfolio
-presets. In particular, caller140 at 60/80/100 digits is explicit. The complete
-comparison funded 64 MiB QS checkpoints equally in both arms after a retained
-stock 1 MiB checkpoint failure; this resource variant is not adopted by default.
-See [results](benchmarks/RESULTS.md#b12f4-configuration-selection-and-held-out-completion-4-november-2026)
-for gains, losses and unresolved acceptance gates.
+presets. In particular, caller140 at 60/80/100 digits is explicit.
+
+The latest comparison uses actual master stock QS checkpoint/fallback settings,
+separating default-schedule and explicit caller140 arms. It finds conditional
+completion gains and regressions, with no universal cold/warm median winner.
+Catalogue matching uses the actual current cofactor's exact size/options; ordinary
+postprocessing cofactors often have no row and remain serial. The opt-in serial
+stream still differs from incumbent S0. A nominated worker count therefore does
+not mean workers engaged on every call. The earlier matched 64 MiB QS checkpoint
+study remains a historical resource variant. See
+[actual-master results](benchmarks/RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026)
+for population sizes, uncertainty, CPU/memory costs and pending acceptance gates.
