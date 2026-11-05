@@ -17,12 +17,12 @@ def main():
         raise RuntimeError("PyPy implementing Python 3.11 required")
     request = json.loads(args.request.read_text())
 
-    from .runner import ARMS
     from ....execution.budget import Budget
     from ....execution.ecm_workers import ECMExecutor
     from ....execution.portfolio_config import PortfolioConfig
     from ....execution.worker_contract import WorkerSettings
     from ....portfolio import factorize_bounded
+    from .runner import ARMS
 
     kernel, workers = ARMS[request["arm"]]
     options = dict(request["config"], ecm_kernel=kernel)
