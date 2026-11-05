@@ -36,6 +36,30 @@ def enriched_plan():
     return rows
 
 
+def hard_plan():
+    """A separate conditional frontier, never a uniform easy-success cohort."""
+    return (
+        dict(
+            id="hard-80-small22",
+            digits=80,
+            cofactor_digits=80,
+            smaller_cofactor_digits=22,
+            two_exponent=0,
+            population="hard_frontier",
+            algorithm_seed=7919,
+        ),
+        dict(
+            id="hard-100-small25",
+            digits=100,
+            cofactor_digits=100,
+            smaller_cofactor_digits=25,
+            two_exponent=0,
+            population="hard_frontier",
+            algorithm_seed=7919,
+        ),
+    )
+
+
 def build(phase, seed, *, excluded=(), seconds=90, draws=200000):
     """Prove candidate primality with independent recursive certificates."""
     from ...suites.build_phase_two_corpus import (
@@ -86,7 +110,7 @@ def build(phase, seed, *, excluded=(), seconds=90, draws=200000):
             )
         uniform, controls = [], []
     else:
-        for plan in enriched_plan():
+        for plan in enriched_plan() + list(hard_plan()):
             while True:
                 small = plan["smaller_cofactor_digits"]
                 p, q = prime(small), prime(plan["cofactor_digits"] - small)

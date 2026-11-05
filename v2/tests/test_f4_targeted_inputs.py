@@ -6,6 +6,7 @@ from v2.benchmarks.ecm.b12_f4.targeted_inputs import (
     CALIBRATION_DIGITS,
     build,
     enriched_plan,
+    hard_plan,
 )
 
 
@@ -30,6 +31,15 @@ class TargetedPlanTests(unittest.TestCase):
             {r["cofactor_digits"] for r in rows if r["two_exponent"]},
             {55, 75, 90},
         )
+
+    def test_frontier_is_separate_and_mathematically_possible(self):
+        rows = hard_plan()
+        self.assertEqual(
+            [(r["digits"], r["smaller_cofactor_digits"]) for r in rows],
+            [(80, 22), (100, 25)],
+        )
+        self.assertTrue(all(r["population"] == "hard_frontier" for r in rows))
+        self.assertTrue(all(r["two_exponent"] == 0 for r in rows))
 
     def test_calibration_and_confirmation_are_distinct_lanes(self):
         self.assertEqual(CALIBRATION_DIGITS, (55, 75, 81, 90))
