@@ -300,3 +300,10 @@ is not new performance confirmation. After a deliberate code change, use a
 reviewed measured reference and expected SHA, package into the production JSON
 and update exactly the adapter policy constant, then perform locked correctness
 QA. Existing automatic checkpoints require their original committed source.
+
+Final committed-only default-integration checkout `094ab1d` passes 1,337 tests
+(9 optional skips), full lint and 264 benchmark imports. Its runtime files are
+implementation `0c4cd18`; later changes fix legacy test-fixture intent only.
+All source/default/API/checkpoint changes are validated. No new-source
+performance measurement or balanced-completion claim is made. The shared
+computation lock is released.

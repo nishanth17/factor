@@ -124,3 +124,7 @@ uncertain reuse. The context fixes its first engaged worker configuration and
 needs a parent-memory reserve matching any explicit portfolio workspace.
 Automatic schema-13 snapshots require the same packaged policy/implementation,
 seed and cap on resume; legacy serial snapshots retain their execution.
+
+Concurrent independent calls own separate contexts and grants. Service callers
+coordinate machine-wide concurrency; nested process calls default to serial.
+A shared retained context admits one active call at a time.

@@ -45,8 +45,11 @@ The normal auto CLI and bounded API now own a cold-intent selected pool and
 close it on all exits; explicit serial/caller limits and legacy resume win.
 New automatic metadata binds policy, implementation and seed. The selected
 34-row policy retains measured costs; only its integration source pins change.
-Working-tree lint, 1,332 tests (9 optional skips) and 263 imports pass; final
-committed-checkout validation follows a small unsupported-size prefilter.
+Implementation `0c4cd18` and committed-only QA checkout `094ab1d` pass full lint,
+1,337 PyPy tests (9 optional skips) and 264 benchmark imports. The final check
+costs 75.474 wall / 93.613 observed aggregate CPU seconds. All QA attempts total
+316.460 wall / 395.016 CPU; full booking is 890/8,900 under 900/9,000. Failed
+legacy-fixture attempts remain retained. Computation and its lock are released.
 No new performance result is claimed. The balanced/p90/cold-median limitations
 are recorded as an [adoption exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).
 This changes branch defaults, not mainline, E1 or B12/F4 completion status.

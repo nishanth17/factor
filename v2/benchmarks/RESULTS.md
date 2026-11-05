@@ -21,14 +21,26 @@ retain the measured SEARCHv1 mapping. The packaged production policy copies all
 34 measured rows unchanged, with new integration pins; historical controls
 and receipts remain immutable. Later code changes invalidate the old profiles.
 
-Focused validation passes 55 tests, including real spawn/drain and no orphan
-children. The full working tree passes 1,332 tests (9 optional skips), lint and
-263 benchmark imports. Legacy serial event/checkpoint oracles now request
-serial explicitly; the default CLI test checks its new selection event. Final
-committed-only validation follows the unsupported-size prefilter. Detailed
-local decision, QA attempts/charges and handoff are under
-`v2/audit/b12_f4/default_adoption_v1/`. No new scaling campaign, universal
-speedup, B12/F4 closure, merge, push or E1 is inferred.
+Focused validation includes real spawn/drain, exact manifests, unchanged serial
+RNG/curve receipts, memory/startup refusal, cancellation, error cleanup and no
+orphan children. New automatic schema tests reject legacy-reader/downgrade
+misinterpretation. Legacy numerical/checkpoint oracles explicitly request
+serial; default-path tests check schema 13 and its mathematical subschema.
+
+Implementation `0c4cd18` with fixture corrections `094ab1d` passes committed-only
+PyPy 3.11 full validation: 1,337 tests (9 optional skips), lint and 264 benchmark
+imports. Final validation costs 75.474 wall / 93.613 observed aggregate CPU
+seconds. All eight QA attempts cost 316.460 wall / 395.016 CPU; full conservative
+booking is 890 wall / 8,900 CPU under the finite 900 / 9,000 ceiling. The initial
+wrong-regime spawn fixture, seven legacy event assumptions, and later schema
+fixture failures stay retained with their full loans. No arithmetic or pool
+lifecycle defect was found in those failures; frozen baselines remain unchanged.
+No failed measurement was rerun because no new performance campaign ran.
+
+Detailed local decision, attempts, resource ledger and handoff are under
+`v2/audit/b12_f4/default_adoption_v1/`. The computation lock is released. This
+branch changes defaults through the recorded adoption exception; it remains
+unmerged/unpushed, B12/F4 remain Open, and E1 stays deferred.
 
 ## B12/F4 fresh cofactor-policy comparison (5 November 2026)
 

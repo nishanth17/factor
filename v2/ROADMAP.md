@@ -10,6 +10,8 @@ authorized in the isolated B12/F4 branch after its fresh bounded comparison.
 This promotion retains the unresolved balanced guardrail and other evidence
 limits as a [recorded exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).
 B12/F4 stay Open; no mainline merge, push or E1 follows. No new 415-curve default.
+Implementation `0c4cd18` / committed QA `094ab1d` pass 1,337 tests (9 optional
+skips), lint and 264 benchmark imports; the computation lock is released.
 
 Status vocabulary: **Done**, **Open**, **Conditional** (requires its trigger),
 **Deferred**, **Rejected**, **Inconclusive**. Done describes the delivered scope;

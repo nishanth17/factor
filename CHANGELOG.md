@@ -16,6 +16,9 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Record the authorized adoption exception: balanced completion and precise
   tails remain unestablished, some cold medians regress and CPU increases.
   No new speedup claim, mainline merge, push, B12/F4 closure or E1.
+- Committed-only `094ab1d` passes 1,337 tests (9 optional skips), full lint and
+  264 benchmark imports; automatic snapshots use outer schema 13 so older
+  readers reject their worker state. Computation and its lock are released.
 
 ## B12/F4 targeted policy and hard-case evidence (5 November 2026)
 
