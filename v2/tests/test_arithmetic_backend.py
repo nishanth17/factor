@@ -372,10 +372,14 @@ class EngineBackendTests(unittest.TestCase):
         for name in BACKENDS:
             config = program_config(backend=name, ecm_program_bytes=0)
             whole = factorize_bounded(
-                n, seed=7, config=config, budget=allowance()
+                n, seed=7, config=config, budget=allowance(), ecm_executor=None
             )
             paused = factorize_bounded(
-                n, seed=7, config=config, budget=allowance(1000)
+                n,
+                seed=7,
+                config=config,
+                budget=allowance(1000),
+                ecm_executor=None,
             )
             legacy = copy.deepcopy(paused.checkpoint)
             legacy["payload"]["version"] = 5
@@ -385,6 +389,7 @@ class EngineBackendTests(unittest.TestCase):
                 config=config,
                 budget=allowance(),
                 checkpoint=reseal(legacy),
+                ecm_executor=None,
             )
             self.assertEqual(
                 (resumed.result, resumed.reason, resumed.work_used),

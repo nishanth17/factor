@@ -137,7 +137,7 @@ class ProductionPM1Tests(unittest.TestCase):
             n, seed=7, config=oldconfig, budget=allowance(700)
         )
         newrun = portfolio.factorize_bounded(
-            n, seed=7, config=legacy, budget=allowance(700)
+            n, seed=7, config=legacy, budget=allowance(700), ecm_executor=None
         )
         for key in ("version", "config", "rng", "work_used", "schedule"):
             self.assertEqual(
@@ -149,6 +149,7 @@ class ProductionPM1Tests(unittest.TestCase):
             config=legacy,
             budget=allowance(),
             checkpoint=json.loads(json.dumps(oldrun.checkpoint)),
+            ecm_executor=None,
         )
         whole = old.factorize_bounded(
             n, seed=7, config=oldconfig, budget=allowance()
@@ -163,17 +164,22 @@ class ProductionPM1Tests(unittest.TestCase):
                 config=configuration(),
                 budget=allowance(),
                 checkpoint=oldrun.checkpoint,
+                ecm_executor=None,
             )
 
     def test_new_schema_resume_and_table_corruption(self):
         n, config = 1009 * 1013, configuration()
         whole = portfolio.factorize_bounded(
-            n, seed=7, config=config, budget=allowance()
+            n, seed=7, config=config, budget=allowance(), ecm_executor=None
         )
         checkpoint = None
         for work in range(0, whole.work_used, 1):
             paused = portfolio.factorize_bounded(
-                n, seed=7, config=config, budget=allowance(work)
+                n,
+                seed=7,
+                config=config,
+                budget=allowance(work),
+                ecm_executor=None,
             )
             current = paused.checkpoint["payload"]["state"]["current"]
             if current and (current.get("job") or {}).get("even_powers"):
@@ -186,6 +192,7 @@ class ProductionPM1Tests(unittest.TestCase):
             config=config,
             budget=allowance(),
             checkpoint=json.loads(json.dumps(checkpoint)),
+            ecm_executor=None,
         )
         self.assertEqual(resumed.result, whole.result)
         self.assertGreater(resumed.work_used, whole.work_used)
@@ -194,6 +201,7 @@ class ProductionPM1Tests(unittest.TestCase):
             config=config,
             budget=allowance(checkpoint["payload"]["work_used"]),
             checkpoint=checkpoint,
+            ecm_executor=None,
         )
         self.assertEqual(same.reason, "work_limit")
         damaged = copy.deepcopy(checkpoint)
@@ -202,7 +210,11 @@ class ProductionPM1Tests(unittest.TestCase):
         damaged["sha256"] = hashlib.sha256(encoded.encode()).hexdigest()
         with self.assertRaisesRegex(ValueError, "corrupt"):
             portfolio.factorize_bounded(
-                n, config=config, budget=allowance(), checkpoint=damaged
+                n,
+                config=config,
+                budget=allowance(),
+                checkpoint=damaged,
+                ecm_executor=None,
             )
 
     def test_oversized_tables_reject_before_rehydration(self):
@@ -249,7 +261,8 @@ class ProductionPM1Tests(unittest.TestCase):
         self.assertEqual(config.chunk_size, 16)
         n = 1009 * 1013
         fresh = portfolio.factorize_bounded(n, budget=allowance(0))
-        self.assertEqual(fresh.checkpoint["payload"]["version"], 10)
+        self.assertEqual(fresh.checkpoint["payload"]["version"], 13)
+        self.assertEqual(fresh.checkpoint["payload"]["portfolio_version"], 10)
         resumed = portfolio.factorize_bounded(
             n, budget=allowance(0), checkpoint=fresh.checkpoint
         )

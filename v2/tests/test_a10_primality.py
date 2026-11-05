@@ -128,16 +128,25 @@ class A10Tests(unittest.TestCase):
             )
         cfg = config(backend="gmpy2-mpz", ecm_program_bytes=65536)
         whole = portfolio.factorize_bounded(
-            REPORTED_PRIME, seed=7, config=cfg, budget=allowance()
+            REPORTED_PRIME,
+            seed=7,
+            config=cfg,
+            budget=allowance(),
+            ecm_executor=None,
         )
         paused = portfolio.factorize_bounded(
-            REPORTED_PRIME, seed=7, config=cfg, budget=allowance(200)
+            REPORTED_PRIME,
+            seed=7,
+            config=cfg,
+            budget=allowance(200),
+            ecm_executor=None,
         )
         resumed = portfolio.factorize_bounded(
             REPORTED_PRIME,
             config=cfg,
             budget=allowance(),
             checkpoint=paused.checkpoint,
+            ecm_executor=None,
         )
         self.assertEqual(paused.checkpoint["payload"]["version"], 6)
         self.assertEqual(
@@ -399,12 +408,14 @@ class A10Tests(unittest.TestCase):
                         seed=7,
                         config=cfg,
                         budget=allowance(),
+                        ecm_executor=None,
                     )
                     paused = portfolio.factorize_bounded(
                         REPORTED_PRIME,
                         seed=7,
                         config=cfg,
                         budget=allowance(200),
+                        ecm_executor=None,
                     )
                     metadata = paused.checkpoint["payload"]
                     self.assertEqual(metadata["version"], version)
@@ -414,6 +425,7 @@ class A10Tests(unittest.TestCase):
                         config=cfg,
                         budget=allowance(),
                         checkpoint=paused.checkpoint,
+                        ecm_executor=None,
                     )
                     self.assertTrue(resumed.result.proven)
                     self.assertEqual(
@@ -432,6 +444,7 @@ class A10Tests(unittest.TestCase):
                         config=cfg,
                         budget=allowance(),
                         checkpoint=legacy,
+                        ecm_executor=None,
                     )
                     self.assertEqual(
                         restored.result.factors[0].certainty,
@@ -453,6 +466,7 @@ class A10Tests(unittest.TestCase):
                             config=cfg,
                             budget=allowance(),
                             checkpoint=reseal(bad),
+                            ecm_executor=None,
                         )
 
     def test_above_final_bound_stays_probable_across_resume(self):

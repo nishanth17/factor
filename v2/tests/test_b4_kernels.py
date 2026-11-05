@@ -186,6 +186,16 @@ class B4KernelTests(unittest.TestCase):
             self.assertFalse(primitive(low_order, 101))
 
     def test_canonical_resume_and_cancellation(self):
+        # Frozen engines predate the optional worker API. Current engines
+        # explicitly retain serial mathematical snapshots for cross-resume.
+        def serial_options(engine):
+            import inspect
+
+            parameters = inspect.signature(engine.factorize_bounded).parameters
+            return (
+                {"ecm_executor": None} if "ecm_executor" in parameters else {}
+            )
+
         protocol, corpus = common.inputs()
         fixture = next(f for f in corpus["fixtures"] if f["id"] == "stage_128")
         for backend in ("python-int", "gmpy2-mpz"):
@@ -217,6 +227,7 @@ class B4KernelTests(unittest.TestCase):
                             work_limit=protocol["work_limit"],
                             cancelled=lambda: bool(progress),
                         ),
+                        **serial_options(engine),
                     )
                 finally:
                     module.scalar_multiply = original
@@ -232,12 +243,14 @@ class B4KernelTests(unittest.TestCase):
                     config=config,
                     checkpoint=checkpoint,
                     budget=engine.Budget(work_limit=protocol["work_limit"]),
+                    **serial_options(engine),
                 )
                 uninterrupted = engine.factorize_bounded(
                     fixture["n"],
                     seed=7,
                     config=config,
                     budget=engine.Budget(work_limit=protocol["work_limit"]),
+                    **serial_options(engine),
                 )
                 self.assertEqual(
                     common.validate_run(resumed, fixture),
@@ -253,6 +266,7 @@ class B4KernelTests(unittest.TestCase):
                         ),
                         checkpoint=checkpoint,
                         budget=plain.Budget(work_limit=protocol["work_limit"]),
+                        **serial_options(plain),
                     )
                     self.assertEqual(
                         common.validate_run(cross, fixture),
@@ -264,6 +278,7 @@ class B4KernelTests(unittest.TestCase):
                     budget=engine.Budget(
                         work_limit=5000, cancelled=lambda: True
                     ),
+                    **serial_options(engine),
                 )
                 self.assertEqual(cancelled.result.reconstruct(), fixture["n"])
                 self.assertFalse(cancelled.result.complete)

@@ -79,10 +79,18 @@ class OptionalChainTests(unittest.TestCase):
         for family in ("lucas", "cf"):
             config = configuration(ecm_chain_family=family)
             full = factorize_bounded(
-                n, seed=19, config=config, budget=allowance()
+                n,
+                seed=19,
+                config=config,
+                budget=allowance(),
+                ecm_executor=None,
             )
             partial = factorize_bounded(
-                n, seed=19, config=config, budget=allowance(250000)
+                n,
+                seed=19,
+                config=config,
+                budget=allowance(250000),
+                ecm_executor=None,
             )
             self.assertEqual(partial.checkpoint["payload"]["version"], 11)
             restored = factorize_bounded(
@@ -90,6 +98,7 @@ class OptionalChainTests(unittest.TestCase):
                 config=config,
                 checkpoint=partial.checkpoint,
                 budget=allowance(),
+                ecm_executor=None,
             )
             self.assertEqual(restored.result, full.result)
             self.assertEqual(restored.result.reconstruct(), n)
@@ -102,6 +111,7 @@ class OptionalChainTests(unittest.TestCase):
                     config=other,
                     checkpoint=partial.checkpoint,
                     budget=allowance(),
+                    ecm_executor=None,
                 )
 
     def test_implicit_resume_keeps_saved_caps_and_legacy_executor(self):

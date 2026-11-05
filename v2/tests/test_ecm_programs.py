@@ -379,7 +379,10 @@ class ResumeTests(unittest.TestCase):
     def test_old_schema_and_corrupt_identity(self):
         config = configuration(ecm_program_bytes=0)
         run = factorize_bounded(
-            25013 * 25031, config=config, budget=allowance(1000)
+            25013 * 25031,
+            config=config,
+            budget=allowance(1000),
+            ecm_executor=None,
         )
         self.assertEqual(run.checkpoint["payload"]["version"], 4)
         self.assertNotIn(
@@ -390,6 +393,7 @@ class ResumeTests(unittest.TestCase):
             config=config,
             budget=allowance(),
             checkpoint=run.checkpoint,
+            ecm_executor=None,
         )
         self.assertEqual(resumed.result.reconstruct(), run.result.original)
         with self.assertRaises(ValueError):
@@ -398,10 +402,14 @@ class ResumeTests(unittest.TestCase):
                 config=configuration(),
                 budget=allowance(),
                 checkpoint=run.checkpoint,
+                ecm_executor=None,
             )
 
         run = factorize_bounded(
-            25013 * 25031, config=configuration(), budget=allowance(1000)
+            25013 * 25031,
+            config=configuration(),
+            budget=allowance(1000),
+            ecm_executor=None,
         )
         corrupt = copy.deepcopy(run.checkpoint)
         corrupt["payload"]["schedule"] = "wrong-program-version"
@@ -411,6 +419,7 @@ class ResumeTests(unittest.TestCase):
                 config=configuration(),
                 budget=allowance(),
                 checkpoint=reseal(corrupt),
+                ecm_executor=None,
             )
 
 

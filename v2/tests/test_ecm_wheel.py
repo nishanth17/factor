@@ -90,6 +90,7 @@ class WheelExecutionTests(unittest.TestCase):
                 1000000000039 * 1000000000061,
                 config=config,
                 budget=allowance(10),
+                ecm_executor=None,
             )
             self.assertEqual(run.checkpoint["payload"]["version"], version)
             self.assertNotIn(
