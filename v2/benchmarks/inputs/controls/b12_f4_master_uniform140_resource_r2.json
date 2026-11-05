@@ -1,0 +1,33 @@
+{
+  "schema": "b12-f4-master-comparison-uniform140-resource-r2",
+  "status": "frozen-before-continuation",
+  "base_policy_sha256": "c38c439e62c61130108169ad0ae11b963aa156f063e96dc09cc5b19da5603694",
+  "reason": "First324cold and36warm cells show higher complete-cost serial fallback on common cofactor sizes absent from the exact-digit cost catalogue. Original2000s cumulative lane may refuse the unchanged final cells. Extend ONLY cumulative lane wall to3000s within unchanged18000s global/17000s measurement ceilings; retain every old charge/ack/result and skip acknowledged IDs. No algorithm/configuration/seed/per-cell cap changes or reruns.",
+  "exposure": "Supplementary comparison on the frozen fresh corpus; some stock/default outcomes were observed before this extension. Not a new pristine confirmation panel.",
+  "regimes": [
+    "60-caller140",
+    "80-caller140",
+    "100-caller140"
+  ],
+  "cold_repetitions": 9,
+  "warm_pool_lifetimes": 3,
+  "warm_repetitions_per_pool": 3,
+  "limits": {
+    "wall": 3000,
+    "cpu": 32000
+  },
+  "global_limits_unchanged": {
+    "wall": 18000,
+    "cpu": 480000
+  },
+  "measurement_stage_limits_unchanged": {
+    "wall": 17000,
+    "cpu": 475000
+  },
+  "expected_wall": [
+    1900,
+    2500
+  ],
+  "stop": "Use only after predecessor controller stops before dispatch at its unchanged2000s lane cap, or is fully finished. Verify prefix acknowledgements and full headroom before continuation. Refuse any issued/unacknowledged cell. Old receipts/freezes unchanged.",
+  "previous_policy_sha256": "6ef9dab35f9f3ac392af48323edaac6f221ccdd2ff1b72ce3062b84724bb8ff6"
+}
