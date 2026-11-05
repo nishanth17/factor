@@ -3,10 +3,15 @@
 import unittest
 from pathlib import Path
 
-from v2.benchmarks.ecm.b12_f4.completion import configuration, point_comparison
+from v2.benchmarks.ecm.b12_f4.completion import (
+    configuration,
+    point_comparison,
+    validate_known_factorization,
+)
 from v2.benchmarks.ecm.b12_f4.selection_child import (
     execution_options,
     selection_options,
+    warmup_validation,
 )
 
 
@@ -84,6 +89,41 @@ class CompletionStudyTests(unittest.TestCase):
             funded.siqs.memory_bytes + funded.workspace_reserve + 8192,
             funded.memory_bytes,
         )
+
+    def test_warmup_oracle_detects_false_prime_despite_exact_reconstruction(
+        self,
+    ):
+        row = dict(
+            n=221,
+            endpoint="complete",
+            reconstruct=221,
+            factorization_complete=True,
+            complete=True,
+            factors=[[13, 1, "proven_prime"], [17, 1, "proven_prime"]],
+            remaining=[],
+            reason="complete",
+            seconds=1,
+            work=100,
+            events=object(),
+        )
+        record = warmup_validation(row)
+        self.assertNotIn("events", record)
+        validate_known_factorization(record, {13: 1, 17: 1})
+
+        # Reconstruction alone accepts a false composite-as-prime result.
+        # The independently certified oracle must still see and reject it.
+        false_prime = dict(record, factors=[[221, 1, "probable_prime"]])
+        with self.assertRaisesRegex(ValueError, "independent factor oracle"):
+            validate_known_factorization(false_prime, {13: 1, 17: 1})
+        partial = dict(
+            record,
+            factors=[[13, 1, "proven_prime"]],
+            remaining=[17],
+            factorization_complete=False,
+            complete=False,
+            reason="wall_limit",
+        )
+        validate_known_factorization(partial, {13: 1, 17: 1})
 
     def test_incomplete_fast_return_is_not_a_speedup(self):
         complete = dict(complete=True, seconds=100)

@@ -121,6 +121,23 @@ def selection_options(request):
     return values
 
 
+def warmup_validation(row):
+    """Keep mathematical output for an independent parent-side oracle."""
+    names = (
+        "n",
+        "endpoint",
+        "reconstruct",
+        "factorization_complete",
+        "complete",
+        "factors",
+        "remaining",
+        "reason",
+        "seconds",
+        "work",
+    )
+    return {name: row[name] for name in names}
+
+
 def child(request_path, source_root):
     """Measure cold CLI or repeated calls with one retained executor."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -171,6 +188,8 @@ def child(request_path, source_root):
     totals = dict(children=0.0, work=0)
     warmup_calls = 0
     warmup_seconds = 0.0
+    warmup_records = []
+    warmup_bytes = 0
     observations = []
     stop_reason = None
 
@@ -293,7 +312,15 @@ def child(request_path, source_root):
         if request["mode"] == "warm":
             warm_started = time.monotonic()
             for _ in range(500_000):
-                invoke()
+                row = invoke()
+                if request.get("retain_warmup_validation", False):
+                    record = warmup_validation(row)
+                    warmup_bytes += len(json.dumps(record).encode())
+                    if warmup_bytes > 2**20:
+                        raise RuntimeError(
+                            "recorder_exhaustion: warmup validation receipts"
+                        )
+                    warmup_records.append(record)
                 warmup_calls += 1
                 warmup_seconds = time.monotonic() - warm_started
                 if warmup_seconds >= 3:
@@ -321,6 +348,7 @@ def child(request_path, source_root):
         stop_reason=stop_reason,
         warmup_calls=warmup_calls,
         warmup_seconds=warmup_seconds,
+        warmup_validation=warmup_records,
         total_work=totals["work"],
         aggregate_cpu=usage.ru_utime
         + usage.ru_stime

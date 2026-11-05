@@ -46,6 +46,23 @@ def configuration(n, source_root):
     return replace(config, memory_bytes=parent_memory, siqs=fallback)
 
 
+def validate_known_factorization(row, factors):
+    """Validate with certified factors held outside the factoring process."""
+    from .selection_child import validate_reconstruction
+
+    validate_reconstruction(row)
+    expected = dict(factors)
+    if math.prod(p**e for p, e in expected.items()) != row["n"]:
+        raise ValueError("oracle belongs to a different input")
+    observed = {}
+    for prime, exponent, _ in row["factors"]:
+        observed[prime] = observed.get(prime, 0) + exponent
+    if any(p not in expected or e > expected[p] for p, e in observed.items()):
+        raise ValueError("output contradicts the independent factor oracle")
+    if row["factorization_complete"] and observed != expected:
+        raise ValueError("complete output contradicts the factor oracle")
+
+
 def point_comparison(control, candidate):
     """A censored outcome never produces a completed-call speedup ratio."""
     rows = (control, candidate)
