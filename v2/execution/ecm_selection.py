@@ -531,6 +531,11 @@ class SelectedECMContext:
         self.catalogue = data
 
     def _select(self, n, config, saved, origin, *, portfolio=False):
+        # The selector coexists with the caller's parent workspace. Refuse the
+        # combined reservation before constructing bounded worker settings;
+        # portfolio callers can then retain their incumbent serial search.
+        if self.settings.parent_memory > 4 * 2**30:
+            raise MemoryError("selector exceeds worker parent ownership bound")
         from .ecm_workers import arithmetic_options
         from .worker_contract import WorkerSettings
 

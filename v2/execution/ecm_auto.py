@@ -9,7 +9,7 @@ from types import SimpleNamespace
 AUTO_VERSION = "b12-f4-auto-v1"
 POLICY_PATH = Path(__file__).with_name("ecm_worker_policy.json")
 POLICY_SHA256 = (
-    "abe5446b91e2d8bfd1b1c956cd0a8f9887d73da98de21d9271ed5816bf8302a2"
+    "1e01666ddbe89b7250c3ccdce9e5f0444b26794bed9d4226cb4c236b0dd4f637"
 )
 MEASURED_PROFILE_SHA256 = (
     "16d52a6e55270d3cfea467f2a5ca41dd00ad1d8d052f2263861656a99b4b00cf"

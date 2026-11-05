@@ -331,6 +331,39 @@ class AutomaticTests(unittest.TestCase):
             with self.assertRaises(MemoryError):
                 owner._select(n, settings, None, None, portfolio=True)
 
+    def test_retained_parent_coexistence_refuses_with_accounted_serial_path(
+        self,
+    ):
+        from v2.execution.ecm_selection import SelectedECMContext
+
+        n = 10**59 + 7
+        settings = PortfolioConfig().for_input(n)
+        ledger = budget()
+        with (
+            SelectedECMContext(
+                POLICY_PATH,
+                POLICY_SHA256,
+                parent_memory=4 * 2**30,
+                memory_bytes=DEFAULT_MEMORY_BYTES,
+            ) as owner,
+            patch(
+                "v2.execution.ecm_workers.ECMExecutor",
+                side_effect=AssertionError("unadmitted worker construction"),
+            ),
+        ):
+            result = owner.run_portfolio(n, config=settings, budget=ledger)
+            self.assertIsNone(result)
+            self.assertIsNone(owner.inner)
+            self.assertEqual(
+                owner.last_stats["engagement"]["reason"],
+                "worker_ownership_refused",
+            )
+            self.assertTrue(owner.last_stats["legacy_serial"])
+            # Loading and validating metadata was real work, despite refusal.
+            self.assertGreater(ledger.used, 0)
+            with self.assertRaisesRegex(MemoryError, "parent ownership"):
+                owner.run(n, config=settings, budget=budget())
+
     def test_borrowed_context_is_not_closed(self):
         class Borrowed:
             identity = "borrowed"
