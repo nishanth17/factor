@@ -305,8 +305,10 @@ def child(request_path, source_root):
     except TimeoutError as error:
         stop_reason = str(error)
     finally:
+        close_started = time.monotonic()
         if executor is not None:
             executor.close()
+        external_context_close_seconds = time.monotonic() - close_started
     usage = resource.getrusage(resource.RUSAGE_SELF)
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     result = dict(
@@ -331,6 +333,11 @@ def child(request_path, source_root):
         parent_hwm=usage.ru_maxrss,
         child_hwm=children.ru_maxrss,
         lifetime={} if executor is None else executor.lifetime_stats,
+        external_context_close_seconds=external_context_close_seconds,
+        pool_lifetime=dict(executor.inner.lifetime_stats)
+        if executor is not None
+        and getattr(executor, "inner", None) is not None
+        else {},
     )
     print(json.dumps(result, allow_nan=False))
 
