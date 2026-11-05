@@ -184,8 +184,10 @@ Its v2 training catalogue preserves the earlier literal cost/settings anchors;
 PRAC/ladder boundaries, unsupported ranges and invalid costs remain guarded.
 Serial decisions are sticky across resume; later eligible calls can still select
 workers. Focused serial/RNG/fallback, ownership, cancellation, resume and real
-spawn tests pass. Full committed-checkout QA is queued; current-source performance
-and balanced completion remain unmeasured. No defaults change. Current local
+spawn tests pass. Committed-only source `4a2f051` passes 1,308 PyPy tests
+(9 optional skips), full lint, 262 benchmark imports and v2 source-pin admission.
+Final QA cost is 76.231 wall / 91.446 aggregate CPU seconds; the lock is released.
+Current-source performance and balanced completion remain unmeasured. No defaults change. Current local
 entry: `v2/audit/b12_f4/selection_integration_v2/DECISION.md` and `HANDOFF.md`.
 
 The actual-master comparison is complete against committed `0efaba1`, using

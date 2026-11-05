@@ -11,8 +11,15 @@ one worker. Later worker refusal cannot silently switch to a serial search.
 
 `b12_f4_selection_v2.json` is a new source-pinned training input. It preserves all
 33 literal cost/settings anchors from the immutable v1 catalogue. This is an
-implementation change, with focused correctness tests passing and full committed
-QA queued. New complete-cost performance, intermediate-size prediction accuracy,
+implementation change. Committed-only `4a2f051` passes 1,308 PyPy tests (9 optional
+skips), full lint, 262 benchmark imports and v2 source-pin admission. Final QA
+cost is 76.231 wall / 91.446 aggregate CPU seconds. All seven QA attempts cost
+86.549 wall / 103.223 CPU seconds; failed attempts and full loans remain retained.
+Booking is 645 wall / 1,190 CPU seconds under a separately recorded QA-only
+675/1,200 ceiling; the initial 600-wall ceiling was revised after a strict test
+style failure, without changing a factoring timeout or resetting any charge.
+The shared computation lock is released. New complete-cost performance,
+intermediate-size prediction accuracy,
 fresh confirmation and the protected balanced guardrail are NOT RUN. The tables
 below describe earlier source `538462a`, not this changed policy; no speedup,
 default promotion or task closure is inferred. Detailed local decision/QA ledger:

@@ -209,7 +209,9 @@ from v1, with bounded same-path size interpolation and incumbent serial portfoli
 declines. Frozen v1 sources/inputs/results remain separate. New-source performance
 is NOT RUN; do not reuse old end-to-end timings as a revised-policy gain.
 The local `v2/audit/b12_f4/selection_integration_v2/HANDOFF.md` records focused
-validation and queued full committed-checkout QA under the shared lock.
+validation and passing full committed-checkout QA (`4a2f051`: 1,308 tests,
+9 optional skips, lint, 262 imports and source-pin admission). The computation
+lock is released; future performance validation remains separately queued.
 
 Current complete-cost comparison entry point:
 `v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and `HANDOFF.md`.

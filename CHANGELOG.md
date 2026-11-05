@@ -15,8 +15,9 @@ below record decisions in their dated scope; later entries may supersede routes.
   add a source-pinned training catalogue with unchanged historical cost anchors.
   Native wire v7, mathematical SEARCHv1 and automatic defaults remain unchanged.
 - Add independent cost, serial/fallback RNG, cancellation, ownership, resume and
-  actual-cofactor spawn regressions. Full committed QA is queued; no new timing
-  result, default promotion, merge or B12/F4 closure.
+  actual-cofactor spawn regressions. Committed-only `4a2f051` passes 1,308 PyPy
+  tests (9 optional skips), lint, 262 imports and source-pin admission. No new
+  performance result, default promotion, merge or B12/F4 closure.
 
 ## B12/F4 actual-master comparison (5 November 2026)
 
