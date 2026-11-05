@@ -178,6 +178,16 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
+The B12/F4 selection-integration follow-up adds bounded same-plan cofactor cost
+interpolation and incumbent serial execution whenever portfolio workers decline.
+Its v2 training catalogue preserves the earlier literal cost/settings anchors;
+PRAC/ladder boundaries, unsupported ranges and invalid costs remain guarded.
+Serial decisions are sticky across resume; later eligible calls can still select
+workers. Focused serial/RNG/fallback, ownership, cancellation, resume and real
+spawn tests pass. Full committed-checkout QA is queued; current-source performance
+and balanced completion remain unmeasured. No defaults change. Current local
+entry: `v2/audit/b12_f4/selection_integration_v2/DECISION.md` and `HANDOFF.md`.
+
 The actual-master comparison is complete against committed `0efaba1`, using
 candidate runtime/benchmark source `538462a` (native runtime `fc6fea3`). All 4,384
 process cells and 6,568 timed calls validate. On 36 independent equal-weight

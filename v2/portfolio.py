@@ -508,7 +508,11 @@ def _advance(
         return
 
     kind = current["stage"]
-    if kind == "ecm" and ecm_executor is not None:
+    if (
+        kind == "ecm"
+        and ecm_executor is not None
+        and not current.get("ecm_serial", False)
+    ):
         from .execution.worker_contract import LeaseRefusedError
 
         if current["tier"] >= len(config.ecm_tiers):
@@ -518,8 +522,15 @@ def _advance(
             raise ValueError(
                 "worker parent reserve must include portfolio ownership"
             )
+        run = getattr(ecm_executor, "run_portfolio", ecm_executor.run)
+        if hasattr(ecm_executor, "run_portfolio") and (
+            current["job"] is not None or current["attempt"] or current["tier"]
+        ):
+            raise ValueError(
+                "selector cannot replace existing serial ECM progress"
+            )
         try:
-            outcome = ecm_executor.run(
+            outcome = run(
                 int(n),
                 config=config,
                 budget=budget,
@@ -528,23 +539,36 @@ def _advance(
             )
         except LeaseRefusedError as error:
             raise BudgetExhaustedError(str(error)) from error
-        current["worker_checkpoint"] = outcome.checkpoint
-        _event(
-            state,
-            config,
-            stage="ecm_workers",
-            n=n,
-            outcome=outcome.reason,
-            stats=outcome.stats,
-        )
-        if outcome.divisor is not None:
-            _split(state, outcome.divisor)
-        elif outcome.reason == "curves_exhausted":
-            current.update(tier=len(config.ecm_tiers), attempt=0)
-            current.pop("worker_checkpoint", None)
+        if outcome is None:
+            # Decide once per cofactor. Warming a pool or resuming later cannot
+            # replace an incumbent curve prefix or move its fallback RNG draws.
+            current["ecm_serial"] = True
+            _event(
+                state,
+                config,
+                stage="ecm_selection",
+                n=n,
+                outcome="legacy_serial",
+                stats=ecm_executor.last_stats,
+            )
         else:
-            raise BudgetExhaustedError(outcome.reason)
-        return
+            current["worker_checkpoint"] = outcome.checkpoint
+            _event(
+                state,
+                config,
+                stage="ecm_workers",
+                n=n,
+                outcome=outcome.reason,
+                stats=outcome.stats,
+            )
+            if outcome.divisor is not None:
+                _split(state, outcome.divisor)
+            elif outcome.reason == "curves_exhausted":
+                current.update(tier=len(config.ecm_tiers), attempt=0)
+                current.pop("worker_checkpoint", None)
+            else:
+                raise BudgetExhaustedError(outcome.reason)
+            return
 
     if kind == "rho":
         attempts, b1, b2 = config.rho_attempts, 0, 0
@@ -1167,6 +1191,15 @@ def _unpack(checkpoint, config):
                     )
                 ):
                     raise ValueError("invalid pending handoff metadata")
+
+        if current and "ecm_serial" in current:
+            if (
+                current["ecm_serial"] is not True
+                or not isinstance(state.get("ecm_worker_identity"), str)
+                or "worker_checkpoint" in current
+                or current["stage"] not in ("ecm", "siqs", "sss")
+            ):
+                raise ValueError("invalid incumbent ECM selection progress")
 
         if current and current["job"] and current["job"]["n"] != current["n"]:
             raise ValueError("candidate modulus disagrees with parent")

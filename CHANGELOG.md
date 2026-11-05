@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 cofactor-aware selection and incumbent serial path (5 November 2026)
+
+- Add bounded piecewise linear per-curve cost estimates between same-plan size
+  anchors, partitioned at active PRAC eligibility boundaries. Retain bundle-bound
+  crossovers, fixed engaged pool settings and explicit estimate provenance.
+- Keep portfolio declines on incumbent serial arithmetic and RNG, with a sticky
+  cofactor checkpoint decision. A declined call no longer pins a serial context;
+  an engaged search never changes stream after a later refusal.
+- Version selector profiles/checkpoints as v2, bind component/portfolio mode and
+  add a source-pinned training catalogue with unchanged historical cost anchors.
+  Native wire v7, mathematical SEARCHv1 and automatic defaults remain unchanged.
+- Add independent cost, serial/fallback RNG, cancellation, ownership, resume and
+  actual-cofactor spawn regressions. Full committed QA is queued; no new timing
+  result, default promotion, merge or B12/F4 closure.
+
 ## B12/F4 actual-master comparison (5 November 2026)
 
 - Preserve benchmark work/CPU accounting through result/checkpoint construction

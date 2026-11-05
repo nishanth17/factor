@@ -17,7 +17,8 @@ from .worker_contract import (
     integer,
 )
 
-PROFILE_VERSION = "b12-f4-selection-v1"
+PROFILE_VERSION = "b12-f4-selection-v2"
+MAX_DIGIT_GAP = 20
 PROFILE_BYTES = 256 * 2**10
 MODEL_BYTES = 4 * 2**20
 HEADER_BYTES = 16 * 2**10
@@ -173,19 +174,110 @@ class SelectionCosts:
             object.__setattr__(self, name, getattr(checked, name))
 
 
+def _path_costs(digits, options, costs):
+    """Do not fit through an accepted PRAC/ladder eligibility discontinuity."""
+    chains = (
+        options["ecm_chain_mode"] != "off"
+        and options["ecm_chain_bytes"] > 0
+        and options["chunk_size"] == 16
+        and any(
+            b1 == 2000 and count >= 8 for b1, _, count in options["ecm_tiers"]
+        )
+    )
+    if not chains:
+        return costs
+    from ..ecm.chains import MAX_MODULUS, MIN_MODULUS
+
+    lower, upper = len(str(MIN_MODULUS)), len(str(MAX_MODULUS)) - 1
+    supported = lower <= digits <= upper
+    return tuple(
+        row for row in costs if (lower <= row.digits <= upper) == supported
+    )
+
+
+def _bracket(digits, options, costs):
+    """Bound interpolation by actual measured sizes of the identical plan."""
+    matching = [row for row in costs if row.options == options]
+    lower = max(
+        (row for row in matching if row.digits < digits),
+        key=lambda row: row.digits,
+        default=None,
+    )
+    upper = min(
+        (row for row in matching if row.digits > digits),
+        key=lambda row: row.digits,
+        default=None,
+    )
+    if lower is None or upper is None:
+        return None
+    if upper.digits - lower.digits > MAX_DIGIT_GAP:
+        return None
+    return lower, upper
+
+
+def _size_cost(digits, options, costs, rate_costs):
+    """Interpolate serial rates; crossovers remain bound to the pool bundle."""
+    matching = [row for row in costs if row.options == options]
+    exact = next((row for row in matching if row.digits == digits), None)
+    if exact is not None:
+        return exact, dict(size_model="measured", anchor_digits=[digits])
+    measured_rate = next(
+        (
+            row
+            for row in rate_costs
+            if row.digits == digits and row.options == options
+        ),
+        None,
+    )
+    bounds = _bracket(digits, options, rate_costs)
+    if not matching or (measured_rate is None and bounds is None):
+        return None, {}
+    if measured_rate is not None:
+        rates = measured_rate.seconds_per_curve
+        provenance = dict(
+            size_model="measured-rate-v1", anchor_digits=[digits]
+        )
+    else:
+        lower, upper = bounds
+        if not lower.seconds_per_curve or len(lower.seconds_per_curve) != len(
+            upper.seconds_per_curve
+        ):
+            return None, {}
+        weight = (digits - lower.digits) / (upper.digits - lower.digits)
+        rates = tuple(
+            a + weight * (b - a)
+            for a, b in zip(lower.seconds_per_curve, upper.seconds_per_curve)
+        )
+        provenance = dict(
+            size_model="bracket-linear-v1",
+            anchor_digits=[lower.digits, upper.digits],
+        )
+    # A retained context never borrows another bundle's crossover. Its nearest
+    # compatible anchor supplies overhead; this remains an unconfirmed model.
+    anchor = min(
+        matching, key=lambda row: (abs(row.digits - digits), row.digits)
+    )
+    cost = replace(anchor, digits=digits, seconds_per_curve=rates)
+    return cost, dict(provenance, threshold_anchor=anchor.digits)
+
+
 @dataclass(frozen=True)
 class SelectionRule:
-    """A fixed context may use only rows calibrated for its own settings."""
+    """Share serial rates across bundles, never pool-specific crossovers."""
 
     profile: str
     execution: str
     costs: tuple = ()
+    rate_costs: tuple = ()
+    workers: int = 1
 
     def decision(self, manifest, **kwargs):
-        key = len(str(manifest.n)), digest(manifest.options)
-        cost = next(
-            (row for row in self.costs if (row.digits, row.options) == key),
-            None,
+        digits, options = len(str(manifest.n)), manifest.options
+        cost, provenance = _size_cost(
+            digits,
+            digest(options),
+            _path_costs(digits, options, self.costs),
+            _path_costs(digits, options, self.rate_costs),
         )
         ready = kwargs.get("ready", False)
         started = kwargs.get("pool_started", False)
@@ -197,8 +289,30 @@ class SelectionRule:
                 estimate=None,
                 threshold=None,
                 reason="unmeasured_selection_cost",
+                **provenance,
             )
-        return CostRow(
+        # Recompute the minimum useful dispatch wave for an interpolated size.
+        # Existing exact anchors retain their literal calibrated thresholds.
+        if provenance["size_model"] != "measured":
+            counts = [tier[2] for tier in manifest.tiers]
+            total = sum(counts)
+            if total and len(counts) == len(cost.seconds_per_curve):
+                wave = (
+                    self.workers
+                    * sum(
+                        count * rate
+                        for count, rate in zip(counts, cost.seconds_per_curve)
+                    )
+                    / total
+                )
+                thresholds = {}
+                for name in ("cold_seconds", "warm_seconds", "pool_seconds"):
+                    value = getattr(cost, name)
+                    thresholds[name] = (
+                        None if value is None else max(value, wave)
+                    )
+                cost = replace(cost, **thresholds)
+        decision = CostRow(
             schedule=manifest.schedule,
             cold_seconds=cost.cold_seconds,
             warm_seconds=cost.warm_seconds,
@@ -206,6 +320,7 @@ class SelectionRule:
             seconds_per_curve=cost.seconds_per_curve,
             execution=self.execution,
         ).decision(manifest, **kwargs)
+        return dict(decision, **provenance)
 
 
 @dataclass(frozen=True)
@@ -245,9 +360,10 @@ class SelectedECMContext:
     """Quiet lazy adapter; a retained pool keeps its first selected settings.
 
     Supply a source-compatible measured profile and its expected SHA256.
-    Serial choices use the explicit v1 ECM stream, not legacy portfolio ECM.
-    Unknown mathematical regimes remain serial. Closing is explicit, including
-    when factorization raises; use this context as a context manager.
+    Direct component calls retain SEARCHv1 serial replay. Portfolio declines
+    return to the incumbent arithmetic/RNG path without starting a search.
+    Closing is explicit, including when factorization raises; use a context
+    manager.
     """
 
     def __init__(
@@ -283,6 +399,7 @@ class SelectedECMContext:
         self.catalogue = None
         self.selected = None
         self.origin = None
+        self.mode = None
         self.closed = False
         self.lock = threading.Lock()
         self.last_stats, self.lifetime_stats = {}, {}
@@ -364,7 +481,7 @@ class SelectedECMContext:
         rows = data["rows"]
         if not isinstance(rows, list) or len(rows) > 256:
             raise ValueError("selector row capacity exceeded")
-        keys = set()
+        keys, declared = set(), {}
         serial = WorkerSettings(**data["serial_settings"])
         if serial.workers != 1:
             raise ValueError("serial fallback must own one context")
@@ -387,6 +504,11 @@ class SelectedECMContext:
             if key in keys:
                 raise ValueError("duplicate selector regime")
             keys.add(key)
+            plan = tuple(map(tuple, tiers))
+            if declared.setdefault(row["options"], plan) != plan:
+                raise ValueError(
+                    "identical option keys declare different tiers"
+                )
             for mode in ("cold", "warm"):
                 candidate = row[mode]
                 if set(candidate) != {"settings", "costs"}:
@@ -399,17 +521,16 @@ class SelectedECMContext:
                     raise ValueError("costs belong to another regime")
         self.catalogue = data
 
-    def _select(self, n, config, saved, origin):
-        from .ecm_workers import ECMExecutor, arithmetic_options
+    def _select(self, n, config, saved, origin, *, portfolio=False):
+        from .ecm_workers import arithmetic_options
         from .worker_contract import WorkerSettings
 
         data = self.catalogue
         mode = "warm" if self.prefer_warm else "cold"
-        options = digest(
-            arithmetic_options(
-                config, WorkerSettings(worker_memory=64 * 2**20)
-            )
+        mathematical = arithmetic_options(
+            config, WorkerSettings(worker_memory=64 * 2**20)
         )
+        options = digest(mathematical)
         key = len(str(n)), options
         if origin is None:
             origin = next(
@@ -420,8 +541,32 @@ class SelectedECMContext:
                 ),
                 -1,
             )
+            if origin == -1:
+                rates = tuple(
+                    SelectionCosts(**entry[mode]["costs"])
+                    for entry in data["rows"]
+                )
+                bounds = _bracket(
+                    key[0], key[1], _path_costs(key[0], mathematical, rates)
+                )
+                if bounds is not None:
+                    anchor = min(
+                        bounds,
+                        key=lambda cost: (
+                            abs(cost.digits - key[0]),
+                            cost.digits,
+                        ),
+                    )
+                    origin = next(
+                        i
+                        for i, entry in enumerate(data["rows"])
+                        if (entry["digits"], entry["options"])
+                        == (anchor.digits, anchor.options)
+                    )
         integer(origin, "selected origin", -1, len(data["rows"]) - 1)
         row = None if origin == -1 else data["rows"][origin]
+        if portfolio and row is None:
+            return None
         candidate = (
             data["serial_settings"] if row is None else (row[mode]["settings"])
         )
@@ -454,7 +599,7 @@ class SelectedECMContext:
         if self.inner is not None:
             if settings != self.inner.settings or origin != self.origin:
                 raise ValueError("retained selector cannot change workers")
-            return
+            return self.inner.settings, self.inner.rule, self.origin
         normalized = asdict(WorkerSettings(**candidate))
         normalized.pop("parent_memory", None)
         normalized.pop("checkpoint_bytes", None)
@@ -469,10 +614,74 @@ class SelectedECMContext:
             self.profile_sha256,
             digest([VERSION, "cost-policy", asdict(settings)]),
             tuple(costs),
+            tuple(
+                SelectionCosts(**entry[mode]["costs"])
+                for entry in data["rows"]
+            ),
+            settings.workers,
         )
-        self.inner = ECMExecutor(seed=self.seed, settings=settings, rule=rule)
-        self.selected = asdict(settings)
-        self.origin = origin
+        return settings, rule, origin
+
+    def _portfolio_decision(self, n, config, budget, lineage, settings, rule):
+        from .ecm_workers import _allowances, arithmetic_options
+        from .worker_contract import Manifest
+
+        options = arithmetic_options(config, settings)
+        if not any(row.options == digest(options) for row in rule.costs):
+            return dict(
+                engage=False,
+                state="pool" if self.inner is not None else "cold",
+                estimate=None,
+                threshold=None,
+                reason="unmeasured_selection_cost",
+                funded=False,
+            )
+        manifest = Manifest(n, self.seed, lineage, options)
+        started = self.inner is not None and self.inner.pool_started()
+        ready = self.inner is not None and self.inner.ready(manifest)
+        decision = rule.decision(
+            manifest,
+            ready=ready,
+            pool_started=started,
+            execution=rule.execution,
+        )
+        work, cpu, wall = _allowances(budget)
+        helper = self.inner is not None and self.inner.helper_funded
+        output = min(work, settings.checkpoint_bytes)
+        funded = started or (
+            wall > 0
+            and cpu
+            > (settings.workers + (not helper))
+            * (settings.startup_seconds + settings.shutdown_cpu)
+            and work - output
+            > settings.workers
+            * (settings.startup_work + 2 * settings.frame_bytes)
+            + (0 if helper else settings.startup_work)
+        )
+        return dict(decision, funded=funded)
+
+    def _stats(self, started, stats):
+        self.selector_cpu += max(
+            0,
+            time.process_time() - started - stats.get("parent_cpu", 0),
+        )
+        self.last_stats = dict(
+            stats,
+            selector_profile=self.profile_sha256,
+            selector_work=self.selector_work,
+            selector_cpu=self.selector_cpu,
+        )
+        self.lifetime_stats = (
+            {} if self.inner is None else dict(self.inner.lifetime_stats)
+        )
+        self.lifetime_stats["charged_work"] = (
+            self.lifetime_stats.get("charged_work", 0) + self.selector_work
+        )
+        return self.last_stats
+
+    def run_portfolio(self, n, **kwargs):
+        """Return None to retain incumbent curves and fallback RNG draws."""
+        return self._invoke(n, portfolio=True, **kwargs)
 
     def run(
         self,
@@ -484,16 +693,39 @@ class SelectedECMContext:
         checkpoint=None,
         fixed_work=False,
     ):
+        return self._invoke(
+            n,
+            config=config,
+            budget=budget,
+            lineage=lineage,
+            checkpoint=checkpoint,
+            fixed_work=fixed_work,
+            portfolio=False,
+        )
+
+    def _invoke(
+        self,
+        n,
+        *,
+        config,
+        budget,
+        lineage="root",
+        checkpoint=None,
+        fixed_work=False,
+        portfolio,
+    ):
         if not self.lock.acquire(blocking=False):
             raise RuntimeError("selector context already active")
         try:
             return self._run(
-                n, config, budget, lineage, checkpoint, fixed_work
+                n, config, budget, lineage, checkpoint, fixed_work, portfolio
             )
         finally:
             self.lock.release()
 
-    def _run(self, n, config, budget, lineage, checkpoint, fixed_work):
+    def _run(
+        self, n, config, budget, lineage, checkpoint, fixed_work, portfolio
+    ):
         if self.closed:
             raise RuntimeError("selector context is closed")
         actual_identity = digest(
@@ -508,6 +740,12 @@ class SelectedECMContext:
         )
         if actual_identity != self.identity:
             raise ValueError("selector configuration mutated")
+        mode = "portfolio" if portfolio else "component"
+        if self.mode is not None and self.mode != mode:
+            raise ValueError(
+                "cannot mix component and portfolio context modes"
+            )
+        self.mode = mode
         integer(n, "cofactor", 2, 2**4096 - 1)
         started = time.process_time()
         budget.consume(0)
@@ -530,16 +768,18 @@ class SelectedECMContext:
             overhead = checkpoint["serialization_overhead"]
             if (
                 not isinstance(header, dict)
-                or len(header) != 6
+                or len(header) != 7
                 or set(header)
                 != {
                     "version",
+                    "mode",
                     "identity",
                     "origin",
                     "settings",
                     "budget",
                     "inner",
                 }
+                or header["mode"] not in ("portfolio", "component")
                 or not isinstance(header["settings"], dict)
                 or len(header["settings"]) > 64
                 or not isinstance(header["budget"], dict)
@@ -577,9 +817,11 @@ class SelectedECMContext:
                 or set(overhead) != {"cpu", "wall"}
                 or header["version"] != PROFILE_VERSION
                 or header["identity"] != self.identity
+                or header["mode"] != mode
                 or set(header)
                 != {
                     "version",
+                    "mode",
                     "identity",
                     "origin",
                     "settings",
@@ -602,7 +844,72 @@ class SelectedECMContext:
         budget.consume(HEADER_BYTES)
         self.selector_work += HEADER_BYTES
         if self.inner is None or saved is not None:
-            self._select(n, config, saved, origin)
+            try:
+                plan = self._select(
+                    n,
+                    config,
+                    saved,
+                    origin,
+                    portfolio=portfolio,
+                )
+                refusal = "unmeasured_selection_cost"
+            except MemoryError:
+                if not portfolio or checkpoint is not None:
+                    raise
+                plan, refusal = None, "worker_ownership_refused"
+            if plan is None:
+                self._stats(
+                    started,
+                    dict(
+                        engaged=False,
+                        legacy_serial=True,
+                        cofactor_digits=len(str(n)),
+                        engagement=dict(
+                            engage=False,
+                            state="cold",
+                            estimate=None,
+                            threshold=None,
+                            reason=refusal,
+                            funded=False,
+                        ),
+                    ),
+                )
+                return None
+            settings, rule, origin = plan
+        else:
+            settings, rule, origin = (
+                self.inner.settings,
+                self.inner.rule,
+                self.origin,
+            )
+        if portfolio and checkpoint is None:
+            decision = self._portfolio_decision(
+                n, config, budget, lineage, settings, rule
+            )
+            if not decision["engage"] or not decision["funded"]:
+                self._stats(
+                    started,
+                    dict(
+                        engaged=False,
+                        legacy_serial=True,
+                        engagement=decision,
+                        cofactor_digits=len(str(n)),
+                        configured_workers=settings.workers,
+                    ),
+                )
+                return None
+        if self.inner is None:
+            from .ecm_workers import ECMExecutor
+
+            # Cost selection already ran. A later resource/cancellation refusal
+            # must pause this search, never silently execute SEARCHv1 serial.
+            self.inner = ECMExecutor(
+                seed=self.seed,
+                settings=settings,
+                rule=rule,
+                force_workers=portfolio,
+            )
+            self.selected, self.origin = asdict(settings), origin
         result = self.inner.run(
             n,
             config=config,
@@ -614,6 +921,7 @@ class SelectedECMContext:
         base = getattr(budget, "budget", budget)
         header = dict(
             version=PROFILE_VERSION,
+            mode=mode,
             identity=self.identity,
             settings=self.selected,
             origin=self.origin,
@@ -634,18 +942,5 @@ class SelectedECMContext:
         checkpoint.update(
             serialization_overhead=overhead, overhead_sha256=digest(overhead)
         )
-        self.selector_cpu += max(
-            0,
-            time.process_time() - started - result.stats.get("parent_cpu", 0),
-        )
-        self.last_stats = dict(
-            result.stats,
-            selector_profile=self.profile_sha256,
-            selector_work=self.selector_work,
-            selector_cpu=self.selector_cpu,
-        )
-        self.lifetime_stats = dict(self.inner.lifetime_stats)
-        self.lifetime_stats["charged_work"] = (
-            self.lifetime_stats.get("charged_work", 0) + self.selector_work
-        )
-        return replace(result, checkpoint=checkpoint, stats=self.last_stats)
+        stats = self._stats(started, result.stats)
+        return replace(result, checkpoint=checkpoint, stats=stats)

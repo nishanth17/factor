@@ -191,8 +191,10 @@ they are not live memory or aggregate RSS. All flags bind the v7 executor/cost
 identity; mathematical v1 manifests and curve streams remain unchanged. These
 options need matched complete-cost evidence and are not adopted defaults.
 
-ECM draws do not move later fallback seeds within the opt-in semantics. Sigma
-collisions are retained; distinct IDs do not prove independence. First-factor
+Native SEARCHv1 execution does not move the portfolio generator with its ECM
+draws. Selected portfolio calls that decline workers instead preserve incumbent
+serial curves and the incumbent fallback RNG consumption. Sigma collisions are
+retained; distinct IDs do not prove independence. First-factor
 winners and staged search order can differ legitimately. Fixed-work runs retain
 the same declared curves and existing exact stage arithmetic.
 
@@ -234,12 +236,12 @@ interface. Use it as a context manager and pass it as `ecm_executor` to
 this retains the production SIQS fallback. Use a finite shared `Budget`.
 
 The adapter reads no profile and imports no multiprocessing machinery until
-actual ECM is reached. A bounded, source-checked measured profile selects one
-configuration at that first cofactor; the count stays fixed for the context
-lifetime. Decisions use decimal size, exact mathematical options, remaining
+actual ECM is reached. A bounded, source-checked profile selects a configuration
+at the first engaged cofactor; declined calls do not pin a serial context.
+The worker count stays fixed after engagement. Decisions use decimal size, exact mathematical options, remaining
 quota and actual pool readiness. `prefer_warm=True` chooses the retained-library
 candidate, while its first call still pays and checks cold startup. Unknown or
-invalid cost estimates remain equivalent-manifest serial. This explicitly
+invalid cost estimates return portfolio execution to incumbent serial ECM. This explicitly
 versioned serial stream differs from legacy production ECM; production serial
 remains the incumbent comparison. No automatic route or default is changed.
 
@@ -261,11 +263,14 @@ separate scopes.
 prefer_warm=False)` loads a bounded, source-checked catalogue lazily when ECM is
 reached. Pass it as `factorize_bounded(..., ecm_executor=context)` and close it
 with a context manager under a protected process entry point. The committed
-catalogue is `benchmarks/inputs/controls/b12_f4_selection_v1.json`, SHA256
-`1dc664ac2d8c2b22eee39d53efe9212a9efd2d8e98e8f8668ad38501d9615ecc`.
-It binds 99 runtime files and 33 exact digit/mathematical-option regimes;
-source incompatibility is rejected. It is optional experimental configuration,
-with no change to automatic routing or the stock CLI.
+current training catalogue is `benchmarks/inputs/controls/b12_f4_selection_v2.json`,
+SHA256 `2c87e95c2cd74bee564adb093a2df71ecb9c45bd64dfb480a86dbcd31b0e5e29`. It binds 99 runtime files and retains the 33 measured cost/settings
+anchors from v1. Their costs are transferred estimates for this changed adapter,
+not measurements of its current complete cost. Source incompatibility is rejected.
+The frozen v1 input remains immutable for its original sources; current selector
+profiles/checkpoints use `b12-f4-selection-v2` and reject v1. Native worker wire v7
+and mathematical SEARCHv1 identities are unchanged. No automatic routing or stock
+CLI change follows.
 
 Cold intent requires expected remaining serial ECM work above both a fitted
 complete-cost crossover and a one-second minimum, with a nominal dispatch-wave
@@ -273,9 +278,27 @@ floor. Separate thresholds cover a started pool and compatible retained metadata
 `prefer_warm=True` selects an explicitly declared horizon of at least 64
 compatible ECM-reaching calls. Actual first-call startup remains cold and fully
 charged. Short or uncertain reuse should use cold intent. A context retains its
-first worker settings; mixed-regime pool resizing is not implemented. Unknown
-regimes, invalid estimates and unsupported continuation estimates stay serial
-under SEARCHv1. Omitting the context retains the legacy production S0 stream.
+first engaged worker settings; mixed-regime pool resizing is not implemented.
+Missing exact sizes use piecewise linear per-curve cost interpolation only
+between same-plan anchors at most 20 decimal digits apart. Nearest-anchor ties
+choose the lower size. Pool crossover estimates remain bound to the selected
+bundle, with a recomputed dispatch-wave floor. PRAC/ladder eligibility boundaries
+partition cost anchors; no extrapolation or interpolation across that boundary
+is admitted. Decision receipts identify measured versus interpolated rates and
+the rate/crossover anchors. Intermediate-size accuracy remains unmeasured.
+
+For `factorize_bounded`, missing/invalid costs, fresh worker-memory refusal and
+unfunded startup select the existing serial stage with its original curves,
+programs and RNG consumption. A per-cofactor checkpoint flag keeps that decision
+sticky across pause/resume. Once workers are selected, later refusal pauses the
+same SEARCHv1 search; it cannot switch streams. Unknown serial calls do not pin
+pool settings for a later eligible cofactor. Omit the context for unmodified S0.
+
+`SelectedECMContext.run()` remains the direct component/fixed-work API and retains
+SEARCHv1 serial replay. `run_portfolio()` is the narrow caller seam, returning
+`None` on an incumbent-serial decision. Component and portfolio modes cannot be
+mixed in one context; drained selector checkpoints bind the mode. Old-source
+performance observations do not establish gains for this revised adapter.
 
 Full constructor snapshots for reproducing the catalogue's mathematical regimes
 live in `benchmarks/inputs/controls/b12_f4_selection_resolved_v1.json`. These

@@ -203,6 +203,14 @@ first-factor or complete-factor latency gains. Root-lineage-aware complete-call
 feasibility precedes engagement calibration and fresh confirmation.
 
 
+Current selection-integration work uses source-pinned training input
+`inputs/controls/b12_f4_selection_v2.json`; its cost/settings anchors are unchanged
+from v1, with bounded same-path size interpolation and incumbent serial portfolio
+declines. Frozen v1 sources/inputs/results remain separate. New-source performance
+is NOT RUN; do not reuse old end-to-end timings as a revised-policy gain.
+The local `v2/audit/b12_f4/selection_integration_v2/HANDOFF.md` records focused
+validation and queued full committed-checkout QA under the shared lock.
+
 Current complete-cost comparison entry point:
 `v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and `HANDOFF.md`.
 All 33 recommended regimes were compared with committed master `0efaba1` using

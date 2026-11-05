@@ -1,5 +1,23 @@
 # Benchmark results and decisions
 
+## B12/F4 cofactor and serial integration (5 November 2026)
+
+The v2 selection adapter fills bounded intermediate-size cost estimates for the
+same mathematical plan and active PRAC/ladder path, without extrapolation. It
+retains pool-specific crossover estimates and publishes model/anchor provenance.
+Portfolio declines now use incumbent serial curves, programs and RNG consumption;
+serial resume stays on that branch. A declined call does not pin the context to
+one worker. Later worker refusal cannot silently switch to a serial search.
+
+`b12_f4_selection_v2.json` is a new source-pinned training input. It preserves all
+33 literal cost/settings anchors from the immutable v1 catalogue. This is an
+implementation change, with focused correctness tests passing and full committed
+QA queued. New complete-cost performance, intermediate-size prediction accuracy,
+fresh confirmation and the protected balanced guardrail are NOT RUN. The tables
+below describe earlier source `538462a`, not this changed policy; no speedup,
+default promotion or task closure is inferred. Detailed local decision/QA ledger:
+`v2/audit/b12_f4/selection_integration_v2/`.
+
 ## B12/F4 actual-master complete-cost comparison (5 November 2026)
 
 The completed comparison uses actual committed master `0efaba1` and candidate
