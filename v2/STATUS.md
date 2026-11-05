@@ -1,3 +1,7 @@
+Balanced 60/70 complete-cost follow-up: funded configuration preparation is
+underway in the isolated F4 branch; earlier 30-second refusals are not
+completion timings. See `benchmarks/ecm/b12_f4/completion_protocol.md`.
+
 # Factor status
 
 Last updated: 5 November 2026 (America/Los_Angeles).

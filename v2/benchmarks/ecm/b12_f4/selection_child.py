@@ -93,6 +93,18 @@ def summarize_stages(events, dropped, seconds):
     )
 
 
+def execution_options(request, executor):
+    """Select the declared owner without inheriting changing defaults."""
+    if request["arm"] == "AUTO":
+        if request["mode"] != "cold":
+            raise ValueError("warm studies require an explicitly retained owner")
+        return dict(
+            ecm_executor="auto",
+            ecm_memory_bytes=request["ecm_memory_bytes"],
+        )
+    return {"ecm_executor": executor}
+
+
 def child(request_path, source_root):
     """Measure cold CLI or repeated calls with one retained executor."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -131,7 +143,7 @@ def child(request_path, source_root):
             seed=request["seed"],
             prefer_warm=request.get("prefer_warm", False),
         )
-    elif request["arm"] != "S0":
+    elif request["arm"] not in ("S0", "AUTO"):
         from v2.execution.ecm_workers import ECMExecutor
         from v2.execution.worker_contract import EngagementRule, WorkerSettings
 
@@ -173,7 +185,7 @@ def child(request_path, source_root):
             else executor.lifetime_stats.get("charged_work", 0)
         )
         started = time.monotonic()
-        kwargs = {} if executor is None else {"ecm_executor": executor}
+        kwargs = execution_options(request, executor)
         try:
             run = run_accounted(
                 factorize_bounded,
@@ -251,6 +263,8 @@ def child(request_path, source_root):
                 run.checkpoint["payload"]["state"]["stage_seconds"],
             ),
         )
+        if request.get("retain_events", False):
+            row["events"] = list(run.events)
         validate_reconstruction(row)
         return row
 
