@@ -53,6 +53,15 @@ def validate_reconstruction(row):
             raise ValueError("first-factor result has no split")
 
 
+def run_accounted(function, budget, totals, **kwargs):
+    """Retain work and child charges even when result construction refuses."""
+    try:
+        return function(budget=budget, **kwargs)
+    finally:
+        totals["work"] += budget.used
+        totals["children"] += budget.prior_cpu
+
+
 def summarize_stages(events, dropped, seconds):
     """Use existing bounded events; missing attribution remains unknown."""
     ecm = [
@@ -132,19 +141,19 @@ def child(request_path, source_root):
             rule=EngagementRule(**(request.get("rule") or {})),
             force_workers=request["arm"] != "M0" and request["arm"] != "N",
         )
-    charged_children = 0.0
-    work_used = 0
+    totals = dict(children=0.0, work=0)
     warmup_calls = 0
     warmup_seconds = 0.0
     observations = []
     stop_reason = None
 
     def invoke():
-        nonlocal charged_children, work_used
         remaining_wall = (
             request["wall"] - (time.monotonic() - request["entry"]) - 3
         )
-        remaining_cpu = request["cpu"] - time.process_time() - charged_children
+        remaining_cpu = (
+            request["cpu"] - time.process_time() - totals["children"]
+        )
         if remaining_wall <= 0 or remaining_cpu <= 0:
             raise TimeoutError("whole-cell allowance exhausted")
         call_seconds = request["call_seconds"]
@@ -154,7 +163,7 @@ def child(request_path, source_root):
         if call_seconds <= 0:
             raise TimeoutError("cold CLI startup exhausted its allowance")
         budget = Budget(
-            work_limit=request["work"] - work_used,
+            work_limit=request["work"] - totals["work"],
             seconds=min(remaining_wall, call_seconds),
             cpu_seconds=remaining_cpu,
         )
@@ -165,17 +174,50 @@ def child(request_path, source_root):
         )
         started = time.monotonic()
         kwargs = {} if executor is None else {"ecm_executor": executor}
-        run = factorize_bounded(
-            request["n"],
-            seed=request["seed"],
-            config=config,
-            budget=budget,
-            stop_after_split=request["endpoint"] == "first",
-            **kwargs,
-        )
+        try:
+            run = run_accounted(
+                factorize_bounded,
+                budget,
+                totals,
+                n=request["n"],
+                seed=request["seed"],
+                config=config,
+                stop_after_split=request["endpoint"] == "first",
+                **kwargs,
+            )
+        except MemoryError as error:
+            if not request.get("record_memory_refusals", False):
+                raise
+            # No native result was returned. Preserve the original cofactor
+            # and all charges; this is a censored refusal, never a fast result.
+            row = dict(
+                n=request["n"],
+                endpoint=request["endpoint"],
+                reconstruct=request["n"],
+                factorization_complete=False,
+                complete=False,
+                factors=[],
+                remaining=[request["n"]],
+                reason="memory_refusal",
+                error=str(error)[:512],
+                seconds=time.monotonic() - started,
+                work=budget.used,
+                charged_child_cpu=budget.prior_cpu,
+                executor_stats={}
+                if executor is None
+                else dict(executor.last_stats),
+                stage_summary=dict(
+                    ecm_reached=None,
+                    ecm_success="unknown",
+                    engaged=None,
+                    fallback_reached=None,
+                    dropped_events=0,
+                    coarse_stage_seconds={},
+                ),
+            )
+            validate_reconstruction(row)
+            return row
         duration = time.monotonic() - started
-        work_used += budget.used
-        charged_children += budget.prior_cpu
         factors = [
             [factor.value, factor.exponent, factor.certainty.value]
             for factor in run.result.factors
@@ -242,14 +284,14 @@ def child(request_path, source_root):
         stop_reason=stop_reason,
         warmup_calls=warmup_calls,
         warmup_seconds=warmup_seconds,
-        total_work=work_used,
+        total_work=totals["work"],
         aggregate_cpu=usage.ru_utime
         + usage.ru_stime
         + children.ru_utime
         + children.ru_stime,
         aggregate_cpu_charged=usage.ru_utime
         + usage.ru_stime
-        + charged_children,
+        + totals["children"],
         helper_coverage="unpublished helper/teardown CPU retained in leases",
         parent_hwm=usage.ru_maxrss,
         child_hwm=children.ru_maxrss,
