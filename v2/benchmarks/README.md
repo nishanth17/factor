@@ -28,7 +28,9 @@ The optional [NEON v3 preparation](inputs/controls/b4a_neon_preparation_v3.json)
 replaces 12 queue-size cells with one 180 wall / 360 CPU screen; A totals 1,695/6,420.
 Arithmetic-only mpn controls, same-layout scalar controls and complete hybrid
 paths are separate. Raw interleaved batches/QoS/checksums are retained. This
-prototype has no executor integration or measured performance verdict yet.
+prototype now has a negative measured complete-path verdict: the hybrid costs
+2.27–3.14x the B4a scalar GMP baseline and is closed without integration. See
+[the screen results](RESULTS.md#b4a-optional-ecm-neon-screen-4-november-2026).
 
 ## Commands
 

@@ -79,3 +79,12 @@ prototype; future Stage Q --with-neon explicitly enables its additional admissio
 and committed-source build checks. Only a frozen v3 Stage A cell may run timing.
 A negative complete-path result closes this prototype without blocking other
 B4a arms or ruling out every SIMD design.
+
+The authorized 4 November screen is complete on source c485f2b. All six complete
+hybrid cases lose to the B4a scalar GMP path by 2.27–3.14x. This prototype is
+closed without integration; scalar/OpenMP evaluation remains independent. See
+[recorded results](../../../benchmarks/RESULTS.md#b4a-optional-ecm-neon-screen-4-november-2026).
+
+Arithmetic alone also loses to GMP mpn at every width/operation (1.53–3.54x
+cost). ECM SIMD is parked; scalar B4a/native threads remain the ECM focus and
+NEON work remains under B5a QS scans/root updates.

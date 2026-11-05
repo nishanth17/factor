@@ -1,5 +1,60 @@
 # Benchmark results and decisions
 
+## B4a optional ECM NEON screen (4 November 2026)
+
+An isolated task-branch screen on committed source `c485f2b` compares the
+200/266/333-bit two-curve NEON prototype against the B4a scalar C/GMP operation
+pattern. This is a standalone arithmetic/hybrid comparison, with no executor
+integration or whole-factor performance claim. Exact targeted checks (13 tests)
+and full lint pass before timing; the full integrated executor suite remains
+future Stage Q.
+
+Nine interleaved batches per arm follow at least three validated PyPy-driver
+warmup seconds per arm. Each arithmetic arm computes two independent results
+per pair. The complete hybrid includes packing, conversion, normalization and
+ordinary GMP reduction; the scalar baseline uses reusable mpz objects.
+Times below are median nanoseconds per result; spread and paired uncertainty
+are retained with all raw observations.
+
+| Bits | Operation | GMP mpn kernel | NEON kernel | B4a scalar complete | NEON hybrid complete | Hybrid / scalar |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 200 | multiply | 8.51 | 13.04 | 57.68 | 155.78 | 2.70x |
+| 200 | square | 7.15 | 12.97 | 56.37 | 128.09 | 2.27x |
+| 266 | multiply | 9.65 | 27.70 | 74.05 | 217.14 | 2.93x |
+| 266 | square | 8.35 | 28.39 | 74.31 | 191.30 | 2.57x |
+| 333 | multiply | 13.50 | 41.36 | 86.68 | 272.54 | 3.14x |
+| 333 | square | 11.75 | 41.54 | 85.24 | 231.64 | 2.72x |
+
+NEON lowers the same-layout custom scalar kernel cost by about 5–30%, but its
+arithmetic-only cost is 1.53–3.54x GMP's. The complete hybrid costs 2.27–3.14x
+the B4a scalar GMP path; every paired 95% interval is above 2.24x. The same
+hybrid with scalar arithmetic is also slower than GMP. The layout-only diagnostic
+already costs 2.01–2.48x the complete GMP baseline; it is not an exactly
+subtractable packing-cost estimate. No measured width/operation advances.
+
+All 378 measured batches and 42 warmup cases validate. The supported interactive
+QoS request and class readback succeed throughout; P/E placement remains
+unobserved. The arithmetic process has one observed thread. The complete
+execution, including failed setup charges, fresh admission, warmup and cleanup,
+uses 153.81 wall / 153.60 aggregate CPU seconds inside one 180/360 reservation.
+A launcher failure and a pre-timing lint failure remain retained; the corrected
+source is frozen before the first timed batch. The shared lock is released and
+all owned groups are empty.
+
+**Decision:** close this NEON hybrid prototype without integration and park ECM
+SIMD for now. Arithmetic alone also loses to GMP mpn in every case. Preserve
+scalar C/GMP and native-thread evaluation; NEON effort belongs to B5a QS scans
+and root updates. No persistent SIMD or vector-reduction follow-up is selected. This result concerns one fixed prototype,
+one modulus at each width and a repeated 64-pair panel; it does not rule out all
+SIMD designs or establish an ECM/portfolio speedup. No excluded reduction work
+was added. The timed reusable child command was `pypy3 -B -m
+v2.benchmarks.ecm.b4a.neon_screen <frozen-request.json>`, under the shared-lock
+owner and exact source/admission checks. Detailed provenance, raw batches and
+median/min/max/MAD are local in
+`v2/benchmarks/results/b4a-neon-direct-v4/`, `b4a-neon-direct-v5/` and
+`v2/audit/b4a/NEON_DIRECT_RESULT_v5.md`. The issued 180/360 charge carries forward
+inside Stage A; it does not authorize another screen or restore removed cells.
+
 ## B12/F4 512-curve cache amortization (4 November 2026)
 
 A resource-valid follow-up uses the unchanged committed runtime `b62ac7a` and

@@ -5,13 +5,16 @@ from validated B12 `787190aa`; this is not a mainline integration or adoption.
 Current planning was separately reviewed at `b8638a0c`. Detailed decision,
 research, QA status and future integration/execution plan are local under
 `v2/audit/b4a/`. Compilation/executable QA remain subject to the shared window;
-no performance campaign is authorized by this preparation. Native teams are
+scalar/thread performance execution remains pending. Native teams are
 implemented as an optional C-only OpenMP continuation owner with dynamic/static/
 guided scheduling; compilation and executable QA remain pending. B4a remains open.
-The v3 amendment prepares one optional ECM-local NEON product/square screen,
-with independent build/correctness admission and no executor integration. Its
-180 wall / 360 CPU reserve replaces 12 queue-size cells within Stage A. Details:
-`v2/audit/b4a/PROTOCOL_neon_v3.md`. No performance execution is authorized here.
+The optional two-curve NEON screen now has a negative result on source c485f2b:
+complete hybrid costs are 2.27–3.14x the B4a scalar GMP baseline at 200/266/333
+bits. Close this prototype without integration; scalar/OpenMP evaluation remains
+open. Fresh exact checks and lint pass. The one issued 180 wall / 360 CPU Stage A
+cell includes failed setup, admission, warmup and cleanup; no new reduction work.
+Current local result: `v2/audit/b4a/NEON_DIRECT_RESULT_v5.md`; concise measurements:
+[NEON screen](benchmarks/RESULTS.md#b4a-optional-ecm-neon-screen-4-november-2026).
 
 Last updated: 4 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.

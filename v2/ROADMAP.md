@@ -523,11 +523,12 @@ performance/default adoption follows. Optional OpenMP stage-one teams and
 static/dynamic/guided scheduling are prepared, with executable QA and generated-
 code inspection pending. Full classical-continuation native execution remains
 a documented boundary gap.
-An optional v3 feasibility screen adds two-curve NEON products/squares at
-200/266/333 bits with GMP reduction and complete conversion-cost controls. It
-remains separate from the executors; exact admission and the bounded Stage A
-screen precede any integration decision. A negative result does not close
-other scalar/threaded B4a evaluation.
+The optional two-curve NEON product/square screen at 200/266/333 bits is closed
+without integration: its complete hybrid costs 2.27–3.14x the B4a scalar GMP
+path on source c485f2b. Exact checks and lint pass; all six measured cases lose.
+The issued 180 wall / 360 CPU reservation remains inside Stage A. Scalar/threaded
+B4a evaluation remains open. Park ECM SIMD for now; NEON effort remains under
+B5a QS scans/root updates. No persistent SIMD/reduction follow-up is selected.
 Detailed local provenance and pending checks are in `v2/audit/b4a/`.
 
 CFFI supplies a boundary, not an arithmetic algorithm or automatic SIMD.

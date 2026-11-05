@@ -3,6 +3,15 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a optional ECM NEON screen closure (4 November 2026)
+
+- Measure the fixed two-curve NEON prototype against GMP and the B4a scalar
+  multiplication/reduction path. All six complete hybrid cases cost 2.27–3.14x
+  the scalar path; close this prototype without integration or default changes.
+- Pass exact targeted checks and lint before timing. Retain raw interleaved
+  batches, uncertainty, setup failures and the original finite charge. Scalar
+  C/GMP and OpenMP evaluation remains open.
+
 ## B4a optional ECM NEON preparation (4 November 2026)
 
 - Prepare a separate two-curve product/square prototype at 200/266/333 bits,
