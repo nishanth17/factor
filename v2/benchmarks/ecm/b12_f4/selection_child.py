@@ -109,6 +109,18 @@ def execution_options(request, executor, *, supports_executor=True):
     return {"ecm_executor": executor}
 
 
+def selection_options(request):
+    """Retain explicit parent/aggregate grants for persistent warm contexts."""
+    values = dict(
+        seed=request["seed"], prefer_warm=request.get("prefer_warm", False)
+    )
+    if "parent_memory" in request:
+        values["parent_memory"] = request["parent_memory"]
+    if "ecm_memory_bytes" in request:
+        values["memory_bytes"] = request["ecm_memory_bytes"]
+    return values
+
+
 def child(request_path, source_root):
     """Measure cold CLI or repeated calls with one retained executor."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -144,8 +156,7 @@ def child(request_path, source_root):
         executor = SelectedECMContext(
             request["selection_profile"],
             request["selection_profile_sha256"],
-            seed=request["seed"],
-            prefer_warm=request.get("prefer_warm", False),
+            **selection_options(request),
         )
     elif request["arm"] not in ("S0", "AUTO"):
         from v2.execution.ecm_workers import ECMExecutor

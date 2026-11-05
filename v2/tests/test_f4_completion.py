@@ -4,7 +4,10 @@ import unittest
 from pathlib import Path
 
 from v2.benchmarks.ecm.b12_f4.completion import configuration, point_comparison
-from v2.benchmarks.ecm.b12_f4.selection_child import execution_options
+from v2.benchmarks.ecm.b12_f4.selection_child import (
+    execution_options,
+    selection_options,
+)
 
 
 class CompletionStudyTests(unittest.TestCase):
@@ -31,6 +34,24 @@ class CompletionStudyTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             execution_options(dict(request, mode="warm"), None)
+
+    def test_retained_context_owns_the_funded_parent_without_changing_legacy(
+        self,
+    ):
+        self.assertEqual(
+            selection_options(dict(seed=7)), dict(seed=7, prefer_warm=False)
+        )
+        values = selection_options(
+            dict(
+                seed=7,
+                prefer_warm=True,
+                parent_memory=2 * 2**30 + 16 * 2**20,
+                ecm_memory_bytes=8 * 2**30,
+            )
+        )
+        self.assertEqual(values["parent_memory"], 2 * 2**30 + 16 * 2**20)
+        self.assertEqual(values["memory_bytes"], 8 * 2**30)
+        self.assertTrue(values["prefer_warm"])
 
     def test_resource_variants_keep_accepted_sixty_digit_policies(self):
         from v2.portfolio import PortfolioConfig
