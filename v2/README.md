@@ -11,6 +11,10 @@ fallback. A separate experimental OpenMP owner supplies static/dynamic/guided
 continuation scheduling. Both builds and executable QA are pending; no performance
 or default adoption is claimed.
 
+A separate optional [ECM NEON feasibility prototype](ecm/native/neon/README.md)
+provides two-curve products/squares at 200/266/333 bits. It is not integrated into
+the executor; only a separately admitted Stage A screen may measure it.
+
 ## Setup and first run
 
 Run commands from the repository root:

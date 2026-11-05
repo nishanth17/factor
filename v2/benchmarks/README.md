@@ -24,6 +24,12 @@ integrated-source Stage Q before preparing Stage A. Scalar C/GMP, OpenMP teams
 and selected schedules, and B12 processes are distinct arms. No B4a speedup is
 recorded.
 
+The optional [NEON v3 preparation](inputs/controls/b4a_neon_preparation_v3.json)
+replaces 12 queue-size cells with one 180 wall / 360 CPU screen; A totals 1,695/6,420.
+Arithmetic-only mpn controls, same-layout scalar controls and complete hybrid
+paths are separate. Raw interleaved batches/QoS/checksums are retained. This
+prototype has no executor integration or measured performance verdict yet.
+
 ## Commands
 
 From the repository root:

@@ -3,6 +3,14 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a optional ECM NEON preparation (4 November 2026)
+
+- Prepare a separate two-curve product/square prototype at 200/266/333 bits,
+  exact GMP controls and a bounded prospective Stage A runner. Include hybrid
+  conversion/reduction costs and distinguish SIMD from layout effects.
+- Preserve scalar C/GMP and OpenMP work. No executor integration or performance
+  verdict; build/correctness admission remains separate from later timing.
+
 ## B12/F4 larger-quota follow-up (4 November 2026)
 
 - Validate the 512-curve checkpoint/resource contract and matched spawn execution

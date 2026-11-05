@@ -82,6 +82,11 @@ def save(path, value):
 
 
 def check_cell(cell):
+    if cell.get("arm") == "ECM-NEON-screen":
+        from .neon_screen import check_screen_cell
+
+        check_screen_cell(cell)
+        return
     if not re.fullmatch(r"[a-zA-Z0-9_-]{1,128}", cell["id"]):
         raise ValueError("invalid bounded cell identity")
     if cell["arm"] not in ARMS:
@@ -545,6 +550,10 @@ def execute(freeze_path, cell_id, directory):
     freeze = json.loads(Path(freeze_path).read_text())
     validate_freeze(freeze, ROOT)
     cell = next(c for c in freeze["cells"] if c["id"] == cell_id)
+    if cell["arm"] == "ECM-NEON-screen":
+        from .neon_runner import execute_screen
+
+        return execute_screen(freeze, cell, directory)
     directory = Path(directory).resolve()
     directory.mkdir(parents=True, exist_ok=True)
     with open("/private/tmp/factor-performance.lock", "r+") as lock:

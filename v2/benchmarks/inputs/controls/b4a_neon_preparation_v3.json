@@ -1,0 +1,59 @@
+{
+  "identity": "b4a-phase12-neon-prospective-v3",
+  "status": "prospective-not-executable",
+  "base_identity": "b4a-phase12-openmp-prospective-v2",
+  "base_sha256": "30f93a51a840f2c28a16040697360931b1f070744561f0bf0bf35c46f1cb5f83",
+  "preserved_commit": "65f8e660e9e84e5e8bb13891b63b275678ea1f74",
+  "no_performance_execution_authorized": true,
+  "widths": [
+    200,
+    266,
+    333
+  ],
+  "operations": [
+    "multiply",
+    "square"
+  ],
+  "pairs": 64,
+  "seed": 2026110407,
+  "radix_bits": 26,
+  "lanes": 2,
+  "warmup_per_arm_seconds": 3,
+  "samples": 9,
+  "reserve": {
+    "wall": 180,
+    "cpu": 360,
+    "rss": 4294967296,
+    "output": 8388608,
+    "shutdown": 2
+  },
+  "removed_cells": [
+    "schedule-60-2-2-dynamic",
+    "schedule-60-2-2-static",
+    "schedule-60-2-2-guided",
+    "schedule-60-4-4-dynamic",
+    "schedule-60-4-4-static",
+    "schedule-60-4-4-guided",
+    "schedule-100-2-2-dynamic",
+    "schedule-100-2-2-static",
+    "schedule-100-2-2-guided",
+    "schedule-100-4-4-dynamic",
+    "schedule-100-4-4-static",
+    "schedule-100-4-4-guided"
+  ],
+  "removed_reserve": {
+    "wall": 240,
+    "cpu": 960
+  },
+  "revised_stage_a": {
+    "cells": 82,
+    "wall": 1695,
+    "cpu": 6420,
+    "ceiling_wall": 1800,
+    "ceiling_cpu": 7200
+  },
+  "qos_request": "pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0)",
+  "placement": "QoS success is not P/E core pinning",
+  "advance": "complete hybrid path only; arithmetic-only win insufficient; exploratory, no integration",
+  "reduction": "ordinary GMP mpz_mod; no new reduction context"
+}

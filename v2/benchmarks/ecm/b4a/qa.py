@@ -29,7 +29,10 @@ def main():
     parser.add_argument(
         "--openmp-prefix", type=Path, default=Path("/opt/homebrew/opt/libomp")
     )
+    parser.add_argument("--with-neon", action="store_true")
     args = parser.parse_args()
+    if args.with_neon and args.stage != "Q":
+        parser.error("use neon_qa for the separate Phase1-2 admission")
     if not args.window_released:
         parser.error(
             "lock availability also requires no competing accepted timing"
@@ -94,6 +97,21 @@ def main():
                 str(args.openmp_prefix),
             ]
         )
+    if args.with_neon:
+        commands[2].insert(-1, "v2.tests.test_neon_ecm")
+        commands[2].insert(-1, "v2.tests.test_b4a_neon_screen")
+        commands.insert(
+            2,
+            [
+                sys.executable,
+                "-B",
+                "-m",
+                "v2.ecm.native.neon_build",
+                "--gmp-prefix",
+                str(args.gmp_prefix),
+            ],
+        )
+        commands[-1].append("--with-neon")
     with open("/private/tmp/factor-performance.lock", "r+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         ledger_path = args.receipts / (args.stage + "-ledger.json")
@@ -117,6 +135,9 @@ def main():
         environment = execution_environment()
         if args.stage == "Q":
             environment["FACTOR_B4A_LIFECYCLE_QA"] = "1"
+        if args.with_neon:
+            environment["FACTOR_B4A_NEON_QA"] = "1"
+            environment["RAYON_NUM_THREADS"] = "1"
         # Per-command maxima partition the same reservation; unused slots do
         # not enlarge any command or authorize extra attempts.
         walls = (
@@ -129,6 +150,9 @@ def main():
             if args.stage == "tiny"
             else [160, 160, 480, 400, 2400, 3600]
         )
+        if args.with_neon:
+            walls = [30, 30, 30, 120, 90, 600, 900]
+            cpus = [120, 120, 120, 480, 360, 2400, 3600]
         try:
             for index, (command, wall, cpu) in enumerate(
                 zip(commands, walls, cpus)
@@ -186,6 +210,8 @@ def main():
                     for p in ROOT.glob("v2/ecm/native/packet.*")
                 },
             )
+            if args.with_neon:
+                receipt.update(neon_passed=passed, timing_executed=False)
             write_new(args.receipts / (args.identity + ".json"), receipt)
 
 

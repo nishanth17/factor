@@ -8,6 +8,10 @@ research, QA status and future integration/execution plan are local under
 no performance campaign is authorized by this preparation. Native teams are
 implemented as an optional C-only OpenMP continuation owner with dynamic/static/
 guided scheduling; compilation and executable QA remain pending. B4a remains open.
+The v3 amendment prepares one optional ECM-local NEON product/square screen,
+with independent build/correctness admission and no executor integration. Its
+180 wall / 360 CPU reserve replaces 12 queue-size cells within Stage A. Details:
+`v2/audit/b4a/PROTOCOL_neon_v3.md`. No performance execution is authorized here.
 
 Last updated: 4 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
