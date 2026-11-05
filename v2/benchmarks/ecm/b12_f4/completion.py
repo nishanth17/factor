@@ -22,7 +22,9 @@ def configuration(n, source_root):
     config = PortfolioConfig().for_input(n)
     if digits == 60:
         if config.siqs is None:
-            raise ValueError("the incumbent calibrated 60-digit fallback is missing")
+            raise ValueError(
+                "the incumbent calibrated 60-digit fallback is missing"
+            )
         # Select the calibrated numerical policies before increasing capacity:
         # rebuilding defaults under a different grant can change solve_policy.
         fallback = replace(
@@ -57,8 +59,9 @@ def point_comparison(control, candidate):
         both_complete=both,
         speedup=control["seconds"] / candidate["seconds"] if both else None,
         candidate_fraction=candidate["seconds"] / control["seconds"]
-        if both else None,
-        inference="exposed single-input exploratory point; no population claim",
+        if both
+        else None,
+        inference="exposed single-input point; no population claim",
     )
 
 
@@ -69,7 +72,9 @@ def main():
     arguments = parser.parse_args()
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
-    print(json.dumps(asdict(configuration(arguments.n, arguments.source_root))))
+    print(
+        json.dumps(asdict(configuration(arguments.n, arguments.source_root)))
+    )
 
 
 if __name__ == "__main__":

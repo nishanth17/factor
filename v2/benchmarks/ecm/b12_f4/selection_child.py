@@ -97,7 +97,9 @@ def execution_options(request, executor):
     """Select the declared owner without inheriting changing defaults."""
     if request["arm"] == "AUTO":
         if request["mode"] != "cold":
-            raise ValueError("warm studies require an explicitly retained owner")
+            raise ValueError(
+                "warm studies require an explicitly retained owner"
+            )
         return dict(
             ecm_executor="auto",
             ecm_memory_bytes=request["ecm_memory_bytes"],
