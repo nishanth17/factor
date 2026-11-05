@@ -285,7 +285,9 @@ choose the lower size. Pool crossover estimates remain bound to the selected
 bundle, with a recomputed dispatch-wave floor. PRAC/ladder eligibility boundaries
 partition cost anchors; no extrapolation or interpolation across that boundary
 is admitted. Decision receipts identify measured versus interpolated rates and
-the rate/crossover anchors. Intermediate-size accuracy remains unmeasured.
+the rate/crossover anchors. A separate targeted calibration validates
+55/75/90-digit fixed-work body estimates within 4–17%; other intermediate sizes
+remain unmeasured.
 
 For `factorize_bounded`, missing/invalid costs, fresh worker-memory refusal and
 unfunded startup select the existing serial stage with its original curves,
@@ -311,8 +313,23 @@ arms. It finds conditional
 completion gains and regressions, with no universal cold/warm median winner.
 That source matched only exact cofactor sizes/options, leaving many calls on
 its distinct SEARCHv1 serial stream. The v2 adapter above changes those two
-integration behaviors and has no new performance comparison yet. A nominated worker count therefore does
+integration behaviors. Its subsequent frozen comparison is linked below. A
+nominated worker count therefore does
 not mean workers engaged on every call. The earlier matched 64 MiB QS checkpoint
 study remains a historical resource variant. See
 [actual-master results](benchmarks/RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026)
 for population sizes, uncertainty, CPU/memory costs and pending acceptance gates.
+
+A separately frozen opt-in profile,
+`benchmarks/inputs/controls/b12_f4_targeted_selected_v1.json`, has SHA256
+`16d52a6e55270d3cfea467f2a5ca41dd00ad1d8d052f2263861656a99b4b00cf`.
+It adds one calibrated 81-digit anchor while retaining the earlier 33 bundles.
+Use it explicitly with `SelectedECMContext`; it does not change global defaults.
+The fresh comparison requests escalating140 at original 60/80/100-digit inputs
+and preserves stock fallback/checkpoint settings. Cost admission uses actual
+cofactor size and pool readiness, with incumbent serial execution on decline.
+It improves completion-sensitive mean latency on the declared fresh uniform
+panel while increasing CPU and regressing some cold medians. Warm results use
+retained homogeneous contexts; they do not establish a cold CLI gain by
+themselves. See the [fresh policy results](benchmarks/RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026)
+for grants, uncertainty, refusals and the pending balanced completion guardrail.

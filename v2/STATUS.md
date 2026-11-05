@@ -178,6 +178,26 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
+The targeted B12/F4 policy comparison is finished: committed-only `9b7eaeb`
+versus actual master `0efaba1`, with the corrected cofactor selector and literal
+stock fallback/checkpoint settings. All 1,248 process cells / 1,838 timed calls
+validate. Fresh equal-weight uniform completion rises from 18/36 to 22/36;
+finite-horizon mean latency ratios are 0.799 cold [0.617, 0.957] and 0.781 warm
+[0.591, 0.944]. Cold 60/100-digit medians regress, median uncertainty remains
+unbounded and p90 is censored. This is a bundled 140-curve/stream/worker policy,
+not pure scaling or a universal winner. Primary cold CPU rises 4.37×.
+
+Workers engage on 29/36 uniform moduli, usually ten processes; prior frozen
+cofactor bundles also select eight cold/fourteen warm. Enriched completion is
+11/12 versus 4/12. The separate 415-curve pilot completes 80/100-digit inputs
+with 22/25-digit smaller factors under both equivalent-manifest serial and ten
+workers; single timings are exploratory. Balanced completion remains pending.
+Source passes 1,311 PyPy tests (9 optional skips), lint and 263 imports. Final
+booking is 4,862.476 wall / 41,616.575 charged CPU seconds under 9,900 / 104,000.
+The computation lock is released. No defaults, merge, push, B12/F4 closure or E1.
+Current local entry: `v2/audit/b12_f4/targeted_policy_v2/REPORT.md` and `HANDOFF.md`.
+See [fresh policy results](benchmarks/RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026).
+
 The B12/F4 selection-integration follow-up adds bounded same-plan cofactor cost
 interpolation and incumbent serial execution whenever portfolio workers decline.
 Its v2 training catalogue preserves the earlier literal cost/settings anchors;
@@ -187,7 +207,9 @@ workers. Focused serial/RNG/fallback, ownership, cancellation, resume and real
 spawn tests pass. Committed-only source `4a2f051` passes 1,308 PyPy tests
 (9 optional skips), full lint, 262 benchmark imports and v2 source-pin admission.
 Final QA cost is 76.231 wall / 91.446 aggregate CPU seconds; the lock is released.
-Current-source performance and balanced completion remain unmeasured. No defaults change. Current local
+At that integration-QA checkpoint performance was unmeasured; the targeted
+comparison above now supplies scoped evidence. Balanced completion remains
+pending and defaults are unchanged. Historical local
 entry: `v2/audit/b12_f4/selection_integration_v2/DECISION.md` and `HANDOFF.md`.
 
 The actual-master comparison is complete against committed `0efaba1`, using

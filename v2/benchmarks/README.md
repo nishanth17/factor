@@ -206,12 +206,14 @@ feasibility precedes engagement calibration and fresh confirmation.
 Current selection-integration work uses source-pinned training input
 `inputs/controls/b12_f4_selection_v2.json`; its cost/settings anchors are unchanged
 from v1, with bounded same-path size interpolation and incumbent serial portfolio
-declines. Frozen v1 sources/inputs/results remain separate. New-source performance
-is NOT RUN; do not reuse old end-to-end timings as a revised-policy gain.
+declines. Frozen v1 sources/inputs/results remain separate. The subsequent targeted
+comparison below measures the revised policy; old end-to-end timings remain
+under their original source identities.
 The local `v2/audit/b12_f4/selection_integration_v2/HANDOFF.md` records focused
 validation and passing full committed-checkout QA (`4a2f051`: 1,308 tests,
 9 optional skips, lint, 262 imports and source-pin admission). The computation
-lock is released; future performance validation remains separately queued.
+lock was released at that QA checkpoint; subsequent targeted validation is
+recorded below.
 
 Current complete-cost comparison entry point:
 `v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and `HANDOFF.md`.
@@ -241,4 +243,40 @@ Final committed-only checkout `20e6681` passes 1,287 PyPy tests (9 optional
 skips), full lint and 262 benchmark imports. Its receipt and exact commands are
 in the local handoff. The computation lock is released. No additional performance
 campaign or default promotion is queued by this report. B12/F4 remain open and
-E1 stays deferred; exact-cofactor coverage and the balanced guardrail are unresolved.
+E1 stays deferred. That source leaves exact-cofactor coverage and the balanced
+guardrail unresolved; the targeted comparison below addresses cofactor coverage
+without establishing the balanced guardrail.
+
+The targeted cofactor-policy comparison uses committed benchmark/helper source
+`9b7eaeb` against actual master `0efaba1`, with the native implementation
+unchanged from `10f64d5` / `4a2f051`. All 1,248 cells / 1,838 timed factor calls
+validate. Nine fresh cold samples and three warm pool lifetimes × three samples
+per primary modulus preserve separate endpoints and full failed-call charges.
+See [fresh results](RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026)
+and the local `v2/audit/b12_f4/targeted_policy_v2/REPORT.md`, `TABLES.md`,
+`resources-r2.json` and `HANDOFF.md`. The lock is released; no further run or
+default promotion is queued automatically.
+
+Reusable `ecm/b12_f4/targeted_inputs.py` adds bounded certified calibration
+primes, direct/recursive enriched inputs, unconditioned uniform integers and
+cheap-exit controls. It requires PyPy 3.11, a frozen policy, a new output path
+and an inherited held shared-lock descriptor. Its CLI is:
+
+```text
+pypy3 -m v2.benchmarks.ecm.b12_f4.targeted_inputs \
+  --phase confirmation --seed SEED \
+  --policy-freeze NEW_FROZEN_POLICY --output NEW_CORPUS
+```
+
+Generation/certification is runtime work: reserve it before execution and never
+replace an exposed corpus. The committed loader inputs are
+`inputs/controls/b12_f4_targeted_policy_v1.json`,
+`b12_f4_targeted_policy_v2.json`, `b12_f4_targeted_selected_v1.json`,
+`b12_f4_targeted_confirmation_v1.json`, and
+`inputs/corpora/b12_f4_targeted_calibration_v1.json` /
+`b12_f4_targeted_confirmation_v1.json`. The selected profile was committed
+before fresh confirmation generation; only its 81-digit anchor was fitted.
+Committed-only `9b7eaeb` passes 1,311 tests (9 optional skips), lint and 263
+benchmark imports. Later report changes are documentation only. Historical
+freezes, refused stock checkpoints, all charges and analysis corrections remain
+local and immutable. B12/F4 stay open, including the balanced guardrail.

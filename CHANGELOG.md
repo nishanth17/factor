@@ -3,6 +3,20 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 targeted policy and hard-case evidence (5 November 2026)
+
+- Add bounded certified calibration/confirmation generation, independent tests,
+  immutable corpora and a profile frozen before fresh input generation. Fit only
+  an 81-digit cost anchor; holdouts validate within 4–17%.
+- Record 1,248 checked cells / 1,838 timed calls against actual master. Fresh
+  uniform completion is 22/36 versus 18/36; completion-sensitive mean latency is
+  lower cold/warm, while some cold medians regress and CPU rises 4.37×.
+- Keep a separate exploratory 415-curve hard pilot, all stock checkpoint refusals,
+  censored tails, resource charges and the pending balanced guardrail explicit.
+- Committed-only `9b7eaeb` passes 1,311 PyPy tests (9 optional skips), lint and
+  263 benchmark imports. Computation is finished and the lock is released.
+  No default promotion, merge, push, B12/F4 closure or E1 campaign.
+
 ## B12/F4 cofactor-aware selection and incumbent serial path (5 November 2026)
 
 - Add bounded piecewise linear per-curve cost estimates between same-plan size
