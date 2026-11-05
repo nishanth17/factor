@@ -200,7 +200,8 @@ B12/F4 implements explicit spawn processes, stable SEARCHv1 identities,
 parent-owned leases, bounded metadata reuse and resource/checkpoint v7.
 Runtime/benchmark source `538462a` passes 1,287 PyPy tests (9 optional skips), lint
 and 262 benchmark imports in a committed-only checkout. Final report/input
-checkout QA is queued. Complete local report, all-regime tables, ledger and
+checkout `20e6681` also passes those checks (75.649 wall / 90.367 CPU seconds).
+The shared computation lock is released; no campaign is running. Complete local report, all-regime tables, ledger and
 handoff: `v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and
 `HANDOFF.md`. Earlier R64 evidence and freezes remain historical resource variants.
 

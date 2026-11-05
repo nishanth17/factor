@@ -14,8 +14,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   completion is 18/36 versus master's 19/36 on the default schedule, or 24/36 with
   explicit caller140. Median uncertainty, the 80-digit losses, sparse actual
   worker engagement and pending balanced guardrail preclude default adoption.
-- Runtime/benchmark `538462a` passes full PyPy QA; final report/input committed
-  checkout validation is queued. Detailed receipts remain local. No B12/F4
+- Final report/input committed checkout `20e6681` passes 1,287 PyPy tests
+  (9 optional skips), full lint and 262 benchmark imports; the lock is released. Detailed receipts remain local. No B12/F4
   closure, merge or E1 campaign.
 
 ## B12/F4 measured opt-in catalogue (4 November 2026)

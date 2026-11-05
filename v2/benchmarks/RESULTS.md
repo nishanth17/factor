@@ -101,9 +101,11 @@ censored outcomes; no R64 substitution or successful-only analysis was used.
 The 60/70 balanced probes remain incomplete: the protected guardrail is pending.
 No default change, global optimum, B12/F4 closure or E1 campaign follows.
 
-Runtime/benchmark source `538462a` passes 1,287 PyPy tests (9 optional skips), lint
-and 262 benchmark imports from committed files. Final report/input checkout QA
-is queued. Detailed all-regime tables, corpus proofs, receipts, uncertainty and
+Final committed-only report/input checkout `20e6681` passes 1,287 PyPy tests
+(9 optional skips), full lint and 262 benchmark imports: 75.649 wall / 90.367 CPU
+seconds, with the full 90/220-second reservation retained. Final campaign booking
+is 16,345.315 wall / 114,769.283 charged CPU seconds within 18,000 / 480,000. The
+shared computation lock is released. Detailed all-regime tables, corpus proofs, receipts, uncertainty and
 resource ledger are local under `v2/audit/b12_f4/master_comparison_v1/REPORT.md`,
 `ALL_REGIMES.md`, `summary.json`, `cost-summary.json` and `HANDOFF.md`.
 

@@ -227,7 +227,8 @@ and `inputs/corpora/b12_f4_master_comparison_v1.json`. The resource revision
 preserves prior charges and changes no per-call treatment. Preserve earlier
 confirmation/R64 inputs and evidence under their original identities.
 
-Final committed-checkout QA is queued under the shared nonblocking performance
-lock, using the finite command in the local handoff. No additional performance
+Final committed-only checkout `20e6681` passes 1,287 PyPy tests (9 optional
+skips), full lint and 262 benchmark imports. Its receipt and exact commands are
+in the local handoff. The computation lock is released. No additional performance
 campaign or default promotion is queued by this report. B12/F4 remain open and
 E1 stays deferred; exact-cofactor coverage and the balanced guardrail are unresolved.
