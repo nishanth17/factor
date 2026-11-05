@@ -1,0 +1,3441 @@
+{
+  "serial_settings": {
+    "allow_wide_workers": true,
+    "assignment_cpu": 60.0,
+    "startup_seconds": 10.0,
+    "checkpoint_bytes": 8388608,
+    "memory_bytes": 8589934592,
+    "parent_memory": 1090519040,
+    "worker_memory": 67108864,
+    "assignment_work": 1000000000,
+    "workers": 1,
+    "worker_imports": "ecm",
+    "stage_two_kernel": "reduced",
+    "decoded_cache_bytes": 8388608,
+    "stage_two_cache_bytes": 8388608,
+    "manifest_cache_bytes": 4194304,
+    "poll_every": 64,
+    "bind_context": true
+  },
+  "rows": [
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            200,
+            7700,
+            10
+          ],
+          [
+            2000,
+            81000,
+            30
+          ],
+          [
+            10000,
+            554000,
+            100
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 16777216,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.04886915178503841,
+            0.04886915178503841,
+            0.04886915178503841
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.488691517850384,
+          "pool_seconds": 0.488691517850384
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.046702601195179994,
+            0.046702601195179994,
+            0.046702601195179994
+          ],
+          "cold_seconds": 0.46702601195179994,
+          "warm_seconds": 0.46702601195179994,
+          "pool_seconds": 0.46702601195179994
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.026379682298284024
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.1055187291931361,
+          "pool_seconds": 0.1055187291931361
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.016149447881616652
+          ],
+          "cold_seconds": 0.12919558305293322,
+          "warm_seconds": 0.12919558305293322,
+          "pool_seconds": 0.12919558305293322
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.019560785163776018
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.07824314065510407,
+          "pool_seconds": 0.13036172865813594
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.015591983072226867
+          ],
+          "cold_seconds": 0.1871037968667224,
+          "warm_seconds": 0.1871037968667224,
+          "pool_seconds": 0.1871037968667224
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            50000,
+            5000000,
+            16
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 16777216,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.3879659505037125
+          ],
+          "cold_seconds": 3.879659505037125,
+          "warm_seconds": 3.879659505037125,
+          "pool_seconds": 3.879659505037125
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.365268559922697
+          ],
+          "cold_seconds": 5.844296958763152,
+          "warm_seconds": 5.844296958763152,
+          "pool_seconds": 5.844296958763152
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            11000,
+            1100000,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.09309399478661362
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.744751958292909,
+          "pool_seconds": 0.744751958292909
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.0880518502817722
+          ],
+          "cold_seconds": 1.4088296045083553,
+          "warm_seconds": 1.4088296045083553,
+          "pool_seconds": 1.4088296045083553
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            512
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.018554293213128403
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.18554293213128403,
+          "pool_seconds": 0.6847018916694636
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.01818476407788694
+          ],
+          "cold_seconds": 0.21821716893464327,
+          "warm_seconds": 0.21821716893464327,
+          "pool_seconds": 0.21821716893464327
+        }
+      }
+    },
+    {
+      "digits": 100,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            128
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.019562051427783445
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.19562051427783445,
+          "pool_seconds": 0.3303523910922384
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "budget_mode": "prospective",
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.01796711457791389
+          ],
+          "cold_seconds": 0.28747383324662223,
+          "warm_seconds": 0.28747383324662223,
+          "pool_seconds": 0.28747383324662223
+        }
+      }
+    },
+    {
+      "digits": 30,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.018123984395060688
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.07249593758024275,
+          "pool_seconds": 0.07249593758024275
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.00622747401939705
+          ],
+          "cold_seconds": 0.0498197921551764,
+          "warm_seconds": 0.0498197921551764,
+          "pool_seconds": 0.0498197921551764
+        }
+      }
+    },
+    {
+      "digits": 30,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            50000,
+            64
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 4,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.006431001958844718
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.02572400783537887,
+          "pool_seconds": 0.09698894048419059
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 0,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.0041908209677785635
+          ],
+          "cold_seconds": 0.05028985161334276,
+          "warm_seconds": 0.05028985161334276,
+          "pool_seconds": 0.05028985161334276
+        }
+      }
+    },
+    {
+      "digits": 40,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.022416901134420186
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.08966760453768075,
+          "pool_seconds": 0.10521081369332838
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.007990015612449497
+          ],
+          "cold_seconds": 0.06392012489959598,
+          "warm_seconds": 0.06392012489959598,
+          "pool_seconds": 0.06392012489959598
+        }
+      }
+    },
+    {
+      "digits": 40,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            200,
+            7700,
+            10
+          ],
+          [
+            2000,
+            81000,
+            30
+          ],
+          [
+            10000,
+            554000,
+            100
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 1090519040,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": {
+          "backend": "python-int",
+          "mode": "siqs",
+          "base_bound": 5000,
+          "multiplier": 0,
+          "half_width": 65536,
+          "factor_count": 5,
+          "family_count": 100000,
+          "pool_size": 32,
+          "assignment_policy": "windowed_pair",
+          "external_coefficients": false,
+          "coefficient_trials": 4096,
+          "polynomials_per_family": 64,
+          "diverse": true,
+          "shared_relations": true,
+          "growth_steps": 0,
+          "max_half_width": 65536,
+          "max_stalled": 100000,
+          "max_trivial": 100000,
+          "weight_two": true,
+          "row_excess": 32,
+          "batch_width": 4096,
+          "filter_row_growth": 32,
+          "tested_dependencies": false,
+          "polynomial_policy": "parity2",
+          "multiplier_policy": "parity2_wide",
+          "root_update_policy": "batch",
+          "sign_policy": "swap_high",
+          "solve_policy": "window",
+          "memory_bytes": 1073741824,
+          "checkpoint_bytes": 67108864,
+          "collector": {
+            "block_width": 4096,
+            "metadata_chunk": 64,
+            "score_backend": "list",
+            "marking": "parity_two",
+            "division": "bucket",
+            "small_prime_cutoff": 0,
+            "threshold_extra": 0,
+            "score_policy": "powers",
+            "sparse_queue_bytes": 33554432,
+            "power_plan_bytes": 2097152,
+            "residual_bound": 25000000,
+            "max_partials": null,
+            "max_relations": null,
+            "max_atoms": null,
+            "memory_bytes": null,
+            "large_prime_bound": 500000,
+            "large_product_bound": 3200000000,
+            "candidate_bound": 0,
+            "split_call_limit": null,
+            "storage_policy": "grow"
+          }
+        },
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 8388608,
+          "bind_context": true,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.0256064014875197,
+            0.0256064014875197,
+            0.0256064014875197
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.20485121190015762,
+          "pool_seconds": 0.5187813372288681
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 8388608,
+          "bind_context": true,
+          "workers": 14
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.02355051249864378,
+            0.02355051249864378,
+            0.02355051249864378
+          ],
+          "cold_seconds": 0.3297071749810129,
+          "warm_seconds": 0.3297071749810129,
+          "pool_seconds": 0.3297071749810129
+        }
+      }
+    },
+    {
+      "digits": 50,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.021014369907788932
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.08405747963115573,
+          "pool_seconds": 0.11228798758445944
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.00863572396337986
+          ],
+          "cold_seconds": 0.06908579170703888,
+          "warm_seconds": 0.06908579170703888,
+          "pool_seconds": 0.06908579170703888
+        }
+      }
+    },
+    {
+      "digits": 50,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.012607307275175117
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.10085845820140094,
+          "pool_seconds": 0.1568454475240285
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 14
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.007800204402883537
+          ],
+          "cold_seconds": 0.10920286164036952,
+          "warm_seconds": 0.10920286164036952,
+          "pool_seconds": 0.10920286164036952
+        }
+      }
+    },
+    {
+      "digits": 50,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            128
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 6
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.010863224935746985
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.06517934961448191,
+          "pool_seconds": 0.3045139266744751
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.009318922850070521
+          ],
+          "cold_seconds": 0.14910276560112834,
+          "warm_seconds": 0.14910276560112834,
+          "pool_seconds": 0.14910276560112834
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            200,
+            7700,
+            10
+          ],
+          [
+            2000,
+            81000,
+            30
+          ],
+          [
+            10000,
+            554000,
+            100
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 1090519040,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": {
+          "backend": "python-int",
+          "mode": "siqs",
+          "base_bound": 250000,
+          "multiplier": 0,
+          "half_width": 65536,
+          "factor_count": 8,
+          "family_count": 100000,
+          "pool_size": 64,
+          "assignment_policy": "windowed_pair",
+          "external_coefficients": false,
+          "coefficient_trials": 4096,
+          "polynomials_per_family": 64,
+          "diverse": true,
+          "shared_relations": true,
+          "growth_steps": 0,
+          "max_half_width": 65536,
+          "max_stalled": 100000,
+          "max_trivial": 100000,
+          "weight_two": true,
+          "row_excess": 32,
+          "batch_width": 4096,
+          "filter_row_growth": 32,
+          "tested_dependencies": false,
+          "polynomial_policy": "parity2",
+          "multiplier_policy": "parity2_wide",
+          "root_update_policy": "batch",
+          "sign_policy": "swap_high",
+          "solve_policy": "collection",
+          "memory_bytes": 1073741824,
+          "checkpoint_bytes": 67108864,
+          "collector": {
+            "block_width": 4096,
+            "metadata_chunk": 64,
+            "score_backend": "list",
+            "marking": "parity_two",
+            "division": "bucket",
+            "small_prime_cutoff": 0,
+            "threshold_extra": 0,
+            "score_policy": "powers",
+            "sparse_queue_bytes": 33554432,
+            "power_plan_bytes": 2097152,
+            "residual_bound": 3000000,
+            "max_partials": null,
+            "max_relations": null,
+            "max_atoms": null,
+            "memory_bytes": null,
+            "large_prime_bound": 3000000,
+            "large_product_bound": 115200000000,
+            "candidate_bound": 0,
+            "split_call_limit": null,
+            "storage_policy": "grow"
+          },
+          "base_count": 5000
+        },
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.03087646101734468,
+            0.03087646101734468,
+            0.03087646101734468
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.3087646101734468,
+          "pool_seconds": 0.4982989066858552
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.02842946964249547,
+            0.02842946964249547,
+            0.02842946964249547
+          ],
+          "cold_seconds": 0.2842946964249547,
+          "warm_seconds": 0.2842946964249547,
+          "pool_seconds": 0.2842946964249547
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.02315764589002356
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.09263058356009424,
+          "pool_seconds": 0.09263058356009424
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.009593885450158268
+          ],
+          "cold_seconds": 0.07675108360126615,
+          "warm_seconds": 0.07675108360126615,
+          "pool_seconds": 0.07675108360126615
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.014141817693598568
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.056567270774394274,
+          "pool_seconds": 0.19349060956058178
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.009692218751297332
+          ],
+          "cold_seconds": 0.11630662501556799,
+          "warm_seconds": 0.11630662501556799,
+          "pool_seconds": 0.11630662501556799
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            50000,
+            5000000,
+            16
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.2699933671974577
+          ],
+          "cold_seconds": 1.0799734687898308,
+          "warm_seconds": 1.0799734687898308,
+          "pool_seconds": 1.0799734687898308
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.24555256770690903
+          ],
+          "cold_seconds": 2.9466308124829084,
+          "warm_seconds": 2.9466308124829084,
+          "pool_seconds": 2.9466308124829084
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            11000,
+            1100000,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.06269304950546939
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.5015443960437551,
+          "pool_seconds": 0.5015443960437551
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.056113757818820886
+          ],
+          "cold_seconds": 0.8978201251011342,
+          "warm_seconds": 0.8978201251011342,
+          "pool_seconds": 0.8978201251011342
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            512
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011524028484018345
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.18733655342347197,
+          "pool_seconds": 0.7292549699876139
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 14
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011273080974206096
+          ],
+          "cold_seconds": 0.24640513778451859,
+          "warm_seconds": 0.2356086554786533,
+          "pool_seconds": 0.2414371717905324
+        }
+      }
+    },
+    {
+      "digits": 60,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            128
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 1,
+          "packet_policy": "fixed",
+          "stage_two_cache_bytes": 0,
+          "budget_mode": "prospective",
+          "workers": 6
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.012368487306957832
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.07421092384174699,
+          "pool_seconds": 0.2905246292176738
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "bind_context": true,
+          "workers": 14
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011286166663921904
+          ],
+          "cold_seconds": 0.15800633329490665,
+          "warm_seconds": 0.15800633329490665,
+          "pool_seconds": 0.15800633329490665
+        }
+      }
+    },
+    {
+      "digits": 70,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.02338115096790716
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.09352460387162864,
+          "pool_seconds": 0.09471735266215661
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.010254635359160602
+          ],
+          "cold_seconds": 0.08203708287328482,
+          "warm_seconds": 0.08203708287328482,
+          "pool_seconds": 0.08203708287328482
+        }
+      }
+    },
+    {
+      "digits": 70,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.015357191412476823
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.12285753129981458,
+          "pool_seconds": 0.17770849670068023
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.010194209622568451
+          ],
+          "cold_seconds": 0.10194209622568451,
+          "warm_seconds": 0.10194209622568451,
+          "pool_seconds": 0.10194209622568451
+        }
+      }
+    },
+    {
+      "digits": 70,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            11000,
+            1100000,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.0659732291533146
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.2638929166132584,
+          "pool_seconds": 0.2638929166132584
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 8388608,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.060305704435450025
+          ],
+          "cold_seconds": 0.9648912709672004,
+          "warm_seconds": 0.9648912709672004,
+          "pool_seconds": 0.9648912709672004
+        }
+      }
+    },
+    {
+      "digits": 70,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            512
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.012185228759335587
+          ],
+          "cold_seconds": 1.0960437025074858,
+          "warm_seconds": 0.16910190251191126,
+          "pool_seconds": 0.8125020670566379
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011793630209467665
+          ],
+          "cold_seconds": 0.18869808335148264,
+          "warm_seconds": 0.18869808335148264,
+          "pool_seconds": 0.18869808335148264
+        }
+      }
+    },
+    {
+      "digits": 70,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            128
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.013150598959327908
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.10520479167462327,
+          "pool_seconds": 0.37692043700565425
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011703533851687098
+          ],
+          "cold_seconds": 0.18725654162699357,
+          "warm_seconds": 0.18725654162699357,
+          "pool_seconds": 0.18725654162699357
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            200,
+            7700,
+            10
+          ],
+          [
+            2000,
+            81000,
+            30
+          ],
+          [
+            10000,
+            554000,
+            100
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 16777216,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.04144698898640594,
+            0.04144698898640594,
+            0.04144698898640594
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.4144698898640594,
+          "pool_seconds": 0.4389593303436418
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "stage_two_cache_bytes": 8388608,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "bind_context": true,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.03929369137289801,
+            0.03929369137289801,
+            0.03929369137289801
+          ],
+          "cold_seconds": 0.3929369137289801,
+          "warm_seconds": 0.3929369137289801,
+          "pool_seconds": 0.3929369137289801
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            8
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.027022505237255245
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.10809002094902098,
+          "pool_seconds": 0.10809002094902098
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.012236604292411357
+          ],
+          "cold_seconds": 0.09789283433929086,
+          "warm_seconds": 0.09789283433929086,
+          "pool_seconds": 0.09789283433929086
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            147396,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 4
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.0163555025937967
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.0654220103751868,
+          "pool_seconds": 0.19834625418953228
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.011908582033356652
+          ],
+          "cold_seconds": 0.09526865626685321,
+          "warm_seconds": 0.09526865626685321,
+          "pool_seconds": 0.09526865626685321
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            50000,
+            5000000,
+            16
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 0,
+          "workers": 8
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.3090361458598636
+          ],
+          "cold_seconds": 2.472289166878909,
+          "warm_seconds": 2.472289166878909,
+          "pool_seconds": 2.472289166878909
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 33554432,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packed_cache_bytes": 8388608,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 0,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.2811899973603431
+          ],
+          "cold_seconds": 4.49903995776549,
+          "warm_seconds": 4.49903995776549,
+          "pool_seconds": 4.49903995776549
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            11000,
+            1100000,
+            32
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 0,
+        "ecm_chain_mode": "off",
+        "ecm_chain_bytes": 0,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 1,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 8388608,
+          "stage_policy": "staged",
+          "workers": 6
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.07644285286369268
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.45865711718215607,
+          "pool_seconds": 0.45865711718215607
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 8388608,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "packet_curves": 1,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 8388608,
+          "stage_policy": "staged",
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.06862148828804493
+          ],
+          "cold_seconds": 0.8234578594565392,
+          "warm_seconds": 0.8234578594565392,
+          "pool_seconds": 0.8234578594565392
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            512
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 12
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.014142458331662056
+          ],
+          "cold_seconds": 1.0150888396042421,
+          "warm_seconds": 0.16970949997994467,
+          "pool_seconds": 0.7467365668354391
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 4194304,
+          "poll_every": 64,
+          "packet_curves": 2,
+          "packet_policy": "tail_one",
+          "stage_two_cache_bytes": 2097152,
+          "workers": 16
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.013728064615861513
+          ],
+          "cold_seconds": 0.2196490338537842,
+          "warm_seconds": 0.2196490338537842,
+          "pool_seconds": 0.2196490338537842
+        }
+      }
+    },
+    {
+      "digits": 80,
+      "config": {
+        "allocation": null,
+        "backend": "python-int",
+        "pm1_gap_mode": "recurrence",
+        "pm1_chunk_size": 64,
+        "trial_bound": 25000,
+        "rho_attempts": 4,
+        "rho_evaluations": 5000,
+        "rho_batch": 64,
+        "recovery_limit": 128,
+        "pm1_attempts": 1,
+        "pm1_b1": 2000,
+        "pm1_b2": 200000,
+        "ecm_tiers": [
+          [
+            2000,
+            200000,
+            128
+          ]
+        ],
+        "chunk_size": 16,
+        "gcd_batch": 128,
+        "primality_rounds": 30,
+        "fermat_steps": 0,
+        "memory_bytes": 67108864,
+        "segment_size": 1024,
+        "trial_chunk": 64,
+        "schedule_cache_bytes": 0,
+        "max_input_bits": 4096,
+        "trace_limit": 256,
+        "rolling": false,
+        "siqs": null,
+        "sss": null,
+        "ecm_program_bytes": 524288,
+        "ecm_chain_mode": "reuse",
+        "ecm_chain_bytes": 8388608,
+        "ecm_chain_family": "auto",
+        "ecm_pair_distance": null,
+        "ecm_pair_wheel": null
+      },
+      "cold": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.015602494138875045
+          ],
+          "cold_seconds": 1.0,
+          "warm_seconds": 0.15602494138875045,
+          "pool_seconds": 0.2992425921857272
+        }
+      },
+      "warm": {
+        "settings": {
+          "allow_wide_workers": true,
+          "assignment_cpu": 60.0,
+          "startup_seconds": 10.0,
+          "checkpoint_bytes": 8388608,
+          "memory_bytes": 8589934592,
+          "parent_memory": 1090519040,
+          "worker_memory": 67108864,
+          "assignment_work": 1000000000,
+          "worker_imports": "ecm",
+          "stage_two_kernel": "reduced",
+          "decoded_cache_bytes": 2097152,
+          "manifest_cache_bytes": 1048576,
+          "poll_every": 64,
+          "workers": 10
+        },
+        "costs": {
+          "seconds_per_curve": [
+            0.013998816408275161
+          ],
+          "cold_seconds": 0.1399881640827516,
+          "warm_seconds": 0.1399881640827516,
+          "pool_seconds": 0.1399881640827516
+        }
+      }
+    }
+  ]
+}

@@ -71,7 +71,7 @@ class ConfirmationInputTests(unittest.TestCase):
             self.assertTrue(all(len(str(r["n"])) == digits for r in rows))
 
     def test_portable_math_configs_bind_the_recorded_profile(self):
-        reviewed = read("controls/b12_f4_selection_reviewed_v1.json")
+        reviewed = read("controls/b12_f4_selection_resolved_v1.json")
         profile = read("controls/b12_f4_selection_v1.json")
         keys = set()
         for row in reviewed["rows"]:
