@@ -10,8 +10,8 @@ Run commands from the repository root:
 
 ```sh
 make -C v2 runtime
-pypy3 -m v2.factor 626100403 --bounded --seed 7 \
-  --work-limit 2000000 --seconds 30 --cpu-seconds 30
+pypy3 -m v2.factor 626100403 --seed 7
+pypy3 -m v2.factor 626100403 --seed 7 --ecm-workers serial
 pypy3 -m v2.factor --help
 ```
 
@@ -78,12 +78,73 @@ See [tests](tests/README.md), [benchmark runners](benchmarks/README.md) and
 Generated captures, profiles and scratch stay in ignored `results/` folders.
 Research and detailed journals remain local under `audit/` and `local/`.
 
-### Experimental bounded ECM workers (B12/F4 preparation)
+### Automatic bounded ECM workers
+
+Normal `python -m v2.factor N` and `factorize_bounded(N)` now select cost-gated
+process ECM automatically on PyPy 3.11 / macOS arm64. The packaged policy uses
+actual cofactor size, exact configuration, remaining work and pool readiness.
+It usually selects ten workers for the 140-curve plan; other declared regimes
+retain their measured nominees. Worker IDs do not identify physical core types.
+Primes, preprocessing exits, unsupported regimes/backends, nested processes and
+unfunded calls stay serial. Catalogue/source incompatibility declines before
+starting a new search. No external factorer is used.
+
+Omitted numerical tiers select escalating140 at exactly 60/80/100 original
+input digits, alongside the existing 30/40 choices. Explicit tiers and saved
+plans win. Other sizes retain their existing numerical schedule. The 415-curve
+hard pilot is not a default. SIQS routing, checkpoint limits and fallback
+configuration are unchanged.
+
+Use `--ecm-workers serial` or `factorize_bounded(..., ecm_executor=None)` to
+select serial execution. Explicit contexts remain borrowed and caller-owned;
+automatically created pools are closed on return and on errors. The legacy
+`factorize()` compatibility helper remains serial; the bounded portfolio is
+the default CLI and the automatic library entry point. `--bounded` still works.
+
+Fresh omitted native non-QS grants are finite: 30 wall seconds, 4,096 aggregate
+CPU seconds and 10^13 work units. Existing calibrated QS grants remain. Fresh
+serial/automatic CLI comparisons receive the same omitted grants; explicit
+Budgets and CLI limits are never increased. Missing finite wall/CPU limits,
+very small startup grants or insufficient owned memory select serial behavior.
+
+Omitted memory permits up to 8 GiB aggregate ECM ownership, including the
+parent, all workers, spawn helper, metadata, transport and checkpoints. This is
+an allowance, not an allocation or RSS claim. An explicitly supplied parent
+workspace cap also limits automatic aggregate ownership unless a separate
+`ecm_memory_bytes` / `--ecm-memory-mib` allowance is given. Parent/fallback
+workspace is never silently reduced to fit workers. `--memory-mib` keeps its
+existing workspace meaning; a tight cap can therefore select serial. Explicit
+aggregate requests above 8 GiB are capped at the packaged policy's 8 GiB limit.
+
+Automatic checkpoints use outer schema 13 with a checked mathematical
+`portfolio_version` subschema. Older readers reject them. They bind
+`b12-f4-auto-v1`, the packaged policy, implementation,
+method seed, aggregate cap and native drained state. Legacy serial checkpoints
+stay serial. Resume cannot change the automatic policy/cap/count or switch to
+an explicit serial override. Integer method seeds retain the measured mapping;
+other supported seed types derive a stored stream without advancing parent RNG.
+Close/drain occurs before the final automatic snapshot/resource clocks.
+
+For retained library use, `execution.ecm_auto.selected_context(...)` returns a
+caller-owned context using the packaged policy. Use a context manager and pass
+it as `ecm_executor`; `prefer_warm=True` retains the explicit 64-compatible-call
+intent, while the first call still pays cold startup. Supply finite shared
+per-call budgets that fund the selected pool. A context keeps its first engaged
+worker configuration; it does not resize for arbitrary mixed workloads.
+
+Adoption is explicitly authorized on 5 November despite the pending balanced
+60/70 completion guardrail, censored p90, some cold median regressions and higher
+CPU. The earlier fresh bounded comparison supports completion-sensitive gains;
+it does not measure the new default wiring or every production grant. See
+[results and the adoption exception](benchmarks/RESULTS.md#b12f4-automatic-default-integration-5-november-2026).
+
+### Bounded ECM executor details
 
 `v2.execution.ecm_workers.ECMExecutor` is an opt-in context for independent
 curves using explicit `spawn` and PyPy implementing Python 3.11. This preparation
 passes runtime arithmetic, multiprocessing and committed-checkout QA on the
-current PyPy/macOS build. Initial scaling observations remain exploratory. Automatic routing and worker defaults are unchanged.
+current PyPy/macOS build. Initial scaling observations remain exploratory. The automatic adapter above
+selects explicit settings; low-level WorkerSettings defaults remain unchanged.
 
 The component accepts a resolved `PortfolioConfig`, a finite `Budget`, an
 original/cofactor lineage string and an optional drained checkpoint. It returns
@@ -98,10 +159,12 @@ recorded separately from useful execution.
 The caller owns `close()` or the context manager lifetime. One call may be
 active per context. Process entry points must be protected by a main guard.
 
-`factorize_bounded(..., ecm_executor=context)` is the narrow portfolio seam.
+The low-level executor remains explicitly configurable; the automatic wrapper
+above selects it by default. `factorize_bounded(..., ecm_executor=context)` is
+the narrow caller-owned portfolio seam.
 Its worker parent-memory reserve must include the literal portfolio allowance.
 The context is borrowed; the caller closes it. Omit it for incumbent behavior.
-No stock CLI worker flag is added. The experimental benchmark driver provides
+The stock CLI exposes automatic/serial selection as described above. The experimental benchmark driver provides
 fresh CLI measurements after runtime admission.
 
 `WorkerSettings` additionally exposes bounded optimization choices:
@@ -262,7 +325,7 @@ separate scopes.
 `v2.execution.ecm_selection.SelectedECMContext(profile, profile_sha256, seed=0,
 prefer_warm=False)` loads a bounded, source-checked catalogue lazily when ECM is
 reached. Pass it as `factorize_bounded(..., ecm_executor=context)` and close it
-with a context manager under a protected process entry point. The current
+with a context manager under a protected process entry point. The historical
 training catalogue is `benchmarks/inputs/controls/b12_f4_selection_v2.json`, SHA256
 `2c87e95c2cd74bee564adb093a2df71ecb9c45bd64dfb480a86dbcd31b0e5e29`.
 It binds 99 runtime files and retains the 33 measured cost/settings anchors from v1. Their costs are transferred estimates for this changed adapter,
@@ -333,3 +396,10 @@ panel while increasing CPU and regressing some cold medians. Warm results use
 retained homogeneous contexts; they do not establish a cold CLI gain by
 themselves. See the [fresh policy results](benchmarks/RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026)
 for grants, uncertainty, refusals and the pending balanced completion guardrail.
+
+Current automatic use loads the packaged `execution/ecm_worker_policy.json`
+through `execution.ecm_auto`; no benchmark directory is needed at runtime. It
+retains the measured 34 rows and new integration source pins. Earlier benchmark
+profiles remain immutable for their pinned sources and reject changed code.
+For current explicit retained contexts, use `selected_context()` above rather
+than an old source-pinned benchmark profile.

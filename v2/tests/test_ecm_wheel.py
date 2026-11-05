@@ -253,7 +253,7 @@ class WheelExecutionTests(unittest.TestCase):
             self.assertEqual(budgets[0].used, budgets[-1].used)
         for config in configs:
             whole = portfolio.factorize_bounded(
-                n, config=config, budget=allowance()
+                n, config=config, budget=allowance(), ecm_executor=None
             )
             for phase in ("stage_one", "pair_baby", "pair_terms"):
                 advance = portfolio.advance_job
@@ -265,7 +265,7 @@ class WheelExecutionTests(unittest.TestCase):
 
                 with patch.object(portfolio, "advance_job", pause):
                     first = portfolio.factorize_bounded(
-                        n, config=config, budget=allowance()
+                        n, config=config, budget=allowance(), ecm_executor=None
                     )
                 self.assertEqual(first.reason, "cancelled")
                 self.assertEqual(first.checkpoint["payload"]["version"], 8)
@@ -274,6 +274,7 @@ class WheelExecutionTests(unittest.TestCase):
                     config=config,
                     budget=allowance(),
                     checkpoint=json.loads(json.dumps(first.checkpoint)),
+                    ecm_executor=None,
                 )
                 self.assertEqual(resumed.result, whole.result)
                 self.assertEqual(resumed.reason, whole.reason)

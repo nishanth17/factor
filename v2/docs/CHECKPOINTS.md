@@ -65,3 +65,23 @@ limit, not a practical factorization-size claim.
 | [p−1](../pm1/README.md) | Same n/base/config, exact rung replay and cumulative verification |
 | [QS/SSS](../qs/README.md#resume-and-storage) | Original relations reverified, derived queues rebuilt, quota rules preserved |
 | [Execution](../execution/README.md) | Shared child allowances and protected fallback admission |
+
+## Automatic ECM portfolio snapshots
+
+Automatically managed ECM uses outer schema 13. `portfolio_version` identifies
+the checked mathematical subschema (2–12); older factorers reject 13 before
+ignoring worker metadata. Stripping the envelope or recursively declaring 13
+as its subschema is rejected. Existing serial schemas remain readable and do
+not adopt workers during resume.
+
+The `ecm_auto` header binds policy, implementation bytes, deterministic method
+seed and aggregate memory cap. Native worker state remains canonical/drained
+with its existing resource and search versions. Recreate the automatic owner
+with the same policy and cap; changing worker count or switching to serial
+mid-search is unsupported. Integer seeds retain the measured mapping. Every
+normal return closes its owned pool before recording final clocks and packing
+the snapshot; exceptions also close it. Explicit retained contexts are borrowed.
+
+Preserve the exact committed source for a later resume. Deliberate policy
+repinning after a code change does not make an old automatic snapshot compatible.
+No live process handles or interpreter internals are serialized.

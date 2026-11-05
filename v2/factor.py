@@ -355,6 +355,17 @@ def main():
     parser.add_argument("--resume", type=Path)
     parser.add_argument("--ecm-curves", type=int)
     parser.add_argument(
+        "--ecm-workers",
+        choices=("auto", "serial"),
+        default="auto",
+        help="cost-gated process ECM (default), or explicit serial execution",
+    )
+    parser.add_argument(
+        "--ecm-memory-mib",
+        type=int,
+        help="aggregate ECM ownership cap including parent and workers",
+    )
+    parser.add_argument(
         "--ecm-policy",
         choices=("pretest", "campaign"),
         help="explicit cumulative pretest or finite deeper ECM campaign",
@@ -390,6 +401,12 @@ def main():
         args.cpu_seconds = 30
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
+    if args.ecm_memory_mib is not None and args.ecm_workers != "auto":
+        parser.error("--ecm-memory-mib requires automatic ECM workers")
+    if args.method != "auto" and (
+        args.ecm_workers != "auto" or args.ecm_memory_mib is not None
+    ):
+        parser.error("ECM worker options require --method auto")
     if args.siqs and args.method != "auto":
         parser.error("--siqs is an auto fallback; use --method siqs alone")
     allocation_names = (
@@ -506,7 +523,23 @@ def main():
                 args.cpu_seconds = C9_SECONDS
 
         if (
-            args.bounded
+            args.method == "auto"
+            and args.backend == "python-int"
+            and (
+                checkpoint is None
+                or "ecm_auto" in checkpoint["payload"]["state"]
+            )
+        ):
+            from .execution.ecm_auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
+
+            if implicit_work and not automatic_qs:
+                args.work_limit = DEFAULT_WORK
+            if implicit_cpu_seconds and not automatic_qs:
+                args.cpu_seconds = DEFAULT_CPU_SECONDS
+
+        if (
+            args.method == "auto"
+            or args.bounded
             or args.resume
             or args.checkpoint
             or use_sss
@@ -725,11 +758,23 @@ def main():
                 if args.ecm_chain == "off":
                     parameters["ecm_chain_bytes"] = 0
             config = PortfolioConfig(**parameters)
+            worker_options = {}
+            if args.method != "auto" or args.ecm_workers == "serial":
+                worker_options["ecm_executor"] = None
+            elif args.ecm_memory_mib is not None:
+                worker_options["ecm_memory_bytes"] = (
+                    args.ecm_memory_mib * 2**20
+                )
+            elif implicit_memory and checkpoint is None:
+                from .execution.ecm_auto import DEFAULT_MEMORY_BYTES
+
+                worker_options["ecm_memory_bytes"] = DEFAULT_MEMORY_BYTES
             run = factorize_bounded(
                 number,
                 seed=args.seed,
                 config=config,
                 checkpoint=checkpoint,
+                **worker_options,
                 budget=Budget(
                     work_limit=args.work_limit,
                     seconds=args.seconds,

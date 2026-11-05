@@ -132,7 +132,12 @@ class AllocationPortfolioTests(unittest.TestCase):
         self.assertEqual(output.getvalue(), "")
         self.assertEqual(run.events[0]["outcome"], "pretest_work")
         self.assertTrue(any(event["stage"] == "siqs" for event in run.events))
-        self.assertEqual(run.checkpoint["payload"]["version"], 12)
+        self.assertEqual(
+            run.checkpoint["payload"].get(
+                "portfolio_version", run.checkpoint["payload"]["version"]
+            ),
+            12,
+        )
 
     def test_insufficient_fallback_is_resumable_without_pretest_restart(self):
         config = configuration(
@@ -249,7 +254,12 @@ class AllocationPortfolioTests(unittest.TestCase):
             config=replace(config, allocation=None),
             budget=ledger(),
         )
-        self.assertLess(legacy.checkpoint["payload"]["version"], 12)
+        self.assertLess(
+            legacy.checkpoint["payload"].get(
+                "portfolio_version", legacy.checkpoint["payload"]["version"]
+            ),
+            12,
+        )
         self.assertNotIn("allocation", legacy.checkpoint["payload"]["config"])
         restored = factorize_bounded(
             1009 * 1013,

@@ -3,6 +3,20 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 automatic default integration (5 November 2026)
+
+- Enable automatic cost-gated process ECM in the normal auto CLI and bounded
+  library API, with explicit serial and aggregate-memory controls. Keep exact
+  arithmetic, caller limits, legacy checkpoints and stock fallback settings.
+- Own automatic pool cleanup on every exit and before final resource snapshots;
+  bind automatic policy, implementation, deterministic seed and memory on resume.
+- Promote escalating140 at 60/80/100 omitted-tier inputs and package unchanged
+  measured nominees/costs with integration source pins. Retained contexts remain
+  available separately; cheap/unsupported/unfunded calls stay serial.
+- Record the authorized adoption exception: balanced completion and precise
+  tails remain unestablished, some cold medians regress and CPU increases.
+  No new speedup claim, mainline merge, push, B12/F4 closure or E1.
+
 ## B12/F4 targeted policy and hard-case evidence (5 November 2026)
 
 - Add bounded certified calibration/confirmation generation, independent tests,

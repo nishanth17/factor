@@ -374,11 +374,15 @@ class SelectedECMContext:
         seed=0,
         prefer_warm=False,
         parent_memory=1040 * 2**20,
+        memory_bytes=None,
     ):
         integer(seed, "method seed", 0, 2**256 - 1)
         integer(parent_memory, "parent memory", 2**20, 4 * 2**30)
         if type(prefer_warm) is not bool:
             raise ValueError("pool preference must be Boolean")
+        if memory_bytes is not None:
+            integer(memory_bytes, "aggregate memory", 0, 2**63 - 1)
+        self.memory_bytes = memory_bytes
         self.profile = Path(profile)
         self.profile_sha256 = _checksum(profile_sha256)
         self.seed, self.prefer_warm = seed, prefer_warm
@@ -394,6 +398,11 @@ class SelectedECMContext:
                 prefer_warm,
                 self.settings.parent_memory,
             ]
+            + (
+                []
+                if memory_bytes is None
+                else ["owned-memory-cap", memory_bytes]
+            )
         )
         self.inner = None
         self.catalogue = None
@@ -590,6 +599,10 @@ class SelectedECMContext:
                 2**20, (required + 2**20 - 1) // 2**20 * 2**20
             ),
         )
+        if self.memory_bytes is not None and (
+            settings.owned_bytes > self.memory_bytes
+        ):
+            raise MemoryError("selector exceeds aggregate memory allowance")
         if settings.checkpoint_bound(sum(t[2] for t in config.ecm_tiers)) > (
             settings.checkpoint_bytes
         ):
@@ -737,6 +750,11 @@ class SelectedECMContext:
                 self.prefer_warm,
                 self.settings.parent_memory,
             ]
+            + (
+                []
+                if self.memory_bytes is None
+                else ["owned-memory-cap", self.memory_bytes]
+            )
         )
         if actual_identity != self.identity:
             raise ValueError("selector configuration mutated")

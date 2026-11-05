@@ -88,3 +88,39 @@ total allowances, including previous consumption. `config=None` restores the
 saved portfolio configuration; an explicit conflicting configuration is
 rejected. [Checkpoint guidance](CHECKPOINTS.md) describes replay costs and
 algorithm-specific continuation limits.
+
+## Automatic and retained ECM contexts
+
+`factorize_bounded(n)` defaults to `ecm_executor="auto"`. The call lazily selects
+a funded process pool and owns its cleanup, including exception exits. Explicit
+`ecm_executor=None` selects serial execution. Other context objects remain
+borrowed; the caller closes them. A serial override retains the declared current
+numerical schedule, not a historical version of all defaults.
+
+`ecm_memory_bytes` supplies a finite aggregate ownership cap for automatic ECM,
+including the parent; omitted ordinary memory permits up to 8 GiB. An explicit
+parent workspace cap remains conservative unless this aggregate cap is given.
+Existing explicit Budgets are unchanged; workers require finite wall/CPU grants
+and startup work. Fresh non-QS omitted grants are 30 wall / 4,096 aggregate CPU
+seconds and 10^13 work units. Existing calibrated QS grants remain.
+
+For repeated compatible calls, use a caller-owned context:
+
+```python
+from v2.execution.ecm_auto import selected_context
+
+with selected_context(seed=7, prefer_warm=True) as context:
+    for n in inputs:
+        run = factorize_bounded(
+            n, seed=7, ecm_executor=context,
+            budget=Budget(work_limit=10**13, seconds=30, cpu_seconds=4096),
+        )
+        assert run.result.reconstruct() == n
+```
+
+Warm intent uses the recorded horizon of at least 64 compatible ECM-reaching
+calls; the first call still pays cold startup. Use cold intent for short or
+uncertain reuse. The context fixes its first engaged worker configuration and
+needs a parent-memory reserve matching any explicit portfolio workspace.
+Automatic schema-13 snapshots require the same packaged policy/implementation,
+seed and cap on resume; legacy serial snapshots retain their execution.

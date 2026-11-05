@@ -84,6 +84,17 @@ predecessor. A task ID, research note or this backlog alone authorizes no run.
 Default promotion requires the stated gates or an explicitly authorized,
 separately recorded exception. Record every unmet gate and limitation.
 
+### Recorded automatic ECM adoption exception — 5 November 2026
+
+Automatic cost-gated B12/F4 selection is explicitly authorized on the isolated
+worker branch after the fresh bounded comparison, with an explicit serial
+fallback/override and finite owned resources. Balanced 60/70 completion remains
+pending, primary p90 is censored, some cold medians regress and CPU increases.
+This is a recorded adoption exception, not a passed guardrail, task closure or
+claim about every input/grant/hardware regime. Earlier sources/controls and
+receipts remain immutable. The standing balanced constraint and confirmation
+rules continue to govern other changes. No E1, merge or push is implied.
+
 ## How to use the gates
 
 - **Acceptance gate (A):** the observable behavior required to close a TODO. Every returned split must satisfy `1 < g < n` and `n % g == 0`.

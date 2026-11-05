@@ -299,10 +299,14 @@ class ResumeTests(unittest.TestCase):
         n = 25013 * 25031
         with redirect_stdout(io.StringIO()) as output:
             whole = factorize_bounded(
-                n, seed=7, config=config, budget=allowance()
+                n, seed=7, config=config, budget=allowance(), ecm_executor=None
             )
             run = factorize_bounded(
-                n, seed=7, config=config, budget=allowance(1000)
+                n,
+                seed=7,
+                config=config,
+                budget=allowance(1000),
+                ecm_executor=None,
             )
             self.assertEqual(run.checkpoint["payload"]["version"], 5)
             self.assertGreater(run.work_used, 0)
@@ -315,6 +319,7 @@ class ResumeTests(unittest.TestCase):
                     config=config,
                     budget=allowance(limit),
                     checkpoint=run.checkpoint,
+                    ecm_executor=None,
                 )
                 self.assertGreaterEqual(run.work_used, previous)
                 self.assertEqual(run.result.reconstruct(), n)
@@ -453,9 +458,15 @@ class CampaignContractTests(unittest.TestCase):
         # More work resumes a declared campaign; changing its identity refuses.
         config = configuration(ecm_tiers=((50, 1000, 2),))
         n = 1000000000039 * 1000000000061
-        first = factorize_bounded(n, config=config, budget=allowance(1000))
+        first = factorize_bounded(
+            n, config=config, budget=allowance(1000), ecm_executor=None
+        )
         resumed = factorize_bounded(
-            n, config=config, budget=allowance(), checkpoint=first.checkpoint
+            n,
+            config=config,
+            budget=allowance(),
+            checkpoint=first.checkpoint,
+            ecm_executor=None,
         )
         self.assertEqual(resumed.result.reconstruct(), n)
         self.assertEqual(len(resumed.events), 2)
@@ -466,6 +477,7 @@ class CampaignContractTests(unittest.TestCase):
                 config=replace(config, ecm_tiers=((50, 1000, 3),)),
                 budget=allowance(),
                 checkpoint=first.checkpoint,
+                ecm_executor=None,
             )
 
     def test_prime_two_shares_the_smallest_resumable_segment(self):

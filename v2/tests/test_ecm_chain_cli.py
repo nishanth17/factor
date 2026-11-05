@@ -25,7 +25,8 @@ class ChainCLITests(unittest.TestCase):
                 )
                 self.assertEqual(run.returncode, 0, run.stderr)
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], version)
+                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["portfolio_version"], version)
                 self.assertIn("1009^1 * 1013^1", run.stdout)
                 if choice in ("lucas", "cf"):
                     self.assertEqual(
@@ -56,7 +57,8 @@ class ChainCLITests(unittest.TestCase):
                 resumed = cli("--resume", path, "--checkpoint", path)
                 self.assertEqual(resumed.returncode, 0, resumed.stderr)
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], version)
+                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["portfolio_version"], version)
                 self.assertEqual(
                     payload["config"]["memory_bytes"], memory * 1024**2
                 )
@@ -69,7 +71,8 @@ class ChainCLITests(unittest.TestCase):
                 run = cli(101, "--bounded", "--checkpoint", path, *arguments)
                 self.assertEqual(run.returncode, 0, run.stderr)
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], 9)
+                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["portfolio_version"], 9)
                 self.assertEqual(
                     payload["config"]["memory_bytes"], 8 * 1024**2
                 )

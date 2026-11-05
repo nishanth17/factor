@@ -1,5 +1,35 @@
 # Benchmark results and decisions
 
+## B12/F4 automatic default integration (5 November 2026)
+
+Automatic cost-gated ECM is promoted on the isolated worker branch by explicit
+direction after the frozen comparison below. This is an adoption decision,
+not a new performance result or a claim that the balanced completion guardrail
+passed. It supersedes the earlier retain-opt-in recommendation; historical
+verdicts below retain their original scope. Cold 60/100 medians regress, p90 is censored and observed CPU rises;
+these limitations and the pending balanced guard are explicitly retained.
+
+The normal auto CLI and bounded API now select the measured configuration and
+own its pool lifecycle. Easy exits do not load the policy or multiprocessing;
+unmeasured sizes and unfunded/unsupported calls remain serial. Omitted tiers
+at 60/80/100 select the measured escalating140 policy; explicit and saved plans
+win. Explicit caller grants and stock QS fallback/checkpoint settings remain.
+New schema-13 automatic metadata binds source implementation, policy, seed
+and memory; older readers reject it before ignoring worker state.
+legacy serial checkpoints do not opt into workers on resume. Integer seeds
+retain the measured SEARCHv1 mapping. The packaged production policy copies all
+34 measured rows unchanged, with new integration pins; historical controls
+and receipts remain immutable. Later code changes invalidate the old profiles.
+
+Focused validation passes 55 tests, including real spawn/drain and no orphan
+children. The full working tree passes 1,332 tests (9 optional skips), lint and
+263 benchmark imports. Legacy serial event/checkpoint oracles now request
+serial explicitly; the default CLI test checks its new selection event. Final
+committed-only validation follows the unsupported-size prefilter. Detailed
+local decision, QA attempts/charges and handoff are under
+`v2/audit/b12_f4/default_adoption_v1/`. No new scaling campaign, universal
+speedup, B12/F4 closure, merge, push or E1 is inferred.
+
 ## B12/F4 fresh cofactor-policy comparison (5 November 2026)
 
 The corrected selector is measured from committed-only `9b7eaeb` against actual

@@ -1,4 +1,4 @@
-"""Size-scoped ECM defaults promoted from C3's revealed-input screen."""
+"""Size-scoped numerical plans adopted by C3 and automatic ECM selection."""
 
 from dataclasses import replace
 
@@ -12,7 +12,7 @@ ESCALATING140 = ECM_PRESETS["escalating140"]
 def resolve_defaults(config, n):
     """Choose measured size bands without expanding any resource allowance.
 
-    The human requested promotion before fresh confirmation. Other sizes and
+    C3 selected 30/40 digits; automatic ECM adds 60/80/100. Other sizes and
     explicitly selected paired executors retain the previous numerical plan.
     A tight existing memory cap also retains that plan rather than reducing
     the relation engine's storage or enlarging the parent's allowance.
@@ -23,7 +23,10 @@ def resolve_defaults(config, n):
     if config.ecm_pair_distance is None and config.ecm_pair_wheel is None:
         if 10**29 <= magnitude < 10**30:
             tiers = COMPACT64
-        elif 10**39 <= magnitude < 10**40:
+        elif any(
+            10 ** (digits - 1) <= magnitude < 10**digits
+            for digits in (40, 60, 80, 100)
+        ):
             tiers = ESCALATING140
     try:
         return replace(config, ecm_tiers=tiers)

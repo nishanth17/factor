@@ -399,11 +399,19 @@ class ProductionChainTests(unittest.TestCase):
             ),
         )
         restored = factorize_bounded(
-            n, config=config, checkpoint=first.checkpoint, budget=allowance()
+            n,
+            config=config,
+            checkpoint=first.checkpoint,
+            budget=allowance(),
+            ecm_executor=None,
         )
         self.assertEqual(restored.result.reconstruct(), n)
         second = factorize_bounded(
-            n, seed=19, config=config, budget=allowance(10000)
+            n,
+            seed=19,
+            config=config,
+            budget=allowance(10000),
+            ecm_executor=None,
         )
         self.assertEqual(
             {

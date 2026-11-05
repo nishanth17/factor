@@ -280,3 +280,23 @@ Committed-only `9b7eaeb` passes 1,311 tests (9 optional skips), lint and 263
 benchmark imports. Later report changes are documentation only. Historical
 freezes, refused stock checkpoints, all charges and analysis corrections remain
 local and immutable. B12/F4 stay open, including the balanced guardrail.
+
+Automatic default integration now uses packaged production policy
+`v2/execution/ecm_worker_policy.json`, copied from the frozen selected profile
+without changing costs or nominees. Current direct library contexts can use
+`v2.execution.ecm_auto.selected_context`; old source-pinned benchmark profiles
+still belong to their historical commits. Use explicit `ecm_executor=None` for
+serial numerical oracles and controls. The normal CLI's `--ecm-workers serial`
+disables process selection while keeping declared default tiers/grants.
+
+No new timing claim accompanies this wiring. The [adoption record](RESULTS.md#b12f4-automatic-default-integration-5-november-2026)
+retains pending guardrails and cold/CPU losses. Local validation/charges:
+`v2/audit/b12_f4/default_adoption_v1/`. Historical freezes stay immutable.
+
+`ecm/b12_f4/adoption_profile.py` is a static maintenance helper. It transfers
+unchanged measured rows with new integration source pins, keeps the reference
+immutable and labels transferred costs as training estimates. Source repinning
+is not new performance confirmation. After a deliberate code change, use a
+reviewed measured reference and expected SHA, package into the production JSON
+and update exactly the adapter policy constant, then perform locked correctness
+QA. Existing automatic checkpoints require their original committed source.

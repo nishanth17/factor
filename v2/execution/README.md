@@ -72,3 +72,12 @@ Implicit API resume restores the saved configuration; conflicting explicit
 fields fail validation. New defaults do not reinterpret older saved jobs.
 Detailed method-specific continuation lives in the [ECM](../ecm/README.md),
 [p−1](../pm1/README.md) and [QS](../qs/README.md) guides.
+
+The bounded portfolio now defaults to automatic cost-gated ECM through
+`ecm_auto.py` and packaged `ecm_worker_policy.json`. It owns cold-intent pool
+cleanup; `selected_context()` provides explicit retained library contexts.
+Explicit serial execution, caller limits, legacy resume and low-level worker
+settings remain available. Automatic outer snapshots use schema 13 while the
+existing native wire/search and selector contracts retain their versions.
+See [API](../docs/API.md#automatic-and-retained-ecm-contexts) and the recorded
+[adoption exception](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).

@@ -2,7 +2,8 @@
 
 Last updated: 5 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
-A1b review record: `61899a9`; production defaults are unchanged.
+A1b review record: `61899a9`. This isolated branch now enables automatic
+cost-gated ECM; it has not been merged into mainline.
 QS roadmap review: `4d65d33`, consolidated into existing task scopes on
 2 November; C10a-01 is now integrated with the selected policies enabled
 for every fresh automatic SIQS configuration by explicit user direction.
@@ -39,6 +40,17 @@ Useful progress toward 60–80-digit factoring remains the immediate focus;
 100 digits is also a measurement target, with completion feasibility still
 unestablished. Existing experiments retain their frozen scopes and budgets.
 
+Automatic ECM default integration is authorized after the frozen campaign.
+The normal auto CLI and bounded API now own a cold-intent selected pool and
+close it on all exits; explicit serial/caller limits and legacy resume win.
+New automatic metadata binds policy, implementation and seed. The selected
+34-row policy retains measured costs; only its integration source pins change.
+Working-tree lint, 1,332 tests (9 optional skips) and 263 imports pass; final
+committed-checkout validation follows a small unsupported-size prefilter.
+No new performance result is claimed. The balanced/p90/cold-median limitations
+are recorded as an [adoption exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).
+This changes branch defaults, not mainline, E1 or B12/F4 completion status.
+
 ## Current automatic defaults
 
 These are current committed behavior, not claims that every routed band passed
@@ -47,11 +59,13 @@ an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [chain eligibility](ecm/chain_options.py). Explicit settings and saved policies
 win. Native means Python integers on PyPy implementing Python 3.11.
 
-The bounded portfolio runs exact preprocessing, rho, p−1 and ECM serially.
+The bounded portfolio runs exact preprocessing, rho and p−1 serially, then
+automatically selects funded process ECM or incumbent serial execution.
 Omitted native configurations automatically enable SIQS at exactly 40 and
 50–60 digits. Direct automatic SIQS calls use the same size selector. Explicit
 `siqs=None` disables that fallback; reference `SIQSConfig()` keeps its own
-fields. SSS and production workers remain opt-in/experimental.
+fields. SSS remains opt-in. Automatic ECM uses the adopted cost-gated policy;
+explicit serial settings and caller-owned contexts remain available.
 
 | Decimal digits / scope | Owned memory allowance | Automatic SIQS selection | Adoption evidence and limits |
 | --- | --- | --- | --- |
@@ -91,7 +105,7 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | ECM / shared portfolio scope | Owned memory / eligibility | Current automatic choice | Adoption evidence and limits |
 | --- | --- | --- | --- |
 | Exactly 30 digits | Existing funded cap; retain previous plan if coexistence fails | compact64: `(2000, 50000, 64)` | [C3 decision](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026): **Adopted before fresh confirmation**; oversized comparison Inconclusive, source screen unstable. |
-| Exactly 40 digits | Same; SIQS headroom above applies | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
+| Exactly 40, 60, 80 or 100 digits | Same; SIQS headroom above applies | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
 | Other sizes, or explicitly selected paired executors | Caller/retained cap | Retained fixed32 numerical schedule | [C3 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#calibrate-automatic-selection-and-handoff-c3-then-g1); not a measured optimum for every size/backend. |
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
@@ -195,7 +209,9 @@ workers; single timings are exploratory. Balanced completion remains pending.
 Source passes 1,311 PyPy tests (9 optional skips), lint and 263 imports. Final
 booking is 4,862.476 wall / 41,616.575 charged CPU seconds under 9,900 / 104,000.
 The computation lock is released. No defaults, merge, push, B12/F4 closure or E1.
-Current local entry: `v2/audit/b12_f4/targeted_policy_v2/REPORT.md` and `HANDOFF.md`.
+Historical comparison entry: `v2/audit/b12_f4/targeted_policy_v2/REPORT.md` and
+`HANDOFF.md`. Current default-integration entry:
+`v2/audit/b12_f4/default_adoption_v1/DECISION.md` and `HANDOFF.md`.
 See [fresh policy results](benchmarks/RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026).
 
 The B12/F4 selection-integration follow-up adds bounded same-plan cofactor cost
