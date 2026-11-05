@@ -17,6 +17,12 @@ class CompletionStudyTests(unittest.TestCase):
             execution_options(dict(arm="POLICY"), owner)["ecm_executor"], owner
         )
 
+    def test_legacy_master_signature_receives_no_candidate_keyword(self):
+        self.assertEqual(
+            execution_options(dict(arm="S0"), None, supports_executor=False),
+            {},
+        )
+
     def test_cold_auto_and_retained_warm_are_explicit(self):
         request = dict(arm="AUTO", mode="cold", ecm_memory_bytes=8 * 2**30)
         self.assertEqual(

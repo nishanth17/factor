@@ -93,7 +93,7 @@ def summarize_stages(events, dropped, seconds):
     )
 
 
-def execution_options(request, executor):
+def execution_options(request, executor, *, supports_executor=True):
     """Select the declared owner without inheriting changing defaults."""
     if request["arm"] == "AUTO":
         if request["mode"] != "cold":
@@ -104,6 +104,8 @@ def execution_options(request, executor):
             ecm_executor="auto",
             ecm_memory_bytes=request["ecm_memory_bytes"],
         )
+    if request["arm"] == "S0" and not supports_executor:
+        return {}
     return {"ecm_executor": executor}
 
 
@@ -187,7 +189,13 @@ def child(request_path, source_root):
             else executor.lifetime_stats.get("charged_work", 0)
         )
         started = time.monotonic()
-        kwargs = execution_options(request, executor)
+        code = factorize_bounded.__code__
+        parameters = code.co_varnames[
+            : code.co_argcount + code.co_kwonlyargcount
+        ]
+        kwargs = execution_options(
+            request, executor, supports_executor="ecm_executor" in parameters
+        )
         try:
             run = run_accounted(
                 factorize_bounded,
