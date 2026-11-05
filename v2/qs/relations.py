@@ -3,6 +3,7 @@
 import hashlib
 from collections import Counter
 from dataclasses import dataclass, field
+from math import isqrt
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd, pow
@@ -25,6 +26,13 @@ def checked_residual_bound(bound):
 def _check_exponents(exponents):
     """Validate immutable, sorted sparse positive prime/exponent pairs."""
     if not isinstance(exponents, tuple):
+        # Tuple-only snapshot loaders do not include the opt-in storage
+        # modules. Import them only when the new representation is present.
+        from .indexed_relations import IndexedFactors
+
+        if isinstance(exponents, IndexedFactors):
+            IndexedFactors(exponents.indices, exponents.primes)
+            return
         raise TypeError("exponents must be a tuple")
     previous = 1
 
@@ -121,7 +129,10 @@ def verify_atomic(
     residual_bound=1,
     large_prime_bound=0,
     large_product_bound=0,
+    small_prime_bound=None,
     budget=None,
+    residual_arity=2,
+    opaque_pairs=False,
 ):
     """Return True for an exact relation; reject invalid math with ValueError.
 
@@ -130,7 +141,65 @@ def verify_atomic(
     Exponent bounds are checked before powers to avoid unbounded allocation.
     BudgetExhaustedError propagates; no partially checked atom is admitted.
     """
+    return _verify_atomic(
+        relation,
+        factor_base,
+        residual_bound=residual_bound,
+        large_prime_bound=large_prime_bound,
+        large_product_bound=large_product_bound,
+        small_prime_bound=small_prime_bound,
+        budget=budget,
+        residual_arity=residual_arity,
+        opaque_pairs=opaque_pairs,
+    )
+
+
+def _verify_atomic(
+    relation,
+    factor_base,
+    *,
+    residual_bound=1,
+    large_prime_bound=0,
+    large_product_bound=0,
+    small_prime_bound=None,
+    budget=None,
+    prime_check=None,
+    residual_arity=2,
+    opaque_pairs=False,
+):
+    """Private checker; only a collector-owned cache may reuse prime proofs."""
     checked_residual_bound(residual_bound)
+    if type(residual_arity) is not int or residual_arity not in (2, 3):
+        raise ValueError("invalid residual arity")
+    extended = False
+    if hasattr(relation, "opaque"):
+        from .residual_relations import ResidualAtom
+
+        extended = isinstance(relation, ResidualAtom)
+    opaque = extended and relation.opaque is not None
+    if not isinstance(relation.large_primes, tuple) or len(
+        relation.large_primes
+    ) not in ((0, 1, 2, 3) if extended else (0, 2)):
+        raise ValueError("invalid residual endpoint shape")
+    if any(
+        not arithmetic.is_integer(p) or not 2 <= p <= MAX_RESIDUAL
+        for p in relation.large_primes
+    ) or relation.large_primes != tuple(sorted(relation.large_primes)):
+        raise ValueError("invalid sorted residual endpoints")
+    if opaque and (
+        type(relation.opaque) is not int
+        or not 4 <= relation.opaque <= MAX_RESIDUAL**residual_arity
+        or relation.large_primes
+    ):
+        raise ValueError("invalid opaque cofactor contract")
+    if (extended and len(relation.large_primes) > residual_arity) or (
+        opaque and not opaque_pairs
+    ):
+        raise ValueError("residual contract is not enabled")
+    if small_prime_bound is not None:
+        utils.require_integer(small_prime_bound, "small_prime_bound", 2)
+        if small_prime_bound > large_prime_bound:
+            raise ValueError("smaller endpoint bound exceeds larger bound")
     polynomial = relation.polynomial
     if (polynomial.n, polynomial.multiplier) != (
         factor_base.n,
@@ -138,11 +207,12 @@ def verify_atomic(
     ):
         raise ValueError("relation target differs from the factor base")
 
-    if len(relation.exponents) > len(factor_base.entries):
+    exponents = relation.exponents
+    if len(exponents) > len(factor_base.entries):
         raise ValueError("relation has too many factor-base exponents")
     budget = budget if budget is not None else Budget()
     value = polynomial.a * polynomial.value(relation.position)
-    budget.consume((len(relation.exponents) + 1) * abs(value).bit_length())
+    budget.consume((len(exponents) + 1) * abs(value).bit_length())
     if relation.u * relation.u - factor_base.n_prime != value:
         raise ValueError("polynomial identity failed")
     if value == 0:
@@ -152,7 +222,12 @@ def verify_atomic(
     remaining = arithmetic.divexact(abs(value), relation.square_correction**2)
     primes = factor_base._columns
 
-    for prime, exponent in relation.exponents:
+    previous_prime = 1
+    for prime, exponent in exponents:
+        utils.require_integer(exponent, "exponent", 1)
+        if prime <= previous_prime:
+            raise ValueError("invalid canonical exponent sequence")
+        previous_prime = prime
         if prime not in primes:
             raise ValueError("exponent prime is outside the factor base")
         if exponent * (prime.bit_length() - 1) > remaining.bit_length():
@@ -164,23 +239,41 @@ def verify_atomic(
 
     if remaining != relation.residual_product:
         raise ValueError("relation factorization is incomplete or incorrect")
-    if relation.large_primes:
+    if extended and not opaque and len(relation.large_primes) == 1:
+        if remaining > residual_bound:
+            raise ValueError("single-prime residual exceeds its SLP bound")
+    elif relation.large_primes or opaque:
         checked_residual_bound(large_prime_bound)
         utils.require_integer(large_product_bound, "large_product_bound", 1)
-        if large_product_bound > MAX_RESIDUAL**2:
+        if large_product_bound > MAX_RESIDUAL**residual_arity:
             raise ValueError("large product bound exceeds the reference limit")
         if (
             remaining > large_product_bound
-            or relation.large_primes[-1] > large_prime_bound
+            or not opaque
+            and relation.large_primes[-1] > large_prime_bound
+            or not opaque
+            and small_prime_bound is not None
+            and relation.large_primes[0] > small_prime_bound
         ):
             raise ValueError("two-prime residual exceeds its bounds")
     if relation.residual > residual_bound:
         raise ValueError("residual exceeds residual_bound")
     for residual in relation.residual_primes:
+        if opaque:
+            budget.consume(len(primes) * (residual.bit_length() + 1))
+            if any(residual % p == 0 for p in primes):
+                raise ValueError(
+                    "opaque cofactor contains an unrecovered base prime"
+                )
+            continue
         if residual in primes:
             raise ValueError("factor-base exponents must be fully recovered")
-        budget.consume(residual.bit_length() ** 2)
-        if utils.classify_prime(residual) != utils.Primality.PROVEN:
+        if prime_check is None:
+            budget.consume(residual.bit_length() ** 2)
+            proven = utils.classify_prime(residual) == utils.Primality.PROVEN
+        else:
+            proven = prime_check(residual, budget)
+        if not proven:
             raise ValueError("residual must be a proven prime")
     return True
 
@@ -195,6 +288,16 @@ def parity_bits(relation, factor_base):
         int(relation.sign < 0)
     )
     columns = factor_base._columns
+    if not isinstance(relation.exponents, tuple):
+        from .indexed_relations import IndexedFactors
+
+        if isinstance(relation.exponents, IndexedFactors):
+            if relation.exponents.primes is not factor_base.primes:
+                raise ValueError("indexed parity uses a different base")
+            for index, exponent in relation.exponents.indices:
+                if exponent % 2:
+                    bits |= 1 << index
+            return bits
     for prime, exponent in relation.exponents:
         if prime not in columns:
             raise ValueError("exponent prime is outside the factor base")
@@ -256,11 +359,16 @@ def _combined_values(atoms, modulus):
         correction = correction * atom.square_correction % modulus
         for prime, exponent in atom.exponents:
             exponents[prime] += exponent
-        if atom.large_primes:
-            residuals.update(atom.large_primes)
-        elif atom.residual != 1:
-            residuals[atom.residual] += 1
+        residuals.update(atom.residual_primes)
 
+    if any(getattr(atom, "opaque", None) is not None for atom in atoms):
+        product = 1
+        for atom in atoms:
+            product *= atom.residual_product
+        root = isqrt(product)
+        if root * root != product:
+            raise ValueError("opaque residual product is not an exact square")
+        residuals = {root: 2}
     for residual, count in sorted(residuals.items()):
         if count % 2:
             raise ValueError("combined residual multiplicities must be even")
@@ -322,7 +430,10 @@ def combine_relations(
             factor_base,
             residual_bound=MAX_RESIDUAL,
             large_prime_bound=MAX_RESIDUAL,
-            large_product_bound=MAX_RESIDUAL**2,
+            large_product_bound=MAX_RESIDUAL
+            ** (3 if hasattr(atom, "opaque") else 2),
+            residual_arity=3 if hasattr(atom, "opaque") else 2,
+            opaque_pairs=hasattr(atom, "opaque"),
             budget=budget,
         )
     for atom in atoms:
@@ -373,9 +484,21 @@ def verify_combined(
             factor_base,
             residual_bound=MAX_RESIDUAL,
             large_prime_bound=MAX_RESIDUAL,
-            large_product_bound=MAX_RESIDUAL**2,
+            large_product_bound=MAX_RESIDUAL
+            ** (3 if hasattr(atom, "opaque") else 2),
+            residual_arity=3 if hasattr(atom, "opaque") else 2,
+            opaque_pairs=hasattr(atom, "opaque"),
             budget=budget,
         )
+    return _verify_combined_values(relation, factor_base, atoms, budget)
+
+
+def _verify_combined_values(relation, factor_base, atoms, budget):
+    """Reconstruct from independently checked atoms without repeating them."""
+    if not 1 <= len(atoms) <= MAX_COMBINED_ATOMS or len(
+        {atom.relation_id for atom in atoms}
+    ) != len(atoms):
+        raise ValueError("combined provenance repeats or exceeds its limit")
     budget.consume(len(atoms) * (len(factor_base.entries) + 1))
     values = _combined_values(atoms, factor_base.n)
     if values != (

@@ -8,6 +8,7 @@ from .relations import (
     AtomicRelation,
     CombinedRelation,
     _combination_workspace,
+    _verify_combined_values,
     combined_storage_reserve,
     verify_atomic,
     verify_combined,
@@ -17,6 +18,10 @@ from .storage import require_published
 
 def pack_store(collector):
     require_published(collector)
+    if getattr(collector.config, "extension_policy", None):
+        from .extended_checkpoint import pack_store as pack_extended
+
+        return pack_extended(collector)
     atoms = list(collector._atoms.values())
     indices = {a.relation_id: i for i, a in enumerate(atoms)}
     polynomials, lookup, encoded = [], {}, []
@@ -38,7 +43,7 @@ def pack_store(collector):
         )
     rows = collector._full + collector._combined
     order = {id(row): i for i, row in enumerate(rows)}
-    return dict(
+    payload = dict(
         polynomials=polynomials,
         atoms=encoded,
         full=[indices[a.relation_id] for a in collector._full],
@@ -56,6 +61,31 @@ def pack_store(collector):
         forest=[indices[i] for i in collector._graph.edges],
         split_calls=collector._split_calls,
     )
+    record_policy = getattr(collector.config, "record_policy", "objects")
+    if record_policy == "packed-v1":
+        from .packed_relations import export_exponents
+
+        payload["record_policy"] = "packed-v1"
+        for record, atom in zip(payload["atoms"], atoms):
+            record[3] = export_exponents(atom)
+        for record, row in zip(payload["combined"], collector._combined):
+            record[3] = export_exponents(row)
+    elif record_policy == "indexed-v2":
+        from .families import _identity
+        from .indexed_relations import export_factors
+
+        payload["record_policy"] = record_policy
+        payload["factor_base_identity"] = _identity(collector.factor_base)
+        for record, atom in zip(payload["atoms"], atoms):
+            record[3] = export_factors(atom, collector.factor_base)
+        for record, row in zip(payload["combined"], collector._combined):
+            record[3] = export_factors(row, collector.factor_base)
+    if collector._checked is not None:
+        payload["cofactor_endpoints"] = list(collector._endpoints.primes)
+        payload["congruence_index"] = [
+            indices[i] for i in collector._checked.canonical_ids
+        ]
+    return payload
 
 
 def _index(value, size):
@@ -68,14 +98,21 @@ def _index(value, size):
 def restore_store(payload, collector, budget):
     """Rebuild only after bounded shape checks; publish a fully checked store.
 
-    Every combined row has exactly one distinct closing edge, and its other
-    IDs must equal the unique path in the retained forest. Owned paths cannot
-    have been evicted. This also reconstructs FIFO order without trusting an
-    encoded union-find cache, and verifies disconnected cycles and loops.
+    Each row has a distinct newest closing edge. Legacy rows use the retained
+    forest path; shortcut rows may use earlier closing edges in a checked
+    simple path. Owned paths cannot have been evicted. Rebuild FIFO order
+    without trusting an encoded union-find cache, including all components.
     """
+    if getattr(collector.config, "extension_policy", None):
+        from .extended_checkpoint import restore_store as restore_extended
+
+        return restore_extended(payload, collector, budget)
     if collector._atoms or collector._rows or collector._graph.edges:
         raise ValueError("DLP restoration requires an empty collector")
-    if not isinstance(payload, dict) or set(payload) != {
+    record_policy = getattr(collector.config, "record_policy", "objects")
+    packed = record_policy in ("packed-v1", "indexed-v2")
+    indexed = record_policy == "indexed-v2"
+    keys = {
         "polynomials",
         "atoms",
         "full",
@@ -83,7 +120,14 @@ def restore_store(payload, collector, budget):
         "row_order",
         "forest",
         "split_calls",
-    }:
+    }
+    if packed:
+        keys.add("record_policy")
+    if indexed:
+        keys.add("factor_base_identity")
+    if collector._checked is not None:
+        keys.update(("cofactor_endpoints", "congruence_index"))
+    if not isinstance(payload, dict) or set(payload) != keys:
         raise ValueError("invalid DLP checkpoint store shape")
     config, base = collector.config, collector.factor_base
     for name, cap in (
@@ -96,6 +140,65 @@ def restore_store(payload, collector, budget):
     ):
         if not isinstance(payload[name], list) or len(payload[name]) > cap:
             raise ValueError("DLP checkpoint exceeds its store cap")
+    decode_scratch = 0
+    if packed:
+        from .families import _identity
+        from .indexed_relations import import_factors
+        from .packed_relations import import_exponents
+
+        if payload["record_policy"] != record_policy:
+            raise ValueError("packed checkpoint policy mismatch")
+        if indexed and payload["factor_base_identity"] != _identity(base):
+            raise ValueError("compact checkpoint uses a different factor base")
+        # The encoded caller payload, decoded pairs and constructed records
+        # coexist. Refuse their bounded expansion before decoding any bytes.
+        # Valid base64 contributes at most two padding bytes to this bound.
+        decode_scratch = 65536
+        for name, size in (("atoms", 6), ("combined", 5)):
+            for record in payload[name]:
+                budget.consume(1)
+                if not isinstance(record, list) or len(record) != size:
+                    raise ValueError("invalid packed relation record")
+                encoded = record[3]
+                expected = {"index-v2", "count"} if indexed else {"u32be64"}
+                if not isinstance(encoded, dict) or set(encoded) != expected:
+                    raise ValueError("invalid packed exponent encoding")
+                if indexed:
+                    count = encoded["count"]
+                    if type(count) is not int or not 0 <= count <= len(
+                        base.entries
+                    ):
+                        raise ValueError(
+                            "compact checkpoint count exceeds base"
+                        )
+                    text, maximum = (
+                        encoded["index-v2"],
+                        4 * ((10 * count + 2) // 3),
+                    )
+                else:
+                    text = encoded["u32be64"]
+                    maximum = 4 * ((8 * len(base.entries) + 2) // 3)
+                if not isinstance(text, str) or len(text) > maximum:
+                    raise ValueError("packed exponent text exceeds its bound")
+                decode_scratch += 512 + 512 * (
+                    count if indexed else (3 * len(text) // 4) // 8
+                )
+        if collector._workspace + decode_scratch > config.memory_limit:
+            raise MemoryError("packed checkpoint expansion exceeds memory cap")
+        decoded = dict(payload)
+        for name, size in (("atoms", 6), ("combined", 5)):
+            decoded[name] = []
+            for record in payload[name]:
+                if not isinstance(record, list) or len(record) != size:
+                    raise ValueError("invalid packed relation record")
+                record = list(record)
+                record[3] = (
+                    import_factors(record[3], base, budget)
+                    if indexed
+                    else import_exponents(record[3], len(base.entries), budget)
+                )
+                decoded[name].append(record)
+        payload = decoded
     calls = payload["split_calls"]
     utils.require_integer(calls, "split_calls", 0)
     if calls > config.split_limit:
@@ -172,7 +275,9 @@ def restore_store(payload, collector, budget):
     reserve += collector._graph_reserve(
         len(forest_indices)
     ) - collector._graph_reserve(0)
-    if reserve > config.memory_limit:
+    if collector._short_cycles is not None:
+        reserve += 2048 * (count - len(payload["full"]))
+    if reserve + decode_scratch > config.memory_limit:
         raise MemoryError(
             "restored DLP provenance and graph exceed memory cap"
         )
@@ -203,6 +308,7 @@ def restore_store(payload, collector, budget):
             residual_bound=config.residual_bound,
             large_prime_bound=config.large_prime_bound,
             large_product_bound=config.large_product_bound,
+            small_prime_bound=getattr(config, "small_prime_bound", None),
             budget=budget,
         )
         if atom.relation_id in store:
@@ -233,10 +339,15 @@ def restore_store(payload, collector, budget):
     scratch_peak = 0
     for record, row_bytes in zip(payload["combined"], combined_bytes):
         indices, u, sign, exponents, correction = record
-        closing = set(indices) - forest
-        if len(closing) != 1:
-            raise ValueError("DLP cycle must have one closing edge")
-        closing = closing.pop()
+        if collector._short_cycles is None:
+            closing = set(indices) - forest
+            if len(closing) != 1:
+                raise ValueError("DLP cycle must have one closing edge")
+            closing = closing.pop()
+        else:
+            closing = max(indices)
+            if closing in forest:
+                raise ValueError("shortcut cycle lacks its new closing edge")
         if (
             closing in closing_edges
             or closing != max(indices)
@@ -247,20 +358,30 @@ def restore_store(payload, collector, budget):
         if atom.residual_product == 1:
             raise ValueError("full atom is marked as a DLP cycle")
         endpoints = atom.large_primes or (1, atom.residual)
-        try:
-            path = graph.path(*endpoints, budget)
-        except CycleTooLongError as error:
-            raise ValueError("checkpoint DLP cycle exceeds its cap") from error
-        expected = {atoms[i].relation_id for i in indices if i != closing}
-        if path is None or set(path) != expected:
-            raise ValueError("DLP cycle differs from its retained forest path")
+        if collector._short_cycles is None:
+            try:
+                path = graph.path(*endpoints, budget)
+            except CycleTooLongError as error:
+                raise ValueError(
+                    "checkpoint DLP cycle exceeds its cap"
+                ) from error
+            expected = {atoms[i].relation_id for i in indices if i != closing}
+            if path is None or set(path) != expected:
+                raise ValueError(
+                    "DLP cycle differs from its retained forest path"
+                )
+        else:
+            from .short_cycles import check_prior_path
+
+            check_prior_path(indices, atoms, closing, budget)
+            path = tuple(atoms[i].relation_id for i in indices if i != closing)
         selected = tuple(atoms[i] for i in indices)
         scratch = (
             _combination_workspace(selected, base, config.memory_limit)
             - base.workspace_bytes
         )
         scratch_peak = max(scratch_peak, scratch)
-        if reserve + scratch > config.memory_limit:
+        if reserve + decode_scratch + scratch > config.memory_limit:
             raise MemoryError("restored DLP verification scratch exceeds cap")
         item = CombinedRelation(
             tuple(a.relation_id for a in selected),
@@ -269,9 +390,18 @@ def restore_store(payload, collector, budget):
             tuple(tuple(pair) for pair in exponents),
             arithmetic.backend_for(base.n).integer(correction),
         )
-        verify_combined(
-            item, base, store, budget=budget, memory_bytes=config.memory_limit
-        )
+        if collector._checked is not None:
+            # Every atom above was independently checked, including bounds
+            # and unit residuals. Reconstruct the row from that local list.
+            _verify_combined_values(item, base, selected, budget)
+        else:
+            verify_combined(
+                item,
+                base,
+                store,
+                budget=budget,
+                memory_bytes=config.memory_limit,
+            )
         for identity in path:
             graph.unowned.pop(identity, None)
         used.update(indices)
@@ -282,10 +412,111 @@ def restore_store(payload, collector, budget):
         raise ValueError("DLP checkpoint has unowned overflow or orphan atoms")
     rows = full + combined
     ordered_rows = [rows[i] for i in order]
+    shortcuts = None
+    if collector._short_cycles is not None:
+        from .short_cycles import ShortCycleIndex
+
+        shortcuts = ShortCycleIndex(
+            config.cycle_search_edges, strategy=config.cycle_policy
+        )
+        for atom in atoms:
+            if atom.residual_product != 1:
+                budget.consume(4)
+                shortcuts.add(
+                    atom.relation_id,
+                    *(atom.large_primes or (1, atom.residual)),
+                    weight=(len(atom.exponents),),
+                )
+    arena = None
+    if indexed:
+        from .indexed_relations import RecordArena
+
+        arena, converted = RecordArena(base), {}
+        for key, atom in store.items():
+            item, _, slot = arena.plan(atom, None, budget)
+            arena.commit(item, slot)
+            converted[key] = item
+        store = converted
+        full = [store[atom.relation_id] for atom in full]
+        combined = [arena.row(row, budget) for row in combined]
+        rows = full + combined
+        ordered_rows = [rows[i] for i in order]
+    elif packed:
+        from .packed_relations import pack_relation
+
+        store = {
+            key: pack_relation(atom, budget) for key, atom in store.items()
+        }
+        full = [store[atom.relation_id] for atom in full]
+        combined = [pack_relation(row, budget) for row in combined]
+        rows = full + combined
+        ordered_rows = [rows[i] for i in order]
+    checked = endpoints = None
+    if collector._checked is not None:
+        from .cofactor_policy import KnownEndpoints
+        from .yield_support import CheckedStore
+
+        checked, endpoints = CheckedStore(base, config), KnownEndpoints()
+        for atom in store.values():
+            budget.consume(len(atom.exponents) + 1)
+            checked.remember(atom)
+        for row in combined:
+            budget.consume(
+                sum(len(store[i].exponents) + 1 for i in row.atom_ids)
+            )
+            checked._record(row, atoms=tuple(store[i] for i in row.atom_ids))
+        saved_primes, saved_index = (
+            payload["cofactor_endpoints"],
+            payload["congruence_index"],
+        )
+        if (
+            not isinstance(saved_primes, list)
+            or len(saved_primes) > endpoints.maximum
+            or any(type(prime) is not int for prime in saved_primes)
+            or len(set(saved_primes)) != len(saved_primes)
+        ):
+            raise ValueError("invalid saved cofactor endpoints")
+        for prime in saved_primes:
+            utils.require_integer(prime, "saved cofactor prime", 2)
+            if prime > max(
+                config.residual_bound, config.large_prime_bound
+            ) or (
+                not checked.prime(prime, budget)
+                or checked.unit(prime, budget) != 1
+            ):
+                raise ValueError("invalid saved endpoint proof")
+        endpoints.add(saved_primes, budget)
+        if not isinstance(saved_index, list) or len(saved_index) > len(atoms):
+            raise ValueError("invalid saved congruence index")
+        seen_keys = set()
+        for index in saved_index:
+            _index(index, len(atoms))
+            atom = store[atoms[index].relation_id]
+            key, divisor = checked.congruence(atom, budget)
+            if key is None or divisor is not None or key in seen_keys:
+                raise ValueError("invalid saved canonical representative")
+            seen_keys.add(key)
+            checked.remember(atom, key=key)
+        if len(checked.canonical) != len(saved_index):
+            raise MemoryError("saved congruence index exceeds its cap")
+        if config.duplicate_policy != "congruence-v2" and saved_index:
+            raise ValueError("disabled congruence policy has saved entries")
+        if config.batch_policy == "off" and saved_primes:
+            raise ValueError("disabled cofactor cache has saved entries")
     budget.consume(count + row_count + 1)
     collector._atoms, collector._atom_bytes = store, sizes
     collector._full, collector._combined = full, combined
     collector._rows = ordered_rows
     collector._graph, collector._split_calls = graph, calls
+    collector._short_cycles = shortcuts
+    if checked is not None:
+        collector._checked, collector._endpoints, collector._arena = (
+            checked,
+            endpoints,
+            arena,
+        )
+        cache = getattr(collector, "_preparation_cache", None)
+        if cache is not None:
+            cache.checked = checked
     collector._workspace = reserve
-    collector._scratch_peak_bytes = scratch_peak
+    collector._scratch_peak_bytes = decode_scratch + scratch_peak

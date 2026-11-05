@@ -98,7 +98,9 @@ class QSJob:
         if self.collector._workspace + cache_bytes < storage_limit(
             self.config.memory_bytes
         ):
-            self.collector._preparation_cache = _VerificationCache(cache_bytes)
+            self.collector._preparation_cache = _VerificationCache(
+                cache_bytes, checked=self.collector._checked
+            )
             self.collector._workspace += cache_bytes
         self.lo, self.hi, self.next_position = lo, hi, lo
         self.weight_two, self.pivot = weight_two, pivot
@@ -106,7 +108,35 @@ class QSJob:
         self.filter_row_growth = filter_row_growth
         self.tested_dependencies = tested_dependencies
         self.collection_continues = collection_continues
+        self._pair_index = None
+        if getattr(self.config, "duplicate_policy", "identity") in (
+            "pair-v1",
+            "congruence-v2",
+        ):
+            from .equal_parity import EqualParityIndex
+
+            available = max(
+                0, self.config.memory_limit - self.collector._workspace - 65536
+            )
+            reserve = min(
+                self.config.duplicate_bytes
+                // (2 if self.collector._checked is not None else 1),
+                available,
+            )
+            self._pair_index = EqualParityIndex(reserve)
+            self.collector._workspace += reserve
         self.zero_checked_count = 0
+        self._useful_target = None
+        if getattr(self.config, "preparation_policy", "fixed") == "active-v2":
+            from .yield_support import UsefulTarget
+
+            if getattr(self.config, "outcome_feedback", False):
+                from .yield_feedback import OutcomeTarget
+
+                self._useful_target = OutcomeTarget()
+            else:
+                self._useful_target = UsefulTarget()
+        self._full_view = self._retry_full_view = self._selected_subset = False
         self.solver, self.extractor, self.prepared = None, None, None
         self.last_count = -1
         self.last_solved_count = -1
@@ -135,14 +165,33 @@ class QSJob:
 
     def _solve(self, final):
         """Prepare changed stores; preserve pending solve/extraction state."""
+        return self._solve_impl(final)
+
+    def _solve_impl(self, final):
+        """Keep a reversible subset retry inside one solve boundary."""
         relations = self.collector.matrix_relations
         count = len(relations)
         if self.solver is None and self.extractor is None:
-            if count == self.last_count and (
-                not final or count == self.last_solved_count
+            if self._useful_target is not None:
+                self._useful_target.observe(
+                    relations, self.collector, self.budget
+                )
+            if self._pair_index is not None:
+                divisor = self._timed(
+                    "equal_parity",
+                    lambda: self._pair_index.probe(
+                        relations, self.collector, self.budget, self.stats
+                    ),
+                )
+                if divisor is not None:
+                    return divisor
+            if (
+                not self._retry_full_view
+                and count == self.last_count
+                and (not final or count == self.last_solved_count)
             ):
                 return None
-            immediate = False
+            immediate = self._retry_full_view
             if self.collection_continues and not final:
                 # Inspect only newly admitted rows. A square must not wait for
                 # the cadence, but its original provenance still goes through
@@ -150,9 +199,21 @@ class QSJob:
                 while self.zero_checked_count < count:
                     row = relations[self.zero_checked_count]
                     self.budget.consume(len(row.exponents) + 1)
-                    if row.sign > 0 and all(
-                        exponent % 2 == 0 for _, exponent in row.exponents
-                    ):
+                    zero = (
+                        self.collector._checked.row(
+                            row,
+                            self.collector._atoms,
+                            self.budget,
+                            self.config.memory_limit,
+                        )
+                        == 0
+                        if self.collector._checked is not None
+                        else row.sign > 0
+                        and all(
+                            exponent % 2 == 0 for _, exponent in row.exponents
+                        )
+                    )
+                    if zero:
                         immediate = True
                         break
                     self.zero_checked_count += 1
@@ -161,6 +222,36 @@ class QSJob:
                 and not immediate
                 and self.last_count >= 0
                 and count - self.last_count < self.filter_row_growth
+            ):
+                return None
+
+            if (
+                not final
+                and not immediate
+                and self.collection_continues
+                and getattr(self.config, "preparation_policy", "fixed")
+                == "target-v1"
+            ):
+                # Full rows plus independent graph cycles are sufficient for
+                # an initial surplus. Later checked but unsuccessful attempts
+                # use a finite 5% top-up, not an arbitrary fixed 128-row pace.
+                target = (
+                    len(self.collector.factor_base.entries)
+                    + 1
+                    + self.row_excess
+                    if self.last_count < 0
+                    else self.last_count
+                    + max(self.filter_row_growth, (self.last_count + 19) // 20)
+                )
+                if count < target:
+                    return None
+
+            if (
+                not final
+                and not immediate
+                and self.collection_continues
+                and self._useful_target is not None
+                and count < self._useful_target.target(self.row_excess)
             ):
                 return None
 
@@ -198,6 +289,26 @@ class QSJob:
                     budget=self.budget,
                     memory_bytes=max(0, remaining),
                     max_rows=self.config.max_relations,
+                    merge_policy="fill-v2"
+                    if getattr(self.config, "filter_policy", "reference")
+                    != "reference"
+                    else "reference",
+                    light_rows=(
+                        getattr(self.config, "filter_policy", "reference")
+                        == "light-v2"
+                        and not final
+                        and not self._full_view
+                    ),
+                    surplus=self.row_excess,
+                    merge_weight=getattr(self.config, "merge_weight", 2),
+                    merge_fill=getattr(self.config, "merge_fill", 0),
+                    sparse_incidence=getattr(
+                        self.config, "sparse_incidence", False
+                    ),
+                    panel_bits=getattr(self.config, "solver_panel_bits", 0),
+                    _incremental=self.collector._incremental
+                    if getattr(self.config, "incremental_bytes", 0)
+                    else None,
                 ),
             )
             self._workspace_peak = max(
@@ -206,15 +317,28 @@ class QSJob:
             )
             self.stats["filter_calls"] += 1
             self.stats["last_filter"] = matrix.stats
+            self._selected_subset = matrix.stats.get(
+                "selected_rows", len(prepared.rows)
+            ) < len(prepared.rows)
+            if self._useful_target is not None:
+                self._useful_target.filtered(
+                    count,
+                    matrix.stats,
+                    self.row_excess,
+                    self.filter_row_growth,
+                    self.config.relation_limit,
+                )
             excess = len(matrix.rows) - matrix.stats["output_columns"]
             if (
                 not final
                 and not matrix.zero_dependencies
                 and (excess < self.row_excess)
+                and not self._selected_subset
             ):
                 # Defer only a growing store; final/storage-cap attempts must
                 # still test kernels when no further collection is possible.
                 self.last_count = count
+                self._full_view = self._retry_full_view = False
                 return None
 
             self.prepared = prepared
@@ -239,12 +363,26 @@ class QSJob:
                     if self.tested_dependencies
                     else None
                 ),
+                product_policy=getattr(
+                    self.config, "extraction_policy", "reference"
+                ),
             )
 
         self.extractor.budget = self.budget
         self.budget.consume(0)
         divisor = self._timed("extraction", self.extractor.run)
         skipped = getattr(self.extractor, "cache_skips", 0)
+        if self._useful_target is not None and getattr(
+            self.config, "outcome_feedback", False
+        ):
+            self._useful_target.extracted(
+                count,
+                self.extractor.trials,
+                skipped,
+                divisor,
+                self.filter_row_growth,
+                self.config.relation_limit,
+            )
         self.stats["trivial_dependencies"] += skipped + sum(
             trial.divisor is None for trial in self.extractor.trials
         )
@@ -256,6 +394,12 @@ class QSJob:
             "peak_pivot_nonzeros": self.solver.peak_nonzeros,
             "dependencies": len(self.solver.dependencies),
         }
+        if divisor is None and self._selected_subset:
+            self.solver, self.extractor, self.prepared = None, None, None
+            self._full_view = self._retry_full_view = True
+            self._selected_subset = False
+            return self._solve_impl(final)
+        self._full_view = self._retry_full_view = self._selected_subset = False
         self.last_count = count
         self.last_solved_count = count
         self.zero_checked_count = count
@@ -320,11 +464,18 @@ class QSJob:
                 if not final:
                     self.collector.budget = self.budget
                     stop = min(self.hi, self.next_position + self.batch_width)
+                    collect = self.collector.collect
+                    if (
+                        type(self.collector) is SieveCollector
+                        and getattr(collect, "__func__", None)
+                        is SieveCollector.collect
+                    ):
+                        # Injected collectors and instance overrides retain
+                        # their public dispatch and snapshot contract.
+                        collect = self.collector._collect_progress
                     result = self._timed(
                         "collection",
-                        lambda: self.collector.collect(
-                            self.next_position, stop
-                        ),
+                        lambda: collect(self.next_position, stop),
                     )
                     counts = self.stats["collector_counts"]
                     for key, value in result.stats.items():

@@ -178,7 +178,7 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
-B12/F4 validated executor source `787190a` passes 1,067 PyPy tests
+B12/F4 pre-synchronization source `28239d6` passes 1,084 PyPy tests
 (9 optional skips) and full lint in a committed-only checkout. Opt-in resource/
 checkpoint v7 retains checked budget and stage-two preparation candidates, context
 binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
@@ -193,8 +193,11 @@ six real S0/M0/P2 cold/warm smoke cases in a committed checkout. Detailed curren
 plan/state: `v2/audit/b12_f4/regime_selection_v1/PLAN.md` and `ACTIVE_STATE.md`.
 The bounded v7 cache-capacity extension passes full runtime QA and addresses
 measured manifest/decode/index retention refusals without changing arithmetic.
-A separate lazy measured-profile selector and its tests are being prepared;
-its integrated runtime validation and confirmation remain pending.
+The lazy measured-profile selector passes its integrated runtime tests.
+Before whole-call comparisons, the isolated candidate imports the current
+committed C9a fallback from mainline `01d00f2`; focused checks and 261 benchmark
+imports pass, with full committed-checkout QA pending. Historical measurements
+retain their exact sources. No C9a experiment or E1 confirmation is reopened.
 
 The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
 tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the

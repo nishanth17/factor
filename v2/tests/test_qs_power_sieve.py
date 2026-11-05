@@ -34,7 +34,12 @@ class PrimePowerSieveTests(unittest.TestCase):
                 roots = PolynomialRoots(prime, values, False)
                 marks = list(
                     prime_power_roots(
-                        polynomial, roots, 2048, 1, unlimited_budget()
+                        polynomial,
+                        roots,
+                        2048,
+                        1,
+                        unlimited_budget(),
+                        inverses={},
                     )
                 )
 

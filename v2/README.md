@@ -244,7 +244,7 @@ remains the incumbent comparison. No automatic route or default is changed.
 The profile is limited to 256 KiB and 256 rows. The parent separately funds
 4 MiB decoded ownership, bounded input/hash scratch and three 16 KiB checkpoint
 headers alongside native executor ownership. Source hashing streams small
-buffers. Header work is reserved before arithmetic. Drained checkpoints bind
+buffers and binds shared runtime imports, including the QS fallback. Header work is reserved before arithmetic. Drained checkpoints bind
 the profile, selected settings, native checkpoint and prior charges; changing
 policy or worker count is rejected. Fresh contexts repay profile preparation
 and process startup. Retained contexts reject incompatible ownership rather

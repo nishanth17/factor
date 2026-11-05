@@ -137,6 +137,32 @@ def family_assignments(
     return tuple(assignments)
 
 
+def _ordered_roots(values):
+    """Order an internal zero/one/two-root tuple without sorting scratch."""
+    if len(values) < 2:
+        return values
+    if len(values) == 2:
+        first, second = values
+        return values if first <= second else (second, first)
+    return tuple(sorted(values))
+
+
+def _canonical_roots(values):
+    """Keep independent validation while specializing native root pairs."""
+    if type(values) is tuple:
+        if not values:
+            return True
+        if len(values) == 1 and type(values[0]) is int:
+            return True
+        if (
+            len(values) == 2
+            and type(values[0]) is int
+            and type(values[1]) is int
+        ):
+            return values[0] < values[1]
+    return values == tuple(sorted(set(values)))
+
+
 def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
     """Certify a supplied complete root tuple without recomputing inverses.
 
@@ -166,7 +192,7 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
             utils.require_integer(root, "root", 0)
             if root >= prime:
                 raise ValueError("cached root is outside its modulus")
-        if item.roots != tuple(sorted(set(item.roots))):
+        if not _canonical_roots(item.roots):
             raise ValueError("cached roots must be distinct and increasing")
         a, b, c = (
             polynomial.a % prime,
@@ -195,7 +221,8 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
         count = 1 if a == 0 else len(entry.square_roots)
         if item.all_positions or len(item.roots) != count:
             raise ValueError("cached root cardinality is incomplete")
-        if any((a * x * x + 2 * b * x + c) % prime for x in item.roots):
+        twice_b = 2 * b
+        if any(((a * x + twice_b) * x + c) % prime for x in item.roots):
             raise ValueError("cached value is not a polynomial root")
 
     return True
@@ -384,7 +411,7 @@ class PolynomialFamily:
                     for root in previous.roots[offset].roots
                 )
                 roots.append(
-                    PolynomialRoots(entry.prime, tuple(sorted(residues)))
+                    PolynomialRoots(entry.prime, _ordered_roots(residues))
                 )
                 continue
 
@@ -399,7 +426,9 @@ class PolynomialFamily:
                     for root in previous.roots[offset].roots
                 )
             )
-            roots.append(PolynomialRoots(entry.prime, tuple(sorted(residues))))
+            roots.append(
+                PolynomialRoots(entry.prime, _ordered_roots(residues))
+            )
 
         return FamilyStep(
             self.identity, index, polynomial, tuple(roots), delta, changed

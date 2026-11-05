@@ -5,8 +5,44 @@ from ..common.arithmetic import pow
 MAX_LIFT_ROOTS = 64
 
 
+class HenselInverses:
+    """Bounded prime/derivative reuse across polynomials of a fixed target.
+
+    At a root, D=2*(A*r+B) satisfies D²=4*k*N modulo p. A fixed target has
+    at most two nonsingular derivatives per odd prime, with opposite inverses.
+    An unexpected derivative is calculated independently and never cached.
+    """
+
+    def __init__(self, limit):
+        self.limit = limit
+        self.values = {}
+
+    def inverse(self, prime, derivative):
+        previous = self.values.get(prime)
+        if previous is not None:
+            value, positive, negative = previous
+            if derivative == value:
+                return positive
+            if derivative == (-value) % prime:
+                return negative
+        result = pow(derivative, -1, prime) if derivative else 0
+        if previous is None and len(self.values) < self.limit:
+            self.values[prime] = derivative, result, (-result) % prime
+        return result
+
+
 def prime_power_roots(
-    polynomial, roots, maximum, log, budget, *, lo=None, hi=None, inverses=None
+    polynomial,
+    roots,
+    maximum,
+    log,
+    budget,
+    *,
+    lo=None,
+    hi=None,
+    inverses=None,
+    shared_inverses=None,
+    root_transfers=None,
 ):
     """Yield modulus/root/ceil-log marks covering every p-adic valuation.
 
@@ -28,29 +64,65 @@ def prime_power_roots(
         initial = tuple(range(prime))
 
     modulus, current = prime, initial
+    target_bits = None
+    transferable = (
+        root_transfers is not None
+        and prime > 2
+        and not roots.all_positions
+        and len(initial) == 2
+    )
 
     while current and modulus <= maximum:
+        modulus_bits = modulus.bit_length()
         if lo is not None:
-            budget.consume(len(current) * (modulus.bit_length() + 1))
+            budget.consume(len(current) * (modulus_bits + 1))
             # Every higher lift is in this residue class. A class without
             # a hit in this window cannot acquire one at a higher power.
-            current = tuple(
-                root for root in current if lo + (root - lo) % modulus < hi
-            )
-            if not current:
-                break
+            # A complete period contains every residue; retain the original
+            # tuple instead of filtering and copying it in that case.
+            if hi - lo < modulus:
+                current = tuple(
+                    root for root in current if lo + (root - lo) % modulus < hi
+                )
+                if not current:
+                    break
 
         yield modulus, current, log
-        if modulus > maximum // prime:
+        # Python integers are exact. The temporary is bounded by maximum's
+        # bit length plus one prime and replaces a division at every level.
+        next_modulus = modulus * prime
+        if next_modulus > maximum:
             break
+        if target_bits is None:
+            target_bits = polynomial.n_prime.bit_length()
+        cost = target_bits + 4 * modulus_bits + 1
+        if transferable and len(current) == 2:
+            shifted = root_transfers.shifted(
+                polynomial, prime, next_modulus, initial, cost, budget
+            )
+            if shifted is not None:
+                current, modulus = shifted, next_modulus
+                continue
         lifted = []
 
         for root in current:
-            budget.consume(
-                polynomial.n_prime.bit_length() + 4 * modulus.bit_length() + 1
-            )
+            budget.consume(cost)
 
-            derivative = 2 * (polynomial.a * root + polynomial.b) % prime
+            # The derivative modulo p is constant within an original root
+            # class. Reuse its inverse (or singular zero) across all lifts.
+            key = prime, root % prime
+            inverse = None if inverses is None else inverses.get(key)
+            if inverse is None:
+                derivative = 2 * (polynomial.a * root + polynomial.b) % prime
+                inverse = (
+                    shared_inverses.inverse(prime, derivative)
+                    if shared_inverses is not None
+                    else pow(derivative, -1, prime)
+                    if derivative
+                    else 0
+                )
+                if inverses is not None:
+                    inverses[key] = inverse
             # Derived lift residues are bounded by maximum, rather than the
             # public position cap. Their invariant is F(root) == 0 mod modulus.
             quotient = (
@@ -61,13 +133,7 @@ def prime_power_roots(
                 // modulus
                 % prime
             )
-            if derivative:
-                key = prime, root % prime
-                inverse = None if inverses is None else inverses.get(key)
-                if inverse is None:
-                    inverse = pow(derivative, -1, prime)
-                    if inverses is not None:
-                        inverses[key] = inverse
+            if inverse:
                 correction = -quotient * inverse % prime
                 lifted.append(root + modulus * correction)
             elif quotient == 0:
@@ -81,5 +147,10 @@ def prime_power_roots(
                     root + modulus * offset for offset in range(prime)
                 )
 
+        complete_pair = transferable and len(current) == len(lifted) == 2
         current = tuple(lifted)
-        modulus *= prime
+        if complete_pair:
+            root_transfers.remember(
+                polynomial, modulus, next_modulus, current, budget
+            )
+        modulus = next_modulus
