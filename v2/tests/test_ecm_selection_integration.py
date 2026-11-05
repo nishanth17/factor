@@ -254,7 +254,8 @@ class PortfolioSelectionTests(unittest.TestCase):
                         owner._load(allowance())
                     self.assertEqual(
                         sha,
-                        "1dc664ac2d8c2b22eee39d53efe9212a9efd2d8e98e8f8668ad38501d9615ecc",
+                        "1dc664ac2d8c2b22eee39d53efe9212a9e"
+                        "fd2d8e98e8f8668ad38501d9615ecc",
                     )
                 else:
                     data = json.loads(path.read_text())

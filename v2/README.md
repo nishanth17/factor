@@ -238,12 +238,12 @@ this retains the production SIQS fallback. Use a finite shared `Budget`.
 The adapter reads no profile and imports no multiprocessing machinery until
 actual ECM is reached. A bounded, source-checked profile selects a configuration
 at the first engaged cofactor; declined calls do not pin a serial context.
-The worker count stays fixed after engagement. Decisions use decimal size, exact mathematical options, remaining
-quota and actual pool readiness. `prefer_warm=True` chooses the retained-library
+The worker count stays fixed after engagement. Decisions use decimal size,
+exact mathematical options, remaining quota and actual pool readiness. `prefer_warm=True` chooses the retained-library
 candidate, while its first call still pays and checks cold startup. Unknown or
-invalid cost estimates return portfolio execution to incumbent serial ECM. This explicitly
-versioned serial stream differs from legacy production ECM; production serial
-remains the incumbent comparison. No automatic route or default is changed.
+invalid cost estimates return portfolio execution to incumbent serial ECM.
+Engaged searches retain the explicit SEARCHv1 stream; production serial remains
+the incumbent comparison. No automatic route or default is changed.
 
 The profile is limited to 256 KiB and 256 rows. The parent separately funds
 4 MiB decoded ownership, bounded input/hash scratch and three 16 KiB checkpoint
@@ -262,10 +262,10 @@ separate scopes.
 `v2.execution.ecm_selection.SelectedECMContext(profile, profile_sha256, seed=0,
 prefer_warm=False)` loads a bounded, source-checked catalogue lazily when ECM is
 reached. Pass it as `factorize_bounded(..., ecm_executor=context)` and close it
-with a context manager under a protected process entry point. The committed
-current training catalogue is `benchmarks/inputs/controls/b12_f4_selection_v2.json`,
-SHA256 `2c87e95c2cd74bee564adb093a2df71ecb9c45bd64dfb480a86dbcd31b0e5e29`. It binds 99 runtime files and retains the 33 measured cost/settings
-anchors from v1. Their costs are transferred estimates for this changed adapter,
+with a context manager under a protected process entry point. The current
+training catalogue is `benchmarks/inputs/controls/b12_f4_selection_v2.json`, SHA256
+`2c87e95c2cd74bee564adb093a2df71ecb9c45bd64dfb480a86dbcd31b0e5e29`.
+It binds 99 runtime files and retains the 33 measured cost/settings anchors from v1. Their costs are transferred estimates for this changed adapter,
 not measurements of its current complete cost. Source incompatibility is rejected.
 The frozen v1 input remains immutable for its original sources; current selector
 profiles/checkpoints use `b12-f4-selection-v2` and reject v1. Native worker wire v7
@@ -305,12 +305,13 @@ live in `benchmarks/inputs/controls/b12_f4_selection_resolved_v1.json`. These
 snapshots define measured caller configurations rather than new portfolio
 presets. In particular, caller140 at 60/80/100 digits is explicit.
 
-The latest comparison uses actual master stock QS checkpoint/fallback settings,
-separating default-schedule and explicit caller140 arms. It finds conditional
+The earlier comparison of source `538462a` uses actual master stock QS
+checkpoint/fallback settings, separating default-schedule and explicit caller140
+arms. It finds conditional
 completion gains and regressions, with no universal cold/warm median winner.
-Catalogue matching uses the actual current cofactor's exact size/options; ordinary
-postprocessing cofactors often have no row and remain serial. The opt-in serial
-stream still differs from incumbent S0. A nominated worker count therefore does
+That source matched only exact cofactor sizes/options, leaving many calls on
+its distinct SEARCHv1 serial stream. The v2 adapter above changes those two
+integration behaviors and has no new performance comparison yet. A nominated worker count therefore does
 not mean workers engaged on every call. The earlier matched 64 MiB QS checkpoint
 study remains a historical resource variant. See
 [actual-master results](benchmarks/RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026)
