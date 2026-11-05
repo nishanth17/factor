@@ -324,7 +324,6 @@ class AutomaticTests(unittest.TestCase):
         with SelectedECMContext(
             POLICY_PATH,
             POLICY_SHA256,
-            SELECTOR_OWNERSHIP,
             parent_memory=settings.memory_bytes,
             memory_bytes=400 * 2**20,
         ) as owner:
