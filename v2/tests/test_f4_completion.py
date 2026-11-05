@@ -78,6 +78,7 @@ class CompletionStudyTests(unittest.TestCase):
         self,
     ):
         from dataclasses import asdict
+
         from v2.portfolio import PortfolioConfig
 
         n = 10**59 + 123
