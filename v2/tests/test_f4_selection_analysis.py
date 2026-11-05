@@ -2,7 +2,10 @@
 
 import unittest
 
-from v2.benchmarks.ecm.b12_f4.selection_analysis import compare_cohort
+from v2.benchmarks.ecm.b12_f4.selection_analysis import (
+    compare_cohort,
+    compare_pool_timings,
+)
 
 
 def row(seconds, complete=True):
@@ -52,6 +55,37 @@ class CohortAnalysisTests(unittest.TestCase):
         candidate[0].append(row(1))
         with self.assertRaises(ValueError):
             compare_cohort(candidate, control)
+
+
+class PoolTimingTests(unittest.TestCase):
+    def test_known_scale_for_cold_and_warm_blocks(self):
+        for control in ([[2]] * 9, [[2, 2, 2]] * 3):
+            candidate = [[value / 2 for value in block] for block in control]
+            result = compare_pool_timings(candidate, control, draws=100)
+            self.assertEqual(result["ratio"], 0.5)
+            self.assertEqual(result["interval"], [0.5, 0.5])
+            self.assertEqual(result["candidate_pools"], len(control))
+            self.assertEqual(result["independent_moduli"], 1)
+
+    def test_nine_calls_in_one_pool_do_not_create_three_lifetimes(self):
+        with self.assertRaises(ValueError):
+            compare_pool_timings([[1] * 9], [[2] * 9], draws=100)
+        with self.assertRaises(ValueError):
+            compare_pool_timings([[1]] * 3, [[2]] * 3, draws=100)
+
+    def test_invalid_or_unequal_blocks_are_rejected(self):
+        control = [[2, 2, 2]] * 3
+        for candidate in (
+            [[0, 1, 1]] * 3,
+            [[float("nan"), 1, 1]] * 3,
+            [[True, 1, 1]] * 3,
+            [[1, 1, 1], [1, 1], [1, 1, 1]],
+            [[1]] * 9,
+        ):
+            with self.assertRaises(ValueError):
+                compare_pool_timings(candidate, control, draws=100)
+        with self.assertRaises(ValueError):
+            compare_pool_timings(control, control, draws=100_000)
 
 
 if __name__ == "__main__":

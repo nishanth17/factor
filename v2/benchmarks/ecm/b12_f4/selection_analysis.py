@@ -141,3 +141,60 @@ def compare_cohort(candidate, control, *, seed=20261110, draws=2000):
             else "Descriptive p90 requires tail/censoring uncertainty."
         ),
     )
+
+
+def compare_pool_timings(candidate, control, *, seed=20261113, draws=2000):
+    """Compare one modulus, resampling independent process/pool lifetimes.
+
+    Cold blocks contain one fresh-interpreter sample each. Warm blocks keep
+    calls from one retained pool together. Temporal pairing is not assumed;
+    this conditional interval does not create independent input moduli.
+    """
+    if type(draws) is not int or not 100 <= draws <= 10_000:
+        raise ValueError("finite bootstrap draw count required")
+    widths = set()
+    for arm in (candidate, control):
+        if not isinstance(arm, (list, tuple)) or not 3 <= len(arm) <= 32:
+            raise ValueError("at least three independent pool lifetimes")
+        total = 0
+        for block in arm:
+            if (
+                not isinstance(block, (list, tuple))
+                or not 1 <= len(block) <= 9
+            ):
+                raise ValueError("finite timing block required")
+            widths.add(len(block))
+            total += len(block)
+            if any(
+                type(value) not in (int, float)
+                or not math.isfinite(value)
+                or value <= 0
+                for value in block
+            ):
+                raise ValueError("validated positive timings required")
+        if total < 9:
+            raise ValueError("at least nine timing samples required")
+    if len(widths) != 1:
+        raise ValueError("equal samples per independent pool required")
+
+    def median(blocks):
+        return statistics.median(value for block in blocks for value in block)
+
+    generator = random.Random(seed)
+    ratios = sorted(
+        median(generator.choices(candidate, k=len(candidate)))
+        / median(generator.choices(control, k=len(control)))
+        for _ in range(draws)
+    )
+    ratio = median(candidate) / median(control)
+    if not math.isfinite(ratio) or not all(map(math.isfinite, ratios)):
+        raise ValueError("timing ratio exceeds finite representation")
+    return dict(
+        ratio=ratio,
+        interval=[ratios[int(0.025 * draws)], ratios[int(0.975 * draws) - 1]],
+        candidate_pools=len(candidate),
+        control_pools=len(control),
+        samples_per_pool=widths.pop(),
+        independent_moduli=1,
+        scope="conditional timings; independently resampled pool lifetimes",
+    )
