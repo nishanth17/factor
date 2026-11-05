@@ -178,6 +178,16 @@ freezes; later comparisons need a new committed source identity. Heavy QA and
 measurements share one serialized performance window. A later separately
 requested execution chat may use Sol / high where its task row permits it.
 
+A new actual-default comparison is running against committed master `0efaba1`,
+using candidate runtime/benchmark source `538462a`. It preserves stock QS
+checkpoint/fallback settings and covers all 33 recommended ECM regimes, with
+cold CLI and warm-library endpoints. New independent certified/uniform inputs
+are committed; the supplementary primary-uniform caller140 comparison is
+separately frozen without tuning settings. Current code passes 1,287 PyPy tests
+(9 optional skips), lint and 262 benchmark imports. This ongoing experiment has
+no final performance verdict. Live state and finite limits:
+`v2/audit/b12_f4/master_comparison_v1/ACTIVE_STATE.md` and `PLAN.md`.
+
 B12/F4 implements opt-in spawn processes with stable SEARCHv1 curve identities,
 parent-owned leases, bounded metadata reuse and resource/checkpoint v7. Current
 runtime `fc6fea3` includes committed mainline `01d00f2` fallback behavior and passes
