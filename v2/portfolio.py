@@ -691,6 +691,8 @@ def _pack(state, config, budget, generator, policy):
     if config.allocation is not None:
         version = ALLOCATION_CHECKPOINT_VERSION
         configuration = asdict(config)
+    if config.ecm_kernel == "python":
+        configuration.pop("ecm_kernel")
     # Default scheduling keeps the legacy checkpoint identity and semantics.
     if config.siqs is not None and config.siqs.solve_policy == "window":
         configuration["siqs"].pop("solve_policy")
@@ -729,6 +731,10 @@ def _pack(state, config, budget, generator, policy):
     }
     if config.allocation is not None:
         payload["allocation"] = ALLOCATION_VERSION
+    if config.ecm_kernel != "python":
+        from .ecm.native_packet import source_identity
+
+        payload["native_packet"] = source_identity()
     if config.ecm_chain_mode == "off":
         payload.pop("chains")
     encoded = _canonical(payload)
@@ -918,6 +924,15 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible primality policy")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if config.ecm_kernel == "python":
+            expected_config.pop("ecm_kernel")
+        expected_packet = None
+        if config.ecm_kernel != "python":
+            from .ecm.native_packet import source_identity
+
+            expected_packet = source_identity()
+        if payload.get("native_packet") != expected_packet:
+            raise ValueError("incompatible native ECM packet identity")
         if (
             config.siqs is not None
             and config.siqs.solve_policy == "window"
@@ -1261,6 +1276,7 @@ def factorize_bounded(
                 ),
                 "ecm_chain_bytes": saved_config.get("ecm_chain_bytes", 0),
                 "ecm_program_bytes": saved_config.get("ecm_program_bytes", 0),
+                "ecm_kernel": saved_config.get("ecm_kernel", "python"),
                 "memory_bytes": saved_config.get("memory_bytes", 8_388_608),
                 "ecm_tiers": saved_config.get(
                     "ecm_tiers", ((constants.ECM_B1, constants.ECM_B2, 32),)
@@ -1375,6 +1391,7 @@ def factorize_bounded(
         else budget
     )
 
+    context = programs = None
     try:
         budget.consume(0)
         if checkpoint is not None and config.allocation is not None:
@@ -1466,6 +1483,10 @@ def factorize_bounded(
                     break
     except BudgetExhaustedError as error:
         reason = str(error)
+    finally:
+        from .execution.portfolio_config import close_execution_context
+
+        close_execution_context(programs or context)
 
     result = _result(state)
     if result.complete:

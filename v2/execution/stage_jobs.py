@@ -185,6 +185,51 @@ def _stage_one(job, budget, context, config):
             job.update(replay_index=position + 1, replay_power=1)
         return
 
+    if not prepare_stage_one(job, budget, context, config):
+        return
+
+    plan = stage_one_plan(job, context, budget)
+    if plan is not None:
+        start = job["value"]
+        value, divisor, replayed = plan.execute(
+            job["powers"],
+            start,
+            job["n"],
+            job["a24"],
+            budget,
+            native_packet=getattr(context, "native_packet", None),
+        )
+        commit_chain_chunk(job, plan, start, value, divisor, replayed)
+        return
+
+    scalar = prod(
+        (power for _, power in job["powers"]),
+        start=arithmetic.backend_for(job["n"]).integer(1),
+    )
+    budget.consume(scalar.bit_length() + 1)
+    # Keep the pre-chunk value until the GCD decides whether replay is needed.
+    start = job["value"]
+    packet = getattr(context, "native_packet", None)
+    if (
+        job["kind"] == "ecm"
+        and packet is not None
+        and not (packet.mode == "auto" and scalar.bit_length() > 4096)
+        and packet.available(job["n"], budget)
+    ):
+        value = list(
+            packet.ladder(scalar, start, job["n"], job["a24"], budget)
+        )
+    else:
+        value = _apply(job, start, scalar)
+    commit_ladder_chunk(job, start, value)
+
+
+def prepare_stage_one(job, budget, context, config):
+    """Advance only prime metadata; return whether a chunk is ready to fund.
+
+    A team owner uses this same traversal without accidentally evaluating the
+    final short chunk in Python. Scalar atomic boundaries stay the same.
+    """
     chunk_size = (
         config.pm1_chunk_size or config.chunk_size
         if job["kind"] == "pm1"
@@ -223,15 +268,20 @@ def _stage_one(job, budget, context, config):
             )
             job["powers"].append([prime, power])
             take_prime(cursor)
-        return
+        return False
 
     if not job["powers"]:
         job.update(
             phase="stage_two_setup",
             cursor=prime_cursor(job["b1"] + 1, job["b2"] + 1),
         )
-        return
+        return False
 
+    return True
+
+
+def stage_one_plan(job, context, budget):
+    """Select the accepted plan under the existing width/bound eligibility."""
     chains = getattr(context, "chains", None) if job["kind"] == "ecm" else None
     plan = None
     if chains is not None:
@@ -239,37 +289,31 @@ def _stage_one(job, budget, context, config):
 
         if supports_modulus(job["n"]):
             plan = chains.get(job["b1"], budget)
-    if plan is not None:
-        start = job["value"]
-        value, divisor, replayed = plan.execute(
-            job["powers"], start, job["n"], job["a24"], budget
-        )
-        job["chain_identity"] = plan.identity
-        job["chain_chunks"] = job.get("chain_chunks", 0) + 1
-        job["chain_replays"] = job.get("chain_replays", 0) + int(replayed)
-        if divisor is not None:
-            _finish(job, divisor)
-        elif value is None:
-            # Preserve the durable original-chunk/prime-unit recovery path.
-            # Its later atomic units retain their normal separate charges.
-            job.update(
-                phase="replay",
-                replay_index=0,
-                replay_power=1,
-                replay_value=start,
-            )
-        else:
-            job.update(value=list(value), powers=[])
-        return
+    return plan
 
-    scalar = prod(
-        (power for _, power in job["powers"]),
-        start=arithmetic.backend_for(job["n"]).integer(1),
-    )
-    budget.consume(scalar.bit_length() + 1)
-    # Keep the pre-chunk value until the GCD decides whether replay is needed.
-    start = job["value"]
-    value = _apply(job, start, scalar)
+
+def commit_chain_chunk(job, plan, start, value, divisor, replayed):
+    """Publish a checked chain outcome through existing recovery rules."""
+    job["chain_identity"] = plan.identity
+    job["chain_chunks"] = job.get("chain_chunks", 0) + 1
+    job["chain_replays"] = job.get("chain_replays", 0) + int(replayed)
+    if divisor is not None:
+        _finish(job, divisor)
+    elif value is None:
+        # Preserve the durable original-chunk/prime-unit recovery path.
+        # Its later atomic units retain their normal separate charges.
+        job.update(
+            phase="replay",
+            replay_index=0,
+            replay_power=1,
+            replay_value=start,
+        )
+    else:
+        job.update(value=list(value), powers=[])
+
+
+def commit_ladder_chunk(job, start, value):
+    """Publish a ladder point only after its unchanged state GCD check."""
     divisor = _state_gcd(job, value)
     if utils.valid_divisor(divisor, job["n"]):
         _finish(job, divisor)

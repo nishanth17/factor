@@ -1,5 +1,14 @@
 # Factor status
 
+Task-branch preparation: B4a scalar C/GMP packets and staged runner are written
+from validated B12 `787190aa`; this is not a mainline integration or adoption.
+Current planning was separately reviewed at `b8638a0c`. Detailed decision,
+research, QA status and future integration/execution plan are local under
+`v2/audit/b4a/`. Compilation/executable QA remain subject to the shared window;
+no performance campaign is authorized by this preparation. Native teams are
+implemented as an optional C-only OpenMP continuation owner with dynamic/static/
+guided scheduling; compilation and executable QA remain pending. B4a remains open.
+
 Last updated: 4 November 2026 (America/Los_Angeles).
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`; production defaults are unchanged.

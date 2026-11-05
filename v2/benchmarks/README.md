@@ -17,6 +17,13 @@ nine observations under the machine-wide performance lock. Full test suites
 share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
 and instrumented diagnostics remain separate from performance evidence.
 
+B4a's [preparation manifest](inputs/controls/b4a_preparation.json) is prospective,
+not an execution grant. `ecm.b4a.runner` preserves finite issued-cell reservations,
+checks raw outputs and supervises owned process groups. `ecm.b4a.plan` requires
+integrated-source Stage Q before preparing Stage A. Scalar C/GMP, OpenMP teams
+and selected schedules, and B12 processes are distinct arms. No B4a speedup is
+recorded.
+
 ## Commands
 
 From the repository root:

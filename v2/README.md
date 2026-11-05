@@ -4,6 +4,13 @@ The active Factor implementation runs on **PyPy implementing Python 3.11**.
 It uses exact integer arithmetic, validates every split and retains unfinished
 cofactors. The default Python-integer backend needs no third-party packages.
 
+An experimental [coarse scalar C/GMP ECM packet](ecm/native/README.md) is
+available through `PortfolioConfig(ecm_kernel="c-gmp")` or
+`--ecm-kernel c-gmp`. It requires an explicit local build and retains the Python
+fallback. A separate experimental OpenMP owner supplies static/dynamic/guided
+continuation scheduling. Both builds and executable QA are pending; no performance
+or default adoption is claimed.
+
 ## Setup and first run
 
 Run commands from the repository root:

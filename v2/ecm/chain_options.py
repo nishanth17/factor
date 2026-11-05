@@ -41,8 +41,11 @@ def default_options(config, tiers=None, *, automatic_memory=False):
         and any(b1 == 2000 and curves >= 8 for b1, _, curves in tiers)
         and all(b2 < 2**64 for _, b2, curves in tiers if curves)
     )
+    native_reserve = 2 * 2**20 if config.ecm_kernel != "python" else 0
     memory_bytes = (
-        16 * 1024**2 if automatic_memory and eligible else config.memory_bytes
+        16 * 1024**2 + native_reserve
+        if automatic_memory and eligible
+        else config.memory_bytes
     )
     available = memory_bytes - config.workspace_reserve - 8192
     fallback = config.siqs or config.sss
@@ -53,6 +56,14 @@ def default_options(config, tiers=None, *, automatic_memory=False):
             available = min(0, available)
         else:
             available -= fallback.memory_bytes
+    if (
+        native_reserve
+        and eligible
+        and available < extra <= available + native_reserve
+    ):
+        raise MemoryError(
+            "native reserve would disable the accepted PRAC plan"
+        )
     supported = eligible and available >= extra
     return dict(
         memory_bytes=memory_bytes if supported else config.memory_bytes,

@@ -366,7 +366,18 @@ class Manifest:
         self.tiers = tuple(tuple(t) for t in tiers)
         self.schedule = digest([VERSION, "cost", options, n.bit_length()])
         self.metadata = metadata_identity(options)
-        self.identity = digest([SEARCH_VERSION, n, seed, lineage, options])
+        # Execution choice must not silently select a different curve stream.
+        # Metadata and native snapshot identity still bind the actual executor.
+        search_options = dict(options)
+        search_options.pop("ecm_kernel", None)
+        self.identity = digest(
+            [SEARCH_VERSION, n, seed, lineage, search_options]
+        )
+        self.execution = None
+        if options.get("ecm_kernel", "python") != "python":
+            from ..ecm.native_packet import source_identity
+
+            self.execution = digest([source_identity(), options["ecm_kernel"]])
         self._assignments = {}
         self.jobs = tuple(
             (tier, index)
@@ -935,6 +946,8 @@ class Search:
             factor=self.factor,
             retired=self.retired,
         )
+        if self.manifest.execution is not None:
+            payload["execution"] = self.manifest.execution
         if len(canonical(payload)) > self.settings.checkpoint_bytes:
             raise MemoryError("checkpoint encoding exceeds cap")
         return dict(payload=payload, sha256=digest(payload))
@@ -946,8 +959,10 @@ class Search:
         data = checkpoint["payload"]
         if checkpoint["sha256"] != digest(data) or data["version"] != VERSION:
             raise ValueError("corrupt/unsupported checkpoint")
-        if data["manifest"] != manifest.identity or data["settings"] != asdict(
-            settings
+        if (
+            data["manifest"] != manifest.identity
+            or data["settings"] != asdict(settings)
+            or data.get("execution") != manifest.execution
         ):
             raise ValueError(
                 "resume identity/settings changed (including workers)"

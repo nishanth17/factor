@@ -83,6 +83,7 @@ class PortfolioConfig:
     ecm_chain_family: str = field(default="auto", kw_only=True)
     ecm_pair_distance: int | None = None
     ecm_pair_wheel: int | None = None
+    ecm_kernel: str = field(default="python", kw_only=True)
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -136,6 +137,10 @@ class PortfolioConfig:
             if self.pm1_chunk_size > 256:
                 raise ValueError("limit p-1 chunks to 256 primes")
         arithmetic.get_backend(self.backend)
+        if self.ecm_kernel not in ("python", "c-gmp", "auto"):
+            raise ValueError("ECM kernel must be python, c-gmp or auto")
+        if self.ecm_kernel != "python" and self.backend != "python-int":
+            raise ValueError("C/GMP ECM packets require python-int state")
         if self.ecm_chain_mode not in ("auto", "off", "reuse"):
             raise ValueError("ECM chain mode must be auto, off or reuse")
         if self.ecm_chain_family not in ("auto", "lucas", "cf"):
@@ -408,6 +413,7 @@ class PortfolioConfig:
             + self.ecm_program_bytes
             + self.ecm_chain_bytes
             + paired_reserve
+            + (2 * 2**20 if self.ecm_kernel != "python" else 0)
         )
 
 
@@ -464,7 +470,20 @@ def _execution_context(state, config, budget):
                 _chain_bounds(config),
                 config.ecm_chain_family,
             )
+    if config.ecm_kernel != "python":
+        from ..ecm.native_packet import NativePacket
+
+        (programs or context).native_packet = NativePacket(
+            mode=config.ecm_kernel
+        )
     return context, programs
+
+
+def close_execution_context(context):
+    """Release optional native ownership before dropping a run/cache owner."""
+    packet = getattr(context, "native_packet", None)
+    if packet is not None:
+        packet.close()
 
 
 # Keep the public import/pickle identity while sharing one config definition.

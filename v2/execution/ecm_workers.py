@@ -55,7 +55,10 @@ def arithmetic_options(config, settings):
         and settings.stage_two_cache_bytes < 4096 + 256 * selected.segment_size
     ):
         raise MemoryError("stage-two worker cache scratch refused")
-    return asdict(selected)
+    options = asdict(selected)
+    if selected.ecm_kernel == "python":
+        options.pop("ecm_kernel")
+    return options
 
 
 def _base_budget(budget):
@@ -262,6 +265,8 @@ class ECMExecutor:
         try:
             started = time.monotonic()
             self._destroy()
+            if self.serial_engine is not None:
+                self.serial_engine.close()
             self.serial_engine = None
             self.manifests.clear()
             self.manifest_bytes = 0

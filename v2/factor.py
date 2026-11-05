@@ -379,6 +379,11 @@ def main():
     parser.add_argument(
         "--backend", choices=("python-int", "gmpy2-mpz"), default="python-int"
     )
+    parser.add_argument(
+        "--ecm-kernel",
+        choices=("python", "c-gmp", "auto"),
+        help="optional scalar ECM executor; explicit local build required",
+    )
     args = parser.parse_args()
     implicit_memory = args.memory_mib is None
     implicit_work = args.work_limit is None
@@ -415,6 +420,8 @@ def main():
         parser.error("choose --ecm-tier or --ecm-curves")
     if args.ecm_chain is not None and args.method != "auto":
         parser.error("--ecm-chain requires the auto portfolio")
+    if args.ecm_kernel is not None and args.method != "auto":
+        parser.error("--ecm-kernel requires the auto portfolio")
     if args.ecm_chain == "prac" and args.backend != "python-int":
         parser.error("--ecm-chain prac requires the native integer backend")
     qs_parameters = {
@@ -514,6 +521,7 @@ def main():
             or args.ecm_chain is not None
             or args.ecm_policy is not None
             or args.ecm_tier is not None
+            or args.ecm_kernel is not None
         ):
             from .execution.allocation import ECMAllocation
             from .execution.budget import Budget
@@ -724,6 +732,10 @@ def main():
                 )
                 if args.ecm_chain == "off":
                     parameters["ecm_chain_bytes"] = 0
+            if args.ecm_kernel is not None:
+                parameters["ecm_kernel"] = args.ecm_kernel
+            elif checkpoint is not None:
+                parameters["ecm_kernel"] = saved.get("ecm_kernel", "python")
             config = PortfolioConfig(**parameters)
             run = factorize_bounded(
                 number,

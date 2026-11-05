@@ -79,7 +79,13 @@ class CurveEngine:
             self.identity = None
             self.context = self.programs = self.config = None
             if len(self.contexts) >= self.settings.metadata_slots:
-                self.contexts.popitem(last=False)
+                from .portfolio_config import close_execution_context
+
+                _, (_, old_context, old_programs) = self.contexts.popitem(
+                    last=False
+                )
+                close_execution_context(old_programs or old_context)
+                del old_context, old_programs
                 self.cache_evictions += 1
             config = PortfolioConfig(**options)
             context, programs = _execution_context({}, config, budget)
@@ -116,7 +122,17 @@ class CurveEngine:
         self.identity = identity
         self.config, self.context, self.programs = config, context, programs
 
+    def close(self):
+        """Drain native contexts before worker teardown or reuse ends."""
+        from .portfolio_config import close_execution_context
+
+        for _, context, programs in self.contexts.values():
+            close_execution_context(programs or context)
+        self.contexts.clear()
+        self.context = self.programs = None
+
     def execute(self, message, *, cancelled, previous_cpu=None):
+        from ..common.arithmetic import BackendUnavailableError
         from .budget import BudgetExhaustedError
         from .ecm_worker_state import ActionBudget, ProspectiveActionBudget
         from .stage_jobs import advance_job, new_job, prime_cursor
@@ -220,7 +236,12 @@ class CurveEngine:
             budget.poll()
         except BudgetExhaustedError as error:
             reason, residue = str(error), None
-        except (MemoryError, ValueError, ArithmeticError) as error:
+        except (
+            MemoryError,
+            ValueError,
+            ArithmeticError,
+            BackendUnavailableError,
+        ) as error:
             reason, residue = "error", None
             failure = type(error).__name__ + ": " + str(error)[:192]
         if stage == "stage_two" and boundary_hash is None:
@@ -290,6 +311,7 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
         os.environ[name] = "1"
     channel.settimeout(0.01)
     decoder = Decoder(frame_bytes)
+    engine = None
     try:
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
             3,
@@ -372,4 +394,6 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
             if closing:
                 break
     finally:
+        if engine is not None:
+            engine.close()
         channel.close()

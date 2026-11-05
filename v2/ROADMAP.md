@@ -516,6 +516,15 @@ compared even if an unrelated reference fails. This review launches no runs.
 
 #### B4a — coarse native arithmetic and whole-portfolio costs
 
+Task-branch Phase1–2 preparation implements an optional scalar C/GMP packet,
+lazy adapter and prospective staged runner from validated B12 `787190aa`.
+Build/correctness and later integrated-source gates remain explicit; no
+performance/default adoption follows. Optional OpenMP stage-one teams and
+static/dynamic/guided scheduling are prepared, with executable QA and generated-
+code inspection pending. Full classical-continuation native execution remains
+a documented boundary gap.
+Detailed local provenance and pending checks are in `v2/audit/b4a/`.
+
 CFFI supplies a boundary, not an arithmetic algorithm or automatic SIMD.
 Current optional GMP values remain in their backend through Python operator
 loops; a useful native challenger moves a bounded ladder/program chunk behind
