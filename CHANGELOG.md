@@ -3,7 +3,7 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
-## ECM package and bundled-data cleanup
+## ECM package and bundled-data cleanup (6 November 2026)
 
 - Move engine-specific execution into the flat `v2/ecm/` package, retaining
   old imports as compatibility aliases. Keep shared budgets/stages separate.

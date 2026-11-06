@@ -1,14 +1,21 @@
 # Factor status
 
-Last updated: 5 November 2026 (America/Los_Angeles).
+Last updated: 6 November 2026 (America/Los_Angeles).
 
 B12/F4 is complete for its delivered process-ECM scope and integrated on
 mainline. The normal bounded portfolio retains QS fallback.
 Cold cheap defaults bypass the selector; the selected larger/warm worker
-configurations remain cost-gated. Committed-only source `c40298e` passes 1,357
-tests (9 optional skips), full lint and 265 benchmark imports. Admission-only
-verification removes about 44 ms at cold 30/50/70 defaults, without importing
-the selector; 20-digit behavior is unchanged. The computation lock is released.
+configurations remain cost-gated. ECM-specific execution now lives in the flat
+`ecm/` package, with compatibility aliases for old imports, bundled Python
+program/policy constants and explicit compatibility versions instead of runtime
+source-file scanning. Numerical schedules and worker choices are unchanged.
+Committed-only refactor source `08a9011` passes 1,360 tests (9 optional skips),
+full lint and 265 benchmark imports. Local QA receipts: `v2/audit/ecm_layout/`.
+The computation lock is released.
+
+Earlier admission-only verification on `c40298e` removes about 44 ms at cold
+30/50/70 defaults, without importing the selector; 20-digit behavior is unchanged.
+This refactor adds no new performance claim.
 
 Matched ECM-only 60/80/100 fixtures with 18-digit smaller factors show
 2.73/2.46/2.66x cold and 5.63/5.96/5.37x warm time-to-factor gains. These
@@ -37,7 +44,7 @@ fallback. These declared objectives and censoring rules are in
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
-[portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
+[portfolio routing](portfolio.py), [ECM defaults](ecm/defaults.py) and
 [chain eligibility](ecm/chain_options.py). Explicit settings and saved policies
 win. Native means Python integers on PyPy implementing Python 3.11.
 
