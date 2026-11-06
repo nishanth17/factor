@@ -155,9 +155,9 @@ its acceptance and experiment gates pass. Summarize accepted behavior in
 
 ## Known host and backend constraints
 
-Recorded 5 November 2026. Reuse these facts rather than researching them for
-every task; still record actual software versions and recheck capabilities when
-a changed host/toolchain or a new backend depends on them.
+Reuse these facts rather than researching them for every task; still record
+actual software versions and recheck capabilities when a changed host/toolchain
+or a new backend depends on them.
 
 - Host: Apple M4 MacBook Air, model `Mac16,13`, 24 GiB, 4 performance and 6
   efficiency cores, fanless. All ten cores are available, but useful concurrency
