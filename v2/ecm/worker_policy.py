@@ -31,10 +31,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.488691517850384,
                         "seconds_per_curve": [
@@ -81,10 +79,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "650912a39916763bc0a7a885ede4c4ba"
-                        "930f81f8d086ce285941f02057628fd1"
-                    ),
+                    "650912a39916763bc0a7a885ede4c4ba"
+                    "930f81f8d086ce285941f02057628fd1"
                 ),
                 "tiers": [
                     [200, 7700, 10],
@@ -96,10 +92,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.46702601195179994,
                         "digits": 100,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.46702601195179994,
                         "seconds_per_curve": [
@@ -151,10 +145,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.1055187291931361,
                         "seconds_per_curve": [0.026379682298284024],
@@ -197,10 +189,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -208,10 +198,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.12919558305293322,
                         "digits": 100,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.12919558305293322,
                         "seconds_per_curve": [0.016149447881616652],
@@ -259,10 +247,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.13036172865813594,
                         "seconds_per_curve": [0.019560785163776018],
@@ -305,10 +291,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                        "c355ca37b6328885a62b509b3cfd44f5"
-                    ),
+                    "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                    "c355ca37b6328885a62b509b3cfd44f5"
                 ),
                 "tiers": [[2000, 147396, 32]],
                 "warm": {
@@ -316,10 +300,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.1871037968667224,
                         "digits": 100,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.1871037968667224,
                         "seconds_per_curve": [0.015591983072226867],
@@ -367,10 +349,8 @@ _POLICY = _freeze(
                         "cold_seconds": 3.879659505037125,
                         "digits": 100,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 3.879659505037125,
                         "seconds_per_curve": [0.3879659505037125],
@@ -413,10 +393,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "0ec1f918b7709ece678ecfa57ccd3cef"
-                        "cf0ed4ad9c144344f5d3b0422b2e0951"
-                    ),
+                    "0ec1f918b7709ece678ecfa57ccd3cef"
+                    "cf0ed4ad9c144344f5d3b0422b2e0951"
                 ),
                 "tiers": [[50000, 5000000, 16]],
                 "warm": {
@@ -424,10 +402,8 @@ _POLICY = _freeze(
                         "cold_seconds": 5.844296958763152,
                         "digits": 100,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 5.844296958763152,
                         "seconds_per_curve": [0.365268559922697],
@@ -475,10 +451,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.744751958292909,
                         "seconds_per_curve": [0.09309399478661362],
@@ -521,10 +495,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "97c69eb27cc3372d7b80e96c024146b0"
-                        "72ce99e7d8a828fdc827b33563c7f2c4"
-                    ),
+                    "97c69eb27cc3372d7b80e96c024146b0"
+                    "72ce99e7d8a828fdc827b33563c7f2c4"
                 ),
                 "tiers": [[11000, 1100000, 32]],
                 "warm": {
@@ -532,10 +504,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.4088296045083553,
                         "digits": 100,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 1.4088296045083553,
                         "seconds_per_curve": [0.0880518502817722],
@@ -583,10 +553,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.6847018916694636,
                         "seconds_per_curve": [0.018554293213128403],
@@ -629,10 +597,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "6806850457d85120915a5898e3690612"
-                        "86d2f8dc95d0339cbb7660fdf69a16d0"
-                    ),
+                    "6806850457d85120915a5898e3690612"
+                    "86d2f8dc95d0339cbb7660fdf69a16d0"
                 ),
                 "tiers": [[2000, 200000, 512]],
                 "warm": {
@@ -640,10 +606,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.21821716893464327,
                         "digits": 100,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.21821716893464327,
                         "seconds_per_curve": [0.01818476407788694],
@@ -691,10 +655,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 100,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.3303523910922384,
                         "seconds_per_curve": [0.019562051427783445],
@@ -737,10 +699,8 @@ _POLICY = _freeze(
                 },
                 "digits": 100,
                 "options": (
-                    (
-                        "592e8044773243c98ac7248e2b3b599b"
-                        "83acc3f33eca0b0cdd8fe75fa665b636"
-                    ),
+                    "592e8044773243c98ac7248e2b3b599b"
+                    "83acc3f33eca0b0cdd8fe75fa665b636"
                 ),
                 "tiers": [[2000, 200000, 128]],
                 "warm": {
@@ -748,10 +708,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.28747383324662223,
                         "digits": 100,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.28747383324662223,
                         "seconds_per_curve": [0.01796711457791389],
@@ -799,10 +757,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 30,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.07249593758024275,
                         "seconds_per_curve": [0.018123984395060688],
@@ -845,10 +801,8 @@ _POLICY = _freeze(
                 },
                 "digits": 30,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -856,10 +810,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.0498197921551764,
                         "digits": 30,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.0498197921551764,
                         "seconds_per_curve": [0.00622747401939705],
@@ -907,10 +859,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 30,
                         "options": (
-                            (
-                                "4c3bd60dbb1e2b519687949618180277"
-                                "b6f8cb502ddf5221b96606b4376709b2"
-                            ),
+                            "4c3bd60dbb1e2b519687949618180277"
+                            "b6f8cb502ddf5221b96606b4376709b2"
                         ),
                         "pool_seconds": 0.09698894048419059,
                         "seconds_per_curve": [0.006431001958844718],
@@ -953,10 +903,8 @@ _POLICY = _freeze(
                 },
                 "digits": 30,
                 "options": (
-                    (
-                        "4c3bd60dbb1e2b519687949618180277"
-                        "b6f8cb502ddf5221b96606b4376709b2"
-                    ),
+                    "4c3bd60dbb1e2b519687949618180277"
+                    "b6f8cb502ddf5221b96606b4376709b2"
                 ),
                 "tiers": [[2000, 50000, 64]],
                 "warm": {
@@ -964,10 +912,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.05028985161334276,
                         "digits": 30,
                         "options": (
-                            (
-                                "4c3bd60dbb1e2b519687949618180277"
-                                "b6f8cb502ddf5221b96606b4376709b2"
-                            ),
+                            "4c3bd60dbb1e2b519687949618180277"
+                            "b6f8cb502ddf5221b96606b4376709b2"
                         ),
                         "pool_seconds": 0.05028985161334276,
                         "seconds_per_curve": [0.0041908209677785635],
@@ -1015,10 +961,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 40,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.10521081369332838,
                         "seconds_per_curve": [0.022416901134420186],
@@ -1061,10 +1005,8 @@ _POLICY = _freeze(
                 },
                 "digits": 40,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -1072,10 +1014,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.06392012489959598,
                         "digits": 40,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.06392012489959598,
                         "seconds_per_curve": [0.007990015612449497],
@@ -1123,10 +1063,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 40,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.5187813372288681,
                         "seconds_per_curve": [
@@ -1173,10 +1111,8 @@ _POLICY = _freeze(
                 },
                 "digits": 40,
                 "options": (
-                    (
-                        "650912a39916763bc0a7a885ede4c4ba"
-                        "930f81f8d086ce285941f02057628fd1"
-                    ),
+                    "650912a39916763bc0a7a885ede4c4ba"
+                    "930f81f8d086ce285941f02057628fd1"
                 ),
                 "tiers": [
                     [200, 7700, 10],
@@ -1188,10 +1124,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.3297071749810129,
                         "digits": 40,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.3297071749810129,
                         "seconds_per_curve": [
@@ -1243,10 +1177,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 50,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.11228798758445944,
                         "seconds_per_curve": [0.021014369907788932],
@@ -1289,10 +1221,8 @@ _POLICY = _freeze(
                 },
                 "digits": 50,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -1300,10 +1230,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.06908579170703888,
                         "digits": 50,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.06908579170703888,
                         "seconds_per_curve": [0.00863572396337986],
@@ -1351,10 +1279,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 50,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.1568454475240285,
                         "seconds_per_curve": [0.012607307275175117],
@@ -1397,10 +1323,8 @@ _POLICY = _freeze(
                 },
                 "digits": 50,
                 "options": (
-                    (
-                        "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                        "c355ca37b6328885a62b509b3cfd44f5"
-                    ),
+                    "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                    "c355ca37b6328885a62b509b3cfd44f5"
                 ),
                 "tiers": [[2000, 147396, 32]],
                 "warm": {
@@ -1408,10 +1332,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.10920286164036952,
                         "digits": 50,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.10920286164036952,
                         "seconds_per_curve": [0.007800204402883537],
@@ -1459,10 +1381,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 50,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.3045139266744751,
                         "seconds_per_curve": [0.010863224935746985],
@@ -1505,10 +1425,8 @@ _POLICY = _freeze(
                 },
                 "digits": 50,
                 "options": (
-                    (
-                        "592e8044773243c98ac7248e2b3b599b"
-                        "83acc3f33eca0b0cdd8fe75fa665b636"
-                    ),
+                    "592e8044773243c98ac7248e2b3b599b"
+                    "83acc3f33eca0b0cdd8fe75fa665b636"
                 ),
                 "tiers": [[2000, 200000, 128]],
                 "warm": {
@@ -1516,10 +1434,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.14910276560112834,
                         "digits": 50,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.14910276560112834,
                         "seconds_per_curve": [0.009318922850070521],
@@ -1567,10 +1483,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.4982989066858552,
                         "seconds_per_curve": [
@@ -1617,10 +1531,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "650912a39916763bc0a7a885ede4c4ba"
-                        "930f81f8d086ce285941f02057628fd1"
-                    ),
+                    "650912a39916763bc0a7a885ede4c4ba"
+                    "930f81f8d086ce285941f02057628fd1"
                 ),
                 "tiers": [
                     [200, 7700, 10],
@@ -1632,10 +1544,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.2842946964249547,
                         "digits": 60,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.2842946964249547,
                         "seconds_per_curve": [
@@ -1687,10 +1597,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.09263058356009424,
                         "seconds_per_curve": [0.02315764589002356],
@@ -1733,10 +1641,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -1744,10 +1650,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.07675108360126615,
                         "digits": 60,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.07675108360126615,
                         "seconds_per_curve": [0.009593885450158268],
@@ -1795,10 +1699,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.19349060956058178,
                         "seconds_per_curve": [0.014141817693598568],
@@ -1841,10 +1743,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                        "c355ca37b6328885a62b509b3cfd44f5"
-                    ),
+                    "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                    "c355ca37b6328885a62b509b3cfd44f5"
                 ),
                 "tiers": [[2000, 147396, 32]],
                 "warm": {
@@ -1852,10 +1752,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.11630662501556799,
                         "digits": 60,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.11630662501556799,
                         "seconds_per_curve": [0.009692218751297332],
@@ -1903,10 +1801,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0799734687898308,
                         "digits": 60,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 1.0799734687898308,
                         "seconds_per_curve": [0.2699933671974577],
@@ -1949,10 +1845,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "0ec1f918b7709ece678ecfa57ccd3cef"
-                        "cf0ed4ad9c144344f5d3b0422b2e0951"
-                    ),
+                    "0ec1f918b7709ece678ecfa57ccd3cef"
+                    "cf0ed4ad9c144344f5d3b0422b2e0951"
                 ),
                 "tiers": [[50000, 5000000, 16]],
                 "warm": {
@@ -1960,10 +1854,8 @@ _POLICY = _freeze(
                         "cold_seconds": 2.9466308124829084,
                         "digits": 60,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 2.9466308124829084,
                         "seconds_per_curve": [0.24555256770690903],
@@ -2011,10 +1903,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.5015443960437551,
                         "seconds_per_curve": [0.06269304950546939],
@@ -2057,10 +1947,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "97c69eb27cc3372d7b80e96c024146b0"
-                        "72ce99e7d8a828fdc827b33563c7f2c4"
-                    ),
+                    "97c69eb27cc3372d7b80e96c024146b0"
+                    "72ce99e7d8a828fdc827b33563c7f2c4"
                 ),
                 "tiers": [[11000, 1100000, 32]],
                 "warm": {
@@ -2068,10 +1956,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.8978201251011342,
                         "digits": 60,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.8978201251011342,
                         "seconds_per_curve": [0.056113757818820886],
@@ -2119,10 +2005,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.7292549699876139,
                         "seconds_per_curve": [0.011524028484018345],
@@ -2165,10 +2049,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "6806850457d85120915a5898e3690612"
-                        "86d2f8dc95d0339cbb7660fdf69a16d0"
-                    ),
+                    "6806850457d85120915a5898e3690612"
+                    "86d2f8dc95d0339cbb7660fdf69a16d0"
                 ),
                 "tiers": [[2000, 200000, 512]],
                 "warm": {
@@ -2176,10 +2058,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.24640513778451859,
                         "digits": 60,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.2414371717905324,
                         "seconds_per_curve": [0.011273080974206096],
@@ -2227,10 +2107,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 60,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.2905246292176738,
                         "seconds_per_curve": [0.012368487306957832],
@@ -2273,10 +2151,8 @@ _POLICY = _freeze(
                 },
                 "digits": 60,
                 "options": (
-                    (
-                        "592e8044773243c98ac7248e2b3b599b"
-                        "83acc3f33eca0b0cdd8fe75fa665b636"
-                    ),
+                    "592e8044773243c98ac7248e2b3b599b"
+                    "83acc3f33eca0b0cdd8fe75fa665b636"
                 ),
                 "tiers": [[2000, 200000, 128]],
                 "warm": {
@@ -2284,10 +2160,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.15800633329490665,
                         "digits": 60,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.15800633329490665,
                         "seconds_per_curve": [0.011286166663921904],
@@ -2335,10 +2209,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 70,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.09471735266215661,
                         "seconds_per_curve": [0.02338115096790716],
@@ -2381,10 +2253,8 @@ _POLICY = _freeze(
                 },
                 "digits": 70,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -2392,10 +2262,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.08203708287328482,
                         "digits": 70,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.08203708287328482,
                         "seconds_per_curve": [0.010254635359160602],
@@ -2443,10 +2311,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 70,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.17770849670068023,
                         "seconds_per_curve": [0.015357191412476823],
@@ -2489,10 +2355,8 @@ _POLICY = _freeze(
                 },
                 "digits": 70,
                 "options": (
-                    (
-                        "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                        "c355ca37b6328885a62b509b3cfd44f5"
-                    ),
+                    "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                    "c355ca37b6328885a62b509b3cfd44f5"
                 ),
                 "tiers": [[2000, 147396, 32]],
                 "warm": {
@@ -2500,10 +2364,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.10194209622568451,
                         "digits": 70,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.10194209622568451,
                         "seconds_per_curve": [0.010194209622568451],
@@ -2551,10 +2413,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 70,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.2638929166132584,
                         "seconds_per_curve": [0.0659732291533146],
@@ -2597,10 +2457,8 @@ _POLICY = _freeze(
                 },
                 "digits": 70,
                 "options": (
-                    (
-                        "97c69eb27cc3372d7b80e96c024146b0"
-                        "72ce99e7d8a828fdc827b33563c7f2c4"
-                    ),
+                    "97c69eb27cc3372d7b80e96c024146b0"
+                    "72ce99e7d8a828fdc827b33563c7f2c4"
                 ),
                 "tiers": [[11000, 1100000, 32]],
                 "warm": {
@@ -2608,10 +2466,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.9648912709672004,
                         "digits": 70,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.9648912709672004,
                         "seconds_per_curve": [0.060305704435450025],
@@ -2659,10 +2515,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0960437025074858,
                         "digits": 70,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.8125020670566379,
                         "seconds_per_curve": [0.012185228759335587],
@@ -2705,10 +2559,8 @@ _POLICY = _freeze(
                 },
                 "digits": 70,
                 "options": (
-                    (
-                        "6806850457d85120915a5898e3690612"
-                        "86d2f8dc95d0339cbb7660fdf69a16d0"
-                    ),
+                    "6806850457d85120915a5898e3690612"
+                    "86d2f8dc95d0339cbb7660fdf69a16d0"
                 ),
                 "tiers": [[2000, 200000, 512]],
                 "warm": {
@@ -2716,10 +2568,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.18869808335148264,
                         "digits": 70,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.18869808335148264,
                         "seconds_per_curve": [0.011793630209467665],
@@ -2767,10 +2617,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 70,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.37692043700565425,
                         "seconds_per_curve": [0.013150598959327908],
@@ -2813,10 +2661,8 @@ _POLICY = _freeze(
                 },
                 "digits": 70,
                 "options": (
-                    (
-                        "592e8044773243c98ac7248e2b3b599b"
-                        "83acc3f33eca0b0cdd8fe75fa665b636"
-                    ),
+                    "592e8044773243c98ac7248e2b3b599b"
+                    "83acc3f33eca0b0cdd8fe75fa665b636"
                 ),
                 "tiers": [[2000, 200000, 128]],
                 "warm": {
@@ -2824,10 +2670,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.18725654162699357,
                         "digits": 70,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.18725654162699357,
                         "seconds_per_curve": [0.011703533851687098],
@@ -2875,10 +2719,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 80,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.4389593303436418,
                         "seconds_per_curve": [
@@ -2925,10 +2767,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "650912a39916763bc0a7a885ede4c4ba"
-                        "930f81f8d086ce285941f02057628fd1"
-                    ),
+                    "650912a39916763bc0a7a885ede4c4ba"
+                    "930f81f8d086ce285941f02057628fd1"
                 ),
                 "tiers": [
                     [200, 7700, 10],
@@ -2940,10 +2780,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.3929369137289801,
                         "digits": 80,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "pool_seconds": 0.3929369137289801,
                         "seconds_per_curve": [
@@ -2995,10 +2833,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 80,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.10809002094902098,
                         "seconds_per_curve": [0.027022505237255245],
@@ -3041,10 +2877,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "6d72b16f24d52b6e6ae9e500d9ec994c"
-                        "320afbad3a4afcb109c3da531216ef60"
-                    ),
+                    "6d72b16f24d52b6e6ae9e500d9ec994c"
+                    "320afbad3a4afcb109c3da531216ef60"
                 ),
                 "tiers": [[2000, 147396, 8]],
                 "warm": {
@@ -3052,10 +2886,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.09789283433929086,
                         "digits": 80,
                         "options": (
-                            (
-                                "6d72b16f24d52b6e6ae9e500d9ec994c"
-                                "320afbad3a4afcb109c3da531216ef60"
-                            ),
+                            "6d72b16f24d52b6e6ae9e500d9ec994c"
+                            "320afbad3a4afcb109c3da531216ef60"
                         ),
                         "pool_seconds": 0.09789283433929086,
                         "seconds_per_curve": [0.012236604292411357],
@@ -3103,10 +2935,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 80,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.19834625418953228,
                         "seconds_per_curve": [0.0163555025937967],
@@ -3149,10 +2979,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                        "c355ca37b6328885a62b509b3cfd44f5"
-                    ),
+                    "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                    "c355ca37b6328885a62b509b3cfd44f5"
                 ),
                 "tiers": [[2000, 147396, 32]],
                 "warm": {
@@ -3160,10 +2988,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.09526865626685321,
                         "digits": 80,
                         "options": (
-                            (
-                                "cb59650ae1206b0d1e7a947f2d8d6f9a"
-                                "c355ca37b6328885a62b509b3cfd44f5"
-                            ),
+                            "cb59650ae1206b0d1e7a947f2d8d6f9a"
+                            "c355ca37b6328885a62b509b3cfd44f5"
                         ),
                         "pool_seconds": 0.09526865626685321,
                         "seconds_per_curve": [0.011908582033356652],
@@ -3211,10 +3037,8 @@ _POLICY = _freeze(
                         "cold_seconds": 2.472289166878909,
                         "digits": 80,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 2.472289166878909,
                         "seconds_per_curve": [0.3090361458598636],
@@ -3257,10 +3081,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "0ec1f918b7709ece678ecfa57ccd3cef"
-                        "cf0ed4ad9c144344f5d3b0422b2e0951"
-                    ),
+                    "0ec1f918b7709ece678ecfa57ccd3cef"
+                    "cf0ed4ad9c144344f5d3b0422b2e0951"
                 ),
                 "tiers": [[50000, 5000000, 16]],
                 "warm": {
@@ -3268,10 +3090,8 @@ _POLICY = _freeze(
                         "cold_seconds": 4.49903995776549,
                         "digits": 80,
                         "options": (
-                            (
-                                "0ec1f918b7709ece678ecfa57ccd3cef"
-                                "cf0ed4ad9c144344f5d3b0422b2e0951"
-                            ),
+                            "0ec1f918b7709ece678ecfa57ccd3cef"
+                            "cf0ed4ad9c144344f5d3b0422b2e0951"
                         ),
                         "pool_seconds": 4.49903995776549,
                         "seconds_per_curve": [0.2811899973603431],
@@ -3319,10 +3139,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 80,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.45865711718215607,
                         "seconds_per_curve": [0.07644285286369268],
@@ -3365,10 +3183,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "97c69eb27cc3372d7b80e96c024146b0"
-                        "72ce99e7d8a828fdc827b33563c7f2c4"
-                    ),
+                    "97c69eb27cc3372d7b80e96c024146b0"
+                    "72ce99e7d8a828fdc827b33563c7f2c4"
                 ),
                 "tiers": [[11000, 1100000, 32]],
                 "warm": {
@@ -3376,10 +3192,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.8234578594565392,
                         "digits": 80,
                         "options": (
-                            (
-                                "97c69eb27cc3372d7b80e96c024146b0"
-                                "72ce99e7d8a828fdc827b33563c7f2c4"
-                            ),
+                            "97c69eb27cc3372d7b80e96c024146b0"
+                            "72ce99e7d8a828fdc827b33563c7f2c4"
                         ),
                         "pool_seconds": 0.8234578594565392,
                         "seconds_per_curve": [0.06862148828804493],
@@ -3427,10 +3241,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0150888396042421,
                         "digits": 80,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.7467365668354391,
                         "seconds_per_curve": [0.014142458331662056],
@@ -3473,10 +3285,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "6806850457d85120915a5898e3690612"
-                        "86d2f8dc95d0339cbb7660fdf69a16d0"
-                    ),
+                    "6806850457d85120915a5898e3690612"
+                    "86d2f8dc95d0339cbb7660fdf69a16d0"
                 ),
                 "tiers": [[2000, 200000, 512]],
                 "warm": {
@@ -3484,10 +3294,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.2196490338537842,
                         "digits": 80,
                         "options": (
-                            (
-                                "6806850457d85120915a5898e3690612"
-                                "86d2f8dc95d0339cbb7660fdf69a16d0"
-                            ),
+                            "6806850457d85120915a5898e3690612"
+                            "86d2f8dc95d0339cbb7660fdf69a16d0"
                         ),
                         "pool_seconds": 0.2196490338537842,
                         "seconds_per_curve": [0.013728064615861513],
@@ -3535,10 +3343,8 @@ _POLICY = _freeze(
                         "cold_seconds": 1.0,
                         "digits": 80,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.2992425921857272,
                         "seconds_per_curve": [0.015602494138875045],
@@ -3581,10 +3387,8 @@ _POLICY = _freeze(
                 },
                 "digits": 80,
                 "options": (
-                    (
-                        "592e8044773243c98ac7248e2b3b599b"
-                        "83acc3f33eca0b0cdd8fe75fa665b636"
-                    ),
+                    "592e8044773243c98ac7248e2b3b599b"
+                    "83acc3f33eca0b0cdd8fe75fa665b636"
                 ),
                 "tiers": [[2000, 200000, 128]],
                 "warm": {
@@ -3592,10 +3396,8 @@ _POLICY = _freeze(
                         "cold_seconds": 0.1399881640827516,
                         "digits": 80,
                         "options": (
-                            (
-                                "592e8044773243c98ac7248e2b3b599b"
-                                "83acc3f33eca0b0cdd8fe75fa665b636"
-                            ),
+                            "592e8044773243c98ac7248e2b3b599b"
+                            "83acc3f33eca0b0cdd8fe75fa665b636"
                         ),
                         "pool_seconds": 0.1399881640827516,
                         "seconds_per_curve": [0.013998816408275161],
@@ -3642,10 +3444,8 @@ _POLICY = _freeze(
                     "costs": {
                         "digits": 81,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "seconds_per_curve": [
                             0.03953792292159051,
@@ -3693,10 +3493,8 @@ _POLICY = _freeze(
                 },
                 "digits": 81,
                 "options": (
-                    (
-                        "650912a39916763bc0a7a885ede4c4ba"
-                        "930f81f8d086ce285941f02057628fd1"
-                    ),
+                    "650912a39916763bc0a7a885ede4c4ba"
+                    "930f81f8d086ce285941f02057628fd1"
                 ),
                 "tiers": [
                     [200, 7700, 10],
@@ -3707,10 +3505,8 @@ _POLICY = _freeze(
                     "costs": {
                         "digits": 81,
                         "options": (
-                            (
-                                "650912a39916763bc0a7a885ede4c4ba"
-                                "930f81f8d086ce285941f02057628fd1"
-                            ),
+                            "650912a39916763bc0a7a885ede4c4ba"
+                            "930f81f8d086ce285941f02057628fd1"
                         ),
                         "seconds_per_curve": [
                             0.03824209017745618,
@@ -3801,5 +3597,5 @@ _POLICY = _freeze(
 
 
 def policy_data():
-    """Return an owned configuration value without exposing mutable globals."""
+    """Return owned values without exposing mutable globals."""
     return _copy(_POLICY)
