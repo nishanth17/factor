@@ -13,7 +13,8 @@ def build_profile(reference, expected_sha256):
     """Transfer measured costs without turning them into fresh confirmation."""
     from ....ecm.selection import COMPATIBILITY, PROFILE_VERSION
 
-    raw = Path(reference).read_bytes()
+    with Path(reference).open("rb") as stream:
+        raw = stream.read(MAX_PROFILE_BYTES + 1)
     if (
         len(raw) > MAX_PROFILE_BYTES
         or hashlib.sha256(raw).hexdigest() != expected_sha256
