@@ -321,13 +321,13 @@ class PortfolioConfig:
         utils.require_integer(n)
         if not self._automatic_ecm_tiers:
             return self
+        from ..ecm.defaults import resolve_defaults
         from ..qs.defaults import (
             C9_MEMORY_BYTES,
             C9_PORTFOLIO_MEMORY_BYTES,
             default_siqs_config,
             uses_siqs_defaults,
         )
-        from .ecm_defaults import resolve_defaults
 
         selected = resolve_defaults(self, n)
         if self._automatic_siqs and uses_siqs_defaults(

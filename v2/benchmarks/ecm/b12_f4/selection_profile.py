@@ -7,10 +7,9 @@ from dataclasses import asdict
 from pathlib import Path
 
 from ....execution.ecm_selection import (
+    COMPATIBILITY,
     PROFILE_BYTES,
     PROFILE_VERSION,
-    SOURCE_NAMES,
-    SOURCE_ROOT,
     SelectionCosts,
 )
 from ....execution.ecm_workers import arithmetic_options
@@ -69,10 +68,7 @@ def build_profile(reviewed, *, status="training"):
         status=status,
         executor_version=VERSION,
         search_version=SEARCH_VERSION,
-        source_sha256={
-            name: hashlib.sha256((SOURCE_ROOT / name).read_bytes()).hexdigest()
-            for name in sorted(SOURCE_NAMES)
-        },
+        compatibility=COMPATIBILITY,
         serial_settings=asdict(serial),
         rows=rows,
     )

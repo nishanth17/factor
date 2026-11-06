@@ -1,9 +1,6 @@
 """Finite run-owned C6 PRAC/Lucas plans for atomic production chunks."""
 
-import hashlib
-import json
 from collections import OrderedDict
-from pathlib import Path
 from types import SimpleNamespace
 
 from ..common import arithmetic, prime_sieve, utils
@@ -18,10 +15,6 @@ from .chain_records import (
     verify_frontier,
 )
 
-CATALOG = (
-    Path(__file__).parents[1]
-    / "benchmarks/inputs/controls/c6_fast_records.json"
-)
 CATALOG_SHA256 = (
     "b316003a7238c1240f52dd28f48f507931ef7f4061362333dc436f016d531ed9"
 )
@@ -120,34 +113,21 @@ class ChainPlan:
             prac=prac,
             gcd=arithmetic.gcd,
         )
-        # Reading, hashing and parsing are paid even if verification fails.
+        # Preserve preparation charges; verify each loaded program below.
         budget.consume(CATALOG_BYTES)
-        with CATALOG.open("rb") as stream:
-            raw = stream.read(CATALOG_BYTES + 1)
-        if (
-            len(raw) != CATALOG_BYTES
-            or hashlib.sha256(raw).hexdigest() != CATALOG_SHA256
-        ):
-            raise ValueError("ECM chain catalog identity mismatch")
-        data = json.loads(raw)
-        if data["schema"] != 1 or data["bound"] != 2000:
-            raise ValueError("incompatible ECM chain catalog")
-        rows = data["families"][family]
+        from . import chain_data
+
+        rows = chain_data.PRAC if family == "prac" else chain_data.LUCAS
         if len(rows) != 333:
             raise ValueError("incomplete ECM chain catalog")
         actions = {}
         owned = 4096
-        for scalar, row in rows.items():
-            scalar = int(scalar)
-            code, masks = (
-                bytes.fromhex(row["code"]),
-                bytes.fromhex(row["masks"]),
-            )
+        for scalar, code, masks, output, slots in rows:
             steps = len(code) // 4
             # Scalar proof, independent coverage, strict verification and
             # decoded tuples all consume the shared cumulative allowance.
-            budget.consume(4 * steps + row["slots"] + 1)
-            record = Record(scalar, code, row["output"], row["slots"])
+            budget.consume(4 * steps + slots + 1)
+            record = Record(scalar, code, output, slots)
             actions[scalar] = Action(record, masks, engine)
             owned += 4096 + 512 * steps
         if owned > PLAN_BYTES:

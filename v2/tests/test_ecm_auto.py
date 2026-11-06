@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.ecm.selection import COMPATIBILITY
 from v2.execution.budget import Budget
 from v2.execution.ecm_auto import (
     DEFAULT_MEMORY_BYTES,
@@ -21,7 +22,6 @@ from v2.execution.ecm_auto import (
     AutomaticECMOwner,
 )
 from v2.execution.ecm_defaults import ESCALATING140
-from v2.execution.ecm_selection import SOURCE_NAMES, SOURCE_ROOT
 from v2.execution.ecm_workers import WorkerRun
 from v2.portfolio import PortfolioConfig, _canonical, factorize_bounded
 
@@ -571,9 +571,9 @@ class AutomaticTests(unittest.TestCase):
     def test_packaged_policy_preserves_measured_rows_and_current_source_pins(
         self,
     ):
-        data = POLICY_PATH.read_bytes()
-        self.assertEqual(hashlib.sha256(data).hexdigest(), POLICY_SHA256)
-        policy = json.loads(data)
+        from v2.ecm.worker_policy import policy_data
+
+        policy = policy_data()
         original = json.loads(
             (
                 ROOT
@@ -585,13 +585,7 @@ class AutomaticTests(unittest.TestCase):
         self.assertEqual(
             policy["serial_settings"], original["serial_settings"]
         )
-        self.assertEqual(set(policy["source_sha256"]), SOURCE_NAMES)
-        for name, digest in policy["source_sha256"].items():
-            self.assertEqual(
-                hashlib.sha256((SOURCE_ROOT / name).read_bytes()).hexdigest(),
-                digest,
-                name,
-            )
+        self.assertEqual(policy["compatibility"], COMPATIBILITY)
 
     def test_policy_packaging_preserves_costs_and_rejects_wrong_reference(
         self,
@@ -605,7 +599,12 @@ class AutomaticTests(unittest.TestCase):
             / "b12_f4_targeted_selected_v1.json"
         )
         data = build_profile(reference, MEASURED_PROFILE_SHA256)
-        self.assertEqual(data, json.loads(POLICY_PATH.read_text()))
+        self.assertEqual(
+            data,
+            __import__(
+                "v2.ecm.worker_policy", fromlist=["policy_data"]
+            ).policy_data(),
+        )
         with self.assertRaises(ValueError):
             build_profile(reference, "0" * 64)
 
@@ -794,9 +793,7 @@ class ColdSerialAdmissionTests(unittest.TestCase):
             (selected_context(prefer_warm=True), settings),
             (selected_context(), larger),
             (
-                SelectedECMContext(
-                    POLICY_PATH.with_name("custom.json"), "0" * 64
-                ),
+                SelectedECMContext(ROOT / "custom.json", "0" * 64),
                 settings,
             ),
         ]

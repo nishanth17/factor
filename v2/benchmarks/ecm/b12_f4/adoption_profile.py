@@ -1,47 +1,29 @@
 """Package unchanged measured costs with new source pins; no calibration."""
 
 import argparse
-import ast
 import hashlib
 import json
 import re
 from pathlib import Path
 
-SOURCE_ROOT = Path(__file__).resolve().parents[3]
 MAX_PROFILE_BYTES = 256 * 2**10
-MAX_SOURCE_BYTES = 2 * 2**20
 
 
-def build_profile(reference, expected_sha256, *, source_root=SOURCE_ROOT):
-    """Transfer estimates explicitly, preserving the immutable reference."""
-    with Path(reference).open("rb") as stream:
-        raw = stream.read(MAX_PROFILE_BYTES + 1)
-    if len(raw) > MAX_PROFILE_BYTES or hashlib.sha256(raw).hexdigest() != (
-        expected_sha256
+def build_profile(reference, expected_sha256):
+    """Transfer measured costs without turning them into fresh confirmation."""
+    from ....ecm.selection import COMPATIBILITY, PROFILE_VERSION
+
+    raw = Path(reference).read_bytes()
+    if (
+        len(raw) > MAX_PROFILE_BYTES
+        or hashlib.sha256(raw).hexdigest() != expected_sha256
     ):
         raise ValueError("measured reference hash or size differs")
     data = json.loads(raw)
-    tree = ast.parse((source_root / "execution/ecm_selection.py").read_text())
-    declaration = next(
-        node.value
-        for node in tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "SOURCE_NAMES"
-            for target in node.targets
-        )
+    data.pop("source_sha256", None)
+    data.update(
+        version=PROFILE_VERSION, compatibility=COMPATIBILITY, status="training"
     )
-    names = ast.literal_eval(declaration.args[0])
-    pins, total = {}, 0
-    for name in names:
-        path = source_root / name
-        total += path.stat().st_size
-        if total > MAX_SOURCE_BYTES:
-            raise ValueError("integration source exceeds profile ownership")
-        pins[name] = hashlib.sha256(path.read_bytes()).hexdigest()
-    data["source_sha256"] = pins
-    # Repinning code cannot turn historical estimates into new confirmation.
-    data["status"] = "training"
     return data
 
 

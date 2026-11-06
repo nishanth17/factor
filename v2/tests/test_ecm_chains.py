@@ -180,9 +180,9 @@ class ProductionChainTests(unittest.TestCase):
             self.assertEqual(prepare.call_count, 1)
 
     def test_catalog_corruption_missing_schedule_and_caps(self):
-        with patch("v2.ecm.chains.CATALOG_SHA256", "0" * 64):
+        with patch("v2.ecm.chain_data.PRAC", ()):
             budget = allowance()
-            with self.assertRaisesRegex(ValueError, "catalog identity"):
+            with self.assertRaisesRegex(ValueError, "catalog"):
                 ChainPlan(2000, "python-int", budget)
             self.assertGreater(budget.used, 0)
         with self.assertRaises(ValueError):

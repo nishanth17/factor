@@ -530,7 +530,7 @@ def main():
                 or "ecm_auto" in checkpoint["payload"]["state"]
             )
         ):
-            from .execution.ecm_auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
+            from .ecm.auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
 
             if implicit_work and not automatic_qs:
                 args.work_limit = DEFAULT_WORK
@@ -772,7 +772,7 @@ def main():
                     args.ecm_memory_mib * 2**20
                 )
             elif implicit_memory and checkpoint is None:
-                from .execution.ecm_auto import DEFAULT_MEMORY_BYTES
+                from .ecm.auto import DEFAULT_MEMORY_BYTES
 
                 worker_options["ecm_memory_bytes"] = DEFAULT_MEMORY_BYTES
             run = factorize_bounded(

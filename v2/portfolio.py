@@ -1311,7 +1311,7 @@ def factorize_bounded(
     if isinstance(ecm_executor, str):
         if ecm_executor != "auto":
             raise ValueError("ECM executor must be auto, None or a context")
-        from .execution.ecm_auto import AutomaticECMOwner
+        from .ecm.auto import AutomaticECMOwner
 
         with AutomaticECMOwner(
             seed=seed, memory_bytes=ecm_memory_bytes
@@ -1432,7 +1432,7 @@ def _factorize_bounded(
         ):
             budget = default_siqs_budget(n, backend=config.backend)
         elif default_policy_budget and config.backend == "python-int":
-            from .execution.ecm_auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
+            from .ecm.auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
 
             budget = Budget(
                 work_limit=DEFAULT_WORK, cpu_seconds=DEFAULT_CPU_SECONDS

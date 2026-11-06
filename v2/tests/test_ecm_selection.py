@@ -15,10 +15,9 @@ from unittest.mock import patch
 
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.ecm_selection import (
+    COMPATIBILITY,
     HEADER_BYTES,
     PROFILE_VERSION,
-    SOURCE_NAMES,
-    SOURCE_ROOT,
     SelectedECMContext,
     SelectionCosts,
     SelectionRule,
@@ -143,12 +142,7 @@ class LazySelectionTests(unittest.TestCase):
             status="training",
             executor_version=VERSION,
             search_version=SEARCH_VERSION,
-            source_sha256={
-                name: hashlib.sha256(
-                    (SOURCE_ROOT / name).read_bytes()
-                ).hexdigest()
-                for name in SOURCE_NAMES
-            },
+            compatibility=COMPATIBILITY,
             serial_settings=asdict(WorkerSettings(memory_bytes=8 * 2**30)),
             rows=[
                 dict(
@@ -267,7 +261,7 @@ class LazySelectionTests(unittest.TestCase):
             lambda m: m.update(rows=m["rows"] * 257),
             lambda m: m["rows"].append(copy.deepcopy(m["rows"][0])),
             lambda m: m["rows"][0].update(known_factor=1009),
-            lambda m: m["source_sha256"].update({"portfolio.py": "0" * 64}),
+            lambda m: m.update(compatibility="unsupported"),
         ):
             original = copy.deepcopy(self.model)
             mutation(self.model)
