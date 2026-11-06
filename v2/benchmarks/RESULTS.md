@@ -23,8 +23,8 @@ no selector and do not import its module. Whole admission-probe processes fall
 from about 192–195 ms to 148–149 ms. Twenty-digit admission remains about
 0.03 ms. These are admission costs, not new whole-factorization speed ratios.
 
-Explicit direction closes the delivered B12/F4 component and authorizes its
-mainline integration with the selected cold/warm regimes. The ECM-only results
+Explicit direction closes the delivered B12/F4 component, integrated on
+mainline at `62c474d` with the selected cold/warm regimes. The ECM-only results
 below retain their source identities, quota failures and remaining regressions;
 none is upgraded into a general portfolio, balanced-completion or p90 claim.
 Native threads, QS workers, serialization and combined E1 work keep their own

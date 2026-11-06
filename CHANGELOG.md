@@ -5,7 +5,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## B12/F4 closeout and cold serial admission (5 November 2026)
 
-- Close the delivered process-ECM workstream and approve mainline integration
+- Close and integrate the delivered process-ECM workstream into mainline
   with its selected numerical/cold/warm regimes. Keep ordinary QS fallback,
   explicit serial/resource settings and checked resume. The benchmark-only
   disabled-fallback configuration does not become a production default.
@@ -16,7 +16,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   and 265 runner/package imports. Retain ECM-only gains, quota failures and
   remaining cheap/warm regressions; make no new whole-portfolio or p90 claim.
 - Preserve research, receipts and source identities in local ignored evidence;
-  remove disposable task worktrees and source snapshots after integration.
+  remove 21 clean F4 worktrees and 41 other temporary snapshots/caches after
+  integration. Keep the shared lock file and other workstreams untouched.
 
 ## B12/F4 automatic default integration (5 November 2026)
 

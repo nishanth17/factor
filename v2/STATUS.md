@@ -2,8 +2,8 @@
 
 Last updated: 5 November 2026 (America/Los_Angeles).
 
-B12/F4 is complete for its delivered process-ECM scope and approved for
-mainline integration. The normal bounded portfolio retains QS fallback.
+B12/F4 is complete for its delivered process-ECM scope and integrated on
+mainline. The normal bounded portfolio retains QS fallback.
 Cold cheap defaults bypass the selector; the selected larger/warm worker
 configurations remain cost-gated. Committed-only source `c40298e` passes 1,357
 tests (9 optional skips), full lint and 265 benchmark imports. Admission-only
@@ -16,7 +16,7 @@ exposed fixtures do not establish whole-portfolio, balanced or population-p90
 gains. The [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026)
 retain failures and cheap-path regressions; the [recorded exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026)
 records component closure separately from those pending broader claims.
-Local evidence: `v2/audit/b12_f4/`; temporary source checkouts are disposable.
+Local evidence: `v2/audit/b12_f4/`; the task worktree and F4 temporary source checkouts are removed.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the

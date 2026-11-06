@@ -4,7 +4,7 @@ Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
 eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 4 November
 2026 after the `963d9cd` refresh, prioritizing parallel and native/SIMD
 acceleration for current factoring and later experiment turnaround.
-B12/F4 is delivered and approved for mainline integration on 5 November;
+B12/F4 is delivered and integrated on mainline on 5 November;
 C9a and C10a-01 remain delivered scopes. ECM component gains do not establish
 a whole-portfolio speedup; the recorded adoption exception retains those limits.
 
@@ -977,7 +977,7 @@ changed accounting/resume. [Full boundaries](https://github.com/nishanth17/facto
 
 ## Completed register
 
-- **B12 → F4 / P6.3 ECM** — 5 November 2026; **Done**. Bounded reproducible process ECM, selected cold/warm configurations and cheap serial admission are approved for mainline integration. Committed-only QA: 1,357 tests (9 optional skips), full lint and 265 benchmark imports. Matched ECM-only gains and all retained regressions are in [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026). Component closure is explicit; broad portfolio, balanced completion and population p90 remain unestablished. QS and native-thread extensions retain their separate owners.
+- **B12 → F4 / P6.3 ECM** — 5 November 2026; **Done**. Bounded reproducible process ECM, selected cold/warm configurations and cheap serial admission are integrated on mainline. Committed-only QA: 1,357 tests (9 optional skips), full lint and 265 benchmark imports. Matched ECM-only gains and all retained regressions are in [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026). Component closure is explicit; broad portfolio, balanced completion and population p90 remain unestablished. QS and native-thread extensions retain their separate owners.
 
 - **A1b existing fixed-score review** — 1 November 2026 study; 2 November integration; **Done, retain defaults**. All 30 prefix calls on nine exposed moduli; fixed/list loses at 50/55/60 and no band advances. Harness/accounting repairs and exact growing-DLP checks complete; no complete-factor claim or production change. [Final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review), [numerical evidence](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_final_results.json).
 
