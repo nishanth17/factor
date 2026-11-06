@@ -17,6 +17,16 @@ nine observations under the machine-wide performance lock. Full test suites
 share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
 and instrumented diagnostics remain separate from performance evidence.
 
+## B12/F4 delivered defaults
+
+The normal bounded factorer uses the [selected regime table](../STATUS.md#selected-ecm-regimes)
+with ordinary QS fallback intact. Cold 30/50/70 cheap plans bypass policy I/O;
+20-digit automatic calls stay serial. A caller-owned warm context is a separate
+endpoint. Latest committed-only QA and admission-only repair checks are in
+[results](RESULTS.md#b12f4-cold-serial-repair-and-component-closure-5-november-2026).
+Detailed evidence stays in local ignored `v2/audit/b12_f4/`. Component closure
+does not establish whole-portfolio or population-tail gains.
+
 ## ECM-only matched execution
 
 `ecm/b12_f4/selection_fixed_child.py` supports first-factor measurements with

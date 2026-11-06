@@ -1,6 +1,36 @@
 # Benchmark results and decisions
 
 
+## B12/F4 cold serial repair and component closure (5 November 2026)
+
+The normal production admission path now skips catalogue/source validation for
+its measured cheap cold plans: compact64 at 30 digits and fixed32 at 50/70.
+No ECM or QS arithmetic is changed. Custom schedules, warm preference and
+checked resumes retain ordinary selection. The usual portfolio keeps QS
+fallback; the disabled-fallback ECM-only study remains a benchmark endpoint.
+
+Source `c40298e` integrates current master `0efaba1e` and passes committed-only
+QA: 1,357 tests (9 optional skips), full lint and 265 benchmark imports. The
+initial import inventory incorrectly included a historical source snapshot
+loaded as data; that harness failure and its full reservation remain retained.
+The passing full suite is reused; only the corrected import check is rerun.
+
+An admission-only check compares `ec4ee79` with `c40298e`, nine fresh processes
+per arm/size after separately validated warmup. It never invokes ECM arithmetic
+or fallback. Median cold production admission falls from 44.35/43.93/43.95 ms
+to 0.033/0.035/0.035 ms at 30/50/70 digits, respectively. New calls construct
+no selector and do not import its module. Whole admission-probe processes fall
+from about 192–195 ms to 148–149 ms. Twenty-digit admission remains about
+0.03 ms. These are admission costs, not new whole-factorization speed ratios.
+
+Explicit direction closes the delivered B12/F4 component and authorizes its
+mainline integration with the selected cold/warm regimes. The ECM-only results
+below retain their source identities, quota failures and remaining regressions;
+none is upgraded into a general portfolio, balanced-completion or p90 claim.
+Native threads, QS workers, serialization and combined E1 work keep their own
+scopes. Detailed evidence remains local under `v2/audit/b12_f4/`, including
+`closeout_serial_bypass_v1/` and `closeout_serial_bypass_v2/`.
+
 ## B12/F4 ECM-only selected-default comparison (5 November 2026)
 
 Source `ec4ee79` compares the unchanged selected cold/warm policy with actual

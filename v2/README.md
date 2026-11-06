@@ -106,7 +106,9 @@ calls. Use the same declared configuration and adequate finite budgets.
 Cold CLI startup and warm retained-pool performance are separate endpoints.
 The compact64 default at 30 digits and fixed32 defaults at 50/70 digits stay
 serial cold before loading the cost catalogue. Twenty-digit automatic calls
-also remain serial. Larger explicit numerical schedules retain selection.
+also remain serial. Larger explicit numerical schedules retain selection. See the
+[selected regime table](STATUS.md#selected-ecm-regimes) for cold/warm worker
+counts and retained performance limitations.
 
 Worker arithmetic remains exact. Stable curve identities, checked divisor
 publication, bounded parent-owned leases, explicit spawn, cancellation/drain

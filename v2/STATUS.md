@@ -2,10 +2,21 @@
 
 Last updated: 5 November 2026 (America/Los_Angeles).
 
-B12/F4 final serial-admission repair and mainline integration are in progress
-in the isolated worker branch. The selected ECM-only results are recorded in
-[results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026).
-Historical receipts remain local; no new full campaign is scheduled.
+B12/F4 is complete for its delivered process-ECM scope and approved for
+mainline integration. The normal bounded portfolio retains QS fallback.
+Cold cheap defaults bypass the selector; the selected larger/warm worker
+configurations remain cost-gated. Committed-only source `c40298e` passes 1,357
+tests (9 optional skips), full lint and 265 benchmark imports. Admission-only
+verification removes about 44 ms at cold 30/50/70 defaults, without importing
+the selector; 20-digit behavior is unchanged. The computation lock is released.
+
+Matched ECM-only 60/80/100 fixtures with 18-digit smaller factors show
+2.73/2.46/2.66x cold and 5.63/5.96/5.37x warm time-to-factor gains. These
+exposed fixtures do not establish whole-portfolio, balanced or population-p90
+gains. The [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026)
+retain failures and cheap-path regressions; the [recorded exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026)
+records component closure separately from those pending broader claims.
+Local evidence: `v2/audit/b12_f4/`; temporary source checkouts are disposable.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -85,7 +96,6 @@ explains residual/endpoint/product controls and charged base-count resolution.
 
 | ID | Current scope and state | Worktree / branch |
 | --- | --- | --- |
-| B12/F4 | **Open; ongoing.** ECM worker ownership, RNG/leases, diagnostics and latency evaluation. Completion and integration are not established by worktree presence. Preserve its active protocol and resource grants. | `/Users/nishanthmohan/Documents/code/factor-b12-f4` / `codex/b12-f4-ecm-workers` |
 
 C9a and C10a-01 are delivered mainline scopes; they are not active worktrees.
 No other ongoing work is inferred from an old preparation note.
@@ -152,6 +162,32 @@ authorization. Correctness/accounting repairs, C10a-06 and requested B14 proof
 work take precedence. E1 remains Deferred and integrated tuning retains its
 prerequisites. Closed C9a/C10a-01 evidence and active grants are unchanged.
 
+## Selected ECM regimes
+
+The bounded auto CLI/API use these defaults on supported macOS arm64/PyPy.
+Explicit arithmetic/resource settings and checked resumes take precedence.
+Worker counts are selected configurations, not a guarantee of optimality for
+every input; the observable-cost and resource gates still apply.
+
+| Total decimal digits | Numerical plan | Cold default | Retained warm preference |
+| --- | --- | --- | --- |
+| 20 | Existing serial plan | Serial; no selector | Serial; unmeasured worker scope |
+| 30 | compact64 | Serial; no selector | Up to 12 workers, cost-gated |
+| 40 | escalating140 | Up to 8 workers | Up to 14 workers |
+| 50 | fixed32 | Serial; no selector | Up to 14 workers |
+| 60 | escalating140 | Up to 10 workers | Up to 10 workers |
+| 70 | fixed32 | Serial; no selector | Up to 10 workers |
+| 80 | escalating140 | Up to 10 workers | Up to 10 workers |
+| 100 | escalating140 | Up to 10 workers | Up to 10 workers |
+
+compact64 is `(2000, 50000, 64)`; fixed32 is `(2000, 147396, 32)`.
+escalating140 is `(200, 7700, 10)`, `(2000, 81000, 30)`,
+`(10000, 554000, 100)`, as `(B1, B2, curves)`. Other sizes/cofactors use
+the bounded existing cost model or serial fallback. Warm 30-digit easy calls
+and some cold 40-digit calls regressed in the retained fixtures; hidden factor
+sizes never select the runtime path. No QS eligibility or fallback grant is
+changed by this table.
+
 ## Known gaps and unresolved conflicts
 
 - **Deferred:** E1 combined confirmation; GNFS until H1 and its coverage review.
@@ -161,7 +197,7 @@ prerequisites. Closed C9a/C10a-01 evidence and active grants are unchanged.
   sizes/backends/grants retain the stated extrapolation and feasibility limits.
 - **Open:** C9b timing variability and fresh confirmation; C10a-06 runner work;
   general R3/provenance and B14 proof scopes; current-worker/SSS comparison and
-  upstream-license clarification. B12/F4 remains ongoing.
+  upstream-license clarification. B12/F4 is closed for the delivered ECM component; A7a and B4a remain separate.
 - **Resolved:** C9a's historical preparation/campaign instructions are superseded
   by scoped closure. Its uncalibrated 15% canary flags remain historical warnings;
   future judgments require measured variability and uncertainty.

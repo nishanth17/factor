@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B12/F4 closeout and cold serial admission (5 November 2026)
+
+- Close the delivered process-ECM workstream and approve mainline integration
+  with its selected numerical/cold/warm regimes. Keep ordinary QS fallback,
+  explicit serial/resource settings and checked resume. The benchmark-only
+  disabled-fallback configuration does not become a production default.
+- Bypass policy loading for cold compact64 at 30 digits and fixed32 at 50/70.
+  Keep warm/custom numerical schedules on ordinary selection. Admission-only
+  checks reduce about 44 ms to 0.035 ms; 20-digit admission stays unchanged.
+- Current committed-only QA passes 1,357 tests (9 optional skips), full lint
+  and 265 runner/package imports. Retain ECM-only gains, quota failures and
+  remaining cheap/warm regressions; make no new whole-portfolio or p90 claim.
+- Preserve research, receipts and source identities in local ignored evidence;
+  remove disposable task worktrees and source snapshots after integration.
+
 ## B12/F4 automatic default integration (5 November 2026)
 
 - Include selector bookkeeping in parent-memory admission. Automatic and

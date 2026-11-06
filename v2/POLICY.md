@@ -95,6 +95,14 @@ claim about every input/grant/hardware regime. Earlier sources/controls and
 receipts remain immutable. The standing balanced constraint and confirmation
 rules continue to govern other changes. No E1, merge or push is implied.
 
+Subsequent explicit direction on 5 November authorizes the cheap cold serial
+admission repair, mainline integration of the selected normal portfolio
+implementation, and closure of the delivered B12/F4 component. QS fallback
+remains available; the ECM-only benchmark configuration is not the production
+configuration. Closure retains the unmet broad portfolio/balanced/p90 gates
+as limitations, rather than recording them as passed. No new balanced/QS
+performance campaign, E1 execution or remote push is authorized by this closure.
+
 ## How to use the gates
 
 - **Acceptance gate (A):** the observable behavior required to close a TODO. Every returned split must satisfy `1 < g < n` and `n % g == 0`.
