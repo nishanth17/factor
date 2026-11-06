@@ -63,7 +63,7 @@ limit, not a practical factorization-size claim.
 | --- | --- |
 | [ECM](../ecm/README.md) | Saved finite tiers, charged plans/recovery; no same-curve B1 migration |
 | [p−1](../pm1/README.md) | Same n/base/config, exact rung replay and cumulative verification |
-| [QS/SSS](../qs/README.md#resume-and-storage) | Original relations reverified, derived queues rebuilt, quota rules preserved |
+| [QS/SSS](../qs/README.md#resume-and-resource-bounds) | Original relations reverified, derived queues rebuilt, quota rules preserved |
 | [Execution](../execution/README.md) | Shared child allowances and protected fallback admission |
 
 ## Automatic ECM portfolio snapshots

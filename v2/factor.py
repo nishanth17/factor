@@ -707,11 +707,17 @@ def main():
                                 GrowingDoubleLargeSieveConfig,
                                 SieveConfig,
                                 SIQSConfig,
+                                YieldSieveConfig,
                             )
 
                             values = dict(saved["siqs"])
                             collector = values["collector"]
-                            if collector.get("storage_policy") == "grow":
+                            if (
+                                "yield_policy" in collector
+                                or "small_prime_bound" in collector
+                            ):
+                                collector_type = YieldSieveConfig
+                            elif collector.get("storage_policy") == "grow":
                                 collector_type = GrowingDoubleLargeSieveConfig
                             elif "large_prime_bound" in collector:
                                 collector_type = DoubleLargeSieveConfig

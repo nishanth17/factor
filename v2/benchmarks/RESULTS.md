@@ -769,10 +769,222 @@ campaign, wider-worker run, merge or push accompanies this screen.
 These are scoped historical observations, not runtime guarantees or a list of
 new experiments. [STATUS](../STATUS.md) records current automatic routing and
 its evidence limits. Use the [runner guide](README.md) for reproduction and
-[pinned history](../history/README.md) for frozen source/accounting detail.
+[pinned history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md) for frozen source/accounting detail.
 Numbers from separate comparisons are not additive portfolio gains.
 
 ## Collection and larger-band decisions
+
+### C9a preparation
+
+The bounded 4 November continuation has three separate matched observations:
+
+| Comparison | Previous/control seconds | New/C9a seconds | Timing screens |
+| --- | ---: | ---: | --- |
+| Same-C9a full60, root transfer (`891eda5` / `ebb35fa`) | 168.974 | 157.717 | false / true |
+| Same-C9a full60, hit words (`ebb35fa` / `c8168dc`) | 159.519 | 132.247 | false / false |
+| Full70 policies, shared optimized `891eda5` | 2742.095 | 1842.083 | true / false |
+
+Both same-C9a full60 pairs retain 764,077,765 positions, 4,977 rows, 5,830
+polynomials and exact factors; additional helper construction/read work stays
+charged. The final hit pair has 17.1% lower raw time and 1.5% higher peak RSS
+(347,127,808/352,403,456 bytes). Nine warmed 2,048-block collector samples have
+12.8%/17.4% lower median cost at 60/70 digits, favorable 9/9 at both sizes,
+with identical stores/progress and explained extra work. This is component
+evidence; no full70 word-helper result is available.
+
+The separate extended full70 freeze grants 9,000 production seconds per arm,
+4 GiB owned storage and 5 GiB process RSS. Both complete with proven factors.
+C9a uses 34.3% fewer positions and 10.1% lower peak RSS, while its reserved
+workspace is higher. The policy comparison uses the optimized shared runtime,
+not a fresh master call. Earlier 900s outcomes and all charges remain preserved.
+Each size has one exposed modulus/seed; repeated component samples are not
+independent inputs. Historical timing flags are preserved, but the uncalibrated
+15% heuristic is no longer a veto in new analyses: warnings accompany retained
+validated observations. Independent-input variability and fresh confirmation
+remain unmeasured. Paired gains are not multiplied into a population speedup.
+Final committed-only
+checks pass 1,113 tests (9 skipped), lint and 243 benchmark imports.
+
+One calibrated whole-factor sample on `ebb35fa` attributes substantial cost
+to marking, queue construction and GC (37.102s, 23.4% of traced wall). Its
+complete mature heap census describes shallow categories, not retained
+dominators or allocation rates. Diagnostic timing is separate from clean
+evidence. Local detail: `v2/audit/c9a/optimization-83-89.md` and
+`verification-89.json`; generated data: `results/c9a/hit-words-89/`, with
+earlier worktree locations recorded in the local report. The bounded phase
+stops here. The delivered C9a stream is integrated and closed by explicit
+direction on 4 November; failed timing/fresh-confirmation gates remain unmet.
+C9b owns subsequent validation and headroom analysis. Existing C9a policy
+classes remain opt-in.
+
+The final shared-source flat-queue pair on `180576c` factors the same exposed
+60-digit input in 268.8/230.4s for incumbent/C9a: 14.3% lower raw candidate time.
+Collection is 215.3/202.8s, filtering 9.07/0.90s and preparation 16.49/0.67s.
+Peak process RSS is 289.0/331.1MB; accounted workspace is 615.0/567.7MB. Both use
+the same 900s production allowance, work grant, input/seed and observer.
+Exact reconstruction and independent proven-corpus agreement pass; terminal
+work, positions, rows and semantic counters match each arm's earlier packed
+queue run. Both revised timing screens fail: control samples are unstable;
+C9a's stable post-run ratio is 0.775. Preserve these failures: the raw difference
+does not establish a clean population speedup or adoption. Committed-only
+1,084 tests (9 skipped), lint and 242 imports pass. Packed-field replay is
+replaced by faster flat words; fused scanning remains optional after mixed
+integration evidence. Local verification: `v2/audit/c9a/verification-77.json`;
+full scope/retained and rejected changes: `v2/audit/c9a/optimization-65.md`.
+No further run or quota/default change follows this finite phase.
+
+The subsequent current-source clean pair on `636484b` completes with C0/C1
+raw times of 356.3/320.9s, about 9.9% less wall time for C9a on the exposed
+balanced 60-digit modulus. Both timing gates fail; no adoption follows.
+Collection is 237.5/234.7s, RSS 290.3/350.2MB, and each arm preserves its
+historical exact work, coverage, rows and collector counts. Earlier pre-fix
+times remain historical rather than matched causal estimates. Separate native
+sampling at 50/60/70/80 and a 10,097-atom checked replay highlight polling,
+scanning/marking, queue construction and polynomial switches. Two bounded
+heap dumps show about 32.1MB incremental live GC memory, with no leak proof.
+A nine-sample matched prefix diagnostic measures 0.385s with the RSS callback
+versus 0.324s with a constant-false callback. That intervention preserves work
+and outputs but is not a production resource-policy change or full-factor
+attribution. Stop after bounded analysis; investigate observer cost before a
+larger comparison. Details: `v2/audit/c9a/profiling-56.md`,
+`verification-62.json` and `verification-64.json`.
+
+The private progress-only collection path on `5b3a6cf` passes 1,070 tests
+(9 skips), lint and committed-only benchmark imports. Nine alternating matched
+samples after at least three seconds of warmup per mode reduce median
+empty-return cost on the captured 26,862-atom / 24,196-partial store from
+0.848ms for full snapshots to 0.000899ms for progress. Progress samples vary;
+this is a return-cost observation, not whole-factor attribution. Matched
+256-block exposed60 prefixes preserve exact serialized stores, work and stable
+statistics but show no runtime benefit: C0 snapshot/progress medians are
+0.324/0.346s, C1 0.394/0.412s. A separate JIT-off fixed-store retention check
+returns to approximately 108MB post-GC live memory through 4,000 calls per
+mode. Snapshot calls add allocation/GC work; retained store size does not grow.
+This does not rule out growing-run retention issues or establish an RSS or
+factoring speedup. Stop after these scoped checks; no adoption follows.
+Details: `v2/audit/c9a/snapshot-50.md`, `verification-55.json`; raw replay and
+retention evidence remain under `benchmarks/results/c9a/`.
+
+The subsequent bounded 60-digit pair on `f0a5791` completes with C0/C1 raw
+wall times of 411.0/487.1s. Both factors verify; both timing checks fail.
+C1 uses 764.1M positions / 4,977 rows versus C0's 911.4M / 4,994, with
+476.2/342.9MB process RSS. Collection remains the gap at 400.5/287.5s;
+elimination is about one second in both. No adoption or independent-input
+campaign follows. The diagnostic stage uses 83.6 seconds of its 180-second
+allowance. On an actual mature 60-digit store, a cumulative snapshot takes
+0.459ms and translates 24,196 partial IDs; the internal caller discards these
+record arrays. This supports implementing a private progress-only collection
+path while preserving public snapshots, not a measured full-factor gain.
+Suppressing reporting counters showed no benefit. Short sentinel calibration
+supports investigating rewarming under a separately identified protocol;
+all original failures remain unchanged. Details: `v2/audit/c9a/followup-43.md`.
+
+The cost follow-up prepares `cost-report` with scalar solving, rho-first
+splitting and serial recovery, after removing repeated sorting, storage work
+and impossible recovery. Source `e0acc17` passes 1,065 tests (9 skips), lint
+and committed-only imports. Runtime/configuration equivalence is checked
+against the serial diagnostic on `193b57c`. On the exposed 50-digit input,
+C0/C1 take 24.2/36.2 raw seconds and both factor correctly. C1 uses 66.6M
+positions / 1,678 rows versus C0's 71.0M / 1,704, with greater RSS. Serial C1
+matches the shared candidate's terminal coverage/rows and charges less work;
+all timing gates fail. A representative/late cofactor replay rejects shortened
+rho effort: it loses eight useful decompositions and takes longer. No clean
+overall speedup, larger-input acceptance or adoption follows. Stop after these
+bounded checks; retain the incumbent. Local detailed evidence and source
+dispositions: `v2/audit/c9a/cost-investigation-20-40.md` and `cost-review-30.md`.
+
+The larger `7feeca4` screen completes all eight calls on four exposed inputs,
+one seed each. At 50/55/60 uneven/62 digits, C0 versus C1 wall seconds are
+24.6/49.7, 77.3/135.3, 236.3/375.3 and 777.9/1,059.6. Every factorization
+matches independent certificates. Candidate terminal sieve coverage is lower
+by about 6.1/8.2/15.3/20.9%, but raw time and process RSS are greater in every
+pair. All eight timing gates fail; no clean speed ratio or population benefit
+follows. Stage timers identify collection/elimination cost as the next questions.
+Stop after this bounded tranche and retain the incumbent. Charges are 7,390
+wall/CPU seconds; actual worker lifecycle totals are 2,769.7 wall / 2,787.6 CPU
+seconds. Local details: `v2/audit/c9a/complete-screen-19-results.md`.
+
+The repaired pair on `bb0764a` completes both 60-digit calls under the same
+900-second and memory grants. C1 uses 764.0M positions and 618.4s; C0 uses
+911.4M and 405.9s. Both factorizations match independent certificates. C1
+needs 16.2% less terminal sieve coverage on this input but has greater raw time,
+RSS and charged work. Accounted workspace is 586.6/629.4MB and RSS is
+546.8/339.7MB for C1/C0. Both drift gates fail; no clean speed ratio or
+population benefit follows. Stop after the pair, charging 2,010 wall/CPU
+seconds; actual worker lifecycle totals are 1,032.7 wall / 1,039.4 CPU seconds.
+No adoption follows. Local details: `v2/audit/c9a/feasibility-18.md`.
+
+An actual-data audit reproduces the long-run memory stop exactly: 26,862 atoms,
+2,666 rows and 579,211,587 positions. Packed factors occupy 158 slabs / 647KB,
+while blanket exponent/context charges alone total 559.5MB. The `09a3a05`
+repair charges shared slabs/contexts and integer digit storage explicitly.
+Exact store replay with the original helper allowances reduces accounted
+workspace from 1,040.1MB to 367.9MB, preserving all records and independently
+verifying every closed row. The committed-only checkout passes 1,048 tests
+(9 skips), lint and 241 imports. This is an accounting repair, not a measured
+RAM reduction or factoring win. No new full comparison is run. Local evidence:
+`v2/audit/c9a/ownership-audit-15-17.md`.
+
+A subsequent 60-digit pair on `e4dec4a` (identical runtime to `44b1f94`)
+grants 900 seconds each, a higher block ceiling and unchanged memory. C0
+finds independently verified factors in 407.8s, with 4,994 closed rows. C1
+stops at accounted memory after 362.4s with 2,666 rows and no matrix solve,
+using 1.040GB accounted workspace / 349.5MB RSS. Both timing screens fail;
+one modulus and unequal terminal coverage establish no yield or speed ratio.
+The current candidate fails full-run feasibility under this grant where C0
+completes. Stop after the pair. Charges are 2,010 wall/CPU seconds; actual
+worker lifecycle totals are 778.5 wall / 783.6 CPU seconds. See local
+`v2/audit/c9a/feasibility-14.md`; no adoption or default change follows.
+
+The bounded-retention repair on `44b1f94` passes 1,040 unit tests (9 skips),
+lint and committed-only checks. Its new four-call C10a-matched screen finishes
+all 67,109,376-position prefixes under unchanged grants. At 60/65 digits the
+candidate uses 210.8/192.4MB accounted workspace and 160.2/153.2MB process RSS,
+without a memory stop. Its 125/111 closed relations match C0, while measured
+charged work is 62.28/55.06 billion versus 7.88/7.92 billion for C0. No staged
+opaque record is promoted or converted in these prefixes. All four timing
+checks fail again; no complete factorization, speedup or adoption is claimed.
+The run stops after four cells and analysis, charging 550 wall/CPU seconds;
+actual worker lifecycle totals are 145.0 wall and 146.0 CPU seconds. Longer
+yield remains uncertain. Local details: `v2/audit/c9a/feasibility-13.md`.
+
+A follow-up used six short, equal-work prefixes (4,067,359 positions each)
+at 60/65 digits, preserving the original memory grants. Full C1 retained
+4,430/3,382 unique opaque cofactors: none repeated, converted or contributed
+to a closed row. Disabling opaque retention preserved 6/7 closed rows and
+reduced accounted ownership from 393.8/416.6MB to 185.6/252.3MB. Restoring only
+the incumbent reporting bound also preserved those row counts, while reducing
+charged factoring work by about 4.7/5.3 times. Cold diagnostic times are not
+speed evidence; longer-horizon yield remains uncertain. The decision is to
+revise opaque retention, reporting and conservative per-atom reservations
+before raising limits or launching a larger campaign. The linked diagnostic
+reserved another 130 wall/CPU seconds within Stage A's existing allocation;
+details remain local in `v2/audit/c9a/opaque-investigation-12.md`.
+
+The first matched C10a/C9a screen completed four calls on source `7fa31cb`
+after 1,030 unit tests (9 skips), lint and committed-only checks passed.
+Both arms used coupled arithmetic. At 60/65 digits C0 finished the fixed-work
+prefixes with 125/111 closed relations; C1 stopped at its accounted memory caps
+with 33/72 relations over shorter coverage. Opaque cofactors made up about
+95–97% of C1's retained atoms. Process RSS stayed below those ownership grants.
+All four canary drift checks failed; no clean timing ratio or speedup follows.
+Stop before a larger campaign to investigate opaque retention and ownership
+accounting. Detailed receipts and the finite decision remain local under
+`v2/audit/c9a/feasibility-11.md` and `benchmarks/results/c9a/`.
+
+The independently selectable useful-yield, admission, cycle, duplicate and
+packed-record bundle is experimental. Retained complete-call evidence motivates
+the comparison but does not measure this implementation. Current preparation
+includes certified inputs, structural multiplier/base resolution, immutable
+control and bounded runners. No new performance calls or complete-run captures
+have executed; no speedup, larger-band feasibility or adoption is claimed.
+See [runner commands](README.md#c9a-preparation-and-staged-execution).
+The expanded combined bundle has source-level oracles and a revised two-arm
+protocol. Before the C10a merge, its full unit suite passed 942 tests (9 skipped),
+with lint and committed-only checks passing. Those checks establish no speedup.
+The initial historical-control freeze was prepared but no feasibility worker
+started before the request to merge current master. A comparison using coupled
+policies in both arms requires a new matched source/configuration identity.
 
 ### C10a-01 coupled polynomial defaults
 
