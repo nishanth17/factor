@@ -2,8 +2,10 @@
 
 Last updated: 6 November 2026 (America/Los_Angeles).
 
-B12/F4 is complete for its delivered process-ECM scope and integrated on
-mainline. The normal bounded portfolio retains QS fallback.
+B12/F4's delivered process-ECM scope is integrated on mainline. Its separate
+[ready-first startup follow-up](ROADMAP.md#b12-f4-in-progress) remains In progress:
+real-spawn/arithmetic, failure/restart and full committed-checkout QA, then a
+small startup comparison are pending. The normal bounded portfolio retains QS fallback.
 Cold cheap defaults bypass the selector; the selected larger/warm worker
 configurations remain cost-gated. ECM-specific execution now lives in the flat
 `ecm/` package, with compatibility aliases for old imports, bundled Python
@@ -11,7 +13,8 @@ program/policy constants and explicit compatibility versions instead of runtime
 source-file scanning. Numerical schedules and worker choices are unchanged.
 Committed-only refactor source `08a9011` passes 1,360 tests (9 optional skips),
 full lint and 265 benchmark imports. Local QA receipts: `v2/audit/ecm_layout/`.
-The computation lock is released.
+That QA run released its owned performance lock; this is not a live
+availability check.
 
 Earlier admission-only verification on `c40298e` removes about 44 ms at cold
 30/50/70 defaults, without importing the selector; 20-digit behavior is unchanged.
@@ -23,7 +26,9 @@ exposed fixtures do not establish whole-portfolio, balanced or population-p90
 gains. The [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026)
 retain failures and cheap-path regressions; the [recorded exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026)
 records component closure separately from those pending broader claims.
-Local evidence: `v2/audit/b12_f4/`; the task worktree and F4 temporary source checkouts are removed.
+Original delivered-component evidence: `v2/audit/b12_f4/`; that task worktree
+and its temporary checkouts are removed. The ready-first prototype remains
+isolated on `codex/ecm-ready-start` with local `v2/audit/ecm_ready_start/` notes.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -101,11 +106,24 @@ explains residual/endpoint/product controls and charged base-count resolution.
 
 ## Work in flight
 
-| ID | Current scope and state | Worktree / branch |
-| --- | --- | --- |
+Inspected 6 November 2026. These are isolated experimental branches; their
+implementations are not mainline defaults. Checkpoint summaries and explicit
+remaining work live in [the roadmap's In progress section](ROADMAP.md#in-progress).
+The snapshot does not assert that any process or performance window is active.
 
-C9a and C10a-01 are delivered mainline scopes; they are not active worktrees.
-No other ongoing work is inferred from an old preparation note.
+| ID | Implemented / remaining | Branch / inspected checkpoint |
+| --- | --- | --- |
+| [B12 / F4 ready-first](ROADMAP.md#b12-f4-in-progress) | Early dispatch/publication and partial-pool cleanup prototype; 15 mock-only tests pass. Real spawn/arithmetic, lifecycle/restart, full committed-only QA and cold-start comparison remain. | `codex/ecm-ready-start` / `636a755` |
+| [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
+| [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
+| [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
+| [A7a](ROADMAP.md#a7a-in-progress) | Current-collector workers and combined options; exploratory 60/70 completions exist, with K3 diagnostics, fresh confirmation and integration pending. | `codex/a7a-current-qs-workers` / `37c4cae` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
+
+B12/F4's earlier delivered integration remains recorded, but its ready-first
+startup follow-up is unfinished. The tuple-decoding microcheck is complete;
+direct runtime tuple storage is the separate open B3b scope. C9a and C10a-01
+remain delivered mainline scopes.
 
 ## Recent completed review
 
@@ -128,7 +146,8 @@ No other ongoing work is inferred from an old preparation note.
 The [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost) now
 prioritizes current acceleration and shorter later experiment turnaround:
 
-1. **B12/F4:** finish the active ECM worker stream — Sol / xhigh.
+1. **B12/F4 ready-first:** validate real spawn/arithmetic, failure/restart and
+   full committed-checkout QA, then compare cold startup — Sol / xhigh.
 2. **A7a:** current-collector parallel QS preparation — Sol / xhigh.
 3. **B4a:** coarse ECM C/CFFI, then selected native SIMD/threads — Sol / xhigh;
    separately selected new arithmetic proofs retain Astra / xhigh.
@@ -204,7 +223,9 @@ changed by this table.
   sizes/backends/grants retain the stated extrapolation and feasibility limits.
 - **Open:** C9b timing variability and fresh confirmation; C10a-06 runner work;
   general R3/provenance and B14 proof scopes; current-worker/SSS comparison and
-  upstream-license clarification. B12/F4 is closed for the delivered ECM component; A7a and B4a remain separate.
+  upstream-license clarification. B12/F4's delivered ECM component remains
+  recorded separately from its unfinished ready-first startup follow-up;
+  A7a and B4a retain their own scopes.
 - **Resolved:** C9a's historical preparation/campaign instructions are superseded
   by scoped closure. Its uncalibrated 15% canary flags remain historical warnings;
   future judgments require measured variability and uncertainty.
