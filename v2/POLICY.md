@@ -282,10 +282,10 @@ a named unresolved invariant or derivation, not elapsed time or source volume.
 | Evidence/integration | One integration writer reconciles shared configuration, portfolio, benchmark guide and roadmap decisions. |
 
 Worktrees isolate edits, not CPU, RAM, disk or thermal conditions. Reserve one
-machine-wide performance window. Pause competing tests, compression, profiling
-and heavy correctness runs during accepted timings. Integrate sequentially and
-compare the exact combined source. There is no benefit in launching every
-eligible row at once. Current allocation belongs in STATUS.md.
+machine-wide performance window under the [task isolation and lock rules](../AGENTS.md#task-isolation-and-the-shared-performance-window).
+Integrate sequentially and compare the exact combined source. There is no
+benefit in launching every eligible row at once. Current allocation belongs
+in STATUS.md.
 
 ## Acceptance, evidence and stop rules
 
@@ -334,11 +334,17 @@ eligible row at once. Current allocation belongs in STATUS.md.
 
 ## Experiment design and prompt review
 
-The [repository working agreements](../AGENTS.md#experiment-design-and-prompt-review)
-record the 1 November lessons from C10a-07. Keep their meaning in every design:
+[AGENTS.md](../AGENTS.md#experiment-design-and-prompt-review) keeps the
+behavioral checklist for agents. Measurement validity and adoption rules are
+maintained here:
 
 - Establish a small uninstrumented feasibility baseline on representative
-  inputs using current committed mainline. Label historical comparisons.
+  inputs using current committed mainline before a large diagnostic or matched
+  campaign. Label historical comparisons and freeze a new identity for a
+  changed integration. Component studies may isolate the affected mechanism;
+  broader portfolio adoption needs the declared population and guardrails,
+  unless an explicit exception is recorded. ECM bounds do not guarantee
+  success for a given factor size; retain declared quota-exhaustion outcomes.
 - Measure diagnostic overhead on identical work with tracing enabled and
   disabled. Prefer short targeted traces or bounded counters when observation
   dominates. Instrumented completion is not clean performance evidence.
@@ -349,15 +355,35 @@ record the 1 November lessons from C10a-07. Keep their meaning in every design:
 - Require matched complete-cost/completion evidence, independent inputs,
   uncertainty and disjoint fresh confirmation for adoption. Repeated seeds
   are not independent moduli; exploratory completion differences justify
-  investigation without establishing a speedup.
+  investigation without establishing a speedup. The promotion rules above
+  govern uncertainty and regressions without a universal percentage-gain floor.
 - Give each stage a question, advancement/stopping decision, estimated total
   runtime and finite cumulative resources. Calibrate estimates from informative
   observations. Reassess recorder failures or unanswered timeouts before
   spending more hours; larger repeated campaigns are not a default remedy.
+  Censored outcomes can still establish finite feasibility or resource limits;
+  lack of a demonstrated gain is not evidence of no benefit.
+- Keep identical-work throughput, time to first validated factor and complete
+  factorization separate. Distinguish fresh-interpreter cold calls from calls
+  using a retained warm context. Put validated warmup in the appropriate
+  preflight/warm lane, never inside a sample labeled cold. Include interpreter,
+  spawn/import/JIT, preparation, validation and shutdown in a declared cold
+  complete-cost endpoint. Neither worker throughput nor a warm-pool gain proves
+  a cold CLI completion gain. Apply the warmup and sample requirements in
+  [acceptance rules](#acceptance-evidence-and-stop-rules).
 - Distinguish recorder storage/event exhaustion from production exhaustion.
+  Validate the recorder's useful observation window before scaling a campaign.
   Preserve receipts, charges, failures and freezes. Revise a flawed protocol
   under a new identity; never selectively retry unfavorable observations,
-  retune on confirmation or relax correctness.
+  retune on confirmation or relax correctness. Carry earlier expenditure into
+  revised protocols under the same campaign allowance; a new run identity does
+  not reset the budget.
+- On the macOS measurement host, capture bounded `pmset -g therm` output before
+  and after each timed cell, outside the measured interval. Charge collection
+  to the campaign ledger and preserve failures or missing readings. This
+  limited telemetry does not prove the absence of throttling on the fanless
+  host. Apply new collection rules prospectively; preserve earlier frozen
+  measurement definitions.
 
 ## Evidence layout
 
