@@ -863,6 +863,40 @@ class SelectedECMContext:
                 finite(overhead[key], "selector serialization " + key)
                 charges[key] += overhead[key]
             _saved_budget(budget, charges)
+        if (
+            portfolio
+            and checkpoint is None
+            and self.inner is None
+            and not self.prefer_warm
+        ):
+            from .ecm_auto import (
+                POLICY_PATH,
+                POLICY_SHA256,
+                cold_serial_default,
+            )
+
+            # Only the packaged cold policy has this predeclared serial rule.
+            # Custom catalogues and checked resumes must still validate their
+            # own source/policy identity before selecting any search.
+            if (
+                self.profile == POLICY_PATH
+                and self.profile_sha256 == POLICY_SHA256
+                and cold_serial_default(n, config)
+            ):
+                self._stats(
+                    started,
+                    dict(
+                        engaged=False,
+                        legacy_serial=True,
+                        cofactor_digits=len(str(n)),
+                        engagement=dict(
+                            engage=False,
+                            state="cold",
+                            reason="cold_serial_default",
+                        ),
+                    ),
+                )
+                return None
         self._load(budget)
         budget.consume(HEADER_BYTES)
         self.selector_work += HEADER_BYTES

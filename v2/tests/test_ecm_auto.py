@@ -716,5 +716,119 @@ class AutomaticTests(unittest.TestCase):
         )
 
 
+class ColdSerialAdmissionTests(unittest.TestCase):
+    def settings(self, digits, **changes):
+        from dataclasses import replace
+
+        n = 10 ** (digits - 1) + 7
+        config = PortfolioConfig().for_input(n)
+        return n, replace(config, **changes) if changes else config
+
+    def test_default_cold_plans_decline_before_context_or_runtime_loading(
+        self,
+    ):
+        for digits in (20, 30, 50, 70):
+            n, settings = self.settings(digits)
+            generator = random.Random(7)
+            before = generator.getstate()
+            fallback = settings.siqs
+            with (
+                self.subTest(digits=digits),
+                patch(
+                    "v2.execution.ecm_auto.selected_context",
+                    side_effect=AssertionError("unexpected selector"),
+                ),
+                patch(
+                    "v2.execution.ecm_auto._runtime_supported",
+                    side_effect=AssertionError("unnecessary platform load"),
+                ),
+                AutomaticECMOwner(seed=7) as owner,
+            ):
+                owner.configure(
+                    settings, generator, None, automatic_memory=True
+                )
+                ledger = budget()
+                self.assertIsNone(
+                    owner.run_portfolio(n, config=settings, budget=ledger)
+                )
+                self.assertIsNone(owner.context)
+                self.assertEqual(ledger.used, 0)
+                self.assertTrue(owner.last_stats["legacy_serial"])
+            self.assertEqual(generator.getstate(), before)
+            self.assertIs(settings.siqs, fallback)
+            if digits == 50:
+                self.assertIsNotNone(fallback)
+
+    def test_borrowed_packaged_cold_context_skips_profile_io(self):
+        from v2.execution.ecm_auto import selected_context
+
+        for digits in (30, 50, 70):
+            n, settings = self.settings(digits)
+            with (
+                self.subTest(digits=digits),
+                selected_context() as owner,
+                patch.object(
+                    owner, "_load", side_effect=AssertionError("profile I/O")
+                ),
+            ):
+                ledger = budget()
+                self.assertIsNone(
+                    owner.run_portfolio(n, config=settings, budget=ledger)
+                )
+                self.assertEqual(ledger.used, 0)
+                self.assertIsNone(owner.inner)
+                self.assertEqual(
+                    owner.last_stats["engagement"]["reason"],
+                    "cold_serial_default",
+                )
+
+    def test_warm_custom_or_larger_plan_keeps_regular_selection(self):
+        from dataclasses import replace
+
+        from v2.execution.ecm_auto import selected_context
+        from v2.execution.ecm_selection import SelectedECMContext
+
+        n, settings = self.settings(30)
+        larger = replace(settings, ecm_tiers=((2000, 50000, 65),))
+        owners = [
+            (selected_context(prefer_warm=True), settings),
+            (selected_context(), larger),
+            (
+                SelectedECMContext(
+                    POLICY_PATH.with_name("custom.json"), "0" * 64
+                ),
+                settings,
+            ),
+        ]
+        for owner, config in owners:
+            with (
+                owner,
+                patch.object(
+                    owner,
+                    "_load",
+                    side_effect=LookupError("regular selection"),
+                ),
+            ):
+                with self.assertRaisesRegex(LookupError, "regular selection"):
+                    owner.run_portfolio(n, config=config, budget=budget())
+
+    def test_expired_cancelled_or_corrupt_resume_does_not_use_bypass(self):
+        from v2.execution.budget import BudgetExhaustedError
+        from v2.execution.ecm_auto import selected_context
+
+        n, settings = self.settings(50)
+        for limits in (dict(seconds=0), dict(cancelled=lambda: True)):
+            with selected_context() as owner:
+                with self.assertRaises(BudgetExhaustedError):
+                    owner.run_portfolio(
+                        n, config=settings, budget=budget(**limits)
+                    )
+        with selected_context() as owner:
+            with self.assertRaises(ValueError):
+                owner.run_portfolio(
+                    n, config=settings, budget=budget(), checkpoint={}
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

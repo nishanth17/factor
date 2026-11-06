@@ -85,7 +85,7 @@ process executor for independent ECM curves on supported macOS/arm64 PyPy.
 The normal portfolio retains preprocessing, recursive completion and its
 existing SIQS/SSS fallback. The ECM-only benchmark runner is separate.
 
-Use `--ecm-execution serial` or `ecm_executor=None` to keep incumbent serial
+Use `--ecm-workers serial` or `ecm_executor=None` to keep incumbent serial
 execution. `--ecm-memory-mib` / `ecm_memory_bytes` set the aggregate owned ECM
 allowance, capped at 8 GiB; caller work, CPU, wall and parent-memory limits
 still apply. Unsupported, unmeasured and unfunded calls stay serial.
@@ -104,6 +104,9 @@ The context's seed, resource grants and selected worker configuration remain
 bound for its lifetime. Do not share one active context across concurrent
 calls. Use the same declared configuration and adequate finite budgets.
 Cold CLI startup and warm retained-pool performance are separate endpoints.
+The compact64 default at 30 digits and fixed32 defaults at 50/70 digits stay
+serial cold before loading the cost catalogue. Twenty-digit automatic calls
+also remain serial. Larger explicit numerical schedules retain selection.
 
 Worker arithmetic remains exact. Stable curve identities, checked divisor
 publication, bounded parent-owned leases, explicit spawn, cancellation/drain

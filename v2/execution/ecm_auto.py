@@ -9,7 +9,7 @@ from types import SimpleNamespace
 AUTO_VERSION = "b12-f4-auto-v1"
 POLICY_PATH = Path(__file__).with_name("ecm_worker_policy.json")
 POLICY_SHA256 = (
-    "1e01666ddbe89b7250c3ccdce9e5f0444b26794bed9d4226cb4c236b0dd4f637"
+    "98877565b678c004eddbb13d31acda2b211bebb2aec8ddd538eecd205f1859d5"
 )
 MEASURED_PROFILE_SHA256 = (
     "16d52a6e55270d3cfea467f2a5ca41dd00ad1d8d052f2263861656a99b4b00cf"
@@ -34,6 +34,28 @@ def _size_supported(n):
     # Every packaged anchor is in this interval, and the cost model never
     # extrapolates. Rejecting outside it needs neither imports nor JSON.
     return 10**29 <= n < 10**100
+
+
+def cold_serial_default(n, config):
+    """Decline measured cheap cold plans without loading a cost catalogue.
+
+    This is a numerical-plan guard, not a factor-size prediction. Larger
+    explicit quotas/bounds, paired arithmetic and allocation policies retain
+    ordinary selection. Warm and resumed owners do not use this shortcut.
+    """
+    if (
+        config.backend != "python-int"
+        or config.allocation is not None
+        or config.ecm_pair_distance is not None
+        or config.ecm_pair_wheel is not None
+    ):
+        return False
+    tiers = tuple(map(tuple, config.ecm_tiers))
+    if tiers == ((2000, 50000, 64),):
+        return 10**29 <= n < 10**30
+    if tiers == ((2000, 147396, 32),):
+        return 10**49 <= n < 10**50 or 10**69 <= n < 10**70
+    return False
 
 
 def _runtime_supported():
@@ -173,6 +195,8 @@ class AutomaticECMOwner:
                 reason = "unmeasured_selection_cost"
             if reason is None and config.backend != "python-int":
                 reason = "unsupported_automatic_backend"
+            if reason is None and cold_serial_default(n, config):
+                reason = "cold_serial_default"
             if reason is None and not _runtime_supported():
                 reason = "unsupported_automatic_runtime"
             if reason is None and (
