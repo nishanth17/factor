@@ -24,6 +24,28 @@ def retained_growth(stats):
     )
 
 
+def endpoint(request):
+    """Keep this runner engine-only; reject configured fallback paths."""
+    value = request.get("endpoint", "fixed")
+    if value not in ("fixed", "first"):
+        raise ValueError("ECM-only endpoint must be fixed or first")
+    if value == "first" and (
+        request["config"].get("siqs", "missing") is not None
+        or request["config"].get("sss", "missing") is not None
+    ):
+        raise ValueError("ECM-only runs require explicit disabled fallbacks")
+    return value
+
+
+def checked_divisor(n, divisor):
+    """Check the public result independently of the ECM implementation."""
+    if divisor is not None and (
+        type(divisor) is not int or not 1 < divisor < n or n % divisor
+    ):
+        raise ValueError("invalid ECM divisor")
+    return divisor
+
+
 def child(request_path, source_root):
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 required")
@@ -34,6 +56,7 @@ def child(request_path, source_root):
         raise RuntimeError("performance lock identity changed")
     fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
     request = json.loads(request_path.read_text())
+    measured_endpoint = endpoint(request)
     if request["mode"] not in ("cold", "warm"):
         raise ValueError("unknown pool condition")
     if request["mode"] == "cold" and request["repetitions"] != 1:
@@ -66,6 +89,7 @@ def child(request_path, source_root):
     directory.mkdir(exist_ok=False)
     work_used, charged_children = 0, 0.0
     reference, calls, statistics = None, [], []
+    outcomes, warmup_outcomes = [], []
     warmup_calls, warmup_seconds, stable_calls = 0, 0.0, 0
     measured_started = None
     measured_wall = 0.0
@@ -82,13 +106,41 @@ def child(request_path, source_root):
             seconds=seconds,
             cpu_seconds=cpu,
         )
-        started = time.monotonic()
-        result = owner.run(
-            request["n"], config=config, budget=budget, fixed_work=True
-        )
+        if request.get("call_seconds") is not None:
+            budget.seconds = min(budget.seconds, request["call_seconds"])
+        started, cpu_started = time.monotonic(), time.process_time()
+        try:
+            result = owner.run(
+                request["n"],
+                config=config,
+                budget=budget,
+                fixed_work=measured_endpoint == "fixed",
+                lineage=request.get("lineage", "root"),
+            )
+        finally:
+            work_used += budget.used
+            charged_children += budget.prior_cpu
         duration = time.monotonic() - started
-        work_used += budget.used
-        charged_children += budget.prior_cpu
+        if measured_endpoint == "first":
+            divisor = checked_divisor(request["n"], result.divisor)
+            if result.reason == "worker_failure":
+                raise RuntimeError("worker failure: " + str(result.stats))
+            manifest = result.stats["manifest"]
+            if reference is None:
+                reference = manifest
+            elif reference != manifest:
+                raise ValueError("retained context changed curve manifest")
+            outcome = dict(
+                divisor=divisor,
+                found=divisor is not None,
+                reason=result.reason,
+                seconds=duration,
+                parent_cpu=time.process_time() - cpu_started,
+                charged_child_cpu=budget.prior_cpu,
+                work=budget.used,
+                manifest=manifest,
+            )
+            return duration, dict(result.stats), outcome
         reason = result.stats.get("termination_reason", result.reason)
         if reason != "curves_exhausted":
             with (directory / "stopped-checkpoint.json").open("x") as stream:
@@ -102,13 +154,15 @@ def child(request_path, source_root):
             reference = rows
         elif reference != rows:
             raise ValueError("retained context changed curve results")
-        return duration, dict(result.stats)
+        return duration, dict(result.stats), None
 
     try:
         if request["mode"] == "warm":
             started = time.monotonic()
             for _ in range(4096):
-                _, stats = invoke()
+                _, stats, outcome = invoke()
+                if outcome is not None:
+                    warmup_outcomes.append(outcome)
                 warmup_calls += 1
                 stable_calls = (
                     stable_calls + 1 if not retained_growth(stats) else 0
@@ -120,16 +174,20 @@ def child(request_path, source_root):
                 raise TimeoutError("finite metadata warmup did not stabilize")
         measured_started = time.monotonic()
         for _ in range(request["repetitions"]):
-            duration, stats = invoke()
+            duration, stats, outcome = invoke()
             calls.append(duration)
             statistics.append(stats)
+            if outcome is not None:
+                outcomes.append(outcome)
         measured_wall = time.monotonic() - measured_started
     except TimeoutError as error:
         if measured_started is not None:
             measured_wall = time.monotonic() - measured_started
         stop_reason = str(error)
     finally:
+        close_started = time.monotonic()
         owner.close()
+        close_seconds = time.monotonic() - close_started
     usage = resource.getrusage(resource.RUSAGE_SELF)
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     result = dict(
@@ -140,7 +198,13 @@ def child(request_path, source_root):
         arm=request["arm"],
         mode=request["mode"],
         observer="none",
+        endpoint=measured_endpoint,
+        qs_disabled=measured_endpoint == "first",
+        lineage=request.get("lineage", "root"),
         rows=reference,
+        outcomes=outcomes,
+        warmup_outcomes=warmup_outcomes,
+        close_seconds=close_seconds,
         calls=calls,
         stats=statistics,
         measured_wall=measured_wall,
