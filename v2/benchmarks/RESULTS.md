@@ -1,5 +1,64 @@
 # Benchmark results and decisions
 
+
+## B12/F4 ECM-only selected-default comparison (5 November 2026)
+
+Source `ec4ee79` compares the unchanged selected cold/warm policy with actual
+master `0efaba1e` serial ECM, using identical selected bounds and SEARCHv1
+curve manifests. The control adapts curve seeds; it preserves incumbent
+arithmetic and full-schedule program/PRAC eligibility. It is not stock-master
+CLI behavior. No preprocessing, QS, SSS or balanced-semiprime run is included.
+
+Fourteen previously exposed unbalanced moduli cover 30/40/50/60/70/80/100
+digits (two per band). Nine fresh-interpreter cold samples and nine warm
+calls after at least three validated seconds per retained context give 504
+measured calls. All independent divisor, manifest and process-group cleanup
+checks pass. The 18-digit-smaller-factor inputs at the three primary sizes
+find factors in all samples:
+
+| Total digits | Cold master / selected, seconds | Cold ratio | Warm master / selected, seconds | Warm ratio |
+| --- | --- | --- | --- | --- |
+| 60 | 3.0890 / 1.1322 | 2.73x | 2.7191 / 0.4832 | 5.63x |
+| 80 | 2.6887 / 1.0917 | 2.46x | 2.3385 / 0.3925 | 5.96x |
+| 100 | 2.9498 / 1.1099 | 2.66x | 2.6209 / 0.4877 | 5.37x |
+
+All outcomes remain in the local tables. Both arms exhaust the same quotas
+without a factor on the larger-factor 50/60/80/100 inputs and both 70-digit
+inputs. Their faster search completion is not a time-to-factor result.
+Cold 30/50/70 calls stay serial and incur selector overhead; both 30-digit
+fixtures regress, as do the 50/70 fixtures. The cheap 40/15 fixture regresses
+cold (0.2450 to 0.4569 seconds), while 40/19 improves. Warm 30/10 also
+regresses (0.0041 to 0.0089 seconds). Thus neither universal improvement nor
+optimality for every modulus follows from the prior grid selection.
+
+Candidate engagement is 72/126 cold and 126/126 warm measured calls. At the
+three successful primary-size fixtures, observed cold aggregate CPU rises
+from 2.69-3.09 to 7.88-8.48 seconds; published warm per-call CPU rises from
+2.33-2.72 to 3.59-4.47 seconds. Their cold pool handshake costs 0.185-0.189
+seconds; observed drain tails are 3-12 ms and final close about 5 ms. Total
+cold latency includes interpreter/import/JIT, preparation, validation and close.
+Warm startup/warmup and whole-context CPU remain separate. Cancellation CPU
+is included in total CPU but is not independently attributed after first factor.
+Largest summed worker RSS high-water marks are 1.06 GiB, not a simultaneous
+RSS measurement; maximum selected owned reservation is 2.26 GiB under 8 GiB.
+
+The completed revision takes 846.147 wall / 2081.735 observed measurement-cell
+CPU seconds. The original one-hour family, including the stopped different-
+configuration diagnostic and one failed harness launch, totals 2245.864 wall /
+15,858.490 conservative CPU charges under 3600/72,000. Final single-threaded lint passes in a further 3.407 wall /
+3.297 CPU seconds, still within those ceilings. The harness launch
+failed before ECM imports due to an inherited CPU limit; its full loan remains.
+Twenty-three focused tests pass from committed source. Factorer arithmetic is
+unchanged by this benchmark extension; its prior full validation remains
+separately identified. The full suite was not repeated for this extension.
+
+These are conditional ECM component measurements on exposed inputs, with one
+warm pool lifetime per arm/input. Two independent moduli per band cannot
+establish a population p90 or general adoption confirmation. No global tuning,
+new default change, merge, B12/F4 closure or E1 execution follows. Detailed
+protocol, all positive/negative cells, manifests, costs and receipts remain at
+`v2/audit/b12_f4/selected_defaults_master_ecm_v2/` locally.
+
 ## B12/F4 automatic default integration (5 November 2026)
 
 Automatic cost-gated ECM is promoted on the isolated worker branch by explicit

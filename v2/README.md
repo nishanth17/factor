@@ -116,6 +116,12 @@ workspace is never silently reduced to fit workers. `--memory-mib` keeps its
 existing workspace meaning; a tight cap can therefore select serial. Explicit
 aggregate requests above 8 GiB are capped at the packaged policy's 8 GiB limit.
 
+The worker parent-memory ceiling is 4 GiB, including selector bookkeeping.
+If the combined reservation cannot fit, automatic and borrowed selected
+portfolio contexts retain the incumbent serial path. Direct selected-component
+calls raise `MemoryError`. A valid large serial fallback grant therefore does
+not by itself guarantee that workers can engage.
+
 Automatic checkpoints use outer schema 13 with a checked mathematical
 `portfolio_version` subschema. Older readers reject them. They bind
 `b12-f4-auto-v1`, the packaged policy, implementation,

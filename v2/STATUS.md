@@ -1,10 +1,25 @@
-Balanced 60/70 complete-cost follow-up: funded configuration preparation is
-underway in the isolated F4 branch; earlier 30-second refusals are not
-completion timings. See `benchmarks/ecm/b12_f4/completion_protocol.md`.
-
 # Factor status
 
 Last updated: 5 November 2026 (America/Los_Angeles).
+
+ECM-only selected-default comparison is complete; computation and the shared
+lock are released. Source `ec4ee79` versus master `0efaba1e`, with identical
+selected bounds and curve manifests, records 504 measured calls across 14
+previously exposed unbalanced inputs at 30/40/50/60/70/80/100 digits. Nine cold
+samples and nine warm calls per arm/input pass independent split/manifest and
+process cleanup checks. At 60/80/100 with 18-digit smaller factors, cold
+median gains are 2.73/2.46/2.66x and warm gains 5.63/5.96/5.37x. Cheap calls
+include regressions; harder quota failures are not time-to-factor gains.
+There are no QS or balanced runs in this comparison. New committed-checkout
+runner tests pass (23 tests); prior factorer source `406a1bf` passed 1,348 tests
+(9 optional skips), full lint and 265 benchmark imports. No population p90,
+stock-CLI completion claim, B12/F4 closure, merge or E1 campaign follows.
+The study uses 846.147 wall seconds; cumulative one-hour family expenditure is
+2245.864 wall seconds with 15,858.490 conservatively charged CPU seconds.
+Final single-threaded lint passes in 3.407 wall / 3.297 CPU seconds; including
+that static check gives 2249.272 wall / 15,861.787 charged CPU seconds.
+Local protocol/receipts: `v2/audit/b12_f4/selected_defaults_master_ecm_v2/`.
+
 Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
 A1b review record: `61899a9`. This isolated branch now enables automatic
 cost-gated ECM; it has not been merged into mainline.

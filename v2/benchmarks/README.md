@@ -17,6 +17,23 @@ nine observations under the machine-wide performance lock. Full test suites
 share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
 and instrumented diagnostics remain separate from performance evidence.
 
+## ECM-only matched execution
+
+`ecm/b12_f4/selection_fixed_child.py` supports first-factor measurements with
+`MASTER-MATCHED` and `SELECTED` request arms. The former loads the declared
+incumbent source and runs its unchanged serial ECM with supplied manifest curve
+seeds. The latter applies the packaged cold/warm policy, including its serial
+decline. Numerical schedules and curve identities must match; this control is
+explicitly distinct from the incumbent's legacy random stream and stock CLI.
+First-factor requests require `siqs=None` and `sss=None`. The runner never
+calls portfolio factorization or fallback for this endpoint.
+
+Execute only under an inherited shared performance lock. Cold requests require
+one fresh interpreter; warm requests retain their selected context and record
+validated warmup, nine measured calls and shutdown separately. Independent
+factor/certificate validation stays outside the factoring request. Detailed
+protocols, source inventories and all receipts remain local under `v2/audit/`.
+
 ## Commands
 
 From the repository root:

@@ -1,7 +1,3 @@
-Automatic ECM now includes selector bookkeeping in the worker parent-memory
-admission ceiling; large valid fallback grants decline workers safely before
-loading the selector.
-
 # Changelog
 
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
@@ -9,6 +5,14 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## B12/F4 automatic default integration (5 November 2026)
 
+- Include selector bookkeeping in parent-memory admission. Automatic and
+  borrowed portfolio contexts decline workers safely when their combined parent
+  reservation exceeds the worker ceiling; direct component calls refuse with
+  `MemoryError`. Keep arithmetic, measured policy rows and serial fallback RNG.
+- Add a source-isolated ECM-only comparison using selected cold/warm defaults
+  and incumbent serial arithmetic on identical curve manifests. Preserve its
+  seed adaptation explicitly, validate proper divisors independently and
+  include declined-policy serial cost. Disable fallback in this endpoint.
 - Enable automatic cost-gated process ECM in the normal auto CLI and bounded
   library API, with explicit serial and aggregate-memory controls. Keep exact
   arithmetic, caller limits, legacy checkpoints and stock fallback settings.
