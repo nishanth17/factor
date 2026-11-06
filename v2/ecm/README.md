@@ -100,3 +100,24 @@ protected handoff to relation engines.
 Research-only catalog/executor APIs live under
 [ECM benchmarks](../benchmarks/ecm/README.md). Current production behavior is
 separate from historical kernel and reused-program measurements.
+
+## Execution and bundled data
+
+ECM-specific execution lives in this flat package: `auto.py`, `selection.py`,
+`workers.py`, `worker.py`, `worker_state.py`, `stage_two.py`, `defaults.py` and
+`presets.py`. `execution/` retains shared budgets, stage coordination and
+contracts. Old `v2.execution.ecm_*` imports are compatibility aliases to these
+modules, including for existing callers and test patch points.
+
+`chain_data.py` and `cf_data.py` contain immutable integer/bytes tuples. Plans
+load them lazily and still verify their mathematical actions and recovery
+frontiers. The retained JSON controls are independent test oracles, not runtime
+inputs. Preparation keeps its existing versioned work charges.
+
+`worker_policy.py` holds immutable measured settings and returns owned copies;
+its numerical rows and worker choices are unchanged. Runtime selection checks
+explicit compatibility identifiers, not source files or their paths. Optional
+external profiles remain bounded JSON, using selector format v3. Automatic
+metadata uses `b12-f4-auto-v2`; old automatic v1 checkpoints and selector v2
+profiles are rejected rather than silently reinterpreted. Existing serial
+checkpoint handling and worker arithmetic/search contracts are unchanged.

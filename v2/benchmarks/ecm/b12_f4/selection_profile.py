@@ -1,4 +1,4 @@
-"""Build a source-pinned selector catalogue from reviewed literal costs."""
+"""Build a versioned selector catalogue from reviewed literal costs."""
 
 import argparse
 import hashlib

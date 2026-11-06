@@ -74,7 +74,7 @@ Detailed method-specific continuation lives in the [ECM](../ecm/README.md),
 [p−1](../pm1/README.md) and [QS](../qs/README.md) guides.
 
 The bounded portfolio now defaults to automatic cost-gated ECM through
-`ecm_auto.py` and packaged `ecm_worker_policy.json`. It owns cold-intent pool
+`ecm_auto.py` and bundled Python policy in `ecm/worker_policy.py`. It owns cold-intent pool
 cleanup; `selected_context()` provides explicit retained library contexts.
 Explicit serial execution, caller limits, legacy resume and low-level worker
 settings remain available. Automatic outer snapshots use schema 13 while the

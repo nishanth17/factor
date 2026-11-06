@@ -1,4 +1,4 @@
-"""Package unchanged measured costs with new source pins; no calibration."""
+"""Package unchanged measured costs with explicit compatibility versions."""
 
 import argparse
 import hashlib

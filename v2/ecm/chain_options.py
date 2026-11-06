@@ -12,7 +12,7 @@ from . import core as ecm
 from . import prac
 
 CF_SHA256 = "fd1e650180c1c576fe9bd95e64221f3d19bb0a730a772d356f0876d1e91284ae"
-CF_BYTES = 62430
+CF_PREPARATION_WORK = 62430
 
 
 def default_options(config, tiers=None, *, automatic_memory=False):
@@ -80,7 +80,11 @@ class ChainPlan(core.ChainPlan):
         self.bound, self.backend = bound, backend
         from . import cf_data, chain_data
 
-        budget.consume(CF_BYTES if family == "cf" else core.CATALOG_BYTES)
+        budget.consume(
+            CF_PREPARATION_WORK
+            if family == "cf"
+            else core.CATALOG_PREPARATION_WORK
+        )
         rows = cf_data.CF if family == "cf" else chain_data.LUCAS
         if len(rows) != 333:
             raise ValueError("incomplete optional ECM catalog")

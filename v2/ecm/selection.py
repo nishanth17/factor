@@ -254,7 +254,7 @@ def _saved_budget(budget, saved):
 class SelectedECMContext:
     """Quiet lazy adapter; a retained pool keeps its first selected settings.
 
-    Supply a source-compatible measured profile and its expected SHA256.
+    Supply a version-compatible measured profile and its expected SHA256.
     Direct component calls retain SEARCHv1 serial replay. Portfolio declines
     return to the incumbent arithmetic/RNG path without starting a search.
     Closing is explicit, including when factorization raises; use a context
@@ -756,7 +756,7 @@ class SelectedECMContext:
 
             # Only the packaged cold policy has this predeclared serial rule.
             # Custom catalogues and checked resumes must still validate their
-            # own source/policy identity before selecting any search.
+            # own compatibility/policy identity before selecting any search.
             if (
                 self.profile is POLICY_PATH
                 and self.profile_sha256 == POLICY_SHA256

@@ -568,7 +568,7 @@ class AutomaticTests(unittest.TestCase):
         other.configure(config(), generator, None, automatic_memory=True)
         self.assertEqual(owner.identity, other.identity)
 
-    def test_packaged_policy_preserves_measured_rows_and_current_source_pins(
+    def test_packaged_policy_preserves_measured_rows_and_compatibility(
         self,
     ):
         from v2.ecm.worker_policy import policy_data
@@ -599,12 +599,9 @@ class AutomaticTests(unittest.TestCase):
             / "b12_f4_targeted_selected_v1.json"
         )
         data = build_profile(reference, MEASURED_PROFILE_SHA256)
-        self.assertEqual(
-            data,
-            __import__(
-                "v2.ecm.worker_policy", fromlist=["policy_data"]
-            ).policy_data(),
-        )
+        from v2.ecm.worker_policy import policy_data
+
+        self.assertEqual(data, policy_data())
         with self.assertRaises(ValueError):
             build_profile(reference, "0" * 64)
 

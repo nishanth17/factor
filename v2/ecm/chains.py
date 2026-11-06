@@ -18,7 +18,7 @@ from .chain_records import (
 CATALOG_SHA256 = (
     "b316003a7238c1240f52dd28f48f507931ef7f4061362333dc436f016d531ed9"
 )
-CATALOG_BYTES = 202461
+CATALOG_PREPARATION_WORK = 202461
 CHAIN_VERSION = "ecm-c6-chunks-v1/" + CATALOG_SHA256
 BATCH = 16
 SCRATCH_BYTES = 4 * 1024**2
@@ -114,7 +114,7 @@ class ChainPlan:
             gcd=arithmetic.gcd,
         )
         # Preserve preparation charges; verify each loaded program below.
-        budget.consume(CATALOG_BYTES)
+        budget.consume(CATALOG_PREPARATION_WORK)
         from . import chain_data
 
         rows = chain_data.PRAC if family == "prac" else chain_data.LUCAS

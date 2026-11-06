@@ -94,7 +94,7 @@ For repeated library calls, a caller-owned context keeps its pool and immutable
 programs warm:
 
 ```python
-from v2.execution.ecm_auto import selected_context
+from v2.ecm.auto import selected_context
 
 with selected_context(seed=7, prefer_warm=True) as context:
     run = factorize_bounded(n, seed=7, ecm_executor=context)
@@ -113,7 +113,8 @@ counts and retained performance limitations.
 Worker arithmetic remains exact. Stable curve identities, checked divisor
 publication, bounded parent-owned leases, explicit spawn, cancellation/drain
 and quiescent checkpoints preserve finite execution and checked resume.
-Automatic checkpoint schema 13 binds policy, implementation, seed and grants;
+Automatic checkpoint schema 13 binds policy, semantic implementation version,
+seed and grants;
 older serial checkpoints remain serial. Worker-count changes on resume are
 rejected. The worker parent ceiling is 4 GiB including selector bookkeeping;
 portfolio admission failures retain serial execution, while direct selected

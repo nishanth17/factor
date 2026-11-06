@@ -3,6 +3,16 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## ECM package and bundled-data cleanup
+
+- Move engine-specific execution into the flat `v2/ecm/` package, retaining
+  old imports as compatibility aliases. Keep shared budgets/stages separate.
+- Replace bundled JSON program tables and worker settings with lazy Python
+  constants. Retain immutable benchmark JSON oracles and exact program checks.
+- Replace runtime source scanning with explicit compatibility identifiers.
+  Selector v3 and automatic metadata v2 reject older corresponding metadata;
+  serial checkpoint behavior, numerical choices and arithmetic remain unchanged.
+
 ## B12/F4 closeout and cold serial admission (5 November 2026)
 
 - Close and integrate the delivered process-ECM workstream into mainline

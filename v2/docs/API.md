@@ -107,7 +107,7 @@ seconds and 10^13 work units. Existing calibrated QS grants remain.
 For repeated compatible calls, use a caller-owned context:
 
 ```python
-from v2.execution.ecm_auto import selected_context
+from v2.ecm.auto import selected_context
 
 with selected_context(seed=7, prefer_warm=True) as context:
     for n in inputs:
