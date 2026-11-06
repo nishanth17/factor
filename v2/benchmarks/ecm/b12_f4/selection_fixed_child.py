@@ -10,6 +10,7 @@ import resource
 import sys
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 
 def retained_growth(stats):
@@ -46,6 +47,104 @@ def checked_divisor(n, divisor):
     return divisor
 
 
+class MatchedSerialECM:
+    """Run a supplied manifest through the selected source's serial ECM.
+
+    Only curve seeds are adapted. Full-schedule program/chain eligibility,
+    setup, both arithmetic stages and recovery remain incumbent code. A warm
+    interpreter still pays per-call preparation, as the incumbent API does.
+    """
+
+    def __init__(self, request):
+        self.assignments = request["assignments"]
+        self.manifest = request["manifest"]
+        self.lifetime_stats = {}
+
+    def run(self, n, *, config, budget, fixed_work=False, **kwargs):
+        from v2.execution.budget import BudgetExhaustedError
+        from v2.execution.stage_jobs import advance_job, new_job
+        from v2.portfolio import _execution_context
+
+        if fixed_work:
+            raise ValueError("matched serial adapter requires first-factor")
+        expected = [
+            (b1, b2)
+            for b1, b2, count in config.ecm_tiers
+            for _ in range(count)
+        ]
+        actual = [(a["b1"], a["b2"]) for a in self.assignments]
+        if actual != expected or any(a["n"] != n for a in self.assignments):
+            raise ValueError("serial manifest differs from numerical schedule")
+        divisor, completed, reason = None, 0, "curves_exhausted"
+        try:
+            context, programs = _execution_context({}, config, budget)
+            for assignment in self.assignments:
+                job = new_job(
+                    "ecm",
+                    n,
+                    assignment["seed"],
+                    assignment["b1"],
+                    assignment["b2"],
+                )
+                while not job["done"]:
+                    advance_job(job, budget, programs or context, config)
+                if job["sigma"] != assignment["sigma"]:
+                    raise ValueError("incumbent generated a different curve")
+                completed += 1
+                divisor = checked_divisor(n, job["factor"])
+                if divisor is not None:
+                    reason = "factor_found"
+                    break
+        except BudgetExhaustedError:
+            reason = budget.reason
+        return SimpleNamespace(
+            divisor=divisor,
+            reason=reason,
+            stats=dict(
+                manifest=self.manifest,
+                engaged=False,
+                completed_curves=completed,
+                startup_seconds=0.0,
+                drain_seconds=0.0,
+                reported_child_cpu=0.0,
+            ),
+        )
+
+    def close(self):
+        pass
+
+
+class SelectedECMOnly:
+    """Apply the adopted engagement policy with a matched serial decline."""
+
+    def __init__(self, request):
+        from v2.execution.ecm_auto import selected_context
+
+        self.owner = selected_context(
+            seed=request["seed"],
+            prefer_warm=request["mode"] == "warm",
+            parent_memory=request["parent_memory"],
+            memory_bytes=request["ecm_memory_bytes"],
+        )
+        self.serial = MatchedSerialECM(request)
+
+    @property
+    def lifetime_stats(self):
+        return self.owner.lifetime_stats
+
+    def run(self, n, **kwargs):
+        result = self.owner.run_portfolio(n, **kwargs)
+        if result is not None:
+            return result
+        result = self.serial.run(n, **kwargs)
+        result.stats.update(self.owner.last_stats)
+        result.stats["manifest"] = self.serial.manifest
+        return result
+
+    def close(self):
+        self.owner.close()
+
+
 def child(request_path, source_root):
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 required")
@@ -68,23 +167,26 @@ def child(request_path, source_root):
         (math.ceil(request["cpu"]), math.ceil(request["cpu"]) + 1),
     )
     sys.path.insert(0, source_root)
-    from v2.benchmarks.ecm.b12_f4.profile_runner import (
-        component_arm,
-        signature,
-    )
     from v2.execution.budget import Budget
-    from v2.execution.ecm_workers import ECMExecutor
-    from v2.execution.worker_contract import WorkerSettings
     from v2.portfolio import PortfolioConfig
 
     config = PortfolioConfig(**request["config"])
-    owner = ECMExecutor(
-        seed=request["seed"],
-        settings=WorkerSettings(**request["settings"]),
-        force_workers=component_arm(
-            request["arm"], request["settings"]["workers"]
-        ),
-    )
+    if request["arm"] == "MASTER-MATCHED":
+        owner = MatchedSerialECM(request)
+    elif request["arm"] == "SELECTED":
+        owner = SelectedECMOnly(request)
+    else:
+        from v2.benchmarks.ecm.b12_f4.profile_runner import component_arm
+        from v2.execution.ecm_workers import ECMExecutor
+        from v2.execution.worker_contract import WorkerSettings
+
+        owner = ECMExecutor(
+            seed=request["seed"],
+            settings=WorkerSettings(**request["settings"]),
+            force_workers=component_arm(
+                request["arm"], request["settings"]["workers"]
+            ),
+        )
     directory = Path(request["capture"])
     directory.mkdir(exist_ok=False)
     work_used, charged_children = 0, 0.0
@@ -136,6 +238,7 @@ def child(request_path, source_root):
                 reason=result.reason,
                 seconds=duration,
                 parent_cpu=time.process_time() - cpu_started,
+                reported_child_cpu=result.stats.get("reported_child_cpu", 0),
                 charged_child_cpu=budget.prior_cpu,
                 work=budget.used,
                 manifest=manifest,
@@ -148,6 +251,8 @@ def child(request_path, source_root):
             if reason == "worker_failure":
                 raise RuntimeError("worker failure: " + str(result.stats))
             raise TimeoutError(reason)
+        from v2.benchmarks.ecm.b12_f4.profile_runner import signature
+
         curves = sum(tier[2] for tier in config.ecm_tiers)
         rows = signature(result.checkpoint, request["n"], curves)
         if reference is None:
