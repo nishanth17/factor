@@ -11,13 +11,19 @@ first, then the [live backlog](v2/ROADMAP.md) and [stable policy](v2/POLICY.md).
   existing matching worktree before reusing it; never overwrite, reset or edit
   another task's worktree, protocol, receipts or grants.
 - Do not merge, push or change automatic defaults unless the user asks.
-- Serialize timed measurements and heavy QA through
+- The lock protects other sessions' measurements, not tests merely because
+  they execute code. Serialize timed measurements and heavy QA through
   `/private/tmp/factor-performance.lock`. Use the runner's lock acquisition:
   nonblocking `fcntl.flock` with `LOCK_EX | LOCK_NB`. Successful acquisition
   admits the run; an owner file or a prior observation does not. Hold the lock
   through child cleanup and draining, then release it without deleting the file.
+- Full `make -C v2 test`, worker/multiprocess tests and native builds require
+  the lock, even when described as correctness validation.
 - Check availability only at planned decision points; never poll or wait in a
   loop. Research, editing, short static checks and light Git work need no lock.
+  Short, bounded targeted runtime tests also need no lock when they take only
+  a few seconds on one core and launch no worker processes. Classify the actual
+  load, not just whether a command is called a test.
 - Do not spawn subagents or message other sessions unless asked.
 
 ## Code and arithmetic
@@ -131,6 +137,8 @@ or a new backend depends on them.
   is measured; worker IDs do not identify physical core types. See Apple's
   [model identification](https://support.apple.com/en-us/102869) and
   [M4 Air announcement](https://www.apple.com/newsroom/2025/03/apple-introduces-the-new-macbook-air-with-the-m4-chip-and-a-sky-blue-color/).
+- The `pmset -g therm` collection procedure is maintained in
+  [POLICY.md's measurement rules](v2/POLICY.md#experiment-design-and-prompt-review).
 - NEON is the current portable SIMD target, not the host's only capability:
   `hw.optional.arm.FEAT_SME` and `hw.optional.arm.FEAT_SME2` both report 1.
   Do not assume SVE or x86 IFMA code is available. A supported instruction set
