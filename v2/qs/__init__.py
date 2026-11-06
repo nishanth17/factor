@@ -1,6 +1,7 @@
 """Exact QS/MPQS contracts, bounded collection and SIQS family primitives."""
 
 from .defaults import default_siqs_config
+from .extended_policy import BoundedYieldSieveConfig, ExtendedYieldSieveConfig
 from .extraction import (
     CongruenceResult,
     DependencyExtractor,
@@ -42,19 +43,25 @@ from .relations import (
     verify_combined,
 )
 from .sieve_collector import (
+    CombinedYieldSieveConfig,
     DoubleLargeSieveConfig,
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
     SieveResult,
+    YieldSieveConfig,
 )
 from .siqs import CountedSIQSConfig, SIQSConfig, SIQSJob
 
 __all__ = [
+    "BoundedYieldSieveConfig",
+    "ExtendedYieldSieveConfig",
     "default_siqs_config",
     "AtomicRelation",
     "DoubleLargeSieveConfig",
     "GrowingDoubleLargeSieveConfig",
+    "YieldSieveConfig",
+    "CombinedYieldSieveConfig",
     "CollectionResult",
     "CombinationResult",
     "CombinedRelation",

@@ -317,7 +317,7 @@ class EngineBackendTests(unittest.TestCase):
         for name in BACKENDS:
             config = program_config(backend=name)
             whole = factorize_bounded(
-                n, seed=7, config=config, budget=allowance()
+                n, seed=7, config=config, budget=allowance(), ecm_executor=None
             )
             signature = (whole.result, whole.reason, whole.work_used)
             if reference is None:
@@ -325,7 +325,11 @@ class EngineBackendTests(unittest.TestCase):
             self.assertEqual(signature, reference)
 
             paused = factorize_bounded(
-                n, seed=7, config=config, budget=allowance(1000)
+                n,
+                seed=7,
+                config=config,
+                budget=allowance(1000),
+                ecm_executor=None,
             )
             self.assertEqual(
                 paused.checkpoint["payload"]["version"],
@@ -336,6 +340,7 @@ class EngineBackendTests(unittest.TestCase):
                 config=config,
                 budget=allowance(),
                 checkpoint=json.loads(json.dumps(paused.checkpoint)),
+                ecm_executor=None,
             )
             self.assertEqual(resumed.result, whole.result)
             self.assertEqual(resumed.reason, whole.reason)
@@ -359,6 +364,7 @@ class EngineBackendTests(unittest.TestCase):
                         config=config,
                         budget=allowance(),
                         checkpoint=reseal(damaged),
+                        ecm_executor=None,
                     )
 
     def test_preintegration_backend_checkpoints_remain_readable(self):
@@ -366,10 +372,14 @@ class EngineBackendTests(unittest.TestCase):
         for name in BACKENDS:
             config = program_config(backend=name, ecm_program_bytes=0)
             whole = factorize_bounded(
-                n, seed=7, config=config, budget=allowance()
+                n, seed=7, config=config, budget=allowance(), ecm_executor=None
             )
             paused = factorize_bounded(
-                n, seed=7, config=config, budget=allowance(1000)
+                n,
+                seed=7,
+                config=config,
+                budget=allowance(1000),
+                ecm_executor=None,
             )
             legacy = copy.deepcopy(paused.checkpoint)
             legacy["payload"]["version"] = 5
@@ -379,6 +389,7 @@ class EngineBackendTests(unittest.TestCase):
                 config=config,
                 budget=allowance(),
                 checkpoint=reseal(legacy),
+                ecm_executor=None,
             )
             self.assertEqual(
                 (resumed.result, resumed.reason, resumed.work_used),

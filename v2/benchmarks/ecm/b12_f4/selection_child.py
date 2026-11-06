@@ -53,6 +53,15 @@ def validate_reconstruction(row):
             raise ValueError("first-factor result has no split")
 
 
+def run_accounted(function, budget, totals, **kwargs):
+    """Retain work and child charges even when result construction refuses."""
+    try:
+        return function(budget=budget, **kwargs)
+    finally:
+        totals["work"] += budget.used
+        totals["children"] += budget.prior_cpu
+
+
 def summarize_stages(events, dropped, seconds):
     """Use existing bounded events; missing attribution remains unknown."""
     ecm = [
@@ -84,6 +93,51 @@ def summarize_stages(events, dropped, seconds):
     )
 
 
+def execution_options(request, executor, *, supports_executor=True):
+    """Select the declared owner without inheriting changing defaults."""
+    if request["arm"] == "AUTO":
+        if request["mode"] != "cold":
+            raise ValueError(
+                "warm studies require an explicitly retained owner"
+            )
+        return dict(
+            ecm_executor="auto",
+            ecm_memory_bytes=request["ecm_memory_bytes"],
+        )
+    if request["arm"] == "S0" and not supports_executor:
+        return {}
+    return {"ecm_executor": executor}
+
+
+def selection_options(request):
+    """Retain explicit parent/aggregate grants for persistent warm contexts."""
+    values = dict(
+        seed=request["seed"], prefer_warm=request.get("prefer_warm", False)
+    )
+    if "parent_memory" in request:
+        values["parent_memory"] = request["parent_memory"]
+    if "ecm_memory_bytes" in request:
+        values["memory_bytes"] = request["ecm_memory_bytes"]
+    return values
+
+
+def warmup_validation(row):
+    """Keep mathematical output for an independent parent-side oracle."""
+    names = (
+        "n",
+        "endpoint",
+        "reconstruct",
+        "factorization_complete",
+        "complete",
+        "factors",
+        "remaining",
+        "reason",
+        "seconds",
+        "work",
+    )
+    return {name: row[name] for name in names}
+
+
 def child(request_path, source_root):
     """Measure cold CLI or repeated calls with one retained executor."""
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
@@ -113,7 +167,15 @@ def child(request_path, source_root):
 
     config = PortfolioConfig(**request["config"])
     executor = None
-    if request["arm"] != "S0":
+    if request["arm"] == "POLICY":
+        from v2.execution.ecm_selection import SelectedECMContext
+
+        executor = SelectedECMContext(
+            request["selection_profile"],
+            request["selection_profile_sha256"],
+            **selection_options(request),
+        )
+    elif request["arm"] not in ("S0", "AUTO"):
         from v2.execution.ecm_workers import ECMExecutor
         from v2.execution.worker_contract import EngagementRule, WorkerSettings
 
@@ -123,19 +185,21 @@ def child(request_path, source_root):
             rule=EngagementRule(**(request.get("rule") or {})),
             force_workers=request["arm"] != "M0" and request["arm"] != "N",
         )
-    charged_children = 0.0
-    work_used = 0
+    totals = dict(children=0.0, work=0)
     warmup_calls = 0
     warmup_seconds = 0.0
+    warmup_records = []
+    warmup_bytes = 0
     observations = []
     stop_reason = None
 
     def invoke():
-        nonlocal charged_children, work_used
         remaining_wall = (
             request["wall"] - (time.monotonic() - request["entry"]) - 3
         )
-        remaining_cpu = request["cpu"] - time.process_time() - charged_children
+        remaining_cpu = (
+            request["cpu"] - time.process_time() - totals["children"]
+        )
         if remaining_wall <= 0 or remaining_cpu <= 0:
             raise TimeoutError("whole-cell allowance exhausted")
         call_seconds = request["call_seconds"]
@@ -145,7 +209,7 @@ def child(request_path, source_root):
         if call_seconds <= 0:
             raise TimeoutError("cold CLI startup exhausted its allowance")
         budget = Budget(
-            work_limit=request["work"] - work_used,
+            work_limit=request["work"] - totals["work"],
             seconds=min(remaining_wall, call_seconds),
             cpu_seconds=remaining_cpu,
         )
@@ -155,18 +219,57 @@ def child(request_path, source_root):
             else executor.lifetime_stats.get("charged_work", 0)
         )
         started = time.monotonic()
-        kwargs = {} if executor is None else {"ecm_executor": executor}
-        run = factorize_bounded(
-            request["n"],
-            seed=request["seed"],
-            config=config,
-            budget=budget,
-            stop_after_split=request["endpoint"] == "first",
-            **kwargs,
+        code = factorize_bounded.__code__
+        parameters = code.co_varnames[
+            : code.co_argcount + code.co_kwonlyargcount
+        ]
+        kwargs = execution_options(
+            request, executor, supports_executor="ecm_executor" in parameters
         )
+        try:
+            run = run_accounted(
+                factorize_bounded,
+                budget,
+                totals,
+                n=request["n"],
+                seed=request["seed"],
+                config=config,
+                stop_after_split=request["endpoint"] == "first",
+                **kwargs,
+            )
+        except MemoryError as error:
+            if not request.get("record_memory_refusals", False):
+                raise
+            # No native result was returned. Preserve the original cofactor
+            # and all charges; this is a censored refusal, never a fast result.
+            row = dict(
+                n=request["n"],
+                endpoint=request["endpoint"],
+                reconstruct=request["n"],
+                factorization_complete=False,
+                complete=False,
+                factors=[],
+                remaining=[request["n"]],
+                reason="memory_refusal",
+                error=str(error)[:512],
+                seconds=time.monotonic() - started,
+                work=budget.used,
+                charged_child_cpu=budget.prior_cpu,
+                executor_stats={}
+                if executor is None
+                else dict(executor.last_stats),
+                stage_summary=dict(
+                    ecm_reached=None,
+                    ecm_success="unknown",
+                    engaged=None,
+                    fallback_reached=None,
+                    dropped_events=0,
+                    coarse_stage_seconds={},
+                ),
+            )
+            validate_reconstruction(row)
+            return row
         duration = time.monotonic() - started
-        work_used += budget.used
-        charged_children += budget.prior_cpu
         factors = [
             [factor.value, factor.exponent, factor.certainty.value]
             for factor in run.result.factors
@@ -200,6 +303,8 @@ def child(request_path, source_root):
                 run.checkpoint["payload"]["state"]["stage_seconds"],
             ),
         )
+        if request.get("retain_events", False):
+            row["events"] = list(run.events)
         validate_reconstruction(row)
         return row
 
@@ -207,7 +312,15 @@ def child(request_path, source_root):
         if request["mode"] == "warm":
             warm_started = time.monotonic()
             for _ in range(500_000):
-                invoke()
+                row = invoke()
+                if request.get("retain_warmup_validation", False):
+                    record = warmup_validation(row)
+                    warmup_bytes += len(json.dumps(record).encode())
+                    if warmup_bytes > 2**20:
+                        raise RuntimeError(
+                            "recorder_exhaustion: warmup validation receipts"
+                        )
+                    warmup_records.append(record)
                 warmup_calls += 1
                 warmup_seconds = time.monotonic() - warm_started
                 if warmup_seconds >= 3:
@@ -219,8 +332,10 @@ def child(request_path, source_root):
     except TimeoutError as error:
         stop_reason = str(error)
     finally:
+        close_started = time.monotonic()
         if executor is not None:
             executor.close()
+        external_context_close_seconds = time.monotonic() - close_started
     usage = resource.getrusage(resource.RUSAGE_SELF)
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     result = dict(
@@ -233,18 +348,24 @@ def child(request_path, source_root):
         stop_reason=stop_reason,
         warmup_calls=warmup_calls,
         warmup_seconds=warmup_seconds,
-        total_work=work_used,
+        warmup_validation=warmup_records,
+        total_work=totals["work"],
         aggregate_cpu=usage.ru_utime
         + usage.ru_stime
         + children.ru_utime
         + children.ru_stime,
         aggregate_cpu_charged=usage.ru_utime
         + usage.ru_stime
-        + charged_children,
+        + totals["children"],
         helper_coverage="unpublished helper/teardown CPU retained in leases",
         parent_hwm=usage.ru_maxrss,
         child_hwm=children.ru_maxrss,
         lifetime={} if executor is None else executor.lifetime_stats,
+        external_context_close_seconds=external_context_close_seconds,
+        pool_lifetime=dict(executor.inner.lifetime_stats)
+        if executor is not None
+        and getattr(executor, "inner", None) is not None
+        else {},
     )
     print(json.dumps(result, allow_nan=False))
 

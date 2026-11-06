@@ -1,0 +1,32 @@
+{
+  "schema": "b12-f4-master-comparison-uniform140-v1",
+  "status": "frozen-before-extension-execution",
+  "base_policy_sha256": "c38c439e62c61130108169ad0ae11b963aa156f063e96dc09cc5b19da5603694",
+  "reason": "Close the default-policy coverage gap: compare the already frozen caller140 recommendation against stock32curve master on ALL36unconditioned primary60/80/100inputs, not only enriched inputs. No count/settings/threshold/seed tuning; shared controls already belong to base study.",
+  "exposure": "Supplementary comparison on the frozen fresh corpus; some stock/default outcomes were observed before this extension. Not a new pristine confirmation panel.",
+  "regimes": [
+    "60-caller140",
+    "80-caller140",
+    "100-caller140"
+  ],
+  "cold_repetitions": 9,
+  "warm_pool_lifetimes": 3,
+  "warm_repetitions_per_pool": 3,
+  "limits": {
+    "wall": 2000,
+    "cpu": 32000
+  },
+  "global_limits_unchanged": {
+    "wall": 18000,
+    "cpu": 480000
+  },
+  "measurement_stage_limits_unchanged": {
+    "wall": 17000,
+    "cpu": 475000
+  },
+  "expected_wall": [
+    700,
+    1500
+  ],
+  "stop": "Admission requires whole2000wall/32000CPU space remaining in global andmeasurement stage after base study. Refuse before execution if it cannot fit; do not select favorable moduli. No reruns or new tuning."
+}

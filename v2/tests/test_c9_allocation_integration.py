@@ -33,7 +33,8 @@ class GrowingAllocationIntegrationTests(unittest.TestCase):
         self.assertEqual(first.reason, expected_reason)
         self.assertEqual(first.result.reconstruct(), number)
         payload = first.checkpoint["payload"]
-        self.assertEqual(payload["version"], 12)
+        self.assertEqual(payload["version"], 13)
+        self.assertEqual(payload["portfolio_version"], 12)
         saved = payload["config"]["siqs"]
         self.assertEqual(saved["collector"]["storage_policy"], "grow")
         self.assertEqual(

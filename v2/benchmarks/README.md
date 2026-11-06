@@ -17,6 +17,35 @@ nine observations under the machine-wide performance lock. Full test suites
 share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
 and instrumented diagnostics remain separate from performance evidence.
 
+## B12/F4 delivered defaults
+
+The normal bounded factorer uses the [selected regime table](../STATUS.md#selected-ecm-regimes)
+with ordinary QS fallback intact. Cold 30/50/70 cheap plans bypass policy I/O;
+20-digit automatic calls stay serial. A caller-owned warm context is a separate
+endpoint. Latest committed-only QA and admission-only repair checks are in
+[results](RESULTS.md#b12f4-cold-serial-repair-and-component-closure-5-november-2026).
+Detailed evidence stays in local ignored `v2/audit/b12_f4/`. Component closure
+does not establish whole-portfolio or population-tail gains.
+
+## ECM-only matched execution
+
+`ecm/b12_f4/selection_fixed_child.py` supports first-factor measurements with
+`MASTER-MATCHED` and `SELECTED` request arms. The former loads the declared
+incumbent source and runs its unchanged serial ECM with supplied manifest curve
+seeds. The latter applies the packaged cold/warm policy, including its serial
+decline. Numerical schedules and curve identities must match; this control is
+explicitly distinct from the incumbent's legacy random stream and stock CLI.
+First-factor requests require `siqs=None` and `sss=None`. The runner never
+calls portfolio factorization or fallback for this endpoint.
+
+Execute only under an inherited shared performance lock. Cold requests require
+one fresh interpreter; warm requests retain their selected context and record
+validated warmup, nine measured calls and shutdown separately. Independent
+factor/certificate validation stays outside the factoring request. Detailed
+protocols, source inventories and all receipts remain local under `v2/audit/`.
+
+## B4a task-branch preparation
+
 B4a's [preparation manifest](inputs/controls/b4a_preparation.json) is prospective,
 not an execution grant. `ecm.b4a.runner` preserves finite issued-cell reservations,
 checks raw outputs and supervises owned process groups. `ecm.b4a.plan` requires
@@ -84,6 +113,7 @@ the archive. Worktree deletion does not discard that evidence.
 | [qs/b1/](qs/b1/) | QS/MPQS/SIQS calibration and width studies |
 | [qs/c1/](qs/c1/) | Large-prime feasibility and implementation studies |
 | [qs/c9/](qs/c9/) | Source-derived large-prime yield, adaptive storage and complete-factor economics |
+| [qs/c9a/](qs/c9a/) | Independent useful-yield/admission/graph/record policies, immutable control, bounded captures/replays and staged complete-cost preparation |
 | [qs/c10/](qs/c10/README.md) | Nine-source collection study, exact polynomial oracles, scoped 40/50-digit plan acceptance and C10a follow-ups |
 | [qs/c10a05/](qs/c10a05/) | Fixed collection/solve pacing, six-source reconciliation, finite resume oracles and scoped 50-digit complete-cost acceptance |
 | [qs/c10a05_plus/](qs/c10a05_plus/) | Frozen 51-digit default-scope extension, 55/60-digit feasibility limits and charged fresh completion evidence |
@@ -106,6 +136,219 @@ Write new captures, stdout, profiles and verification dumps under ignored
 outputs; direct runners may require an existing output folder. Do not
 force-add generated results, local journals or external source checkouts.
 
+## C9a preparation and staged execution
+
+`qs.c9a.source_compare` supports matched committed-library comparisons through
+the same external harness. `archive_library` records runtime file hashes and
+`load_library` verifies bytes before private-package imports; `prefix_cost`
+includes setup, collection, checked stores and helper work. `measure_rotating`
+requires at least three CPU/wall seconds of warmup per mode and retains nine
+rotated samples. Complete calls use `launch_pinned`; the worker entry point is
+`pypy3 -B -m v2.benchmarks.qs.c9a.source_compare --worker REQUEST.json`.
+The request contains the frozen cell and optional archived library; the driver
+binds source identity and validates results against the fixture. Do not
+substitute current code into a historical identity. Run performance work only
+under the shared quiet lock and a declared finite cumulative ledger.
+
+The final continuation uses the versioned C9a corpus, exposed_60_0/exposed_70_0,
+seed 104729, list scores, `presieve+unroll4+parity_two` and the frozen C9a
+configuration with recompute_prime_limit=0. Its new 2,048-block comparison
+(`ebb35fa` / `c8168dc`) has nine favorable samples at both sizes; the full60
+pair takes 159.519/132.247s with identical mathematical counters. Both timing
+screens fail, so the raw difference is exploratory. The separate 9,000s-per-arm
+full70 policy comparison on shared `891eda5` completes in 2742.095/1842.083s
+(C0/C9a), with mixed timing validity. Neither is population confirmation.
+Final checks: 1,113 tests (9 skipped), lint and 243 benchmark imports.
+Prospective plans, exact invocation receipts, pinned settings and worktree
+evidence locations are in local `v2/audit/c9a/optimization-83-89.md`;
+final generated evidence is under `results/c9a/hit-words-89/`. Immutable
+identities must not be reused. This continuation launches no further campaign.
+
+New C9a analyses use `observational-v2`: the old `timing_valid` field retains
+its historical 15% heuristic for provenance but is a diagnostic warning,
+not a veto on otherwise validated timings. `resource_valid` separately records
+real production resource/recorder compliance; instrumented data stays separate.
+`summarize(..., legacy_timing=True)` explicitly reproduces the historical
+analysis exclusion. New reports retain canary-warning counts, independent-modulus
+uncertainty and all failures. Calibrate future timing decisions with unchanged
+code and matched references; no universal percentage replaces that analysis.
+Post-correction mainline publication checks pass 1,114 tests (9 skipped), lint
+and all 243 benchmark imports from committed files only.
+
+The final `180576c` matched pair uses flat queues in both arms and the literal
+prior incumbent/`cost-report` configurations. On one exposed 60-digit input,
+raw C0/C1 times are 268.807/230.364s. Both exact factorizations finish within the
+same 900s/work/storage grants; unchanged terminal semantic counters and work
+are verified against each arm's prior run. Both timing screens fail, so the
+14.3% raw difference is qualified and is not adoption evidence. See
+`results/c9a/final-pair-76/` and `v2/audit/c9a/verification-77.json`.
+Historical invocation under the shared quiet lock:
+`pypy3 v2/audit/c9a/run_optimization65.py execution final-pair-76 1900
+pypy3 -B v2/audit/c9a/final-pair-76.py`.
+The immutable identity cannot be reused. Final committed-only checks pass
+1,084 tests (9 skips), lint and 242 imports. No additional campaign follows.
+
+The waste-removal bundle on `f28fd61` has matched, validated component
+measurements against its parent `57b40ad`. After at least three seconds of
+warmup per mode, nine samples of 128-block prefixes at 50/60/70/80 digits
+have 22–32% lower median whole-prefix time and identical serialized stores,
+positions and divisors. The 80-digit prefix has no retained atoms; this does
+not establish useful large-input yield or complete-factor improvement.
+An actual-score scan has 55% lower median cost; the 26,862-atom historical
+graph replay has 23% lower median time and about 1.2 MB less live GC memory.
+These component gains are not additive. Local receipts:
+`results/c9a/waste-components-67/`; reproduction:
+`pypy3 v2/audit/c9a/run_optimization65.py measurement components-67 680
+pypy3 -B v2/audit/c9a/measure-waste-67.py` under the shared quiet lock.
+The receipt name is immutable and cannot be reused.
+
+The subsequent whole 60-digit comparison on `359e935` finds correct factorizations
+in 316.0/295.6/250.5s for the archived incumbent, optimized incumbent and C9a.
+Both incumbent screens pass the revised timing policy; C9a's stable post-run
+sentinel is 17.4% faster and fails the unchanged 15% drift gate. Its raw result
+remains qualified. A targeted actual-event queue replay then rejects packed
+64-bit fields: 77.4ms versus 42.2ms for tuples. Flat unsigned-word triples take
+41.3ms with compact storage and replace that representation.
+The distinct experimental `--profile scan-report` adds the existing exact
+fused scanner to `cost-report` while preserving its other settings and all
+pre-existing kernels. `cost-report` and automatic configurations retain their
+policies. Nine warmed integration samples at each size preserve exact stores,
+positions and divisors. At 60 digits flat queues improve 8/9 observations over
+packed fields; adding fused scanning improves 7/9 over flat-only, while its 70-digit
+median is worse. Its declared selection gate fails and is preserved. Keep
+`scan-report` optional; the final current-source pair uses `cost-report` with
+flat queues in both incumbent and candidate. This shared change requires a new
+matched pair rather than comparing a flat candidate to an old packed control.
+Local records: `results/c9a/whole-cost-70/`, `queue-replay-73/` and
+`v2/audit/c9a/integration-74-plan.json`.
+
+The worker also supports the separately selected `timing_policy` value
+`retire-rewarm-v1`. It preserves the immediate legacy post-run sentinel,
+then releases the completed job, collects garbage and performs at least
+three seconds of validated warmup before a second nine-sample sentinel.
+Both screens, all warm work and cleanup costs are recorded. The original
+15% drift/spread rule remains unchanged. Historical freezes retain the
+legacy policy; a revised policy requires a new prospective freeze and a
+matched harness for every source. The optional launcher `execution_root`
+permits a verified archived library with that same shared harness.
+
+The new expanded arm is prepared by `freeze --extended` under
+`c9a-expanded-yield-v4`, after executable correctness and committed-only checks.
+The v2 and v3 protocols retain their identities. The expanded primary remains
+one C0/C1 comparison with the same first-four-prefix stop and cumulative stage
+ceilings; no run has been launched. Eight input sizes remain 50–80 digits, and
+80 still has no complete-factor cell.
+
+`qs/c9a/extended.py` provides six separately named reporting/SLP/endpoint/product
+profiles, base/interval alternatives, a bounded observed-population Pareto
+ranking function and a matched future-integration builder. Its initial
+three-prime envelope admits the geometric B,2B,4B example within 8B³; this is a
+populated starting hypothesis, not a calibrated optimum. Wider unobserved
+reporting remains unknown in ranking. Changed bases and intervals require
+their own resolved literals and eligible populations. Optional parameter work
+uses a new decision/identity within the existing diagnostic allocation, not an
+automatic Cartesian sweep or extra multi-hour campaign.
+`freeze --extended --profile NAME` selects one of the six joint hypotheses;
+its literal configuration, identity and fresh confirmation preserve that choice.
+Observed credits are a screening aid; changed admission can change graph
+closures, and a wider population must be measured before selecting it.
+The separately identified `--profile bounded-report` challenger retains the
+incumbent reporting allowance, proven three-prime admission and the expanded
+mechanisms, while selecting bounded opaque staging and shape-based ownership.
+It requires a new integration freeze; it does not revise the historical full
+reporting receipts or increase their grants.
+The subsequent ownership audit uses one unchanged reproduction and an end-state
+census, followed by exact store replay. Its accounted-byte comparison holds
+helper reservations constant; replay RSS and encoded snapshot size are not
+factoring memory or speed measurements. Current in-memory bounded storage
+charges shared slabs/contexts once and keeps packing/restore scratch explicit.
+The separately identified `--profile cost-report` nominee keeps that envelope
+and ownership policy, selects scalar XOR elimination and serial recovery, and
+uses `rho-first-v3` with SQUFOF as a bounded fallback. It follows real-matrix,
+observed-cofactor and shared/serial recovery
+cost checks; it does not revise earlier `bounded-report` configurations or
+establish a factoring win. Shared batching and panel solving remain selectable.
+
+Built-in QS/SIQS now consumes private progress after each collection batch;
+the public collector still provides full owned snapshots. The scoped return
+replay compares these entry points under the same committed runtime and checks
+identical stores, work and progress. Its mature-store cost reduction does not
+establish a whole-factor gain; short almost-empty prefixes showed no benefit.
+Keep JIT-off retention checks and explicit GC observations separate from
+uninstrumented timings. See [scoped observations](RESULTS.md#c9a-preparation).
+
+Subsequent diagnostics use PyPy's built-in statistical sampler with Python/JIT
+frames and a pinned local reader. Calibrate overhead on identical work and
+retain the resulting signatures; sampling shares are not removable-cost bounds.
+Keep heap dumps, explicit GC and resource-observer interventions separate from
+clean performance calls. A growing heap needs object/lifetime attribution;
+RSS high-water alone does not establish a leak. The measured callback cost and
+failed timing gates remain attached to the current scoped results.
+
+The primary configuration uses serial recovery and in-memory storage. Threaded
+hints and persistent spill are implemented selectable capabilities; exercising
+them needs a separately frozen configuration and finite production-disk grant
+in addition to diagnostic output caps. A DLP incumbent cannot replay a 3LP or
+opaque stream as though it admitted that population. Future C10a integration
+binds the same supplied committed base to both arms under a new identity; it
+does not alter the active C10a worktree or adopt its current nominee.
+`freeze --extended --integration PATH` accepts a preparation containing the
+exact current `source_commit`, `corpus_sha256`, per-fixture serialized
+`incumbents` and independently resolved `resolved` metadata. Both arms then
+execute that same committed runtime with their literal configurations; C0 does
+not load the historical control archive. `preparation.structural` accepts
+per-size configurations for resolving that geometry, and fresh confirmation
+uses the same per-size incumbent and a distinct input identity. These helpers
+have not been executed for a C10a integration.
+
+Preparation delivers code and certified inputs without running A/B/M/R/F/C.
+The literal configurations and actual input multiplier/base bounds live in
+`qs/c9a/extended.py` and `inputs/c9a/structural.json`. The former
+`configuration.py` plan retains its historical identity. Detailed research,
+the decision note and a concrete execution handoff are local in `audit/c9a/`.
+
+```sh
+pypy3 -m v2.benchmarks.qs.c9a --help
+pypy3 -m v2.benchmarks.qs.c9a freeze --extended \
+  --output v2/benchmarks/results/c9a/expanded-v4-freeze.json
+```
+
+Run the queued correctness and committed-only checks before freezing. This
+expanded bundle's executable QA is deferred until C10a finishes. Freezing
+requires committed, clean preparation and never starts a campaign.
+A separately authorized execution uses `run --stage A --freeze PATH
+--output DIRECTORY --decision DECISION.json`, then a recorded usefulness/cost
+decision for each later stage. There is no run-all command or full 80-digit
+cell. In the combined protocol, the first A invocation stops after four clean
+60/65-digit anchor prefixes (410 seconds maximum worker lifecycle total).
+`--continue-early` requires their recorded feasibility review and reuses them
+inside the 32-call 50–80-digit primary screen. B1 can follow the four initial
+calls directly; it does not wait for every larger prefix or a successful
+control. The complete 60/62-digit B1 anchors, broader B2, regression R,
+conditional 75-digit F and disjoint one-band confirmation remain separately
+decided stages. No component-by-component wins are prerequisites.
+`observer` performs nine matched one-block overhead pairs; optional
+`replay` uses a maximum of two validated complete streams and eight slots.
+Captured fixed populations cannot establish additional I/E yield.
+
+The runner reserves warmup/end work, lifecycle time and output storage before
+each worker, validates factors against parent-held certificates, preserves
+censored/lost cells and separates recorder exhaustion from native limits.
+`select-confirmation`, `prepare-confirmation` and `freeze-confirmation` select
+one band before fresh sampling and preserve earlier charges. Fresh required
+inputs are committed before their freeze. These commands do not grant
+permission to execute the preparation-only task's future campaigns.
+
+The combined envelope preserves the incumbent domain and proposes
+`S=max(floor(sqrt(P0)),4B)`, `L=max(L0,16B)`, and `P=max(P0,32B²)`, clipped only
+to the exact ordered endpoint product. SLP has a separate allowance and
+reporting retains the incumbent ceiling. Each cell records resolved literals.
+These settings make the boundaries explicit; no measured optimum is claimed.
+The current mainline/control runtime equivalence is recorded in
+`inputs/c9a/control_equivalence.json`. A later runtime integration needs a new
+matched identity. This QS study is not global portfolio acceptance for uniform
+60/80/100-digit integers; balanced 60/70-digit completion must not regress.
+
 ## Completed A1b review
 
 The [final decision](RESULTS.md#a1b-existing-fixed-score-review) retains current defaults.
@@ -123,7 +366,7 @@ pypy3 -B -m v2.benchmarks.qs.a1b_continuation verify
 ## Structural migrations
 
 The former `v2/studies/` collection is preserved in
-[pinned Git history](../history/README.md). Its retired C10a-04 orchestration
+[pinned Git history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md). Its retired C10a-04 orchestration
 replays from the original revision with unchanged source freezes. Only the
 tested schedule and preliminary decision helpers remain in
 [c10a04](qs/c10a04/README.md); this cleanup changes no experimental verdict.
@@ -216,3 +459,109 @@ A recorder permission error remains fully charged, with explicit late exit proof
 no unfavorable timing is selectively rerun. Warm reuse benefits do not establish
 first-factor or complete-factor latency gains. Root-lineage-aware complete-call
 feasibility precedes engagement calibration and fresh confirmation.
+
+
+Current selection-integration work uses source-pinned training input
+`inputs/controls/b12_f4_selection_v2.json`; its cost/settings anchors are unchanged
+from v1, with bounded same-path size interpolation and incumbent serial portfolio
+declines. Frozen v1 sources/inputs/results remain separate. The subsequent targeted
+comparison below measures the revised policy; old end-to-end timings remain
+under their original source identities.
+The local `v2/audit/b12_f4/selection_integration_v2/HANDOFF.md` records focused
+validation and passing full committed-checkout QA (`4a2f051`: 1,308 tests,
+9 optional skips, lint, 262 imports and source-pin admission). The computation
+lock was released at that QA checkpoint; subsequent targeted validation is
+recorded below.
+
+Current complete-cost comparison entry point:
+`v2/audit/b12_f4/master_comparison_v1/REPORT.md`, `ALL_REGIMES.md` and `HANDOFF.md`.
+All 33 recommended regimes were compared with committed master `0efaba1` using
+candidate runtime/benchmark `538462a`. Stock numerical fallback and QS checkpoint
+settings remain literal. Separate cold CLI and retained-context endpoints cover
+4,384 process cells / 6,568 timed calls, preserving refusals and uncertainty.
+See [results](RESULTS.md#b12f4-actual-master-complete-cost-comparison-5-november-2026).
+
+Reusable `ecm/b12_f4/selection_calibration.py` fits cold/started/warm costs;
+`selection_analysis.py` resamples pool/modulus clusters and preserves censored
+quantiles. `selection_inputs.py` generates bounded certified enriched inputs
+separately from unconditioned uniform panels. `selection_child.py` runs the
+source-pinned process request and preserves work/CPU charges even when result
+construction raises. Optional benchmark refusal recording reconstructs the whole
+input as unresolved rather than inventing partial progress. Runtime remains PyPy
+3.11; controllers and text analysis are separate from factoring measurements.
+
+Committed loader inputs include `inputs/controls/b12_f4_selection_v1.json`,
+`b12_f4_selection_resolved_v1.json`, `b12_f4_master_comparison_v1.json`,
+`b12_f4_master_uniform140_v1.json`, `b12_f4_master_uniform140_resource_r2.json`,
+and `inputs/corpora/b12_f4_master_comparison_v1.json`. The resource revision
+preserves prior charges and changes no per-call treatment. Preserve earlier
+confirmation/R64 inputs and evidence under their original identities.
+
+Final committed-only checkout `20e6681` passes 1,287 PyPy tests (9 optional
+skips), full lint and 262 benchmark imports. Its receipt and exact commands are
+in the local handoff. The computation lock is released. No additional performance
+campaign or default promotion is queued by this report. B12/F4 remain open and
+E1 stays deferred. That source leaves exact-cofactor coverage and the balanced
+guardrail unresolved; the targeted comparison below addresses cofactor coverage
+without establishing the balanced guardrail.
+
+The targeted cofactor-policy comparison uses committed benchmark/helper source
+`9b7eaeb` against actual master `0efaba1`, with the native implementation
+unchanged from `10f64d5` / `4a2f051`. All 1,248 cells / 1,838 timed factor calls
+validate. Nine fresh cold samples and three warm pool lifetimes × three samples
+per primary modulus preserve separate endpoints and full failed-call charges.
+See [fresh results](RESULTS.md#b12f4-fresh-cofactor-policy-comparison-5-november-2026)
+and the local `v2/audit/b12_f4/targeted_policy_v2/REPORT.md`, `TABLES.md`,
+`resources-r2.json` and `HANDOFF.md`. The lock is released; no further run or
+default promotion is queued automatically.
+
+Reusable `ecm/b12_f4/targeted_inputs.py` adds bounded certified calibration
+primes, direct/recursive enriched inputs, unconditioned uniform integers and
+cheap-exit controls. It requires PyPy 3.11, a frozen policy, a new output path
+and an inherited held shared-lock descriptor. Its CLI is:
+
+```text
+pypy3 -m v2.benchmarks.ecm.b12_f4.targeted_inputs \
+  --phase confirmation --seed SEED \
+  --policy-freeze NEW_FROZEN_POLICY --output NEW_CORPUS
+```
+
+Generation/certification is runtime work: reserve it before execution and never
+replace an exposed corpus. The committed loader inputs are
+`inputs/controls/b12_f4_targeted_policy_v1.json`,
+`b12_f4_targeted_policy_v2.json`, `b12_f4_targeted_selected_v1.json`,
+`b12_f4_targeted_confirmation_v1.json`, and
+`inputs/corpora/b12_f4_targeted_calibration_v1.json` /
+`b12_f4_targeted_confirmation_v1.json`. The selected profile was committed
+before fresh confirmation generation; only its 81-digit anchor was fitted.
+Committed-only `9b7eaeb` passes 1,311 tests (9 optional skips), lint and 263
+benchmark imports. Later report changes are documentation only. Historical
+freezes, refused stock checkpoints, all charges and analysis corrections remain
+local and immutable. B12/F4 stay open, including the balanced guardrail.
+
+Automatic default integration now uses packaged production policy
+`v2/execution/ecm_worker_policy.json`, copied from the frozen selected profile
+without changing costs or nominees. Current direct library contexts can use
+`v2.execution.ecm_auto.selected_context`; old source-pinned benchmark profiles
+still belong to their historical commits. Use explicit `ecm_executor=None` for
+serial numerical oracles and controls. The normal CLI's `--ecm-workers serial`
+disables process selection while keeping declared default tiers/grants.
+
+No new timing claim accompanies this wiring. The [adoption record](RESULTS.md#b12f4-automatic-default-integration-5-november-2026)
+retains pending guardrails and cold/CPU losses. Local validation/charges:
+`v2/audit/b12_f4/default_adoption_v1/`. Historical freezes stay immutable.
+
+`ecm/b12_f4/adoption_profile.py` is a static maintenance helper. It transfers
+unchanged measured rows with new integration source pins, keeps the reference
+immutable and labels transferred costs as training estimates. Source repinning
+is not new performance confirmation. After a deliberate code change, use a
+reviewed measured reference and expected SHA, package into the production JSON
+and update exactly the adapter policy constant, then perform locked correctness
+QA. Existing automatic checkpoints require their original committed source.
+
+Final committed-only default-integration checkout `094ab1d` passes 1,337 tests
+(9 optional skips), full lint and 264 benchmark imports. Its runtime files are
+implementation `0c4cd18`; later changes fix legacy test-fixture intent only.
+All source/default/API/checkpoint changes are validated. No new-source
+performance measurement or balanced-completion claim is made. The shared
+computation lock is released.

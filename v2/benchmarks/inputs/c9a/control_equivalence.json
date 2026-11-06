@@ -1,0 +1,12 @@
+{
+  "archive_commit": "b0813230a05396874c41c649fa01738484a1f55e",
+  "reviewed_mainline": "99a2943aa9ba681091184007d6dd8aa7171969a2",
+  "changed_v2_paths": [
+    "v2/POLICY.md",
+    "v2/ROADMAP.md",
+    "v2/STATUS.md"
+  ],
+  "runtime_source_identical": true,
+  "scope": "Native runtime and immutable control configuration; documentation updates are not performance observations.",
+  "verification_command": "git diff --name-only b0813230a05396874c41c649fa01738484a1f55e 99a2943aa9ba681091184007d6dd8aa7171969a2 -- v2"
+}

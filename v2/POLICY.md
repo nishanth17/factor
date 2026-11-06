@@ -3,7 +3,7 @@
 Start with [status](STATUS.md), then the [live backlog](ROADMAP.md).
 Stable rules below retain the roadmap's promotion policy revised 9 October
 2026 and its acceptance contracts. Historical protocols and verdicts are
-preserved in the [history index](history/README.md); they are not rewritten.
+preserved in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md); they are not rewritten.
 
 ## Scope and standing directions
 
@@ -84,6 +84,25 @@ predecessor. A task ID, research note or this backlog alone authorizes no run.
 Default promotion requires the stated gates or an explicitly authorized,
 separately recorded exception. Record every unmet gate and limitation.
 
+### Recorded automatic ECM adoption exception — 5 November 2026
+
+Automatic cost-gated B12/F4 selection is explicitly authorized on the isolated
+worker branch after the fresh bounded comparison, with an explicit serial
+fallback/override and finite owned resources. Balanced 60/70 completion remains
+pending, primary p90 is censored, some cold medians regress and CPU increases.
+This is a recorded adoption exception, not a passed guardrail, task closure or
+claim about every input/grant/hardware regime. Earlier sources/controls and
+receipts remain immutable. The standing balanced constraint and confirmation
+rules continue to govern other changes. No E1, merge or push is implied.
+
+Subsequent explicit direction on 5 November authorizes the cheap cold serial
+admission repair, mainline integration of the selected normal portfolio
+implementation, and closure of the delivered B12/F4 component. QS fallback
+remains available; the ECM-only benchmark configuration is not the production
+configuration. Closure retains the unmet broad portfolio/balanced/p90 gates
+as limitations, rather than recording them as passed. No new balanced/QS
+performance campaign, E1 execution or remote push is authorized by this closure.
+
 ## How to use the gates
 
 - **Acceptance gate (A):** the observable behavior required to close a TODO. Every returned split must satisfy `1 < g < n` and `n % g == 0`.
@@ -93,7 +112,19 @@ separately recorded exception. Record every unmet gate and limitation.
 
 **Performance promotion policy for Phases 3–8 — revised 9 October 2026;
 wall-time objective and balanced guardrail clarified 2 November 2026:**
-require zero correctness failures and the same finite work, wall/CPU time,
+The 4 November timing correction removes universal percentage-based canary
+vetoes from new performance decisions. The historical C9a 15% tolerance was
+an engineering heuristic, not a threshold derived from host variability.
+Preserve its raw observations and recorded flags for historical replay;
+report the flags as diagnostic warnings in new analysis rather than discarding
+otherwise validated timings. Actual correctness, resource and recorder
+failures remain distinct. Calibrate variability with unchanged-code A/A and
+matched references, quantify uncertainty, and justify any future rejection
+rule prospectively from those measurements. A descriptive canary warning
+alone neither proves nor disproves a speedup. Independent inputs and fresh
+confirmation below still govern adoption.
+
+Require zero correctness failures and the same finite work, wall/CPU time,
 memory and storage ceilings within a matched comparison. For latency studies,
 freeze a machine-wide aggregate CPU allowance appropriate to the permitted
 concurrency and available cores; both arms receive that allowance even if a
@@ -189,6 +220,26 @@ component gains into a portfolio claim. Refresh representative matrices after
 collection changes before promoting a solver. A timeout or zero useful rows
 alone does not justify DLP or a more elaborate solver.
 
+## Phase checkpoints
+
+[Original phase exit gates](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#phase-checkpoints).
+
+| Phase | Concrete deliverable | Exit decision |
+| --- | --- | --- |
+| 1 | Native Python 3 repairs, result/certainty contracts, regression suite | All counterexamples and failure paths pass; freeze corrected baseline |
+| 2 | Budgeted portfolio, bounded schedules, recovery/resume, corpus/runner | Time/memory limits and reproducibility demonstrated |
+| 3 | Verified relation pipeline, SIQS, SSS comparison | Balanced-composite completion improves under equal limits |
+| 4 | Validated PRAC/kernel/backend/reducer experiments | Promote measured winners; retain baseline for losses |
+| 5 | p+1, paired/recoverable continuations, double-large-prime SIQS | Complementary completion gain without resource regression |
+| 6 | Curve-family/research decisions, fixed-core workers, evidence-backed README | Held-out results support every adopted default and claim |
+| 7 | Bounded GNFS reference, scaling pipeline, SIQS/GNFS crossover | Separate correctness, scaling and held-out dispatch gates |
+| 8 | Reconciled Phase 2 calibration, preprocessing and overhead experiments | Fresh held-out promotion or explicit retain/defer/reject decisions |
+
+Execution priority after Phase 3 is current-engine calibration, selected
+P4–P6 improvements and fresh Phase 8 portfolio confirmation. Existing phase
+numbers preserve references. GNFS remains deferred until H1 and a coverage
+review justify activating the later tranche.
+
 ## Model and effort key
 
 For **new** tasks, **Sol** means **GPT-6.1 Sol** (`gpt-6.1-sol`) and **Astra**
@@ -212,9 +263,9 @@ The roadmap's task rows are the source of truth for scope-specific assignments.
 Use a fixed model/effort for the requested chat phase; these recommendations do
 not assume autonomous model switching or authorize delegation. A later,
 separately requested frozen-execution chat may use Sol / high when the row
-allows it. C10a-01 retains Astra / xhigh throughout its current workstream,
-including authorized execution. Expanded C9a admission/graph/storage research,
-implementation and correctness use Astra / xhigh; Sol / xhigh remains suitable
+allows it. Historical C10a-01 used Astra / xhigh throughout its workstream,
+including execution. The delivered C9a admission/graph/storage research,
+implementation and correctness used Astra / xhigh; Sol / xhigh remains suitable
 for a separately scoped existing-policy cadence task. Reserve Astra / max for
 a named unresolved invariant or derivation, not elapsed time or source volume.
 
@@ -222,8 +273,8 @@ a named unresolved invariant or derivation, not elapsed time or source volume.
 
 | Lane | Scope and collision rule |
 | --- | --- |
-| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. A7a owns adapting existing workers to that collector; C10a/C9a/A1a/A1c retain their scopes. Preserve the active C10a-01 freeze. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector, relation and checkpoint edits. |
-| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected C9a compact-record implementation may satisfy its B7 contract within the same workstream. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
+| QS collector | Use settled B1/C9/C10/A1a/C10a-07 decisions and the current committed control. A7a owns adapting existing workers to that collector; remaining C10a/C9b/A1a/A1c retain their scopes. Preserve historical C9a/C10a-01 freezes; new comparisons use current committed code. A1b is Done and A1b-F1 stays Deferred. B13/C8 retain their capacity/eligibility triggers. Coordinate shared collector, relation and checkpoint edits. |
+| Matrix/provenance | A8/B6/B7/C4/D1/D2 share exact row/operator/lifting contracts. A selected partial-store implementation may satisfy its B7 contract within the same workstream; delivered C9a records remain the control. Coordinate relation and checkpoint edits; ownership does not mandate a separate chat. |
 | ECM arithmetic | P4.3/P4.1/P4.2/P4.4; separate oracle/record work from production `ecm/core.py` and `execution/stage_jobs.py` integration. |
 | Schedules/continuations | P5.2/P5.3 and p+1 coordinate `execution/schedules.py`, stage jobs, backend boundaries and checkpoint versions. |
 | CLI/dispatch | Completed A11 covers explicit QS/MPQS/SIQS access. C3a/G1 own remaining allocation/handoff deltas. Coordinate `factor.py`, configuration identity and usage guides. |
@@ -231,10 +282,10 @@ a named unresolved invariant or derivation, not elapsed time or source volume.
 | Evidence/integration | One integration writer reconciles shared configuration, portfolio, benchmark guide and roadmap decisions. |
 
 Worktrees isolate edits, not CPU, RAM, disk or thermal conditions. Reserve one
-machine-wide performance window. Pause competing tests, compression, profiling
-and heavy correctness runs during accepted timings. Integrate sequentially and
-compare the exact combined source. There is no benefit in launching every
-eligible row at once. Current allocation belongs in STATUS.md.
+machine-wide performance window under the [task isolation and lock rules](../AGENTS.md#task-isolation-and-the-shared-performance-window).
+Integrate sequentially and compare the exact combined source. There is no
+benefit in launching every eligible row at once. Current allocation belongs
+in STATUS.md.
 
 ## Acceptance, evidence and stop rules
 
@@ -283,11 +334,17 @@ eligible row at once. Current allocation belongs in STATUS.md.
 
 ## Experiment design and prompt review
 
-The [repository working agreements](../AGENTS.md#experiment-design-and-prompt-review)
-record the 1 November lessons from C10a-07. Keep their meaning in every design:
+[AGENTS.md](../AGENTS.md#experiment-design-and-prompt-review) keeps the
+behavioral checklist for agents. Measurement validity and adoption rules are
+maintained here:
 
 - Establish a small uninstrumented feasibility baseline on representative
-  inputs using current committed mainline. Label historical comparisons.
+  inputs using current committed mainline before a large diagnostic or matched
+  campaign. Label historical comparisons and freeze a new identity for a
+  changed integration. Component studies may isolate the affected mechanism;
+  broader portfolio adoption needs the declared population and guardrails,
+  unless an explicit exception is recorded. ECM bounds do not guarantee
+  success for a given factor size; retain declared quota-exhaustion outcomes.
 - Measure diagnostic overhead on identical work with tracing enabled and
   disabled. Prefer short targeted traces or bounded counters when observation
   dominates. Instrumented completion is not clean performance evidence.
@@ -298,15 +355,35 @@ record the 1 November lessons from C10a-07. Keep their meaning in every design:
 - Require matched complete-cost/completion evidence, independent inputs,
   uncertainty and disjoint fresh confirmation for adoption. Repeated seeds
   are not independent moduli; exploratory completion differences justify
-  investigation without establishing a speedup.
+  investigation without establishing a speedup. The promotion rules above
+  govern uncertainty and regressions without a universal percentage-gain floor.
 - Give each stage a question, advancement/stopping decision, estimated total
   runtime and finite cumulative resources. Calibrate estimates from informative
   observations. Reassess recorder failures or unanswered timeouts before
   spending more hours; larger repeated campaigns are not a default remedy.
+  Censored outcomes can still establish finite feasibility or resource limits;
+  lack of a demonstrated gain is not evidence of no benefit.
+- Keep identical-work throughput, time to first validated factor and complete
+  factorization separate. Distinguish fresh-interpreter cold calls from calls
+  using a retained warm context. Put validated warmup in the appropriate
+  preflight/warm lane, never inside a sample labeled cold. Include interpreter,
+  spawn/import/JIT, preparation, validation and shutdown in a declared cold
+  complete-cost endpoint. Neither worker throughput nor a warm-pool gain proves
+  a cold CLI completion gain. Apply the warmup and sample requirements in
+  [acceptance rules](#acceptance-evidence-and-stop-rules).
 - Distinguish recorder storage/event exhaustion from production exhaustion.
+  Validate the recorder's useful observation window before scaling a campaign.
   Preserve receipts, charges, failures and freezes. Revise a flawed protocol
   under a new identity; never selectively retry unfavorable observations,
-  retune on confirmation or relax correctness.
+  retune on confirmation or relax correctness. Carry earlier expenditure into
+  revised protocols under the same campaign allowance; a new run identity does
+  not reset the budget.
+- On the macOS measurement host, capture bounded `pmset -g therm` output before
+  and after each timed cell, outside the measured interval. Charge collection
+  to the campaign ledger and preserve failures or missing readings. This
+  limited telemetry does not prove the absence of throttling on the fanless
+  host. Apply new collection rules prospectively; preserve earlier frozen
+  measurement definitions.
 
 ## Evidence layout
 
@@ -317,14 +394,14 @@ local. Detailed research, comparison reports and result JSON stay in these
 ignored trees; do not maintain a selective public `v2/studies/` collection.
 Keep reusable runner code under `v2/benchmarks/` and concise decisions in
 [benchmark results](benchmarks/RESULTS.md). Historical reports remain available
-through [pinned Git history](history/README.md), with original source identities.
+through [pinned Git history](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md), with original source identities.
 External sources stay in folder-ignored `v2/benchmarks/inputs/upstream/`;
 keep licenses, inventories and comparison provenance locally. Do not force-add
 generated evidence or create individual-file study ignore rules. Preserve
 historical archives at their recorded restoration locations and lossless
 compression manifests. Publish concise commands, findings and limitations.
 
-The [history record](history/ROADMAP_CLEANUP.md) resolves the old removed-link
+The [history record](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/ROADMAP_CLEANUP.md) resolves the old removed-link
 labels and records the historical Git revision, source hash and original link context.
 The source audit used
 `1272e033f889a105792cbb924bf8a12a46ac88ae`; the C-sieve review used

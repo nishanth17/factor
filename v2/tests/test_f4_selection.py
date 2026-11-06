@@ -16,6 +16,7 @@ from v2.benchmarks.ecm.b12_f4.selection_child import (
 )
 from v2.benchmarks.ecm.b12_f4.selection_fixed_child import retained_growth
 from v2.benchmarks.ecm.b12_f4.selection_inputs import (
+    confirmation_plan,
     smaller_sizes,
     uniform_panel,
 )
@@ -119,6 +120,28 @@ class InputPlanTests(unittest.TestCase):
             self.assertEqual(len(smaller_sizes(digits)), 4)
             for small in smaller_sizes(digits):
                 self.assertLessEqual(small, digits // 2)
+
+    def test_confirmation_scope_contains_twelve_additional_large_moduli(self):
+        ordinary = confirmation_plan()
+        selected = confirmation_plan(True)
+        self.assertEqual(len(ordinary), 28)
+        self.assertEqual(selected[:28], ordinary)
+        extra = selected[28:]
+        self.assertEqual(len(extra), 12)
+        self.assertEqual(len({row[0] for row in selected}), 40)
+        self.assertEqual(
+            {(digits, small) for _, digits, small, _ in extra},
+            {
+                (digits, small)
+                for digits in (60, 80, 100)
+                for small in (15, 17, 18, 20)
+            },
+        )
+        for _, digits, small, population in extra:
+            self.assertLessEqual(small, digits // 2)
+            self.assertEqual(population, "selected_ecm_enriched")
+        with self.assertRaises(ValueError):
+            confirmation_plan(1)
 
     def test_uniform_draws_are_reproducible_and_include_both_parities(self):
         rows = uniform_panel(2026110902, 12, 4)

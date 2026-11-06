@@ -4,18 +4,21 @@ from array import array
 from dataclasses import dataclass, field
 
 from ..common import utils
-from ..common.arithmetic import gcd
+from ..common.arithmetic import gcd, isqrt
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
+from .hit_words import MAX_HIT_BYTES, WordHits
 from .polynomial import (
     MAX_COEFFICIENT_BITS,
     MAX_POSITION_BITS,
     checked_position,
     polynomial_roots,
 )
-from .power_sieve import prime_power_roots
+from .power_reuse import MAX_TRANSFER_BYTES, RootTransfers
+from .power_sieve import HenselInverses, prime_power_roots
 from .relations import (
     AtomicRelation,
     _combination_workspace,
@@ -149,8 +152,10 @@ class DoubleLargeSieveConfig(SieveConfig):
         utils.require_integer(
             self.large_product_bound, "large_product_bound", 4
         )
-        if self.large_product_bound > self.large_prime_bound**2:
-            raise ValueError("product bound exceeds the two endpoint envelope")
+        if self.large_product_bound > self.large_prime_bound ** getattr(
+            self, "residual_arity", 2
+        ):
+            raise ValueError("product bound exceeds the endpoint envelope")
         utils.require_integer(self.candidate_bound, "candidate_bound", 0)
         if self.candidate_bound and not (
             self.residual_bound
@@ -193,6 +198,113 @@ class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
 
 
 @dataclass(frozen=True)
+class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
+    """Independent useful-yield policies with checked original provenance.
+
+    For proven endpoints p <= q, require p <= small_prime_bound and
+    q <= large_prime_bound, including p == q. The product ceiling remains
+    binding. This changes admission only; it never widens reporting itself.
+    """
+
+    small_prime_bound: int | None = field(default=None, kw_only=True)
+    yield_policy: str = field(default="yield-v1", kw_only=True)
+    preparation_policy: str = field(default="fixed", kw_only=True)
+    cycle_policy: str = field(default="forest", kw_only=True)
+    cycle_search_edges: int = field(default=4096, kw_only=True)
+    duplicate_policy: str = field(default="identity", kw_only=True)
+    duplicate_bytes: int = field(default=16 * 2**20, kw_only=True)
+    record_policy: str = field(default="objects", kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.yield_policy not in ("yield-v1", "yield-v2"):
+            raise ValueError("unknown useful-yield policy")
+        if self.yield_policy == "yield-v1" and any(
+            getattr(self, name).endswith("v2")
+            for name in (
+                "preparation_policy",
+                "cycle_policy",
+                "duplicate_policy",
+                "record_policy",
+            )
+        ):
+            raise ValueError("combined policies require yield-v2")
+        if self.yield_policy == "yield-v2" and not isinstance(
+            self, CombinedYieldSieveConfig
+        ):
+            raise ValueError("yield-v2 requires the combined configuration")
+        if self.small_prime_bound is not None:
+            utils.require_integer(
+                self.small_prime_bound, "small_prime_bound", 2
+            )
+            if self.small_prime_bound > self.large_prime_bound:
+                raise ValueError("smaller endpoint bound exceeds larger bound")
+        for name, choices in (
+            ("preparation_policy", ("fixed", "target-v1", "active-v2")),
+            ("cycle_policy", ("forest", "short-v1", "short-v2")),
+            ("duplicate_policy", ("identity", "pair-v1", "congruence-v2")),
+            ("record_policy", ("objects", "packed-v1", "indexed-v2")),
+        ):
+            if getattr(self, name) not in choices:
+                raise ValueError("unknown " + name)
+        for name, maximum in (
+            ("cycle_search_edges", 65536),
+            ("duplicate_bytes", 64 * 2**20),
+        ):
+            utils.require_integer(getattr(self, name), name, 0)
+            if getattr(self, name) > maximum:
+                raise ValueError(name + " exceeds its finite cap")
+
+
+@dataclass(frozen=True)
+class CombinedYieldSieveConfig(YieldSieveConfig):
+    """Versioned combined challenger; every auxiliary path has a finite cap."""
+
+    yield_policy: str = field(default="yield-v2", kw_only=True)
+    preparation_policy: str = field(default="active-v2", kw_only=True)
+    cycle_policy: str = field(default="short-v2", kw_only=True)
+    duplicate_policy: str = field(default="congruence-v2", kw_only=True)
+    record_policy: str = field(default="indexed-v2", kw_only=True)
+    recovery_policy: str = field(default="checked-v2", kw_only=True)
+    split_policy: str = field(default="portfolio-v2", kw_only=True)
+    batch_policy: str = field(default="shared-v2", kw_only=True)
+    batch_size: int = field(default=64, kw_only=True)
+    checked_bytes: int = field(default=8 * 2**20, kw_only=True)
+    filter_policy: str = field(default="light-v2", kw_only=True)
+    extraction_policy: str = field(default="joint-v2", kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.yield_policy != "yield-v2":
+            raise ValueError("combined policies require yield-v2")
+        for name, choices in (
+            ("recovery_policy", ("reference", "checked-v2")),
+            (
+                "split_policy",
+                (
+                    "reference",
+                    "rho-v2",
+                    "portfolio-v2",
+                    "ecm-v2",
+                    "rho-first-v3",
+                ),
+            ),
+            ("batch_policy", ("off", "known-v2", "shared-v2")),
+            ("filter_policy", ("reference", "fill-v2", "light-v2")),
+            ("extraction_policy", ("reference", "joint-v2")),
+        ):
+            if getattr(self, name) not in choices:
+                raise ValueError("unknown " + name)
+        for name, low, high in (
+            ("batch_size", 2, 256),
+            ("checked_bytes", 0, 64 * 2**20),
+        ):
+            utils.require_integer(getattr(self, name), name, low)
+            if getattr(self, name) > high:
+                raise ValueError(name + " exceeds its finite cap")
+
+
+@dataclass(frozen=True)
 class SieveResult:
     """Cumulative checked store and per-call diagnostics for [lo,hi).
 
@@ -214,6 +326,17 @@ class SieveResult:
     workspace_bytes: int
 
 
+@dataclass(frozen=True)
+class _CollectionProgress:
+    """Internal status without references to the cumulative relation store."""
+
+    divisor: int | None
+    next_position: int
+    reason: str
+    stats: dict
+    workspace_bytes: int
+
+
 class SieveCollector:
     """Cache one polynomial's roots/logs and reuse bounded working blocks.
 
@@ -221,6 +344,18 @@ class SieveCollector:
     Collection refusals return a checked prefix. Single-thread use only;
     state is in-memory, not the serialized SIQS checkpoint of P3.4.
     """
+
+    @property
+    def budget(self):
+        return self._budget
+
+    @budget.setter
+    def budget(self, value):
+        self._budget = value
+        arena = getattr(self, "_arena", None)
+        if arena is not None and arena.spill is not None:
+            # Reads of old cold records belong to the resumed allowance too.
+            arena.spill.budget = value
 
     def __init__(
         self,
@@ -233,10 +368,18 @@ class SieveCollector:
     ):
         """Reserve metadata/buffers and validate A's factor-base support."""
         self.config = config if config is not None else SieveConfig()
+        if (
+            isinstance(self.config, CombinedYieldSieveConfig)
+            and type(factor_base.n) is not int
+        ):
+            raise ValueError(
+                "combined useful-yield policies require native integers"
+            )
         double = isinstance(self.config, DoubleLargeSieveConfig)
         if double and type(self) is not SieveCollector:
             raise ValueError("DLP supports the serial SieveCollector only")
         self._graph = None
+        self._short_cycles = None
         if double:
             # Keep ordinary SLP and owned historic loader dependencies intact.
             from .large_prime_collector import (
@@ -284,6 +427,20 @@ class SieveCollector:
         )
         if double:
             self._workspace += self._graph_reserve(0)
+        if not getattr(self.config, "extension_policy", None) and getattr(
+            self.config, "cycle_policy", "forest"
+        ) in (
+            "short-v1",
+            "short-v2",
+        ):
+            from .short_cycles import ShortCycleIndex
+
+            self._short_cycles = ShortCycleIndex(
+                self.config.cycle_search_edges,
+                strategy=self.config.cycle_policy,
+            )
+            self._workspace += self._short_cycles.scratch_reserve
+            self._workspace += self._short_cycles.edge_reserve(0)
         if self.config.score_policy in ("powers", "fixed"):
             # Two capped root lists coexist while lifting; coefficients and
             # positions have finite bit bounds even far from zero.
@@ -333,6 +490,8 @@ class SieveCollector:
         self._a_support = tuple(
             i for i, value in enumerate(a_exponents) if value
         )
+        self._a_factor_value = polynomial.supported_a
+        self._a_factor_primes = factor_base.primes
         self._skipped = tuple(
             i
             for i, roots in enumerate(self._roots)
@@ -365,6 +524,186 @@ class SieveCollector:
         self._atoms, self._pending = {}, {}
         self._full, self._combined, self._rows = [], [], []
         self._atom_bytes = {}
+        self._checked = self._arena = self._endpoints = None
+        if isinstance(self.config, CombinedYieldSieveConfig):
+            from .cofactor_policy import KnownEndpoints
+            from .indexed_relations import RecordArena
+            from .yield_collector import divide_yield_residual
+            from .yield_support import CheckedStore, residual_floor
+
+            self._workspace += self.config.checked_bytes + 65536
+            if self.config.duplicate_policy == "congruence-v2":
+                self._workspace += self.config.duplicate_bytes // 2
+            # Lookahead norms, exponents and product/remainder temporaries
+            # coexist with scoring buffers and retained graph/row ownership.
+            self._batch_reserve = (
+                self.config.batch_size
+                * (
+                    8192
+                    + 256 * len(factor_base.entries)
+                    + 16 * (MAX_COEFFICIENT_BITS + 2 * MAX_POSITION_BITS + 4)
+                )
+                if self.config.batch_policy == "shared-v2"
+                else 0
+            )
+            if (
+                getattr(self.config, "extension_policy", None) == "extended-v2"
+                and self.config.batch_policy == "shared-v2"
+            ):
+                from .yield_memory import base_batch_reserve
+
+                self._batch_base = base_batch_reserve(
+                    factor_base, self.config.batch_size, self.budget
+                )
+                self._batch_reserve = self._batch_base
+            self._workspace += self._batch_reserve
+            if self._workspace > self.config.memory_limit:
+                raise MemoryError("combined-yield helpers exceed memory_bytes")
+            self._checked = CheckedStore(factor_base, self.config)
+            self._endpoints = KnownEndpoints()
+            if self.config.record_policy == "indexed-v2":
+                self._arena = RecordArena(
+                    factor_base, config=self.config, budget=self.budget
+                )
+            self._divide_double = divide_yield_residual
+            self._residual_floor = (
+                residual_floor(
+                    factor_base,
+                    self.budget,
+                    self.config.memory_limit - self._workspace,
+                )
+                if self.config.recovery_policy == "checked-v2"
+                else 2
+            )
+            self._incoming_key = None
+            if getattr(self.config, "extension_policy", None):
+                from .cofactor_policy import SplitMemo
+                from .incremental_structure import IncrementalStructure
+                from .residual_kernel import ResidualKernel
+                from .yield_feedback import ReportingController
+
+                self._workspace += (
+                    4096 * self.config.split_cache_entries + 2**21
+                )
+                self._workspace += (
+                    self.config.spill_cache_bytes
+                    if self.config.spill_bytes
+                    else 0
+                )
+                self._workspace += self.config.incremental_bytes
+                if self.config.extension_policy == "extended-v2":
+                    from .opaque_staging import OpaqueStaging
+
+                    self._opaque_staging = OpaqueStaging(
+                        self.config, factor_base
+                    )
+                    self._workspace += self.config.opaque_cache_bytes
+                    self._slab_bytes = 0
+                self._workspace += 16 * 2**20 * self.config.recovery_workers
+                if self._workspace > self.config.memory_limit:
+                    raise MemoryError("expanded helpers exceed memory_bytes")
+                self._split_memo = SplitMemo(self.config.split_cache_entries)
+                self._conversion_attempts = 0
+                self._conversion_events = []
+                self._conversion_bytes = 0
+                self._incremental = IncrementalStructure(
+                    self.config.incremental_bytes
+                )
+                self._graph = ResidualKernel()
+                self._short_cycles = None
+                self._reporting = ReportingController(
+                    self._candidate_bound,
+                    max(
+                        self._candidate_bound, self.config.large_product_bound
+                    ),
+                    self.config.threshold_exposure,
+                    self.config.threshold_epochs,
+                )
+
+        # Optional derived helpers compete for the same owned allowance.
+        # Their refusal preserves the original exact arithmetic/shift paths.
+        self._shared_lift_inverses = None
+        self._reuse_workspace = 0
+        inverse_bytes = 256 + 512 * count
+        if (
+            self.config.score_policy in ("powers", "fixed")
+            and inverse_bytes <= 8 * 2**20
+            and self._workspace + inverse_bytes <= self.config.memory_limit
+        ):
+            self._workspace += inverse_bytes
+            self._reuse_workspace += inverse_bytes
+            self._shared_lift_inverses = HenselInverses(count)
+        self._hit_masks = ()
+        if self.config.division in ("bucket", "resieve"):
+            cap = min(4 * 2**20, self.config.memory_limit - self._workspace)
+            masks, reserved = [], 256
+            for index in range(count):
+                size = 120 + 8 * ((index + 63) // 64)
+                if reserved + size > cap:
+                    break
+                self.budget.consume(1 + (index + 63) // 64)
+                masks.append(1 << index)
+                reserved += size
+            if masks:
+                self._hit_masks = tuple(masks)
+                # Include the temporary list during construction as well.
+                self._workspace += reserved
+                self._reuse_workspace += reserved
+        self._power_transfers = None
+        transfer_bytes = min(MAX_TRANSFER_BYTES, 65536 + 4096 * count)
+        switch_bytes = 512 * count + 32768
+        if (
+            self.config.score_policy in ("powers", "fixed")
+            and self._workspace + transfer_bytes + switch_bytes
+            <= self.config.memory_limit
+        ):
+            # Leave the mandatory old/new polynomial metadata coexistence
+            # funded; an optional cache must not prevent the next switch.
+            self._workspace += transfer_bytes
+            self._reuse_workspace += transfer_bytes
+            self._power_transfers = RootTransfers(transfer_bytes)
+            self._power_transfers.bind(polynomial)
+        self._word_hits = None
+        hit_bytes = WordHits.reservation(count, width)
+        hit_work = WordHits.construction_work(count, width)
+        if (
+            count > 60
+            and self.config.score_backend == "list"
+            and self.config.division == "bucket"
+            and self.config.score_policy in ("powers", "fixed")
+            and hit_bytes <= MAX_HIT_BYTES
+            and self._workspace + hit_bytes + switch_bytes
+            <= self.config.memory_limit
+            and hit_work <= self.budget.work_limit - self.budget.used
+        ):
+            # Existing helpers keep priority. Construction and lazy reads
+            # have explicit extra work; scarce memory keeps the list path.
+            self._word_hits = WordHits(count, self._hits, self.budget)
+            self._hits = self._word_hits
+            self._workspace += hit_bytes
+            self._reuse_workspace += hit_bytes
+        self._sparse_split = None
+        if self.config.sparse_queue_bytes:
+            target = polynomial.n_prime
+            self.budget.consume(count + target.bit_length() ** 2 + 1)
+            self._sparse_split = next(
+                (
+                    i
+                    for i, entry in enumerate(factor_base.entries)
+                    if entry.prime >= self.config.block_width
+                ),
+                count,
+            )
+            self._sparse_singular = any(
+                target % entry.prime == 0
+                for entry in factor_base.entries[self._sparse_split :]
+            )
+            self._sparse_square = isqrt(target) ** 2 == target
+
+    def _recovery_mask(self, index):
+        """Reuse a funded immutable prefix; larger indices stay exact."""
+        masks = self._hit_masks
+        return masks[index] if index < len(masks) else 1 << index
 
     @property
     def matrix_relations(self):
@@ -374,6 +713,10 @@ class SieveCollector:
     @property
     def partial_ids(self):
         """Unowned atoms only; emitted cycle provenance stays pinned."""
+        if getattr(self.config, "extension_policy", None):
+            return tuple(
+                self._arena.atoms[i].relation_id for i in self._graph.unowned
+            )
         return (
             tuple(self._graph.unowned)
             if self._graph is not None
@@ -394,30 +737,84 @@ class SieveCollector:
         verify_polynomial_roots(
             polynomial, self.factor_base, roots, budget=self.budget
         )
-        remaining, exponents = polynomial.supported_a, []
+        supported_a = polynomial.supported_a
+        primes = self.factor_base.primes
+        if (
+            supported_a == self._a_factor_value
+            and primes == self._a_factor_primes
+        ):
+            # Gray steps change B but retain A. The immutable exponent tuple
+            # is already checked against exactly this supported A and base.
+            self.budget.consume(1)
+            exponents, support = self._a_exponents, self._a_support
+        else:
+            remaining, exponents = supported_a, []
+            for entry in self.factor_base.entries:
+                self.budget.consume(polynomial.a.bit_length() + 1)
+                exponent = 0
+                while remaining % entry.prime == 0:
+                    remaining //= entry.prime
+                    exponent += 1
+                exponents.append(exponent)
 
-        for entry in self.factor_base.entries:
-            self.budget.consume(polynomial.a.bit_length() + 1)
-            exponent = 0
-            while remaining % entry.prime == 0:
-                remaining //= entry.prime
-                exponent += 1
-            exponents.append(exponent)
-
-        if remaining != 1:
-            raise ValueError("A must factor completely over the factor base")
+            if remaining != 1:
+                raise ValueError(
+                    "A must factor completely over the factor base"
+                )
+            exponents = tuple(exponents)
+            support = tuple(i for i, value in enumerate(exponents) if value)
         self._switch_peak = max(
             getattr(self, "_switch_peak", 0), self._workspace + extra
         )
         if not retain_relations:
+            if self._checked is not None:
+                from .indexed_relations import RecordArena
+
+                self._checked.clear()
+                if self._arena is not None:
+                    # Old public snapshots keep their original arena alive.
+                    spill = self._arena.spill
+                    if (
+                        getattr(self.config, "extension_policy", None)
+                        == "extended-v2"
+                    ):
+                        self._workspace -= self._slab_bytes
+                        self._slab_bytes = 0
+                    self._arena = RecordArena(
+                        self.factor_base,
+                        config=self.config,
+                        budget=self.budget,
+                    )
+                    self._arena.spill = spill
+                if getattr(self.config, "extension_policy", None):
+                    from .incremental_structure import IncrementalStructure
+
+                    self._incremental = IncrementalStructure(
+                        self.config.incremental_bytes
+                    )
+                    self._conversion_events = []
+                    self._workspace -= self._conversion_bytes
+                    self._conversion_bytes = 0
+                    if self.config.extension_policy == "extended-v2":
+                        from .opaque_staging import OpaqueStaging
+
+                        self._opaque_staging = OpaqueStaging(
+                            self.config, self.factor_base
+                        )
             cache = getattr(self, "_preparation_cache", None)
             if cache is not None:
                 cache.clear()
             self._workspace -= sum(self._atom_bytes.values())
+            if self._short_cycles is not None:
+                self._workspace -= 2048 * len(self._short_cycles.edges)
+                self._short_cycles.edges.clear()
+                self._short_cycles.neighbors.clear()
+                self._short_cycles.weights.clear()
             if self._graph is not None:
-                self._workspace -= self._graph_reserve(
-                    len(self._graph.edges)
-                ) - self._graph_reserve(0)
+                if not getattr(self.config, "extension_policy", None):
+                    self._workspace -= self._graph_reserve(
+                        len(self._graph.edges)
+                    ) - self._graph_reserve(0)
                 self._graph = type(self._graph)()
             self._atoms.clear()
             self._pending.clear()
@@ -431,10 +828,10 @@ class SieveCollector:
 
             clear(self)
         self.polynomial, self._roots = polynomial, roots
-        self._a_exponents = tuple(exponents)
-        self._a_support = tuple(
-            i for i, value in enumerate(exponents) if value
-        )
+        if self._power_transfers is not None:
+            self._power_transfers.bind(polynomial)
+        self._a_exponents, self._a_support = exponents, support
+        self._a_factor_value, self._a_factor_primes = supported_a, primes
         self._lift_inverses.clear()
         self._power_plans.clear()
         self._plan_refused.clear()
@@ -466,6 +863,8 @@ class SieveCollector:
                     lo=window_lo,
                     hi=window_hi,
                     inverses=self._lift_inverses,
+                    shared_inverses=self._shared_lift_inverses,
+                    root_transfers=self._power_transfers,
                 ):
                     modulus, residues, _ = mark
                     words = (modulus.bit_length() + 7) // 8
@@ -504,6 +903,8 @@ class SieveCollector:
             lo=lo,
             hi=hi,
             inverses=self._lift_inverses,
+            shared_inverses=self._shared_lift_inverses,
+            root_transfers=self._power_transfers,
         )
 
     def _set_plan_interval(self, lo, hi):
@@ -602,11 +1003,60 @@ class SieveCollector:
                 self._scores[index] += weight
 
     def _sieve(self, lo, hi, stats):
+        self._block_norm_bits = None
+        if (
+            getattr(self.config, "extension_policy", None) == "extended-v2"
+            and self.config.batch_policy == "shared-v2"
+        ):
+            from .yield_memory import reserve_batch
+
+            reserve_batch(self, lo, hi)
+        self._piecewise_thresholds = None
         if self.config.sparse_queue_bytes:
             from .sparse_queue import sieve
 
-            return sieve(self, lo, hi, stats)
-        return self._sieve_direct(lo, hi, stats)
+            threshold = sieve(self, lo, hi, stats)
+        else:
+            threshold = self._sieve_direct(lo, hi, stats)
+        if self._word_hits is not None and self._hits is self._word_hits:
+            self._word_hits.seal()
+        width = getattr(self.config, "refinement_width", 0)
+        if (
+            width
+            and self.config.score_policy in ("candidate", "powers")
+            and not self._skipped
+        ):
+            if (
+                self._block_norm_bits is not None
+                and self._block_norm_bits[0] == self._block_norm_bits[1]
+            ):
+                # Every subwindow has the same norm bit length, so the
+                # refined threshold cannot exceed this block's threshold.
+                return threshold
+            refined = []
+            for start in range(lo, hi, width):
+                self.budget.consume(
+                    8 * self.factor_base.n_prime.bit_length() + 1
+                )
+                lower, _ = self._bounds(start, min(start + width, hi))
+                needed = max(0, lower.bit_length() - 1)
+                needed -= (
+                    self._candidate_bound - 1
+                ).bit_length() + self._omitted_allowance
+                needed = max(0, needed + self.config.threshold_extra)
+                refined.append(max(threshold, self._clip_threshold(needed)))
+            self._piecewise_thresholds = tuple(refined)
+        return threshold
+
+    def _piecewise_passes(self, offset):
+        bounds = getattr(self, "_piecewise_thresholds", None)
+        if bounds is None:
+            return True
+        self.budget.consume(1)
+        return (
+            self._scores[offset]
+            >= bounds[offset // self.config.refinement_width]
+        )
 
     def _sieve_direct(self, lo, hi, stats):
         """Mark complete root hits in bounded prime chunks, without F(x)."""
@@ -614,17 +1064,31 @@ class SieveCollector:
         self._omitted_allowance = 0
         self.budget.consume(width)
         two_levels, initial_score, initial_hit = 0, 0, 0
+        powers = self.config.score_policy in ("powers", "fixed")
         parity_two = "parity_two" in self.config._kernels
         if parity_two:
             lower, maximum = self._bounds(lo, hi)
             two_levels, initial_score, initial_hit = (
                 kernels.parity_two_initial(self, maximum)
             )
-        for index in range(width):
-            self._scores[index] = initial_score
-            self._hits[index] = initial_hit
+        period_initializes = (
+            powers
+            and self._presieve is not None
+            and self.config.score_backend == "list"
+        )
+        words = self._word_hits if self._hits is self._word_hits else None
+        if words is not None:
+            words.begin(initial_hit, self.budget)
+        # Both periodic implementations replace the full active slices,
+        # including empty-prime periods. Avoid clearing those slices first.
+        if not period_initializes:
+            for index in range(width):
+                self._scores[index] = initial_score
+                if words is None:
+                    self._hits[index] = initial_hit
         if not parity_two:
             lower, maximum = self._bounds(lo, hi)
+        self._block_norm_bits = lower.bit_length(), maximum.bit_length()
         if two_levels:
             stats["parity_two_blocks"] = stats.get("parity_two_blocks", 0) + 1
             stats["parity_two_seeded_hits"] = (
@@ -649,7 +1113,6 @@ class SieveCollector:
             )
             return 0
 
-        powers = self.config.score_policy in ("powers", "fixed")
         weights = self._logs if powers else self._weights(maximum)
         omitted = 0
         buckets = (
@@ -671,6 +1134,7 @@ class SieveCollector:
             for index in range(start, min(start + chunk, len(self._roots))):
                 roots, weight = self._roots[index], weights[index]
                 prime = roots.prime
+                recovery_mask = self._recovery_mask(index) if buckets else 0
                 skipped = prime < self.config.small_prime_cutoff
                 if skipped:
                     # Power scores recover skipped valuations exactly at the
@@ -694,6 +1158,8 @@ class SieveCollector:
                             lo=lo,
                             hi=hi,
                             inverses=self._lift_inverses,
+                            shared_inverses=self._shared_lift_inverses,
+                            root_transfers=self._power_transfers,
                         )
                     )
 
@@ -728,6 +1194,17 @@ class SieveCollector:
                                     stats["root_hits"] += len(hits)
                                 stats["power_hits"] += len(hits)
                                 continue
+                            if first_level and buckets and words is not None:
+                                hits = range(
+                                    (root - lo) % modulus, width, modulus
+                                )
+                                self.budget.consume(len(hits) + 1)
+                                stats["root_hits"] += len(hits)
+                                stats["power_hits"] += len(hits)
+                                words.add(
+                                    index, hits, self._scores, power_weight
+                                )
+                                continue
                             if density:
                                 # Sparse powers have at most one hit. Keep
                                 # the scalar reservation, including empty
@@ -741,7 +1218,7 @@ class SieveCollector:
                                     stats["power_hits"] += count
                                     if count:
                                         if first_level and buckets:
-                                            self._hits[offset] |= 1 << index
+                                            self._hits[offset] |= recovery_mask
                                         self._scores[offset] += power_weight
                                     continue
 
@@ -758,7 +1235,7 @@ class SieveCollector:
                                         width,
                                         modulus,
                                         power_weight,
-                                        (1 << index)
+                                        recovery_mask
                                         if first_level and buckets
                                         else 0,
                                     )
@@ -766,7 +1243,7 @@ class SieveCollector:
                                 if first_level and buckets:
                                     # The same certified first-level hits
                                     # supply both recovery bits and scores.
-                                    bit = 1 << index
+                                    bit = recovery_mask
                                     for hit in hits:
                                         self._hits[hit] |= bit
                                         self._scores[hit] += power_weight
@@ -779,12 +1256,24 @@ class SieveCollector:
                             self.budget.consume(len(hits) + 1)
                             if first_level:
                                 stats["root_hits"] += len(hits)
-                                if buckets:
-                                    for hit in hits:
-                                        self._hits[hit] |= 1 << index
 
                             stats["power_hits"] += len(hits)
-                            self._add(hits, power_weight, stats)
+                            if (
+                                first_level
+                                and buckets
+                                and self.config.score_backend == "list"
+                            ):
+                                # Both writes use the same certified range;
+                                # avoid traversing all first-level hits twice.
+                                scores, hit_masks = self._scores, self._hits
+                                for hit in hits:
+                                    hit_masks[hit] |= recovery_mask
+                                    scores[hit] += power_weight
+                            else:
+                                if first_level and buckets:
+                                    for hit in hits:
+                                        self._hits[hit] |= recovery_mask
+                                self._add(hits, power_weight, stats)
 
                         first_level = False
 
@@ -799,8 +1288,11 @@ class SieveCollector:
                     self.budget.consume(len(hits) + 1)
                     stats["root_hits"] += len(hits)
                     if buckets:
-                        for hit in hits:
-                            self._hits[hit] |= 1 << index
+                        if words is not None:
+                            words.add(index, hits)
+                        else:
+                            for hit in hits:
+                                self._hits[hit] |= recovery_mask
                     if skipped or powers or self.config.marking == "bucket":
                         continue
                     if (
@@ -928,11 +1420,17 @@ class SieveCollector:
                 values[offset] = value
                 remaining[offset] = abs(value)
                 recovered[offset] = {
-                    self._roots[i].prime: self._a_exponents[i]
+                    (
+                        i + 1
+                        if getattr(self.config, "indexed_recovery", False)
+                        else self._roots[i].prime
+                    ): self._a_exponents[i]
                     for i in self._a_support
                 }
 
-        for roots, a_exponent in zip(self._roots, self._a_exponents):
+        for index, (roots, a_exponent) in enumerate(
+            zip(self._roots, self._a_exponents)
+        ):
             self.budget.consume(1)
             prime = roots.prime
             residues = (0,) if roots.all_positions else roots.roots
@@ -950,7 +1448,12 @@ class SieveCollector:
                         remaining[offset] //= prime
                         exponent += 1
                     if exponent:
-                        recovered[offset][prime] = a_exponent + exponent
+                        key = (
+                            index + 1
+                            if getattr(self.config, "indexed_recovery", False)
+                            else prime
+                        )
+                        recovered[offset][key] = a_exponent + exponent
                     stats["division_primes"] += 1
                     stats["division_steps"] += exponent
 
@@ -984,6 +1487,13 @@ class SieveCollector:
         else:
             value = self.polynomial.value(position)
             remaining, exponents = abs(value), []
+        smooth_residual = getattr(self, "_smooth_hints", {}).get(position, 1)
+        if smooth_residual != 1 and self.config.division != "resieve":
+            remaining, remainder = divmod(remaining, smooth_residual)
+            if remainder:
+                raise ArithmeticError(
+                    "batch residual does not divide its norm"
+                )
 
         self.budget.consume(abs(value).bit_length() + 2)
         stats["candidates"] += 1
@@ -1005,9 +1515,15 @@ class SieveCollector:
         if self.config.division == "resieve":
             indices = ()
         elif self.config.division == "bucket":
-            bits = self._hits[offset]
+            hit_bits = (
+                self._word_hits.mask(offset, self.budget)
+                if self._word_hits is not None
+                and self._hits is self._word_hits
+                else self._hits[offset]
+            )
+            bits = hit_bits
             for index in self._a_support:
-                bits |= 1 << index
+                bits |= self._recovery_mask(index)
             indices = []
             while bits:
                 bit = bits & -bits
@@ -1024,7 +1540,7 @@ class SieveCollector:
             if self.config.division == "full":
                 hit = True
             elif self.config.division == "bucket":
-                hit = bool(self._hits[offset] & (1 << index))
+                hit = bool(hit_bits & self._recovery_mask(index))
             else:
                 hit = roots.all_positions or position % prime in roots.roots
 
@@ -1037,7 +1553,21 @@ class SieveCollector:
                     stats["division_steps"] += 1
 
             if exponent:
-                exponents.append((prime, exponent))
+                exponents.append(
+                    (
+                        index + 1
+                        if getattr(self.config, "indexed_recovery", False)
+                        else prime,
+                        exponent,
+                    )
+                )
+
+        if getattr(self.config, "indexed_recovery", False):
+            from .indexed_relations import IndexedFactors
+
+            exponents = IndexedFactors(exponents, self.factor_base.primes)
+        if self.config.division != "resieve":
+            remaining *= smooth_residual
 
         if self._graph is not None:
             return self._divide_double(
@@ -1080,8 +1610,20 @@ class SieveCollector:
 
         FIFO eviction cannot reach pinned atoms. Refusal leaves store state
         untouched, so the same position can be retried with a new Budget.
+        Expanded admission may first commit a separately recorded opaque
+        conversion; refusal then preserves that conversion and retries only
+        the uncommitted incoming atom.
         """
         require_published(self)
+        if self._checked is not None:
+            from .yield_collector import prepare_admission
+
+            if not prepare_admission(self, atom, stats):
+                return None
+        if getattr(self.config, "extension_policy", None):
+            from .extended_collector import admit
+
+            return admit(self, atom, stats)
         if self._graph is not None and atom.residual_product != 1:
             return self._admit_double(self, atom, stats)
         if atom.relation_id in self._atoms:
@@ -1157,11 +1699,19 @@ class SieveCollector:
                     "previously checked unit residual changed"
                 )
 
+        compact_slot = None
+        if self._arena is not None:
+            atom, _, compact_slot = self._arena.plan(atom, None, self.budget)
+        elif getattr(self.config, "record_policy", "objects") == "packed-v1":
+            from .packed_relations import pack_relation
+
+            atom = pack_relation(atom, self.budget)
         self.budget.consume(len(atom.exponents) + 1)
         # A failed insertion must not expose a partially published smooth
         # row (or legacy SLP match) as a resumable memory-limit result.
         self._publication_failed = True
         try:
+            evicted_atoms = (self._atoms[evicted],) if evicted else ()
             if evicted:
                 del self._pending[self._atoms[evicted].residual]
                 del self._atoms[evicted]
@@ -1169,6 +1719,12 @@ class SieveCollector:
                 stats["evictions"] += 1
 
             self._atoms[atom.relation_id] = atom
+            if self._checked is not None:
+                from .yield_collector import publish_auxiliary
+
+                publish_auxiliary(
+                    self, atom, None, compact_slot, evicted_atoms
+                )
             self._atom_bytes[atom.relation_id] = reserve
             self._workspace += reserve - released
             stats["admitted_atoms"] += 1
@@ -1199,6 +1755,14 @@ class SieveCollector:
         scratch may change on refusal; accepted store state never does.
         Eviction and thresholds may lose yield only as documented in config.
         """
+        return self._collect(lo, hi, snapshot=True)
+
+    def _collect_progress(self, lo, hi):
+        """Collect for an internal caller that already owns the live store."""
+        return self._collect(lo, hi, snapshot=False)
+
+    def _collect(self, lo, hi, *, snapshot):
+        """Share validation, traversal and publication for both results."""
         require_published(self)
         checked_position(lo)
         checked_position(hi)
@@ -1233,7 +1797,24 @@ class SieveCollector:
             stats.update(dict.fromkeys(self._double_counters, 0))
         stats["threshold_min"] = 2**63
         position, reason, divisor = lo, "complete", None
+        span_budget = (
+            self.budget if isinstance(self.budget, PollingBudget) else None
+        )
+        span_ledger = None if span_budget is None else span_budget.budget
+        reporting = (
+            self._reporting
+            if getattr(self.config, "extension_policy", None)
+            else None
+        )
         kernel_before = kernels.counters(self)
+        batcher = None
+        if (
+            self._checked is not None
+            and self.config.batch_policy == "shared-v2"
+        ):
+            from .cofactor_policy import CofactorBatch
+
+            batcher = CofactorBatch(self.config.batch_size)
 
         try:
             if (
@@ -1253,6 +1834,19 @@ class SieveCollector:
             while position < hi:
                 block_lo = position
                 block_hi = min(hi, block_lo + self.config.block_width)
+                if getattr(self.config, "extension_policy", None):
+                    # Resume completes the same physical block before making
+                    # a reporting decision; a pause cannot create a new epoch.
+                    block_hi = min(
+                        hi,
+                        (position // self.config.block_width + 1)
+                        * self.config.block_width,
+                    )
+                    if position % self.config.block_width == 0:
+                        self._candidate_bound = self._reporting.decide()
+                if batcher is not None:
+                    batcher.records.clear()
+                    batcher.hints.clear()
                 threshold = self._sieve(block_lo, block_hi, stats)
                 if self.config.division == "resieve":
                     if not self._resieve(block_lo, block_hi, threshold, stats):
@@ -1275,6 +1869,29 @@ class SieveCollector:
                         if candidates is None
                         else offset == next_candidate
                     )
+                    if not selected and candidates is None and span_budget:
+                        affordable = span_ledger.work_limit - span_ledger.used
+                        # Remaining is already bounded by64. Cache the
+                        # ledger reference, never its mutable limit or usage.
+                        amount = span_budget._remaining
+                        if amount > affordable:
+                            amount = affordable
+                        if amount < 1:
+                            amount = 1
+                        stop = min(block_hi - block_lo, offset + amount)
+                        end = offset + 1
+                        while end < stop and self._scores[end] < threshold:
+                            end += 1
+                        amount = end - offset
+                        # Publish only affordable certified rejects. The
+                        # adapter counts these logical actions individually,
+                        # so batching cannot enlarge its 64-action poll gap.
+                        span_budget.consume_span(amount)
+                        position += amount
+                        stats["scanned"] += amount
+                        if reporting is not None:
+                            reporting.record(amount, 0, 0)
+                        continue
                     if not selected and candidates is not None:
                         end = (
                             block_hi
@@ -1292,15 +1909,34 @@ class SieveCollector:
                         self.budget.consume(amount)
                         position += amount
                         stats["scanned"] += amount
+                        if getattr(self.config, "extension_policy", None):
+                            self._reporting.record(amount, 0, 0)
                         continue
                     if selected:
                         # Candidate division reserves the position unit and
                         # recovery work in one atomic check. The former two
                         # adjacent polls did no intervening published work.
-                        atom, divisor = self._divide(position, offset, stats)
+                        if not self._piecewise_passes(offset):
+                            self.budget.consume()
+                            atom, divisor = None, None
+                        elif batcher is None:
+                            atom, divisor = self._divide(
+                                position, offset, stats
+                            )
+                        else:
+                            atom, divisor = batcher.recover(
+                                self,
+                                position,
+                                offset,
+                                block_hi,
+                                threshold,
+                                stats,
+                            )
                         if divisor is not None:
                             position += 1
                             stats["scanned"] += 1
+                            if getattr(self.config, "extension_policy", None):
+                                self._reporting.record(1, 1, 0)
                             reason = "factor_found"
                             break
 
@@ -1314,6 +1950,8 @@ class SieveCollector:
 
                     position += 1
                     stats["scanned"] += 1
+                    if getattr(self.config, "extension_policy", None):
+                        self._reporting.record(1, int(selected), 0)
                     # Searching another group can poll and refuse. Publish
                     # this candidate's cursor before doing that derived work.
                     if selected and candidates is not None:
@@ -1321,6 +1959,11 @@ class SieveCollector:
 
                 if reason != "complete":
                     break
+                if (
+                    getattr(self.config, "extension_policy", None)
+                    and position % self.config.block_width == 0
+                ):
+                    self._candidate_bound = self._reporting.decide()
         except BudgetExhaustedError:
             reason = self.budget.reason
 
@@ -1335,6 +1978,16 @@ class SieveCollector:
                 for key, value in kernels.counters(self).items()
             }
         )
+        if not snapshot:
+            # QSJob consumes status only. Expanding cumulative records here
+            # copies a growing history after every bounded collection batch.
+            return _CollectionProgress(
+                divisor,
+                position,
+                reason,
+                stats,
+                self._workspace + self._scratch_peak_bytes,
+            )
         return SieveResult(
             tuple(self._atoms.values()),
             tuple(self._full),

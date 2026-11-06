@@ -1,0 +1,259 @@
+"""Matched modulus-level uncertainty with explicit censored outcomes."""
+
+import math
+import random
+import statistics
+
+from .selection import censored_quantile
+
+
+def _validate_arms(candidate, control):
+    if set(candidate) != set(control) or not candidate:
+        raise ValueError("matched independent modulus identities required")
+    for identity in candidate:
+        left, right = candidate[identity], control[identity]
+        if not left or len(left) != len(right) or len(left) > 100:
+            raise ValueError("matched finite timing repetitions required")
+        for observations in (left, right):
+            for row in observations:
+                if set(row) != {"seconds", "complete", "grant"}:
+                    raise ValueError("invalid latency observation")
+                if type(row["complete"]) is not bool:
+                    raise ValueError("invalid completion flag")
+                if (
+                    type(row["seconds"]) not in (float, int)
+                    or not math.isfinite(row["seconds"])
+                    or row["seconds"] < 0
+                ):
+                    raise ValueError("invalid observed latency")
+                if (
+                    type(row["grant"]) not in (float, int)
+                    or not math.isfinite(row["grant"])
+                    or row["grant"] <= 0
+                ):
+                    raise ValueError("invalid common grant")
+                if row["complete"] and row["seconds"] > row["grant"]:
+                    raise ValueError("completed observation exceeds grant")
+    grants = {
+        row["grant"]
+        for arms in (candidate, control)
+        for observations in arms.values()
+        for row in observations
+    }
+    if len(grants) != 1:
+        raise ValueError("one latency comparison needs equal grants")
+
+
+def _completion_and_restricted(arm, identities):
+    # Each independent modulus has equal weight, regardless of sample count.
+    completion, restricted = [], []
+    for identity in identities:
+        observations = arm[identity]
+        completion.append(
+            statistics.mean(row["complete"] for row in observations)
+        )
+        restricted.append(
+            statistics.mean(
+                row["seconds"] if row["complete"] else row["grant"]
+                for row in observations
+            )
+        )
+    return statistics.mean(completion), statistics.mean(restricted)
+
+
+def compare_cohort(candidate, control, *, seed=20261110, draws=2000):
+    """Resample moduli, keeping their seeds/repetitions together.
+
+    Restricted latency charges failures/timeouts the common grant. It is a
+    finite-horizon endpoint, not an estimate of unknown completion time. Raw
+    quantiles stay censored when completion cannot identify them.
+    """
+    _validate_arms(candidate, control)
+    if type(draws) is not int or not 100 <= draws <= 10_000:
+        raise ValueError("finite bootstrap draw count required")
+    identities = sorted(candidate)
+    if len(identities) < 3:
+        raise ValueError("at least three independent moduli required")
+    # Keeping equal repetition counts also gives each modulus equal weight
+    # in the pooled descriptive latency quantiles below.
+    counts = {len(observations) for observations in candidate.values()}
+    counts.update(len(observations) for observations in control.values())
+    if len(counts) != 1:
+        raise ValueError("cohort quantiles require equal repetition counts")
+    c_completion, c_restricted = _completion_and_restricted(
+        candidate, identities
+    )
+    s_completion, s_restricted = _completion_and_restricted(
+        control, identities
+    )
+    if s_restricted <= 0:
+        raise ValueError("zero control latency cannot define a ratio")
+    # Cache per-modulus summaries: repetitions remain one cluster, and the
+    # bootstrap never repeats their decoding or mean calculations.
+    clusters = {
+        identity: (
+            _completion_and_restricted(candidate, [identity]),
+            _completion_and_restricted(control, [identity]),
+        )
+        for identity in identities
+    }
+    generator = random.Random(seed)
+    differences, ratios = [], []
+    for _ in range(draws):
+        chosen = generator.choices(identities, k=len(identities))
+        complete_c = sum(clusters[key][0][0] for key in chosen)
+        complete_s = sum(clusters[key][1][0] for key in chosen)
+        restricted_c = sum(clusters[key][0][1] for key in chosen)
+        restricted_s = sum(clusters[key][1][1] for key in chosen)
+        differences.append((complete_c - complete_s) / len(identities))
+        if restricted_s <= 0:
+            raise ValueError("bootstrap control latency is zero")
+        ratios.append(restricted_c / restricted_s)
+    differences.sort()
+    ratios.sort()
+    lower, upper = int(0.025 * draws), int(0.975 * draws) - 1
+    arms = {}
+    for name, arm, completion, restricted in (
+        ("candidate", candidate, c_completion, c_restricted),
+        ("control", control, s_completion, s_restricted),
+    ):
+        observations = [
+            row for identity in identities for row in arm[identity]
+        ]
+        arms[name] = dict(
+            completion=completion,
+            restricted_mean_seconds=restricted,
+            median=censored_quantile(observations, 0.5),
+            p90=censored_quantile(observations, 0.9),
+        )
+    return dict(
+        independent_moduli=len(identities),
+        repetitions_per_modulus=counts.pop(),
+        scope="modulus-cluster bootstrap; censored finite-horizon latency",
+        completion_difference=c_completion - s_completion,
+        completion_interval=[differences[lower], differences[upper]],
+        restricted_latency_ratio=c_restricted / s_restricted,
+        restricted_ratio_interval=[ratios[lower], ratios[upper]],
+        arms=arms,
+        tail_warning=(
+            "Small cohort: descriptive p90, substantial tail uncertainty."
+            if len(identities) < 100
+            else "Descriptive p90 requires tail/censoring uncertainty."
+        ),
+    )
+
+
+def compare_pool_timings(candidate, control, *, seed=20261113, draws=2000):
+    """Compare one modulus, resampling independent process/pool lifetimes.
+
+    Cold blocks contain one fresh-interpreter sample each. Warm blocks keep
+    calls from one retained pool together. Temporal pairing is not assumed;
+    this conditional interval does not create independent input moduli.
+    """
+    if type(draws) is not int or not 100 <= draws <= 10_000:
+        raise ValueError("finite bootstrap draw count required")
+    widths = set()
+    for arm in (candidate, control):
+        if not isinstance(arm, (list, tuple)) or not 3 <= len(arm) <= 32:
+            raise ValueError("at least three independent pool lifetimes")
+        total = 0
+        for block in arm:
+            if (
+                not isinstance(block, (list, tuple))
+                or not 1 <= len(block) <= 9
+            ):
+                raise ValueError("finite timing block required")
+            widths.add(len(block))
+            total += len(block)
+            if any(
+                type(value) not in (int, float)
+                or not math.isfinite(value)
+                or value <= 0
+                for value in block
+            ):
+                raise ValueError("validated positive timings required")
+        if total < 9:
+            raise ValueError("at least nine timing samples required")
+    if len(widths) != 1:
+        raise ValueError("equal samples per independent pool required")
+
+    def median(blocks):
+        return statistics.median(value for block in blocks for value in block)
+
+    generator = random.Random(seed)
+    ratios = sorted(
+        median(generator.choices(candidate, k=len(candidate)))
+        / median(generator.choices(control, k=len(control)))
+        for _ in range(draws)
+    )
+    ratio = median(candidate) / median(control)
+    if not math.isfinite(ratio) or not all(map(math.isfinite, ratios)):
+        raise ValueError("timing ratio exceeds finite representation")
+    return dict(
+        ratio=ratio,
+        interval=[ratios[int(0.025 * draws)], ratios[int(0.975 * draws) - 1]],
+        candidate_pools=len(candidate),
+        control_pools=len(control),
+        samples_per_pool=widths.pop(),
+        independent_moduli=1,
+        scope="conditional timings; independently resampled pool lifetimes",
+    )
+
+
+def cohort_median_interval(candidate, control, *, seed=20261116, draws=2000):
+    """Bound paired modulus-bootstrap median ratios under common censoring.
+
+    Unidentified medians contribute bounds rather than successful-only
+    estimates. Repetitions and algorithm seeds stay inside their modulus
+    cluster. The interval is a small-sample bootstrap, not a precise tail
+    guarantee or a substitute for independent moduli.
+    """
+    _validate_arms(candidate, control)
+    identities = sorted(candidate)
+    if len(identities) < 3:
+        raise ValueError("at least three independent moduli required")
+    if type(draws) is not int or not 100 <= draws <= 10_000:
+        raise ValueError("finite bootstrap draw count required")
+    counts = {
+        len(rows) for arm in (candidate, control) for rows in arm.values()
+    }
+    if len(counts) != 1:
+        raise ValueError("equal repetitions required for pooled medians")
+
+    def bounds(chosen):
+        medians = [
+            censored_quantile(
+                [row for identity in chosen for row in arm[identity]], 0.5
+            )
+            for arm in (candidate, control)
+        ]
+        left, right = (median["seconds"] for median in medians)
+        if left is not None and right is not None:
+            if right <= 0:
+                raise ValueError("zero control median cannot define a ratio")
+            return left / right, left / right
+        if left is None and right is None:
+            return 0.0, math.inf
+        if left is None:
+            if right <= 0:
+                raise ValueError("zero control median cannot define a ratio")
+            return medians[0]["lower_bound"] / right, math.inf
+        return 0.0, left / medians[1]["lower_bound"]
+
+    point = bounds(identities)
+    generator = random.Random(seed)
+    intervals = [
+        bounds(generator.choices(identities, k=len(identities)))
+        for _ in range(draws)
+    ]
+    lower = sorted(pair[0] for pair in intervals)[int(0.025 * draws)]
+    upper = sorted(pair[1] for pair in intervals)[int(0.975 * draws) - 1]
+    return dict(
+        independent_moduli=len(identities),
+        repetitions_per_modulus=counts.pop(),
+        ratio=point[0] if point[0] == point[1] else None,
+        ratio_bounds=[point[0], point[1] if math.isfinite(point[1]) else None],
+        interval=[lower, upper if math.isfinite(upper) else None],
+        upper_unbounded=not math.isfinite(upper),
+        scope="paired modulus-cluster median bootstrap with censoring bounds",
+    )

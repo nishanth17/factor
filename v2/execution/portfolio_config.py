@@ -27,11 +27,14 @@ def _decode_siqs_config(values):
         GrowingDoubleLargeSieveConfig,
         SieveConfig,
         SIQSConfig,
+        YieldSieveConfig,
     )
 
     decoded = dict(values)
     collector = decoded["collector"]
-    if collector.get("storage_policy") == "grow":
+    if "yield_policy" in collector or "small_prime_bound" in collector:
+        collector_type = YieldSieveConfig
+    elif collector.get("storage_policy") == "grow":
         collector_type = GrowingDoubleLargeSieveConfig
     elif "large_prime_bound" in collector:
         collector_type = DoubleLargeSieveConfig
@@ -323,13 +326,13 @@ class PortfolioConfig:
         utils.require_integer(n)
         if not self._automatic_ecm_tiers:
             return self
+        from ..ecm.defaults import resolve_defaults
         from ..qs.defaults import (
             C9_MEMORY_BYTES,
             C9_PORTFOLIO_MEMORY_BYTES,
             default_siqs_config,
             uses_siqs_defaults,
         )
-        from .ecm_defaults import resolve_defaults
 
         selected = resolve_defaults(self, n)
         if self._automatic_siqs and uses_siqs_defaults(
@@ -340,6 +343,10 @@ class PortfolioConfig:
                 if self._automatic_memory
                 else self.memory_bytes
             )
+            if self._automatic_memory and self.ecm_kernel != "python":
+                # Fund native scratch alongside the unchanged SIQS child;
+                # explicit parent caps remain binding.
+                memory += 2 * 2**20
             # Resolve at the root; children and checkpoints retain concrete
             # settings and finite parent/child coexistence allowances.
             child_memory = (

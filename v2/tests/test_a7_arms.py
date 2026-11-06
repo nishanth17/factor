@@ -12,8 +12,14 @@ from v2.qs.sss import SSSJob
 
 
 class PreparedArmTests(unittest.TestCase):
+    def setUp(self):
+        # Configuration tests read the historical literal policies. Current
+        # runtime admission remains separately pinned: an unrelated opt-in
+        # change must neither rewrite that freeze nor imply an E1 reapproval.
+        self.plan = json.loads(a7_r5.PLAN.read_text())
+
     def test_calibrated_controls_are_exact_and_budgets_are_common(self):
-        plan = a7_r5.load_plan()
+        plan = self.plan
         for band, name in (
             ("30d", "b1_selected.json"),
             ("40d", "b1_40d_selected.json"),
@@ -49,7 +55,7 @@ class PreparedArmTests(unittest.TestCase):
         self.assertEqual(plan["seeds"], [7, 29])
 
     def test_both_sssf_loss_policies_are_separately_labelled(self):
-        configs = a7_r5.serial_configurations("30d")
+        configs = a7_r5.serial_configurations("30d", plan=self.plan)
         self.assertEqual(configs["sss"].mode, "sss")
         self.assertGreater(configs["sssf_filtered"].filter_bound, 0)
         self.assertEqual(configs["sssf_six_unfiltered"].filter_bound, 0)
@@ -57,23 +63,46 @@ class PreparedArmTests(unittest.TestCase):
 
     def test_current_adapter_uses_b1_classification_and_allowances(self):
         fixture = {"n": 10**29 + 1, "digits": 30}
-        with patch.object(a7_r5.b1, "run_one", return_value="checked") as run:
+        with (
+            patch.object(a7_r5, "load_plan", return_value=self.plan),
+            patch.object(a7_r5.b1, "run_one", return_value="checked") as run,
+        ):
             self.assertEqual(
                 a7_r5.run_serial(fixture, 7, "30d", "sss"), "checked"
             )
+            with self.assertRaises(ValueError):
+                a7_r5.run_serial(fixture, 999, "30d", "sss")
         self.assertEqual(run.call_args.kwargs["job_type"], SSSJob)
         self.assertEqual(run.call_args.args[-1], 5)
-        with self.assertRaises(ValueError):
-            a7_r5.run_serial(fixture, 999, "30d", "sss")
 
     def test_worker_configuration_is_the_accepted_bounded_schedule(self):
-        plan = a7_r5.load_plan()
+        plan = self.plan
         for band in ("small", "medium"):
             config = a7_r5.worker_configuration(band, plan=plan)
             self.assertEqual(config.batch_width, 256)
             self.assertEqual(config.poll_interval, 64)
             self.assertEqual(config.memory_bytes, 512 * 2**20)
             self.assertLessEqual(config.half_width, 8192)
+
+    def test_runtime_admission_still_checks_every_frozen_pin(self):
+        with patch.object(
+            a7_r5, "matches_source_pin", return_value=True
+        ) as match:
+            a7_r5.load_plan()
+        integrated = json.loads(a7_r5.CURRENT_SOURCES.read_text())
+        expected = sum(
+            len(self.plan[key]) for key in ("source_sha256", "input_sha256")
+        )
+        expected += len(integrated["additional_source_sha256"])
+        self.assertEqual(match.call_count, expected)
+        for refused in range(expected):
+            answers = [True] * expected
+            answers[refused] = False
+            with patch.object(
+                a7_r5, "matches_source_pin", side_effect=answers
+            ):
+                with self.assertRaisesRegex(ValueError, "pin changed"):
+                    a7_r5.load_plan()
 
     def test_changed_runtime_pin_cannot_load_as_the_frozen_control(self):
         with tempfile.TemporaryDirectory(prefix="a7-pin-") as directory:

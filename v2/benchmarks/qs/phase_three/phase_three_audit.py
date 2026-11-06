@@ -32,6 +32,8 @@ MODULES = (
     "relations",
     "reference_collector",
     "power_sieve",
+    "power_reuse",
+    "hit_words",
     "collector_kernels",
     "score",
     "storage",

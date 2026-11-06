@@ -3,6 +3,115 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## ECM package and bundled-data cleanup (6 November 2026)
+
+- Move engine-specific execution into the flat `v2/ecm/` package, retaining
+  old imports as compatibility aliases. Keep shared budgets/stages separate.
+- Replace bundled JSON program tables and worker settings with lazy Python
+  constants. Retain immutable benchmark JSON oracles and exact program checks.
+- Replace runtime source scanning with explicit compatibility identifiers.
+  Selector v3 and automatic metadata v2 reject older corresponding metadata;
+  serial checkpoint behavior, numerical choices and arithmetic remain unchanged.
+
+## B12/F4 closeout and cold serial admission (5 November 2026)
+
+- Close and integrate the delivered process-ECM workstream into mainline
+  with its selected numerical/cold/warm regimes. Keep ordinary QS fallback,
+  explicit serial/resource settings and checked resume. The benchmark-only
+  disabled-fallback configuration does not become a production default.
+- Bypass policy loading for cold compact64 at 30 digits and fixed32 at 50/70.
+  Keep warm/custom numerical schedules on ordinary selection. Admission-only
+  checks reduce about 44 ms to 0.035 ms; 20-digit admission stays unchanged.
+- Current committed-only QA passes 1,357 tests (9 optional skips), full lint
+  and 265 runner/package imports. Retain ECM-only gains, quota failures and
+  remaining cheap/warm regressions; make no new whole-portfolio or p90 claim.
+- Preserve research, receipts and source identities in local ignored evidence;
+  remove 21 clean F4 worktrees and 41 other temporary snapshots/caches after
+  integration. Keep the shared lock file and other workstreams untouched.
+
+## B12/F4 automatic default integration (5 November 2026)
+
+- Include selector bookkeeping in parent-memory admission. Automatic and
+  borrowed portfolio contexts decline workers safely when their combined parent
+  reservation exceeds the worker ceiling; direct component calls refuse with
+  `MemoryError`. Keep arithmetic, measured policy rows and serial fallback RNG.
+- Add a source-isolated ECM-only comparison using selected cold/warm defaults
+  and incumbent serial arithmetic on identical curve manifests. Preserve its
+  seed adaptation explicitly, validate proper divisors independently and
+  include declined-policy serial cost. Disable fallback in this endpoint.
+- Enable automatic cost-gated process ECM in the normal auto CLI and bounded
+  library API, with explicit serial and aggregate-memory controls. Keep exact
+  arithmetic, caller limits, legacy checkpoints and stock fallback settings.
+- Own automatic pool cleanup on every exit and before final resource snapshots;
+  bind automatic policy, implementation, deterministic seed and memory on resume.
+- Promote escalating140 at 60/80/100 omitted-tier inputs and package unchanged
+  measured nominees/costs with integration source pins. Retained contexts remain
+  available separately; cheap/unsupported/unfunded calls stay serial.
+- Record the authorized adoption exception: balanced completion and precise
+  tails remain unestablished, some cold medians regress and CPU increases.
+  No new speedup claim, mainline merge, push, B12/F4 closure or E1.
+- Committed-only `094ab1d` passes 1,337 tests (9 optional skips), full lint and
+  264 benchmark imports; automatic snapshots use outer schema 13 so older
+  readers reject their worker state. Computation and its lock are released.
+
+## B12/F4 targeted policy and hard-case evidence (5 November 2026)
+
+- Add bounded certified calibration/confirmation generation, independent tests,
+  immutable corpora and a profile frozen before fresh input generation. Fit only
+  an 81-digit cost anchor; holdouts validate within 4–17%.
+- Record 1,248 checked cells / 1,838 timed calls against actual master. Fresh
+  uniform completion is 22/36 versus 18/36; completion-sensitive mean latency is
+  lower cold/warm, while some cold medians regress and CPU rises 4.37×.
+- Keep a separate exploratory 415-curve hard pilot, all stock checkpoint refusals,
+  censored tails, resource charges and the pending balanced guardrail explicit.
+- Committed-only `9b7eaeb` passes 1,311 PyPy tests (9 optional skips), lint and
+  263 benchmark imports. Computation is finished and the lock is released.
+  No default promotion, merge, push, B12/F4 closure or E1 campaign.
+
+## B12/F4 cofactor-aware selection and incumbent serial path (5 November 2026)
+
+- Add bounded piecewise linear per-curve cost estimates between same-plan size
+  anchors, partitioned at active PRAC eligibility boundaries. Retain bundle-bound
+  crossovers, fixed engaged pool settings and explicit estimate provenance.
+- Keep portfolio declines on incumbent serial arithmetic and RNG, with a sticky
+  cofactor checkpoint decision. A declined call no longer pins a serial context;
+  an engaged search never changes stream after a later refusal.
+- Version selector profiles/checkpoints as v2, bind component/portfolio mode and
+  add a source-pinned training catalogue with unchanged historical cost anchors.
+  Native wire v7, mathematical SEARCHv1 and automatic defaults remain unchanged.
+- Add independent cost, serial/fallback RNG, cancellation, ownership, resume and
+  actual-cofactor spawn regressions. Committed-only `4a2f051` passes 1,308 PyPy
+  tests (9 optional skips), lint, 262 imports and source-pin admission. No new
+  performance result, default promotion, merge or B12/F4 closure.
+
+## B12/F4 actual-master comparison (5 November 2026)
+
+- Preserve benchmark work/CPU accounting through result/checkpoint construction
+  failures; add three regression tests and finite censored refusal recording.
+  Production arithmetic, resource limits and automatic defaults are unchanged.
+- Version fresh independent certified/uniform inputs, the stock-master comparison
+  policy and a separately frozen caller140 supplement/resource continuation.
+- Record all 33 regimes, cold CLI and warm context outcomes: primary uniform
+  completion is 18/36 versus master's 19/36 on the default schedule, or 24/36 with
+  explicit caller140. Median uncertainty, the 80-digit losses, sparse actual
+  worker engagement and pending balanced guardrail preclude default adoption.
+- Final report/input committed checkout `20e6681` passes 1,287 PyPy tests
+  (9 optional skips), full lint and 262 benchmark imports; the lock is released. Detailed receipts remain local. No B12/F4
+  closure, merge or E1 campaign.
+
+## B12/F4 measured opt-in catalogue (4 November 2026)
+
+- Add lazy, source-checked selection for 33 exact mathematical regimes with
+  separately calibrated cold/started/warm thresholds and explicit retained-pool
+  intent. Preserve exact ECM arithmetic, SEARCHv1 identity, finite v7 ownership,
+  actual incumbent control and automatic serial defaults.
+- Version reproducible configuration snapshots, a disjoint certified/uniform
+  corpus and censor-aware cluster analysis. Retain full failures and charges.
+- Record repeated fixed-work scaling and 448 held-out complete calls, including
+  median uncertainty, the 80-digit regression, explicit matched QS checkpoint
+  funding and the pending balanced guardrail. No production adoption or closure;
+  final committed-checkout tooling QA remains queued with the lock released.
+
 ## B4a optional ECM NEON screen closure (4 November 2026)
 
 - Measure the fixed two-curve NEON prototype against GMP and the B4a scalar
@@ -102,6 +211,175 @@ below record decisions in their dated scope; later entries may supersede routes.
   Arithmetic/process/full-suite QA and performance measurements are NOT RUN;
   B12/F4 remain open and this branch is not adopted or merged.
 
+## C9a useful-yield continuation (4 November 2026)
+
+- Remove the uncalibrated 15% canary veto from new C9a analyses, observer
+  comparisons and feasibility admission. Retain legacy flags as diagnostics
+  and provide explicit historical analysis replay. Keep instrumented runs and
+  actual resource/recorder failures distinct; future performance judgments
+  require measured variability and uncertainty rather than a universal cutoff.
+  Post-correction committed-only mainline passes 1,114 tests (9 skipped), lint
+  and all 243 benchmark imports; measured factoring arithmetic is unchanged.
+- Integrate the tested C9a bundle into mainline and close the delivered stream
+  by explicit direction. Keep the performance verdict exploratory and policy
+  classes opt-in. Replace C9a in the ranked queue with C9b for current-mainline
+  timing validation and a bounded remaining-headroom analysis.
+- Mark bucket recovery metadata in bounded 60-bit integer words with block
+  epochs; materialize exact wide masks only for selected candidates. Charge
+  construction, periodic stamp copies and internal reads, keep mandatory
+  polynomial-switch scratch funded, and retain the ordinary-list fallback.
+  Checkpoint formats and mathematical collection order are unchanged.
+- The extended 70-digit comparison completes both policies within 9,000s each:
+  C9a/C0 take 1842.1/2742.1s on shared source `891eda5`. The final same-C9a
+  hit-metadata full60 pair takes 159.5/132.2s on `ebb35fa`/`c8168dc`.
+  Mixed/failed timing screens and one exposed modulus per band limit these
+  raw differences to exploratory observations. No default adoption follows.
+- Validate the final committed-only checkout with 1,113 tests (9 skipped),
+  lint and all 243 benchmark imports. Calibrated whole-factor sampling and a
+  complete mature heap inform the implementation; they are diagnostic data.
+
+## C9a useful-yield preparation (3 November 2026)
+
+- Prepare bounded complete prime-power root transfer across same-A
+  polynomials, with independent uncached/modular-enumeration oracles. Preserve
+  root traversal order and exceptional lifting; charge inverse construction,
+  retain polynomial-switch scratch and discard derived caches on restore.
+  Correctness and performance gates remain separate from adoption.
+
+- Fuse exact dense hit/score updates, skip initialization overwritten by
+  periodic scores, and replace repeated sparse-queue division with additive
+  offsets and grouped reservations. Preserve event order, complete charges
+  and cooperative polling. Avoid tiny root sorts and redundant lifting
+  arithmetic while retaining independent polynomial-root verification.
+  Benchmark warmup now retains every selected marking kernel.
+
+- Remove repeated compact-factor decoding in private proof checks and exact
+  canonical keys; retire obsolete raw proofs after packed publication. Reuse
+  bounded Hensel inverse information and recovery masks across polynomials,
+  hoist fixed-target queue eligibility, and batch scalar reject accounting
+  with unchanged finite polling and exact refusal/resume. Keep the existing
+  recomputation default and automatic routing pending matched measurements.
+
+- Validate the final flat-queue bundle with 1,084 tests (9 skips), lint and 242
+  committed benchmark imports. The matched exposed 60-digit incumbent/C9a pair
+  finishes in 268.8/230.4s; both timing screens fail, so preserve the raw 14.3%
+  difference without adoption. Keep fused scanning optional after mixed
+  prefix evidence and retain every failed/rejected measurement.
+
+- Replace slower packed-field queue replay with measured flat unsigned-word
+  triples. Add the separate experimental `scan-report` nominee to activate
+  exact fused scanning while preserving existing kernel and admission choices.
+
+- Implement shared SIQS polling, checked same-A metadata reuse, packed sparse
+  queues, redundant-refinement avoidance and compact residual coordinates.
+  Preserve immediate work refusal, cancellation publication boundaries and
+  independent checkpoint validation. Measurements remain pending.
+
+- Complete the shared progress-path 60-digit pair: raw C9a time 320.9s versus
+  incumbent 356.3s, with both timing gates failed. Add bounded CPU/heap evidence
+  and identify resource-observer cost; retain exploratory scope without a
+  production observation-policy change or adoption.
+
+- Avoid copying cumulative atom/relation arrays and expanding partial IDs on
+  every built-in QS/SIQS collection batch. Share the same traversal, exact
+  publication and refusal/resume path with public collection; preserve full
+  public snapshots, collector overrides and serialized checkpoint formats.
+
+- Remove pivot sorting with an incrementally maintained presence bitset, avoid
+  unnecessary panel-table invalidation, and bound
+  cofactor lookahead checks in prepaid chunks. Add a rho-first split policy with
+  retained SQUFOF fallback and reuse of paid splits for three-prime recovery.
+  Prepare the separate `cost-report` nominee using scalar elimination and that
+  split order; preserve earlier profiles and all exact validation contracts.
+
+- Reject proven single-prime domain holes before hints/primality testing.
+  Skip rho-first three-prime recovery below the proven residual-prime floor
+  cubed while retaining the final useful two-prime rho walk, and
+  validate narrower split memos on restore. Reuse batch scratch high-water
+  bounds, avoid repeated ownership calculation and disabled recomputation
+  scans, cache singular/nonsingular Hensel derivative results, and retain the
+  dense-root view across sparse-queue blocks.
+
+- Publish bounded opaque staging with only actual FIFO evictions instead of
+  copying its map. Skip canonical-key construction for unmatched staged atoms
+  after exact validation and the applicable nonunit check. Budget refusal
+  preserves staging; interrupted allocation requires a prior checkpoint.
+
+- Select serial recovery in the experimental `cost-report` nominee after an
+  exact-prefix check and exposed complete-call diagnostic. Preserve shared
+  batching as an option. The candidate still loses to the incumbent on this
+  input and timing screens fail; no adoption or default change follows.
+
+- Complete a larger bounded screen: four independent exposed inputs, eight
+  successful calls at 50/55/60/62 digits. Candidate sieve coverage is lower,
+  but raw complete time and RSS are greater in every pair. Preserve failed
+  calibration gates and retain the incumbent pending targeted cost work.
+
+- Complete the repaired 60-digit matched pair under the original 900-second
+  and memory grants. Both factor successfully; C9a uses fewer sieve positions
+  but greater observed complete time, RSS and charged work. Preserve failed
+  timing gates and stop after the pair without adoption.
+
+- Audit the actual 26,862-atom ownership stop. Charge shared slabs and polynomial
+  contexts once, integer digit storage explicitly, and packing scratch separately.
+  Rebuild compact in-memory records on restore and preserve cold-file identities.
+  The same captured state replays at 367.9MB accounted workspace with matched
+  helper allowances, versus 1,040.1MB previously. This is an ownership correction,
+  not a measured RAM reduction, factoring speedup or default promotion.
+
+- Extend one matched 60-digit comparison to 900 seconds per arm under unchanged
+  memory grants. C0 factors the input; C1 stops at accounted memory before a
+  matrix solve. Preserve failed timing screens and the remaining storage limit;
+  stop after the pair without adoption or a default change.
+
+- Add a separately versioned bounded-yield variant with capped opaque staging,
+  exact promotion, shape-based incidence ownership and norm-bounded batch
+  scratch. Preserve FIFO state in schema 14 and retain the incumbent reporting
+  allowance in the new experimental profile. Fix sparse incidence ordering
+  after light-row selection and preserve completed divisors across restore.
+  The four-call rerun finishes matched prefixes under unchanged grants; early
+  closed-row yield matches C0, charged work is greater and drift gates fail.
+  Keep the variant experimental and stop before a larger campaign.
+
+- Make the measurement warmup exercise selected coupled arithmetic. Complete
+  the four-call matched feasibility screen; retain candidate ownership-cap
+  stops and failed drift checks without a speedup claim. Pause larger runs
+  for opaque-retention and memory-accounting review.
+
+- Merge current C10a-01 mainline policies into the C9a branch. Preserve
+  coupled arithmetic markers alongside yield schemas 11–13 and keep historical
+  control decoding explicit; add combined checkpoint/resume regression cases.
+
+- Fix expanded SIQS result statistics to report residual incidence without
+  ordinary-forest attributes. Keep tuple-based legacy loaders independent of
+  opt-in residual/storage imports. The PyPy unit suite passes 942 tests with
+  9 skips after these repairs; performance acceptance remains pending.
+
+- Prepare the separate expanded arm with lazy cycle arithmetic, integer
+  incidence/provenance, three-prime and opaque residual contracts, bounded
+  conversion/reduction, adaptive reporting and extraction-outcome feedback.
+  Add recomputation/spill capabilities, finite asynchronous hints, sparse and
+  structured filtering, a bounded panel solver, schema13 restore and a v4
+  two-arm/parameter-selection protocol. New executable validation is pending;
+  this records opt-in preparation, not acceptance or a performance result.
+
+- Extend the opt-in combined challenger with occupied-column feedback, private
+  checked-proof reuse, exact early rejection, bounded cofactor splitting and
+  batch hints, direct/bidirectional cycle shortcuts, canonical congruences,
+  base-index slabs and integer provenance handles. Add fill-aware filtering,
+  reversible lighter-row attempts, joint extraction and schema-12 restore.
+- Prepare a separately identified two-arm protocol with a four-call clean
+  feasibility checkpoint. Expanded correctness checks are written but their
+  execution is deferred until the shared quiet window; no new campaign ran.
+- Add independent opt-ins for useful-row preparation targets, asymmetric
+  proven large-prime endpoints, shorter exact cycles, immediate equal-parity
+  dependencies and immutable packed exponent records. Preserve separate
+  reporting/admission controls, original provenance and finite reservations.
+- Add policy-bound schema-11 checkpoints, independent correctness oracles,
+  an immutable mainline control, certified exposed inputs and bounded staged
+  experiment tooling. Automatic defaults and routing are unchanged; no C9a
+  performance campaign or adoption is included.
+
 ## C10a-01 mainline and automatic defaults (3 November 2026)
 
 - Integrate exact parity polynomials, coupled odd/even multiplier ranking,
@@ -152,7 +430,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 - Split current status, live backlog and stable policy. Preserve historical
   quantitative narratives through a pinned Git revision and source/hash metadata
-  in the [history index](v2/history/README.md). Remove the
+  in the [history index](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/README.md). Remove the
   duplicate full snapshot and use Git history. No experimental verdict changed.
 
 ## C10a-07 combined defaults (1 November 2026)

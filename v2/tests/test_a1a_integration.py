@@ -189,7 +189,11 @@ class SelectedKernelTests(unittest.TestCase):
                 base,
                 SELECTED,
                 block_width=64,
-                memory_bytes=scalar._workspace + reserve - 1,
+                # Optional reuse caches may decline their allocation. Test
+                # the required presieve floor independently of those caches.
+                memory_bytes=(
+                    scalar._workspace - scalar._reuse_workspace + reserve - 1
+                ),
             )
 
     def test_selector_rejects_unported_or_noncanonical_support(self):

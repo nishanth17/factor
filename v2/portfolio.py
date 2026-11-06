@@ -1,4 +1,4 @@
-"""Bounded serial portfolio with reconstructible, versioned checkpoints."""
+"""Bounded portfolio with automatic ECM and checked owned-pool lifetimes."""
 
 import hashlib
 import json
@@ -58,6 +58,7 @@ from .qs.sss import SSSConfig, SSSJob
 CHECKPOINT_VERSION = 10
 OPTIONAL_CHAIN_CHECKPOINT_VERSION = 11
 ALLOCATION_CHECKPOINT_VERSION = 12
+AUTOMATIC_CHECKPOINT_VERSION = 13
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -508,7 +509,11 @@ def _advance(
         return
 
     kind = current["stage"]
-    if kind == "ecm" and ecm_executor is not None:
+    if (
+        kind == "ecm"
+        and ecm_executor is not None
+        and not current.get("ecm_serial", False)
+    ):
         from .execution.worker_contract import LeaseRefusedError
 
         if current["tier"] >= len(config.ecm_tiers):
@@ -518,8 +523,15 @@ def _advance(
             raise ValueError(
                 "worker parent reserve must include portfolio ownership"
             )
+        run = getattr(ecm_executor, "run_portfolio", ecm_executor.run)
+        if hasattr(ecm_executor, "run_portfolio") and (
+            current["job"] is not None or current["attempt"] or current["tier"]
+        ):
+            raise ValueError(
+                "selector cannot replace existing serial ECM progress"
+            )
         try:
-            outcome = ecm_executor.run(
+            outcome = run(
                 int(n),
                 config=config,
                 budget=budget,
@@ -528,23 +540,36 @@ def _advance(
             )
         except LeaseRefusedError as error:
             raise BudgetExhaustedError(str(error)) from error
-        current["worker_checkpoint"] = outcome.checkpoint
-        _event(
-            state,
-            config,
-            stage="ecm_workers",
-            n=n,
-            outcome=outcome.reason,
-            stats=outcome.stats,
-        )
-        if outcome.divisor is not None:
-            _split(state, outcome.divisor)
-        elif outcome.reason == "curves_exhausted":
-            current.update(tier=len(config.ecm_tiers), attempt=0)
-            current.pop("worker_checkpoint", None)
+        if outcome is None:
+            # Decide once per cofactor. Warming a pool or resuming later cannot
+            # replace an incumbent curve prefix or move its fallback RNG draws.
+            current["ecm_serial"] = True
+            _event(
+                state,
+                config,
+                stage="ecm_selection",
+                n=n,
+                outcome="legacy_serial",
+                stats=ecm_executor.last_stats,
+            )
         else:
-            raise BudgetExhaustedError(outcome.reason)
-        return
+            current["worker_checkpoint"] = outcome.checkpoint
+            _event(
+                state,
+                config,
+                stage="ecm_workers",
+                n=n,
+                outcome=outcome.reason,
+                stats=outcome.stats,
+            )
+            if outcome.divisor is not None:
+                _split(state, outcome.divisor)
+            elif outcome.reason == "curves_exhausted":
+                current.update(tier=len(config.ecm_tiers), attempt=0)
+                current.pop("worker_checkpoint", None)
+            else:
+                raise BudgetExhaustedError(outcome.reason)
+            return
 
     if kind == "rho":
         attempts, b1, b2 = config.rho_attempts, 0, 0
@@ -737,6 +762,11 @@ def _pack(state, config, budget, generator, policy):
         payload["native_packet"] = source_identity()
     if config.ecm_chain_mode == "off":
         payload.pop("chains")
+    if "ecm_auto" in state:
+        # Older readers must reject automatic state before they can ignore its
+        # worker metadata. Retain the mathematical subschema for validation.
+        payload["portfolio_version"] = payload["version"]
+        payload["version"] = AUTOMATIC_CHECKPOINT_VERSION
     encoded = _canonical(payload)
     if len(encoded.encode()) > config.memory_bytes // 2:
         raise MemoryError("serialized checkpoint exceeds output reserve")
@@ -915,6 +945,23 @@ def _unpack(checkpoint, config):
             != checkpoint["sha256"]
         ):
             raise ValueError("checkpoint checksum mismatch")
+
+        if payload["version"] == AUTOMATIC_CHECKPOINT_VERSION:
+            base_version = payload.get("portfolio_version")
+            if (
+                type(base_version) is not int
+                or not 2 <= base_version <= ALLOCATION_CHECKPOINT_VERSION
+                or not isinstance(payload.get("state"), dict)
+                or "ecm_auto" not in payload["state"]
+                or "ecm_worker_identity" not in payload["state"]
+            ):
+                raise ValueError("invalid automatic checkpoint envelope")
+            payload["version"] = base_version
+        elif "portfolio_version" in payload or (
+            isinstance(payload.get("state"), dict)
+            and "ecm_auto" in payload["state"]
+        ):
+            raise ValueError("automatic checkpoint requires version 13")
 
         policy = payload.get("primality", utils.LEGACY_PRIMALITY_POLICY)
         if policy not in (
@@ -1183,6 +1230,26 @@ def _unpack(checkpoint, config):
                 ):
                     raise ValueError("invalid pending handoff metadata")
 
+        if (
+            current
+            and "worker_checkpoint" in current
+            and (
+                not isinstance(state.get("ecm_worker_identity"), str)
+                or current["stage"] != "ecm"
+                or current["job"] is not None
+            )
+        ):
+            raise ValueError("unbound ECM worker progress")
+
+        if current and "ecm_serial" in current:
+            if (
+                current["ecm_serial"] is not True
+                or not isinstance(state.get("ecm_worker_identity"), str)
+                or "worker_checkpoint" in current
+                or current["stage"] not in ("ecm", "siqs", "sss")
+            ):
+                raise ValueError("invalid incumbent ECM selection progress")
+
         if current and current["job"] and current["job"]["n"] != current["n"]:
             raise ValueError("candidate modulus disagrees with parent")
         if current:
@@ -1240,7 +1307,48 @@ def factorize_bounded(
     budget=None,
     checkpoint=None,
     stop_after_split=False,
+    ecm_executor="auto",
+    ecm_memory_bytes=None,
+):
+    """Factor with automatic cost-gated ECM; None explicitly selects serial.
+
+    Automatically created contexts are closed before returning or raising.
+    Explicit contexts remain borrowed. Omitted budgets/memory receive finite
+    parallel-capable grants; explicit allowances and legacy checkpoints win.
+    """
+    options = dict(
+        seed=seed,
+        config=config,
+        budget=budget,
+        checkpoint=checkpoint,
+        stop_after_split=stop_after_split,
+    )
+    if isinstance(ecm_executor, str):
+        if ecm_executor != "auto":
+            raise ValueError("ECM executor must be auto, None or a context")
+        from .ecm.auto import AutomaticECMOwner
+
+        with AutomaticECMOwner(
+            seed=seed, memory_bytes=ecm_memory_bytes
+        ) as owner:
+            return _factorize_bounded(
+                n, ecm_executor=owner, _owned_ecm=True, **options
+            )
+    if ecm_memory_bytes is not None:
+        raise ValueError("aggregate ECM memory requires automatic execution")
+    return _factorize_bounded(n, ecm_executor=ecm_executor, **options)
+
+
+def _factorize_bounded(
+    n,
+    *,
+    seed=0,
+    config=None,
+    budget=None,
+    checkpoint=None,
+    stop_after_split=False,
     ecm_executor=None,
+    _owned_ecm=False,
 ):
     """Factor under one budget, retaining exact state on pause/exhaustion.
 
@@ -1313,6 +1421,20 @@ def factorize_bounded(
                 if checkpoint is not None
                 else 64,
             )
+    automatic_memory = config._automatic_memory
+    automatic_policy = _owned_ecm
+    if checkpoint is not None:
+        try:
+            automatic_policy = _owned_ecm and (
+                "ecm_auto" in checkpoint["payload"]["state"]
+            )
+        except (KeyError, TypeError) as error:
+            raise ValueError("malformed checkpoint") from error
+    default_policy_budget = automatic_policy or (
+        checkpoint is None
+        and ecm_executor is None
+        and config._automatic_ecm_tiers
+    )
     if budget is None:
         from .qs.defaults import default_siqs_budget, uses_siqs_defaults
 
@@ -1325,6 +1447,12 @@ def factorize_bounded(
             n, backend=config.backend
         ):
             budget = default_siqs_budget(n, backend=config.backend)
+        elif default_policy_budget and config.backend == "python-int":
+            from .ecm.auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
+
+            budget = Budget(
+                work_limit=DEFAULT_WORK, cpu_seconds=DEFAULT_CPU_SECONDS
+            )
         else:
             budget = Budget()
     if abs(n).bit_length() > config.max_input_bits:
@@ -1368,6 +1496,19 @@ def factorize_bounded(
         budget.used = payload["work_used"]
         budget.prior_wall = payload["wall_used"]
         budget.prior_cpu = payload["cpu_used"]
+
+    if _owned_ecm:
+        if checkpoint is not None and "ecm_auto" not in state:
+            # Legacy serial/custom checkpoints never adopt a new stream.
+            ecm_executor = None
+        else:
+            ecm_executor.configure(
+                config,
+                generator,
+                state.get("ecm_auto"),
+                automatic_memory=automatic_memory,
+            )
+            state["ecm_auto"] = ecm_executor.header
 
     # Opt-in search semantics never impersonate the incumbent RNG/checkpoint.
     saved_executor = state.get("ecm_worker_identity")
@@ -1500,6 +1641,10 @@ def factorize_bounded(
             "job"
         ].checkpoint()
 
+    if _owned_ecm and ecm_executor is not None:
+        # Include owned-pool shutdown in the final clocks/checkpoint. The outer
+        # owner also closes on exceptions before result construction finishes.
+        ecm_executor.close()
     snapshot = _pack(state, config, budget, generator, policy)
     return PortfolioRun(
         result,

@@ -1,0 +1,251 @@
+"""One selection before fresh sampling; preserve every exposed charge."""
+
+import hashlib
+import json
+import time
+from pathlib import Path
+
+from ..c10a04.accounting import atomic, digest, output_lock, receipt
+from .accounting import StudyLedger
+from .gates import outcomes
+from .inputs import validate
+from .plan import CONFIRMATION_SECONDS, confirmation_cells, limits
+from .preparation import (
+    INPUTS,
+    ROOT,
+    load_freeze,
+    prepare,
+    require_clean,
+    source_manifest,
+)
+
+
+def input_prefix(selection):
+    protocol = selection.get("protocol", "")
+    if protocol == "c9a-expanded-yield-v4":
+        return "expanded_confirmation_"
+    if protocol.startswith("c9a-expanded-yield-v4-"):
+        return (
+            "expanded_confirmation_"
+            + hashlib.sha256(protocol.encode()).hexdigest()[:16]
+            + "_"
+        )
+    if protocol == "c9a-combined-yield-v3":
+        return "combined_confirmation_"
+    return "confirmation_"
+
+
+def select(freeze_path, output, band, decision):
+    started, cpu = time.monotonic(), time.process_time()
+    frozen = load_freeze(freeze_path)
+    if band not in CONFIRMATION_SECONDS:
+        raise ValueError("unfrozen confirmation band")
+    output = Path(output)
+    with output_lock(output):
+        ledger = StudyLedger(output, frozen["sha256"], frozen["limits"])
+        if (output / "confirmation-selection.json").exists():
+            raise ValueError("confirmation selection already exists")
+        # Selection closes the exposed screen. Charge its source validation
+        # to the B2 orchestration pool before binding the final ledger hash.
+        read_bytes = sum(
+            (ROOT / name).stat().st_size for name in frozen["source"]["files"]
+        )
+        read_bytes += Path(frozen["source"]["interpreter"]).stat().st_size
+        ledger.call_controller(
+            "B2",
+            max(10, time.monotonic() - started, time.process_time() - cpu),
+            10**10,
+            lambda: dict(work=8 * read_bytes, checked_source=frozen["sha256"]),
+        )
+        if (
+            len(outcomes(ledger, "B1")) != 4
+            or len(outcomes(ledger, "B2")) != 20
+        ):
+            raise RuntimeError(
+                "broader exposed completion screen is incomplete"
+            )
+        if len(outcomes(ledger, "R")) != 24:
+            raise RuntimeError("lower-band regression screen is incomplete")
+        if not all(
+            decision.get(key)
+            for key in (
+                "reason",
+                "uncertainty",
+                "regressions",
+                "expected_seconds",
+                "stop_rule",
+            )
+        ):
+            raise ValueError(
+                "selection lacks its exposed cost/completion assessment"
+            )
+        estimate = decision["expected_seconds"]
+        if (
+            type(estimate) is not int
+            or not 0 < estimate <= CONFIRMATION_SECONDS[band]
+        ):
+            raise ValueError("confirmation estimate exceeds its ceiling")
+        selection = dict(
+            parent_freeze=frozen["sha256"],
+            band=band,
+            nominee="C1",
+            decision=decision,
+            ledger_sha256=digest(ledger.path),
+            exposed_charges={
+                k: ledger.used(field=k) for k in ("wall", "cpu", "work")
+            },
+            source=frozen["source"],
+            parent_output=str(output.resolve()),
+            protocol=frozen["plan"]["identity"],
+            integrated_incumbents=frozen["plan"].get("integrated_incumbents"),
+            primary_profile=frozen["plan"].get(
+                "primary_profile", "three-prime"
+            ),
+        )
+        receipt(output / "confirmation-selection.json", selection)
+        return selection
+
+
+def fresh(selection_path, exclusions):
+    selection = json.loads(Path(selection_path).read_text())
+    parent = Path(selection["parent_output"])
+    if digest(parent / "ledger.json") != selection["ledger_sha256"]:
+        raise ValueError("exposed ledger changed after fresh selection")
+    prefix = input_prefix(selection)
+    output = INPUTS / (prefix + str(selection["band"]))
+    # Include the entire exposed corpus plus every certified factor. This
+    # supplements, rather than replaces, the historical overlap inventory.
+    excluded = json.loads(Path(exclusions).read_text())
+    exposed = json.loads((INPUTS / "corpus.json").read_text())
+    values = set(excluded["integers"])
+    for row in exposed["fixtures"]:
+        values.update([row["n"], *row["factors"]])
+    combined = parent / "confirmation-exclusions.json"
+    receipt(combined, dict(integers=sorted(values)))
+    resources = dict(
+        C=dict(wall=1200, cpu=1200, work=10**13, disk_bytes=128 * 2**20),
+        total=dict(wall=1200, cpu=1200, work=10**13),
+        disk_bytes=128 * 2**20,
+    )
+    directory = parent / "confirmation-preparation"
+    with output_lock(directory):
+        ledger = StudyLedger(
+            directory, digest(Path(selection_path)), resources
+        )
+        return ledger.call_operation(
+            "C",
+            "fresh-inputs",
+            1200,
+            10**13,
+            {"kind": "fresh_generation"},
+            lambda: prepare(
+                combined,
+                band=selection["band"],
+                output=output,
+                seconds=990,
+                configurations=selection.get("integrated_incumbents"),
+            ),
+        )
+
+
+def freeze_confirmation(selection_path, output):
+    """Bind committed fresh inputs and both unchanged arms."""
+    selection = json.loads(Path(selection_path).read_text())
+    require_clean()
+    parent = Path(selection["parent_output"])
+    if digest(parent / "ledger.json") != selection["ledger_sha256"]:
+        raise ValueError("exposed charges changed after selection")
+    current = source_manifest()
+    old = selection["source"]
+    if any(
+        current["files"].get(name) != sha for name, sha in old["files"].items()
+    ):
+        raise ValueError(
+            "confirmation cannot silently change either underlying arm"
+        )
+    if (current["interpreter_sha256"], current["version"]) != (
+        old["interpreter_sha256"],
+        old["version"],
+    ):
+        raise ValueError("confirmation interpreter changed")
+    band = selection["band"]
+    combined = selection.get("protocol") == "c9a-combined-yield-v3"
+    extended = selection.get("protocol", "").startswith(
+        "c9a-expanded-yield-v4"
+    )
+    prefix = input_prefix(selection)
+    corpus_path = INPUTS / (prefix + str(band)) / "corpus.json"
+    corpus = json.loads(corpus_path.read_text())
+    validate(corpus, band=band)
+    resolved = json.loads(
+        corpus_path.with_name("structural.json").read_text()
+    )["resolved"]
+    if extended:
+        from .extended import confirmation_cells as combined_cells
+    elif combined:
+        from .combined import confirmation_cells as combined_cells
+    plan = dict(
+        identity=selection.get("protocol", "c9a-full-yield-v2")
+        + "-fresh-"
+        + str(band),
+        cells=(combined_cells if combined or extended else confirmation_cells)(
+            corpus, resolved, band
+        ),
+        confirmation_band=band,
+        parent_selection=selection,
+    )
+    if extended:
+        plan["cells"] = combined_cells(
+            corpus,
+            resolved,
+            band,
+            profile=selection.get("primary_profile", "three-prime"),
+        )
+    if selection.get("integrated_incumbents"):
+        from .... import qs
+        from .configuration import decode
+
+        incumbent = decode(selection["integrated_incumbents"][str(band)], qs)
+        plan["cells"] = combined_cells(
+            corpus,
+            resolved,
+            band,
+            incumbent=incumbent,
+            profile=selection.get("primary_profile", "three-prime"),
+        )
+        for cell in plan["cells"]:
+            cell["source"] = "candidate"
+            cell["protocol"] = plan["identity"]
+        plan["integrated_incumbents"] = selection["integrated_incumbents"]
+    resources = limits(plan, confirmation_band=band)
+    prep = json.loads(
+        (parent / "confirmation-preparation/ledger.json").read_text()
+    )
+    if any(row["status"] != "complete" for row in prep["calls"]):
+        raise RuntimeError("fresh preparation has unsettled or failed work")
+    preparation_charges = {
+        key: sum(row[key] for row in prep["calls"])
+        for key in ("wall", "cpu", "work")
+    }
+    for key, charge in preparation_charges.items():
+        resources["C"][key] -= charge
+    resources["total"] = {
+        key: resources["C"][key] for key in ("wall", "cpu", "work")
+    }
+    resources["disk_bytes"] = resources["C"]["disk_bytes"]
+    data = dict(
+        plan=plan,
+        limits=resources,
+        source=current,
+        corpus_path=str(corpus_path.relative_to(ROOT)),
+        corpus_sha256=digest(corpus_path),
+        confirmation_band=band,
+        preparation_charges=preparation_charges,
+    )
+    data["sha256"] = hashlib.sha256(
+        json.dumps(data, sort_keys=True).encode()
+    ).hexdigest()
+    if Path(output).exists():
+        raise ValueError("fresh freeze already exists")
+    atomic(Path(output), data)
+    return dict(freeze=data["sha256"], band=band)

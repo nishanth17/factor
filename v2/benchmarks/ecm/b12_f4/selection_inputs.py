@@ -30,6 +30,29 @@ def smaller_sizes(digits):
     return plans[digits]
 
 
+def confirmation_plan(include_ecm=False):
+    """Declare twelve additional ECM moduli before any generation."""
+    if type(include_ecm) is not bool:
+        raise ValueError("ECM confirmation selection must be Boolean")
+    plans = [
+        (f"fresh-{digits}-small{small}", digits, small, "certified_enriched")
+        for digits in DIGITS
+        for small in smaller_sizes(digits)
+    ]
+    if include_ecm:
+        plans.extend(
+            (
+                f"fresh-ecm-{digits}-small{small}",
+                digits,
+                small,
+                "selected_ecm_enriched",
+            )
+            for digits in (60, 80, 100)
+            for small in (15, 17, 18, 20)
+        )
+    return plans
+
+
 def uniform_panel(seed, primary_count=36, auxiliary_count=12):
     """Draw without conditioning on factors, parity or primality."""
     if not 12 <= primary_count <= 100 or not 4 <= auxiliary_count <= 100:
@@ -49,7 +72,7 @@ def uniform_panel(seed, primary_count=36, auxiliary_count=12):
     ]
 
 
-def build(seed, *, seconds=120, draws=200_000):
+def build(seed, *, seconds=120, draws=200_000, include_ecm=False):
     """Generate independent certified pairs within a finite draw/CPU lane."""
     from ...suites.build_phase_two_corpus import (
         certified_prime,
@@ -58,6 +81,7 @@ def build(seed, *, seconds=120, draws=200_000):
 
     if not 0 < seconds <= 120 or not 1000 <= draws <= 200_000:
         raise ValueError("corpus allowance exceeds the campaign allocation")
+    plans = confirmation_plan(include_ecm)
     started = time.monotonic()
 
     class LimitedRandom(random.Random):
@@ -80,25 +104,24 @@ def build(seed, *, seconds=120, draws=200_000):
                 used_primes.add(value)
                 return value
 
-    for digits in DIGITS:
-        for small in smaller_sizes(digits):
-            while True:
-                p = prime(small)
-                q = prime(digits - small)
-                n = p * q
-                if len(str(n)) == digits and n not in moduli:
-                    break
-            moduli.add(n)
-            fixtures.append(
-                dict(
-                    id=f"fresh-{digits}-small{small}",
-                    n=n,
-                    digits=digits,
-                    factors=[[p, 1], [q, 1]],
-                    smaller_digits=small,
-                    population="certified_enriched",
-                )
+    for identity, digits, small, population in plans:
+        while True:
+            p = prime(small)
+            q = prime(digits - small)
+            n = p * q
+            if len(str(n)) == digits and n not in moduli:
+                break
+        moduli.add(n)
+        fixtures.append(
+            dict(
+                id=identity,
+                n=n,
+                digits=digits,
+                factors=[[p, 1], [q, 1]],
+                smaller_digits=small,
+                population=population,
             )
+        )
     verify_certificates(certificates)
     assert all(
         math.prod(p**e for p, e in row["factors"]) == row["n"]
@@ -132,7 +155,10 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         resource.setrlimit(resource.RLIMIT_CPU, (120, 121))
         signal.alarm(120)
-        corpus = build(arguments.seed)
+        corpus = build(
+            arguments.seed,
+            include_ecm=policy.get("include_ecm_confirmation", False),
+        )
         corpus["uniform"] = uniform_panel(
             arguments.seed + 1,
             policy.get("primary_uniform_count", 36),

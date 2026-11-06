@@ -145,7 +145,10 @@ class SIQSCLITests(unittest.TestCase):
         ]
         stages = [event["stage"] for event in events]
         self.assertEqual(status, 0)
-        self.assertEqual(stages, ["rho"] * 4 + ["pm1", "ecm", "siqs"])
+        self.assertEqual(
+            stages, ["rho"] * 4 + ["pm1", "ecm_selection", "ecm", "siqs"]
+        )
+        self.assertEqual(events[5]["outcome"], "legacy_serial")
         self.assertEqual(events[-1]["outcome"], "factor")
         self.assertEqual(lines[-1], f"{NUMBER} = 100003^1 * 100019^1")
 

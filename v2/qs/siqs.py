@@ -6,6 +6,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.work_budget import PollingBudget
 from .assignment_stream import (
     AssignmentStream,
     paired_workspace,
@@ -38,6 +39,7 @@ from .polynomial import (
 )
 from .root_updates import ROOT_UPDATE_POLICIES, root_update_workspace
 from .sieve_collector import (
+    CombinedYieldSieveConfig,
     GrowingDoubleLargeSieveConfig,
     SieveCollector,
     SieveConfig,
@@ -125,6 +127,13 @@ class SIQSConfig:
                 object.__setattr__(self, "checkpoint_bytes", 1024 * 1024)
         if self.backend not in ("python-int", "gmpy2-mpz"):
             raise ValueError("unknown arithmetic backend")
+        if (
+            isinstance(self.collector, CombinedYieldSieveConfig)
+            and self.backend != "python-int"
+        ):
+            raise ValueError(
+                "combined useful-yield policies require native integers"
+            )
         if self.solve_policy not in ("window", "collection"):
             raise ValueError("unknown SIQS solve policy")
 
@@ -644,6 +653,9 @@ class SIQSJob:
             self.pending_step = self._timed("roots", self._next_step)
         if self.pending_step is None:
             return False
+        # Root generation may install cancellation. Keep the generated step
+        # pending until the stop check admits its publication to the collector.
+        self.budget.consume(0)
         polynomial, roots = self.pending_step
         key = (
             polynomial.a,
@@ -706,6 +718,14 @@ class SIQSJob:
             if not self.config.shared_relations:
                 self.engine.last_count = self.engine.last_solved_count = -1
                 self.engine.zero_checked_count = 0
+                if self.engine._useful_target is not None:
+                    self.engine._useful_target = type(
+                        self.engine._useful_target
+                    )()
+                self.engine._full_view = self.engine._retry_full_view = False
+                self.engine._selected_subset = False
+                if self.engine._pair_index is not None:
+                    self.engine._pair_index.clear()
 
         if not self.config.streaming:
             self.seen.add(key)
@@ -767,6 +787,29 @@ class SIQSJob:
 
     def run(self, *, max_blocks=None):
         """Run or pause at block boundaries; all exhausted results retain n."""
+        original = self.budget
+        if not isinstance(original, PollingBudget):
+            self.budget = PollingBudget(original)
+        if isinstance(self.assignments, AssignmentStream):
+            self.assignments.budget = self.budget
+        if self.family is not None:
+            self.family.budget = self.budget
+        try:
+            return self._run(max_blocks=max_blocks)
+        finally:
+            # Derived producers can survive a pause. Restore their caller
+            # ledger as well, so a later allowance cannot retain an old view.
+            self.budget = original
+            if isinstance(self.assignments, AssignmentStream):
+                self.assignments.budget = original
+            if self.family is not None:
+                self.family.budget = original
+            if self.engine is not None:
+                self.engine.budget = original
+                self.engine.collector.budget = original
+
+    def _run(self, *, max_blocks=None):
+        """Share one polling cadence across setup, switches and collection."""
         if self.engine is not None:
             require_published(self.engine.collector)
         if max_blocks is not None:
@@ -872,7 +915,26 @@ class SIQSJob:
             )
             self.stats["partials"] = len(self.engine.collector.partial_ids)
             graph = self.engine.collector._graph
-            if graph is not None:
+            if getattr(self.config.collector, "extension_policy", None):
+                # Generalized residual incidence is not an ordinary forest.
+                # Report its retained atoms and rank without constructing a
+                # redundant adjacency/component view solely for statistics.
+                self.stats["large_prime_graph"] = dict(
+                    representation="incidence-v1",
+                    retained_atoms=len(graph.edges),
+                    residual_rank=len(graph.pivots),
+                    unowned_atoms=len(graph.unowned),
+                    closed_relations=len(self.engine.collector._rows),
+                    opaque_conversions=len(graph.resolutions),
+                    split_calls=self.engine.collector._split_calls,
+                )
+                if self.config.collector.extension_policy == "extended-v2":
+                    staging = self.engine.collector._opaque_staging
+                    self.stats["large_prime_graph"].update(
+                        staged_opaque_atoms=len(staging.atoms),
+                        staged_opaque_bytes=staging.used,
+                    )
+            elif graph is not None:
                 self.stats["large_prime_graph"] = dict(
                     forest_edges=len(graph.edges),
                     forest_vertices=len(graph.adjacency),
@@ -891,6 +953,12 @@ class SIQSJob:
                 )
             )
 
+        if max_blocks != 0:
+            try:
+                self.budget.consume(0)
+            except BudgetExhaustedError:
+                if self.divisor is None:
+                    reason = self.budget.reason
         self.stats["work_used"] = self.budget.used
         return QSResult(
             self.divisor,

@@ -1,73 +1,67 @@
 # Factor status
 
-Task-branch preparation: B4a scalar C/GMP packets and staged runner are written
-from validated B12 `787190aa`; this is not a mainline integration or adoption.
-Current planning was separately reviewed at `b8638a0c`. Detailed decision,
-research, QA status and future integration/execution plan are local under
-`v2/audit/b4a/`. Compilation/executable QA remain subject to the shared window;
-scalar/thread performance execution remains pending. Native teams are
-implemented as an optional C-only OpenMP continuation owner with dynamic/static/
-guided scheduling; compilation and executable QA remain pending. B4a remains open.
-The optional two-curve NEON screen now has a negative result on source c485f2b:
-complete hybrid costs are 2.27–3.14x the B4a scalar GMP baseline at 200/266/333
-bits. Close this prototype without integration; scalar/OpenMP evaluation remains
-open. Fresh exact checks and lint pass. The one issued 180 wall / 360 CPU Stage A
-cell includes failed setup, admission, warmup and cleanup; no new reduction work.
-Current local result: `v2/audit/b4a/NEON_DIRECT_RESULT_v5.md`; concise measurements:
-[NEON screen](benchmarks/RESULTS.md#b4a-optional-ecm-neon-screen-4-november-2026).
+Last updated: 6 November 2026 (America/Los_Angeles).
 
-Last updated: 4 November 2026 (America/Los_Angeles).
-Integration base: `99a2943`; C10a-01 terminal source: `d37b809`.
-A1b review record: `61899a9`; production defaults are unchanged.
-QS roadmap review: `4d65d33`, consolidated into existing task scopes on
-2 November; C10a-01 is now integrated with the selected policies enabled
-for every fresh automatic SIQS configuration by explicit user direction.
-The expanded 2 November ECM/QS literature and source review adds A1d
-multi-polynomial buckets and conditional F9 genus-two/Kummer research to the
-ECM/acceleration amendments. It changes no defaults and launches no runs.
-Local supporting reviews: `v2/audit/research/ecm_qs_review_20261102.md` and
-`v2/audit/research/ecm/roadmap_review_20261102.md`.
-The broader portfolio follow-up adds B4a fused native ECM chunks and expands
-E3/E4/E5/E6/A10a/A2a opportunity gates. Local supporting review:
-`v2/audit/research/portfolio_review_20261102.md`. No experiment is launched.
-The subsequent QS CFFI/SIMD pass refines B5a with queue-compatible buffers,
-root/mark/scan packets and separate M4 NEON versus x86 AVX dispatch. Local
-review: `v2/audit/research/qs_cffi_simd_20261102.md`.
+B12/F4 is complete for its delivered process-ECM scope and integrated on
+mainline. The normal bounded portfolio retains QS fallback.
+Cold cheap defaults bypass the selector; the selected larger/warm worker
+configurations remain cost-gated. ECM-specific execution now lives in the flat
+`ecm/` package, with compatibility aliases for old imports, bundled Python
+program/policy constants and explicit compatibility versions instead of runtime
+source-file scanning. Numerical schedules and worker choices are unchanged.
+Committed-only refactor source `08a9011` passes 1,360 tests (9 optional skips),
+full lint and 265 benchmark imports. Local QA receipts: `v2/audit/ecm_layout/`.
+The computation lock is released.
 
-**Target: complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
-machine; all cores are available.** Choose worker counts by measured latency
-and aggregate memory, with total CPU reported as a secondary cost.
+Earlier admission-only verification on `c40298e` removes about 44 ms at cold
+30/50/70 defaults, without importing the selector; 20-digit behavior is unchanged.
+This refactor adds no new performance claim.
 
-**Primary workload: uniformly sampled random integers at 60, 80 and 100 decimal
-digits, with equal weight across the three size bands.** Report median and p90
-complete-factorization time and completion rates for each band. Balanced
-semiprime completion at 60 and 70 digits is a must-not-regress constraint.
+Matched ECM-only 60/80/100 fixtures with 18-digit smaller factors show
+2.73/2.46/2.66x cold and 5.63/5.96/5.37x warm time-to-factor gains. These
+exposed fixtures do not establish whole-portfolio, balanced or population-p90
+gains. The [results](benchmarks/RESULTS.md#b12f4-ecm-only-selected-default-comparison-5-november-2026)
+retain failures and cheap-path regressions; the [recorded exception](POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026)
+records component closure separately from those pending broader claims.
+Local evidence: `v2/audit/b12_f4/`; the task worktree and F4 temporary source checkouts are removed.
 
-**Native code is allowed as an optional backend; a working pure-Python/PyPy
-fallback must remain available.** Select one justified implementation per
-task; NumPy and CFFI are alternatives, not mandatory twin developments.
-These are planning and acceptance objectives, not implemented default changes.
-See [metric and resource rules](POLICY.md#scope-and-standing-directions).
+B4a task branch is rebased onto master `bf243db`, including the ECM package
+refactor. Native packet/team hooks follow the implementation into `v2/ecm/`;
+legacy execution imports remain compatibility aliases. Historical numerical
+worker-policy settings remain unchanged. Native costs/engagement still need
+current-source calibration; the prior scoped NEON loss and its charges remain.
+Local validation: `v2/audit/b4a/rebase_20261106/`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
-Full historical results and gates remain in the [history index](history/README.md).
-Useful progress toward 60–80-digit factoring remains the immediate focus;
-100 digits is also a measurement target, with completion feasibility still
-unestablished. Existing experiments retain their frozen scopes and budgets.
+[Results](benchmarks/RESULTS.md) hold numerical evidence; the
+[completed register](ROADMAP.md#completed-register) holds delivered milestones.
+
+## Target metric and workload
+
+Minimum complete-factorization wall time on the Apple M4 / 24 GiB / 10-core
+machine. All cores are available; report total CPU, peak memory and startup/
+cancellation cost. Use equally weighted uniformly sampled 60/80/100-digit
+integers, with median/p90 time and completion per band. Balanced-semiprime
+completion at 60/70 is a must-not-regress constraint. Feasibility at 100 is
+unestablished. Optional native backends retain a working pure-Python/PyPy
+fallback. These declared objectives and censoring rules are in
+[policy](POLICY.md#scope-and-standing-directions).
 
 ## Current automatic defaults
 
 These are current committed behavior, not claims that every routed band passed
 an experimental gate. Sources: [SIQS selector](qs/defaults.py),
-[portfolio routing](portfolio.py), [ECM selector](execution/ecm_defaults.py) and
+[portfolio routing](portfolio.py), [ECM defaults](ecm/defaults.py) and
 [chain eligibility](ecm/chain_options.py). Explicit settings and saved policies
 win. Native means Python integers on PyPy implementing Python 3.11.
 
-The bounded portfolio runs exact preprocessing, rho, p−1 and ECM serially.
+The bounded portfolio runs exact preprocessing, rho and p−1 serially, then
+selects bounded process ECM or the incumbent serial path.
 Omitted native configurations automatically enable SIQS at exactly 40 and
 50–60 digits. Direct automatic SIQS calls use the same size selector. Explicit
 `siqs=None` disables that fallback; reference `SIQSConfig()` keeps its own
-fields. SSS and production workers remain opt-in/experimental.
+fields. SSS remains opt-in. ECM workers use the selected automatic cost gate; QS
+workers remain opt-in/experimental.
 
 | Decimal digits / scope | Owned memory allowance | Automatic SIQS selection | Adoption evidence and limits |
 | --- | --- | --- | --- |
@@ -112,163 +106,119 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## Work in flight
+
+| ID | Current scope and state | Worktree / branch |
+| --- | --- | --- |
+
+C9a and C10a-01 are delivered mainline scopes; they are not active worktrees.
+No other ongoing work is inferred from an old preparation note.
+
 ## Recent completed review
 
-**A1b is Done: retain integrated SIQS defaults and fixed-score opt-ins.**
-All 30 planned prefix calls on nine exposed moduli completed; fixed/list lost
-all matched pairs at 50/55/60 digits. This bundled scoring/scheduling screen
-justified no complete-factor pilot or default change. Earlier harness failures,
-missing historical clocks and the explicit accounting repair remain recorded.
-See the [final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review) and
-[numerical evidence](https://github.com/nishanth17/factor/blob/23b71fa723b7982f1b1ceb18c426036e5e39290d/v2/studies/a1b_final_results.json). Fixed-score queue support
-is a separate deferred mechanism, not a continuation of this completed study.
-Evidence and tests are integrated in mainline; task worktrees/scratch were
-removed after archive verification. See the report's integration/cleanup record.
+- **C9a — Done, 4 November:** delivered and integrated; policies remain opt-in.
+  Complete60/70 evidence is exploratory; one exposed input per size and no
+  disjoint fresh confirmation establish no population speedup.
+  [Completion and evidence](ROADMAP.md#c9a-completion).
+- **C10a-01 — Done, 3 November:** integrated coupled policies are adopted for
+  fresh automatic SIQS before fresh confirmation. The failed 65 canary,
+  censored 70 control and unmeasured all-size gains remain explicit.
+  [Completion and evidence](ROADMAP.md#c10a-01-completion).
+- **A1b — Done, 2 November integration:** retain defaults after the fixed/list
+  screen lost at 50/55/60; no complete-factor claim.
+  [Final decision](benchmarks/RESULTS.md#a1b-existing-fixed-score-review).
 
-## C10a-01 delivered integration
-
-The coupled arithmetic, finite multiplier/A selection, modular root updates,
-independent exceptional-root/reconstruction oracles and versioned charged
-resume are integrated. The all-size default decision follows the completed
-60/62/65/70 exploratory feasibility work and the deep 65-digit host-state
-investigation. No arithmetic regression was found; timing and confirmation
-limits remain explicit in [results](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
-
-Research, raw receipts, failures and sealed evidence are retained locally at
-`v2/audit/archives/c10a01-20261103/`. Task worktree and temporary-state cleanup
-is verified against the archive manifests. Source history and frozen controls
-are retained; no E1 campaign or remote push accompanies this integration.
+<a id="c10a-01-delivered-integration"></a>
 
 ## Next eligible items
 
-Use the [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost)
-for the ordering under the wall-time objective and declared workloads above.
-Task rows retain exact scope, dependencies and fixed-session model assignments.
+The [ranked queue](ROADMAP.md#ranked-next-work--expected-benefit-and-cost) now
+prioritizes current acceleration and shorter later experiment turnaround:
 
-1. **C3a/C11 current portfolio/ECM cost-yield and missing-policy screen — Sol / xhigh.**
-   Start from completed C3 and existing deeper presets; select a concrete
-   60–100-digit opportunity, completed-search credit or handoff delta.
-2. **B12 → F4 opt-in independent ECM workers — Sol / xhigh.**
-   Prepare stable RNG/lease/restart contracts. Isolated ECM feasibility does
-   not wait for E1; measure 1/2/4 workers before wider M4 occupancy.
-3. **A7a current-collector parallel QS collection — Sol / xhigh.**
-   Reuse A7 workers, adapting growing-DLP and current collector identities
-   before measuring 1/2/4-worker complete factoring at 60/70 digits. Existing
-   workers reject growing DLP and cap windows below the calibrated serial
-   width. Family-sharing alternatives are a later measured subquestion.
-4. **C9a combined useful-yield candidate — Astra / xhigh.**
-   Ranked next after parallel collection; research need not wait for a worker
-   result. Rank intake/endpoints against current collection cost; use late-run
-   replays for cycle/storage/cadence hypotheses.
-5. **B4a fused native ECM chunks — Sol / xhigh, optional native track.**
-   Price complete setup/conversion/recovery and scalar execution before SIMD
-   or new reducers. A CFFI wrapper alone is no measured gain.
-6. **A1d prime-major multi-polynomial buckets — Sol / xhigh.** Current queues
-   are polynomial-local; amortize prime/root traversal across a funded Gray
-   batch, retaining exact coverage and charging unused preparation.
-7. **B3a larger-bound chains — Sol / xhigh, profile-gated; F3 polynomial
-   continuation — Astra / xhigh.** Accepted chains stop at B1 = 2,000;
-   neither deeper-bound savings nor a polynomial/backend crossover is measured.
-8. **A1c/B5/B5a bulk kernels — Sol / xhigh.** Select a PyPy, NumPy or CFFI
-   scan/root/mark packet with queue-compatible buffers and exact hit/score
-   costs; retain the Python fallback. M4 NEON and x86 AVX are separate targets.
-   M4 ARM SIMD is a source/host fact, not a measured gain or default migration.
+1. **B12/F4:** finish the active ECM worker stream — Sol / xhigh.
+2. **A7a:** current-collector parallel QS preparation — Sol / xhigh.
+3. **B4a:** coarse ECM C/CFFI, then selected native SIMD/threads — Sol / xhigh;
+   separately selected new arithmetic proofs retain Astra / xhigh.
+4. **B5a:** QS C/CFFI and ARM NEON, with A1c/B5 controls — Sol / xhigh.
+5. **E6:** bundled native prime batches/reusable-context opportunity screen —
+   Sol / high screen, Sol / xhigh ABI and implementation.
+6. **B15:** native helper/SIMD opportunity selection across E4/A10a/A2a/C5 —
+   Sol / high evidence review; Sol / xhigh for boundary/protocol design. Deliver
+   at most one justified candidate or a no-go; implementation retains its owner.
+7. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
+   Sol / xhigh. Reuse accelerator receipts rather than repeating broad studies.
 
-The roadmap ranks C2/F2/F7, remaining A1a and matrix preparation behind these
-initial opportunities, with explicit capacity/profile triggers. E3/A10a/E4/E5/
-E6 can screen a named current cheap-path or overhead gap without restarting
-E1/D7; integrated tuning retains its prerequisites. B14 remains
-High for requested prime certification; accounting/correctness repairs take
-precedence. A1b is Done, A1b-F1 stays Deferred, C10a-01 is integrated and E1
-remains Deferred. Do not restart the stopped broad backend study or duplicate the completed
-C10a-01 exploratory feasibility.
+Then A1d, B3a, F3, broader C9b and the remaining ranked rows. F3 is the first
+substantial Astra / xhigh algorithmic research choice; a concrete opportunity
+can start before every conditional native port is settled.
 
-E6's prime-generation candidate is a source-bundled adaptation of the existing
-C11 wheel-30 sieve through CFFI, with finite batches and a Python fallback.
-It must not depend on a sibling checkout or an external prime-sieve library;
-see the [native prime-provider gates](ROADMAP.md#e6--self-contained-native-prime-generation).
-Local source review: `v2/audit/research/prime_provider_20261102.md`.
+A7a can prepare alongside B12 with pinned shared contracts; timed execution
+uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
+saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
+C5 is the separate low-level limb-buffer/modular-context follow-up. B4a already
+owns reusable ordinary GMP objects/scratch; C5 research, specification,
+implementation and handoff are outside that phase. Select C5 from remaining
+allocation/dispatch/arithmetic cost against B4a's scalar baseline. Existing
+Montgomery curves do not supply a residue backend, and earlier Python-reducer
+losses do not settle the native question. B4a's native
+thread screen centers on cold-CLI startup/heap savings against B12 processes,
+using a C-side multi-curve team and a pthread alternative when OpenMP is absent.
+E6/B15 at ranks 5–6 are conditional screens. B15 is not a C3a prerequisite;
+its selected helper implementation does not inherit rank 6 automatically.
+Parallel latency gains do not imply lower CPU cost or higher batch throughput;
+native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
+this priority increase. Small cost/A/A checks belong in each task; C9b is not
+a gate on preparation. The local pressure test is
+`v2/audit/research/acceleration_priority_20261104.md`.
 
-Separate worktrees isolate source changes. Preserve C10a-01 historical timing
-freezes; later comparisons need a new committed source identity. Heavy QA and
-measurements share one serialized performance window. A later separately
-requested execution chat may use Sol / high where its task row permits it.
+This order is an expected-benefit judgment, not measured gains or campaign
+authorization. Correctness/accounting repairs, C10a-06 and requested B14 proof
+work take precedence. E1 remains Deferred and integrated tuning retains its
+prerequisites. Closed C9a/C10a-01 evidence and active grants are unchanged.
 
-B12/F4 last fully validated executor source `b62ac7a` passes 1,046 PyPy tests
-(9 optional skips) and full lint in a committed-only checkout. Opt-in resource/
-checkpoint v6 adds checked budget and stage-two preparation candidates, context
-binding and tail-aware packets. Exact arithmetic, mathematical v1 streams,
-accepted PRAC guards and global serial defaults are unchanged.
+## Selected ECM regimes
 
-The active selection campaign now covers 30 explicit size/schedule regimes at
-30/40/50/60/70/80/100 digits. All 600 cold count screens and 260 warm blocks
-complete with matching curves. Joint parameter refinement and complete-call
-selection continue; this is not a final optimum or performance promotion.
-The new source-isolated selection tools pass 16 targeted tests, full lint and
-six real S0/M0/P2 cold/warm smoke cases in a committed checkout. Detailed current
-plan/state: `v2/audit/b12_f4/regime_selection_v1/PLAN.md` and `ACTIVE_STATE.md`.
-A bounded v7 cache-capacity extension is awaiting full runtime QA; it addresses
-measured manifest/decode/index retention refusals without changing arithmetic.
+The bounded auto CLI/API use these defaults on supported macOS arm64/PyPy.
+Explicit arithmetic/resource settings and checked resumes take precedence.
+Worker counts are selected configurations, not a guarantee of optimality for
+every input; the observable-cost and resource gates still apply.
 
-The preceding 161-cell screen at 60/80/100 digits finds useful warm fixed-work gains:
-tail-aware packet2 lowers the six-regime geometric time about 6.0% versus the
-prior F4 incumbent, 4.3% versus new-source options-off. Individual budget/index
-settings help selected regimes; their effects do not add. The 81 fresh CLI
-calls show no convincing new cold gain. A small first/complete pilot validates
-outputs but demonstrates no complete-factor improvement. A 512-curve extension
-refuses unfunded checkpoint ownership before worker launch; its charge is
-retained and subsequent cells are NOT RUN. No engagement threshold or default
-adoption is established; B12/F4 stay open. See [current results](benchmarks/RESULTS.md#b12f4-checked-fast-paths-and-complete-cost-screen-4-november-2026)
-and local `v2/audit/b12_f4/headroom_impl_v2/HANDOFF.md`.
+| Total decimal digits | Numerical plan | Cold default | Retained warm preference |
+| --- | --- | --- | --- |
+| 20 | Existing serial plan | Serial; no selector | Serial; unmeasured worker scope |
+| 30 | compact64 | Serial; no selector | Up to 12 workers, cost-gated |
+| 40 | escalating140 | Up to 8 workers | Up to 14 workers |
+| 50 | fixed32 | Serial; no selector | Up to 14 workers |
+| 60 | escalating140 | Up to 10 workers | Up to 10 workers |
+| 70 | fixed32 | Serial; no selector | Up to 10 workers |
+| 80 | escalating140 | Up to 10 workers | Up to 10 workers |
+| 100 | escalating140 | Up to 10 workers | Up to 10 workers |
 
-The resource-valid 512-curve follow-up now completes 45 invocations on one
-exposed 80-digit modulus with matching curve results. Index preparation lowers
-warm time 6.2% versus packets alone; cold time is conditionally lower versus
-current options-off, but improvement over the prior optimized F4 control remains
-inconclusive. The 5 MiB checkpoint, spawn and owned-resource checks pass. A
-transient recorder proof failure stays fully charged, with exit independently
-proved before continuation. New-phase booking is 269.18 wall / 3,425.99 CPU
-seconds under 600 / 4,800. All groups exit and the lock is released. No routing
-or default changes. Current local entry: `v2/audit/b12_f4/long_quota_v2/HANDOFF.md`;
-see [larger-quota results](benchmarks/RESULTS.md#b12f4-512-curve-cache-amortization-4-november-2026).
-
-The earlier 4/6/8/10/12/14/16-worker screen and metadata/import reuse evidence
-remain separately source-pinned. The observed cold leader is eight workers;
-warm nominees from 10 to 16 are scoped observations, not universal count choices. Original reuse source `f9473f0`
-passes 1,026 tests (9 optional skips); recorder `9065fca` preserves those runtime
-bytes. The capture audit reconciles all 189 CPU/heap files and 100 JIT summaries;
-analyser `6a2e36b` passes 14 targeted tests and lint. Complete capture coverage does
-not establish exhausted headroom. Detailed historical entries remain under
-`headroom_opt_v1/`, `capture_coverage_v1/`, `counts16_v1/` and `profiles-v1/`.
-
-C9a's release was explicitly confirmed and runtime uses the shared lock. New
-successful lanes drain their owned groups; all failed QA, recorder and refused-
-allocation charges remain. The earlier feasibility group-exit acknowledgement
-remains unknown/full charged. New-phase booking 1,075.20 wall / 11,635.99 CPU is
-separate from all earlier ledgers. E5a owns the parked serialization follow-up;
-native/SIMD remains B4a. No merge, push, default promotion or E1 accompanies this
-work. Larger-work feasibility and calibrated engagement precede a fresh matched
-complete-CLI comparison and protected balanced 60/70 completion.
+compact64 is `(2000, 50000, 64)`; fixed32 is `(2000, 147396, 32)`.
+escalating140 is `(200, 7700, 10)`, `(2000, 81000, 30)`,
+`(10000, 554000, 100)`, as `(B1, B2, curves)`. Other sizes/cofactors use
+the bounded existing cost model or serial fallback. Warm 30-digit easy calls
+and some cold 40-digit calls regressed in the retained fixtures; hidden factor
+sizes never select the runtime path. No QS eligibility or fallback grant is
+changed by this table.
 
 ## Known gaps and unresolved conflicts
 
-- **Deferred:** E1 combined portfolio confirmation. Individual accepted
-  components do not establish a compounded win. H1 and its coverage review
-  still precede GNFS activation.
-- **Inconclusive/unmeasured:** the adoption limitations are attached to the
-  tables above. No broad SIQS crossover or practical general 60–80-digit
-  completion has been established. The historical 65-digit spike timed out
-  under an older collector; C10a-01 now records exploratory completions at all four sizes, with
-  the 65 rerun drift failure and censored 70 control. Consume those scoped
-  results before a duplicate larger-size study; there is
-  no promoted 61–80 route.
-- **Open:** C10a-06 runner work; R3 general cadence/storage proofs; B14 proofs;
-  final SSS/worker comparisons and upstream-license clarification. See the
-  [live catalogue](ROADMAP.md#numbered-phase-catalogue-and-acceptance-gates).
-- **Unresolved conflicts:** none of the checked stale claims requires choosing
-  between unsupported conclusions. Historical contradictory instructions stay
-  in the pinned Git revision and are superseded by dated closure/current code.
-- **Unresolvable references:** none among the roadmap's “local audit material”
-  labels. The [history reference register](history/ROADMAP_CLEANUP.md#local-audit-reference-register)
-  names existing local paths and the committed M17 baseline. Historical source
-  links use the pinned `v2/ROADMAP.md` Git revision and its original context.
+- **Deferred:** E1 combined confirmation; GNFS until H1 and its coverage review.
+- **Unmeasured/Inconclusive:** no general all-size speedup or broad crossover
+  is established. Coupled SIQS policies apply at every size, but tuned size
+  presets and automatic portfolio SIQS eligibility still end at 60. Other
+  sizes/backends/grants retain the stated extrapolation and feasibility limits.
+- **Open:** C9b timing variability and fresh confirmation; C10a-06 runner work;
+  general R3/provenance and B14 proof scopes; current-worker/SSS comparison and
+  upstream-license clarification. B12/F4 is closed for the delivered ECM component; A7a and B4a remain separate.
+- **Resolved:** C9a's historical preparation/campaign instructions are superseded
+  by scoped closure. Its uncalibrated 15% canary flags remain historical warnings;
+  future judgments require measured variability and uncertainty.
+- **Unresolved conflicts:** none found in the checked current behavior/closure
+  records. No conflicting experimental verdict was upgraded.
+- **Local references:** earlier C9a preparation files are preserved under
+  `v2/audit/c9a/archive-20261104/base/c9a/`, with former worktree roots recorded
+  in `v2/audit/c9a/archive-20261104/relocations.json`. Detailed chronology and prior
+  quantitative records remain in [pinned history](ROADMAP.md#documentation-history-and-local-evidence).
+  No missing audit reference was discarded.

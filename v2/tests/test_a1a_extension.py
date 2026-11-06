@@ -281,7 +281,11 @@ class ExtendedKernelTests(unittest.TestCase):
                 base,
                 BOTH,
                 block_width=64,
-                memory_bytes=scalar._workspace + reserve - 1,
+                # Optional reuse caches may decline their allocation. Test
+                # the required presieve floor independently of those caches.
+                memory_bytes=(
+                    scalar._workspace - scalar._reuse_workspace + reserve - 1
+                ),
             )
         with self.assertRaises(ValueError):
             config(marking="presieve+presieve_powers")

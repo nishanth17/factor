@@ -191,7 +191,7 @@ class SSSDispatchTests(unittest.TestCase):
         config = PortfolioConfig(rho_attempts=0, pm1_attempts=0, ecm_tiers=())
 
         first = factorize_bounded(
-            1009 * 1013, config=config, budget=allowance(0)
+            1009 * 1013, config=config, budget=allowance(0), ecm_executor=None
         )
         checkpoint = copy.deepcopy(first.checkpoint)
         checkpoint["payload"]["version"] = 3
@@ -206,6 +206,7 @@ class SSSDispatchTests(unittest.TestCase):
             config=config,
             checkpoint=checkpoint,
             budget=allowance(),
+            ecm_executor=None,
         )
 
         self.assertTrue(resumed.result.complete)

@@ -180,9 +180,9 @@ class ProductionChainTests(unittest.TestCase):
             self.assertEqual(prepare.call_count, 1)
 
     def test_catalog_corruption_missing_schedule_and_caps(self):
-        with patch("v2.ecm.chains.CATALOG_SHA256", "0" * 64):
+        with patch("v2.ecm.chain_data.PRAC", ()):
             budget = allowance()
-            with self.assertRaisesRegex(ValueError, "catalog identity"):
+            with self.assertRaisesRegex(ValueError, "catalog"):
                 ChainPlan(2000, "python-int", budget)
             self.assertGreater(budget.used, 0)
         with self.assertRaises(ValueError):
@@ -259,15 +259,25 @@ class ProductionChainTests(unittest.TestCase):
 
     def test_pause_rebuild_cumulative_allowance_identity_and_legacy(self):
         config, n = configuration(), 6120168563605791616423380424731852610871
-        full = factorize_bounded(n, seed=19, config=config, budget=allowance())
+        full = factorize_bounded(
+            n, seed=19, config=config, budget=allowance(), ecm_executor=None
+        )
         self.assertEqual(full.result.reconstruct(), n)
         partial = factorize_bounded(
-            n, seed=19, config=config, budget=allowance(250000)
+            n,
+            seed=19,
+            config=config,
+            budget=allowance(250000),
+            ecm_executor=None,
         )
         self.assertEqual(partial.reason, "work_limit")
         self.assertEqual(partial.checkpoint["payload"]["version"], 10)
         resumed = factorize_bounded(
-            n, checkpoint=partial.checkpoint, config=config, budget=allowance()
+            n,
+            checkpoint=partial.checkpoint,
+            config=config,
+            budget=allowance(),
+            ecm_executor=None,
         )
         self.assertEqual(resumed.result.reconstruct(), n)
         self.assertEqual(resumed.result, full.result)
@@ -280,7 +290,11 @@ class ProductionChainTests(unittest.TestCase):
         reseal(corrupt)
         with self.assertRaisesRegex(ValueError, "incompatible"):
             factorize_bounded(
-                n, checkpoint=corrupt, config=config, budget=allowance()
+                n,
+                checkpoint=corrupt,
+                config=config,
+                budget=allowance(),
+                ecm_executor=None,
             )
         for field, value in (
             ("value", [0, 0]),
@@ -292,17 +306,25 @@ class ProductionChainTests(unittest.TestCase):
             reseal(corrupt)
             with self.assertRaises(ValueError):
                 factorize_bounded(
-                    n, checkpoint=corrupt, config=config, budget=allowance()
+                    n,
+                    checkpoint=corrupt,
+                    config=config,
+                    budget=allowance(),
+                    ecm_executor=None,
                 )
         off = replace(config, ecm_chain_mode="off", ecm_chain_bytes=0)
         old = factorize_bounded(
-            n, seed=19, config=off, budget=allowance(10000)
+            n, seed=19, config=off, budget=allowance(10000), ecm_executor=None
         )
         self.assertNotIn("chains", old.checkpoint["payload"])
         self.assertNotIn("ecm_chain_mode", old.checkpoint["payload"]["config"])
         self.assertLess(old.checkpoint["payload"]["version"], 10)
         restored = factorize_bounded(
-            n, checkpoint=old.checkpoint, config=off, budget=allowance()
+            n,
+            checkpoint=old.checkpoint,
+            config=off,
+            budget=allowance(),
+            ecm_executor=None,
         )
         self.assertEqual(restored.result.reconstruct(), n)
 
@@ -388,6 +410,7 @@ class ProductionChainTests(unittest.TestCase):
         options.pop("ecm_chain_bytes")
         options.pop("ecm_chain_family")
         options.pop("allocation")
+        options.pop("ecm_kernel")
         old_config = old.PortfolioConfig(**options)
         n = 1000000000039 * 1000000000061
         first = old.factorize_bounded(
@@ -399,11 +422,19 @@ class ProductionChainTests(unittest.TestCase):
             ),
         )
         restored = factorize_bounded(
-            n, config=config, checkpoint=first.checkpoint, budget=allowance()
+            n,
+            config=config,
+            checkpoint=first.checkpoint,
+            budget=allowance(),
+            ecm_executor=None,
         )
         self.assertEqual(restored.result.reconstruct(), n)
         second = factorize_bounded(
-            n, seed=19, config=config, budget=allowance(10000)
+            n,
+            seed=19,
+            config=config,
+            budget=allowance(10000),
+            ecm_executor=None,
         )
         self.assertEqual(
             {

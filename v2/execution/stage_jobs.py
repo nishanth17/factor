@@ -191,14 +191,21 @@ def _stage_one(job, budget, context, config):
     plan = stage_one_plan(job, context, budget)
     if plan is not None:
         start = job["value"]
-        value, divisor, replayed = plan.execute(
-            job["powers"],
-            start,
-            job["n"],
-            job["a24"],
-            budget,
-            native_packet=getattr(context, "native_packet", None),
-        )
+        packet = getattr(context, "native_packet", None)
+        if packet is None:
+            # Historical chain providers retain the original call contract.
+            value, divisor, replayed = plan.execute(
+                job["powers"], start, job["n"], job["a24"], budget
+            )
+        else:
+            value, divisor, replayed = plan.execute(
+                job["powers"],
+                start,
+                job["n"],
+                job["a24"],
+                budget,
+                native_packet=packet,
+            )
         commit_chain_chunk(job, plan, start, value, divisor, replayed)
         return
 

@@ -4,8 +4,6 @@ The default executor and its legacy identity remain in ecm_chains. Optional
 plans reuse its certified actions, atomic reservations and strict recovery.
 """
 
-import hashlib
-import json
 from types import SimpleNamespace
 
 from ..common import arithmetic, prime_sieve, utils
@@ -13,9 +11,8 @@ from . import chains as core
 from . import core as ecm
 from . import prac
 
-CF_CATALOG = core.CATALOG.with_name("b3_cf_records.json")
 CF_SHA256 = "fd1e650180c1c576fe9bd95e64221f3d19bb0a730a772d356f0876d1e91284ae"
-CF_BYTES = 62430
+CF_PREPARATION_WORK = 62430
 
 
 def default_options(config, tiers=None, *, automatic_memory=False):
@@ -92,35 +89,26 @@ class ChainPlan(core.ChainPlan):
             raise ValueError("ECM chains support B1 <= 2000")
         self.identity = identity(bound, backend, family)
         self.bound, self.backend = bound, backend
-        path, digest, size = (
-            (CF_CATALOG, CF_SHA256, CF_BYTES)
+        from . import cf_data, chain_data
+
+        budget.consume(
+            CF_PREPARATION_WORK
             if family == "cf"
-            else (core.CATALOG, core.CATALOG_SHA256, core.CATALOG_BYTES)
+            else core.CATALOG_PREPARATION_WORK
         )
-        budget.consume(size)
-        with path.open("rb") as stream:
-            raw = stream.read(size + 1)
-        if len(raw) != size or hashlib.sha256(raw).hexdigest() != digest:
-            raise ValueError("optional ECM catalog identity mismatch")
-        data = json.loads(raw)
-        if data["schema"] != 1 or data["bound"] != 2000:
-            raise ValueError("incompatible optional ECM catalog")
-        rows = data["families"][family]
+        rows = cf_data.CF if family == "cf" else chain_data.LUCAS
         if len(rows) != 333:
             raise ValueError("incomplete optional ECM catalog")
         engine = SimpleNamespace(
             name=backend, ecm=ecm, prac=prac, gcd=arithmetic.gcd
         )
         actions, owned = {}, 4096
-        for scalar, row in rows.items():
-            scalar = int(scalar)
-            code = bytes.fromhex(row["code"])
-            masks = bytes.fromhex(row["masks"])
+        for scalar, code, masks, output, slots in rows:
             steps = len(code) // 4
             # Keep the production verification/reservation contract even
             # though these records were independently certified in C6.
-            budget.consume(4 * steps + row["slots"] + 1)
-            record = core.Record(scalar, code, row["output"], row["slots"])
+            budget.consume(4 * steps + slots + 1)
+            record = core.Record(scalar, code, output, slots)
             actions[scalar] = core.Action(record, masks, engine)
             owned += 4096 + 512 * steps
         if owned > core.PLAN_BYTES:

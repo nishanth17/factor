@@ -332,7 +332,7 @@ class SIQSTests(unittest.TestCase):
         )
 
         first = factorize_bounded(
-            4001 * 5003, config=config, budget=allowance(0)
+            4001 * 5003, config=config, budget=allowance(0), ecm_executor=None
         )
         checkpoint = copy.deepcopy(first.checkpoint)
         checkpoint["payload"]["version"] = 2
@@ -344,6 +344,7 @@ class SIQSTests(unittest.TestCase):
             config=config,
             checkpoint=checkpoint,
             budget=allowance(),
+            ecm_executor=None,
         )
 
         self.assertEqual(result.result.reconstruct(), 4001 * 5003)

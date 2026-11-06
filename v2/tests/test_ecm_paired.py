@@ -284,7 +284,7 @@ class PairedResumeTests(unittest.TestCase):
         for backend in backends:
             config = settings(backend=backend)
             whole = portfolio.factorize_bounded(
-                n, config=config, budget=allowance()
+                n, config=config, budget=allowance(), ecm_executor=None
             )
             self.assertEqual(whole.reason, "exhausted")
             self.assertEqual(len(whole.events), 4)
@@ -298,7 +298,7 @@ class PairedResumeTests(unittest.TestCase):
 
                 with patch.object(portfolio, "advance_job", pause):
                     first = portfolio.factorize_bounded(
-                        n, config=config, budget=allowance()
+                        n, config=config, budget=allowance(), ecm_executor=None
                     )
                 self.assertEqual(first.reason, "cancelled")
                 self.assertEqual(first.checkpoint["payload"]["version"], 7)
@@ -307,6 +307,7 @@ class PairedResumeTests(unittest.TestCase):
                     config=config,
                     budget=allowance(),
                     checkpoint=json.loads(json.dumps(first.checkpoint)),
+                    ecm_executor=None,
                 )
                 self.assertEqual(resumed.result, whole.result)
                 self.assertEqual(resumed.reason, whole.reason)

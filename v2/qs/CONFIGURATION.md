@@ -64,6 +64,9 @@ See the [promotion evidence and limits](../benchmarks/RESULTS.md#c10a-01-coupled
 
 ## Collector families
 
+See [collector policies and storage](COLLECTORS.md) for the optional
+useful-yield, expanded-intake and compact-record policy reference.
+
 | Configuration | Role |
 | --- | --- |
 | `SieveConfig` | Single-large-prime reference and scored collection |

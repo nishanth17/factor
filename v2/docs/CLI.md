@@ -85,3 +85,28 @@ installed in the chosen PyPy environment; no runtime or backend fallback occurs.
 Use `--checkpoint PATH` to save state and `--resume PATH` to restore it.
 Resume grants are cumulative totals. Preserve the saved method and compatible
 configuration; see [checkpoints](CHECKPOINTS.md) for examples and restore rules.
+
+## Automatic ECM selection
+
+The normal auto command now uses the bounded portfolio and automatic cost-gated
+process ECM. `--bounded` remains accepted. Omitted tiers choose escalating140
+at exactly 60/80/100 original digits; explicit tiers and saved configurations
+win. Unsupported/unfunded regimes and cheap calls stay serial. Direct QS/SSS
+methods keep their own execution path.
+
+Use `--ecm-workers serial` for an explicit serial run, or leave the default
+`--ecm-workers auto`. `--ecm-memory-mib` sets aggregate ECM ownership including
+the parent and workers. Omitted ordinary memory permits up to 8 GiB; an explicit
+`--memory-mib` workspace cap is also respected conservatively unless a separate
+aggregate cap is granted. Worker count is selected by the packaged policy.
+
+Fresh non-QS omitted grants are 30 wall seconds, 4,096 aggregate CPU seconds and
+10^13 work units in both auto and serial mode. Explicit limits are never raised;
+a small explicit CPU/work grant can select serial. Calibrated QS grants and
+stock fallback/checkpoint settings remain. This is finite bounded execution,
+not a guarantee of completion. The legacy `factorize()` API remains available.
+
+Automatic snapshots use schema 13; resume retains the policy, implementation,
+method seed and resource identity. Old serial snapshots stay serial. Switching
+an automatic snapshot to `--ecm-workers serial` is rejected; use a fresh run
+for a new execution policy. See [adoption limits](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).

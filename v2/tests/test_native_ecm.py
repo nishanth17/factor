@@ -83,6 +83,10 @@ class OptionalPacketTests(unittest.TestCase):
             self.assertEqual(native.ecm_tiers, python.ecm_tiers)
             self.assertEqual(native.ecm_chain_mode, python.ecm_chain_mode)
             self.assertEqual(native.siqs, python.siqs)
+            if python.siqs is not None:
+                self.assertEqual(
+                    native.memory_bytes, python.memory_bytes + RESERVE
+                )
 
     def test_memory_and_configuration_refuse_before_loading(self):
         with self.assertRaises(MemoryError):
