@@ -206,7 +206,7 @@ def child(request_path, source_root):
         budget = Budget(
             work_limit=request.get("work", 10**12) - work_used,
             seconds=seconds,
-            cpu_seconds=cpu,
+            cpu_seconds=min(cpu, request.get("call_cpu", cpu)),
         )
         if request.get("call_seconds") is not None:
             budget.seconds = min(budget.seconds, request["call_seconds"])
