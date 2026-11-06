@@ -303,9 +303,9 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
             )
         settings = WorkerSettings(**(settings_data or {}))
         if settings.worker_imports == "ecm":
-            pass
+            from ..execution import portfolio_config  # noqa: F401
         else:
-            pass
+            from .. import portfolio  # noqa: F401
         engine = CurveEngine(settings)
         previous_cpu = time.process_time()
         channel.sendall(
