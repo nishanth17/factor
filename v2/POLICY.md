@@ -132,8 +132,9 @@ serial arm cannot consume it before the wall deadline. CPU consumption need
 not be equal. Compare equal-CPU efficiency separately when making that claim.
 A repeatable reduction in complete-run wall-time median/p90 or increase in
 completion within budget can qualify at any percentage.
-Confirm the effect on fresh held-out inputs with repeated seeds, stable
-samples and a prespecified uncertainty analysis, normally a 95% confidence
+Confirm the effect on fresh held-out inputs with matched seeds,
+[cost-scaled paired sampling](#cost-scaled-paired-sampling) and a prespecified
+uncertainty analysis, normally a 95% confidence
 interval supporting a positive improvement. Account for run-to-run noise,
 measurement order and drift; a positive point estimate alone is insufficient.
 Include setup, conversion, timeout, recovery and output-validation costs.
@@ -157,6 +158,36 @@ the declared study limits. Preserve previous frozen protocols and historical
 verdicts. Reconsider their evidence through an explicit policy reassessment,
 without retuning on held-out inputs or treating the policy change as automatic
 production promotion.
+
+### Cost-scaled paired sampling
+
+Match inputs, seeds and budgets. Warm measurements require at least three
+seconds of validated PyPy warmup. A cold call uses a fresh interpreter with
+no warmup; include spawn/import/JIT, preparation, validation and shutdown.
+Separate retained-warm calls, identical-work throughput, first validated factor
+and complete factorization. Keep instrumented profiles outside clean timings.
+
+Performance claims need at least **nine matched paired observations in total
+per declared comparison, regime and process lifetime**. Each pair has one clean
+observation per arm on the same input, seed and grants. Count pairs across
+inputs, rather than requiring nine repetitions per input; workers, diagnostic
+companions and unrelated regimes do not count. Prefer independent inputs and
+scale repetitions with complete-call feasibility cost:
+
+- **Under about 10 seconds:** typically five to nine repetitions per input.
+- **10 seconds to 5 minutes:** two to three interleaved repetitions per input.
+- **Over 5 minutes:** one repetition per input is acceptable; favor more inputs.
+
+Estimate unchanged-code A/A variability in the target regime before ranking;
+treat differences within measured noise as ties and retain tied finalists.
+Account for dependence among repetitions of an input. Nine pairs alone do not
+establish sufficient independent coverage or p90 precision.
+
+Extend only under a predeclared sequential rule with finite maximum, declared
+analysis looks and adjustment for repeated looks, while the uncertainty interval
+straddles the decision. Stop at that maximum and report Inconclusive if needed.
+Apply changed sampling protocols prospectively under new identities.
+Diagnostic allowances are separate; follow [profiling limits](#experiment-design-and-prompt-review).
 
 ## Dependencies and priority
 
@@ -303,9 +334,10 @@ in STATUS.md.
 3. **Measure the whole consequence.** Include setup, import/conversion where
    relevant, planning, failed attempts, splitting, filtering, lifting,
    serialization, replay and retained storage. Report owned bounds separately
-   from observed RSS. Benchmarks must use matched inputs, seeds and budgets,
-   at least three seconds of validated PyPy warmup and nine samples, extended
-   when unstable. Cold startup and instrumented profiles stay separate.
+   from observed RSS. Use matched inputs, seeds and budgets and the
+   [cost-scaled paired sampling rule](#cost-scaled-paired-sampling). Warm
+   measurements need validated warmup; cold measurements exclude warmup.
+   Instrumented profiles remain separate from clean performance evidence.
 4. **Use the revised promotion policy in “How to use the gates”.** Require zero correctness
    failures and a repeatable complete-run time or completion improvement
    supported by fresh confirmation and uncertainty beyond measurement noise.
