@@ -51,12 +51,20 @@ def candidate(count, packet=64, *, features=None, collector=None, name=None):
     )
 
 
-def coarse(*, features=None, collector=None):
+def coarse(*, features=None, collector=None, gray_limit=64):
     """Two packet scales per count, plus the direct serial control."""
+    if gray_limit not in (16, 32, 64):
+        raise ValueError("a separately admitted family geometry is required")
+    packets = (min(16, gray_limit // 2), gray_limit)
     return [candidate(0, collector=collector)] + [
-        candidate(count, packet, features=features, collector=collector)
+        candidate(
+            count,
+            packet,
+            features=dict(features or {}, whole_family=packet == gray_limit),
+            collector=collector,
+        )
         for count in COUNTS
-        for packet in (16, 64)
+        for packet in packets
     ]
 
 

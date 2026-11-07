@@ -22,6 +22,18 @@ from v2.benchmarks.qs.a7a.regime_search import (
 
 
 class RegimeSearchTests(unittest.TestCase):
+    def test_whole_family_flag_does_not_collapse_the_packet_grid(self):
+        for gray in (16, 32, 64):
+            rows = coarse(features={"whole_family": True}, gray_limit=gray)
+            actual = {
+                gray
+                if row["features"]["whole_family"]
+                else row["polynomials_per_task"]
+                for row in rows
+                if row["arm"] == "C4"
+            }
+            self.assertEqual(actual, {min(16, gray // 2), gray})
+
     def test_regime_panel_is_certified_disjoint_and_split_before_tuning(self):
         from v2.benchmarks.suites.build_phase_two_corpus import (
             verify_certificates,

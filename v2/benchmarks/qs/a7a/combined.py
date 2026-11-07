@@ -180,6 +180,10 @@ def run(plan_path, output):
     panel = plan.get("corpus_kind", "combined")
     if plan["corpus_sha256"] != corpus_identity(panel):
         raise ValueError("panel identity mismatch")
+    if plan.get("analyze_profiles", False):
+        # Admission fails before spending a factoring window if the optional
+        # analysis reader is missing. It is never sent into worker imports.
+        import vmprof  # noqa: F401
     output.mkdir(parents=True, exist_ok=False)
     ledger = dict(
         plan=plan,
@@ -192,6 +196,7 @@ def run(plan_path, output):
     prior_cpu = sum(r["cpu"] for r in plan.get("prior_charges", []))
     profiles = Path(plan["profile_folder"])
     profiles.mkdir(parents=True, exist_ok=False)
+    sealed_capture_bytes = 0
 
     def save():
         children = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -267,7 +272,7 @@ def run(plan_path, output):
                 )
                 break
             if (
-                storage_bytes(profiles)
+                sealed_capture_bytes
                 + plan.get("prior_storage", 0)
                 + (
                     3 * 2**30
@@ -444,7 +449,8 @@ def run(plan_path, output):
                                 )
                         if mode in ("profile", "packet", "cpu"):
                             if (
-                                storage_bytes(profiles)
+                                sealed_capture_bytes
+                                + storage_bytes(capture)
                                 + plan.get("prior_storage", 0)
                                 > plan["storage"]
                             ):
@@ -516,6 +522,22 @@ def run(plan_path, output):
                         raise RuntimeError(
                             "profile lacks required flushed captures"
                         )
+                    if mode == "profile" and plan.get(
+                        "analyze_profiles", False
+                    ):
+                        from .capture_review import review
+
+                        analysis = review(
+                            capture,
+                            result,
+                            source=commit,
+                            input_id=spec["fixture"],
+                        )
+                        receipt["analysis"] = dict(
+                            file=str(capture / "analysis.json"),
+                            wall=analysis["wall"],
+                            cpu=analysis["cpu"],
+                        )
                 receipt.update(
                     status="reported",
                     body=result["samples"][0]["library_seconds"],
@@ -551,6 +573,10 @@ def run(plan_path, output):
                     - before.ru_stime,
                     thermal_end=thermal_status(),
                 )
+                # Finished capture folders are immutable. Revisit only the
+                # current folder while recording, avoiding an ever-growing
+                # directory scan in every100ms observation tick.
+                sealed_capture_bytes += storage_bytes(capture)
                 save()
                 print(json.dumps(receipt), flush=True)
             if receipt["status"] == "failed":
