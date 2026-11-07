@@ -175,17 +175,22 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
-- **G2 early stop:** coverage paused at a reference checkpoint-grant mismatch.
-  The adapter repair passes committed-only QA on `70ef473`; retain completed
-  data and failures. G2 continuation requires revised approval; tuning,
-  confirmation, probes and adoption remain pending. Local report:
-  `v2/audit/a7a/g2-reference-repair-20261107/REPORT.md`.
+- **G2 reported (7 November):** the approved corrected continuation covers all
+  24 cold/warm arm cells. Serial/process controls complete every row; literal
+  mainline is incomplete at 60/65/70. Single balanced inputs establish costs
+  and feasibility, not per-regime winners. The bounded parent/worker capture
+  is analyzed without rerunning factoring; scope repair `88430a5` retains the
+  failed review/charge and all-process requirements for full captures. QA:
+  1,548 tests (9 optional skips), lint and 291 imports, including separately
+  passing host-inspection tests. G2H overhead removal needs approval before
+  anchor tuning; confirmation, probes and adoption remain pending. Local
+  report and priced next stage: `v2/audit/a7a/g2-report-20261107/REPORT.md`.
 
 - **G1 preparation gate (7 November):** bounded stage driver, certified fresh
   confirmation corpus, literal-mainline adapter and optional timeline/progress
   observers validated on `62854f9`. Committed-only QA passes 1,546 tests
-  (9 optional skips), lint and 291 benchmark imports. G2 coverage is proposed,
-  not authorized; search, confirmation and integration remain open. Detailed
+  (9 optional skips), lint and 291 benchmark imports. G2 is reported above;
+  search, confirmation and integration remain open. Detailed
   local gate report: `v2/audit/a7a/g1-20261107/REPORT.md`.
 
 - **Implemented on the task branch:** calibrated growing-DLP/current-collector

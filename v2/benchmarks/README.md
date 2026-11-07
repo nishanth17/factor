@@ -12,12 +12,32 @@ needed, and give every stage a question, stop decision and finite cumulative
 resources. Freeze source/configuration, inputs, seeds and selection before
 accepted timing. Use independent fresh confirmation and validate every output.
 
-Accepted timings need at least three seconds of validated PyPy warmup and
-nine observations under the machine-wide performance lock. Full test suites
-share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
-and instrumented diagnostics remain separate from performance evidence.
+Use the policy's evidence tiers: start with three independent paired inputs,
+extending to six and nine only under a funded, prespecified uncertainty rule.
+Warm timings need at least three seconds of validated warmup; cold timings use
+a fresh interpreter with no warmup. Full test suites share the measurement
+lock; worktrees do not isolate CPU, RAM or thermals. Instrumented diagnostics
+remain separate from clean performance evidence.
 
 ## Current-collector QS regime studies
+
+The current [gated A7a plan](A7A_EXPERIMENT.md) supersedes the older broad
+designs described below. G2 covers cold 40/50/55/60/65/70 and warm 40/50;
+62 is excluded, and 75/80 remain separately approved post-G3 feasibility
+probes. Fix measured architectural overhead, classify options, then tune only
+real tunables at anchors and verify interpolation. Fresh G4 inputs live in
+`inputs/a7a/confirmation_g4.json` and remain outside tuning.
+
+G2's corrected coverage is reported locally in
+`v2/audit/a7a/g2-report-20261107/REPORT.md`. All serial/process cells complete;
+literal mainline is incomplete at 60/65/70. This is exposed-input feasibility,
+not a confirmed speedup or routing table. Bounded capture review uses explicit
+parent/representative-worker targets; full capture review requires all owned
+streams. Representative diagnostics and finalist profiles follow the current
+plan, rather than attaching a profile to every search loser.
+
+The following runners remain available for historical protocol reproduction;
+their design sizes and per-candidate capture rule are not the current campaign.
 
 The opt-in [A7a search](qs/a7a/regime_search.py) defines bounded worker/packet
 neighborhoods and compatible feature removals. Its 40/50/55/60/62/65/70/75/80

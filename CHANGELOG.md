@@ -10,6 +10,15 @@ below record decisions in their dated scope; later entries may supersede routes.
   readings outside actor timing. G2 stopped before continuation; no production
   factoring defaults change.
 
+## Bounded QS diagnostic review (7 November 2026)
+
+- Review explicitly selected parent/worker CPU streams for bounded windows,
+  retaining the unreviewed process inventory. Full profiles still require
+  every owned process; missing targets and unflushed streams fail review.
+- Finish the approved G2 breadth report on the isolated branch. Preserve
+  incomplete mainline controls and historical recorder failures; architectural
+  fixes, configuration tuning and fresh confirmation remain separately gated.
+
 ## Experimental QS campaign preparation (7 November 2026)
 
 - Add bounded, explicitly gated stage proposals, checked coverage and durable

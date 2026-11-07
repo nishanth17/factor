@@ -104,16 +104,23 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
-## A7a G2 early stop — 7 November 2026
+## A7a G2 coverage report — 7 November 2026
 
-The approved coverage run stopped on a reference checkpoint error at 60 digits.
-The adapter had retained a 1 MiB default instead of the declared 64 MiB grant.
-The corrected adapter also retains reference thermal context; committed-only
-QA on `70ef473` passes 1,547 tests (9 optional skips), lint and 291 imports.
-Completed receipts and the failed call remain local. G2 is incomplete and no
-winner/default change is adopted. A corrected continuation awaits revised
-approval under the experiment's stop rule. Local report:
-`v2/audit/a7a/g2-reference-repair-20261107/REPORT.md`.
+The approved corrected continuation has finished all 24 coverage cells over
+cold 40/50/55/60/65/70 and warm 40/50. All strong-serial/process calls complete;
+literal mainline reaches its wall limit at 60 and exhausts its generic preset
+at 65/70. One balanced input per size establishes feasibility and costs, not
+selected recipes or fresh confirmation. Historical reference failures remain.
+
+The representative CPU/heap capture was recovered through a scoped review
+without repeating factoring. Fix `88430a5` distinguishes an intentionally
+unsampled worker from a missing required stream; full captures still require
+every owned process. Committed-only QA covers 1,548 tests (9 optional skips),
+lint and 291 imports; two host-inspection permission errors passed when rerun
+with host access on identical source. CPU accounting, sparse preparation and
+budget checks are the next measured overhead candidates. G2H needs approval;
+tuning, confirmation, probes and adoption remain pending. Local cost/resource
+report: `v2/audit/a7a/g2-report-20261107/REPORT.md`. The owned lock is released.
 
 ## A7a preparation gate — 7 November 2026
 
@@ -124,7 +131,7 @@ The driver binds approval to the exact stage/source/corpus and rejects missing
 coverage, invalid grants and automatic retries of unfinished attempts. Fresh
 certified confirmation inputs are reserved for the three/six/nine-input rule.
 Observer overhead on short prefixes remains inconclusive; optional counters
-stay off in clean coverage. G2 requires separate approval. No per-regime winner,
+stayed off in the separately approved G2 coverage. No per-regime winner,
 large-probe completion or automatic-default change is established.
 Local report: `v2/audit/a7a/g1-20261107/REPORT.md`.
 
@@ -142,7 +149,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | Current-collector workers and CPU/heap/RSS capture; completed counterbalanced 60-digit reruns, independent-input/packet follow-ups, full 62/70-digit feasibility and a fresh-process serial reference. C8/p16 remains provisional; physical-state variation, per-regime confirmation and integration remain open. | `codex/a7a-regime-tuning`; experimental source `ae1cfd9`, committed QA `d9443d9` |
+| [A7a](ROADMAP.md#a7a-in-progress) | G2 breadth complete across six cold and two warm rows, with representative CPU/heaps and a priced overhead stage. Architectural fixes, anchor tuning, fresh per-regime confirmation and integration remain open. | `codex/a7a-regime-tuning`; coverage `71f6103`, review repair/QA `88430a5` |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
