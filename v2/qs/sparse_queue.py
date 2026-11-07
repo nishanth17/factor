@@ -34,7 +34,15 @@ def build(collector, window, byte_cap):
     weight_max = max(1, maximum.bit_length()) * max(collector._logs)
     if max(width - 1, len(roots) - 1, (weight_max << 1) | 1) > word_max:
         return None
-    queues = [array("I") for _ in range(count)]
+    packed = "packed_queue" in collector.config._kernels
+    offset_bits = (width - 1).bit_length()
+    index_bits = (len(roots) - 1).bit_length()
+    if packed and (
+        offset_bits + index_bits + ((weight_max << 1) | 1).bit_length()
+        > 8 * array("Q").itemsize
+    ):
+        return None
+    queues = [array("Q" if packed else "I") for _ in range(count)]
     budget = collector.budget
     grouped = isinstance(budget, PollingBudget)
     for index in range(split, len(roots)):
@@ -53,6 +61,11 @@ def build(collector, window, byte_cap):
         )
         for modulus, residues, weight in marks:
             encoded_weight = (weight << 1) | (modulus == root.prime)
+            prefix = (
+                ((encoded_weight << index_bits) | index) << offset_bits
+                if packed
+                else 0
+            )
             for residue in residues:
                 hits = range(lo + (residue - lo) % modulus, hi, modulus)
                 hit_count = len(hits)
@@ -89,7 +102,15 @@ def build(collector, window, byte_cap):
                         # Advance quotient/remainder by addition. Sparse
                         # moduli visit each block at most once; emitted words
                         # and the root traversal order remain unchanged.
-                        queues[block].extend((offset, index, encoded_weight))
+                        if packed:
+                            # Immutable index/weight bits are computed once
+                            # per root level. Each hit writes one machine word
+                            # without a transient tuple or three array writes.
+                            queues[block].append(prefix | offset)
+                        else:
+                            queues[block].extend(
+                                (offset, index, encoded_weight)
+                            )
                         block += block_step
                         offset += offset_step
                         if offset >= width:
@@ -170,7 +191,8 @@ def sieve(collector, lo, hi, stats):
         threshold = collector._sieve_direct(lo, hi, stats)
     finally:
         collector._roots = roots
-    hits = len(entries) // 3
+    packed = "packed_queue" in cfg._kernels
+    hits = len(entries) if packed else len(entries) // 3
     collector.budget.consume(hits + 1)
     first_count = 0
     masks = collector._hit_masks
@@ -178,12 +200,21 @@ def sieve(collector, lo, hi, stats):
     words = getattr(collector, "_word_hits", None)
     if collector._hits is not words:
         words = None
-    for entry in range(0, len(entries), 3):
-        offset, index, weight = (
-            entries[entry],
-            entries[entry + 1],
-            entries[entry + 2],
-        )
+    offset_bits = (cfg.block_width - 1).bit_length()
+    index_bits = (len(roots) - 1).bit_length()
+    offset_mask, index_mask = (1 << offset_bits) - 1, (1 << index_bits) - 1
+    for entry in range(0, len(entries), 1 if packed else 3):
+        if packed:
+            word = entries[entry]
+            offset = word & offset_mask
+            index = (word >> offset_bits) & index_mask
+            weight = word >> (offset_bits + index_bits)
+        else:
+            offset, index, weight = (
+                entries[entry],
+                entries[entry + 1],
+                entries[entry + 2],
+            )
         collector._scores[offset] += weight >> 1
         if weight & 1:
             if words is not None:

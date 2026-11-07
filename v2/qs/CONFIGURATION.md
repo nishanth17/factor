@@ -124,7 +124,7 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused` and `parity_two` in valid duplicate-free combinations. The two presieve selectors
+`scan_fused`, `parity_two` and `packed_queue` in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
 Scratch coexistence, rotation, cancellation and refused work stay bounded.
@@ -142,6 +142,11 @@ queues inside the existing owned allowance. Unsupported scores/recovery,
 singular sparse roots, unaligned blocks or capacity refusal use the ordinary
 exact path. All hits and candidate checks remain covered. Polynomial changes
 release queues; interruption/restore rebuilds them with charges.
+
+The opt-in `packed_queue` component uses one checked 64-bit word per hit,
+replacing three 32-bit words and the temporary append tuple. It preserves the
+older conservative reservation, work/event order and exact direct fallback.
+It is last in canonical marking-component order and changes no default.
 
 This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain

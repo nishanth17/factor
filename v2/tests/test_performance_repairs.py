@@ -26,6 +26,43 @@ def allowance(work=10**12):
 
 
 class PollingTests(unittest.TestCase):
+    def test_mixed_reservations_keep_poll_boundaries_and_atomic_refusal(self):
+        ledger = allowance(20)
+        polls = []
+        budget = PollingBudget(
+            ledger, interval=4, poll=lambda shared: polls.append(shared.used)
+        )
+        budget.consume(1)
+        budget.consume(2)
+        budget.consume_actions(2, 5)
+        budget.consume_span(1)
+        budget.consume_span(4)
+        budget.consume(0)
+
+        self.assertEqual((ledger.used, budget._remaining), (18, 3))
+        self.assertEqual(polls, [0, 13, 14, 18])
+        with self.assertRaises(BudgetExhaustedError):
+            budget.consume(100)
+        self.assertEqual((ledger.used, budget._remaining), (18, 3))
+        self.assertEqual(polls, [0, 13, 14, 18, 18])
+
+    def test_poll_callback_can_replace_ledger_without_stale_reservations(self):
+        first, replacement = allowance(10), allowance(10)
+
+        def switch(shared):
+            self.assertIs(shared, first)
+            budget.budget = replacement
+            budget.cancelled = lambda: True
+
+        budget = PollingBudget(first, poll=switch)
+        with self.assertRaises(BudgetExhaustedError):
+            budget.consume(1)
+
+        self.assertEqual((first.used, replacement.used), (0, 0))
+        self.assertIsNone(first.cancelled)
+        self.assertEqual(replacement.reason, "cancelled")
+        self.assertEqual(budget._remaining, 0)
+
     def test_exact_work_refusal_and_explicit_publication_check(self):
         original = allowance(3)
         budget = PollingBudget(original)

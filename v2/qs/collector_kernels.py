@@ -1,6 +1,8 @@
 """Exact density, bounded periodic scores and fused scanning.
 
 Selectors are explicit; automatic adoption requires separate acceptance.
+The packed_queue component changes sparse event storage only; scores, event
+order, paid work and conservative reservations remain identical.
 """
 
 from ..common.arithmetic import gcd
@@ -13,6 +15,7 @@ KERNELS = (
     "unroll4",
     "scan_fused",
     "parity_two",
+    "packed_queue",
 )
 SCAN_CHUNK = 64
 

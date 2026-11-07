@@ -119,6 +119,7 @@ def _initialize_process(state):
 def _snapshot_process():
     """Publish post-transfer CPU; the barrier covers every live worker."""
     state, index = _PROCESS_STATE
+    state.pop("_qs_writer", None)
     state["cpu"][index] = time.process_time()
     state["rss"][index] = _rss()
     state["barrier"].wait(timeout=30)
@@ -325,6 +326,22 @@ def _collect(task, state=None):
     )
 
 
+class _OwnedSpawnContext:
+    """Retain each owned process before the executor can lose its table."""
+
+    def __init__(self, context, processes):
+        self.context, self.processes = context, processes
+
+    def __getattr__(self, name):
+        return getattr(self.context, name)
+
+    # The multiprocessing context protocol requires this factory name.
+    def Process(self, *args, **kwargs):  # noqa: N802
+        process = self.context.Process(*args, **kwargs)
+        self.processes.append(process)
+        return process
+
+
 class CollectionPool:
     """Reusable bounded executor; single active job, explicit close required.
 
@@ -339,8 +356,8 @@ class CollectionPool:
         if mode not in ("serial", "thread", "process"):
             raise ValueError("unknown execution mode")
         utils.require_integer(workers, "workers", 1)
-        if workers > 4 or (mode == "serial" and workers != 1):
-            raise ValueError("use one serial or at most four workers")
+        if workers > 10 or (mode == "serial" and workers != 1):
+            raise ValueError("use one serial or at most ten workers")
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
             3,
             11,
@@ -374,10 +391,11 @@ class CollectionPool:
             )
 
         self.executor = None
+        self._owned_processes = []
         if mode == "process":
             self.executor = ProcessPoolExecutor(
                 max_workers=workers,
-                mp_context=context,
+                mp_context=_OwnedSpawnContext(context, self._owned_processes),
                 initializer=_initialize_process,
                 initargs=(self.state,),
             )
@@ -393,9 +411,53 @@ class CollectionPool:
         self.close()
 
     def close(self):
+        if self.closed:
+            return
         self.state["stop"].set()
         if self.executor is not None:
             self.executor.shutdown(wait=True, cancel_futures=True)
+        self.closed = True
+
+    def abort(self):
+        """Retire this pool's owned processes after a missing current report.
+
+        Current-collector callers retain the outstanding grants. The executor
+        cannot be reused after termination; unrelated children are untouched.
+        """
+        if self.mode != "process":
+            self.state["stop"].set()
+            self.close()
+            return
+        # A dead worker can hold the stop Event's condition lock. Hard
+        # retirement must not acquire that lock before terminating children.
+        # shutdown() takes the executor's submission lock. Once it returns,
+        # an already-started submission cannot still be adding a child. The
+        # creation registry survives manager-table clearing, including a
+        # crash during submit() before the caller receives its future.
+        manager = self.executor._executor_manager_thread
+        self.executor.shutdown(wait=False, cancel_futures=True)
+        processes = [p for p in self._owned_processes if p.pid is not None]
+        for process in processes:
+            if process.is_alive():
+                process.terminate()
+        # A broken executor publishes failed futures before its manager joins
+        # children. Concurrent Process.join/waitpid calls can leave a stale
+        # live-child handle on PyPy/macOS. Bound manager retirement first.
+        if manager is not None and manager is not threading.current_thread():
+            manager.join(timeout=1.0)
+        processes = [p for p in self._owned_processes if p.pid is not None]
+        for process in processes:
+            if process.is_alive():
+                process.kill()
+        if (
+            manager is not None
+            and manager is not threading.current_thread()
+            and manager.is_alive()
+        ):
+            manager.join(timeout=1.0)
+        deadline = time.monotonic() + 1.0
+        for process in processes:
+            process.join(timeout=max(0, deadline - time.monotonic()))
         self.closed = True
 
     def begin(self, budget):
@@ -415,6 +477,8 @@ class CollectionPool:
             raise
 
     def finish(self, budget):
+        if self.mode != "process":
+            self.state.pop("_qs_writer", None)
         if self.mode == "process" and self.state["slot"].value:
             futures = [
                 self.executor.submit(_snapshot_process)

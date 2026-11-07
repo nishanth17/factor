@@ -913,8 +913,14 @@ class SIQSJob:
             self.stats["relations"] = len(self.engine.collector._full) + len(
                 self.engine.collector._combined
             )
-            self.stats["partials"] = len(self.engine.collector.partial_ids)
             graph = self.engine.collector._graph
+            # Block-by-block portfolio calls need only this count. Building
+            # every retained ID here makes reporting grow with graph history.
+            self.stats["partials"] = (
+                len(graph.unowned)
+                if graph is not None
+                else len(self.engine.collector._pending)
+            )
             if getattr(self.config.collector, "extension_policy", None):
                 # Generalized residual incidence is not an ordinary forest.
                 # Report its retained atoms and rank without constructing a

@@ -32,7 +32,22 @@ def _decode_siqs_config(values):
 
     decoded = dict(values)
     collector = decoded["collector"]
-    if "yield_policy" in collector or "small_prime_bound" in collector:
+    if "extension_policy" in collector:
+        from ..qs.extended_policy import (
+            BoundedYieldSieveConfig,
+            ExtendedYieldSieveConfig,
+        )
+
+        collector_type = (
+            BoundedYieldSieveConfig
+            if collector["extension_policy"] == "extended-v2"
+            else ExtendedYieldSieveConfig
+        )
+    elif "recovery_policy" in collector:
+        from ..qs import CombinedYieldSieveConfig
+
+        collector_type = CombinedYieldSieveConfig
+    elif "yield_policy" in collector or "small_prime_bound" in collector:
         collector_type = YieldSieveConfig
     elif collector.get("storage_policy") == "grow":
         collector_type = GrowingDoubleLargeSieveConfig
