@@ -39,11 +39,23 @@ def child(request):
     )
     samples = []
 
-    def call():
+    def call(seconds_cap=None):
         started = time.monotonic()
-        run = factorize_bounded(
-            n, seed=spec["seed"], config=options, budget=budget
+        remaining_seconds = max(0, budget.seconds - budget.wall_used)
+        if seconds_cap is not None:
+            remaining_seconds = min(remaining_seconds, seconds_cap)
+        inner = Budget(
+            work_limit=budget.work_limit - budget.used,
+            seconds=remaining_seconds,
+            cpu_seconds=max(0, budget.cpu_seconds - budget.cpu_used),
         )
+        try:
+            run = factorize_bounded(
+                n, seed=spec["seed"], config=options, budget=inner
+            )
+        finally:
+            budget.used += inner.used
+
         factors = [
             (f.value, f.exponent, f.certainty.value)
             for f in run.result.factors
@@ -63,7 +75,8 @@ def child(request):
     if spec["lifetime"] == "warm":
         started = time.monotonic()
         while time.monotonic() - started < 3:
-            call()
+            budget.consume(0)
+            call(seconds_cap=max(0, 3 - (time.monotonic() - started)))
         warm_seconds = time.monotonic() - started
     for _ in range(spec["samples"]):
         samples.append(call())
@@ -137,6 +150,7 @@ def run(plan_path, output):
                     (output / "stdout.json").open("x") as stdout,
                     (output / "stderr.txt").open("x") as stderr,
                 ):
+                    actor_started = time.monotonic()
                     process = subprocess.Popen(
                         [sys.executable, "-B", str(adapter), str(request)],
                         cwd=root,
@@ -151,6 +165,22 @@ def run(plan_path, output):
                     if code:
                         raise RuntimeError(f"reference child exited {code}")
                 body = json.loads((output / "stdout.json").read_text())
+                body["actor_seconds"] = time.monotonic() - actor_started
+                oracle = fixtures(plan["corpus_kind"])[spec["fixture"]]
+                for sample in body["samples"]:
+                    if (
+                        sample["complete"]
+                        and "factors" in oracle
+                        and sorted(
+                            p
+                            for p, e, _ in sample["factors"]
+                            for _ in range(e)
+                        )
+                        != sorted(oracle["factors"])
+                    ):
+                        raise ArithmeticError(
+                            "reference disagrees with factor oracle"
+                        )
                 write(output / "result.json", body)
                 status = "reported"
             finally:
