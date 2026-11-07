@@ -19,7 +19,13 @@ from pathlib import Path
 from .diagnostics import _events
 from .performance_lock import open_lock
 from .protocol import INPUTS, schedule
-from .runner import source, thermal_status, validate_output, write
+from .runner import (
+    host_pressure_status,
+    source,
+    thermal_status,
+    validate_output,
+    write,
+)
 
 FEATURES = dict(
     lease_budget=True,
@@ -338,6 +344,7 @@ def run(plan_path, output):
                 pair=spec.get("pair"),
                 diagnostic_for=spec.get("diagnostic_for"),
                 thermal_start=thermal_status(),
+                host_pressure_start=host_pressure_status(),
             )
             ledger["attempts"].append(receipt)
             save()
@@ -614,6 +621,7 @@ def run(plan_path, output):
                     - before.ru_utime
                     - before.ru_stime,
                     thermal_end=thermal_status(),
+                    host_pressure_end=host_pressure_status(),
                 )
                 receipt["cpu_charged"] = _charged_cpu(
                     receipt, spec["cpu"], launched=process is not None

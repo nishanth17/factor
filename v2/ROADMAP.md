@@ -182,18 +182,27 @@ does not establish a free increase in B1.
   options are implemented. Combined Stage 1 and targeted L/R/S ablations have
   exploratory complete-factor observations at 60/70 digits; censored controls,
   exposed inputs, drift and CPU costs remain part of the evidence.
-- **Remaining:** complete the bounded K3 recovery/stop-poll diagnostics,
-  outstanding T/V removals and only justified interactions; explain the worker
-  CPU/packet-wall gap before further changes. Revalidate the resulting source,
-  freeze fresh confirmation with the strong serial/P4 controls, and settle
-  finite-resource, restart and cheap-path behavior before integration/adoption.
-  No optimal worker count or general factoring speedup is established.
-  Native QS kernels/threads and ECM-to-QS pool reuse remain separately scoped.
-- **Checkpoint:** `codex/a7a-current-qs-workers` at `37c4cae`.
-  Local entries: that worktree's `v2/STATUS.md`,
-  `v2/benchmarks/RESULTS.md` combined-process section, and
-  `v2/audit/a7a/K3-approved-plan-20261106-01.json`. Older handoffs retain their
-  historical state and are not evidence of current process or lock ownership.
+- **Current continuation:** refreshed onto mainline `e62ec18` with private
+  semaphore stop checks, optional parent coefficient reuse and bounded cache
+  alternatives. Worker CPU/packet-wall utilization reaches approximately one
+  in representative captures after the stop-check repair. Every new clean
+  repetition has a matching parent/all-worker CPU diagnostic, owned RSS and
+  parent/representative-worker heap. A fresh, certified corpus separates
+  calibration and confirmation at nine 40–80-digit anchors. Full 60-digit
+  feasibility and negative cache/GC screens are recorded in
+  [results](benchmarks/RESULTS.md#a7a-current-mainline-feasibility-6-november-2026).
+- **Remaining:** resolve measurement drift with matched ordering and host
+  pressure records, finish justified per-regime count/packet/feature removals,
+  and establish useful full-factor feasibility above 60 digits on this source.
+  Price any shared cofactor queue against its measured opportunity. Freeze
+  independent confirmation and validate cold admission, finite resources and
+  restart before integration/adoption. No optimal count or general factoring
+  speedup is established. Native QS kernels/threads remain B5a work;
+  ECM-to-QS pool reuse retains its separate owner.
+- **Checkpoint:** `codex/a7a-regime-tuning`, validated runtime `0c853bc`.
+  Local entry: `v2/audit/a7a/HANDOFF.md` in the continuation worktree. The old
+  `codex/a7a-current-qs-workers` evidence and protocols remain preserved.
+  Historical checkpoints do not assert current process or lock ownership.
 
 <a id="b4a-in-progress"></a>
 

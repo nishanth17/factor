@@ -117,7 +117,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | Current-collector workers and combined options; exploratory 60/70 completions exist, with K3 diagnostics, fresh confirmation and integration pending. | `codex/a7a-current-qs-workers` / `37c4cae` |
+| [A7a](ROADMAP.md#a7a-in-progress) | Current-collector workers refreshed onto current mainline; per-run CPU/heap/RSS capture, cache and scheduling screens, and full 60-digit feasibility. Per-regime selection, fresh confirmation and integration remain. | `codex/a7a-regime-tuning`; validated runtime `0c853bc` |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first

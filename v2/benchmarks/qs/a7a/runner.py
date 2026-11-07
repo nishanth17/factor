@@ -187,6 +187,34 @@ def thermal_status():
         return dict(monotonic=started, unavailable=repr(error))
 
 
+def _host_command_status(command):
+    """Bound telemetry duration and retained output without hiding failures."""
+    started = time.monotonic()
+    try:
+        result = subprocess.run(
+            command, capture_output=True, text=True, timeout=1
+        )
+        maximum = 128 * 1024
+        return dict(
+            monotonic=started,
+            returncode=result.returncode,
+            stdout=result.stdout[:maximum],
+            stderr=result.stderr[:maximum],
+            truncated=len(result.stdout) > maximum
+            or len(result.stderr) > maximum,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return dict(monotonic=started, unavailable=repr(error))
+
+
+def host_pressure_status():
+    """Read whole-host pressure outside the measured cell interval."""
+    return dict(
+        vm=_host_command_status(["vm_stat"]),
+        cpu=_host_command_status(["ps", "-axo", "pid=,ppid=,pcpu=,comm="]),
+    )
+
+
 def run_stage(args):
     frozen = checked_freeze(args.freeze)
     stage_started, controller_cpu = time.monotonic(), time.process_time()

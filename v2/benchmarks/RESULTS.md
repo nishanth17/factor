@@ -1,5 +1,49 @@
 # Benchmark results and decisions
 
+## A7a current-mainline feasibility (6 November 2026)
+
+The isolated `codex/a7a-regime-tuning` continuation starts from mainline
+`e62ec18`. One certified balanced 60-digit calibration modulus completes in
+every tested arm under the same Y0 numerical policy, seed and finite grants.
+These are exploratory warmed observations with a ten-second warmup and
+tier-A counters; S0 is the strong experimental serial control. They are not
+a literal master comparison, an accepted speedup or an optimal worker table.
+
+| Arm | Warm factor seconds | Whole-call CPU seconds, including warmup |
+| --- | ---: | ---: |
+| S0 | 109.148 | 119.351 |
+| C4, 16-polynomial packets | 59.136 | 282.707 |
+| C6, 16-polynomial packets | 38.095 | 287.134 |
+| C8, 16-polynomial packets | 34.854 | 345.741 |
+| C10, 16-polynomial packets | 35.006 | 392.062 |
+
+The original four-arm source is `12e4f34`; C8 uses `0c853bc` with its optional
+parent CPU snapshot disabled. Every result reconstructs the certified input.
+CPU/heap/RSS companions are separate from clean timing. The C4 recorder
+failure, repaired missing capture and conservatively reserved unknown worker
+CPU remain explicit in the local receipts; its valid clean run was retained.
+Its 42.6-second diagnostic versus 59.1-second clean run also exposes drift.
+
+The new parent CPU snapshot has no established benefit: C8 clean times were
+34.854 seconds disabled and 36.601 enabled. The memory nursery screen likewise
+retains 4 MiB. Its 60-digit 4 MiB controls drifted from 36.262 to 48.996 seconds
+on identical scanned work, preventing a setting ranking. At 80 digits, fixed
+640-polynomial 4 MiB controls were 11.240/11.185 seconds; 16/64/128 MiB settings
+were 11.370/11.332/11.992 seconds. Larger nurseries reduced sampled GC shares
+while increasing diagnostic owned RSS sums to approximately 5.4–6.5 GiB at
+60 digits and 6.3–6.4 GiB at 80 digits. These sums include shared pages and may
+miss peaks. Heap census is live GC-object data, not allocation attribution.
+
+Packed event storage, fused scan, larger inverse/root-transfer caches and
+pruned replay have no established full-factor gain in this continuation.
+Larger hit storage remains an 80-digit collection lead. Per-regime removals,
+independent confirmation, current-source 70–80-digit completion and cold
+admission remain open. Automatic QS settings retain their existing behavior;
+native/NEON QS work stays with B5a.
+
+Reproduction uses `v2.benchmarks.qs.a7a.combined` with source-bound plans and
+the versioned `regime_corpus.json`. Detailed plans, all failures, capture
+indices and charges remain under local `v2/audit/a7a/`; start at `HANDOFF.md`.
 
 ## B12/F4 cold serial repair and component closure (5 November 2026)
 

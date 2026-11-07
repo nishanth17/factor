@@ -45,6 +45,13 @@ flush profiles before cleanup, and failed or unissued diagnostics remain
 explicit. Every new optimization candidate receives its companion, including
 rejected candidates.
 
+Clean and diagnostic receipts retain bounded host VM and process-CPU snapshots
+before and after each call, alongside thermal readings. Their differences can
+expose host compression, swapping or other CPU workloads. These include other
+applications and are not the factorer's owned memory or exclusive CPU cost.
+Missing or truncated telemetry remains explicit. These
+bookends are outside the measured cell interval and charged to the campaign.
+
 Multi-sample cells retain the same repetition count in their diagnostic
 companion, so later warmed execution and GC behavior remain visible. The
 whole clean/diagnostic reservation must fit before either is issued.

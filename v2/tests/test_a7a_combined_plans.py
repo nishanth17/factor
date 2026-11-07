@@ -1,5 +1,6 @@
 """Amended stage membership, ordering and finite confirmation allowances."""
 
+import subprocess
 import tempfile
 import unittest
 from collections import Counter
@@ -23,6 +24,43 @@ from v2.benchmarks.qs.a7a.combined_plans import (
 
 
 class CombinedPlanTests(unittest.TestCase):
+    def test_pressure_bookends_preserve_raw_counters_and_failures(self):
+        from v2.benchmarks.qs.a7a.runner import host_pressure_status
+
+        completed = SimpleNamespace(
+            returncode=0, stdout="Swapouts: 12.\n", stderr=""
+        )
+        with patch(
+            "v2.benchmarks.qs.a7a.runner.subprocess.run",
+            return_value=completed,
+        ) as command:
+            record = host_pressure_status()
+        self.assertEqual(record["vm"]["stdout"], "Swapouts: 12.\n")
+        self.assertEqual(record["vm"]["returncode"], 0)
+        self.assertEqual(command.call_args_list[0].args[0], ["vm_stat"])
+        self.assertEqual(
+            command.call_args_list[1].args[0],
+            ["ps", "-axo", "pid=,ppid=,pcpu=,comm="],
+        )
+        self.assertEqual(command.call_args.kwargs["timeout"], 1)
+
+        with patch(
+            "v2.benchmarks.qs.a7a.runner.subprocess.run",
+            side_effect=subprocess.TimeoutExpired(["vm_stat"], 1),
+        ):
+            record = host_pressure_status()
+        self.assertIn("unavailable", record["vm"])
+        self.assertIn("unavailable", record["cpu"])
+
+        completed.stdout = "x" * (128 * 1024 + 1)
+        with patch(
+            "v2.benchmarks.qs.a7a.runner.subprocess.run",
+            return_value=completed,
+        ):
+            record = host_pressure_status()
+        self.assertTrue(record["cpu"]["truncated"])
+        self.assertEqual(len(record["cpu"]["stdout"]), 128 * 1024)
+
     def test_atomic_metadata_rename_does_not_abort_capture_accounting(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)

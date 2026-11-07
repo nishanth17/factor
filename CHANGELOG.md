@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental current-collector QS continuation (6 November 2026)
+
+- On the isolated A7a branch, add bounded worker/cache configuration controls,
+  checked resource accounting and a certified per-regime calibration corpus.
+- Pair every clean benchmark repetition with parent/all-worker CPU tracing,
+  owned RSS and parent/representative-worker heaps, analyzed before selection.
+  Preserve recorder failures and unknown CPU charges separately.
+- Record exploratory full 60-digit feasibility and cache/GC screens. Worker
+  selection, fresh confirmation and integration remain open; QS automatic
+  settings retain their existing behavior.
+
 ## ECM package and bundled-data cleanup (6 November 2026)
 
 - Move engine-specific execution into the flat `v2/ecm/` package, retaining
