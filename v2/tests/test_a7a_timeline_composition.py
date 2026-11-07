@@ -8,6 +8,7 @@ from multiprocessing import queues, util
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.qs.a7a import diagnostic_hook
 from v2.benchmarks.qs.a7a.worker_timeline import initialize_worker
 from v2.qs import worker_packet
 
@@ -33,8 +34,9 @@ class TimelineCompositionTests(unittest.TestCase):
                         "v2.qs.parallel._initialize_process",
                         side_effect=lambda state: calls.append("base"),
                     ),
-                    patch(
-                        "v2.benchmarks.qs.a7a.diagnostic_hook.initialize_worker",
+                    patch.object(
+                        diagnostic_hook,
+                        "initialize_worker",
                         side_effect=lambda state: calls.append("diagnostics"),
                     ),
                     patch.object(worker_packet, "collect_packet"),
