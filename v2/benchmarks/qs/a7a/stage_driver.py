@@ -21,6 +21,7 @@ CELL_FIELDS = frozenset(
         "profile_required progress_path qs_memory_bytes rss_interval "
         "samples seed siqs_overrides storage tasks tier_a timeline_path "
         "wall warmup_seconds work digits mode stage variant purpose "
+        "worker_observe "
     ).split()
 )
 

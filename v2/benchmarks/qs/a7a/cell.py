@@ -346,7 +346,7 @@ def execute(request):
     workers = settings(
         spec["arm"],
         spec["memory"],
-        spec["observe"],
+        spec.get("worker_observe", spec["observe"]),
         spec.get("polynomials_per_task", 4),
         spec.get("max_batch_atoms", 8192),
         spec.get("features"),

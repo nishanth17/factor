@@ -34,7 +34,10 @@ def stream_packets(tasks, payload):
     from ....qs.worker_wire import PackedRows
 
     started, cpu = time.monotonic(), time.process_time()
-    budget = Budget(work_limit=96 * 10**12, seconds=15, cpu_seconds=150)
+    seconds = payload["seconds"]
+    budget = Budget(
+        work_limit=96 * 10**12, seconds=seconds, cpu_seconds=10 * seconds
+    )
     runtime = WorkerState(payload, budget)
     writer = PackedRows(payload["settings"].packet_bytes)
     reports = []
@@ -45,6 +48,11 @@ def stream_packets(tasks, payload):
         )
         if report["reason"] != "complete" or report["publication_stop"]:
             raise RuntimeError("independent fixed packet did not complete")
+        divisor = report["divisor"]
+        if divisor is not None and not (
+            1 < divisor < runtime.base.n and runtime.base.n % divisor == 0
+        ):
+            raise ArithmeticError("independent packet divisor is invalid")
         budget.consume(report["work"])
         reports.append(
             dict(
@@ -95,7 +103,7 @@ def summarize(streams, expected_packets):
     )
 
 
-def execute(fixture, workers):
+def execute(fixture, workers, *, longer_window=False):
     """Run local (zero) or one private stream per spawned owned process."""
     from ....execution.budget import Budget
     from ....qs.current_parallel import CurrentParallelSIQSJob
@@ -103,6 +111,11 @@ def execute(fixture, workers):
 
     if workers not in (0, 1, 4, 8):
         raise ValueError("unsupported concurrency")
+    if type(longer_window) is not bool:
+        raise ValueError("window selector must be Boolean")
+    polynomials, packet, seconds = (
+        (512, 16, 35) if longer_window else (POLYNOMIALS, PACKET, 15)
+    )
     digits, index = map(
         int, fixture.removeprefix("regime_calibration_").split("_")
     )
@@ -119,7 +132,7 @@ def execute(fixture, workers):
         f"C{workers or 1}",
         22 * 2**30,
         False,
-        polynomials_per_task=PACKET,
+        polynomials_per_task=packet,
         max_batch_atoms=2048,
         features=dict(
             lease_budget=True,
@@ -137,7 +150,11 @@ def execute(fixture, workers):
         seed=SEEDS[index],
         config=config,
         workers=options,
-        budget=Budget(work_limit=96 * 10**12, seconds=15, cpu_seconds=150),
+        budget=Budget(
+            work_limit=96 * 10**12,
+            seconds=seconds,
+            cpu_seconds=10 * seconds,
+        ),
     )
     job.fixed_work = True
     job._setup()
@@ -157,10 +174,12 @@ def execute(fixture, workers):
         work=1
         + len(job.source.base.entries)
         * job.source.base.bound.bit_length() ** 2,
+        seconds=seconds,
     )
     payload["key"] = context_key(payload)
     tasks = [
-        job._task(i, 2 * 10**12, 150, 15) for i in range(POLYNOMIALS // PACKET)
+        job._task(i, 2 * 10**12, 10 * seconds, seconds)
+        for i in range(polynomials // packet)
     ]
     prepared = time.monotonic()
     if not workers:
@@ -180,7 +199,7 @@ def execute(fixture, workers):
                 connections.append(parent)
                 process.start()
                 child.close()
-            deadline = started + 18
+            deadline = started + seconds + 3
             for connection in connections:
                 if not connection.poll(max(0, deadline - time.monotonic())):
                     raise TimeoutError("independent actor deadline")
@@ -205,15 +224,15 @@ def execute(fixture, workers):
             for connection in connections:
                 connection.close()
     result = summarize(streams, len(tasks))
-    expected = POLYNOMIALS * (2 * config.half_width + 1)
+    expected = polynomials * (2 * config.half_width + 1)
     if result["scanned"] != expected:
         raise ValueError("fixed polynomial traversal incomplete")
     return dict(
         fixture=fixture,
         workers=workers,
         seed=SEEDS[index],
-        polynomials=POLYNOMIALS,
-        packet=PACKET,
+        polynomials=polynomials,
+        packet=packet,
         setup_wall=prepared - started,
         actor_wall=time.monotonic() - started,
         collection_wall=time.monotonic() - prepared,
@@ -236,10 +255,13 @@ def main():
     parser.add_argument("fixture")
     parser.add_argument("workers", type=int)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--longer-window", action="store_true")
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("never overwrite a throughput receipt")
-    result = execute(args.fixture, args.workers)
+    result = execute(
+        args.fixture, args.workers, longer_window=args.longer_window
+    )
     with args.output.open("x") as stream:
         json.dump(result, stream, indent=2)
         stream.write("\n")

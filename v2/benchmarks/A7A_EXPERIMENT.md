@@ -242,9 +242,9 @@ Do not silently run the old 32-row all-binary design.
 | `scan_fused` | (b) | Fuse scan stages instead of separate passes over identical candidates. |
 | `parity_two` | (b) | Alternative exact two-root marking implementation. |
 | `packed_queue` | (b) | Packed versus object queue representation for identical entries. |
-| `wide_hits` | (b) | Alternative hit computation at a fixed capacity and arithmetic domain. |
-| `wide_inverses` | (b) | Alternative inverse computation/cache layout at fixed capacity. |
-| `wide_transfers` | (b) | Alternative root-transfer representation at fixed capacity. |
+| `wide_hits` | (c), conditionally inactive | Raise the hit-helper admission ceiling from 32 to 128 MiB; this is a capacity choice, not a different hit algorithm. |
+| `wide_inverses` | (c), conditionally inactive | Raise the inverse ceiling from 8 to 32 MiB and change coexistence reservations. |
+| `wide_transfers` | (c) | Raise the transfer ceiling from 32 to 128 MiB and requested bytes per base entry from 4,096 to 8,192. |
 | `pruned_transfers` | (b) | Omit provably redundant transfers while preserving exact roots. |
 | Serial/process worker count | (c) | Startup, parent pressure and heterogeneous-core throughput vary with size. |
 | Polynomials per packet, lookahead | (c) | Amortization and load balance interact with workers and family geometry. |
@@ -257,6 +257,14 @@ Do not silently run the old 32-row all-binary design.
 | Whole-family flag | Derived | Derive from packet width and actual family size; do not count a redundant independent dimension. |
 | Numerical/base/large-prime policy | Frozen boundary | Changing mathematical effort needs a separately priced design, not a hidden concurrency comparison. |
 | Native/NEON | Excluded | Deferred B5a implementation, not an available option in this process campaign. |
+
+The three `wide_*` classifications correct the initial inventory against the
+implementation before their trials, rather than reclassifying an observed
+interaction. With the frozen Y0 base-count bounds through 70 digits, hit
+scratch fits the default 32 MiB ceiling and the inverse table fits 8 MiB.
+Record exact capacity/coexistence eligibility before constructing G3; omit
+inactive levels with that bound, rather than timing equivalent recipes.
+`wide_transfers` can change admitted cache capacity within these regimes.
 
 Screen (a)/(b) once at **50 and 65 digits**, on identical packet work and
 fixed resources/seeds. Apply Tier 1: three independent calibration inputs per

@@ -13,9 +13,20 @@ def initialize_worker(state):
     from multiprocessing import queues, util
 
     from ....qs import worker_packet
-    from ....qs.parallel import _initialize_process
 
-    _initialize_process(state)
+    if os.environ.get("FACTOR_A7A_DIAGNOSTIC_DIR"):
+        from .diagnostic_hook import (
+            initialize_worker as initialize_diagnostics,
+        )
+
+        # The cell selects this initializer when timelines are requested.
+        # Preserve the CPU/heap and optional recovery observers before adding
+        # queue spans; replacing their initializer would silently lose them.
+        initialize_diagnostics(state)
+    else:
+        from ....qs.parallel import _initialize_process
+
+        _initialize_process(state)
     folder = Path(os.environ["FACTOR_A7A_TIMELINE_DIR"])
     path = folder / f"worker-{os.getpid()}.json"
     totals = defaultdict(lambda: [0, 0.0, 0.0])

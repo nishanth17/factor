@@ -36,6 +36,13 @@ parent/representative-worker targets; full capture review requires all owned
 streams. Representative diagnostics and finalist profiles follow the current
 plan, rather than attaching a profile to every search loser.
 
+Experimental cells can set `worker_observe` independently of `observe`:
+`observe` retains owned RSS monitoring, while `worker_observe` controls the
+per-relation worker timing/backlog counters. Omitted `worker_observe` preserves
+historical behavior. Measure this observation cost before using the lighter
+setting in clean comparisons; do not relabel historical observations. Worker
+timeline capture composes with requested CPU/heap and recovery observers.
+
 The following runners remain available for historical protocol reproduction;
 their design sizes and per-candidate capture rule are not the current campaign.
 
