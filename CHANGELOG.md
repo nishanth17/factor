@@ -10,7 +10,9 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Pair every clean benchmark repetition with parent/all-worker CPU tracing,
   owned RSS and parent/representative-worker heaps, analyzed before selection.
   Preserve recorder failures and unknown CPU charges separately.
-- Record exploratory full 60-digit feasibility and cache/GC screens. Worker
+- Add bounded joint designs with explicit geometry, conditional validity and
+  pair-coverage checks. Record exploratory full 60/70-digit feasibility,
+  cache/GC screens and the first joint 60-digit block. Worker
   selection, fresh confirmation and integration remain open; QS automatic
   settings retain their existing behavior.
 

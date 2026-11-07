@@ -1,5 +1,27 @@
 # Benchmark results and decisions
 
+## A7a joint starting screen (7 November 2026)
+
+Source `768727d` tests eight joint configurations on one exposed certified
+balanced 60-digit input. Five complete in 45.289–97.284 seconds and three
+censor at their wall limits. The same-source C8/p16 incumbent completes in
+32.988 seconds. Its closing bracket was unissued when the next whole pair
+could not fit M2's remaining allowance; a separately charged M3 supplement
+on `c156298` completes in 33.229 seconds, a 0.73% end/start difference.
+Only design/test/documentation files changed between these sources.
+
+This block uses ten-second warmup, uninstrumented clean calls with tier-A
+timers off, and CPU/heap/RSS companions for every issued repetition. All ten
+companions, including the supplementary control and censored factor runs,
+pass observation validation. The joint block costs 1,591.585 wall seconds,
+6,912.573 CPU seconds and 982,568,746 capture bytes; the closing supplement
+costs 92.697 wall seconds and 701.922 CPU seconds. No tested bundle beats
+the incumbent on this input. A single bracket cannot exclude transient drift;
+one observation per bundle cannot establish independent-input gains, individual
+flag effects or per-regime optimality. Untested combinations remain eligible.
+Plans, complete cost tables, captures, failures and charges remain local under
+`v2/audit/a7a/`.
+
 ## A7a current-mainline feasibility (6 November 2026)
 
 The isolated `codex/a7a-regime-tuning` continuation starts from mainline
@@ -37,8 +59,13 @@ miss peaks. Heap census is live GC-object data, not allocation attribution.
 Packed event storage, fused scan, larger inverse/root-transfer caches and
 pruned replay have no established full-factor gain in this continuation.
 Larger hit storage remains an 80-digit collection lead. Per-regime removals,
-independent confirmation, current-source 70–80-digit completion and cold
-admission remain open. Automatic QS settings retain their existing behavior;
+independent confirmation, 75/80-digit completion and cold admission remain
+open. One balanced 70-digit input completes in 533.568 seconds on `535edd7`
+with C10/p16 and tier-A counters. Its original RSS recorder timed out; this
+was an observation failure, not production memory exhaustion. The repaired
+native-RSS companion on `7c452e3` completes with all CPU streams and heaps;
+its instrumented time is not a performance comparison. Automatic QS settings
+retain their existing behavior;
 native/NEON QS work stays with B5a.
 
 Reproduction uses `v2.benchmarks.qs.a7a.combined` with source-bound plans and

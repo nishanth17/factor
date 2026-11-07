@@ -36,6 +36,12 @@ must be reported separately from raw coverage. A partial block does not inherit
 the full design's coverage. This is an exploratory starting design, not a
 completed per-regime search or a configuration adoption.
 
+A conditional eight-row refinement covers pairs of seven local factors around
+an explicit anchor: workers, packets, verification, packed events, fused scan,
+CPU snapshot and periodic prime-power initialization. It retains fast lease/
+reuse/semaphore settings without declaring them globally dominant. Fund broader
+exploration separately and preserve the aliases and incomplete coverage.
+
 Numerical experiments may supply explicit collector endpoint, product and
 reporting bounds, including `small_prime_bound`. The collector validates the
 resulting configuration. Changing a factor-base size does not automatically

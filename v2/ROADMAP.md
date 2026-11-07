@@ -188,18 +188,21 @@ does not establish a free increase in B1.
   in representative captures after the stop-check repair. Every new clean
   repetition has a matching parent/all-worker CPU diagnostic, owned RSS and
   parent/representative-worker heap. A fresh, certified corpus separates
-  calibration and confirmation at nine 40–80-digit anchors. Full 60-digit
-  feasibility and negative cache/GC screens are recorded in
+  calibration and confirmation at nine 40–80-digit anchors. Full 60/70-digit
+  feasibility, inconclusive cache/GC screens and an exploratory joint starting
+  design are recorded in
   [results](benchmarks/RESULTS.md#a7a-current-mainline-feasibility-6-november-2026).
 - **Remaining:** resolve measurement drift with matched ordering and host
-  pressure records, finish justified per-regime count/packet/feature removals,
-  and establish useful full-factor feasibility above 60 digits on this source.
-  Price any shared cofactor queue against its measured opportunity. Freeze
+  pressure records and finish per-regime joint count/packet/feature selection.
+  Establish useful full-factor feasibility at 75/80 digits. The shared
+  cofactor queue remains unimplemented; price it against measured recovery
+  costs rather than assuming a gain. Freeze
   independent confirmation and validate cold admission, finite resources and
   restart before integration/adoption. No optimal count or general factoring
   speedup is established. Native QS kernels/threads remain B5a work;
   ECM-to-QS pool reuse retains its separate owner.
-- **Checkpoint:** `codex/a7a-regime-tuning`, validated runtime `0c853bc`.
+- **Checkpoint:** `codex/a7a-regime-tuning`, runtime/recorder QA `7c452e3`;
+  geometry-aware joint design `c156298`.
   Local entry: `v2/audit/a7a/HANDOFF.md` in the continuation worktree. The old
   `codex/a7a-current-qs-workers` evidence and protocols remain preserved.
   Historical checkpoints do not assert current process or lock ownership.

@@ -1,5 +1,6 @@
 """A finite joint starting design, not an exhaustive or optimality claim."""
 
+from copy import deepcopy
 from itertools import combinations, product
 
 from ....qs.collector_kernels import combine
@@ -162,3 +163,67 @@ def pair_coverage(rows, *, gray_limit=64):
             observed=len(observed & possible), possible=len(possible)
         )
     return result
+
+
+def local_design(anchor, *, gray_limit=64):
+    """Cover pairs of seven local factors in eight joint configurations.
+
+    This conditional refinement retains packet leases, state reuse and private
+    semaphore stops. Broader exploration must remain separately funded; these
+    retained choices are not declarations of global dominance. Pair coverage
+    does not resolve the aliases between main effects and interactions.
+    """
+    _factor_levels(gray_limit)
+    features = anchor["features"]
+    if not (
+        features.get("lease_budget")
+        and features.get("reuse_state")
+        and features.get("private_stop")
+        and features.get("stop_backend") == "semaphore"
+    ):
+        raise ValueError("local refinement requires its declared fast anchor")
+
+    rows = []
+    for index in range(8):
+        bits = [bool((index & mask).bit_count() % 2) for mask in range(1, 8)]
+        row = deepcopy(anchor)
+        count = 10 if bits[0] else 6
+        packet = gray_limit // (2 if bits[1] else 8)
+        row.update(
+            name=f"local_{index:02}",
+            arm=f"C{count}",
+            polynomials_per_task=packet,
+        )
+        row["features"].update(
+            verification="batch" if bits[2] else "worker",
+            verification_batch_atoms=64,
+            cpu_snapshot=bits[5],
+            whole_family=False,
+        )
+        pieces = set(row["collector_overrides"]["marking"].split("+"))
+        pieces.difference_update(
+            (
+                "sparse",
+                "presieve",
+                "presieve_powers",
+                "packed_queue",
+                "scan_fused",
+            )
+        )
+        pieces.add("presieve_powers" if bits[6] else "presieve")
+        if bits[3]:
+            pieces.add("packed_queue")
+        if bits[4]:
+            pieces.add("scan_fused")
+        row["collector_overrides"]["marking"] = combine(pieces)
+        row["design_levels"] = dict(
+            workers=count,
+            packet=packet,
+            verification="batch64" if bits[2] else "worker",
+            packed_queue=bits[3],
+            scan_fused=bits[4],
+            cpu_snapshot=bits[5],
+            periodic="presieve_powers" if bits[6] else "presieve",
+        )
+        rows.append(row)
+    return rows

@@ -2,9 +2,14 @@
 
 import unittest
 from collections import Counter
+from itertools import combinations
 
 from v2.benchmarks.qs.a7a.cell import settings
-from v2.benchmarks.qs.a7a.joint_search import initial_design, pair_coverage
+from v2.benchmarks.qs.a7a.joint_search import (
+    initial_design,
+    local_design,
+    pair_coverage,
+)
 from v2.qs.collector_kernels import components
 
 
@@ -75,6 +80,40 @@ class JointSearchTests(unittest.TestCase):
             pair_coverage(initial_design(gray_limit=16))
         with self.assertRaises(ValueError):
             initial_design(gray_limit=8)
+
+    def test_local_refinement_covers_all_pairs_without_mutating_anchor(self):
+        anchor = next(
+            row
+            for row in initial_design()
+            if row["features"]["reuse_state"]
+            and row["features"]["stop_backend"] == "semaphore"
+        )
+        before = repr(anchor)
+        rows = local_design(anchor)
+        self.assertEqual(len(rows), 8)
+        self.assertEqual(repr(anchor), before)
+        names = tuple(rows[0]["design_levels"])
+        for left, right in combinations(names, 2):
+            frequencies = Counter(
+                (row["design_levels"][left], row["design_levels"][right])
+                for row in rows
+            )
+            self.assertEqual(sorted(frequencies.values()), [2, 2, 2, 2])
+        for row in rows:
+            settings(
+                row["arm"],
+                22 * 2**30,
+                False,
+                row["polynomials_per_task"],
+                2048,
+                row["features"],
+            )
+            pieces = components(row["collector_overrides"]["marking"])
+            self.assertNotEqual(
+                "presieve" in pieces, "presieve_powers" in pieces
+            )
+        with self.assertRaises(ValueError):
+            local_design(initial_design()[0])
 
 
 if __name__ == "__main__":
