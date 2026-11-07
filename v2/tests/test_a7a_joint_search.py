@@ -52,6 +52,30 @@ class JointSearchTests(unittest.TestCase):
         first[0]["features"]["reuse_state"] = True
         self.assertFalse(initial_design()[0]["features"]["reuse_state"])
 
+    def test_small_family_geometry_does_not_collapse_the_packet_design(self):
+        for gray in (16, 32, 64):
+            rows = initial_design(gray_limit=gray)
+            self.assertEqual(
+                {row["polynomials_per_task"] for row in rows},
+                {gray // 16, gray // 8, gray // 4, gray},
+            )
+            self.assertTrue(
+                all(
+                    pair["observed"] == pair["possible"]
+                    for pair in pair_coverage(rows, gray_limit=gray).values()
+                )
+            )
+            for row in rows:
+                self.assertEqual(
+                    row["features"]["whole_family"],
+                    row["polynomials_per_task"] == gray,
+                )
+                self.assertEqual(gray % row["polynomials_per_task"], 0)
+        with self.assertRaises(ValueError):
+            pair_coverage(initial_design(gray_limit=16))
+        with self.assertRaises(ValueError):
+            initial_design(gray_limit=8)
+
 
 if __name__ == "__main__":
     unittest.main()

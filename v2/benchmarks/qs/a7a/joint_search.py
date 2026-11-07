@@ -36,17 +36,35 @@ BINARY = (
 )
 
 
-def initial_design():
-    """Return 32 explicit configurations for the retained 64-polynomial family.
+def _factor_levels(gray_limit):
+    if type(gray_limit) is not int or gray_limit not in (16, 32, 64):
+        raise ValueError("a separately admitted family geometry is required")
+    factors = dict(CATEGORICAL)
+    contrasts, _ = factors["packet"]
+    factors["packet"] = (
+        contrasts,
+        (
+            gray_limit // 16,
+            gray_limit // 8,
+            gray_limit // 4,
+            gray_limit,
+        ),
+    )
+    return factors
+
+
+def initial_design(*, gray_limit=64):
+    """Return 32 explicit configurations for a declared polynomial family.
 
     This first design uses two levels for binary/buffer options. Later
     refinements retain the broader declared parameter space. CPU snapshots
     are inactive without packet leases; other inactive mechanisms remain
     visible in the design rather than being counted as executed coverage.
     """
+    factors = _factor_levels(gray_limit)
     occupied = {
         mask
-        for (left, right), _ in CATEGORICAL.values()
+        for (left, right), _ in factors.values()
         for mask in (left, right, left ^ right)
     }
     masks = [mask for mask in range(1, 32) if mask not in occupied]
@@ -56,7 +74,7 @@ def initial_design():
     rows = []
     for index in range(32):
         levels = {}
-        for name, ((left, right), values) in CATEGORICAL.items():
+        for name, ((left, right), values) in factors.items():
             level = (index & left).bit_count() % 2
             level += 2 * ((index & right).bit_count() % 2)
             levels[name] = values[level]
@@ -75,7 +93,7 @@ def initial_design():
             else verification,
             verification_batch_atoms=256 if verification == "batch256" else 64,
             lookahead=8 if levels["lookahead"] else 0,
-            whole_family=levels["packet"] == 64,
+            whole_family=levels["packet"] == gray_limit,
             private_stop=stop in ("private_event", "semaphore"),
             stop_backend="semaphore" if stop == "semaphore" else "event",
             cpu_snapshot=levels["cpu_snapshot"] and stop != "legacy",
@@ -120,16 +138,17 @@ def initial_design():
     return rows
 
 
-def pair_coverage(rows):
+def pair_coverage(rows, *, gray_limit=64):
     """Report raw design coverage; runtime activity needs separate evidence."""
-    names = tuple(CATEGORICAL) + BINARY
+    factors = _factor_levels(gray_limit)
+    names = tuple(factors) + BINARY
     result = {}
     for left, right in combinations(names, 2):
         levels = {
-            name: values if name in CATEGORICAL else (False, True)
+            name: values if name in factors else (False, True)
             for name, values in (
-                (left, CATEGORICAL[left][1] if left in CATEGORICAL else ()),
-                (right, CATEGORICAL[right][1] if right in CATEGORICAL else ()),
+                (left, factors[left][1] if left in factors else ()),
+                (right, factors[right][1] if right in factors else ()),
             )
         }
         observed = {
@@ -137,6 +156,8 @@ def pair_coverage(rows):
             for row in rows
         }
         possible = set(product(levels[left], levels[right]))
+        if observed - possible:
+            raise ValueError("row levels differ from declared geometry")
         result[f"{left}:{right}"] = dict(
             observed=len(observed & possible), possible=len(possible)
         )

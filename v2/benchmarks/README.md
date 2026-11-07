@@ -28,7 +28,7 @@ confirmation moduli per anchor before timing. Confirmation outcomes must stay
 outside tuning.
 
 The [joint starting design](qs/a7a/joint_search.py) supplies 32 configurations
-for retained 64-polynomial families: four worker, packet, verification and
+for declared 16/32/64-polynomial families: four worker, packet, verification and
 stop-policy levels plus nineteen binary options. All raw factor pairs have
 balanced coverage; higher interactions remain confounded. Conditional
 inactivity, such as snapshots without leases or packed events without a queue,
