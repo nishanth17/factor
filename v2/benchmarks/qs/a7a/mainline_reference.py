@@ -106,7 +106,7 @@ def run(plan_path, output):
 
     from .performance_lock import open_lock
     from .protocol import ROOT
-    from .runner import write
+    from .runner import thermal_status, write
 
     plan = json.loads(Path(plan_path).read_text())
     if len(plan["cells"]) != 1:
@@ -131,6 +131,7 @@ def run(plan_path, output):
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         started = time.monotonic()
         before = resource.getrusage(resource.RUSAGE_CHILDREN)
+        thermal_start = thermal_status()
         status = "issued"
         process = None
         with tempfile.TemporaryDirectory(prefix="a7a-mainline-") as directory:
@@ -200,6 +201,7 @@ def run(plan_path, output):
                     except subprocess.TimeoutExpired:
                         os.killpg(process.pid, signal.SIGKILL)
                         process.wait()
+                thermal_end = thermal_status()
                 after = resource.getrusage(resource.RUSAGE_CHILDREN)
                 write(
                     output / "ledger.json",
@@ -210,6 +212,8 @@ def run(plan_path, output):
                         - before.ru_utime
                         - before.ru_stime,
                         reference_source=commit,
+                        thermal_start=thermal_start,
+                        thermal_end=thermal_end,
                         attempts=[dict(status=status)],
                     ),
                 )
