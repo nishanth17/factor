@@ -8,24 +8,44 @@ from pathlib import Path
 from .diagnostic_analysis import heap_census
 
 
-def review(capture, result, *, source, input_id):
-    """Summarize every CPU stream, heap census and logical buffer snapshot.
+def review(
+    capture, result, *, source, input_id, expected_pids=None, output=None
+):
+    """Review the declared CPU targets and their heap/buffer snapshots.
 
     The optional vmprof reader belongs to the analysis environment, never the
     factorer or worker environment. Heap records are streamed; no retained
     object graph or allocation-rate estimate is inferred from their census.
+    Default to all recorded processes; bounded windows must pass their exact
+    targets so an unsampled worker is distinct from a missing required stream.
     """
     import vmprof
 
     started, cpu = time.monotonic(), time.process_time()
+    folders = {
+        int(folder.name): folder
+        for folder in Path(capture).iterdir()
+        if folder.is_dir() and (folder / "events.json").exists()
+    }
+    expected = set(folders) if expected_pids is None else set(expected_pids)
+    if not expected or not expected.issubset(folders):
+        raise ValueError("missing requested capture processes")
     processes = []
     aggregate = {"parent": Counter(), "worker": Counter()}
     callers = {"parent": Counter(), "worker": Counter()}
-    for folder in sorted(Path(capture).iterdir()):
-        if not folder.is_dir() or not (folder / "events.json").exists():
-            continue
+    for pid in sorted(expected):
+        folder = folders[pid]
         events = json.loads((folder / "events.json").read_text())
         ready = events[0]
+        kinds = [event["kind"] for event in events]
+        if (
+            ready["pid"] != pid
+            or ready["role"] not in aggregate
+            or "recorder_failure" in kinds
+            or kinds.count("cpu_started") != kinds.count("cpu_stopped")
+            or "cpu_stopped" not in kinds
+        ):
+            raise ValueError("requested CPU capture lacks a valid flush")
         segments, leaves, samples = [], Counter(), 0
         for path in sorted(folder.glob("*.vmprof")):
             stats = vmprof.read_profile(str(path))
@@ -69,6 +89,8 @@ def review(capture, result, *, source, input_id):
         source=source,
         input=input_id,
         processes=processes,
+        expected_pids=sorted(expected),
+        unreviewed_pids=sorted(set(folders) - expected),
         cpu_top_by_role={
             key: counter.most_common(30) for key, counter in aggregate.items()
         },
@@ -95,7 +117,9 @@ def review(capture, result, *, source, input_id):
             ),
         ],
     )
-    path = Path(capture) / "analysis.json"
+    path = (
+        Path(output) if output is not None else Path(capture) / "analysis.json"
+    )
     with path.open("x") as stream:
         json.dump(record, stream, indent=2)
         stream.write("\n")

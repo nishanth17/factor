@@ -603,6 +603,11 @@ def run(plan_path, output):
                             result,
                             source=commit,
                             input_id=spec["fixture"],
+                            expected_pids=(
+                                owned
+                                if spec.get("full_profile", False)
+                                else state["targets"]
+                            ),
                         )
                         receipt["analysis"] = dict(
                             file=str(capture / "analysis.json"),
