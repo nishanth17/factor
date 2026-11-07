@@ -21,6 +21,7 @@ class WarmOwnershipTests(unittest.TestCase):
             observe=False,
             wall=120,
             cpu=1200,
+            warmup_seconds=10,
         )
         calls = []
 
@@ -48,8 +49,23 @@ class WarmOwnershipTests(unittest.TestCase):
         self.assertTrue(
             all(endpoint == "complete" for _, _, endpoint in calls)
         )
-        self.assertGreaterEqual(result["warm_seconds"], 3)
+        self.assertGreaterEqual(result["warm_seconds"], 10)
         self.assertEqual(result["warm_endpoint"], "complete")
+        self.assertEqual(result["warmup_target"], 10)
+
+    def test_unfunded_or_unadmitted_warmup_is_rejected_before_configuration(
+        self,
+    ):
+        for duration, wall in ((True, 120), (4, 120), (10, 20), (20, 30)):
+            spec = cell(
+                "S0", lifetime="warm", warmup_seconds=duration, wall=wall
+            )
+            with patch(
+                "v2.benchmarks.qs.a7a.cell.configuration"
+            ) as configuration:
+                with self.assertRaises(ValueError):
+                    execute(dict(n=10403, cell=spec))
+            configuration.assert_not_called()
 
     def test_exception_retains_work_and_publishes_child_cpu_once(self):
         budget = Budget(

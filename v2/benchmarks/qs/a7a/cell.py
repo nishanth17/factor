@@ -274,6 +274,11 @@ def execute(request):
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
     n, spec = request["n"], request["cell"]
+    warm_target = spec.get("warmup_seconds", 3)
+    if type(warm_target) is not int or warm_target not in (3, 10, 20):
+        raise ValueError("unadmitted warmup duration")
+    if spec["lifetime"] == "warm" and spec["wall"] <= warm_target + 10:
+        raise ValueError("warmup must leave timed work and cleanup funded")
     config = configuration(n, spec["policy"])
     if "checkpoint_bytes" in spec:
         # A complete pilot needs a funded resume snapshot beyond tiny prefixes;
@@ -379,7 +384,7 @@ def execute(request):
     try:
         if spec["lifetime"] == "warm":
             started, before = time.monotonic(), budget.used
-            while time.monotonic() - started < 3:
+            while time.monotonic() - started < warm_target:
                 budget.consume(0)
                 if spec["endpoint"] == "prefix":
                     prefix(
@@ -402,7 +407,9 @@ def execute(request):
                         budget,
                         pool,
                         spec,
-                        seconds_cap=max(0, 3 - (time.monotonic() - started)),
+                        seconds_cap=max(
+                            0, warm_target - (time.monotonic() - started)
+                        ),
                     )
             warm_seconds, warm_work = (
                 time.monotonic() - started,
@@ -445,6 +452,7 @@ def execute(request):
         warm_seconds=warm_seconds,
         warm_work=warm_work,
         warm_endpoint=spec["endpoint"],
+        warmup_target=warm_target,
         work=budget.used,
         charged_cpu=budget.cpu_used,
         process_tree_cpu=own.ru_utime

@@ -47,6 +47,11 @@ Warm complete-factor cells warm the same bounded factoring entry point with
 a short partial allowance. They do not prime a bare-prefix pool under a
 different coexistence contract. Warmup charges remain cumulative; neither
 the control nor a candidate must solve during warmup to enter a comparison.
+The default warmup target remains three seconds. A separately identified
+selection protocol may request ten or twenty seconds through
+`warmup_seconds`; these bounded partial calls remain charged, and the grant
+must leave measured execution and cleanup funded. Record the warmup target
+with each cost table; process warming does not establish thermal stability.
 
 ## B12/F4 delivered defaults
 
