@@ -39,6 +39,11 @@ flush profiles before cleanup, and failed or unissued diagnostics remain
 explicit. Every new optimization candidate receives its companion, including
 rejected candidates.
 
+Warm complete-factor cells warm the same bounded factoring entry point with
+a short partial allowance. They do not prime a bare-prefix pool under a
+different coexistence contract. Warmup charges remain cumulative; neither
+the control nor a candidate must solve during warmup to enter a comparison.
+
 ## B12/F4 delivered defaults
 
 The normal bounded factorer uses the [selected regime table](../STATUS.md#selected-ecm-regimes)

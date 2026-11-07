@@ -121,6 +121,8 @@ def refinements(selected):
 
 def ablations(selected, marking):
     """Compatible removals, hot-loop alternatives and named interactions."""
+    from ....qs.collector_kernels import KERNELS
+
     if selected["arm"] == "S0":
         return []
     count = int(selected["arm"][1:])
@@ -183,20 +185,11 @@ def ablations(selected, marking):
         "scan_fused",
         "packed_queue",
         "wide_hits",
+        "wide_inverses",
     ):
         altered = [p for p in pieces if p != piece]
         if piece not in pieces:
-            order = (
-                "density",
-                "presieve",
-                "presieve_powers",
-                "unroll4",
-                "scan_fused",
-                "parity_two",
-                "packed_queue",
-                "wide_hits",
-            )
-            altered = [p for p in order if p in (*pieces, piece)]
+            altered = [p for p in KERNELS if p in (*pieces, piece)]
         collector_alternatives.append(
             (f"toggle_{piece}", {"marking": "+".join(altered) or "sparse"})
         )

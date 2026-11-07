@@ -124,7 +124,8 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused`, `parity_two`, `packed_queue` and `wide_hits` in valid duplicate-free combinations. The two presieve selectors
+`scan_fused`, `parity_two`, `packed_queue`, `wide_hits` and `wide_inverses`
+in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
 Scratch coexistence, rotation, cancellation and refused work stay bounded.
@@ -152,6 +153,12 @@ It follows `parity_two` in component order and changes no default.
 ceiling from 32 to 128 MiB. Its actual reservation, construction work and the
 next polynomial's metadata coexistence must still fit the caller's grant.
 Scarce resources retain exact large-integer masks. This selection is opt-in.
+
+`wide_inverses` follows `wide_hits` and permits 32 MiB of shared derivative
+inverse scratch instead of 8 MiB. It uses the existing exact fixed-target
+opposite-derivative cache, with independent inversion for unexpected values.
+The full reservation and subsequent polynomial-switch coexistence must fit
+the collector grant. No automatic default changes.
 
 This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain

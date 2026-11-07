@@ -38,6 +38,8 @@ MAX_BLOCK_WIDTH = 4096
 MAX_WINDOW_WIDTH = 1_000_000
 MAX_STORED_ATOMS = 65536
 MAX_METADATA_CHUNK = 1024
+MAX_SHARED_INVERSE_BYTES = 8 * 2**20
+MAX_WIDE_INVERSE_BYTES = 32 * 2**20
 
 
 @dataclass(frozen=True)
@@ -625,17 +627,28 @@ class SieveCollector:
         self._shared_lift_inverses = None
         self._reuse_workspace = 0
         inverse_bytes = 256 + 512 * count
+        wide_inverses = "wide_inverses" in self.config._kernels
+        inverse_limit = (
+            MAX_WIDE_INVERSE_BYTES
+            if wide_inverses
+            else MAX_SHARED_INVERSE_BYTES
+        )
+        inverse_coexistence = 512 * count + 32768 if wide_inverses else 0
         if (
             self.config.score_policy in ("powers", "fixed")
-            and inverse_bytes <= 8 * 2**20
-            and self._workspace + inverse_bytes <= self.config.memory_limit
+            and inverse_bytes <= inverse_limit
+            and self._workspace + inverse_bytes + inverse_coexistence
+            <= self.config.memory_limit
         ):
             self._workspace += inverse_bytes
             self._reuse_workspace += inverse_bytes
             self._shared_lift_inverses = HenselInverses(count)
         self._hit_masks = ()
         if self.config.division in ("bucket", "resieve"):
-            cap = min(4 * 2**20, self.config.memory_limit - self._workspace)
+            available = self.config.memory_limit - self._workspace
+            if wide_inverses:
+                available = max(0, available - inverse_coexistence)
+            cap = min(4 * 2**20, available)
             masks, reserved = [], 256
             for index in range(count):
                 size = 120 + 8 * ((index + 63) // 64)

@@ -237,6 +237,37 @@ def complete(
     return result
 
 
+def complete_call(n, config, workers, budget, pool, spec, *, seconds_cap=None):
+    """Use the real entry point and reconcile each warm/sample child ledger."""
+    from ....execution.budget import Budget
+
+    seconds = max(0, budget.seconds - budget.wall_used)
+    if seconds_cap is not None:
+        seconds = min(seconds, seconds_cap)
+    child = Budget(
+        work_limit=budget.work_limit - budget.used,
+        seconds=seconds,
+        cpu_seconds=max(0, budget.cpu_seconds - budget.cpu_used),
+    )
+    child.a7a_seed = spec["seed"]
+    child.cancelled = budget.cancelled
+    try:
+        return complete(
+            n,
+            config,
+            workers,
+            child,
+            pool,
+            spec["endpoint"],
+            memory_bytes=spec["memory"],
+        )
+    finally:
+        # Parent CPU is already on the encompassing process clock. Publish
+        # only this child's worker CPU once, including on exceptional exit.
+        budget.used += child.used
+        budget.prior_cpu += child.prior_cpu
+
+
 def execute(request):
     from ....execution.budget import Budget
 
@@ -350,14 +381,29 @@ def execute(request):
             started, before = time.monotonic(), budget.used
             while time.monotonic() - started < 3:
                 budget.consume(0)
-                prefix(
-                    n,
-                    config,
-                    workers,
-                    budget,
-                    max(1, workers.workers if workers else 1),
-                    pool,
-                )
+                if spec["endpoint"] == "prefix":
+                    prefix(
+                        n,
+                        config,
+                        workers,
+                        budget,
+                        max(1, workers.workers if workers else 1),
+                        pool,
+                    )
+                else:
+                    # The portfolio adds coexistence ownership to its QS
+                    # settings. Warm that same entry point, not a bare prefix
+                    # with another pool identity. A bounded partial call is
+                    # sufficient; warmup need not solve the input first.
+                    complete_call(
+                        n,
+                        config,
+                        workers,
+                        budget,
+                        pool,
+                        spec,
+                        seconds_cap=max(0, 3 - (time.monotonic() - started)),
+                    )
             warm_seconds, warm_work = (
                 time.monotonic() - started,
                 budget.used - before,
@@ -378,28 +424,7 @@ def execute(request):
                     polynomials=spec.get("polynomials"),
                 )
             else:
-                # Each complete call receives unused cumulative resources in a
-                # fresh portfolio ledger; warmup charges are explicitly prior.
-                child = Budget(
-                    work_limit=budget.work_limit - budget.used,
-                    seconds=max(0, budget.seconds - budget.wall_used),
-                    cpu_seconds=max(0, budget.cpu_seconds - budget.cpu_used),
-                )
-                child.a7a_seed = spec["seed"]
-                child.cancelled = budget.cancelled
-                result = complete(
-                    n,
-                    config,
-                    workers,
-                    child,
-                    pool,
-                    spec["endpoint"],
-                    memory_bytes=spec["memory"],
-                )
-                budget.used += child.used
-                # A7 publishes child CPU into this child's prior_cpu; preserve
-                # it on the encompassing warmup/sample ledger once.
-                budget.prior_cpu += child.prior_cpu
+                result = complete_call(n, config, workers, budget, pool, spec)
             result["library_seconds"] = time.perf_counter() - started
             if counters is not None:
                 result["tier_a"] = counters.report(result["library_seconds"])
@@ -419,6 +444,7 @@ def execute(request):
         samples=samples,
         warm_seconds=warm_seconds,
         warm_work=warm_work,
+        warm_endpoint=spec["endpoint"],
         work=budget.used,
         charged_cpu=budget.cpu_used,
         process_tree_cpu=own.ru_utime

@@ -243,6 +243,18 @@ def _logical_owners(frame):
                     derived["hit_backend"] = (
                         "list" if words is None else "WordHits"
                     )
+                    inverses = state.get("_shared_lift_inverses")
+                    derived["shared_inverse_entries"] = (
+                        None if inverses is None else len(inverses.values)
+                    )
+                    transfers = state.get("_power_transfers")
+                    if transfers is not None:
+                        derived["root_transfer_entries"] = len(
+                            transfers.values
+                        )
+                        derived["root_transfer_reserved"] = transfers.used
+                        derived["root_transfer_builds"] = transfers.builds
+                        derived["root_transfer_replays"] = transfers.replays
                     if words is not None:
                         derived["hit_word_groups"] = len(words.words)
                         derived["hit_word_cells"] = sum(map(len, words.words))

@@ -248,6 +248,13 @@ per-coordinate work reservation and poll. The 64 KiB reserve is included in
 aggregate ownership. The cache is discarded on merge exit and rebuilt after
 resume; the enabled setting pins execution identity. The default is false.
 
+The opt-in `wide_inverses` marking component permits up to 32 MiB of shared
+Hensel-derivative inverse scratch instead of 8 MiB. A fixed target has at
+most two opposite nonsingular derivatives per odd prime, so the existing
+checked cache reuses inverses across polynomials and A values. Its complete
+reservation and the next polynomial switch must fit the collector grant;
+scarce memory retains independent exact inversion. No default changes.
+
 `private_stop=True` requires process packet leases and gives each worker its
 own synchronized stop flag. The parent sets or clears every flag, while each
 worker retains the same 64-action polling cadence and exact budget checks.
