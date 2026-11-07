@@ -3,7 +3,7 @@
 Status: revised execution design, not a completed campaign or approval to
 launch it. No successor stage is pre-approved. Follow the
 [joint-search policy](../POLICY.md#joint-parameter-searches) and
-[paired-sampling policy](../POLICY.md#cost-scaled-paired-sampling).
+[evidence tiers](../POLICY.md#evidence-tiers-and-sample-sizing).
 Preserve historical freezes, failures, charges and captures unchanged.
 
 ## Deliverable, scope and source
@@ -50,7 +50,7 @@ result during a stage, without treating that update as permission to advance.
 
 | Stage / exit gate | Question and resulting decision | Expected duration before calibration | Finite new measurement ceiling |
 | --- | --- | --- | --- |
-| Preparation / G1 | Are the bounded driver, corpus, mainline adapter, counters and diagnostic modes tested and ready? Report even if incomplete. | One working day of implementation; up to 1 h locked QA | 8 active implementation hours; 2 h QA wall, 20 core-hours, 2 GiB captures |
+| Preparation / G1 | Are the bounded driver, corpus, mainline adapter, counters and progress/thermal logs tested and ready? Report even if incomplete. | One working day of implementation; up to 1 h locked QA | 8 active implementation hours; 2 h QA wall, 20 core-hours, 2 GiB captures |
 | Coverage / G2 | Do complete calls work across every admitted row, and what is the priced whole schedule and dominant cost? | 1–3 h, replace with the G1 frozen estimate | 5 h wall, 50 core-hours, 4 GiB captures |
 | Architectural overhead / G2H | Which measured serial/coordination cost can be removed, and does the fixed bundle improve complete runs before tuning? | 1–2 h measurement; up to one working day engineering | 8 active engineering hours; 4 h measurement/QA wall, 40 core-hours, 8 GiB captures |
 | Conditional cofactor engineering / G2K | If the measured cofactor share warrants a separate queue, is its exact contract and complete cost worthwhile? Otherwise defer. | Must be priced separately at G2H | At most 8 active engineering hours, 2 h measurement/QA, 20 core-hours, 2 GiB captures; requires separate approval and repricing |
@@ -61,19 +61,22 @@ Ordinary ceilings include preparation QA, coverage, overhead, search,
 confirmation, warmup, diagnostics, telemetry and cleanup, not just actor time.
 Engineering time is recorded separately; no timed grant is an instruction to
 spend it. The optional K stage is not an extra automatic allowance: fund it
-by an explicitly approved redistribution or revised cumulative grant.
+by an explicitly approved redistribution or revised stage grant.
 75/80 have separate limits below and cannot consume ordinary confirmation
-reserves. Each ordinary stage needs its own approved increment and prior ledger;
-cumulative reports include all M1/M2/M3 expenditure. The earlier proposal
-is not a grant, and existing M3 cannot fund the ordinary stages.
+reserves. Keep exact wall/CPU/output charges in each stage's own receipts,
+and one cumulative resource total in the shared progress table. New grants
+name only their stage and finite allowance; they do not require a recursive
+historical charge chain or a sealed-ledger check. Preserve historical evidence.
 
 At G2 publish expected cost and a conservative ceiling bill for **every**
 remaining row/stage. At G2H update that bill after any source change, before
 search approval. At G3 price confirmation again using frozen recipes and
-literal mainline. If the minimum nine-input confirmation cannot fit the
-budget actually approved by the user, stop and propose cuts or a revised grant before
-spending the search allocation. If no total is approved, publish the full
-forecast anyway and request only the named next stage.
+literal mainline. Price the initial three-input confirmation block separately
+from the optional three-to-six and six-to-nine extensions. If the initial
+block cannot fit the budget actually approved by the user, stop and propose
+cuts or a revised grant before spending the search allocation. If no total
+is approved, publish the full forecast anyway and request only the named
+next stage.
 Do not discover missing coverage after a deep 60-digit campaign.
 
 Stop earlier at the first finite limit, 1.5 times the frozen stage estimate,
@@ -95,11 +98,11 @@ implementation timebox and report at G1 if unfinished; do not expand scope.
 Required before coverage:
 
 1. A fixed stage/row manifest, precomputed proposal list, gate-approval identity,
-   source/corpus binding and per-stage recipe cap. A restart reads the sealed
-   ledger, skips reported identities and preserves failures/charges. Reject a
+   source/corpus binding and per-stage recipe cap. A restart reads that stage's
+   receipts, skips reported identities and preserves failures/charges. Reject a
    missing row, duplicate issue, unapproved stage or cap overrun. Reuse existing
    runner locking, accounting and cleanup rather than a new scheduler service.
-2. A separately named immutable corpus with 15 fresh certified balanced moduli
+2. A separately named immutable corpus with nine fresh certified balanced moduli
    per ordinary digit regime, generation seed `202611071442`. Validate prime
    certificates, digit/factor sizes and pairwise coprimality with existing
    corpora. Reserve it for confirmation; preserve `regime_corpus.json`.
@@ -123,13 +126,10 @@ Required before coverage:
    Add only missing bounded outer-loop observations. Measure counters on/off
    on identical work; if their effect cannot be bounded within measured A/A
    noise, reduce them or confine them to diagnostics, keeping clean calls clean.
-5. A bounded diagnostic window and the lightweight large-probe adapter below:
-   selected-process vmprof, rotation/file caps, one late heap, progress sampling,
-   periodic thermals, recorder isolation and timeout-result preservation.
-   Reject unsupported diagnostic settings; never silently map them onto
-   `full_profile=True`. Existing full-profile mode traces every owned process
-   and cannot satisfy the new probe contract unchanged.
-6. Exact-output, lease, crash, resume, telemetry/recorder failure, near-limit,
+   Reuse these counters for the clean probes' 60-second progress and thermal
+   log; preserve the last observation on timeout. No probe profiler, heap
+   dumper, segment rotation or new capture-storage system is a prerequisite.
+5. Exact-output, lease, crash, resume, telemetry/recorder failure, near-limit,
    no-leaked-child and pure planning checks. Code changes require full suite,
    lint and benchmark imports from a committed-files-only checkout under the
    shared lock. Documents alone do not require another factoring run.
@@ -174,9 +174,12 @@ Always set `endpoint="complete"`; `regime_search.cells()` defaults to
 prefixes above 55 and must not be used unchanged. Each cold repetition uses a
 fresh interpreter and pool with `samples=1` and zero executed warmup. Warm
 rows use at least three seconds of validated warmup and a declared retained
-lifetime; charge it. Estimate A/A variability first with one additional
-unchanged-incumbent call per row, supplementing only under a predeclared
-bounded rule if noise is unresolved. Counterbalance arms and retain near ties.
+lifetime; charge it. Estimate A/A timing noise on bounded identical work
+expected to take under ten seconds, with three to five repetitions. Do not
+add repeated long complete calls merely to estimate timing noise. Prefix
+noise alone does not estimate full-call input effects: use paired complete
+candidate/mainline ratios across inputs for that. Counterbalance arms and
+retain near ties. Coverage input 0 establishes feasibility, not a selection.
 
 Collect only representative family diagnostics, not a companion for every
 candidate/repetition. Declare families by backend/execution path before runs:
@@ -203,7 +206,8 @@ parent stalls collection. Price and freeze a bounded next iteration; if its
 need contradicts the stage assumptions or exceeds the cap, stop and report.
 
 Measure the **N-independent-workers throughput upper bound** at N=1/4/8 using
-matched deterministic disjoint packet work at 50 and 65 digits. Remove shared
+matched deterministic disjoint packet work on three calibration inputs
+per regime at 50 and 65 digits. Remove shared
 parent admission/transport from that diagnostic, not arithmetic or validation.
 Compare aggregate useful-work throughput and a local-packet/no-pool control
 with the real timeline. This bounds a coordination opportunity on the actual
@@ -251,10 +255,13 @@ Do not silently run the old 32-row all-binary design.
 | Native/NEON | Excluded | Deferred B5a implementation, not an available option in this process campaign. |
 
 Screen (a)/(b) once at **50 and 65 digits**, on identical packet work and
-fixed resources/seeds, with bounded paired A/A-calibrated observations.
-Maximum 28 distinct screen recipes per representative regime, including
-baseline and implementation alternatives; at most three short paired
-observations per recipe. Calibrate a fixed packet quota expected to take at
+fixed resources/seeds. Apply Tier 1: three independent calibration inputs per
+representative regime, with one matched observation per input and comparison
+against A/A noise. Maximum 28 distinct screen recipes per representative
+regime, including baseline and alternatives. Repeat an input only to estimate
+within-input noise for calls under ten seconds (three to five observations,
+predeclared and priced); repetitions do not replace independent inputs.
+Calibrate a fixed packet quota expected to take at
 most five seconds per side, with a 45-second hard cap; price the full screen,
 complete-run rechecks and QA inside G2H before approval. Freeze exact work
 before results; a work prefix can diagnose identical-work overhead without
@@ -271,8 +278,9 @@ specific option as (c), after reporting evidence and approving a revised
 finite design. Uncertainty alone is not interaction evidence. Do not promote
 all inconclusive flags to joint dimensions.
 
-Validate the fixed architectural bundle with matched complete calls at 50
-and 65, then recheck the six cold rows before freezing search source. At G2H
+Validate the fixed architectural bundle with matched complete calls on
+three calibration inputs per regime at 50 and 65, then recheck the six cold
+rows before freezing search source. At G2H
 report attribution, screen decisions, fixed options, exclusions, full-run
 results and the repriced search/confirmation bill; stop for approval. New
 hotspots discovered later require a separately gated fix and retuning of
@@ -323,10 +331,14 @@ these maxima; repetitions are not new configurations. Price the executable
 subset inside the row cap, leaving room for independent-input survivors,
 exploration and diagnostics before issuing it.
 
-Race on complete-factor input 0, retaining uncertain/near-tied candidates.
-Evaluate up to four survivors on calibration inputs 1/2. Clear losers do not
-need nine repeated screens. Reserve at least one proposal outside the current
-neighborhood; refine one/two (c) levels and adjacent worker/packet/cache levels.
+Use complete-factor input 0 to prioritize proposals, retaining uncertain/
+near-tied candidates. Advance up to four to calibration inputs 1/2. A Tier 1
+selection or rejection needs all three independent inputs and comparison
+against measured noise; candidates not advanced remain deferred/untested,
+not demonstrated losers. Inconclusive choices retain the simpler valid path.
+Nine-input screening is not required. Reserve at least one proposal outside
+the current neighborhood; refine one/two (c) levels and adjacent worker/
+packet/cache levels.
 An unrelated reference timeout does not block a valid candidate. Prefixes do
 not rank complete-factor candidates without validated predictive agreement.
 Finish a breadth round at every anchor before a second deep round at one.
@@ -336,8 +348,8 @@ anchor by decimal digits, lower anchor on an exact tie. Inherit its worker,
 lookahead, order and capacity levels; map packet fraction onto the target's
 actual family using the declared valid integer levels. Apply only publicly
 observable size/backend/allowance inputs. Verify cold 50/60/65 against literal
-mainline on calibration inputs 1/2, at most one proposed recipe plus the
-reference per row. If a check fails, stop at G3 and propose a separately
+mainline on all three calibration inputs 0/1/2, at most one proposed recipe
+plus the reference per row. If a check fails, stop at G3 and propose a separately
 bounded new anchor; do not quietly optimize every intermediate row. Label
 unmeasured boundaries and do not adopt a routing table before their checks.
 
@@ -352,40 +364,54 @@ Retain same-policy serial coverage as explanatory evidence without treating
 it as a separately confirmed comparison. No confirmation inputs may tune a
 recipe, interpolation, work quota or seed.
 
-Use the first nine independent new moduli per row in committed order:
+Measure preliminary sigma during G2/G3: the across-input standard deviation
+of log(candidate time / mainline time) on matched pairs. A/A estimates timing
+noise, not candidate-specific input variability. Refine sigma using the first
+fresh paired block; never assume a 5–10% value or transfer an incumbent's
+variance to a changed recipe as if it were measured. Calibration inputs do not
+count as fresh confirmation inputs.
 
-| Calibrated complete-call tier | Initial paired allocation |
+Start each row with **three fresh independent inputs**, in committed order:
+
+| Complete-call cost, frozen at G3 | Initial allocation per arm |
 | --- | --- |
-| Under 10 s | 9 inputs x 5 interleaved repetitions = 45 pairs |
-| 10 s–5 min | 9 inputs x 2 interleaved repetitions = 18 pairs |
-| Over 5 min | 9 inputs x 1 repetition = 9 pairs |
+| Under about 10 s, where within-input noise needs estimation | 3 inputs x 3 interleaved repetitions; up to 5 only if chosen from calibration before confirmation |
+| Otherwise | 3 inputs x 1 repetition |
 
-Freeze the tier from calibration, preferably the slower arm for noise/cost
-planning. Repetitions of one modulus form a cluster, not independent inputs.
-Cold means a fresh interpreter/pool every repetition. Warm applies only at
-40/50 with the separately frozen lifetime and charged validated warmup.
-Counterbalance order, preserve failures/censoring and reconstruct exact results.
-Never insert a timeout cap as an exact completed factor time; report completion
-and restricted-cost evidence separately. Protect 60/70 completion.
+One cold repetition means one fresh interpreter/pool, with no warmup. Warm
+applies only at 40/50 with the separately frozen lifetime and at least three
+seconds of validated, charged warmup. Freeze the repetition count before
+confirmation; use one per input for calls at or above ten seconds. Treat
+repetitions as a cluster and form one paired log-ratio observation per input.
+Counterbalance arm order, preserve failures and reconstruct exact results.
 
-Predeclare looks after 9/12/15 independent moduli, with the same repetitions
-per input. Freeze and test an uncertainty procedure accounting for repeated
-looks, clusters and multiple rows before timing. Extend only while its adjusted
-interval straddles the decision **and** the approved remaining grant funds
-the entire next block. Reserve those blocks explicitly; 15 is a maximum,
-not a commitment to spend it. At the funded maximum stop/report inconclusive.
-No selective retries, tuning on confirmation or unadjusted 95% intervals at
-each look. Nine moduli do not alone justify a precise population-p90 claim.
+Use prespecified **98 1/3% intervals** at looks after **3, 6 and 9 independent
+inputs**. This is the approximately 98% per-look rule, with at least 95%
+overall coverage for one comparison if its individual intervals are valid.
+Freeze/test the interval procedure, distribution assumptions and decision
+threshold before timing; adjust separately for joint claims across rows.
+Extend from three to six, then nine **only** while the interval straddles the
+decision and the approved stage grant funds the whole next block. Stop as soon
+as the decision is clear. At nine, or the funded maximum, stop/report
+inconclusive if ambiguity remains. Nine is a maximum, never an initial quota.
+Do not retune, change repetitions or selectively retry from these results.
 
-At G2/G2H and again at G3, price each row as the frozen input count times
-repetitions times the sum of **measured** candidate/mainline complete costs,
-plus warmup, controls, diagnostic windows, telemetry and cleanup. Report the
-conservative actor-ceiling bill separately from the expected runtime; do not
-present ceiling multiplication as a prediction. Price the 9-to-12 and 12-to-15
-blocks separately. With no approved ordinary total, none of these blocks is
-funded by an assumed campaign allowance. A 15-input maximum is not a promise
-to run 15. Obtain the named confirmation grant at G3; stop at its funded
-maximum and report uncertainty. No automatic new grant.
+Keep timeouts censored: never use their cap as an exact completed time or
+discard them to form favorable paired ratios. If censoring prevents the
+predeclared ratio analysis, use the frozen completion/guardrail decision and
+report its uncertainty; do not declare a latency win from successful pairs
+alone. Protect 60/70 balanced completion. Published README/RESULTS performance
+numbers and p90 claims need Tier 3 evidence and precision; this small default/
+dispatch confirmation alone does not establish a population quantile.
+
+At G2/G2H and again at G3, price each row as inputs times frozen repetitions
+times the sum of **measured** candidate/mainline complete costs, plus warmup,
+controls, diagnostics, telemetry and cleanup. Price the **three-input initial
+block** at G3, and the **three-to-six and six-to-nine blocks separately**.
+Report conservative actor-ceiling bills separately from expected runtime.
+With no approved ordinary total, no extension is funded by an assumed campaign
+allowance. Keep exact stage charges and update the one cumulative total in
+the progress table. No automatic new grant or extension beyond nine.
 
 G4 delivers the whole admitted table, including explicit infeasible/inconclusive
 rows and untested interactions, and stops. Confirmation is not adoption or
@@ -409,7 +435,6 @@ confirmation is implied by any outcome. Report admission refusal as an outcome.
 | Aggregate owned RAM | 22 GiB | 22 GiB |
 | Worker / runtime per worker | 768 / 256 MiB | 768 / 256 MiB |
 | Parent QS / checkpoint | 4 GiB / 256 MiB | 4 GiB / 256 MiB |
-| Aggregate new capture ceiling | 8 GiB | 8 GiB |
 | Logical work ceiling | 96,000,000,000,000 | 96,000,000,000,000 |
 
 Freeze the candidate before its outcome: seed 104729, Y0 numerical policy,
@@ -421,36 +446,15 @@ sparse queue 32 MiB. Do not silently retune base/report/product/residual limits
 or change to a later search winner. Record actual resolved settings/domain
 limitations and validate admission; refusal means report and stop.
 
-### Lightweight observation and useful timeout receipts
+### Clean observation and useful timeout receipts
 
-Use vmprof sampling at **10 ms for the parent and one fixed representative
-owned worker**, plus owned RSS/progress telemetry and **one parent heap
-snapshot near the end**. Do not enable all-worker profiling, JIT logging,
-per-packet dumps or duplicate full-factor diagnostics. Measure sampler/counter
-cost on bounded identical 60-digit work during approved preparation, not by
-adding a second 75/80 candidate. Record that overhead and its transfer limit.
-A sampled timeout is not proof of uninstrumented infeasibility.
+Run **one clean call**, with the 60-second progress and thermal log only.
+No vmprof, heap snapshot, segment rotation, JIT logging, per-packet dumps or
+profile companion. CPU/heap profiling decisions come from approved 60–70-digit
+work; they are not prerequisites for a two-/six-hour feasibility question.
+The cheap progress/RSS observers must be checked on bounded ordinary work;
+record their measured overhead without adding a second 75/80 call.
 
-Implement/test the following benchmark-only contract before approval to run:
-
-- Rotate vmprof segments at most every five minutes, flushing each; the current
-  hook has a 64 MiB CPU-file soft cap, so increasing only the outer limit is
-  insufficient. Never overwrite segments. Freeze the rotation and stop policy.
-- Measure aggregate recorder MiB/min over minutes 1/3/5 of the **same** probe.
-  Forecast remaining CPU bytes with 1.5x the highest measured rate, plus a
-  2 GiB heap reservation and 256 MiB metadata/cleanup reserve. Report this
-  forecast versus the fixed 8 GiB grant; do not dynamically enlarge the grant.
-  Reserve disk before the late heap. If the forecast exceeds the ceiling,
-  stop CPU sampling cleanly and mark diagnostic coverage incomplete, while
-  continuing the single bounded factor call. Recorder failure must not be
-  mislabeled as factorer exhaustion or trigger another call. Hard production
-  resource failures still stop production. Test that isolation at G1.
-- Request the one heap at 90% of actor allowance, or immediately before owned
-  teardown if the call finishes/stops earlier and state is still available.
-  Pause/flush sampling for it, cap it at 2 GiB and charge its elapsed/CPU cost.
-  If a useful safe capture is unavailable, record missing/phase limitations;
-  do not force a retry or an extra factorization. Keep output validation and
-  cleanup within the owner tail; observation never extends the actor limit.
 - Every 60 seconds, retain elapsed time, raw/accepted/usable relation counts,
   current target, usable/target fraction, graph/cycle progress, queue backlog,
   stage and owned CPU/RSS. Include cumulative and rolling 5/15-minute useful
@@ -462,45 +466,36 @@ Implement/test the following benchmark-only contract before approval to run:
   remains outside the actor measurement. This is partial evidence, not a
   guarantee of no throttling.
 - On timeout, preserve the last validated progress/checkpoint, exact input/
-  source, stop reason, reconstruction/unresolved cofactor, work/wall/CPU, RSS,
-  capture bytes and matrix-stage status. Report collection-only ETA ranges
-  from each useful-relation-rate window when meaningful. Late cycle yield
-  and a changing target make linear extrapolation uncertain; filtering/solve/
-  recovery are not included. Do not label that estimate a completion time.
+  source, stop reason, reconstruction/unresolved cofactor, work/wall/CPU, RSS
+  and matrix-stage status. Report collection-only ETA ranges from useful-
+  relation-rate windows when meaningful. Late cycle yield and a changing
+  target make linear extrapolation uncertain; filtering/solve/recovery are
+  not included. Do not label that estimate a measured completion time.
+- A missing telemetry sample is a recorded observation failure, not a reason
+  to retry or duplicate the factor call. Preserve the production result and
+  exact charges; hard production limits still stop production.
 
-### Storage fields, grants and actual execution
-
-`cell.storage` currently sets **per-file `RLIMIT_FSIZE`**, not aggregate capture
-storage. The old `storage=8 * 2**20` meant an 8 MiB per-file limit; profile mode
-then raised it internally to at least 2 GiB. Replace that reliance with an
-explicit **`cell.storage=8 * 2**30`** and retain the narrower individual
-CPU/heap caps above. **`plan.storage`** is the aggregate capture ceiling:
-`prior_storage + 8 * 2**30`. Enforce both, including rotation and metadata;
-raising a per-file cap does not grant eight GiB to every worker. G1 tests must
-cover per-file versus aggregate exhaustion separately.
-
-The old executable recipe is withdrawn: existing `mode="profile"` plus
-`full_profile=True` cannot implement this lighter contract. Do not paste new
-unsupported keys into `combined.cell`, which accepts arbitrary overrides,
-and assume they are enforced. Extend/validate the existing benchmark adapter
-at G1, freeze its accepted schema/command and demonstrate the observation
-contract on a short fixture before requesting a probe run. No unsupported
-probe command is presented here as ready to execute.
+### Stage accounting and execution
 
 Use the existing `combined.cell`, `configuration`, `settings`, `source()` and
-`corpus_identity("regimes")` to build the single-cell plan after that adapter
-passes. Required cell fields: complete endpoint, cold lifetime, samples=1,
-zero executed warmup, the exact table allowances and candidate settings.
-Record one approved probe identity in `grant.json`, with the regime, approved
-observation contract, wall/CPU/capture increments and `prior_ledger`.
-The latest sealed ledger must have no issued/unaccounted attempts. Carry its
-entire prior-charge chain and bytes; do not reset the M1/M2/M3 history. M3's
-378.775 seconds remaining cannot fund either probe. Each probe's owner
-increment is new and separate, not time rolled over from another stage.
+`corpus_identity("regimes")` to build a single-cell **clean-mode** plan.
+Required fields: complete endpoint, cold lifetime, samples=1, zero executed
+warmup, the exact table allowances and candidate settings. Disable automatic
+profile companions and profile analysis. Validate the 60-second log and
+last-progress receipt on a short fixture first; unsupported fields must be
+rejected rather than silently ignored.
 
-Keep generated plans/receipts/captures under the main repository's ignored
-`v2/benchmarks/results/a7a/`, using a new immutable identity. For ordinary
-batches and an adapter-validated probe, the existing CLI entry point is:
+Record one approved probe identity, regime and finite owner allowance in
+`grant.json`. Keep exact charges in this stage's own receipts and update the
+single cumulative total in the progress table. No M1/M2/M3 prior-charge chain,
+`prior_ledger`, sealed-ledger admission check or new profile-storage work is
+required for a new grant. Preserve historical records unchanged. Existing
+finite runner output limits remain in force; no multi-GiB profile capture is
+requested. Owner cleanup time is separate from the actor factoring allowance.
+
+Keep generated plans/receipts and ordinary diagnostic captures in the main
+repository's ignored `v2/benchmarks/results/a7a/`, using a new immutable identity. For ordinary
+batches and a validated clean probe, the existing CLI entry point is:
 
 ```sh
 /opt/homebrew/bin/pypy3 -m v2.benchmarks.qs.a7a.combined \
@@ -508,11 +503,10 @@ batches and an adapter-validated probe, the existing CLI entry point is:
   --output /absolute/path/to/new-receipts-directory
 ```
 
-Run from the A7a worktree with PyPy implementing Python 3.11. Verify the
-optional vmprof reader installation if analysis is requested; a historical
-`/private/tmp` reader is not a portable dependency. Static freezing does not
-run factoring. The runner must acquire `/private/tmp/factor-performance.lock`
-with nonblocking exclusive flock; an owner file is not admission. If occupied,
+Run from the A7a worktree with PyPy implementing Python 3.11. Ordinary
+profile analysis may need its optional reader; a clean probe does not. Static
+freezing does not run factoring. The runner must acquire
+`/private/tmp/factor-performance.lock` with nonblocking exclusive flock; an owner file is not admission. If occupied,
 report without polling or claiming a reservation. Hold through cleanup/draining
 and preserve the lock file. After the single probe, **stop and notify for every
 outcome**. No automatic 80 call, search, confirmation or budget escalation.

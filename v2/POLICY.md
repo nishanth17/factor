@@ -133,7 +133,7 @@ not be equal. Compare equal-CPU efficiency separately when making that claim.
 A repeatable reduction in complete-run wall-time median/p90 or increase in
 completion within budget can qualify at any percentage.
 Confirm the effect on fresh held-out inputs with matched seeds,
-[cost-scaled paired sampling](#cost-scaled-paired-sampling) and a prespecified
+[evidence tiers](#evidence-tiers-and-sample-sizing) and a prespecified
 uncertainty analysis, normally a 95% confidence
 interval supporting a positive improvement. Account for run-to-run noise,
 measurement order and drift; a positive point estimate alone is insufficient.
@@ -159,35 +159,48 @@ verdicts. Reconsider their evidence through an explicit policy reassessment,
 without retuning on held-out inputs or treating the policy change as automatic
 production promotion.
 
-### Cost-scaled paired sampling
+### Evidence tiers and sample sizing
 
-Match inputs, seeds and budgets. Warm measurements require at least three
-seconds of validated PyPy warmup. A cold call uses a fresh interpreter with
-no warmup; include spawn/import/JIT, preparation, validation and shutdown.
-Separate retained-warm calls, identical-work throughput, first validated factor
-and complete factorization. Keep instrumented profiles outside clean timings.
+Scale evidence to the cost of the decision and the size of the effect.
 
-Performance claims need at least **nine matched paired observations in total
-per declared comparison, regime and process lifetime**. Each pair has one clean
-observation per arm on the same input, seed and grants. Count pairs across
-inputs, rather than requiring nine repetitions per input; workers, diagnostic
-companions and unrelated regimes do not count. Prefer independent inputs and
-scale repetitions with complete-call feasibility cost:
+- **Tier 1 — internal and exploratory decisions** (screens, (a)/(b) choices,
+  dropping candidates, opt-in paths): identical validated outputs, matched
+  inputs/seeds and three independent inputs, compared against measured A/A
+  noise. Decide when the difference is clearly beyond noise; otherwise take
+  the simpler option. Revert if later evidence contradicts it.
+- **Tier 2 — default or dispatch changes:** matched cold complete runs on fresh
+  inputs in each affected band, sized by the rule below, with the protected
+  60/70 balanced completion guardrail.
+- **Tier 3 — published claims** (README/RESULTS numbers, p90): Tier 2 plus
+  censoring-aware quantiles and enough fresh inputs for the stated precision.
 
-- **Under about 10 seconds:** typically five to nine repetitions per input.
-- **10 seconds to 5 minutes:** two to three interleaved repetitions per input.
-- **Over 5 minutes:** one repetition per input is acceptable; favor more inputs.
+**Sizing.** Match inputs, seeds and grants. Estimate sigma, the across-input
+standard deviation of log(candidate time / control time), from initial paired
+inputs. Use A/A measurements to estimate timing noise; A/A alone does not
+estimate input-dependent differences between implementations. Start with
+**three independent inputs**; extend to **six, then nine**, only while the
+interval straddles the predeclared decision. Stop at nine and report
+Inconclusive if needed. Freeze the analysis and extension rule before results.
+Use approximately 98% intervals at each look: 98 1/3% gives at least 95%
+overall coverage across the three looks for one comparison, by the union
+bound, provided each individual interval is valid. Account separately for
+multiple comparisons when making a joint claim. Declare distribution/model
+assumptions; a small sample does not validate them automatically.
 
-Estimate unchanged-code A/A variability in the target regime before ranking;
-treat differences within measured noise as ties and retain tied finalists.
-Account for dependence among repetitions of an input. Nine pairs alone do not
-establish sufficient independent coverage or p90 precision.
+As a rough single-look 95% paired-t guide, three inputs resolve effects above
+about 2.5 sigma, six about 1 sigma and nine about 0.8 sigma. Sequential intervals
+are more conservative; these guides are not guarantees or a reason to assume
+a particular sigma without measurement. Repeat an input only to estimate
+within-input noise for calls under about ten seconds (three to five
+repetitions); otherwise run each input once. Repetitions are not independent
+inputs and must be analyzed as clusters.
 
-Extend only under a predeclared sequential rule with finite maximum, declared
-analysis looks and adjustment for repeated looks, while the uncertainty interval
-straddles the decision. Stop at that maximum and report Inconclusive if needed.
-Apply changed sampling protocols prospectively under new identities.
-Diagnostic allowances are separate; follow [profiling limits](#experiment-design-and-prompt-review).
+Warm measurements need at least three seconds of validated warmup. Cold calls
+use a fresh interpreter with no warmup and include spawn, import, JIT,
+preparation, validation and shutdown. Keep instrumented runs out of clean
+timings. Preserve censoring, completion denominators and guardrails; do not
+turn timeouts into exact completed times or discard them to form favorable
+ratios. Apply the revised sizing prospectively, preserving historical freezes.
 
 ## Dependencies and priority
 
@@ -335,7 +348,7 @@ in STATUS.md.
    relevant, planning, failed attempts, splitting, filtering, lifting,
    serialization, replay and retained storage. Report owned bounds separately
    from observed RSS. Use matched inputs, seeds and budgets and the
-   [cost-scaled paired sampling rule](#cost-scaled-paired-sampling). Warm
+   [evidence tiers](#evidence-tiers-and-sample-sizing). Warm
    measurements need validated warmup; cold measurements exclude warmup.
    Instrumented profiles remain separate from clean performance evidence.
 4. **Use the revised promotion policy in “How to use the gates”.** Require zero correctness
@@ -427,7 +440,7 @@ rules and diagnostic limits in [experiment design](#experiment-design-and-prompt
   current committed production and the strongest valid serial control during
   calibration; do not duplicate an explanatory control in confirmation unless
   it answers a separate predeclared claim. Apply the
-  [sampling/noise rules](#cost-scaled-paired-sampling) by regime and lifetime.
+  [evidence tiers](#evidence-tiers-and-sample-sizing) by regime and lifetime.
 - **Fix measured architectural overhead before tuning parameters around it.**
   Use phase/timeline counters and bounded profiles to locate dominant serial,
   coordination, allocation or repeated-computation costs. A joint search does
