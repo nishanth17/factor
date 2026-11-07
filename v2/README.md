@@ -295,6 +295,9 @@ baseline, instead of locking each scalar read. Aggregate charging, immediate
 budget refusal and the parent polling cadence remain unchanged. The baseline
 is rebuilt after each quiescent pool `begin`; the enabled option pins execution
 identity and defaults off.
+The parent copies into a reused private buffer while locked, then releases
+the lock before clipping and summing differences, allowing worker publication
+during that arithmetic.
 
 `reuse_state=True` installs an identity-bound immutable context on every worker
 before sending packet deltas. `state_cache_bytes` bounds that context; aggregate

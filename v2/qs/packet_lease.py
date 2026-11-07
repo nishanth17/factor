@@ -8,12 +8,27 @@ class ParentCPUSnapshot:
     """Read worker counters under one lock at the unchanged parent cadence."""
 
     def __init__(self, pool):
-        from .worker_packet import _process_cpu_reader
-
         self.pool = pool
         # begin() has fixed this run's baseline; finish() drains workers
         # before another begin can replace it. Capture only this run's view.
-        self.worker_cpu = _process_cpu_reader(pool.state)
+        baseline = tuple(pool.state["cpu_base"])
+        counters = pool.state["cpu"]
+        values, lock = counters.get_obj(), counters.get_lock()
+        samples = [0.0] * len(baseline)
+
+        def used():
+            # This reader has one owner. Retain a private consistent copy and
+            # release the shared lock before subtraction, clipping and sum;
+            # workers can publish while the parent reduces its snapshot.
+            with lock:
+                for index in range(len(samples)):
+                    samples[index] = values[index]
+            return sum(
+                max(0, value - prior)
+                for value, prior in zip(samples, baseline)
+            )
+
+        self.worker_cpu = used
 
     def __call__(self, budget):
         pool = self.pool
