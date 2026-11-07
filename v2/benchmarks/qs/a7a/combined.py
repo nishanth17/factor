@@ -337,6 +337,11 @@ def run(plan_path, output):
                 if reference
                 else spec.get("profile_reference_seconds", 60)
             )
+            if spec.get("full_profile", False):
+                # CPU covers the complete execution. Place the single live
+                # heap within the repeated workload, including later warmed
+                # cache/GC state, rather than always inside its first sample.
+                estimate *= spec["samples"]
             window = [
                 max(1, 0.20 * estimate),
                 max(3, 0.40 * estimate),

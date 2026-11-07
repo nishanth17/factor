@@ -32,7 +32,7 @@ class ProfilePairTests(unittest.TestCase):
         self.assertEqual(diagnostic["mode"], "profile")
         self.assertTrue(diagnostic["full_profile"])
         self.assertTrue(diagnostic["observe"])
-        self.assertEqual((clean["samples"], diagnostic["samples"]), (9, 1))
+        self.assertEqual((clean["samples"], diagnostic["samples"]), (9, 9))
         self.assertNotIn("pair", original)
 
     def test_clean_run_is_not_issued_without_the_whole_pair_reservation(self):

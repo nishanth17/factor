@@ -6,7 +6,7 @@ from copy import deepcopy
 def paired_cells(cells):
     """Keep clean evidence and whole-execution CPU/live-heap diagnostics.
 
-    The diagnostic repeats one sample with exactly the same configuration,
+    The diagnostic repeats every sample with exactly the same configuration,
     input, seed and lifetime. CPU traces cover every owned worker. Parent and
     one worker have live heaps, with explicitly labeled teardown fallback for
     very short calls. Neither diagnostic timing nor heap pauses rank arms.
@@ -27,7 +27,6 @@ def paired_cells(cells):
             mode="profile",
             full_profile=True,
             diagnostic_for=pair,
-            samples=1,
             observe=True,
         )
         result.extend((clean, diagnostic))

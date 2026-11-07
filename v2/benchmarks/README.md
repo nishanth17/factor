@@ -39,6 +39,10 @@ flush profiles before cleanup, and failed or unissued diagnostics remain
 explicit. Every new optimization candidate receives its companion, including
 rejected candidates.
 
+Multi-sample cells retain the same repetition count in their diagnostic
+companion, so later warmed execution and GC behavior remain visible. The
+whole clean/diagnostic reservation must fit before either is issued.
+
 Warm complete-factor cells warm the same bounded factoring entry point with
 a short partial allowance. They do not prime a bare-prefix pool under a
 different coexistence contract. Warmup charges remain cumulative; neither
