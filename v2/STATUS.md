@@ -157,7 +157,12 @@ prioritizes current acceleration and shorter later experiment turnaround:
 6. **B15:** native helper/SIMD opportunity selection across E4/A10a/A2a/C5 —
    Sol / high evidence review; Sol / xhigh for boundary/protocol design. Deliver
    at most one justified candidate or a no-go; implementation retains its owner.
-7. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
+7. **H2:** profile-driven overhead sweep after the B12/A7a/B4a integration
+   checkpoint — Sol / xhigh. Rank time/heap costs, remove measured overhead,
+   justify memory reservations and compare the combined result with the
+   pre-sweep control; a no-conflict CLI/preprocessing/reconstruction subset
+   may start earlier.
+8. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
    Sol / xhigh. Reuse accelerator receipts rather than repeating broad studies.
 
 Then A1d, B3a, F3, broader C9b and the remaining ranked rows. F3 is the first
@@ -176,7 +181,9 @@ losses do not settle the native question. B4a's native
 thread screen centers on cold-CLI startup/heap savings against B12 processes,
 using a C-side multi-curve team and a pthread alternative when OpenMP is absent.
 E6/B15 at ranks 5–6 are conditional screens. B15 is not a C3a prerequisite;
-its selected helper implementation does not inherit rank 6 automatically.
+its selected helper implementation does not inherit rank 6 automatically. H2
+is rank 7, ahead of broader policy tuning; its removable overhead is unmeasured.
+Reuse compatible H2 evidence in C11/C9b and retain their algorithmic owners.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
 native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
 this priority increase. Small cost/A/A checks belong in each task; C9b is not
