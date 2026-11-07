@@ -27,6 +27,15 @@ versioned regime corpus partitions three independent calibration and three
 confirmation moduli per anchor before timing. Confirmation outcomes must stay
 outside tuning.
 
+The [joint starting design](qs/a7a/joint_search.py) supplies 32 configurations
+for retained 64-polynomial families: four worker, packet, verification and
+stop-policy levels plus nineteen binary options. All raw factor pairs have
+balanced coverage; higher interactions remain confounded. Conditional
+inactivity, such as snapshots without leases or packed events without a queue,
+must be reported separately from raw coverage. A partial block does not inherit
+the full design's coverage. This is an exploratory starting design, not a
+completed per-regime search or a configuration adoption.
+
 Numerical experiments may supply explicit collector endpoint, product and
 reporting bounds, including `small_prime_bound`. The collector validates the
 resulting configuration. Changing a factor-base size does not automatically
