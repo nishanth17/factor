@@ -39,7 +39,17 @@ def prepare(identity, reference_source, folder):
             if role == "mainline":
                 spec.update(arm="MAINLINE", policy="G0")
             elif role == "process":
-                recipe = candidate(COUNTS[digits], 16)
+                spec.update(nursery_mb=4, max_batch_atoms=2048)
+                recipe = candidate(
+                    COUNTS[digits],
+                    16,
+                    features=dict(
+                        worker_memory_bytes=512 * 2**20,
+                        state_cache_bytes=64 * 2**20,
+                        packet_bytes=4 * 2**20,
+                        coefficient_cache=True,
+                    ),
+                )
                 recipe.pop("name")
                 spec.update(recipe)
             batch = dict(

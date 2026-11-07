@@ -651,3 +651,20 @@ implementation `0c4cd18`; later changes fix legacy test-fixture intent only.
 All source/default/API/checkpoint changes are validated. No new-source
 performance measurement or balanced-completion claim is made. The shared
 computation lock is released.
+
+### A7a gated preparation
+
+The isolated A7a branch provides `coverage_plan.prepare(identity, reference_source,
+folder)` to construct the proposed G2 manifest without factoring. The reference
+source is a full committed mainline hash, not a working-copy path.
+`stage_driver.validate(plan, approval)` checks exact source/corpus bindings,
+complete endpoints, coverage, configuration caps and whole-stage reservations.
+The approval object names `stage`, `plan_sha256=stage_driver.digest(plan)` and
+`approved=True`; it must reflect explicit approval of that exact stage.
+`stage_driver.execute(plan, approval, output)` records issued attempts before
+running and refuses automatic retries of unfinished work. It starts no successor.
+The separately certified `inputs/a7a/confirmation_g4.json` corpus is reserved
+for three/six/nine-input confirmation; generation is exclusive and bounded.
+Optional benchmark observers record parent stages, worker service/queue spans
+and minute-level progress. Their overhead needs matched calibration before
+use in clean performance claims. No automatic factoring defaults are changed.

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 import resource
 import time
 from pathlib import Path
@@ -11,6 +12,17 @@ from .confirmation import BANDS
 from .runner import source, write
 
 ROWS = {(d, "cold") for d in BANDS} | {(40, "warm"), (50, "warm")}
+CELL_FIELDS = frozenset(
+    (
+        "arm checkpoint_bytes collector_overrides cpu cpu_window "
+        "diagnostic_for endpoint features fixture full_profile id lifetime "
+        "max_batch_atoms memory nursery_mb observe packet_counters pair "
+        "policy polynomials polynomials_per_task profile_reference_seconds "
+        "profile_required progress_path qs_memory_bytes rss_interval "
+        "samples seed siqs_overrides storage tasks tier_a timeline_path "
+        "wall warmup_seconds work digits mode stage variant "
+    ).split()
+)
 
 
 def save(path, value):
@@ -41,6 +53,15 @@ def validate(plan, approval):
         raise ValueError("implementation source changed")
     if plan["corpus_sha256"] != corpus_identity(plan["corpus_kind"]):
         raise ValueError("corpus source changed")
+    for grant in [plan] + plan["batches"]:
+        for name in ("wall", "cpu"):
+            value = grant[name]
+            if (
+                type(value) not in (int, float)
+                or not math.isfinite(value)
+                or value <= 0
+            ):
+                raise ValueError("grant must be positive and finite")
     rows = {(50, "cold"), (65, "cold")} if plan["stage"] == "G2H" else ROWS
     panel = fixtures(plan["corpus_kind"])
     present, ids, recipes = set(), set(), {}
@@ -58,6 +79,13 @@ def validate(plan, approval):
             raise ValueError("batch source differs from stage")
         reserved_wall = reserved_cpu = 0
         for cell in batch["cells"]:
+            if cell.keys() - CELL_FIELDS:
+                raise ValueError("unsupported cell fields")
+            if any(
+                type(cell[k]) is not int or cell[k] <= 0
+                for k in ("memory", "work")
+            ):
+                raise ValueError("integer work and memory grants required")
             row = (cell["digits"], cell["lifetime"])
             if len(str(panel[cell["fixture"]]["n"])) != cell["digits"]:
                 raise ValueError("fixture differs from declared regime")
@@ -71,6 +99,8 @@ def validate(plan, approval):
                 <= 0
             ):
                 raise ValueError("nonpositive allowance")
+            if not all(math.isfinite(cell[k]) for k in ("wall", "cpu")):
+                raise ValueError("cell grant must be finite")
             reserved_wall += cell["wall"] + 5
             reserved_cpu += cell["cpu"]
             # These fields identify execution, rather than an input/repetition.
@@ -81,6 +111,17 @@ def validate(plan, approval):
                 "samples",
                 "pair",
                 "diagnostic_for",
+                "variant",
+                "progress_path",
+                "timeline_path",
+                "tier_a",
+                "observe",
+                "rss_interval",
+                "full_profile",
+                "profile_required",
+                "profile_reference_seconds",
+                "cpu_window",
+                "packet_counters",
                 "mode",
                 "id",
                 "stage",

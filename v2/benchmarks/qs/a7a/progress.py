@@ -17,6 +17,8 @@ class Progress:
         if interval != 60:
             raise ValueError("progress interval must be 60 seconds")
         self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.touch(exist_ok=False)
         self.counters, self.observer = counters, observer
         self.stop = threading.Event()
         self.thread = threading.Thread(target=self._run, daemon=True)

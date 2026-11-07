@@ -65,7 +65,16 @@ class G1Tests(unittest.TestCase):
             self.assertEqual(
                 len(stage_driver.validate(plan, self.approve(plan))), 8
             )
-            for changed in ("coverage", "fixture", "grant", "source", "cap"):
+            for changed in (
+                "coverage",
+                "fixture",
+                "grant",
+                "source",
+                "cap",
+                "nan",
+                "inf",
+                "unknown",
+            ):
                 bad = copy.deepcopy(plan)
                 if changed == "coverage":
                     bad["batches"].pop()
@@ -75,6 +84,10 @@ class G1Tests(unittest.TestCase):
                     bad["wall"] = 1
                 elif changed == "source":
                     bad["source"] = "other"
+                elif changed == "unknown":
+                    bad["batches"][0]["cells"][0]["unsupported_flag"] = True
+                elif changed in ("nan", "inf"):
+                    bad["wall"] = float(changed)
                 else:
                     bad["recipe_caps"]["40:cold"] = 0
                 with (
