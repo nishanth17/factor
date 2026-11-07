@@ -419,79 +419,66 @@ maintained here:
 
 ## Joint parameter searches
 
-Use this workflow when tuning combinations of worker counts, packet sizes,
-numerical parameters, caches, scheduling and optimization flags. Follow the
-measurement and adoption rules [above](#how-to-use-the-gates); isolated component
-screens do not deliver a joint configuration search.
+Use this workflow for combinations of worker counts, packet sizes, numerical
+parameters, caches, scheduling and flags. Apply the stage contracts, measurement
+rules and diagnostic limits in [experiment design](#experiment-design-and-prompt-review).
 
-- Define the regimes, target workload and complete-run objective before
-  searching. Separate balanced semiprimes from other input classes, and cold
-  calls from retained warm contexts. Include current committed production and
-  the strongest valid serial control; label historical comparisons separately.
-  A control's timeout does not bar measuring a valid candidate.
-- Declare the joint search space: parameter ranges, flag states, conditional
-  dependencies, invalid combinations and aggregate resource limits. Include
-  total process allocation when comparing separate collection/cofactor workers.
-  A flag's inconclusive standalone result is not grounds to exclude it from
-  combinations. Record every exclusion and its correctness or evidence basis.
-- Freeze source, input identities, seeds, objective, censoring rules and grants
-  for each comparison. Change numerical effort only as an explicit search
-  dimension; distinguish cheaper execution of identical work from changed
-  effort or relation yield. Known factors may validate results, never select
-  a runtime configuration.
-- Give each search stage a question, decision, expected total runtime and finite
-  cumulative wall/CPU/memory/capture allowance. Include warmup, controls,
-  diagnostic companions and confirmation in the estimate. Preserve all earlier
-  charges when revising a protocol; report the first informative result before
-  scaling it. Declare a maximum number of configurations per stage before
-  running. Count exploratory configurations toward that ceiling; charge A/A
-  calibration, exploration and confirmation to the cumulative resource allowances.
-- Estimate unchanged-code A/A variability in the target regime before ranking
-  candidates, separately for cold and warm lifetimes where applicable. Treat
-  differences within that measured noise as ties and keep tied finalists rather
-  than picking a winner. Recheck validity when drift or a changed regime makes
-  the calibration inapplicable; retain the uncertainty and confirmation gates.
-- Default to simple methods: a small space-filling initial design
-  (Latin-hypercube or covering-array style) over valid configurations, then a
-  racing procedure that drops candidates once they are clearly worse on matched
-  inputs, then complete-run comparison of the survivors. Do not build a general
-  optimization framework.
-- Start with a bounded joint design covering diverse valid configurations and
-  important parameter pairs, rather than a full Cartesian grid or only
-  one-flag-at-a-time tests. Cover both flag states and meaningful worker/packet
-  levels. Report actual coverage and confounded interactions; pairwise coverage
-  alone does not establish the best combination or exclude higher interactions.
-- Refine with the simple race by default, respecting mixed and conditional
-  parameters and the measured noise floor. Reserve trials for exploration outside
-  predicted winners. Check one- and two-option changes around promising bundles,
-  adjacent worker counts and packet/cache levels. Reuse neighboring-regime
-  results to propose candidates, then measure them in the target regime.
-- Use increasing-budget elimination only after checking that the cheaper
-  measurement predicts the complete-run ranking on representative candidates.
-  Fixed-work prefixes and replay throughput answer mechanism questions; they
-  can miss yield, matrix, startup and draining costs. If rankings disagree or
-  remain uncertain, retain candidates for bounded complete-run comparisons.
-  Keep timeouts censored, never count them as fast completions, and distinguish
-  recorder failures from factorer resource exhaustion.
-- Match candidate comparisons by input, seed, allowance and process lifetime.
-  Randomize or counterbalance order, interleave controls and retain host/thermal
-  observations. Do not select a winner from a drifting single-input sequence.
-  Repeated seeds measure variability; they do not replace independent moduli.
-- Plan bounded CPU and memory diagnostics alongside clean timings, with their
-  overhead measured separately. Use profiles and heap evidence to identify the
-  largest measured costs, implement a concrete change, then remeasure complete
-  runs and revisit affected combinations. A prominent stack or large retained
-  object is a hypothesis, not a promised removable fraction or speedup.
-- Advance finalists using the sample and uncertainty requirements [above](#acceptance-evidence-and-stop-rules),
-  then freeze the selected configuration before disjoint fresh-input
-  confirmation. Do not tune on confirmation inputs. Measure neighboring regime
-  boundaries and selection overhead before adopting a routing table; leave
-  unmeasured interpolation explicit.
-- Report each regime's full configuration, worker allocation, complete-run time,
-  completion, CPU, peak memory, uncertainty, near ties and remaining search
-  gaps. Say "best found and confirmed within the declared search" unless an
-  exhaustive comparison or justified bound establishes global optimality.
-  Keep untested, inconclusive and demonstrated losing combinations distinct.
+- Declare the regimes, target workload and complete-run objective. Include
+  current committed production and the strongest valid serial control during
+  calibration; do not duplicate an explanatory control in confirmation unless
+  it answers a separate predeclared claim. Apply the
+  [sampling/noise rules](#cost-scaled-paired-sampling) by regime and lifetime.
+- **Fix measured architectural overhead before tuning parameters around it.**
+  Use phase/timeline counters and bounded profiles to locate dominant serial,
+  coordination, allocation or repeated-computation costs. A joint search does
+  not substitute for removing that cost. Verify the change on complete runs
+  before freezing the implementation for tuning; a prominent stack alone is
+  not a removable fraction or a promised speedup.
+- **Classify every option before searching**, with a one-line reason and its
+  correctness/measurement basis:
+  - **(a) Overhead removal:** identical work done more cheaply. Screen once at
+    two representative regimes and enable unless it clearly loses. If the
+    screen is inconclusive, retain the simpler valid option; new machinery
+    is not enabled solely because no loss was established.
+  - **(b) Alternative implementations of one mechanism:** screen once at the
+    same two representative regimes and retain the supported winner. An
+    inconclusive screen defaults to the simpler valid implementation.
+  - **(c) Real tunables:** values plausibly vary with size or interact with
+    other options, such as workers, packet sizes and cache capacities.
+  Only (c) enters the joint search. Reclassify (a)/(b) only on measured
+  evidence of an interaction, under a new bounded design; disagreement or
+  uncertainty alone does not justify putting every flag back into the grid.
+- For (c), declare ranges, conditional dependencies, invalid combinations,
+  aggregate resources and a maximum configuration count per stage. Include
+  total collection/cofactor process allocation, controls, exploration and
+  confirmation in the grants. Give every exclusion a correctness or evidence
+  basis and record inactive dimensions separately from exercised coverage.
+- Freeze source, inputs, seeds, metrics, censoring and grants. Vary numerical
+  effort only as an explicit dimension; distinguish cheaper identical work
+  from changed effort/yield. Known factors validate results, never select
+  runtime settings.
+- Tune (c) at a few declared anchor regimes spanning the range, using a small
+  valid space-filling or covering design, matched-input racing and bounded
+  local refinement. Reserve exploration beyond predicted winners. Do not
+  build a general optimization framework or exhaust every flag product.
+- Interpolate between anchor recipes using a frozen rule that respects discrete
+  and conditional settings. Verify at least one intermediate regime and the
+  relevant routing boundaries before adoption. Label interpolated rows,
+  including verified ones; do not call them independently tuned optima. If an
+  intermediate check fails, report and propose a bounded new anchor rather
+  than silently starting another full search.
+- Report actual coverage and confounded/untested interactions. Use shorter
+  measurements for elimination only after establishing their complete-run
+  predictive validity; exact-work screens may diagnose overhead without
+  establishing complete-factor rankings.
+- Match input/seed/grant/lifetime, counterbalance order, interleave controls
+  and retain host/thermal observations. Keep timeouts censored with charges.
+  Freeze finalists before disjoint fresh confirmation; do not retune on it.
+- At each declared stage gate, report recipes, coverage, validation, uncertainty,
+  resources and the next decision, then stop unless that successor was
+  explicitly pre-approved. Say "best found and confirmed within the declared
+  search" unless exhaustive evidence or a justified bound supports global
+  optimality. Distinguish untested, inconclusive and losing combinations.
 
 ## Evidence layout
 
