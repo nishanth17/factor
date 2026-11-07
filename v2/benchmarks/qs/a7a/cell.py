@@ -71,6 +71,8 @@ def settings(
         "cpu_snapshot",
         "stop_backend",
         "coefficient_cache",
+        "worker_memory_bytes",
+        "packet_bytes",
     }
     if features.keys() - allowed:
         raise ValueError("unknown experimental worker features")
@@ -248,6 +250,21 @@ def execute(request):
         config = replace(config, checkpoint_bytes=spec["checkpoint_bytes"])
     if "qs_memory_bytes" in spec:
         config = replace(config, memory_bytes=spec["qs_memory_bytes"])
+    numerical = spec.get("siqs_overrides", {})
+    numerical_fields = {
+        "base_count",
+        "base_bound",
+        "factor_count",
+        "half_width",
+        "max_half_width",
+        "polynomials_per_family",
+        "pool_size",
+        "batch_width",
+    }
+    if type(numerical) is not dict or numerical.keys() - numerical_fields:
+        raise ValueError("unknown experimental numerical overrides")
+    if numerical:
+        config = replace(config, **numerical)
     overrides = spec.get("collector_overrides", {})
     allowed = {
         "marking",
@@ -257,6 +274,14 @@ def execute(request):
         "batch_policy",
         "batch_size",
         "opaque_cache_entries",
+        "candidate_bound",
+        "large_prime_bound",
+        "large_product_bound",
+        "residual_bound",
+        "split_call_limit",
+        "max_atoms",
+        "max_partials",
+        "max_relations",
     }
     if type(overrides) is not dict or overrides.keys() - allowed:
         raise ValueError("unknown experimental collector overrides")
@@ -264,6 +289,23 @@ def execute(request):
         config = replace(
             config, collector=replace(config.collector, **overrides)
         )
+    startup_gc = None
+    if "nursery_mb" in spec:
+        import gc
+        import os
+        import re
+
+        nursery = spec["nursery_mb"]
+        if type(nursery) is not int or nursery not in (4, 16, 64, 128):
+            raise ValueError("unadmitted nursery setting")
+        if os.environ.get("PYPY_GC_NURSERY") != f"{nursery}MB":
+            raise ValueError("nursery must be selected before process startup")
+        startup_gc = str(gc.get_stats())
+        observed = re.search(r"nursery:\s+([\d.]+)MB", startup_gc)
+        if observed is None or float(observed.group(1)) != nursery:
+            raise ValueError(
+                "runtime nursery differs from the requested setting"
+            )
     workers = settings(
         spec["arm"],
         spec["memory"],
@@ -387,6 +429,7 @@ def execute(request):
         rss_children_hwm=children.ru_maxrss,
         memory_note="Lifetime HWM fields are not simultaneous aggregate RSS.",
         configuration=asdict(config),
+        startup_gc=startup_gc,
         rss_samples=[] if observer is None else observer.rows,
         observer_failure=None if observer is None else observer.error,
         observer_exhausted=False if observer is None else observer.exceeded,

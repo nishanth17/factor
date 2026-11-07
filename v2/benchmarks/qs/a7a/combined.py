@@ -30,12 +30,15 @@ FEATURES = dict(
 
 
 def fixtures(kind="combined"):
-    if kind not in ("combined", "all"):
+    if kind not in ("combined", "all", "regimes"):
         raise ValueError("unknown source-pinned input panel")
     data = json.loads((INPUTS / "combined_corpus.json").read_text())
     result = {r["id"]: r for r in data["fixtures"]}
-    if kind == "all":
-        other = json.loads((INPUTS / "corpus.json").read_text())
+    names = [] if kind == "combined" else ["corpus.json"]
+    if kind == "regimes":
+        names.append("regime_corpus.json")
+    for name in names:
+        other = json.loads((INPUTS / name).read_text())
         for row in other["fixtures"]:
             if row["id"] in result:
                 if row["n"] != result[row["id"]]["n"]:
@@ -51,10 +54,13 @@ def corpus_identity(kind="combined"):
         return hashlib.sha256(
             (INPUTS / "combined_corpus.json").read_bytes()
         ).hexdigest()
-    if kind != "all":
+    if kind not in ("all", "regimes"):
         raise ValueError("unknown source-pinned input panel")
     digest = hashlib.sha256()
-    for name in ("combined_corpus.json", "corpus.json"):
+    names = ["combined_corpus.json", "corpus.json"]
+    if kind == "regimes":
+        names.append("regime_corpus.json")
+    for name in names:
         digest.update(name.encode() + b"\0")
         digest.update((INPUTS / name).read_bytes())
     return digest.hexdigest()
@@ -128,6 +134,40 @@ def _capture(process, capture, elapsed, window, state, *, live_heaps=True):
                 os.kill(target, signal.SIGUSR2)
                 state["heaps"][target] = (attempts + 1, elapsed)
             break
+
+
+def _capture_full(process, capture, elapsed, window, state):
+    """Trace owned processes throughout; request two labeled live heaps."""
+    owned = _events(capture, process.pid)
+    if process.pid not in owned:
+        return
+    targets = [process.pid]
+    workers = [
+        pid for pid, rows in owned.items() if rows[0]["role"] == "worker"
+    ]
+    if workers:
+        targets.append(min(workers))
+    if state["targets"] != targets:
+        state["targets"] = targets
+        temporary = capture / "heap-targets.tmp"
+        temporary.write_text(json.dumps(targets))
+        temporary.replace(capture / "heap-targets.json")
+    if elapsed < window[2]:
+        return
+    for target in targets:
+        kinds = [event["kind"] for event in owned[target]]
+        if "heap_finished" in kinds or target in state["heaps"]:
+            continue
+        try:
+            # The private session/group binds these PIDs to this invocation.
+            # Never send a heap request to a process outside the owned group.
+            if os.getpgid(target) != process.pid:
+                continue
+            os.kill(target, signal.SIGUSR2)
+        except ProcessLookupError:
+            continue
+        state["heaps"][target] = (1, elapsed)
+        break
 
 
 def run(plan_path, output):
@@ -205,9 +245,22 @@ def run(plan_path, output):
             if mode not in ("clean", "profile", "packet", "cpu"):
                 raise ValueError("unknown observation mode")
             spec["id"] = f"{plan['identity']}-{ordinal:03}"
+            reserved_wall, reserved_cpu = spec["wall"], spec["cpu"]
+            if spec.get("profile_required", False):
+                following = plan["cells"][ordinal + 1 : ordinal + 2]
+                if (
+                    not following
+                    or following[0].get("mode") != "profile"
+                    or following[0].get("diagnostic_for") != spec.get("pair")
+                ):
+                    raise ValueError(
+                        "clean run lacks its required diagnostic pair"
+                    )
+                reserved_wall += following[0]["wall"] + 5
+                reserved_cpu += following[0]["cpu"]
             if (
-                ledger["cumulative_wall"] + spec["wall"] + 5 > plan["wall"]
-                or ledger["cumulative_cpu"] + spec["cpu"] > plan["cpu"]
+                ledger["cumulative_wall"] + reserved_wall + 5 > plan["wall"]
+                or ledger["cumulative_cpu"] + reserved_cpu > plan["cpu"]
             ):
                 ledger["stopped"] = (
                     "Next whole reservation exceeds cumulative allowance"
@@ -218,7 +271,7 @@ def run(plan_path, output):
                 + plan.get("prior_storage", 0)
                 + (
                     3 * 2**30
-                    if mode == "profile"
+                    if mode == "profile" or spec.get("profile_required", False)
                     else 160 * 2**20
                     if mode == "cpu"
                     else 0
@@ -246,6 +299,8 @@ def run(plan_path, output):
                 fixture=spec["fixture"],
                 mode=mode,
                 status="issued",
+                pair=spec.get("pair"),
+                diagnostic_for=spec.get("diagnostic_for"),
                 thermal_start=thermal_status(),
             )
             ledger["attempts"].append(receipt)
@@ -267,6 +322,10 @@ def run(plan_path, output):
                 and r["mode"] == "clean"
                 and r["arm"] == spec["arm"]
                 and r["fixture"] == spec["fixture"]
+                and (
+                    "diagnostic_for" not in spec
+                    or r.get("pair") == spec["diagnostic_for"]
+                )
             ]
             estimate = (
                 statistics.median(reference)
@@ -278,6 +337,21 @@ def run(plan_path, output):
                 max(3, 0.40 * estimate),
                 max(4, 0.50 * estimate),
             ]
+            if spec.get("full_profile", False):
+                matched = next(
+                    (
+                        r
+                        for r in ledger["attempts"]
+                        if r.get("pair") == spec.get("diagnostic_for")
+                        and r.get("mode") == "clean"
+                        and r.get("status") == "reported"
+                    ),
+                    {},
+                )
+                window[2] = max(
+                    0.1,
+                    0.5 * (estimate + matched.get("warm_seconds", 0) + 0.2),
+                )
             if mode == "cpu" and "cpu_window" in spec:
                 window = spec["cpu_window"]
                 if (
@@ -293,6 +367,16 @@ def run(plan_path, output):
                     PYTHONPATH=temporary,
                     PYTHONDONTWRITEBYTECODE="1",
                 )
+                if "nursery_mb" in spec:
+                    nursery = spec["nursery_mb"]
+                    if type(nursery) is not int or nursery not in (
+                        4,
+                        16,
+                        64,
+                        128,
+                    ):
+                        raise ValueError("unadmitted nursery setting")
+                    env["PYPY_GC_NURSERY"] = f"{nursery}MB"
                 module = "v2.benchmarks.qs.a7a.cell"
                 if mode in ("profile", "cpu"):
                     env.update(
@@ -301,6 +385,11 @@ def run(plan_path, output):
                         if mode == "profile"
                         else "0",
                     )
+                    if spec.get("full_profile", False):
+                        env.update(
+                            FACTOR_A7A_PROFILE_ALL="1",
+                            FACTOR_A7A_LIVE_HEAPS="0",
+                        )
                     module = "v2.benchmarks.qs.a7a.diagnostic_hook"
                     if mode == "profile":
                         spec["storage"] = max(spec["storage"], 2 * 2**30)
@@ -340,14 +429,19 @@ def run(plan_path, output):
                                 "finite cell/stage wall exhausted"
                             )
                         if mode in ("profile", "cpu"):
-                            _capture(
-                                process,
-                                capture,
-                                elapsed,
-                                window,
-                                state,
-                                live_heaps=mode == "profile",
-                            )
+                            if spec.get("full_profile", False):
+                                _capture_full(
+                                    process, capture, elapsed, window, state
+                                )
+                            else:
+                                _capture(
+                                    process,
+                                    capture,
+                                    elapsed,
+                                    window,
+                                    state,
+                                    live_heaps=mode == "profile",
+                                )
                         if mode in ("profile", "packet", "cpu"):
                             if (
                                 storage_bytes(profiles)
@@ -390,6 +484,25 @@ def run(plan_path, output):
                         )
                 if mode in ("profile", "cpu"):
                     owned = _events(capture, process.pid)
+                    if spec.get("full_profile", False):
+                        workers = [
+                            pid
+                            for pid, events in owned.items()
+                            if events[0]["role"] == "worker"
+                        ]
+                        state["targets"] = [process.pid] + (
+                            [min(workers)] if workers else []
+                        )
+                        if any(
+                            not all(
+                                any(e["kind"] == kind for e in events)
+                                for kind in ("cpu_started", "cpu_stopped")
+                            )
+                            for events in owned.values()
+                        ):
+                            raise RuntimeError(
+                                "owned process lacks its full CPU trace"
+                            )
                     required = ["cpu_started", "cpu_stopped"]
                     if mode == "profile":
                         required.append("heap_finished")
@@ -410,6 +523,7 @@ def run(plan_path, output):
                     complete=result["samples"][0]["complete"],
                     reason=result["samples"][0]["reason"],
                     result=str(result_path),
+                    warm_seconds=result["warm_seconds"],
                     targets=state["targets"],
                     profile_window=window
                     if mode in ("profile", "cpu")
@@ -461,6 +575,15 @@ def run(plan_path, output):
                             source=commit,
                             arm=receipt["arm"],
                             flags=request["cell"].get("features", {}),
+                            collector_overrides=request["cell"].get(
+                                "collector_overrides", {}
+                            ),
+                            siqs_overrides=request["cell"].get(
+                                "siqs_overrides", {}
+                            ),
+                            nursery_mb=request["cell"].get("nursery_mb"),
+                            pair=receipt.get("pair"),
+                            diagnostic_for=receipt.get("diagnostic_for"),
                             input=receipt["fixture"],
                             repetition=capture.name,
                             capture_point=receipt.get("profile_window"),

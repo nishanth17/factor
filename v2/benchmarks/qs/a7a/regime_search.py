@@ -22,7 +22,7 @@ def candidate(count, packet=64, *, features=None, collector=None, name=None):
             arm="S0",
             polynomials_per_task=packet,
             features={},
-            collector_overrides={},
+            collector_overrides={} if collector is None else dict(collector),
         )
     options = dict(
         FEATURES,
@@ -53,7 +53,7 @@ def candidate(count, packet=64, *, features=None, collector=None, name=None):
 
 def coarse(*, features=None, collector=None):
     """Two packet scales per count, plus the direct serial control."""
-    return [candidate(0)] + [
+    return [candidate(0, collector=collector)] + [
         candidate(count, packet, features=features, collector=collector)
         for count in COUNTS
         for packet in (16, 64)

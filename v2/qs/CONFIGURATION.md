@@ -146,7 +146,7 @@ release queues; interruption/restore rebuilds them with charges.
 The opt-in `packed_queue` component uses one checked 64-bit word per hit,
 replacing three 32-bit words and the temporary append tuple. It preserves the
 older conservative reservation, work/event order and exact direct fallback.
-It is last in canonical marking-component order and changes no default.
+It follows `parity_two` in component order and changes no default.
 
 `wide_hits` follows `packed_queue` and raises the optional native-word scratch
 ceiling from 32 to 128 MiB. Its actual reservation, construction work and the

@@ -17,6 +17,28 @@ nine observations under the machine-wide performance lock. Full test suites
 share that lock; worktrees do not isolate CPU, RAM or thermals. Cold startup
 and instrumented diagnostics remain separate from performance evidence.
 
+## Current-collector QS regime studies
+
+The opt-in [A7a search](qs/a7a/regime_search.py) defines bounded worker/packet
+neighborhoods and compatible feature removals. Its 40/50/55/60/62/65/70/75/80
+anchors have separate configuration and resource identities; a prefix winner
+does not establish complete-factor ranking or justify interpolation. The
+versioned regime corpus partitions three independent calibration and three
+confirmation moduli per anchor before timing. Confirmation outcomes must stay
+outside tuning.
+
+[Paired cells](qs/a7a/profile_pairs.py) reserve each clean timing and its
+diagnostic companion together. Diagnostics trace the factoring execution in
+the parent and every owned worker at 10 ms, pause sampling for parent and one
+worker heap, then resume into a separate immutable stream. Two-Hz owned RSS
+samples complement GC-object and logical-buffer data. Short calls retain a
+labeled teardown heap if a live request cannot arrive in time. These captures
+explain costs; their timings do not rank candidates. Source, flags, input,
+pair identity and file hashes accompany the capture index. Worker finalizers
+flush profiles before cleanup, and failed or unissued diagnostics remain
+explicit. Every new optimization candidate receives its companion, including
+rejected candidates.
+
 ## B12/F4 delivered defaults
 
 The normal bounded factorer uses the [selected regime table](../STATUS.md#selected-ecm-regimes)

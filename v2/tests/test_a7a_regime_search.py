@@ -1,9 +1,14 @@
 """Finite neighborhoods, compatible ablations and uncensored ranking."""
 
 import copy
+import json
 import unittest
+from collections import Counter
+from math import gcd, prod
 
 from v2.benchmarks.qs.a7a.cell import settings
+from v2.benchmarks.qs.a7a.combined import corpus_identity, fixtures
+from v2.benchmarks.qs.a7a.protocol import INPUTS
 from v2.benchmarks.qs.a7a.regime_search import (
     BANDS,
     COUNTS,
@@ -17,6 +22,39 @@ from v2.benchmarks.qs.a7a.regime_search import (
 
 
 class RegimeSearchTests(unittest.TestCase):
+    def test_regime_panel_is_certified_disjoint_and_split_before_tuning(self):
+        from v2.benchmarks.suites.build_phase_two_corpus import (
+            verify_certificates,
+        )
+
+        data = json.loads((INPUTS / "regime_corpus.json").read_text())
+        verify_certificates(data["certificates"])
+        self.assertEqual(
+            Counter(
+                (row["purpose"], row["digits"]) for row in data["fixtures"]
+            ),
+            Counter(
+                {
+                    (purpose, digits): 3
+                    for purpose in ("calibration", "confirmation")
+                    for digits in BANDS
+                }
+            ),
+        )
+        previous = [r["n"] for r in fixtures("all").values() if r["n"] > 1]
+        for row in data["fixtures"]:
+            self.assertEqual(prod(row["factors"]), row["n"])
+            self.assertEqual(len(str(row["n"])), row["digits"])
+            self.assertLessEqual(
+                abs(row["factor_bits"][0] - row["factor_bits"][1]), 1
+            )
+            self.assertTrue(
+                all(gcd(row["n"], value) == 1 for value in previous)
+            )
+            previous.append(row["n"])
+        self.assertNotEqual(corpus_identity("all"), corpus_identity("regimes"))
+        self.assertEqual(len(fixtures("regimes")), len(fixtures("all")) + 54)
+
     def test_coarse_search_covers_counts_packets_and_serial_for_each_band(
         self,
     ):

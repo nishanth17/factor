@@ -15,6 +15,8 @@ _role = None
 _profile = None
 _cpu_file_limit = None
 _events = []
+_cpu_segments = 0
+_closed = False
 
 
 def _record(kind, **values):
@@ -62,7 +64,7 @@ def _frames(frame):
 
 
 def _cpu_signal(signum, frame):
-    global _profile, _cpu_file_limit
+    global _profile, _cpu_file_limit, _cpu_segments
     import _vmprof
 
     try:
@@ -78,11 +80,27 @@ def _cpu_signal(signum, frame):
                 resource.RLIMIT_FSIZE,
                 (soft, _cpu_file_limit[1]),
             )
-            _profile = (_folder / "cpu.vmprof").open("xb")
-            _vmprof.enable(
-                _profile.fileno(), 0.002, False, False, False, False
+            _cpu_segments += 1
+            name = (
+                "cpu.vmprof"
+                if _cpu_segments == 1
+                else f"cpu-{_cpu_segments:03}.vmprof"
             )
-            _record("cpu_started", location=_location(frame))
+            interval = (
+                0.01
+                if os.environ.get("FACTOR_A7A_PROFILE_ALL") == "1"
+                else 0.002
+            )
+            _profile = (_folder / name).open("xb")
+            _vmprof.enable(
+                _profile.fileno(), interval, False, False, False, False
+            )
+            _record(
+                "cpu_started",
+                location=_location(frame),
+                file=name,
+                interval=interval,
+            )
         else:
             _vmprof.disable()
             _profile.close()
@@ -121,9 +139,15 @@ def _location(frame):
 def _heap_signal(signum, frame):
     # The supervisor stops CPU sampling first. A heap pause must never become
     # evidence about production arithmetic, memory refusal or speed.
-    if _profile is not None:
+    automatic = os.environ.get("FACTOR_A7A_PROFILE_ALL") == "1"
+    resume_cpu = automatic and _profile is not None
+    if _profile is not None and not automatic:
         _record("recorder_failure", operation="heap", error="CPU still active")
         return
+    if resume_cpu:
+        # Pauses are absent from CPU attribution. Resume into a new immutable
+        # segment; never truncate or append over an earlier sample stream.
+        _cpu_signal(None, frame)
     started, cpu = time.monotonic(), time.process_time()
     frames = _frames(frame)
     if os.environ.get("FACTOR_A7A_LIVE_HEAPS") == "1":
@@ -149,11 +173,14 @@ def _heap_signal(signum, frame):
             rss_hwm=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
             frames=frames,
             logical_owners=owners,
+            phase="teardown" if frame is None else "live",
         )
     except Exception as error:
         _record("recorder_failure", operation="heap", error=repr(error))
     finally:
         resource.setrlimit(resource.RLIMIT_FSIZE, previous)
+        if resume_cpu and not _closed:
+            _cpu_signal(None, frame)
 
 
 def _logical_owners(frame):
@@ -200,6 +227,29 @@ def _logical_owners(frame):
                         accounted_bytes=scalars,
                     )
                 )
+                if type(candidate).__name__ == "SieveCollector":
+                    derived = {}
+                    schedule = state.get("_sparse_queue")
+                    if schedule is not None:
+                        queues = schedule[1]
+                        derived["queue_blocks"] = len(queues)
+                        derived["queue_payload_bytes"] = sum(
+                            len(queue) * queue.itemsize for queue in queues
+                        )
+                        derived["queue_numeric_words"] = sum(
+                            len(queue) for queue in queues
+                        )
+                    words = state.get("_word_hits")
+                    derived["hit_backend"] = (
+                        "list" if words is None else "WordHits"
+                    )
+                    if words is not None:
+                        derived["hit_word_groups"] = len(words.words)
+                        derived["hit_word_cells"] = sum(map(len, words.words))
+                        derived["hit_stamp_cells"] = sum(
+                            map(len, words.stamps)
+                        )
+                    owners[-1]["derived_buffers"] = derived
         frame = frame.f_back
     return owners
 
@@ -217,13 +267,40 @@ def install(role):
         ppid=os.getppid(),
         role=role,
         runtime=sys.version,
+        startup_gc=str(gc.get_stats()),
     )
 
     def close():
+        global _closed
+        if _closed:
+            return
+        _closed = True
         if _profile is not None:
             _cpu_signal(None, None)
+        if os.environ.get("FACTOR_A7A_PROFILE_ALL") == "1":
+            targets = _folder.parent / "heap-targets.json"
+            selected = role == "parent"
+            if targets.exists():
+                chosen = json.loads(targets.read_text())
+                selected = (
+                    selected or os.getpid() in chosen or len(chosen) == 1
+                )
+            elif role == "worker":
+                selected = True
+            if selected and not any(
+                e["kind"] == "heap_finished" for e in _events
+            ):
+                _heap_signal(None, None)
 
     atexit.register(close)
+    if role == "worker" and os.environ.get("FACTOR_A7A_PROFILE_ALL") == "1":
+        from multiprocessing.util import Finalize
+
+        # Spawned workers can exit through multiprocessing finalizers rather
+        # than ordinary interpreter atexit. The shared close is idempotent.
+        Finalize(None, close, exitpriority=0)
+        _cpu_signal(None, None)
+    return close
 
 
 def initialize_worker(state):
@@ -235,13 +312,27 @@ def initialize_worker(state):
 
 def main():
     from ....qs import parallel
-    from .cell import main as cell_main
+    from . import cell
 
-    install("parent")
+    close = install("parent")
     # Only this diagnostic process selects the wrapper. Spawn imports its
     # original production initializer, then installs identical signal hooks.
     parallel._initialize_process = initialize_worker
-    cell_main()
+    if os.environ.get("FACTOR_A7A_PROFILE_ALL") == "1":
+        execute = cell.execute
+
+        def profiled_execute(request):
+            # cell.main has installed its finite file limit by this point.
+            # Saving/restoring that limit cannot accidentally raise a hard
+            # limit that the request subsequently lowered.
+            _cpu_signal(None, None)
+            try:
+                return execute(request)
+            finally:
+                close()
+
+        cell.execute = profiled_execute
+    cell.main()
 
 
 if __name__ == "__main__":
