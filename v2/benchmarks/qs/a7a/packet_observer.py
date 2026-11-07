@@ -190,13 +190,11 @@ def validate_capture(folder, workers):
         raise RuntimeError("packet recorder lacks all owned workers")
 
 
-def main():
-    from ....qs import parallel
+def install_parent():
+    """Observe publication in a fresh diagnostic process only."""
     from ....qs.current_parallel import CurrentParallelSIQSJob
-    from .cell import main as cell_main
 
     recorder = Recorder("parent")
-    parallel._initialize_process = initialize_worker
     for name in ("_receive", "_merge"):
         original = getattr(CurrentParallelSIQSJob, name)
 
@@ -215,6 +213,68 @@ def main():
             return observed
 
         setattr(CurrentParallelSIQSJob, name, bind(original, name[1:]))
+    return recorder
+
+
+def summarize_capture(folder, intervals):
+    """Separate timed packets from warmup without retaining packet records.
+
+    Recovery includes splitting; their CPU spans must not be added. Stop
+    timing covers only the sampled calls, never all polling overhead. These
+    are instrumented spans, including GC and any diagnostic interruptions.
+    """
+    samples = [
+        dict(
+            packets=0,
+            packet_cpu=0.0,
+            recovery_calls=0,
+            recovery_cpu=0.0,
+            split_calls=0,
+            split_cpu=0.0,
+            poll_calls=0,
+            poll_samples=0,
+            poll_sample_cpu=0.0,
+        )
+        for _ in intervals
+    ]
+    outside = 0
+    for path in sorted(Path(folder).glob("*.jsonl")):
+        with path.open() as stream:
+            for line in stream:
+                packet = json.loads(line)
+                if packet["kind"] != "packet":
+                    continue
+                first = packet["start"]
+                last = first + packet["wall"]
+                index = next(
+                    (
+                        i
+                        for i, (start, end) in enumerate(intervals)
+                        if start <= first <= last <= end
+                    ),
+                    None,
+                )
+                if index is None:
+                    outside += 1
+                    continue
+                row, counters = samples[index], packet["counters"]
+                row["packets"] += 1
+                row["packet_cpu"] += packet["cpu"]
+                for name in ("recovery", "split"):
+                    row[name + "_calls"] += counters[name][0]
+                    row[name + "_cpu"] += counters[name][2] / 10**9
+                row["poll_calls"] += counters["poll_calls"]
+                row["poll_samples"] += counters["poll_samples"]
+                row["poll_sample_cpu"] += counters["poll_cpu_ns"] / 10**9
+    return dict(samples=samples, outside_measurement_packets=outside)
+
+
+def main():
+    from ....qs import parallel
+    from .cell import main as cell_main
+
+    install_parent()
+    parallel._initialize_process = initialize_worker
     cell_main()
 
 

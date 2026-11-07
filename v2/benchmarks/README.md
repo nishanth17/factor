@@ -61,6 +61,14 @@ If a launched call aborts before worker CPU can be fully observed, the
 unknown portion of its CPU grant remains charged separately from measured
 CPU. Failed receipts retain detailed errors and traceback provenance.
 
+Targeted diagnostic cells can add `packet_counters=true` to combine the
+existing bounded recovery/split counters with CPU/heap/RSS capture. Clean
+companions retain the configuration label without installing these timers.
+Sample intervals exclude warmup from the counter summary; unmatched packets
+remain counted separately. Recovery contains splitting, and polling timings
+cover only sampled calls. These instrumented spans include GC and diagnostic
+interruptions. Calibrate their overhead on identical work before a long use.
+
 Warm complete-factor cells warm the same bounded factoring entry point with
 a short partial allowance. They do not prime a bare-prefix pool under a
 different coexistence contract. Warmup charges remain cumulative; neither

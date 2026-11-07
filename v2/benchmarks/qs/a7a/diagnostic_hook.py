@@ -254,6 +254,12 @@ def _logical_owners(frame):
                     derived["shared_inverse_entries"] = (
                         None if inverses is None else len(inverses.values)
                     )
+                    staging = state.get("_opaque_staging")
+                    if staging is not None:
+                        derived["opaque_staging_entries"] = len(staging.atoms)
+                        derived["opaque_staging_accounted_bytes"] = (
+                            staging.used
+                        )
                     transfers = state.get("_power_transfers")
                     if transfers is not None:
                         derived["root_transfer_capacity"] = (
@@ -333,6 +339,10 @@ def initialize_worker(state):
 
     _initialize_process(state)
     install("worker")
+    if os.environ.get("FACTOR_A7A_PACKET_DIR"):
+        from .packet_observer import install_worker
+
+        install_worker(state)
 
 
 def main():
@@ -340,6 +350,10 @@ def main():
     from . import cell
 
     close = install("parent")
+    if os.environ.get("FACTOR_A7A_PACKET_DIR"):
+        from .packet_observer import install_parent
+
+        install_parent()
     # Only this diagnostic process selects the wrapper. Spawn imports its
     # original production initializer, then installs identical signal hooks.
     parallel._initialize_process = initialize_worker

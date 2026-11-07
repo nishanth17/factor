@@ -286,6 +286,11 @@ def run(plan_path, output):
             mode = spec.pop("mode", "clean")
             if mode not in ("clean", "profile", "packet", "cpu"):
                 raise ValueError("unknown observation mode")
+            packet_counters = spec.get("packet_counters", False)
+            if type(packet_counters) is not bool or (
+                packet_counters and not spec["arm"].startswith("C")
+            ):
+                raise ValueError("packet counters need process workers")
             spec["id"] = f"{plan['identity']}-{ordinal:03}"
             reserved_wall, reserved_cpu = spec["wall"], spec["cpu"]
             if spec.get("profile_required", False):
@@ -415,6 +420,7 @@ def run(plan_path, output):
                     PYTHONPATH=temporary,
                     PYTHONDONTWRITEBYTECODE="1",
                 )
+                env.pop("FACTOR_A7A_PACKET_DIR", None)
                 if "nursery_mb" in spec:
                     nursery = spec["nursery_mb"]
                     if type(nursery) is not int or nursery not in (
@@ -427,6 +433,10 @@ def run(plan_path, output):
                     env["PYPY_GC_NURSERY"] = f"{nursery}MB"
                 module = "v2.benchmarks.qs.a7a.cell"
                 if mode in ("profile", "cpu"):
+                    if packet_counters:
+                        packet_folder = capture / "packet-counters"
+                        packet_folder.mkdir()
+                        env["FACTOR_A7A_PACKET_DIR"] = str(packet_folder)
                     env.update(
                         FACTOR_A7A_DIAGNOSTIC_DIR=str(capture),
                         FACTOR_A7A_LIVE_HEAPS="1"
@@ -505,6 +515,17 @@ def run(plan_path, output):
                     raise RuntimeError(f"cell exited {process.returncode}")
                 result = json.loads(result_path.read_text())
                 validate_output(result, request)
+                if packet_counters and mode in ("profile", "cpu"):
+                    from .packet_observer import (
+                        summarize_capture,
+                        validate_capture,
+                    )
+
+                    validate_capture(packet_folder, int(spec["arm"][1:]))
+                    receipt["packet_counters"] = summarize_capture(
+                        packet_folder,
+                        [s["measurement_interval"] for s in result["samples"]],
+                    )
                 if mode == "packet":
                     from .packet_observer import validate_capture
 

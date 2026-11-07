@@ -94,6 +94,8 @@ class WarmOwnershipTests(unittest.TestCase):
         self.assertGreaterEqual(result["warm_seconds"], 10)
         self.assertEqual(result["warm_endpoint"], "complete")
         self.assertEqual(result["warmup_target"], 10)
+        first, last = result["samples"][0]["measurement_interval"]
+        self.assertLessEqual(first, last)
 
     def test_unfunded_or_unadmitted_warmup_is_rejected_before_configuration(
         self,

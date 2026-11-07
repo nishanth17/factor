@@ -2,10 +2,13 @@
 
 import inspect
 import json
+import os
 import tempfile
 import unittest
 from array import array
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from v2.benchmarks.qs.a7a.diagnostic_analysis import heap_census
 from v2.benchmarks.qs.a7a.diagnostic_hook import _logical_owners
@@ -13,12 +16,46 @@ from v2.benchmarks.qs.a7a.diagnostics import _events, plan
 
 
 class DiagnosticTests(unittest.TestCase):
+    def test_optional_worker_counters_compose_after_cpu_heap_installation(
+        self,
+    ):
+        from v2.benchmarks.qs.a7a.diagnostic_hook import initialize_worker
+
+        for enabled in (False, True):
+            calls = []
+            with (
+                patch.dict(
+                    os.environ,
+                    FACTOR_A7A_PACKET_DIR="capture" if enabled else "",
+                ),
+                patch(
+                    "v2.qs.parallel._initialize_process",
+                    side_effect=lambda state: calls.append("base"),
+                ),
+                patch(
+                    "v2.benchmarks.qs.a7a.diagnostic_hook.install",
+                    side_effect=lambda role: calls.append("cpu_heap"),
+                ),
+                patch(
+                    "v2.benchmarks.qs.a7a.packet_observer.install_worker",
+                    side_effect=lambda state: calls.append("counters"),
+                ),
+            ):
+                initialize_worker({})
+            self.assertEqual(
+                calls,
+                ["base", "cpu_heap"] + (["counters"] if enabled else []),
+            )
+
     def test_collector_snapshot_exposes_actual_numerical_and_memory_domain(
         self,
     ):
         from v2.tests.test_qs_hit_words import make_worker
 
         worker = make_worker(64)
+        worker._opaque_staging = SimpleNamespace(
+            atoms={1: None, 2: None}, used=4096
+        )
         frame = inspect.currentframe()
         try:
             owners = _logical_owners(frame)
@@ -40,6 +77,8 @@ class DiagnosticTests(unittest.TestCase):
         )
         self.assertEqual(snapshot["candidate_bound"], worker._candidate_bound)
         self.assertEqual(snapshot["split_calls"], worker._split_calls)
+        self.assertEqual(snapshot["opaque_staging_entries"], 2)
+        self.assertEqual(snapshot["opaque_staging_accounted_bytes"], 4096)
 
     def test_heap_census_rejects_truncation_and_duplicate_root_marker(self):
         with tempfile.TemporaryDirectory() as temporary:

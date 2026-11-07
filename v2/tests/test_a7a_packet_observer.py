@@ -12,11 +12,47 @@ from v2.benchmarks.qs.a7a.packet_observer import (
     PacketCounters,
     Recorder,
     initialize_worker,
+    summarize_capture,
     validate_capture,
 )
 
 
 class PacketObserverTests(unittest.TestCase):
+    def test_packet_cpu_summary_excludes_warmup_and_crossing_intervals(self):
+        counters = dict(
+            recovery=[2, 100000000, 60000000],
+            split=[1, 50000000, 30000000],
+            poll_calls=256,
+            poll_samples=1,
+            poll_cpu_ns=1000,
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "123.jsonl"
+            packets = [dict(kind="ready", role="worker")]
+            for start, wall in ((1, 1), (10, 1), (19, 2), (21, 1)):
+                packets.append(
+                    dict(
+                        kind="packet",
+                        start=start,
+                        wall=wall,
+                        cpu=0.1,
+                        counters=counters,
+                    )
+                )
+            path.write_text("".join(json.dumps(row) + "\n" for row in packets))
+            result = summarize_capture(temporary, [(10, 20), (20, 30)])
+
+        self.assertEqual(result["outside_measurement_packets"], 2)
+        for row in result["samples"]:
+            self.assertEqual(row["packets"], 1)
+            self.assertEqual(row["packet_cpu"], 0.1)
+            self.assertEqual(row["recovery_calls"], 2)
+            self.assertEqual(row["recovery_cpu"], 0.06)
+            self.assertEqual(row["split_calls"], 1)
+            self.assertEqual(row["split_cpu"], 0.03)
+            self.assertEqual(row["poll_samples"], 1)
+            self.assertEqual(row["poll_sample_cpu"], 0.000001)
+
     def test_spawned_observer_preserves_exact_admitted_atoms(self):
         from v2.qs import parallel
         from v2.tests.test_current_qs_workers import prepared, settings

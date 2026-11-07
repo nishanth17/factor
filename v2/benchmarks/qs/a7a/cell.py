@@ -420,6 +420,7 @@ def execute(request):
             budget.consume(0)
             if counters is not None:
                 counters.reset()
+            interval_start = time.monotonic()
             started = time.perf_counter()
             if spec["endpoint"] == "prefix":
                 result = prefix(
@@ -434,6 +435,10 @@ def execute(request):
             else:
                 result = complete_call(n, config, workers, budget, pool, spec)
             result["library_seconds"] = time.perf_counter() - started
+            result["measurement_interval"] = [
+                interval_start,
+                time.monotonic(),
+            ]
             if counters is not None:
                 result["tier_a"] = counters.report(result["library_seconds"])
             samples.append(result)
