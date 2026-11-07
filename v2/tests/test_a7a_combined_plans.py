@@ -24,6 +24,43 @@ from v2.benchmarks.qs.a7a.combined_plans import (
 
 
 class CombinedPlanTests(unittest.TestCase):
+    def test_thermal_hints_preserve_invalid_and_unavailable_readings(self):
+        from v2.benchmarks.qs.a7a.runner import foundation_thermal_status
+
+        completed = SimpleNamespace(
+            returncode=0, stdout='{"raw":2,"low_power_mode":false}', stderr=""
+        )
+        with (
+            patch("v2.benchmarks.qs.a7a.runner.sys.platform", "darwin"),
+            patch(
+                "v2.benchmarks.qs.a7a.runner.subprocess.run",
+                return_value=completed,
+            ),
+        ):
+            record = foundation_thermal_status()
+        self.assertEqual(record["reading"]["state"], "serious")
+        self.assertFalse(record["reading"]["low_power_mode"])
+
+        for stdout in (
+            "not-json",
+            '{"raw":true,"low_power_mode":false}',
+            '{"raw":4,"low_power_mode":false}',
+        ):
+            completed.stdout = stdout
+            with (
+                patch("v2.benchmarks.qs.a7a.runner.sys.platform", "darwin"),
+                patch(
+                    "v2.benchmarks.qs.a7a.runner.subprocess.run",
+                    return_value=completed,
+                ),
+            ):
+                record = foundation_thermal_status()
+            self.assertIn("parse_error", record)
+            self.assertNotIn("reading", record)
+
+        with patch("v2.benchmarks.qs.a7a.runner.sys.platform", "linux"):
+            self.assertIn("unavailable", foundation_thermal_status())
+
     def test_pressure_bookends_preserve_raw_counters_and_failures(self):
         from v2.benchmarks.qs.a7a.runner import host_pressure_status
 

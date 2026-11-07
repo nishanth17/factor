@@ -212,7 +212,46 @@ def host_pressure_status():
     return dict(
         vm=_host_command_status(["vm_stat"]),
         cpu=_host_command_status(["ps", "-axo", "pid=,ppid=,pcpu=,comm="]),
+        foundation=foundation_thermal_status(),
     )
+
+
+def foundation_thermal_status():
+    """Read bounded OS thermal/low-power hints without privileged tools.
+
+    This is neither temperature nor clock telemetry. In particular, Apple's
+    nominal state can also mean that thermal awareness is unavailable.
+    """
+    if sys.platform != "darwin":
+        return dict(unavailable="Foundation thermal state requires macOS")
+    script = (
+        'ObjC.import("Foundation"); '
+        "var info=$.NSProcessInfo.processInfo; "
+        "JSON.stringify({raw:Number(info.thermalState), "
+        "low_power_mode:Boolean(info.isLowPowerModeEnabled)});"
+    )
+    record = _host_command_status(
+        ["/usr/bin/osascript", "-l", "JavaScript", "-e", script]
+    )
+    if record.get("returncode") != 0:
+        return record
+    try:
+        value = json.loads(record["stdout"])
+        if (
+            type(value) is not dict
+            or set(value) != {"raw", "low_power_mode"}
+            or type(value["raw"]) is not int
+            or not 0 <= value["raw"] <= 3
+            or type(value["low_power_mode"]) is not bool
+        ):
+            raise ValueError("invalid Foundation thermal reading")
+        record["reading"] = dict(
+            value,
+            state=("nominal", "fair", "serious", "critical")[value["raw"]],
+        )
+    except (ValueError, TypeError) as error:
+        record["parse_error"] = repr(error)
+    return record
 
 
 def run_stage(args):

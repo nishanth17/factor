@@ -22,6 +22,19 @@ flag effects or per-regime optimality. Untested combinations remain eligible.
 Plans, complete cost tables, captures, failures and charges remain local under
 `v2/audit/a7a/`.
 
+A conditional local design on a second independent 60-digit calibration input
+uses `d389c17`: eight joint local bundles, two prespecified broad exploration
+rows and bracketing C8/p16 controls. Its pilot and continuation finish all
+24 calls with valid observations, costing 1,721.221 wall seconds, 11,188.663
+CPU seconds and 1,316,835,512 capture bytes. The control changes from 37.127
+to 56.709 seconds despite identical scanned positions (801,118,176), packet
+counts and 5,013 useful rows. Worker CPU rises from 271.451 to 424.386 seconds.
+The 52.74% control drift prevents ranking close configurations; raw times
+cannot establish individual flag losses or a new optimum. Host snapshots
+show background analysis/cloud activity and unchanged swap counters, without
+isolating a cause. Further selection requires a separately identified
+measurement-stability decision, not an automatic larger repeat of this matrix.
+
 ## A7a current-mainline feasibility (6 November 2026)
 
 The isolated `codex/a7a-regime-tuning` continuation starts from mainline

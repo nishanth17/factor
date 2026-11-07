@@ -73,6 +73,10 @@ expose host compression, swapping or other CPU workloads. These include other
 applications and are not the factorer's owned memory or exclusive CPU cost.
 Missing or truncated telemetry remains explicit. These
 bookends are outside the measured cell interval and charged to the campaign.
+Prospective macOS bookends also query Foundation's thermal state and low-power
+hint through a bounded, unprivileged command. Raw output and parse failures
+remain explicit. This state is not CPU frequency or temperature; nominal can
+also indicate unavailable thermal awareness. It cannot establish no throttling.
 
 Multi-sample cells retain the same repetition count in their diagnostic
 companion, so later warmed execution and GC behavior remain visible. The
