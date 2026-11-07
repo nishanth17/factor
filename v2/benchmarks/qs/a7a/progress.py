@@ -26,6 +26,7 @@ class Progress:
         self.rows = 0
         self.error = None
         self.job = None
+        self.started = time.monotonic()
 
     def sample(self):
         now = time.monotonic()
@@ -44,6 +45,10 @@ class Progress:
                         now - points[0][0]
                     )
             row["rolling_relations_per_second"] = rates
+            row["elapsed"] = now - self.started
+            row["cumulative_relations_per_second"] = useful / max(
+                1e-9, now - self.started
+            )
         row.update(
             monotonic=now,
             cpu=resource.getrusage(resource.RUSAGE_SELF).ru_utime

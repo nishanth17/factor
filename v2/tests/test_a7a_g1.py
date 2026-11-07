@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.qs.a7a import confirmation, stage_driver
@@ -155,6 +156,27 @@ class G1Tests(unittest.TestCase):
             confirmation.validate(data, old + [data["fixtures"][0]["n"]])
         with self.assertRaises(FileExistsError):
             confirmation.generate()
+
+    def test_fixed_relation_target_tracks_initial_and_topup_gates(self):
+        collector = SimpleNamespace(
+            _rows=[1, 2],
+            _full=[1, 2],
+            _combined=[],
+            factor_base=SimpleNamespace(entries=[1] * 10),
+        )
+        engine = SimpleNamespace(
+            collector=collector,
+            _useful_target=None,
+            row_excess=2,
+            last_count=-1,
+            filter_row_growth=2,
+        )
+        counters = TierA()
+        counters.owner = SimpleNamespace(engine=engine, n=221, stats={})
+        self.assertEqual(counters.snapshot()["target"], 13)
+        self.assertEqual(counters.snapshot()["target_fraction"], 2 / 13)
+        engine.last_count = 100
+        self.assertEqual(counters.snapshot()["target"], 105)
 
     def test_progress_failure_is_observation_only(self):
         counters = TierA()

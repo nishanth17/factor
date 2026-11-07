@@ -115,12 +115,20 @@ class TierA:
             collector = engine.collector
             usable = len(collector._rows)
             target_state = engine._useful_target
-            target = (
-                None
-                if target_state is None
-                else target_state.target(engine.row_excess)
-            )
+            if target_state is not None:
+                target = target_state.target(engine.row_excess)
+            elif engine.last_count < 0:
+                target = (
+                    len(collector.factor_base.entries) + 1 + engine.row_excess
+                )
+            else:
+                target = engine.last_count + max(
+                    engine.filter_row_growth, (engine.last_count + 19) // 20
+                )
+
             row.update(
+                raw_relations=len(getattr(collector, "_atoms", ())),
+                cycle_relations=len(collector._combined),
                 usable_relations=usable,
                 target=target,
                 target_fraction=None if not target else usable / target,
