@@ -98,6 +98,14 @@ class G1Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 stage_driver.validate(plan, {})
 
+    def test_diagnostics_never_supply_complete_coverage(self):
+        plan = self.plan()
+        for batch in plan["batches"]:
+            batch["cells"][0].update(endpoint="prefix", purpose="diagnostic")
+        with patch.object(stage_driver, "source", return_value="pin"):
+            with self.assertRaises(ValueError):
+                stage_driver.validate(plan, self.approve(plan))
+
     def test_restart_skips_completed_batches(self):
         calls = []
 

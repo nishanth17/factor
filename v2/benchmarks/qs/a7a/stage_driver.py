@@ -20,7 +20,7 @@ CELL_FIELDS = frozenset(
         "policy polynomials polynomials_per_task profile_reference_seconds "
         "profile_required progress_path qs_memory_bytes rss_interval "
         "samples seed siqs_overrides storage tasks tier_a timeline_path "
-        "wall warmup_seconds work digits mode stage variant "
+        "wall warmup_seconds work digits mode stage variant purpose "
     ).split()
 )
 
@@ -89,9 +89,13 @@ def validate(plan, approval):
             row = (cell["digits"], cell["lifetime"])
             if len(str(panel[cell["fixture"]]["n"])) != cell["digits"]:
                 raise ValueError("fixture differs from declared regime")
-            if row not in rows or cell["endpoint"] != "complete":
+            diagnostic = cell.get("purpose") == "diagnostic"
+            if row not in rows or cell["endpoint"] not in (
+                ("complete", "prefix") if diagnostic else ("complete",)
+            ):
                 raise ValueError("missing complete endpoint or invalid regime")
-            present.add(row)
+            if not diagnostic:
+                present.add(row)
             if cell["lifetime"] == "cold" and cell["samples"] != 1:
                 raise ValueError("cold observations require fresh actors")
             if (
@@ -112,6 +116,8 @@ def validate(plan, approval):
                 "pair",
                 "diagnostic_for",
                 "variant",
+                "purpose",
+                "endpoint",
                 "progress_path",
                 "timeline_path",
                 "tier_a",
