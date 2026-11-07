@@ -417,6 +417,69 @@ maintained here:
   host. Apply new collection rules prospectively; preserve earlier frozen
   measurement definitions.
 
+## Joint parameter searches
+
+Use this workflow for combinations of worker counts, packet sizes, numerical
+parameters, caches, scheduling and flags. Apply the stage contracts, measurement
+rules and diagnostic limits in [experiment design](#experiment-design-and-prompt-review).
+
+- Declare the regimes, target workload and complete-run objective. Include
+  current committed production and the strongest valid serial control during
+  calibration; do not duplicate an explanatory control in confirmation unless
+  it answers a separate predeclared claim. Apply the
+  [sampling/noise rules](#cost-scaled-paired-sampling) by regime and lifetime.
+- **Fix measured architectural overhead before tuning parameters around it.**
+  Use phase/timeline counters and bounded profiles to locate dominant serial,
+  coordination, allocation or repeated-computation costs. A joint search does
+  not substitute for removing that cost. Verify the change on complete runs
+  before freezing the implementation for tuning; a prominent stack alone is
+  not a removable fraction or a promised speedup.
+- **Classify every option before searching**, with a one-line reason and its
+  correctness/measurement basis:
+  - **(a) Overhead removal:** identical work done more cheaply. Screen once at
+    two representative regimes and enable unless it clearly loses. If the
+    screen is inconclusive, retain the simpler valid option; new machinery
+    is not enabled solely because no loss was established.
+  - **(b) Alternative implementations of one mechanism:** screen once at the
+    same two representative regimes and retain the supported winner. An
+    inconclusive screen defaults to the simpler valid implementation.
+  - **(c) Real tunables:** values plausibly vary with size or interact with
+    other options, such as workers, packet sizes and cache capacities.
+  Only (c) enters the joint search. Reclassify (a)/(b) only on measured
+  evidence of an interaction, under a new bounded design; disagreement or
+  uncertainty alone does not justify putting every flag back into the grid.
+- For (c), declare ranges, conditional dependencies, invalid combinations,
+  aggregate resources and a maximum configuration count per stage. Include
+  total collection/cofactor process allocation, controls, exploration and
+  confirmation in the grants. Give every exclusion a correctness or evidence
+  basis and record inactive dimensions separately from exercised coverage.
+- Freeze source, inputs, seeds, metrics, censoring and grants. Vary numerical
+  effort only as an explicit dimension; distinguish cheaper identical work
+  from changed effort/yield. Known factors validate results, never select
+  runtime settings.
+- Tune (c) at a few declared anchor regimes spanning the range, using a small
+  valid space-filling or covering design, matched-input racing and bounded
+  local refinement. Reserve exploration beyond predicted winners. Do not
+  build a general optimization framework or exhaust every flag product.
+- Interpolate between anchor recipes using a frozen rule that respects discrete
+  and conditional settings. Verify at least one intermediate regime and the
+  relevant routing boundaries before adoption. Label interpolated rows,
+  including verified ones; do not call them independently tuned optima. If an
+  intermediate check fails, report and propose a bounded new anchor rather
+  than silently starting another full search.
+- Report actual coverage and confounded/untested interactions. Use shorter
+  measurements for elimination only after establishing their complete-run
+  predictive validity; exact-work screens may diagnose overhead without
+  establishing complete-factor rankings.
+- Match input/seed/grant/lifetime, counterbalance order, interleave controls
+  and retain host/thermal observations. Keep timeouts censored with charges.
+  Freeze finalists before disjoint fresh confirmation; do not retune on it.
+- At each declared stage gate, report recipes, coverage, validation, uncertainty,
+  resources and the next decision, then stop unless that successor was
+  explicitly pre-approved. Say "best found and confirmed within the declared
+  search" unless exhaustive evidence or a justified bound supports global
+  optimality. Distinguish untested, inconclusive and losing combinations.
+
 ## Evidence layout
 
 Required immutable corpora, baselines and loader snapshots live in versioned
