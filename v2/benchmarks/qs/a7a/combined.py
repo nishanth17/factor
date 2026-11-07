@@ -515,6 +515,9 @@ def run(plan_path, output):
                     raise RuntimeError(f"cell exited {process.returncode}")
                 result = json.loads(result_path.read_text())
                 validate_output(result, request)
+                from .observer import validate_observation
+
+                validate_observation(result)
                 if packet_counters and mode in ("profile", "cpu"):
                     from .packet_observer import (
                         summarize_capture,

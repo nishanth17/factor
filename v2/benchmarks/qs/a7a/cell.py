@@ -471,6 +471,7 @@ def execute(request):
         configuration=asdict(config),
         startup_gc=startup_gc,
         rss_samples=[] if observer is None else observer.rows,
+        rss_backend=None if observer is None else observer.backend,
         observer_failure=None if observer is None else observer.error,
         observer_exhausted=False if observer is None else observer.exceeded,
         worker_configuration=None if workers is None else asdict(workers),

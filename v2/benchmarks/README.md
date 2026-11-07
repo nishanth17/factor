@@ -45,6 +45,13 @@ flush profiles before cleanup, and failed or unissued diagnostics remain
 explicit. Every new optimization candidate receives its companion, including
 rejected candidates.
 
+On macOS the RSS recorder reads resident bytes directly from libproc for the
+parent, owned workers and spawn helper; other platforms retain the `ps`
+backend. Results identify the backend and missing PIDs. Recorder errors, empty
+samples and diagnostic RSS-limit stops fail observation validation rather
+than passing as factorer cancellation. Recorder sample exhaustion remains
+separate from exceeding the actor memory allowance.
+
 Clean and diagnostic receipts retain bounded host VM and process-CPU snapshots
 before and after each call, alongside thermal readings. Their differences can
 expose host compression, swapping or other CPU workloads. These include other
