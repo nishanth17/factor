@@ -27,6 +27,12 @@ versioned regime corpus partitions three independent calibration and three
 confirmation moduli per anchor before timing. Confirmation outcomes must stay
 outside tuning.
 
+Numerical experiments may supply explicit collector endpoint, product and
+reporting bounds, including `small_prime_bound`. The collector validates the
+resulting configuration. Changing a factor-base size does not automatically
+retune these literals: a coupled alternative needs a separate policy identity,
+new collection observations and recalibration of dependent worker selections.
+
 [Paired cells](qs/a7a/profile_pairs.py) reserve each clean timing and its
 diagnostic companion together. Diagnostics trace the factoring execution in
 the parent and every owned worker at 10 ms, pause sampling for parent and one

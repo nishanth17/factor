@@ -312,6 +312,7 @@ def execute(request):
         "opaque_cache_entries",
         "candidate_bound",
         "large_prime_bound",
+        "small_prime_bound",
         "large_product_bound",
         "residual_bound",
         "split_call_limit",

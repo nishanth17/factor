@@ -10,6 +10,48 @@ from v2.execution.budget import Budget
 
 
 class WarmOwnershipTests(unittest.TestCase):
+    def test_literal_endpoint_override_uses_checked_collector_configuration(
+        self,
+    ):
+        spec = cell(
+            "S0",
+            policy="Y0",
+            endpoint="complete",
+            lifetime="cold",
+            samples=1,
+            tier_a=False,
+            observe=False,
+            collector_overrides={
+                "small_prime_bound": 2400000,
+                "large_prime_bound": 9600000,
+                "large_product_bound": 1728000000000000000,
+            },
+        )
+        number = 10**79 + 7
+        partial = dict(
+            complete=False, factors=[], remaining=[number], reason="bounded"
+        )
+
+        with patch(
+            "v2.benchmarks.qs.a7a.cell.complete", return_value=partial
+        ) as complete:
+            result = execute(dict(n=number, cell=spec))
+
+        observed = complete.call_args.args[1].collector
+        self.assertEqual(observed.small_prime_bound, 2400000)
+        self.assertEqual(observed.large_prime_bound, 9600000)
+        self.assertEqual(
+            result["configuration"]["collector"]["large_product_bound"],
+            1728000000000000000,
+        )
+        self.assertEqual(observed.candidate_bound, 115200000000)
+
+        spec["collector_overrides"]["small_prime_bound"] = 9600001
+        with patch("v2.benchmarks.qs.a7a.cell.complete") as complete:
+            with self.assertRaises(ValueError):
+                execute(dict(n=number, cell=spec))
+        complete.assert_not_called()
+
     def test_complete_warmup_never_binds_a_bare_prefix_pool(self):
         spec = cell(
             "M0",
