@@ -35,6 +35,19 @@ show background analysis/cloud activity and unchanged swap counters, without
 isolating a cause. Further selection requires a separately identified
 measurement-stability decision, not an automatic larger repeat of this matrix.
 
+A separate four-control repeatability screen on `d9443d9` writes new captures
+outside Documents and records unprivileged Foundation thermal/low-power hints.
+Identical C8/p16 calls take 37.159, 40.257, 44.734 and 49.126 seconds, with the
+same 801,118,176 scanned positions, assignments and useful rows. The 32.20%
+range fails its prospective 10% measurement-admission gate. All observations
+are valid; low-power mode stays off and OS thermal state changes from nominal
+to fair. Capture relocation alone does not establish stable timing or isolate
+the cause. The screen costs 439.963 wall seconds and 3,395.649 CPU seconds.
+Configuration selection stops under that protocol. A new comparison must
+declare transient versus sustained machine conditions separately from PyPy
+warmup and use suitably frequent controls; the drifting matrix is not repaired
+by retrospective timing corrections. No per-regime optimum is established.
+
 ## A7a current-mainline feasibility (6 November 2026)
 
 The isolated `codex/a7a-regime-tuning` continuation starts from mainline

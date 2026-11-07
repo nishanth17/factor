@@ -77,6 +77,11 @@ Prospective macOS bookends also query Foundation's thermal state and low-power
 hint through a bounded, unprivileged command. Raw output and parse failures
 remain explicit. This state is not CPU frequency or temperature; nominal can
 also indicate unavailable thermal awareness. It cannot establish no throttling.
+PyPy warmup and thermal conditioning are distinct. Declare one-off versus
+sustained workloads and any finite preconditioning before selection. Use
+frequent matched controls; a failed repeatability gate stops configuration
+selection under that protocol. Retain the entire series instead of correcting
+away drift or choosing a favorable subset retrospectively.
 
 Multi-sample cells retain the same repetition count in their diagnostic
 companion, so later warmed execution and GC behavior remain visible. The

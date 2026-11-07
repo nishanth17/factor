@@ -194,6 +194,9 @@ does not establish a free increase in B1.
   [results](benchmarks/RESULTS.md#a7a-current-mainline-feasibility-6-november-2026).
 - **Remaining:** resolve measurement drift with matched ordering and host
   pressure records and finish per-regime joint count/packet/feature selection.
+  The second joint block and a separate control series fail repeatability;
+  define transient/sustained machine conditions separately from PyPy warmup
+  before further selection. Preserve the complete drifting evidence.
   Establish useful full-factor feasibility at 75/80 digits. The shared
   cofactor queue remains unimplemented; price it against measured recovery
   costs rather than assuming a gain. Freeze
@@ -201,8 +204,8 @@ does not establish a free increase in B1.
   restart before integration/adoption. No optimal count or general factoring
   speedup is established. Native QS kernels/threads remain B5a work;
   ECM-to-QS pool reuse retains its separate owner.
-- **Checkpoint:** `codex/a7a-regime-tuning`, runtime/recorder QA `7c452e3`;
-  geometry-aware joint design `c156298`.
+- **Checkpoint:** `codex/a7a-regime-tuning`; committed QA `d9443d9` passes
+  1,539 tests (9 skips), lint and 285 benchmark imports. Joint design `d389c17`.
   Local entry: `v2/audit/a7a/HANDOFF.md` in the continuation worktree. The old
   `codex/a7a-current-qs-workers` evidence and protocols remain preserved.
   Historical checkpoints do not assert current process or lock ownership.
