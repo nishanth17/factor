@@ -228,7 +228,14 @@ def _logical_owners(frame):
                     )
                 )
                 if type(candidate).__name__ == "SieveCollector":
-                    derived = {}
+                    derived = dict(
+                        collector_memory_limit=candidate.config.memory_limit,
+                        factor_base_bound=candidate.factor_base.bound,
+                        factor_base_count=len(candidate.factor_base.entries),
+                        residual_floor=state.get("_residual_floor"),
+                        candidate_bound=state.get("_candidate_bound"),
+                        split_calls=state.get("_split_calls"),
+                    )
                     schedule = state.get("_sparse_queue")
                     if schedule is not None:
                         queues = schedule[1]

@@ -1,5 +1,6 @@
 """Recorder framing, finite reservations and process ownership admission."""
 
+import inspect
 import json
 import tempfile
 import unittest
@@ -7,10 +8,39 @@ from array import array
 from pathlib import Path
 
 from v2.benchmarks.qs.a7a.diagnostic_analysis import heap_census
+from v2.benchmarks.qs.a7a.diagnostic_hook import _logical_owners
 from v2.benchmarks.qs.a7a.diagnostics import _events, plan
 
 
 class DiagnosticTests(unittest.TestCase):
+    def test_collector_snapshot_exposes_actual_numerical_and_memory_domain(
+        self,
+    ):
+        from v2.tests.test_qs_hit_words import make_worker
+
+        worker = make_worker(64)
+        frame = inspect.currentframe()
+        try:
+            owners = _logical_owners(frame)
+        finally:
+            del frame
+        snapshot = next(
+            owner["derived_buffers"]
+            for owner in owners
+            if owner["owner"] == "worker"
+        )
+        self.assertEqual(
+            snapshot["collector_memory_limit"], worker.config.memory_limit
+        )
+        self.assertEqual(
+            snapshot["factor_base_bound"], worker.factor_base.bound
+        )
+        self.assertEqual(
+            snapshot["factor_base_count"], len(worker.factor_base.entries)
+        )
+        self.assertEqual(snapshot["candidate_bound"], worker._candidate_bound)
+        self.assertEqual(snapshot["split_calls"], worker._split_calls)
+
     def test_heap_census_rejects_truncation_and_duplicate_root_marker(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "live.heap"
