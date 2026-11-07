@@ -70,6 +70,7 @@ def settings(
         "private_stop",
         "cpu_snapshot",
         "stop_backend",
+        "coefficient_cache",
     }
     if features.keys() - allowed:
         raise ValueError("unknown experimental worker features")

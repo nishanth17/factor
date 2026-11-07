@@ -47,8 +47,14 @@ def verification_options(config):
     )
 
 
-def polynomial_at(base, primes, ordinal, config, budget):
+def polynomial_at(
+    base, primes, ordinal, config, budget, *, coefficient_cache=None
+):
     """Reconstruct coefficients without consuming worker root tables."""
+    if coefficient_cache is not None:
+        return coefficient_cache.polynomial_at(
+            base, primes, ordinal, config, budget
+        )
     a = math.prod(primes)
     parity = config.polynomial_policy == "parity2" and base.n_prime % 4 == 1
     if parity:

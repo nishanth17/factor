@@ -66,6 +66,7 @@ class QSWorkerConfig:
     private_stop: bool = False
     cpu_snapshot: bool = False
     stop_backend: str = "event"
+    coefficient_cache: bool = False
 
     def __post_init__(self):
         if type(self.observe) is not bool:
@@ -92,6 +93,8 @@ class QSWorkerConfig:
             )
         if type(self.cpu_snapshot) is not bool:
             raise ValueError("cpu_snapshot must be Boolean")
+        if type(self.coefficient_cache) is not bool:
+            raise ValueError("coefficient_cache must be Boolean")
         if self.stop_backend not in ("event", "semaphore") or (
             self.stop_backend == "semaphore" and not self.private_stop
         ):
@@ -175,6 +178,8 @@ class QSWorkerConfig:
             values.pop("cpu_snapshot")
         if self.stop_backend == "event":
             values.pop("stop_backend")
+        if not self.coefficient_cache:
+            values.pop("coefficient_cache")
         return values
 
     @property
@@ -220,6 +225,7 @@ class QSWorkerConfig:
             )
             + self.lookahead * (4 * self.packet_bytes + atoms)
             + (self.workers * 65536 if self.private_stop else 0)
+            + (65536 if self.coefficient_cache else 0)
         )
 
 
@@ -731,6 +737,13 @@ class CurrentParallelSIQSJob:
             raise ValueError("unfunded or incomplete out-of-order admission")
         primes, _, _ = self._spec(index)
         polynomials = {}
+        coefficient_cache = None
+        if self.workers.coefficient_cache:
+            from .coefficient_cache import CoefficientCache
+
+            coefficient_cache = CoefficientCache(
+                self.source.base, primes, self.config
+            )
         collector = self.engine.collector
         stats = defaultdict(int)
         prepared_atoms = {}
@@ -744,6 +757,7 @@ class CurrentParallelSIQSJob:
                     gray,
                     self.config,
                     self.engine.budget,
+                    coefficient_cache=coefficient_cache,
                 )
             polynomial = polynomials[gray]
             if (
@@ -769,6 +783,7 @@ class CurrentParallelSIQSJob:
                                 member[0],
                                 self.config,
                                 self.engine.budget,
+                                coefficient_cache=coefficient_cache,
                             )
                         candidate = decode_atom(
                             member,

@@ -5,6 +5,7 @@ from ..common import utils
 WORD_BITS = 60
 WORD_MASK = (1 << WORD_BITS) - 1
 MAX_HIT_BYTES = 32 * 2**20
+MAX_EXTENDED_HIT_BYTES = 128 * 2**20
 
 
 class WordHits:
@@ -28,10 +29,13 @@ class WordHits:
             2 * ((count + WORD_BITS - 1) // WORD_BITS) * width + count + width
         )
 
-    def __init__(self, count, cache, budget):
+    def __init__(self, count, cache, budget, *, byte_limit=MAX_HIT_BYTES):
         utils.require_integer(count, "hit count", 1)
+        utils.require_integer(byte_limit, "hit word bytes", 1)
+        if byte_limit > MAX_EXTENDED_HIT_BYTES:
+            raise ValueError("hit word allowance exceeds its finite ceiling")
         width = len(cache)
-        if not width or self.reservation(count, width) > MAX_HIT_BYTES:
+        if not width or self.reservation(count, width) > byte_limit:
             raise ValueError("hit word scratch exceeds its bounded allowance")
         work = self.construction_work(count, width)
         budget.consume(work)

@@ -234,6 +234,20 @@ Explicit QS worker aggregate grants may reach 22 GiB; the default remains
 decoded/in-flight publication, coexistence and checkpoint reserves. This is
 an ownership bound, separate from measured RSS and physical-memory pressure.
 
+The opt-in `wide_hits` marking component permits up to 128 MiB of lazy
+native-word hit scratch per collector instead of the usual 32 MiB ceiling.
+The actual reservation and construction work must fit the existing collector
+grant, leaving polynomial-switch coexistence funded; otherwise the ordinary
+exact mask path remains available. This can keep larger bases off repeated
+large-integer mask operations. It follows `packed_queue` in component order.
+
+`QSWorkerConfig(coefficient_cache=True)` retains one bounded parent CRT
+template within each packet merge. It uses the factor base's checked column
+map, selected roots and cached modular terms while preserving every original
+per-coordinate work reservation and poll. The 64 KiB reserve is included in
+aggregate ownership. The cache is discarded on merge exit and rebuilt after
+resume; the enabled setting pins execution identity. The default is false.
+
 `private_stop=True` requires process packet leases and gives each worker its
 own synchronized stop flag. The parent sets or clears every flag, while each
 worker retains the same 64-action polling cadence and exact budget checks.

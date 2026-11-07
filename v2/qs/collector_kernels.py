@@ -16,6 +16,7 @@ KERNELS = (
     "scan_fused",
     "parity_two",
     "packed_queue",
+    "wide_hits",
 )
 SCAN_CHUNK = 64
 

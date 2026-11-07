@@ -3,10 +3,11 @@
 import unittest
 from collections import Counter
 from dataclasses import replace
+from unittest.mock import patch
 
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base
-from v2.qs.hit_words import WORD_MASK, WordHits
+from v2.qs.hit_words import MAX_EXTENDED_HIT_BYTES, WORD_MASK, WordHits
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.tests.test_qs import unlimited_budget
@@ -96,6 +97,34 @@ def make_worker(width=64, kernels=(), sparse=0):
 
 
 class HitCollectorTests(unittest.TestCase):
+    def test_wider_opt_in_cache_uses_funded_words_with_exact_fallback_masks(
+        self,
+    ):
+        # A low test-only legacy ceiling exercises the real selection boundary
+        # without allocating a large reference matrix in a small oracle.
+        with patch("v2.qs.sieve_collector.MAX_HIT_BYTES", 1):
+            reference = make_worker(64, sparse=2**20)
+            wider = make_worker(64, kernels=("wide_hits",), sparse=2**20)
+        self.assertIsNone(reference._word_hits)
+        self.assertIsNotNone(wider._word_hits)
+        reference._set_plan_interval(-79, 82)
+        wider._set_plan_interval(-79, 82)
+        left, right = Counter(), Counter()
+        self.assertEqual(
+            reference._sieve(-79, -15, left), wider._sieve(-79, -15, right)
+        )
+        self.assertEqual(reference._scores, wider._scores)
+        self.assertEqual(reference._hits[:], wider._hits[:])
+        self.assertEqual(left, right)
+        self.assertLessEqual(wider._workspace, wider.config.memory_limit)
+        with self.assertRaises(ValueError):
+            WordHits(
+                61,
+                [0] * 7,
+                unlimited_budget(),
+                byte_limit=MAX_EXTENDED_HIT_BYTES + 1,
+            )
+
     def test_every_mask_and_score_matches_list_and_modular_enumeration(self):
         for width in (17, 64):
             for kernels in (

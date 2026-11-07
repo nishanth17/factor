@@ -10,7 +10,7 @@ from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
-from .hit_words import MAX_HIT_BYTES, WordHits
+from .hit_words import MAX_EXTENDED_HIT_BYTES, MAX_HIT_BYTES, WordHits
 from .polynomial import (
     MAX_COEFFICIENT_BITS,
     MAX_POSITION_BITS,
@@ -666,19 +666,26 @@ class SieveCollector:
         self._word_hits = None
         hit_bytes = WordHits.reservation(count, width)
         hit_work = WordHits.construction_work(count, width)
+        hit_limit = (
+            MAX_EXTENDED_HIT_BYTES
+            if "wide_hits" in self.config._kernels
+            else MAX_HIT_BYTES
+        )
         if (
             count > 60
             and self.config.score_backend == "list"
             and self.config.division == "bucket"
             and self.config.score_policy in ("powers", "fixed")
-            and hit_bytes <= MAX_HIT_BYTES
+            and hit_bytes <= hit_limit
             and self._workspace + hit_bytes + switch_bytes
             <= self.config.memory_limit
             and hit_work <= self.budget.work_limit - self.budget.used
         ):
             # Existing helpers keep priority. Construction and lazy reads
             # have explicit extra work; scarce memory keeps the list path.
-            self._word_hits = WordHits(count, self._hits, self.budget)
+            self._word_hits = WordHits(
+                count, self._hits, self.budget, byte_limit=hit_limit
+            )
             self._hits = self._word_hits
             self._workspace += hit_bytes
             self._reuse_workspace += hit_bytes
