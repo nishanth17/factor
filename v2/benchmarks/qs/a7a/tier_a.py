@@ -16,6 +16,8 @@ class TierA:
         self.costs = defaultdict(lambda: [0, 0.0, 0.0])
         self.jobs = {}
         self.transport_bytes = 0
+        self.owner = None
+        self.phase = "setup"
         self.started_cpu = time.process_time()
 
     def patch(self, cls, name, category):
@@ -23,6 +25,8 @@ class TierA:
 
         @wraps(original)
         def timed(owner, *args, **kwargs):
+            previous = self.phase
+            self.phase = category
             key = category
             if name == "_timed":
                 key += "." + args[0]
@@ -34,6 +38,7 @@ class TierA:
                 row[0] += 1
                 row[1] += time.perf_counter() - wall
                 row[2] += time.process_time() - cpu
+                self.phase = previous
 
         self.patches.append((cls, name, original))
         setattr(cls, name, timed)
@@ -57,6 +62,14 @@ class TierA:
         ):
             self.patch(cls, name, category)
 
+        original_serial_run = SIQSJob.run
+
+        def serial_run(owner, *args, **kwargs):
+            self.owner = owner
+            return original_serial_run(owner, *args, **kwargs)
+
+        self.patches.append((SIQSJob, "run", original_serial_run))
+        SIQSJob.run = serial_run
         original_receive = CurrentParallelSIQSJob._receive
         original_run = CurrentParallelSIQSJob.run
 
@@ -65,6 +78,7 @@ class TierA:
             return original_receive(owner, report, *args, **kwargs)
 
         def run(owner, *args, **kwargs):
+            self.owner = owner
             try:
                 return original_run(owner, *args, **kwargs)
             finally:
@@ -85,6 +99,35 @@ class TierA:
                 )
             )
             setattr(CurrentParallelSIQSJob, name, wrapper)
+
+    def snapshot(self):
+        """Read counts only; never copy relation graphs or arbitrary locals."""
+        row = dict(
+            stage=self.phase,
+            parent_stages={k: list(v) for k, v in self.costs.copy().items()},
+        )
+        owner = self.owner
+        engine = None if owner is None else owner.engine
+        if owner is not None:
+            row["job"] = getattr(owner, "identity", str(owner.n))
+            row["stats"] = dict(owner.stats)
+        if engine is not None:
+            collector = engine.collector
+            usable = len(collector._rows)
+            target_state = engine._useful_target
+            target = (
+                None
+                if target_state is None
+                else target_state.target(engine.row_excess)
+            )
+            row.update(
+                usable_relations=usable,
+                target=target,
+                target_fraction=None if not target else usable / target,
+                accepted_relations=len(collector._full)
+                + len(collector._combined),
+            )
+        return row
 
     def report(self, seconds):
         return dict(

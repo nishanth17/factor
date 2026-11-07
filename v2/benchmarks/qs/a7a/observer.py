@@ -94,7 +94,10 @@ def validate_observation(result):
 class OwnedRSS:
     """Bounded outer samples; child HWM sums are never called aggregate RSS."""
 
-    def __init__(self, pool, *, limit, samples=16000):
+    def __init__(self, pool, *, limit, samples=16000, interval=0.5):
+        if not 0.1 <= interval <= 60:
+            raise ValueError("unadmitted RSS interval")
+        self.interval = interval
         self.pool, self.limit, self.maximum = pool, limit, samples
         self.rows, self.error, self.exceeded = [], None, False
         self.reader = DarwinRSS() if sys.platform == "darwin" else None
@@ -159,7 +162,7 @@ class OwnedRSS:
             except Exception as error:
                 self.error = str(error)
                 return
-            self.stop.wait(0.5)
+            self.stop.wait(self.interval)
 
     def __enter__(self):
         self.thread.start()

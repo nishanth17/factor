@@ -362,25 +362,54 @@ def execute(request):
     if workers is not None:
         from ....qs.parallel import CollectionPool
 
-    pool = (
-        None
-        if workers is None
-        else CollectionPool(workers.mode, workers.workers)
-    )
+    timeline_original = None
+    if spec.get("timeline_path") and workers is not None:
+        import os
+
+        from ....qs import parallel
+        from .worker_timeline import initialize_worker
+
+        Path(spec["timeline_path"]).mkdir(parents=True, exist_ok=False)
+        os.environ["FACTOR_A7A_TIMELINE_DIR"] = spec["timeline_path"]
+        timeline_original = parallel._initialize_process
+        parallel._initialize_process = initialize_worker
+    try:
+        pool = (
+            None
+            if workers is None
+            else CollectionPool(workers.mode, workers.workers)
+        )
+    finally:
+        if timeline_original is not None:
+            parallel._initialize_process = timeline_original
     observer = None
     if spec["observe"]:
         from .observer import OwnedRSS
 
-        observer = OwnedRSS(pool, limit=spec["memory"])
+        observer = OwnedRSS(
+            pool,
+            limit=spec["memory"],
+            interval=spec.get("rss_interval", 0.5),
+        )
         observer.__enter__()
         budget.cancelled = (
             lambda: observer.exceeded or observer.error is not None
         )
     from .tier_a import TierA
 
-    counters = TierA() if spec.get("tier_a", False) else None
+    counters = (
+        TierA()
+        if spec.get("tier_a", False) or spec.get("progress_path")
+        else None
+    )
     if counters is not None:
         counters.install()
+    progress = None
+    if spec.get("progress_path"):
+        from .progress import Progress
+
+        progress = Progress(spec["progress_path"], counters, observer)
+        progress.__enter__()
     samples, warm_seconds, warm_work = [], 0.0, 0
     try:
         if spec["lifetime"] == "warm":
@@ -443,6 +472,8 @@ def execute(request):
                 result["tier_a"] = counters.report(result["library_seconds"])
             samples.append(result)
     finally:
+        if progress is not None:
+            progress.__exit__()
         if observer is not None:
             observer.__exit__()
         if pool is not None:
@@ -459,6 +490,7 @@ def execute(request):
         warm_work=warm_work,
         warm_endpoint=spec["endpoint"],
         warmup_target=warm_target,
+        progress_error=None if progress is None else progress.error,
         work=budget.used,
         charged_cpu=budget.cpu_used,
         process_tree_cpu=own.ru_utime

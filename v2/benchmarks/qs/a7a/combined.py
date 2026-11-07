@@ -38,13 +38,15 @@ FEATURES = dict(
 
 
 def fixtures(kind="combined"):
-    if kind not in ("combined", "all", "regimes"):
+    if kind not in ("combined", "all", "regimes", "confirmation"):
         raise ValueError("unknown source-pinned input panel")
     data = json.loads((INPUTS / "combined_corpus.json").read_text())
     result = {r["id"]: r for r in data["fixtures"]}
     names = [] if kind == "combined" else ["corpus.json"]
-    if kind == "regimes":
+    if kind in ("regimes", "confirmation"):
         names.append("regime_corpus.json")
+    if kind == "confirmation":
+        names.append("confirmation_g4.json")
     for name in names:
         other = json.loads((INPUTS / name).read_text())
         for row in other["fixtures"]:
@@ -62,12 +64,14 @@ def corpus_identity(kind="combined"):
         return hashlib.sha256(
             (INPUTS / "combined_corpus.json").read_bytes()
         ).hexdigest()
-    if kind not in ("all", "regimes"):
+    if kind not in ("all", "regimes", "confirmation"):
         raise ValueError("unknown source-pinned input panel")
     digest = hashlib.sha256()
     names = ["combined_corpus.json", "corpus.json"]
-    if kind == "regimes":
+    if kind in ("regimes", "confirmation"):
         names.append("regime_corpus.json")
+    if kind == "confirmation":
+        names.append("confirmation_g4.json")
     for name in names:
         digest.update(name.encode() + b"\0")
         digest.update((INPUTS / name).read_bytes())
