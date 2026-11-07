@@ -148,6 +148,26 @@ class G1Tests(unittest.TestCase):
                 stage_driver.execute(plan, self.approve(plan), folder)
             self.assertEqual(run.call_count, 1)
 
+    def test_reference_honors_declared_checkpoint_allowance(self):
+        from dataclasses import asdict
+
+        from v2.benchmarks.qs.a7a.mainline_reference import (
+            reference_configuration,
+        )
+        from v2.qs.defaults import default_siqs_config
+
+        n = fixtures("regimes")["regime_calibration_60_0"]["n"]
+        original = default_siqs_config(n, memory_bytes=4 * 2**30)
+        self.assertEqual(original.checkpoint_bytes, 2**20)
+        declared = reference_configuration(
+            n, dict(qs_memory_bytes=4 * 2**30, checkpoint_bytes=64 * 2**20)
+        )
+        self.assertEqual(declared.checkpoint_bytes, 64 * 2**20)
+        before, after = asdict(original), asdict(declared)
+        before.pop("checkpoint_bytes")
+        after.pop("checkpoint_bytes")
+        self.assertEqual(before, after)
+
     def test_confirmation_proofs_and_disjointness(self):
         data = json.loads(confirmation.PATH.read_text())
         old = [r["n"] for r in fixtures("regimes").values() if r["n"] > 1]

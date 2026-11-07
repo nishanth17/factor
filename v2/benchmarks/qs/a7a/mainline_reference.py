@@ -10,21 +10,30 @@ import subprocess
 import sys
 import tempfile
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
+
+
+def reference_configuration(n, spec):
+    """Apply declared storage ownership without changing numerical policy."""
+    from v2.qs.defaults import default_siqs_config
+
+    config = default_siqs_config(n, memory_bytes=spec["qs_memory_bytes"])
+    if "checkpoint_bytes" in spec:
+        config = replace(config, checkpoint_bytes=spec["checkpoint_bytes"])
+    return config
 
 
 def child(request):
     """Import production only from the exported mainline beside this file."""
     from v2.execution.budget import Budget
     from v2.portfolio import PortfolioConfig, factorize_bounded
-    from v2.qs.defaults import default_siqs_config
 
     n, spec = request["n"], request["cell"]
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy 3.11 required")
     resource.setrlimit(resource.RLIMIT_CPU, (math.ceil(spec["cpu"]),) * 2)
-    config = default_siqs_config(n, memory_bytes=spec["qs_memory_bytes"])
+    config = reference_configuration(n, spec)
     options = PortfolioConfig(
         siqs=config,
         rho_attempts=0,
