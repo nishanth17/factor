@@ -192,11 +192,18 @@ does not establish a free increase in B1.
   feasibility, inconclusive cache/GC screens and an exploratory joint starting
   design are recorded in
   [results](benchmarks/RESULTS.md#a7a-current-mainline-feasibility-6-november-2026).
+  The separately identified continuation completes all 92 planned cells with
+  matched diagnostics, including opposite-order joint reruns, a third balanced
+  60-digit training input, packet refinements, full 62-digit feasibility and
+  fresh-process complete costs. C8/p16 remains the provisional 60-digit
+  incumbent; close six-/ten-worker alternatives are not globally rejected.
 - **Remaining:** resolve measurement drift with matched ordering and host
   pressure records and finish per-regime joint count/packet/feature selection.
-  The second joint block and a separate control series fail repeatability;
-  define transient/sustained machine conditions separately from PyPy warmup
-  before further selection. Preserve the complete drifting evidence.
+  The earlier failed gates remain historical. Subsequent controls show an
+  initial ramp and tighter later timings, while a serial arm can cool the host
+  before its closing control. Endpoint agreement alone does not bound middle
+  calls. Separate transient/sustained conditions from PyPy warmup and retain
+  the entire sequence; no confirmed all-regime routing table exists.
   Establish useful full-factor feasibility at 75/80 digits. The shared
   cofactor queue remains unimplemented; price it against measured recovery
   costs rather than assuming a gain. Freeze
@@ -205,7 +212,8 @@ does not establish a free increase in B1.
   speedup is established. Native QS kernels/threads remain B5a work;
   ECM-to-QS pool reuse retains its separate owner.
 - **Checkpoint:** `codex/a7a-regime-tuning`; committed QA `d9443d9` passes
-  1,539 tests (9 skips), lint and 285 benchmark imports. Joint design `d389c17`.
+  1,539 tests (9 skips), lint and 285 benchmark imports. Experimental source
+  `ae1cfd9` changes only documentation after that QA; joint design `d389c17`.
   Local entry: `v2/audit/a7a/HANDOFF.md` in the continuation worktree. The old
   `codex/a7a-current-qs-workers` evidence and protocols remain preserved.
   Historical checkpoints do not assert current process or lock ownership.

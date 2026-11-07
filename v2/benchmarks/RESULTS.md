@@ -1,5 +1,37 @@
 # Benchmark results and decisions
 
+## A7a completed rerun tranche (7 November 2026)
+
+Named source `ae1cfd9` completes all 92 planned cells in five separately
+identified protocols: 44 clean completions, two clean timeouts and 46 valid
+CPU/heap/RSS companions, covering 390 process CPU streams and 90 heap dumps.
+All prior failures, freezes and charges remain preserved. The new owners cost
+6,432.520 wall seconds, 41,621.052 CPU seconds and 5,022,838,440 capture bytes.
+Peak diagnostic summed RSS is 3.520 GiB, including possible shared-page counts.
+No arithmetic or worker source changed after the applicable committed QA.
+
+| Exposed balanced input / scope | Configuration | Clean seconds |
+| --- | --- | ---: |
+| 60 digits, third calibration modulus, warm library interval | C8/p16 | 33.253 / 35.141 |
+| Same input and numerical policy, warm library interval | Serial Y0 | 116.871 |
+| Same input, fresh-process complete actor | C8/p16 | 35.401 |
+| Same input and numerical policy, fresh-process complete actor | Serial Y0 | 115.463 |
+| 62 digits, first full-factor calibration screen, warm library interval | C8/p16 | 74.936 |
+| Same 62-digit input and policy | C8/p32, arrival admission, lookahead 4 | 102.472 |
+
+The opposite-order 60-digit joint rerun retains all ten candidates and frequent
+controls. Controls initially rise from 35.953 to 57.411 seconds, then cluster
+near 55–57 seconds. Six-/ten-worker alternatives remain near ties in some
+blocks; none establishes an improvement over the provisional C8/p16 incumbent.
+The third-input serial arm changes thermal state from fair to nominal, so its
+similar endpoint controls do not establish comparable intermediate conditions.
+Whole-family and 32-polynomial proposals reduce some coordination costs but
+do not establish a complete-factor gain. These are exploratory observations,
+not nine-sample independent confirmation, individual-flag rejection, a literal
+current-master comparison or an all-regime optimum. Confirmation inputs remain
+untouched; no defaults, merge or push occurred. Full configurations, complete
+cost tables, raw captures and release audits remain under local `v2/audit/a7a/`.
+
 ## A7a joint starting screen (7 November 2026)
 
 Source `768727d` tests eight joint configurations on one exposed certified

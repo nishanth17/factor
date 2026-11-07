@@ -83,6 +83,12 @@ frequent matched controls; a failed repeatability gate stops configuration
 selection under that protocol. Retain the entire series instead of correcting
 away drift or choosing a favorable subset retrospectively.
 
+Agreement between endpoint controls does not bound intermediate machine state.
+A serial arm can cool the host before a closing parallel control. Retain the
+per-call state and ordering, and distinguish initial and sustained conditions.
+Fresh-process complete actor costs include startup and teardown; they are
+separate from warmed library intervals and production-CLI selector overhead.
+
 Multi-sample cells retain the same repetition count in their diagnostic
 companion, so later warmed execution and GC behavior remain visible. The
 whole clean/diagnostic reservation must fit before either is issued.
