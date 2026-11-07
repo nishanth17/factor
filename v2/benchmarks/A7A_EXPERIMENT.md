@@ -443,7 +443,7 @@ confirmation is implied by any outcome. Report admission refusal as an outcome.
 | Field | 75 digits | 80 digits |
 | --- | ---: | ---: |
 | Input | `regime_calibration_75_0` | `regime_calibration_80_0` |
-| Collection workers / packet width | Frozen G3 cold 70-digit recipe, mapped below | 8 / 16 |
+| Collection workers / packet width | Frozen G3 cold 70-digit recipe, mapped to 75 | Frozen G3 cold 70-digit recipe, mapped to 80 |
 | Actor wall | 7,200 s | 21,600 s |
 | Owner wall, including observation and cleanup | 7,500 s | 22,500 s |
 | Actor / owner aggregate CPU | 72,000 / 75,000 s | 216,000 / 225,000 s |
@@ -465,15 +465,21 @@ If the mapped recipe is refused, report the refusal and stop; do not substitute
 another recipe. Record the exact resolved recipe and derivation in the G3
 report before any probe result; do not choose it from 75-digit outcomes.
 
-The 80-digit candidate is unchanged by this 75-digit mapping amendment:
-freeze it before its separately authorized outcome with seed 104729, Y0
-numerical policy, nursery 4 MiB; leases, persistent state, packed transport, worker verification,
-private semaphore stopping, coefficient reuse, lookahead 4, state cache 64 MiB,
-wire 4 MiB and batch atoms 2,048. CPU snapshot off, arrival off, whole-family
-off. Add `wide_hits` to the resolved collector marking, power plan 2 MiB,
-sparse queue 32 MiB. Do not silently retune base/report/product/residual limits
-or change to a later search winner. Record actual resolved settings/domain
-limitations and validate admission; refusal means report and stop.
+**80-digit candidate:** use the same derivation as the 75-digit probe:
+the frozen G3 cold 70-digit anchor recipe, mapped to the actual 80-digit
+family by the declared interpolation rule and valid integer packet levels.
+Inherit worker count, lookahead, admission order and capacity levels; keep the
+G2H implementation bundle and (a)/(b) choices unchanged. Use seed 104729 and
+Y0 resolved for 80 digits without retuning base/report/product/residual limits.
+Keep the 80-digit table allowances. Record the exact resolved recipe and its
+derivation before the call; if refused, report the refusal and stop without
+substituting another recipe.
+
+If the 75-digit receipt motivates a different 80-digit candidate, propose it
+in the 75-digit report for separate approval and freeze it before the 80-digit
+call. A proposal does not authorize a switch. Never choose or tune the
+candidate from 80-digit outcomes. The 75-digit report and separate instruction
+remain prerequisites for the single clean 80-digit call.
 
 ### Clean observation and useful timeout receipts
 
