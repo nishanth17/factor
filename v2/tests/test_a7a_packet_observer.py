@@ -12,12 +12,28 @@ from v2.benchmarks.qs.a7a.packet_observer import (
     PacketCounters,
     Recorder,
     initialize_worker,
+    reported_relation_mix,
     summarize_capture,
     validate_capture,
 )
 
 
 class PacketObserverTests(unittest.TestCase):
+    def test_reported_mix_preserves_shapes_without_claiming_validation(self):
+        rows = [
+            [0, 1, 1, [], 1, [], None, False],
+            [0, 2, 1, [], 7, [], None, False],
+            [0, 3, 1, [], 1, [7, 11], None, True],
+            [0, 4, 1, [], 1, [7, 11, 13], None, True],
+            [0, 5, 1, [], 1, [], 77, True],
+        ]
+        before = json.dumps(rows)
+        counts = reported_relation_mix(rows)
+        self.assertEqual(
+            counts, {"0": 1, "1": 1, "2": 1, "3": 1, "opaque": 1, "other": 0}
+        )
+        self.assertEqual(json.dumps(rows), before)
+
     def test_packet_cpu_summary_excludes_warmup_and_crossing_intervals(self):
         counters = dict(
             recovery=[2, 100000000, 60000000],
@@ -29,6 +45,13 @@ class PacketObserverTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "123.jsonl"
             packets = [dict(kind="ready", role="worker")]
+            packets.append(
+                dict(
+                    kind="relations",
+                    at=12,
+                    reported_mix={"0": 2, "opaque": 5},
+                )
+            )
             for start, wall in ((1, 1), (10, 1), (19, 2), (21, 1)):
                 packets.append(
                     dict(
@@ -43,6 +66,10 @@ class PacketObserverTests(unittest.TestCase):
             result = summarize_capture(temporary, [(10, 20), (20, 30)])
 
         self.assertEqual(result["outside_measurement_packets"], 2)
+        self.assertEqual(result["samples"][0]["reported_relation_mix"]["0"], 2)
+        self.assertEqual(
+            result["samples"][0]["reported_relation_mix"]["opaque"], 5
+        )
         for row in result["samples"]:
             self.assertEqual(row["packets"], 1)
             self.assertEqual(row["packet_cpu"], 0.1)

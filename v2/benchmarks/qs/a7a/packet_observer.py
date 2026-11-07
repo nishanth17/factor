@@ -111,7 +111,7 @@ class Recorder:
         self.size += len(row)
 
 
-def install_worker(state):
+def install_worker(state, *, stop_samples=True):
     global _observer
     from ....qs import cofactor_policy, worker_packet, yield_collector
 
@@ -128,13 +128,14 @@ def install_worker(state):
     yield_collector.divide_yield_residual = counters.wrap(
         "recovery", yield_collector.divide_yield_residual
     )
-    stop = state["stop"]
-    if hasattr(stop, "worker_event"):
-        from ....qs.parallel import _PROCESS_STATE
+    if stop_samples:
+        stop = state["stop"]
+        if hasattr(stop, "worker_event"):
+            from ....qs.parallel import _PROCESS_STATE
 
-        stop = stop.worker_event(_PROCESS_STATE[1])
-    original_stop = stop.is_set
-    stop.is_set = lambda: counters.stop_poll(original_stop)
+            stop = stop.worker_event(_PROCESS_STATE[1])
+        original_stop = stop.is_set
+        stop.is_set = lambda: counters.stop_poll(original_stop)
     original_packet = worker_packet.collect_packet
 
     def packet(task, **kwargs):
@@ -155,7 +156,7 @@ def install_worker(state):
                 cpu=time.process_time() - cpu,
                 reason=None if report is None else report["reason"],
                 report_cpu=None if report is None else report["cpu_seconds"],
-                counters=counters.finish(),
+                counters=dict(counters.finish(), poll_enabled=stop_samples),
             )
 
     worker_packet.collect_packet = packet
@@ -190,11 +191,37 @@ def validate_capture(folder, workers):
         raise RuntimeError("packet recorder lacks all owned workers")
 
 
+def reported_relation_mix(rows):
+    """Count reported residual shapes without retaining or trusting atoms."""
+    counts = dict.fromkeys(("0", "1", "2", "3", "opaque", "other"), 0)
+    for row in rows:
+        if row[6] is not None:
+            key = "opaque"
+        else:
+            arity = len(row[5]) + (row[4] != 1)
+            key = str(arity) if 0 <= arity <= 3 else "other"
+        counts[key] += 1
+    return counts
+
+
 def install_parent():
     """Observe publication in a fresh diagnostic process only."""
     from ....qs.current_parallel import CurrentParallelSIQSJob
 
     recorder = Recorder("parent")
+    validate = CurrentParallelSIQSJob._validate_report
+
+    def observed_validate(owner, report, task):
+        checked, work = validate(owner, report, task)
+        recorder.write(
+            "relations",
+            job=owner.identity,
+            index=task["id"],
+            reported_mix=reported_relation_mix(checked["rows"]),
+        )
+        return checked, work
+
+    CurrentParallelSIQSJob._validate_report = observed_validate
     for name in ("_receive", "_merge"):
         original = getattr(CurrentParallelSIQSJob, name)
 
@@ -234,18 +261,23 @@ def summarize_capture(folder, intervals):
             poll_calls=0,
             poll_samples=0,
             poll_sample_cpu=0.0,
+            poll_timed_packets=0,
+            reported_relation_mix=dict.fromkeys(
+                ("0", "1", "2", "3", "opaque", "other"), 0
+            ),
         )
         for _ in intervals
     ]
-    outside = 0
+    outside = outside_reports = 0
     for path in sorted(Path(folder).glob("*.jsonl")):
         with path.open() as stream:
             for line in stream:
                 packet = json.loads(line)
-                if packet["kind"] != "packet":
+                kind = packet["kind"]
+                if kind not in ("packet", "relations"):
                     continue
-                first = packet["start"]
-                last = first + packet["wall"]
+                first = packet["start"] if kind == "packet" else packet["at"]
+                last = first + packet["wall"] if kind == "packet" else first
                 index = next(
                     (
                         i
@@ -255,7 +287,14 @@ def summarize_capture(folder, intervals):
                     None,
                 )
                 if index is None:
-                    outside += 1
+                    if kind == "packet":
+                        outside += 1
+                    else:
+                        outside_reports += 1
+                    continue
+                if kind == "relations":
+                    for key, count in packet["reported_mix"].items():
+                        samples[index]["reported_relation_mix"][key] += count
                     continue
                 row, counters = samples[index], packet["counters"]
                 row["packets"] += 1
@@ -266,7 +305,12 @@ def summarize_capture(folder, intervals):
                 row["poll_calls"] += counters["poll_calls"]
                 row["poll_samples"] += counters["poll_samples"]
                 row["poll_sample_cpu"] += counters["poll_cpu_ns"] / 10**9
-    return dict(samples=samples, outside_measurement_packets=outside)
+                row["poll_timed_packets"] += counters.get("poll_enabled", True)
+    return dict(
+        samples=samples,
+        outside_measurement_packets=outside,
+        outside_measurement_relation_reports=outside_reports,
+    )
 
 
 def main():

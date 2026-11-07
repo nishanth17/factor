@@ -38,13 +38,16 @@ class DiagnosticTests(unittest.TestCase):
                 ),
                 patch(
                     "v2.benchmarks.qs.a7a.packet_observer.install_worker",
-                    side_effect=lambda state: calls.append("counters"),
+                    side_effect=lambda state, **kwargs: calls.append(
+                        ("counters", kwargs)
+                    ),
                 ),
             ):
                 initialize_worker({})
             self.assertEqual(
                 calls,
-                ["base", "cpu_heap"] + (["counters"] if enabled else []),
+                ["base", "cpu_heap"]
+                + ([("counters", {"stop_samples": False})] if enabled else []),
             )
 
     def test_collector_snapshot_exposes_actual_numerical_and_memory_domain(

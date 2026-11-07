@@ -65,9 +65,13 @@ Targeted diagnostic cells can add `packet_counters=true` to combine the
 existing bounded recovery/split counters with CPU/heap/RSS capture. Clean
 companions retain the configuration label without installing these timers.
 Sample intervals exclude warmup from the counter summary; unmatched packets
-remain counted separately. Recovery contains splitting, and polling timings
-cover only sampled calls. These instrumented spans include GC and diagnostic
+remain counted separately. Recovery contains splitting. The combined profile
+leaves stop callbacks unchanged; standalone packet diagnostics can still time
+sampled stop calls. These instrumented spans include GC and diagnostic
 interruptions. Calibrate their overhead on identical work before a long use.
+The parent also counts reported residual shapes after schema decoding.
+These counts describe incoming records; checked parent admission still
+validates their arithmetic and determines actual retention and useful rows.
 
 Warm complete-factor cells warm the same bounded factoring entry point with
 a short partial allowance. They do not prime a bare-prefix pool under a

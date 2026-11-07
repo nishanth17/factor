@@ -342,7 +342,9 @@ def initialize_worker(state):
     if os.environ.get("FACTOR_A7A_PACKET_DIR"):
         from .packet_observer import install_worker
 
-        install_worker(state)
+        # The stop-check issue already has a separate sampled diagnostic.
+        # Target recovery without adding a callback to every hot stop poll.
+        install_worker(state, stop_samples=False)
 
 
 def main():
