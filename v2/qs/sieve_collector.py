@@ -17,7 +17,11 @@ from .polynomial import (
     checked_position,
     polynomial_roots,
 )
-from .power_reuse import MAX_TRANSFER_BYTES, RootTransfers
+from .power_reuse import (
+    MAX_EXTENDED_TRANSFER_BYTES,
+    MAX_TRANSFER_BYTES,
+    RootTransfers,
+)
 from .power_sieve import HenselInverses, prime_power_roots
 from .relations import (
     AtomicRelation,
@@ -663,7 +667,18 @@ class SieveCollector:
                 self._workspace += reserved
                 self._reuse_workspace += reserved
         self._power_transfers = None
-        transfer_bytes = min(MAX_TRANSFER_BYTES, 65536 + 4096 * count)
+        wide_transfers = "wide_transfers" in self.config._kernels
+        transfer_limit = (
+            MAX_EXTENDED_TRANSFER_BYTES
+            if wide_transfers
+            else MAX_TRANSFER_BYTES
+        )
+        # Multiple powers of one prime own separate cached pairs. A larger
+        # experiment therefore funds more than one entry per base member;
+        # the default capacity and refusal behavior remain unchanged.
+        transfer_bytes = min(
+            transfer_limit, 65536 + (8192 if wide_transfers else 4096) * count
+        )
         switch_bytes = 512 * count + 32768
         if (
             self.config.score_policy in ("powers", "fixed")
@@ -674,7 +689,9 @@ class SieveCollector:
             # funded; an optional cache must not prevent the next switch.
             self._workspace += transfer_bytes
             self._reuse_workspace += transfer_bytes
-            self._power_transfers = RootTransfers(transfer_bytes)
+            self._power_transfers = RootTransfers(
+                transfer_bytes, capacity_limit=transfer_limit
+            )
             self._power_transfers.bind(polynomial)
         self._word_hits = None
         hit_bytes = WordHits.reservation(count, width)

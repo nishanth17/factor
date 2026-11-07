@@ -186,6 +186,7 @@ def ablations(selected, marking):
         "packed_queue",
         "wide_hits",
         "wide_inverses",
+        "wide_transfers",
     ):
         altered = [p for p in pieces if p != piece]
         if piece not in pieces:

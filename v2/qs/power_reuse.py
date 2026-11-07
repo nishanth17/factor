@@ -5,6 +5,7 @@ from ..common.arithmetic import pow
 from .polynomial import Polynomial
 
 MAX_TRANSFER_BYTES = 32 * 2**20
+MAX_EXTENDED_TRANSFER_BYTES = 128 * 2**20
 
 
 class RootTransfers:
@@ -15,10 +16,13 @@ class RootTransfers:
     Characteristic two and exceptional/singular primes keep ordinary lifting.
     """
 
-    def __init__(self, byte_limit):
+    def __init__(self, byte_limit, *, capacity_limit=MAX_TRANSFER_BYTES):
         utils.require_integer(byte_limit, "root transfer bytes", 0)
-        if byte_limit > MAX_TRANSFER_BYTES:
-            raise ValueError("root transfer bytes exceed the 32 MiB ceiling")
+        utils.require_integer(capacity_limit, "root transfer capacity", 0)
+        if capacity_limit > MAX_EXTENDED_TRANSFER_BYTES:
+            raise ValueError("root transfer capacity exceeds 128 MiB")
+        if byte_limit > capacity_limit:
+            raise ValueError("root transfer bytes exceed the capacity ceiling")
         self.byte_limit = max(0, byte_limit - 65536)
         self.used = 0
         self.builds = self.replays = self.extra_work = 0

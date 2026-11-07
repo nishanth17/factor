@@ -256,6 +256,9 @@ def _logical_owners(frame):
                     )
                     transfers = state.get("_power_transfers")
                     if transfers is not None:
+                        derived["root_transfer_capacity"] = (
+                            transfers.byte_limit
+                        )
                         derived["root_transfer_entries"] = len(
                             transfers.values
                         )

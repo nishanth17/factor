@@ -124,7 +124,8 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused`, `parity_two`, `packed_queue`, `wide_hits` and `wide_inverses`
+`scan_fused`, `parity_two`, `packed_queue`, `wide_hits`, `wide_inverses`
+and `wide_transfers`
 in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
@@ -159,6 +160,12 @@ inverse scratch instead of 8 MiB. It uses the existing exact fixed-target
 opposite-derivative cache, with independent inversion for unexpected values.
 The full reservation and subsequent polynomial-switch coexistence must fit
 the collector grant. No automatic default changes.
+
+`wide_transfers` follows `wide_inverses` and permits up to 128 MiB of
+within-family prime-power root pairs instead of 32 MiB, with a larger
+per-base-member allowance for distinct powers. The complete scratch and next
+polynomial switch must fit; otherwise ordinary exact lifting remains. The
+cache retains complete nonsingular pairs and is rebuilt after resume.
 
 This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain

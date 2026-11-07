@@ -18,6 +18,7 @@ KERNELS = (
     "packed_queue",
     "wide_hits",
     "wide_inverses",
+    "wide_transfers",
 )
 SCAN_CHUNK = 64
 

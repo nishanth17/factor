@@ -255,6 +255,13 @@ checked cache reuses inverses across polynomials and A values. Its complete
 reservation and the next polynomial switch must fit the collector grant;
 scarce memory retains independent exact inversion. No default changes.
 
+The opt-in `wide_transfers` marking component permits up to 128 MiB of
+within-family prime-power root transfers instead of 32 MiB. It funds multiple
+power levels per base prime inside the collector grant, leaving the next
+polynomial switch funded. Insufficient memory keeps exact ordinary lifting.
+Cached pairs remain derived state and are rebuilt after resume. This follows
+`wide_inverses` in component order and changes no automatic selection.
+
 `private_stop=True` requires process packet leases and gives each worker its
 own synchronized stop flag. The parent sets or clears every flag, while each
 worker retains the same 64-action polling cadence and exact budget checks.
