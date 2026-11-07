@@ -42,6 +42,10 @@ per-relation worker timing/backlog counters. Omitted `worker_observe` preserves
 historical behavior. Measure this observation cost before using the lighter
 setting in clean comparisons; do not relabel historical observations. Worker
 timeline capture composes with requested CPU/heap and recovery observers.
+Short process screens may declare `features.assignment_cpu` to fund every
+in-flight packet without assigning tiny residual CPU leases to lookahead
+work. Hold it fixed across compared recipes and keep the aggregate CPU grant
+unchanged. A local CPU-lease stop is not aggregate CPU exhaustion.
 
 The following runners remain available for historical protocol reproduction;
 their design sizes and per-candidate capture rule are not the current campaign.

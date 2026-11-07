@@ -21,6 +21,7 @@ class ObservationControlTests(unittest.TestCase):
                 samples=1,
                 tasks=1,
                 tier_a=False,
+                features={"assignment_cpu": 5},
             )
             if explicit:
                 spec["worker_observe"] = False
@@ -50,5 +51,6 @@ class ObservationControlTests(unittest.TestCase):
                 result["worker_configuration"]["observe"], not explicit
             )
             self.assertEqual(collect.call_args.args[2].observe, not explicit)
+            self.assertEqual(collect.call_args.args[2].assignment_cpu, 5)
             rss.assert_called_once()
             observer.__exit__.assert_called_once()

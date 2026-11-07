@@ -73,6 +73,7 @@ def settings(
         "coefficient_cache",
         "worker_memory_bytes",
         "packet_bytes",
+        "assignment_cpu",
     }
     if features.keys() - allowed:
         raise ValueError("unknown experimental worker features")
