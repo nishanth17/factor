@@ -20,6 +20,7 @@ def review(capture, result, *, source, input_id):
     started, cpu = time.monotonic(), time.process_time()
     processes = []
     aggregate = {"parent": Counter(), "worker": Counter()}
+    callers = {"parent": Counter(), "worker": Counter()}
     for folder in sorted(Path(capture).iterdir()):
         if not folder.is_dir() or not (folder / "events.json").exists():
             continue
@@ -34,6 +35,9 @@ def review(capture, result, *, source, input_id):
                     stats.adr_dict[a] for a in trace if a in stats.adr_dict
                 ]
                 segment[names[-1] if names else "unresolved"] += weight
+                if len(names) >= 2:
+                    edge = names[-1], names[-2]
+                    callers[ready["role"]][edge] += weight
             leaves.update(segment)
             samples += stats.n_samples
             segments.append(
@@ -69,6 +73,9 @@ def review(capture, result, *, source, input_id):
             key: counter.most_common(30) for key, counter in aggregate.items()
         },
         owned_rss_sample_max=max((row["bytes"] for row in rss), default=None),
+        callers_by_role={
+            key: counter.most_common(30) for key, counter in callers.items()
+        },
         rss_samples=len(rss),
         observer_failure=result.get("observer_failure"),
         wall=time.monotonic() - started,
