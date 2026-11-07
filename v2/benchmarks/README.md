@@ -42,6 +42,11 @@ rejected candidates.
 Multi-sample cells retain the same repetition count in their diagnostic
 companion, so later warmed execution and GC behavior remain visible. The
 whole clean/diagnostic reservation must fit before either is issued.
+Capture accounting tolerates disappearing temporary metadata names during
+atomic replacement; missing immutable capture files still fail validation.
+If a launched call aborts before worker CPU can be fully observed, the
+unknown portion of its CPU grant remains charged separately from measured
+CPU. Failed receipts retain detailed errors and traceback provenance.
 
 Warm complete-factor cells warm the same bounded factoring entry point with
 a short partial allowance. They do not prime a bare-prefix pool under a

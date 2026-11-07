@@ -1,5 +1,6 @@
 """Amended stage membership, ordering and finite confirmation allowances."""
 
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -8,8 +9,10 @@ from unittest.mock import patch
 
 from v2.benchmarks.qs.a7a.combined import (
     _capture,
+    _charged_cpu,
     corpus_identity,
     fixtures,
+    storage_bytes,
 )
 from v2.benchmarks.qs.a7a.combined_plans import (
     LIMITS,
@@ -20,6 +23,28 @@ from v2.benchmarks.qs.a7a.combined_plans import (
 
 
 class CombinedPlanTests(unittest.TestCase):
+    def test_atomic_metadata_rename_does_not_abort_capture_accounting(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            capture = folder / "live.heap"
+            capture.write_bytes(b"heap")
+            retired = folder / "events.tmp"
+            with patch.object(Path, "rglob", return_value=(capture, retired)):
+                self.assertEqual(storage_bytes(folder), 4)
+            missing = folder / "cpu.vmprof"
+            with patch.object(Path, "rglob", return_value=(capture, missing)):
+                with self.assertRaises(FileNotFoundError):
+                    storage_bytes(folder)
+
+    def test_aborted_workers_keep_unknown_cpu_reserved_separately(self):
+        failed = dict(status="failed", cpu=9.5)
+        self.assertEqual(_charged_cpu(failed, 3000, launched=True), 3000)
+        self.assertEqual(_charged_cpu(failed, 3000, launched=False), 9.5)
+        reported = dict(status="reported", cpu=9.5)
+        self.assertEqual(_charged_cpu(reported, 3000, launched=True), 9.5)
+        failed["cpu"] = 3001
+        self.assertEqual(_charged_cpu(failed, 3000, launched=True), 3001)
+
     def test_broad_panel_preserves_old_identity_and_binds_both_sources(self):
         import hashlib
 

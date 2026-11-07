@@ -7,11 +7,13 @@ import json
 import os
 import resource
 import signal
+import stat
 import statistics
 import subprocess
 import sys
 import tempfile
 import time
+import traceback
 from pathlib import Path
 
 from .diagnostics import _events
@@ -82,7 +84,30 @@ def cell(arm, fixture="exposed_60_0", **changes):
 
 
 def storage_bytes(folder):
-    return sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
+    """Count captures while atomic metadata replacements may be in flight."""
+    size = 0
+    for path in folder.rglob("*"):
+        try:
+            details = path.stat()
+        except FileNotFoundError:
+            if path.suffix == ".tmp":
+                # events.tmp is renamed over events.json atomically. Losing
+                # this transient name is expected, not lost capture evidence.
+                continue
+            raise
+        if stat.S_ISREG(details.st_mode):
+            size += details.st_size
+    return size
+
+
+def _charged_cpu(receipt, reservation, *, launched):
+    """Retain a failed launch's CPU grant when child usage may be missing."""
+    observed = receipt["cpu"]
+    if launched and receipt["status"] == "failed":
+        # Killing a parent before it reaps workers can omit orphan CPU from
+        # RUSAGE_CHILDREN. Keep the unknown portion funded, not measured.
+        return max(observed, reservation)
+    return observed
 
 
 def _capture(process, capture, elapsed, window, state, *, live_heaps=True):
@@ -197,17 +222,23 @@ def run(plan_path, output):
     profiles = Path(plan["profile_folder"])
     profiles.mkdir(parents=True, exist_ok=False)
     sealed_capture_bytes = 0
+    unobserved_cpu_reserve = 0.0
 
     def save():
         children = resource.getrusage(resource.RUSAGE_CHILDREN)
-        ledger.update(
-            wall=time.monotonic() - started,
-            cpu=time.process_time()
+        observed_cpu = (
+            time.process_time()
             - cpu_start
             + children.ru_utime
             + children.ru_stime
             - child_start.ru_utime
-            - child_start.ru_stime,
+            - child_start.ru_stime
+        )
+        ledger.update(
+            wall=time.monotonic() - started,
+            observed_cpu=observed_cpu,
+            cpu=observed_cpu + unobserved_cpu_reserve,
+            unobserved_cpu_reserve=unobserved_cpu_reserve,
         )
         ledger["cumulative_wall"] = prior_wall + ledger["wall"]
         ledger["cumulative_cpu"] = prior_cpu + ledger["cpu"]
@@ -564,7 +595,13 @@ def run(plan_path, output):
                     except subprocess.TimeoutExpired:
                         os.killpg(process.pid, signal.SIGKILL)
                         process.wait(timeout=2)
-                receipt.update(status="failed", error=repr(error))
+                receipt.update(
+                    status="failed",
+                    error=repr(error),
+                    error_detail=str(error),
+                    error_file=getattr(error, "filename", None),
+                    error_traceback=traceback.format_exc(),
+                )
                 ledger["stopped"] = (
                     "Harness/validation failure: reassess before new issuance"
                 )
@@ -578,6 +615,13 @@ def run(plan_path, output):
                     - before.ru_stime,
                     thermal_end=thermal_status(),
                 )
+                receipt["cpu_charged"] = _charged_cpu(
+                    receipt, spec["cpu"], launched=process is not None
+                )
+                receipt["unobserved_cpu_reserve"] = (
+                    receipt["cpu_charged"] - receipt["cpu"]
+                )
+                unobserved_cpu_reserve += receipt["unobserved_cpu_reserve"]
                 # Finished capture folders are immutable. Revisit only the
                 # current folder while recording, avoiding an ever-growing
                 # directory scan in every100ms observation tick.
