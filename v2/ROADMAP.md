@@ -175,6 +175,12 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **G2 early stop:** coverage paused at a reference checkpoint-grant mismatch.
+  The adapter repair passes committed-only QA on `70ef473`; retain completed
+  data and failures. G2 continuation requires revised approval; tuning,
+  confirmation, probes and adoption remain pending. Local report:
+  `v2/audit/a7a/g2-reference-repair-20261107/REPORT.md`.
+
 - **G1 preparation gate (7 November):** bounded stage driver, certified fresh
   confirmation corpus, literal-mainline adapter and optional timeline/progress
   observers validated on `62854f9`. Committed-only QA passes 1,546 tests

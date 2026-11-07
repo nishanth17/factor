@@ -3,6 +3,13 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## QS reference allowance correction (7 November 2026)
+
+- Apply the explicitly declared checkpoint allowance in the experimental
+  mainline reference adapter, preserving its numerical policy. Retain thermal
+  readings outside actor timing. G2 stopped before continuation; no production
+  factoring defaults change.
+
 ## Experimental QS campaign preparation (7 November 2026)
 
 - Add bounded, explicitly gated stage proposals, checked coverage and durable

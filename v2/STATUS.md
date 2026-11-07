@@ -104,6 +104,17 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## A7a G2 early stop — 7 November 2026
+
+The approved coverage run stopped on a reference checkpoint error at 60 digits.
+The adapter had retained a 1 MiB default instead of the declared 64 MiB grant.
+The corrected adapter also retains reference thermal context; committed-only
+QA on `70ef473` passes 1,547 tests (9 optional skips), lint and 291 imports.
+Completed receipts and the failed call remain local. G2 is incomplete and no
+winner/default change is adopted. A corrected continuation awaits revised
+approval under the experiment's stop rule. Local report:
+`v2/audit/a7a/g2-reference-repair-20261107/REPORT.md`.
+
 ## A7a preparation gate — 7 November 2026
 
 G1 passes on isolated source `62854f9`: 1,546 committed-only tests (9 optional
