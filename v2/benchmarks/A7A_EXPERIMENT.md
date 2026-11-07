@@ -28,8 +28,11 @@ estimates before approval.
 The earlier 48-hour proposal is withdrawn; no stage may assume that allowance.
 
 75/80 are separate single-candidate feasibility gates, never ordinary search
-or confirmation rows. The 80-digit gate requires the 75-digit report and a
-subsequent instruction; neither probe starts automatically.
+or confirmation rows. The 75-digit probe runs only after G3, with the G2H
+fixes and frozen G3 recipes, and explicit approval at or after the G3 report.
+It may run before or after G4; G4 does not depend on it. The 80-digit gate
+requires the 75-digit report and a separate instruction. Neither probe starts
+automatically.
 
 Continue in `/Users/nishanthmohan/Documents/code/factor-a7a-regime-tuning`,
 branch `codex/a7a-regime-tuning`. The implementation checkpoint is `276ebd8`,
@@ -135,7 +138,8 @@ Required before coverage:
    shared lock. Documents alone do not require another factoring run.
 
 G1 reports ready/missing items and tests, commits the bounded implementation,
-and stops. Neither the ordinary campaign nor the probes start at G1 by default.
+and stops. No successor starts automatically. The 75-digit probe additionally
+requires completion of G3 and explicit approval at or after its report.
 
 ## G2: complete coverage before deep tuning
 
@@ -354,7 +358,15 @@ bounded new anchor; do not quietly optimize every intermediate row. Label
 unmeasured boundaries and do not adopt a routing table before their checks.
 
 At G3 freeze every recipe, reference commit, interpolation label, analysis,
-confirmation cost tier and complete priced schedule; report and stop.
+confirmation cost tier and complete priced schedule. Include the exact resolved
+75-digit probe recipe and its derivation before any probe result: the source/
+identity of the cold 70-digit anchor, inherited worker count, lookahead,
+admission order and capacity levels, fixed G2H implementation/(a)/(b) choices,
+source packet fraction, actual 75-digit family and mapped valid integer packet
+width, resolved Y0 numerical settings and admission under the probe allowances.
+Configuration resolution does not authorize a factoring call. Report and stop;
+the 75-digit call needs explicit approval at or after this report. G4 can
+proceed independently under its own approval, before or after that probe.
 
 ## G4: independent confirmation against literal mainline
 
@@ -420,15 +432,18 @@ permission to merge/change defaults.
 ## Separate 75/80 feasibility probes: one candidate, then stop
 
 75 has a **two-hour actor budget**; 80 has **three times that, six hours**.
-After the 75 receipt, stop and notify. An 80 probe needs a subsequent explicit
-instruction. Exactly one candidate, one input, one cold call per approved
-probe. No second seed, companion, repetition, configuration, larger grant or
+Run 75 **only after G3**, once the G2H fixes and frozen G3 recipes exist, and
+only with explicit approval at or after the G3 report. It may run before or
+after G4; **G4 does not depend on the probe**. After the 75 receipt, stop and
+notify. The 80-digit probe still needs that report and a separate instruction.
+Exactly one candidate, one input, one clean cold call per approved probe.
+No second seed, companion, repetition, configuration, larger grant or
 confirmation is implied by any outcome. Report admission refusal as an outcome.
 
 | Field | 75 digits | 80 digits |
 | --- | ---: | ---: |
 | Input | `regime_calibration_75_0` | `regime_calibration_80_0` |
-| Collection workers / packet width | 8 / 16 | 8 / 16 |
+| Collection workers / packet width | Frozen G3 cold 70-digit recipe, mapped below | 8 / 16 |
 | Actor wall | 7,200 s | 21,600 s |
 | Owner wall, including observation and cleanup | 7,500 s | 22,500 s |
 | Actor / owner aggregate CPU | 72,000 / 75,000 s | 216,000 / 225,000 s |
@@ -437,8 +452,22 @@ confirmation is implied by any outcome. Report admission refusal as an outcome.
 | Parent QS / checkpoint | 4 GiB / 256 MiB | 4 GiB / 256 MiB |
 | Logical work ceiling | 96,000,000,000,000 | 96,000,000,000,000 |
 
-Freeze the candidate before its outcome: seed 104729, Y0 numerical policy,
-nursery 4 MiB; leases, persistent state, packed transport, worker verification,
+**75-digit candidate:** use the frozen G3 cold 70-digit anchor recipe,
+carried to 75 by the declared interpolation rule. Inherit worker count,
+lookahead, admission order and capacity levels; map its packet fraction onto
+the actual 75-digit family using the declared valid integer levels. Keep the
+G2H implementation bundle and (a)/(b) choices unchanged. Inactive settings
+remain inactive; do not force an eight-worker or packet-16 fallback. Use seed
+104729 and the Y0 numerical policy resolved for 75 digits, without retuning
+base/report/product/residual limits. Keep the allowances above, including
+actor 7,200 s, owner 7,500 s, worker/runtime 768/256 MiB and parent QS 4 GiB.
+If the mapped recipe is refused, report the refusal and stop; do not substitute
+another recipe. Record the exact resolved recipe and derivation in the G3
+report before any probe result; do not choose it from 75-digit outcomes.
+
+The 80-digit candidate is unchanged by this 75-digit mapping amendment:
+freeze it before its separately authorized outcome with seed 104729, Y0
+numerical policy, nursery 4 MiB; leases, persistent state, packed transport, worker verification,
 private semaphore stopping, coefficient reuse, lookahead 4, state cache 64 MiB,
 wire 4 MiB and batch atoms 2,048. CPU snapshot off, arrival off, whole-family
 off. Add `wide_hits` to the resolved collector marking, power plan 2 MiB,
