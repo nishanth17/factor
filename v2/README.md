@@ -262,6 +262,13 @@ polynomial switch funded. Insufficient memory keeps exact ordinary lifting.
 Cached pairs remain derived state and are rebuilt after resume. This follows
 `wide_inverses` in component order and changes no automatic selection.
 
+The independent opt-in `pruned_transfers` component replays a complete cached
+prime-power pair when window pruning has retained only one first-level root
+class. It selects that surviving class modulo the original prime, while
+keeping both roots in derived storage. Both replayed roots remain charged;
+the extra charge is counted separately. Cache misses use ordinary lifting.
+It follows `wide_transfers` and changes no default or checkpoint format.
+
 `private_stop=True` requires process packet leases and gives each worker its
 own synchronized stop flag. The parent sets or clears every flag, while each
 worker retains the same 64-action polling cadence and exact budget checks.

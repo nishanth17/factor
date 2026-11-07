@@ -690,7 +690,9 @@ class SieveCollector:
             self._workspace += transfer_bytes
             self._reuse_workspace += transfer_bytes
             self._power_transfers = RootTransfers(
-                transfer_bytes, capacity_limit=transfer_limit
+                transfer_bytes,
+                capacity_limit=transfer_limit,
+                pruned_replay="pruned_transfers" in self.config._kernels,
             )
             self._power_transfers.bind(polynomial)
         self._word_hits = None

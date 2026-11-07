@@ -19,6 +19,7 @@ KERNELS = (
     "wide_hits",
     "wide_inverses",
     "wide_transfers",
+    "pruned_transfers",
 )
 SCAN_CHUNK = 64
 

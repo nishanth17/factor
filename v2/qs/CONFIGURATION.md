@@ -124,8 +124,8 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused`, `parity_two`, `packed_queue`, `wide_hits`, `wide_inverses`
-and `wide_transfers`
+`scan_fused`, `parity_two`, `packed_queue`, `wide_hits`, `wide_inverses`,
+`wide_transfers` and `pruned_transfers`
 in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
@@ -166,6 +166,12 @@ within-family prime-power root pairs instead of 32 MiB, with a larger
 per-base-member allowance for distinct powers. The complete scratch and next
 polynomial switch must fit; otherwise ordinary exact lifting remains. The
 cache retains complete nonsingular pairs and is rebuilt after resume.
+
+`pruned_transfers` follows `wide_transfers` and independently allows complete
+cached pairs to serve a single surviving first-level class after window
+pruning. The class is selected modulo the original prime; cached state stays
+complete, and the extra replayed root remains charged. Ordinary lifting
+handles cache misses. The option changes no automatic selection.
 
 This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain

@@ -265,6 +265,9 @@ def _logical_owners(frame):
                         derived["root_transfer_reserved"] = transfers.used
                         derived["root_transfer_builds"] = transfers.builds
                         derived["root_transfer_replays"] = transfers.replays
+                        derived["pruned_root_replays"] = (
+                            transfers.pruned_replays
+                        )
                     if words is not None:
                         derived["hit_word_groups"] = len(words.words)
                         derived["hit_word_cells"] = sum(map(len, words.words))
