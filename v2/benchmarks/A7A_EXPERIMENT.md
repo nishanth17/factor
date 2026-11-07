@@ -515,7 +515,9 @@ record their measured overhead without adding a second 75/80 call.
 Use the existing `combined.cell`, `configuration`, `settings`, `source()` and
 `corpus_identity("regimes")` to build a single-cell **clean-mode** plan.
 Required fields: complete endpoint, cold lifetime, samples=1, zero executed
-warmup, the exact table allowances and candidate settings. Disable automatic
+warmup, the exact table allowances and candidate settings. Set `rss_interval=60`
+and a new exclusive `progress_path` for minute-level probe logging; omit
+`timeline_path` so worker packet diagnostics remain off. Disable automatic
 profile companions and profile analysis. Validate the 60-second log and
 last-progress receipt on a short fixture first; unsupported fields must be
 rejected rather than silently ignored.

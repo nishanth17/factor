@@ -104,6 +104,19 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## A7a preparation gate — 7 November 2026
+
+G1 passes on isolated source `62854f9`: 1,546 committed-only tests (9 optional
+skips), lint and 291 benchmark imports; fixed-work signatures survive observer
+on/off checks, and literal-mainline cold/warm calls reconstruct correctly.
+The driver binds approval to the exact stage/source/corpus and rejects missing
+coverage, invalid grants and automatic retries of unfinished attempts. Fresh
+certified confirmation inputs are reserved for the three/six/nine-input rule.
+Observer overhead on short prefixes remains inconclusive; optional counters
+stay off in clean coverage. G2 requires separate approval. No per-regime winner,
+large-probe completion or automatic-default change is established.
+Local report: `v2/audit/a7a/g1-20261107/REPORT.md`.
+
 ## Work in flight
 
 Inspected 6 November 2026; A7a results updated 7 November. These are isolated

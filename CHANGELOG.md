@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental QS campaign preparation (7 November 2026)
+
+- Add bounded, explicitly gated stage proposals, checked coverage and durable
+  per-stage accounting on the isolated A7a branch.
+- Add independent certified confirmation inputs and a literal-mainline
+  complete-QS reference adapter with bounded cold/warm ownership.
+- Add optional worker service/queue spans and minute-level progress, including
+  fixed/adaptive relation targets. Keep unresolved observer costs diagnostic.
+- Pass the G1 preparation gate; coverage/search/confirmation and default
+  adoption remain pending. No automatic factoring settings change.
+
 ## Experimental current-collector QS continuation (6 November 2026)
 
 - On the isolated A7a branch, add bounded worker/cache configuration controls,

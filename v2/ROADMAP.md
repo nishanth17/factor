@@ -175,6 +175,13 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **G1 preparation gate (7 November):** bounded stage driver, certified fresh
+  confirmation corpus, literal-mainline adapter and optional timeline/progress
+  observers validated on `62854f9`. Committed-only QA passes 1,546 tests
+  (9 optional skips), lint and 291 benchmark imports. G2 coverage is proposed,
+  not authorized; search, confirmation and integration remain open. Detailed
+  local gate report: `v2/audit/a7a/g1-20261107/REPORT.md`.
+
 - **Implemented on the task branch:** calibrated growing-DLP/current-collector
   worker compatibility, checked parent admission, finite leases and drained
   resume. Independent default-off packet-lease, persistent-state, packed
