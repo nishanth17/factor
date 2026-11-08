@@ -2,12 +2,14 @@
 
 import ctypes
 import errno
+import inspect
 import json
 import math
 import os
 import sys
 import tempfile
 from dataclasses import dataclass
+from functools import wraps
 
 RESOURCE_VERSION = "observed-resources/saved-history-v1"
 DEFAULT_RSS = object()
@@ -16,7 +18,9 @@ DEFAULT_RSS = object()
 class RemovedResourceLimitError(TypeError):
     """A former internal refusal argument was supplied."""
 
-    def __init__(self, argument, replacement="Budget(rss_bytes=...) at the root"):
+    def __init__(
+        self, argument, replacement="Budget(rss_bytes=...) at the root"
+    ):
         self.argument, self.replacement = argument, replacement
         super().__init__(f"{argument} was removed; use {replacement}")
 
@@ -47,9 +51,18 @@ class ProcessSample:
 
 class _RUsage(ctypes.Structure):
     _fields_ = [("uuid", ctypes.c_ubyte * 16)] + [
-        (name, ctypes.c_uint64) for name in (
-            "user", "system", "idle", "interrupt", "pageins", "wired",
-            "resident", "physical", "start", "exit",
+        (name, ctypes.c_uint64)
+        for name in (
+            "user",
+            "system",
+            "idle",
+            "interrupt",
+            "pageins",
+            "wired",
+            "resident",
+            "physical",
+            "start",
+            "exit",
         )
     ]
 
@@ -61,16 +74,23 @@ class MacResources:
         self.lib = ctypes.CDLL("/usr/lib/libproc.dylib", use_errno=True)
         self.system = ctypes.CDLL(None, use_errno=True)
         self.lib.proc_listchildpids.argtypes = [
-            ctypes.c_int, ctypes.c_void_p, ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_void_p,
+            ctypes.c_int,
         ]
         self.lib.proc_listchildpids.restype = ctypes.c_int
         self.lib.proc_pid_rusage.argtypes = [
-            ctypes.c_int, ctypes.c_int, ctypes.c_void_p,
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_void_p,
         ]
         self.lib.proc_pid_rusage.restype = ctypes.c_int
         self.system.sysctlbyname.argtypes = [
-            ctypes.c_char_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_size_t),
-            ctypes.c_void_p, ctypes.c_size_t,
+            ctypes.c_char_p,
+            ctypes.c_void_p,
+            ctypes.POINTER(ctypes.c_size_t),
+            ctypes.c_void_p,
+            ctypes.c_size_t,
         ]
         self.system.sysctlbyname.restype = ctypes.c_int
 
@@ -96,15 +116,21 @@ class MacResources:
                 if error == errno.ESRCH:
                     continue
                 raise ResourceProviderError(f"proc_pid_rusage({pid}): {error}")
-            result.append(ProcessSample(
-                pid, usage.start, usage.resident,
-                (usage.user + usage.system) / 1_000_000_000,
-            ))
+            result.append(
+                ProcessSample(
+                    pid,
+                    usage.start,
+                    usage.resident,
+                    (usage.user + usage.system) / 1_000_000_000,
+                )
+            )
             # Size can change between calls. Retry with the returned size;
             # this grows an observation buffer, never a production quota.
             size = self.lib.proc_listchildpids(pid, None, 0)
             if size < 0:
-                raise ResourceProviderError(f"proc_listchildpids({pid}) failed")
+                raise ResourceProviderError(
+                    f"proc_listchildpids({pid}) failed"
+                )
             while size:
                 children = (ctypes.c_int * (size + 1))()
                 count = self.lib.proc_listchildpids(
@@ -132,7 +158,9 @@ def default_provider():
 
 def validate_seconds(value, name):
     if value is not None and (
-        type(value) not in (int, float) or not math.isfinite(value) or value < 0
+        type(value) not in (int, float)
+        or not math.isfinite(value)
+        or value < 0
     ):
         raise ValueError(name + " must be finite and nonnegative")
 
@@ -148,11 +176,15 @@ def atomic_save(path, payload, *, checkpoint_bytes=None, events=None):
         type(checkpoint_bytes) is not int or checkpoint_bytes < 0
     ):
         raise ValueError("checkpoint_bytes must be nonnegative or None")
-    encoded = json.dumps(payload, separators=(",", ":"), allow_nan=False).encode()
+    encoded = json.dumps(
+        payload, separators=(",", ":"), allow_nan=False
+    ).encode()
     if checkpoint_bytes is not None and len(encoded) > checkpoint_bytes:
         event = dict(
-            reason="checkpoint_size_skip", limit="checkpoint_bytes",
-            requested=len(encoded), limit_value=checkpoint_bytes,
+            reason="checkpoint_size_skip",
+            limit="checkpoint_bytes",
+            requested=len(encoded),
+            limit_value=checkpoint_bytes,
             scope="checkpoint_save",
         )
         if events is not None:
@@ -176,3 +208,74 @@ def atomic_save(path, payload, *, checkpoint_bytes=None, events=None):
         if os.path.exists(temporary):
             os.unlink(temporary)
     return None
+
+
+def removed_arguments(names, replacement="Budget(rss_bytes=...) at the root"):
+    """Reject retired keyword arguments before calling the revised API."""
+
+    def decorate(target):
+        original = target.__init__ if isinstance(target, type) else target
+
+        @wraps(original)
+        def checked(*args, **kwargs):
+            for name in names:
+                if name in kwargs:
+                    raise RemovedResourceLimitError(name, replacement)
+            return original(*args, **kwargs)
+
+        if isinstance(target, type):
+            target.__init__ = checked
+            return target
+        return checked
+
+    return decorate
+
+
+class AllocationFailureError(RuntimeError):
+    """Allocation interrupted an operation; a poisoned owner cannot resume."""
+
+    reason = "allocation_failure"
+
+    def __init__(self, operation, owner=None):
+        self.operation, self.owner = operation, owner
+        self.payload = dict(
+            reason=self.reason, operation=operation, owner=owner
+        )
+        super().__init__("allocation_failure: " + operation)
+
+
+class UnsupportedEncodingError(ValueError):
+    """A retained arithmetic representation cannot encode this object."""
+
+
+def encode_checkpoint(function):
+    """Bind every new snapshot to the saved-history resource schema."""
+
+    @wraps(function)
+    def encode(*args, **kwargs):
+        result = function(*args, **kwargs)
+        result["resource_version"] = RESOURCE_VERSION
+        return result
+
+    return encode
+
+
+def decode_checkpoint(function):
+    """Reject pre-resource-model checkpoints before any replay or decoding."""
+    signature = inspect.signature(function)
+
+    @wraps(function)
+    def decode(*args, **kwargs):
+        bound = signature.bind(*args, **kwargs)
+        checkpoint = bound.arguments["checkpoint"]
+        if not isinstance(checkpoint, dict):
+            raise ValueError("checkpoint must be an object")
+        require_resource_version(checkpoint)
+        bound.arguments["checkpoint"] = {
+            key: value
+            for key, value in checkpoint.items()
+            if key != "resource_version"
+        }
+        return function(*bound.args, **bound.kwargs)
+
+    return decode

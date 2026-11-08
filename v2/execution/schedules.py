@@ -5,6 +5,7 @@ from collections import OrderedDict
 from math import isqrt
 
 from ..common import utils
+from .resources import removed_arguments
 
 
 class SieveContext:
@@ -16,20 +17,18 @@ class SieveContext:
     Endpoints are Python integers; output above 2**32 is never narrowed.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(
         self,
         max_hi,
         *,
-        memory_bytes=1_048_576,
         segment_size=4096,
         rolling=False,
         budget=None,
     ):
         utils.require_integer(max_hi, "max_hi", 3)
-        utils.require_integer(memory_bytes, "memory_bytes", 8192)
         utils.require_integer(segment_size, "segment_size", 1)
         self.max_hi = max_hi
-        self.memory_bytes = memory_bytes
         self.segment_size = segment_size
         self.rolling = rolling
         self.active = False
@@ -38,8 +37,8 @@ class SieveContext:
         # Bound construction conservatively before allocating. Worst-case
         # base storage includes every odd candidate, plus rolling offsets.
         required = 4096 + 18 * size + 3 * segment_size
-        if root >= 2**64 or required > memory_bytes:
-            raise MemoryError("base-prime workspace exceeds configured cap")
+        if root >= 2**64:
+            raise ValueError("base-prime endpoint exceeds packed u64 domain")
         if budget is not None:
             budget.consume(size)
         flags = bytearray(b"\x01") * size

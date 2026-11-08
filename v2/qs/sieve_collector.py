@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from ..common import utils
 from ..common.arithmetic import gcd, isqrt
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.resources import removed_arguments
 from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
-from .factor_base import DEFAULT_MEMORY_BYTES
 from .families import verify_polynomial_roots
 from .hit_words import MAX_HIT_BYTES, WordHits
 from .polynomial import (
@@ -40,6 +40,7 @@ MAX_STORED_ATOMS = 65536
 MAX_METADATA_CHUNK = 1024
 
 
+@removed_arguments(("max_atoms", "max_relations", "memory_bytes"))
 @dataclass(frozen=True)
 class SieveConfig:
     """Finite collector controls; threshold_extra > 0 is intentionally lossy.
@@ -62,21 +63,18 @@ class SieveConfig:
     sparse_queue_bytes: int = field(default=0, kw_only=True)
     power_plan_bytes: int = field(default=0, kw_only=True)
     residual_bound: int = 500
+    preparation_cache_bytes: int = field(default=2 * 2**20, kw_only=True)
+    target_rows: int | None = field(default=1024, kw_only=True)
     max_partials: int = 256
-    max_relations: int = 1024
-    max_atoms: int = 2048
-    memory_bytes: int = DEFAULT_MEMORY_BYTES
 
     def __post_init__(self):
         """Validate bounded choices before allocating buffers or roots."""
         limits = {
             "block_width": (1, MAX_BLOCK_WIDTH),
             "metadata_chunk": (1, MAX_METADATA_CHUNK),
-            "small_prime_cutoff": (0, 100_000),
+            "small_prime_cutoff": (0, 100000),
             "threshold_extra": (0, 65536),
             "max_partials": (0, MAX_STORED_ATOMS),
-            "max_relations": (0, MAX_STORED_ATOMS),
-            "max_atoms": (0, MAX_STORED_ATOMS),
             "power_plan_bytes": (0, 16 * 1024 * 1024),
             "sparse_queue_bytes": (0, 32 * 1024 * 1024),
         }
@@ -84,8 +82,6 @@ class SieveConfig:
             value = getattr(self, name)
             if getattr(self, "storage_policy", None) == "grow" and name in (
                 "max_partials",
-                "max_atoms",
-                "max_relations",
             ):
                 storage_limit(value)
                 continue
@@ -93,10 +89,6 @@ class SieveConfig:
             if value > maximum:
                 raise ValueError(f"{name} exceeds the collector limit")
 
-        if getattr(self, "storage_policy", None) == "grow":
-            storage_limit(self.memory_bytes)
-        else:
-            utils.require_integer(self.memory_bytes, "memory_bytes", 0)
         checked_residual_bound(self.residual_bound)
         if self.score_backend not in ("list", "bytearray", "array"):
             raise ValueError("unknown score backend")
@@ -115,22 +107,11 @@ class SieveConfig:
             raise ValueError("unknown score policy")
 
     @property
-    def memory_limit(self):
-        return storage_limit(self.memory_bytes)
-
-    @property
-    def atom_limit(self):
-        return storage_limit(self.max_atoms)
-
-    @property
     def partial_limit(self):
         return storage_limit(self.max_partials)
 
-    @property
-    def relation_limit(self):
-        return storage_limit(self.max_relations)
 
-
+@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
 @dataclass(frozen=True)
 class DoubleLargeSieveConfig(SieveConfig):
     """Opt-in two-prime bounds and a finite cumulative splitting quota.
@@ -175,6 +156,7 @@ class DoubleLargeSieveConfig(SieveConfig):
         return storage_limit(self.split_call_limit)
 
 
+@removed_arguments(("max_atoms", "max_relations", "memory_bytes"))
 @dataclass(frozen=True)
 class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
     """Retain partial history with allocator-grown containers by default.
@@ -184,11 +166,9 @@ class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
     The policy marker distinguishes this execution from legacy capped DLP.
     """
 
+    target_rows: int | None = field(default=None, kw_only=True)
     storage_policy: str = field(default="grow", kw_only=True)
     max_partials: int | None = None
-    max_atoms: int | None = None
-    max_relations: int | None = None
-    memory_bytes: int | None = None
     split_call_limit: int | None = field(default=None, kw_only=True)
 
     def __post_init__(self):
@@ -197,6 +177,7 @@ class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
         super().__post_init__()
 
 
+@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
 @dataclass(frozen=True)
 class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
     """Independent useful-yield policies with checked original provenance.
@@ -256,6 +237,7 @@ class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
                 raise ValueError(name + " exceeds its finite cap")
 
 
+@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
 @dataclass(frozen=True)
 class CombinedYieldSieveConfig(YieldSieveConfig):
     """Versioned combined challenger; every auxiliary path has a finite cap."""
@@ -390,10 +372,8 @@ class SieveCollector:
             from .large_primes import LargePrimeForest, graph_reserve
 
             if isinstance(self.config, GrowingDoubleLargeSieveConfig):
-                from functools import partial
-
-                self._graph = LargePrimeForest(edge_limit=None)
-                self._graph_reserve = partial(graph_reserve, edge_limit=None)
+                self._graph = LargePrimeForest()
+                self._graph_reserve = graph_reserve
             else:
                 self._graph = LargePrimeForest()
                 self._graph_reserve = graph_reserve
@@ -449,8 +429,6 @@ class SieveCollector:
             )
             self._workspace += 512 * count
 
-        if self._workspace > self.config.memory_limit:
-            raise MemoryError("collector setup exceeds memory_bytes")
         if precomputed_roots is not None:
             verify_polynomial_roots(
                 polynomial, factor_base, precomputed_roots, budget=self.budget
@@ -557,8 +535,6 @@ class SieveCollector:
                 )
                 self._batch_reserve = self._batch_base
             self._workspace += self._batch_reserve
-            if self._workspace > self.config.memory_limit:
-                raise MemoryError("combined-yield helpers exceed memory_bytes")
             self._checked = CheckedStore(factor_base, self.config)
             self._endpoints = KnownEndpoints()
             if self.config.record_policy == "indexed-v2":
@@ -570,7 +546,6 @@ class SieveCollector:
                 residual_floor(
                     factor_base,
                     self.budget,
-                    self.config.memory_limit - self._workspace,
                 )
                 if self.config.recovery_policy == "checked-v2"
                 else 2
@@ -587,7 +562,7 @@ class SieveCollector:
                 )
                 self._workspace += (
                     self.config.spill_cache_bytes
-                    if self.config.spill_bytes
+                    if (self.config.spill_directory is not None)
                     else 0
                 )
                 self._workspace += self.config.incremental_bytes
@@ -600,8 +575,6 @@ class SieveCollector:
                     self._workspace += self.config.opaque_cache_bytes
                     self._slab_bytes = 0
                 self._workspace += 16 * 2**20 * self.config.recovery_workers
-                if self._workspace > self.config.memory_limit:
-                    raise MemoryError("expanded helpers exceed memory_bytes")
                 self._split_memo = SplitMemo(self.config.split_cache_entries)
                 self._conversion_attempts = 0
                 self._conversion_events = []
@@ -628,14 +601,13 @@ class SieveCollector:
         if (
             self.config.score_policy in ("powers", "fixed")
             and inverse_bytes <= 8 * 2**20
-            and self._workspace + inverse_bytes <= self.config.memory_limit
         ):
             self._workspace += inverse_bytes
             self._reuse_workspace += inverse_bytes
             self._shared_lift_inverses = HenselInverses(count)
         self._hit_masks = ()
         if self.config.division in ("bucket", "resieve"):
-            cap = min(4 * 2**20, self.config.memory_limit - self._workspace)
+            cap = 4 * 2**20
             masks, reserved = [], 256
             for index in range(count):
                 size = 120 + 8 * ((index + 63) // 64)
@@ -651,12 +623,8 @@ class SieveCollector:
                 self._reuse_workspace += reserved
         self._power_transfers = None
         transfer_bytes = min(MAX_TRANSFER_BYTES, 65536 + 4096 * count)
-        switch_bytes = 512 * count + 32768
-        if (
-            self.config.score_policy in ("powers", "fixed")
-            and self._workspace + transfer_bytes + switch_bytes
-            <= self.config.memory_limit
-        ):
+        512 * count + 32768
+        if self.config.score_policy in ("powers", "fixed"):
             # Leave the mandatory old/new polynomial metadata coexistence
             # funded; an optional cache must not prevent the next switch.
             self._workspace += transfer_bytes
@@ -665,16 +633,13 @@ class SieveCollector:
             self._power_transfers.bind(polynomial)
         self._word_hits = None
         hit_bytes = WordHits.reservation(count, width)
-        hit_work = WordHits.construction_work(count, width)
+        WordHits.construction_work(count, width)
         if (
             count > 60
             and self.config.score_backend == "list"
             and self.config.division == "bucket"
             and self.config.score_policy in ("powers", "fixed")
             and hit_bytes <= MAX_HIT_BYTES
-            and self._workspace + hit_bytes + switch_bytes
-            <= self.config.memory_limit
-            and hit_work <= self.budget.work_limit - self.budget.used
         ):
             # Existing helpers keep priority. Construction and lazy reads
             # have explicit extra work; scarce memory keeps the list path.
@@ -732,8 +697,6 @@ class SieveCollector:
         if type(retain_relations) is not bool:
             raise TypeError("retain_relations must be Boolean")
         extra = 512 * len(self.factor_base.entries) + 32768
-        if self._workspace + extra > self.config.memory_limit:
-            raise MemoryError("polynomial switch exceeds memory_bytes")
         verify_polynomial_roots(
             polynomial, self.factor_base, roots, budget=self.budget
         )
@@ -1404,8 +1367,6 @@ class SieveCollector:
             support += 1
 
         scratch = (hi - lo) * (1024 + 128 * support + 4 * maximum.bit_length())
-        if self._workspace + scratch > self.config.memory_limit:
-            return False
         self._scratch_bytes = scratch
         self._scratch_peak_bytes = max(self._scratch_peak_bytes, scratch)
 
@@ -1633,24 +1594,18 @@ class SieveCollector:
             self._pending.get(atom.residual) if atom.residual != 1 else None
         )
         accepted = atom.residual == 1 or partner is not None
-        if accepted and len(self._full) + len(self._combined) >= (
-            self.config.relation_limit
-        ):
-            return "relation_limit"
         evicted = None
         if not accepted:
             if self.config.max_partials == 0:
                 stats["dropped_partials"] += 1
                 return None
-            if len(self._pending) >= self.config.partial_limit:
+            if (
+                self.config.max_partials is not None
+                and len(self._pending) >= self.config.max_partials
+            ):
                 evicted = next(iter(self._pending.values()))
 
         released = self._atom_bytes[evicted] if evicted else 0
-        if (
-            len(self._atoms) + 1 - int(evicted is not None)
-            > self.config.atom_limit
-        ):
-            return "atom_limit"
 
         reserve = 4096 + 256 * len(atom.exponents)
         reserve += 16 * (
@@ -1668,20 +1623,9 @@ class SieveCollector:
                 _combination_workspace(
                     combination_atoms,
                     self.factor_base,
-                    self.config.memory_limit,
                 )
                 - self.factor_base.workspace_bytes
             )
-
-        if (
-            self._workspace
-            + self._scratch_bytes
-            + reserve
-            + scratch
-            - released
-            > self.config.memory_limit
-        ):
-            return "memory_limit"
 
         combination = None
         if partner is not None:
@@ -1692,7 +1636,6 @@ class SieveCollector:
                 combination_atoms,
                 self.factor_base,
                 budget=self.budget,
-                memory_bytes=self.config.memory_limit,
             )
             if combination.divisor is not None:
                 raise ArithmeticError(
@@ -1800,7 +1743,6 @@ class SieveCollector:
         span_budget = (
             self.budget if isinstance(self.budget, PollingBudget) else None
         )
-        span_ledger = None if span_budget is None else span_budget.budget
         reporting = (
             self._reporting
             if getattr(self.config, "extension_policy", None)
@@ -1849,9 +1791,7 @@ class SieveCollector:
                     batcher.hints.clear()
                 threshold = self._sieve(block_lo, block_hi, stats)
                 if self.config.division == "resieve":
-                    if not self._resieve(block_lo, block_hi, threshold, stats):
-                        reason = "memory_limit"
-                        break
+                    self._resieve(block_lo, block_hi, threshold, stats)
                 candidates = None
                 if "scan_fused" in self.config._kernels:
                     self.budget.consume(block_hi - block_lo + 1)
@@ -1870,12 +1810,9 @@ class SieveCollector:
                         else offset == next_candidate
                     )
                     if not selected and candidates is None and span_budget:
-                        affordable = span_ledger.work_limit - span_ledger.used
                         # Remaining is already bounded by64. Cache the
                         # ledger reference, never its mutable limit or usage.
                         amount = span_budget._remaining
-                        if amount > affordable:
-                            amount = affordable
                         if amount < 1:
                             amount = 1
                         stop = min(block_hi - block_lo, offset + amount)
@@ -1901,7 +1838,6 @@ class SieveCollector:
                         amount = min(
                             kernels.SCAN_CHUNK,
                             end - position,
-                            max(1, self.budget.work_limit - self.budget.used),
                         )
                         # These positions are certified rejects. Reserve one
                         # unit each before committing this bounded span; a

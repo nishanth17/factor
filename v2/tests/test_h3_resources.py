@@ -9,7 +9,9 @@ from unittest.mock import patch
 
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.resources import (
-    ProcessSample, RemovedResourceLimitError, atomic_save,
+    ProcessSample,
+    RemovedResourceLimitError,
+    atomic_save,
 )
 
 
@@ -38,8 +40,10 @@ class ResourceTests(unittest.TestCase):
 
     def budget(self, **kwargs):
         return Budget(
-            wall_clock=self.wall, cpu_clock=self.cpu,
-            provider=self.provider, **kwargs,
+            wall_clock=self.wall,
+            cpu_clock=self.cpu,
+            provider=self.provider,
+            **kwargs,
         )
 
     def test_defaults_and_work_counter(self):
@@ -68,8 +72,13 @@ class ResourceTests(unittest.TestCase):
             self.assertEqual(budget.stop["limit_value"], limit)
             self.assertEqual(budget.stop["scope"], "factorization")
             self.assertGreaterEqual(budget.stop["observed"], limit)
-            setattr(budget, {"wall": "seconds", "cpu": "cpu_seconds",
-                             "rss": "rss_bytes"}[name], None)
+            setattr(
+                budget,
+                {"wall": "seconds", "cpu": "cpu_seconds", "rss": "rss_bytes"}[
+                    name
+                ],
+                None,
+            )
 
     def test_sampled_current_tree_rss(self):
         budget = self.budget(rss_bytes=500)
@@ -136,3 +145,101 @@ class ResourceTests(unittest.TestCase):
                     atomic_save(path, large)
             self.assertEqual(json.loads(path.read_text()), old)
             self.assertEqual(list(Path(directory).iterdir()), [path])
+
+
+class StorageMigrationTests(unittest.TestCase):
+    def test_internal_limit_arguments_are_named_errors(self):
+        from v2.portfolio import PortfolioConfig
+        from v2.qs import SieveConfig, SIQSConfig
+        from v2.qs.extended_policy import BoundedYieldSieveConfig
+
+        for factory, argument in (
+            (SieveConfig, "max_atoms"),
+            (SieveConfig, "max_relations"),
+            (SieveConfig, "memory_bytes"),
+            (SIQSConfig, "checkpoint_bytes"),
+            (PortfolioConfig, "memory_bytes"),
+            (BoundedYieldSieveConfig, "spill_bytes"),
+        ):
+            with self.subTest(factory=factory, argument=argument):
+                with self.assertRaisesRegex(
+                    RemovedResourceLimitError, argument
+                ):
+                    factory(**{argument: None})
+
+    def test_graph_65536_is_not_an_admission_ceiling(self):
+        from v2.qs.large_primes import LargePrimeForest, graph_reserve
+
+        class BoundaryDict(dict):
+            def __len__(self):
+                return 65536
+
+        graph = LargePrimeForest()
+        graph.edges = BoundaryDict()
+        plan = graph.plan_link(101, 103, "boundary", Budget(rss_bytes=None))
+        graph.commit_link(plan)
+        self.assertIn("boundary", graph.edges)
+        self.assertGreater(graph_reserve(65537), graph_reserve(65536))
+
+    def test_matrix_estimate_is_diagnostic(self):
+        from v2.qs.linear_algebra import filter_matrix
+
+        with patch(
+            "v2.qs.linear_algebra.matrix_workspace", return_value=10**30
+        ):
+            matrix = filter_matrix((3, 3), budget=Budget(rss_bytes=None))
+        self.assertEqual(matrix.original_rows, (3, 3))
+        self.assertEqual(matrix.workspace_bytes, 10**30)
+
+    def test_old_checkpoint_refused_and_saved_resume(self):
+        from v2.execution.resources import UnsupportedResourceVersionError
+        from v2.qs.siqs import SIQSConfig, SIQSJob
+
+        job = SIQSJob(
+            1009 * 1013, config=SIQSConfig(), budget=Budget(rss_bytes=None)
+        )
+        job.run(max_blocks=1)
+        snapshot = job.checkpoint()
+        old = dict(snapshot)
+        del old["resource_version"]
+        with self.assertRaises(UnsupportedResourceVersionError):
+            SIQSJob.from_checkpoint(old, budget=Budget(rss_bytes=None))
+        restored = SIQSJob.from_checkpoint(
+            snapshot, budget=Budget(rss_bytes=None)
+        )
+        self.assertEqual(
+            restored.engine.next_position, job.engine.next_position
+        )
+        self.assertGreaterEqual(restored.budget.used, job.budget.used)
+
+    def test_stage_share_hands_off_with_unfunded_reserve(self):
+        import contextlib
+        import io
+
+        from v2.execution.allocation import ECMAllocation
+        from v2.portfolio import PortfolioConfig, factorize_bounded
+        from v2.qs.siqs import SIQSConfig
+
+        output = io.StringIO()
+        config = PortfolioConfig(
+            allocation=ECMAllocation(
+                "pretest", pretest_work=0, fallback_work=10**100
+            ),
+            siqs=SIQSConfig(mode="qs", base_bound=100),
+            ecm_chain_mode="off",
+        )
+        with (
+            contextlib.redirect_stdout(output),
+            contextlib.redirect_stderr(output),
+        ):
+            run = factorize_bounded(
+                1009 * 1013,
+                config=config,
+                budget=Budget(rss_bytes=None),
+                ecm_executor=None,
+            )
+        self.assertEqual(output.getvalue(), "")
+        self.assertEqual(run.result.reconstruct(), 1009 * 1013)
+        self.assertNotIn(
+            run.reason, ("pretest_exhausted", "insufficient_fallback_work")
+        )

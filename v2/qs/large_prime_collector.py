@@ -76,7 +76,10 @@ def divide_large_residual(
                     stats.get("endpoint_product_rejections", 0) + 1
                 )
                 return None, None
-            if collector._split_calls >= config.split_limit:
+            if (
+                config.split_limit is not None
+                and collector._split_calls >= config.split_limit
+            ):
                 stats["split_quota_rejections"] += 1
                 return None, None
             # A started attempt remains charged even if a later cancellation
@@ -150,18 +153,8 @@ def admit_large_relation(collector, atom, stats):
     # The existing graph reservation covers two simultaneous map sets. Allow
     # one new forest edge and incoming atom before planning a staged rebuild;
     # old atoms remain live until commit, so do not subtract evictions here.
-    if (
-        collector._workspace + collector._scratch_bytes + reserve + 4096
-        > config.memory_limit
-    ):
-        return "memory_limit"
     endpoints = atom.large_primes or (1, atom.residual)
     shortcuts = collector._short_cycles
-    if shortcuts is not None and (
-        collector._workspace + collector._scratch_bytes + reserve + 6144
-        > config.memory_limit
-    ):
-        return "memory_limit"
     try:
         direct = None
         if (
@@ -199,7 +192,7 @@ def admit_large_relation(collector, atom, stats):
         return (
             "atom_limit"
             if len(collector._atoms) >= config.atom_limit
-            else "memory_limit"
+            else "allocation_failure"
         )
     except CycleTooLongError:
         if shortcuts is None:
@@ -229,10 +222,6 @@ def admit_large_relation(collector, atom, stats):
         stats["dropped_partials"] += 1
         return None
     accepted = plan.cycle is not None
-    if accepted and len(collector._rows) >= config.relation_limit:
-        return "relation_limit"
-    if len(collector._atoms) + 1 - len(plan.evicted) > config.atom_limit:
-        return "atom_limit"
     old_edges = len(graph.edges)
     new_edges = old_edges + int(not accepted) - len(plan.evicted)
     graph_delta = collector._graph_reserve(
@@ -248,33 +237,21 @@ def admit_large_relation(collector, atom, stats):
             collector.factor_base.n.bit_length(),
         )
         scratch = (
-            _combination_workspace(
-                atoms, collector.factor_base, config.memory_limit
-            )
+            _combination_workspace(atoms, collector.factor_base)
             - collector.factor_base.workspace_bytes
         )
-    if (
-        collector._workspace
-        + collector._scratch_bytes
-        + reserve
-        + scratch
-        + max(0, graph_delta)
-        > config.memory_limit
-    ):
-        return "memory_limit"
     if accepted:
         collector._scratch_peak_bytes = max(
             collector._scratch_peak_bytes, collector._scratch_bytes + scratch
         )
         combination = (
-            collector._checked.combine(atoms, budget, config.memory_limit)
+            collector._checked.combine(atoms, budget)
             if collector._checked is not None
             and config.recovery_policy == "checked-v2"
             else combine_relations(
                 atoms,
                 collector.factor_base,
                 budget=budget,
-                memory_bytes=config.memory_limit,
             )
         )
         if combination.divisor is not None:

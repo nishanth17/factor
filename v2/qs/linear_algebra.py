@@ -6,8 +6,7 @@ from heapq import heapify, heappop, heappush
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget
-from .factor_base import DEFAULT_MEMORY_BYTES
-from .storage import storage_limit
+from ..execution.resources import removed_arguments
 
 MAX_MATRIX_ROWS = 65536
 MAX_MATRIX_COLUMNS = 100_001
@@ -40,13 +39,12 @@ def matrix_workspace(row_count, column_count):
     )
 
 
+@removed_arguments(("max_atoms", "max_rows", "memory_bytes"))
 def filter_matrix(
     rows,
     *,
     weight_two=False,
     budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
-    max_rows=MAX_MATRIX_ROWS,
     merge_policy="reference",
     light_rows=False,
     surplus=32,
@@ -91,13 +89,8 @@ def filter_matrix(
         or survivor_mask.bit_length() > len(rows)
     ):
         raise ValueError("invalid incremental singleton mask")
-    if len(rows) > storage_limit(max_rows):
-        raise ValueError("matrix row cap exceeded")
     for row in rows:
         utils.require_integer(row, "row", 0)
-        if row.bit_length() > MAX_MATRIX_COLUMNS:
-            raise ValueError("matrix column cap exceeded")
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     backend = arithmetic.backend_for(
         next((row for row in rows if arithmetic.is_mpz(row)), 0)
     )
@@ -124,8 +117,6 @@ def filter_matrix(
         reserve += 256 * columns + 16 * ((original_columns + 7) // 8)
         reserve += sum(128 + 8 * ((row.bit_length() + 7) // 8) for row in rows)
 
-    if reserve > memory_bytes:
-        raise MemoryError("matrix fill-in/provenance exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
     if _incremental is not None:
         survivor_mask = _incremental.observe(rows, budget)

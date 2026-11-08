@@ -82,11 +82,6 @@ def reserve_batch(collector, lo, hi):
         512 * support + 16 * bits
     )
     delta = max(0, needed - collector._batch_reserve)
-    if (
-        collector._workspace + delta + collector._scratch_bytes
-        > collector.config.memory_limit
-    ):
-        raise MemoryError("bounded batch scratch exceeds memory cap")
     collector._batch_reserve += delta
     collector._workspace += delta
     # The required support and scalar storage are monotone in this bound.

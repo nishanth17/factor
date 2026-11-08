@@ -3,29 +3,19 @@
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd
 from ..execution.budget import Budget
+from ..execution.resources import removed_arguments
 
 
-def _tree_reservation(values, max_bits, max_nodes, memory_bytes):
+@removed_arguments(("max_bits", "max_nodes", "memory_bytes"))
+def _tree_reservation(values):
     """Check every leaf before allocating the tree or multiplying nodes."""
     if not isinstance(values, tuple):
         raise TypeError("tree leaves must be a tuple")
-    for name, value in (
-        ("max_bits", max_bits),
-        ("max_nodes", max_nodes),
-        ("memory_bytes", memory_bytes),
-    ):
-        utils.require_integer(value, name, 0)
 
-    if max_bits > 1048576 or max_nodes > 8192:
-        raise ValueError("tree configuration exceeds the finite hard limits")
-    if len(values) > max_nodes:
-        raise MemoryError("product tree exceeds its node limit")
     bits = 0
     for value in values:
         utils.require_integer(value, "tree leaf", 1)
         bits += value.bit_length()
-        if bits > max_bits:
-            raise MemoryError("product tree exceeds its bit limit")
 
     nodes, width = 0, len(values)
     while width:
@@ -34,25 +24,15 @@ def _tree_reservation(values, max_bits, max_nodes, memory_bytes):
             break
         width = (width + 1) // 2
 
-    if bits > max_bits or nodes > max_nodes:
-        raise MemoryError("product tree exceeds bit/node limits")
     reserve = 4096 + 192 * nodes
     reserve += 4 * bits * (len(values).bit_length() + 2)
-    if reserve > memory_bytes:
-        raise MemoryError("product/remainder tree exceeds memory_bytes")
     return reserve
 
 
-def product_tree(
-    values,
-    *,
-    budget=None,
-    max_bits=262144,
-    max_nodes=8192,
-    memory_bytes=32 * 1024 * 1024,
-):
+@removed_arguments(("max_bits", "max_nodes", "memory_bytes"))
+def product_tree(values, *, budget=None):
     """Return immutable levels; empty input has no root, one is permitted."""
-    _tree_reservation(values, max_bits, max_nodes, memory_bytes)
+    _tree_reservation(values)
     budget = budget if budget is not None else Budget()
     budget.consume(len(values) + 1)
     levels, level = [], values
@@ -82,22 +62,12 @@ class SmoothBatch:
     smoothness, not its prime exponents: relation recovery remains separate.
     """
 
-    def __init__(
-        self,
-        primes,
-        *,
-        backend="python-int",
-        budget=None,
-        max_bits=262144,
-        max_nodes=8192,
-        memory_bytes=32 * 1024 * 1024,
-    ):
+    @removed_arguments(("max_bits", "max_nodes", "memory_bytes"))
+    def __init__(self, primes, *, backend="python-int", budget=None):
         self.budget = budget if budget is not None else Budget()
-        self.max_bits, self.max_nodes = max_bits, max_nodes
-        self.memory_bytes = memory_bytes
         if not isinstance(primes, tuple):
             raise TypeError("primes must be a tuple")
-        _tree_reservation(primes, max_bits, max_nodes, memory_bytes)
+        _tree_reservation(primes)
         previous = 1
 
         for prime in primes:
@@ -112,25 +82,15 @@ class SmoothBatch:
         tree = product_tree(
             tuple(engine.integer(prime) for prime in primes),
             budget=self.budget,
-            max_bits=max_bits,
-            max_nodes=max_nodes,
-            memory_bytes=memory_bytes,
         )
         self.radical = tree[-1][0] if tree else 1
 
     def residuals(self, values):
         """Return exact non-base parts in input order, including duplicates."""
-        reserve = _tree_reservation(
-            values, self.max_bits, self.max_nodes, self.memory_bytes
-        )
-        if reserve + 8 * self.radical.bit_length() > self.memory_bytes:
-            raise MemoryError("radical and tree coexistence exceeds cap")
+        _tree_reservation(values)
         tree = product_tree(
             values,
             budget=self.budget,
-            max_bits=self.max_bits,
-            max_nodes=self.max_nodes,
-            memory_bytes=self.memory_bytes,
         )
         if not tree:
             return ()

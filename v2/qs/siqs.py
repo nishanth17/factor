@@ -6,6 +6,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.resources import removed_arguments
 from ..execution.work_budget import PollingBudget
 from .assignment_stream import (
     AssignmentStream,
@@ -44,9 +45,10 @@ from .sieve_collector import (
     SieveCollector,
     SieveConfig,
 )
-from .storage import require_published, storage_limit
+from .storage import require_published
 
 
+@removed_arguments(("checkpoint_bytes", "memory_bytes"))
 @dataclass(frozen=True)
 class SIQSConfig:
     """Finite experimental parameters; growth retains the same factor base."""
@@ -79,13 +81,9 @@ class SIQSConfig:
     root_update_policy: str = field(default="standard", kw_only=True)
     sign_policy: str = field(default="canonical", kw_only=True)
     solve_policy: str = field(default="window", kw_only=True)
-    memory_bytes: int | None = None
-    checkpoint_bytes: int | None = None
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
             residual_bound=10000,
-            max_atoms=4096,
-            max_relations=2048,
             max_partials=512,
         )
     )
@@ -119,12 +117,7 @@ class SIQSConfig:
             raise ValueError("norm multiplier ranking requires streaming A")
         if self.sign_policy not in ("canonical", "swap_high"):
             raise ValueError("unknown SIQS sign policy")
-        growing = isinstance(self.collector, GrowingDoubleLargeSieveConfig)
-        if not growing:
-            if self.memory_bytes is None:
-                object.__setattr__(self, "memory_bytes", 32 * 1024 * 1024)
-            if self.checkpoint_bytes is None:
-                object.__setattr__(self, "checkpoint_bytes", 1024 * 1024)
+        isinstance(self.collector, GrowingDoubleLargeSieveConfig)
         if self.backend not in ("python-int", "gmpy2-mpz"):
             raise ValueError("unknown arithmetic backend")
         if (
@@ -156,18 +149,8 @@ class SIQSConfig:
             "row_excess": (0, 4096),
             "batch_width": (1, 4096),
             "filter_row_growth": (1, 4096),
-            "checkpoint_bytes": (
-                4096,
-                (64 if self.streaming else 16) * 1024 * 1024,
-            ),
-            "memory_bytes": (4 * 1024 * 1024, 4 * 1024 * 1024 * 1024),
         }
         for name, (low, high) in limits.items():
-            if growing and name in ("memory_bytes", "checkpoint_bytes"):
-                value = getattr(self, name)
-                if value is not None:
-                    utils.require_integer(value, name, low)
-                continue
             value = utils.require_integer(getattr(self, name), name, low)
             if value > high:
                 raise ValueError(f"{name} exceeds the SIQS limit")
@@ -209,10 +192,6 @@ class SIQSConfig:
             raise ValueError("unknown polynomial mode")
         if not isinstance(self.collector, SieveConfig):
             raise TypeError("collector must be a SieveConfig")
-        if self.metadata_reserve + 3 * 1024 * 1024 > self.memory_limit:
-            raise MemoryError(
-                "SIQS metadata/checkpoint reservation exceeds cap"
-            )
 
     @property
     def paced_collection(self):
@@ -222,14 +201,6 @@ class SIQSConfig:
             and self.mode == "siqs"
             and self.shared_relations
         )
-
-    @property
-    def memory_limit(self):
-        return storage_limit(self.memory_bytes)
-
-    @property
-    def checkpoint_limit(self):
-        return storage_limit(self.checkpoint_bytes)
 
     @property
     def streaming(self):
@@ -278,7 +249,6 @@ class SIQSConfig:
         face = 256 * 1024 if self.sign_policy != "canonical" else 0
         return (
             65536
-            + 8 * (self.checkpoint_bytes or 0)
             + registry
             + quality
             + paired
@@ -294,6 +264,7 @@ class SIQSConfig:
         )
 
 
+@removed_arguments(("memory_bytes", "checkpoint_bytes"))
 @dataclass(frozen=True)
 class CountedSIQSConfig(SIQSConfig):
     """Resolve an exact eligible count below base_bound during charged setup.
@@ -319,7 +290,8 @@ class CountedSIQSConfig(SIQSConfig):
             raise ValueError("count policies require native SIQS")
 
 
-def make_family(base, primes, *, config, budget, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def make_family(base, primes, *, config, budget):
     """Apply saved coordinate/parity policies without global dispatch."""
     parity = config.polynomial_policy == "parity2" and base.n_prime % 4 == 1
     root_options = dict(
@@ -341,13 +313,11 @@ def make_family(base, primes, *, config, budget, memory_bytes):
             **root_options,
             parity=parity,
             budget=budget,
-            memory_bytes=memory_bytes,
         )
     return PolynomialFamily(
         base,
         primes,
         budget=budget,
-        memory_bytes=memory_bytes,
         parity=parity,
         **root_options,
     )
@@ -425,15 +395,11 @@ class SIQSJob:
                         config=self.config,
                         seed=self.seed,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_limit
-                        - self.config.metadata_reserve,
                     )
                     if self.config.multiplier_policy == "parity2_norm"
                     else select_coupled_multiplier(
                         self.n,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_limit
-                        - self.config.metadata_reserve,
                     )
                     if self.config.multiplier_policy == "parity2_wide"
                     else select_multiplier(
@@ -473,8 +439,6 @@ class SIQSJob:
                         self.config.base_count,
                         self.budget,
                         ceiling=self.config.base_bound,
-                        memory_bytes=self.config.memory_limit
-                        - self.config.metadata_reserve,
                     ),
                 )
                 if self.divisor is not None:
@@ -486,8 +450,6 @@ class SIQSJob:
                     multiplier=self.multiplier,
                     bound=bound,
                     budget=self.budget,
-                    memory_bytes=self.config.memory_limit
-                    - self.config.metadata_reserve,
                 ),
             )
             self.base, self.divisor = setup.factor_base, setup.divisor
@@ -517,8 +479,6 @@ class SIQSJob:
                         seed=self.seed,
                         policy=self.config.assignment_policy,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_limit
-                        - self.config.metadata_reserve,
                     ),
                 )
             elif self.config.external_coefficients:
@@ -541,8 +501,6 @@ class SIQSJob:
                         pool_size=self.config.pool_size,
                         seed=(self.seed + self.epoch) % 2**64,
                         budget=self.budget,
-                        memory_bytes=self.config.memory_limit
-                        - self.config.metadata_reserve,
                     ),
                 )
             elif self.config.mode == "mpqs":
@@ -631,8 +589,6 @@ class SIQSJob:
                     self.assignments[self.family_index],
                     config=self.config,
                     budget=self.budget,
-                    memory_bytes=self.config.memory_limit
-                    - self.config.metadata_reserve,
                 )
 
             self.family.budget = self.budget
@@ -678,7 +634,6 @@ class SIQSJob:
         )
         config = replace(
             self.config.collector,
-            memory_bytes=self.config.memory_limit - extra,
         )
         if self.engine is None:
             self.engine = QSJob(
@@ -782,7 +737,7 @@ class SIQSJob:
         except MemoryError:
             # A checked store survives an impossible downstream reservation;
             # do not repeat that reservation at an unchanged terminal stop.
-            self.finished_reason = "memory_limit"
+            self.finished_reason = "allocation_failure"
         self.pending_final_reason = None
 
     def run(self, *, max_blocks=None):
@@ -876,7 +831,7 @@ class SIQSJob:
                 elif reason in (
                     "relation_limit",
                     "atom_limit",
-                    "memory_limit",
+                    "allocation_failure",
                 ):
                     self.finished_reason = reason
                 elif reason not in ("paused", "factor_found"):
@@ -888,7 +843,7 @@ class SIQSJob:
         except BudgetExhaustedError:
             reason = self.budget.reason
         except MemoryError:
-            self._stop_collection("memory_limit")
+            self._stop_collection("allocation_failure")
             if self.pending_final_reason is not None:
                 try:
                     self._finish_collection()
@@ -943,14 +898,10 @@ class SIQSJob:
                     owned_forest_edges=len(graph.edges) - len(graph.unowned),
                     split_calls=self.engine.collector._split_calls,
                 )
-            self.stats["workspace_bytes"] = (
-                self.config.memory_limit
-                - self.engine.config.memory_limit
-                + max(
-                    self.engine._workspace_peak,
-                    self.engine.collector._workspace,
-                    getattr(self.engine.collector, "_switch_peak", 0),
-                )
+            self.stats["workspace_bytes"] = self.config.metadata_reserve + max(
+                self.engine._workspace_peak,
+                self.engine.collector._workspace,
+                getattr(self.engine.collector, "_switch_peak", 0),
             )
 
         if max_blocks != 0:

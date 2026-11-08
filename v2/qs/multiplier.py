@@ -6,6 +6,7 @@ from fractions import Fraction
 from ..common import prime_sieve, utils
 from ..common.arithmetic import gcd, pow
 from ..execution.budget import Budget
+from ..execution.resources import removed_arguments
 from .factor_base import checked_target
 
 DEFAULT_MULTIPLIERS = (1, 3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 29, 31)
@@ -184,9 +185,8 @@ def _legendre(value, prime):
     return 0 if residue == 0 else 1 if residue == 1 else -1
 
 
-def select_coupled_multiplier(
-    n, *, budget=None, memory_bytes=WIDE_MULTIPLIER_WORKSPACE
-):
+@removed_arguments(("memory_bytes",))
+def select_coupled_multiplier(n, *, budget=None):
     """Rank the fixed wider parity population with local exact-symbol reuse.
 
     All fractions share an exact denominator. The returned integer scores
@@ -194,10 +194,7 @@ def select_coupled_multiplier(
     No cache survives this call or crosses input/backend identities.
     """
     checked_target(n, 1)
-    utils.require_integer(memory_bytes, "multiplier memory_bytes", 0)
-    if memory_bytes < WIDE_MULTIPLIER_WORKSPACE:
-        raise MemoryError("wide multiplier workspace exceeds memory_bytes")
-    budget = budget if budget is not None else Budget(work_limit=32_000_000)
+    budget = budget if budget is not None else Budget()
     budget.consume(WIDE_PRIME_BOUND + 32 * len(WIDE_MULTIPLIERS))
     primes = prime_sieve.small_sieve(WIDE_PRIME_BOUND)[1:]
     factors = prime_sieve.small_sieve(98)

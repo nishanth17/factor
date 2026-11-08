@@ -5,8 +5,11 @@ import time
 
 from ..common import utils
 from .resources import (
-    DEFAULT_RSS, RESOURCE_VERSION, RemovedResourceLimitError,
-    default_provider, validate_seconds,
+    DEFAULT_RSS,
+    RESOURCE_VERSION,
+    RemovedResourceLimitError,
+    default_provider,
+    validate_seconds,
 )
 
 
@@ -30,9 +33,19 @@ class Budget:
     """
 
     def __init__(
-        self, *, seconds=None, cpu_seconds=None, rss_bytes=DEFAULT_RSS,
-        cancelled=None, used=0, prior_wall=0.0, prior_cpu=0.0,
-        wall_clock=None, cpu_clock=None, provider=None, scope="factorization",
+        self,
+        *,
+        seconds=None,
+        cpu_seconds=None,
+        rss_bytes=DEFAULT_RSS,
+        cancelled=None,
+        used=0,
+        prior_wall=0.0,
+        prior_cpu=0.0,
+        wall_clock=None,
+        cpu_clock=None,
+        provider=None,
+        scope="factorization",
         **removed,
     ):
         if removed:
@@ -43,8 +56,10 @@ class Budget:
                 )
             raise TypeError("unexpected Budget argument: " + name)
         for name, value in (
-            ("seconds", seconds), ("cpu_seconds", cpu_seconds),
-            ("prior_wall", prior_wall), ("prior_cpu", prior_cpu),
+            ("seconds", seconds),
+            ("cpu_seconds", cpu_seconds),
+            ("prior_wall", prior_wall),
+            ("prior_cpu", prior_cpu),
         ):
             validate_seconds(value, name)
         utils.require_integer(used, "used", 0)
@@ -52,7 +67,11 @@ class Budget:
             utils.require_integer(rss_bytes, "rss_bytes", 0)
         self.seconds, self.cpu_seconds = seconds, cpu_seconds
         self.cancelled, self.scope = cancelled, scope
-        self.used, self.prior_wall, self.prior_cpu = used, prior_wall, prior_cpu
+        self.used, self.prior_wall, self.prior_cpu = (
+            used,
+            prior_wall,
+            prior_cpu,
+        )
         self.reason = self.stop = None
         self._wall_clock = wall_clock or time.monotonic
         self._cpu_clock = cpu_clock or time.process_time
@@ -67,7 +86,8 @@ class Budget:
             self.provider = default_provider()
         self.rss_bytes = (
             4 * self.provider.physical_memory() // 5
-            if rss_bytes is DEFAULT_RSS else rss_bytes
+            if rss_bytes is DEFAULT_RSS
+            else rss_bytes
         )
         self.start()
 
@@ -106,8 +126,10 @@ class Budget:
 
     @property
     def cpu_used(self):
-        return self.prior_cpu + self._child_cpu + (
-            self._cpu_clock() - self._cpu_start if self._active else 0
+        return (
+            self.prior_cpu
+            + self._child_cpu
+            + (self._cpu_clock() - self._cpu_start if self._active else 0)
         )
 
     def register(self, pid):
@@ -134,7 +156,8 @@ class Budget:
             return
         now = self._wall_clock()
         if (
-            not force and self._last_sample is not None
+            not force
+            and self._last_sample is not None
             and now - self._last_sample < 0.05
         ):
             return
@@ -160,8 +183,11 @@ class Budget:
             if limit is not None and observed >= limit:
                 self.reason = name + "_limit"
                 self.stop = dict(
-                    reason=self.reason, limit=name, observed=observed,
-                    limit_value=limit, scope=self.scope,
+                    reason=self.reason,
+                    limit=name,
+                    observed=observed,
+                    limit_value=limit,
+                    scope=self.scope,
                 )
                 raise BudgetExhaustedError(self.reason, self.stop)
 
@@ -191,6 +217,8 @@ class Budget:
 
     def charges(self):
         return dict(
-            resource_version=RESOURCE_VERSION, work=self.used,
-            wall=self.wall_used, cpu=self.cpu_used,
+            resource_version=RESOURCE_VERSION,
+            work=self.used,
+            wall=self.wall_used,
+            cpu=self.cpu_used,
         )

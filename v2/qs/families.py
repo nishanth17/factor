@@ -9,7 +9,11 @@ from math import comb, prod
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget
-from .factor_base import DEFAULT_MEMORY_BYTES
+from ..execution.resources import (
+    decode_checkpoint,
+    encode_checkpoint,
+    removed_arguments,
+)
 from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
 
 MAX_A_FACTORS = 32
@@ -74,6 +78,7 @@ def _checked_resources(resources):
     return resources
 
 
+@removed_arguments(("memory_bytes",))
 def family_assignments(
     base,
     half_width,
@@ -83,7 +88,6 @@ def family_assignments(
     pool_size=16,
     seed=7,
     budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
 ):
     """Return reproducible distinct squarefree A sets near the integer target.
 
@@ -102,11 +106,8 @@ def family_assignments(
         if value > maximum:
             raise ValueError(f"{name} exceeds the family limit")
 
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     reserve = base.workspace_bytes + 32768 + 256 * len(base.entries)
     reserve += family_count * factor_count * 256
-    if reserve > memory_bytes:
-        raise MemoryError("family assignment workspace exceeds memory_bytes")
     budget = budget if budget is not None else Budget()
     target = a_target(base.n_prime, half_width)
     budget.consume(len(base.entries) * (factor_count + 1))
@@ -249,13 +250,13 @@ class PolynomialFamily:
     the actual recentered B difference; 2 and p|A use their exact branches.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(
         self,
         base,
         a_primes,
         *,
         budget=None,
-        memory_bytes=DEFAULT_MEMORY_BYTES,
         parity=False,
         root_update_policy="standard",
         root_update_limit=None,
@@ -278,7 +279,6 @@ class PolynomialFamily:
             p not in base.primes or base.n_prime % p == 0 for p in a_primes
         ):
             raise ValueError("A primes must be nonsingular base members")
-        utils.require_integer(memory_bytes, "memory_bytes", 0)
         a = arithmetic.backend_for(base.n).integer(prod(a_primes))
         if parity:
             # CRT terms modulo 2a are even. Adding odd a to the initial
@@ -288,11 +288,9 @@ class PolynomialFamily:
         reserve += 512 * len(a_primes) + 16 * (
             a.bit_length() + base.n.bit_length()
         )
-        if reserve > memory_bytes:
-            raise MemoryError("family roots/CRT state exceeds memory_bytes")
         self.base, self.a_primes, self.a = base, a_primes, a
         self.budget = budget if budget is not None else Budget()
-        self.memory_bytes, self.workspace_bytes = memory_bytes, reserve
+        self.workspace_bytes = reserve
         entries = {
             entry.prime: entry
             for entry in base.entries
@@ -447,6 +445,7 @@ class PolynomialFamily:
         self.next_index += 1
         return step
 
+    @encode_checkpoint
     def checkpoint(self):
         """Save compact family progress/resources; root caches are rebuilt.
 
@@ -472,22 +471,12 @@ class PolynomialFamily:
             payload["root_update_policy"] = self.root_update_policy
             payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
-        if (
-            len(json.dumps(payload, default=arithmetic.json_integer).encode())
-            > MAX_CHECKPOINT_BYTES
-        ):
-            raise ValueError("family checkpoint exceeds its byte limit")
         return {"payload": payload, "sha256": _checksum(payload)}
 
     @classmethod
-    def from_checkpoint(
-        cls,
-        base,
-        checkpoint,
-        *,
-        budget,
-        memory_bytes=DEFAULT_MEMORY_BYTES,
-    ):
+    @removed_arguments(("memory_bytes",))
+    @decode_checkpoint
+    def from_checkpoint(cls, base, checkpoint, *, budget):
         """Verify progress and reconstruct charged caches on resume."""
         if not isinstance(checkpoint, dict) or set(checkpoint) != {
             "payload",
@@ -561,15 +550,9 @@ class PolynomialFamily:
         if index > 1 << (len(primes) - 1):
             raise ValueError("family checkpoint index exceeds its limit")
         resources = _checked_resources(payload["resources"])
-        if (
-            len(json.dumps(payload, default=arithmetic.json_integer).encode())
-            > MAX_CHECKPOINT_BYTES
-        ):
-            raise ValueError("family checkpoint exceeds its byte limit")
         if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("family checkpoint integrity mismatch")
         prior = Budget(
-            work_limit=budget.work_limit,
             used=resources["work_used"],
             prior_wall=resources["wall_used"],
             prior_cpu=resources["cpu_used"],
@@ -585,7 +568,6 @@ class PolynomialFamily:
             base,
             tuple(primes),
             budget=budget,
-            memory_bytes=memory_bytes,
             parity=parity,
             root_update_policy=policy,
             root_update_limit=limit,

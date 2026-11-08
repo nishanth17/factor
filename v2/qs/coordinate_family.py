@@ -1,8 +1,11 @@
 """Exact coordinate view using the production root recurrence unchanged."""
 
-import json
-
 from ..common import arithmetic, utils
+from ..execution.resources import (
+    decode_checkpoint,
+    encode_checkpoint,
+    removed_arguments,
+)
 from .families import (
     PolynomialFamily,
     _checked_resources,
@@ -24,6 +27,7 @@ class CoordinateFamily:
     changes initial signs, not the initial ordinal or the root recurrence.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(
         self,
         base,
@@ -31,7 +35,6 @@ class CoordinateFamily:
         *,
         schedule,
         budget,
-        memory_bytes,
         parity=False,
         root_update_policy="standard",
         root_update_limit=None,
@@ -41,14 +44,11 @@ class CoordinateFamily:
         ) or schedule.factor_count != len(a_primes):
             raise ValueError("schedule does not match this A family")
         extra = 1024 + 512 * len(a_primes)
-        if extra > HELPER_BYTES or memory_bytes < extra:
-            raise MemoryError("coordinate view exceeds its memory allowance")
         budget.consume(len(a_primes) + 1)
         kernel = PolynomialFamily(
             base,
             a_primes,
             budget=budget,
-            memory_bytes=memory_bytes - extra,
             parity=parity,
         )
         order = (0,) + schedule.variable_order
@@ -94,6 +94,7 @@ class CoordinateFamily:
     def budget(self, value):
         self._kernel.budget = value
 
+    @encode_checkpoint
     def checkpoint(self):
         payload = dict(
             schema="c10a01-coordinate-family-v2"
@@ -117,13 +118,13 @@ class CoordinateFamily:
             payload["root_update_policy"] = self.root_update_policy
             payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
-        if len(json.dumps(payload).encode()) > CHECKPOINT_BYTES:
-            raise MemoryError("coordinate family checkpoint exceeds its cap")
         return dict(payload=payload, sha256=_checksum(payload))
 
     @classmethod
+    @removed_arguments(("memory_bytes",))
+    @decode_checkpoint
     def from_checkpoint(
-        cls, base, checkpoint, *, budget, memory_bytes, expected_schedule=None
+        cls, base, checkpoint, *, budget, expected_schedule=None
     ):
         if not isinstance(checkpoint, dict) or set(checkpoint) != {
             "payload",
@@ -184,9 +185,7 @@ class CoordinateFamily:
             "base_identity"
         ] != _identity(base):
             raise ValueError("coordinate family target/convention mismatch")
-        if len(json.dumps(payload).encode()) > CHECKPOINT_BYTES or checkpoint[
-            "sha256"
-        ] != _checksum(payload):
+        if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("coordinate family integrity/size mismatch")
         if (
             budget.used < resources["work_used"]
@@ -202,7 +201,6 @@ class CoordinateFamily:
             root_update_policy=policy,
             root_update_limit=limit,
             budget=budget,
-            memory_bytes=memory_bytes,
         )
         if index > family.root_update_limit:
             raise ValueError("coordinate cursor exceeds root-update prefix")

@@ -3,9 +3,13 @@
 from dataclasses import dataclass, field
 
 from ..common import utils
+from ..execution.resources import removed_arguments
 from .sieve_collector import CombinedYieldSieveConfig
 
 
+@removed_arguments(
+    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes")
+)
 @dataclass(frozen=True)
 class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
     """Versioned extensions; production and earlier combined policies persist.
@@ -37,7 +41,6 @@ class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
     solver_panel_bits: int = field(default=4, kw_only=True)
     recovery_workers: int = field(default=0, kw_only=True)
     spill_directory: str | None = field(default=None, kw_only=True)
-    spill_bytes: int = field(default=0, kw_only=True)
     spill_cache_bytes: int = field(default=2**20, kw_only=True)
 
     def __post_init__(self):
@@ -81,7 +84,6 @@ class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
             "merge_fill": (0, 4096),
             "solver_panel_bits": (0, 8),
             "recovery_workers": (0, 1),
-            "spill_bytes": (0, 4 * 2**30),
             "spill_cache_bytes": (65536, 64 * 2**20),
         }
         for name, (minimum, maximum) in limits.items():
@@ -97,8 +99,6 @@ class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
             )
         if self.recovery_policy != "checked-v2":
             raise ValueError("expanded arithmetic requires checked recovery")
-        if bool(self.spill_bytes) != (self.spill_directory is not None):
-            raise ValueError("spill requires a directory and finite disk cap")
         if self.spill_directory is not None and (
             not isinstance(self.spill_directory, str)
             or not self.spill_directory.startswith("/")
@@ -111,6 +111,9 @@ EXTENSION_FIELDS = frozenset(
 ) - frozenset(CombinedYieldSieveConfig.__dataclass_fields__)
 
 
+@removed_arguments(
+    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes")
+)
 @dataclass(frozen=True)
 class BoundedYieldSieveConfig(ExtendedYieldSieveConfig):
     """Stage opaque atoms separately and reserve by retained shape."""

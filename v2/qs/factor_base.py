@@ -6,6 +6,7 @@ from types import MappingProxyType
 from ..common import arithmetic, prime_sieve, utils
 from ..common.arithmetic import gcd, pow
 from ..execution.budget import Budget
+from ..execution.resources import removed_arguments
 
 MAX_INPUT_BITS = 4096
 MAX_MULTIPLIER = 1_000_000
@@ -189,14 +190,9 @@ class FactorBaseBuild:
     divisor: int | None
 
 
+@removed_arguments(("memory_bytes",))
 def build_factor_base(
-    n,
-    *,
-    multiplier=1,
-    bound=100,
-    budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
-    backend=None,
+    n, *, multiplier=1, bound=100, budget=None, backend=None
 ):
     """Build roots for primes p < bound with gcd(h,n) checked first.
 
@@ -208,7 +204,6 @@ def build_factor_base(
         n = arithmetic.get_backend(backend).integer(n)
     target = checked_target(n, multiplier)
     utils.require_integer(bound, "bound", 3)
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     if bound > MAX_FACTOR_BASE_BOUND:
         raise ValueError("factor-base bound exceeds the reference limit")
     budget = budget if budget is not None else Budget()
@@ -218,9 +213,7 @@ def build_factor_base(
         return FactorBaseBuild(None, divisor)
     if divisor != 1:
         raise ValueError("multiplier is divisible by n")
-    reserve = 8192 + 64 * bound + 8 * target.bit_length()
-    if reserve > memory_bytes:
-        raise MemoryError("factor-base workspace exceeds memory_bytes")
+    8192 + 64 * bound + 8 * target.bit_length()
     budget.consume(bound)
     entries = []
 

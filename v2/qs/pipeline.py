@@ -14,7 +14,7 @@ from .extraction import (
 from .linear_algebra import DependencySolver, filter_matrix
 from .polynomial import checked_position
 from .sieve_collector import SieveCollector, SieveConfig
-from .storage import require_published, storage_limit
+from .storage import require_published
 
 
 @dataclass(frozen=True)
@@ -91,13 +91,9 @@ class QSJob:
             self.collector._set_plan_interval(lo, hi)
         # Only retained rows are cached. The collector owns the reservation,
         # including while matrix scratch coexists or a polynomial is switched.
-        cache_bytes = min(
-            2 * 2**20, 2048 * storage_limit(self.config.max_relations)
-        )
+        cache_bytes = self.config.preparation_cache_bytes
         self.collector._preparation_cache = None
-        if self.collector._workspace + cache_bytes < storage_limit(
-            self.config.memory_bytes
-        ):
+        if cache_bytes:
             self.collector._preparation_cache = _VerificationCache(
                 cache_bytes, checked=self.collector._checked
             )
@@ -115,13 +111,9 @@ class QSJob:
         ):
             from .equal_parity import EqualParityIndex
 
-            available = max(
-                0, self.config.memory_limit - self.collector._workspace - 65536
-            )
             reserve = min(
                 self.config.duplicate_bytes
                 // (2 if self.collector._checked is not None else 1),
-                available,
             )
             self._pair_index = EqualParityIndex(reserve)
             self.collector._workspace += reserve
@@ -204,7 +196,6 @@ class QSJob:
                             row,
                             self.collector._atoms,
                             self.budget,
-                            self.config.memory_limit,
                         )
                         == 0
                         if self.collector._checked is not None
@@ -263,11 +254,8 @@ class QSJob:
                     self.collector.factor_base,
                     store,
                     budget=self.budget,
-                    memory_bytes=storage_limit(self.config.memory_bytes),
                     retained_workspace_bytes=self.collector._workspace,
                     verification_cache=self.collector._preparation_cache,
-                    max_rows=self.config.max_relations,
-                    max_atoms=self.config.max_atoms,
                 ),
             )
             # Collection buffers and preparation scratch coexist. Only
@@ -278,17 +266,12 @@ class QSJob:
                 - prepared.shared_workspace_bytes
             )
             self._workspace_peak = max(self._workspace_peak, live_workspace)
-            remaining = (
-                storage_limit(self.config.memory_bytes) - live_workspace
-            )
             matrix = self._timed(
                 "filtering",
                 lambda: filter_matrix(
                     prepared.rows,
                     weight_two=self.weight_two,
                     budget=self.budget,
-                    memory_bytes=max(0, remaining),
-                    max_rows=self.config.max_relations,
                     merge_policy="fill-v2"
                     if getattr(self.config, "filter_policy", "reference")
                     != "reference"
@@ -326,7 +309,7 @@ class QSJob:
                     matrix.stats,
                     self.row_excess,
                     self.filter_row_growth,
-                    self.config.relation_limit,
+                    self.config.target_rows,
                 )
             excess = len(matrix.rows) - matrix.stats["output_columns"]
             if (
@@ -357,7 +340,6 @@ class QSJob:
                 self.prepared,
                 dependencies,
                 budget=self.budget,
-                max_dependencies=self.config.max_relations,
                 tested_cache=(
                     self.collector._preparation_cache
                     if self.tested_dependencies
@@ -381,7 +363,7 @@ class QSJob:
                 skipped,
                 divisor,
                 self.filter_row_growth,
-                self.config.relation_limit,
+                self.config.target_rows,
             )
         self.stats["trivial_dependencies"] += skipped + sum(
             trial.divisor is None for trial in self.extractor.trials
@@ -417,7 +399,7 @@ class QSJob:
             try:
                 self.divisor = self._solve(True)
             except MemoryError:
-                self.storage_reason = "memory_limit"
+                self.storage_reason = "allocation_failure"
             self.storage_solve_done = True
 
         return self.storage_reason
@@ -503,7 +485,7 @@ class QSJob:
                         if reason in (
                             "relation_limit",
                             "atom_limit",
-                            "memory_limit",
+                            "allocation_failure",
                         ):
                             self.storage_reason = reason
                             reason = self._finish_storage()

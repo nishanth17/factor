@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from ..common import prime_sieve, utils
 from ..common.arithmetic import gcd, pow
+from ..execution.resources import removed_arguments
 from .factor_witness import factor_snapshot
 from .indexed_relations import FactorRecord, encode_factors
 from .lazy_relations import LazyCombinedRelation
@@ -169,11 +170,12 @@ class CheckedStore:
         )
         self._record(atom)
 
-    def combine(self, atoms, budget, memory_bytes):
+    @removed_arguments(("memory_bytes",))
+    def combine(self, atoms, budget):
         identities = tuple(atom.relation_id for atom in atoms)
         if not 1 <= len(atoms) <= 256 or len(set(identities)) != len(atoms):
             raise ValueError("invalid checked combination provenance")
-        _combination_workspace(atoms, self.base, memory_bytes)
+        _combination_workspace(atoms, self.base)
         for atom in atoms:
             self.atom(atom, budget)
             for prime in atom.residual_primes:
@@ -197,7 +199,8 @@ class CheckedStore:
         self._record(row, atoms=atoms)
         return CombinationResult(row, None)
 
-    def row(self, row, store, budget, memory_bytes):
+    @removed_arguments(("memory_bytes",))
+    def row(self, row, store, budget):
         if (
             isinstance(row, LazyCombinedRelation)
             and row._modulus != self.base.n
@@ -232,7 +235,7 @@ class CheckedStore:
                     if atom is None or atom.relation_id != identity:
                         raise ValueError("missing checked provenance")
                     self.atom(atom, budget)
-                _combination_workspace(atoms, self.base, memory_bytes)
+                _combination_workspace(atoms, self.base)
                 if isinstance(row, LazyCombinedRelation):
                     row.verify_structure(atoms, budget)
                 else:
@@ -317,15 +320,14 @@ class CheckedStore:
             self.used -= record[3]
 
 
-def residual_floor(base, budget, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def residual_floor(base, budget):
     """First omitted eligible prime, conservatively, even for custom bases.
 
     Every prime dividing the remaining norm must divide U²-kN. Thus a prime
     below B can remain only if kN is a square modulo it and it was omitted.
     A custom incomplete base or multiplier exception lowers this bound.
     """
-    if 64 * base.bound + base.workspace_bytes > memory_bytes:
-        return 2
     budget.consume(base.bound)
     for prime in prime_sieve.prime_sieve(base.bound):
         if prime in base._columns:
@@ -354,9 +356,7 @@ class UsefulTarget:
             raise ValueError("useful-target cursor exceeds retained rows")
         while self.count < len(rows):
             row = rows[self.count]
-            bits = collector._checked.row(
-                row, collector._atoms, budget, collector.config.memory_limit
-            )
+            bits = collector._checked.row(row, collector._atoms, budget)
             budget.consume(1 + (bits.bit_length() + 63) // 64)
             self.columns |= bits
             self.count += 1
@@ -378,7 +378,9 @@ class UsefulTarget:
         # the current row count bounds overshoot; the normal growth floor
         # prevents repeatedly preparing nearly identical inputs.
         topup = min(max(growth, (count + 3) // 4), max(growth, desired))
-        self.next_target = min(limit, count + topup)
+        self.next_target = (
+            count + topup if limit is None else min(limit, count + topup)
+        )
         self.last_raw, self.last_useful = count, useful
 
     def state(self):
@@ -401,12 +403,9 @@ class UsefulTarget:
             raise ValueError("useful-target columns differ from checked rows")
         for name in ("next_target", "last_raw", "last_useful"):
             value = state[name]
-            if (
-                type(value) is not int
-                or not -len(collector.factor_base.entries) - 1
-                <= value
-                <= collector.config.relation_limit
-            ):
+            if type(value) is not int or not -len(
+                collector.factor_base.entries
+            ) - 1 <= value <= max(len(rows), state["next_target"]):
                 raise ValueError("useful-target feedback exceeds its bound")
         if (
             not 0 <= state["last_raw"] <= count

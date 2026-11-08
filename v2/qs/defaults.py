@@ -3,6 +3,7 @@
 from dataclasses import replace
 
 from ..common import utils
+from ..execution.resources import removed_arguments
 from .collector_kernels import combine, components
 from .sieve_collector import GrowingDoubleLargeSieveConfig
 from .siqs import CountedSIQSConfig, SIQSConfig
@@ -47,7 +48,8 @@ def _coupled_policies(config):
     )
 
 
-def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
+@removed_arguments(("memory_bytes",))
+def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
     """Select coupled policies at every size without enlarging grants.
 
     The existing 40 and 50–60-digit parameter/resource presets remain intact.
@@ -59,23 +61,24 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         return _coupled_policies(
             SIQSConfig(
                 backend=backend,
-                memory_bytes=memory_bytes,
                 sign_policy="swap_high",
             )
         )
 
     forty_digits = abs(n) < 10**40
-    owned_memory = C9_MEMORY_BYTES if memory_bytes is None else memory_bytes
+    if recipe not in ("calibrated", "reference"):
+        raise ValueError("unknown SIQS recipe")
+    calibrated = recipe == "calibrated"
     # A1a passed at 50; the user extends routing through 55 despite drift at
     # 55 and unmeasured intermediate sizes. Keep the tested owned allowance.
     selected_marking = (
         "density+presieve+scan_fused"
-        if 10**49 <= abs(n) < 10**55 and owned_memory == C9_MEMORY_BYTES
+        if 10**49 <= abs(n) < 10**55 and calibrated
         else "sparse"
     )
     # C10 isolated this plan at 40/50 digits; the later 51-digit default study
     # confirms the same bundle. Other owned allowances were not tested.
-    plan_bytes = C10_POWER_PLAN_BYTES if owned_memory == C9_MEMORY_BYTES else 0
+    plan_bytes = C10_POWER_PLAN_BYTES if calibrated else 0
 
     larger = abs(n) >= 10**51
     config_type = CountedSIQSConfig if larger else SIQSConfig
@@ -107,12 +110,8 @@ def default_siqs_config(n, *, backend="python-int", memory_bytes=None):
         # 51-digit default study confirms this bundle's completion gain; 40
         # digits retains window pacing after its inconclusive comparison.
         solve_policy=(
-            "collection"
-            if not forty_digits and owned_memory == C9_MEMORY_BYTES
-            else "window"
+            "collection" if not forty_digits and calibrated else "window"
         ),
-        memory_bytes=owned_memory,
-        checkpoint_bytes=1048576,
         collector=GrowingDoubleLargeSieveConfig(
             sparse_queue_bytes=32 * 1024 * 1024,
             marking=selected_marking,
@@ -132,10 +131,4 @@ def default_siqs_budget(n, *, backend="python-int"):
     """Use finite size-scoped grants only when the caller omits a budget."""
     from ..execution.budget import Budget
 
-    if uses_siqs_defaults(n, backend=backend):
-        return Budget(
-            work_limit=C9_WORK_LIMIT,
-            seconds=1800 if abs(n) >= 10**55 else C9_SECONDS,
-            cpu_seconds=1800 if abs(n) >= 10**55 else C9_SECONDS,
-        )
     return Budget()
