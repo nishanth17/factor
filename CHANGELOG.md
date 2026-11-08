@@ -14,6 +14,9 @@ below record decisions in their dated scope; later entries may supersede routes.
   observation settings before starting actors.
 - Report the bounded overhead comparisons and full-factor remeasurement.
   Configuration tuning and fresh performance confirmation remain open.
+- Close the final source gap with the requested interleaved fixed-work
+  comparison. Preserve exact signatures/scanned positions and explicitly
+  list default-path changes; this Tier 1 check is not a new speedup claim.
 
 ## QS reference allowance correction (7 November 2026)
 

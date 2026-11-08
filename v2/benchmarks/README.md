@@ -711,3 +711,10 @@ inputs per band and matched factoring/interpreter hash seeds. Clean timings
 exclude CPU/heap captures; timeline tables and full evidence remain local.
 See [the execution specification](A7A_EXPERIMENT.md) for the protocol and
 gates. No automatic factoring defaults are changed.
+
+G2H closes with a separate intermediate/final fixed-work bridge: three inputs
+at each of 50/65 digits, three interleaved repetitions per source/input, exact
+relation signatures and scanned positions. Its requested Tier 1 criterion
+checks aggregate collector-time ratios within roughly 3%; cold actor times
+and default-path diff touches are also reported. This is not a statistical
+equivalence or full-factor speedup claim. G3 remains separately gated.

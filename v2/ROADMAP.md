@@ -175,7 +175,7 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
-- **G2H reported (7 November):** independent packet references include N=10;
+- **G2H complete (7 November):** independent packet references include N=10;
   static family affinity, grouped exact marking leases and byte hit stamps
   have explicit implementations and exactness tests. Full comparisons and
   the requested three-input byte/native remeasurement remain inconclusive
@@ -183,8 +183,12 @@ does not establish a free increase in B1.
   now. Current cold coverage completes across 40–70 digits; G3/G2K/G4 and
   75/80 probes remain separately gated. All G2H/G3 process arms now require
   worker timelines; G4 disables them. Committed-only QA `1b5ab81` passes
-  1,572 tests (nine optional skips), lint and imports. Detailed local report:
-  `v2/audit/a7a/g2h-report-20261107-r2/REPORT.md`.
+  1,572 tests (nine optional skips), lint and imports. The final 36-call
+  intermediate/final fixed-work comparison passes the requested Tier 1 3%
+  aggregate criterion with identical signatures/scanned work. Default-path
+  touches are explicitly audited. Final closure and fixed options:
+  `v2/audit/a7a/g2h-closure-20261107/REPORT.md`; preceding full evidence and
+  prices: `v2/audit/a7a/g2h-report-20261107-r2/REPORT.md`.
 
 - **G2 reported (7 November):** the approved corrected continuation covers all
   24 cold/warm arm cells. Serial/process controls complete every row; literal

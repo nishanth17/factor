@@ -104,9 +104,9 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
-## A7a G2H report — 7 November 2026
+## A7a G2H complete — 7 November 2026
 
-The approved overhead stage is reported on `codex/a7a-regime-tuning`.
+The approved overhead stage is complete on `codex/a7a-regime-tuning`.
 Independent packet measurements include 1/4/8/10 workers and local execution.
 Family affinity, grouped exact lease charging and byte-sized hit stamps are
 implemented as explicit experimental choices. Matched full-factor checks and
@@ -114,11 +114,20 @@ the requested byte/native remeasurement do not establish a new wall-time gain;
 their failures, uncertainty and original source identities remain preserved.
 Current-source cold coverage completes at 40/50/55/60/65/70 digits.
 
+The requested final source-gap check closes the remaining validation gap:
+36 interleaved fixed-work calls, three inputs per representative size and
+three repetitions per source/input, all match relation signatures and scanned
+positions. Aggregate collector-time ratios meet the requested Tier 1 3%
+criterion at both 50 and 65 digits. The diff audit lists default-path guards
+and construction changes; it does not claim those paths are untouched.
+
 Worker active, queue-wait and publication timelines are required in G2H/G3
 process calls and disabled in G4 confirmation. The runner enforces this before
 starting actors. Committed-only QA on `1b5ab81`: 1,572 tests, nine optional
 skips, lint and benchmark imports pass. The measurement window is released.
-Local evidence, timeline tables and repricing:
+Final closure, fixed options and diff audit:
+`v2/audit/a7a/g2h-closure-20261107/REPORT.md`.
+Earlier full evidence, timeline tables and repricing remain in
 `v2/audit/a7a/g2h-report-20261107-r2/REPORT.md`.
 Anchor tuning, fresh confirmation, probes and adoption remain pending;
 G3 requires explicit approval.
@@ -168,7 +177,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | G2H reported: independent throughput, worker-side alternatives, matched full calls, CPU/heaps and timelines. New wall-time gains remain inconclusive; anchor tuning, fresh confirmation and integration remain open. | `codex/a7a-regime-tuning`; G2H QA `1b5ab81` |
+| [A7a](ROADMAP.md#a7a-in-progress) | G2H complete, including the final Tier 1 source-gap check. New full-factor wall-time gains remain inconclusive; anchor tuning, fresh confirmation and integration remain open. | `codex/a7a-regime-tuning`; G2H QA `1b5ab81`, gap measurement `f589ea3` |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first

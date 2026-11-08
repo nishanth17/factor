@@ -364,6 +364,39 @@ block. Stop after the twelve calls; extensions and adoption are not automatic.
 Use the existing combined runner with the frozen per-call JSON plans and
 their recorded `PYTHONHASHSEED`; retain the enclosing grant and all charges.
 
+### Final source-gap check — replacement instruction, 7 November
+
+For the later default-off additions, the explicitly requested Tier 1 bridge
+replaces remaining new full-factor gap calls. Preserve the completed and
+interrupted calls from the replaced protocol; do not pool them with prefixes.
+Compare intermediate `fabfa9f` with final `f589ea3`, whose runtime is `1b5ab81`
+plus documentation. The preceding three-input matched full checks remain
+labeled with their original sources.
+
+Run 512 polynomials/p16 on each of the three 50- and three 65-digit calibration
+inputs, three cold repetitions per source/input: 36 calls. Hold Y0, C4/C8,
+lookahead 4, native stamps, scalar leases and all other mechanisms fixed.
+Use packet CPU 5 and actor wall/CPU 30/300 seconds, with a 45-second owner
+allowance per call. Enclosing grant: 1,640 wall seconds, 16,400 CPU-seconds,
+128 MiB storage, charged within G2H. No CPU/heap capture; Tier A, RSS and
+worker active/queue-wait/publication timelines are on both arms.
+
+Visit repetitions 0/1/2, input indices 0/1/2, then sizes 50/65. Alternate
+source order by repetition + input index + regime. Pin both factoring and
+interpreter hash seeds to 104729/130363/155921 by input index. Require exactly
+67,109,376 scanned positions per call and identical relation signatures
+across all six calls for each input.
+
+Geometrically average paired collector-time ratios within each input, then
+equally across the three independent inputs. Report cold actor ratios and
+within-input A/A ranges separately. Record this gap as closed when work and
+signatures match and aggregate collector ratios at both sizes lie in
+[0.97, 1.03]. Do not add an all-inputs or uncertainty-interval requirement to
+this explicit Tier 1 point criterion, or interpret it as default adoption.
+Audit the exact source diff and list default-path touches rather than
+assuming default-off selectors leave the hot path unchanged. Stop and report;
+G3 still requires its own gate.
+
 ### Conditional G2K: shared cofactor jobs
 
 K is unimplemented and offers no guaranteed speedup. At G2H report measured
