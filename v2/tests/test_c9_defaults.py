@@ -3,7 +3,6 @@
 import json
 import tempfile
 import unittest
-from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
@@ -25,6 +24,7 @@ from v2.qs.defaults import (
 )
 from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 ROOT = Path(__file__).resolve().parents[2]

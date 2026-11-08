@@ -1,5 +1,6 @@
 """One observed resource owner shared by stages and recursive children."""
 
+import itertools
 import os
 import sys
 import time
@@ -12,6 +13,8 @@ from .resources import (
     default_provider,
     validate_seconds,
 )
+
+_PROCESS_REGISTRATIONS = itertools.count()
 
 
 class BudgetExhaustedError(Exception):
@@ -77,7 +80,10 @@ class Budget:
         self._wall_clock = wall_clock or time.monotonic
         self._cpu_clock = cpu_clock or time.process_time
         self.provider = provider
-        self.roots = {os.getpid()}
+        self.roots = {os.getpid(): None}
+        self._process_bindings = {}
+        self._process_identities = {}
+        self._live_identities = {}
         self._children = {}
         self._child_cpu = 0.0
         self._last_sample = None
@@ -137,7 +143,7 @@ class Budget:
 
     def register(self, pid):
         """Include an owned helper/worker even after it is reparented."""
-        self.roots.add(pid)
+        self.roots[pid] = None
 
     def observe_child(self, identity, cpu_total, *, baseline=False):
         """Reconcile OS samples, acknowledgments and final wait4 totals once.
@@ -165,6 +171,26 @@ class Budget:
         ):
             return
         samples = self.provider.sample(self.roots)
+        self._live_identities = {
+            sample.pid: (sample.pid, sample.birth) for sample in samples
+        }
+        for sample in samples:
+            if type(sample.rss) is not int or sample.rss < 0:
+                raise ValueError("invalid observed resident size")
+            if sample.pid in self.roots:
+                self.roots[sample.pid] = sample.birth
+            binding = self._process_bindings.get(sample.pid)
+            identity = (sample.pid, sample.birth)
+            if binding is not None and binding[1] != identity:
+                # A child may finish exec before libproc first observes it.
+                # Move its report counter to the now-known birth identity;
+                # otherwise report -> sample -> exit could bill it twice.
+                previous = self._children.pop(binding[1], 0.0)
+                self._children[identity] = max(
+                    previous, self._children.get(identity, 0.0)
+                )
+                binding[1] = identity
+                self._process_identities[sample.pid] = identity
         self.observed_rss = sum(sample.rss for sample in samples)
         for sample in samples:
             if sample.pid != os.getpid():
@@ -174,12 +200,22 @@ class Budget:
         self._last_sample = now
 
     def _check(self, *, publication=False):
-        self._sample(force=publication)
         if self.cancelled is not None and self.cancelled():
             self.reason, self.stop = "cancelled", None
             raise BudgetExhaustedError(self.reason)
+        wall = self.wall_used
+        if self.seconds is not None and wall >= self.seconds:
+            self.reason = "wall_limit"
+            self.stop = dict(
+                reason=self.reason,
+                limit="wall",
+                observed=wall,
+                limit_value=self.seconds,
+                scope=self.scope,
+            )
+            raise BudgetExhaustedError(self.reason, self.stop)
+        self._sample(force=publication)
         for name, observed, limit in (
-            ("wall", self.wall_used, self.seconds),
             ("cpu", self.cpu_used, self.cpu_seconds),
             ("rss", self.observed_rss, self.rss_bytes),
         ):
@@ -193,6 +229,7 @@ class Budget:
                     scope=self.scope,
                 )
                 raise BudgetExhaustedError(self.reason, self.stop)
+        self.reason = self.stop = None
 
     def consume(self, amount=1):
         utils.require_integer(amount, "amount", 0)
@@ -229,10 +266,12 @@ class Budget:
     def acknowledge(self, pid, cpu_total):
         """Reconcile a process-lifetime acknowledgment with OS samples."""
         self._sample(force=True)
-        identities = [key for key in self._children if key[0] == pid]
-        if not identities:
+        identity = self._process_identities.get(pid)
+        if identity is None:
+            identity = self._live_identities.get(pid)
+        if identity is None:
             raise RuntimeError("CPU report from an unregistered process")
-        self.observe_child(identities[-1], cpu_total)
+        self.observe_child(identity, cpu_total)
 
     def track_process(self, process):
         """Retain final wait4 usage through this owned Popen's sole reaper.
@@ -243,18 +282,40 @@ class Budget:
         process changes only its current accounting owner; no global process
         or multiprocessing runtime is modified.
         """
-        self.register(process.pid)
-        self._sample(force=True)
-        identities = [key for key in self._children if key[0] == process.pid]
-        identity = identities[-1] if identities else (process.pid, id(process))
-        self._children.setdefault(identity, 0.0)
         popen = process._popen
         existing = getattr(popen, "_factor_accounting", None)
+        self.register(process.pid)
+        self._sample(force=True)
+        identity = (
+            existing[1]
+            if existing is not None
+            else self._live_identities.get(
+                process.pid,
+                (process.pid, ("unobserved", next(_PROCESS_REGISTRATIONS))),
+            )
+        )
         if existing is not None:
+            previous_owner = existing[0]
+            if previous_owner is not self:
+                previous_owner.roots.pop(process.pid, None)
+                previous_owner._process_bindings.pop(process.pid, None)
+            if popen.returncode is not None:
+                # An idle exit predates this new active interval.
+                self._children.setdefault(
+                    identity, previous_owner._children.get(identity, 0.0)
+                )
             existing[0], existing[1] = self, identity
+            binding = existing
+        else:
+            self._children.setdefault(identity, 0.0)
+            binding = [self, identity]
+            popen._factor_accounting = binding
+        self._process_identities[process.pid] = identity
+        self._process_bindings[process.pid] = binding
+        if popen.returncode is not None:
+            self.roots.pop(process.pid, None)
+        if existing is not None:
             return
-        binding = [self, identity]
-        popen._factor_accounting = binding
 
         def poll(flag=os.WNOHANG):
             if popen.returncode is None:
@@ -268,7 +329,13 @@ class Budget:
                     raise
                 if pid == popen.pid:
                     owner, key = binding
-                    owner.observe_child(key, usage.ru_utime + usage.ru_stime)
+                    owner.observe_child(
+                        key,
+                        usage.ru_utime + usage.ru_stime,
+                        baseline=not owner._active,
+                    )
+                    owner.roots.pop(popen.pid, None)
+                    owner._process_bindings.pop(popen.pid, None)
                     popen.returncode = os.waitstatus_to_exitcode(status)
             return popen.returncode
 

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from ..common import utils
 from ..common.arithmetic import gcd, isqrt
 from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import removed_arguments
+from ..execution.resources import accounted_job, removed_arguments
 from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .families import verify_polynomial_roots
@@ -695,6 +695,7 @@ class SieveCollector:
         The target/base are fixed. Reserve coexistence with old metadata before
         rebuilding; budget or memory refusal leaves the published state intact.
         """
+        require_published(self)
         if type(retain_relations) is not bool:
             raise TypeError("retain_relations must be Boolean")
         extra = 512 * len(self.factor_base.entries) + 32768
@@ -730,78 +731,85 @@ class SieveCollector:
         self._switch_peak = max(
             getattr(self, "_switch_peak", 0), self._workspace + extra
         )
-        if not retain_relations:
-            if self._checked is not None:
-                from .indexed_relations import RecordArena
+        self.budget.publication()
+        try:
+            if not retain_relations:
+                if self._checked is not None:
+                    from .indexed_relations import RecordArena
 
-                self._checked.clear()
-                if self._arena is not None:
-                    # Old public snapshots keep their original arena alive.
-                    spill = self._arena.spill
-                    if (
-                        getattr(self.config, "extension_policy", None)
-                        == "extended-v2"
-                    ):
-                        self._workspace -= self._slab_bytes
-                        self._slab_bytes = 0
-                    self._arena = RecordArena(
-                        self.factor_base,
-                        config=self.config,
-                        budget=self.budget,
-                    )
-                    self._arena.spill = spill
-                if getattr(self.config, "extension_policy", None):
-                    from .incremental_structure import IncrementalStructure
-
-                    self._incremental = IncrementalStructure(
-                        self.config.incremental_bytes
-                    )
-                    self._conversion_events = []
-                    self._workspace -= self._conversion_bytes
-                    self._conversion_bytes = 0
-                    if self.config.extension_policy == "extended-v2":
-                        from .opaque_staging import OpaqueStaging
-
-                        self._opaque_staging = OpaqueStaging(
-                            self.config, self.factor_base
+                    self._checked.clear()
+                    if self._arena is not None:
+                        # Old public snapshots keep their original arena alive.
+                        spill = self._arena.spill
+                        if (
+                            getattr(self.config, "extension_policy", None)
+                            == "extended-v2"
+                        ):
+                            self._workspace -= self._slab_bytes
+                            self._slab_bytes = 0
+                        self._arena = RecordArena(
+                            self.factor_base,
+                            config=self.config,
+                            budget=self.budget,
                         )
-            cache = getattr(self, "_preparation_cache", None)
-            if cache is not None:
-                cache.clear()
-            self._workspace -= sum(self._atom_bytes.values())
-            if self._short_cycles is not None:
-                self._workspace -= 2048 * len(self._short_cycles.edges)
-                self._short_cycles.edges.clear()
-                self._short_cycles.neighbors.clear()
-                self._short_cycles.weights.clear()
-            if self._graph is not None:
-                if not getattr(self.config, "extension_policy", None):
-                    self._workspace -= self._graph_reserve(
-                        len(self._graph.edges)
-                    ) - self._graph_reserve(0)
-                self._graph = type(self._graph)()
-            self._atoms.clear()
-            self._pending.clear()
-            self._atom_bytes.clear()
-            self._full.clear()
-            self._combined.clear()
-            self._rows.clear()
+                        self._arena.spill = spill
+                    if getattr(self.config, "extension_policy", None):
+                        from .incremental_structure import IncrementalStructure
 
-        if self.config.sparse_queue_bytes:
-            from .sparse_queue import clear
+                        self._incremental = IncrementalStructure(
+                            self.config.incremental_bytes
+                        )
+                        self._conversion_events = []
+                        self._workspace -= self._conversion_bytes
+                        self._conversion_bytes = 0
+                        if self.config.extension_policy == "extended-v2":
+                            from .opaque_staging import OpaqueStaging
 
-            clear(self)
-        self.polynomial, self._roots = polynomial, roots
-        if self._power_transfers is not None:
-            self._power_transfers.bind(polynomial)
-        self._a_exponents, self._a_support = exponents, support
-        self._a_factor_value, self._a_factor_primes = supported_a, primes
-        self._lift_inverses.clear()
-        self._power_plans.clear()
-        self._plan_refused.clear()
-        self._plan_bytes = 0
-        self._plan_window = None
-        self._resieved.clear()
+                            self._opaque_staging = OpaqueStaging(
+                                self.config, self.factor_base
+                            )
+                cache = getattr(self, "_preparation_cache", None)
+                if cache is not None:
+                    cache.clear()
+                self._workspace -= sum(self._atom_bytes.values())
+                if self._short_cycles is not None:
+                    self._workspace -= 2048 * len(self._short_cycles.edges)
+                    self._short_cycles.edges.clear()
+                    self._short_cycles.neighbors.clear()
+                    self._short_cycles.weights.clear()
+                if self._graph is not None:
+                    if not getattr(self.config, "extension_policy", None):
+                        self._workspace -= self._graph_reserve(
+                            len(self._graph.edges)
+                        ) - self._graph_reserve(0)
+                    self._graph = type(self._graph)()
+                self._atoms.clear()
+                self._pending.clear()
+                self._atom_bytes.clear()
+                self._full.clear()
+                self._combined.clear()
+                self._rows.clear()
+
+            if self.config.sparse_queue_bytes:
+                from .sparse_queue import clear
+
+                clear(self)
+            self.polynomial, self._roots = polynomial, roots
+            if self._power_transfers is not None:
+                self._power_transfers.bind(polynomial)
+            self._a_exponents, self._a_support = exponents, support
+            self._a_factor_value, self._a_factor_primes = supported_a, primes
+            self._lift_inverses.clear()
+            self._power_plans.clear()
+            self._plan_refused.clear()
+            self._plan_bytes = 0
+            self._plan_window = None
+            self._resieved.clear()
+        except MemoryError as error:
+            self._publication_failed = True
+            raise RelationPublicationError(
+                "polynomial metadata publication", "sieve_collector"
+            ) from error
 
     def _power_marks(self, index, maximum, lo, hi, stats):
         """Reuse a charged, capped plan bound to this polynomial/window.
@@ -1693,6 +1701,7 @@ class SieveCollector:
 
         return None
 
+    @accounted_job
     def collect(self, lo, hi):
         """Collect a bounded window using reusable half-open working blocks.
 

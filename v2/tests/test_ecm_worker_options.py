@@ -400,9 +400,8 @@ class PoolShutdownTests(unittest.TestCase):
         )
 
 
-def packet_factor_worker(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def packet_factor_worker(channel, settings_data=None):
+    _frame_bytes, startup_work = 16384, 0
     """Finite fake service for real spawn/healthy reuse QA; no ECM calls."""
     from v2.execution.ecm_worker import read_message
     from v2.execution.worker_contract import Decoder, frame

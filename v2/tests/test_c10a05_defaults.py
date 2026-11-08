@@ -2,7 +2,7 @@
 
 import json
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
@@ -12,6 +12,7 @@ from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs import allowance
 
 ROOT = Path(__file__).resolve().parents[2]

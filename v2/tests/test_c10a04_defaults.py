@@ -3,7 +3,7 @@
 import json
 import tempfile
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -18,6 +18,7 @@ from v2.qs.count_policy import CountPolicyRefusedError, endpoint_for_count
 from v2.qs.defaults import default_siqs_budget, uses_siqs_defaults
 from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 

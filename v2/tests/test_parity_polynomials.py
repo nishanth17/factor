@@ -235,9 +235,7 @@ class ParityPolynomialTests(unittest.TestCase):
             kind = (
                 CoordinateFamily if policy == "swap_high" else PolynomialFamily
             )
-            restored = kind.from_checkpoint(
-                base, saved, budget=budget, memory_bytes=2**24
-            )
+            restored = kind.from_checkpoint(base, saved, budget=budget)
             self.assertEqual(restored.next(), family.next())
             previous = family.current
             family.budget = allowance(0)

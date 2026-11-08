@@ -458,3 +458,156 @@ class IncidentCoverageTests(unittest.TestCase):
         self.assertIsNone(budget.stop)
         with self.assertRaises(RelationPublicationError):
             require_published(owner)
+
+
+class ResumeOrdinalTests(unittest.TestCase):
+    def test_cancellation_resumes_do_not_consume_failure_retry_effort(self):
+        from v2.execution.worker_contract import (
+            Manifest,
+            Search,
+            WorkerSettings,
+        )
+
+        settings = WorkerSettings()
+        manifest = Manifest(
+            35,
+            7,
+            "repeated-resume",
+            dict(ecm_tiers=((10, 30, 1),), backend="python-int"),
+        )
+        search = Search(manifest, settings)
+        for ordinal in range(1, 7):
+            self.assertEqual(search.next(), 0)
+            search.dispatch(0, ordinal)
+            search.receive(
+                0,
+                ordinal,
+                dict(
+                    id=manifest.assignment(0)["id"],
+                    token=ordinal,
+                    attempt=ordinal,
+                    reason="cancelled",
+                    factor=None,
+                    stage="curve",
+                    work=1,
+                ),
+            )
+            search = Search.restore(search.snapshot(), manifest, settings)
+        self.assertEqual(search.attempts, [6])
+        self.assertEqual(search.failed_attempts, [0])
+
+    def test_numerical_failure_retry_effort_still_has_its_original_value(self):
+        from v2.execution.worker_contract import (
+            LeaseRefusedError,
+            Manifest,
+            Search,
+            WorkerSettings,
+        )
+
+        settings = WorkerSettings()
+        manifest = Manifest(
+            35,
+            7,
+            "failure-retries",
+            dict(ecm_tiers=((10, 30, 1),), backend="python-int"),
+        )
+        search = Search(manifest, settings)
+        for ordinal in range(1, settings.max_attempts + 1):
+            search.dispatch(0, ordinal)
+            search.receive(
+                0,
+                ordinal,
+                dict(
+                    id=manifest.assignment(0)["id"],
+                    token=ordinal,
+                    attempt=ordinal,
+                    reason="error",
+                    factor=None,
+                    stage="curve",
+                    work=1,
+                ),
+            )
+        with self.assertRaisesRegex(LeaseRefusedError, "attempt_limit"):
+            search.next()
+
+
+class DrainPublicationTests(unittest.TestCase):
+    def test_drained_result_settles_without_publishing_a_completed_cursor(
+        self,
+    ):
+        from v2.execution.worker_contract import (
+            Manifest,
+            Search,
+            WorkerSettings,
+        )
+
+        manifest = Manifest(
+            35,
+            7,
+            "drain",
+            dict(ecm_tiers=((10, 30, 1),), backend="python-int"),
+        )
+        search = Search(manifest, WorkerSettings())
+        search.dispatch(0, 1)
+        search.receive(
+            0,
+            1,
+            dict(
+                id=manifest.assignment(0)["id"],
+                token=1,
+                attempt=1,
+                reason="complete",
+                factor=5,
+                stage="curve",
+                work=1,
+            ),
+            publish=False,
+        )
+        self.assertEqual(search.active, {})
+        self.assertEqual(search.completed, {})
+        self.assertIsNone(search.factor)
+        self.assertEqual(search.next(), 0)
+
+
+class ProcessIdentityRaceTests(unittest.TestCase):
+    def test_report_before_first_live_sample_reconciles_with_birth_and_exit(
+        self,
+    ):
+        from types import SimpleNamespace
+
+        provider = Provider()
+        budget = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        process = SimpleNamespace(
+            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+        )
+        budget.track_process(process)
+        budget.acknowledge(123, 2)
+        provider.rows.append(ProcessSample(123, 99, 50, 3))
+        budget.publication()
+        self.assertEqual(budget.cpu_used, 3)
+        usage = SimpleNamespace(ru_utime=4, ru_stime=1)
+        with patch("os.wait4", return_value=(123, 0, usage)):
+            process._popen.poll()
+        self.assertEqual(budget.cpu_used, 5)
+        self.assertNotIn(123, budget.roots)
+
+    def test_reused_pid_with_no_live_sample_does_not_reuse_old_cpu_counter(
+        self,
+    ):
+        from types import SimpleNamespace
+
+        provider = Provider()
+        budget = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        for cpu in (3, 1):
+            process = SimpleNamespace(
+                pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+            )
+            budget.track_process(process)
+            usage = SimpleNamespace(ru_utime=cpu, ru_stime=0)
+            with patch("os.wait4", return_value=(123, 0, usage)):
+                process._popen.poll()
+        self.assertEqual(budget.cpu_used, 4)

@@ -315,9 +315,8 @@ def truncate_then_crash(channel, settings_data=None):
     _fake_worker(channel, frame_bytes, startup_work, "truncated")
 
 
-def oversize_then_crash(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def oversize_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "oversized")
 
 

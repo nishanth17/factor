@@ -23,6 +23,7 @@ from .execution.resources import (
     RemovedResourceLimitError,
     accounted_entry,
     atomic_save,
+    validate_seconds,
 )
 from .rho import brent as pollard_rho
 
@@ -424,6 +425,11 @@ def main(*, budget=None):
     try:
         args = parser.parse_args()
     except RemovedResourceLimitError as error:
+        parser.error(str(error))
+    try:
+        validate_seconds(args.seconds, "seconds")
+        validate_seconds(args.cpu_seconds, "cpu_seconds")
+    except ValueError as error:
         parser.error(str(error))
     budget.seconds, budget.cpu_seconds = args.seconds, args.cpu_seconds
     if args.no_rss_limit:

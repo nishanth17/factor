@@ -60,8 +60,6 @@ def build_profile(reviewed, *, status="training"):
             settings = adapt_resource_configuration(
                 WorkerSettings, **candidate["settings"]
             )
-            if settings.worker_memory != serial.worker_memory:
-                raise ValueError("mathematical memory differs between arms")
             if digest(arithmetic_options(config, settings)) != options:
                 raise ValueError("candidate changes mathematical search")
             costs = SelectionCosts(

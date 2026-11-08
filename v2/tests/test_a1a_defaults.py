@@ -3,7 +3,7 @@
 import json
 import tempfile
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
@@ -12,6 +12,7 @@ from v2.benchmarks.infrastructure.resource_control import (
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 SELECTED = "density+presieve+scan_fused"

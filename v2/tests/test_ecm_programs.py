@@ -207,7 +207,6 @@ class CoverageTests(unittest.TestCase):
                     b1=b1,
                     b2=b2,
                     distance=distance,
-                    memory_bytes=16384,
                     budget=allowance(),
                 )
                 for center, offset, minus, plus in coverage.records():
@@ -266,31 +265,14 @@ class CoverageTests(unittest.TestCase):
         for distance in (1, 3, 6):
             with self.assertRaises(TypeError):
                 pair_coverage(
-                    block,
-                    b1=11,
-                    b2=29,
-                    distance=distance,
-                    memory_bytes=16384,
-                    budget=allowance(),
+                    block, b1=11, b2=29, distance=distance, budget=allowance()
                 )
         with self.assertRaises(TypeError):
-            pair_coverage(
-                block,
-                b1=11,
-                b2=29,
-                distance=4,
-                memory_bytes=4096,
-                budget=allowance(),
-            )
+            pair_coverage(block, b1=11, b2=29, distance=4, budget=allowance())
         duplicate = replace(block, primes=pack("<QQ", 13, 13))
         with self.assertRaises(TypeError):
             pair_coverage(
-                duplicate,
-                b1=11,
-                b2=29,
-                distance=0,
-                memory_bytes=16384,
-                budget=allowance(),
+                duplicate, b1=11, b2=29, distance=0, budget=allowance()
             )
 
 

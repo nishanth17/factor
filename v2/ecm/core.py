@@ -13,6 +13,7 @@ from typing import Optional, Tuple
 from .. import constants
 from ..common import arithmetic, prime_sieve, utils
 from ..common.arithmetic import gcd, isqrt, pow
+from ..execution.resources import accounted_entry, active_owner
 from . import prac
 
 Point = Tuple[int, int]
@@ -252,9 +253,12 @@ def stage_two(point, n, a24, b1, primes, batch_size=constants.GCD_BATCH_SIZE):
         return None, False
     terms = []
 
+    budget = active_owner()
     for term in _stage_two_terms(point, n, a24, b1, primes):
         terms.append(term)
         if len(terms) == batch_size:
+            if budget is not None:
+                budget.consume(0)
             divisor, saturated = utils.batch_factor(terms, n)
             if divisor is not None or saturated:
                 return divisor, saturated
@@ -264,6 +268,7 @@ def stage_two(point, n, a24, b1, primes, batch_size=constants.GCD_BATCH_SIZE):
     return utils.batch_factor(terms, n) if terms else (None, False)
 
 
+@accounted_entry
 def factorize_ecm(
     n,
     verbose=False,
@@ -277,6 +282,7 @@ def factorize_ecm(
     stats=None,
     _known_composite=False,
     backend=None,
+    budget=None,
 ):
     """Return a proper divisor or None after exactly at most max_curves.
 
@@ -311,6 +317,7 @@ def factorize_ecm(
     stage_two_primes = None
 
     for _ in range(max_curves):
+        budget.consume(0)
         work.curves += 1
         sigma = generator.randint(6, constants.MAX_RANDOM_ECM)
         setup = setup_curve(n, sigma)
@@ -324,6 +331,7 @@ def factorize_ecm(
 
         work.stage_one_calls += 1
         point = scalar_multiply(scalar, *setup.point, n, setup.a24)
+        budget.consume(0)
         divisor = gcd(point[1], n)
         if utils.valid_divisor(divisor, n):
             return int(divisor)
@@ -338,6 +346,7 @@ def factorize_ecm(
         divisor, saturated = stage_two(
             point, n, setup.a24, b1, stage_two_primes, batch_size
         )
+        budget.consume(0)
         if saturated:
             work.stage_two_saturations += 1
         if utils.valid_divisor(divisor, n):

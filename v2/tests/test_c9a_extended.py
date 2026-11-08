@@ -499,14 +499,14 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spill_limits_corruption_and_explicit_lifetime(self):
         with tempfile.TemporaryDirectory() as directory:
-            owner = SpillStore(directory, 6, 65536, allowance())
+            owner = SpillStore(directory, 65536, allowance())
             reference = owner.append(b"abc")
             owner.append(b"def")
             with self.assertRaises(MemoryError):
                 owner.append(b"g")
             manifest = owner.manifest()
             owner.close()
-            restored = SpillStore(directory, 6, 65536, allowance())
+            restored = SpillStore(directory, 65536, allowance())
             restored.restore_manifest(manifest)
             self.assertEqual(restored.read(reference), b"abc")
             path = Path(directory) / reference[0]
@@ -549,7 +549,7 @@ class ExpandedResourceTests(unittest.TestCase):
         from v2.qs.cold_factors import ColdFactors
 
         with tempfile.TemporaryDirectory() as directory:
-            owner = SpillStore(directory, 2**20, 65536, allowance())
+            owner = SpillStore(directory, 65536, allowance())
             with self.assertRaises(ValueError):
                 ColdFactors(
                     owner, ("c9a-cold-test.bin", 0, 10000, "0" * 64), (2,), 1
@@ -590,7 +590,7 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_base_batch_recovers_all_valuations_independently(self):
         worker = collector()
-        helper = BaseRecovery(worker.factor_base, 2**20, allowance())
+        helper = BaseRecovery(worker.factor_base, allowance())
         values = (2**20 * 15, 2**7 * 3, 1, 2**20 * 15)
         self.assertEqual(helper.residuals(values, allowance()), (15, 3, 1, 15))
 

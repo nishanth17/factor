@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from .. import constants
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd
+from ..execution.resources import accounted_entry, active_owner
 
 
 @dataclass
@@ -24,7 +25,10 @@ def _brent_attempt(
     cycle_length = 1
     used = 0
 
+    owner = active_owner()
     while used < max_evaluations:
+        if owner is not None:
+            owner.consume(0)
         # Brent doubles the cycle length; x anchors the next comparison run.
         x = y
         advance = min(cycle_length, max_evaluations - used)
@@ -35,6 +39,8 @@ def _brent_attempt(
         position = 0
 
         while position < cycle_length and used < max_evaluations:
+            if owner is not None:
+                owner.consume(0)
             # Save the batch start so saturation can replay the same walk.
             saved = y
             count = min(
@@ -74,6 +80,7 @@ def _brent_attempt(
     return None
 
 
+@accounted_entry
 def factorize_rho(
     n,
     verbose=False,
@@ -87,6 +94,7 @@ def factorize_rho(
     stats=None,
     _known_composite=False,
     backend=None,
+    budget=None,
 ):
     """Return a proper divisor or None within explicit evaluation limits.
 
@@ -114,6 +122,7 @@ def factorize_rho(
     work = stats if stats is not None else RhoStats()
 
     for _ in range(max_attempts):
+        budget.consume(0)
         start = engine.integer(generator.randint(1, int(n) - 1))
         offset = engine.integer(generator.randint(1, int(n) - 1))
         work.attempts += 1

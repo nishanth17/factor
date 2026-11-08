@@ -86,6 +86,7 @@ class ECMExecutor:
         self.slots = []
         self.packet_sequence = 0
         self.helper_funded = False
+        self.startup_in_progress = False
         self.cost_identity = digest(
             [VERSION, "cost-policy", asdict(self.settings)]
         )
@@ -223,6 +224,8 @@ class ECMExecutor:
             else:
                 slot["process"].close()
         self.slots = survivors
+        if not survivors:
+            self.startup_in_progress = False
         if survivors:
             raise RuntimeError(
                 "owned workers did not exit: "
@@ -260,6 +263,7 @@ class ECMExecutor:
         if context.get_start_method() != "spawn":
             raise RuntimeError("explicit spawn context unavailable")
         self.helper_funded = True
+        self.startup_in_progress = True
         startup_tokens, pending = [], []
         try:
             # Start all funded children before collecting ready reports.
@@ -352,6 +356,7 @@ class ECMExecutor:
                         raise EOFError("worker exited during startup")
                 if pending and not progress:
                     time.sleep(0.001)
+            self.startup_in_progress = False
         except BaseException:
             # Every launched child without a checked report keeps its full
             # lease, even if a different child's startup caused the failure.
@@ -793,7 +798,7 @@ class ECMExecutor:
                             raise LeaseRefusedError(result["reason"])
         except (BudgetExhaustedError, LeaseRefusedError) as error:
             reason = str(error)
-            damaged = reason == "error"
+            damaged = reason in ("error", "allocation_failure")
         except (
             OSError,
             EOFError,
@@ -843,12 +848,20 @@ class ECMExecutor:
             stats["reported_child_cpu"] = (
                 sum(s["reported_cpu"] for s in self.slots) - reported_before
             )
-            damaged = damaged or any(s["active"] for s in self.slots)
+            damaged = (
+                damaged
+                or self.startup_in_progress
+                or any(s["active"] for s in self.slots)
+            )
             if damaged:
+                self.serial_engine = None
                 try:
                     self._destroy()
                 except RuntimeError as error:
                     stats["cleanup_failure"] = str(error)
+            if reason == "worker_failure":
+                for position in search.active:
+                    search.record_failure(position)
             search.active.clear()
             for token in list(ledger.active):
                 ledger.lose(token)

@@ -235,8 +235,9 @@ class ChainPlans:
             del old
         self.misses += 1
         plan = ChainPlan(bound, self.backend, budget)
-        self.plans[key] = plan
-        self.used_bytes += plan.owned_bytes
+        if self.used_bytes + plan.owned_bytes <= self.memory_bytes:
+            self.plans[key] = plan
+            self.used_bytes += plan.owned_bytes
         return plan
 
 

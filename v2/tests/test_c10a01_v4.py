@@ -193,10 +193,7 @@ class GrayTableTests(unittest.TestCase):
             family.next()
             saved = family.checkpoint()
             restored = CoordinateFamily.from_checkpoint(
-                base,
-                saved,
-                budget=resumed_budget(saved),
-                memory_bytes=8 * 2**20,
+                base, saved, budget=resumed_budget(saved)
             )
             self.assertEqual(family.next(), restored.next())
             old = (family.next_index, family.current)
@@ -210,9 +207,7 @@ class GrayTableTests(unittest.TestCase):
             bad["payload"]["schema"] = "c10a01-coordinate-family-v2"
             bad["sha256"] = _checksum(bad["payload"])
             with self.assertRaises(TypeError):
-                CoordinateFamily.from_checkpoint(
-                    base, bad, budget=allowance(), memory_bytes=8 * 2**20
-                )
+                CoordinateFamily.from_checkpoint(base, bad, budget=allowance())
         ledger = allowance()
         ledger.cancelled = lambda: ledger.used > standard.budget.used + 10
         with self.assertRaises(BudgetExhaustedError):

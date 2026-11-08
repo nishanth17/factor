@@ -156,10 +156,7 @@ class AutomaticTests(unittest.TestCase):
                 side_effect=AssertionError("unfunded pool"),
             ):
                 run = factorize_bounded(
-                    1009 * 1013,
-                    config=settings,
-                    budget=budget(),
-                    ecm_memory_bytes=cap,
+                    1009 * 1013, config=settings, budget=budget()
                 )
             self.assertEqual(run.result.reconstruct(), 1009 * 1013)
 

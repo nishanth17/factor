@@ -377,7 +377,7 @@ class Manifest:
 
 
 class LeaseRefusedError(Exception):
-    """A lease could not be admitted without exceeding the finite envelope."""
+    """A lifecycle watchdog or numerical retry boundary was reached."""
 
 
 class Ledger:
@@ -390,7 +390,7 @@ class Ledger:
 
     def __init__(self, *old, **removed):
         if old or removed:
-            name = next(iter(removed)) if removed else "work/cpu"
+            name = next(iter(removed)) if removed else "work"
             raise RemovedResourceLimitError(name, "the shared root Budget")
         self.work = 0
         self.cpu = self.parent_cpu = 0.0
@@ -407,6 +407,7 @@ class Ledger:
             self.parent_cpu = parent_cpu
         self.work += work
 
+    @removed_arguments(("work", "cpu"))
     def reserve(self, identity):
         """Issue a token before dispatch; the token carries no resources."""
         self.next_token += 1
@@ -485,6 +486,8 @@ class Search:
         self.fixed_work = fixed_work
         self.attempts = [0] * len(manifest.jobs)
         self.continuation_attempts = [0] * len(manifest.jobs)
+        self.failed_attempts = [0] * len(manifest.jobs)
+        self.failed_continuation_attempts = [0] * len(manifest.jobs)
         self.boundaries = {}
         self.completed, self.active = {}, {}
         self.factor, self.retired, self.runs = None, False, 0
@@ -501,6 +504,22 @@ class Search:
             else self.attempts
         )
         return counts[position]
+
+    def failures(self, position):
+        counts = (
+            self.failed_continuation_attempts
+            if position in self.boundaries
+            else self.failed_attempts
+        )
+        return counts[position]
+
+    def record_failure(self, position):
+        counts = (
+            self.failed_continuation_attempts
+            if position in self.boundaries
+            else self.failed_attempts
+        )
+        counts[position] += 1
 
     def next(self, slot=None):
         remaining = [
@@ -533,7 +552,7 @@ class Search:
                 else second
             )
         for position in candidates:
-            if self.attempt(position) >= self.settings.max_attempts:
+            if self.failures(position) >= self.settings.max_attempts:
                 raise LeaseRefusedError("attempt_limit")
             return position
         return None
@@ -566,7 +585,7 @@ class Search:
         integer(token, "lease token", 1)
         if position in self.completed or position in self.active:
             raise ValueError("duplicate dispatch")
-        if self.attempt(position) >= self.settings.max_attempts:
+        if self.failures(position) >= self.settings.max_attempts:
             raise LeaseRefusedError("attempt_limit")
         if self.stage(position) == "stage_one" and (
             len(self.boundaries)
@@ -616,9 +635,7 @@ class Search:
         }
         if not message.keys() <= allowed:
             raise ValueError("unbounded result record")
-        integer(
-            message["attempt"], "result attempt", 1, self.settings.max_attempts
-        )
+        integer(message["attempt"], "result attempt", 1)
         integer(message["token"], "result token", 1)
         for key in (
             "work",
@@ -671,8 +688,8 @@ class Search:
             "cancelled",
             "wall_limit",
             "cpu_limit",
-            "work_limit",
             "error",
+            "allocation_failure",
         ):
             raise ValueError("invalid worker outcome")
         if message["reason"] != "complete" and factor is not None:
@@ -712,6 +729,12 @@ class Search:
                 self.manifest.metadata,
             )
         del self.active[position]
+        if message["reason"] in ("error", "allocation_failure"):
+            self.record_failure(position)
+        if not publish:
+            # Draining settles costs and identities, but a refused batch
+            # cannot publish a factor, boundary or completed search cursor.
+            return
         if boundary is not None:
             self.boundaries[position] = boundary
         elif message["reason"] == "complete":
@@ -760,7 +783,6 @@ class Search:
                 receipt["attempt"],
                 "receipt attempt",
                 1,
-                self.settings.max_attempts,
             )
             key = (position, stage, attempt)
             if key in attempts:
@@ -790,6 +812,8 @@ class Search:
             fixed_work=self.fixed_work,
             attempts=self.attempts,
             continuation_attempts=self.continuation_attempts,
+            failed_attempts=self.failed_attempts,
+            failed_continuation_attempts=self.failed_continuation_attempts,
             # Normalize before hashing: JSON decodes position keys as strings.
             boundaries={
                 str(key): value for key, value in self.boundaries.items()
@@ -825,11 +849,29 @@ class Search:
             setattr(
                 result,
                 key,
-                [
-                    integer(a, "attempt", 0, settings.max_attempts)
-                    for a in values
-                ],
+                [integer(a, "dispatch ordinal", 0) for a in values],
             )
+        for key in ("failed_attempts", "failed_continuation_attempts"):
+            values = data[key]
+            if not isinstance(values, list) or len(values) != len(
+                result.attempts
+            ):
+                raise ValueError("retry counters changed shape")
+            checked = [
+                integer(value, "failed attempts", 0, settings.max_attempts)
+                for value in values
+            ]
+            ordinals = (
+                result.attempts
+                if key == "failed_attempts"
+                else result.continuation_attempts
+            )
+            if any(
+                failures > issued
+                for failures, issued in zip(checked, ordinals)
+            ):
+                raise ValueError("failures exceed issued attempts")
+            setattr(result, key, checked)
         if len(data["boundaries"]) > settings.residue_capacity:
             raise ValueError("oversized boundary queue")
         for key, boundary in data["boundaries"].items():

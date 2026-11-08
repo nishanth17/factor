@@ -12,7 +12,7 @@ import tempfile
 from dataclasses import dataclass
 from functools import wraps
 
-RESOURCE_VERSION = "observed-resources/saved-history-v1"
+RESOURCE_VERSION = "observed-resources/saved-history-v2"
 DEFAULT_RSS = object()
 
 
@@ -117,6 +117,13 @@ class MacResources:
                 if error == errno.ESRCH:
                     continue
                 raise ResourceProviderError(f"proc_pid_rusage({pid}): {error}")
+            if isinstance(roots, dict):
+                expected_birth = roots.get(pid)
+                if (
+                    expected_birth is not None
+                    and expected_birth != usage.start
+                ):
+                    continue
             result.append(
                 ProcessSample(
                     pid,

@@ -223,7 +223,15 @@ class CurveEngine:
             budget.poll()
         except BudgetExhaustedError as error:
             reason, residue = str(error), None
-        except (MemoryError, ValueError, ArithmeticError) as error:
+        except MemoryError as error:
+            reason, residue = "allocation_failure", None
+            failure = (
+                "curve execution: "
+                + type(error).__name__
+                + ": "
+                + str(error)[:192]
+            )
+        except (ValueError, ArithmeticError) as error:
             reason, residue = "error", None
             failure = type(error).__name__ + ": " + str(error)[:192]
         if stage == "stage_two" and boundary_hash is None:
