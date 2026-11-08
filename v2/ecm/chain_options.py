@@ -16,10 +16,10 @@ CF_PREPARATION_WORK = 62430
 
 
 def default_options(config, tiers=None, *, automatic_memory=False):
-    """Resolve fresh automatic routing within the existing finite cap.
+    """Resolve fresh numerical/cache routing independently of root limits.
 
     This pure preparation decision never loads records or runs arithmetic.
-    Unsupported schedules and smaller user caps retain streamed execution.
+    Unsupported schedules retain streamed execution.
     """
     tiers = config.ecm_tiers if tiers is None else tiers
     program_bytes = config.ecm_program_bytes or max(

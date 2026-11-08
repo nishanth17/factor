@@ -761,6 +761,7 @@ def main(*, budget=None):
                     args.checkpoint,
                     run.checkpoint,
                     checkpoint_bytes=args.checkpoint_bytes,
+                    events=budget.resource_events,
                 )
                 if save_event is not None and args.verbose:
                     print(save_event)

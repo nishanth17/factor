@@ -4,6 +4,9 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base
 from v2.qs.polynomial import polynomial_roots
@@ -77,7 +80,9 @@ class R2CollectorTests(unittest.TestCase):
             worker = cls(
                 polynomial,
                 base,
-                config=SieveConfig(
+                config=adapt_resource_configuration(
+                    SieveConfig,
+                    memory_bytes=64 * 2**20,
                     score_policy="powers",
                     division="bucket",
                     residual_bound=97,

@@ -16,6 +16,7 @@ from ..common import arithmetic, utils
 from ..common.arithmetic import pow
 from ..execution.budget import Budget, BudgetExhaustedError
 from ..execution.resources import (
+    AllocationFailureError,
     accounted_entry,
     accounted_job,
     decode_checkpoint,
@@ -304,8 +305,10 @@ def _collect(task, state=None):
         budget.consume(0)
     except BudgetExhaustedError:
         reason = budget.reason
-    except MemoryError:
-        reason = "allocation_failure"
+    except MemoryError as error:
+        raise AllocationFailureError(
+            "family assignment collection", "qs_worker"
+        ) from error
     finally:
         if process:
             state["cpu"][slot] = time.process_time()

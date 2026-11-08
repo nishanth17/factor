@@ -406,10 +406,7 @@ class QSJob:
         without repeating preparation on every unchanged run.
         """
         if not self.storage_solve_done:
-            try:
-                self.divisor = self._solve(True)
-            except MemoryError:
-                self.storage_reason = "allocation_failure"
+            self.divisor = self._solve(True)
             self.storage_solve_done = True
 
         return self.storage_reason

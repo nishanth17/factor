@@ -113,7 +113,8 @@ counts and retained performance limitations.
 
 Worker arithmetic remains exact. Tokens identify assignments; they carry no
 resource grants. The root observes parent, workers, owned helpers and descendants.
-Live samples, process-lifetime acknowledgments and final wait4 usage reconcile
+Live samples, process-lifetime acknowledgments and final libproc self CPU
+before wait4 reaping reconcile
 by process birth identity, including crashes and shutdown. Retained context
 startup, each call and close own active intervals; idle time is excluded.
 
@@ -127,8 +128,8 @@ remain quiet. `used` counts algorithmic work for diagnostics; it cannot refuse w
 
 macOS uses libproc through ctypes to sum current RSS over the owned process tree.
 The parent is included; shared pages can be counted multiple times. Samples run
-at entry and publication boundaries and during cooperative polls, at intervals
-of at most 50 ms. Allocations, native operations and active worker stages can
+at entry and publication boundaries. Ordinary cooperative polls throttle
+sampling to once per 50 ms; a long atomic operation can delay the next sample. Allocations, native operations and active worker stages can
 overshoot the guard. Provider failures are explicit errors.
 
 Only root wall, aggregate CPU, observed RSS and an optional checkpoint save cap
@@ -163,8 +164,9 @@ Saving is optional. `atomic_save(path, snapshot, checkpoint_bytes=None)` has no
 size cap by default; CLI `--checkpoint-bytes` supplies one. Oversize records
 `checkpoint_size_skip` with requested/limit bytes, preserves the old file and
 continues factoring. Saves use only published state, a temporary sibling,
-flush/fsync, atomic `os.replace` and directory fsync. An interrupted write leaves
-the previous checkpoint valid. Allocation or I/O failure retains its own cause.
+flush/fsync, atomic `os.replace` and directory fsync. Before replacement, an interrupted write leaves the previous checkpoint valid.
+Atomic replacement exposes a complete old or new file; a later directory-fsync
+failure can leave the complete new file installed. Allocation or I/O failure retains its own cause.
 
 ## Optional GMP backend
 

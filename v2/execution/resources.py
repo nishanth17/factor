@@ -302,18 +302,31 @@ def removed_arguments(
             for parameter in parameters
         )
 
+        def removed(name):
+            suggested = replacement
+            if name == "checkpoint_bytes":
+                suggested = "atomic_save(..., checkpoint_bytes=...)"
+            elif name in ("assignment_work", "startup_work"):
+                suggested = (
+                    "root Budget(seconds=..., cpu_seconds=...); "
+                    "work is diagnostic"
+                )
+            elif name == "assignment_cpu":
+                suggested = "root Budget(cpu_seconds=...)"
+            return RemovedResourceLimitError(name, suggested)
+
         @wraps(original)
         def checked(*args, **kwargs):
             if positional is not None:
                 retained, name = positional
                 allowed = retained + int(isinstance(target, type))
                 if len(args) > allowed:
-                    raise RemovedResourceLimitError(name, replacement)
+                    raise removed(name)
             if not variadic and len(args) > positional_count:
-                raise RemovedResourceLimitError(names[0], replacement)
+                raise removed(names[0])
             for name in names:
                 if name in kwargs:
-                    raise RemovedResourceLimitError(name, replacement)
+                    raise removed(name)
             return original(*args, **kwargs)
 
         if isinstance(target, type):

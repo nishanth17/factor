@@ -30,11 +30,9 @@ ECM_PRESETS = MappingProxyType(
 def with_ecm_preset(config, name):
     """Replace only ECM tiers, retaining explicit SIQS and admission bounds.
 
-    The caller supplies the existing cumulative allocation with positive
-    work/wall/CPU fallback floors. The normal PortfolioConfig constructor
-    checks coexistence of the larger point/schedule workspace with unchanged
-    SIQS storage; an unfunded preset raises rather than shrinking SIQS.
-    Pretest ceilings, total run budgets and checkpoint behavior stay binding.
+    The caller supplies the cumulative stage-allocation policy with positive
+    fallback fields. Root resources apply to all stages; estimated coexistence
+    bytes no longer refuse a preset or shrink the unchanged SIQS configuration.
     """
     from ..portfolio import PortfolioConfig
 

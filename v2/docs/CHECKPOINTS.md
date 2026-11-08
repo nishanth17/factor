@@ -31,7 +31,9 @@ published state with no default size cap. CLI `--checkpoint-bytes` supplies an
 optional cap. An oversized proposal records `checkpoint_size_skip` with requested
 bytes, cap and scope, leaves the old file valid and continues computation.
 A temporary sibling is flushed and fsynced before atomic `os.replace`, followed
-by directory fsync. Interrupted writes leave the previous file valid; allocation,
+by directory fsync. Before replacement, interruptions preserve the previous file. Atomic replacement
+exposes a complete old or new file; a later directory-fsync error can leave the
+complete new file installed. Allocation,
 I/O and unsupported-encoding failures retain distinct identities and causes.
 A store poisoned by interrupted publication cannot be reused or checkpointed;
 recover a prior valid snapshot or the original run identity.

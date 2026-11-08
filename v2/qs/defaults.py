@@ -55,7 +55,8 @@ def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
     The existing 40 and 50–60-digit parameter/resource presets remain intact.
     Other sizes/backends use the reference parameters with the same coupled
     policies; those parameters are not calibrated larger-size presets.
-    Explicit memory remains binding, including metadata and charged setup.
+    The explicit recipe preserves historical numerical/cache choices independently
+    of root resource limits.
     """
     if not uses_siqs_defaults(n, backend=backend):
         return _coupled_policies(
@@ -128,7 +129,7 @@ def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
 
 
 def default_siqs_budget(n, *, backend="python-int"):
-    """Use finite size-scoped grants only when the caller omits a budget."""
+    """Create the default observed root owner; numerical presets are separate."""
     from ..execution.budget import Budget
 
     return Budget()

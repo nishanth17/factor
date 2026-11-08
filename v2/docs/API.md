@@ -50,7 +50,7 @@ print(run.reason, run.work_used)
 
 The run carries `result`, `reason`, cumulative work/time, events and checkpoint
 state. One allowance covers preprocessing, retries and recursive children.
-`Budget` reservations occur before atomic mutation. Work units are algorithmic
+Root checks occur before atomic mutation. Work units are diagnostic algorithmic
 charges and are not comparable time units across different methods.
 
 Omitting `config` permits automatic routing. `PortfolioConfig().for_input(n)`
@@ -97,7 +97,7 @@ algorithm-specific continuation limits.
 ## Automatic and retained ECM contexts
 
 `factorize_bounded(n)` defaults to `ecm_executor="auto"`. The call lazily selects
-a funded process pool and owns its cleanup, including exception exits. Explicit
+a cost-selected process pool and owns its cleanup, including exception exits. Explicit
 `ecm_executor=None` selects serial execution. Other context objects remain
 borrowed; the caller closes them. A serial override retains the declared current
 numerical schedule, not a historical version of all defaults.
@@ -122,10 +122,42 @@ with selected_context(seed=7, prefer_warm=True) as context:
 Warm intent uses the recorded horizon of at least 64 compatible ECM-reaching
 calls; the first call still pays cold startup. Use cold intent for short or
 uncertain reuse. The context fixes its first engaged worker configuration and
-needs a parent-memory reserve matching any explicit portfolio workspace.
+observes the same root RSS guard as the caller.
 Automatic schema-13 snapshots require the same packaged policy/implementation,
 seed on resume. Pre-H3 resource schemas are refused without migration.
 
 Concurrent independent calls own separate contexts and resource owners. Service callers
 coordinate machine-wide concurrency; nested process calls default to serial.
 A shared retained context admits one active call at a time.
+
+## Resource ownership and errors
+
+Import `Budget` from `v2.execution.budget`, and `RemovedResourceLimitError`,
+`UnsupportedResourceVersionError`, `AllocationFailureError`,
+`UnsupportedEncodingError`, `ResourceProviderError` and `atomic_save` from
+`v2.execution.resources`. Resource stops carry `reason`, `limit`, `observed`
+(or `requested`), `limit_value` and `scope`; factoring run results expose
+`resource_stop`. Cancellation and finite numerical exhaustion remain separate.
+
+A retained `Budget` starts with an active interval. `close()` settles it;
+`start()` resumes accounting while excluding idle intervals. Public factoring
+entries and retained executor start/close operations own their intervals;
+nested calls borrow the current owner. `charges()` returns its saved prefix.
+For exact cumulative retries, reuse that live object. A fresh owner resumed
+from a file inherits only that file's recorded history plus its invocation.
+Unsaved consumption after a skipped save or process death is not recovered.
+No durable ledger is built; experiment ledgers remain authoritative.
+
+`atomic_save` returns a `checkpoint_size_skip` event for an oversized save,
+or `None` after a successful save. Pass `events=owner.resource_events` to
+retain skip events on a live owner; the quiet CLI does this. Omit the cap to
+allow snapshots of any encoded size under root resources.
+
+`SieveConfig.preparation_cache_bytes` and `target_rows` separate the retained
+verified-row cache and scheduling target from the removed `max_relations`
+ceiling. Their concrete reference values are preserved: 2 MiB cache with
+1,024 rows for direct collectors, 2,048 for SIQS/SSS and 4,096 for coarse
+parallel collection; growing DLP retains `target_rows=None`. Use keyword
+arguments for configuration fields after the former positional resource
+arguments. Supplying a removed keyword or positional limit raises a named
+`RemovedResourceLimitError`; it is never silently accepted.

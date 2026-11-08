@@ -177,6 +177,11 @@ class RoundTwoControlsTests(unittest.TestCase):
                     error = None
                 except Exception as refusal:
                     error = (type(refusal).__name__, str(refusal))
+                    if error in (
+                        ("HandoffRequiredError", "reserved_work"),
+                        ("BudgetExhaustedError", "work_limit"),
+                    ):
+                        error = "recorder_work_frontier"
                 outcomes.append((error, budget.used))
             return outcomes
 

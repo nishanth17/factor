@@ -108,6 +108,7 @@ class Budget:
         self._history_wall = prior_wall
         self._history_cpu = prior_cpu
         self.reason = self.stop = None
+        self.resource_events = []
         self._accounting_lock = threading.RLock()
         self._wall_clock = wall_clock or time.monotonic
         self._cpu_clock = cpu_clock or time.process_time
