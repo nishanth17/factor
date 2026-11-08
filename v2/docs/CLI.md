@@ -54,7 +54,8 @@ pypy3 -m v2.factor 10002200057 --siqs --ecm-curves 2 --seed 7
 unlimited. `--rss-bytes` sets the sampled current process-tree RSS cap, whose
 default is floor(0.8 × physical RAM). `--no-rss-limit` explicitly disables it.
 `--checkpoint-bytes` optionally caps encoded saves; the default has no cap.
-Checks are cooperative and RSS may overshoot. Increasing a deadline does not
+Root resource stops emit a JSON object on stderr naming the limit, observed
+value, limit value and scope. Checks are cooperative and RSS may overshoot. Increasing a deadline does not
 restart an exhausted numerical schedule. `--work-limit`, `--memory-mib` and
 `--ecm-memory-mib` raise named removed-argument errors.
 

@@ -98,6 +98,69 @@ class ResourceTests(unittest.TestCase):
         for field in ("work", "scanned", "divisor"):
             self.assertEqual(results[0][0][field], results[1][0][field])
 
+    def test_cli_resource_stop_payload_for_bounded_and_legacy(self):
+        from contextlib import redirect_stderr, redirect_stdout
+        from io import StringIO
+
+        from v2.factor import main
+
+        for options in ([], ["--bounded"]):
+            output, errors = StringIO(), StringIO()
+            with (
+                patch(
+                    "sys.argv", ["factor", "91", "--seconds", "0", *options]
+                ),
+                redirect_stdout(output),
+                redirect_stderr(errors),
+            ):
+                status = main(budget=self.budget())
+            self.assertEqual(status, 1)
+            self.assertEqual(
+                json.loads(errors.getvalue()),
+                {
+                    "reason": "wall_limit",
+                    "limit": "wall",
+                    "observed": 0,
+                    "limit_value": 0,
+                    "scope": "factorization",
+                },
+            )
+
+    def test_cli_oversized_save_records_skip_and_keeps_complete_result(self):
+        from contextlib import redirect_stderr, redirect_stdout
+        from io import StringIO
+
+        from v2.factor import main
+
+        owner = self.budget()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checkpoint.json"
+            path.write_text("old published checkpoint")
+            with (
+                patch(
+                    "sys.argv",
+                    [
+                        "factor",
+                        "91",
+                        "--bounded",
+                        "--checkpoint",
+                        str(path),
+                        "--checkpoint-bytes",
+                        "0",
+                    ],
+                ),
+                redirect_stdout(StringIO()),
+                redirect_stderr(StringIO()),
+            ):
+                status = main(budget=owner)
+            self.assertEqual(status, 0)
+            self.assertEqual(path.read_text(), "old published checkpoint")
+        self.assertEqual(len(owner.resource_events), 1)
+        self.assertEqual(
+            owner.resource_events[0]["reason"], "checkpoint_size_skip"
+        )
+        self.assertEqual(owner.resource_events[0]["limit_value"], 0)
+
     def test_removed_work_argument(self):
         with self.assertRaisesRegex(RemovedResourceLimitError, "work_limit"):
             self.budget(work_limit=10**20)

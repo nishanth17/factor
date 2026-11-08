@@ -18,6 +18,7 @@ if __package__ in (None, ""):
 from . import constants
 from .common import arithmetic, prime_sieve, utils
 from .ecm import core as ecm
+from .execution.budget import BudgetExhaustedError
 from .execution.resources import (
     DEFAULT_RSS,
     RemovedResourceLimitError,
@@ -756,6 +757,11 @@ def main(*, budget=None):
                 budget=budget,
             )
             result = run.result
+            if run.resource_stop is not None:
+                print(
+                    json.dumps(run.resource_stop, sort_keys=True),
+                    file=sys.stderr,
+                )
             if args.checkpoint:
                 save_event = atomic_save(
                     args.checkpoint,
@@ -783,6 +789,10 @@ def main(*, budget=None):
                 else constants.MAX_CURVES_ECM,
                 backend=args.backend,
             )
+    except BudgetExhaustedError as error:
+        stop = error.payload or {"reason": str(error), "scope": budget.scope}
+        print(json.dumps(stop, sort_keys=True), file=sys.stderr)
+        return 1
     except (
         TypeError,
         ValueError,
