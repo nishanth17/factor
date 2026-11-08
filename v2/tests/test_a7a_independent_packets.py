@@ -2,10 +2,21 @@
 
 import unittest
 
-from v2.benchmarks.qs.a7a.independent_packets import partition, summarize
+from v2.benchmarks.qs.a7a.independent_packets import (
+    execute,
+    partition,
+    summarize,
+)
 
 
 class IndependentPacketTests(unittest.TestCase):
+    def test_wall_override_rejects_unbounded_or_unmatched_windows(self):
+        for value in (0, 34, 76, True, 35.0):
+            with self.assertRaises(ValueError):
+                execute("unused", 1, longer_window=True, seconds=value)
+        with self.assertRaises(ValueError):
+            execute("unused", 1, seconds=75)
+
     def test_every_concurrency_preserves_the_same_disjoint_work(self):
         tasks = list(range(16))
         for workers in (1, 4, 8, 10):

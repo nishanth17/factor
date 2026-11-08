@@ -166,7 +166,9 @@ def summarize(streams, expected_packets):
     )
 
 
-def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
+def execute(
+    fixture, workers, *, longer_window=False, byte_stamps=False, seconds=None
+):
     """Run local (zero) or one private stream per spawned owned process."""
     from ....execution.budget import Budget
     from ....qs.current_parallel import CurrentParallelSIQSJob
@@ -176,9 +178,16 @@ def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
         raise ValueError("unsupported concurrency")
     if type(longer_window) is not bool:
         raise ValueError("window selector must be Boolean")
-    polynomials, packet, seconds = (
+    if seconds is not None and (
+        not longer_window
+        or type(seconds) is not int
+        or seconds not in (35, 75)
+    ):
+        raise ValueError("unadmitted fixed-work wall allowance")
+    polynomials, packet, default_seconds = (
         (512, 16, 35) if longer_window else (POLYNOMIALS, PACKET, 15)
     )
+    seconds = default_seconds if seconds is None else seconds
     digits, index = map(
         int, fixture.removeprefix("regime_calibration_").split("_")
     )
@@ -312,6 +321,7 @@ def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
         polynomials=polynomials,
         packet=packet,
         byte_stamps=byte_stamps,
+        seconds=seconds,
         setup_wall=prepared - started,
         actor_wall=time.monotonic() - started,
         collection_wall=time.monotonic() - prepared,
@@ -338,6 +348,7 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--longer-window", action="store_true")
     parser.add_argument("--byte-stamps", action="store_true")
+    parser.add_argument("--seconds", type=int, choices=(35, 75))
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("never overwrite a throughput receipt")
@@ -346,6 +357,7 @@ def main():
         args.workers,
         longer_window=args.longer_window,
         byte_stamps=args.byte_stamps,
+        seconds=args.seconds,
     )
     with args.output.open("x") as stream:
         json.dump(result, stream, indent=2)
