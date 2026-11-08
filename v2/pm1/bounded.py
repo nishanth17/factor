@@ -29,7 +29,7 @@ CHECKPOINT_VERSION = 1
 EXECUTION_VERSION = "pm1-campaign-v1"
 
 
-@removed_arguments(("memory_bytes",))
+@removed_arguments(("memory_bytes",), positional=(5, "memory_bytes"))
 @dataclass(frozen=True)
 class PM1Config:
     """Predeclare inclusive (B1, B2) rungs for one explicit base.

@@ -109,7 +109,7 @@ Use `--ecm-workers serial` for an explicit serial run, or leave the default
 recipes. Workers share root resources without independent grants.
 
 Snapshots bind numerical policy, implementation and method seed together with
-resource version `observed-resources/saved-history-v2`. Old resource schemas are
+resource version `observed-resources/saved-history-v3`. Old resource schemas are
 refused; no migration is provided. Switching an automatic snapshot to serial
 mid-search is rejected; use a fresh run for a different execution policy.
 See [adoption limits](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).

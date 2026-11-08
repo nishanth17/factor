@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass, replace
 
 from ..execution.resources import (
     RESOURCE_VERSION,
+    UnsupportedEncodingError,
     accounted_entry,
     require_resource_version,
 )
@@ -795,11 +796,13 @@ class ECMExecutor:
         except (BudgetExhaustedError, LeaseRefusedError) as error:
             reason = str(error)
             damaged = reason in ("error", "allocation_failure")
+        except (MemoryError, UnsupportedEncodingError):
+            damaged = True
+            raise
         except (
             OSError,
             EOFError,
             ValueError,
-            MemoryError,
             KeyError,
             TypeError,
         ) as error:

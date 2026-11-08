@@ -53,7 +53,9 @@ from .sieve_collector import (
 from .storage import require_published
 
 
-@removed_arguments(("checkpoint_bytes", "memory_bytes"))
+@removed_arguments(
+    ("checkpoint_bytes", "memory_bytes"), positional=(22, "memory_bytes")
+)
 @dataclass(frozen=True)
 class SIQSConfig:
     """Finite experimental parameters; growth retains the same factor base."""
@@ -88,6 +90,7 @@ class SIQSConfig:
     solve_policy: str = field(default="window", kw_only=True)
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
+            target_rows=2048,
             residual_bound=10000,
             max_partials=512,
         )
@@ -269,7 +272,9 @@ class SIQSConfig:
         )
 
 
-@removed_arguments(("memory_bytes", "checkpoint_bytes"))
+@removed_arguments(
+    ("memory_bytes", "checkpoint_bytes"), positional=(22, "memory_bytes")
+)
 @dataclass(frozen=True)
 class CountedSIQSConfig(SIQSConfig):
     """Resolve an exact eligible count below base_bound during charged setup.

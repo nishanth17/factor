@@ -442,9 +442,6 @@ def _advance(
         result = job.run(batch_limit=1)
         if result.divisor is not None or result.reason in (
             "search_exhausted",
-            "relation_limit",
-            "atom_limit",
-            "memory_limit",
         ):
             _event(
                 state,

@@ -12,7 +12,7 @@ import tempfile
 from dataclasses import dataclass
 from functools import wraps
 
-RESOURCE_VERSION = "observed-resources/saved-history-v2"
+RESOURCE_VERSION = "observed-resources/saved-history-v3"
 DEFAULT_RSS = object()
 
 
@@ -270,13 +270,19 @@ def atomic_save(path, payload, *, checkpoint_bytes=None, events=None):
             os.fsync(directory_fd)
         finally:
             os.close(directory_fd)
+    except MemoryError as error:
+        raise AllocationFailureError(
+            "checkpoint write", "checkpoint_save"
+        ) from error
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
     return None
 
 
-def removed_arguments(names, replacement="Budget(rss_bytes=...) at the root"):
+def removed_arguments(
+    names, replacement="Budget(rss_bytes=...) at the root", *, positional=None
+):
     """Reject retired keyword arguments before calling the revised API."""
 
     def decorate(target):
@@ -298,6 +304,11 @@ def removed_arguments(names, replacement="Budget(rss_bytes=...) at the root"):
 
         @wraps(original)
         def checked(*args, **kwargs):
+            if positional is not None:
+                retained, name = positional
+                allowed = retained + int(isinstance(target, type))
+                if len(args) > allowed:
+                    raise RemovedResourceLimitError(name, replacement)
             if not variadic and len(args) > positional_count:
                 raise RemovedResourceLimitError(names[0], replacement)
             for name in names:

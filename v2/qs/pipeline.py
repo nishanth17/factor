@@ -510,8 +510,8 @@ class QSJob:
                     break
 
             self.budget.consume(0)
-        except BudgetExhaustedError:
-            reason = self.budget.reason
+        except BudgetExhaustedError as error:
+            reason = self.budget.reason or str(error)
 
         if self.divisor is not None:
             if not utils.valid_divisor(

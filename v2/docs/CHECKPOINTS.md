@@ -20,7 +20,7 @@ is no durable ledger. Benchmark and study ledgers remain the authority for
 experiment charges. Restore, replay, validation and failed encoding are charged;
 paused/idle intervals between owned calls are excluded.
 
-Resource version `observed-resources/saved-history-v2` binds this contract.
+Resource version `observed-resources/saved-history-v3` binds this contract.
 `UnsupportedResourceVersionError` names `unsupported-resource-version` for old
 resource schemas; there is no migration. Integrity hashes, mathematical shape,
 proper-divisor checks, provenance and exact reconstruction remain mandatory.

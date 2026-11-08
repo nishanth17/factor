@@ -15,7 +15,7 @@ from .resources import (
 )
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-observed-v8"
+VERSION = "b12-f4-observed-v9"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -63,7 +63,8 @@ def digest(value):
         "residue_bytes",
         "startup_work",
         "worker_memory",
-    )
+    ),
+    positional=(1, "assignment_work"),
 )
 @dataclass(frozen=True)
 class WorkerSettings:
@@ -436,6 +437,7 @@ class Ledger:
         self.lost += 1
 
 
+@removed_arguments(("limit",))
 def checked_residue(residue, assignment, metadata):
     """Validate a canonical boundary before any stage-two tables exist."""
     if not isinstance(residue, dict):

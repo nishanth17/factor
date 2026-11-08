@@ -51,15 +51,17 @@ _PROCESS_STATE = None
         "memory_bytes",
         "parent_memory_bytes",
         "worker_memory_bytes",
-    )
+    ),
+    positional=(5, "assignment_work"),
 )
 @dataclass(frozen=True)
 class ParallelConfig:
     """One fixed SIQS family schedule; no width recovery or auto dispatch.
 
-    Memory includes parent, all worker workspaces, three bounded copies of
-    each returned batch, and checkpoint encoding. Work leases are charged
-    before submission; only reported unspent work is refunded.
+    Completed assignments carry atom packets of max_batch_atoms each. Packet
+    saturation retains another packet and continues the same numerical work.
+    Root resources cover worker storage, completion envelopes and parent merge;
+    no assignment lease or owned-byte estimate refuses work.
     """
 
     backend: str = field(default="python-int", kw_only=True)
@@ -73,6 +75,7 @@ class ParallelConfig:
     poll_interval: int = 64
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
+            target_rows=4096,
             score_policy="powers",
             division="bucket",
             residual_bound=10000,
@@ -139,14 +142,19 @@ class _ExportCollector(SieveCollector):
 
     def __init__(self, *args, packet_atoms=1024, **kwargs):
         self.packet_atoms = packet_atoms
+        self.packets = []
+        self.exported_ids = set()
         super().__init__(*args, **kwargs)
 
     def _admit(self, atom, stats):
-        if atom.relation_id in self._atoms:
+        if atom.relation_id in self.exported_ids:
             stats["duplicates"] += 1
             return None
-        if len(self._atoms) >= self.packet_atoms:
-            return "batch_limit"
+        if len(self._atoms) == self.packet_atoms:
+            # A full transport packet is retained in the completion envelope;
+            # it never ends or replays this numerical family assignment.
+            self.packets.append(tuple(self._atoms.values()))
+            self._atoms.clear()
         reserve = 4096 + 256 * len(atom.exponents)
         reserve += 16 * (
             abs(atom.position).bit_length() + atom.polynomial.n.bit_length()
@@ -154,6 +162,7 @@ class _ExportCollector(SieveCollector):
         self.budget.consume(len(atom.exponents) + 1)
         self._workspace += reserve
         self._atoms[atom.relation_id] = atom
+        self.exported_ids.add(atom.relation_id)
         stats["admitted_atoms"] += 1
         return None
 
@@ -314,6 +323,9 @@ def _collect(task, state=None):
     return dict(
         id=index,
         atoms=atoms,
+        packets=tuple(collector.packets)
+        if collector is not None and reason == "complete"
+        else (),
         divisor=divisor,
         reason=reason,
         work=budget.used,
@@ -996,6 +1008,20 @@ class ParallelSIQSJob:
         self.stats["worker_cpu_seconds"] += result["cpu_seconds"]
         self.stats["scanned"] += result["scanned"]
         if result["reason"] in ("complete", "factor_found"):
+            packets = result.pop("packets", ())
+            if any(
+                len(packet) > self.config.max_batch_atoms
+                for packet in (*packets, result["atoms"])
+            ):
+                raise ValueError(
+                    "worker packet exceeds declared transport width"
+                )
+            if packets:
+                result["atoms"] = tuple(
+                    atom
+                    for packet in (*packets, result["atoms"])
+                    for atom in packet
+                )
             index = result["id"]
             if index in self.pending or index < self.next_assignment:
                 raise ValueError("duplicate worker assignment")
@@ -1152,23 +1178,20 @@ class ParallelSIQSJob:
             if payload["store"] is not None:
                 _restore_store(payload["store"], job.engine.collector, budget)
             pending = payload["pending"]
-            if not isinstance(pending, list) or len(pending) > 4:
-                raise ValueError("pending batch cap exceeded")
+            if not isinstance(pending, list):
+                raise ValueError("pending batches must be a list")
             job._memory(max(1, len(pending)))
             for record in pending:
                 index = utils.require_integer(
                     record["id"], "assignment ID", next_index
                 )
-                if (
-                    index >= min(job.assignment_count, next_index + 4)
-                    or index in job.pending
-                ):
+                if index >= job.assignment_count or index in job.pending:
                     raise ValueError("invalid pending assignment")
 
-                if (
-                    record["reason"] not in ("complete", "factor_found")
-                    or len(record["atoms"]) > config.max_batch_atoms
-                ):
+                if record["reason"] not in (
+                    "complete",
+                    "factor_found",
+                ) or not isinstance(record["atoms"], list):
                     raise ValueError("invalid pending batch")
 
                 if record["divisor"] is not None and not utils.valid_divisor(

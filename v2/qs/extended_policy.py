@@ -8,7 +8,8 @@ from .sieve_collector import CombinedYieldSieveConfig
 
 
 @removed_arguments(
-    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes")
+    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes"),
+    positional=(10, "max_relations"),
 )
 @dataclass(frozen=True)
 class ExtendedYieldSieveConfig(CombinedYieldSieveConfig):
@@ -112,7 +113,8 @@ EXTENSION_FIELDS = frozenset(
 
 
 @removed_arguments(
-    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes")
+    ("memory_bytes", "max_atoms", "max_relations", "spill_bytes"),
+    positional=(10, "max_relations"),
 )
 @dataclass(frozen=True)
 class BoundedYieldSieveConfig(ExtendedYieldSieveConfig):

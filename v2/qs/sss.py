@@ -32,7 +32,8 @@ from .smooth_batch import SmoothBatch
         "max_tree_bits",
         "max_tree_nodes",
         "memory_bytes",
-    )
+    ),
+    positional=(6, "max_candidates"),
 )
 @dataclass(frozen=True)
 class SSSConfig:
@@ -57,6 +58,7 @@ class SSSConfig:
     weight_two: bool = True
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
+            target_rows=2048,
             division="roots",
             residual_bound=10000,
             max_partials=512,

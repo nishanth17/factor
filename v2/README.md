@@ -151,7 +151,7 @@ scope. Cancellation, finite numerical exhaustion, `allocation_failure`, I/O
 failure and unsupported encoding retain distinct identities. Interrupted
 publication poisons its owner; it cannot be reused or checkpointed.
 
-Checkpoints use resource version `observed-resources/saved-history-v2`. Older
+Checkpoints use resource version `observed-resources/saved-history-v3`. Older
 resource schemas raise `UnsupportedResourceVersionError`; there is no migration.
 Resumes inherit recorded cumulative charges plus the current invocation. Work
 and resource consumption after the last valid save are **not recovered** after

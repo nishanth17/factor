@@ -44,7 +44,10 @@ MAX_STORED_ATOMS = 65536
 MAX_METADATA_CHUNK = 1024
 
 
-@removed_arguments(("max_atoms", "max_relations", "memory_bytes"))
+@removed_arguments(
+    ("max_atoms", "max_relations", "memory_bytes"),
+    positional=(10, "max_relations"),
+)
 @dataclass(frozen=True)
 class SieveConfig:
     """Finite collector controls; threshold_extra > 0 is intentionally lossy.
@@ -115,7 +118,10 @@ class SieveConfig:
         return storage_limit(self.max_partials)
 
 
-@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
+@removed_arguments(
+    ("memory_bytes", "max_atoms", "max_relations"),
+    positional=(10, "max_relations"),
+)
 @dataclass(frozen=True)
 class DoubleLargeSieveConfig(SieveConfig):
     """Opt-in two-prime bounds and a finite cumulative splitting quota.
@@ -160,7 +166,10 @@ class DoubleLargeSieveConfig(SieveConfig):
         return storage_limit(self.split_call_limit)
 
 
-@removed_arguments(("max_atoms", "max_relations", "memory_bytes"))
+@removed_arguments(
+    ("max_atoms", "max_relations", "memory_bytes"),
+    positional=(10, "max_relations"),
+)
 @dataclass(frozen=True)
 class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
     """Retain partial history with allocator-grown containers by default.
@@ -181,7 +190,10 @@ class GrowingDoubleLargeSieveConfig(DoubleLargeSieveConfig):
         super().__post_init__()
 
 
-@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
+@removed_arguments(
+    ("memory_bytes", "max_atoms", "max_relations"),
+    positional=(10, "max_relations"),
+)
 @dataclass(frozen=True)
 class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
     """Independent useful-yield policies with checked original provenance.
@@ -241,7 +253,10 @@ class YieldSieveConfig(GrowingDoubleLargeSieveConfig):
                 raise ValueError(name + " exceeds its finite cap")
 
 
-@removed_arguments(("memory_bytes", "max_atoms", "max_relations"))
+@removed_arguments(
+    ("memory_bytes", "max_atoms", "max_relations"),
+    positional=(10, "max_relations"),
+)
 @dataclass(frozen=True)
 class CombinedYieldSieveConfig(YieldSieveConfig):
     """Versioned combined challenger; every auxiliary path has a finite cap."""
@@ -1835,6 +1850,11 @@ class SieveCollector:
                         while end < stop and self._scores[end] < threshold:
                             end += 1
                         amount = end - offset
+                        recorder_span = getattr(
+                            self.budget, "recorder_span", None
+                        )
+                        if recorder_span is not None:
+                            amount = recorder_span(amount)
                         # Publish only affordable certified rejects. The
                         # adapter counts these logical actions individually,
                         # so batching cannot enlarge its 64-action poll gap.
@@ -1915,8 +1935,8 @@ class SieveCollector:
                     and position % self.config.block_width == 0
                 ):
                     self._candidate_bound = self._reporting.decide()
-        except BudgetExhaustedError:
-            reason = self.budget.reason
+        except BudgetExhaustedError as error:
+            reason = self.budget.reason or str(error)
 
         if stats["blocks"] == 0:
             stats["threshold_min"] = 0

@@ -8,7 +8,7 @@ from ..execution.resources import removed_arguments
 from . import bounded as control
 
 
-@removed_arguments(("memory_bytes",))
+@removed_arguments(("memory_bytes",), positional=(5, "memory_bytes"))
 @dataclass(frozen=True)
 class PM1TuningConfig(control.PM1Config):
     """Select finite exponent/gap/paired variants without changing defaults.
