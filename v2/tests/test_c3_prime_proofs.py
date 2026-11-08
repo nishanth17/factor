@@ -97,11 +97,14 @@ class PrimeProofTests(unittest.TestCase):
 
     def test_child_work_is_charged_before_parent_deadline_check(self):
         # Explicit starts avoid default factories bound to original clocks.
+        clock = [100]
         parent = Budget(
-            work_limit=100, seconds=1, cpu_seconds=None, _wall_start=100
+            work_limit=100,
+            seconds=1,
+            cpu_seconds=None,
+            wall_clock=lambda: clock[0],
         )
         source = proofs.UniformPrimeSource(17, budget=parent)
-        clock = [100]
 
         def finish(*args, budget, **kwargs):
             budget.consume(7)

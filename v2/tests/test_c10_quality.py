@@ -173,7 +173,7 @@ class QualityAssignmentTests(unittest.TestCase):
             collector=collector,
         )
         self.assertFalse(hasattr(config, "memory_bytes"))
-        self.assertIsNone(config.checkpoint_bytes)
+        self.assertNotIn("checkpoint_bytes", config.__dataclass_fields__)
         job = SIQSJob(self.n, config=config, budget=Budget(work_limit=10**9))
         self.assertEqual(job.run(max_blocks=1).reason, "paused")
         checkpoint = job.checkpoint()
@@ -184,9 +184,13 @@ class QualityAssignmentTests(unittest.TestCase):
             allow_extension=True,
         )
         self.assertGreater(restored.budget.used, job.budget.used)
-        self.assertIsNone(restored.config.memory_bytes)
-        self.assertIsNone(restored.config.checkpoint_bytes)
-        self.assertIsNone(restored.config.collector.max_atoms)
+        self.assertNotIn("memory_bytes", restored.config.__dataclass_fields__)
+        self.assertNotIn(
+            "checkpoint_bytes", restored.config.__dataclass_fields__
+        )
+        self.assertNotIn(
+            "max_atoms", restored.config.collector.__dataclass_fields__
+        )
         self.assertEqual(
             restored.assignments.identity, job.assignments.identity
         )

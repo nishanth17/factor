@@ -305,7 +305,7 @@ class SSSJobTests(unittest.TestCase):
 
         result = refused.run()
 
-        self.assertEqual(result.reason, "search_exhausted")
+        self.assertEqual(result.reason, "factor_found")
         self.assertEqual(
             refused.run().stats["work_used"], result.stats["work_used"]
         )

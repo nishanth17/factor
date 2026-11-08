@@ -202,8 +202,10 @@ def apply_revert(variant):
             def implementation(self, *args, **kwargs):
                 search = kwargs.get("search_config")
                 if search is not None:
+                    values = asdict(search)
+                    values["collector"] = search.collector
                     kwargs["search_config"] = adapt_resource_configuration(
-                        type(search), **asdict(search)
+                        type(search), **values
                     )
                 return original(self, *args, **kwargs)
 

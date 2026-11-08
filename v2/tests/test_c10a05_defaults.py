@@ -47,7 +47,7 @@ class PacingDefaultTests(unittest.TestCase):
                 selected["collector"]["marking"] = "sparse"
                 self.assertEqual(
                     selected,
-                    control[str(digits)][arm],
+                    asdict(control[str(digits)][arm]),
                 )
             self.assertEqual(
                 PortfolioConfig().for_input(number).siqs,

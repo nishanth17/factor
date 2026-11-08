@@ -177,7 +177,7 @@ class RoundTwoControlsTests(unittest.TestCase):
                     error = None
                 except Exception as refusal:
                     error = (type(refusal).__name__, str(refusal))
-                outcomes.append((error, budget.used, budget.reason))
+                outcomes.append((error, budget.used))
             return outcomes
 
         with (

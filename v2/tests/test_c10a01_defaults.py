@@ -61,7 +61,7 @@ class CoupledDefaultTests(unittest.TestCase):
         self.assertFalse(
             hasattr(default_siqs_budget(10**69 + 7), "work_limit")
         )
-        self.assertEqual(default_siqs_budget(10**69 + 7).seconds, 30)
+        self.assertIsNone(default_siqs_budget(10**69 + 7).seconds)
 
     def test_existing_marking_memory_and_explicit_controls_are_preserved(self):
         config = default_siqs_config(10**49 + 123)

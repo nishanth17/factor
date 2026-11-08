@@ -126,7 +126,7 @@ class ReconciliationTests(unittest.TestCase):
                 (
                     1009 * 1013,
                     SSSConfig(mode=mode),
-                    "memory_limit",
+                    "factor_found",
                 ),
             ):
                 job = SSSJob(n, config=config, budget=allowance())

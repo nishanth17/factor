@@ -6,8 +6,8 @@ import io
 import json
 import tempfile
 import unittest
-from unittest.mock import patch
 from pathlib import Path
+from unittest.mock import patch
 
 from v2.common.prime_sieve import prime_sieve
 from v2.execution.budget import BudgetExhaustedError

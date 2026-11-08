@@ -266,10 +266,13 @@ class B4KernelTests(unittest.TestCase):
                 # Canonical X:Z and the existing a24 convention also resume in
                 # the unmodified engine; no candidate identity is serialized.
                 for plain in (self.engines["baseline"], portfolio):
-                    if plain is portfolio:
-                        with self.assertRaises(
+                    if (plain is portfolio) != (engine is portfolio):
+                        error = (
                             UnsupportedResourceVersionError
-                        ):
+                            if plain is portfolio
+                            else ValueError
+                        )
+                        with self.assertRaises(error):
                             plain.factorize_bounded(
                                 fixture["n"],
                                 checkpoint=checkpoint,

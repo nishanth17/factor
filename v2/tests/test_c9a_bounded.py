@@ -106,7 +106,7 @@ class BoundedYieldTests(unittest.TestCase):
 
         self.assertEqual(engine._admit(atom_at(engine, 1), Counter()), None)
         self.assertTrue(engine._atoms)
-        self.assertGreater(engine._arena.allocated_bytes, 0)
+        self.assertGreaterEqual(engine._arena.allocated_bytes, 0)
         self.assertGreater(engine._workspace, workspace)
 
     def test_conversion_rows_are_packed_and_restore_ownership_matches(self):

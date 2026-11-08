@@ -44,14 +44,14 @@ class LargerBandDefaultTests(unittest.TestCase):
                     "density+presieve+scan_fused",
                 )
                 selected["collector"]["marking"] = "sparse"
-                self.assertEqual(selected, expected)
+                self.assertEqual(selected, asdict(expected))
                 if signed > 0 and signed % 2:
                     self.assertEqual(
                         SIQSJob(signed).config, default_siqs_config(signed)
                     )
 
-        self.assertEqual(default_siqs_budget(NUMBER_51).work_limit, 10**13)
-        self.assertEqual(default_siqs_budget(NUMBER_51).seconds, 1200)
+        self.assertFalse(hasattr(default_siqs_budget(NUMBER_51), "work_limit"))
+        self.assertIsNone(default_siqs_budget(NUMBER_51).seconds)
         self.assertEqual(
             previous_siqs_config(10**60), SIQSConfig(sign_policy="swap_high")
         )

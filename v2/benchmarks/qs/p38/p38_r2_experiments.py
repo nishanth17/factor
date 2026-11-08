@@ -7,6 +7,7 @@ from functools import lru_cache
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    historical_asdict,
 )
 
 
@@ -30,7 +31,10 @@ def experiment_collector(module, variant):
                 # Reserve the complete simultaneous tree and leaf storage,
                 # including construction, rather than subtracting base bytes.
                 reserve = 8 * 2**20 + 512 * self.config.block_width
-                if self._workspace + reserve > self.config.memory_bytes:
+                if (
+                    self._workspace + reserve
+                    > historical_asdict(self.config)["memory_bytes"]
+                ):
                     raise MemoryError("batch coexistence exceeds memory cap")
                 self._workspace += reserve
                 self._smooth = adapt_resource_configuration(

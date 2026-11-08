@@ -293,9 +293,10 @@ class CapacityTests(unittest.TestCase):
                 target_rows=128,
             ),
         )
-        validate_extension(original, enlarged)
+        with self.assertRaises(ValueError):
+            validate_extension(original, enlarged)
         enlarged = replace(enlarged)
-        validate_extension(original, enlarged)
+        validate_extension(enlarged, replace(enlarged))
         report = capacity_report(self.base, enlarged)
 
         self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)

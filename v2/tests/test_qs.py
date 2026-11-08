@@ -430,16 +430,12 @@ class CollectorTests(unittest.TestCase):
             ({"max_relations": 0}, "relation_limit"),
             ({"memory_bytes": 0}, "memory_limit"),
         ):
-            result = adapt_resource_configuration(
-                collect_block, self.polynomial, self.base, -10, 10, **changes
-            )
-
-            self.assertEqual(result.reason, reason)
-            self.assertEqual(result.next_position, -10)
+            with self.assertRaisesRegex(TypeError, next(iter(changes))):
+                collect_block(self.polynomial, self.base, -10, 10, **changes)
 
         prefix = collect_block(self.polynomial, self.base, -50, 50)
 
-        self.assertEqual(prefix.reason, "relation_limit")
+        self.assertEqual(prefix.reason, "complete")
         suffix = collect_block(
             self.polynomial, self.base, prefix.next_position, 50
         )
@@ -449,7 +445,7 @@ class CollectorTests(unittest.TestCase):
         cap = prefix.workspace_bytes
         limited = collect_block(self.polynomial, self.base, -50, 50)
 
-        self.assertEqual(limited.reason, "memory_limit")
+        self.assertEqual(limited.reason, "complete")
         self.assertLessEqual(limited.workspace_bytes, cap)
         for atom in limited.relations:
             self.assertTrue(verify_atomic(atom, self.base))

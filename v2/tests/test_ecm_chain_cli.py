@@ -79,7 +79,9 @@ class ChainCLITests(unittest.TestCase):
                     10 if arguments[0] == "--rss-bytes" else 9,
                 )
                 self.assertNotIn("memory_bytes", payload["config"])
-                self.assertNotIn("chains", payload)
+                self.assertEqual(
+                    "chains" in payload, arguments[0] == "--rss-bytes"
+                )
 
     def test_unrelated_engine_and_native_prac_backend_are_rejected(self):
         for arguments in (

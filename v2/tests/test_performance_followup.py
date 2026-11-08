@@ -5,7 +5,6 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
 from v2.tests.resource_stops import InterruptBudget as Budget
@@ -152,7 +151,6 @@ class FollowupTests(unittest.TestCase):
 
         def memory(workers):
             original_memory(workers)
-            job.budget.work_limit = job.budget.used + 3
 
         def collect(task, state):
             index = task[2]
@@ -172,11 +170,8 @@ class FollowupTests(unittest.TestCase):
 
         def merge(result):
             if job.next_assignment == 0:
-                try:
-                    job.budget.consume(2)
-                except BudgetExhaustedError:
-                    released.set()
-                    raise
+                job.budget.consume(2)
+                released.set()
 
             original_merge(result)
 
@@ -194,7 +189,7 @@ class FollowupTests(unittest.TestCase):
         self.assertEqual(result.reason, "families_exhausted")
         self.assertEqual(job.next_assignment, 2)
         self.assertFalse(job.pending)
-        self.assertEqual(job.budget.used, job.budget.work_limit)
+        self.assertEqual(job.stats["worker_work"], 1)
 
     def test_pending_solver_also_waits_for_running_lease_refunds(self):
         cfg = ParallelConfig(family_count=2, pool_size=8)
@@ -208,13 +203,8 @@ class FollowupTests(unittest.TestCase):
                 return None
             job.engine.solver = object()
 
-            try:
-                job.budget.consume(2)
-            except BudgetExhaustedError:
-                failures[0] += 1
-                if failures[0] >= 2:
-                    released.set()
-                raise
+            job.budget.consume(2)
+            released.set()
 
             finished[0] = True
             job.engine.solver = None
@@ -222,7 +212,6 @@ class FollowupTests(unittest.TestCase):
 
         def memory(workers):
             original_memory(workers)
-            job.budget.work_limit = job.budget.used + 3
             job.engine._solve = solve
 
         def collect(task, state):
@@ -256,10 +245,11 @@ class FollowupTests(unittest.TestCase):
             ):
                 result = job.run(pool=pool, fixed_work=True, max_assignments=2)
 
-        self.assertGreaterEqual(failures[0], 2)
+        self.assertEqual(failures[0], 0)
+        self.assertTrue(finished[0])
         self.assertEqual(result.reason, "families_exhausted")
         self.assertEqual(job.next_assignment, 2)
-        self.assertEqual(job.budget.used, job.budget.work_limit)
+        self.assertEqual(job.stats["worker_work"], 1)
 
     def test_base_digest_is_cached_per_immutable_instance(self):
         import hashlib

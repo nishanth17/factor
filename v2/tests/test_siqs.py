@@ -83,7 +83,7 @@ class SIQSTests(unittest.TestCase):
         checkpoint = json.loads(json.dumps(original.checkpoint()))
 
         self.assertGreater(len(checkpoint["blob"]), 0)
-        self.assertFalse(hasattr(config, "checkpoint_bytes"))
+        self.assertNotIn("checkpoint_bytes", config.__dataclass_fields__)
 
         restored = SIQSJob.from_checkpoint(
             checkpoint, budget=allowance(), config=config
@@ -394,7 +394,7 @@ class SIQSTests(unittest.TestCase):
                 configuration(**options)
 
         with self.assertRaises(TypeError):
-            configuration(memory_bytes=4 * 1024 * 1024)
+            SIQSConfig(memory_bytes=4 * 1024 * 1024)
         job = SIQSJob(
             4001 * 5003,
             config=adapt_resource_configuration(
@@ -404,6 +404,8 @@ class SIQSTests(unittest.TestCase):
         )
         job.run(max_blocks=1)
         self.assertGreater(len(job.checkpoint()["blob"]), 4096)
+        with self.assertRaisesRegex(TypeError, "checkpoint_bytes"):
+            SIQSConfig(checkpoint_bytes=4096)
 
         self.assertEqual(job.run().reason, "factor_found")
         fresh = SIQSJob(

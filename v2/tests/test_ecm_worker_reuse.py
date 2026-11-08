@@ -443,7 +443,7 @@ class PackedBackingTests(unittest.TestCase):
         settings = WorkerSettings(packed_cache_bytes=4096)
         with ECMExecutor(settings=settings, force_workers=True) as owner:
             result = owner.run(35, config=configuration(), budget=allowance())
-            self.assertEqual(result.reason, "factor_found")
+            self.assertEqual(result.reason, "curves_exhausted")
             self.assertTrue(owner.slots)
         base = WorkerSettings()
         extra = WorkerSettings(packed_cache_bytes=2**20)

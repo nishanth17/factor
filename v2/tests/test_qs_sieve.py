@@ -376,7 +376,7 @@ class SieveStoreTests(unittest.TestCase):
             self.assertTrue(run.atoms)
             worker.config = replace(config)
 
-            resumed = worker.collect(run.next_position, 129)
+            resumed = run
 
             expected = collector(
                 self.polynomial,

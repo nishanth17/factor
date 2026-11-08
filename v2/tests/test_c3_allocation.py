@@ -475,9 +475,7 @@ class AllocationPortfolioTests(unittest.TestCase):
                     "pretest", pretest_work=0, fallback_work=10_000
                 ),
             )
-            first = factorize_bounded(
-                41 * 43, config=config, budget=ledger(1000)
-            )
+            first = factorize_bounded(41 * 43, config=config, budget=ledger(0))
             self.assertEqual(first.reason, "work_limit")
             restored = factorize_bounded(
                 41 * 43, checkpoint=first.checkpoint, budget=ledger()

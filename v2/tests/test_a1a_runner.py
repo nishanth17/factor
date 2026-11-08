@@ -113,7 +113,9 @@ class FrozenRunnerTests(unittest.TestCase):
         self.assertEqual(
             previous_values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
         )
-        self.assertEqual(values, previous_values)
+        from v2.tests.resource_stops import recipe_values
+
+        self.assertEqual(recipe_values(values), recipe_values(previous_values))
         # Count-stage reservations are identical; the new boundary additionally
         # preflights temporary sieve memory and then constructs the same base.
         count_budget = unlimited_budget()

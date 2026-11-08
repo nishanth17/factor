@@ -60,9 +60,9 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertEqual(asdict(growing)["storage_policy"], "grow")
         config = SIQSConfig(collector=growing)
         for name in ("memory_bytes", "checkpoint_bytes"):
-            self.assertFalse(hasattr(config, name))
+            self.assertNotIn(name, config.__dataclass_fields__)
         for name in ("memory_bytes", "max_atoms", "max_relations"):
-            self.assertFalse(hasattr(growing, name))
+            self.assertNotIn(name, growing.__dataclass_fields__)
         self.assertEqual(
             config.metadata_reserve, 65536 + 512 * config.polynomial_limit
         )
@@ -70,7 +70,7 @@ class GrowingStorageTests(unittest.TestCase):
             large_prime_bound=1000, large_product_bound=1000000
         )
         self.assertEqual(capped.max_partials, 256)
-        self.assertFalse(hasattr(capped, "max_atoms"))
+        self.assertNotIn("max_atoms", capped.__dataclass_fields__)
         self.assertNotIn("storage_policy", asdict(capped))
         self.assertEqual(SIQSConfig(collector=capped).collector, capped)
         self.assertIsNone(replace(growing).max_partials)
