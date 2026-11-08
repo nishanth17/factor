@@ -10,6 +10,7 @@ from .resources import (
     DEFAULT_RSS,
     RESOURCE_VERSION,
     RemovedResourceLimitError,
+    ResourceProviderError,
     default_provider,
     validate_seconds,
 )
@@ -66,6 +67,8 @@ class Budget:
             ("prior_cpu", prior_cpu),
         ):
             validate_seconds(value, name)
+            if name.startswith("prior_") and value is None:
+                raise ValueError(name + " must be finite and nonnegative")
         utils.require_integer(used, "used", 0)
         if rss_bytes is not DEFAULT_RSS and rss_bytes is not None:
             utils.require_integer(rss_bytes, "rss_bytes", 0)
@@ -93,8 +96,12 @@ class Budget:
             rss_bytes is not None or sys.platform == "darwin"
         ):
             self.provider = default_provider()
+        if rss_bytes is DEFAULT_RSS:
+            physical = self.provider.physical_memory()
+            if type(physical) is not int or physical <= 0:
+                raise ResourceProviderError("invalid physical memory size")
         self.rss_bytes = (
-            4 * self.provider.physical_memory() // 5
+            4 * physical // 5
             if rss_bytes is DEFAULT_RSS
             else rss_bytes
         )
@@ -153,6 +160,8 @@ class Budget:
         cannot erase charges; a duplicate acknowledgment cannot add charges.
         """
         validate_seconds(cpu_total, "child CPU")
+        if cpu_total is None:
+            raise ResourceProviderError("invalid observed child CPU")
         previous = self._children.get(identity)
         if baseline or previous is None:
             previous = cpu_total if baseline else 0.0
@@ -176,7 +185,7 @@ class Budget:
         }
         for sample in samples:
             if type(sample.rss) is not int or sample.rss < 0:
-                raise ValueError("invalid observed resident size")
+                raise ResourceProviderError("invalid observed resident size")
             if sample.pid in self.roots:
                 self.roots[sample.pid] = sample.birth
             binding = self._process_bindings.get(sample.pid)
@@ -322,8 +331,8 @@ class Budget:
                 try:
                     pid, status, usage = os.wait4(popen.pid, flag)
                 except OSError as error:
-                    # Match Popen's pre-creation/ECHILD handling. Other OS
-                    # Other OS failures keep their original error identity.
+                    # Match Popen's pre-creation/ECHILD handling; other
+                    # OS failures keep their original error identity.
                     if error.errno == 10:
                         return None
                     raise

@@ -101,6 +101,7 @@ def factorize_rho(
     The dispatcher supplies _known_composite only after its own classification;
     ordinary public calls still check primality. All outputs remain divisors.
     """
+    budget.consume(0)
     utils.require_integer(n, minimum=1)
     engine = (
         arithmetic.backend_for(n)

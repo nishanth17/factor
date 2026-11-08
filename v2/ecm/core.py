@@ -290,6 +290,7 @@ def factorize_ecm(
     immediately; stage 2 can recover a mixed-factor batch locally. The internal
     _known_composite hint avoids repeating the dispatcher's classification.
     """
+    budget.consume(0)
     utils.require_integer(n, minimum=1)
     engine = (
         arithmetic.backend_for(n)

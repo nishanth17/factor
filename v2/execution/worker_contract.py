@@ -338,7 +338,11 @@ class Manifest:
         # Retain that hash input solely as a compatibility identity; no byte
         # allowance is constructed or enforced from it. Removing a resource
         # argument must not silently change sigmas for the same root seed.
-        search_options = dict(options, memory_bytes=64 * 2**20)
+        search_options = (
+            dict(options, memory_bytes=64 * 2**20)
+            if "gcd_batch" in options
+            else options
+        )
         self.identity = digest(
             [SEARCH_VERSION, n, seed, lineage, search_options]
         )

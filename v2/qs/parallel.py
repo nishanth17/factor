@@ -214,6 +214,7 @@ def _collect(task, state=None):
             if deadline is None
             else max(0, deadline - time.monotonic()),
             cpu_seconds=None,
+            rss_bytes=None,
             cancelled=cancelled,
         ),
         interval=config.poll_interval,
@@ -425,6 +426,8 @@ class CollectionPool:
     def poll(self, budget):
         """Charge all published worker CPU, including spawn/import startup."""
         if self.mode == "process":
+            for process in (self.executor._processes or {}).values():
+                budget.track_process(process)
             current = sum(
                 max(0, x - y)
                 for x, y in zip(self.state["cpu"], self.state["cpu_base"])

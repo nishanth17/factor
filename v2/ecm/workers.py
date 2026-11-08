@@ -686,7 +686,6 @@ class ECMExecutor:
             slot["rss"] = max(slot["rss"], message["rss"])
             slot["reported_cpu"] += consumed
             base.acknowledge(slot["process"].pid, slot["reported_cpu"])
-            base.acknowledge(slot["process"].pid, slot["reported_cpu"])
             stats["residue_queue_peak"] = max(
                 stats["residue_queue_peak"], len(search.boundaries)
             )
@@ -732,7 +731,7 @@ class ECMExecutor:
                         stats["worker_dispatches"] += len(issued)
                         self._send(slot, packet)
                     if not search.active:
-                        raise LeaseRefusedError("lease_refused")
+                        raise LeaseRefusedError("attempts_exhausted")
                     wait = self.settings.parent_poll_seconds
                     if deadline is not None:
                         wait = min(wait, max(0, deadline - time.monotonic()))
@@ -759,7 +758,7 @@ class ECMExecutor:
                         manifest, search, ledger, deadline, slot, serial=True
                     )
                     if not issued:
-                        raise LeaseRefusedError("lease_refused")
+                        raise LeaseRefusedError("attempts_exhausted")
                     cancelled_after_factor = False
                     for index, (task, (position, token)) in enumerate(
                         zip(packet["jobs"], issued)

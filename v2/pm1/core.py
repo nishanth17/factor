@@ -74,6 +74,7 @@ def factorize_pm1(
     Stage 2 targets a divisor p whose p-1 has one eligible large prime,
     not a prime divisor of n between the bounds.
     """
+    budget.consume(0)
     utils.require_integer(n, minimum=1)
     engine = (
         arithmetic.backend_for(n)
