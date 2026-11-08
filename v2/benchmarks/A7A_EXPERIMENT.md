@@ -132,6 +132,12 @@ Required before coverage:
    Reuse these counters for the clean probes' 60-second progress and thermal
    log; preserve the last observation on timeout. No probe profiler, heap
    dumper, segment rotation or new capture-storage system is a prerequisite.
+   From the 7 November addendum, enable worker active, queue-wait and
+   publication timelines in every subsequent G2H and G3 cell, on both arms
+   of each comparison, and include their summaries in reports. The measured
+   G1 overhead was approximately 1%. Keep worker timelines off for G4 clean
+   confirmation. Preserve already launched historical cells' actual settings;
+   do not relabel them as timeline-enabled observations.
 5. Exact-output, lease, crash, resume, telemetry/recorder failure, near-limit,
    no-leaked-child and pure planning checks. Code changes require full suite,
    lint and benchmark imports from a committed-files-only checkout under the
@@ -209,15 +215,27 @@ result before another fix; do not optimize a small matrix stage while the
 parent stalls collection. Price and freeze a bounded next iteration; if its
 need contradicts the stage assumptions or exceeds the cap, stop and report.
 
-Measure the **N-independent-workers throughput upper bound** at N=1/4/8 using
+Measure the **independent-packet throughput reference** at N=1/4/8/10 using
 matched deterministic disjoint packet work on three calibration inputs
 per regime at 50 and 65 digits. Remove shared
 parent admission/transport from that diagnostic, not arithmetic or validation.
 Compare aggregate useful-work throughput and a local-packet/no-pool control
-with the real timeline. This bounds a coordination opportunity on the actual
-heterogeneous host; N times serial rate is not an empirical bound, and
+with the real timeline. Report scanned positions per worker CPU-second for
+every allocation, local/no-pool and S0; label whole-factor S0 separately when
+it includes graph/solve work. Static independent streams can suffer tail
+imbalance, so this reference is not a proven upper bound. N times serial
+rate is not an empirical bound, and
 independent full factorizations do not model cooperative collection. Include
 startup, remaining serial stages and load imbalance in any completion model.
+
+After the CPU-snapshot screen, the first worker-side fix is family-affinity
+placement, then grouped exact lease charging. Validate any parent-budget fix
+already in progress, but do not treat it as the main G2H fix: the G2 workers
+were 90–97% busy while spending substantially more CPU on similar scanned
+work. Isolate affinity from an explicitly wider credit window; preserve paid
+packet identities, exact admission and aggregate memory/CPU reservations.
+Do not issue the G2H gate report before implementing and measuring affinity,
+or reporting a concrete reason it cannot be measured.
 
 ### Classify and screen before constructing a joint design
 
@@ -232,6 +250,7 @@ Do not silently run the old 32-row all-binary design.
 | Per-packet budget leases | (a) | Replace repeated shared budget calls with bounded exact reservations/reconciliation for the same work. |
 | Persistent worker state (`reuse_state`) | (a) | Avoid rebuilding identical immutable context between packets; charge retained memory. |
 | Coefficient reuse (`coefficient_cache`) | (a) | Avoid recalculating identical coefficients without changing assignment coverage. |
+| Family-affinity placement (`family_affinity`) | (b) | Pin original packets to reuse contiguous family state; compare a matched credit window separately from the incumbent window. |
 | `density` | (a) | Skip redundant marking overhead while retaining exact hits. |
 | `unroll4` | (a) | Change loop shape for identical marking work; no gain is presumed. |
 | Packed versus object transport (`packed_transport`) | (b) | Alternative relation representation/publication with exact decode/admission. |

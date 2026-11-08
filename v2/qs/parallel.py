@@ -354,12 +354,16 @@ class CollectionPool:
     this is not an OS CPU/RSS sandbox. No nested backend threads are started.
     """
 
-    def __init__(self, mode="serial", workers=1):
+    def __init__(self, mode="serial", workers=1, *, family_affinity=False):
         if mode not in ("serial", "thread", "process"):
             raise ValueError("unknown execution mode")
         utils.require_integer(workers, "workers", 1)
         if workers > 10 or (mode == "serial" and workers != 1):
             raise ValueError("use one serial or at most ten workers")
+        if type(family_affinity) is not bool or (
+            family_affinity and mode != "process"
+        ):
+            raise ValueError("family affinity requires process workers")
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
             3,
             11,
@@ -367,6 +371,7 @@ class CollectionPool:
             raise RuntimeError("parallel collection requires PyPy Python 3.11")
 
         self.mode, self.workers = mode, workers
+        self.family_affinity = family_affinity
         context = None
         if mode == "process":
             context = multiprocessing.get_context("spawn")
@@ -395,8 +400,15 @@ class CollectionPool:
         self.executor = None
         self._owned_processes = []
         if mode == "process":
-            self.executor = ProcessPoolExecutor(
-                max_workers=workers,
+            executor = ProcessPoolExecutor
+            width = dict(max_workers=workers)
+            if family_affinity:
+                from .affinity_executor import FamilyAffinityExecutor
+
+                executor = FamilyAffinityExecutor
+                width = dict(workers=workers)
+            self.executor = executor(
+                **width,
                 mp_context=_OwnedSpawnContext(context, self._owned_processes),
                 initializer=_initialize_process,
                 initargs=(self.state,),
@@ -436,7 +448,9 @@ class CollectionPool:
         # an already-started submission cannot still be adding a child. The
         # creation registry survives manager-table clearing, including a
         # crash during submit() before the caller receives its future.
-        manager = self.executor._executor_manager_thread
+        managers = getattr(self.executor, "_executor_manager_threads", None)
+        if managers is None:
+            managers = (self.executor._executor_manager_thread,)
         self.executor.shutdown(wait=False, cancel_futures=True)
         processes = [p for p in self._owned_processes if p.pid is not None]
         for process in processes:
@@ -445,18 +459,25 @@ class CollectionPool:
         # A broken executor publishes failed futures before its manager joins
         # children. Concurrent Process.join/waitpid calls can leave a stale
         # live-child handle on PyPy/macOS. Bound manager retirement first.
-        if manager is not None and manager is not threading.current_thread():
-            manager.join(timeout=1.0)
+        deadline = time.monotonic() + 1.0
+        for manager in managers:
+            if (
+                manager is not None
+                and manager is not threading.current_thread()
+            ):
+                manager.join(timeout=max(0, deadline - time.monotonic()))
         processes = [p for p in self._owned_processes if p.pid is not None]
         for process in processes:
             if process.is_alive():
                 process.kill()
-        if (
-            manager is not None
-            and manager is not threading.current_thread()
-            and manager.is_alive()
-        ):
-            manager.join(timeout=1.0)
+        deadline = time.monotonic() + 1.0
+        for manager in managers:
+            if (
+                manager is not None
+                and manager is not threading.current_thread()
+                and manager.is_alive()
+            ):
+                manager.join(timeout=max(0, deadline - time.monotonic()))
         deadline = time.monotonic() + 1.0
         for process in processes:
             process.join(timeout=max(0, deadline - time.monotonic()))

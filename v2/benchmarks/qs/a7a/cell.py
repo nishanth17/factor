@@ -71,6 +71,7 @@ def settings(
         "cpu_snapshot",
         "stop_backend",
         "coefficient_cache",
+        "family_affinity",
         "worker_memory_bytes",
         "packet_bytes",
         "assignment_cpu",
@@ -378,7 +379,11 @@ def execute(request):
         pool = (
             None
             if workers is None
-            else CollectionPool(workers.mode, workers.workers)
+            else CollectionPool(
+                workers.mode,
+                workers.workers,
+                family_affinity=workers.family_affinity,
+            )
         )
     finally:
         if timeline_original is not None:

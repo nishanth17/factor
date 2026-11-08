@@ -67,6 +67,7 @@ class QSWorkerConfig:
     cpu_snapshot: bool = False
     stop_backend: str = "event"
     coefficient_cache: bool = False
+    family_affinity: bool = False
 
     def __post_init__(self):
         if type(self.observe) is not bool:
@@ -95,6 +96,11 @@ class QSWorkerConfig:
             raise ValueError("cpu_snapshot must be Boolean")
         if type(self.coefficient_cache) is not bool:
             raise ValueError("coefficient_cache must be Boolean")
+        if type(self.family_affinity) is not bool or (
+            self.family_affinity
+            and (self.mode != "process" or not self.reuse_state)
+        ):
+            raise ValueError("family affinity requires reused process state")
         if self.stop_backend not in ("event", "semaphore") or (
             self.stop_backend == "semaphore" and not self.private_stop
         ):
@@ -180,6 +186,8 @@ class QSWorkerConfig:
             values.pop("stop_backend")
         if not self.coefficient_cache:
             values.pop("coefficient_cache")
+        if not self.family_affinity:
+            values.pop("family_affinity")
         return values
 
     @property
@@ -916,11 +924,16 @@ class CurrentParallelSIQSJob:
         pool = (
             pool
             if pool is not None
-            else CollectionPool(self.workers.mode, self.workers.workers)
+            else CollectionPool(
+                self.workers.mode,
+                self.workers.workers,
+                family_affinity=self.workers.family_affinity,
+            )
         )
         if (
             pool.mode != self.workers.mode
             or pool.workers != self.workers.workers
+            or pool.family_affinity != self.workers.family_affinity
         ):
             raise ValueError("pool differs from pinned execution identity")
         from .worker_stop import configure_stop
@@ -1121,9 +1134,17 @@ class CurrentParallelSIQSJob:
                             raise
                     else:
                         try:
-                            future = pool.executor.submit(
-                                execute_packet, wire_task
-                            )
+                            if self.workers.family_affinity:
+                                slot = (
+                                    index // self.chunks_per_family
+                                ) % self.workers.workers
+                                future = pool.executor.submit_to(
+                                    slot, execute_packet, wire_task
+                                )
+                            else:
+                                future = pool.executor.submit(
+                                    execute_packet, wire_task
+                                )
                             # BrokenProcessPool's manager may clear its table
                             # before abort runs. Keep our own bounded handles
                             # from successful issuance until pool retirement.

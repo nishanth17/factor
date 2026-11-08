@@ -340,6 +340,15 @@ hint boundaries retain the original chunk scope. Flagged checkpoints validate
 contiguous paid receipts for fully admitted partial packets as well as pending
 work; legacy off identities and formats remain unchanged.
 
+`family_affinity=True` is an experimental process-only placement option that
+requires `reuse_state=True`. Each family index selects one of the same N
+worker processes; consecutive original packets can retain that family's root
+state. Packet identities, paid leases, ordered admission and resume coverage
+are unchanged. Pass the same option when constructing a retained
+`CollectionPool`. The option does not enlarge lookahead or memory allowances:
+a small packet-credit window can leave pinned workers idle. Any wider window
+must be explicitly funded and compared separately from placement.
+
 `arrival_order=True` is a separate, trajectory-changing experiment. Complete
 packets can enter the graph in observed arrival order while paid witnesses
 retain the bounded ordinal frontier. Partial packets retain their admission
