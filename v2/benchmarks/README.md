@@ -34,9 +34,9 @@ C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold, and C10/p64 at 70 cold.
 The 55 ranking is inconclusive under control drift. All 100 current-source
 calls complete; these calibration choices do not establish a fresh mainline
 speedup or a routing table. Runtime/committed-only QA source is `60bfd95`;
-full tests, lint and benchmark imports pass. Intermediate verification, G4
-and probes remain gated. Detailed evidence and exact recipes are local in
-main's ignored `results/a7a/g3-restricted-20261107-r2/` directory.
+full tests, lint and benchmark imports pass. Intermediate verification and G4
+remain gated. Subsequent probe outcomes are reported below. G3 evidence is
+local in main's ignored `results/a7a/g3-restricted-20261107-r2/` directory.
 
 The independent-packet diagnostic accepts an explicit bounded `--seconds`
 override of 35 or 75 seconds. It changes the observation allowance, not the
@@ -49,7 +49,16 @@ The RSS observer then cooperatively cancels work at that sampled live bound;
 `preserve_checkpoint=True` includes the validated portfolio checkpoint in the
 sample result. Recorder failure and a live-memory stop remain distinct.
 The amended 75/80 probes use a 32 GiB admission grant, 1 GiB worker /
-256 MiB runtime, 6 GiB parent, an 18 GiB live guard and 256 MiB checkpoint caps; this does not change G3's historical grants.
+256 MiB runtime, 6 GiB parent, an 18 GiB live guard and 256 MiB checkpoint
+caps; this does not change G3's historical grants.
+
+The approved 75/80 single-input probes are reported in main's ignored
+`results/a7a/probes-20261108/REPORT.md`. Both pass admission and stop before
+filtering/solving with generic internal `memory_limit` outcomes; neither
+live RSS nor wall/CPU allowance causes the stop. Exact sub-limit attribution
+is unrecorded. Outer checkpoints retain unresolved inputs but the terminal
+QS path clears the collected state. Feasibility is not established; no retry
+or default change follows. Committed-only probe QA passes on `5526118`.
 
 G2's corrected coverage is reported locally in
 `v2/audit/a7a/g2-report-20261107/REPORT.md`. All serial/process cells complete;

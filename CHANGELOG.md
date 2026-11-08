@@ -5,6 +5,9 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## Experimental QS kernel specialization and restricted tuning (8 November 2026)
 
+- Report both approved 75/80 feasibility probes on the isolated A7a branch.
+  Retain incomplete internal memory outcomes, missing sub-limit attribution
+  and the terminal path's discarded QS state. No automatic retry or adoption.
 - Admit explicit QS bookkeeping grants through 32 GiB without changing the
   default. Probe cells can enforce a lower sampled live-RSS cancellation
   bound and retain their portfolio checkpoint, separately from recorder errors.

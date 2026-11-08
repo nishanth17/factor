@@ -4,7 +4,9 @@ Status: restricted G3 reported on 8 November; the approved stage is finished
 and stopped. All 100 calls complete on runtime `60bfd95`. Frozen experimental
 process recipes: C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold (ranking
 inconclusive), C10/p64 at 70 cold. Pre-G3 cleanup and diagnostics are complete.
-Intermediate verification, G4 and the 75/80 probes require separate approval.
+The subsequently approved generous-bounds 75/80 probes are also reported:
+both incomplete under internal memory outcomes before solving. No further
+probe is approved. Intermediate verification and G4 remain gated.
 Follow the
 [joint-search policy](../POLICY.md#joint-parameter-searches) and
 [evidence tiers](../POLICY.md#evidence-tiers-and-sample-sizing).
@@ -648,6 +650,38 @@ rows and untested interactions, and stops. Confirmation is not adoption or
 permission to merge/change defaults.
 
 ## Separate 75/80 feasibility probes: one candidate, then stop
+
+**Reported:** exactly one cold call per size on `5526118`; both ownership
+admissions pass. Both return internal QS `memory_limit` events before any
+filtering/matrix solve. Neither the 18 GiB RSS guard nor wall/CPU allowance
+causes the stops. Feasibility is unestablished. The precise internal cap or
+allocation error is unrecorded; do not substitute a guessed attribution.
+The terminal path drops live QS state, so saved outer checkpoints retain
+unresolved cofactors/accounting but cannot resume the collected rows.
+Progress and thermals remain durable. No further run or retuning follows
+automatically. Canonical local report:
+`v2/benchmarks/results/a7a/probes-20261108/REPORT.md` in main.
+
+The actors used 1,969.676906459 / 4,794.110493167 wall seconds, respectively.
+Cumulative owner charges including prior validation are 6,973.427729834 wall
+and 67,091.398186075 CPU-seconds, within 40,800 / 396,000. Runtime/QA source
+`5526118` passes 1,579 tests (nine optional skips), lint and 292 imports.
+The same-source 80 call reuses QA. Scripts, commands, exact recipes, source
+archives, progress, receipts and hashes are in each ignored probe directory.
+No test or benchmark overlapped a timed actor. The contracts below record
+what was approved and executed; they are not a new grant.
+
+Historical executed commands from the task worktree:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/probe75-20261108/generous-owner.py --digits 75
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/probe75-20261108/generous-owner.py --digits 80
+```
+
+Each controller is archived as `owner.py` alongside `batches.py`, committed
+`source.tar`, `plan.json` and `request.json` in its probe evidence directory.
+Do not execute these historical identities again. A future run needs a new
+approved identity, output directory and finite grant; retain old failures.
 
 The latest 8 November generous-bounds amendment supersedes the earlier
 24 GiB probe amendment. It raises only these probes' aggregate owned-memory

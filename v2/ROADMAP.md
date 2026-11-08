@@ -175,6 +175,18 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **75/80 probes reported (8 November):** both single-input C10/p64 recipes
+  pass the amended 32 GiB bookkeeping grant (1 GiB worker / 256 MiB runtime,
+  6 GiB parent, 256 MiB checkpoints). Both stop with internal QS `memory_limit`
+  before filtering or a matrix solve; neither RSS guard nor wall/CPU grants
+  cause the stops. Exact attribution is missing; physical exhaustion is not
+  established. The terminal QS path clears collection state before outer
+  checkpointing. Preserve these failures; expose the precise refusal and
+  retain live state before proposing another expensive capacity experiment.
+  No retry or adoption. QA `5526118`: 1,579 tests, nine optional skips, lint
+  and 292 imports. Canonical local report in main:
+  `v2/benchmarks/results/a7a/probes-20261108/REPORT.md`.
+
 - **Restricted G3 reported (8 November):** the approved four-row worker/packet
   grid completes all 100 current-source calls on `60bfd95`. Experimental
   process recipes are C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold and

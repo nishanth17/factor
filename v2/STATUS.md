@@ -104,6 +104,28 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## A7a 75/80 probes reported — 8 November 2026
+
+Both approved, single-input cold probes are finished on `5526118`. Frozen
+C10/p64 passes the amended 32 GiB ownership grant with 1 GiB worker / 256 MiB
+runtime, 6 GiB parent and 256 MiB checkpoints. Both return internal QS
+`memory_limit` events before filtering or a matrix solve; neither the 18 GiB
+live-RSS guard nor wall/CPU grants stopped the calls. Feasibility remains
+unestablished. The precise sub-limit is unrecorded; physical memory exhaustion
+is not demonstrated.
+
+Progress, thermals and outer checkpoints are saved. The existing terminal
+internal-memory path clears the live QS job, so these checkpoints do not
+retain collected rows. Precise refusal attribution and retaining that state
+are proposed next work before another expensive call. The separate cooperative
+RSS cancellation/checkpoint path passes focused tests. Committed-only QA:
+1,579 tests (nine optional skips), lint and 292 imports. The same-source 80
+probe reuses that passing QA. Both controllers exited after draining actors
+and releasing their locks. No retry, extra candidate or adoption.
+
+Canonical local reports in main's ignored archive:
+`v2/benchmarks/results/a7a/probes-20261108/REPORT.md`.
+
 ## A7a restricted G3 reported — 8 November 2026
 
 The approved worker-count/packet-width search completes all 100 calls on
@@ -124,9 +146,9 @@ Owned actors drained and the controller exited, releasing its performance
 lock. Detailed report and exact recipes:
 `v2/benchmarks/results/a7a/g3-restricted-20261107-r2/REPORT.md` in the main
 repository's ignored evidence archive. No G4, intermediate verification,
-75/80 factoring, default adoption, merge or push was run. Static 75/80
-derivations exceed the prescribed aggregate owned-memory allowance; no
-substitute recipe is selected. The stage stops here.
+75/80 factoring, default adoption, merge or push was run within G3. Its static
+75/80 derivations exceeded the original 22 GiB allowance. Subsequent amended
+probe grants and outcomes are reported above; frozen G3 evidence is unchanged.
 
 ## A7a G2H complete — 7 November 2026
 
@@ -201,7 +223,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | Restricted G3 reported: cold 40/55/70, warm 40; 55 ranking inconclusive. Intermediate verification, fresh confirmation, probes and integration remain gated. | `codex/a7a-regime-tuning`; runtime/QA `60bfd95`; ignored `g3-restricted-20261107-r2/REPORT.md` |
+| [A7a](ROADMAP.md#a7a-in-progress) | G3 and amended 75/80 probes reported; both probes incomplete under internal memory outcomes. Exact refusal attribution, state retention, intermediate verification and fresh confirmation remain. | `codex/a7a-regime-tuning`; probes/QA `5526118`, G3 `60bfd95`; ignored `probes-20261108/REPORT.md` |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
