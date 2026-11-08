@@ -21,11 +21,11 @@ class PackedQueueTests(unittest.TestCase):
         from v2.qs.current_parallel import QSWorkerConfig
 
         self.assertEqual(
-            QSWorkerConfig(memory_bytes=22 * 2**30).memory_bytes,
-            22 * 2**30,
+            QSWorkerConfig(memory_bytes=32 * 2**30).memory_bytes,
+            32 * 2**30,
         )
         with self.assertRaises(ValueError):
-            QSWorkerConfig(memory_bytes=22 * 2**30 + 1)
+            QSWorkerConfig(memory_bytes=32 * 2**30 + 1)
 
     def test_packed_words_match_independent_events_and_paid_work(self):
         for width in (4, 7, 16):

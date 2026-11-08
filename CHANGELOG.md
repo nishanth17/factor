@@ -5,7 +5,7 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## Experimental QS kernel specialization and restricted tuning (8 November 2026)
 
-- Admit explicit QS bookkeeping grants through 24 GiB without changing the
+- Admit explicit QS bookkeeping grants through 32 GiB without changing the
   default. Probe cells can enforce a lower sampled live-RSS cancellation
   bound and retain their portfolio checkpoint, separately from recorder errors.
 - Select default scalar marking, collection and native-stamp kernels at

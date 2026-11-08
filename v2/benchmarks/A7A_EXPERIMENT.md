@@ -649,75 +649,60 @@ permission to merge/change defaults.
 
 ## Separate 75/80 feasibility probes: one candidate, then stop
 
-The 8 November bounds amendment raises only these probes' aggregate
-owned-memory admission grant to **24 GiB** and requires a distinct **18 GiB
-live aggregate owned-RSS stop guard**. Keep worker/runtime 768/256 MiB,
-parent 4 GiB and both parent/worker checkpoint caps 256 MiB. The bookkeeping
-bound sums concurrent caps; it is not expected physical use. Preserve a
-cooperative memory stop's progress and checkpoint, report a memory outcome
-and do not substitute another recipe. Poll aggregate owned RSS every 0.5 s
-at 75 digits; retain 60-second progress and thermal observations. No CPU
-profile, heap dump, extra candidate or repetition is included.
+The latest 8 November generous-bounds amendment supersedes the earlier
+24 GiB probe amendment. It raises only these probes' aggregate owned-memory
+admission grant to **32 GiB**, worker scratch to **1 GiB per worker** and
+parent QS to **6 GiB**. Runtime remains 256 MiB per worker and both
+parent/worker checkpoint caps remain 256 MiB. The bookkeeping bound sums
+concurrent caps; it is not expected physical use. The separate **18 GiB live
+aggregate owned-RSS stop guard** remains unchanged. On exceeding it, cancel
+cooperatively, preserve progress/checkpoint and report a memory outcome.
 
-Recomputed with the portfolio coexistence reservation: C10/p64 needs
-25,578,184,704 bytes (23.822 GiB) at 75 digits, admitted within
-25,769,803,776 bytes; 80 needs 26,090,151,936 bytes (24.298 GiB), refused.
-These revised bounds include the worker checkpoint's 256 MiB cap, unlike
-the earlier inherited 64 MiB request. The earlier frozen G3 derivations and
-their 22 GiB refusals remain historical, not edited receipts. The 75 call is
-explicitly approved now if admitted; 80 still requires a separate instruction
-after the 75 report and must satisfy admission before execution.
+Recomputed with portfolio coexistence: C10/p64 needs 30,410,022,912 bytes
+(28.322 GiB) at 75 digits and 30,921,990,144 bytes (28.798 GiB) at 80; both
+fit 34,359,738,368 bytes. Earlier 22/24 GiB calculations, failed validation
+and pre-lock attempts remain historical. No factoring call was issued by
+those attempts. The latest instruction approves 75 now and 80 after its
+report under the conditional continuation, with one fixed recipe per size.
+No fresh G4 or intermediate-size work is authorized.
 
-75 has a **two-hour actor budget**; 80 has **three times that, six hours**.
-Run 75 **only after G3**, once the G2H fixes and frozen G3 recipes exist, and
-only with explicit approval at or after the G3 report. It may run before or
-after G4; **G4 does not depend on the probe**. After the 75 receipt, stop and
-notify. The 80-digit probe still needs that report and a separate instruction.
-Exactly one candidate, one input, one clean cold call per approved probe.
-No second seed, companion, repetition, configuration, larger grant or
-confirmation is implied by any outcome. Report admission refusal as an outcome.
+75 has a **three-hour actor budget**; 80 has **eight hours**. Owner wall is
+actor plus ten minutes, including setup, observation and cleanup. CPU is ten
+times actor wall, with exact preparation charges included in the cumulative
+stage ledger. A predecessor's unused allowance cannot fund extra candidates.
+Exactly one candidate, one input, one clean cold call per probe; no repetition,
+profile companion, extra seed, retuning or larger grant is implicit.
 
 | Field | 75 digits | 80 digits |
 | --- | ---: | ---: |
 | Input | `regime_calibration_75_0` | `regime_calibration_80_0` |
-| Collection workers / packet width | Frozen G3 cold 70-digit recipe, mapped to 75 | Frozen G3 cold 70-digit recipe, mapped to 80 |
-| Actor wall | 7,200 s | 21,600 s |
-| Owner wall, including observation and cleanup | 7,500 s | 22,500 s |
-| Actor / owner aggregate CPU | 72,000 / 75,000 s | 216,000 / 225,000 s |
-| Aggregate owned RAM | 24 GiB | 24 GiB |
+| Collection workers / packet width | Frozen G3 cold 70 C10/p64, mapped to 75 | Same anchor, mapped to 80 |
+| Actor wall | 10,800 s | 28,800 s |
+| Owner wall including observation/cleanup | 11,400 s | 29,400 s |
+| Aggregate CPU ceiling | 108,000 s | 288,000 s |
+| Aggregate owned RAM admission | 32 GiB | 32 GiB |
 | Live aggregate owned RSS stop | Over 18 GiB | Over 18 GiB |
-| Worker / runtime per worker | 768 / 256 MiB | 768 / 256 MiB |
-| Parent QS / checkpoint | 4 GiB / 256 MiB | 4 GiB / 256 MiB |
+| Worker / runtime per worker | 1 GiB / 256 MiB | 1 GiB / 256 MiB |
+| Parent QS / checkpoint | 6 GiB / 256 MiB | 6 GiB / 256 MiB |
 | Logical work ceiling | 96,000,000,000,000 | 96,000,000,000,000 |
 
-**75-digit candidate:** use the frozen G3 cold 70-digit anchor recipe,
-carried to 75 by the declared interpolation rule. Inherit worker count,
-lookahead, admission order and capacity levels; map its packet fraction onto
-the actual 75-digit family using the declared valid integer levels. Keep the
-G2H implementation bundle and (a)/(b) choices unchanged. Inactive settings
-remain inactive; do not force an eight-worker or packet-16 fallback. Use seed
-104729 and the Y0 numerical policy resolved for 75 digits, without retuning
-base/report/product/residual limits. Keep the allowances above, including
-actor 7,200 s, owner 7,500 s, worker/runtime 768/256 MiB and parent QS 4 GiB.
-If the mapped recipe is refused, report the refusal and stop; do not substitute
-another recipe. Record the exact resolved recipe and derivation in the G3
-report before any probe result; do not choose it from 75-digit outcomes.
+Use the frozen G3 cold-70 anchor, preserving its worker count, lookahead,
+ordered admission, packet fraction, implementation bundle and (a)/(b)
+choices. At both targets the actual family is 64, so fraction g maps to
+packet width 64. Apply only the explicitly amended memory grants. Use seed
+104729 and Y0 resolved at the target size without retuning base, reporting,
+product or residual limits. Record exact derivations before outcomes.
+A refusal ends that probe without another recipe. Never choose an 80-digit
+candidate from 80-digit outcomes. Any proposal motivated by 75 must be
+reported and approved before replacing the already frozen 80 candidate.
 
-**80-digit candidate:** use the same derivation as the 75-digit probe:
-the frozen G3 cold 70-digit anchor recipe, mapped to the actual 80-digit
-family by the declared interpolation rule and valid integer packet levels.
-Inherit worker count, lookahead, admission order and capacity levels; keep the
-G2H implementation bundle and (a)/(b) choices unchanged. Use seed 104729 and
-Y0 resolved for 80 digits without retuning base/report/product/residual limits.
-Keep the 80-digit table allowances. Record the exact resolved recipe and its
-derivation before the call; if refused, report the refusal and stop without
-substituting another recipe.
-
-If the 75-digit receipt motivates a different 80-digit candidate, propose it
-in the 75-digit report for separate approval and freeze it before the 80-digit
-call. A proposal does not authorize a switch. Never choose or tune the
-candidate from 80-digit outcomes. The 75-digit report and separate instruction
-remain prerequisites for the single clean 80-digit call.
+Poll aggregate owned RSS every two seconds at both sizes, covering the
+factoring parent, workers, spawn helper and external owner. This fits the
+existing bounded recorder even for eight hours; it is a sampled guard,
+not an instantaneous physical-memory cap. Preserve the 60-second progress
+and thermal log. Stop and notify after each receipt. The latest instruction
+pre-approves the conditional 80 continuation after the 75 report; no broader
+search, default adoption, merge or push is implied.
 
 ### Clean observation and useful timeout receipts
 
@@ -783,5 +768,5 @@ profile analysis may need its optional reader; a clean probe does not. Static
 freezing does not run factoring. The runner must acquire
 `/private/tmp/factor-performance.lock` with nonblocking exclusive flock; an owner file is not admission. If occupied,
 report without polling or claiming a reservation. Hold through cleanup/draining
-and preserve the lock file. After the single probe, **stop and notify for every
+and preserve the lock file. After each single probe, **stop and notify for every
 outcome**. No automatic 80 call, search, confirmation or budget escalation.

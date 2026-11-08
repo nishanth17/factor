@@ -248,7 +248,7 @@ packed or ordinary sparse queues and falls back exactly when the word helper
 is ineligible. Extra wraparound work remains charged. No automatic default
 selects this layout.
 
-Explicit QS worker aggregate grants may reach 24 GiB; the default remains
+Explicit QS worker aggregate grants may reach 32 GiB; the default remains
 12 GiB. Prospective ownership still includes parent state, every worker,
 decoded/in-flight publication, coexistence and checkpoint reserves. This is
 an ownership bound, separate from measured RSS and physical-memory pressure.
