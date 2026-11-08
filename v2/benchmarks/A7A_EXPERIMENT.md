@@ -262,6 +262,7 @@ Do not silently run the old 32-row all-binary design.
 | `scan_fused` | (b) | Fuse scan stages instead of separate passes over identical candidates. |
 | `parity_two` | (b) | Alternative exact two-root marking implementation. |
 | `packed_queue` | (b) | Packed versus object queue representation for identical entries. |
+| `byte_stamps` | (b) | Alternative recovery-word epoch storage, with funded wraparound clears and the existing memory reservation. Screen its interaction with packed queues as one bounded memory-layout question. |
 | `wide_hits` | (c), conditionally inactive | Raise the hit-helper admission ceiling from 32 to 128 MiB; this is a capacity choice, not a different hit algorithm. |
 | `wide_inverses` | (c), conditionally inactive | Raise the inverse ceiling from 8 to 32 MiB and change coexistence reservations. |
 | `wide_transfers` | (c) | Raise the transfer ceiling from 32 to 128 MiB and requested bytes per base entry from 4,096 to 8,192. |

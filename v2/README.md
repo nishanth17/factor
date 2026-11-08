@@ -238,6 +238,16 @@ older conservative memory reservation remain unchanged. Derived queues are
 rebuilt after interruption/restore; the marking selection pins configuration
 identity. This changes no automatic default or admission policy.
 
+The experimental `byte_stamps` marking component stores bulk recovery-word
+epochs in byte arrays. It follows `packed_queue` in component order and keeps
+the original conservative scratch reservation. Each reused epoch triggers a
+charged clear before any stale words can become visible; interrupted clears
+retain the old epoch until all buffers are funded. Native recovery words and
+candidate-read caches keep their existing representation. It composes with
+packed or ordinary sparse queues and falls back exactly when the word helper
+is ineligible. Extra wraparound work remains charged. No automatic default
+selects this layout.
+
 Explicit QS worker aggregate grants may reach 22 GiB; the default remains
 12 GiB. Prospective ownership still includes parent state, every worker,
 decoded/in-flight publication, coexistence and checkpoint reserves. This is

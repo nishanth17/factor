@@ -716,7 +716,12 @@ class SieveCollector:
         ):
             # Existing helpers keep priority. Construction and lazy reads
             # have explicit extra work; scarce memory keeps the list path.
-            self._word_hits = WordHits(
+            word_type = WordHits
+            if "byte_stamps" in self.config._kernels:
+                from .byte_hit_words import ByteStampWordHits
+
+                word_type = ByteStampWordHits
+            self._word_hits = word_type(
                 count, self._hits, self.budget, byte_limit=hit_limit
             )
             self._hits = self._word_hits

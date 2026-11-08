@@ -280,6 +280,12 @@ def _logical_owners(frame):
                         derived["hit_stamp_cells"] = sum(
                             map(len, words.stamps)
                         )
+                        derived["hit_stamp_storage"] = type(
+                            words.stamps[0]
+                        ).__name__
+                        derived["hit_stamp_epoch_resets"] = getattr(
+                            words, "epoch_resets", 0
+                        )
                     owners[-1]["derived_buffers"] = derived
         frame = frame.f_back
     return owners

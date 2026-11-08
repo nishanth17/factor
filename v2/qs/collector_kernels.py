@@ -16,6 +16,7 @@ KERNELS = (
     "scan_fused",
     "parity_two",
     "packed_queue",
+    "byte_stamps",
     "wide_hits",
     "wide_inverses",
     "wide_transfers",

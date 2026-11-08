@@ -42,7 +42,7 @@ class WordHits:
         self.work = work
         self.width = width
         self.words = [[0] * width for _ in range((count + 59) // 60)]
-        self.stamps = [[0] * width for _ in self.words]
+        self.stamps = self._new_stamps(width)
         self.descriptors = [
             (self.words[i // 60], self.stamps[i // 60], 1 << (i % 60))
             for i in range(count)
@@ -209,3 +209,7 @@ class WordHits:
         for group, words in enumerate(self.words):
             words[offset] = (value >> (WORD_BITS * group)) & WORD_MASK
             self.stamps[group][offset] = self.epoch
+
+    def _new_stamps(self, width):
+        """Keep the default native integer representation unchanged."""
+        return [[0] * width for _ in self.words]
