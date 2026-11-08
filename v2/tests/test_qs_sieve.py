@@ -353,7 +353,7 @@ class SieveStoreTests(unittest.TestCase):
     def test_caps_refuse_before_publication(self):
         """Cancellation before insertion leaves a valid, retryable store."""
         for config in (
-            SieveConfig(),
+            SieveConfig(residual_bound=97),
             SieveConfig(
                 residual_bound=1, target_rows=0, preparation_cache_bytes=0
             ),
