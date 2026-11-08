@@ -1680,8 +1680,8 @@ class SieveCollector:
         self.budget.consume(len(atom.exponents) + 1)
         # A failed insertion must not expose a partially published smooth
         # row (or legacy SLP match) as a resumable memory-limit result.
-        self._publication_failed = True
         self.budget.publication()
+        self._publication_failed = True
         try:
             evicted_atoms = (self._atoms[evicted],) if evicted else ()
             if evicted:
@@ -1874,6 +1874,11 @@ class SieveCollector:
                             kernels.SCAN_CHUNK,
                             end - position,
                         )
+                        recorder_span = getattr(
+                            self.budget, "recorder_span", None
+                        )
+                        if recorder_span is not None:
+                            amount = recorder_span(amount)
                         # These positions are certified rejects. Reserve one
                         # unit each before committing this bounded span; a
                         # refused poll leaves its first position untouched.

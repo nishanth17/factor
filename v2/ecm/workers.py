@@ -882,6 +882,10 @@ class ECMExecutor:
                 lost_reports=ledger.lost,
                 elapsed=time.monotonic() - started,
             )
+        try:
+            base.publication()
+        except BudgetExhaustedError as error:
+            reason = str(error)
         # A proper factor may coexist with an interrupted fixed-work search.
         # Keep the public factor outcome and expose the actual traversal stop.
         stats["termination_reason"] = reason

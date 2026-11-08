@@ -252,6 +252,7 @@ def admit_retained(collector, atom, stats):
     else:
         packed, row, slot = arena.plan(atom, row, budget)
     budget.consume(len(atom.exponents) + len(plan.provenance) + 1)
+    collector.budget.publication()
     collector._publication_failed = True
     try:
         arena.commit(packed, slot)

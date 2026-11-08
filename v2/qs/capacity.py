@@ -28,7 +28,8 @@ def validate_extension(previous, proposed):
     if previous.external_coefficients:
         quotas.add("coefficient_trials")
     for name in quotas:
-        if storage_limit(new[name]) < storage_limit(old[name]):
+        before, after = storage_limit(old[name]), storage_limit(new[name])
+        if after is not None and (before is None or after < before):
             raise ValueError(f"extension cannot reduce {name}")
         new[name] = old[name]
     for name in ("max_partials",):

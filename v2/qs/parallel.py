@@ -763,7 +763,10 @@ class ParallelSIQSJob:
         if not isinstance(self.config, ParallelConfig):
             raise TypeError("config must be a ParallelConfig")
         original = self._original_config
-        if self.config != original:
+        if (
+            replace(self.config, poll_interval=original.poll_interval)
+            != original
+        ):
             raise ValueError(
                 "changed assignment/storage settings require a new job"
             )
@@ -939,8 +942,6 @@ class ParallelSIQSJob:
                 reason = "families_exhausted"
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "allocation_failure"
         finally:
             try:
                 if begun:

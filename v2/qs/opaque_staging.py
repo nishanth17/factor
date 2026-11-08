@@ -57,8 +57,8 @@ class OpaqueStaging:
         # only the insertion and actual evictions, without copying the map.
         # Unexpected allocation failure poisons the owner, as retained-atom
         # publication does; recovery then starts from a checked checkpoint.
-        collector._publication_failed = True
         collector.budget.publication()
+        collector._publication_failed = True
         try:
             self.atoms[atom.opaque] = atom
             for residual in retired:

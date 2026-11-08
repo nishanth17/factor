@@ -595,6 +595,37 @@ class IncidentCoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetExhaustedError, "cpu_limit"):
             budget.consume(1)
 
+    def test_cancellation_before_publication_keeps_store_valid(self):
+        from collections import Counter
+
+        from v2.qs.factor_base import build_factor_base
+        from v2.qs.polynomial import qs_polynomial
+        from v2.qs.reference_collector import collect_block
+        from v2.qs.sieve_collector import SieveCollector
+        from v2.qs.storage import require_published
+
+        owner = Budget(
+            provider=Provider(), wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        base = build_factor_base(
+            1009 * 1013, bound=100, budget=owner
+        ).factor_base
+        polynomial = qs_polynomial(base)
+        atom = collect_block(polynomial, base, 0, 1, budget=owner).relations[0]
+        collector = SieveCollector(polynomial, base, budget=owner)
+        original = owner.publication
+        owner.publication = lambda: (_ for _ in ()).throw(
+            BudgetExhaustedError("cancelled")
+        )
+        with self.assertRaises(BudgetExhaustedError):
+            collector._admit(atom, Counter())
+        require_published(collector)
+        self.assertFalse(collector._atoms)
+        owner.publication = original
+        collector._admit(atom, Counter())
+        require_published(collector)
+        self.assertEqual(tuple(collector._atoms), (atom.relation_id,))
+
     def test_allocation_interruption_poison_is_not_an_rss_stop(self):
         from collections import Counter
 

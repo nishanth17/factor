@@ -273,8 +273,8 @@ def admit_large_relation(collector, atom, stats):
     # Containers allocate during insertion. If the allocator fails midway,
     # old external checkpoints remain valid, but this live store must never
     # masquerade as a resumable resource refusal or publish a partial row.
-    collector._publication_failed = True
     collector.budget.publication()
+    collector._publication_failed = True
     try:
         evicted_atoms = tuple(collector._atoms[i] for i in plan.evicted)
         graph.commit(plan)
