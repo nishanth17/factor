@@ -728,10 +728,9 @@ class ECMExecutor:
                         self._send(slot, packet)
                     if not search.active:
                         raise LeaseRefusedError("lease_refused")
-                    wait = min(
-                        self.settings.parent_poll_seconds,
-                        max(0, deadline - time.monotonic()),
-                    )
+                    wait = self.settings.parent_poll_seconds
+                    if deadline is not None:
+                        wait = min(wait, max(0, deadline - time.monotonic()))
                     for slot in self._readable(wait):
                         message = self._read(slot)
                         if message is not None:
