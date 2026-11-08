@@ -67,7 +67,7 @@ class ScheduleReuseTests(unittest.TestCase):
             )
         self.assertEqual(source.calls, 80)
         self.assertEqual(cache.hits, 80)
-        self.assertGreaterEqual(cache.used_bytes, 0)
+        self.assertLessEqual(cache.used_bytes, cache.memory_bytes)
 
     def test_insufficient_capacity_keeps_a_reusable_prefix_not_scan_thrash(
         self,

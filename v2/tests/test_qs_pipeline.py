@@ -20,6 +20,7 @@ from v2.qs import (
     SieveCollector,
     SieveConfig,
     build_factor_base,
+    collect_block,
     extract_dependency,
     filter_matrix,
     prepare_relations,
@@ -487,6 +488,16 @@ class StorageCompletionTests(unittest.TestCase):
         )
 
     def test_relation_and_atom_caps_extract_existing_rows(self):
+        oracle_job = self.make_job()
+        oracle = collect_block(
+            oracle_job.collector.polynomial,
+            oracle_job.collector.factor_base,
+            -256,
+            513,
+            budget=unlimited_budget(),
+        )
+        self.assertEqual(oracle.reason, "complete")
+        self.assertGreater(len(oracle.relations), 8)
         for limits in ({"max_relations": 8}, {"max_atoms": 8}):
             job = self.make_job(**limits)
 
@@ -496,7 +507,8 @@ class StorageCompletionTests(unittest.TestCase):
             self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
             self.assertEqual(result.divisor * result.cofactor, 20_017_003)
             self.assertEqual(result.next_position, 513)
-            self.assertGreater(len(job.collector._full), 8)
+            self.assertEqual(len(job.collector._full), len(oracle.relations))
+            self.assertEqual(tuple(job.collector._full), oracle.relations)
             self.assertEqual(result.stats["solve_calls"], 1)
             self.assertEqual(job.run(), result)
 

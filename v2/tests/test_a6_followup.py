@@ -251,6 +251,29 @@ class ExecutionTests(unittest.TestCase):
                 1000003, config=cfg, budget=allowance(), checkpoint=checkpoint
             )
 
+        current = pm1_bounded.factorize_pm1_bounded(
+            1000003, config=cfg, budget=allowance(), max_actions=12
+        )
+        resumed = pm1_bounded.factorize_pm1_bounded(
+            1000003,
+            config=cfg,
+            budget=allowance(),
+            checkpoint=current.checkpoint,
+        )
+        whole = pm1_bounded.factorize_pm1_bounded(
+            1000003, config=cfg, budget=allowance()
+        )
+        self.assertEqual(resumed.reason, "exhausted")
+        self.assertEqual(resumed.result, whole.result)
+        self.assertEqual(resumed.result.reconstruct(), 1000003)
+        self.assertEqual(
+            resumed.checkpoint["payload"]["execution"], "pm1-campaign-v1"
+        )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["config"],
+            current.checkpoint["payload"]["config"],
+        )
+
     def test_every_boundary_resume_atomic_refusal_and_cancellation(self):
         for cfg in (
             configured(chunk_bits=32, chunk_size=256, gap_mode="recurrence"),

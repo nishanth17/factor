@@ -267,6 +267,62 @@ class A10Tests(unittest.TestCase):
             self.assertEqual(stopped.result.remaining, (REPORTED_PRIME,))
             self.assertEqual(stopped.work_used, 0)
 
+    def assert_current_resume(self, n, cfg, *, seed=7):
+        whole = portfolio.factorize_bounded(
+            n, seed=seed, config=cfg, budget=allowance(), ecm_executor=None
+        )
+        paused = portfolio.factorize_bounded(
+            n, seed=seed, config=cfg, budget=allowance(200), ecm_executor=None
+        )
+        self.assertEqual(paused.reason, "work_limit")
+        self.assertEqual(paused.result.reconstruct(), n)
+        resumed = portfolio.factorize_bounded(
+            n,
+            config=cfg,
+            budget=allowance(),
+            checkpoint=paused.checkpoint,
+            ecm_executor=None,
+        )
+        self.assertTrue(resumed.result.complete)
+        self.assertEqual(resumed.result.reconstruct(), n)
+        self.assertEqual(resumed.result, whole.result)
+        self.assertEqual(
+            [
+                (f.value, f.exponent, f.certainty)
+                for f in resumed.result.factors
+            ],
+            [(f.value, f.exponent, f.certainty) for f in whole.result.factors],
+        )
+        self.assertEqual(resumed.work_used, whole.work_used)
+        for field in (
+            "rng",
+            "primality",
+            "config",
+            "version",
+            "portfolio_version",
+        ):
+            self.assertEqual(
+                resumed.checkpoint["payload"][field],
+                whole.checkpoint["payload"][field],
+            )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["primality"], "mr13-strict-v1"
+        )
+        again = portfolio.factorize_bounded(
+            n,
+            config=cfg,
+            budget=allowance(),
+            checkpoint=resumed.checkpoint,
+            ecm_executor=None,
+        )
+        self.assertEqual(again.result, resumed.result)
+        self.assertEqual(again.work_used, resumed.work_used)
+        self.assertEqual(
+            again.checkpoint["payload"]["rng"],
+            resumed.checkpoint["payload"]["rng"],
+        )
+        return resumed
+
     def test_legacy_witnesses_and_terminal_labels_remain_conservative(self):
         old = self.control
         for backend, program_bytes in (
@@ -320,6 +376,27 @@ class A10Tests(unittest.TestCase):
                     checkpoint=paused.checkpoint,
                 )
 
+            # Current policy proves the smaller fixture; above its final bound
+            # a current resource checkpoint must still retain probable status.
+            for n, certainty in (
+                (REPORTED_PRIME, utils.Primality.PROVEN),
+                (
+                    next(
+                        f["n"]
+                        for f in self.data["fixtures"]
+                        if f["prime"] and f["n"] > 3317044064679887385961981
+                    ),
+                    utils.Primality.PROBABLE,
+                ),
+            ):
+                resumed = self.assert_current_resume(n, new_cfg)
+                self.assertEqual(
+                    resumed.result.factors[0].certainty, certainty
+                )
+                self.assertEqual(
+                    resumed.result.proven, certainty is utils.Primality.PROVEN
+                )
+
     def test_legacy_policy_covers_pending_children_and_rng(self):
         old = self.control
         options = dict(
@@ -365,6 +442,22 @@ class A10Tests(unittest.TestCase):
                 budget=allowance(),
                 checkpoint=paused.checkpoint,
             )
+
+        current_cfg = portfolio.PortfolioConfig(**options)
+        resumed = self.assert_current_resume(
+            REPORTED_INPUT, current_cfg, seed=104729
+        )
+        self.assertEqual(
+            [
+                (f.value, f.exponent, f.certainty)
+                for f in resumed.result.factors
+            ],
+            [
+                (value, 1, utils.Primality.PROVEN)
+                for value in (61, 27103, REPORTED_PRIME)
+            ],
+        )
+        self.assertTrue(resumed.result.proven)
 
     def test_primality_policies_compose_with_paired_checkpoint_schemas(self):
         for backend in ("python-int", "gmpy2-mpz"):
@@ -440,6 +533,25 @@ class A10Tests(unittest.TestCase):
 
                     # No ECM job exists: transplant the independently frozen
                     # random-witness state into B2's configuration envelope.
+                    self.assertEqual(
+                        resumed.result.reconstruct(), REPORTED_PRIME
+                    )
+                    for field in ("rng", "config", "primality", "version"):
+                        self.assertEqual(
+                            resumed.checkpoint["payload"][field],
+                            whole.checkpoint["payload"][field],
+                        )
+                    above_bound = next(
+                        f["n"]
+                        for f in self.data["fixtures"]
+                        if f["prime"] and f["n"] > 3317044064679887385961981
+                    )
+                    probable = self.assert_current_resume(above_bound, cfg)
+                    self.assertEqual(
+                        probable.result.factors[0].certainty,
+                        utils.Primality.PROBABLE,
+                    )
+                    self.assertFalse(probable.result.proven)
                     legacy = copy.deepcopy(old_paused.checkpoint)
                     for name in ("version", "schedule", "config"):
                         legacy["payload"][name] = copy.deepcopy(metadata[name])

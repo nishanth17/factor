@@ -17,7 +17,8 @@ from v2.qs.external_square import CoefficientExhaustedError, external_square
 from v2.qs.factor_base import build_factor_base
 from v2.qs.families import PolynomialFamily
 from v2.qs.linear_algebra import filter_matrix, verify_dependency
-from v2.qs.polynomial import Polynomial, polynomial_roots
+from v2.qs.pipeline import QSJob
+from v2.qs.polynomial import Polynomial, polynomial_roots, qs_polynomial
 from v2.qs.reference_collector import collect_block
 from v2.qs.relations import verify_atomic, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
@@ -278,37 +279,53 @@ class CapacityTests(unittest.TestCase):
                 validate_extension(extended, invalid)
 
     def test_extension_reserves_growth_of_verified_row_cache(self):
-        original = SIQSConfig(
-            assignment_policy="nearest",
-            collector=SieveConfig(
-                preparation_cache_bytes=min(2 * 2**20, 2048 * 64),
-                target_rows=64,
-            ),
-        )
-        enlarged = replace(
-            original,
-            collector=replace(
-                original.collector,
-                preparation_cache_bytes=128 * 2048,
-                target_rows=128,
-            ),
-        )
-        with self.assertRaises(ValueError):
-            validate_extension(original, enlarged)
-        enlarged = replace(enlarged)
-        validate_extension(enlarged, replace(enlarged))
-        report = capacity_report(self.base, enlarged)
+        configs = [
+            SIQSConfig(
+                assignment_policy="nearest",
+                collector=adapt_resource_configuration(
+                    SieveConfig, max_relations=rows
+                ),
+            )
+            for rows in (64, 128, 2048, 4096)
+        ]
+        capacities = (64 * 2048, 128 * 2048, 2 * 2**20, 2 * 2**20)
+        for config, capacity in zip(configs, capacities):
+            with self.subTest(target_rows=config.collector.target_rows):
+                report = capacity_report(self.base, config)
+                self.assertEqual(
+                    report["preparation_cache_reserve_bytes"], capacity
+                )
+                job = QSJob(
+                    qs_polynomial(self.base),
+                    self.base,
+                    0,
+                    1,
+                    config=config.collector,
+                    budget=budget(),
+                )
+                self.assertEqual(
+                    job.collector._preparation_cache.memory_bytes, capacity
+                )
+                extended = replace(
+                    config, family_count=config.family_count + 1
+                )
+                self.assertNotEqual(config, extended)
+                validate_extension(config, extended)
 
-        self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)
-        saturated = replace(enlarged, collector=replace(enlarged.collector))
-        validate_extension(enlarged, saturated)
-        validate_extension(
-            saturated,
-            replace(
-                saturated,
-                collector=replace(saturated.collector),
-            ),
+        original, enlarged, saturated, more_rows = configs
+        self.assertNotEqual(original, enlarged)
+        self.assertGreater(capacities[1], capacities[0])
+        self.assertNotEqual(enlarged, saturated)
+        self.assertGreater(capacities[2], capacities[1])
+        self.assertNotEqual(saturated, more_rows)
+        self.assertEqual(
+            saturated.collector.preparation_cache_bytes,
+            more_rows.collector.preparation_cache_bytes,
         )
+        # Changing the retained cache/solve target changes execution identity.
+        for before, after in zip(configs, configs[1:]):
+            with self.assertRaises(ValueError):
+                validate_extension(before, after)
 
     def test_sparse_incidence_work_preserves_verified_dependencies(self):
         rows = tuple(1 << (i % 500) for i in range(2000))

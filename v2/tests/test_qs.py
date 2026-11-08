@@ -433,16 +433,39 @@ class CollectorTests(unittest.TestCase):
             with self.assertRaisesRegex(TypeError, next(iter(changes))):
                 collect_block(self.polynomial, self.base, -10, 10, **changes)
 
-        prefix = collect_block(self.polynomial, self.base, -50, 50)
+        full = collect_block(self.polynomial, self.base, -50, 50)
+        self.assertGreaterEqual(len(full.relations), 3)
+        midpoint = full.relations[len(full.relations) // 2].position
+        cancelled = [False]
+        verify = verify_atomic
 
-        self.assertEqual(prefix.reason, "complete")
+        def stop_after_verified_atom(atom, *args, **kwargs):
+            result = verify(atom, *args, **kwargs)
+            if atom.position == midpoint:
+                cancelled[0] = True
+            return result
+
+        owner = Budget(cancelled=lambda: cancelled[0])
+        with patch(
+            "v2.qs.reference_collector.verify_atomic",
+            side_effect=stop_after_verified_atom,
+        ):
+            prefix = collect_block(
+                self.polynomial, self.base, -50, 50, budget=owner
+            )
+
+        self.assertEqual(prefix.reason, "cancelled")
+        self.assertTrue(prefix.relations)
+        self.assertGreater(prefix.next_position, -50)
+        self.assertLess(prefix.next_position, 50)
         suffix = collect_block(
             self.polynomial, self.base, prefix.next_position, 50
         )
         full = collect_block(self.polynomial, self.base, -50, 50)
 
         self.assertEqual(prefix.relations + suffix.relations, full.relations)
-        cap = prefix.workspace_bytes
+        self.assertTrue(suffix.relations)
+        cap = full.workspace_bytes
         limited = collect_block(self.polynomial, self.base, -50, 50)
 
         self.assertEqual(limited.reason, "complete")

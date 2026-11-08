@@ -125,7 +125,7 @@ class ProgramTests(unittest.TestCase):
             costs.append(budget.used)
 
             self.assertEqual(result, primes_between(2, 500))
-            self.assertGreaterEqual(store.used_bytes, 0)
+            self.assertLessEqual(store.used_bytes, store.memory_bytes)
         self.assertEqual(len(store.blocks), 1)
         self.assertGreater(store.unretained, 0)
         self.assertEqual(store.hits, 1)

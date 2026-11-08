@@ -83,7 +83,7 @@ class PollingAndCacheTests(unittest.TestCase):
         self.assertEqual(refused.refusals, 1)
         for index in range(80):
             cache.program_segment(20 + index, 21 + index, budget)
-            self.assertGreaterEqual(cache.used_bytes, 0)
+            self.assertLessEqual(cache.used_bytes, cache.memory_bytes)
             self.assertLessEqual(len(cache.blocks), 64)
 
     def test_contexts_reuse_across_moduli_and_evict_before_refused_allocation(

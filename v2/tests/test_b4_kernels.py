@@ -263,6 +263,25 @@ class B4KernelTests(unittest.TestCase):
                     common.validate_run(resumed, fixture),
                     common.validate_run(uninterrupted, fixture),
                 )
+                if engine is portfolio:
+                    for field in ("rng", "config", "primality", "schedule"):
+                        self.assertEqual(
+                            resumed.checkpoint["payload"][field],
+                            uninterrupted.checkpoint["payload"][field],
+                        )
+                    again = portfolio.factorize_bounded(
+                        fixture["n"],
+                        config=config,
+                        checkpoint=json.loads(json.dumps(resumed.checkpoint)),
+                        budget=recording_budget(
+                            portfolio.Budget, work_limit=protocol["work_limit"]
+                        ),
+                        ecm_executor=None,
+                    )
+                    self.assertEqual(
+                        common.validate_run(again, fixture),
+                        common.validate_run(uninterrupted, fixture),
+                    )
                 # Canonical X:Z and the existing a24 convention also resume in
                 # the unmodified engine; no candidate identity is serialized.
                 for plain in (self.engines["baseline"], portfolio):

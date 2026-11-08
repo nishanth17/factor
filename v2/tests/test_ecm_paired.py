@@ -186,7 +186,7 @@ class PairedExecutionTests(unittest.TestCase):
                 break
         self.assertTrue(job["done"])
         self.assertGreater(context.coverage_misses, 0)
-        self.assertGreaterEqual(context.used_bytes, 0)
+        self.assertLessEqual(context.used_bytes, context.memory_bytes)
         other = new_job("ecm", n, 19, 50, 1000)
         while not other["done"]:
             advance_job(other, allowance(), context, config)

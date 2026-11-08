@@ -170,6 +170,27 @@ class ProductionPM1Tests(unittest.TestCase):
                     ecm_executor=None,
                 )
 
+        current_whole = portfolio.factorize_bounded(
+            n, seed=7, config=legacy, budget=allowance(), ecm_executor=None
+        )
+        resumed = portfolio.factorize_bounded(
+            n,
+            config=legacy,
+            budget=allowance(),
+            checkpoint=json.loads(json.dumps(newrun.checkpoint)),
+            ecm_executor=None,
+        )
+        self.assertEqual(
+            (resumed.result, resumed.work_used),
+            (current_whole.result, current_whole.work_used),
+        )
+        self.assertEqual(resumed.result.reconstruct(), n)
+        for field in ("rng", "config", "schedule", "primality"):
+            self.assertEqual(
+                resumed.checkpoint["payload"][field],
+                current_whole.checkpoint["payload"][field],
+            )
+
     def test_new_schema_resume_and_table_corruption(self):
         n, config = 1009 * 1013, configuration()
         whole = portfolio.factorize_bounded(
@@ -270,6 +291,37 @@ class ProductionPM1Tests(unittest.TestCase):
             n, budget=allowance(0), checkpoint=fresh.checkpoint
         )
         self.assertEqual(resumed.reason, "work_limit")
+        self.assertEqual(resumed.work_used, fresh.work_used)
+        for field in (
+            "version",
+            "portfolio_version",
+            "config",
+            "rng",
+            "primality",
+        ):
+            self.assertEqual(
+                resumed.checkpoint["payload"][field],
+                fresh.checkpoint["payload"][field],
+            )
+        saved_config = resumed.checkpoint["payload"]["config"]
+        self.assertEqual(
+            (saved_config["pm1_chunk_size"], saved_config["pm1_gap_mode"]),
+            (64, "recurrence"),
+        )
+        whole = portfolio.factorize_bounded(
+            n, budget=allowance(), ecm_executor=None
+        )
+        finished = portfolio.factorize_bounded(
+            n,
+            budget=allowance(),
+            checkpoint=resumed.checkpoint,
+            ecm_executor=None,
+        )
+        self.assertEqual(
+            (finished.result, finished.work_used),
+            (whole.result, whole.work_used),
+        )
+        self.assertEqual(finished.result.reconstruct(), n)
 
         old = load_control("portfolio")
         paused = old.factorize_bounded(n, budget=allowance(0))
@@ -306,6 +358,35 @@ class ProductionPM1Tests(unittest.TestCase):
                 checkpoint=paused.checkpoint,
                 max_actions=0,
             )
+
+        from v2.pm1.bounded import PM1Config
+
+        # The original arithmetic executor supports current resource markers.
+        legacy_config = PM1Config(bounds=((7, 13), (10, 31)))
+        current = factorize_pm1_bounded(
+            n, config=legacy_config, budget=allowance(), max_actions=0
+        )
+        restored = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=current.checkpoint, max_actions=0
+        )
+        self.assertEqual(
+            restored.checkpoint["payload"]["execution"], "pm1-campaign-v1"
+        )
+        self.assertEqual(
+            restored.checkpoint["payload"]["config"]["chunk_size"], 16
+        )
+        self.assertEqual(
+            restored.checkpoint["payload"]["config"],
+            current.checkpoint["payload"]["config"],
+        )
+        whole = factorize_pm1_bounded(
+            n, config=legacy_config, budget=allowance()
+        )
+        finished = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=restored.checkpoint
+        )
+        self.assertEqual(finished.result, whole.result)
+        self.assertEqual(finished.result.reconstruct(), n)
 
     def test_malformed_implicit_resume_is_rejected(self):
         from v2.pm1.bounded import factorize_pm1_bounded

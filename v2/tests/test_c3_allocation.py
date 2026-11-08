@@ -412,6 +412,39 @@ class AllocationPortfolioTests(unittest.TestCase):
                 budget=ledger(),
             )
 
+        current = factorize_bounded(
+            number,
+            config=native_config,
+            seed=7,
+            budget=ledger(8000),
+            ecm_executor=None,
+        )
+        restored = factorize_bounded(
+            number,
+            config=native_config,
+            checkpoint=current.checkpoint,
+            budget=ledger(),
+            ecm_executor=None,
+        )
+        whole = factorize_bounded(
+            number,
+            config=native_config,
+            seed=7,
+            budget=ledger(),
+            ecm_executor=None,
+        )
+        self.assertEqual(restored.result.reconstruct(), number)
+        self.assertGreater(restored.work_used, current.work_used)
+        self.assertEqual(
+            (restored.result, restored.work_used),
+            (whole.result, whole.work_used),
+        )
+        for field in ("rng", "config", "primality", "schedule"):
+            self.assertEqual(
+                restored.checkpoint["payload"][field],
+                whole.checkpoint["payload"][field],
+            )
+
     def test_cli_policy_resume_restores_fallback_and_rejects_override(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "state.json"

@@ -351,40 +351,68 @@ class SieveStoreTests(unittest.TestCase):
         self.assertEqual(run.stats, other.stats)
 
     def test_caps_refuse_before_publication(self):
-        """Atom/relation caps leave the first refused position resumable."""
-        for config, reason in (
-            (SieveConfig(), "atom_limit"),
-            (
-                SieveConfig(
-                    residual_bound=1,
-                    preparation_cache_bytes=min(2 * 2**20, 2048 * 0),
-                    target_rows=0,
-                ),
-                "relation_limit",
+        """Cancellation before insertion leaves a valid, retryable store."""
+        for config in (
+            SieveConfig(),
+            SieveConfig(
+                residual_bound=1, target_rows=0, preparation_cache_bytes=0
             ),
         ):
-            worker = SieveCollector(
-                self.polynomial,
-                self.base,
-                config=config,
-                budget=unlimited_budget(),
-            )
+            with self.subTest(config=config):
+                owner = unlimited_budget()
+                worker = SieveCollector(
+                    self.polynomial, self.base, config=config, budget=owner
+                )
+                before = (
+                    dict(worker._atoms),
+                    tuple(worker._full),
+                    tuple(worker._combined),
+                    dict(worker._pending),
+                )
+                publication = owner.publication
 
-            run = worker.collect(-128, 129)
+                def cancel_publication():
+                    owner.cancelled = lambda: True
+                    publication()
 
-            self.assertNotIn(run.reason, ("atom_limit", "relation_limit"))
-            self.assertTrue(run.atoms)
-            worker.config = replace(config)
-
-            resumed = run
-
-            expected = collector(
-                self.polynomial,
-                self.base,
-                residual_bound=config.residual_bound,
-            ).collect(-128, 129)
-
-            self.assertEqual(resumed.atoms, expected.atoms)
+                with patch.object(
+                    owner, "publication", side_effect=cancel_publication
+                ) as boundary:
+                    stopped = worker.collect(-128, 129)
+                self.assertEqual(boundary.call_count, 1)
+                self.assertEqual(stopped.reason, "cancelled")
+                self.assertFalse(worker._publication_failed)
+                self.assertEqual(
+                    (
+                        worker._atoms,
+                        tuple(worker._full),
+                        tuple(worker._combined),
+                        worker._pending,
+                    ),
+                    before,
+                )
+                self.assertLess(stopped.next_position, 129)
+                spent = owner.used
+                owner.cancelled = None
+                resumed = worker.collect(stopped.next_position, 129)
+                expected_worker = SieveCollector(
+                    self.polynomial,
+                    self.base,
+                    config=config,
+                    budget=unlimited_budget(),
+                )
+                expected = expected_worker.collect(-128, 129)
+                self.assertEqual(resumed.reason, "complete")
+                self.assertEqual(resumed.next_position, 129)
+                self.assertGreater(owner.used, spent)
+                self.assertEqual(resumed.atoms, expected.atoms)
+                self.assertEqual(
+                    resumed.full_relations, expected.full_relations
+                )
+                self.assertEqual(
+                    resumed.combined_relations, expected.combined_relations
+                )
+                self.assertEqual(worker._pending, expected_worker._pending)
 
     def test_memory_refusal_and_zero_partial_cap(self):
         """Check storage before mutation and count dropped partials."""

@@ -144,7 +144,9 @@ class WheelExecutionTests(unittest.TestCase):
                     }
                     actual = {(r[2], r[3]) for r in records if r[2] and r[3]}
                     self.assertEqual(actual, expected)
-                    self.assertGreaterEqual(context.used_bytes, 0)
+                    self.assertLessEqual(
+                        context.used_bytes, context.memory_bytes
+                    )
 
     def test_sparse_points_and_products_against_affine_oracle(self):
         modulus, curve_a, point = 1009, 6, (3, 293)

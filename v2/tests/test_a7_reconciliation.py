@@ -176,6 +176,30 @@ class ReconciliationTests(unittest.TestCase):
                     with self.assertRaises(UnsupportedResourceVersionError):
                         SSSJob.from_checkpoint(checkpoint, budget=allowance())
 
+        for mode in ("sss", "sssf"):
+            n = 100003 * 100019
+            config = SSSConfig(mode=mode, base_bound=400)
+            current = SSSJob(n, config=config, budget=allowance())
+            current.run(batch_limit=1)
+            saved = json.loads(json.dumps(current.checkpoint()))
+            restored = SSSJob.from_checkpoint(saved, budget=allowance())
+            self.assertEqual(restored.checkpoint()["version"], 3)
+            self.assertEqual(restored.config, current.config)
+            self.assertEqual(
+                (restored.n, restored.seed), (current.n, current.seed)
+            )
+            result = restored.run()
+            whole = SSSJob(n, config=config, budget=allowance()).run()
+            self.assertEqual(
+                (result.divisor, result.cofactor),
+                (whole.divisor, whole.cofactor),
+            )
+            self.assertEqual(
+                {result.divisor, result.cofactor}, {100003, 100019}
+            )
+            self.assertTrue(1 < result.divisor < n)
+            self.assertEqual(result.divisor * result.cofactor, n)
+
     def test_sss_checkpoint_hashes_wide_valid_lifted_masks(self):
         # Isolate packing's solver fingerprint from relation-store encoding.
         # A valid original-row dependency can exceed PyPy's decimal limit.

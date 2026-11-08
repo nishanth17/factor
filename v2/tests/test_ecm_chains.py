@@ -207,7 +207,7 @@ class ProductionChainTests(unittest.TestCase):
         self.assertEqual(budget.used, preparation + 1)
         store.get(1999, budget)
         self.assertEqual(store.evictions, 1)
-        self.assertGreaterEqual(store.used_bytes, 0)
+        self.assertLessEqual(store.used_bytes, store.memory_bytes)
         store.get(2000, budget)
         self.assertEqual(store.evictions, 2)
         self.assertIsNone(store.get(2001, allowance()))
@@ -478,6 +478,30 @@ class ProductionChainTests(unittest.TestCase):
             ecm_executor=None,
         )
         self.assertEqual(restored.result.reconstruct(), n)
+
+        whole = factorize_bounded(
+            n, seed=19, config=config, budget=allowance(), ecm_executor=None
+        )
+        self.assertEqual(
+            (restored.result, restored.work_used),
+            (whole.result, whole.work_used),
+        )
+        for field in ("rng", "config", "primality", "schedule"):
+            self.assertEqual(
+                restored.checkpoint["payload"][field],
+                whole.checkpoint["payload"][field],
+            )
+        again = factorize_bounded(
+            n,
+            config=config,
+            checkpoint=restored.checkpoint,
+            budget=allowance(),
+            ecm_executor=None,
+        )
+        self.assertEqual(
+            (again.result, again.work_used),
+            (restored.result, restored.work_used),
+        )
 
     def test_supported_size_band_uses_exact_boundaries(self):
         self.assertFalse(supports_modulus(10**39 - 1))

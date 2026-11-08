@@ -142,6 +142,45 @@ class StableRowTests(unittest.TestCase):
             with self.assertRaises(UnsupportedResourceVersionError):
                 SIQSJob.from_checkpoint(checkpoint, budget=unlimited_budget())
 
+        from v2.execution.budget import BudgetExhaustedError
+        from v2.qs import SieveConfig, SIQSConfig
+        from v2.qs.linear_algebra import DependencySolver
+
+        n = 4001 * 5003
+        config = SIQSConfig(
+            base_bound=200,
+            half_width=256,
+            collector=SieveConfig(residual_bound=500),
+        )
+        owner = unlimited_budget()
+        current = SIQSJob(n, config=config, budget=owner)
+        owner.reason = "work_limit"
+        with patch.object(
+            DependencySolver,
+            "run",
+            side_effect=BudgetExhaustedError("work_limit"),
+        ):
+            self.assertEqual(current.run().reason, "work_limit")
+        self.assertIsNotNone(current.engine.solver)
+        saved = json.loads(json.dumps(current.checkpoint()))
+        restored = SIQSJob.from_checkpoint(saved, budget=unlimited_budget())
+        self.assertEqual(restored.config, config)
+        self.assertEqual(
+            (restored.n, restored.seed), (current.n, current.seed)
+        )
+        self.assertEqual(
+            tuple(restored.engine.collector._rows),
+            tuple(current.engine.collector._rows),
+        )
+        result = restored.run()
+        whole = SIQSJob(n, config=config, budget=unlimited_budget()).run()
+        self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
+        self.assertTrue(1 < result.divisor < n)
+        self.assertEqual(result.divisor * result.cofactor, n)
+        self.assertEqual(
+            (result.divisor, result.cofactor), (whole.divisor, whole.cofactor)
+        )
+
     def test_new_version_requires_the_mixed_order_field(self):
         from v2.qs.siqs import SIQSJob
         from v2.tests.test_siqs import configuration, mutate
@@ -268,7 +307,7 @@ class TestedDependencyTests(unittest.TestCase):
         self.assertIsNone(second.run())
         self.assertEqual(second.cache_skips, 1)
         self.assertFalse(second.trials)
-        self.assertGreaterEqual(cache.used, 0)
+        self.assertLessEqual(cache.used, cache.memory_bytes)
         key = cache.dependency_key(prepared, mask, unlimited_budget())
         base, relation, atoms = next(iter(key))
         changed = replace(relation, sign=-relation.sign)

@@ -92,7 +92,7 @@ class PreparedIndexTests(unittest.TestCase):
                         cursor["index"] = end
                 self.assertEqual(seen, trial_primes(b1 + 1, b2 + 1))
             self.assertGreater(schedule.hits, 0)
-            self.assertGreaterEqual(schedule.used_bytes, 0)
+            self.assertLessEqual(schedule.used_bytes, schedule.memory_bytes)
 
     def test_group_reads_reuse_one_immutable_block_without_slice_allocation(
         self,
