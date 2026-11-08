@@ -3,10 +3,12 @@
 import math
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 
 from ....common import utils
+from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from .round2_corpus import GenerationRandom
 
@@ -104,13 +106,17 @@ class UniformPrimeSource:
         self.budget = (
             budget
             if budget is not None
-            else Budget(
-                work_limit=150_000_000_000, seconds=180, cpu_seconds=180
+            else recording_budget(
+                Budget,
+                work_limit=150_000_000_000,
+                seconds=180,
+                cpu_seconds=180,
             )
         )
         self.generator = ProofRandom(seed, self.budget)
         self.certificates = {}
-        self.config = PortfolioConfig(
+        self.config = adapt_resource_configuration(
+            PortfolioConfig,
             ecm_tiers=(),
             rho_attempts=8,
             rho_evaluations=2_000_000,
@@ -138,7 +144,8 @@ class UniformPrimeSource:
             if self.budget.cpu_seconds is None
             else max(0, self.budget.cpu_seconds - self.budget.cpu_used)
         )
-        child = Budget(
+        child = recording_budget(
+            Budget,
             work_limit=remaining_work,
             seconds=remaining_wall,
             cpu_seconds=remaining_cpu,

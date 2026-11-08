@@ -3,10 +3,12 @@
 import hashlib
 import json
 import sys
-from dataclasses import asdict
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from ....qs import SieveConfig

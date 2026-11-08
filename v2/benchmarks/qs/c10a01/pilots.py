@@ -8,8 +8,11 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ..c10a04.accounting import Ledger, digest, output_lock
 from . import runner
@@ -26,7 +29,7 @@ CELL_RECEIPT_BYTES = 64 * 1024
 def pilot_configuration(digits, arm, *, multiplier=0):
     """Suballocate parent ownership without changing any algorithm policy."""
     config = configuration(digits, arm, multiplier=multiplier)
-    return replace(config)
+    return replace(config, memory_bytes=config.memory_bytes - PARENT_OWNED)
 
 
 class BoundedLedger(Ledger):

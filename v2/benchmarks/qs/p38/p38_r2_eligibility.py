@@ -4,10 +4,14 @@ import argparse
 import importlib
 import json
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ...infrastructure.performance.performance_audit import (
     fingerprint,

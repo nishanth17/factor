@@ -12,10 +12,12 @@ from math import prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 
 from ....common import utils
+from ....execution.budget import Budget
 from ....qs import (
     Polynomial,
     PolynomialFamily,
@@ -36,7 +38,9 @@ MEMORY_BYTES = 32 * 1024 * 1024
 
 def _budget():
     """Declare one setup-to-extraction allowance per input in both arms."""
-    return Budget(work_limit=200_000_000, seconds=10, cpu_seconds=10)
+    return recording_budget(
+        Budget, work_limit=200_000_000, seconds=10, cpu_seconds=10
+    )
 
 
 def full_steps(base, primes, budget):
@@ -76,7 +80,13 @@ def full_steps(base, primes, budget):
 
 def cached_steps(base, primes, budget):
     """Consume the entire bounded stream of exact Gray/cache steps."""
-    family = PolynomialFamily(base, primes, budget=budget)
+    family = adapt_resource_configuration(
+        PolynomialFamily,
+        base,
+        primes,
+        budget=budget,
+        memory_bytes=MEMORY_BYTES,
+    )
     while (step := family.next()) is not None:
         yield step.polynomial, step.roots
 
@@ -87,8 +97,14 @@ def root_utility(cached):
     base = build_factor_base(
         4001 * 5003, bound=2000, budget=budget
     ).factor_base
-    primes = family_assignments(
-        base, 256, factor_count=4, family_count=1, budget=budget
+    primes = adapt_resource_configuration(
+        family_assignments,
+        base,
+        256,
+        factor_count=4,
+        family_count=1,
+        budget=budget,
+        memory_bytes=MEMORY_BYTES,
     )[0]
     steps = cached_steps if cached else full_steps
     return [
@@ -116,8 +132,15 @@ def attempt_cohort(cached):
         budget = _budget()
         n = fixture["n"]
         base = build_factor_base(n, bound=200, budget=budget).factor_base
-        assignments = family_assignments(
-            base, 256, factor_count=3, family_count=8, seed=2934, budget=budget
+        assignments = adapt_resource_configuration(
+            family_assignments,
+            base,
+            256,
+            factor_count=3,
+            family_count=8,
+            seed=2934,
+            budget=budget,
+            memory_bytes=MEMORY_BYTES,
         )
         found = None
 
@@ -128,13 +151,15 @@ def attempt_cohort(cached):
                 collector = partial(SieveCollector, precomputed_roots=roots)
                 # Both arms supply independently validated roots to the same
                 # collector, avoiding an output-contract or validation bias.
-                32768 + 640 * len(base.entries) + 8192
-                config = SieveConfig(
+                family_reserve = 32768 + 640 * len(base.entries) + 8192
+                config = adapt_resource_configuration(
+                    SieveConfig,
                     division="bucket",
                     residual_bound=1,
+                    max_atoms=4096,
+                    max_relations=4096,
                     max_partials=4096,
-                    preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
-                    target_rows=4096,
+                    memory_bytes=MEMORY_BYTES - family_reserve,
                 )
                 job = QSJob(
                     polynomial,

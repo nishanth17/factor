@@ -12,6 +12,7 @@ from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 from .diagnostics import (
@@ -98,10 +99,7 @@ def child(path):
     capture = None
     if request["observer"] in ("cpu", "counters", "heap"):
         capture = Capture(request, "parent")
-    from v2.benchmarks.infrastructure.resource_control import (
-        RecordingBudget as Budget,
-    )
-
+    from ....execution.budget import Budget
     from ....execution.ecm_workers import ECMExecutor
     from ....execution.worker_contract import WorkerSettings
     from ....portfolio import PortfolioConfig
@@ -136,7 +134,8 @@ def child(path):
         cpu = request["cpu"] - time.process_time() - charged_children
         if wall <= 0 or cpu <= 0:
             raise ResourceTrialStoppedError("cell_allowance")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=10**12 - work_used,
             seconds=wall,
             cpu_seconds=cpu,

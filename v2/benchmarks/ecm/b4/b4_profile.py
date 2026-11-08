@@ -9,7 +9,9 @@ import pstats
 import time
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ..p52.p52_realistic import check_quiet
 from . import b4_common as common

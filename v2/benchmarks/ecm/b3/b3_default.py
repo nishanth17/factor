@@ -188,7 +188,7 @@ def cohort(settings, fixtures, seeds, arm, scope):
                 checkpoint=checkpoint,
                 budget=recording_budget(
                     engine.Budget,
-                    work_limit=2000000
+                    work_limit=2_000_000
                     if scope == "default_budget"
                     else settings["work"],
                     seconds=settings["seconds"],

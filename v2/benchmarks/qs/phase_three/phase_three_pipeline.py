@@ -11,14 +11,18 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from ....common import utils
+from ....execution.budget import Budget
 from ....tests.test_qs import reference_positions
 from ...suites.phase_one import environment
 from ...support.paths import (
@@ -33,7 +37,9 @@ CHANGES = ("qs.factor_base", "qs.sieve_collector")
 
 def _budget():
     """Use identical declared finite allowances for all candidate arms."""
-    return Budget(work_limit=200_000_000, seconds=10, cpu_seconds=10)
+    return recording_budget(
+        Budget, work_limit=200_000_000, seconds=10, cpu_seconds=10
+    )
 
 
 def _corpus(seed, count):
@@ -80,11 +86,13 @@ def _config(arm, **options):
 def _collection(arm, fixture, config, *, exhaustive=False):
     """Return consumed checked payloads, including common partial matching."""
     budget = _budget()
-    base = arm.qs.factor_base.build_factor_base(
+    base = adapt_resource_configuration(
+        arm.qs.factor_base.build_factor_base,
         fixture["n"],
         multiplier=fixture["h"],
         bound=fixture["bound"],
         budget=budget,
+        memory_bytes=config.memory_bytes,
     ).factor_base
     polynomial = arm.qs.polynomial.Polynomial(
         fixture["n"],
@@ -100,13 +108,15 @@ def _collection(arm, fixture, config, *, exhaustive=False):
     )
 
     if exhaustive:
-        result = arm.qs.reference_collector.collect_block(
+        result = adapt_resource_configuration(
+            arm.qs.reference_collector.collect_block,
             polynomial,
             base,
             -128,
             129,
             residual_bound=fixture["residual"],
             budget=budget,
+            memory_bytes=config.memory_bytes,
         )
 
         if result.reason != "complete":
@@ -141,7 +151,14 @@ def _collection(arm, fixture, config, *, exhaustive=False):
     for relation in full:
         arm.qs.relations.verify_atomic(relation, base, budget=budget)
     for relation in combined:
-        arm.qs.relations.verify_combined(relation, base, store, budget=budget)
+        adapt_resource_configuration(
+            arm.qs.relations.verify_combined,
+            relation,
+            base,
+            store,
+            budget=budget,
+            memory_bytes=config.memory_bytes,
+        )
 
     return _signature(atoms), len(full), len(combined)
 
@@ -164,8 +181,12 @@ def _complete(
     for fixture in corpus:
         budget = _budget()
         n = fixture["n"]
-        setup = arm.qs.factor_base.build_factor_base(
-            n, bound=200, budget=budget
+        setup = adapt_resource_configuration(
+            arm.qs.factor_base.build_factor_base,
+            n,
+            bound=200,
+            budget=budget,
+            memory_bytes=config.memory_bytes,
         )
 
         if setup.divisor:
@@ -221,13 +242,15 @@ def _exhaustive_collector(arm):
 
         def collect(self, lo, hi):
             """Transfer one complete checked batch under the same budget."""
-            raw = arm.qs.reference_collector.collect_block(
+            raw = adapt_resource_configuration(
+                arm.qs.reference_collector.collect_block,
                 self.polynomial,
                 self.factor_base,
                 lo,
                 hi,
                 residual_bound=self.config.residual_bound,
                 budget=self.budget,
+                memory_bytes=self.config.memory_bytes,
             )
 
             if raw.reason != "complete":

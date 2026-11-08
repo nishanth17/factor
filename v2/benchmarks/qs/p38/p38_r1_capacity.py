@@ -16,18 +16,22 @@ import sys
 import tempfile
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import isqrt, prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
-    adapt_resource_configuration,
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....common import utils
+from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -72,7 +76,8 @@ def configuration(digits, preset, policy):
     target = isqrt(2 * 10**digits) // width
     count = next(k for k in range(1, 33) if (bound // 3) ** k >= target)
     rows = min(8192, max(2048, bound // 8))
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=bound,
         half_width=width,
         max_half_width=width,
@@ -85,16 +90,17 @@ def configuration(digits, preset, policy):
         max_trivial=100000,
         row_excess=32,
         batch_width=4096,
-        collector=SieveConfig(
+        memory_bytes=384 * 2**20,
+        checkpoint_bytes=16 * 2**20,
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             score_policy="powers",
             division="bucket",
             residual_bound=min(10**12, bound**2),
+            max_relations=rows,
             max_partials=rows,
-            target_rows=rows,
-            preparation_cache_bytes=2 * 2**20
-            if rows is None
-            else min(2 * 2**20, 2048 * rows),
+            max_atoms=min(65536, rows * 4),
         ),
     )
 
@@ -143,7 +149,8 @@ def run_one(fixture, seed, config, arm, seconds):
             polynomials_per_family=1,
         )
 
-    portfolio = PortfolioConfig(
+    portfolio = adapt_resource_configuration(
+        PortfolioConfig,
         trial_bound=1000,
         rho_attempts=0,
         pm1_attempts=1,
@@ -154,8 +161,11 @@ def run_one(fixture, seed, config, arm, seconds):
         if arm in ("ecm", "ecm_siqs")
         else (),
         siqs=None if arm == "ecm" else config,
+        memory_bytes=MEMORY,
     )
-    allowance = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
+    allowance = recording_budget(
+        Budget, work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    )
     start, cpu = time.perf_counter(), time.process_time()
 
     result = factorize_bounded(

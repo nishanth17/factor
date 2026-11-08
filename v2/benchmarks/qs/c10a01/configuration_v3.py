@@ -1,6 +1,8 @@
 """Literal combined-arm configuration; no timed protocol is admitted here."""
 
-from dataclasses import replace
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .configuration import configuration as previous_configuration
 

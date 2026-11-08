@@ -9,10 +9,11 @@ import time
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ....qs.extraction import prepare_relations
 from ....qs.linear_algebra import (
     DependencySolver,
@@ -46,15 +47,25 @@ def matrix_check(spec, budget):
     """Check admission before allocation, then exact original-row kernels."""
     rows = matrix_rows(spec["rows"], spec["columns"], spec["kind"])
     reserve = matrix_workspace(len(rows), spec["columns"])
-    refused = Budget(work_limit=10**12, seconds=None, cpu_seconds=None)
+    refused = recording_budget(
+        Budget, work_limit=10**12, seconds=None, cpu_seconds=None
+    )
     try:
-        filter_matrix(rows, budget=refused)
+        adapt_resource_configuration(
+            filter_matrix, rows, budget=refused, memory_bytes=reserve - 1
+        )
     except MemoryError:
         assert refused.used == 0
     else:
         raise AssertionError("matrix reserve did not reject the smaller grant")
     start, cpu, before = time.monotonic(), time.process_time(), budget.used
-    matrix = filter_matrix(rows, weight_two=True, budget=budget)
+    matrix = adapt_resource_configuration(
+        filter_matrix,
+        rows,
+        weight_two=True,
+        budget=budget,
+        memory_bytes=reserve,
+    )
     filtered = dict(
         wall=time.monotonic() - start,
         cpu=time.process_time() - cpu,
@@ -103,12 +114,16 @@ def memory_call(fixture, spec):
         time.monotonic(),
         time.process_time(),
     )
-    prepared = prepare_relations(
+    prepared = adapt_resource_configuration(
+        prepare_relations,
         collector.matrix_relations,
         job.base,
         collector._atoms,
         budget=budget,
+        memory_bytes=job.config.memory_bytes,
         retained_workspace_bytes=collector._workspace,
+        max_rows=job.config.collector.max_relations,
+        max_atoms=job.config.collector.max_atoms,
     )
     preparation = dict(
         work=budget.used - before,
@@ -143,7 +158,8 @@ def memory_call(fixture, spec):
 def memory_warm(fixture, spec):
     start, cpu = time.monotonic(), time.process_time()
     collection = runner.warm(fixture["n"], spec["digits"], "control")
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=290000000000 - collection["work"],
         seconds=20,
         cpu_seconds=20,

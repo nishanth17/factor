@@ -18,15 +18,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
-)
-from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 from .... import portfolio
 from ....common import utils
 from ....execution import stage_jobs
+from ....execution.budget import Budget
 from ....pm1 import bounded as pm1_bounded
 from ....pm1.tuning import PM1TuningConfig
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -133,16 +132,16 @@ def configuration(options, bounds):
     )
     if set(options) == {"chunk_size"}:
         module = pm1_bounded if legacy_hook else frozen_control()
-        return module, adapt_resource_configuration(
-            module.PM1Config, **common, **options
-        )
+        return module, module.PM1Config(**common, **options)
     return pm1_bounded, adapt_resource_configuration(
         PM1TuningConfig, **common, **options
     )
 
 
 def grant(work=2_000_000, seconds=30):
-    return Budget(work_limit=work, seconds=seconds, cpu_seconds=seconds)
+    return recording_budget(
+        Budget, work_limit=work, seconds=seconds, cpu_seconds=seconds
+    )
 
 
 def run(n, bounds, options, *, checkpoint=None, max_actions=None):
@@ -418,7 +417,8 @@ def portfolio_run(arm):
         ).read_text()
     )["fixtures"]
     fixtures = [f for f in fixtures if len(str(f["n"])) == 20][:12]
-    config = portfolio.PortfolioConfig(
+    config = adapt_resource_configuration(
+        portfolio.PortfolioConfig,
         trial_bound=100,
         chunk_size=16,
         gcd_batch=64,
@@ -482,7 +482,8 @@ def continuation_call(n, options, arm, pause_steps=None):
             outcome = module.factorize_pm1_bounded(
                 n,
                 config=single,
-                budget=Budget(
+                budget=recording_budget(
+                    Budget,
                     work_limit=2000000 - prior_work,
                     seconds=30 - prior_wall,
                     cpu_seconds=30 - prior_cpu,

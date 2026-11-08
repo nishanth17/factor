@@ -14,8 +14,11 @@ import sys
 import sysconfig
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-from dataclasses import asdict
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....common import utils
 from ....ecm import core as ecm

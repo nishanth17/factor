@@ -12,19 +12,20 @@ import subprocess
 import sys
 import time
 from contextlib import ExitStack
-from dataclasses import asdict
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
-    adapt_resource_configuration,
+    historical_asdict as asdict,
 )
 
 from ... import portfolio
 from ...common import utils
 from ...ecm import core as ecm
+from ...execution.budget import Budget
 from ...factor import factorize, factorize_bf
 from ...pm1 import core as pollard_pm1
 from ...portfolio import PortfolioConfig, factorize_bounded
@@ -122,7 +123,8 @@ def _sample(request):
                 seed=seed,
                 config=config,
                 stop_after_split=request["mode"] == "factor_one",
-                budget=Budget(
+                budget=recording_budget(
+                    Budget,
                     work_limit=request["work_limit"],
                     seconds=request["seconds"],
                     cpu_seconds=request["cpu_seconds"],
@@ -372,7 +374,8 @@ def run(args):
             PortfolioConfig, **json.loads(source_path(args.config).read_text())
         )
     else:
-        config = PortfolioConfig(
+        config = adapt_resource_configuration(
+            PortfolioConfig,
             trial_bound=args.trial_bound,
             max_input_bits=512,
             ecm_tiers=((2000, 147396, args.curves),),

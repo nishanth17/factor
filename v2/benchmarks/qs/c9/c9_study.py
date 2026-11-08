@@ -10,19 +10,22 @@ import random
 import time
 from collections import Counter, deque
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
-    adapt_resource_configuration,
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from .... import qs
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ...ecm.p52.p52_realistic import check_quiet
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..b1.b1_calibration import save
@@ -122,9 +125,7 @@ def decode(value):
         if ("large_prime_bound" in value["collector"])
         else qs.SieveConfig
     )
-    value["collector"] = adapt_resource_configuration(
-        kind, **value["collector"]
-    )
+    value["collector"] = kind(**value["collector"])
     return adapt_resource_configuration(qs.SIQSConfig, **value)
 
 
@@ -203,8 +204,12 @@ def run_one(fixture, seed, config, arm, seconds, *, prefixes=False):
         return False
 
     started, cpu = time.monotonic(), time.process_time()
-    budget = Budget(
-        work_limit=10**13, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        Budget,
+        work_limit=10**13,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     job = qs.SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
     observations, tiers = [], deque((60, 120))

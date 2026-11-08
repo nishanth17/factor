@@ -11,19 +11,22 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
-    adapt_resource_configuration,
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig, SIQSJob
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -42,16 +45,19 @@ WORK = 200_000_000
 
 
 def base_config():
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=200,
         half_width=256,
         family_count=8,
-        collector=SieveConfig(
+        memory_bytes=MEMORY,
+        collector=adapt_resource_configuration(
+            SieveConfig,
             division="bucket",
             residual_bound=1,
+            max_atoms=4096,
+            max_relations=4096,
             max_partials=4096,
-            target_rows=4096,
-            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
         ),
     )
 
@@ -74,14 +80,18 @@ def run_one(fixture, seed, config, *, ecm=False, seconds=None):
         if seconds is not None
         else (SMALL_SECONDS if fixture["band"] == "small" else LARGE_SECONDS)
     )
-    budget = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    )
     started, cpu = time.perf_counter(), time.process_time()
     if ecm:
-        portfolio = PortfolioConfig(
+        portfolio = adapt_resource_configuration(
+            PortfolioConfig,
             trial_bound=2,
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=((2000, 147396, 2),),
+            memory_bytes=MEMORY,
         )
 
         result = factorize_bounded(
@@ -624,7 +634,9 @@ def main():
         job = SIQSJob(
             fixture["n"],
             config=small_config,
-            budget=Budget(work_limit=WORK, seconds=10, cpu_seconds=10),
+            budget=recording_budget(
+                Budget, work_limit=WORK, seconds=10, cpu_seconds=10
+            ),
         )
         job.run(max_blocks=1)
         snapshot = job.checkpoint()
@@ -632,7 +644,9 @@ def main():
 
         resumed = SIQSJob.from_checkpoint(
             snapshot,
-            budget=Budget(work_limit=WORK, seconds=10, cpu_seconds=10),
+            budget=recording_budget(
+                Budget, work_limit=WORK, seconds=10, cpu_seconds=10
+            ),
         )
 
         result = resumed.run()

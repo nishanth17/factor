@@ -6,7 +6,13 @@ import os
 import random
 import sys
 import time
-from dataclasses import asdict
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....qs import SIQSConfig, default_siqs_config
 from ...infrastructure.performance.performance_audit import verify_corpus
@@ -95,8 +101,12 @@ def main():
         "source_commit": "3d4bf42",
         "corpus_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "arms": {
-            "current_mainline": asdict(SIQSConfig()),
-            "c9_c10_pacing": asdict(default_siqs_config(10**49)),
+            "current_mainline": asdict(
+                adapt_resource_configuration(SIQSConfig)
+            ),
+            "c9_c10_pacing": asdict(
+                adapt_resource_configuration(default_siqs_config, 10**49)
+            ),
         },
         "caps": {"current_mainline": 60, "c9_c10_pacing": 240},
         "limit": (
@@ -127,9 +137,11 @@ def main():
                 ):
                     raise RuntimeError("feasibility aggregate allowance")
                 config = (
-                    SIQSConfig()
+                    adapt_resource_configuration(SIQSConfig)
                     if arm == "current_mainline"
-                    else default_siqs_config(10**49)
+                    else adapt_resource_configuration(
+                        default_siqs_config, 10**49
+                    )
                 )
                 row = c9.run_one(fixture, 7, config, arm, cap)
                 row["feasibility"] = True
@@ -162,7 +174,7 @@ def long55():
         if f["digits"] == 55
     )
     output = study.ROOT / "v2/benchmarks/results/c10a05_plus/feasibility"
-    config = default_siqs_config(10**49)
+    config = adapt_resource_configuration(default_siqs_config, 10**49)
     identity = dict(
         source_commit="bdc2330",
         corpus_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
@@ -216,7 +228,7 @@ def long60():
         if f["digits"] == 60
     )
     output = study.ROOT / "v2/benchmarks/results/c10a05_plus/feasibility"
-    config = default_siqs_config(10**49)
+    config = adapt_resource_configuration(default_siqs_config, 10**49)
     identity = dict(
         source_commit="bdc2330",
         corpus_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),

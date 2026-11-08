@@ -3,9 +3,12 @@
 import argparse
 import inspect
 import json
-from dataclasses import asdict
 from math import gcd, prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ...common.prime_sieve import prime_sieve
 from ...ecm.core import EcmStats, factorize_ecm

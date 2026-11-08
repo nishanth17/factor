@@ -5,11 +5,13 @@ import importlib
 import importlib.util
 import json
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from .configuration_v4 import configuration

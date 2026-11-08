@@ -12,12 +12,17 @@ import sys
 import tempfile
 import time
 import types
-from dataclasses import asdict, replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
     recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from .... import qs
@@ -125,9 +130,7 @@ def decode_config(value, module=qs):
         if "large_prime_bound" in values["collector"]
         else "SieveConfig"
     )
-    values["collector"] = adapt_resource_configuration(
-        getattr(module, name), **values["collector"]
-    )
+    values["collector"] = getattr(module, name)(**values["collector"])
     return adapt_resource_configuration(module.SIQSConfig, **values)
 
 

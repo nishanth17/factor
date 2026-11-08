@@ -5,8 +5,14 @@ import hashlib
 import json
 import random
 import time
-from dataclasses import asdict, replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ..b1.b1_calibration import save
 from . import c9_study as study

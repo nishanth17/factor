@@ -3,11 +3,13 @@
 import argparse
 import hashlib
 import json
-from dataclasses import asdict
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from ....execution.ecm_selection import (
@@ -40,7 +42,7 @@ def build_profile(reviewed, *, status="training"):
     serial = adapt_resource_configuration(
         WorkerSettings, **reviewed["serial_settings"]
     )
-    if serial.workers != 1:
+    if serial.workers != 1 or serial.worker_memory != 64 * 2**20:
         raise ValueError("incompatible serial mathematical context")
     for row in reviewed["rows"]:
         if set(row) != {"digits", "config", "cold", "warm"}:
@@ -60,6 +62,8 @@ def build_profile(reviewed, *, status="training"):
             settings = adapt_resource_configuration(
                 WorkerSettings, **candidate["settings"]
             )
+            if settings.worker_memory != serial.worker_memory:
+                raise ValueError("mathematical memory differs between arms")
             if digest(arithmetic_options(config, settings)) != options:
                 raise ValueError("candidate changes mathematical search")
             costs = SelectionCosts(

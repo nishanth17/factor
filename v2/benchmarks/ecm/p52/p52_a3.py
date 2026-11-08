@@ -196,7 +196,10 @@ def measure(case, arm, corpus, engine, stages):
         )
         for seed in seeds:
             budget = recording_budget(
-                engine.Budget, work_limit=50000000, seconds=30, cpu_seconds=30
+                engine.Budget,
+                work_limit=50_000_000,
+                seconds=30,
+                cpu_seconds=30,
             )
             n = fixture["n"]
             if case in ("campaign", "large_campaign"):
@@ -206,7 +209,11 @@ def measure(case, arm, corpus, engine, stages):
                     budget=budget,
                 )
                 programs = (
-                    ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+                    adapt_resource_configuration(
+                        ECMPrograms,
+                        context,
+                        memory_bytes=config.ecm_program_bytes,
+                    )
                     if arm in ("programs", "regenerated")
                     else None
                 )
@@ -308,13 +315,15 @@ def measure_schedule(case, arm, corpus, engine):
         engine.PortfolioConfig, **options(case, arm)
     )
     budget = recording_budget(
-        engine.Budget, work_limit=50000000, seconds=30, cpu_seconds=30
+        engine.Budget, work_limit=50_000_000, seconds=30, cpu_seconds=30
     )
     context = engine.SieveContext(
         config.max_hi, segment_size=config.segment_size, budget=budget
     )
     programs = (
-        ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+        adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+        )
         if arm in ("programs", "regenerated")
         else None
     )
@@ -404,7 +413,7 @@ def campaign_probes():
             )
             budget = recording_budget(
                 engine.Budget,
-                work_limit=50000000,
+                work_limit=50_000_000,
                 seconds=120,
                 cpu_seconds=120,
             )
@@ -412,7 +421,9 @@ def campaign_probes():
                 config.max_hi, segment_size=config.segment_size, budget=budget
             )
             programs = (
-                ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+                adapt_resource_configuration(
+                    ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+                )
                 if arm == "programs"
                 else None
             )

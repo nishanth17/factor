@@ -6,12 +6,14 @@ import platform
 import statistics
 import time
 from contextlib import nullcontext
-from dataclasses import asdict
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
     recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from .... import qs as candidate
@@ -131,6 +133,7 @@ def warm_once(qs, budgets, template, deadline):
         base_bound=200,
         half_width=128,
         max_half_width=128,
+        memory_bytes=64 * 2**20,
         collector=collector,
         sign_policy="swap_high",
         solve_policy="collection",

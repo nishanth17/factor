@@ -4,8 +4,14 @@ import argparse
 import hashlib
 import json
 import sys
-from dataclasses import asdict, replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .configuration import (
     ATOMS,
@@ -71,7 +77,7 @@ def config_values(digits, arm, *, multiplier=0, **options):
     if arm not in ("full", "nominee"):
         raise ValueError("unknown experiment arm")
     cfg = configuration(digits, "coupled", multiplier=multiplier, **options)
-    cfg = replace(cfg)
+    cfg = replace(cfg, memory_bytes=cfg.memory_bytes - PARENT_OWNED)
     return asdict(cfg)
 
 

@@ -11,14 +11,18 @@ import json
 import pickle
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
+from ....execution.budget import Budget
 from ....qs import parallel
 from ....qs.relations import verify_atomic
 from ...support.paths import (
@@ -62,7 +66,8 @@ def main():
         diagnostics={},
         transport={},
     )
-    control = parallel.ParallelConfig(
+    control = adapt_resource_configuration(
+        parallel.ParallelConfig,
         base_bound=400,
         factor_count=3,
         half_width=512,
@@ -74,7 +79,9 @@ def main():
     for width, interval in ((0, 1), (0, 64), (256, 64)):
         config = replace(control, batch_width=width, poll_interval=interval)
         job = parallel.ParallelSIQSJob(
-            fixture["n"], config=config, budget=Budget(work_limit=10**12)
+            fixture["n"],
+            config=config,
+            budget=recording_budget(Budget, work_limit=10**12),
         )
         job._setup()
         with parallel.CollectionPool() as pool:

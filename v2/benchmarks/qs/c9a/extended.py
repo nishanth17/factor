@@ -2,7 +2,16 @@
 
 import hashlib
 import json
-from dataclasses import asdict, replace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....qs import BoundedYieldSieveConfig, ExtendedYieldSieveConfig
 from ....qs.collector_kernels import combine, components
@@ -233,7 +242,9 @@ def configuration(
         if "scan_fused" not in kernels:
             values["marking"] = combine((*kernels, "scan_fused"))
     cls = BoundedYieldSieveConfig if bounded else ExtendedYieldSieveConfig
-    return replace(config, collector=cls(**values))
+    return replace(
+        config, collector=adapt_resource_configuration(cls, **values)
+    )
 
 
 def convert(cell, *, incumbent=None, profile=None):

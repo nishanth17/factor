@@ -10,11 +10,16 @@ import subprocess
 import sys
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....qs import (
@@ -276,9 +281,9 @@ def _config(fixture, **options):
         SieveConfig,
         residual_bound=fixture["residual"],
         max_partials=4096,
+        max_relations=4096,
+        max_atoms=4096,
         **options,
-        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
-        target_rows=4096,
     )
 
 

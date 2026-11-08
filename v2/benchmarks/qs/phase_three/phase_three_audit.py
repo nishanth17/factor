@@ -14,6 +14,10 @@ from pathlib import Path
 from v2.benchmarks.infrastructure.resource_control import (
     RecordingBudget as Budget,
 )
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 
 from ....common import arithmetic, prime_sieve, utils
 from ....execution import work_budget
@@ -59,6 +63,19 @@ def load_arm(name, current=False):
     package.budget = sys.modules[Budget.__module__]
     package.work_budget = work_budget
     sys.modules[name] = package
+    if current:
+        from .... import common, execution
+        from ....execution import budget, resources
+        from ....execution import work_budget as polling
+
+        for suffix, module in (
+            ("common", common),
+            ("execution", execution),
+            ("execution.budget", budget),
+            ("execution.resources", resources),
+            ("execution.work_budget", polling),
+        ):
+            sys.modules[name + "." + suffix] = module
     for child in (
         "arithmetic",
         "utils",
@@ -148,18 +165,18 @@ def oracle_audit(arm):
                             "conservative",
                             "candidate",
                         ):
-                            config = qs.sieve_collector.SieveConfig(
+                            config = adapt_resource_configuration(
+                                qs.sieve_collector.SieveConfig,
                                 score_backend=backend,
                                 division=division,
                                 score_policy=policy,
                                 block_width=17,
                                 small_prime_cutoff=11,
                                 residual_bound=97,
+                                max_atoms=4096,
                                 max_partials=4096,
-                                preparation_cache_bytes=min(
-                                    2 * 2**20, 2048 * 4096
-                                ),
-                                target_rows=4096,
+                                max_relations=4096,
+                                memory_bytes=33554432,
                             )
                             worker = qs.sieve_collector.SieveCollector(
                                 polynomial,
@@ -273,10 +290,10 @@ def main():
             matrix = arm.qs.linear_algebra.filter_matrix(
                 rows,
                 weight_two=True,
-                budget=Budget(work_limit=200000000),
+                budget=recording_budget(Budget, work_limit=200000000),
             )
             solver = arm.qs.linear_algebra.DependencySolver(
-                matrix, budget=Budget(work_limit=200000000)
+                matrix, budget=recording_budget(Budget, work_limit=200000000)
             )
             return solver.run()
 

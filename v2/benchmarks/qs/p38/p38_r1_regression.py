@@ -15,7 +15,18 @@ import time
 from math import gcd, isqrt, prod
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+
+def adapt_resource_configuration(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.adapt_resource_configuration(*args, **kwargs)
+
+
+def recording_budget(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.recording_budget(*args, **kwargs)
+
 
 if __package__ in (None, ""):
     # Select a historical runtime before importing any v2 implementation.
@@ -135,7 +146,8 @@ def main():
         budget_module = runtime_module("budget")
         qs = importlib.import_module("v2.qs")
         utils = runtime_module("utils")
-        config = qs.SIQSConfig(
+        config = adapt_resource_configuration(
+            qs.SIQSConfig,
             base_bound=3000,
             half_width=32768,
             max_half_width=32768,
@@ -146,14 +158,17 @@ def main():
             max_trivial=4096,
             row_excess=32,
             batch_width=4096,
-            collector=qs.SieveConfig(
+            memory_bytes=384 * 2**20,
+            checkpoint_bytes=16 * 2**20,
+            collector=adapt_resource_configuration(
+                qs.SieveConfig,
                 block_width=4096,
                 score_policy="powers",
                 division="bucket",
                 residual_bound=3000**2,
+                max_atoms=8192,
+                max_relations=2048,
                 max_partials=2048,
-                target_rows=2048,
-                preparation_cache_bytes=min(2 * 2**20, 2048 * 2048),
             ),
         )
         corpus = json.loads(source_path(args.corpus).read_text())

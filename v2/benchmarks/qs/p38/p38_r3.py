@@ -14,11 +14,19 @@ import sys
 import tempfile
 import time
 import types
-from dataclasses import asdict, replace
 from functools import lru_cache
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     checked_baseline,
@@ -313,8 +321,12 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
     retained = prepared.workspace_bytes if prepared is not None else 0
     remaining = MEMORY - retained
     if variant == "rebuild":
-        matrix = rebuilt_filter(module)(
-            rows, weight_two=True, budget=budget, memory_bytes=remaining
+        matrix = adapt_resource_configuration(
+            rebuilt_filter(module),
+            rows,
+            weight_two=True,
+            budget=budget,
+            memory_bytes=remaining,
         )
     elif variant.startswith(("history", "dense_batch")):
         matrix = history_filter(
@@ -326,7 +338,13 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
             use_history=variant.startswith("history"),
         )
     else:
-        matrix = module.filter_matrix(rows, weight_two=True, budget=budget)
+        matrix = adapt_resource_configuration(
+            module.filter_matrix,
+            rows,
+            weight_two=True,
+            budget=budget,
+            memory_bytes=remaining,
+        )
         if variant == "live":
             matrix = live_compaction(matrix, budget, remaining)
 
@@ -362,7 +380,8 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
 
 def config(module, band):
     if band == "30d":
-        return module.SIQSConfig(
+        return adapt_resource_configuration(
+            module.SIQSConfig,
             base_bound=10000,
             half_width=8192,
             max_half_width=8192,
@@ -373,14 +392,17 @@ def config(module, band):
             max_trivial=4096,
             row_excess=32,
             batch_width=4096,
-            collector=module.SieveConfig(
+            memory_bytes=MEMORY,
+            checkpoint_bytes=2**20,
+            collector=adapt_resource_configuration(
+                module.SieveConfig,
                 block_width=4096,
                 score_policy="powers",
                 division="bucket",
                 residual_bound=10000000,
+                max_atoms=65536,
+                max_relations=32768,
                 max_partials=32768,
-                target_rows=32768,
-                preparation_cache_bytes=min(2 * 2**20, 2048 * 32768),
             ),
         )
 
@@ -390,7 +412,8 @@ def config(module, band):
         "20d": (3000, 2048, 3),
         "30d": (3000, 4096, 5),
     }[band]
-    return module.SIQSConfig(
+    return adapt_resource_configuration(
+        module.SIQSConfig,
         base_bound=bound,
         half_width=width,
         max_half_width=width,
@@ -399,13 +422,15 @@ def config(module, band):
         pool_size=32,
         max_stalled=4096,
         max_trivial=4096,
-        collector=module.SieveConfig(
+        memory_bytes=MEMORY,
+        collector=adapt_resource_configuration(
+            module.SieveConfig,
             score_policy="powers",
             division="bucket",
             residual_bound=bound**2,
+            max_atoms=8192,
+            max_relations=4096,
             max_partials=2048,
-            target_rows=4096,
-            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
         ),
     )
 
@@ -486,11 +511,13 @@ def prepare_fixture(mods, fixture):
         polynomial,
         base,
         budget=budget,
-        config=mods["qs.sieve_collector"].SieveConfig(
+        config=adapt_resource_configuration(
+            mods["qs.sieve_collector"].SieveConfig,
             residual_bound=1000,
+            max_atoms=8192,
+            max_relations=4096,
             max_partials=2048,
-            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
-            target_rows=4096,
+            memory_bytes=MEMORY,
         ),
     )
 
@@ -514,18 +541,25 @@ def prepare_run(mods, fixture_data, cached):
         set(min(len(relations), n) for n in (8, 16, 32, 64, 128))
     ):
         last = None
-        last = extraction._prepare_relations(
+        last = adapt_resource_configuration(
+            extraction._prepare_relations,
             relations[:count],
             base,
             atoms,
             budget=budget,
+            memory_bytes=MEMORY - cache_reserve,
             verification_cache=cache,
         )
         costs.append(
             dict(count=count, work=budget.used, workspace=last.workspace_bytes)
         )
 
-    matrix = mods["qs.linear_algebra"].filter_matrix(last.rows, budget=budget)
+    matrix = adapt_resource_configuration(
+        mods["qs.linear_algebra"].filter_matrix,
+        last.rows,
+        budget=budget,
+        memory_bytes=MEMORY - last.workspace_bytes - cache_reserve,
+    )
 
     dependencies = (
         mods["qs.linear_algebra"].DependencySolver(matrix, budget=budget).run()
@@ -707,11 +741,13 @@ def main():
                     base, relations, atoms = prepare_fixture(
                         current, corpus["fixtures"][0]
                     )
-                    prepared = current["qs.extraction"].prepare_relations(
+                    prepared = adapt_resource_configuration(
+                        current["qs.extraction"].prepare_relations,
                         relations[:128],
                         base,
                         atoms,
                         budget=allowance(current["budget"]),
+                        memory_bytes=MEMORY,
                     )
                     rows = prepared.rows
                 else:

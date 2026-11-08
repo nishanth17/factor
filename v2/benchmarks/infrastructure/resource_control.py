@@ -4,6 +4,11 @@ Historical runners use algorithmic counters as diagnostic endpoints.
 These controls belong to the recorder, not to Factor's production resource API.
 """
 
+import json
+from dataclasses import fields, is_dataclass
+from dataclasses import replace as dataclass_replace
+from pathlib import Path
+
 from ...common import utils
 from ...execution.budget import Budget as ResourceBudget
 from ...execution.budget import BudgetExhaustedError
@@ -80,6 +85,25 @@ def adapt_resource_configuration(factory, *args, **values):
     parameters = inspect.signature(factory).parameters
     fields = getattr(factory, "__dataclass_fields__", {})
     values = dict(values)
+    historical = {
+        key: value
+        for key, value in values.items()
+        if key in RETIRED_CONFIG_FIELDS
+    }
+    recipe = values.get("recipe")
+    if (
+        getattr(factory, "__name__", "") == "default_siqs_config"
+        and "recipe" in parameters
+    ):
+        legacy_memory = historical.get("memory_bytes")
+        recipe = recipe or (
+            "calibrated" if legacy_memory in (None, 2**30) else "reference"
+        )
+        values["recipe"] = recipe
+        historical["memory_bytes"] = (
+            2**30 if legacy_memory is None else legacy_memory
+        )
+        historical.setdefault("checkpoint_bytes", 2**20)
     if "preparation_cache_bytes" in fields and "max_relations" in values:
         rows = values["max_relations"]
         values.setdefault(
@@ -100,7 +124,15 @@ def adapt_resource_configuration(factory, *args, **values):
     for name in RETIRED_CONFIG_FIELDS:
         if name in values and name not in parameters:
             values.pop(name)
-    return factory(*args, **values)
+    result = factory(*args, **values)
+    if is_dataclass(result):
+        if recipe is not None:
+            historical.setdefault(
+                "memory_bytes",
+                2**30 if recipe == "calibrated" else 128 * 2**20,
+            )
+        _attach_metadata(result, historical)
+    return result
 
 
 def recording_budget(factory, **kwargs):
@@ -108,3 +140,65 @@ def recording_budget(factory, **kwargs):
     if factory is ResourceBudget:
         return RecordingBudget(**kwargs)
     return factory(**kwargs)
+
+
+# Explicit alias for isolated historical runtime loaders.
+Budget = RecordingBudget
+
+
+def historical_asdict(value):
+    """Serialize recorder metadata in its historical, source-pinned schema.
+
+    Retired grants are metadata only here. Production configuration and its
+    checkpoint serializers continue to expose only the new resource API.
+    """
+    if is_dataclass(value):
+        result = {
+            f.name: historical_asdict(getattr(value, f.name))
+            for f in fields(value)
+        }
+        defaults_path = (
+            Path(__file__).resolve().parents[1]
+            / "inputs/controls/h3_historical_resources.json"
+        )
+        defaults = json.loads(defaults_path.read_text())["defaults"]
+        metadata = defaults.get(type(value).__name__, {})
+        metadata = dict(
+            metadata, **getattr(value, "_historical_resources", {})
+        )
+        if "preparation_cache_bytes" in result:
+            result.pop("preparation_cache_bytes")
+            metadata["max_relations"] = result.pop("target_rows")
+        result.update(metadata)
+        return result
+    if isinstance(value, dict):
+        return {key: historical_asdict(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return type(value)(historical_asdict(item) for item in value)
+    return value
+
+
+def historical_replace(value, **changes):
+    """Retain recorder-only grant metadata across literal policy changes."""
+    metadata = dict(getattr(value, "_historical_resources", {}))
+    accepted = {f.name for f in fields(value)}
+    for key in tuple(changes):
+        if key in RETIRED_CONFIG_FIELDS and key not in accepted:
+            metadata[key] = changes.pop(key)
+    result = dataclass_replace(value, **changes)
+    _attach_metadata(result, metadata)
+    return result
+
+
+def _attach_metadata(result, supplied):
+    defaults_path = (
+        Path(__file__).resolve().parents[1]
+        / "inputs/controls/h3_historical_resources.json"
+    )
+    defaults = json.loads(defaults_path.read_text())["defaults"]
+    metadata = dict(defaults.get(type(result).__name__, {}), **supplied)
+    object.__setattr__(result, "_historical_resources", metadata)
+    actual = {f.name for f in fields(result)}
+    for key, value in metadata.items():
+        if key not in actual:
+            object.__setattr__(result, key, value)

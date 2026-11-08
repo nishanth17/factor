@@ -7,14 +7,17 @@ import json
 import os
 import pstats
 import time
-from dataclasses import replace
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    historical_replace as replace,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
 )
 
 from ....common import utils
+from ....execution.budget import Budget
 from ....qs import SIQSJob
 from ..b1.b1_calibration import save
 from . import c9_growth_study as study
@@ -56,7 +59,12 @@ def resume(config, fixture, output):
     """Release old stores before two restores; charge encoding and replay."""
     # Checkpoint verification reserves eight simultaneous encoded copies.
     # This is a correctness diagnostic, separately bounded from timing arms.
-    config = replace(config, collector=replace(config.collector))
+    config = replace(
+        config,
+        memory_bytes=1024 * 2**20,
+        checkpoint_bytes=16 * 2**20,
+        collector=replace(config.collector, memory_bytes=1024 * 2**20),
+    )
     start, cpu = time.monotonic(), time.process_time()
     last_poll = time.monotonic()
 
@@ -70,8 +78,8 @@ def resume(config, fixture, output):
             last_poll = now
         return False
 
-    budget = Budget(
-        work_limit=10**13, seconds=240, cpu_seconds=240, cancelled=poll
+    budget = recording_budget(
+        Budget, work_limit=10**13, seconds=240, cpu_seconds=240, cancelled=poll
     )
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     receipts = []

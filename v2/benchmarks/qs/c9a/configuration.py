@@ -1,10 +1,15 @@
 """Independent full-arm policies with input-resolved numerical admission."""
 
-from dataclasses import asdict, replace
 from math import isqrt
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....qs import (
@@ -104,9 +109,7 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
                 adapt_resource_configuration(
                     control.default_siqs_config,
                     10 ** (digits - 1),
-                    recipe="calibrated"
-                    if owned in (None, 2**30)
-                    else "reference",
+                    memory_bytes=owned,
                 )
             ),
             qs,
@@ -135,7 +138,8 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
             solve_policy="collection",
             memory_bytes=owned,
             checkpoint_bytes=1048576,
-            collector=GrowingDoubleLargeSieveConfig(
+            collector=adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig,
                 sparse_queue_bytes=32 * 2**20,
                 marking="sparse",
                 block_width=4096,
@@ -145,12 +149,10 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
                 residual_bound=3000000,
                 large_prime_bound=3000000,
                 large_product_bound=115200000000,
+                max_atoms=ATOMS[digits],
                 max_partials=PARTIALS[digits],
+                max_relations=ROWS[digits],
                 split_call_limit=1048576,
-                preparation_cache_bytes=2 * 2**20
-                if ROWS[digits] is None
-                else min(2 * 2**20, 2048 * ROWS[digits]),
-                target_rows=ROWS[digits],
             ),
         )
         # The existing count resolver caps its sieve at 250000. Frontier
@@ -163,7 +165,7 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
             else adapt_resource_configuration(SIQSConfig, **values)
         )
 
-    config = replace(config)
+    config = replace(config, memory_bytes=owned - HELPER_BYTES)
     if digits not in SIZES:
         return config
 
@@ -231,4 +233,4 @@ def decode(values, qs):
                     "target runtime cannot implement coupled policy " + key
                 )
             values.pop(key)
-    return cls(**values)
+    return adapt_resource_configuration(cls, **values)

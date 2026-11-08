@@ -15,7 +15,9 @@ import time
 import zipfile
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from . import worker
 from .configuration import decode
@@ -256,7 +258,10 @@ def proof_cost(qs, budgets, base, config, records):
     )
     budget = polling.PollingBudget(
         recording_budget(
-            budgets.Budget, work_limit=10**14, seconds=20, cpu_seconds=20
+            budgets.Budget,
+            work_limit=10**14,
+            seconds=20,
+            cpu_seconds=20,
         )
     )
     start, cpu = time.monotonic(), time.process_time()

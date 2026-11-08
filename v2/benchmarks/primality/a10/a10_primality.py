@@ -25,7 +25,10 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 
 from .... import portfolio
 from ....common import arithmetic, utils
@@ -327,8 +330,12 @@ def sympy_work(fixtures):
 
 
 def factoring_work(module, budget_module, fixtures, seeds):
-    config = module.PortfolioConfig(
-        trial_bound=30000, rho_attempts=0, pm1_attempts=0, ecm_tiers=()
+    config = adapt_resource_configuration(
+        module.PortfolioConfig,
+        trial_bound=30000,
+        rho_attempts=0,
+        pm1_attempts=0,
+        ecm_tiers=(),
     )
     signature = []
     for fixture in fixtures:

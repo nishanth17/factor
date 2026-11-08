@@ -9,10 +9,10 @@ import time
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    recording_budget,
 )
 
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ...support.paths import (
     source_path,
 )
@@ -142,7 +142,9 @@ def main():
     _, fixtures, _ = load_followup()
     with machine_window():
         started, cpu = time.monotonic(), time.process_time()
-        study = Budget(work_limit=6 * 10**12, seconds=180, cpu_seconds=180)
+        study = recording_budget(
+            Budget, work_limit=6 * 10**12, seconds=180, cpu_seconds=180
+        )
         result = dict(
             protocol_sha256=hashlib.sha256(
                 source_path(PROTOCOL).read_bytes()

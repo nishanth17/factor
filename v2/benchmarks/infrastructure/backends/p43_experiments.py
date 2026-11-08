@@ -1,7 +1,10 @@
 """Process-local QS representation experiments; no production policy switch."""
 
 import sys
-from dataclasses import replace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....qs import extraction, factor_base, siqs

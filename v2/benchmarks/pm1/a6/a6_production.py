@@ -11,14 +11,13 @@ import sys
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
-)
-from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 from .... import portfolio
 from ....execution import stage_jobs
+from ....execution.budget import Budget
 from ....execution.schedules import SieveContext
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (
@@ -107,7 +106,9 @@ def config(arm, backend, **changes):
 
 
 def grant():
-    return Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30)
+    return recording_budget(
+        Budget, work_limit=2_000_000, seconds=30, cpu_seconds=30
+    )
 
 
 def stage(arm, fixture, bounds, backend):
@@ -165,7 +166,9 @@ def portfolio_call(arm, backend):
             fixture["n"],
             seed=7,
             config=cfg,
-            budget=Budget(work_limit=500000, seconds=5, cpu_seconds=5),
+            budget=recording_budget(
+                Budget, work_limit=500000, seconds=5, cpu_seconds=5
+            ),
         )
         if outcome.result.reconstruct() != fixture["n"]:
             raise AssertionError("portfolio reconstruction failed")

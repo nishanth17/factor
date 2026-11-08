@@ -20,11 +20,12 @@ from concurrent.futures import (
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ....execution.schedules import SieveContext
 from ....execution.stage_jobs import advance_job, new_job
 from ....portfolio import PortfolioConfig
@@ -68,7 +69,8 @@ def _worker_cpu(executor, workers):
 
 def _job(assignment):
     """Execute one unique candidate; never give it known input factors."""
-    config = PortfolioConfig(
+    config = adapt_resource_configuration(
+        PortfolioConfig,
         trial_bound=100,
         max_input_bits=256,
         rho_evaluations=5000,
@@ -86,7 +88,8 @@ def _job(assignment):
     )
     started = time.perf_counter()
     cpu_started = time.thread_time()
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=250000,
         seconds=None,
         cpu_seconds=None,

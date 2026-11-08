@@ -6,6 +6,10 @@ import importlib.util
 import json
 import sys
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (
     BENCHMARK_ROOT,
@@ -102,12 +106,14 @@ def load_control(name="_b4_control"):
 
 
 def config(engine, protocol, case, backend):
-    return engine.PortfolioConfig(
+    return adapt_resource_configuration(
+        engine.PortfolioConfig,
         trial_bound=5,
         rho_attempts=0,
         pm1_attempts=0,
         ecm_tiers=(tuple(protocol["cases"][case]),),
         backend=backend,
+        memory_bytes=protocol["memory_bytes"],
         max_input_bits=protocol["max_input_bits"],
         trace_limit=256,
     )

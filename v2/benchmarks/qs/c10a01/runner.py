@@ -2,6 +2,13 @@
 
 import time
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
+
 IMPORT_WALL = time.monotonic()
 IMPORT_CPU = time.process_time()
 
@@ -13,16 +20,11 @@ import resource  # noqa: E402
 import subprocess  # noqa: E402
 import sys  # noqa: E402
 from contextlib import contextmanager  # noqa: E402
-from dataclasses import asdict  # noqa: E402
 from math import prod  # noqa: E402
 from pathlib import Path  # noqa: E402
 
-from v2.benchmarks.infrastructure.resource_control import (  # noqa: E402
-    RecordingBudget as Budget,
-)
-
 from ....common import utils  # noqa: E402
-from ....execution.budget import BudgetExhaustedError  # noqa: E402
+from ....execution.budget import Budget, BudgetExhaustedError  # noqa: E402
 from ....qs import SIQSJob  # noqa: E402
 from ....qs.sieve_collector import SieveCollector  # noqa: E402
 from ....qs.sign_schedule import schedule_for  # noqa: E402
@@ -152,8 +154,12 @@ def run_one(
             last_poll = now
         return rss_stop
 
-    budget = Budget(
-        work_limit=work, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        Budget,
+        work_limit=work,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     cfg = configuration(digits, arm, multiplier=multiplier)
     job = SIQSJob(n, seed=7, config=cfg, budget=budget)
@@ -255,7 +261,9 @@ def describe(job):
     schedule = schedule_for(cfg.factor_count, cfg.sign_policy)
     samples, records, charged = {}, [], 0
     old_budget = job.assignments.budget
-    analysis_budget = Budget(work_limit=10**10, seconds=2.5, cpu_seconds=2.5)
+    analysis_budget = recording_budget(
+        Budget, work_limit=10**10, seconds=2.5, cpu_seconds=2.5
+    )
     job.assignments.budget = analysis_budget
     try:
         for ordinal in range(count):

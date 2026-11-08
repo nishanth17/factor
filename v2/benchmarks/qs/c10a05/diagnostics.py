@@ -5,12 +5,15 @@ import gc
 import json
 import pstats
 import time
-from dataclasses import replace
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    historical_replace as replace,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
 )
 
+from ....execution.budget import Budget
 from ....qs import SIQSJob
 from ..b1.b1_calibration import save
 from . import study
@@ -44,8 +47,10 @@ def profile(fixture, config, arm, path):
 
 def checkpoint(fixture, config):
     # This separate diagnostic shares a larger encoding allowance across arms.
-    config = replace(config)
-    budget = Budget(work_limit=10**13, seconds=60, cpu_seconds=60)
+    config = replace(config, checkpoint_bytes=16 * 2**20)
+    budget = recording_budget(
+        Budget, work_limit=10**13, seconds=60, cpu_seconds=60
+    )
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     records = []
     for _ in range(2):

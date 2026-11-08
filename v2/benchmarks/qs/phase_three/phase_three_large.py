@@ -16,14 +16,21 @@ import subprocess
 import sys
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
+from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig
 from ....qs.polynomial import a_target
@@ -49,7 +56,8 @@ def allowance(digits):
 def configuration(n, bound, width, residual, multiplier=1):
     target = a_target(n, width)
     count = next((k for k in range(1, 9) if (bound // 2) ** k >= target), 8)
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=bound,
         half_width=width,
         max_half_width=width,
@@ -60,15 +68,18 @@ def configuration(n, bound, width, residual, multiplier=1):
         max_trivial=4096,
         row_excess=32,
         batch_width=4096,
+        memory_bytes=768 * 1024 * 1024,
+        checkpoint_bytes=16 * 1024 * 1024,
         multiplier=multiplier,
-        collector=SieveConfig(
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             division="bucket",
             score_policy="powers",
             residual_bound=residual,
+            max_atoms=65536,
+            max_relations=32768,
             max_partials=32768,
-            target_rows=32768,
-            preparation_cache_bytes=min(2 * 2**20, 2048 * 32768),
         ),
     )
 
@@ -95,7 +106,9 @@ def run_one(
 ):
     seconds = allowance(fixture["digits"]) if seconds is None else seconds
     if varied:
-        portfolio = PortfolioConfig(
+        portfolio = adapt_resource_configuration(
+            PortfolioConfig,
+            memory_bytes=MEMORY,
             rho_attempts=4,
             rho_evaluations=100000,
             pm1_attempts=2,
@@ -106,7 +119,9 @@ def run_one(
             siqs=config if arm == "fallback" else None,
         )
     else:
-        portfolio = PortfolioConfig(
+        portfolio = adapt_resource_configuration(
+            PortfolioConfig,
+            memory_bytes=MEMORY,
             trial_bound=2,
             rho_attempts=0,
             pm1_attempts=0,
@@ -116,7 +131,9 @@ def run_one(
         )
 
     print("starting", fixture["id"], arm, seed, "cap", seconds, flush=True)
-    budget = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    )
     began, cpu = time.perf_counter(), time.process_time()
 
     result = factorize_bounded(
@@ -321,7 +338,9 @@ def main():
                     choices = []
                     if inherited is not None:
                         config = replace(
-                            _config(inherited["configs"][str(digits)])
+                            _config(inherited["configs"][str(digits)]),
+                            memory_bytes=768 * 1024 * 1024,
+                            checkpoint_bytes=16 * 1024 * 1024,
                         )
                         rows = []
 

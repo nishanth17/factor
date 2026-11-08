@@ -14,7 +14,9 @@ import time
 from math import gcd
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ...support.paths import (
     REPOSITORY_ROOT,

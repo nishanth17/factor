@@ -14,6 +14,7 @@ from types import SimpleNamespace
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 
@@ -124,8 +125,12 @@ class SelectedECMOnly:
     def __init__(self, request):
         from v2.execution.ecm_auto import selected_context
 
-        self.owner = selected_context(
-            seed=request["seed"], prefer_warm=request["mode"] == "warm"
+        self.owner = adapt_resource_configuration(
+            selected_context,
+            seed=request["seed"],
+            prefer_warm=request["mode"] == "warm",
+            parent_memory=request["parent_memory"],
+            memory_bytes=request["ecm_memory_bytes"],
         )
         self.serial = MatchedSerialECM(request)
 
@@ -168,9 +173,7 @@ def child(request_path, source_root):
         (math.ceil(request["cpu"]), math.ceil(request["cpu"]) + 1),
     )
     sys.path.insert(0, source_root)
-    from v2.benchmarks.infrastructure.resource_control import (
-        RecordingBudget as Budget,
-    )
+    from v2.execution.budget import Budget
     from v2.portfolio import PortfolioConfig
 
     config = adapt_resource_configuration(PortfolioConfig, **request["config"])
@@ -208,7 +211,8 @@ def child(request_path, source_root):
         cpu = request["cpu"] - time.process_time() - charged_children
         if seconds <= 0 or cpu <= 0:
             raise TimeoutError("whole-cell allowance exhausted")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=request.get("work", 10**12) - work_used,
             seconds=seconds,
             cpu_seconds=min(cpu, request.get("call_cpu", cpu)),

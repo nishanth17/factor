@@ -11,9 +11,18 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     fingerprint,
@@ -88,7 +97,9 @@ def freeze(mainline_revision, decision):
     configs = {}
     for digits in TRAIN_CAPS:
         control = (
-            SIQSConfig(base_bound=200, half_width=256)
+            adapt_resource_configuration(
+                SIQSConfig, base_bound=200, half_width=256
+            )
             if digits == 8
             else c9.decode(
                 prior["configurations"][str(digits)][

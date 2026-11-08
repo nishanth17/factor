@@ -5,12 +5,16 @@ import gc
 import json
 import pstats
 import time
-from dataclasses import replace
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
+from ....execution.budget import Budget
 from ....qs import SIQSJob, build_factor_base
 from ....qs.assignment_stream import AssignmentStream
 from ..b1.b1_calibration import save
@@ -20,7 +24,9 @@ from .oracles import product_census
 
 def census(fixtures, registry):
     records = []
-    budget = Budget(work_limit=10**9, seconds=20, cpu_seconds=20)
+    budget = recording_budget(
+        Budget, work_limit=10**9, seconds=20, cpu_seconds=20
+    )
     for fixture in fixtures:
         config = study.c9.decode(registry[str(fixture["digits"])]["control"])
         base = build_factor_base(
@@ -30,7 +36,8 @@ def census(fixtures, registry):
             budget=budget,
         ).factor_base
         for policy in ("flyer", "quality"):
-            stream = AssignmentStream(
+            stream = adapt_resource_configuration(
+                AssignmentStream,
                 base,
                 config.half_width,
                 factor_count=config.factor_count,
@@ -39,6 +46,7 @@ def census(fixtures, registry):
                 seed=7,
                 policy=policy,
                 budget=budget,
+                memory_bytes=config.memory_limit,
             )
             families = [stream[i] for i in range(min(128, len(stream)))]
             records.append(
@@ -90,8 +98,10 @@ def profile(fixture, config, arm, path):
 
 def checkpoint(fixture, config):
     # This separate diagnostic shares a larger encoding allowance across arms.
-    config = replace(config)
-    budget = Budget(work_limit=10**13, seconds=60, cpu_seconds=60)
+    config = replace(config, checkpoint_bytes=16 * 2**20)
+    budget = recording_budget(
+        Budget, work_limit=10**13, seconds=60, cpu_seconds=60
+    )
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     records = []
     for _ in range(2):

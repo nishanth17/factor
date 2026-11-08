@@ -16,22 +16,25 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
-)
-from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
     recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from .... import portfolio
 from ....common import arithmetic, utils
 from ....ecm import core as ecm
 from ....execution import stage_jobs
+from ....execution.budget import Budget
 from ....execution.schedules import SieveContext
 from ....qs import SieveConfig, SIQSConfig, siqs
 from ...qs.p38.p38_r3 import config as small_qs_config
@@ -175,7 +178,8 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
     count = min(
         32, max(4, math.ceil((digits / 2 - 4) / math.log10(bound / 2)))
     )
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         backend=backend,
         mode=mode,
         base_bound=bound,
@@ -192,14 +196,17 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
         row_excess=32,
         batch_width=4096,
         filter_row_growth=32,
-        collector=SieveConfig(
+        memory_bytes=768 * 2**20 if large else MEMORY,
+        checkpoint_bytes=2**20,
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             division="bucket",
             score_policy="fixed",
             residual_bound=bound**2,
+            max_atoms=32768,
+            max_relations=16384,
             max_partials=16384,
-            target_rows=16384,
-            preparation_cache_bytes=min(2 * 2**20, 2048 * 16384),
         ),
     )
 
@@ -278,7 +285,9 @@ def ecm_call(spec, backend, before=None):
     config = adapt_resource_configuration(
         portfolio_module.PortfolioConfig, **options
     )
-    budget = Budget(work_limit=10**10, seconds=None, cpu_seconds=None)
+    budget = recording_budget(
+        Budget, work_limit=10**10, seconds=None, cpu_seconds=None
+    )
     context = SieveContext(b2 + 1, segment_size=config.segment_size)
     outputs = []
     for index in range(spec["curves"]):

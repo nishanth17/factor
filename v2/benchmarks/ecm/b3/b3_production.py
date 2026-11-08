@@ -190,7 +190,9 @@ def stage_cohort(fixtures, seeds, backend, candidate, scope, targets):
             continue
         for seed in seeds:
             context = SieveContext(147397, segment_size=128)
-            store = programs_module.ECMPrograms(context, memory_bytes=262144)
+            store = adapt_resource_configuration(
+                programs_module.ECMPrograms, context, memory_bytes=262144
+            )
             if candidate:
                 store.chains = ChainPlans(
                     MIN_MEMORY_BYTES, backend, (1999, 2000)

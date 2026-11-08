@@ -13,11 +13,19 @@ import sys
 import time
 from collections import Counter
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....execution import budget as live_budget
@@ -71,7 +79,9 @@ def sources():
 def policy():
     configurations = {}
     for digits in CAPS:
-        cfg = defaults.default_siqs_config(10 ** (digits - 1))
+        cfg = adapt_resource_configuration(
+            defaults.default_siqs_config, 10 ** (digits - 1)
+        )
         selected = replace(
             cfg, collector=replace(cfg.collector, marking=SELECTED)
         )
@@ -167,7 +177,9 @@ def configuration(n, arm, control_runtime):
         raise ValueError("outside frozen band/arm")
     # Decode the owned historical control into current classes. Inheriting
     # today's factory would change more than the frozen marking treatment.
-    cfg = control_runtime[0].default_siqs_config(n)
+    cfg = adapt_resource_configuration(
+        control_runtime[0].default_siqs_config, n
+    )
     if arm == "selected":
         cfg = _decode_siqs_config(asdict(cfg))
         # Retain the previously integrated face/queue compatibility delta.

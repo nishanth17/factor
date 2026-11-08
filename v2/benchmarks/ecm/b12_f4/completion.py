@@ -8,7 +8,16 @@ import argparse
 import json
 import math
 import sys
-from dataclasses import asdict, replace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 
 def configuration(n, source_root, *, funded=True):
@@ -19,7 +28,7 @@ def configuration(n, source_root, *, funded=True):
     digits = len(str(n))
     if digits not in (60, 70):
         raise ValueError("balanced completion preparation supports 60/70 only")
-    config = PortfolioConfig().for_input(n)
+    config = adapt_resource_configuration(PortfolioConfig).for_input(n)
     if not funded:
         return config
     if digits == 60:
@@ -29,8 +38,10 @@ def configuration(n, source_root, *, funded=True):
             )
         # Select the calibrated numerical policies before increasing capacity:
         # rebuilding defaults under a different grant can change solve_policy.
-        fallback = replace(config.siqs)
-        2 * 2**30 + 16 * 2**20
+        fallback = replace(
+            config.siqs, memory_bytes=2 * 2**30, checkpoint_bytes=64 * 2**20
+        )
+        parent_memory = 2 * 2**30 + 16 * 2**20
     else:
         from v2.benchmarks.qs.c10a01.configuration_v4 import (
             configuration as qs_configuration,
@@ -39,10 +50,11 @@ def configuration(n, source_root, *, funded=True):
         # This is an explicit common exploratory fallback, not stock 70-digit
         # automatic routing. These are the retained C10a completion policies.
         fallback = replace(
-            qs_configuration(70, "coupled", multiplier_policy="parity2_wide")
+            qs_configuration(70, "coupled", multiplier_policy="parity2_wide"),
+            checkpoint_bytes=64 * 2**20,
         )
-        4 * 2**30
-    return replace(config, siqs=fallback)
+        parent_memory = 4 * 2**30
+    return replace(config, memory_bytes=parent_memory, siqs=fallback)
 
 
 def validate_known_factorization(row, factors):

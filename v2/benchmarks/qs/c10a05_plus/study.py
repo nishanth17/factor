@@ -9,8 +9,17 @@ import random
 import resource
 import sys
 import time
-from dataclasses import asdict, replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     fingerprint,
@@ -67,7 +76,7 @@ def configurations():
         collector=replace(c10_window.collector, power_plan_bytes=0),
     )
     return {
-        "current": SIQSConfig(),
+        "current": adapt_resource_configuration(SIQSConfig),
         "c9_window": c9_window,
         "c10_window": c10_window,
         "collection": replace(c10_window, solve_policy="collection"),

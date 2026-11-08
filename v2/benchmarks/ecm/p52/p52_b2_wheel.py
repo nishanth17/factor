@@ -321,8 +321,10 @@ def diagnostics(protocol, corpus):
                 config.max_hi, segment_size=config.segment_size, budget=budget
             )
             programs = (
-                engine.ECMPrograms(
-                    context, memory_bytes=config.ecm_program_bytes
+                adapt_resource_configuration(
+                    engine.ECMPrograms,
+                    context,
+                    memory_bytes=config.ecm_program_bytes,
                 )
                 if config.ecm_program_bytes
                 else None

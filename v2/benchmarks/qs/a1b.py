@@ -15,10 +15,11 @@ from math import exp, log
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    recording_budget,
 )
 
 from ...common.utils import classify_prime
+from ...execution.budget import Budget
 from ...portfolio import _decode_siqs_config
 from ...qs import SIQSJob, verify_atomic
 from .c10a04.accounting import Ledger, digest, output_lock, receipt
@@ -61,7 +62,9 @@ def run_one(fixture, seed, config, blocks, seconds, work):
     """Time native setup-to-prefix work and exact output validation."""
     gc.collect()
     wall, cpu = time.perf_counter(), time.process_time()
-    budget = Budget(work_limit=work, seconds=seconds, cpu_seconds=seconds)
+    budget = recording_budget(
+        Budget, work_limit=work, seconds=seconds, cpu_seconds=seconds
+    )
     job = SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
     result = job.run(max_blocks=blocks)
     native_wall = time.perf_counter() - wall

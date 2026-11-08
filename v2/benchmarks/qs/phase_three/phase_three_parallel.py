@@ -9,19 +9,22 @@ import resource
 import statistics
 import sys
 import time
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    adapt_resource_configuration,
+    recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
-    adapt_resource_configuration,
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ....qs.parallel import (
     CollectionPool,
     ParallelConfig,
@@ -54,18 +57,20 @@ ARMS = (
 
 def configuration(band, bound=None):
     return replace(
-        ParallelConfig(),
+        adapt_resource_configuration(ParallelConfig),
         base_bound=bound or (200 if band == "small" else 1000),
         half_width=256 if band == "small" else 512,
         factor_count=1 if band == "small" else 3,
         family_count=4,
         pool_size=16,
         max_batch_atoms=512,
+        assignment_work=50_000_000,
     )
 
 
 def reference_config(config):
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=config.base_bound,
         half_width=config.half_width,
         factor_count=config.factor_count,
@@ -73,6 +78,7 @@ def reference_config(config):
         pool_size=config.pool_size,
         max_stalled=64,
         max_trivial=4096,
+        memory_bytes=config.parent_memory_bytes,
         collector=config.collector,
     )
 
@@ -88,7 +94,9 @@ def run_one(
 ):
     """Include setup, transfer, verification, extraction and classification."""
     started, cpu_started = time.perf_counter(), process_cpu()
-    budget = Budget(work_limit=WORK, seconds=SECONDS, cpu_seconds=SECONDS)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=SECONDS, cpu_seconds=SECONDS
+    )
     own_pool = None
     if cold:
         own_pool = CollectionPool(pool.mode, pool.workers)

@@ -7,16 +7,21 @@ import json
 import platform
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
-    RecordingBudget as Budget,
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
 )
 
 from ....common import utils
-from ....execution.budget import BudgetExhaustedError
+from ....execution.budget import Budget, BudgetExhaustedError
 from ....qs import SIQSJob
 from ...support.paths import (
     source_path,
@@ -42,7 +47,11 @@ def run(output):
     config = arm_config(configs[control["digits"]], control["arm"])
     config = replace(
         config,
-        collector=replace(config.collector),
+        memory_bytes=control["memory_bytes"],
+        checkpoint_bytes=control["checkpoint_bytes"],
+        collector=replace(
+            config.collector, memory_bytes=control["memory_bytes"]
+        ),
     )
     save(
         output / "manifest.json",
@@ -60,7 +69,8 @@ def run(output):
         ),
     )
     started, cpu = time.monotonic(), time.process_time()
-    prior = Budget(
+    prior = recording_budget(
+        Budget,
         work_limit=control["work"],
         seconds=control["pause_seconds"],
         cpu_seconds=control["pause_seconds"],
@@ -83,7 +93,8 @@ def run(output):
     # Charge encoding, disk roundtrip and collection of the released old job.
     # No old live atom store is intentionally retained beside the restored one.
     checkpoint = json.loads(source_path(checkpoint_path).read_text())
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=control["work"],
         seconds=control["cumulative_seconds"],
         cpu_seconds=control["cumulative_seconds"],

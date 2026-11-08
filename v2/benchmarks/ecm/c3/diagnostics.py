@@ -6,7 +6,9 @@ import json
 import time
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from .... import portfolio
 from .c3_study import (
@@ -57,7 +59,7 @@ def diagnose(output):
                     config=config,
                     budget=recording_budget(
                         budget_module.Budget,
-                        work_limit=2000000,
+                        work_limit=2_000_000,
                         seconds=30,
                         cpu_seconds=30,
                     ),

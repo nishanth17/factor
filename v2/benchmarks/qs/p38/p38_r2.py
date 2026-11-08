@@ -13,10 +13,18 @@ import sys
 import tempfile
 import time
 import types
-from dataclasses import asdict, replace
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     checked_baseline,
@@ -232,7 +240,8 @@ def collector_run(mods, fixture, seed, variant):
     if variant in ("tiny", "batch", "chunks"):
         cls = experiment_collector(mods["qs.sieve_collector"], variant)
     try:
-        worker = cls(
+        worker = adapt_resource_configuration(
+            cls,
             polynomial,
             job.base,
             config=selected.collector,
@@ -262,11 +271,19 @@ def collector_run(mods, fixture, seed, variant):
         raise AssertionError("collector returned an improper divisor")
     atoms = {a.relation_id: a for a in result.atoms}
     extraction = mods["qs.extraction"]
-    prepared = extraction.prepare_relations(
-        worker.matrix_relations, job.base, atoms, budget=budget
+    prepared = adapt_resource_configuration(
+        extraction.prepare_relations,
+        worker.matrix_relations,
+        job.base,
+        atoms,
+        budget=budget,
+        memory_bytes=MEMORY,
     )
-    matrix = mods["qs.linear_algebra"].filter_matrix(
-        prepared.rows, budget=budget
+    matrix = adapt_resource_configuration(
+        mods["qs.linear_algebra"].filter_matrix,
+        prepared.rows,
+        budget=budget,
+        memory_bytes=MEMORY,
     )
     large_primes = sum(e.prime > hi - lo for e in job.base.entries)
     return dict(

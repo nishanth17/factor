@@ -22,6 +22,7 @@ from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 
@@ -265,9 +266,7 @@ def child(request_path, source_root):
         (math.ceil(request["cpu"]), math.ceil(request["cpu"]) + 1),
     )
     sys.path.insert(0, source_root)
-    from v2.benchmarks.infrastructure.resource_control import (
-        RecordingBudget as Budget,
-    )
+    from v2.execution.budget import Budget
     from v2.portfolio import PortfolioConfig, factorize_bounded
 
     options = dict(request["config"])
@@ -300,7 +299,8 @@ def child(request_path, source_root):
         remaining_cpu = request["cpu"] - time.process_time() - charged_children
         if remaining_wall <= 0 or remaining_cpu <= 0:
             raise TimeoutError("cell startup/warmup allowance exhausted")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=max(0, request["work"] - total_work),
             seconds=remaining_wall,
             cpu_seconds=remaining_cpu,

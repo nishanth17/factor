@@ -12,7 +12,9 @@ import time
 from math import prod
 from pathlib import Path
 
-from v2.benchmarks.infrastructure.resource_control import recording_budget
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ...pm1.a6.a6_pm1 import assert_quiet, require_runtime
 from ...suites.build_phase_two_corpus import (

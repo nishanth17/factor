@@ -4,11 +4,16 @@ The primary comparison has two arms. Grouped runtime switches are correctness
 and diagnostic controls, not a required all-combinations campaign.
 """
 
-from dataclasses import asdict, replace
 from math import isqrt
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 
 from ....qs import CombinedYieldSieveConfig

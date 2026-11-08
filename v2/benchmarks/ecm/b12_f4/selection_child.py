@@ -17,6 +17,7 @@ from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+    recording_budget,
 )
 
 
@@ -166,9 +167,7 @@ def child(request_path, source_root):
         (math.ceil(request["cpu"]), math.ceil(request["cpu"]) + 1),
     )
     sys.path.insert(0, source_root)
-    from v2.benchmarks.infrastructure.resource_control import (
-        RecordingBudget as Budget,
-    )
+    from v2.execution.budget import Budget
     from v2.portfolio import PortfolioConfig, factorize_bounded
 
     config = adapt_resource_configuration(PortfolioConfig, **request["config"])
@@ -176,8 +175,7 @@ def child(request_path, source_root):
     if request["arm"] == "POLICY":
         from v2.execution.ecm_selection import SelectedECMContext
 
-        executor = adapt_resource_configuration(
-            SelectedECMContext,
+        executor = SelectedECMContext(
             request["selection_profile"],
             request["selection_profile_sha256"],
             **selection_options(request),
@@ -217,7 +215,8 @@ def child(request_path, source_root):
             call_seconds -= time.monotonic() - request["entry"]
         if call_seconds <= 0:
             raise TimeoutError("cold CLI startup exhausted its allowance")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=request["work"] - totals["work"],
             seconds=min(remaining_wall, call_seconds),
             cpu_seconds=remaining_cpu,

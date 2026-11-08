@@ -7,13 +7,15 @@ import os
 import resource
 import sys
 import time
-from dataclasses import asdict
 from importlib import import_module
 from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
     recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 
 from .... import portfolio
