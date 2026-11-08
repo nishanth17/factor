@@ -12,6 +12,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
@@ -57,7 +60,7 @@ def policy(**changes):
         duplicate_policy="identity",
     )
     values.update(changes)
-    return ExtendedYieldSieveConfig(**values)
+    return adapt_resource_configuration(ExtendedYieldSieveConfig, **values)
 
 
 def collector(**changes):
@@ -188,9 +191,7 @@ class ExpandedArithmeticTests(unittest.TestCase):
                 )
             row = worker._rows[0]
             self.assertIsInstance(row, LazyCombinedRelation)
-            worker._checked.row(
-                row, worker._atoms, worker.budget, worker.config.memory_limit
-            )
+            worker._checked.row(row, worker._atoms, worker.budget)
             payload = json.loads(json.dumps(pack_store(worker)))
         self.assertTrue(
             verify_combined(
@@ -417,7 +418,6 @@ class ExpandedResourceTests(unittest.TestCase):
                 base_bound=40,
                 half_width=512,
                 max_half_width=512,
-                memory_bytes=128 * 2**20,
                 solve_policy="collection",
                 row_excess=0,
                 filter_row_growth=1,
@@ -497,14 +497,14 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spill_limits_corruption_and_explicit_lifetime(self):
         with tempfile.TemporaryDirectory() as directory:
-            owner = SpillStore(directory, 6, 65536, allowance())
+            owner = SpillStore(directory, 65536, allowance())
             reference = owner.append(b"abc")
             owner.append(b"def")
-            with self.assertRaises(MemoryError):
-                owner.append(b"g")
+            owner.append(b"g")
+            self.assertEqual(owner.read(reference), b"abc")
             manifest = owner.manifest()
             owner.close()
-            restored = SpillStore(directory, 6, 65536, allowance())
+            restored = SpillStore(directory, 65536, allowance())
             restored.restore_manifest(manifest)
             self.assertEqual(restored.read(reference), b"abc")
             path = Path(directory) / reference[0]
@@ -516,12 +516,16 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spilled_collector_restores_without_duplicate_disk_charge(self):
         with tempfile.TemporaryDirectory() as directory:
-            worker = collector(spill_directory=directory, spill_bytes=2**20)
+            worker = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             for position in (1, -21):
                 worker._admit(atom_at(worker, position), Counter())
             payload = json.loads(json.dumps(pack_store(worker)))
             used = worker._arena.spill.used
-            restored = collector(spill_directory=directory, spill_bytes=2**20)
+            restored = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             restore_store(payload, restored, restored.budget)
             self.assertEqual(restored._arena.spill.used, used)
             self.assertEqual(pack_store(restored), payload)
@@ -530,7 +534,9 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spill_reads_follow_the_resumed_allowance(self):
         with tempfile.TemporaryDirectory() as directory:
-            worker = collector(spill_directory=directory, spill_bytes=2**20)
+            worker = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             source = atom_at(worker, 1)
             worker._admit(source, Counter())
             worker.budget = allowance(0)
@@ -547,7 +553,7 @@ class ExpandedResourceTests(unittest.TestCase):
         from v2.qs.cold_factors import ColdFactors
 
         with tempfile.TemporaryDirectory() as directory:
-            owner = SpillStore(directory, 2**20, 65536, allowance())
+            owner = SpillStore(directory, 65536, allowance())
             with self.assertRaises(ValueError):
                 ColdFactors(
                     owner, ("c9a-cold-test.bin", 0, 10000, "0" * 64), (2,), 1
@@ -560,11 +566,7 @@ class ExpandedResourceTests(unittest.TestCase):
             rows += suffix
             previous = dict(cache.cores)
             matrix = filter_matrix(
-                rows,
-                weight_two=True,
-                budget=allowance(),
-                _incremental=cache,
-                memory_bytes=16 * 2**20,
+                rows, weight_two=True, budget=allowance(), _incremental=cache
             )
             self.assertTrue(matrix.stats["incremental_core"])
             dependencies = DependencySolver(matrix, budget=allowance()).run()
@@ -592,7 +594,7 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_base_batch_recovers_all_valuations_independently(self):
         worker = collector()
-        helper = BaseRecovery(worker.factor_base, 2**20, allowance())
+        helper = BaseRecovery(worker.factor_base, allowance())
         values = (2**20 * 15, 2**7 * 3, 1, 2**20 * 15)
         self.assertEqual(helper.residuals(values, allowance()), (15, 3, 1, 15))
 
@@ -623,7 +625,6 @@ class ExpandedResourceTests(unittest.TestCase):
             base_bound=100,
             half_width=256,
             max_half_width=256,
-            memory_bytes=128 * 2**20,
             solve_policy="collection",
             collector=policy(),
         )
@@ -695,7 +696,6 @@ class ExpandedResourceTests(unittest.TestCase):
                     family_count=2,
                     pool_size=8,
                     polynomials_per_family=4,
-                    memory_bytes=128 * 2**20,
                     polynomial_policy="parity2",
                     multiplier_policy="parity2_wide",
                     assignment_policy="windowed_pair",

@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from v2.benchmarks.qs.phase_three import phase_three_audit
 from v2.benchmarks.support import paths
-from v2.execution.budget import Budget
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class LayoutTests(unittest.TestCase):

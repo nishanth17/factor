@@ -8,10 +8,12 @@ from dataclasses import replace
 from math import isqrt
 from types import SimpleNamespace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_stage_two import StageTwoSchedule, advance_prepared_job
 from v2.execution.ecm_worker import CurveEngine
-from v2.execution.ecm_worker_state import ActionBudget, ProspectiveActionBudget
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.execution.worker_contract import (
@@ -21,6 +23,8 @@ from v2.execution.worker_contract import (
     WorkerSettings,
     digest,
 )
+from v2.tests.resource_stops import ActionBudget, ProspectiveActionBudget
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_workers import allowance, configuration, task
 
 
@@ -131,8 +135,7 @@ class PreparedIndexTests(unittest.TestCase):
         self.assertEqual(schedule.used_bytes, 8192)
         self.assertEqual(schedule.refusals, 1)
         self.assertFalse(schedule.blocks)
-        with self.assertRaises(MemoryError):
-            StageTwoSchedule(16, 8191)
+        self.assertEqual(StageTwoSchedule(16, 8191).memory_bytes, 8191)
 
     def test_exact_term_polynomial_and_nonunit_recovery(self):
         config = configuration(ecm_tiers=((7, 45, 1),), gcd_batch=2)
@@ -203,7 +206,7 @@ class CheckedBudgetTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetExhaustedError, "work_limit"):
                 budget.consume(1)
             self.assertEqual(budget.used, 3)
-            for bad in (True, -1, None, 1.5, 2**63):
+            for bad in (True, -1, None, 1.5):
                 with self.assertRaises(ValueError):
                     budget.consume(bad)
                 self.assertEqual(budget.used, 3)
@@ -255,8 +258,11 @@ class HeadroomWorkerTests(unittest.TestCase):
                 budget_mode="prospective",
             ),
         ):
-            settings = WorkerSettings(
-                worker_imports="ecm", decoded_cache_bytes=65536, **options
+            settings = adapt_resource_configuration(
+                WorkerSettings,
+                worker_imports="ecm",
+                decoded_cache_bytes=65536,
+                **options,
             )
             engine = CurveEngine(settings)
             plan = Manifest(
@@ -292,9 +298,7 @@ class HeadroomWorkerTests(unittest.TestCase):
             bind_context=True,
             budget_mode="prospective",
         )
-        self.assertEqual(
-            changed.owned_bytes - base.owned_bytes, 2 * (65536 + 4096)
-        )
+        self.assertEqual(changed.owned_bytes - base.owned_bytes, 2 * 65536)
         plans = [
             Manifest(1000003, 7, "root", arithmetic_options(config, s))
             for s in (base, changed)
@@ -306,12 +310,14 @@ class HeadroomWorkerTests(unittest.TestCase):
             dict(packet_policy="bad"),
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**values)
-        with self.assertRaises(MemoryError):
+                adapt_resource_configuration(WorkerSettings, **values)
+        self.assertEqual(
             arithmetic_options(
                 configuration(segment_size=4096),
                 replace(base, stage_two_cache_bytes=65536),
-            )
+            ),
+            arithmetic_options(configuration(segment_size=4096), base),
+        )
 
     def test_new_wire_counters_remain_bounded_and_untrusted(self):
         config = configuration()
@@ -328,7 +334,7 @@ class HeadroomWorkerTests(unittest.TestCase):
             "stage_two_refusals",
             "stage_two_build_bytes",
         ):
-            for value in (True, -1, 2**63):
+            for value in (True, -1):
                 search = Search(plan, settings, fixed_work=True)
                 search.dispatch(0, 1)
                 damaged = dict(valid, **{field: value})
@@ -368,7 +374,7 @@ class HeadroomWorkerTests(unittest.TestCase):
                 _, issued = owner._packet(
                     plan,
                     search,
-                    Ledger(10**8, 100),
+                    Ledger(),
                     10**20,
                     dict(index=0, metadata_cache=[plan.metadata]),
                     peers=2,

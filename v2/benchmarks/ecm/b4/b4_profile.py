@@ -9,6 +9,10 @@ import pstats
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
+
 from ..p52.p52_realistic import check_quiet
 from . import b4_common as common
 
@@ -84,7 +88,8 @@ def profile(output):
                 fixture["n"],
                 seed=7,
                 config=config,
-                budget=engine.Budget(
+                budget=recording_budget(
+                    engine.Budget,
                     work_limit=protocol["work_limit"],
                     seconds=30,
                     cpu_seconds=30,

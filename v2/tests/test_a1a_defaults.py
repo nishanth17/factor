@@ -3,12 +3,16 @@
 import json
 import tempfile
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 SELECTED = "density+presieve+scan_fused"
@@ -28,8 +32,12 @@ class A1aDefaultTests(unittest.TestCase):
                         2**30,
                         2**30 + 1,
                     ):
-                        config = default_siqs_config(
-                            signed, memory_bytes=memory
+                        config = adapt_resource_configuration(
+                            default_siqs_config,
+                            signed,
+                            recipe="calibrated"
+                            if memory in (None, 2**30)
+                            else "reference",
                         )
                         selected = 50 <= digits <= 55 and memory in (
                             None,
@@ -63,8 +71,8 @@ class A1aDefaultTests(unittest.TestCase):
                 10**54 + 123,
                 "--method",
                 "siqs",
-                "--work-limit",
-                0,
+                "--seconds",
+                "0",
                 "--checkpoint",
                 path,
             )
@@ -74,7 +82,7 @@ class A1aDefaultTests(unittest.TestCase):
                 saved["siqs"]["collector"]["marking"], DEFAULT_SELECTED
             )
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(
@@ -88,8 +96,13 @@ class A1aDefaultTests(unittest.TestCase):
             default, collector=replace(default.collector, marking=EXTENSION)
         )
         self.assertEqual(default.collector.marking, DEFAULT_SELECTED)
-        config = PortfolioConfig(siqs=extended, memory_bytes=1040 * 2**20)
-        self.assertEqual(PortfolioConfig(**asdict(config)).siqs, extended)
+        config = PortfolioConfig(siqs=extended)
+        self.assertEqual(
+            adapt_resource_configuration(
+                PortfolioConfig, **asdict(config)
+            ).siqs,
+            extended,
+        )
 
         first = factorize_bounded(
             n, config=config, budget=Budget(work_limit=0)

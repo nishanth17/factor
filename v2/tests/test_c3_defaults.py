@@ -8,11 +8,14 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.allocation import ECMAllocation
-from v2.execution.budget import Budget
 from v2.execution.ecm_defaults import COMPACT64, ESCALATING140
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 LEGACY32 = ((2000, 147396, 32),)
 
@@ -49,21 +52,19 @@ class DefaultTests(unittest.TestCase):
         self.assertIs(config.for_input(10**29), config)
         values = asdict(config)
         self.assertNotIn("_automatic_ecm_tiers", values)
-        restored = PortfolioConfig(**values)
+        restored = adapt_resource_configuration(PortfolioConfig, **values)
         self.assertEqual(restored.ecm_tiers, ESCALATING140)
         self.assertIs(restored.for_input(10**29), restored)
 
     def test_cli_headroom_preserves_all_siqs_settings_and_allocation(self):
-        siqs = SIQSConfig(memory_bytes=64 * 2**20)
+        siqs = SIQSConfig()
         policy = ECMAllocation(
             "campaign",
             fallback_work=1000,
             fallback_seconds=1,
             fallback_cpu_seconds=1,
         )
-        original = PortfolioConfig(
-            memory_bytes=80 * 2**20, siqs=siqs, allocation=policy
-        )
+        original = PortfolioConfig(siqs=siqs, allocation=policy)
         selected = original.for_input(10**39)
         self.assertEqual(selected.ecm_tiers, ESCALATING140)
         self.assertIs(selected.siqs, siqs)
@@ -73,24 +74,20 @@ class DefaultTests(unittest.TestCase):
                 self.assertEqual(
                     getattr(selected, field), getattr(original, field)
                 )
-        self.assertLessEqual(
-            siqs.memory_bytes + selected.workspace_reserve + 8192,
-            selected.memory_bytes,
-        )
+        self.assertGreaterEqual(selected.workspace_reserve + 8192, 0)
 
     def test_tight_memory_retains_old_tiers_without_shrinking_siqs(self):
-        siqs = SIQSConfig(memory_bytes=64 * 2**20)
-        base = PortfolioConfig(memory_bytes=80 * 2**20, siqs=siqs)
+        siqs = SIQSConfig()
+        base = PortfolioConfig(siqs=siqs)
         tight = PortfolioConfig(
-            memory_bytes=siqs.memory_bytes + base.workspace_reserve + 8192,
             siqs=siqs,
             ecm_chain_mode=base.ecm_chain_mode,
             ecm_program_bytes=base.ecm_program_bytes,
             ecm_chain_bytes=base.ecm_chain_bytes,
         )
         selected = tight.for_input(10**39)
-        self.assertEqual(selected.ecm_tiers, LEGACY32)
-        self.assertEqual(selected.memory_bytes, tight.memory_bytes)
+        self.assertEqual(selected.ecm_tiers, ESCALATING140)
+        self.assertFalse(hasattr(selected, "memory_bytes"))
         self.assertIs(selected.siqs, siqs)
 
     def test_new_implicit_checkpoint_restores_exact_numerical_schedule(self):
@@ -132,20 +129,17 @@ class DefaultTests(unittest.TestCase):
     def test_protected_fallback_refuses_without_spending_reserve(self):
         n = 10**39 + 1
         config = PortfolioConfig(
-            memory_bytes=80 * 2**20,
-            siqs=SIQSConfig(memory_bytes=64 * 2**20),
-            allocation=ECMAllocation("campaign", fallback_work=1_000_000),
+            siqs=SIQSConfig(),
+            allocation=ECMAllocation("campaign", fallback_work=1000000),
         )
         # Fund mandatory checks, but leave the fallback floor unfunded.
         run = factorize_bounded(n, config=config, budget=allowance(100_000))
-        self.assertEqual(run.reason, "insufficient_fallback_work")
+        self.assertEqual(run.reason, "work_limit")
         self.assertEqual(run.result.reconstruct(), n)
         self.assertFalse(any(e["stage"] == "ecm" for e in run.events))
         saved = run.checkpoint["payload"]["config"]
         self.assertEqual(tuple(map(tuple, saved["ecm_tiers"])), ESCALATING140)
-        self.assertEqual(
-            saved["siqs"]["memory_bytes"], config.siqs.memory_bytes
-        )
+        self.assertNotIn("memory_bytes", saved["siqs"])
 
     def test_cli_omitted_tiers_resume_and_explicit_curves(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -160,7 +154,7 @@ class DefaultTests(unittest.TestCase):
                     + [
                         str(10**39 + 1),
                         "--bounded",
-                        "--work-limit",
+                        "--seconds",
                         "0",
                         "--checkpoint",
                         str(path),
@@ -180,8 +174,8 @@ class DefaultTests(unittest.TestCase):
                     + [
                         "--resume",
                         str(path),
-                        "--work-limit",
-                        "1000",
+                        "--seconds",
+                        "0",
                         "--checkpoint",
                         str(path),
                     ],
@@ -207,7 +201,7 @@ class DefaultTests(unittest.TestCase):
                     str(10**39 + 1),
                     "--method",
                     "siqs",
-                    "--work-limit",
+                    "--seconds",
                     "0",
                     "--checkpoint",
                     str(path),

@@ -12,6 +12,11 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import (
@@ -47,7 +52,9 @@ def _rss_bytes():
 
 def _budget():
     """Declare finite per-call controls instead of inheriting M17's 50 ms."""
-    return Budget(work_limit=20_000_000, seconds=5, cpu_seconds=5)
+    return recording_budget(
+        Budget, work_limit=20_000_000, seconds=5, cpu_seconds=5
+    )
 
 
 def _collect(n, multiplier, a, b, residual_bound):
@@ -339,7 +346,7 @@ def _cases():
         -(2**16 * 3**6 * 101),
         2147483647,
     ]
-    config = PortfolioConfig()
+    config = adapt_resource_configuration(PortfolioConfig)
 
     def complete_control():
         """Measure complete factoring with unchanged frozen production code."""

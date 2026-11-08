@@ -1,6 +1,8 @@
 """Bounded filtering challengers, including conversion and exact lifting."""
 
-from dataclasses import replace
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 
 def live_compaction(matrix, budget, memory_bytes):

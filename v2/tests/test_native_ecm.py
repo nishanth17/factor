@@ -12,6 +12,7 @@ from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import RecordingBudget
 from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     matches,
@@ -27,11 +28,12 @@ from v2.ecm.native_packet import (
     NativePacket,
     source_identity,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_worker_state import ActionBudget, ProspectiveActionBudget
 from v2.execution.ecm_workers import arithmetic_options
 from v2.execution.portfolio_config import close_execution_context
+from v2.execution.resources import RemovedResourceLimitError
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.execution.worker_contract import (
     Manifest,
@@ -43,7 +45,9 @@ from v2.portfolio import PortfolioConfig, _execution_context, factorize_bounded
 
 
 def allowance(work=10**8, **changes):
-    return Budget(work_limit=work, seconds=10, cpu_seconds=10, **changes)
+    return RecordingBudget(
+        work_limit=work, seconds=10, cpu_seconds=10, **changes
+    )
 
 
 def config(**changes):
@@ -56,7 +60,6 @@ def config(**changes):
             ecm_tiers=((20, 200, 2),),
             segment_size=16,
             max_input_bits=512,
-            memory_bytes=32 * 2**20,
         ),
         **changes,
     )
@@ -83,15 +86,14 @@ class OptionalPacketTests(unittest.TestCase):
             self.assertEqual(native.ecm_tiers, python.ecm_tiers)
             self.assertEqual(native.ecm_chain_mode, python.ecm_chain_mode)
             self.assertEqual(native.siqs, python.siqs)
-            if python.siqs is not None:
-                self.assertEqual(
-                    native.memory_bytes, python.memory_bytes + RESERVE
-                )
+            self.assertEqual(
+                native.workspace_reserve, python.workspace_reserve + RESERVE
+            )
 
-    def test_memory_and_configuration_refuse_before_loading(self):
-        with self.assertRaises(MemoryError):
+    def test_retired_memory_caps_rejected_before_loading(self):
+        with self.assertRaises(RemovedResourceLimitError):
             NativePacket(memory_bytes=RESERVE - 1)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(RemovedResourceLimitError):
             config(memory_bytes=2**20, ecm_kernel="c-gmp")
         with self.assertRaises(ValueError):
             config(ecm_kernel="unknown")
@@ -334,7 +336,6 @@ class CompiledPacketTests(unittest.TestCase):
     def test_foreign_boundaries_force_amortized_worker_budget_polling(self):
         for budget_type in (ActionBudget, ProspectiveActionBudget):
             budget = budget_type(
-                work_limit=10**8,
                 seconds=10,
                 cpu_seconds=10,
                 poll_every=64,

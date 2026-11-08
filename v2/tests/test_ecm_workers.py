@@ -15,7 +15,6 @@ from v2.benchmarks.support.prac_oracle import (
     twist_point,
 )
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
 from v2.execution.stage_jobs import advance_job, new_job
@@ -26,6 +25,7 @@ from v2.execution.worker_contract import (
     WorkerSettings,
 )
 from v2.portfolio import PortfolioConfig, _execution_context, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_programs import primes_between
 
 
@@ -45,7 +45,6 @@ def configuration(**changes):
             ecm_tiers=((20, 200, 4),),
             segment_size=16,
             max_input_bits=512,
-            memory_bytes=16 * 2**20,
         ),
         **changes,
     )
@@ -262,14 +261,9 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
 
     channel.settimeout(0.01)
     channel.sendall(
-        frame(
-            dict(
-                kind="ready", cpu=time.process_time(), rss=1, work=startup_work
-            ),
-            frame_bytes,
-        )
+        frame(dict(kind="ready", cpu=time.process_time(), rss=1, work=0))
     )
-    decoder = Decoder(frame_bytes)
+    decoder = Decoder()
     deadline = time.monotonic() + 3
     job = None
     while job is None and time.monotonic() < deadline:
@@ -300,38 +294,34 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
                     reason="complete",
                     factor=5,
                     sigma=job["assignment"]["sigma"],
-                ),
-                frame_bytes,
+                )
             )
         )
     os._exit(17)
 
 
-def crash_before_report(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def crash_before_report(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "crash")
 
 
-def publish_then_crash(channel, frame_bytes, startup_work, settings_data=None):
+def publish_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "ack")
 
 
-def truncate_then_crash(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def truncate_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "truncated")
 
 
-def oversize_then_crash(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def oversize_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "oversized")
 
 
-def exit_during_startup(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def exit_during_startup(channel, settings_data=None):
+    _frame_bytes, _startup_work = 16384, 0
     os._exit(23)
 
 
@@ -344,6 +334,7 @@ class StartupOwnershipTests(unittest.TestCase):
                 workers=workers, startup_seconds=startup_seconds
             )
         )
+        executor._budget = executor._active_owner = allowance()
         events, processes = [], []
 
         def process_factory(**options):
@@ -361,7 +352,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
     def test_launches_overlap_and_ready_reports_can_arrive_out_of_order(self):
         executor, context, started, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         reads = []
 
         def read(slot):
@@ -386,10 +377,8 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertEqual(reads, [0, 1, 2, 3, 0])
         self.assertFalse(ledger.active)
-        self.assertEqual(ledger.work, 5_000_000)
-        self.assertEqual(
-            ledger.cpu, 14 + 4 * (0.125 + executor.settings.shutdown_cpu)
-        )
+        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(ledger.cpu, 4 * 0.125)
         self.assertEqual(
             [s["reported_cpu"] for s in executor.slots], [0.125] * 4
         )
@@ -399,7 +388,7 @@ class StartupOwnershipTests(unittest.TestCase):
         executor, context, _, _ = self.prepare()
         context.Process.side_effect = OSError("injected construction failure")
         parent, child = Mock(), Mock()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         with (
             patch(
                 "v2.execution.ecm_workers.multiprocessing.get_context",
@@ -420,7 +409,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
     def test_bad_ready_keeps_every_unreported_startup_lease(self):
         executor, context, _, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         with (
             patch(
                 "v2.execution.ecm_workers.multiprocessing.get_context",
@@ -437,17 +426,15 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 4)
-        self.assertEqual(
-            ledger.cpu, 14 + 4 * (10 + executor.settings.shutdown_cpu)
-        )
-        self.assertEqual(ledger.work, 5_000_000)
+        self.assertEqual(ledger.cpu, 0)
+        self.assertEqual(ledger.work, 0)
         executor.slots.clear()
 
     def test_one_ready_report_refunds_only_that_child_before_peer_failure(
         self,
     ):
         executor, context, _, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         messages = [
             dict(kind="ready", work=1_000_000, cpu=0.125, rss=1),
             dict(kind="result"),
@@ -468,17 +455,15 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 3)
-        self.assertEqual(
-            ledger.cpu, 14 + 0.125 + 30 + 4 * executor.settings.shutdown_cpu
-        )
-        self.assertEqual(ledger.work, 5_000_000)
+        self.assertEqual(ledger.cpu, 0.125)
+        self.assertEqual(ledger.work, 1_000_000)
         executor.slots.clear()
 
     def test_startup_deadline_is_not_reset_after_launching_other_workers(self):
         executor, context, _, processes = self.prepare(
             workers=2, startup_seconds=1
         )
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         clock = [0.0]
         factory = context.Process.side_effect
 
@@ -533,7 +518,7 @@ class ProcessFailureTests(unittest.TestCase):
         self.assertGreaterEqual(result.stats["lost_reports"], 4)
         self.assertGreaterEqual(
             result.stats["charged_child_cpu"],
-            4 * (settings.startup_seconds + settings.shutdown_cpu),
+            0,
         )
         self.assertEqual(
             {p.pid for p in multiprocessing.active_children()}, original

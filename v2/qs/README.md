@@ -12,7 +12,7 @@ Run from the repository root with a PyPy installation implementing Python 3.11:
 ```sh
 make -C v2 runtime
 pypy3 -m v2.factor 626100403 --method siqs --bounded --seed 7 \
-  --work-limit 2000000 --seconds 30 --cpu-seconds 30
+  --seconds 30 --cpu-seconds 30
 pypy3 -m v2.factor --help
 ```
 
@@ -37,7 +37,7 @@ n = 4001 * 5003
 job = SIQSJob(
     n, seed=7,
     config=SIQSConfig(base_bound=200, half_width=256),
-    budget=Budget(work_limit=200_000_000, seconds=30, cpu_seconds=30),
+    budget=Budget(seconds=30, cpu_seconds=30),
 )
 result = job.run()
 assert (result.divisor or 1) * result.cofactor == n
@@ -60,7 +60,7 @@ resource accounting and policy combinations are specific to this implementation.
 | Area | Techniques available |
 | --- | --- |
 | Polynomial setup | Exact factor-base roots and eligible-prime counts; parity-aware polynomial forms; coupled multiplier scoring and optional norm previews; streamed A assignments with reachable product windows and paired completion; CRT/Gray families and adjacent sign schedules. |
-| Root reuse | Bounded modular Gray-update tables, derivative-inverse reuse, cached prime-power plans and complete same-A higher-root transfers, with ordinary exact lifting for exceptional or unfunded cases. |
+| Root reuse | Bounded modular Gray-update tables, derivative-inverse reuse, cached prime-power plans and complete same-A higher-root transfers, with ordinary exact lifting for exceptional or capacity-limited cases. |
 | Sieving | Conservative integer/fixed-point scores, prime-power marking, periodic presieves, guaranteed two-adic initialization, density/unrolled kernels, fused score/hit updates and candidate scanning. Flat sparse queues use additive offsets; native-width hit words and epochs defer wide-mask construction to selected candidates. |
 | Recovery and admission | Separate reporting/product/endpoint bounds; exact impossible-domain rejection; bounded splitter portfolios, batch-GCD and known-endpoint hints, split memoization and candidate-only smooth-part recovery using product/remainder trees ([Bernstein, *How to Find Smooth Parts of Integers*, 2004](https://cr.yp.to/factorization/smoothparts-20040510.pdf)). Admissions reconstruct residuals and verify their declared types. |
 | Relation graphs | Single/double-large-prime matching ([Lenstra–Manasse, *Factoring with Two Large Primes*, 1994](https://doi.org/10.1090/S0025-5718-1994-1250773-9)), optional three-endpoint and opaque-residual policies, incidence elimination, shorter-cycle searches, congruence deduplication and checked equal-parity dependencies. Original atoms, repeated primes and square corrections remain recoverable. |
@@ -87,7 +87,8 @@ identities; compatible extensions use `allow_extension=True` and retain consumed
 work and traversal progress. `QSJob` supports in-memory continuation; SSS has
 its own checked serializer.
 
-Work, time and owned storage remain finite. Derived root tables, presieves,
+Work is diagnostic. Root wall/CPU are optional; sampled RSS defaults to 80%
+of physical memory. Internal stores grow under that root guard. Derived root tables, presieves,
 queues and hit helpers rebuild with charges and exact fallbacks. A refusal
 before publication is resumable. `RelationPublicationError` invalidates the
 live store; restore its previous completed checkpoint. Explicit cold-record

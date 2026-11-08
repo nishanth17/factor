@@ -2,13 +2,17 @@
 
 import json
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs import allowance
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,7 +47,7 @@ class PacingDefaultTests(unittest.TestCase):
                 selected["collector"]["marking"] = "sparse"
                 self.assertEqual(
                     selected,
-                    control[str(digits)][arm],
+                    asdict(control[str(digits)][arm]),
                 )
             self.assertEqual(
                 PortfolioConfig().for_input(number).siqs,
@@ -54,7 +58,13 @@ class PacingDefaultTests(unittest.TestCase):
         number = 10**49 + 123
         for memory in (128 * 2**20, C9_MEMORY_BYTES - 1, C9_MEMORY_BYTES + 1):
             self.assertEqual(
-                default_siqs_config(number, memory_bytes=memory).solve_policy,
+                adapt_resource_configuration(
+                    default_siqs_config,
+                    number,
+                    recipe="calibrated"
+                    if memory in (None, 2**30)
+                    else "reference",
+                ).solve_policy,
                 "window",
             )
         for other in (10**29, 10**40, 10**49 - 1, 10**60):
@@ -85,7 +95,7 @@ class PacingDefaultTests(unittest.TestCase):
         restored = SIQSJob.from_checkpoint(checkpoint, budget=allowance())
         self.assertEqual(restored.config, legacy)
 
-        config = PortfolioConfig(siqs=legacy, memory_bytes=1040 * 2**20)
+        config = PortfolioConfig(siqs=legacy)
         first = factorize_bounded(number, config=config, budget=allowance(0))
         saved = first.checkpoint["payload"]["config"]
         self.assertNotIn("solve_policy", saved["siqs"])

@@ -8,6 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from ..common.arithmetic import BackendUnavailableError
+from ..execution.resources import removed_arguments
 from .chain_records import verify_frontier
 
 ABI = 1
@@ -21,7 +22,9 @@ _OPENMP_BINDINGS = []
 
 def poll_budget(budget):
     """Force a real poll on B12 budgets and preserve policy-wrapper checks."""
-    method = getattr(budget, "poll", None)
+    method = getattr(budget, "publication", None)
+    if method is None:
+        method = getattr(budget, "poll", None)
     if getattr(method, "__self__", None) is budget:
         method()
     else:
@@ -66,6 +69,7 @@ def _bytes(value):
     return value.to_bytes(max(1, (value.bit_length() + 7) // 8), "big")
 
 
+@removed_arguments(("memory_bytes",))
 class NativePacket:
     """One non-reentrant adapter per context; no threads or callbacks.
 
@@ -80,15 +84,12 @@ class NativePacket:
         self,
         *,
         mode="c-gmp",
-        memory_bytes=RESERVE,
         _variant="scalar",
         _binding=None,
         _programs=None,
     ):
         if mode not in ("c-gmp", "auto"):
             raise ValueError("invalid native packet mode")
-        if type(memory_bytes) is not int or memory_bytes < RESERVE:
-            raise MemoryError("native packet reserve refused")
         self.mode = mode
         self.ffi = self.lib = self.context = None
         self.variant = _variant

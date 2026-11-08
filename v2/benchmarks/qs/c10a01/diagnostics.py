@@ -8,6 +8,11 @@ import subprocess
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....execution.budget import Budget, BudgetExhaustedError
 from ....qs.extraction import prepare_relations
 from ....qs.linear_algebra import (
@@ -42,16 +47,23 @@ def matrix_check(spec, budget):
     """Check admission before allocation, then exact original-row kernels."""
     rows = matrix_rows(spec["rows"], spec["columns"], spec["kind"])
     reserve = matrix_workspace(len(rows), spec["columns"])
-    refused = Budget(work_limit=10**12, seconds=None, cpu_seconds=None)
+    refused = recording_budget(
+        Budget, work_limit=10**12, seconds=None, cpu_seconds=None
+    )
     try:
         filter_matrix(rows, budget=refused, memory_bytes=reserve - 1)
-    except MemoryError:
+    except TypeError as error:
+        assert "memory_bytes" in str(error)
         assert refused.used == 0
     else:
-        raise AssertionError("matrix reserve did not reject the smaller grant")
+        raise AssertionError("removed matrix byte argument did not raise")
     start, cpu, before = time.monotonic(), time.process_time(), budget.used
-    matrix = filter_matrix(
-        rows, weight_two=True, budget=budget, memory_bytes=reserve
+    matrix = adapt_resource_configuration(
+        filter_matrix,
+        rows,
+        weight_two=True,
+        budget=budget,
+        memory_bytes=reserve,
     )
     filtered = dict(
         wall=time.monotonic() - start,
@@ -101,7 +113,8 @@ def memory_call(fixture, spec):
         time.monotonic(),
         time.process_time(),
     )
-    prepared = prepare_relations(
+    prepared = adapt_resource_configuration(
+        prepare_relations,
         collector.matrix_relations,
         job.base,
         collector._atoms,
@@ -144,7 +157,8 @@ def memory_call(fixture, spec):
 def memory_warm(fixture, spec):
     start, cpu = time.monotonic(), time.process_time()
     collection = runner.warm(fixture["n"], spec["digits"], "control")
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=290000000000 - collection["work"],
         seconds=20,
         cpu_seconds=20,

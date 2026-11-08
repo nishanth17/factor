@@ -8,13 +8,15 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import RecordingBudget
 from v2.ecm import core
 from v2.ecm.native_packet import SOURCE
-from v2.ecm.native_team import RESERVE, TEAM_OVERHEAD, NativeTeam
+from v2.ecm.native_team import TEAM_OVERHEAD, NativeTeam
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.ecm_native import NativeECMExecutor
 from v2.execution.ecm_workers import ECMExecutor
 from v2.execution.portfolio_config import PortfolioConfig
+from v2.execution.resources import RemovedResourceLimitError
 from v2.execution.worker_contract import WorkerSettings
 
 ENV = dict(
@@ -29,7 +31,7 @@ ENV = dict(
 
 
 def budget(**kwargs):
-    return Budget(
+    return RecordingBudget(
         **dict(dict(work_limit=10**8, seconds=8, cpu_seconds=16), **kwargs)
     )
 
@@ -39,20 +41,11 @@ def team(workers=2, schedule="dynamic", capacity=8):
         workers=workers,
         schedule=schedule,
         capacity=capacity,
-        memory_bytes=TEAM_OVERHEAD + capacity * RESERVE,
     )
 
 
 def settings(workers=2):
-    return WorkerSettings(
-        workers=workers,
-        worker_memory=16 * 2**20,
-        parent_memory=32 * 2**20,
-        memory_bytes=512 * 2**20,
-        checkpoint_bytes=2**20,
-        assignment_cpu=16,
-        assignment_work=10**9,
-    )
+    return WorkerSettings(workers=workers)
 
 
 def config(kernel="c-gmp"):
@@ -61,14 +54,13 @@ def config(kernel="c-gmp"):
         ecm_kernel=kernel,
         siqs=None,
         segment_size=16,
-        memory_bytes=16 * 2**20,
         max_input_bits=512,
     )
 
 
 class NativeTeamAdmissionTests(unittest.TestCase):
-    def test_memory_and_configuration_refuse_before_loading(self):
-        with self.assertRaises(MemoryError):
+    def test_retired_memory_and_invalid_configuration_refuse(self):
+        with self.assertRaises(RemovedResourceLimitError):
             NativeTeam(memory_bytes=TEAM_OVERHEAD)
         for options in (
             dict(workers=3),
@@ -76,8 +68,8 @@ class NativeTeamAdmissionTests(unittest.TestCase):
             dict(capacity=33),
         ):
             with self.assertRaises(ValueError):
-                NativeTeam(memory_bytes=2**30, **options)
-        with self.assertRaises(MemoryError):
+                NativeTeam(**options)
+        with self.assertRaises(RemovedResourceLimitError):
             NativeECMExecutor(
                 settings=replace(settings(), memory_bytes=100 * 2**20),
                 capacity=8,
@@ -101,6 +93,45 @@ class NativeTeamAdmissionTests(unittest.TestCase):
             self.assertIsNone(owner.team)
         finally:
             owner.close()
+
+
+class NativeObservedResourceTests(unittest.TestCase):
+    def test_unlimited_root_and_saved_history_without_loading_native(self):
+        selected = replace(config(), ecm_tiers=((11, 47, 0),))
+        owner = NativeECMExecutor(settings=settings())
+        self.addCleanup(owner.close)
+        first_budget = Budget(rss_bytes=None)
+        first = owner.run(1013, config=selected, budget=first_budget)
+        self.assertEqual(first.reason, "curves_exhausted")
+        self.assertIsNone(owner.team)
+        restored = Budget(rss_bytes=None)
+        second = owner.run(
+            1013, config=selected, budget=restored, checkpoint=first.checkpoint
+        )
+        self.assertEqual(second.reason, "curves_exhausted")
+        saved = first.checkpoint["payload"]["budget"]
+        self.assertGreaterEqual(restored.used, saved["work"])
+        self.assertGreaterEqual(restored.prior_wall, saved["wall"])
+        self.assertGreaterEqual(restored.prior_cpu, saved["cpu"])
+        self.assertEqual(second.checkpoint["payload"]["runs"], 2)
+
+    def test_root_stop_is_structured_and_precedes_native_loading(self):
+        owner = NativeECMExecutor(settings=settings())
+        self.addCleanup(owner.close)
+        run = owner.run(1013, config=config(), budget=Budget(seconds=0))
+        self.assertEqual(run.reason, "wall_limit")
+        self.assertEqual(run.resource_stop["limit"], "wall")
+        self.assertIsNone(owner.team)
+
+    def test_historical_native_checkpoint_requires_new_resource_identity(self):
+        selected = replace(config(), ecm_tiers=((11, 47, 0),))
+        owner = NativeECMExecutor(settings=settings())
+        self.addCleanup(owner.close)
+        run = owner.run(1013, config=selected, budget=Budget(rss_bytes=None))
+        old = copy.deepcopy(run.checkpoint)
+        old.pop("resource_version")
+        with self.assertRaises(ValueError):
+            owner.run(1013, config=selected, budget=Budget(), checkpoint=old)
 
 
 @unittest.skipUnless(

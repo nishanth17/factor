@@ -7,11 +7,14 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.execution.budget import Budget
 from v2.factor import main
+from v2.qs.sieve_collector import SieveCollector
+from v2.qs.siqs import SIQSJob
 
 ROOT = Path(__file__).resolve().parents[2]
 NUMBER = 100003 * 100019
@@ -168,14 +171,39 @@ class SIQSCLITests(unittest.TestCase):
                     7,
                 ]
 
-                first = cli(
-                    NUMBER,
-                    *selection,
-                    "--work-limit",
-                    130000,
+                owner = Budget()
+                run = SIQSJob.run
+                active = []
+
+                def observe_active(job, **options):
+                    self.assertIs(job.budget, owner)
+                    active.append((job.n, job.seed, job.config))
+                    return run(job, **options)
+
+                collect = SieveCollector._collect_progress
+
+                def pause_active(collector, *args, **options):
+                    owner.cancelled = lambda: True
+                    return collect(collector, *args, **options)
+
+                output, errors = io.StringIO(), io.StringIO()
+                arguments = [
+                    "factor",
+                    str(NUMBER),
+                    *map(str, selection),
                     "--checkpoint",
-                    path,
-                )
+                    str(path),
+                ]
+                with (
+                    patch.object(sys, "argv", arguments),
+                    patch.object(SIQSJob, "run", observe_active),
+                    patch.object(
+                        SieveCollector, "_collect_progress", pause_active
+                    ),
+                    redirect_stdout(output),
+                    redirect_stderr(errors),
+                ):
+                    first_code = main(budget=owner)
                 checkpoint = json.loads(path.read_text())
                 mismatched = cli(
                     "--method",
@@ -190,11 +218,32 @@ class SIQSCLITests(unittest.TestCase):
                 )
                 restored = json.loads(path.read_text())
 
-                self.assertEqual(first.returncode, 1, first.stderr)
-                self.assertIn("unresolved", first.stdout)
-                self.assertEqual(
-                    checkpoint["payload"]["state"]["current"]["stage"], "siqs"
+                self.assertEqual(first_code, 1, errors.getvalue())
+                self.assertIn("unresolved", output.getvalue())
+                self.assertEqual(len(active), 1)
+                current = checkpoint["payload"]["state"]["current"]
+                self.assertEqual(current["stage"], "siqs")
+                child = json.loads(current["siqs_checkpoint"]["blob"])
+                self.assertEqual((child["n"], child["seed"]), active[0][:2])
+                self.assertEqual(child["seed"], current["siqs_seed"])
+                self.assertEqual(child["config"]["mode"], mode)
+                self.assertTrue(child["active"])
+                self.assertIsNotNone(child["base_identity"])
+                rebuilt = SIQSJob.from_checkpoint(
+                    current["siqs_checkpoint"], budget=Budget()
                 )
+                saved_again = json.loads(rebuilt.checkpoint()["blob"])
+                for field in (
+                    "n",
+                    "seed",
+                    "config",
+                    "base_identity",
+                    "assignment_identity",
+                    "family_index",
+                    "coefficient_cursor",
+                    "pending",
+                ):
+                    self.assertEqual(saved_again[field], child[field])
                 self.assertEqual(
                     checkpoint["payload"]["config"]["siqs"]["mode"], mode
                 )
@@ -283,8 +332,8 @@ class SIQSCLITests(unittest.TestCase):
                 50000000,
                 "--qs-dlp-split-call-limit",
                 64,
-                "--work-limit",
-                0,
+                "--seconds",
+                "0",
             )
             first = cli(NUMBER, *options, "--checkpoint", path)
 
@@ -308,8 +357,8 @@ class SIQSCLITests(unittest.TestCase):
             run = cli(
                 NUMBER,
                 "--bounded",
-                "--work-limit",
-                0,
+                "--seconds",
+                "0",
                 "--checkpoint",
                 path,
             )
@@ -318,7 +367,7 @@ class SIQSCLITests(unittest.TestCase):
             self.assertEqual(run.returncode, 1, run.stderr)
             self.assertIsNone(config["siqs"])
             self.assertIsNone(config["sss"])
-            self.assertEqual(config["memory_bytes"], 16 * 1024 * 1024)
+            self.assertNotIn("memory_bytes", config)
             self.assertEqual(config["ecm_chain_mode"], "reuse")
             self.assertEqual(config["ecm_tiers"], [[2000, 147396, 32]])
 

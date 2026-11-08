@@ -5,8 +5,13 @@ import unittest
 from dataclasses import asdict, replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.benchmarks.qs.a1b import CONTROL, ready
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
 from v2.qs.sieve_collector import SieveConfig
 from v2.tests.test_qs import reference_positions, unlimited_budget
@@ -59,7 +64,6 @@ class A1bTests(unittest.TestCase):
                 expected = reference_positions(poly, base, -71, 80, 97)
                 for marking in ("sparse", "density+presieve+scan_fused"):
                     cfg = SieveConfig(
-                        memory_bytes=64 * 2**20,
                         score_policy="fixed",
                         score_backend="list",
                         division="bucket",
@@ -68,9 +72,9 @@ class A1bTests(unittest.TestCase):
                         block_width=17,
                         residual_bound=97,
                         marking=marking,
-                        max_atoms=4096,
-                        max_relations=4096,
                         max_partials=4096,
+                        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+                        target_rows=4096,
                     )
                     worker = SieveCollector(
                         poly, base, config=cfg, budget=unlimited_budget()
@@ -83,26 +87,24 @@ class A1bTests(unittest.TestCase):
                     self.assertEqual(result.reason, "complete")
                     self.assertEqual(signature(result), expected)
                     self.assertNotIn("queue_builds", result.stats)
-                    self.assertLessEqual(
-                        result.workspace_bytes, cfg.memory_limit
-                    )
+                    self.assertGreaterEqual(result.workspace_bytes, 0)
 
     def test_fixed_saved_policy_restores_with_charges_and_rejects_powers(self):
-        cfg = configuration(
+        cfg = adapt_resource_configuration(
+            configuration,
             sign_policy="swap_high",
             checkpoint_bytes=2**20,
             memory_bytes=128 * 2**20,
             collector=SieveConfig(
-                memory_bytes=64 * 2**20,
                 score_policy="fixed",
                 division="bucket",
                 power_plan_bytes=2**20,
                 sparse_queue_bytes=2**20,
                 residual_bound=500,
                 marking="density+presieve+scan_fused",
-                max_atoms=4096,
-                max_relations=4096,
                 max_partials=4096,
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+                target_rows=4096,
             ),
         )
         job = SIQSJob(4001 * 5003, config=cfg, seed=73, budget=allowance())

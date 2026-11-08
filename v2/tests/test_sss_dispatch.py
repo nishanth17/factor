@@ -12,10 +12,10 @@ from itertools import product
 from pathlib import Path
 
 from v2.common import utils
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
 from v2.qs.sss import SSSConfig, SSSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,7 +30,6 @@ def configuration(mode="sss"):
         rho_attempts=0,
         pm1_attempts=0,
         ecm_tiers=(),
-        memory_bytes=80 * 1024 * 1024,
         sss=SSSConfig(mode=mode, base_bound=400),
     )
 
@@ -72,7 +71,7 @@ class SSSDispatchTests(unittest.TestCase):
             self.assertEqual(run.result.remaining, (4001 * 4003,))
 
         self.assertIsNone(PortfolioConfig().sss)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             replace(configuration(), memory_bytes=64 * 1024 * 1024)
         with self.assertRaises(ValueError):
             replace(configuration(), siqs=SIQSConfig())
@@ -176,15 +175,14 @@ class SSSDispatchTests(unittest.TestCase):
 
         small = SSSJob(
             4001 * 5003,
-            config=SSSConfig(base_bound=400, checkpoint_bytes=4096),
+            config=SSSConfig(base_bound=400),
             budget=allowance(),
         )
         small.run(batch_limit=1)
-        with self.assertRaises(MemoryError):
-            small.checkpoint()
+        self.assertGreater(len(small.checkpoint()["blob"]), 0)
 
         self.assertIsNotNone(small.run().divisor)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SSSJob(4001 * 5003, config=SSSConfig(memory_bytes=1)).checkpoint()
 
     def test_version_three_checkpoint_without_sss_remains_readable(self):
@@ -231,8 +229,7 @@ class SSSDispatchTests(unittest.TestCase):
                 path = Path(directory) / "progress.json"
 
                 first = subprocess.run(
-                    command
-                    + ["--work-limit", "100000", "--checkpoint", str(path)],
+                    command + ["--seconds", "0", "--checkpoint", str(path)],
                     cwd=ROOT,
                     capture_output=True,
                     text=True,

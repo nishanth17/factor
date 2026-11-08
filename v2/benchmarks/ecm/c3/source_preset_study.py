@@ -6,9 +6,12 @@ import os
 import time
 from collections import defaultdict
 from contextlib import contextmanager
-from dataclasses import asdict
 from statistics import mean
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....execution.ecm_presets import with_ecm_preset
 from ..p52.p52_realistic import check_quiet

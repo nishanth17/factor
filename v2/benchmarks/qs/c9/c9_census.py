@@ -8,6 +8,11 @@ from collections import Counter
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....execution.budget import Budget
 from ....qs.large_primes import LargePrimeForest
 from ..b1.b1_calibration import save
@@ -74,7 +79,8 @@ def replay(records, n, aligned, budget):
     # Reserve raw-record objects, two forest maps and replay union-find first.
     replay_reserve = 32768 + 4096 * len(forest.edges) + 512 * len(parents)
     available = 512 * 2**20 - retained_reserve - replay_reserve
-    report = compact_report(
+    report = adapt_resource_configuration(
+        compact_report,
         [records[i] for i in sorted(selected)],
         n,
         budget=budget,
@@ -122,8 +128,8 @@ def run(retained, output):
             last_poll = time.monotonic()
         return False
 
-    budget = Budget(
-        work_limit=10**13, seconds=120, cpu_seconds=120, cancelled=poll
+    budget = recording_budget(
+        Budget, work_limit=10**13, seconds=120, cpu_seconds=120, cancelled=poll
     )
     for index, fixture in enumerate(control["fixtures"]):
         path = retained / f"50-{index}-records.json"

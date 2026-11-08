@@ -8,10 +8,17 @@ import random
 import subprocess
 import time
 from collections import Counter
-from dataclasses import asdict
 from math import log1p, prod
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -262,7 +269,9 @@ class AnalysisBudget:
 
     def __init__(self, parent):
         self.parent = parent
-        self.local = Budget(work_limit=10**12, seconds=30, cpu_seconds=30)
+        self.local = recording_budget(
+            Budget, work_limit=10**12, seconds=30, cpu_seconds=30
+        )
 
     @property
     def used(self):
@@ -285,8 +294,8 @@ def compact_report(
     try:
         validate_records(records, n, budget)
         pairs = graph_pairs(records)
-        cycles, graph = fundamental_cycles(
-            pairs, budget, memory_bytes=memory_bytes
+        cycles, graph = adapt_resource_configuration(
+            fundamental_cycles, pairs, budget, memory_bytes=memory_bytes
         )
         base_labels = sorted({p for r in records for p, _ in r["exponents"]})
         columns = {p: i + 1 for i, p in enumerate(base_labels)}
@@ -311,7 +320,8 @@ def compact_report(
             assert check_cycle(pairs, mask)
             rows.append(xor_selected(parity, mask))
         rows = tuple(rows)
-        filtered = filter_matrix(
+        filtered = adapt_resource_configuration(
+            filter_matrix,
             rows,
             weight_two=True,
             budget=budget,
@@ -413,8 +423,8 @@ class FollowupAudit(ResidualAudit):
             )
         self.product_limit = 128 * config.base_bound**2
         self.inner_limit = 64 * config.base_bound**2
-        self.budget = Budget(
-            work_limit=10**13, seconds=seconds, cpu_seconds=seconds
+        self.budget = recording_budget(
+            Budget, work_limit=10**13, seconds=seconds, cpu_seconds=seconds
         )
         self.sampling_rng = random.Random(548128 + seed)
         self.next_sample = self.sample_gap()
@@ -614,7 +624,8 @@ def followup_probe(fixture, seed, config, seconds):
     # Preserve three analysis slots plus bounded retained-prefix refinement.
     # Otherwise a terminal collection timeout would censor already retained
     # evidence without ever examining its final useful-yield opportunity.
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=10**13,
         seconds=seconds - 120,
         cpu_seconds=seconds - 120,
@@ -682,7 +693,9 @@ class RefinementBudget:
 
     def __init__(self, parent):
         self.parent = parent
-        self.local = Budget(work_limit=10**11, seconds=30, cpu_seconds=30)
+        self.local = recording_budget(
+            Budget, work_limit=10**11, seconds=30, cpu_seconds=30
+        )
 
     def consume(self, amount=1):
         self.parent.consume(amount)
@@ -854,8 +867,8 @@ def main():
                     ).read_text()
                 )
                 records = json.loads(source_path(path).read_text())
-                cell_budget = Budget(
-                    work_limit=10**12, seconds=30, cpu_seconds=30
+                cell_budget = recording_budget(
+                    Budget, work_limit=10**12, seconds=30, cpu_seconds=30
                 )
                 results.append(
                     dict(

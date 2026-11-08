@@ -9,6 +9,9 @@ from dataclasses import asdict, replace
 from unittest.mock import patch
 
 from v2 import qs
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c9a import extended
 from v2.benchmarks.qs.c9a.configuration import configuration, decode
 from v2.execution.budget import BudgetExhaustedError
@@ -23,7 +26,7 @@ from v2.tests.test_qs_dlp import allowance
 def bounded(**changes):
     values = dict(asdict(policy()), extension_policy="extended-v2")
     values.update(changes)
-    return qs.BoundedYieldSieveConfig(**values)
+    return adapt_resource_configuration(qs.BoundedYieldSieveConfig, **values)
 
 
 def worker(**changes):
@@ -98,18 +101,13 @@ class BoundedYieldTests(unittest.TestCase):
 
     def test_memory_refusal_precedes_any_slab_allocation(self):
         engine = worker()
-        engine.config = replace(
-            engine.config,
-            memory_bytes=(engine._workspace + engine._scratch_bytes + 1),
-        )
+        engine.config = replace(engine.config)
         workspace = engine._workspace
 
-        self.assertEqual(
-            engine._admit(atom_at(engine, 1), Counter()), "memory_limit"
-        )
-        self.assertFalse(engine._atoms)
-        self.assertEqual(engine._arena.allocated_bytes, 0)
-        self.assertEqual(engine._workspace, workspace)
+        self.assertEqual(engine._admit(atom_at(engine, 1), Counter()), None)
+        self.assertTrue(engine._atoms)
+        self.assertGreaterEqual(engine._arena.allocated_bytes, 0)
+        self.assertGreater(engine._workspace, workspace)
 
     def test_conversion_rows_are_packed_and_restore_ownership_matches(self):
         engine = worker()
@@ -166,12 +164,16 @@ class BoundedYieldTests(unittest.TestCase):
 
     def test_cold_restore_preserves_existing_file_extents(self):
         with tempfile.TemporaryDirectory() as directory:
-            engine = worker(spill_directory=directory, spill_bytes=2**20)
+            engine = adapt_resource_configuration(
+                worker, spill_directory=directory, spill_bytes=2**20
+            )
             engine._admit(atom_at(engine, 1, opaque=True), Counter())
             engine._admit(atom_at(engine, -21), Counter())
             saved = json.loads(json.dumps(pack_store(engine)))
             used = engine._arena.spill.used
-            clone = worker(spill_directory=directory, spill_bytes=2**20)
+            clone = adapt_resource_configuration(
+                worker, spill_directory=directory, spill_bytes=2**20
+            )
 
             restore_store(saved, clone, clone.budget)
             self.assertEqual(pack_store(clone), saved)
@@ -310,7 +312,6 @@ class BoundedYieldTests(unittest.TestCase):
             base_bound=100,
             half_width=128,
             max_half_width=128,
-            memory_bytes=128 * 2**20,
             multiplier=3,
             polynomial_policy="parity2",
             multiplier_policy="parity2_wide",

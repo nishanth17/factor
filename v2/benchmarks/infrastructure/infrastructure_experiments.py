@@ -7,9 +7,19 @@ import resource
 import sys
 import time
 from array import array
-from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...common import prime_sieve, utils
 from ...ecm import core as ecm
@@ -29,7 +39,8 @@ from .sieves.sieve_candidates import integer_bitset, presieved, wheel_thirty
 def run(args):
     """Validate every warmed and timed output before recording samples."""
     measured_environment = environment()
-    config = PortfolioConfig(
+    config = adapt_resource_configuration(
+        PortfolioConfig,
         max_input_bits=512,
         pm1_b1=10,
         pm1_b2=200,
@@ -93,8 +104,8 @@ def run(args):
                 fixture["n"],
                 seed=seed,
                 config=candidate_config,
-                budget=Budget(
-                    work_limit=2_000_000, seconds=0.2, cpu_seconds=0.2
+                budget=recording_budget(
+                    Budget, work_limit=2_000_000, seconds=0.2, cpu_seconds=0.2
                 ),
             )
             for fixture in fixtures

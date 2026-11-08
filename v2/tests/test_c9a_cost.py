@@ -76,12 +76,11 @@ class CostRegressionTests(unittest.TestCase):
             "density+presieve+scan_fused+parity_two",
         ):
             incumbent = qs.SIQSConfig(
-                memory_bytes=2**30,
                 collector=qs.GrowingDoubleLargeSieveConfig(
                     marking=marking,
                     large_prime_bound=3000000,
                     large_product_bound=115200000000,
-                ),
+                )
             )
             plain = extended.configuration(
                 60,
@@ -324,10 +323,9 @@ class CostRegressionTests(unittest.TestCase):
         original = engine.config
         engine.config = SimpleNamespace(batch_size=64, memory_limit=0)
         with patch.object(engine, "_bounds", return_value=(1, 2**40)):
-            with self.assertRaises(MemoryError):
-                reserve_batch(engine, 0, 1)
-        self.assertEqual(engine._batch_bits, bits)
-        self.assertEqual(engine._batch_reserve, owned)
+            reserve_batch(engine, 0, 1)
+        self.assertGreater(engine._batch_bits, bits)
+        self.assertGreater(engine._batch_reserve, owned)
         engine.config = original
         with patch.object(engine, "_bounds", return_value=(1, 2**40)):
             reserve_batch(engine, 0, 1)

@@ -17,17 +17,22 @@ def main():
         raise RuntimeError("PyPy implementing Python 3.11 required")
     request = json.loads(args.request.read_text())
 
-    from ....execution.budget import Budget
     from ....execution.ecm_workers import ECMExecutor
     from ....execution.portfolio_config import PortfolioConfig
     from ....execution.worker_contract import WorkerSettings
     from ....portfolio import factorize_bounded
+    from ...infrastructure.resource_control import (
+        RecordingBudget as Budget,
+    )
+    from ...infrastructure.resource_control import (
+        adapt_resource_configuration,
+    )
     from .runner import ARMS
 
     kernel, workers = ARMS[request["arm"]]
     options = dict(request["config"], ecm_kernel=kernel)
     # Leaving ecm_tiers/siqs omitted preserves automatic root routing intent.
-    config = PortfolioConfig(**options)
+    config = adapt_resource_configuration(PortfolioConfig, **options)
     n = request["input"]["n"]
     executor = None
     settings = dict(
@@ -41,14 +46,14 @@ def main():
 
         executor = NativeECMExecutor(
             seed=request["seed"],
-            settings=WorkerSettings(**settings),
+            settings=adapt_resource_configuration(WorkerSettings, **settings),
             schedule=request.get("schedule", "dynamic"),
             capacity=request.get("capacity"),
         )
     elif workers:
         executor = ECMExecutor(
             seed=request["seed"],
-            settings=WorkerSettings(**settings),
+            settings=adapt_resource_configuration(WorkerSettings, **settings),
             force_workers=workers > 1,
         )
     used_work, warmup_calls, warmup_seconds, charged_children = 0, 0, 0, 0

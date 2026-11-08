@@ -6,11 +6,11 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
 from v2.qs import CountedSIQSConfig, Polynomial, SIQSJob, build_factor_base
 from v2.qs.collector_kernels import add_unrolled, combine, workspace
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
 from v2.qs.polynomial import polynomial_roots
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_a1a_density import config, worker
 from v2.tests.test_a1a_integration import SELECTED, scored
 from v2.tests.test_qs import reference_positions, unlimited_budget
@@ -275,18 +275,19 @@ class ExtendedKernelTests(unittest.TestCase):
         reserve = workspace(BOTH, 64, len(base.entries))
         selected = worker(poly, base, BOTH, block_width=64)
         self.assertEqual(selected._workspace, scalar._workspace + reserve)
-        with self.assertRaises(MemoryError):
-            worker(
-                poly,
-                base,
-                BOTH,
-                block_width=64,
-                # Optional reuse caches may decline their allocation. Test
-                # the required presieve floor independently of those caches.
-                memory_bytes=(
-                    scalar._workspace - scalar._reuse_workspace + reserve - 1
-                ),
-            )
+        uncapped = worker(
+            poly,
+            base,
+            BOTH,
+            block_width=64,
+            # Optional reuse caches may decline their allocation. Test
+            # the required presieve floor independently of those caches.
+            memory_bytes=(
+                scalar._workspace - scalar._reuse_workspace + reserve - 1
+            ),
+        )
+
+        self.assertEqual(uncapped._workspace, selected._workspace)
         with self.assertRaises(ValueError):
             config(marking="presieve+presieve_powers")
         with self.assertRaises(ValueError):
@@ -302,7 +303,6 @@ class ExtendedResumeTests(unittest.TestCase):
                 base_count=30,
                 base_bound=500,
                 factor_count=3,
-                memory_bytes=64 * 2**20,
                 batch_width=1,
                 collector=config(marking=arm, power_plan_bytes=2**20),
             )

@@ -12,9 +12,12 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from dataclasses import asdict
 from functools import lru_cache
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .... import constants
 from ....common import prime_sieve, utils

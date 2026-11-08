@@ -19,6 +19,7 @@ from ..ecm.native_team import (
 from .budget import BudgetExhaustedError
 from .ecm_worker import CurveEngine
 from .ecm_workers import WorkerRun, _base_budget, arithmetic_options
+from .resources import RESOURCE_VERSION, require_resource_version
 from .worker_contract import (
     Manifest,
     WorkerSettings,
@@ -28,7 +29,7 @@ from .worker_contract import (
     integer,
 )
 
-VERSION = "b4a-openmp-owner-v1"
+VERSION = "b4a-openmp-owner-h3-v2"
 
 
 class _BudgetView:
@@ -49,7 +50,7 @@ class NativeECMExecutor:
 
     Stable B12 assignments are evaluated in tier order, at most capacity curves
     live at once. Setup, strict recovery and classical stage two run in the
-    Python owner. Only funded stage-one packets enter OpenMP. Pauses drain C,
+    Python owner. Only prepared stage-one packets enter OpenMP. Pauses drain C,
     retain completed curves and charges, and restart unfinished curve IDs on
     resume; partial native/curve state is deliberately never serialized.
     """
@@ -75,24 +76,12 @@ class NativeECMExecutor:
             32,
         )
         self.schedule = schedule
-        # Reserve simultaneous Python jobs, metadata, transport, OpenMP stacks
-        # and parent ownership before any native allocation or worker launch.
+        # Diagnostic retained-capacity estimate; the root observes actual RSS.
         self.owned_bytes = (
-            self.settings.parent_memory
+            self.settings.owned_bytes
             + TEAM_OVERHEAD
-            + self.capacity * (self.settings.worker_memory + 2 * 2**20)
-            + self.settings.metadata_slots
-            * (
-                self.settings.worker_memory
-                + self.settings.decoded_cache_bytes
-                + self.settings.packed_cache_bytes
-                + self.settings.stage_two_cache_bytes
-                + 4096 * self.settings.bind_context
-            )
-            + 3 * self.settings.checkpoint_bytes
+            + self.capacity * 2 * 2**20
         )
-        if self.owned_bytes > self.settings.memory_bytes:
-            raise MemoryError("simultaneous native-team ownership refused")
         self.engine = CurveEngine(self.settings)
         self.team = None
         self.lock = threading.Lock()
@@ -127,7 +116,6 @@ class NativeECMExecutor:
                 workers=self.settings.workers,
                 schedule=self.schedule,
                 capacity=self.capacity,
-                memory_bytes=TEAM_OVERHEAD + self.capacity * 2 * 2**20,
             )
         return self.team
 
@@ -174,11 +162,9 @@ class NativeECMExecutor:
             self.lock.release()
 
     def _restore(self, checkpoint, manifest, base, fixed_work):
-        if (
-            not isinstance(checkpoint, dict)
-            or len(canonical(checkpoint)) > self.settings.checkpoint_bytes
-        ):
-            raise ValueError("oversized native checkpoint")
+        if not isinstance(checkpoint, dict):
+            raise ValueError("invalid native checkpoint")
+        require_resource_version(checkpoint)
         payload = checkpoint["payload"]
         overhead = checkpoint["serialization_overhead"]
         if checkpoint["sha256"] != digest(payload) or checkpoint[
@@ -241,7 +227,7 @@ class NativeECMExecutor:
                 result["factor"], manifest.n
             ):
                 raise ValueError("invalid native checkpoint divisor")
-        integer(payload["runs"], "native runs", 1, self.settings.max_runs)
+        integer(payload["runs"], "native runs", 1)
         saved = dict(payload["budget"])
         if set(saved) != {"work", "wall", "cpu"}:
             raise ValueError("invalid native resource record")
@@ -250,21 +236,9 @@ class NativeECMExecutor:
             saved[name] = finite(saved[name], "saved " + name) + finite(
                 overhead[name], "serialization " + name
             )
-        if (
-            saved["work"] > base.work_limit
-            or saved["wall"] > base.seconds
-            or saved["cpu"] > base.cpu_seconds
-        ):
-            raise ValueError("resume grant below native prior charges")
-        if base.used == base.prior_wall == base.prior_cpu == 0:
-            base.used = saved["work"]
-            base.prior_wall, base.prior_cpu = saved["wall"], saved["cpu"]
-        elif (
-            base.used < saved["work"]
-            or base.wall_used < saved["wall"]
-            or base.cpu_used < saved["cpu"]
-        ):
-            raise ValueError("native resume would reset cumulative charges")
+        base.restore_charges(
+            work=saved["work"], wall=saved["wall"], cpu=saved["cpu"]
+        )
         return dict(completed), list(attempts), payload["runs"]
 
     def _run(self, n, config, budget, lineage, checkpoint, fixed_work):
@@ -289,34 +263,18 @@ class NativeECMExecutor:
         if type(fixed_work) is not bool:
             raise ValueError("fixed_work must be Boolean")
         base = _base_budget(budget)
-        if base.seconds is None or base.cpu_seconds is None:
-            raise ValueError("finite native wall/CPU grants required")
-        if (
-            self.settings.assignment_cpu < base.cpu_seconds
-            or self.settings.assignment_work < base.work_limit
-        ):
-            raise ValueError(
-                "assignment caps must cover the native global grant"
-            )
         view = _BudgetView(budget)
         options = arithmetic_options(config, self.settings)
         manifest = Manifest(n, self.seed, lineage, options)
-        output_bound = 8192 + 2048 * len(manifest.jobs)
-        if output_bound > self.settings.checkpoint_bytes:
-            raise MemoryError(
-                "native checkpoint ownership refused before dispatch"
-            )
         completed, attempts, runs = {}, [0] * len(manifest.jobs), 0
         if checkpoint is not None:
             completed, attempts, runs = self._restore(
                 checkpoint, manifest, base, fixed_work
             )
-        if runs >= self.settings.max_runs:
-            raise ValueError("native resume run limit")
         runs += 1
-        # Output and manifest preparation remain charged even on cancellation.
-        # There are no refundable child leases: all CPU is this process's CPU.
-        active, curve_work = {}, {}
+        # Diagnostic work remains counted even on cancellation; native thread
+        # CPU is included in this process's root resource observation.
+        active = {}
         reason, factor = "curves_exhausted", None
         start_wall, start_cpu = time.monotonic(), time.process_time()
         slices_before = 0 if self.team is None else self.team.slices
@@ -339,13 +297,12 @@ class NativeECMExecutor:
                 reason="complete",
             )
             active.pop(position)
-            curve_work.pop(position)
             if divisor is not None and factor is None:
                 factor = divisor
             return factor is not None and not fixed_work
 
         try:
-            view.consume(output_bound + len(canonical(options)))
+            view.consume(len(canonical(options)))
             if (
                 self.team is not None
                 and self.engine.identity != manifest.metadata
@@ -403,10 +360,8 @@ class NativeECMExecutor:
                         assignment["b2"],
                     )
                     attempts[position] += 1
-                    curve_work[position] = 0
                 requests, bindings = [], []
                 for position, job in list(active.items()):
-                    before = base.used
                     if job["phase"] == "stage_one" and jobs.prepare_stage_one(
                         job, view, context, selected
                     ):
@@ -423,9 +378,6 @@ class NativeECMExecutor:
                         bindings.append((position, job, plan, start, payload))
                     elif job["phase"] != "stage_one":
                         advance(job, view, context, selected)
-                    curve_work[position] += base.used - before
-                    if curve_work[position] > self.settings.assignment_work:
-                        raise BudgetExhaustedError("assignment_work_limit")
                     if job["done"] and finish(position, job):
                         break
                 if factor is not None and not fixed_work:
@@ -506,7 +458,12 @@ class NativeECMExecutor:
                 work=base.used, wall=base.wall_used, cpu=base.cpu_used
             ),
         )
-        checkpoint = dict(payload=payload, sha256=digest(payload))
+        base.record_charges(**payload["budget"])
+        checkpoint = dict(
+            resource_version=RESOURCE_VERSION,
+            payload=payload,
+            sha256=digest(payload),
+        )
         overhead = dict(
             wall=time.monotonic() - serialization_wall,
             cpu=time.process_time() - serialization_cpu,
@@ -514,9 +471,9 @@ class NativeECMExecutor:
         checkpoint.update(
             serialization_overhead=overhead, overhead_sha256=digest(overhead)
         )
-        if len(canonical(checkpoint)) > output_bound:
-            raise MemoryError("native checkpoint exceeded its funded bound")
-        return WorkerRun(factor, reason, checkpoint, stats)
+        return WorkerRun(
+            factor, reason, checkpoint, stats, resource_stop=base.stop
+        )
 
     def close(self):
         if not self.lock.acquire(blocking=False):

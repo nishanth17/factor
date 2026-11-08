@@ -32,7 +32,7 @@ def read_message(channel, decoder, *, block=False):
     if not select.select([channel], [], [], None if block else 0)[0]:
         return None
     try:
-        raw = channel.recv(decoder.limit + 4 - len(decoder.buffer))
+        raw = channel.recv(min(16384, decoder.limit + 4 - len(decoder.buffer)))
     except socket.timeout:
         return None
     if not raw:
@@ -153,9 +153,11 @@ class CurveEngine:
         )
         budget = budget_type(
             poll_every=self.settings.poll_every,
-            work_limit=message["work"],
-            seconds=max(0, message["deadline"] - time.monotonic()),
-            cpu_seconds=message["cpu"],
+            seconds=None
+            if message["deadline"] is None
+            else max(0, message["deadline"] - time.monotonic()),
+            cpu_seconds=None,
+            rss_bytes=None,
             cancelled=cancelled,
         )
         if previous_cpu is not None:
@@ -194,12 +196,11 @@ class CurveEngine:
                 )
                 advance = advance_prepared_job
             if stage == "stage_two":
-                budget.consume(self.settings.residue_bytes)
+                budget.consume(len(str(message.get("residue", ""))) + 1)
                 boundary = checked_residue(
                     message.get("residue"),
                     assignment,
                     message["schedule"],
-                    self.settings.residue_bytes,
                 )
                 boundary_hash = boundary["sha256"]
                 job.update(
@@ -213,7 +214,7 @@ class CurveEngine:
             while not job["done"]:
                 budget.enter_phase(job["phase"])
                 if stage == "stage_one" and job["phase"] == "stage_two_setup":
-                    budget.consume(self.settings.residue_bytes)
+                    budget.consume(len(str(message.get("residue", ""))) + 1)
                     payload = dict(
                         version=RESIDUE_VERSION,
                         id=assignment["id"],
@@ -230,7 +231,6 @@ class CurveEngine:
                         dict(payload, sha256=digest(payload)),
                         assignment,
                         message["schedule"],
-                        self.settings.residue_bytes,
                     )
                     reason = "boundary"
                     break
@@ -241,12 +241,15 @@ class CurveEngine:
             budget.poll()
         except BudgetExhaustedError as error:
             reason, residue = str(error), None
-        except (
-            MemoryError,
-            ValueError,
-            ArithmeticError,
-            BackendUnavailableError,
-        ) as error:
+        except MemoryError as error:
+            reason, residue = "allocation_failure", None
+            failure = (
+                "curve execution: "
+                + type(error).__name__
+                + ": "
+                + str(error)[:192]
+            )
+        except (ValueError, ArithmeticError, BackendUnavailableError) as error:
             reason, residue = "error", None
             failure = type(error).__name__ + ": " + str(error)[:192]
         if stage == "stage_two" and boundary_hash is None:
@@ -304,7 +307,7 @@ class CurveEngine:
         return result
 
 
-def worker_main(channel, frame_bytes, startup_work, settings_data=None):
+def worker_main(channel, settings_data=None):
     """One bounded packet, streamed per-job results, no nested processes."""
     for name in (
         "OMP_NUM_THREADS",
@@ -315,7 +318,7 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
     ):
         os.environ[name] = "1"
     channel.settimeout(0.01)
-    decoder = Decoder(frame_bytes)
+    decoder = Decoder()
     engine = None
     try:
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
@@ -338,9 +341,8 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
                     kind="ready",
                     cpu=previous_cpu,
                     rss=rss_bytes(),
-                    work=startup_work,
+                    work=0,
                 ),
-                frame_bytes,
             )
         )
         while True:
@@ -391,7 +393,7 @@ def worker_main(channel, frame_bytes, startup_work, settings_data=None):
                     rss=rss_bytes(),
                 )
                 previous_cpu = current_cpu
-                channel.sendall(frame(result, frame_bytes))
+                channel.sendall(frame(result))
                 if result["factor"] is not None and not message["fixed_work"]:
                     stopped = True
                 if result["reason"] not in ("complete", "boundary"):

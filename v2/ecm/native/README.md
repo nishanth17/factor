@@ -41,15 +41,16 @@ curve families and prime coverage are unchanged. Public/checkpoint values remain
 canonical. The adapter uses documented CFFI/GMP interfaces and explicit release;
 no interpreter-private bigint casts or global allocator hooks are used.
 
-Each scalar context reserves2MiB for bounded transport/program/native scratch,
-in addition to the ordinary portfolio workspace. Inputs/descriptors/output
+Each scalar context has a 2 MiB diagnostic scratch estimate alongside the
+ordinary portfolio workspace. H3 root RSS observation governs memory refusal;
+there is no per-packet memory grant. Inputs/descriptors/output
 buffers and GMP scratch are reused. Canonical n/a24 identity bytes permit native
-import reuse. Program packing/verification is cached within its funded owner.
+import reuse. Program packing/verification is cached within its retained owner.
 Setup, file/dependency hashing, copies and unused preparation are charged;
-mathematical/recovery work is funded by the caller before dispatch. GMP's default
+mathematical/recovery work is counted diagnostically before dispatch. GMP's default
 allocation failure may terminate the process; it is not a catchable quota refusal.
-The last external committed checkpoint and fully retained grant remain recovery
-boundaries after process death.
+The last saved checkpoint remains the recovery boundary after process death.
+Saved-history accounting retains that checkpoint prefix, not unsaved work.
 
 OpenMP use is a separately selected library owner, with one active team per
 process and no Python callbacks in native worker threads:
@@ -61,12 +62,8 @@ from v2.execution.portfolio_config import PortfolioConfig
 from v2.execution.worker_contract import WorkerSettings
 from v2.portfolio import factorize_bounded
 
-budget = Budget(work_limit=2_000_000_000, seconds=30, cpu_seconds=120)
-settings = WorkerSettings(
-    workers=2, worker_memory=128 * 2**20, parent_memory=1088 * 2**20,
-    memory_bytes=3 * 2**30, checkpoint_bytes=2 * 2**20,
-    assignment_work=budget.work_limit, assignment_cpu=budget.cpu_seconds,
-)
+budget = Budget(seconds=30, cpu_seconds=120)
+settings = WorkerSettings(workers=2)
 owner = NativeECMExecutor(seed=7, settings=settings, schedule="dynamic")
 try:
     run = factorize_bounded(
@@ -77,9 +74,9 @@ finally:
     owner.close()
 ```
 
-The initial owner requires per-curve caps covering the whole global grant and
-refuses stricter ones. It does not silently ignore a requested per-curve CPU
-policy. Process CPU already includes native thread CPU; no child CPU is added.
+The owner follows H3 root wall/CPU/RSS limits; omitted wall/CPU are unlimited.
+Retired packet/team memory and worker-assignment caps are rejected explicitly.
+Process CPU already includes native thread CPU; no child CPU is added.
 Setup/recovery/classical stage two remain in the Python parent. Accepted stage-one
 PRAC/ladder continuations are parallelized; a whole-curve C port is not assumed.
 The owner rejects paired/wheel continuation and supports the current classical
@@ -90,7 +87,7 @@ results. Late/uncommitted work remains charged.
 
 Choose workers1/2/4 and schedule="dynamic"/"static"/"guided". All use chunk1;
 dynamic1 is the baseline hypothesis, not a measured optimum. Default ready-set
-capacity is2*workers, explicit1..32 supported with simultaneous memory admission.
+capacity is2*workers, explicit1..32 supported; memory estimates are diagnostic.
 Before the first runtime load, the experiment launcher sets passive wait,
 KMP_BLOCKTIME=0, OMP_DYNAMIC=FALSE, OMP_MAX_ACTIVE_LEVELS=1, OMP_THREAD_LIMIT=4,
 KMP_STACKSIZE=4M and no hidden helper threads. Library users must control/account
@@ -109,7 +106,9 @@ native result. The future owned-group watchdog covers process lifetime/failure.
 
 The native owner checkpoint records completed curves, attempts and cumulative
 charges after drain. Unfinished curves restart from their stable assignment
-boundary on resume, without refunds; attempts and run count are finite. Changing
+boundary on resume, retaining saved history; retry attempts remain bounded.
+Native H3 checkpoints have a new identity; earlier native checkpoints reject.
+Changing
 source, schedule, capacity or team count on resume rejects. No native pointers,
 partially evaluated points or live thread state are serialized.
 

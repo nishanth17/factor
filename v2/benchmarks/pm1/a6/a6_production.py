@@ -10,6 +10,11 @@ import statistics
 import sys
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ....execution import stage_jobs
 from ....execution.budget import Budget
@@ -44,6 +49,12 @@ def load_control(name):
         module = importlib.util.module_from_spec(spec)
         sys.modules[qualified] = module
         loader.exec_module(module)
+        if hasattr(module, "SieveContext"):
+            from functools import partial
+
+            module.SieveContext = partial(
+                adapt_resource_configuration, module.SieveContext
+            )
         if name == "portfolio":
             module.advance_job = load_control("stage_jobs").advance_job
     return sys.modules[qualified]
@@ -95,11 +106,15 @@ def config(arm, backend, **changes):
     if arm != "control":
         common.update(options(arm))
     common.update(changes)
-    return module, module.PortfolioConfig(**common)
+    return module, adapt_resource_configuration(
+        module.PortfolioConfig, **common
+    )
 
 
 def grant():
-    return Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30)
+    return recording_budget(
+        Budget, work_limit=2_000_000, seconds=30, cpu_seconds=30
+    )
 
 
 def stage(arm, fixture, bounds, backend):
@@ -157,7 +172,9 @@ def portfolio_call(arm, backend):
             fixture["n"],
             seed=7,
             config=cfg,
-            budget=Budget(work_limit=500000, seconds=5, cpu_seconds=5),
+            budget=recording_budget(
+                Budget, work_limit=500000, seconds=5, cpu_seconds=5
+            ),
         )
         if outcome.result.reconstruct() != fixture["n"]:
             raise AssertionError("portfolio reconstruction failed")

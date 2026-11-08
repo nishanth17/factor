@@ -92,6 +92,8 @@ factoring central, and apply this behavioral checklist:
 - If both arms time out without answering the question, redesign rather than
   automatically extending their limits.
 
+For joint configuration tuning, follow [POLICY.md](v2/POLICY.md#joint-parameter-searches).
+
 ## Calibration and cheap paths
 
 - Declare numerical work first: bounds, curve counts and quotas. Hold that work

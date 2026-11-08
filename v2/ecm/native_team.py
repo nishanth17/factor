@@ -2,6 +2,7 @@
 
 import threading
 
+from ..execution.resources import removed_arguments
 from .native_packet import RESERVE, NativePacket, ProgramStore, poll_budget
 
 SCHEDULES = {"dynamic": 0, "static": 1, "guided": 2}
@@ -14,6 +15,7 @@ class TeamRefusedError(RuntimeError):
     """The runtime refused the funded team size before native arithmetic."""
 
 
+@removed_arguments(("memory_bytes",))
 class NativeTeam:
     """No Python workers/callbacks inside a parallel region; one active owner.
 
@@ -23,9 +25,7 @@ class NativeTeam:
     export. A true return stops further slices and discards unfinished state.
     """
 
-    def __init__(
-        self, *, workers=2, schedule="dynamic", capacity=8, memory_bytes=None
-    ):
+    def __init__(self, *, workers=2, schedule="dynamic", capacity=8):
         if type(workers) is not int or workers not in (1, 2, 4):
             raise ValueError("native team supports 1, 2 or 4 workers")
         if schedule not in SCHEDULES:
@@ -33,12 +33,6 @@ class NativeTeam:
         if type(capacity) is not int or not 1 <= capacity <= MAX_TASKS:
             raise ValueError("native team capacity must be 1..32")
         required = TEAM_OVERHEAD + capacity * RESERVE
-        if (
-            memory_bytes is None
-            or type(memory_bytes) is not int
-            or memory_bytes < required
-        ):
-            raise MemoryError("native team memory reservation refused")
         self.workers, self.schedule, self.capacity = (
             workers,
             schedule,

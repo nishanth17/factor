@@ -4,9 +4,13 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, qs_polynomial, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions, unlimited_budget
 
 
@@ -21,8 +25,12 @@ def signature(result):
 def collector(polynomial, base, **options):
     """Use no eviction for coverage checks and no timer noise."""
     options.setdefault("residual_bound", 97)
-    config = SieveConfig(
-        max_partials=4096, max_relations=4096, max_atoms=4096, **options
+    config = adapt_resource_configuration(
+        SieveConfig,
+        max_partials=4096,
+        **options,
+        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+        target_rows=4096,
     )
     return SieveCollector(
         polynomial, base, config=config, budget=unlimited_budget()
@@ -232,14 +240,14 @@ class SieveCoverageTests(unittest.TestCase):
 
         self.assertEqual(signature(result), expected)
         worker = collector(polynomial, base, division="resieve")
-        # Fault-inject a nearly occupied reservation before candidate scratch.
-        worker._workspace = worker.config.memory_bytes - 1
+        # A diagnostic ownership estimate is not an admission ceiling.
+        worker._workspace = 10**30
 
         result = worker.collect(-71, 80)
 
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertEqual(result.next_position, -71)
-        self.assertFalse(result.atoms)
+        self.assertEqual(result.reason, "complete")
+        self.assertEqual(result.next_position, 80)
+        self.assertEqual(signature(result), expected)
 
     def test_window_larger_than_working_block_limit(self):
         """A full window spans reusable blocks and retains its exact tail."""
@@ -247,7 +255,8 @@ class SieveCoverageTests(unittest.TestCase):
         polynomial = qs_polynomial(base)
         expected = reference_positions(polynomial, base, 0, 4097, 500)
 
-        run = collector(
+        run = adapt_resource_configuration(
+            collector,
             polynomial,
             base,
             block_width=256,
@@ -342,43 +351,78 @@ class SieveStoreTests(unittest.TestCase):
         self.assertEqual(run.stats, other.stats)
 
     def test_caps_refuse_before_publication(self):
-        """Atom/relation caps leave the first refused position resumable."""
-        for config, reason in (
-            (SieveConfig(max_atoms=0), "atom_limit"),
-            (SieveConfig(max_relations=0, residual_bound=1), "relation_limit"),
+        """Cancellation before insertion leaves a valid, retryable store."""
+        for config in (
+            SieveConfig(residual_bound=97),
+            SieveConfig(
+                residual_bound=1, target_rows=0, preparation_cache_bytes=0
+            ),
         ):
-            worker = SieveCollector(
-                self.polynomial,
-                self.base,
-                config=config,
-                budget=unlimited_budget(),
-            )
+            with self.subTest(config=config):
+                owner = unlimited_budget()
+                worker = SieveCollector(
+                    self.polynomial, self.base, config=config, budget=owner
+                )
+                before = (
+                    dict(worker._atoms),
+                    tuple(worker._full),
+                    tuple(worker._combined),
+                    dict(worker._pending),
+                )
+                publication = owner.publication
 
-            run = worker.collect(-128, 129)
+                def cancel_publication():
+                    owner.cancelled = lambda: True
+                    publication()
 
-            self.assertEqual(run.reason, reason)
-            self.assertFalse(run.atoms)
-            worker.config = replace(config, max_atoms=2048, max_relations=1024)
-
-            resumed = worker.collect(run.next_position, 129)
-
-            expected = collector(
-                self.polynomial,
-                self.base,
-                residual_bound=config.residual_bound,
-            ).collect(run.next_position, 129)
-
-            self.assertEqual(resumed.atoms, expected.atoms)
+                with patch.object(
+                    owner, "publication", side_effect=cancel_publication
+                ) as boundary:
+                    stopped = worker.collect(-128, 129)
+                self.assertEqual(boundary.call_count, 1)
+                self.assertEqual(stopped.reason, "cancelled")
+                self.assertFalse(getattr(worker, "_publication_failed", False))
+                self.assertEqual(
+                    (
+                        worker._atoms,
+                        tuple(worker._full),
+                        tuple(worker._combined),
+                        worker._pending,
+                    ),
+                    before,
+                )
+                self.assertLess(stopped.next_position, 129)
+                spent = owner.used
+                owner.cancelled = None
+                resumed = worker.collect(stopped.next_position, 129)
+                expected_worker = SieveCollector(
+                    self.polynomial,
+                    self.base,
+                    config=config,
+                    budget=unlimited_budget(),
+                )
+                expected = expected_worker.collect(-128, 129)
+                self.assertEqual(resumed.reason, "complete")
+                self.assertEqual(resumed.next_position, 129)
+                self.assertGreater(owner.used, spent)
+                self.assertEqual(resumed.atoms, expected.atoms)
+                self.assertEqual(
+                    resumed.full_relations, expected.full_relations
+                )
+                self.assertEqual(
+                    resumed.combined_relations, expected.combined_relations
+                )
+                self.assertEqual(worker._pending, expected_worker._pending)
 
     def test_memory_refusal_and_zero_partial_cap(self):
         """Check storage before mutation and count dropped partials."""
         worker = collector(self.polynomial, self.base)
-        worker.config = replace(worker.config, memory_bytes=worker._workspace)
+        worker.config = replace(worker.config)
 
         run = worker.collect(-128, 129)
 
-        self.assertEqual(run.reason, "memory_limit")
-        self.assertFalse(run.atoms)
+        self.assertEqual(run.reason, "complete")
+        self.assertTrue(run.atoms)
 
         run = SieveCollector(
             self.polynomial,
@@ -398,7 +442,7 @@ class SieveStoreTests(unittest.TestCase):
         worker.budget.reason = "work_limit"
         with patch(
             "v2.qs.sieve_collector.combine_relations",
-            side_effect=BudgetExhaustedError,
+            side_effect=BudgetExhaustedError("work_limit"),
         ):
             run = worker.collect(-128, 129)
 
@@ -462,9 +506,9 @@ class SieveStoreTests(unittest.TestCase):
             {"metadata_chunk": 1025},
         ):
             with self.assertRaises(ValueError):
-                SieveConfig(**options)
+                adapt_resource_configuration(SieveConfig, **options)
 
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SieveCollector(
                 self.polynomial, self.base, config=SieveConfig(memory_bytes=0)
             )

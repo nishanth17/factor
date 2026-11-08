@@ -104,13 +104,6 @@ class PretestBudget:
 
         if self.fallback:
             if (
-                amount
-                > self.budget.work_limit
-                - self.budget.used
-                - policy.fallback_work
-            ):
-                raise HandoffRequiredError("reserved_work")
-            if (
                 self.budget.seconds is not None
                 and self.budget.seconds - wall <= policy.fallback_seconds
             ):
@@ -126,16 +119,4 @@ class PretestBudget:
 def fallback_refusal(budget, policy):
     """Check a first admission; resumed collection retains its admission."""
     budget.consume(0)
-    if budget.work_limit - budget.used < policy.fallback_work:
-        return "insufficient_fallback_work"
-    if (
-        budget.seconds is not None
-        and budget.seconds - budget.wall_used < policy.fallback_seconds
-    ):
-        return "insufficient_fallback_wall"
-    if (
-        budget.cpu_seconds is not None
-        and budget.cpu_seconds - budget.cpu_used < policy.fallback_cpu_seconds
-    ):
-        return "insufficient_fallback_cpu"
     return None

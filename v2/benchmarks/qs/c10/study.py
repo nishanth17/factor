@@ -11,9 +11,15 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     fingerprint,

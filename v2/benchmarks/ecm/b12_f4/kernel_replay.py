@@ -15,6 +15,10 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 REPLAY_VERSION = "b12-f4-common-curve-replay-v1"
 
 
@@ -47,10 +51,12 @@ def child(path):
     from ....execution.portfolio_config import PortfolioConfig
     from ....execution.worker_contract import Manifest, WorkerSettings
 
-    settings = WorkerSettings(**request["settings"])
-    base = PortfolioConfig(**request["config"])
-    selected = PortfolioConfig(
-        **dict(request["config"], **request["parameters"])
+    settings = adapt_resource_configuration(
+        WorkerSettings, **request["settings"]
+    )
+    base = adapt_resource_configuration(PortfolioConfig, **request["config"])
+    selected = adapt_resource_configuration(
+        PortfolioConfig, **dict(request["config"], **request["parameters"])
     )
     original = Manifest(
         request["n"],

@@ -5,6 +5,7 @@ from fractions import Fraction
 from math import prod
 
 from ..common import arithmetic, utils
+from ..execution.resources import removed_arguments
 from .assignment_stream import AssignmentStream
 from .count_policy import CountPolicyRefusedError, endpoint_for_count
 from .factor_base import build_factor_base, checked_target
@@ -97,7 +98,8 @@ def preview_polynomials(base, primes, config, budget):
     return tuple(result)
 
 
-def _preview(n, multiplier, config, seed, budget, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def _preview(n, multiplier, config, seed, budget):
     """Own one base and population at a time, then return scalar receipts."""
     bound = config.base_bound
     if hasattr(config, "base_count"):
@@ -107,7 +109,6 @@ def _preview(n, multiplier, config, seed, budget, memory_bytes):
             config.base_count,
             budget,
             ceiling=bound,
-            memory_bytes=memory_bytes,
         )
         if divisor is not None:
             return divisor, None
@@ -116,7 +117,6 @@ def _preview(n, multiplier, config, seed, budget, memory_bytes):
         multiplier=multiplier,
         bound=bound,
         budget=budget,
-        memory_bytes=memory_bytes,
     )
     if setup.divisor is not None:
         return setup.divisor, None
@@ -132,7 +132,6 @@ def _preview(n, multiplier, config, seed, budget, memory_bytes):
             seed=seed,
             policy=config.assignment_policy,
             budget=budget,
-            memory_bytes=memory_bytes,
         )
     except ValueError as error:
         raise NormPolicyRefusedError(str(error)) from error
@@ -182,7 +181,8 @@ def _preview(n, multiplier, config, seed, budget, memory_bytes):
     )
 
 
-def select_norm_multiplier(n, *, config, seed, budget, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def select_norm_multiplier(n, *, config, seed, budget):
     """Rerank four density nominees using fixed actual-A/norm samples.
 
     Scores are an exact rational heuristic in units of 1/256 binary log.
@@ -195,16 +195,12 @@ def select_norm_multiplier(n, *, config, seed, budget, memory_bytes):
     utils.require_integer(seed, "seed", 0)
     if seed >= 2**64:
         raise ValueError("norm selector seed exceeds 64 bits")
-    scratch = 262144 + 1024 * (
+    262144 + 1024 * (
         2 * n.bit_length() + 4 * config.half_width.bit_length() + 128
     )
-    if scratch > memory_bytes:
-        raise MemoryError("norm preview scratch exceeds memory_bytes")
-    available = memory_bytes - scratch
     density = select_coupled_multiplier(
         n,
         budget=budget,
-        memory_bytes=available,
     )
     if density.divisor is not None:
         return NormMultiplierChoice(
@@ -222,7 +218,6 @@ def select_norm_multiplier(n, *, config, seed, budget, memory_bytes):
                 config,
                 seed,
                 budget,
-                available,
             )
         except (CountPolicyRefusedError, NormPolicyRefusedError) as error:
             refused.append((multiplier, str(error)))

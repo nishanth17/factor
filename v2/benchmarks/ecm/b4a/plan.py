@@ -323,28 +323,22 @@ def main():
     from ....execution.ecm_workers import arithmetic_options
     from ....execution.portfolio_config import PortfolioConfig
     from ....execution.worker_contract import Manifest, WorkerSettings
+    from ...infrastructure.resource_control import (
+        adapt_resource_configuration,
+    )
 
     for selected in cells:
-        actual = PortfolioConfig(
-            **dict(
-                plan["configurations"][selected["config"]],
-                ecm_kernel=ARMS[selected["arm"]][0],
-            )
-        ).for_input(plan["inputs"][selected["input"]]["n"])
-        if actual.memory_bytes > plan["settings"]["parent_memory"]:
-            raise ValueError(
-                "parent reserve does not include the automatic portfolio"
-            )
         if selected["endpoint"] != "fixed":
             continue
         kernel, workers = ARMS[selected["arm"]]
-        config = PortfolioConfig(
+        config = adapt_resource_configuration(
+            PortfolioConfig,
             **dict(
                 plan["configurations"][selected["config"]], ecm_kernel=kernel
-            )
+            ),
         )
-        settings = WorkerSettings(
-            **dict(plan["settings"], workers=workers or 1)
+        settings = adapt_resource_configuration(
+            WorkerSettings, **dict(plan["settings"], workers=workers or 1)
         )
         manifest = Manifest(
             plan["inputs"][selected["input"]]["n"],

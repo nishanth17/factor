@@ -86,7 +86,10 @@ def divide_yield_residual(
             if remaining > min(product, endpoint_product):
                 stats["product_rejections"] += 1
                 return None, None
-            if collector._split_calls >= config.split_limit:
+            if (
+                config.split_limit is not None
+                and collector._split_calls >= config.split_limit
+            ):
                 stats["split_quota_rejections"] += 1
                 return None, None
             collector._split_calls += 1

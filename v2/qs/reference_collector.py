@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from ..common import utils
 from ..common.arithmetic import gcd
-from ..execution.budget import Budget, BudgetExhaustedError
-from .factor_base import DEFAULT_MEMORY_BYTES
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import removed_arguments, resolve_budget
 from .polynomial import checked_position
 from .relations import AtomicRelation, checked_residual_bound, verify_atomic
 
@@ -28,18 +28,12 @@ class CollectionResult:
     reason: str
     zero_positions: tuple[int, ...]
     workspace_bytes: int
+    resource_stop: dict | None = None
 
 
+@removed_arguments(("max_relations", "memory_bytes"))
 def collect_block(
-    polynomial,
-    factor_base,
-    lo,
-    hi,
-    *,
-    residual_bound=1,
-    max_relations=MAX_BLOCK_WIDTH,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
-    budget=None,
+    polynomial, factor_base, lo, hi, *, residual_bound=1, budget=None
 ):
     """Collect every admissible relation in [lo,hi), including negative x.
 
@@ -53,19 +47,15 @@ def collect_block(
     checked_position(lo)
     checked_position(hi)
     checked_residual_bound(residual_bound)
-    utils.require_integer(max_relations, "max_relations", 0)
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     if not 0 <= hi - lo <= MAX_BLOCK_WIDTH:
         raise ValueError("block must be ordered and at most 4096 positions")
-    if max_relations > MAX_BLOCK_WIDTH:
-        raise ValueError("max_relations exceeds the reference limit")
     if (polynomial.n, polynomial.multiplier) != (
         factor_base.n,
         factor_base.multiplier,
     ):
         raise ValueError("polynomial and factor-base identity mismatch")
 
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     relations, zero_positions = [], []
     position, reason, divisor = lo, "complete", None
     # A*x and its square are finite because coefficient/position bits are
@@ -82,21 +72,11 @@ def collect_block(
 
     try:
         while position < hi:
-            if len(relations) >= max_relations:
-                reason = "relation_limit"
-                break
-            if workspace > memory_bytes:
-                reason = "memory_limit"
-                break
-
             budget.consume((len(primes) + 1) * value_bits)
             value = polynomial.a * polynomial.value(position)
             if value == 0:
                 # Division of zero never terminates. Surface a square-target
                 # GCD when proper, otherwise record the exceptional position.
-                if workspace + 64 > memory_bytes:
-                    reason = "memory_limit"
-                    break
                 zero_positions.append(position)
                 workspace += 64
                 candidate = gcd(polynomial.u_value(position), factor_base.n)
@@ -139,9 +119,6 @@ def collect_block(
 
             if atom is not None:
                 reserve = 1024 + 128 * len(exponents) + value_bits
-                if workspace + reserve > memory_bytes:
-                    reason = "memory_limit"
-                    break
                 relations.append(atom)
                 workspace += reserve
 
@@ -158,4 +135,5 @@ def collect_block(
         reason,
         tuple(zero_positions),
         workspace,
+        resource_stop=getattr(budget, "stop", None),
     )

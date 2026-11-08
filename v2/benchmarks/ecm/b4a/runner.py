@@ -594,8 +594,6 @@ def execute(freeze_path, cell_id, directory):
                 "--bounded",
                 "--seed",
                 str(cell["seed"]),
-                "--work-limit",
-                str(cell["work"]),
                 "--seconds",
                 str(cell["wall"] - cell["shutdown"] - 2),
                 "--cpu-seconds",

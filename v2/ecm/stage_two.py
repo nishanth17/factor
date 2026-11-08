@@ -30,8 +30,6 @@ class StageTwoSchedule:
             memory_bytes, "index memory", 0, 64 * 2**20
         )
         self.used_bytes = 4096 + 256 * segment_size
-        if self.used_bytes > memory_bytes:
-            raise MemoryError("stage-two index scratch refused")
         self.blocks = {}
         self.hits = self.misses = self.refusals = self.build_bytes = 0
 

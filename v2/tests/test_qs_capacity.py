@@ -6,19 +6,24 @@ import unittest
 from dataclasses import replace
 from math import prod
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common.utils import DETERMINISTIC_LIMIT
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.assignment_stream import AssignmentStream, unrank_combination
 from v2.qs.capacity import capacity_report, validate_extension
 from v2.qs.external_square import CoefficientExhaustedError, external_square
 from v2.qs.factor_base import build_factor_base
 from v2.qs.families import PolynomialFamily
 from v2.qs.linear_algebra import filter_matrix, verify_dependency
-from v2.qs.polynomial import Polynomial, polynomial_roots
+from v2.qs.pipeline import QSJob
+from v2.qs.polynomial import Polynomial, polynomial_roots, qs_polynomial
 from v2.qs.reference_collector import collect_block
 from v2.qs.relations import verify_atomic, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import SIQSConfig, SIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def budget(work=10**12):
@@ -42,7 +47,9 @@ class CapacityTests(unittest.TestCase):
             memory_bytes=16 * 2**20,
         )
         options.update(kwargs)
-        return AssignmentStream(self.base, 256, **options)
+        return adapt_resource_configuration(
+            AssignmentStream, self.base, 256, **options
+        )
 
     def test_combinadic_oracle_and_unique_prefix_extension(self):
         for size in range(1, 9):
@@ -145,16 +152,13 @@ class CapacityTests(unittest.TestCase):
             65,
             residual_bound=10000,
             budget=budget(),
-            memory_bytes=64 * 2**20,
-            max_relations=1024,
         )
         config = SieveConfig(
             residual_bound=10000,
-            max_atoms=4096,
             max_partials=4096,
-            max_relations=4096,
-            memory_bytes=64 * 2**20,
             score_policy="conservative",
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         )
         collector = SieveCollector(
             polynomial, self.base, config=config, budget=budget()
@@ -182,11 +186,7 @@ class CapacityTests(unittest.TestCase):
         for combined in result.combined_relations:
             self.assertTrue(
                 verify_combined(
-                    combined,
-                    self.base,
-                    collector._atoms,
-                    budget=budget(),
-                    memory_bytes=64 * 2**20,
+                    combined, self.base, collector._atoms, budget=budget()
                 )
             )
 
@@ -209,9 +209,9 @@ class CapacityTests(unittest.TestCase):
             max_stalled=1000,
             collector=SieveConfig(
                 residual_bound=10000,
-                max_atoms=4096,
-                max_relations=2048,
                 max_partials=512,
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 2048),
+                target_rows=2048,
             ),
         )
         job = SIQSJob(self.base.n, config=cfg, budget=budget())
@@ -272,50 +272,65 @@ class CapacityTests(unittest.TestCase):
             replace(extended, base_bound=110),
             replace(extended, pool_size=9),
             replace(extended, polynomials_per_family=2),
-            replace(extended, checkpoint_bytes=2**21),
+            replace(extended, half_width=extended.half_width + 1),
             replace(extended, family_count=1),
         ):
             with self.assertRaises(ValueError):
                 validate_extension(extended, invalid)
 
     def test_extension_reserves_growth_of_verified_row_cache(self):
-        original = SIQSConfig(
-            assignment_policy="nearest",
-            collector=SieveConfig(max_relations=64),
-        )
-        enlarged = replace(
-            original,
-            collector=replace(original.collector, max_relations=128),
-        )
-        with self.assertRaisesRegex(ValueError, "checkpoint/cache"):
-            validate_extension(original, enlarged)
-        enlarged = replace(
-            enlarged, memory_bytes=original.memory_bytes + 64 * 2048
-        )
-        validate_extension(original, enlarged)
-        report = capacity_report(self.base, enlarged)
+        configs = [
+            SIQSConfig(
+                assignment_policy="nearest",
+                collector=adapt_resource_configuration(
+                    SieveConfig, max_relations=rows
+                ),
+            )
+            for rows in (64, 128, 2048, 4096)
+        ]
+        capacities = (64 * 2048, 128 * 2048, 2 * 2**20, 2 * 2**20)
+        for config, capacity in zip(configs, capacities):
+            with self.subTest(target_rows=config.collector.target_rows):
+                report = capacity_report(self.base, config)
+                self.assertEqual(
+                    report["preparation_cache_reserve_bytes"], capacity
+                )
+                job = QSJob(
+                    qs_polynomial(self.base),
+                    self.base,
+                    0,
+                    1,
+                    config=config.collector,
+                    budget=budget(),
+                )
+                self.assertEqual(
+                    job.collector._preparation_cache.memory_bytes, capacity
+                )
+                extended = replace(
+                    config, family_count=config.family_count + 1
+                )
+                self.assertNotEqual(config, extended)
+                validate_extension(config, extended)
 
-        self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)
-        saturated = replace(
-            enlarged,
-            collector=replace(enlarged.collector, max_relations=2048),
-            memory_bytes=enlarged.memory_bytes + 2 * 2**20,
+        original, enlarged, saturated, more_rows = configs
+        self.assertNotEqual(original, enlarged)
+        self.assertGreater(capacities[1], capacities[0])
+        self.assertNotEqual(enlarged, saturated)
+        self.assertGreater(capacities[2], capacities[1])
+        self.assertNotEqual(saturated, more_rows)
+        self.assertEqual(
+            saturated.collector.preparation_cache_bytes,
+            more_rows.collector.preparation_cache_bytes,
         )
-        validate_extension(enlarged, saturated)
-        validate_extension(
-            saturated,
-            replace(
-                saturated,
-                collector=replace(saturated.collector, max_relations=4096),
-            ),
-        )
+        # Changing the retained cache/solve target changes execution identity.
+        for before, after in zip(configs, configs[1:]):
+            with self.assertRaises(ValueError):
+                validate_extension(before, after)
 
     def test_sparse_incidence_work_preserves_verified_dependencies(self):
         rows = tuple(1 << (i % 500) for i in range(2000))
         allowance = budget(2_000_000)
-        filtered = filter_matrix(
-            rows, budget=allowance, memory_bytes=32 * 2**20, weight_two=True
-        )
+        filtered = filter_matrix(rows, budget=allowance, weight_two=True)
 
         self.assertLess(allowance.used, 2_000_000)
         for mask in filtered.zero_dependencies:
@@ -323,12 +338,7 @@ class CapacityTests(unittest.TestCase):
 
         self.assertEqual(filtered.original_rows, rows)
         wide = (1 << 99999,) * 32
-        compact = filter_matrix(
-            wide,
-            budget=budget(2_000_000),
-            memory_bytes=8 * 2**20,
-            weight_two=True,
-        )
+        compact = filter_matrix(wide, budget=budget(2000000), weight_two=True)
 
         self.assertEqual(compact.stats["working_columns"], 1)
         for mask in compact.zero_dependencies:
@@ -341,9 +351,7 @@ class CapacityTests(unittest.TestCase):
             "333125016877336815730234617089075553677225251597802911492140000"
             "164835979295625386188653593061163021"
         )
-        base = build_factor_base(
-            n, bound=10000, budget=budget(), memory_bytes=32 * 2**20
-        ).factor_base
+        base = build_factor_base(n, bound=10000, budget=budget()).factor_base
         cfg = SIQSConfig(
             base_bound=10000,
             half_width=8192,

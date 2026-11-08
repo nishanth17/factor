@@ -42,7 +42,7 @@ class MatchedMasterTests(unittest.TestCase):
         )
 
     def test_master_arithmetic_owns_setup_and_preserves_full_config(self):
-        from v2.execution.budget import Budget
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         owner = MatchedSerialECM(self.request())
         config = SimpleNamespace(ecm_tiers=((20, 100, 1),))
@@ -67,7 +67,7 @@ class MatchedMasterTests(unittest.TestCase):
         self.assertEqual(result.stats["completed_curves"], 1)
 
     def test_wrong_sigma_or_invalid_factor_cannot_be_published(self):
-        from v2.execution.budget import Budget
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         config = SimpleNamespace(ecm_tiers=((20, 100, 1),))
         for sigma, factor in ((32, 13), (31, 14), (31, 221)):

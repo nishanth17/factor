@@ -2,11 +2,13 @@
 
 import json
 import unittest
-from dataclasses import asdict
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 from v2.benchmarks.qs.c9 import c9_growth_confirmation as confirmation
 from v2.benchmarks.qs.c9 import c9_growth_study as study
 

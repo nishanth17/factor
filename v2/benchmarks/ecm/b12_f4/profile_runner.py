@@ -10,6 +10,11 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .diagnostics import (
     Capture,
     RSSSampler,
@@ -105,10 +110,12 @@ def child(path):
         os.environ["FACTOR_ECM_DIAGNOSTIC"] = str(path.resolve())
         ecm_worker.worker_main = captured_worker
         install_engine_hooks(capture)
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     executor = ECMExecutor(
         seed=request["seed"],
-        settings=WorkerSettings(**request["settings"]),
+        settings=adapt_resource_configuration(
+            WorkerSettings, **request["settings"]
+        ),
         force_workers=component_arm(
             request["arm"], request["settings"]["workers"]
         ),
@@ -127,7 +134,8 @@ def child(path):
         cpu = request["cpu"] - time.process_time() - charged_children
         if wall <= 0 or cpu <= 0:
             raise ResourceTrialStoppedError("cell_allowance")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=10**12 - work_used,
             seconds=wall,
             cpu_seconds=cpu,

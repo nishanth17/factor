@@ -10,9 +10,19 @@ import random
 import time
 from collections import Counter, deque
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .... import qs
 from ....common import utils
@@ -91,7 +101,9 @@ def growing(config):
     return replace(
         config,
         memory_bytes=MEMORY,
-        collector=qs.GrowingDoubleLargeSieveConfig(**options),
+        collector=adapt_resource_configuration(
+            qs.GrowingDoubleLargeSieveConfig, **options
+        ),
     )
 
 
@@ -126,8 +138,10 @@ def decode(value):
         if ("large_prime_bound" in value["collector"])
         else qs.SieveConfig
     )
-    value["collector"] = kind(**value["collector"])
-    return qs.SIQSConfig(**value)
+    value["collector"] = adapt_resource_configuration(
+        kind, **value["collector"]
+    )
+    return adapt_resource_configuration(qs.SIQSConfig, **value)
 
 
 def graph_diagnostics(collector):
@@ -230,8 +244,12 @@ def run_one(fixture, seed, config, arm, seconds, *, prefixes=False):
         return False
 
     started, cpu = time.monotonic(), time.process_time()
-    budget = Budget(
-        work_limit=10**13, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        Budget,
+        work_limit=10**13,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     job = qs.SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
     observations, tiers = [], deque((60, 180))
@@ -467,7 +485,8 @@ def joint_freeze(output):
     graph = growing(
         replace(
             slp,
-            collector=qs.DoubleLargeSieveConfig(
+            collector=adapt_resource_configuration(
+                qs.DoubleLargeSieveConfig,
                 **asdict(slp.collector),
                 large_prime_bound=2,
                 large_product_bound=4,

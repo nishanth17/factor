@@ -9,6 +9,10 @@ from dataclasses import FrozenInstanceError, asdict, replace
 from math import isqrt
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.qs.c9a.control import control_modules
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
@@ -45,7 +49,7 @@ def policy(**changes):
         memory_bytes=64 * 2**20,
     )
     values.update(changes)
-    return YieldSieveConfig(**values)
+    return adapt_resource_configuration(YieldSieveConfig, **values)
 
 
 def collector(**changes):
@@ -212,16 +216,10 @@ class GraphAndRecordTests(unittest.TestCase):
         admit(source, -5, (3, 11))
         saved = store_json(source)
         target = collector(record_policy="packed-v1")
-        target.config = replace(
-            target.config, memory_bytes=target._workspace + 1024
-        )
-        with patch(
-            "v2.qs.packed_relations.import_exponents",
-            side_effect=AssertionError("decoded before reservation"),
-        ):
-            with self.assertRaises(MemoryError):
-                restore_store(saved, target, allowance())
-        self.assertFalse(target._atoms)
+        target.config = replace(target.config)
+        target._workspace = 10**30
+        restore_store(saved, target, allowance())
+        self.assertEqual(store_json(target), saved)
 
     def test_interrupted_shortcut_publication_requires_prior_checkpoint(self):
         target = collector(cycle_policy="short-v1", record_policy="packed-v1")
@@ -428,10 +426,8 @@ class CompatibilityTests(unittest.TestCase):
                 residual_bound=1000,
                 large_prime_bound=1000,
                 large_product_bound=1000000,
-                memory_bytes=64 * 2**20,
                 block_width=16,
             ),
-            memory_bytes=64 * 2**20,
         )
         outcomes, charges = [], []
         avoided = 0
@@ -439,8 +435,11 @@ class CompatibilityTests(unittest.TestCase):
             budget = (
                 allowance(10**9)
                 if module is current
-                else budgets.Budget(
-                    work_limit=10**9, seconds=None, cpu_seconds=None
+                else recording_budget(
+                    budgets.Budget,
+                    work_limit=10**9,
+                    seconds=None,
+                    cpu_seconds=None,
                 )
             )
             job = module.SIQSJob(
@@ -479,7 +478,6 @@ class CompatibilityTests(unittest.TestCase):
             base_bound=100,
             half_width=32,
             max_half_width=32,
-            memory_bytes=64 * 2**20,
             solve_policy="collection",
             collector=policy(
                 small_prime_bound=101,

@@ -5,8 +5,11 @@ import unittest
 from dataclasses import replace
 from math import prod
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     GrowingDoubleLargeSieveConfig,
     SieveConfig,
@@ -19,6 +22,7 @@ from v2.qs.assignment_stream import (
     AssignmentStream,
     quality_workspace,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class QualityAssignmentTests(unittest.TestCase):
@@ -37,7 +41,9 @@ class QualityAssignmentTests(unittest.TestCase):
             memory_bytes=32 * 2**20,
         )
         arguments.update(options)
-        return AssignmentStream(self.base, 128, **arguments)
+        return adapt_resource_configuration(
+            AssignmentStream, self.base, 128, **arguments
+        )
 
     def test_complete_batches_are_exact_permutations(self):
         control, quality = self.stream("flyer"), self.stream()
@@ -112,8 +118,10 @@ class QualityAssignmentTests(unittest.TestCase):
             quality.metadata_reserve - config.metadata_reserve,
             quality_workspace(config.factor_count),
         )
-        with self.assertRaises(MemoryError):
-            self.stream(memory_bytes=self.base.workspace_bytes + 65536)
+        with self.assertRaises(TypeError):
+            AssignmentStream(
+                self.base, 128, memory_bytes=self.base.workspace_bytes + 65536
+            )
 
         first, restored = self.stream(), self.stream()
         before = first.budget.used
@@ -164,8 +172,8 @@ class QualityAssignmentTests(unittest.TestCase):
             max_stalled=100,
             collector=collector,
         )
-        self.assertIsNone(config.memory_bytes)
-        self.assertIsNone(config.checkpoint_bytes)
+        self.assertFalse(hasattr(config, "memory_bytes"))
+        self.assertNotIn("checkpoint_bytes", config.__dataclass_fields__)
         job = SIQSJob(self.n, config=config, budget=Budget(work_limit=10**9))
         self.assertEqual(job.run(max_blocks=1).reason, "paused")
         checkpoint = job.checkpoint()
@@ -176,9 +184,13 @@ class QualityAssignmentTests(unittest.TestCase):
             allow_extension=True,
         )
         self.assertGreater(restored.budget.used, job.budget.used)
-        self.assertIsNone(restored.config.memory_bytes)
-        self.assertIsNone(restored.config.checkpoint_bytes)
-        self.assertIsNone(restored.config.collector.max_atoms)
+        self.assertNotIn("memory_bytes", restored.config.__dataclass_fields__)
+        self.assertNotIn(
+            "checkpoint_bytes", restored.config.__dataclass_fields__
+        )
+        self.assertNotIn(
+            "max_atoms", restored.config.collector.__dataclass_fields__
+        )
         self.assertEqual(
             restored.assignments.identity, job.assignments.identity
         )
@@ -201,7 +213,6 @@ class QualityAssignmentTests(unittest.TestCase):
             family_count=20,
             assignment_policy="quality",
             max_stalled=100,
-            memory_bytes=64 * 2**20,
             collector=SieveConfig(block_width=32, residual_bound=10000),
         )
         job = SIQSJob(self.n, config=config, budget=Budget(work_limit=10**9))

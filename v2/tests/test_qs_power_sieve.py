@@ -7,9 +7,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from v2.common.prime_sieve import prime_sieve
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, verify_atomic
 from v2.qs.extraction import DependencyExtractor, prepare_relations
 from v2.qs.factor_base import FactorBase, FactorBaseEntry, modular_square_roots
@@ -18,6 +19,7 @@ from v2.qs.polynomial import PolynomialRoots
 from v2.qs.power_sieve import prime_power_roots
 from v2.qs.relations import AtomicRelation, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
 
@@ -165,10 +167,11 @@ class PrimePowerSieveTests(unittest.TestCase):
                             block_width=17,
                             small_prime_cutoff=cutoff,
                             residual_bound=97,
-                            max_atoms=4096,
                             max_partials=4096,
-                            max_relations=4096,
-                            memory_bytes=64 * 1024 * 1024,
+                            preparation_cache_bytes=min(
+                                2 * 2**20, 2048 * 4096
+                            ),
+                            target_rows=4096,
                         )
 
                         result = SieveCollector(
@@ -212,9 +215,7 @@ class PrimePowerSieveTests(unittest.TestCase):
         worker = SieveCollector(
             polynomial,
             base,
-            config=SieveConfig(
-                residual_bound=97, memory_bytes=32 * 1024 * 1024
-            ),
+            config=SieveConfig(residual_bound=97),
             budget=unlimited_budget(),
         )
         stats = dict(duplicates=0, admitted_atoms=0, matches=0)
@@ -236,11 +237,14 @@ class PrimePowerSieveTests(unittest.TestCase):
             if index == 199:
                 prior = dict(worker._atoms)
                 config = worker.config
-                worker.config = replace(config, memory_bytes=worker._workspace)
+                worker.config = replace(config)
 
-                self.assertEqual(
-                    worker._admit(translated[1], stats), "memory_limit"
-                )
+                with patch(
+                    "v2.qs.sieve_collector.combine_relations",
+                    side_effect=MemoryError("injected combination"),
+                ):
+                    with self.assertRaises(MemoryError):
+                        worker._admit(translated[1], stats)
                 self.assertEqual(worker._atoms, prior)
                 worker.config = config
 
@@ -253,11 +257,7 @@ class PrimePowerSieveTests(unittest.TestCase):
         for relation in worker._combined:
             self.assertTrue(
                 verify_combined(
-                    relation,
-                    base,
-                    worker._atoms,
-                    budget=unlimited_budget(),
-                    memory_bytes=32 * 1024 * 1024,
+                    relation, base, worker._atoms, budget=unlimited_budget()
                 )
             )
 
@@ -269,17 +269,9 @@ class PrimePowerSieveTests(unittest.TestCase):
         )
         store = {atom.relation_id: atom for atom in atoms}
         prepared = prepare_relations(
-            atoms,
-            base,
-            store,
-            budget=unlimited_budget(),
-            memory_bytes=128 * 1024 * 1024,
+            atoms, base, store, budget=unlimited_budget()
         )
-        matrix = filter_matrix(
-            prepared.rows,
-            budget=unlimited_budget(),
-            memory_bytes=128 * 1024 * 1024,
-        )
+        matrix = filter_matrix(prepared.rows, budget=unlimited_budget())
 
         dependencies = DependencySolver(
             matrix, budget=unlimited_budget()
@@ -296,11 +288,7 @@ class PrimePowerSieveTests(unittest.TestCase):
     def test_large_single_prime_residual_keeps_exact_identity(self):
         base = build_factor_base(4001, bound=100).factor_base
         polynomial = Polynomial(4001, 1, 1, 1002)
-        config = SieveConfig(
-            score_policy="powers",
-            residual_bound=10**10,
-            memory_bytes=64 * 1024 * 1024,
-        )
+        config = SieveConfig(score_policy="powers", residual_bound=10**10)
 
         result = SieveCollector(
             polynomial, base, config=config, budget=unlimited_budget()
@@ -324,10 +312,9 @@ class PrimePowerSieveTests(unittest.TestCase):
         config = arm.qs.sieve_collector.SieveConfig(
             score_policy="powers",
             residual_bound=97,
-            memory_bytes=64 * 1024 * 1024,
-            max_atoms=4096,
             max_partials=4096,
-            max_relations=4096,
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         )
 
         result = arm.qs.sieve_collector.SieveCollector(
@@ -357,7 +344,7 @@ class PrimePowerSieveTests(unittest.TestCase):
         self.assertEqual(config.checkpoint_bytes, 16 * 1024 * 1024)
         from dataclasses import replace
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             replace(config, checkpoint_bytes=16 * 1024 * 1024 + 1)
         with tempfile.TemporaryDirectory() as directory:
             checkpoints = Path(directory) / "checkpoints"
@@ -407,10 +394,10 @@ class PrimePowerSieveTests(unittest.TestCase):
         next(marks)
         with self.assertRaises(BudgetExhaustedError):
             next(marks)
-        SieveConfig(residual_bound=10**12, max_atoms=65536)
+        SieveConfig(residual_bound=10**12)
         with self.assertRaises(ValueError):
             SieveConfig(residual_bound=10**12 + 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             SieveConfig(max_atoms=65537)
 
 

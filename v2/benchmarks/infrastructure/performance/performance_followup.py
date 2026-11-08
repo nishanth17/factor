@@ -13,9 +13,27 @@ import json
 import sys
 import tempfile
 import time
-from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
+
+
+def adapt_resource_configuration(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.adapt_resource_configuration(*args, **kwargs)
+
+
+def recording_budget(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.recording_budget(*args, **kwargs)
+
+
+def replace(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.historical_replace(*args, **kwargs)
+
 
 if __package__ in (None, ""):
     # Loading paths as a standalone module leaves the chosen v2 runtime
@@ -186,11 +204,15 @@ def main():
 def family_setup(fixture, seed, config, modules):
     """Check finite setup CRT/inverse outputs, including repeated bases."""
     started = time.perf_counter()
-    budget = modules["budget"].Budget(
-        work_limit=2_000_000_000, seconds=5, cpu_seconds=5
+    budget = recording_budget(
+        modules["budget"].Budget,
+        work_limit=2_000_000_000,
+        seconds=5,
+        cpu_seconds=5,
     )
     parallel = modules["parallel"]
-    base = parallel.build_factor_base(
+    base = adapt_resource_configuration(
+        parallel.build_factor_base,
         fixture["n"],
         bound=config["base_bound"],
         budget=budget,
@@ -211,8 +233,12 @@ def family_setup(fixture, seed, config, modules):
 
     for _ in range(config["repetitions"]):
         for primes in assignments:
-            family = parallel.PolynomialFamily(
-                base, primes, budget=budget, memory_bytes=32 * 2**20
+            family = adapt_resource_configuration(
+                parallel.PolynomialFamily,
+                base,
+                primes,
+                budget=budget,
+                memory_bytes=32 * 2**20,
             )
 
             for entry, inverse in zip(base.entries, family.inverses):
@@ -246,11 +272,15 @@ def family_setup(fixture, seed, config, modules):
 def resieve_capacity(fixture, seed, config, modules):
     """Validate each returned atom at a matched finite storage capacity."""
     started = time.perf_counter()
-    budget = modules["budget"].Budget(
-        work_limit=2_000_000_000, seconds=5, cpu_seconds=5
+    budget = recording_budget(
+        modules["budget"].Budget,
+        work_limit=2_000_000_000,
+        seconds=5,
+        cpu_seconds=5,
     )
     stats, signature, divisor = {}, None, None
-    base = modules["factor_base"].build_factor_base(
+    base = adapt_resource_configuration(
+        modules["factor_base"].build_factor_base,
         fixture["n"],
         bound=config["base_bound"],
         budget=budget,
@@ -265,7 +295,8 @@ def resieve_capacity(fixture, seed, config, modules):
             polynomial,
             base.factor_base,
             budget=budget,
-            config=modules["sieve_collector"].SieveConfig(
+            config=adapt_resource_configuration(
+                modules["sieve_collector"].SieveConfig,
                 score_policy="powers",
                 division="resieve",
                 block_width=config["block_width"],

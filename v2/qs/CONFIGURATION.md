@@ -1,5 +1,10 @@
 # QS and SIQS configuration
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 Use the [package guide](README.md) for jobs and relation invariants.
 [STATUS](../STATUS.md#current-automatic-defaults) is the single current
 size/resource routing table, including adopted and unmeasured bands.
@@ -15,7 +20,7 @@ finite endpoint ceiling. Base resolution and restore are charged.
 Explicit settings, CLI parameter overrides and saved concrete configurations
 win over automatic choices. `asdict`/`replace` copies freeze the selected
 values. Direct QS/MPQS controls and other backends retain their documented
-scope. A finite default grant does not promise completion.
+scope. Omitted wall/CPU are unlimited; root RSS defaults to 80% of physical RAM.
 
 ## Coupled polynomial policies
 
@@ -24,11 +29,11 @@ Fresh `default_siqs_config(n)` and unconfigured SIQS jobs select
 `multiplier=0`, `assignment_policy="windowed_pair"` and
 `root_update_policy="batch"`. `parity_two` marking is composed with the
 previous collector kernels. This applies at every supported size and backend;
-performance outside the measured scope is unconfirmed. Size parameters,
-owned allowances and finite grants are retained. The automatic portfolio still
+performance outside the measured scope is unconfirmed. Size parameters and
+concrete cache capacities are retained. The automatic portfolio still
 introduces SIQS only at native 40 and 50–60 digits. Direct CLI `--method siqs`
 or `--siqs` without QS parameter overrides uses these policies at other sizes
-with the existing generic grants, not a newly tuned larger-size preset.
+with reference size parameters. Root resources do not select a different recipe.
 
 For `kN` congruent to 1 modulo 4, the parity family uses `A = 2a` for an odd
 squarefree A product `a`, and odd centered `B`. The exact existing identity
@@ -59,7 +64,7 @@ Checkpoint schemas 8/9/10 explicitly version the additional semantics; the
 selected bundle uses schema 10. Incompatible representation, multiplier,
 assignment or root-policy substitutions are rejected even when granting a
 budget extension. Tables, queues and plans rebuild with their original policy
-identities and charges. Legacy schemas retain their original arithmetic.
+identities and charges. Old resource schemas are refused without migration.
 See the [promotion evidence and limits](../benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults).
 
 ## Collector families
@@ -70,8 +75,8 @@ useful-yield, expanded-intake and compact-record policy reference.
 | Configuration | Role |
 | --- | --- |
 | `SieveConfig` | Single-large-prime reference and scored collection |
-| `DoubleLargeSieveConfig` | Bounded DLP graph with fixed legacy quotas |
-| `GrowingDoubleLargeSieveConfig` | DLP with allocator-grown stores and optional quotas |
+| `DoubleLargeSieveConfig` | DLP graph with explicit unowned FIFO retention |
+| `GrowingDoubleLargeSieveConfig` | Allocator-grown DLP with optional unowned FIFO retention |
 
 A DLP configuration separately bounds `residual_bound` for SLP admission,
 `large_prime_bound` for endpoints, `large_product_bound` for products,
@@ -86,11 +91,17 @@ valid SLP matches; it is a retention policy, not an arithmetic shortcut.
 DLP CLI use requires explicit endpoint/product bounds when manually selected.
 SSS and coarse-worker exporters reject unsupported DLP configurations.
 
-Growing stores have no implicit FIFO or count stop when their quotas are
-`None`. They still use finite job allowances and per-residual effort. Explicit
-outer portfolio memory constrains the child. Integer quota fields restore
-finite application-specific stops; a larger store alone does not establish a
-complete-factor benefit.
+All collector stores, pinned atoms, rows, provenance, graphs and matrices grow
+under the root resource owner. `memory_bytes`, `max_atoms`, `max_relations`
+and child checkpoint limits are removed arguments. `max_partials` retains its
+SLP/DLP unowned FIFO semantics; numerical split quotas retain their effort.
+`preparation_cache_bytes` and `target_rows` retain the former mixed control's
+concrete cache and scheduling values, independently of store growth.
+
+Coarse collection keeps `max_batch_atoms` as a logical transport packet width.
+A full packet starts another packet in the same assignment's growable completion
+envelope, preserving the scan and search identity. A cancelled private assignment
+remains unpublished and can replay; root accounting retains consumed resources.
 
 ## Assignment and stopping
 
@@ -138,7 +149,7 @@ explicit reference configs retain `"canonical"`. Saved schedules preserve their
 identity. Nonadjacent jumps cannot reuse a one-sign update.
 
 `sparse_queue_bytes` is a ceiling for exact per-polynomial prime/power hit
-queues inside the existing owned allowance. Unsupported scores/recovery,
+queues under root resources. Unsupported scores/recovery,
 singular sparse roots, unaligned blocks or capacity refusal use the ordinary
 exact path. All hits and candidate checks remain covered. Polynomial changes
 release queues; interruption/restore rebuilds them with charges.

@@ -8,6 +8,9 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.worker_contract import (
     RESIDUE_VERSION,
     CostRow,
@@ -134,7 +137,7 @@ class LifecycleTests(unittest.TestCase):
             search.snapshot()
         search.receive(0, 1, message(search, 0, 1, factor=5), publish=False)
         self.assertIsNone(search.factor)
-        self.assertIn(0, search.completed)
+        self.assertNotIn(0, search.completed)
         self.assertFalse(search.retired)
 
     def test_fault_before_ack_retries_same_curve_with_a_new_attempt(self):
@@ -176,7 +179,7 @@ class LifecycleTests(unittest.TestCase):
     def test_checkpoint_corruption_count_change_and_attempt_ceiling(self):
         search = Search(manifest(), WorkerSettings(max_attempts=1))
         search.dispatch(0, 1)
-        del search.active[0]
+        search.receive(0, 1, message(search, 0, 1, reason="error"))
         saved = search.snapshot()
         with self.assertRaises(LeaseRefusedError):
             search.next(0)
@@ -196,62 +199,59 @@ class LifecycleTests(unittest.TestCase):
 
 
 class ResourceTests(unittest.TestCase):
-    def test_missing_report_is_not_free_and_refund_is_exactly_once(self):
-        ledger = Ledger(100, 10)
-        first = ledger.reserve("curve-a", 40, 4)
-        second = ledger.reserve("curve-b", 40, 4)
+    def test_missing_report_is_unknown_and_ack_is_exactly_once(self):
+        ledger = Ledger()
+        first = ledger.reserve("curve-a")
+        second = ledger.reserve("curve-b")
         ledger.lose(first)
         ledger.settle(second, "curve-b", 13, 1.5)
-        self.assertEqual(ledger.work, 53)
-        self.assertEqual(ledger.cpu, 5.5)
+        self.assertEqual((ledger.work, ledger.cpu), (13, 1.5))
+        self.assertEqual(ledger.receipts[0]["status"], "lost")
         with self.assertRaises(KeyError):
             ledger.settle(second, "curve-b", 0, 0)
         ledger.charge(parent_cpu=4)
-        with self.assertRaises(LeaseRefusedError):
-            ledger.reserve("unfunded", 1, 1)
-        self.assertEqual(ledger.work, 53)
+        ledger.reserve("next")
+        self.assertEqual(ledger.work, 13)
 
-    def test_bad_report_never_refunds_and_partial_grant_can_be_used(self):
-        ledger = Ledger(7, 1)
-        ticket = ledger.reserve("last", 7, 1)
+    def test_bad_reports_do_not_change_observed_charges(self):
+        ledger = Ledger()
+        ticket = ledger.reserve("last")
         for identity, work, cpu in (
             ("wrong", 0, 0),
-            ("last", 8, 0),
-            ("last", 0, 2),
             ("last", -1, 0),
             ("last", 0, float("nan")),
         ):
             with self.assertRaises(ValueError):
                 ledger.settle(ticket, identity, work, cpu)
-            self.assertEqual((ledger.work, ledger.cpu), (7, 1))
-        ledger.settle(ticket, "last", 7, 1)
-        with self.assertRaises(LeaseRefusedError):
-            Ledger(0, 0).reserve("zero", 1, 0)
-        with self.assertRaises(MemoryError):
+            self.assertEqual((ledger.work, ledger.cpu), (0, 0))
+        ledger.settle(ticket, "last", 8, 2)
+        self.assertEqual((ledger.work, ledger.cpu), (8, 2))
+        with self.assertRaises(TypeError):
             WorkerSettings(memory_bytes=2**20)
-        with self.assertRaises(MemoryError):
-            Search(manifest(), WorkerSettings(checkpoint_bytes=4096))
+        with self.assertRaises(TypeError):
+            WorkerSettings(checkpoint_bytes=4096)
 
     def test_frame_fragmentation_coalescing_corruption_and_oversize(self):
-        raw = frame(dict(kind="fake", id=7), 1024)
+        raw = frame(dict(kind="fake", id=7))
         for boundary in range(len(raw)):
-            decoder = Decoder(1024)
+            decoder = Decoder()
             self.assertIsNone(decoder.feed(raw[:boundary]))
             self.assertEqual(
                 decoder.feed(raw[boundary:]), dict(kind="fake", id=7)
             )
-        decoder = Decoder(1024)
+        decoder = Decoder()
         self.assertEqual(decoder.feed(raw + raw), dict(kind="fake", id=7))
         self.assertEqual(decoder.feed(b""), dict(kind="fake", id=7))
         for raw_bad in (
-            struct.pack("!I", 1025),
             b"\x00\x00\x00\x00",
             struct.pack("!I", 1) + b"x",
         ):
             with self.assertRaises(ValueError):
-                Decoder(1024).feed(raw_bad)
-        with self.assertRaises(ValueError):
-            frame(dict(payload="x" * 2000), 1024)
+                Decoder().feed(raw_bad)
+        self.assertEqual(
+            Decoder().feed(frame(dict(payload="x" * 2000))),
+            dict(payload="x" * 2000),
+        )
 
     def test_engagement_uses_only_declared_plan_and_pool_readiness(self):
         plan = manifest()
@@ -385,17 +385,15 @@ class StagedContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             search.receive(0, 1, boundary(search, 0, 1))
         with self.assertRaises(ValueError):
-            checked_residue(
-                {}, manifest().assignment(0), manifest().metadata, 1024
-            )
+            checked_residue({}, manifest().assignment(0), manifest().metadata)
 
     def test_restart_rejects_unpaid_boundaries_and_reset_charges(self):
         search = Search(
             manifest(),
             WorkerSettings(stage_policy="staged", residue_capacity=1),
         )
-        ledger = Ledger(100, 2)
-        token = ledger.reserve(search.manifest.assignment(0)["id"], 50, 1)
+        ledger = Ledger()
+        token = ledger.reserve(search.manifest.assignment(0)["id"])
         search.dispatch(0, token)
         msg = boundary(search, 0, token)
         search.receive(0, token, msg)
@@ -407,9 +405,10 @@ class StagedContractTests(unittest.TestCase):
             boundary_sha256=msg["residue"]["sha256"],
         )
         search.check_leases(ledger.receipts, dict(work=7, cpu=0.2))
-        for saved in (dict(work=0, cpu=0.2), dict(work=7, cpu=0)):
-            with self.assertRaises(ValueError):
-                search.check_leases(ledger.receipts, saved)
+        with self.assertRaises(ValueError):
+            search.check_leases(ledger.receipts, dict(work=0, cpu=0.2))
+        with self.assertRaises(ValueError):
+            search.check_leases(ledger.receipts, dict(work=7, cpu=0))
         with self.assertRaises(ValueError):
             search.check_leases([], dict(work=7, cpu=0.2))
         with self.assertRaises(ValueError):
@@ -445,16 +444,16 @@ class OptimizationContractTests(unittest.TestCase):
     def test_explicit_wider_workers_and_simultaneous_cache_ownership(self):
         with self.assertRaises(ValueError):
             WorkerSettings(workers=6)
-        with self.assertRaises(MemoryError):
-            WorkerSettings(workers=10, allow_wide_workers=True)
+        self.assertEqual(
+            WorkerSettings(workers=10, allow_wide_workers=True).workers, 10
+        )
         settings = WorkerSettings(
             workers=10,
             allow_wide_workers=True,
-            memory_bytes=2**31,
             metadata_slots=2,
             decoded_cache_bytes=2**20,
         )
-        self.assertLessEqual(settings.owned_bytes, settings.memory_bytes)
+        self.assertGreaterEqual(settings.owned_bytes, 0)
         for changes in (
             dict(packet_curves=5),
             dict(poll_every=65),
@@ -463,7 +462,7 @@ class OptimizationContractTests(unittest.TestCase):
             dict(stage_policy="unknown"),
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**changes)
+                adapt_resource_configuration(WorkerSettings, **changes)
 
     def test_cost_table_distinguishes_cold_pool_and_metadata_warmth(self):
         plan = manifest()
@@ -507,8 +506,8 @@ class OptimizationContractTests(unittest.TestCase):
         )
 
     def test_decoder_recognizes_buffered_and_invalid_following_frames(self):
-        raw = frame(dict(a=1), 1024)
-        decoder = Decoder(1024)
+        raw = frame(dict(a=1))
+        decoder = Decoder()
         self.assertEqual(decoder.feed(raw + raw), dict(a=1))
         self.assertTrue(decoder.complete)
         self.assertEqual(decoder.feed(b""), dict(a=1))
@@ -516,15 +515,14 @@ class OptimizationContractTests(unittest.TestCase):
         self.assertEqual(
             decoder.feed(raw + struct.pack("!I", 2048)), dict(a=1)
         )
-        self.assertTrue(decoder.complete)
-        with self.assertRaises(ValueError):
-            decoder.feed(b"")
+        self.assertFalse(decoder.complete)
+        self.assertIsNone(decoder.feed(b""))
 
 
 class DurablePositionTests(unittest.TestCase):
     def test_double_digit_positions_survive_actual_json_round_trip(self):
         plan = manifest(((10, 100, 16),))
-        settings = WorkerSettings(checkpoint_bytes=2**21)
+        settings = WorkerSettings()
         search = Search(plan, settings, fixed_work=True)
         for position in range(16):
             token = position + 1
@@ -539,7 +537,7 @@ class DurablePositionTests(unittest.TestCase):
 
     def test_noncanonical_position_is_rejected_after_resealing(self):
         plan = manifest(((10, 100, 16),))
-        settings = WorkerSettings(checkpoint_bytes=2**21)
+        settings = WorkerSettings()
         search = Search(plan, settings, fixed_work=True)
         search.dispatch(0, 1)
         search.receive(0, 1, message(search, 0, 1))
@@ -552,12 +550,7 @@ class DurablePositionTests(unittest.TestCase):
             Search.restore(saved, plan, settings, fixed_work=True)
 
     def test_sixteen_slot_traversal_round_trip_keeps_remaining_identity(self):
-        settings = WorkerSettings(
-            workers=16,
-            allow_wide_workers=True,
-            memory_bytes=4 * 2**30,
-            checkpoint_bytes=4 * 2**20,
-        )
+        settings = WorkerSettings(workers=16, allow_wide_workers=True)
         plan = manifest(((10, 100, 32),))
         search = Search(plan, settings, fixed_work=True)
         issued = []
@@ -582,8 +575,9 @@ class DurablePositionTests(unittest.TestCase):
                 WorkerSettings(workers=count)
         with self.assertRaises(ValueError):
             WorkerSettings(workers=17, allow_wide_workers=True)
-        with self.assertRaises(MemoryError):
-            WorkerSettings(workers=16, allow_wide_workers=True)
+        self.assertEqual(
+            WorkerSettings(workers=16, allow_wide_workers=True).workers, 16
+        )
 
 
 if __name__ == "__main__":

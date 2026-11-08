@@ -16,6 +16,11 @@ import types
 from collections import Counter
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (
@@ -127,7 +132,9 @@ def options(protocol, case, arm):
 def measure(protocol, fixtures, engine, case, arm):
     """Whole factoring, including setup, table/recovery and output costs."""
     start, cpu_start = time.perf_counter(), time.process_time()
-    config = engine.PortfolioConfig(**options(protocol, case, arm))
+    config = adapt_resource_configuration(
+        engine.PortfolioConfig, **options(protocol, case, arm)
+    )
     rows = []
     for fixture in fixtures:
         for seed in protocol["seeds"]:
@@ -135,7 +142,8 @@ def measure(protocol, fixtures, engine, case, arm):
                 fixture["n"],
                 seed=seed,
                 config=config,
-                budget=engine.Budget(
+                budget=recording_budget(
+                    engine.Budget,
                     work_limit=protocol["work_limit"],
                     seconds=protocol["seconds"],
                     cpu_seconds=protocol["cpu_seconds"],
@@ -398,8 +406,11 @@ def diagnostics(protocol, corpus):
         )
         for arm in protocol["training_arms"]:
             engine = control if arm in ("streamed", "programs") else portfolio
-            config = engine.PortfolioConfig(**options(protocol, case, arm))
-            budget = engine.Budget(
+            config = adapt_resource_configuration(
+                engine.PortfolioConfig, **options(protocol, case, arm)
+            )
+            budget = recording_budget(
+                engine.Budget,
                 work_limit=protocol["work_limit"],
                 seconds=protocol["seconds"],
                 cpu_seconds=protocol["cpu_seconds"],
@@ -408,8 +419,10 @@ def diagnostics(protocol, corpus):
                 config.max_hi, segment_size=config.segment_size, budget=budget
             )
             programs = (
-                engine.ECMPrograms(
-                    context, memory_bytes=config.ecm_program_bytes
+                adapt_resource_configuration(
+                    engine.ECMPrograms,
+                    context,
+                    memory_bytes=config.ecm_program_bytes,
                 )
                 if config.ecm_program_bytes
                 else None

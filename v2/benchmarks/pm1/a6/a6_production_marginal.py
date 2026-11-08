@@ -3,9 +3,12 @@
 import hashlib
 import json
 import sys
-from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...support.paths import (
     source_path,

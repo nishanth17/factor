@@ -16,9 +16,19 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict, replace
 from datetime import datetime, timezone
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .... import portfolio
 from ....common import arithmetic, utils
@@ -168,7 +178,8 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
     count = min(
         32, max(4, math.ceil((digits / 2 - 4) / math.log10(bound / 2)))
     )
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         backend=backend,
         mode=mode,
         base_bound=bound,
@@ -187,7 +198,8 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
         filter_row_growth=32,
         memory_bytes=768 * 2**20 if large else MEMORY,
         checkpoint_bytes=2**20,
-        collector=SieveConfig(
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             division="bucket",
             score_policy="fixed",
@@ -211,10 +223,12 @@ def qs_call(spec, backend, before=None):
     if before is not None:
         options = asdict(config)
         options.pop("backend")
-        options["collector"] = module.SieveConfig(**options["collector"])
-        config = module.SIQSConfig(**options)
-    budget = module.Budget(
-        work_limit=spec["work"], seconds=None, cpu_seconds=None
+        options["collector"] = adapt_resource_configuration(
+            module.SieveConfig, **options["collector"]
+        )
+        config = adapt_resource_configuration(module.SIQSConfig, **options)
+    budget = recording_budget(
+        module.Budget, work_limit=spec["work"], seconds=None, cpu_seconds=None
     )
     job = module.SIQSJob(
         f["n"], seed=spec["seed"], config=config, budget=budget
@@ -268,8 +282,12 @@ def ecm_call(spec, backend, before=None):
     portfolio_module = before.portfolio if before is not None else portfolio
     if before is None:
         options["backend"] = backend
-    config = portfolio_module.PortfolioConfig(**options)
-    budget = Budget(work_limit=10**10, seconds=None, cpu_seconds=None)
+    config = adapt_resource_configuration(
+        portfolio_module.PortfolioConfig, **options
+    )
+    budget = recording_budget(
+        Budget, work_limit=10**10, seconds=None, cpu_seconds=None
+    )
     context = SieveContext(b2 + 1, segment_size=config.segment_size)
     outputs = []
     for index in range(spec["curves"]):

@@ -7,6 +7,9 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from v2 import portfolio
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic, utils
 from v2.ecm.programs import ECMPrograms
 from v2.execution.budget import BudgetExhaustedError
@@ -22,7 +25,8 @@ def settings(**changes):
 
 
 def store(config):
-    return ECMPrograms(
+    return adapt_resource_configuration(
+        ECMPrograms,
         SieveContext(config.max_hi, segment_size=config.segment_size),
         memory_bytes=config.ecm_program_bytes,
     )
@@ -52,7 +56,7 @@ class PairedExecutionTests(unittest.TestCase):
             replace(settings(), ecm_pair_distance=True)
         with self.assertRaises(ValueError):
             replace(settings(), ecm_program_bytes=0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             replace(settings(), memory_bytes=65536)
         self.assertIsNone(portfolio.PortfolioConfig().ecm_pair_distance)
 
