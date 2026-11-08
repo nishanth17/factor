@@ -1,5 +1,6 @@
 """Top-level observed resources and atomic, optional checkpoint persistence."""
 
+import contextvars
 import ctypes
 import errno
 import inspect
@@ -279,3 +280,56 @@ def decode_checkpoint(function):
         return function(*bound.args, **bound.kwargs)
 
     return decode
+
+
+_ACTIVE_OWNER = contextvars.ContextVar("factor_resource_owner", default=None)
+
+
+def active_owner():
+    """Return the borrowed root during a public factoring call, if any."""
+    return _ACTIVE_OWNER.get()
+
+
+def accounted_entry(function):
+    """Own validation, restore, computation, encoding and final cleanup."""
+
+    @wraps(function)
+    def run(*args, **kwargs):
+        from .budget import Budget
+
+        previous = _ACTIVE_OWNER.get()
+        owner = previous or kwargs.get("budget") or Budget()
+        own_interval = previous is None
+        if own_interval:
+            owner.start()
+        kwargs["budget"] = owner
+        token = _ACTIVE_OWNER.set(owner)
+        try:
+            return function(*args, **kwargs)
+        finally:
+            _ACTIVE_OWNER.reset(token)
+            if own_interval:
+                owner.close()
+
+    return run
+
+
+def accounted_job(function):
+    """Exclude idle intervals between direct retained-job invocations."""
+
+    @wraps(function)
+    def run(self, *args, **kwargs):
+        owner = getattr(self.budget, "budget", self.budget)
+        previous = _ACTIVE_OWNER.get()
+        own_interval = previous is None
+        if own_interval:
+            owner.start()
+        token = _ACTIVE_OWNER.set(owner)
+        try:
+            return function(self, *args, **kwargs)
+        finally:
+            _ACTIVE_OWNER.reset(token)
+            if own_interval:
+                owner.close()
+
+    return run

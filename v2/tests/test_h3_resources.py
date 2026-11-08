@@ -243,3 +243,52 @@ class StorageMigrationTests(unittest.TestCase):
         self.assertNotIn(
             run.reason, ("pretest_exhausted", "insufficient_fallback_work")
         )
+
+
+class ChildReaperTests(unittest.TestCase):
+    def test_live_ack_exit_and_crash_use_one_total(self):
+        from types import SimpleNamespace
+
+        provider = Provider()
+        provider.rows.append(ProcessSample(123, 10, 50, 2))
+        budget = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        process = SimpleNamespace(
+            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+        )
+        budget.track_process(process)
+        budget.acknowledge(123, 3)
+        usage = SimpleNamespace(ru_utime=4, ru_stime=1)
+        with patch("os.wait4", return_value=(123, 9, usage)) as wait:
+            self.assertEqual(process._popen.poll(), -9)
+            self.assertEqual(process._popen.poll(), -9)
+            wait.assert_called_once_with(123, os.WNOHANG)
+        # The initial retained CPU was a baseline, so only 5 - 2 is new.
+        self.assertEqual(budget.cpu_used, 3)
+        budget.acknowledge(123, 5)
+        self.assertEqual(budget.cpu_used, 3)
+
+    def test_retained_process_rebinds_and_excludes_idle_cpu(self):
+        from types import SimpleNamespace
+
+        provider = Provider()
+        provider.rows.append(ProcessSample(123, 10, 50, 2))
+        first = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        process = SimpleNamespace(
+            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+        )
+        first.track_process(process)
+        first.close()
+        provider.rows[-1] = ProcessSample(123, 10, 50, 7)
+        second = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        second.track_process(process)
+        usage = SimpleNamespace(ru_utime=8, ru_stime=1)
+        with patch("os.wait4", return_value=(123, 0, usage)):
+            self.assertEqual(process._popen.poll(0), 0)
+        self.assertEqual(first.cpu_used, 0)
+        self.assertEqual(second.cpu_used, 2)

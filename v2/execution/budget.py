@@ -1,6 +1,7 @@
 """One observed resource owner shared by stages and recursive children."""
 
 import os
+import sys
 import time
 
 from ..common import utils
@@ -82,7 +83,9 @@ class Budget:
         self._last_sample = None
         self.observed_rss = 0
         self._active = False
-        if rss_bytes is not None and self.provider is None:
+        if self.provider is None and (
+            rss_bytes is not None or sys.platform == "darwin"
+        ):
             self.provider = default_provider()
         self.rss_bytes = (
             4 * self.provider.physical_memory() // 5
@@ -222,3 +225,51 @@ class Budget:
             wall=self.wall_used,
             cpu=self.cpu_used,
         )
+
+    def acknowledge(self, pid, cpu_total):
+        """Reconcile a process-lifetime acknowledgment with OS samples."""
+        self._sample(force=True)
+        identities = [key for key in self._children if key[0] == pid]
+        if not identities:
+            raise RuntimeError("CPU report from an unregistered process")
+        self.observe_child(identities[-1], cpu_total)
+
+    def track_process(self, process):
+        """Retain final wait4 usage through this owned Popen's sole reaper.
+
+        PyPy 3.11 Popen.wait delegates reaping to poll. This instance adapter
+        uses the same flags, status conversion and returncode cache as poll,
+        retaining the final CPU that waitpid discards. Rebinding a retained
+        process changes only its current accounting owner; no global process
+        or multiprocessing runtime is modified.
+        """
+        self.register(process.pid)
+        self._sample(force=True)
+        identities = [key for key in self._children if key[0] == process.pid]
+        identity = identities[-1] if identities else (process.pid, id(process))
+        self._children.setdefault(identity, 0.0)
+        popen = process._popen
+        existing = getattr(popen, "_factor_accounting", None)
+        if existing is not None:
+            existing[0], existing[1] = self, identity
+            return
+        binding = [self, identity]
+        popen._factor_accounting = binding
+
+        def poll(flag=os.WNOHANG):
+            if popen.returncode is None:
+                try:
+                    pid, status, usage = os.wait4(popen.pid, flag)
+                except OSError as error:
+                    # Match Popen's pre-creation/ECHILD handling. Other OS
+                    # failures stay explicit rather than hiding accounting loss.
+                    if error.errno == 10:
+                        return None
+                    raise
+                if pid == popen.pid:
+                    owner, key = binding
+                    owner.observe_child(key, usage.ru_utime + usage.ru_stime)
+                    popen.returncode = os.waitstatus_to_exitcode(status)
+            return popen.returncode
+
+        popen.poll = poll

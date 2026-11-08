@@ -3,9 +3,10 @@
 import hashlib
 import json
 import sys
-from types import SimpleNamespace
 
-AUTO_VERSION = "b12-f4-auto-v2"
+from ..execution.resources import removed_arguments
+
+AUTO_VERSION = "b12-f4-auto-observed-v3"
 POLICY_PATH = None
 POLICY_SHA256 = (
     "38b28f423811ceb3242dcc989f8e14f70759c96fa9944cd2fa33bbb846327032"
@@ -67,99 +68,53 @@ def _runtime_supported():
     return platform.machine() == "arm64"
 
 
-def selected_context(
-    *,
-    seed=0,
-    prefer_warm=False,
-    parent_memory=1040 * 2**20,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
-):
-    """Return a caller-owned context using the packaged production policy."""
+@removed_arguments(("parent_memory", "memory_bytes"))
+def selected_context(*, seed=0, prefer_warm=False):
+    """Return a retained context using the unchanged packaged cost policy."""
     from .selection import SelectedECMContext
 
     return SelectedECMContext(
-        POLICY_PATH,
-        POLICY_SHA256,
-        seed=seed,
-        prefer_warm=prefer_warm,
-        parent_memory=parent_memory,
-        memory_bytes=memory_bytes,
+        POLICY_PATH, POLICY_SHA256, seed=seed, prefer_warm=prefer_warm
     )
 
 
 class AutomaticECMOwner:
     """Own a cold-intent pool without runtime imports on easy exits."""
 
-    def __init__(self, *, seed=0, memory_bytes=None):
-        if memory_bytes is not None and (
-            type(memory_bytes) is not int or not 0 <= memory_bytes < 2**63
-        ):
-            raise ValueError("ECM aggregate memory must be a finite allowance")
+    @removed_arguments(("memory_bytes",))
+    def __init__(self, *, seed=0):
         self.requested_seed = seed
-        self.requested_memory = memory_bytes
         self.context = None
         self.closed = False
         self.last_stats = {}
         self.disabled_reason = None
 
-    def configure(self, config, generator, saved, *, automatic_memory):
-        """Bind a policy/seed/grant without advancing the portfolio RNG."""
-        implementation = "ecm-auto-implementation-v2"
+    def configure(self, config, generator, saved, *, automatic_memory=True):
+        """Bind numerical policy/seed without advancing the parent RNG."""
+        implementation = "ecm-auto-observed-v3"
         if saved is not None:
             if (
-                type(saved) is not dict
-                or set(saved)
-                != {
-                    "version",
-                    "profile",
-                    "seed",
-                    "memory_bytes",
-                    "implementation",
-                }
-                or saved["implementation"] != implementation
+                set(saved) != {"version", "profile", "seed", "implementation"}
                 or saved["version"] != AUTO_VERSION
                 or saved["profile"] != POLICY_SHA256
+                or saved["implementation"] != implementation
                 or type(saved["seed"]) is not int
                 or not 0 <= saved["seed"] < 2**256
-                or type(saved["memory_bytes"]) is not int
-                or not 0 <= saved["memory_bytes"] <= DEFAULT_MEMORY_BYTES
             ):
                 raise ValueError("incompatible automatic ECM checkpoint")
-            memory = saved["memory_bytes"]
-            if (
-                self.requested_memory is not None
-                and min(self.requested_memory, DEFAULT_MEMORY_BYTES) != memory
-            ):
-                raise ValueError("automatic ECM resume cannot change memory")
             seed = saved["seed"]
         else:
-            # Retain the measured integer-seed mapping. Other legacy Random
-            # seed types use getstate without advancing the parent generator.
             seed = self.requested_seed
             if type(seed) is not int or not 0 <= seed < 2**256:
                 seed = int(_digest([AUTO_VERSION, generator.getstate()]), 16)
-            memory = self.requested_memory
-            if memory is None:
-                memory = (
-                    DEFAULT_MEMORY_BYTES
-                    if automatic_memory
-                    else config.memory_bytes
-                )
-            memory = min(memory, DEFAULT_MEMORY_BYTES)
-        self.memory_bytes = memory
         self.seed = seed
-        self.parent_memory = config.memory_bytes
-        self.settings = SimpleNamespace(
-            parent_memory=config.memory_bytes + SELECTOR_OWNERSHIP
-        )
         self.header = dict(
             version=AUTO_VERSION,
             profile=POLICY_SHA256,
             seed=seed,
-            memory_bytes=memory,
             implementation=implementation,
         )
-        self.identity = _digest([self.header, self.settings.parent_memory])
+        self.identity = _digest(self.header)
 
     def __enter__(self):
         return self
@@ -185,7 +140,6 @@ class AutomaticECMOwner:
         if self.closed:
             raise RuntimeError("automatic ECM owner is closed")
         budget.consume(0)
-        base = getattr(budget, "budget", budget)
         if checkpoint is None and self.context is None:
             reason = self.disabled_reason
             if reason is None and not _size_supported(n):
@@ -196,19 +150,6 @@ class AutomaticECMOwner:
                 reason = "cold_serial_default"
             if reason is None and not _runtime_supported():
                 reason = "unsupported_automatic_runtime"
-            if reason is None and (
-                base.seconds is None
-                or base.cpu_seconds is None
-                or base.cpu_seconds - base.cpu_used <= MIN_STARTUP_CPU
-                or base.work_limit - base.used <= MIN_STARTUP_WORK
-            ):
-                reason = "insufficient_automatic_startup_allowance"
-            if reason is None and (
-                self.settings.parent_memory > 4 * 2**30
-                or self.memory_bytes
-                < self.settings.parent_memory + 5 * 64 * 2**20
-            ):
-                reason = "worker_ownership_refused"
             if reason is not None:
                 return self._serial(reason)
         if self.context is None:
@@ -220,8 +161,6 @@ class AutomaticECMOwner:
                 return self._serial("nested_process")
             self.context = selected_context(
                 seed=self.seed,
-                parent_memory=self.parent_memory,
-                memory_bytes=self.memory_bytes,
             )
             try:
                 self.context._load(budget)

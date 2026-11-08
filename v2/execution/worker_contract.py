@@ -7,15 +7,26 @@ import random
 import struct
 from dataclasses import asdict, dataclass
 
+from .resources import (
+    RemovedResourceLimitError,
+    decode_checkpoint,
+    encode_checkpoint,
+    removed_arguments,
+)
+
 SEARCH_VERSION = "b12-f4-v1"
 VERSION = "b12-f4-v7"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
 
-def integer(value, name, low=0, high=2**63 - 1):
+def integer(value, name, low=0, high=None):
     """Reject booleans and unbounded protocol integers."""
-    if type(value) is not int or not low <= value <= high:
+    if (
+        type(value) is not int
+        or value < low
+        or (high is not None and value > high)
+    ):
         raise ValueError(name + " outside finite bounds")
     return value
 
@@ -40,24 +51,29 @@ def digest(value):
     return hashlib.sha256(canonical(value).encode("ascii")).hexdigest()
 
 
+@removed_arguments(
+    (
+        "assignment_cpu",
+        "assignment_work",
+        "checkpoint_bytes",
+        "frame_bytes",
+        "max_runs",
+        "memory_bytes",
+        "parent_memory",
+        "residue_bytes",
+        "startup_work",
+        "worker_memory",
+    )
+)
 @dataclass(frozen=True)
 class WorkerSettings:
     """Finite pool ownership; acceleration choices remain explicitly opt-in."""
 
     workers: int = 1
-    assignment_work: int = 32_000_000
-    assignment_cpu: float = 30.0
-    startup_work: int = 1_000_000
     startup_seconds: float = 10.0
     drain_seconds: float = 1.0
     kill_seconds: float = 1.0
-    worker_memory: int = 64 * 2**20
-    parent_memory: int = 32 * 2**20
-    memory_bytes: int = 512 * 2**20
-    frame_bytes: int = 16_384
-    checkpoint_bytes: int = 2**20
     max_attempts: int = 3
-    max_runs: int = 32
     assignment_policy: str = "dynamic"
     packet_curves: int = 1
     poll_every: int = 1
@@ -73,7 +89,6 @@ class WorkerSettings:
     packet_policy: str = "fixed"
     stage_policy: str = "whole"
     residue_capacity: int = 16
-    residue_bytes: int = 8192
     allow_wide_workers: bool = False
     parent_poll_seconds: float = 0.01
 
@@ -85,31 +100,17 @@ class WorkerSettings:
             raise ValueError("workers outside 1/2/4 require explicit opt-in")
         for name, low, high in (
             ("max_attempts", 1, 3),
-            ("max_runs", 1, 32),
             ("packet_curves", 1, 4),
             ("poll_every", 1, 64),
             ("metadata_slots", 1, 2),
             ("residue_capacity", 1, 64),
-            ("residue_bytes", 1024, 16384),
         ):
             integer(getattr(self, name), name, low, high)
-        for name in ("assignment_work", "startup_work"):
-            integer(getattr(self, name), name, 1)
-        for name in (
-            "assignment_cpu",
-            "startup_seconds",
-            "drain_seconds",
-            "kill_seconds",
-        ):
+        for name in ("startup_seconds", "drain_seconds", "kill_seconds"):
             finite(getattr(self, name), name, 0.001)
         finite(self.parent_poll_seconds, "parent poll", 0.001)
         if self.parent_poll_seconds > 0.05:
             raise ValueError("parent poll exceeds cancellation bound")
-        integer(self.frame_bytes, "frame_bytes", 1024, 65_536)
-        integer(self.checkpoint_bytes, "checkpoint_bytes", 4096, 64 * 2**20)
-        integer(self.worker_memory, "worker_memory", 2**20, 2**30)
-        integer(self.parent_memory, "parent_memory", 2**20, 4 * 2**30)
-        integer(self.memory_bytes, "memory_bytes", 2**20, 24 * 2**30)
         integer(self.decoded_cache_bytes, "decoded cache", 0, 64 * 2**20)
         integer(self.packed_cache_bytes, "packed cache", 0, 16 * 2**20)
         integer(self.manifest_cache_bytes, "manifest cache", 0, 16 * 2**20)
@@ -128,52 +129,21 @@ class WorkerSettings:
             raise ValueError("unknown curve assignment policy")
         if self.stage_policy not in ("whole", "staged"):
             raise ValueError("unknown stage policy")
-        if (
-            self.stage_policy == "staged"
-            and self.residue_bytes + RESULT_BYTES > self.frame_bytes
-        ):
-            raise ValueError("stage result cannot fit the frame allowance")
-        if self.owned_bytes > self.memory_bytes:
-            raise MemoryError("simultaneous pool ownership refused")
-
-    @property
-    def shutdown_cpu(self):
-        # A final interpreter teardown report is unavailable: retain in full.
-        return self.drain_seconds + 2 * self.kill_seconds + 1
 
     @property
     def owned_bytes(self):
-        contexts = (self.workers + 1) * self.metadata_slots
-        residues = (
-            self.residue_capacity if self.stage_policy == "staged" else 0
-        )
-        return (
-            self.parent_memory
-            + self.manifest_cache_bytes
-            + contexts
-            * (
-                self.worker_memory
-                + self.decoded_cache_bytes
-                + self.packed_cache_bytes
-                + self.stage_two_cache_bytes
-                + 4096 * self.bind_context
-            )
-            + self.worker_memory  # Possible runtime-managed spawn helper.
-            + self.workers
-            * (12 * self.frame_bytes + RESULT_BYTES * self.packet_curves)
-            + 4 * residues * self.residue_bytes
-            + 3 * self.checkpoint_bytes
+        """Retained-cache estimate, diagnostic only; current RSS is observed."""
+        return self.manifest_cache_bytes + (
+            self.workers + 1
+        ) * self.metadata_slots * (
+            self.decoded_cache_bytes
+            + self.packed_cache_bytes
+            + self.stage_two_cache_bytes
         )
 
     def checkpoint_bound(self, curves):
-        stages = 2 if self.stage_policy == "staged" else 1
-        residues = self.residue_capacity if stages == 2 else 0
-        return (
-            65536
-            + curves * (RESULT_BYTES + 256 + stages * self.max_attempts * 1024)
-            + self.max_runs * (self.workers * 2048 + 1024)
-            + residues * self.residue_bytes
-        )
+        """Diagnostic estimate; saving is never required for dispatch."""
+        return 65536 + curves * (RESULT_BYTES + 256 + self.max_attempts * 2048)
 
 
 @dataclass(frozen=True)
@@ -343,12 +313,10 @@ class Manifest:
     def __init__(self, n, seed, lineage, options):
         integer(n, "cofactor", 2, 2**4096 - 1)
         integer(seed, "method seed", 0, 2**256 - 1)
-        if not isinstance(lineage, str) or len(lineage) > 2048:
+        if not isinstance(lineage, str):
             raise ValueError("bounded cofactor lineage required")
         # Canonical copying prevents callers mutating the frozen schedule.
         self._options = canonical(options)
-        if len(self._options) > 12_000:
-            raise ValueError("arithmetic configuration exceeds transport cap")
         tiers = options["ecm_tiers"]
         if not isinstance(tiers, (list, tuple)) or not 1 <= len(tiers) <= 32:
             raise ValueError("finite ECM tiers required")
@@ -406,17 +374,21 @@ class LeaseRefusedError(Exception):
 
 
 class Ledger:
-    """Reserve before dispatch; refund only checked reports."""
+    """Assignment identities and observed reports; no prepaid allowance.
 
-    def __init__(self, work, cpu):
-        self.work_limit = integer(work, "work allowance")
-        self.cpu_limit = finite(cpu, "CPU allowance")
+    The root Budget observes process CPU, including failed/killed workers.
+    Reports here count algorithmic work and support checked replay; they do
+    not reserve, refund or independently charge CPU into the root owner.
+    """
+
+    def __init__(self, *old, **removed):
+        if old or removed:
+            name = next(iter(removed)) if removed else "work/cpu"
+            raise RemovedResourceLimitError(name, "the shared root Budget")
         self.work = 0
-        self.cpu = 0.0
-        self.parent_cpu = 0.0
+        self.cpu = self.parent_cpu = 0.0
         self.active = {}
-        self.next_token = 0
-        self.lost = 0
+        self.next_token = self.lost = 0
         self.receipts = []
 
     def charge(self, work=0, *, parent_cpu=None):
@@ -426,55 +398,35 @@ class Ledger:
             if parent_cpu < self.parent_cpu:
                 raise ValueError("parent CPU counter decreased")
             self.parent_cpu = parent_cpu
-        if self.work + work > self.work_limit:
-            raise LeaseRefusedError("work_limit")
-        if self.cpu + self.parent_cpu > self.cpu_limit:
-            raise LeaseRefusedError("cpu_limit")
         self.work += work
 
-    def reserve(self, identity, work, cpu):
-        integer(work, "lease work")
-        finite(cpu, "lease CPU")
-        self.charge(work)
-        if self.cpu + self.parent_cpu + cpu > self.cpu_limit:
-            self.work -= work
-            raise LeaseRefusedError("cpu_limit")
+    def reserve(self, identity):
+        """Issue a token before dispatch; the token carries no resources."""
         self.next_token += 1
         token = self.next_token
-        self.active[token] = (identity, work, cpu)
-        self.receipts.append(
-            dict(
-                token=token,
-                id=identity,
-                work_grant=work,
-                cpu_grant=cpu,
-                status="reserved",
-            )
-        )
-        self.cpu += cpu
+        self.active[token] = identity
+        self.receipts.append(dict(token=token, id=identity, status="issued"))
         return token
 
     def settle(self, token, identity, work, cpu):
-        """Validate fully before refunding; a duplicate cannot refund twice."""
         integer(work, "reported work")
         finite(cpu, "reported CPU")
-        expected, grant_work, grant_cpu = self.active[token]
-        if identity != expected or work > grant_work or cpu > grant_cpu:
-            raise ValueError("worker identity or lease overrun")
+        if self.active[token] != identity:
+            raise ValueError("worker identity changed")
         del self.active[token]
         self.receipts[token - 1].update(status="reported", work=work, cpu=cpu)
-        self.work -= grant_work - work
-        self.cpu = max(0.0, self.cpu - (grant_cpu - cpu))
+        self.work += work
+        self.cpu += cpu
 
     def lose(self, token):
         self.active.pop(token)
-        self.receipts[token - 1]["status"] = "lost"
+        self.receipts[token - 1].update(status="lost", work=0, cpu=0.0)
         self.lost += 1
 
 
-def checked_residue(residue, assignment, metadata, limit):
+def checked_residue(residue, assignment, metadata):
     """Validate a canonical boundary before any stage-two tables exist."""
-    if not isinstance(residue, dict) or len(canonical(residue)) > limit:
+    if not isinstance(residue, dict):
         raise ValueError("oversized/noncanonical residue")
     required = {
         "version",
@@ -523,11 +475,6 @@ class Search:
         if type(fixed_work) is not bool:
             raise ValueError("fixed_work must be Boolean")
         self.manifest, self.settings = manifest, settings
-        if (
-            settings.checkpoint_bound(len(manifest.jobs))
-            > settings.checkpoint_bytes
-        ):
-            raise MemoryError("checkpoint ownership refused before dispatch")
         self.fixed_work = fixed_work
         self.attempts = [0] * len(manifest.jobs)
         self.continuation_attempts = [0] * len(manifest.jobs)
@@ -660,12 +607,7 @@ class Search:
             "stage_two_refusals",
             "stage_two_build_bytes",
         }
-        limit = RESULT_BYTES + (
-            self.settings.residue_bytes
-            if message.get("reason") == "boundary"
-            else 0
-        )
-        if not message.keys() <= allowed or len(canonical(message)) > limit:
+        if not message.keys() <= allowed:
             raise ValueError("unbounded result record")
         integer(
             message["attempt"], "result attempt", 1, self.settings.max_attempts
@@ -761,7 +703,6 @@ class Search:
                 message.get("residue"),
                 self.manifest.assignment(position),
                 self.manifest.metadata,
-                self.settings.residue_bytes,
             )
         del self.active[position]
         if boundary is not None:
@@ -776,144 +717,61 @@ class Search:
                     self.retired = True
 
     def check_leases(self, receipts, saved):
-        """Reject unpaid traversal or charges below retained lease evidence."""
-        maximum = len(
-            self.attempts
-        ) * self.settings.max_attempts * 2 + self.settings.max_runs * (
-            2 * self.settings.workers + 1
-        )
-        if not isinstance(receipts, list) or len(receipts) > maximum:
-            raise ValueError("lease history exceeds ownership")
+        """Validate issued identities/attempts and observed saved charges."""
+        if not isinstance(receipts, list):
+            raise ValueError("invalid assignment history")
         identities = {
             digest([self.manifest.identity, tier, index]): position
             for position, (tier, index) in enumerate(self.manifest.jobs)
         }
-        issued, acknowledged, phase_attempts = {}, {}, {}
-        charged_work, charged_cpu = 0, []
+        attempts, reported = {}, {}
+        work, cpu = 0, 0.0
         for receipt in receipts:
-            if not isinstance(receipt, dict) or len(canonical(receipt)) > 1024:
-                raise ValueError("invalid bounded lease receipt")
-            integer(receipt["token"], "lease token", 1)
-            work = integer(receipt["work_grant"], "work grant")
-            cpu = finite(receipt["cpu_grant"], "CPU grant")
+            if not isinstance(receipt, dict):
+                raise ValueError("invalid assignment receipt")
+            integer(receipt["token"], "assignment token", 1)
+            used = integer(receipt["work"], "reported work")
+            consumed = finite(receipt["cpu"], "reported CPU")
+            if receipt["status"] not in ("reported", "lost"):
+                raise ValueError("checkpoint requires settled assignments")
+            work += used
+            cpu += consumed
             identity = receipt["id"]
-            if receipt["status"] == "reported":
-                used, consumed = (
-                    integer(receipt["work"], "used work"),
-                    finite(receipt["cpu"], "used CPU"),
-                )
-                if (
-                    used > work
-                    or consumed > cpu
-                    or "overrun_work" in receipt
-                    or "overrun_cpu" in receipt
-                ):
-                    raise ValueError("invalid lease refund")
-            elif receipt["status"] == "lost":
-                used = max(
-                    work,
-                    integer(receipt.get("overrun_work", 0), "overrun work"),
-                )
-                consumed = max(
-                    cpu, finite(receipt.get("overrun_cpu", 0), "overrun CPU")
-                )
-            else:
-                raise ValueError("checkpoint has unsettled lease")
-            charged_work += used
-            charged_cpu.append(consumed)
             if identity not in identities:
                 if identity not in (
                     "startup",
                     "shutdown",
                     "spawn_runtime_helper",
                 ):
-                    raise ValueError("foreign lease identity")
+                    raise ValueError("unknown assignment receipt")
                 continue
             position = identities[identity]
-            stage = receipt.get("stage")
-            allowed = (
-                ("curve",)
-                if self.settings.stage_policy == "whole"
-                else ("stage_one", "stage_two")
-            )
-            if stage not in allowed:
-                raise ValueError("missing or unsupported lease stage")
+            stage = receipt["stage"]
+            if stage not in ("curve", "stage_one", "stage_two"):
+                raise ValueError("invalid receipt stage")
             attempt = integer(
-                receipt.get("attempt"),
-                "lease attempt",
+                receipt["attempt"],
+                "receipt attempt",
                 1,
                 self.settings.max_attempts,
             )
             key = (position, stage, attempt)
-            if key in issued:
-                raise ValueError("duplicate assignment lease")
-            issued[key] = receipt
-            phase_attempts.setdefault((position, stage), set()).add(attempt)
+            if key in attempts:
+                raise ValueError("duplicate assignment attempt")
+            attempts[key] = receipt
             if receipt["status"] == "reported":
-                acknowledged[key] = receipt
-        for position in range(len(self.attempts)):
-            first = (
-                "curve"
-                if self.settings.stage_policy == "whole"
-                else "stage_one"
-            )
-            for stage, count in (
-                (first, self.attempts[position]),
-                ("stage_two", self.continuation_attempts[position]),
-            ):
-                actual = phase_attempts.get((position, stage), set())
-                if actual != set(range(1, count + 1)):
-                    raise ValueError("traversal and lease attempts disagree")
-            if self.continuation_attempts[position]:
-                first_ack = acknowledged.get(
-                    (position, "stage_one", self.attempts[position])
-                )
-                if first_ack is None or first_ack.get("reason") != "boundary":
-                    raise ValueError(
-                        "continuation has no paid stage-one boundary"
-                    )
-                checksum = first_ack.get("boundary_sha256")
-                for attempt in range(
-                    1, self.continuation_attempts[position] + 1
-                ):
-                    row = issued[(position, "stage_two", attempt)]
-                    if row.get("boundary_sha256") != checksum:
-                        raise ValueError(
-                            "continuation lease changed its boundary"
-                        )
-            message = self.completed.get(position)
-            if message is not None:
-                row = acknowledged.get(
-                    (
-                        position,
-                        message.get("stage", "curve"),
-                        message["attempt"],
-                    )
-                )
-                if (
-                    row is None
-                    or row.get("reason") != "complete"
-                    or row["token"] != message["token"]
-                ):
-                    raise ValueError("result has no paid acknowledgement")
-            if position in self.boundaries:
-                row = acknowledged.get(
-                    (position, "stage_one", self.attempts[position])
-                )
-                if (
-                    row is None
-                    or row.get("reason") != "boundary"
-                    or row.get("boundary_sha256")
-                    != self.boundaries[position]["sha256"]
-                ):
-                    raise ValueError("boundary has no paid acknowledgement")
-        try:
-            total_cpu = math.fsum(charged_cpu)
-        except OverflowError as error:
-            raise ValueError("unbounded lease CPU total") from error
-        if saved["work"] < charged_work or saved["cpu"] + 1e-9 < total_cpu:
-            raise ValueError("resume would reset retained lease charges")
+                reported[key] = receipt
+        for position, message in self.completed.items():
+            key = (position, message.get("stage", "curve"), message["attempt"])
+            receipt = reported.get(key)
+            if receipt is None or receipt["token"] != message["token"]:
+                raise ValueError("completed result lacks a matching receipt")
+            if receipt["reason"] != message["reason"]:
+                raise ValueError("completed receipt outcome changed")
+        if saved["work"] < work or saved["cpu"] + 1e-9 < cpu:
+            raise ValueError("resume would reset observed charges")
 
+    @encode_checkpoint
     def snapshot(self):
         if self.active:
             raise ValueError("checkpoint requires drained leases")
@@ -935,14 +793,11 @@ class Search:
             factor=self.factor,
             retired=self.retired,
         )
-        if len(canonical(payload)) > self.settings.checkpoint_bytes:
-            raise MemoryError("checkpoint encoding exceeds cap")
         return dict(payload=payload, sha256=digest(payload))
 
     @classmethod
+    @decode_checkpoint
     def restore(cls, checkpoint, manifest, settings, *, fixed_work=False):
-        if len(canonical(checkpoint)) > settings.checkpoint_bytes:
-            raise ValueError("oversized checkpoint")
         data = checkpoint["payload"]
         if checkpoint["sha256"] != digest(data) or data["version"] != VERSION:
             raise ValueError("corrupt/unsupported checkpoint")
@@ -955,7 +810,7 @@ class Search:
         result = cls(manifest, settings, fixed_work=fixed_work)
         if data["fixed_work"] != fixed_work:
             raise ValueError("resume traversal changed")
-        result.runs = integer(data["runs"], "run count", 0, settings.max_runs)
+        result.runs = integer(data["runs"], "run count", 0)
         for key in ("attempts", "continuation_attempts"):
             values = data[key]
             if len(values) != len(result.attempts):
@@ -987,10 +842,7 @@ class Search:
             ):
                 raise ValueError("unissued/duplicate boundary")
             result.boundaries[position] = checked_residue(
-                boundary,
-                manifest.assignment(position),
-                manifest.metadata,
-                settings.residue_bytes,
+                boundary, manifest.assignment(position), manifest.metadata
             )
         for key, message in data["completed"].items():
             if (
@@ -1070,40 +922,45 @@ class Search:
         return result
 
 
-def frame(message, limit):
+@removed_arguments(("limit", "frame_bytes"))
+def frame(message):
     raw = canonical(message).encode("ascii")
-    if len(raw) > limit:
-        raise ValueError("oversized message")
+    if len(raw) >= 2**32:
+        raise ValueError("unsupported_encoding: frame length exceeds u32")
     return struct.pack("!I", len(raw)) + raw
 
 
 class Decoder:
-    """Bounded incremental frames without blocking on partial headers."""
+    """Incremental u32 frames; the byte buffer grows with received data."""
 
-    def __init__(self, limit):
-        self.limit, self.buffer = limit, bytearray()
+    @removed_arguments(("limit",))
+    def __init__(self):
+        self.buffer = bytearray()
+
+    @property
+    def limit(self):
+        # This is the wire word domain, not a resource grant.
+        return 2**32 - 1
 
     @property
     def complete(self):
         if len(self.buffer) < 4:
             return False
         size = struct.unpack("!I", self.buffer[:4])[0]
-        return size == 0 or size > self.limit or len(self.buffer) >= size + 4
+        return size == 0 or len(self.buffer) >= size + 4
 
     def feed(self, data):
         self.buffer.extend(data)
-        if len(self.buffer) > self.limit + 4:
-            raise ValueError("transport capacity exceeded")
         if len(self.buffer) < 4:
             return None
         size = struct.unpack("!I", self.buffer[:4])[0]
-        if size > self.limit or size == 0:
+        if size == 0:
             raise ValueError("invalid frame size")
         if len(self.buffer) < size + 4:
             return None
         stop = size + 4
         result = json.loads(bytes(self.buffer[4:stop]))
-        del self.buffer[: size + 4]
+        del self.buffer[:stop]
         if type(result) is not dict:
             raise ValueError("message must be an object")
         return result
