@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental QS kernel specialization and restricted tuning (8 November 2026)
+
+- Select default scalar marking, collection and native-stamp kernels at
+  construction, including prime-power root lifting. Preserve explicitly
+  selected alternatives, exact signatures, work accounting and resume behavior.
+- Finish the approved four-row worker/packet calibration on the isolated A7a
+  branch. Preserve noisy/inconclusive rankings, complete worker timelines and
+  earlier failed or superseded measurements. Recipes remain experimental;
+  automatic defaults and numerical policies are unchanged. Intermediate
+  verification, fresh confirmation and feasibility probes remain gated.
+
 ## Experimental QS worker overhead checks (7 November 2026)
 
 - Add explicit family-affinity placement, grouped exact marking leases and

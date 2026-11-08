@@ -1,6 +1,6 @@
 # Factor status
 
-Last updated: 7 November 2026 (America/Los_Angeles).
+Last updated: 8 November 2026 (America/Los_Angeles).
 
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate
 [ready-first startup follow-up](ROADMAP.md#b12-f4-in-progress) remains In progress:
@@ -104,6 +104,30 @@ explains residual/endpoint/product controls and charged base-count resolution.
 | Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
 | Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
+## A7a restricted G3 reported — 8 November 2026
+
+The approved worker-count/packet-width search completes all 100 calls on
+committed runtime `60bfd95`: cold 40/55/70 and warm 40. Frozen experimental
+process recipes are C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold, and
+C10/p64 at 70 cold. The 55-digit worker ranking is inconclusive under control
+drift; unadvanced 70-digit recipes have only one input. These are calibration
+choices, not a confirmed all-regime optimum or a mainline speedup claim.
+
+Default block/root loops now use construction-time specialized kernels,
+including transitive prime-power lifting. Explicit alternative mechanisms
+remain available. Matched 50/65 prefixes preserve signatures and scanned
+positions. Committed-only QA passes 1,575 tests (nine optional skips), lint
+and 292 benchmark imports. Native stamps remain selected; the footprint and
+background-QoS diagnostics do not establish a cache limit or a pure E/P ratio.
+
+Owned actors drained and the controller exited, releasing its performance
+lock. Detailed report and exact recipes:
+`v2/benchmarks/results/a7a/g3-restricted-20261107-r2/REPORT.md` in the main
+repository's ignored evidence archive. No G4, intermediate verification,
+75/80 factoring, default adoption, merge or push was run. Static 75/80
+derivations exceed the prescribed aggregate owned-memory allowance; no
+substitute recipe is selected. The stage stops here.
+
 ## A7a G2H complete — 7 November 2026
 
 The approved overhead stage is complete on `codex/a7a-regime-tuning`.
@@ -165,7 +189,7 @@ Local report: `v2/audit/a7a/g1-20261107/REPORT.md`.
 
 ## Work in flight
 
-Inspected 6 November 2026; A7a results updated 7 November. These are isolated
+Inspected 6 November 2026; A7a results updated 8 November. These are isolated
 experimental branches; their implementations are not mainline defaults.
 Checkpoint summaries and explicit
 remaining work live in [the roadmap's In progress section](ROADMAP.md#in-progress).
@@ -177,7 +201,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | G2H complete, including the final Tier 1 source-gap check. New full-factor wall-time gains remain inconclusive; anchor tuning, fresh confirmation and integration remain open. | `codex/a7a-regime-tuning`; G2H QA `1b5ab81`, gap measurement `f589ea3` |
+| [A7a](ROADMAP.md#a7a-in-progress) | Restricted G3 reported: cold 40/55/70, warm 40; 55 ranking inconclusive. Intermediate verification, fresh confirmation, probes and integration remain gated. | `codex/a7a-regime-tuning`; runtime/QA `60bfd95`; ignored `g3-restricted-20261107-r2/REPORT.md` |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first

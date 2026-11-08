@@ -1,21 +1,26 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
-Status: G2H accepted. The 7 November instruction authorizes the pre-G3
-cleanup/diagnostics and the restricted G3 below, then stop. G4 and the 75/80
-probes still require separate approval. Follow the
+Status: restricted G3 reported on 8 November; the approved stage is finished
+and stopped. All 100 calls complete on runtime `60bfd95`. Frozen experimental
+process recipes: C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold (ranking
+inconclusive), C10/p64 at 70 cold. Pre-G3 cleanup and diagnostics are complete.
+Intermediate verification, G4 and the 75/80 probes require separate approval.
+Follow the
 [joint-search policy](../POLICY.md#joint-parameter-searches) and
 [evidence tiers](../POLICY.md#evidence-tiers-and-sample-sizing).
 Preserve historical freezes, failures, charges and captures unchanged.
 
 ## Deliverable, scope and source
 
-Deliver cold CLI rows for **40, 50, 55, 60, 65 and 70 digits**. Add warm rows
-only at **40 and 50 digits**. **62 digits is dropped** from new measurements;
+The broader deliverable remains cold CLI rows for **40, 50, 55, 60, 65 and
+70 digits**. The latest scope limits warm tuning to **40 digits**, superseding
+the earlier warm-50 proposal. **62 digits is dropped** from new measurements;
 retain its historical evidence without claiming an adopted interpolation.
 
-Tune cold anchors at **40, 55 and 70** and warm anchors at **40 and 50**.
-After architectural fixes, interpolate cold 50/60/65 from those anchors and
-verify each of these three rows. They remain labeled "interpolated, verified",
+Tune cold anchors at **40, 55 and 70** and the warm anchor at **40**.
+Cold 50/60/65 proposals are currently **interpolated, unverified**; their
+verification was excluded from the restricted G3 authorization. Once separately
+authorized checks pass, label them "interpolated, verified",
 not independently tuned optima. Warm/cold results are distinct lifetimes.
 Report full recipes, input coverage, completion, elapsed time, CPU, aggregate
 owned RSS, uncertainty, ties, exclusions and untested interactions. The claim
@@ -40,6 +45,11 @@ branch `codex/a7a-regime-tuning`. The implementation checkpoint is `276ebd8`,
 based on mainline `e62ec18`; historical experimental source is `ae1cfd9`.
 Later documentation commits do not establish fresh runtime evidence. Record
 actual committed source, corpus hash and runtime versions in each new freeze.
+Current G3 runtime and QA source is `60bfd95`; the earlier checkpoint above
+is historical. Canonical local evidence is main's ignored
+`v2/benchmarks/results/a7a/g3-restricted-20261107-r2/`. It contains the
+source archive, executable controller, frozen plan, per-call commands,
+receipts, progress/thermals, worker timelines, exact recipes, report and hashes.
 Pin literal current mainline separately. Do not merge implementation changes,
 push or change automatic defaults under this plan.
 
@@ -447,13 +457,15 @@ before/after cells and every 60 seconds during a batch. Missing readings
 remain explicit; telemetry does not establish absence of throttling.
 
 Each batch begins and ends with an A/A pair using identical source, input,
-seed, work, lifetime and settings. Define drift as `max(time)/min(time)-1`:
+seed, work, lifetime and settings. Define drift as `max(time)/min(time)-1`.
+The later user amendment makes short pre-G3 and G3 40/55 checks report-only;
+continue while retaining their uncertainty. For the long G3 70-digit batch,
 stop/report above 10% within either pair, or between the geometric mean times
 of the start/end pairs. The pre-G3 endpoint is full external cold actor wall;
 G3 cold uses that endpoint and warm uses the timed complete library call.
-No automatic retry/restart after drift. The end gate determines validity of
-that batch; retain earlier observations if it fails, without presenting them
-as a quiet-window-confirmed comparison.
+No automatic retry/restart after a long-run drift stop. The long-run end gate
+determines that batch's validity; retain observations if it fails, without
+presenting them as a quiet-window-confirmed comparison.
 
 Production calls keep Tier A, owned RSS and active/task-wait/publication
 worker timelines on both arms. Independent packets have active private
@@ -480,6 +492,17 @@ incumbent (a)/(b) choices unless the authorized byte-footprint diagnostic
 establishes a clear choice; freeze that decision before G3 outcomes. Keep
 numerical base/report/product/residual limits unchanged.
 
+The completed pre-G3 diagnostic retained native stamps. Current default hot
+loops use construction-time specialization through root lifting, validated
+on `60bfd95` with exact matched 50/65 prefixes and committed-only full QA
+(1,575 tests, nine optional skips, lint, 292 benchmark imports). An earlier
+77-call cheap G3 batch on `d1ae1ae` was closed before any 70-digit cell to
+finish the missing root specialization. Its outcomes and charges are retained,
+not pooled with the current-source search. All cheap rows were rerun.
+Represent whole-family packets canonically as explicit width g with
+`whole_family=False`; setting that flag with the same width describes the
+same allocation, not another tuning dimension.
+
 Maximum eight distinct configurations per row, no extra refinement. At
 40 cold/warm and 55 cold run all eight on three calibration inputs. At 70,
 run all eight on input 0, then the incumbent C8/p16 and the best distinct
@@ -497,14 +520,17 @@ Maximum calls: 28 each at 40 cold, 40 warm and 55 cold; 16 at 70 cold,
 
 | Row | Calls | Actor wall / CPU | Owner wall / CPU per call |
 | --- | ---: | ---: | ---: |
-| 40 cold | 28 | 30 s / 650 s | 45 s / 710 s |
-| 40 warm | 28 | 30 s / 650 s | 45 s / 710 s |
+| 40 cold | 28 | 30 s / 550 s | 45 s / 610 s |
+| 40 warm | 28 | 30 s / 550 s | 45 s / 610 s |
 | 55 cold | 28 | 100 s / 1,000 s | 120 s / 1,060 s |
 | 70 cold | 16 | 1,800 s / 18,000 s | 1,820 s / 18,060 s |
 
-The calls reserve 35,000 wall seconds and 358,400 CPU-seconds, within the
-10-hour/100-core-hour G3 ceiling, leaving 1,000 wall and 1,600 CPU-seconds
-for preparation/telemetry/cleanup. Output ceiling 16 GiB. Actual expected
+The current calls reserve 35,000 wall seconds and 352,800 CPU-seconds.
+Carry the earlier batch's exact 589.638380584 wall / 5,896.383805838 charged
+CPU-seconds and reserve 100 wall / 1,000 CPU-seconds for static analysis.
+The combined ceiling bill is 35,689.638380584 wall / 359,696.383805838
+CPU-seconds, within 10 hours / 100 core-hours. There is no transfer of unused
+pre-G3 allowance. Output ceiling 16 GiB. Actual expected
 runtime is approximately 3–6 hours from accepted current costs, not a target
 to spend. Funding must include outstanding leases; refusals are censored and
 never automatically retried. Packet CPU stays at incumbent 30 seconds.
@@ -524,6 +550,41 @@ Freeze the exact 75/80 probe derivations in the G3 report before outcomes,
 using the frozen cold 70 anchor, its implementation bundle and Y0 resolved
 at the target size. Configuration resolution is not a factoring call.
 Keep the separate probe allowances and approval gates below unchanged.
+
+### Reported G3 outcome and reproduction
+
+The current 100-call search completed, reconstructed every input and drained
+owned children. The long 70-digit A/A gate passed. Short-call drift is retained
+as uncertainty, especially at 55 digits; it is not treated as proof of a new
+worker-count gain. The report freezes full recipes, CPU/wall tradeoffs and
+worker timelines, not merely worker counts. Intermediate proposals are
+50: C4/p8, 60: C4/p16 and 65: C10/p64, all unverified.
+
+The cumulative G3 charge, including the historical batch and analysis reserve,
+is 12,083.295227043 wall / 120,832.952270429 conservative CPU-seconds.
+Observed CPU is recorded separately. All historical failures remain retained.
+The versioned driver/runner imports are covered by committed-only QA; this
+reporting update changes documentation only.
+
+Exact historical execution from the task worktree was:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/pre-g3/g3-r2.py
+```
+
+The archived copy is `controller.py` beside `plan.json`; `batch-helpers.py`
+and `source.tar` preserve its dependencies and committed runtime. Paths in
+these immutable scripts identify the original evidence directories. Do not
+rerun into them. Any new run needs a new identity, fresh output directory,
+approved grant and nonblocking performance lock. No successor is authorized
+by this reproduction command.
+
+The mapped 75/80 recipe is C10/p64 from the frozen 70 anchor (actual family
+64 at both target sizes), with unchanged G2H choices and target-resolved Y0.
+Prospective owned bounds are 23,965,302,784 / 24,477,270,016 bytes against
+23,622,320,128 bytes allowed. These are accounting refusals, not observed
+physical exhaustion. No probe ran; do not silently change worker count,
+capacity or recipe. Exact derivations are saved before any probe outcome.
 
 ## G4: independent confirmation against literal mainline
 
@@ -548,8 +609,8 @@ Start each row with **three fresh independent inputs**, in committed order:
 | Otherwise | 3 inputs x 1 repetition |
 
 One cold repetition means one fresh interpreter/pool, with no warmup. Warm
-applies only at 40/50 with the separately frozen lifetime and at least three
-seconds of validated, charged warmup. Freeze the repetition count before
+applies only at 40 under the latest scope, with the frozen lifetime and at
+least three seconds of validated, charged warmup. Freeze the repetition count before
 confirmation; use one per input for calls at or above ten seconds. Treat
 repetitions as a cluster and form one paired log-ratio observation per input.
 Counterbalance arm order, preserve failures and reconstruct exact results.

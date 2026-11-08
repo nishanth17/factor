@@ -28,6 +28,22 @@ probes. Fix measured architectural overhead, classify options, then tune only
 real tunables at anchors and verify interpolation. Fresh G4 inputs live in
 `inputs/a7a/confirmation_g4.json` and remain outside tuning.
 
+The restricted G3 is now reported: only workers 4/6/8/10 and packets g/4,g
+were varied at cold 40/55/70 and warm 40. Experimental process recipes are
+C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold, and C10/p64 at 70 cold.
+The 55 ranking is inconclusive under control drift. All 100 current-source
+calls complete; these calibration choices do not establish a fresh mainline
+speedup or a routing table. Runtime/committed-only QA source is `60bfd95`;
+full tests, lint and benchmark imports pass. Intermediate verification, G4
+and probes remain gated. Detailed evidence and exact recipes are local in
+main's ignored `results/a7a/g3-restricted-20261107-r2/` directory.
+
+The independent-packet diagnostic accepts an explicit bounded `--seconds`
+override of 35 or 75 seconds. It changes the observation allowance, not the
+fixed packet work. Background QoS is not core pinning. Buffer payload,
+accounted cache ownership and observed RSS are distinct memory measurements;
+the byte/native screen does not establish a working-set scaling limit.
+
 G2's corrected coverage is reported locally in
 `v2/audit/a7a/g2-report-20261107/REPORT.md`. All serial/process cells complete;
 literal mainline is incomplete at 60/65/70. This is exposed-input feasibility,

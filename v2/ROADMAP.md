@@ -175,6 +175,21 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **Restricted G3 reported (8 November):** the approved four-row worker/packet
+  grid completes all 100 current-source calls on `60bfd95`. Experimental
+  process recipes are C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold and
+  C10/p64 at 70 cold. Control drift leaves the 55-digit ranking inconclusive;
+  nonadvanced 70 recipes have insufficient input coverage. Construction-time
+  specialization removes disabled guards from default block/root loops,
+  including transitive root lifting. Exact 50/65 prefix checks pass; full
+  committed-only QA passes 1,575 tests (nine optional skips), lint and 292
+  imports. Native stamps remain selected. Current evidence is calibration,
+  not fresh mainline confirmation, adoption or a global optimum. Intermediate
+  50/60/65 proposals remain unverified. Static 75/80 candidate derivations
+  exceed their prescribed owned-memory allowance; neither probe was run.
+  Stage stopped and lock released after cleanup. Canonical local report:
+  `v2/benchmarks/results/a7a/g3-restricted-20261107-r2/REPORT.md` in main.
+
 - **G2H complete (7 November):** independent packet references include N=10;
   static family affinity, grouped exact marking leases and byte hit stamps
   have explicit implementations and exactness tests. Full comparisons and
