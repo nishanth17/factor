@@ -153,7 +153,9 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     result = dict(
-        qs=[qs_prefix(identity, n) for identity, n in cases()], ecm=ecm_cases()
+        qs=[qs_prefix(identity, n) for identity, n in cases()],
+        ecm=ecm_cases(),
+        manifests=manifest_cases(),
     )
     args.output.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
 
