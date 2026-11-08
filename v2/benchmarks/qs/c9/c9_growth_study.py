@@ -14,9 +14,16 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .... import qs
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ...ecm.p52.p52_realistic import check_quiet
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..b1.b1_calibration import save
@@ -89,16 +96,17 @@ def growing(config):
         split_call_limit=None,
     )
     return replace(
-        config, collector=qs.GrowingDoubleLargeSieveConfig(**options)
+        config,
+        collector=adapt_resource_configuration(
+            qs.GrowingDoubleLargeSieveConfig, **options
+        ),
     )
 
 
 def configuration(registry, arm):
     if arm in ("slp", "dlp"):
         config = decode(registry["slp_aligned" if arm == "slp" else "dlp"])
-        return replace(
-            config, collector=replace(config.collector, memory_bytes=MEMORY)
-        )
+        return replace(config, collector=replace(config.collector))
     config = growing(decode(registry["dlp"]))
     if arm == "grow_aligned":
         config = replace(
@@ -122,8 +130,10 @@ def decode(value):
         if ("large_prime_bound" in value["collector"])
         else qs.SieveConfig
     )
-    value["collector"] = kind(**value["collector"])
-    return qs.SIQSConfig(**value)
+    value["collector"] = adapt_resource_configuration(
+        kind, **value["collector"]
+    )
+    return adapt_resource_configuration(qs.SIQSConfig, **value)
 
 
 def graph_diagnostics(collector):
@@ -463,7 +473,8 @@ def joint_freeze(output):
     graph = growing(
         replace(
             slp,
-            collector=qs.DoubleLargeSieveConfig(
+            collector=adapt_resource_configuration(
+                qs.DoubleLargeSieveConfig,
                 **asdict(slp.collector),
                 large_prime_bound=2,
                 large_product_bound=4,

@@ -9,6 +9,9 @@ from dataclasses import asdict, replace
 from unittest.mock import patch
 
 from v2 import qs
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c9a import extended
 from v2.benchmarks.qs.c9a.configuration import configuration, decode
 from v2.execution.budget import BudgetExhaustedError
@@ -23,7 +26,7 @@ from v2.tests.test_qs_dlp import allowance
 def bounded(**changes):
     values = dict(asdict(policy()), extension_policy="extended-v2")
     values.update(changes)
-    return qs.BoundedYieldSieveConfig(**values)
+    return adapt_resource_configuration(qs.BoundedYieldSieveConfig, **values)
 
 
 def worker(**changes):

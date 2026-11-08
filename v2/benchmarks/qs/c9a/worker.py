@@ -9,6 +9,11 @@ from contextlib import nullcontext
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import qs as candidate
 from ....execution import budget as candidate_budget
 from ...support.resources import PeakRSSReader
@@ -90,15 +95,25 @@ def warm_once(qs, budgets, template, deadline):
                     values.update(
                         {key: selected[key] for key in BOUNDED_FIELDS}
                     )
-                    collector = qs.BoundedYieldSieveConfig(**values)
+                    collector = adapt_resource_configuration(
+                        qs.BoundedYieldSieveConfig, **values
+                    )
                 else:
-                    collector = qs.ExtendedYieldSieveConfig(**values)
+                    collector = adapt_resource_configuration(
+                        qs.ExtendedYieldSieveConfig, **values
+                    )
             else:
-                collector = qs.CombinedYieldSieveConfig(**values)
+                collector = adapt_resource_configuration(
+                    qs.CombinedYieldSieveConfig, **values
+                )
         else:
-            collector = qs.YieldSieveConfig(**values)
+            collector = adapt_resource_configuration(
+                qs.YieldSieveConfig, **values
+            )
     else:
-        collector = qs.GrowingDoubleLargeSieveConfig(**values)
+        collector = adapt_resource_configuration(
+            qs.GrowingDoubleLargeSieveConfig, **values
+        )
     arithmetic = {
         key: template[key]
         for key in (
@@ -111,7 +126,8 @@ def warm_once(qs, budgets, template, deadline):
     if arithmetic:
         arithmetic["assignment_policy"] = template["assignment_policy"]
         arithmetic["multiplier"] = 0
-    config = qs.SIQSConfig(
+    config = adapt_resource_configuration(
+        qs.SIQSConfig,
         base_bound=200,
         half_width=128,
         max_half_width=128,
@@ -120,7 +136,8 @@ def warm_once(qs, budgets, template, deadline):
         solve_policy="collection",
         **arithmetic,
     )
-    budget = budgets.Budget(
+    budget = recording_budget(
+        budgets.Budget,
         work_limit=10**9,
         seconds=max(0, deadline - time.monotonic()),
         cpu_seconds=5,
@@ -277,7 +294,8 @@ def run(cell, *, capture_path=None):
         exceeded = exceeded or rss() > cell["rss_bytes"]
         return exceeded
 
-    budget = budgets.Budget(
+    budget = recording_budget(
+        budgets.Budget,
         work_limit=cell["work_limit"] - VALIDATION_WORK,
         seconds=cell["seconds"],
         cpu_seconds=cell["seconds"],

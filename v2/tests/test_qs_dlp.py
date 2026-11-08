@@ -9,6 +9,9 @@ from dataclasses import asdict, replace
 from math import gcd
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic
 from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -53,7 +56,7 @@ def configuration(**options):
         max_partials=32,
     )
     values.update(options)
-    return DoubleLargeSieveConfig(**values)
+    return adapt_resource_configuration(DoubleLargeSieveConfig, **values)
 
 
 def worker(*, backend="python-int", **options):

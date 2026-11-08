@@ -11,8 +11,11 @@ from functools import partial
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget
 from ....qs import (
     Polynomial,
     PolynomialFamily,

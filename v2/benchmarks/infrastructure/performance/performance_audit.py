@@ -23,6 +23,11 @@ from dataclasses import asdict, replace
 from math import gcd, isqrt, prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 if __package__ in (None, ""):
     # Resolve driver inputs without importing the selected runtime early.
     from runpy import run_path
@@ -310,7 +315,9 @@ def make_config(case, band, modules):
             params["poll_interval"] = 1
         if "cap" in case:
             params["max_batch_atoms"] = 1024
-        return modules["parallel"].ParallelConfig(**params)
+        return adapt_resource_configuration(
+            modules["parallel"].ParallelConfig, **params
+        )
 
     if case.startswith("siqs"):
         if "feasible" in case:
@@ -330,8 +337,6 @@ def make_config(case, band, modules):
                     options,
                     block_width=4096,
                     residual_bound=10000000,
-                    max_atoms=65536,
-                    max_relations=32768,
                     max_partials=32768,
                 ),
             )
@@ -367,8 +372,9 @@ def run_one(case, fixture, seed, config, modules, pool=None):
         if "feasible" in case
         else (0.2 if fixture["band"] in ("40d", "60d", "80d") else 5)
     )
-    budget = modules["budget"].Budget(
-        work_limit=10**13 if "feasible" in case else 2_000_000_000,
+    budget = recording_budget(
+        modules["budget"].Budget,
+        work_limit=10**13 if "feasible" in case else 2000000000,
         seconds=seconds,
         cpu_seconds=seconds,
     )
@@ -383,7 +389,9 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                 n,
                 seed=seed,
                 budget=budget,
-                config=portfolio.PortfolioConfig(**config),
+                config=adapt_resource_configuration(
+                    portfolio.PortfolioConfig, **config
+                ),
             )
 
             if outcome.result.reconstruct() != n:

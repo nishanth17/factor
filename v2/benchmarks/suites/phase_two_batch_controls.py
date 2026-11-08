@@ -6,9 +6,12 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ...common import utils
 from ...execution import stage_jobs
-from ...execution.budget import Budget
 from ...execution.schedules import SieveContext
 from ...portfolio import PortfolioConfig
 from ..support.snapshot_loader import load_stage_jobs

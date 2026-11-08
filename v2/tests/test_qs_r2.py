@@ -317,9 +317,11 @@ class R2CollectorTests(unittest.TestCase):
                 power_plan_bytes=2**20,
                 division="bucket",
                 residual_bound=1000000,
-                max_atoms=8192,
-                max_relations=4096,
                 max_partials=2048,
+                target_rows=4096,
+                preparation_cache_bytes=2 * 2**20
+                if 4096 == None
+                else min(2 * 2**20, 2048 * 4096),
             ),
         )
         job = SIQSJob(n, config=config, budget=unlimited_budget())

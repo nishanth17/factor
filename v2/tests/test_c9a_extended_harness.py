@@ -10,6 +10,9 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2 import qs
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c9a import combined, extended
 from v2.benchmarks.qs.c9a.__main__ import execution_cells
 from v2.benchmarks.qs.c9a.accounting import StudyLedger
@@ -198,7 +201,9 @@ class ExpandedProtocolTests(unittest.TestCase):
             for values in choices.values():
                 base = asdict(incumbent)
                 base.update(values)
-                qs.ExtendedYieldSieveConfig(**base)
+                adapt_resource_configuration(
+                    qs.ExtendedYieldSieveConfig, **base
+                )
 
     def test_unobserved_wider_domain_is_not_ranked_as_free_yield(self):
         choices = extended.profiles(30000, configuration(60, "C0").collector)

@@ -6,6 +6,7 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
 from v2.benchmarks.qs.p38.p38_r3_experiments import (
     history_filter,
     live_compaction,
@@ -108,8 +109,11 @@ class StableRowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="r3-legacy-") as directory:
             control = modules(load_control(directory))
             old = control["qs.siqs"]
-            budget = control["budget"].Budget(
-                work_limit=10**9, seconds=30, cpu_seconds=30
+            budget = recording_budget(
+                control["budget"].Budget,
+                work_limit=10**9,
+                seconds=30,
+                cpu_seconds=30,
             )
             job = old.SIQSJob(
                 4001 * 5003,

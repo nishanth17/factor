@@ -8,7 +8,10 @@ import sys
 import time
 from pathlib import Path
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ..c10a04.accounting import digest, output_lock
 from . import host_state, pilots_v4, plan_v4
 

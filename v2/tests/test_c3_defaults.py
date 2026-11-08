@@ -8,6 +8,9 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.allocation import ECMAllocation
 from v2.execution.ecm_defaults import COMPACT64, ESCALATING140
 from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -49,7 +52,7 @@ class DefaultTests(unittest.TestCase):
         self.assertIs(config.for_input(10**29), config)
         values = asdict(config)
         self.assertNotIn("_automatic_ecm_tiers", values)
-        restored = PortfolioConfig(**values)
+        restored = adapt_resource_configuration(PortfolioConfig, **values)
         self.assertEqual(restored.ecm_tiers, ESCALATING140)
         self.assertIs(restored.for_input(10**29), restored)
 
@@ -129,7 +132,7 @@ class DefaultTests(unittest.TestCase):
     def test_protected_fallback_refuses_without_spending_reserve(self):
         n = 10**39 + 1
         config = PortfolioConfig(
-            siqs=SIQSConfig(memory_bytes=64 * 2**20),
+            siqs=SIQSConfig(),
             allocation=ECMAllocation("campaign", fallback_work=1000000),
         )
         # Fund mandatory checks, but leave the fallback floor unfunded.

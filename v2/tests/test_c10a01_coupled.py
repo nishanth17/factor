@@ -9,6 +9,9 @@ from fractions import Fraction
 from math import isqrt, prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c10a01.configuration import configuration as old_config
 from v2.benchmarks.qs.c10a01.configuration_v3 import (
     configuration as study_config,
@@ -190,9 +193,15 @@ class PairedAssignmentTests(unittest.TestCase):
             policy="paired_flyer",
             memory_bytes=2**24,
         )
-        stream = AssignmentStream(base, 32, budget=allowance(), **options)
-        short = AssignmentStream(
-            base, 32, budget=allowance(), **dict(options, family_count=3)
+        stream = adapt_resource_configuration(
+            AssignmentStream, base, 32, budget=allowance(), **options
+        )
+        short = adapt_resource_configuration(
+            AssignmentStream,
+            base,
+            32,
+            budget=allowance(),
+            **dict(options, family_count=3),
         )
         values = [stream[i] for i in range(len(stream))]
         self.assertEqual(len(values), 15)
@@ -233,7 +242,8 @@ class PairedAssignmentTests(unittest.TestCase):
                 self.assertEqual(stream.__dict__[key], before[key])
         ledger = allowance()
         with self.assertRaises(TypeError):
-            AssignmentStream(
+            adapt_resource_configuration(
+                AssignmentStream,
                 base,
                 32,
                 budget=ledger,
@@ -244,8 +254,12 @@ class PairedAssignmentTests(unittest.TestCase):
             stream.workspace_bytes, paired_workspace(len(base.entries), 4)
         )
         with self.assertRaises(ValueError):
-            AssignmentStream(
-                base, 32, budget=allowance(), **dict(options, factor_count=2)
+            adapt_resource_configuration(
+                AssignmentStream,
+                base,
+                32,
+                budget=allowance(),
+                **dict(options, factor_count=2),
             )
 
 
@@ -271,7 +285,9 @@ class ParityInitializationTests(unittest.TestCase):
                 polynomial,
                 base,
                 budget=allowance(),
-                config=SieveConfig(marking=kind, **values),
+                config=adapt_resource_configuration(
+                    SieveConfig, marking=kind, **values
+                ),
             )
             for kind in (marking, opt_marking)
         ]

@@ -20,8 +20,12 @@ from dataclasses import asdict, replace
 from math import isqrt, prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs import SieveConfig, SIQSConfig, SIQSJob
 from ....qs import siqs as siqs_module
 from ...ecm.p52.p52_realistic import check_quiet
@@ -136,10 +140,11 @@ def common_config(
             score_policy="powers",
             division="bucket",
             residual_bound=residual or min(10**12, bound**2),
-            max_relations=rows,
             max_partials=partials,
-            max_atoms=min(65536, 2 * (rows + partials)),
-            memory_bytes=memory,
+            target_rows=rows,
+            preparation_cache_bytes=2 * 2**20
+            if rows is None
+            else min(2 * 2**20, 2048 * rows),
         ),
     )
 

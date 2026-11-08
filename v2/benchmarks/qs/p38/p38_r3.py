@@ -18,6 +18,8 @@ from dataclasses import asdict, replace
 from functools import lru_cache
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from ...infrastructure.performance.performance_audit import (
     checked_baseline,
     fingerprint,
@@ -43,7 +45,8 @@ SECONDS = 0.2
 
 
 def allowance(module, *, timed=False):
-    return module.Budget(
+    return recording_budget(
+        module.Budget,
         work_limit=WORK,
         seconds=SECONDS if timed else 30,
         cpu_seconds=SECONDS if timed else 30,
@@ -375,9 +378,11 @@ def config(module, band):
                 score_policy="powers",
                 division="bucket",
                 residual_bound=10000000,
-                max_atoms=65536,
-                max_relations=32768,
                 max_partials=32768,
+                target_rows=32768,
+                preparation_cache_bytes=2 * 2**20
+                if 32768 == None
+                else min(2 * 2**20, 2048 * 32768),
             ),
         )
 
@@ -400,9 +405,11 @@ def config(module, band):
             score_policy="powers",
             division="bucket",
             residual_bound=bound**2,
-            max_atoms=8192,
-            max_relations=4096,
             max_partials=2048,
+            target_rows=4096,
+            preparation_cache_bytes=2 * 2**20
+            if 4096 == None
+            else min(2 * 2**20, 2048 * 4096),
         ),
     )
 
@@ -410,8 +417,11 @@ def config(module, band):
 def factor_run(mods, fixture, seed, variant):
     module = mods["qs.siqs"]
     seconds = 2 if fixture["band"] == "30d" else 0.2
-    budget = mods["budget"].Budget(
-        work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    budget = recording_budget(
+        mods["budget"].Budget,
+        work_limit=WORK,
+        seconds=seconds,
+        cpu_seconds=seconds,
     )
     selected = config(module, fixture["band"])
     if variant.startswith("cadence"):

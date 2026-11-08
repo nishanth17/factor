@@ -4,6 +4,9 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, qs_polynomial, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
@@ -22,7 +25,8 @@ def signature(result):
 def collector(polynomial, base, **options):
     """Use no eviction for coverage checks and no timer noise."""
     options.setdefault("residual_bound", 97)
-    config = SieveConfig(
+    config = adapt_resource_configuration(
+        SieveConfig,
         max_partials=4096,
         **options,
         preparation_cache_bytes=2 * 2**20
@@ -477,7 +481,7 @@ class SieveStoreTests(unittest.TestCase):
             {"metadata_chunk": 1025},
         ):
             with self.assertRaises(ValueError):
-                SieveConfig(**options)
+                adapt_resource_configuration(SieveConfig, **options)
 
         with self.assertRaises(TypeError):
             SieveCollector(

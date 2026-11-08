@@ -2,8 +2,11 @@
 
 import math
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from .round2_corpus import GenerationRandom
 

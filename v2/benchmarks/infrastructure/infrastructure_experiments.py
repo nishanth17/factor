@@ -11,9 +11,12 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ...common import prime_sieve, utils
 from ...ecm import core as ecm
-from ...execution.budget import Budget
 from ...execution.schedules import ScheduleCache, SieveContext
 from ...execution.stage_jobs import advance_job, new_job
 from ...factor import factorize

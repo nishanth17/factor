@@ -9,6 +9,9 @@ import weakref
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     DependencyExtractor,
@@ -471,7 +474,9 @@ class StorageCompletionTests(unittest.TestCase):
         budget = unlimited_budget()
         base = build_factor_base(n, bound=100, budget=budget).factor_base
         limits.pop("memory_bytes", 32 * 1024 * 1024)
-        config = SieveConfig(residual_bound=1, **limits)
+        config = adapt_resource_configuration(
+            SieveConfig, residual_bound=1, **limits
+        )
         return QSJob(
             qs_polynomial(base),
             base,
@@ -555,7 +560,7 @@ class StorageCompletionTests(unittest.TestCase):
         def refuse_storage_matrix(*args, **kwargs):
             if job.storage_reason is not None:
                 raise MemoryError("no room for final matrix")
-            return filter_matrix(*args, **kwargs)
+            return adapt_resource_configuration(filter_matrix, *args, **kwargs)
 
         with patch(
             "v2.qs.pipeline.filter_matrix", side_effect=refuse_storage_matrix

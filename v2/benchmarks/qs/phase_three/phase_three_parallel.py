@@ -13,8 +13,15 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs.parallel import (
     CollectionPool,
     ParallelConfig,
@@ -368,8 +375,10 @@ def main():
         if band not in output["training"]:
             raise ValueError("provide --training before held-out evaluation")
         options = dict(output["training"][band]["config"])
-        options["collector"] = SieveConfig(**options["collector"])
-        config = ParallelConfig(**options)
+        options["collector"] = adapt_resource_configuration(
+            SieveConfig, **options["collector"]
+        )
+        config = adapt_resource_configuration(ParallelConfig, **options)
         fixtures = [
             f
             for f in corpus["fixtures"]

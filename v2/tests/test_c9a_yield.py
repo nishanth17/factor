@@ -9,6 +9,10 @@ from dataclasses import FrozenInstanceError, asdict, replace
 from math import isqrt
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.qs.c9a.control import control_modules
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
@@ -45,7 +49,7 @@ def policy(**changes):
         memory_bytes=64 * 2**20,
     )
     values.update(changes)
-    return YieldSieveConfig(**values)
+    return adapt_resource_configuration(YieldSieveConfig, **values)
 
 
 def collector(**changes):
@@ -426,7 +430,6 @@ class CompatibilityTests(unittest.TestCase):
                 residual_bound=1000,
                 large_prime_bound=1000,
                 large_product_bound=1000000,
-                memory_bytes=64 * 2**20,
                 block_width=16,
             ),
         )
@@ -436,8 +439,11 @@ class CompatibilityTests(unittest.TestCase):
             budget = (
                 allowance(10**9)
                 if module is current
-                else budgets.Budget(
-                    work_limit=10**9, seconds=None, cpu_seconds=None
+                else recording_budget(
+                    budgets.Budget,
+                    work_limit=10**9,
+                    seconds=None,
+                    cpu_seconds=None,
                 )
             )
             job = module.SIQSJob(

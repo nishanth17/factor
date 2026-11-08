@@ -17,6 +17,8 @@ from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 if __package__ in (None, ""):
     # Loading paths as a standalone module leaves the chosen v2 runtime
     # unimported; --runtime-root can then select an immutable old checkout.
@@ -184,8 +186,11 @@ def main():
 def family_setup(fixture, seed, config, modules):
     """Check finite setup CRT/inverse outputs, including repeated bases."""
     started = time.perf_counter()
-    budget = modules["budget"].Budget(
-        work_limit=2_000_000_000, seconds=5, cpu_seconds=5
+    budget = recording_budget(
+        modules["budget"].Budget,
+        work_limit=2000000000,
+        seconds=5,
+        cpu_seconds=5,
     )
     parallel = modules["parallel"]
     base = parallel.build_factor_base(
@@ -239,8 +244,11 @@ def family_setup(fixture, seed, config, modules):
 def resieve_capacity(fixture, seed, config, modules):
     """Validate each returned atom at a matched finite storage capacity."""
     started = time.perf_counter()
-    budget = modules["budget"].Budget(
-        work_limit=2_000_000_000, seconds=5, cpu_seconds=5
+    budget = recording_budget(
+        modules["budget"].Budget,
+        work_limit=2000000000,
+        seconds=5,
+        cpu_seconds=5,
     )
     stats, signature, divisor = {}, None, None
     base = modules["factor_base"].build_factor_base(

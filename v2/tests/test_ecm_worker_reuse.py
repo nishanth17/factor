@@ -11,6 +11,9 @@ from dataclasses import replace
 from math import isqrt
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_worker_state import DecodedPrograms
@@ -289,7 +292,7 @@ print(json.dumps({'passed':True}))
             {"manifest_cache_bytes": 16 * 2**20 + 1},
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**changes)
+                adapt_resource_configuration(WorkerSettings, **changes)
         config = configuration()
         base = Manifest(
             35, 7919, "root", arithmetic_options(config, WorkerSettings())

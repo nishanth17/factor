@@ -14,6 +14,8 @@ import time
 from math import gcd
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from ...support.paths import (
     REPOSITORY_ROOT,
     matches_source_pins,
@@ -201,7 +203,8 @@ def measure_full(engine, protocol, backend, fixtures):
                 fixture["n"],
                 seed=seed,
                 config=config,
-                budget=engine.Budget(
+                budget=recording_budget(
+                    engine.Budget,
                     work_limit=protocol["work_limit"],
                     seconds=protocol["seconds"],
                     cpu_seconds=protocol["cpu_seconds"],

@@ -13,6 +13,9 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.ecm.b12_f4.selection_profile import build_profile
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_selection import (
@@ -43,7 +46,7 @@ def configuration(**changes):
         sss=None,
     )
     values.update(changes)
-    return PortfolioConfig(**values)
+    return adapt_resource_configuration(PortfolioConfig, **values)
 
 
 class InterpolatedCostTests(unittest.TestCase):

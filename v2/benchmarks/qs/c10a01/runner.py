@@ -17,8 +17,12 @@ from dataclasses import asdict  # noqa: E402
 from math import prod  # noqa: E402
 from pathlib import Path  # noqa: E402
 
+from v2.benchmarks.infrastructure.resource_control import (  # noqa: E402
+    RecordingBudget as Budget,
+)
+
 from ....common import utils  # noqa: E402
-from ....execution.budget import Budget, BudgetExhaustedError  # noqa: E402
+from ....execution.budget import BudgetExhaustedError  # noqa: E402
 from ....qs import SIQSJob  # noqa: E402
 from ....qs.sieve_collector import SieveCollector  # noqa: E402
 from ....qs.sign_schedule import schedule_for  # noqa: E402

@@ -15,6 +15,10 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 
 def validate_reconstruction(row):
     """Reject malformed raw output before retaining a timing observation."""
@@ -167,12 +171,13 @@ def child(request_path, source_root):
     )
     from v2.portfolio import PortfolioConfig, factorize_bounded
 
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     executor = None
     if request["arm"] == "POLICY":
         from v2.execution.ecm_selection import SelectedECMContext
 
-        executor = SelectedECMContext(
+        executor = adapt_resource_configuration(
+            SelectedECMContext,
             request["selection_profile"],
             request["selection_profile_sha256"],
             **selection_options(request),
@@ -183,7 +188,9 @@ def child(request_path, source_root):
 
         executor = ECMExecutor(
             seed=request["seed"],
-            settings=WorkerSettings(**request["settings"]),
+            settings=adapt_resource_configuration(
+                WorkerSettings, **request["settings"]
+            ),
             rule=EngagementRule(**(request.get("rule") or {})),
             force_workers=request["arm"] != "M0" and request["arm"] != "N",
         )

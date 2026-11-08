@@ -9,6 +9,10 @@ from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.qs.c10a01 import control_v4, plan_v4
 from v2.benchmarks.qs.c10a01.configuration_v4 import configuration
 from v2.qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSConfig
@@ -73,11 +77,14 @@ class ExperimentDesignTests(unittest.TestCase):
             if row["arm"] == "control":
                 continue
             values = copy.deepcopy(row["configuration"])
-            values["collector"] = GrowingDoubleLargeSieveConfig(
-                **values["collector"]
+            values["collector"] = adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig, **values["collector"]
             )
             self.assertEqual(
-                asdict(CountedSIQSConfig(**values)), row["configuration"]
+                asdict(
+                    adapt_resource_configuration(CountedSIQSConfig, **values)
+                ),
+                row["configuration"],
             )
         for digits in (60, 62, 65, 70):
             for roots in ("standard", "cached", "batch"):
@@ -161,8 +168,11 @@ class OwnedControlTests(unittest.TestCase):
                 result = module.SIQSJob(
                     10403,
                     config=module.SIQSConfig(base_bound=200),
-                    budget=budgets.Budget(
-                        work_limit=1000000, seconds=None, cpu_seconds=None
+                    budget=recording_budget(
+                        budgets.Budget,
+                        work_limit=1000000,
+                        seconds=None,
+                        cpu_seconds=None,
                     ),
                 ).run()
                 self.assertEqual(result.reason, "factor_found")

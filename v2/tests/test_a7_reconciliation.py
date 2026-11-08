@@ -12,6 +12,7 @@ from unittest.mock import patch
 from v2.benchmarks.infrastructure.performance.performance_audit import (
     materialize_baseline,
 )
+from v2.benchmarks.infrastructure.resource_control import recording_budget
 from v2.benchmarks.qs.phase_three.phase_three_comparison import OutputCheck
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs.checkpoint import _solver_digest
@@ -160,8 +161,11 @@ class ReconciliationTests(unittest.TestCase):
                     job = old.SSSJob(
                         100003 * 100019,
                         config=old.SSSConfig(mode=mode, base_bound=400),
-                        budget=budgets.Budget(
-                            work_limit=10**9, seconds=None, cpu_seconds=None
+                        budget=recording_budget(
+                            budgets.Budget,
+                            work_limit=10**9,
+                            seconds=None,
+                            cpu_seconds=None,
                         ),
                     )
                     job.run(batch_limit=1)

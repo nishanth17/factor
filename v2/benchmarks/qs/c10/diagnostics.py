@@ -7,7 +7,10 @@ import pstats
 import time
 from dataclasses import replace
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....qs import SIQSJob, build_factor_base
 from ....qs.assignment_stream import AssignmentStream
 from ..b1.b1_calibration import save

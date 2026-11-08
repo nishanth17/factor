@@ -23,6 +23,7 @@ _AUTO_SIQS = object()
 def _decode_siqs_config(values):
     """Rebuild a concrete SIQS child from an asdict-style mapping."""
     from ..qs import (
+        CombinedYieldSieveConfig,
         CountedSIQSConfig,
         DoubleLargeSieveConfig,
         GrowingDoubleLargeSieveConfig,
@@ -30,10 +31,20 @@ def _decode_siqs_config(values):
         SIQSConfig,
         YieldSieveConfig,
     )
+    from ..qs.extended_policy import (
+        BoundedYieldSieveConfig,
+        ExtendedYieldSieveConfig,
+    )
 
     decoded = dict(values)
     collector = decoded["collector"]
-    if "yield_policy" in collector or "small_prime_bound" in collector:
+    if collector.get("extension_policy") == "extended-v2":
+        collector_type = BoundedYieldSieveConfig
+    elif collector.get("extension_policy") == "extended-v1":
+        collector_type = ExtendedYieldSieveConfig
+    elif collector.get("yield_policy") == "yield-v2":
+        collector_type = CombinedYieldSieveConfig
+    elif "yield_policy" in collector or "small_prime_bound" in collector:
         collector_type = YieldSieveConfig
     elif collector.get("storage_policy") == "grow":
         collector_type = GrowingDoubleLargeSieveConfig

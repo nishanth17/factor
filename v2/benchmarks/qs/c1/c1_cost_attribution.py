@@ -8,7 +8,11 @@ import subprocess
 import time
 from pathlib import Path
 
-from ....execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
+from ....execution.budget import BudgetExhaustedError
 from ...support.paths import (
     source_path,
 )

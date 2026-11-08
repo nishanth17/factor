@@ -7,6 +7,9 @@ from collections import defaultdict
 from dataclasses import asdict, replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     CountedSIQSConfig,
@@ -347,7 +350,8 @@ class CountedIntegrationTests(unittest.TestCase):
     def test_scoped_defaults_explicit_configs_and_saved_jobs(self):
         for digits in (40, *range(50, 61)):
             for memory in (None, 128 * 2**20, 2**30):
-                cfg = default_siqs_config(
+                cfg = adapt_resource_configuration(
+                    default_siqs_config,
                     10 ** (digits - 1),
                     recipe="calibrated"
                     if memory in (None, 2**30)

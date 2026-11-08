@@ -15,10 +15,16 @@ from contextlib import ExitStack
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ... import portfolio
 from ...common import utils
 from ...ecm import core as ecm
-from ...execution.budget import Budget
 from ...factor import factorize, factorize_bf
 from ...pm1 import core as pollard_pm1
 from ...portfolio import PortfolioConfig, factorize_bounded
@@ -85,7 +91,7 @@ def _baseline_one(n, seed, config):
 
 def _sample(request):
     """Time one validated answer under identical external time/CPU caps."""
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     n, seed = request["n"], request["seed"]
     started = time.perf_counter()
     cpu_started = time.process_time()
@@ -362,8 +368,8 @@ def run(args):
     if not fixtures:
         raise ValueError("no matching fixtures")
     if args.config:
-        config = PortfolioConfig(
-            **json.loads(source_path(args.config).read_text())
+        config = adapt_resource_configuration(
+            PortfolioConfig, **json.loads(source_path(args.config).read_text())
         )
     else:
         config = PortfolioConfig(

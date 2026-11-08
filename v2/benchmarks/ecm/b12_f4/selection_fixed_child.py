@@ -12,6 +12,10 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 
 def retained_growth(stats):
     """Separate retained inserts from repeated bounded-cache refusals."""
@@ -169,7 +173,7 @@ def child(request_path, source_root):
     )
     from v2.portfolio import PortfolioConfig
 
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     if request["arm"] == "MASTER-MATCHED":
         owner = MatchedSerialECM(request)
     elif request["arm"] == "SELECTED":
@@ -181,7 +185,9 @@ def child(request_path, source_root):
 
         owner = ECMExecutor(
             seed=request["seed"],
-            settings=WorkerSettings(**request["settings"]),
+            settings=adapt_resource_configuration(
+                WorkerSettings, **request["settings"]
+            ),
             force_workers=component_arm(
                 request["arm"], request["settings"]["workers"]
             ),

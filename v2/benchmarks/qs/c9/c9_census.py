@@ -8,7 +8,10 @@ from collections import Counter
 from math import prod
 from pathlib import Path
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....qs.large_primes import LargePrimeForest
 from ..b1.b1_calibration import save
 from ..c1.c1_followup import compact_report, validate_records

@@ -17,10 +17,13 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from .... import portfolio
 from ....common import utils
 from ....execution import stage_jobs
-from ....execution.budget import Budget
 from ....execution.schedules import ScheduleCache, SieveContext
 from ....pm1.bounded import PM1Config, factorize_pm1_bounded
 from ...suites.build_phase_two_corpus import verify_certificates

@@ -8,6 +8,9 @@ from fractions import Fraction
 from math import prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c10a01.configuration_v3 import configuration as v3_config
 from v2.benchmarks.qs.c10a01.configuration_v4 import configuration as v4_config
 from v2.execution.budget import BudgetExhaustedError
@@ -77,7 +80,8 @@ class GrayTableTests(unittest.TestCase):
                     schedule=schedule, parity=parity, memory_bytes=8 * 2**20
                 )
                 families = [
-                    CoordinateFamily(
+                    adapt_resource_configuration(
+                        CoordinateFamily,
                         base,
                         primes,
                         budget=allowance(),
@@ -263,8 +267,13 @@ class ProductPopulationTests(unittest.TestCase):
             policy="windowed_pair",
             memory_bytes=8 * 2**20,
         )
-        stream = AssignmentStream(
-            base, 64, family_count=10000, budget=allowance(), **options
+        stream = adapt_resource_configuration(
+            AssignmentStream,
+            base,
+            64,
+            family_count=10000,
+            budget=allowance(),
+            **options,
         )
         self.assertFalse(set(stream.pool) & set(stream.lower_flyers))
         self.assertFalse(set(stream.pool) & set(stream.upper_flyers))
@@ -282,8 +291,13 @@ class ProductPopulationTests(unittest.TestCase):
         actual = [stream[i] for i in range(len(stream))]
         self.assertEqual(set(actual), expected)
         self.assertEqual(len(actual), len(set(actual)))
-        short = AssignmentStream(
-            base, 64, family_count=3, budget=allowance(), **options
+        short = adapt_resource_configuration(
+            AssignmentStream,
+            base,
+            64,
+            family_count=3,
+            budget=allowance(),
+            **options,
         )
         self.assertEqual(short.identity, stream.identity)
         self.assertEqual(actual[:3], [short[i] for i in range(3)])
@@ -414,11 +428,7 @@ class NormPreviewTests(unittest.TestCase):
         ) as preview:
             with self.assertRaises(NormPolicyRefusedError):
                 select_norm_multiplier(
-                    4001 * 5003,
-                    config=cfg,
-                    seed=7,
-                    budget=allowance(),
-                    memory_bytes=32 * 2**20,
+                    4001 * 5003, config=cfg, seed=7, budget=allowance()
                 )
             self.assertEqual(preview.call_count, 4)
         result = select_norm_multiplier(

@@ -7,6 +7,8 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from ...infrastructure.performance.performance_audit import (
     fingerprint,
     verify_corpus,
@@ -20,7 +22,9 @@ from .p38_r2 import INPUTS, ROOT, WORK, digest, modules, selected_config
 def probe(mods, fixture, seed):
     siqs = mods["qs.siqs"]
     selected = selected_config(siqs, fixture["band"], "current")
-    budget = mods["budget"].Budget(work_limit=WORK, seconds=30, cpu_seconds=30)
+    budget = recording_budget(
+        mods["budget"].Budget, work_limit=WORK, seconds=30, cpu_seconds=30
+    )
     job = siqs.SIQSJob(fixture["n"], seed=seed, config=selected, budget=budget)
     job._setup()
     polynomial, roots = job._next_step()

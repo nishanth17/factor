@@ -4,8 +4,11 @@ import time
 from collections import defaultdict
 from dataclasses import asdict, replace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from .... import qs
-from ....execution.budget import Budget
 from ....qs.polynomial import polynomial_roots
 from .configuration import ARMS, configuration, decode
 from .journal import records

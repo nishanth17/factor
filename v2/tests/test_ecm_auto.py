@@ -12,6 +12,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.ecm.selection import COMPATIBILITY
 from v2.execution.ecm_auto import (
     DEFAULT_MEMORY_BYTES,
@@ -38,7 +42,7 @@ def config(**changes):
         sss=None,
     )
     values.update(changes)
-    return PortfolioConfig(**values)
+    return adapt_resource_configuration(PortfolioConfig, **values)
 
 
 def budget(**changes):
@@ -455,9 +459,13 @@ class AutomaticTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             old.factorize_bounded(
                 1009 * 1013,
-                config=old.PortfolioConfig(**options),
+                config=adapt_resource_configuration(
+                    old.PortfolioConfig, **options
+                ),
                 checkpoint=first.checkpoint,
-                budget=old.Budget(work_limit=1000, seconds=10, cpu_seconds=10),
+                budget=recording_budget(
+                    old.Budget, work_limit=1000, seconds=10, cpu_seconds=10
+                ),
             )
 
     def test_legacy_checkpoint_does_not_adopt_workers(self):

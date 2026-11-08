@@ -11,8 +11,12 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs import SIQSJob
 from ...support.paths import (
     source_path,
@@ -38,9 +42,7 @@ def run(output):
     config = arm_config(configs[control["digits"]], control["arm"])
     config = replace(
         config,
-        collector=replace(
-            config.collector, memory_bytes=control["memory_bytes"]
-        ),
+        collector=replace(config.collector),
     )
     save(
         output / "manifest.json",

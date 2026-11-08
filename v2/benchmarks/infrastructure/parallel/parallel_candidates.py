@@ -19,8 +19,12 @@ from concurrent.futures import (
 )
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....execution.schedules import SieveContext
 from ....execution.stage_jobs import advance_job, new_job
 from ....portfolio import PortfolioConfig

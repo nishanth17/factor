@@ -15,8 +15,12 @@ from math import gcd, isqrt, prod
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs import SIQSJob
 from ....qs.linear_algebra import filter_matrix
 from ....qs.sieve_collector import SieveCollector

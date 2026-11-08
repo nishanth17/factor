@@ -5,6 +5,9 @@ import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES
@@ -54,7 +57,8 @@ class PacingDefaultTests(unittest.TestCase):
         number = 10**49 + 123
         for memory in (128 * 2**20, C9_MEMORY_BYTES - 1, C9_MEMORY_BYTES + 1):
             self.assertEqual(
-                default_siqs_config(
+                adapt_resource_configuration(
+                    default_siqs_config,
                     number,
                     recipe="calibrated"
                     if memory in (None, 2**30)

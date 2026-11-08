@@ -17,6 +17,8 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from ....common import utils
 from ....execution import budget as live_budget
 from ....portfolio import _decode_siqs_config
@@ -233,8 +235,12 @@ def run_one(fixture, arm, seconds, control_runtime, *, blocks=None):
     qs_module, budget_module, utils_module = (
         control_runtime if arm == "control" else (siqs, live_budget, utils)
     )
-    budget = budget_module.Budget(
-        work_limit=WORK, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        budget_module.Budget,
+        work_limit=WORK,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     cfg = configuration(fixture["n"], arm, control_runtime)
     job = result = None

@@ -408,13 +408,12 @@ def packet_factor_worker(
     from v2.execution.worker_contract import Decoder, frame
 
     channel.settimeout(0.01)
-    decoder = Decoder(frame_bytes)
+    decoder = Decoder()
     channel.sendall(
         frame(
             dict(
                 kind="ready", cpu=time.process_time(), rss=1, work=startup_work
-            ),
-            frame_bytes,
+            )
         )
     )
     while True:
@@ -443,8 +442,7 @@ def packet_factor_worker(
                         rss=1,
                         prepared_schedule=packet["schedule"],
                         metadata_cache=[packet["schedule"]],
-                    ),
-                    frame_bytes,
+                    )
                 )
             )
     channel.close()

@@ -8,6 +8,10 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .configuration_v4 import configuration
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -88,7 +92,7 @@ def configuration_values(digits):
 def control_configuration(digits, module):
     """Instantiate the exact literal configuration in the owned runtime."""
     values = configuration_values(digits)
-    values["collector"] = module.GrowingDoubleLargeSieveConfig(
-        **values["collector"]
+    values["collector"] = adapt_resource_configuration(
+        module.GrowingDoubleLargeSieveConfig, **values["collector"]
     )
-    return module.CountedSIQSConfig(**values)
+    return adapt_resource_configuration(module.CountedSIQSConfig, **values)

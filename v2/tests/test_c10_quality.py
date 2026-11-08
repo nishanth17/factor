@@ -5,6 +5,9 @@ import unittest
 from dataclasses import replace
 from math import prod
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
@@ -38,7 +41,9 @@ class QualityAssignmentTests(unittest.TestCase):
             memory_bytes=32 * 2**20,
         )
         arguments.update(options)
-        return AssignmentStream(self.base, 128, **arguments)
+        return adapt_resource_configuration(
+            AssignmentStream, self.base, 128, **arguments
+        )
 
     def test_complete_batches_are_exact_permutations(self):
         control, quality = self.stream("flyer"), self.stream()

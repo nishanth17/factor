@@ -29,7 +29,9 @@ def run(arm, backend, start):
     )
     outcomes = []
     for fixture in fixtures:
-        from ....execution.budget import Budget
+        from v2.benchmarks.infrastructure.resource_control import (
+            RecordingBudget as Budget,
+        )
 
         outcome = module.factorize_bounded(
             fixture["n"],

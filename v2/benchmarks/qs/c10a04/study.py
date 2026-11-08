@@ -14,8 +14,12 @@ from dataclasses import asdict
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs import SIQSJob
 from ...infrastructure.performance.performance_audit import (
     fingerprint,

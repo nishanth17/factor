@@ -7,6 +7,9 @@ from dataclasses import FrozenInstanceError, replace
 from math import isqrt
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
@@ -130,7 +133,9 @@ class FactorBaseTests(unittest.TestCase):
             ({"multiplier": 7, "bound": 3}, 7),
             ({"bound": 20}, 7),
         ):
-            result = build_factor_base(77, **kwargs)
+            result = adapt_resource_configuration(
+                build_factor_base, 77, **kwargs
+            )
 
             self.assertIsNone(result.factor_base)
             self.assertEqual(result.divisor, expected)
@@ -425,8 +430,8 @@ class CollectorTests(unittest.TestCase):
             ({"max_relations": 0}, "relation_limit"),
             ({"memory_bytes": 0}, "memory_limit"),
         ):
-            result = collect_block(
-                self.polynomial, self.base, -10, 10, **changes
+            result = adapt_resource_configuration(
+                collect_block, self.polynomial, self.base, -10, 10, **changes
             )
 
             self.assertEqual(result.reason, reason)

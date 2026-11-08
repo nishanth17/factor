@@ -7,6 +7,9 @@ from dataclasses import replace
 from functools import partial
 from math import prod
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     PolynomialFamily,
@@ -50,9 +53,16 @@ class FamilyTests(unittest.TestCase):
     def test_reproducible_distinct_bounded_assignments(self):
         base = self.base()
         options = dict(factor_count=3, family_count=16, pool_size=8, seed=29)
-        first = family_assignments(base, 64, **options)
+        first = adapt_resource_configuration(
+            family_assignments, base, 64, **options
+        )
 
-        self.assertEqual(first, family_assignments(base, 64, **options))
+        self.assertEqual(
+            first,
+            adapt_resource_configuration(
+                family_assignments, base, 64, **options
+            ),
+        )
         self.assertEqual(len(first), len(set(first)))
         self.assertEqual(len(first), 16)
         for values in first:
@@ -268,7 +278,9 @@ class FamilyTests(unittest.TestCase):
             {"pool_size": 129},
         ):
             with self.assertRaises(ValueError):
-                family_assignments(base, 64, **kwargs)
+                adapt_resource_configuration(
+                    family_assignments, base, 64, **kwargs
+                )
 
     def test_family_polynomials_use_existing_checked_extraction(self):
         n = 2003 * 8353

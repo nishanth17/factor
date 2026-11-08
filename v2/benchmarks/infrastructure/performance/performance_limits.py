@@ -7,7 +7,10 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
 from ...support.paths import (
     REPOSITORY_ROOT,

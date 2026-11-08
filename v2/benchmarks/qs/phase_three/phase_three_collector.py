@@ -13,6 +13,10 @@ from collections import Counter
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....qs import (
     Polynomial,
     SieveCollector,
@@ -268,7 +272,8 @@ def _coverage(fixture, config):
 
 def _config(fixture, **options):
     """Keep eviction out of score coverage comparisons."""
-    return SieveConfig(
+    return adapt_resource_configuration(
+        SieveConfig,
         residual_bound=fixture["residual"],
         max_partials=4096,
         **options,
@@ -467,7 +472,7 @@ def main():
 
     # Choose a measured complete-coverage configuration from training only.
     winner = min(tuning, key=lambda row: row["measurement"]["median_seconds"])
-    selected = SieveConfig(**winner["config"])
+    selected = adapt_resource_configuration(SieveConfig, **winner["config"])
     freeze = {
         "training_winner": winner["name"],
         "config": asdict(selected),

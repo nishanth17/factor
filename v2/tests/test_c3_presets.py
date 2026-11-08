@@ -17,9 +17,7 @@ def base_config(**changes):
         pm1_attempts=0,
         max_input_bits=128,
         segment_size=16,
-        siqs=SIQSConfig(
-            base_bound=100, half_width=64, memory_bytes=32 * 2**20
-        ),
+        siqs=SIQSConfig(base_bound=100, half_width=64),
         allocation=ECMAllocation(
             "pretest",
             pretest_work=0,

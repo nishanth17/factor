@@ -7,6 +7,9 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.collector_kernels import components
 from v2.qs.defaults import default_siqs_budget
@@ -64,7 +67,8 @@ class CoupledDefaultTests(unittest.TestCase):
             config.collector.marking, "density+presieve+scan_fused+parity_two"
         )
         self.assertEqual(config.collector.sparse_queue_bytes, 32 * 2**20)
-        limited = default_siqs_config(
+        limited = adapt_resource_configuration(
+            default_siqs_config,
             10**49 + 123,
             recipe="calibrated"
             if 128 * 2**20 in (None, 2**30)

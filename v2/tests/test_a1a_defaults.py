@@ -6,6 +6,9 @@ import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.tests.resource_stops import InterruptBudget as Budget
@@ -28,7 +31,8 @@ class A1aDefaultTests(unittest.TestCase):
                         2**30,
                         2**30 + 1,
                     ):
-                        config = default_siqs_config(
+                        config = adapt_resource_configuration(
+                            default_siqs_config,
                             signed,
                             recipe="calibrated"
                             if memory in (None, 2**30)
@@ -92,7 +96,12 @@ class A1aDefaultTests(unittest.TestCase):
         )
         self.assertEqual(default.collector.marking, DEFAULT_SELECTED)
         config = PortfolioConfig(siqs=extended)
-        self.assertEqual(PortfolioConfig(**asdict(config)).siqs, extended)
+        self.assertEqual(
+            adapt_resource_configuration(
+                PortfolioConfig, **asdict(config)
+            ).siqs,
+            extended,
+        )
 
         first = factorize_bounded(
             n, config=config, budget=Budget(work_limit=0)

@@ -4,6 +4,9 @@ import unittest
 from unittest.mock import patch
 
 from v2.benchmarks.ecm.p52 import p52_b2, p52_b2_wheel
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.ecm import core as ecm
 
 
@@ -20,8 +23,9 @@ class WheelProtocolTests(unittest.TestCase):
         for case in protocol["cases"]:
             for arm in protocol["training_arms"]:
                 engine = p52_b2_wheel.engine_for(arm)
-                config = engine.PortfolioConfig(
-                    **p52_b2_wheel.options(protocol, case, arm)
+                config = adapt_resource_configuration(
+                    engine.PortfolioConfig,
+                    **p52_b2_wheel.options(protocol, case, arm),
                 )
                 self.assertLess(config.workspace_reserve, config.memory_bytes)
         for arm in ("streamed", "programs", "legacy"):

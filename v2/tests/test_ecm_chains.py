@@ -8,6 +8,10 @@ from unittest.mock import patch
 
 from v2.benchmarks.ecm.c6 import c6_b4, c6_fast
 from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
@@ -410,14 +414,16 @@ class ProductionChainTests(unittest.TestCase):
         options.pop("ecm_chain_bytes")
         options.pop("ecm_chain_family")
         options.pop("allocation")
-        old_config = old.PortfolioConfig(**options)
+        old_config = adapt_resource_configuration(
+            old.PortfolioConfig, **options
+        )
         n = 1000000000039 * 1000000000061
         first = old.factorize_bounded(
             n,
             seed=19,
             config=old_config,
-            budget=old.Budget(
-                work_limit=10000, seconds=None, cpu_seconds=None
+            budget=recording_budget(
+                old.Budget, work_limit=10000, seconds=None, cpu_seconds=None
             ),
         )
         restored = factorize_bounded(
@@ -451,8 +457,8 @@ class ProductionChainTests(unittest.TestCase):
             n,
             config=old_config,
             checkpoint=second.checkpoint,
-            budget=old.Budget(
-                work_limit=10**8, seconds=None, cpu_seconds=None
+            budget=recording_budget(
+                old.Budget, work_limit=10**8, seconds=None, cpu_seconds=None
             ),
         )
         self.assertEqual(old_restored.result.reconstruct(), n)

@@ -15,6 +15,8 @@ import time
 from math import gcd, isqrt, prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 if __package__ in (None, ""):
     # Select a historical runtime before importing any v2 implementation.
     from runpy import run_path
@@ -149,9 +151,11 @@ def main():
                 score_policy="powers",
                 division="bucket",
                 residual_bound=3000**2,
-                max_atoms=8192,
-                max_relations=2048,
                 max_partials=2048,
+                target_rows=2048,
+                preparation_cache_bytes=2 * 2**20
+                if 2048 == None
+                else min(2 * 2**20, 2048 * 2048),
             ),
         )
         corpus = json.loads(source_path(args.corpus).read_text())
@@ -166,8 +170,11 @@ def main():
             rows = []
 
             for seed in corpus["seeds"]:
-                allowance = budget_module.Budget(
-                    work_limit=10**13, seconds=30, cpu_seconds=30
+                allowance = recording_budget(
+                    budget_module.Budget,
+                    work_limit=10**13,
+                    seconds=30,
+                    cpu_seconds=30,
                 )
                 started = time.perf_counter()
 

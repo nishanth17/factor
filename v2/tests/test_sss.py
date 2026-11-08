@@ -8,6 +8,9 @@ from dataclasses import replace
 from math import prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.qs import (
     build_factor_base,
@@ -77,7 +80,9 @@ class SmoothBatchTests(unittest.TestCase):
         ):
             budget = allowance()
             with self.assertRaises(MemoryError):
-                product_tree((2, 3, 5), budget=budget, **options)
+                adapt_resource_configuration(
+                    product_tree, (2, 3, 5), budget=budget, **options
+                )
 
             self.assertEqual(budget.used, 0)
 
@@ -315,7 +320,7 @@ class SSSJobTests(unittest.TestCase):
             dict(filter_bound=-1),
         ):
             with self.assertRaises(ValueError):
-                SSSConfig(**changes)
+                adapt_resource_configuration(SSSConfig, **changes)
 
         job = SSSJob(4001 * 4003, budget=allowance())
         with patch(

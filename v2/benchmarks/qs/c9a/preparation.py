@@ -7,8 +7,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from .... import qs
-from ....execution.budget import Budget
 from ..c10a04.accounting import atomic, digest
 from .configuration import BASE_COMMIT, SEEDS, configuration, decode
 from .control import MANIFEST

@@ -15,8 +15,15 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig, SIQSJob
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -42,9 +49,11 @@ def base_config():
         collector=SieveConfig(
             division="bucket",
             residual_bound=1,
-            max_atoms=4096,
-            max_relations=4096,
             max_partials=4096,
+            target_rows=4096,
+            preparation_cache_bytes=2 * 2**20
+            if 4096 == None
+            else min(2 * 2**20, 2048 * 4096),
         ),
     )
 
@@ -364,8 +373,10 @@ def training(corpus, args):
 
 def _config(values):
     values = dict(values)
-    values["collector"] = SieveConfig(**values["collector"])
-    return SIQSConfig(**values)
+    values["collector"] = adapt_resource_configuration(
+        SieveConfig, **values["collector"]
+    )
+    return adapt_resource_configuration(SIQSConfig, **values)
 
 
 def bootstrap(records, before, after):

@@ -11,6 +11,9 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.execution.schedules import SieveContext
 from v2.pm1 import bounded as pm1_bounded
@@ -19,7 +22,9 @@ from v2.tests.test_a6_pm1 import allowance, resign
 
 
 def configured(**options):
-    return PM1TuningConfig(bounds=((10, 101),), segment_size=3, **options)
+    return adapt_resource_configuration(
+        PM1TuningConfig, bounds=((10, 101),), segment_size=3, **options
+    )
 
 
 def prime_oracle(lo, hi):

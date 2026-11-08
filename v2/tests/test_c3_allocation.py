@@ -11,6 +11,9 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.allocation import (
     ECMAllocation,
     HandoffRequiredError,
@@ -31,9 +34,7 @@ def configuration(**changes):
         ecm_tiers=((50, 1000, 3),),
         max_input_bits=128,
         segment_size=16,
-        siqs=SIQSConfig(
-            base_bound=100, half_width=64, memory_bytes=32 * 2**20
-        ),
+        siqs=SIQSConfig(base_bound=100, half_width=64),
         allocation=ECMAllocation(
             "pretest", pretest_work=0, fallback_work=1000
         ),
@@ -403,7 +404,9 @@ class AllocationPortfolioTests(unittest.TestCase):
         # Routing intent is private; legacy constructors receive saved fields.
         values = asdict(native_config)
         values.pop("allocation")
-        old_config = old.PortfolioConfig(**values)
+        old_config = adapt_resource_configuration(
+            old.PortfolioConfig, **values
+        )
         old_budget = sys.modules[old.__package__ + ".execution.budget"].Budget
         original = old.factorize_bounded(
             number,

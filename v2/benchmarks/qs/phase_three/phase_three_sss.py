@@ -13,8 +13,15 @@ from dataclasses import asdict, replace
 from math import isfinite, prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ....qs import SieveConfig, SIQSConfig, SIQSJob
 from ....qs.polynomial import a_target
 from ....qs.sss import SSSConfig, SSSJob
@@ -230,8 +237,10 @@ def train(corpus, args):
 
 def deserialize_config(data):
     data = dict(data)
-    data["collector"] = SieveConfig(**data["collector"])
-    return SSSConfig(**data)
+    data["collector"] = adapt_resource_configuration(
+        SieveConfig, **data["collector"]
+    )
+    return adapt_resource_configuration(SSSConfig, **data)
 
 
 def band_bound(band):
@@ -487,8 +496,10 @@ def main():
         if control_training.get("band", args.band) != args.band:
             raise ValueError("SIQS settings were trained for another band")
         data = dict(control_training["frozen"])
-        data["collector"] = SieveConfig(**data["collector"])
-        configs["siqs"] = SIQSConfig(**data)
+        data["collector"] = adapt_resource_configuration(
+            SieveConfig, **data["collector"]
+        )
+        configs["siqs"] = adapt_resource_configuration(SIQSConfig, **data)
         for name, digest in control_training["source_sha256"].items():
             if name.startswith("qs/") and manifest.get(name) != digest:
                 raise ValueError("SIQS training and evaluation sources differ")

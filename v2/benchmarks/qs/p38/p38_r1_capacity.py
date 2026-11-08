@@ -20,8 +20,14 @@ from dataclasses import asdict, replace
 from math import isqrt, prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....common import utils
-from ....execution.budget import Budget
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -84,17 +90,21 @@ def configuration(digits, preset, policy):
             score_policy="powers",
             division="bucket",
             residual_bound=min(10**12, bound**2),
-            max_relations=rows,
             max_partials=rows,
-            max_atoms=min(65536, rows * 4),
+            target_rows=rows,
+            preparation_cache_bytes=2 * 2**20
+            if rows is None
+            else min(2 * 2**20, 2048 * rows),
         ),
     )
 
 
 def decode_config(values):
     values = dict(values)
-    values["collector"] = SieveConfig(**values["collector"])
-    return SIQSConfig(**values)
+    values["collector"] = adapt_resource_configuration(
+        SieveConfig, **values["collector"]
+    )
+    return adapt_resource_configuration(SIQSConfig, **values)
 
 
 def validate(row, fixture):

@@ -10,6 +10,10 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .diagnostics import (
     Capture,
     RSSSampler,
@@ -94,7 +98,10 @@ def child(path):
     capture = None
     if request["observer"] in ("cpu", "counters", "heap"):
         capture = Capture(request, "parent")
-    from ....execution.budget import Budget
+    from v2.benchmarks.infrastructure.resource_control import (
+        RecordingBudget as Budget,
+    )
+
     from ....execution.ecm_workers import ECMExecutor
     from ....execution.worker_contract import WorkerSettings
     from ....portfolio import PortfolioConfig
@@ -105,10 +112,12 @@ def child(path):
         os.environ["FACTOR_ECM_DIAGNOSTIC"] = str(path.resolve())
         ecm_worker.worker_main = captured_worker
         install_engine_hooks(capture)
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     executor = ECMExecutor(
         seed=request["seed"],
-        settings=WorkerSettings(**request["settings"]),
+        settings=adapt_resource_configuration(
+            WorkerSettings, **request["settings"]
+        ),
         force_workers=component_arm(
             request["arm"], request["settings"]["workers"]
         ),

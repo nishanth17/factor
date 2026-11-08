@@ -5,6 +5,9 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES, default_siqs_budget
@@ -57,7 +60,8 @@ class LargerBandDefaultTests(unittest.TestCase):
             "window",
         )
         self.assertEqual(
-            default_siqs_config(
+            adapt_resource_configuration(
+                default_siqs_config,
                 NUMBER_51,
                 recipe="calibrated"
                 if 128 * 2**20 in (None, 2**30)

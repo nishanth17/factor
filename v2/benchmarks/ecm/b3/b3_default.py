@@ -10,6 +10,11 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ...pm1.a6.a6_pm1 import performance_window, require_runtime
 from ...suites.build_phase_two_corpus import verify_certificates
@@ -162,7 +167,7 @@ def cohort(settings, fixtures, seeds, arm, scope):
     )
     if arm in ("lucas", "cf"):
         options["ecm_chain_family"] = arm
-    config = engine.PortfolioConfig(**options)
+    config = adapt_resource_configuration(engine.PortfolioConfig, **options)
     rows = []
     for fixture in fixtures:
         if scope == "resume_equal" and not fixture["id"].startswith(
@@ -181,8 +186,9 @@ def cohort(settings, fixtures, seeds, arm, scope):
                 seed=seed,
                 config=config,
                 checkpoint=checkpoint,
-                budget=engine.Budget(
-                    work_limit=2_000_000
+                budget=recording_budget(
+                    engine.Budget,
+                    work_limit=2000000
                     if scope == "default_budget"
                     else settings["work"],
                     seconds=settings["seconds"],

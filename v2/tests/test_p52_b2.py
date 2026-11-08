@@ -6,6 +6,9 @@ from unittest.mock import patch
 
 from v2 import portfolio
 from v2.benchmarks.ecm.p52 import p52_b2
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.ecm import core as ecm
 
 
@@ -20,8 +23,9 @@ class PairedProtocolTests(unittest.TestCase):
         )
         for case in protocol["cases"]:
             for arm in protocol["training_arms"]:
-                config = portfolio.PortfolioConfig(
-                    **p52_b2.options(protocol, case, arm)
+                config = adapt_resource_configuration(
+                    portfolio.PortfolioConfig,
+                    **p52_b2.options(protocol, case, arm),
                 )
                 self.assertLess(config.workspace_reserve, config.memory_bytes)
                 self.assertEqual(config.backend, "python-int")

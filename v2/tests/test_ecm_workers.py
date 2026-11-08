@@ -261,14 +261,9 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
 
     channel.settimeout(0.01)
     channel.sendall(
-        frame(
-            dict(
-                kind="ready", cpu=time.process_time(), rss=1, work=startup_work
-            ),
-            frame_bytes,
-        )
+        frame(dict(kind="ready", cpu=time.process_time(), rss=1, work=0))
     )
-    decoder = Decoder(frame_bytes)
+    decoder = Decoder()
     deadline = time.monotonic() + 3
     job = None
     while job is None and time.monotonic() < deadline:
@@ -299,8 +294,7 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
                     reason="complete",
                     factor=5,
                     sigma=job["assignment"]["sigma"],
-                ),
-                frame_bytes,
+                )
             )
         )
     os._exit(17)
@@ -386,9 +380,7 @@ class StartupOwnershipTests(unittest.TestCase):
         self.assertEqual(reads, [0, 1, 2, 3, 0])
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.work, 5_000_000)
-        self.assertEqual(
-            ledger.cpu, 14 + 4 * (0.125 + executor.settings.shutdown_cpu)
-        )
+        self.assertEqual(ledger.cpu, 14 + 4 * (0.125 + 0.0))
         self.assertEqual(
             [s["reported_cpu"] for s in executor.slots], [0.125] * 4
         )
@@ -436,9 +428,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 4)
-        self.assertEqual(
-            ledger.cpu, 14 + 4 * (10 + executor.settings.shutdown_cpu)
-        )
+        self.assertEqual(ledger.cpu, 14 + 4 * (10 + 0.0))
         self.assertEqual(ledger.work, 5_000_000)
         executor.slots.clear()
 
@@ -467,9 +457,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 3)
-        self.assertEqual(
-            ledger.cpu, 14 + 0.125 + 30 + 4 * executor.settings.shutdown_cpu
-        )
+        self.assertEqual(ledger.cpu, 14 + 0.125 + 30 + 4 * 0.0)
         self.assertEqual(ledger.work, 5_000_000)
         executor.slots.clear()
 
@@ -532,7 +520,7 @@ class ProcessFailureTests(unittest.TestCase):
         self.assertGreaterEqual(result.stats["lost_reports"], 4)
         self.assertGreaterEqual(
             result.stats["charged_child_cpu"],
-            4 * (settings.startup_seconds + settings.shutdown_cpu),
+            4 * (settings.startup_seconds + 0.0),
         )
         self.assertEqual(
             {p.pid for p in multiprocessing.active_children()}, original

@@ -14,6 +14,11 @@ import time
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ....common import arithmetic, utils
 from ....ecm import core as ecm
@@ -76,7 +81,9 @@ def baseline():
 
 
 def allowance(engine=portfolio, work=2_000_000):
-    return engine.Budget(work_limit=work, seconds=20, cpu_seconds=20)
+    return recording_budget(
+        engine.Budget, work_limit=work, seconds=20, cpu_seconds=20
+    )
 
 
 def configuration(engine, backend, candidate, curves=8):
@@ -96,7 +103,7 @@ def configuration(engine, backend, candidate, curves=8):
         options.update(
             ecm_chain_mode="reuse", ecm_chain_bytes=MIN_MEMORY_BYTES
         )
-    return engine.PortfolioConfig(**options)
+    return adapt_resource_configuration(engine.PortfolioConfig, **options)
 
 
 def validate(run, fixture):

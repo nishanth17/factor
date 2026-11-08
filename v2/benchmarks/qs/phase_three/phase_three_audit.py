@@ -11,9 +11,12 @@ import time
 import types
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import arithmetic, prime_sieve, utils
 from ....execution import work_budget
-from ....execution.budget import Budget
 from ...suites.phase_one import environment
 from ...support.paths import (
     REPOSITORY_ROOT,

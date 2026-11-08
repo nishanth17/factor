@@ -12,7 +12,10 @@ import sys
 import time
 from pathlib import Path
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import (
     build_factor_base,

@@ -22,10 +22,16 @@ from dataclasses import asdict
 from pathlib import Path
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .... import portfolio
 from ....common import arithmetic, utils
 from ....execution import stage_jobs
-from ....execution.budget import Budget
 from ....execution.schedules import SieveContext
 from ....qs import SieveConfig, SIQSConfig, SIQSJob
 from ....qs.linear_algebra import DependencySolver, filter_matrix
@@ -148,7 +154,7 @@ def _portfolio_call(module, fixtures, seeds, backend=None):
     )
     if backend is not None:
         options["backend"] = backend
-    config = module.PortfolioConfig(**options)
+    config = adapt_resource_configuration(module.PortfolioConfig, **options)
     outputs = []
     for fixture in fixtures:
         for seed in seeds:
@@ -200,12 +206,12 @@ def _qs_call(mode, backend, before=None):
         ),
     )
     if before is not None:
-        options["collector"] = module.SieveConfig(
-            **asdict(options["collector"])
+        options["collector"] = adapt_resource_configuration(
+            module.SieveConfig, **asdict(options["collector"])
         )
     else:
         options["backend"] = backend
-    config = module.SIQSConfig(**options)
+    config = adapt_resource_configuration(module.SIQSConfig, **options)
     budget = Budget(work_limit=20_000_000, seconds=None, cpu_seconds=None)
     job = module.SIQSJob(4001 * 5003, seed=73, config=config, budget=budget)
     result = job.run()
@@ -232,7 +238,7 @@ def _sss_call(mode, backend, before=None):
     job = module.SSSJob(
         4001 * 4003,
         seed=73,
-        config=module.SSSConfig(**options),
+        config=adapt_resource_configuration(module.SSSConfig, **options),
         budget=Budget(work_limit=20_000_000, seconds=None, cpu_seconds=None),
     )
     result = job.run()

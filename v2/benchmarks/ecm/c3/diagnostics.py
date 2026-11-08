@@ -6,6 +6,8 @@ import json
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from .... import portfolio
 from .c3_study import (
     SELECTED,
@@ -53,8 +55,11 @@ def diagnose(output):
                     fixture["n"],
                     seed=7,
                     config=config,
-                    budget=budget_module.Budget(
-                        work_limit=2_000_000, seconds=30, cpu_seconds=30
+                    budget=recording_budget(
+                        budget_module.Budget,
+                        work_limit=2000000,
+                        seconds=30,
+                        cpu_seconds=30,
                     ),
                 )
                 validate(first.result, fixture)
@@ -62,8 +67,11 @@ def diagnose(output):
                     fixture["n"],
                     config=config,
                     checkpoint=first.checkpoint,
-                    budget=budget_module.Budget(
-                        work_limit=10**13, seconds=30, cpu_seconds=30
+                    budget=recording_budget(
+                        budget_module.Budget,
+                        work_limit=10**13,
+                        seconds=30,
+                        cpu_seconds=30,
                     ),
                 )
                 validate(restored.result, fixture)

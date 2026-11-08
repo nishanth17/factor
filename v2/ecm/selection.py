@@ -171,7 +171,7 @@ class SelectionRule:
         digits, options = len(str(manifest.n)), manifest.options
         cost, provenance = _size_cost(
             digits,
-            profile_options_digest(options),
+            profile_options_digest(options, self.costs + self.rate_costs),
             _path_costs(digits, options, self.costs),
             _path_costs(digits, options, self.rate_costs),
         )
@@ -388,7 +388,7 @@ class SelectedECMContext:
         data = self.catalogue
         mode = "warm" if self.prefer_warm else "cold"
         mathematical = arithmetic_options(config, WorkerSettings())
-        options = profile_options_digest(mathematical)
+        options = profile_options_digest(mathematical, data["rows"])
         key = len(str(n)), options
         if origin is None:
             origin = next(
@@ -472,7 +472,7 @@ class SelectedECMContext:
 
         options = arithmetic_options(config, settings)
         if not any(
-            row.options == profile_options_digest(options)
+            row.options == profile_options_digest(options, rule.costs)
             for row in rule.costs
         ):
             return dict(
@@ -838,6 +838,14 @@ def profile_settings(values):
     }
 
 
-def profile_options_digest(options):
+def profile_options_digest(options, rows):
     """Match historical recipe identities without imposing a byte grant."""
-    return digest(dict(options, memory_bytes=64 * 2**20))
+    current = digest(options)
+    identities = {
+        row["options"] if isinstance(row, dict) else row.options
+        for row in rows
+    }
+    if current in identities:
+        return current
+    historical = digest(dict(options, memory_bytes=64 * 2**20))
+    return historical if historical in identities else current

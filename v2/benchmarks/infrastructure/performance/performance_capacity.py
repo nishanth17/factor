@@ -7,7 +7,10 @@ from math import isqrt, prod
 from pathlib import Path
 from types import SimpleNamespace
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....qs import parallel
 from ....qs.relations import verify_atomic
 from ...support.paths import (

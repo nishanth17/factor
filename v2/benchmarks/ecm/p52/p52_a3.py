@@ -16,6 +16,11 @@ from collections import Counter
 from pathlib import Path
 from struct import pack
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ....ecm.programs import ECMPrograms
 from ....execution.stage_jobs import advance_job, new_job
@@ -174,7 +179,9 @@ def measure(case, arm, corpus, engine, stages):
         return measure_schedule(case, arm, corpus, engine)
     started = time.perf_counter()
     cpu_started = time.process_time()
-    config = engine.PortfolioConfig(**options(case, arm))
+    config = adapt_resource_configuration(
+        engine.PortfolioConfig, **options(case, arm)
+    )
     rows = []
     for fixture in corpus["fixtures"]:
         band = "campaign" if case == "large_campaign" else case
@@ -188,8 +195,8 @@ def measure(case, arm, corpus, engine, stages):
             else corpus["seeds"]
         )
         for seed in seeds:
-            budget = engine.Budget(
-                work_limit=50_000_000, seconds=30, cpu_seconds=30
+            budget = recording_budget(
+                engine.Budget, work_limit=50000000, seconds=30, cpu_seconds=30
             )
             n = fixture["n"]
             if case in ("campaign", "large_campaign"):
@@ -297,8 +304,12 @@ def measure_schedule(case, arm, corpus, engine):
     """Consume whole integer programs; this is not factorization evidence."""
     started = time.perf_counter()
     cpu_started = time.process_time()
-    config = engine.PortfolioConfig(**options(case, arm))
-    budget = engine.Budget(work_limit=50_000_000, seconds=30, cpu_seconds=30)
+    config = adapt_resource_configuration(
+        engine.PortfolioConfig, **options(case, arm)
+    )
+    budget = recording_budget(
+        engine.Budget, work_limit=50000000, seconds=30, cpu_seconds=30
+    )
     context = engine.SieveContext(
         config.max_hi, segment_size=config.segment_size, budget=budget
     )
@@ -388,9 +399,14 @@ def campaign_probes():
     for case in SCHEDULE_CASES:
         for arm in ("baseline", "programs"):
             engine = control if arm == "baseline" else portfolio
-            config = engine.PortfolioConfig(**options(case, arm))
-            budget = engine.Budget(
-                work_limit=50_000_000, seconds=120, cpu_seconds=120
+            config = adapt_resource_configuration(
+                engine.PortfolioConfig, **options(case, arm)
+            )
+            budget = recording_budget(
+                engine.Budget,
+                work_limit=50000000,
+                seconds=120,
+                cpu_seconds=120,
             )
             context = engine.SieveContext(
                 config.max_hi, segment_size=config.segment_size, budget=budget

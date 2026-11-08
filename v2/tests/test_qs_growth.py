@@ -7,6 +7,9 @@ from dataclasses import asdict, replace
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
@@ -40,7 +43,9 @@ def growing_worker(**options):
     return SieveCollector(
         qs_polynomial(base),
         base,
-        config=GrowingDoubleLargeSieveConfig(**values),
+        config=adapt_resource_configuration(
+            GrowingDoubleLargeSieveConfig, **values
+        ),
         budget=allowance(),
     )
 

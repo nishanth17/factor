@@ -16,6 +16,8 @@ import types
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from ...infrastructure.performance.performance_audit import (
     checked_baseline,
     fingerprint,
@@ -146,7 +148,8 @@ def selected_config(module, band, variant):
 
 def factor_run(mods, fixture, seed, variant):
     module = mods["qs.siqs"]
-    budget = mods["budget"].Budget(
+    budget = recording_budget(
+        mods["budget"].Budget,
         work_limit=WORK,
         seconds=2 if fixture["band"] == "30d" else 0.2,
         cpu_seconds=2 if fixture["band"] == "30d" else 0.2,
@@ -215,7 +218,9 @@ def factor_run(mods, fixture, seed, variant):
 def collector_run(mods, fixture, seed, variant):
     module = mods["qs.siqs"]
     selected = selected_config(module, fixture["band"], variant)
-    budget = mods["budget"].Budget(work_limit=WORK, seconds=30, cpu_seconds=30)
+    budget = recording_budget(
+        mods["budget"].Budget, work_limit=WORK, seconds=30, cpu_seconds=30
+    )
     job = module.SIQSJob(
         fixture["n"], seed=seed, config=selected, budget=budget
     )

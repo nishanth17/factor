@@ -15,6 +15,11 @@ import types
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import qs
 from ....common import utils
 from ....execution import budget as current_budget
@@ -90,7 +95,9 @@ def arm_config(config, arm):
     return replace(
         config,
         base_bound=bound,
-        collector=qs.DoubleLargeSieveConfig(**options),
+        collector=adapt_resource_configuration(
+            qs.DoubleLargeSieveConfig, **options
+        ),
     )
 
 
@@ -118,8 +125,10 @@ def decode_config(value, module=qs):
         if "large_prime_bound" in values["collector"]
         else "SieveConfig"
     )
-    values["collector"] = getattr(module, name)(**values["collector"])
-    return module.SIQSConfig(**values)
+    values["collector"] = adapt_resource_configuration(
+        getattr(module, name), **values["collector"]
+    )
+    return adapt_resource_configuration(module.SIQSConfig, **values)
 
 
 def run_one(fixture, seed, config, arm, seconds, baseline=None, *, cold=False):
@@ -140,8 +149,12 @@ def run_one(fixture, seed, config, arm, seconds, baseline=None, *, cold=False):
         return False
 
     started, cpu = time.perf_counter(), time.process_time()
-    budget = ledger.Budget(
-        work_limit=10**13, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        ledger.Budget,
+        work_limit=10**13,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     job = module.SIQSJob(fixture["n"], seed=seed, config=config, budget=budget)
     result = job.run()

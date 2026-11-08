@@ -8,6 +8,9 @@ import tempfile
 import unittest
 from dataclasses import asdict, replace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c10a01 import control_v4
 from v2.benchmarks.qs.c10a01 import lower_plan_v4 as plan
 from v2.benchmarks.suites.build_phase_two_corpus import verify_certificates
@@ -75,8 +78,9 @@ class LowerDesignTests(unittest.TestCase):
                         if "base_count" in values
                         else module.SIQSConfig
                     )
-                    values["collector"] = module.GrowingDoubleLargeSieveConfig(
-                        **values["collector"]
+                    values["collector"] = adapt_resource_configuration(
+                        module.GrowingDoubleLargeSieveConfig,
+                        **values["collector"],
                     )
                     typ(**values)
             finally:
@@ -89,8 +93,8 @@ class LowerDesignTests(unittest.TestCase):
     def test_nominee_retains_lower_marking_and_extra_scratch_bound(self):
         for digits in (50, 51, 52, 55, 56):
             values = plan.configuration(digits, "nominee")
-            values["collector"] = GrowingDoubleLargeSieveConfig(
-                **values["collector"]
+            values["collector"] = adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig, **values["collector"]
             )
             typ = CountedSIQSConfig if "base_count" in values else SIQSConfig
             cfg = typ(**values)

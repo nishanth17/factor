@@ -8,6 +8,9 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.worker_contract import (
     RESIDUE_VERSION,
     CostRow,
@@ -233,14 +236,14 @@ class ResourceTests(unittest.TestCase):
             Search(manifest(), WorkerSettings(checkpoint_bytes=4096))
 
     def test_frame_fragmentation_coalescing_corruption_and_oversize(self):
-        raw = frame(dict(kind="fake", id=7), 1024)
+        raw = frame(dict(kind="fake", id=7))
         for boundary in range(len(raw)):
-            decoder = Decoder(1024)
+            decoder = Decoder()
             self.assertIsNone(decoder.feed(raw[:boundary]))
             self.assertEqual(
                 decoder.feed(raw[boundary:]), dict(kind="fake", id=7)
             )
-        decoder = Decoder(1024)
+        decoder = Decoder()
         self.assertEqual(decoder.feed(raw + raw), dict(kind="fake", id=7))
         self.assertEqual(decoder.feed(b""), dict(kind="fake", id=7))
         for raw_bad in (
@@ -249,9 +252,9 @@ class ResourceTests(unittest.TestCase):
             struct.pack("!I", 1) + b"x",
         ):
             with self.assertRaises(ValueError):
-                Decoder(1024).feed(raw_bad)
+                Decoder().feed(raw_bad)
         with self.assertRaises(ValueError):
-            frame(dict(payload="x" * 2000), 1024)
+            frame(dict(payload="x" * 2000))
 
     def test_engagement_uses_only_declared_plan_and_pool_readiness(self):
         plan = manifest()
@@ -385,9 +388,7 @@ class StagedContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             search.receive(0, 1, boundary(search, 0, 1))
         with self.assertRaises(ValueError):
-            checked_residue(
-                {}, manifest().assignment(0), manifest().metadata, 1024
-            )
+            checked_residue({}, manifest().assignment(0), manifest().metadata)
 
     def test_restart_rejects_unpaid_boundaries_and_reset_charges(self):
         search = Search(
@@ -462,7 +463,7 @@ class OptimizationContractTests(unittest.TestCase):
             dict(stage_policy="unknown"),
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**changes)
+                adapt_resource_configuration(WorkerSettings, **changes)
 
     def test_cost_table_distinguishes_cold_pool_and_metadata_warmth(self):
         plan = manifest()
@@ -506,8 +507,8 @@ class OptimizationContractTests(unittest.TestCase):
         )
 
     def test_decoder_recognizes_buffered_and_invalid_following_frames(self):
-        raw = frame(dict(a=1), 1024)
-        decoder = Decoder(1024)
+        raw = frame(dict(a=1))
+        decoder = Decoder()
         self.assertEqual(decoder.feed(raw + raw), dict(a=1))
         self.assertTrue(decoder.complete)
         self.assertEqual(decoder.feed(b""), dict(a=1))

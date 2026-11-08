@@ -13,9 +13,16 @@ from contextlib import contextmanager
 from dataclasses import asdict, replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .... import qs
 from ....common import utils
-from ....execution.budget import Budget, BudgetExhaustedError
+from ....execution.budget import BudgetExhaustedError
 from ...ecm.p52.p52_realistic import check_quiet
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..b1.b1_calibration import save
@@ -115,8 +122,10 @@ def decode(value):
         if ("large_prime_bound" in value["collector"])
         else qs.SieveConfig
     )
-    value["collector"] = kind(**value["collector"])
-    return qs.SIQSConfig(**value)
+    value["collector"] = adapt_resource_configuration(
+        kind, **value["collector"]
+    )
+    return adapt_resource_configuration(qs.SIQSConfig, **value)
 
 
 def graph_diagnostics(collector):

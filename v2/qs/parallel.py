@@ -135,7 +135,7 @@ class _ParentBudget(PollingBudget):
 class _ExportCollector(SieveCollector):
     """Export verified atoms; matching belongs to the parent."""
 
-    def __init__(self, *args, packet_atoms, **kwargs):
+    def __init__(self, *args, packet_atoms=1024, **kwargs):
         self.packet_atoms = packet_atoms
         super().__init__(*args, **kwargs)
 

@@ -8,6 +8,9 @@ from dataclasses import replace
 from math import isqrt
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_stage_two import StageTwoSchedule, advance_prepared_job
 from v2.execution.ecm_worker import CurveEngine
@@ -256,8 +259,11 @@ class HeadroomWorkerTests(unittest.TestCase):
                 budget_mode="prospective",
             ),
         ):
-            settings = WorkerSettings(
-                worker_imports="ecm", decoded_cache_bytes=65536, **options
+            settings = adapt_resource_configuration(
+                WorkerSettings,
+                worker_imports="ecm",
+                decoded_cache_bytes=65536,
+                **options,
             )
             engine = CurveEngine(settings)
             plan = Manifest(
@@ -307,7 +313,7 @@ class HeadroomWorkerTests(unittest.TestCase):
             dict(packet_policy="bad"),
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**values)
+                adapt_resource_configuration(WorkerSettings, **values)
         with self.assertRaises(MemoryError):
             arithmetic_options(
                 configuration(segment_size=4096),

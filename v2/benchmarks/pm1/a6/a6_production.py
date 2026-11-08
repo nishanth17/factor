@@ -10,9 +10,15 @@ import statistics
 import sys
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from .... import portfolio
 from ....execution import stage_jobs
-from ....execution.budget import Budget
 from ....execution.schedules import SieveContext
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (
@@ -95,7 +101,9 @@ def config(arm, backend, **changes):
     if arm != "control":
         common.update(options(arm))
     common.update(changes)
-    return module, module.PortfolioConfig(**common)
+    return module, adapt_resource_configuration(
+        module.PortfolioConfig, **common
+    )
 
 
 def grant():

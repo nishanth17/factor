@@ -6,6 +6,9 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import (
@@ -86,7 +89,8 @@ class C10DefaultTests(unittest.TestCase):
         self.assertEqual(SIQSConfig().collector.power_plan_bytes, 0)
 
         for number in (NUMBER_40, NUMBER_50, NUMBER_51):
-            selected = default_siqs_config(
+            selected = adapt_resource_configuration(
+                default_siqs_config,
                 number,
                 recipe="calibrated"
                 if 128 * 2**20 in (None, 2**30)
@@ -109,7 +113,10 @@ class C10DefaultTests(unittest.TestCase):
                 C10_POWER_PLAN_BYTES,
             )
             self.assertEqual(
-                PortfolioConfig(**asdict(selected)).siqs, selected.siqs
+                adapt_resource_configuration(
+                    PortfolioConfig, **asdict(selected)
+                ).siqs,
+                selected.siqs,
             )
             self.assertEqual(
                 PortfolioConfig()

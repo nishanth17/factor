@@ -7,6 +7,7 @@ from math import gcd
 from v2 import portfolio
 from v2.benchmarks.ecm.b4 import b4_common as common
 from v2.benchmarks.ecm.b4 import b4_kernels as kernels
+from v2.benchmarks.infrastructure.resource_control import recording_budget
 from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
@@ -223,7 +224,8 @@ class B4KernelTests(unittest.TestCase):
                         fixture["n"],
                         seed=7,
                         config=config,
-                        budget=engine.Budget(
+                        budget=recording_budget(
+                            engine.Budget,
                             work_limit=protocol["work_limit"],
                             cancelled=lambda: bool(progress),
                         ),
@@ -242,14 +244,18 @@ class B4KernelTests(unittest.TestCase):
                     fixture["n"],
                     config=config,
                     checkpoint=checkpoint,
-                    budget=engine.Budget(work_limit=protocol["work_limit"]),
+                    budget=recording_budget(
+                        engine.Budget, work_limit=protocol["work_limit"]
+                    ),
                     **serial_options(engine),
                 )
                 uninterrupted = engine.factorize_bounded(
                     fixture["n"],
                     seed=7,
                     config=config,
-                    budget=engine.Budget(work_limit=protocol["work_limit"]),
+                    budget=recording_budget(
+                        engine.Budget, work_limit=protocol["work_limit"]
+                    ),
                     **serial_options(engine),
                 )
                 self.assertEqual(
@@ -265,7 +271,9 @@ class B4KernelTests(unittest.TestCase):
                             plain, protocol, fixture["case"], backend
                         ),
                         checkpoint=checkpoint,
-                        budget=plain.Budget(work_limit=protocol["work_limit"]),
+                        budget=recording_budget(
+                            plain.Budget, work_limit=protocol["work_limit"]
+                        ),
                         **serial_options(plain),
                     )
                     self.assertEqual(
@@ -275,8 +283,8 @@ class B4KernelTests(unittest.TestCase):
                 cancelled = engine.factorize_bounded(
                     fixture["n"],
                     config=config,
-                    budget=engine.Budget(
-                        work_limit=5000, cancelled=lambda: True
+                    budget=recording_budget(
+                        engine.Budget, work_limit=5000, cancelled=lambda: True
                     ),
                     **serial_options(engine),
                 )
@@ -301,7 +309,7 @@ class B4KernelTests(unittest.TestCase):
             job = package.stage_jobs.new_job("ecm", n, 7, 2, 2)
             job.update(phase="stage_one", value=[x, z], a24=2, powers=[[2, 2]])
             job["cursor"].update(next=3)
-            budget = engine.Budget(work_limit=100)
+            budget = recording_budget(engine.Budget, work_limit=100)
             package.stage_jobs.advance_job(job, budget, None, config)
             self.assertEqual(job["factor"], factor)
             self.assertTrue(job["done"])
@@ -312,7 +320,7 @@ class B4KernelTests(unittest.TestCase):
             package = __import__(engine.__package__, fromlist=["stage_jobs"])
             job = package.stage_jobs.new_job("ecm", 35, 7, 2, 2)
             job.update(phase="stage_two", terms=[5, 7], product=0)
-            budget = engine.Budget(work_limit=100)
+            budget = recording_budget(engine.Budget, work_limit=100)
 
             # Saturation must replay and retain the proper term factor.
             package.stage_jobs._batch_check(job, budget)

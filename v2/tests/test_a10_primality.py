@@ -8,6 +8,10 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from v2 import portfolio
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.primality.a10.a10_inputs import (
     REPORTED_INPUT,
     REPORTED_PRIME,
@@ -29,7 +33,8 @@ def allowance(work=1000000, **kwargs):
 
 
 def config(module=portfolio, **kwargs):
-    return module.PortfolioConfig(
+    return adapt_resource_configuration(
+        module.PortfolioConfig,
         trial_bound=5,
         rho_attempts=0,
         pm1_attempts=0,
@@ -283,15 +288,21 @@ class A10Tests(unittest.TestCase):
             kwargs = dict(seed=7, config=cfg)
             whole = old.portfolio.factorize_bounded(
                 REPORTED_PRIME,
-                budget=old.budget.Budget(
-                    work_limit=1000000, seconds=None, cpu_seconds=None
+                budget=recording_budget(
+                    old.budget.Budget,
+                    work_limit=1000000,
+                    seconds=None,
+                    cpu_seconds=None,
                 ),
                 **kwargs,
             )
             paused = old.portfolio.factorize_bounded(
                 REPORTED_PRIME,
-                budget=old.budget.Budget(
-                    work_limit=200, seconds=None, cpu_seconds=None
+                budget=recording_budget(
+                    old.budget.Budget,
+                    work_limit=200,
+                    seconds=None,
+                    cpu_seconds=None,
                 ),
                 **kwargs,
             )
@@ -322,25 +333,35 @@ class A10Tests(unittest.TestCase):
         options = dict(
             trial_bound=30000, rho_attempts=0, pm1_attempts=0, ecm_tiers=()
         )
-        cfg = old.portfolio.PortfolioConfig(**options)
+        cfg = adapt_resource_configuration(
+            old.portfolio.PortfolioConfig, **options
+        )
         kwargs = dict(seed=104729, config=cfg)
         whole = old.portfolio.factorize_bounded(
             REPORTED_INPUT,
-            budget=old.budget.Budget(
-                work_limit=1000000, seconds=None, cpu_seconds=None
+            budget=recording_budget(
+                old.budget.Budget,
+                work_limit=1000000,
+                seconds=None,
+                cpu_seconds=None,
             ),
             **kwargs,
         )
         paused = old.portfolio.factorize_bounded(
             REPORTED_INPUT,
-            budget=old.budget.Budget(
-                work_limit=200, seconds=None, cpu_seconds=None
+            budget=recording_budget(
+                old.budget.Budget,
+                work_limit=200,
+                seconds=None,
+                cpu_seconds=None,
             ),
             **kwargs,
         )
         resumed = portfolio.factorize_bounded(
             REPORTED_INPUT,
-            config=portfolio.PortfolioConfig(**options),
+            config=adapt_resource_configuration(
+                portfolio.PortfolioConfig, **options
+            ),
             budget=allowance(),
             checkpoint=paused.checkpoint,
         )
@@ -383,16 +404,22 @@ class A10Tests(unittest.TestCase):
                 REPORTED_PRIME,
                 seed=7,
                 config=old_cfg,
-                budget=self.control.budget.Budget(
-                    work_limit=1000000, seconds=None, cpu_seconds=None
+                budget=recording_budget(
+                    self.control.budget.Budget,
+                    work_limit=1000000,
+                    seconds=None,
+                    cpu_seconds=None,
                 ),
             )
             old_paused = self.control.portfolio.factorize_bounded(
                 REPORTED_PRIME,
                 seed=7,
                 config=old_cfg,
-                budget=self.control.budget.Budget(
-                    work_limit=200, seconds=None, cpu_seconds=None
+                budget=recording_budget(
+                    self.control.budget.Budget,
+                    work_limit=200,
+                    seconds=None,
+                    cpu_seconds=None,
                 ),
             )
             for version, pairing in (

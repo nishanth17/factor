@@ -20,7 +20,10 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
-from ....execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....portfolio import PortfolioConfig, factorize_bounded
 from ....qs import SieveConfig, SIQSConfig
 from ....qs.polynomial import a_target
@@ -63,9 +66,11 @@ def configuration(n, bound, width, residual, multiplier=1):
             division="bucket",
             score_policy="powers",
             residual_bound=residual,
-            max_atoms=65536,
-            max_relations=32768,
             max_partials=32768,
+            target_rows=32768,
+            preparation_cache_bytes=2 * 2**20
+            if 32768 == None
+            else min(2 * 2**20, 2048 * 32768),
         ),
     )
 

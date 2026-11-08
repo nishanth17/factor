@@ -57,10 +57,12 @@ def configuration(digits, arm, *, multiplier=0):
             residual_bound=3000000,
             large_prime_bound=3000000,
             large_product_bound=115200000000,
-            max_atoms=ATOMS[digits],
             max_partials=PARTIALS[digits],
-            max_relations=ROWS[digits],
             split_call_limit=1048576,
+            target_rows=ROWS[digits],
+            preparation_cache_bytes=2 * 2**20
+            if ROWS[digits] is None
+            else min(2 * 2**20, 2048 * ROWS[digits]),
         ),
     )
     if arm != "control":

@@ -15,6 +15,8 @@ import time
 import zipfile
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import recording_budget
+
 from . import worker
 from .configuration import decode
 from .journal import canonical
@@ -106,8 +108,8 @@ def load_library(snapshot):
 
 def prefix_cost(qs, budgets, cell, *, blocks=128, seconds=20):
     """Include setup, collection, verification and store publication cost."""
-    budget = budgets.Budget(
-        work_limit=10**14, seconds=seconds, cpu_seconds=seconds
+    budget = recording_budget(
+        budgets.Budget, work_limit=10**14, seconds=seconds, cpu_seconds=seconds
     )
     start, cpu = time.monotonic(), time.process_time()
     job = qs.SIQSJob(
@@ -253,10 +255,8 @@ def proof_cost(qs, budgets, base, config, records):
         budgets.__name__.rsplit(".", 1)[0] + ".work_budget"
     )
     budget = polling.PollingBudget(
-        budgets.Budget(
-            work_limit=10**14,
-            seconds=20,
-            cpu_seconds=20,
+        recording_budget(
+            budgets.Budget, work_limit=10**14, seconds=20, cpu_seconds=20
         )
     )
     start, cpu = time.monotonic(), time.process_time()

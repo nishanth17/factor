@@ -13,6 +13,9 @@ from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_selection import (
     COMPATIBILITY,
@@ -160,7 +163,9 @@ class LazySelectionTests(unittest.TestCase):
         self.sha = hashlib.sha256(self.path.read_bytes()).hexdigest()
 
     def owner(self, **kwargs):
-        return SelectedECMContext(self.path, self.sha, seed=7, **kwargs)
+        return adapt_resource_configuration(
+            SelectedECMContext, self.path, self.sha, seed=7, **kwargs
+        )
 
     def run_fake(self, owner, *, checkpoint=None, budget=None):
         with patch("v2.execution.ecm_workers.ECMExecutor", FakeExecutor):

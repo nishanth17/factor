@@ -7,6 +7,10 @@ and diagnostic controls, not a required all-combinations campaign.
 from dataclasses import asdict, replace
 from math import isqrt
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ....qs import CombinedYieldSieveConfig
 from . import plan as historical
 from .configuration import SIZES
@@ -51,7 +55,12 @@ def configuration(digits, arm="C1", *, admission_base_bound=None):
         return config
     values = asdict(config.collector)
     values.update(envelope(admission_base_bound, config.collector))
-    return replace(config, collector=CombinedYieldSieveConfig(**values))
+    return replace(
+        config,
+        collector=adapt_resource_configuration(
+            CombinedYieldSieveConfig, **values
+        ),
+    )
 
 
 def convert(cell):

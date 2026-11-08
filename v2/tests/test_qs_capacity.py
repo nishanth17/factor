@@ -6,6 +6,9 @@ import unittest
 from dataclasses import replace
 from math import prod
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common.utils import DETERMINISTIC_LIMIT
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs.assignment_stream import AssignmentStream, unrank_combination
@@ -43,7 +46,9 @@ class CapacityTests(unittest.TestCase):
             memory_bytes=16 * 2**20,
         )
         options.update(kwargs)
-        return AssignmentStream(self.base, 256, **options)
+        return adapt_resource_configuration(
+            AssignmentStream, self.base, 256, **options
+        )
 
     def test_combinadic_oracle_and_unique_prefix_extension(self):
         for size in range(1, 9):
@@ -297,9 +302,7 @@ class CapacityTests(unittest.TestCase):
         report = capacity_report(self.base, enlarged)
 
         self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)
-        saturated = replace(
-            enlarged, collector=replace(enlarged.collector, max_relations=2048)
-        )
+        saturated = replace(enlarged, collector=replace(enlarged.collector))
         validate_extension(enlarged, saturated)
         validate_extension(
             saturated,

@@ -14,8 +14,11 @@ import time
 from dataclasses import asdict
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget
 from ....tests.test_qs import reference_positions
 from ...suites.phase_one import environment
 from ...support.paths import (

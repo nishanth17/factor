@@ -10,8 +10,11 @@ import time
 from dataclasses import replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    RecordingBudget as Budget,
+)
+
 from ....common import utils
-from ....execution.budget import Budget
 from ....qs import SIQSJob
 from ..b1.b1_calibration import save
 from . import c9_study as study
@@ -53,9 +56,7 @@ def resume(config, fixture, output):
     """Release old stores before two restores; charge encoding and replay."""
     # Checkpoint verification reserves eight simultaneous encoded copies.
     # This is a correctness diagnostic, separately bounded from timing arms.
-    config = replace(
-        config, collector=replace(config.collector, memory_bytes=512 * 2**20)
-    )
+    config = replace(config, collector=replace(config.collector))
     start, cpu = time.monotonic(), time.process_time()
     last_poll = time.monotonic()
 

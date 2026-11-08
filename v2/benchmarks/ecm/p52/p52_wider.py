@@ -12,6 +12,11 @@ import time
 from collections import Counter
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ...support.paths import (
     source_path,
@@ -41,8 +46,10 @@ def worker(args):
     )
     if args.arm == "programs":
         options["ecm_program_bytes"] = 128 * 2**20
-    config = engine.PortfolioConfig(**options)
-    budget = engine.Budget(work_limit=work_limit, seconds=120, cpu_seconds=120)
+    config = adapt_resource_configuration(engine.PortfolioConfig, **options)
+    budget = recording_budget(
+        engine.Budget, work_limit=work_limit, seconds=120, cpu_seconds=120
+    )
     started = time.perf_counter()
     run = engine.factorize_bounded(
         fixture["n"], seed=7, config=config, budget=budget

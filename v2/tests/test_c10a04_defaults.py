@@ -7,6 +7,9 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c10a04 import configuration, short_decisions
 from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -60,7 +63,8 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertIs(SIQSJob(n, config=explicit).config, explicit)
         grant = allowance(0)
         self.assertIs(SIQSJob(n, budget=grant).budget, grant)
-        limited = default_siqs_config(
+        limited = adapt_resource_configuration(
+            default_siqs_config,
             n,
             recipe="calibrated"
             if 128 * 2**20 in (None, 2**30)
@@ -149,7 +153,10 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertEqual(selected.memory_bytes, 1040 * 2**20)
         self.assertIs(type(selected.siqs), CountedSIQSConfig)
         self.assertEqual(
-            PortfolioConfig(**asdict(selected)).siqs, selected.siqs
+            adapt_resource_configuration(
+                PortfolioConfig, **asdict(selected)
+            ).siqs,
+            selected.siqs,
         )
         self.assertIsNone(PortfolioConfig(siqs=None).for_input(n).siqs)
         first = factorize_bounded(n, budget=allowance(0))
@@ -179,9 +186,7 @@ class LargerDefaultTests(unittest.TestCase):
                 n, 1, 10, allowance(), ceiling=500, memory_bytes=0
             )
         with self.assertRaises(BudgetExhaustedError):
-            endpoint_for_count(
-                n, 1, 10, allowance(0), ceiling=500, memory_bytes=2**20
-            )
+            endpoint_for_count(n, 1, 10, allowance(0), ceiling=500)
         config = CountedSIQSConfig(base_bound=10, base_count=9)
         result = SIQSJob(n, config=config, budget=allowance()).run()
         self.assertEqual(result.reason, "configuration_refusal")
@@ -190,6 +195,4 @@ class LargerDefaultTests(unittest.TestCase):
             "v2.qs.count_policy.prime_sieve.prime_sieve", return_value=[]
         ):
             with self.assertRaises(CountPolicyRefusedError):
-                endpoint_for_count(
-                    n, 1, 10, allowance(), ceiling=500, memory_bytes=2**20
-                )
+                endpoint_for_count(n, 1, 10, allowance(), ceiling=500)

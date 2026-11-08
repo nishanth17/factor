@@ -6,6 +6,9 @@ from collections import defaultdict
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SIQSConfig, SIQSJob, build_factor_base
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
@@ -28,7 +31,7 @@ def config(**kwargs):
         memory_bytes=64 * 2**20,
     )
     values.update(kwargs)
-    return SieveConfig(**values)
+    return adapt_resource_configuration(SieveConfig, **values)
 
 
 def worker(poly, base, marking, **kwargs):

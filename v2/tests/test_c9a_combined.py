@@ -9,6 +9,9 @@ from dataclasses import FrozenInstanceError, replace
 from math import gcd
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
@@ -63,7 +66,7 @@ def policy(**changes):
         memory_bytes=128 * 2**20,
     )
     values.update(changes)
-    return CombinedYieldSieveConfig(**values)
+    return adapt_resource_configuration(CombinedYieldSieveConfig, **values)
 
 
 def collector(**changes):

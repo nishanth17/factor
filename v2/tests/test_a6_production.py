@@ -8,6 +8,9 @@ from dataclasses import replace
 from math import gcd
 
 from v2 import portfolio
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.pm1.a6.a6_production import load_control
 from v2.execution import stage_jobs
 from v2.execution.budget import BudgetExhaustedError
@@ -21,7 +24,8 @@ def allowance(work=1000000):
 
 
 def configuration(**changes):
-    return portfolio.PortfolioConfig(
+    return adapt_resource_configuration(
+        portfolio.PortfolioConfig,
         trial_bound=5,
         rho_attempts=0,
         ecm_tiers=(),
@@ -129,9 +133,14 @@ class ProductionPM1Tests(unittest.TestCase):
             segment_size=16,
             gcd_batch=4,
         )
-        oldconfig = old.PortfolioConfig(**options)
-        legacy = portfolio.PortfolioConfig(
-            **options, pm1_gap_mode="cached", pm1_chunk_size=None
+        oldconfig = adapt_resource_configuration(
+            old.PortfolioConfig, **options
+        )
+        legacy = adapt_resource_configuration(
+            portfolio.PortfolioConfig,
+            **options,
+            pm1_gap_mode="cached",
+            pm1_chunk_size=None,
         )
         n = 1009 * 1013
         oldrun = old.factorize_bounded(

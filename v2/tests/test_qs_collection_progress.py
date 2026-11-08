@@ -10,6 +10,9 @@ from dataclasses import replace
 from functools import partial
 from unittest.mock import PropertyMock, patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.qs import (
     BoundedYieldSieveConfig,
     GrowingDoubleLargeSieveConfig,
@@ -64,12 +67,20 @@ class CollectionProgressTests(unittest.TestCase):
     def test_signed_batches_preserve_stats_work_and_serialized_store(self):
         common = dict(residual_bound=500, block_width=17, division="full")
         configs = (
-            SieveConfig(max_partials=2, **common),
-            GrowingDoubleLargeSieveConfig(
-                large_prime_bound=500, large_product_bound=500**2, **common
+            adapt_resource_configuration(
+                SieveConfig, max_partials=2, **common
             ),
-            BoundedYieldSieveConfig(
-                large_prime_bound=500, large_product_bound=500**2, **common
+            adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig,
+                large_prime_bound=500,
+                large_product_bound=500**2,
+                **common,
+            ),
+            adapt_resource_configuration(
+                BoundedYieldSieveConfig,
+                large_prime_bound=500,
+                large_product_bound=500**2,
+                **common,
             ),
         )
         for config in configs:

@@ -12,6 +12,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
@@ -57,7 +60,7 @@ def policy(**changes):
         duplicate_policy="identity",
     )
     values.update(changes)
-    return ExtendedYieldSieveConfig(**values)
+    return adapt_resource_configuration(ExtendedYieldSieveConfig, **values)
 
 
 def collector(**changes):
