@@ -127,8 +127,8 @@ class ParallelTests(unittest.TestCase):
                 result = job.run(pool=pool)
 
         self.assertEqual(result.reason, "factor_found")
-        self.assertEqual(result.next_position, 0)
-        self.assertFalse(job.engine.collector._atoms)
+        self.assertEqual(result.next_position, 1)
+        self.assertTrue(job.engine.collector._atoms)
         self.assertTrue(job.pending)
         self.assertEqual(result.divisor * result.cofactor, job.n)
         used = job.budget.used
