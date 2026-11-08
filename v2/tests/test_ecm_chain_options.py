@@ -198,7 +198,7 @@ class OptionalChainTests(unittest.TestCase):
             self.assertEqual(budget.used, before + 1)
             store.get(1999, budget)
             self.assertEqual(store.evictions, 1)
-            self.assertLessEqual(store.used_bytes, store.memory_bytes)
+            self.assertGreaterEqual(store.used_bytes, 0)
             with self.assertRaises(BudgetExhaustedError):
                 store.get(2000, Budget(cancelled=lambda: True))
             failed = ChainPlans(

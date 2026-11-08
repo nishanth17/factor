@@ -6,10 +6,15 @@ import sys
 import tempfile
 import time
 import unittest
-from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.benchmarks.qs.a1a_integration import analysis, inputs, runtime, study
 from v2.benchmarks.qs.c10a04 import configuration
 from v2.benchmarks.qs.c10a04.accounting import Ledger
@@ -172,7 +177,7 @@ class FrozenRunnerTests(unittest.TestCase):
             path = Path(directory) / "checkpoint.json"
             path.write_text(json.dumps(first.checkpoint))
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", 0, "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(

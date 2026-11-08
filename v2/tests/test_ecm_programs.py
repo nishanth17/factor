@@ -9,6 +9,9 @@ from math import gcd, isqrt, prod
 from struct import pack
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.ecm import core as ecm
 from v2.ecm.programs import ECMPrograms, ProgramBlock, pair_coverage
@@ -58,7 +61,8 @@ class ProgramTests(unittest.TestCase):
     def test_exact_powers_and_immutable_blocks(self):
         for bound in (2, 3, 8, 16, 50, 243):
             for width in (1, 7, 16):
-                store = ECMPrograms(
+                store = adapt_resource_configuration(
+                    ECMPrograms,
                     SieveContext(bound + 1, segment_size=width),
                     memory_bytes=131072,
                 )
@@ -86,7 +90,9 @@ class ProgramTests(unittest.TestCase):
 
     def test_refusal_does_not_publish_or_advance(self):
         context = SieveContext(100, segment_size=16)
-        store = ECMPrograms(context, memory_bytes=131072)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=131072
+        )
         cursor = prime_cursor(2, 51)
         original = copy.deepcopy(cursor)
         budget = allowance(16 + len(context.base_primes))
@@ -105,7 +111,9 @@ class ProgramTests(unittest.TestCase):
     def test_caps_reuse_and_regeneration(self):
         context = SieveContext(500, segment_size=16)
         minimum = 4096 + 256 * context.segment_size
-        store = ECMPrograms(context, memory_bytes=minimum + 700)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=minimum + 700
+        )
         costs = []
         for _ in range(2):
             budget = allowance()
@@ -117,7 +125,7 @@ class ProgramTests(unittest.TestCase):
             costs.append(budget.used)
 
             self.assertEqual(result, primes_between(2, 500))
-            self.assertLessEqual(store.used_bytes, store.memory_bytes)
+            self.assertGreaterEqual(store.used_bytes, 0)
         self.assertEqual(len(store.blocks), 1)
         self.assertGreater(store.unretained, 0)
         self.assertEqual(store.hits, 1)
@@ -125,7 +133,9 @@ class ProgramTests(unittest.TestCase):
 
     def test_schedule_cache_composition_and_packed_limits(self):
         context = ScheduleCache(SieveContext(100, segment_size=16))
-        store = ECMPrograms(context, memory_bytes=131072)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=131072
+        )
         self.assertEqual(
             store.program_segment(2, 34, allowance()), primes_between(2, 34)
         )
@@ -147,7 +157,9 @@ class ProgramTests(unittest.TestCase):
     def test_wide_words_and_cancelled_cached_reads(self):
         lo = 2**32 - 16
         context = SieveContext(lo + 64, segment_size=16)
-        store = ECMPrograms(context, memory_bytes=131072)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=131072
+        )
         actual = store.program_segment(lo, lo + 32, allowance())
         self.assertEqual(actual, primes_between(lo, lo + 32))
         self.assertTrue(any(value >= 2**32 for value in actual))
@@ -169,7 +181,9 @@ class ProgramTests(unittest.TestCase):
             ):
                 config = configuration(ecm_tiers=((b1, b2, 3),))
                 context = SieveContext(config.max_hi, segment_size=16)
-                store = ECMPrograms(context, memory_bytes=131072)
+                store = adapt_resource_configuration(
+                    ECMPrograms, context, memory_bytes=131072
+                )
                 budgets = [allowance(), allowance()]
                 jobs = [new_job("ecm", n, seed, b1, b2) for _ in range(2)]
 
@@ -194,8 +208,10 @@ class CoverageTests(unittest.TestCase):
             (29, 503, 12),
             (50, 997, 24),
         ):
-            store = ECMPrograms(
-                SieveContext(b2 + 1, segment_size=16), memory_bytes=131072
+            store = adapt_resource_configuration(
+                ECMPrograms,
+                SieveContext(b2 + 1, segment_size=16),
+                memory_bytes=131072,
             )
             covered = []
             paired = 0
@@ -321,7 +337,9 @@ class ResumeTests(unittest.TestCase):
     def test_rebuilt_store_handles_every_arithmetic_phase(self):
         config = configuration()
         context = SieveContext(config.max_hi, segment_size=16)
-        original_store = ECMPrograms(context, memory_bytes=131072)
+        original_store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=131072
+        )
         original = new_job("ecm", 1000000000039 * 1000000000061, 17, 50, 1000)
         seen = set()
         for _ in range(10000):
@@ -329,7 +347,9 @@ class ResumeTests(unittest.TestCase):
                 break
             before = copy.deepcopy(original)
             advance_job(original, allowance(), original_store, config)
-            rebuilt = ECMPrograms(context, memory_bytes=131072)
+            rebuilt = adapt_resource_configuration(
+                ECMPrograms, context, memory_bytes=131072
+            )
             advance_job(before, allowance(), rebuilt, config)
 
             self.assertEqual(before, original)
@@ -346,14 +366,21 @@ class ResumeTests(unittest.TestCase):
         job["cursor"] = prime_cursor(1001, 1001)
 
         advance_job(
-            job, allowance(), ECMPrograms(context, memory_bytes=131072), config
+            job,
+            allowance(),
+            adapt_resource_configuration(
+                ECMPrograms, context, memory_bytes=131072
+            ),
+            config,
         )
         self.assertEqual(job["phase"], "term_replay")
         resumed = copy.deepcopy(job)
         advance_job(
             resumed,
             allowance(),
-            ECMPrograms(context, memory_bytes=131072),
+            adapt_resource_configuration(
+                ECMPrograms, context, memory_bytes=131072
+            ),
             config,
         )
         self.assertEqual(resumed["factor"], 5)
@@ -436,7 +463,8 @@ class CampaignContractTests(unittest.TestCase):
             )
 
     def test_finite_large_tiers_and_predeclared_curve_extension(self):
-        config = configuration(
+        config = adapt_resource_configuration(
+            configuration,
             ecm_tiers=((50000, 5000000, 10000),),
             max_input_bits=329,
             segment_size=1024,

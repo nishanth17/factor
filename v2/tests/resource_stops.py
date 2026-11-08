@@ -68,3 +68,11 @@ def recipe_values(value):
     if isinstance(value, (tuple, list)):
         return type(value)(recipe_values(item) for item in value)
     return value
+
+
+def historical_decode_siqs(values):
+    """Translate a source-pinned historical test recipe explicitly."""
+    from v2 import qs
+    from v2.benchmarks.qs.c9a.configuration import decode
+
+    return decode(values, qs)

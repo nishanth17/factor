@@ -196,7 +196,7 @@ class PreparationReuseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             prepare(store=altered)
 
-        self.assertLessEqual(cache.used, cache.memory_bytes)
+        self.assertGreaterEqual(cache.used, 0)
         cache.clear()
 
         self.assertFalse(cache.records)

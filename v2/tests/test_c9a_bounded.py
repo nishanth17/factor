@@ -166,12 +166,16 @@ class BoundedYieldTests(unittest.TestCase):
 
     def test_cold_restore_preserves_existing_file_extents(self):
         with tempfile.TemporaryDirectory() as directory:
-            engine = worker(spill_directory=directory, spill_bytes=2**20)
+            engine = adapt_resource_configuration(
+                worker, spill_directory=directory, spill_bytes=2**20
+            )
             engine._admit(atom_at(engine, 1, opaque=True), Counter())
             engine._admit(atom_at(engine, -21), Counter())
             saved = json.loads(json.dumps(pack_store(engine)))
             used = engine._arena.spill.used
-            clone = worker(spill_directory=directory, spill_bytes=2**20)
+            clone = adapt_resource_configuration(
+                worker, spill_directory=directory, spill_bytes=2**20
+            )
 
             restore_store(saved, clone, clone.budget)
             self.assertEqual(pack_store(clone), saved)

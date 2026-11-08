@@ -148,7 +148,10 @@ class AutomaticTests(unittest.TestCase):
 
     def test_explicit_parent_memory_or_zero_aggregate_cap_stays_serial(self):
         for settings, cap in (
-            (config(memory_bytes=16 * 2**20), None),
+            (
+                adapt_resource_configuration(config, memory_bytes=16 * 2**20),
+                None,
+            ),
             (config(), 0),
         ):
             with patch(
@@ -172,7 +175,9 @@ class AutomaticTests(unittest.TestCase):
                     side_effect=AssertionError("unadmitted selector"),
                 ),
             ):
-                settings = config(memory_bytes=parent)
+                settings = adapt_resource_configuration(
+                    config, memory_bytes=parent
+                )
                 generator = random.Random(7)
                 before = generator.getstate()
                 with AutomaticECMOwner(seed=7) as owner:
@@ -193,7 +198,9 @@ class AutomaticTests(unittest.TestCase):
         with patch(
             "v2.execution.ecm_selection.SelectedECMContext", FakeSelected
         ):
-            settings = config(memory_bytes=maximum)
+            settings = adapt_resource_configuration(
+                config, memory_bytes=maximum
+            )
             with AutomaticECMOwner(seed=7) as owner:
                 owner.configure(
                     settings, random.Random(7), None, automatic_memory=False
@@ -628,8 +635,8 @@ class AutomaticTests(unittest.TestCase):
                         "-m",
                         "v2.factor",
                         str(10**79 + 7),
-                        "--work-limit",
-                        "0",
+                        "--seconds",
+                        0,
                         "--checkpoint",
                         str(path),
                         *flags,

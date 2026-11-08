@@ -7,10 +7,12 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 from v2.benchmarks.qs.c10a01 import pilots
 from v2.benchmarks.qs.c10a01.configuration import configuration
 

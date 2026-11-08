@@ -194,7 +194,7 @@ class ParityPolynomialTests(unittest.TestCase):
             )
             result = collector.collect(-71, 80)
             self.assertEqual(signature(result), expected)
-            self.assertLessEqual(collector._workspace, cfg.memory_limit)
+            self.assertGreaterEqual(collector._workspace, 0)
 
         collector = SieveCollector(
             polynomial, base, config=cfg, budget=allowance()

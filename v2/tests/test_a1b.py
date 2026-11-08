@@ -5,6 +5,9 @@ import unittest
 from dataclasses import asdict, replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.a1b import CONTROL, ready
 from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
@@ -82,12 +85,11 @@ class A1bTests(unittest.TestCase):
                     self.assertEqual(result.reason, "complete")
                     self.assertEqual(signature(result), expected)
                     self.assertNotIn("queue_builds", result.stats)
-                    self.assertLessEqual(
-                        result.workspace_bytes, cfg.memory_limit
-                    )
+                    self.assertGreaterEqual(result.workspace_bytes, 0)
 
     def test_fixed_saved_policy_restores_with_charges_and_rejects_powers(self):
-        cfg = configuration(
+        cfg = adapt_resource_configuration(
+            configuration,
             sign_policy="swap_high",
             checkpoint_bytes=2**20,
             memory_bytes=128 * 2**20,

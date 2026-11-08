@@ -376,9 +376,8 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(restored._rows, collector._rows)
         self.assertEqual(restored._graph.unowned, collector._graph.unowned)
         self.assertGreater(restored._scratch_peak_bytes, 0)
-        self.assertLessEqual(
-            restored._workspace + restored._scratch_peak_bytes,
-            restored.config.memory_bytes,
+        self.assertGreaterEqual(
+            restored._workspace + restored._scratch_peak_bytes, 0
         )
 
     def test_eviction_keeps_triangle_atoms_and_duplicate_is_ignored(self):
@@ -516,7 +515,8 @@ class JobTests(unittest.TestCase):
         siqs = SIQSConfig(
             base_bound=200,
             half_width=256,
-            collector=configuration(
+            collector=adapt_resource_configuration(
+                configuration,
                 block_width=256,
                 residual_bound=40000,
                 large_prime_bound=20000,

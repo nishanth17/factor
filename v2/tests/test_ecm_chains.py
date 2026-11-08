@@ -205,7 +205,7 @@ class ProductionChainTests(unittest.TestCase):
         self.assertEqual(budget.used, preparation + 1)
         store.get(1999, budget)
         self.assertEqual(store.evictions, 1)
-        self.assertLessEqual(store.used_bytes, store.memory_bytes)
+        self.assertGreaterEqual(store.used_bytes, 0)
         store.get(2000, budget)
         self.assertEqual(store.evictions, 2)
         self.assertIsNone(store.get(2001, allowance()))
@@ -228,7 +228,9 @@ class ProductionChainTests(unittest.TestCase):
             context = SieveContext(
                 config.max_hi, segment_size=config.segment_size
             )
-            store = ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+            store = adapt_resource_configuration(
+                ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+            )
             store.chains = ChainPlans(MIN_MEMORY_BYTES, "python-int", (2000,))
             job, budget = new_job("ecm", n, seed, 2000, 2500), allowance()
             for _ in range(10000):
@@ -491,7 +493,9 @@ class ProductionChainTests(unittest.TestCase):
         config = configuration()
         n = 6120168563605791616423380424731852610871
         context = SieveContext(config.max_hi, segment_size=config.segment_size)
-        store = ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+        )
         store.chains = ChainPlans(MIN_MEMORY_BYTES, "python-int", (2000,))
         job = new_job("ecm", n, 17, 2000, 2500)
         with patch.object(

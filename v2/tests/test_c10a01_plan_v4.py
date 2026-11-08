@@ -5,13 +5,15 @@ import json
 import sys
 import tempfile
 import unittest
-from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
     recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
 )
 from v2.benchmarks.qs.c10a01 import control_v4, plan_v4
 from v2.benchmarks.qs.c10a01.configuration_v4 import configuration

@@ -4,7 +4,6 @@ import json
 import tempfile
 import time
 import unittest
-from dataclasses import asdict, replace
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -12,6 +11,12 @@ from unittest.mock import patch
 from v2 import qs
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 from v2.benchmarks.qs.c9a import combined, extended
 from v2.benchmarks.qs.c9a.__main__ import execution_cells

@@ -575,7 +575,8 @@ class FallbackStreamTests(unittest.TestCase):
     def test_serial_decline_preserves_curve_and_later_siqs_seed(self):
         from v2.qs import SIQSConfig
 
-        config = configuration(
+        config = adapt_resource_configuration(
+            configuration,
             ecm_tiers=((2, 2, 3), (3, 3, 2)),
             siqs=SIQSConfig(),
             memory_bytes=2**31,
@@ -650,7 +651,9 @@ class FallbackStreamTests(unittest.TestCase):
             return seeds, rng.getstate()
 
         selector = SimpleNamespace(
-            settings=SimpleNamespace(parent_memory=4 * 2**30),
+            settings=adapt_resource_configuration(
+                SimpleNamespace, parent_memory=4 * 2**30
+            ),
             run=lambda *a, **kw: self.fail("component stream must not run"),
             run_portfolio=lambda *a, **kw: None,
             last_stats={},

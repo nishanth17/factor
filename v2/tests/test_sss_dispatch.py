@@ -230,8 +230,7 @@ class SSSDispatchTests(unittest.TestCase):
                 path = Path(directory) / "progress.json"
 
                 first = subprocess.run(
-                    command
-                    + ["--work-limit", "100000", "--checkpoint", str(path)],
+                    command + ["--seconds", 0, "--checkpoint", str(path)],
                     cwd=ROOT,
                     capture_output=True,
                     text=True,

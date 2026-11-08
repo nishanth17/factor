@@ -171,8 +171,8 @@ class SIQSCLITests(unittest.TestCase):
                 first = cli(
                     NUMBER,
                     *selection,
-                    "--work-limit",
-                    130000,
+                    "--seconds",
+                    0,
                     "--checkpoint",
                     path,
                 )
@@ -244,7 +244,7 @@ class SIQSCLITests(unittest.TestCase):
             ("--siqs", "--method", "sss"),
             ("--siqs-base-bound", 400),
             ("--method", "siqs", "--siqs-half-width", 0),
-            ("--method", "siqs", "--memory-mib", 8),
+            ("--method", "siqs", "--rss-bytes", 8388608),
             ("--method", "qs", "--qs-assignment-policy", "nearest"),
             ("--method", "mpqs", "--qs-polynomials-per-family", 2),
             ("--method", "siqs", "--qs-dlp"),
@@ -283,7 +283,7 @@ class SIQSCLITests(unittest.TestCase):
                 50000000,
                 "--qs-dlp-split-call-limit",
                 64,
-                "--work-limit",
+                "--seconds",
                 0,
             )
             first = cli(NUMBER, *options, "--checkpoint", path)
@@ -308,7 +308,7 @@ class SIQSCLITests(unittest.TestCase):
             run = cli(
                 NUMBER,
                 "--bounded",
-                "--work-limit",
+                "--seconds",
                 0,
                 "--checkpoint",
                 path,

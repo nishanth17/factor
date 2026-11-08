@@ -5,6 +5,9 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c1.c1_feasibility import kernel, xor_selected
 from v2.benchmarks.qs.c1.c1_followup import (
     FollowupAudit,
@@ -132,7 +135,9 @@ class CompleteOfflineGraphTests(unittest.TestCase):
 
     def test_censoring_is_explicit_not_zero_yield(self):
         row = dict(u=10, sign=1, square=1, residual=23, lp=(23,), exponents=())
-        report = compact_report([row], 77, memory_bytes=1)
+        report = adapt_resource_configuration(
+            compact_report, [row], 77, memory_bytes=1
+        )
         self.assertIn("censored", report)
         self.assertNotIn("dependencies", report)
         report = compact_report([row], 77, budget=Budget(work_limit=0))

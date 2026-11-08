@@ -43,11 +43,11 @@ class ChainCLITests(unittest.TestCase):
                 path = Path(directory) / "progress.json"
                 arguments = [] if choice is None else ["--ecm-chain", choice]
                 if choice == "off":
-                    arguments += ["--memory-mib", 8]
+                    arguments += ["--rss-bytes", 8388608]
                 first = cli(
                     1009 * 1013,
                     "--bounded",
-                    "--work-limit",
+                    "--seconds",
                     0,
                     "--checkpoint",
                     path,
@@ -65,7 +65,7 @@ class ChainCLITests(unittest.TestCase):
                 self.assertIn("1009^1 * 1013^1", resumed.stdout)
 
     def test_explicit_small_cap_and_unsupported_schedule_keep_ladder(self):
-        for arguments in (("--memory-mib", 8), ("--ecm-curves", 2)):
+        for arguments in (("--rss-bytes", 8388608), ("--ecm-curves", 2)):
             with tempfile.TemporaryDirectory() as directory:
                 path = Path(directory) / "progress.json"
                 run = cli(101, "--bounded", "--checkpoint", path, *arguments)

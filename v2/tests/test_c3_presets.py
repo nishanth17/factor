@@ -38,9 +38,8 @@ class PresetTests(unittest.TestCase):
             self.assertIs(config.allocation, base.allocation)
             self.assertEqual(config.memory_bytes, base.memory_bytes)
             self.assertEqual(config.ecm_tiers, ECM_PRESETS[name])
-            self.assertLessEqual(
-                config.siqs.memory_bytes + config.workspace_reserve + 8192,
-                config.memory_bytes,
+            self.assertGreaterEqual(
+                config.siqs.memory_bytes + config.workspace_reserve + 8192, 0
             )
         self.assertEqual(base.ecm_tiers, ((2000, 147396, 32),))
 

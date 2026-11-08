@@ -71,7 +71,7 @@ class A1aDefaultTests(unittest.TestCase):
                 10**54 + 123,
                 "--method",
                 "siqs",
-                "--work-limit",
+                "--seconds",
                 0,
                 "--checkpoint",
                 path,
@@ -82,7 +82,7 @@ class A1aDefaultTests(unittest.TestCase):
                 saved["siqs"]["collector"]["marking"], DEFAULT_SELECTED
             )
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", 0, "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(

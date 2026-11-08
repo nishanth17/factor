@@ -6,10 +6,15 @@ import json
 import sys
 import tempfile
 import unittest
-from dataclasses import asdict, replace
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 from v2.benchmarks.qs.c10a01 import control_v4
 from v2.benchmarks.qs.c10a01 import lower_plan_v4 as plan

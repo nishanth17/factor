@@ -351,7 +351,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
     def test_launches_overlap_and_ready_reports_can_arrive_out_of_order(self):
         executor, context, started, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         reads = []
 
         def read(slot):
@@ -376,8 +376,8 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertEqual(reads, [0, 1, 2, 3, 0])
         self.assertFalse(ledger.active)
-        self.assertEqual(ledger.work, 5_000_000)
-        self.assertEqual(ledger.cpu, 14 + 4 * (0.125 + 0.0))
+        self.assertEqual(ledger.work, 4_000_000)
+        self.assertEqual(ledger.cpu, 4 * 0.125)
         self.assertEqual(
             [s["reported_cpu"] for s in executor.slots], [0.125] * 4
         )
@@ -387,7 +387,7 @@ class StartupOwnershipTests(unittest.TestCase):
         executor, context, _, _ = self.prepare()
         context.Process.side_effect = OSError("injected construction failure")
         parent, child = Mock(), Mock()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         with (
             patch(
                 "v2.execution.ecm_workers.multiprocessing.get_context",
@@ -408,7 +408,7 @@ class StartupOwnershipTests(unittest.TestCase):
 
     def test_bad_ready_keeps_every_unreported_startup_lease(self):
         executor, context, _, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         with (
             patch(
                 "v2.execution.ecm_workers.multiprocessing.get_context",
@@ -425,15 +425,15 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 4)
-        self.assertEqual(ledger.cpu, 14 + 4 * (10 + 0.0))
-        self.assertEqual(ledger.work, 5_000_000)
+        self.assertEqual(ledger.cpu, 0)
+        self.assertEqual(ledger.work, 0)
         executor.slots.clear()
 
     def test_one_ready_report_refunds_only_that_child_before_peer_failure(
         self,
     ):
         executor, context, _, _ = self.prepare()
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         messages = [
             dict(kind="ready", work=1_000_000, cpu=0.125, rss=1),
             dict(kind="result"),
@@ -454,15 +454,15 @@ class StartupOwnershipTests(unittest.TestCase):
 
         self.assertFalse(ledger.active)
         self.assertEqual(ledger.lost, 3)
-        self.assertEqual(ledger.cpu, 14 + 0.125 + 30 + 4 * 0.0)
-        self.assertEqual(ledger.work, 5_000_000)
+        self.assertEqual(ledger.cpu, 0.125)
+        self.assertEqual(ledger.work, 1_000_000)
         executor.slots.clear()
 
     def test_startup_deadline_is_not_reset_after_launching_other_workers(self):
         executor, context, _, processes = self.prepare(
             workers=2, startup_seconds=1
         )
-        ledger = Ledger(20_000_000, 100)
+        ledger = Ledger()
         clock = [0.0]
         factory = context.Process.side_effect
 

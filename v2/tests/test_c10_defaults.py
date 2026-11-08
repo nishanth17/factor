@@ -58,9 +58,13 @@ class C10DefaultTests(unittest.TestCase):
                     else "sparse",
                 )
                 selected["collector"]["marking"] = "sparse"
-                self.assertEqual(selected, configurations[digits]["plan"])
+                self.assertEqual(
+                    selected, asdict(configurations[digits]["plan"])
+                )
                 selected["collector"]["power_plan_bytes"] = 0
-                self.assertEqual(selected, configurations[digits]["control"])
+                self.assertEqual(
+                    selected, asdict(configurations[digits]["control"])
+                )
                 self.assertEqual(
                     SIQSJob(number).config, default_siqs_config(number)
                 )
@@ -148,7 +152,7 @@ class C10DefaultTests(unittest.TestCase):
                 NUMBER_40,
                 "--method",
                 "siqs",
-                "--work-limit",
+                "--seconds",
                 0,
                 "--checkpoint",
                 path,
@@ -162,7 +166,7 @@ class C10DefaultTests(unittest.TestCase):
             )
 
             restored = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", 0, "--checkpoint", path
             )
             self.assertEqual(restored.returncode, 1, restored.stderr)
             self.assertEqual(

@@ -111,7 +111,7 @@ class LargerDefaultTests(unittest.TestCase):
                 10**59 + 123,
                 "--method",
                 "siqs",
-                "--work-limit",
+                "--seconds",
                 0,
                 "--checkpoint",
                 path,
@@ -120,7 +120,7 @@ class LargerDefaultTests(unittest.TestCase):
             saved = json.loads(path.read_text())["payload"]["config"]
             self.assertEqual(saved["siqs"]["base_count"], 5000)
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", 0, "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(

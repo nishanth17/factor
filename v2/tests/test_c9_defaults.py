@@ -146,7 +146,7 @@ class C9DefaultTests(unittest.TestCase):
         for options, growing, memory in (
             ((), True, 1040),
             (("--method", "siqs"), True, 1040),
-            (("--method", "siqs", "--memory-mib", 128), True, 128),
+            (("--method", "siqs", "--rss-bytes", 134217728), True, 128),
             (("--method", "siqs", "--qs-base-bound", 1000), False, 80),
         ):
             with (
@@ -155,7 +155,7 @@ class C9DefaultTests(unittest.TestCase):
             ):
                 path = Path(directory) / "checkpoint.json"
                 first = cli(
-                    NUMBER, *options, "--work-limit", 0, "--checkpoint", path
+                    NUMBER, *options, "--seconds", 0, "--checkpoint", path
                 )
                 self.assertEqual(first.returncode, 1, first.stderr)
                 self.assertNotIn("Traceback", first.stderr)
@@ -166,7 +166,7 @@ class C9DefaultTests(unittest.TestCase):
                     growing,
                 )
                 resumed = cli(
-                    "--resume", path, "--work-limit", 0, "--checkpoint", path
+                    "--resume", path, "--seconds", 0, "--checkpoint", path
                 )
                 self.assertEqual(resumed.returncode, 1, resumed.stderr)
                 self.assertNotIn("Traceback", resumed.stderr)

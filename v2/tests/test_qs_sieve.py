@@ -255,7 +255,8 @@ class SieveCoverageTests(unittest.TestCase):
         polynomial = qs_polynomial(base)
         expected = reference_positions(polynomial, base, 0, 4097, 500)
 
-        run = collector(
+        run = adapt_resource_configuration(
+            collector,
             polynomial,
             base,
             block_width=256,

@@ -501,7 +501,7 @@ class StorageCompletionTests(unittest.TestCase):
             self.assertEqual(job.run(), result)
 
     def test_memory_stop_can_extract_retained_rows(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
         collect = job.collector.collect
 
         def memory_stop(lo, hi):
@@ -517,7 +517,7 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(result.divisor * result.cofactor, 20_017_003)
 
     def test_refused_storage_extraction_resumes_without_collection(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
 
         def refuse(solver):
             solver.budget.consume(solver.budget.work_limit + 1)
@@ -545,7 +545,9 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(tuple(job.collector._atoms), before)
 
     def test_unsuccessful_storage_stop_is_idempotent(self):
-        job = self.make_job(n=104729, max_relations=8)
+        job = adapt_resource_configuration(
+            self.make_job, n=104729, max_relations=8
+        )
 
         result = job.run()
         self.assertEqual(result.reason, "relation_limit")
@@ -555,7 +557,7 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(job.run(), result)
 
     def test_matrix_memory_refusal_keeps_explicit_cofactor(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
 
         def refuse_storage_matrix(*args, **kwargs):
             if job.storage_reason is not None:
@@ -574,7 +576,7 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(result, again)
 
     def test_simultaneous_preparation_workspace_is_reserved(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
 
         collected = job.collector.collect(-256, 513)
         prepared = prepare_relations(
@@ -595,14 +597,18 @@ class StorageCompletionTests(unittest.TestCase):
         ) + matrix_workspace(len(prepared.rows), columns)
 
         self.assertGreater(expected, old_maximum)
-        capped = self.make_job(max_relations=8, memory_bytes=expected - 1)
+        capped = adapt_resource_configuration(
+            self.make_job, max_relations=8, memory_bytes=expected - 1
+        )
 
         result = capped.run()
 
         self.assertEqual(result.reason, "memory_limit")
         self.assertIsNone(result.divisor)
         self.assertEqual(result.cofactor, 20_017_003)
-        enough = self.make_job(max_relations=8, memory_bytes=expected)
+        enough = adapt_resource_configuration(
+            self.make_job, max_relations=8, memory_bytes=expected
+        )
 
         result = enough.run()
 

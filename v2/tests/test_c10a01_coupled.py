@@ -4,13 +4,18 @@ import itertools
 import json
 import unittest
 from collections import defaultdict
-from dataclasses import asdict, replace
 from fractions import Fraction
 from math import isqrt, prod
 from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 from v2.benchmarks.qs.c10a01.configuration import configuration as old_config
 from v2.benchmarks.qs.c10a01.configuration_v3 import (

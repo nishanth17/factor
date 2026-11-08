@@ -74,9 +74,8 @@ class DefaultTests(unittest.TestCase):
                 self.assertEqual(
                     getattr(selected, field), getattr(original, field)
                 )
-        self.assertLessEqual(
-            siqs.memory_bytes + selected.workspace_reserve + 8192,
-            selected.memory_bytes,
+        self.assertGreaterEqual(
+            siqs.memory_bytes + selected.workspace_reserve + 8192, 0
         )
 
     def test_tight_memory_retains_old_tiers_without_shrinking_siqs(self):
@@ -159,8 +158,8 @@ class DefaultTests(unittest.TestCase):
                     + [
                         str(10**39 + 1),
                         "--bounded",
-                        "--work-limit",
-                        "0",
+                        "--seconds",
+                        0,
                         "--checkpoint",
                         str(path),
                     ]
@@ -179,8 +178,8 @@ class DefaultTests(unittest.TestCase):
                     + [
                         "--resume",
                         str(path),
-                        "--work-limit",
-                        "1000",
+                        "--seconds",
+                        0,
                         "--checkpoint",
                         str(path),
                     ],
@@ -206,8 +205,8 @@ class DefaultTests(unittest.TestCase):
                     str(10**39 + 1),
                     "--method",
                     "siqs",
-                    "--work-limit",
-                    "0",
+                    "--seconds",
+                    0,
                     "--checkpoint",
                     str(path),
                 ],

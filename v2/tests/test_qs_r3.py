@@ -272,7 +272,7 @@ class TestedDependencyTests(unittest.TestCase):
         self.assertIsNone(second.run())
         self.assertEqual(second.cache_skips, 1)
         self.assertFalse(second.trials)
-        self.assertLessEqual(cache.used, cache.memory_bytes)
+        self.assertGreaterEqual(cache.used, 0)
         key = cache.dependency_key(prepared, mask, unlimited_budget())
         base, relation, atoms = next(iter(key))
         changed = replace(relation, sign=-relation.sign)

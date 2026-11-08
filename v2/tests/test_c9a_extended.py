@@ -518,12 +518,16 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spilled_collector_restores_without_duplicate_disk_charge(self):
         with tempfile.TemporaryDirectory() as directory:
-            worker = collector(spill_directory=directory, spill_bytes=2**20)
+            worker = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             for position in (1, -21):
                 worker._admit(atom_at(worker, position), Counter())
             payload = json.loads(json.dumps(pack_store(worker)))
             used = worker._arena.spill.used
-            restored = collector(spill_directory=directory, spill_bytes=2**20)
+            restored = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             restore_store(payload, restored, restored.budget)
             self.assertEqual(restored._arena.spill.used, used)
             self.assertEqual(pack_store(restored), payload)
@@ -532,7 +536,9 @@ class ExpandedResourceTests(unittest.TestCase):
 
     def test_spill_reads_follow_the_resumed_allowance(self):
         with tempfile.TemporaryDirectory() as directory:
-            worker = collector(spill_directory=directory, spill_bytes=2**20)
+            worker = adapt_resource_configuration(
+                collector, spill_directory=directory, spill_bytes=2**20
+            )
             source = atom_at(worker, 1)
             worker._admit(source, Counter())
             worker.budget = allowance(0)

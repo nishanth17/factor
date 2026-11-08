@@ -137,7 +137,7 @@ class CoupledDefaultTests(unittest.TestCase):
                     10 ** (digits - 1) + 123,
                     "--method",
                     "siqs",
-                    "--work-limit",
+                    "--seconds",
                     0,
                     "--checkpoint",
                     path,

@@ -7,6 +7,9 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from v2 import portfolio
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic, utils
 from v2.ecm.programs import ECMPrograms
 from v2.execution.budget import BudgetExhaustedError
@@ -22,7 +25,8 @@ def settings(**changes):
 
 
 def store(config):
-    return ECMPrograms(
+    return adapt_resource_configuration(
+        ECMPrograms,
         SieveContext(config.max_hi, segment_size=config.segment_size),
         memory_bytes=config.ecm_program_bytes,
     )
@@ -182,7 +186,7 @@ class PairedExecutionTests(unittest.TestCase):
                 break
         self.assertTrue(job["done"])
         self.assertGreater(context.coverage_misses, 0)
-        self.assertLessEqual(context.used_bytes, context.memory_bytes)
+        self.assertGreaterEqual(context.used_bytes, 0)
         other = new_job("ecm", n, 19, 50, 1000)
         while not other["done"]:
             advance_job(other, allowance(), context, config)

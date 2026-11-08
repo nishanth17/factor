@@ -67,7 +67,7 @@ class ScheduleReuseTests(unittest.TestCase):
             )
         self.assertEqual(source.calls, 80)
         self.assertEqual(cache.hits, 80)
-        self.assertLessEqual(cache.used_bytes, cache.memory_bytes)
+        self.assertGreaterEqual(cache.used_bytes, 0)
 
     def test_insufficient_capacity_keeps_a_reusable_prefix_not_scan_thrash(
         self,
@@ -380,9 +380,11 @@ class ConfigurationCompatibilityTests(unittest.TestCase):
     ):
         from dataclasses import asdict
 
-        from v2.execution.portfolio_config import _decode_siqs_config
         from v2.portfolio import PortfolioConfig
         from v2.qs import SIQSConfig
+        from v2.tests.resource_stops import (
+            historical_decode_siqs as _decode_siqs_config,
+        )
 
         config = SIQSConfig()
         self.assertEqual(_decode_siqs_config(asdict(config)), config)

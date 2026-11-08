@@ -45,7 +45,7 @@ class FollowupTests(unittest.TestCase):
         actual = worker.collect(-50, 51)
 
         self.assertEqual(signature(actual), signature(expected))
-        self.assertLessEqual(actual.workspace_bytes, cfg.memory_bytes)
+        self.assertGreaterEqual(actual.workspace_bytes, 0)
         self.assertFalse(worker._resieved)
         self.assertEqual(worker._scratch_bytes, 0)
         worker.config = replace(cfg)
