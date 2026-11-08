@@ -72,7 +72,7 @@ class A1aDefaultTests(unittest.TestCase):
                 "--method",
                 "siqs",
                 "--seconds",
-                0,
+                "0",
                 "--checkpoint",
                 path,
             )

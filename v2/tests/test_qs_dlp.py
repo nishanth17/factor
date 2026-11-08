@@ -409,11 +409,9 @@ class StoreTests(unittest.TestCase):
             admit(collector, 1, (3, 5))
             saved = encoded(collector)
             cap = collector._workspace if field == "memory_bytes" else cap
-            collector.config = replace(collector.config, **{field: cap})
-            _, refusal, _ = admit(
-                collector, 2, (3, 5), polynomial=Polynomial(91, 1, 9, 1, 3)
-            )
-            self.assertEqual(refusal, reason)
+            with self.assertRaises(TypeError) as removed:
+                replace(collector.config, **{field: cap})
+            self.assertIn(field, str(removed.exception))
             self.assertEqual(encoded(collector), saved)
         collector = worker()
         admit(collector, 1, (3, 5))

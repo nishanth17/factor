@@ -442,11 +442,9 @@ class PackedBackingTests(unittest.TestCase):
     ):
         settings = WorkerSettings(packed_cache_bytes=4096)
         with ECMExecutor(settings=settings, force_workers=True) as owner:
-            with self.assertRaisesRegex(
-                MemoryError, "packed worker cache scratch"
-            ):
-                owner.run(35, config=configuration(), budget=allowance())
-            self.assertFalse(owner.slots)
+            result = owner.run(35, config=configuration(), budget=allowance())
+            self.assertEqual(result.reason, "factor_found")
+            self.assertTrue(owner.slots)
         base = WorkerSettings()
         extra = WorkerSettings(packed_cache_bytes=2**20)
         self.assertEqual(extra.owned_bytes - base.owned_bytes, 2 * 2**20)

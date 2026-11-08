@@ -329,7 +329,7 @@ class PipelineTests(unittest.TestCase):
         job.budget = unlimited_budget()
         with patch(
             "v2.qs.pipeline.DependencySolver.run",
-            side_effect=BudgetExhaustedError,
+            side_effect=BudgetExhaustedError("work_limit"),
         ):
             job.budget.reason = "work_limit"
 

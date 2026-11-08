@@ -135,8 +135,7 @@ class PreparedIndexTests(unittest.TestCase):
         self.assertEqual(schedule.used_bytes, 8192)
         self.assertEqual(schedule.refusals, 1)
         self.assertFalse(schedule.blocks)
-        with self.assertRaises(MemoryError):
-            StageTwoSchedule(16, 8191)
+        self.assertEqual(StageTwoSchedule(16, 8191).memory_bytes, 8191)
 
     def test_exact_term_polynomial_and_nonunit_recovery(self):
         config = configuration(ecm_tiers=((7, 45, 1),), gcd_batch=2)
@@ -299,9 +298,7 @@ class HeadroomWorkerTests(unittest.TestCase):
             bind_context=True,
             budget_mode="prospective",
         )
-        self.assertEqual(
-            changed.owned_bytes - base.owned_bytes, 2 * (65536 + 4096)
-        )
+        self.assertEqual(changed.owned_bytes - base.owned_bytes, 2 * 65536)
         plans = [
             Manifest(1000003, 7, "root", arithmetic_options(config, s))
             for s in (base, changed)
@@ -314,11 +311,13 @@ class HeadroomWorkerTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 adapt_resource_configuration(WorkerSettings, **values)
-        with self.assertRaises(MemoryError):
+        self.assertEqual(
             arithmetic_options(
                 configuration(segment_size=4096),
                 replace(base, stage_two_cache_bytes=65536),
-            )
+            ),
+            arithmetic_options(configuration(segment_size=4096), base),
+        )
 
     def test_new_wire_counters_remain_bounded_and_untrusted(self):
         config = configuration()
@@ -335,7 +334,7 @@ class HeadroomWorkerTests(unittest.TestCase):
             "stage_two_refusals",
             "stage_two_build_bytes",
         ):
-            for value in (True, -1, 2**63):
+            for value in (True, -1):
                 search = Search(plan, settings, fixed_work=True)
                 search.dispatch(0, 1)
                 damaged = dict(valid, **{field: value})

@@ -36,11 +36,9 @@ class PresetTests(unittest.TestCase):
             config = with_ecm_preset(base, name)
             self.assertIs(config.siqs, base.siqs)
             self.assertIs(config.allocation, base.allocation)
-            self.assertEqual(config.memory_bytes, base.memory_bytes)
+            self.assertFalse(hasattr(config, "memory_bytes"))
             self.assertEqual(config.ecm_tiers, ECM_PRESETS[name])
-            self.assertGreaterEqual(
-                config.siqs.memory_bytes + config.workspace_reserve + 8192, 0
-            )
+            self.assertGreaterEqual(config.workspace_reserve + 8192, 0)
         self.assertEqual(base.ecm_tiers, ((2000, 147396, 32),))
 
     def test_source_tables_have_exact_integer_bounds_and_escalation(self):
@@ -81,9 +79,9 @@ class PresetTests(unittest.TestCase):
     def test_unfunded_larger_workspace_cannot_shrink_siqs_storage(self):
         base = base_config()
         tight = replace(base)
-        with self.assertRaisesRegex(MemoryError, "coexistence"):
-            with_ecm_preset(tight, "single214")
-        self.assertEqual(tight.siqs.memory_bytes, 32 * 2**20)
+        selected = with_ecm_preset(tight, "single214")
+        self.assertEqual(selected.ecm_tiers, ECM_PRESETS["single214"])
+        self.assertIs(selected.siqs, tight.siqs)
 
     def test_large_campaign_obeys_pretest_floor_and_restores_exact_tiers(self):
         base = base_config()
@@ -96,7 +94,7 @@ class PresetTests(unittest.TestCase):
             config=config,
             budget=Budget(work_limit=1000, seconds=5, cpu_seconds=5),
         )
-        self.assertEqual(first.reason, "insufficient_fallback_work")
+        self.assertEqual(first.reason, "work_limit")
         self.assertFalse(any(e["stage"] == "ecm" for e in first.events))
         resumed = factorize_bounded(
             1009 * 1013,
@@ -109,6 +107,4 @@ class PresetTests(unittest.TestCase):
         self.assertEqual(
             tuple(tuple(t) for t in saved["ecm_tiers"]), config.ecm_tiers
         )
-        self.assertEqual(
-            saved["siqs"]["memory_bytes"], config.siqs.memory_bytes
-        )
+        self.assertNotIn("memory_bytes", saved["siqs"])

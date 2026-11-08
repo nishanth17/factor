@@ -338,7 +338,7 @@ class CountedIntegrationTests(unittest.TestCase):
         )
         job = SIQSJob(n, config=cfg, budget=Budget(work_limit=0))
         result = job.run()
-        self.assertEqual(result.reason, "cancelled")
+        self.assertEqual(result.reason, "work_limit")
         checkpoint = json.loads(json.dumps(job.checkpoint()))
         resumed = SIQSJob.from_checkpoint(
             checkpoint, budget=unlimited_budget()

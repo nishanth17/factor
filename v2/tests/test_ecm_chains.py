@@ -192,8 +192,9 @@ class ProductionChainTests(unittest.TestCase):
             self.assertGreater(budget.used, 0)
         with self.assertRaises(ValueError):
             self.native.execute([[2, 2]], (2, 1), 101, 2, allowance())
-        with self.assertRaises(MemoryError):
-            configuration(ecm_chain_bytes=4096)
+        self.assertEqual(
+            configuration(ecm_chain_bytes=4096).ecm_chain_bytes, 4096
+        )
         with self.assertRaises(ValueError):
             configuration(ecm_chain_mode="off")
 

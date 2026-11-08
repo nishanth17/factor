@@ -130,7 +130,9 @@ def decode_config(value, module=qs):
         if "large_prime_bound" in values["collector"]
         else "SieveConfig"
     )
-    values["collector"] = getattr(module, name)(**values["collector"])
+    values["collector"] = adapt_resource_configuration(
+        getattr(module, name), **values["collector"]
+    )
     return adapt_resource_configuration(module.SIQSConfig, **values)
 
 

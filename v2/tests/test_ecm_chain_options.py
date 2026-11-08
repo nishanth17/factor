@@ -44,18 +44,15 @@ class OptionalChainTests(unittest.TestCase):
             candidate.ecm_chain_bytes, ecm_chains.MIN_MEMORY_BYTES
         )
         self.assertEqual(candidate.ecm_program_bytes, 512 * 1024)
-        self.assertGreaterEqual(
-            candidate.memory_bytes - candidate.workspace_reserve, 8192
-        )
+        self.assertGreaterEqual(candidate.workspace_reserve, 8192)
         fresh = PortfolioConfig()
         self.assertEqual(fresh.ecm_chain_mode, "reuse")
-        self.assertEqual(fresh.memory_bytes, 16 * 1024**2)
-        self.assertEqual(PortfolioConfig().ecm_chain_mode, "off")
-        self.assertEqual(
-            PortfolioConfig(ecm_tiers=()).memory_bytes, 8 * 1024**2
+        self.assertFalse(hasattr(fresh, "memory_bytes"))
+        self.assertEqual(PortfolioConfig().ecm_chain_mode, "reuse")
+        self.assertFalse(
+            hasattr(PortfolioConfig(ecm_tiers=()), "memory_bytes")
         )
         for changes in (
-            dict(memory_bytes=8 * 1024**2),
             dict(chunk_size=32),
             dict(ecm_tiers=((2001, 2500, 32),)),
             dict(ecm_tiers=((2000, 2500, 7),)),
@@ -131,7 +128,7 @@ class OptionalChainTests(unittest.TestCase):
             )
             self.assertEqual(restored.result.reconstruct(), 101)
             saved = restored.checkpoint["payload"]["config"]
-            self.assertEqual(saved["memory_bytes"], config.memory_bytes)
+            self.assertNotIn("memory_bytes", saved)
             self.assertEqual(
                 saved.get("ecm_chain_mode", "off"), config.ecm_chain_mode
             )

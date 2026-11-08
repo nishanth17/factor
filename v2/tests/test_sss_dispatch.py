@@ -179,8 +179,7 @@ class SSSDispatchTests(unittest.TestCase):
             budget=allowance(),
         )
         small.run(batch_limit=1)
-        with self.assertRaises(MemoryError):
-            small.checkpoint()
+        self.assertGreater(len(small.checkpoint()["blob"]), 0)
 
         self.assertIsNotNone(small.run().divisor)
         with self.assertRaises(TypeError):

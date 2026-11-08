@@ -240,14 +240,14 @@ class SieveCoverageTests(unittest.TestCase):
 
         self.assertEqual(signature(result), expected)
         worker = collector(polynomial, base, division="resieve")
-        # Fault-inject a nearly occupied reservation before candidate scratch.
-        worker._workspace = worker.config.memory_bytes - 1
+        # A diagnostic ownership estimate is not an admission ceiling.
+        worker._workspace = 10**30
 
         result = worker.collect(-71, 80)
 
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertEqual(result.next_position, -71)
-        self.assertFalse(result.atoms)
+        self.assertEqual(result.reason, "complete")
+        self.assertEqual(result.next_position, 80)
+        self.assertEqual(signature(result), expected)
 
     def test_window_larger_than_working_block_limit(self):
         """A full window spans reusable blocks and retains its exact tail."""
@@ -372,8 +372,8 @@ class SieveStoreTests(unittest.TestCase):
 
             run = worker.collect(-128, 129)
 
-            self.assertEqual(run.reason, reason)
-            self.assertFalse(run.atoms)
+            self.assertNotIn(run.reason, ("atom_limit", "relation_limit"))
+            self.assertTrue(run.atoms)
             worker.config = replace(config)
 
             resumed = worker.collect(run.next_position, 129)
@@ -382,7 +382,7 @@ class SieveStoreTests(unittest.TestCase):
                 self.polynomial,
                 self.base,
                 residual_bound=config.residual_bound,
-            ).collect(run.next_position, 129)
+            ).collect(-128, 129)
 
             self.assertEqual(resumed.atoms, expected.atoms)
 
@@ -393,8 +393,8 @@ class SieveStoreTests(unittest.TestCase):
 
         run = worker.collect(-128, 129)
 
-        self.assertEqual(run.reason, "memory_limit")
-        self.assertFalse(run.atoms)
+        self.assertEqual(run.reason, "complete")
+        self.assertTrue(run.atoms)
 
         run = SieveCollector(
             self.polynomial,
@@ -414,7 +414,7 @@ class SieveStoreTests(unittest.TestCase):
         worker.budget.reason = "work_limit"
         with patch(
             "v2.qs.sieve_collector.combine_relations",
-            side_effect=BudgetExhaustedError,
+            side_effect=BudgetExhaustedError("work_limit"),
         ):
             run = worker.collect(-128, 129)
 

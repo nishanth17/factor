@@ -628,7 +628,7 @@ class AutomaticTests(unittest.TestCase):
                         "v2.factor",
                         str(10**79 + 7),
                         "--seconds",
-                        0,
+                        "0",
                         "--checkpoint",
                         str(path),
                         *flags,

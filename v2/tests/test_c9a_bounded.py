@@ -104,12 +104,10 @@ class BoundedYieldTests(unittest.TestCase):
         engine.config = replace(engine.config)
         workspace = engine._workspace
 
-        self.assertEqual(
-            engine._admit(atom_at(engine, 1), Counter()), "memory_limit"
-        )
-        self.assertFalse(engine._atoms)
-        self.assertEqual(engine._arena.allocated_bytes, 0)
-        self.assertEqual(engine._workspace, workspace)
+        self.assertEqual(engine._admit(atom_at(engine, 1), Counter()), None)
+        self.assertTrue(engine._atoms)
+        self.assertGreater(engine._arena.allocated_bytes, 0)
+        self.assertGreater(engine._workspace, workspace)
 
     def test_conversion_rows_are_packed_and_restore_ownership_matches(self):
         engine = worker()

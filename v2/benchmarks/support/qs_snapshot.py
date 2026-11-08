@@ -46,6 +46,18 @@ def load_qs_arm(name, changes=()):
     qs.__package__ = name + ".qs"
     sys.modules[qs.__name__] = qs
     package.qs = qs
+    import importlib
+
+    for suffix in (
+        "common",
+        "execution",
+        "execution.resources",
+        "execution.budget",
+        "execution.work_budget",
+    ):
+        sys.modules[name + "." + suffix] = importlib.import_module(
+            "v2." + suffix
+        )
     names = [key for key in sources if key != "qs.__init__"]
     names.insert(names.index("constants") + 1, "arithmetic")
     names.insert(names.index("budget") + 1, "work_budget")

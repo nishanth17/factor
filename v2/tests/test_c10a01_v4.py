@@ -206,7 +206,7 @@ class GrayTableTests(unittest.TestCase):
             bad = json.loads(json.dumps(saved))
             bad["payload"]["schema"] = "c10a01-coordinate-family-v2"
             bad["sha256"] = _checksum(bad["payload"])
-            with self.assertRaises(TypeError):
+            with self.assertRaises(ValueError):
                 CoordinateFamily.from_checkpoint(base, bad, budget=allowance())
         ledger = allowance()
         ledger.cancelled = lambda: ledger.used > standard.budget.used + 10

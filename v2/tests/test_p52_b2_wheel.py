@@ -27,7 +27,8 @@ class WheelProtocolTests(unittest.TestCase):
                     engine.PortfolioConfig,
                     **p52_b2_wheel.options(protocol, case, arm),
                 )
-                self.assertLess(config.workspace_reserve, config.memory_bytes)
+                self.assertGreater(config.workspace_reserve, 0)
+                self.assertEqual(config.memory_bytes, 16 * 2**20)
         for arm in ("streamed", "programs", "legacy"):
             engine = p52_b2_wheel.engine_for(arm)
             self.assertNotIn(

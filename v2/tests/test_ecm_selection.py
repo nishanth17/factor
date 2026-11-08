@@ -197,7 +197,7 @@ class LazySelectionTests(unittest.TestCase):
         first = self.run_fake(owner)
         inner = owner.inner
         self.assertEqual(inner.settings.workers, 2)
-        self.assertLess(inner.settings.checkpoint_bytes, 8 * 2**20)
+        self.assertFalse(hasattr(inner.settings, "checkpoint_bytes"))
         self.assertGreater(first.stats["selector_work"], HEADER_BYTES)
         self.path.unlink()
         self.run_fake(owner)

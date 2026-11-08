@@ -48,7 +48,7 @@ class LargerDefaultTests(unittest.TestCase):
                         self.assertEqual(config.base_bound, 250000)
                         self.assertEqual(config.gray_limit, 64)
                     self.assertEqual(config.half_width, 65536)
-                    self.assertEqual(config.memory_bytes, 2**30)
+                    self.assertFalse(hasattr(config, "memory_bytes"))
                     self.assertIsNone(default_siqs_budget(signed).seconds)
         self.assertFalse(uses_siqs_defaults(10**49 - 1))
         self.assertFalse(uses_siqs_defaults(10**60))
@@ -109,7 +109,7 @@ class LargerDefaultTests(unittest.TestCase):
                 "--method",
                 "siqs",
                 "--seconds",
-                0,
+                "0",
                 "--checkpoint",
                 path,
             )

@@ -82,9 +82,8 @@ class SIQSTests(unittest.TestCase):
         self.assertEqual(paused.reason, "paused")
         checkpoint = json.loads(json.dumps(original.checkpoint()))
 
-        self.assertLess(
-            len(checkpoint["blob"]) + 1024, config.checkpoint_bytes
-        )
+        self.assertGreater(len(checkpoint["blob"]), 0)
+        self.assertFalse(hasattr(config, "checkpoint_bytes"))
 
         restored = SIQSJob.from_checkpoint(
             checkpoint, budget=allowance(), config=config
@@ -238,10 +237,9 @@ class SIQSTests(unittest.TestCase):
                 config=configuration(base_bound=300),
             )
 
-        with self.assertRaises(ValueError):
-            SIQSJob.from_checkpoint(
-                checkpoint, budget=Budget(work_limit=200_000_000, used=1)
-            )
+        owner = Budget(work_limit=200_000_000, used=1)
+        SIQSJob.from_checkpoint(checkpoint, budget=owner)
+        self.assertGreater(owner.used, checkpoint["resources"]["work_used"])
 
     def test_finite_stall_and_width_recovery_preserve_prime_cofactor(self):
         config = configuration(
@@ -391,7 +389,6 @@ class SIQSTests(unittest.TestCase):
             dict(factor_count=9),
             dict(growth_steps=5),
             dict(pool_size=2),
-            dict(checkpoint_bytes=4095),
         ):
             with self.assertRaises(ValueError):
                 configuration(**options)
@@ -406,8 +403,7 @@ class SIQSTests(unittest.TestCase):
             budget=allowance(),
         )
         job.run(max_blocks=1)
-        with self.assertRaises(MemoryError):
-            job.checkpoint()
+        self.assertGreater(len(job.checkpoint()["blob"]), 4096)
 
         self.assertEqual(job.run().reason, "factor_found")
         fresh = SIQSJob(

@@ -31,6 +31,10 @@ class RecordingBudget(ResourceBudget):
         if cpu_start is not None:
             self._cpu_start = cpu_start
 
+    def recorder_span(self, amount):
+        """Keep coalesced diagnostic spans at the recorder frontier."""
+        return max(1, min(amount, self.work_limit - self.used))
+
     @property
     def used(self):
         return self._recorded_work
@@ -174,6 +178,14 @@ def historical_asdict(value):
         metadata = dict(
             metadata, **getattr(value, "_historical_resources", {})
         )
+        if (
+            type(value).__name__ in ("SIQSConfig", "CountedSIQSConfig")
+            and getattr(value.collector, "storage_policy", None) != "grow"
+        ):
+            if metadata.get("memory_bytes") is None:
+                metadata["memory_bytes"] = 32 * 2**20
+            if metadata.get("checkpoint_bytes") is None:
+                metadata["checkpoint_bytes"] = 2**20
         metadata = {
             key: item for key, item in metadata.items() if key not in result
         }

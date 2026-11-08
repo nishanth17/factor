@@ -217,13 +217,9 @@ class GraphAndRecordTests(unittest.TestCase):
         saved = store_json(source)
         target = collector(record_policy="packed-v1")
         target.config = replace(target.config)
-        with patch(
-            "v2.qs.packed_relations.import_exponents",
-            side_effect=AssertionError("decoded before reservation"),
-        ):
-            with self.assertRaises(MemoryError):
-                restore_store(saved, target, allowance())
-        self.assertFalse(target._atoms)
+        target._workspace = 10**30
+        restore_store(saved, target, allowance())
+        self.assertEqual(store_json(target), saved)
 
     def test_interrupted_shortcut_publication_requires_prior_checkpoint(self):
         target = collector(cycle_policy="short-v1", record_policy="packed-v1")

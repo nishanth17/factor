@@ -138,7 +138,9 @@ def decode(value):
         if ("large_prime_bound" in value["collector"])
         else qs.SieveConfig
     )
-    value["collector"] = kind(**value["collector"])
+    value["collector"] = adapt_resource_configuration(
+        kind, **value["collector"]
+    )
     return adapt_resource_configuration(qs.SIQSConfig, **value)
 
 

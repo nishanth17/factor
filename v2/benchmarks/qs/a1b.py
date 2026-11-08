@@ -18,6 +18,7 @@ from v2.benchmarks.infrastructure.resource_control import (
     decode_historical_siqs as _decode_siqs_config,
 )
 from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict,
     recording_budget,
 )
 
@@ -105,7 +106,12 @@ def run_one(fixture, seed, config, blocks, seconds, work):
         rss *= 1024
     if rss > 3 * 2**30:
         raise MemoryError("A1b RSS ceiling")
-    if result.stats.get("workspace_bytes", 0) > config.memory_limit:
+    # Preserve this recorder's historical owned-storage ceiling explicitly.
+    owned_limit = historical_asdict(config)["memory_bytes"]
+    if (
+        owned_limit is not None
+        and result.stats.get("workspace_bytes", 0) > owned_limit
+    ):
         raise MemoryError("A1b native owned ceiling")
     physical = dict(
         blocks=result.stats["blocks"],

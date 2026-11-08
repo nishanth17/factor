@@ -271,7 +271,7 @@ class CapacityTests(unittest.TestCase):
             replace(extended, base_bound=110),
             replace(extended, pool_size=9),
             replace(extended, polynomials_per_family=2),
-            replace(extended),
+            replace(extended, half_width=extended.half_width + 1),
             replace(extended, family_count=1),
         ):
             with self.assertRaises(ValueError):
@@ -287,10 +287,13 @@ class CapacityTests(unittest.TestCase):
         )
         enlarged = replace(
             original,
-            collector=replace(original.collector),
+            collector=replace(
+                original.collector,
+                preparation_cache_bytes=128 * 2048,
+                target_rows=128,
+            ),
         )
-        with self.assertRaisesRegex(ValueError, "checkpoint/cache"):
-            validate_extension(original, enlarged)
+        validate_extension(original, enlarged)
         enlarged = replace(enlarged)
         validate_extension(original, enlarged)
         report = capacity_report(self.base, enlarged)

@@ -60,7 +60,9 @@ def verify_plan(plan):
         for call in calls:
             assert call["work"] == work_limit(call["digits"], call["seconds"])
             assert call["tier"] == TIERS[call["digits"]]
-            from dataclasses import asdict
+            from v2.benchmarks.infrastructure.resource_control import (
+                historical_asdict as asdict,
+            )
 
             current = asdict(
                 pilot_configuration(

@@ -372,7 +372,8 @@ class LiveGrantTests(unittest.TestCase):
             code = """
 import json,os,sys,time
 from pathlib import Path
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import RecordingBudget
+Budget=RecordingBudget
 from v2.benchmarks.qs.c10a01 import live_limits,plan_v4
 out=sys.argv[1]
 b=Budget(seconds=2,cpu_seconds=2,work_limit=plan_v4.call_work(60,2))

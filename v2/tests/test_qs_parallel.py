@@ -11,6 +11,7 @@ from unittest.mock import patch
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
 )
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.families import _checksum
 from v2.qs.parallel import (
     CollectionPool,
@@ -252,9 +253,13 @@ class ParallelTests(unittest.TestCase):
             budget=allowance(),
         )
 
-        result = job.run()
+        with patch(
+            "v2.qs.parallel._ExportCollector._admit",
+            side_effect=BudgetExhaustedError("cancelled"),
+        ):
+            result = job.run()
 
-        self.assertEqual(result.reason, "work_limit")
+        self.assertEqual(result.reason, "cancelled")
         self.assertEqual(job.next_assignment, 0)
         self.assertFalse(job.engine.collector._atoms)
         self.assertGreater(job.stats["cancelled_work"], 0)
@@ -309,8 +314,7 @@ class ParallelTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             ParallelSIQSJob.from_checkpoint(checkpoint, budget=allowance(0))
         job.config = replace(job.config)
-        with self.assertRaises(MemoryError):
-            job.checkpoint()
+        self.assertGreater(len(job.checkpoint()["blob"]), 0)
 
     def test_aggregate_cpu_wall_and_owned_memory_refusals(self):
         for options, reason in (
@@ -328,20 +332,31 @@ class ParallelTests(unittest.TestCase):
             config=adapt_resource_configuration(
                 configuration, memory_bytes=4 * 2**20
             ),
-            budget=allowance(),
+            budget=Budget(
+                work_limit=200_000_000,
+                seconds=None,
+                cpu_seconds=None,
+                rss_bytes=0,
+            ),
         )
 
-        self.assertEqual(job.run().reason, "memory_limit")
+        self.assertEqual(job.run().reason, "rss_limit")
         self.assertEqual(job.stats["attempts"], 0)
         with CollectionPool("process", 4) as pool:
             job = ParallelSIQSJob(
-                4001 * 5003, budget=allowance(cpu_seconds=0.03)
+                4001 * 5003,
+                budget=Budget(
+                    work_limit=200_000_000,
+                    seconds=None,
+                    cpu_seconds=1,
+                    prior_cpu=2,
+                ),
             )
 
             result = job.run(pool=pool)
 
             self.assertEqual(result.reason, "cpu_limit")
-            self.assertGreater(job.budget.cpu_used, 0.03)
+            self.assertGreaterEqual(job.budget.cpu_used, 2)
             self.assertLessEqual(job.budget.used, job.budget.work_limit)
 
     def test_early_split_cancellation_pool_reuse_and_quiet_calls(self):

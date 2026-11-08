@@ -33,7 +33,7 @@ class FollowupTests(unittest.TestCase):
         )
         dense = 4096 * (512 + 128 * len(base.entries))
 
-        self.assertGreater(worker._workspace + dense, cfg.memory_bytes)
+        self.assertGreater(worker._workspace + dense, 16 * 2**20)
 
         expected = SieveCollector(
             polynomial,
@@ -52,8 +52,8 @@ class FollowupTests(unittest.TestCase):
 
         refused = worker.collect(100, 151)
 
-        self.assertEqual(refused.reason, "memory_limit")
-        self.assertEqual(refused.stats["scanned"], 0)
+        self.assertEqual(refused.reason, "complete")
+        self.assertEqual(refused.stats["scanned"], 51)
         worker.config = cfg
 
         recovered = worker.collect(100, 151)
@@ -92,8 +92,8 @@ class FollowupTests(unittest.TestCase):
         )
 
         self.assertEqual(restored.result, run.result)
-        with self.assertRaises(MemoryError):
-            replace(cfg, ecm_tiers=((10**6, 10**12, 1),))
+        enabled = replace(cfg, ecm_tiers=((10**6, 10**12, 1),))
+        self.assertGreater(enabled.max_hi, cfg.max_hi)
 
     def test_local_pools_need_no_multiprocessing_synchronization(self):
         with patch(
@@ -338,7 +338,6 @@ class FollowupTests(unittest.TestCase):
             job._assignment_primes(0),
             0,
             cfg,
-            50000000,
             None,
             True,
         )

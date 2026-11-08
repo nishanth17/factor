@@ -6,6 +6,7 @@ import io
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from v2.common.prime_sieve import prime_sieve
@@ -238,9 +239,12 @@ class PrimePowerSieveTests(unittest.TestCase):
                 config = worker.config
                 worker.config = replace(config)
 
-                self.assertEqual(
-                    worker._admit(translated[1], stats), "memory_limit"
-                )
+                with patch(
+                    "v2.qs.sieve_collector.combine_relations",
+                    side_effect=MemoryError("injected combination"),
+                ):
+                    with self.assertRaises(MemoryError):
+                        worker._admit(translated[1], stats)
                 self.assertEqual(worker._atoms, prior)
                 worker.config = config
 

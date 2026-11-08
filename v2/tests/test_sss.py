@@ -79,10 +79,8 @@ class SmoothBatchTests(unittest.TestCase):
             dict(memory_bytes=1),
         ):
             budget = allowance()
-            with self.assertRaises(MemoryError):
-                adapt_resource_configuration(
-                    product_tree, (2, 3, 5), budget=budget, **options
-                )
+            with self.assertRaisesRegex(TypeError, next(iter(options))):
+                product_tree((2, 3, 5), budget=budget, **options)
 
             self.assertEqual(budget.used, 0)
 
@@ -156,12 +154,10 @@ class CollisionTests(unittest.TestCase):
         first, second = search_collector(), search_collector()
         for index in range(8):
             self.assertEqual(first.assignment(index), second.assignment(index))
-        capped = adapt_resource_configuration(
-            search_collector, max_candidates=1
-        )
-        with self.assertRaises(MemoryError):
-            capped.assignment(0)
-        self.assertEqual(capped._atoms, {})
+        with self.assertRaisesRegex(TypeError, "max_candidates"):
+            replace(SSSConfig(), max_candidates=1)
+        self.assertEqual(first.assignment(0), second.assignment(0))
+        self.assertEqual(first._atoms, {})
 
 
 class SSSJobTests(unittest.TestCase):
@@ -268,8 +264,8 @@ class SSSJobTests(unittest.TestCase):
 
         result = job.run()
 
-        self.assertEqual(result.reason, "relation_limit")
-        self.assertIsNone(result.divisor)
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, job.n)
         self.assertEqual(
             job.run().stats["work_used"], result.stats["work_used"]
         )
@@ -303,13 +299,13 @@ class SSSJobTests(unittest.TestCase):
         )
         self.assertEqual(
             SSSJob(10403, config=SSSConfig()).run().reason,
-            "memory_limit",
+            "factor_found",
         )
         refused = SSSJob(1009 * 1013, config=SSSConfig())
 
         result = refused.run()
 
-        self.assertEqual(result.reason, "memory_limit")
+        self.assertEqual(result.reason, "search_exhausted")
         self.assertEqual(
             refused.run().stats["work_used"], result.stats["work_used"]
         )

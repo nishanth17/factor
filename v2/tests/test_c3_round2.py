@@ -203,6 +203,12 @@ class RoundTwoControlsTests(unittest.TestCase):
                     cancelled=lambda: cancel,
                 )
                 new, old = Budget(**options), old_budget(**options)
+                if policy.fallback_work and fallback and not cancel:
+                    # Work is diagnostic; a reserve cannot spend it in advance.
+                    view = PretestBudget(new, policy, fallback=fallback)
+                    view.consume(0)
+                    self.assertEqual(new.used, 7)
+                    continue
                 self.assertEqual(
                     outcome(
                         PretestBudget(new, policy, fallback=fallback), new

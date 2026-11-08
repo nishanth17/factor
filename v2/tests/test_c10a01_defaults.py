@@ -58,7 +58,9 @@ class CoupledDefaultTests(unittest.TestCase):
                         "parity_two", components(config.collector.marking)
                     )
                     self.assertEqual(config.backend, backend)
-        self.assertEqual(default_siqs_budget(10**69 + 7).work_limit, 2000000)
+        self.assertFalse(
+            hasattr(default_siqs_budget(10**69 + 7), "work_limit")
+        )
         self.assertEqual(default_siqs_budget(10**69 + 7).seconds, 30)
 
     def test_existing_marking_memory_and_explicit_controls_are_preserved(self):
@@ -138,7 +140,7 @@ class CoupledDefaultTests(unittest.TestCase):
                     "--method",
                     "siqs",
                     "--seconds",
-                    0,
+                    "0",
                     "--checkpoint",
                     path,
                 )

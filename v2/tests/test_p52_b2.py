@@ -27,7 +27,8 @@ class PairedProtocolTests(unittest.TestCase):
                     portfolio.PortfolioConfig,
                     **p52_b2.options(protocol, case, arm),
                 )
-                self.assertLess(config.workspace_reserve, config.memory_bytes)
+                self.assertGreater(config.workspace_reserve, 0)
+                self.assertEqual(config.memory_bytes, 16 * 2**20)
                 self.assertEqual(config.backend, "python-int")
         control = p52_b2.load_control()
         self.assertNotIn(

@@ -74,7 +74,7 @@ class CompleteOfflineGraphTests(unittest.TestCase):
         pairs = tuple((i, i + 1) for i in range(1000, 3000)) + ((1000, 3000),)
         cycles, _ = fundamental_cycles(pairs, unlimited_budget())
         self.assertEqual(cycles, ((1 << len(pairs)) - 1,))
-        with self.assertRaises(TypeError):
+        with self.assertRaises(MemoryError):
             fundamental_cycles(pairs, unlimited_budget(), memory_bytes=1024)
         with self.assertRaises(BudgetExhaustedError):
             fundamental_cycles(pairs, Budget(work_limit=1))

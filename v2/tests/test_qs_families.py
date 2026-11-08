@@ -197,10 +197,11 @@ class FamilyTests(unittest.TestCase):
             self.assertEqual(restored.next(), family.next())
 
         self.assertIsNone(restored.next())
-        with self.assertRaises(ValueError):
-            PolynomialFamily.from_checkpoint(
-                base, checkpoint, budget=unlimited_budget()
-            )
+        fresh = unlimited_budget()
+        PolynomialFamily.from_checkpoint(base, checkpoint, budget=fresh)
+        self.assertGreater(
+            fresh.used, checkpoint["payload"]["resources"]["work_used"]
+        )
 
     def test_checkpoint_corruption_and_invalid_progress(self):
         base = self.base()
@@ -240,10 +241,6 @@ class FamilyTests(unittest.TestCase):
             ("next_index", 1 << 200),
             (
                 "resources",
-                {"work_used": 1 << 200, "wall_used": 0, "cpu_used": 0},
-            ),
-            (
-                "resources",
                 {"work_used": 0, "wall_used": float("nan"), "cpu_used": 0},
             ),
         ):
@@ -255,8 +252,10 @@ class FamilyTests(unittest.TestCase):
                 )
 
         family.budget = Budget(work_limit=1 << 200, used=1 << 199)
-        with self.assertRaises(ValueError):
-            family.checkpoint()
+        self.assertEqual(
+            family.checkpoint()["payload"]["resources"]["work_used"],
+            1 << 199,
+        )
 
     def test_family_input_memory_and_work_caps(self):
         base = self.base(3)

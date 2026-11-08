@@ -475,8 +475,8 @@ class CampaignContractTests(unittest.TestCase):
             ecm_program_bytes=8 * 2**20,
         )
         self.assertLess(config.workspace_reserve, config.memory_bytes)
-        with self.assertRaises(MemoryError):
-            replace(config, max_input_bits=4096)
+        larger = replace(config, max_input_bits=4096)
+        self.assertGreater(larger.workspace_reserve, config.workspace_reserve)
 
         # More work resumes a declared campaign; changing its identity refuses.
         config = configuration(ecm_tiers=((50, 1000, 2),))

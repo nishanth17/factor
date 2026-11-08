@@ -155,7 +155,7 @@ class C10DefaultTests(unittest.TestCase):
                 "--method",
                 "siqs",
                 "--seconds",
-                0,
+                "0",
                 "--checkpoint",
                 path,
             )

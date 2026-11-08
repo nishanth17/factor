@@ -181,10 +181,36 @@ def apply_revert(variant):
             module.__dict__,
             namespace,
         )
+        implementation = namespace[function]
+        if variant == "sssf_trees":
+            import types
+
+            historical_globals = dict(module.__dict__, replace=replace)
+            historical_globals["SSSConfig"] = (
+                lambda: adapt_resource_configuration(module.SSSConfig)
+            )
+            implementation = types.FunctionType(
+                implementation.__code__,
+                historical_globals,
+                implementation.__name__,
+                implementation.__defaults__,
+                implementation.__closure__,
+            )
+            implementation.__kwdefaults__ = namespace[function].__kwdefaults__
+            original = implementation
+
+            def implementation(self, *args, **kwargs):
+                search = kwargs.get("search_config")
+                if search is not None:
+                    kwargs["search_config"] = adapt_resource_configuration(
+                        type(search), **asdict(search)
+                    )
+                return original(self, *args, **kwargs)
+
         setattr(
             module if owner is None else getattr(module, owner),
             function,
-            namespace[function],
+            implementation,
         )
 
     if variant == "preprocessing":

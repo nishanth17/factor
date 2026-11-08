@@ -51,13 +51,12 @@ def matrix_check(spec, budget):
         Budget, work_limit=10**12, seconds=None, cpu_seconds=None
     )
     try:
-        adapt_resource_configuration(
-            filter_matrix, rows, budget=refused, memory_bytes=reserve - 1
-        )
-    except MemoryError:
+        filter_matrix(rows, budget=refused, memory_bytes=reserve - 1)
+    except TypeError as error:
+        assert "memory_bytes" in str(error)
         assert refused.used == 0
     else:
-        raise AssertionError("matrix reserve did not reject the smaller grant")
+        raise AssertionError("removed matrix byte argument did not raise")
     start, cpu, before = time.monotonic(), time.process_time(), budget.used
     matrix = adapt_resource_configuration(
         filter_matrix,

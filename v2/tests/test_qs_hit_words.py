@@ -160,8 +160,10 @@ class HitCollectorTests(unittest.TestCase):
             budget=unlimited_budget(),
             config=replace(worker.config),
         )
-        self.assertIsNone(fallback._word_hits)
-        self.assertIsInstance(fallback._hits, list)
+        self.assertIsNotNone(fallback._word_hits)
+        self.assertEqual(
+            fallback._word_hits.descriptors, worker._word_hits.descriptors
+        )
         with self.assertRaises(BudgetExhaustedError):
             WordHits(
                 count,

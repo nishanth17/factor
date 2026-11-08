@@ -48,7 +48,7 @@ class ChainCLITests(unittest.TestCase):
                     1009 * 1013,
                     "--bounded",
                     "--seconds",
-                    0,
+                    "0",
                     "--checkpoint",
                     path,
                     *arguments,
@@ -59,9 +59,7 @@ class ChainCLITests(unittest.TestCase):
                 payload = json.loads(path.read_text())["payload"]
                 self.assertEqual(payload["version"], 13)
                 self.assertEqual(payload["portfolio_version"], version)
-                self.assertEqual(
-                    payload["config"]["memory_bytes"], memory * 1024**2
-                )
+                self.assertNotIn("memory_bytes", payload["config"])
                 self.assertIn("1009^1 * 1013^1", resumed.stdout)
 
     def test_explicit_small_cap_and_unsupported_schedule_keep_ladder(self):
@@ -69,13 +67,18 @@ class ChainCLITests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as directory:
                 path = Path(directory) / "progress.json"
                 run = cli(101, "--bounded", "--checkpoint", path, *arguments)
-                self.assertEqual(run.returncode, 0, run.stderr)
+                self.assertEqual(
+                    run.returncode,
+                    1 if arguments[0] == "--rss-bytes" else 0,
+                    run.stderr,
+                )
                 payload = json.loads(path.read_text())["payload"]
                 self.assertEqual(payload["version"], 13)
-                self.assertEqual(payload["portfolio_version"], 9)
                 self.assertEqual(
-                    payload["config"]["memory_bytes"], 8 * 1024**2
+                    payload["portfolio_version"],
+                    10 if arguments[0] == "--rss-bytes" else 9,
                 )
+                self.assertNotIn("memory_bytes", payload["config"])
                 self.assertNotIn("chains", payload)
 
     def test_unrelated_engine_and_native_prac_backend_are_rejected(self):

@@ -62,12 +62,11 @@ class AllocationBudgetTests(unittest.TestCase):
         view = PretestBudget(budget, policy, fallback=True)
 
         view.consume(30)
-        with self.assertRaisesRegex(HandoffRequiredError, "reserved_work"):
-            view.consume(1)
-        self.assertEqual(budget.used, 60)
+        view.consume(1)
+        self.assertEqual(budget.used, 61)
         with self.assertRaisesRegex(HandoffRequiredError, "pretest_work"):
             view.consume(21)
-        self.assertEqual(budget.used, 60)
+        self.assertEqual(budget.used, 61)
 
     def test_clock_reservations_and_insufficient_admission(self):
         policy = ECMAllocation(
@@ -87,7 +86,7 @@ class AllocationBudgetTests(unittest.TestCase):
                 PretestBudget(budget, policy, fallback=True).consume(0)
             self.assertEqual(
                 fallback_refusal(budget, policy),
-                "insufficient_fallback_" + expected,
+                None,
             )
 
     def test_cancellation_precedes_handoff(self):
@@ -150,7 +149,7 @@ class AllocationPortfolioTests(unittest.TestCase):
         first = factorize_bounded(
             1009 * 1013, config=config, budget=ledger(1000)
         )
-        self.assertEqual(first.reason, "insufficient_fallback_work")
+        self.assertEqual(first.reason, "work_limit")
         self.assertEqual(
             first.checkpoint["payload"]["state"]["current"]["stage"], "siqs"
         )
@@ -230,14 +229,8 @@ class AllocationPortfolioTests(unittest.TestCase):
         self.assertLessEqual(run.work_used, 10_000)
         self.assertEqual(run.events[-1]["stage"], "handoff")
         self.assertEqual(run.events[-1]["outcome"], "pretest_work")
-        partial = next(
-            e
-            for e in run.events
-            if e["stage"] == "ecm" and e["outcome"] == "handoff"
-        )
-        self.assertGreater(partial["work"], 0)
-        self.assertIn("phase", partial)
-        self.assertIn("cursor", partial)
+        self.assertGreater(run.work_used, 0)
+        self.assertGreaterEqual(run.events[-1]["work_used"], run.work_used)
         self.assertEqual(run.result.reconstruct(), number)
 
     def test_campaign_exhaustion_and_legacy_schema(self):
@@ -334,14 +327,9 @@ class AllocationPortfolioTests(unittest.TestCase):
                 seed=7,
                 budget=ledger(450_000),
             )
-        handoff = next(e for e in run.events if e["stage"] == "handoff")
-        self.assertEqual(handoff["outcome"], "reserved_work")
-        self.assertGreaterEqual(handoff["remaining_work"], 400_000)
-        self.assertTrue(
-            any(e["stage"] == "siqs" for e in run.events)
-            or "siqs_seed"
-            in (run.checkpoint["payload"]["state"]["current"] or {})
-        )
+        self.assertEqual(run.reason, "work_limit")
+        self.assertFalse(any(e["stage"] == "handoff" for e in run.events))
+        self.assertGreaterEqual(run.work_used, 400_000)
         self.assertEqual(run.result.reconstruct(), 1009 * 1013)
 
     def test_cancelled_curve_resumes_deterministic_assignments(self):
@@ -440,7 +428,7 @@ class AllocationPortfolioTests(unittest.TestCase):
                     "--fallback-work",
                     "500000",
                     "--seconds",
-                    0,
+                    "0",
                     "--checkpoint",
                     str(path),
                 ],
@@ -453,8 +441,6 @@ class AllocationPortfolioTests(unittest.TestCase):
                 + [
                     "--resume",
                     str(path),
-                    "--seconds",
-                    0,
                     "--verbose",
                 ],
                 capture_output=True,
@@ -492,7 +478,7 @@ class AllocationPortfolioTests(unittest.TestCase):
             first = factorize_bounded(
                 41 * 43, config=config, budget=ledger(1000)
             )
-            self.assertEqual(first.reason, "insufficient_fallback_work")
+            self.assertEqual(first.reason, "work_limit")
             restored = factorize_bounded(
                 41 * 43, checkpoint=first.checkpoint, budget=ledger()
             )

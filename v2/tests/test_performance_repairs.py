@@ -220,18 +220,15 @@ class PreparationReuseTests(unittest.TestCase):
                     fixture.base,
                     fixture.store,
                     allowance(),
-                    2**20,
                 )
 
             with self.assertRaises(BudgetExhaustedError):
                 cache.check(
-                    relation, fixture.base, fixture.store, allowance(0), 2**20
+                    relation, fixture.base, fixture.store, allowance(0)
                 )
 
             self.assertFalse(cache.records)
-            cache.check(
-                relation, fixture.base, fixture.store, allowance(), 2**20
-            )
+            cache.check(relation, fixture.base, fixture.store, allowance())
 
             self.assertLessEqual(cache.used, cap)
 
@@ -357,7 +354,6 @@ class ChunkedWorkerTests(unittest.TestCase):
         for changes in (
             dict(batch_width=64),
             dict(max_batch_atoms=64),
-            dict(checkpoint_bytes=original.checkpoint_bytes + 4096),
         ):
             job.config = replace(original, **changes)
             for action in (job.checkpoint, job.run):
@@ -386,20 +382,16 @@ class ChunkedWorkerTests(unittest.TestCase):
         job._setup()
         job._memory(4)
 
-        self.assertLess(job.stats["peak_owned_bytes"], config.memory_bytes)
+        self.assertGreater(job.stats["peak_owned_bytes"], 0)
         dense_atom = 4096 + 256 * len(job.base.entries)
         dense_atom += 128 * (
             job.n.bit_length()
             + 2 * config.factor_count * config.base_bound.bit_length()
             + 32
         )
-        dense_owned = config.parent_memory_bytes + 4 * (
-            config.worker_memory_bytes
-            + 3 * 256 * dense_atom
-            + job.base.workspace_bytes
-        )
-
-        self.assertGreater(dense_owned, config.memory_bytes)
+        dense_owned = 4 * (3 * 256 * dense_atom + job.base.workspace_bytes)
+        self.assertGreater(dense_owned, job.stats["peak_owned_bytes"])
+        self.assertFalse(hasattr(config, "memory_bytes"))
 
         result = job.run(max_assignments=1, fixed_work=True)
 

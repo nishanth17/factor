@@ -191,9 +191,7 @@ class ExpandedArithmeticTests(unittest.TestCase):
                 )
             row = worker._rows[0]
             self.assertIsInstance(row, LazyCombinedRelation)
-            worker._checked.row(
-                row, worker._atoms, worker.budget, worker.config.memory_limit
-            )
+            worker._checked.row(row, worker._atoms, worker.budget)
             payload = json.loads(json.dumps(pack_store(worker)))
         self.assertTrue(
             verify_combined(
@@ -502,8 +500,8 @@ class ExpandedResourceTests(unittest.TestCase):
             owner = SpillStore(directory, 65536, allowance())
             reference = owner.append(b"abc")
             owner.append(b"def")
-            with self.assertRaises(MemoryError):
-                owner.append(b"g")
+            owner.append(b"g")
+            self.assertEqual(owner.read(reference), b"abc")
             manifest = owner.manifest()
             owner.close()
             restored = SpillStore(directory, 65536, allowance())

@@ -15,25 +15,32 @@ from v2.tests.test_qs_sieve import signature
 
 class R2CollectorTests(unittest.TestCase):
     def test_legacy_positional_configuration_remains_unchanged(self):
+        with self.assertRaises(TypeError) as removed:
+            SieveConfig(
+                17,
+                64,
+                "list",
+                "sparse",
+                "bucket",
+                0,
+                0,
+                "powers",
+                97,
+                4096,
+                4096,
+                4096,
+                64 * 2**20,
+            )
+        self.assertIn("was removed", str(removed.exception))
         config = SieveConfig(
-            17,
-            64,
-            "list",
-            "sparse",
-            "bucket",
-            0,
-            0,
-            "powers",
-            97,
-            4096,
-            4096,
-            4096,
-            64 * 2**20,
+            block_width=17,
+            metadata_chunk=64,
+            score_policy="powers",
+            residual_bound=97,
+            max_partials=4096,
         )
-
         self.assertEqual(config.residual_bound, 97)
-        self.assertEqual(config.max_atoms, 4096)
-        self.assertEqual(config.memory_bytes, 64 * 2**20)
+        self.assertEqual(config.max_partials, 4096)
         self.assertEqual(config.power_plan_bytes, 0)
 
     def test_plan_bound_reserves_large_coefficients_before_evaluation(self):

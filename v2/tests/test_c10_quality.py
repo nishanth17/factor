@@ -172,7 +172,7 @@ class QualityAssignmentTests(unittest.TestCase):
             max_stalled=100,
             collector=collector,
         )
-        self.assertIsNone(config.memory_bytes)
+        self.assertFalse(hasattr(config, "memory_bytes"))
         self.assertIsNone(config.checkpoint_bytes)
         job = SIQSJob(self.n, config=config, budget=Budget(work_limit=10**9))
         self.assertEqual(job.run(max_blocks=1).reason, "paused")

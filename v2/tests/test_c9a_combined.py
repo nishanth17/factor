@@ -321,13 +321,9 @@ class CompactStoreTests(unittest.TestCase):
                 restore_store(bad, empty, allowance())
             self.assertFalse(empty._atoms)
         empty = collector(duplicate_policy="pair-v1")
-        empty._workspace = empty.config.memory_limit - 1
-        with patch(
-            "v2.qs.indexed_relations.import_factors",
-            side_effect=AssertionError("decoded before preflight"),
-        ):
-            with self.assertRaises(MemoryError):
-                restore_store(payload, empty, allowance())
+        empty._workspace = 10**30
+        restore_store(payload, empty, allowance())
+        self.assertEqual(encoded(empty), payload)
 
     def test_failed_auxiliary_publication_poisoned_not_resumable(self):
         worker = collector()

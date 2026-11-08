@@ -54,6 +54,50 @@ class ResourceTests(unittest.TestCase):
         budget.consume(10**100)
         self.assertEqual(budget.used, 10**100)
 
+    def test_qs_packet_capacity_continues_identical_assignment(self):
+        from dataclasses import replace
+
+        from v2.qs.parallel import (
+            CollectionPool,
+            ParallelConfig,
+            ParallelSIQSJob,
+            _collect,
+        )
+
+        config = ParallelConfig(family_count=2, pool_size=8)
+        job = ParallelSIQSJob(4001 * 5003, config=config, budget=self.budget())
+        job._setup()
+        results = []
+        for capacity in (1, config.max_batch_atoms):
+            selected = replace(config, max_batch_atoms=capacity)
+            task = (
+                job.base,
+                job._assignment_primes(0),
+                0,
+                selected,
+                None,
+                True,
+            )
+            with CollectionPool() as pool:
+                result = _collect(task, pool.state)
+            packets = (*result["packets"], result["atoms"])
+            self.assertTrue(all(len(packet) <= capacity for packet in packets))
+            self.assertEqual(result["reason"], "complete")
+            results.append(
+                (
+                    result,
+                    tuple(
+                        atom.relation_id
+                        for packet in packets
+                        for atom in packet
+                    ),
+                )
+            )
+        self.assertTrue(results[0][0]["packets"])
+        self.assertEqual(results[0][1], results[1][1])
+        for field in ("work", "scanned", "divisor"):
+            self.assertEqual(results[0][0][field], results[1][0][field])
+
     def test_removed_work_argument(self):
         with self.assertRaisesRegex(RemovedResourceLimitError, "work_limit"):
             self.budget(work_limit=10**20)
@@ -259,6 +303,25 @@ class StorageMigrationTests(unittest.TestCase):
                     RemovedResourceLimitError, argument
                 ):
                     factory(**{argument: None})
+
+    def test_removed_positional_limits_are_named_before_validation(self):
+        from v2.execution.worker_contract import (
+            WorkerSettings,
+            checked_residue,
+        )
+        from v2.qs.sieve_collector import SieveConfig
+        from v2.qs.sss import SSSConfig
+
+        for factory, count, argument in (
+            (WorkerSettings, 2, "assignment_work"),
+            (SieveConfig, 11, "max_relations"),
+            (SSSConfig, 7, "max_candidates"),
+            (checked_residue, 4, "limit"),
+        ):
+            with self.subTest(factory=factory.__name__):
+                with self.assertRaises(RemovedResourceLimitError) as failed:
+                    factory(*([None] * count))
+                self.assertEqual(failed.exception.argument, argument)
 
     def test_graph_65536_is_not_an_admission_ceiling(self):
         from v2.qs.large_primes import LargePrimeForest, graph_reserve

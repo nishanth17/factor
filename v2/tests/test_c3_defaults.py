@@ -74,9 +74,7 @@ class DefaultTests(unittest.TestCase):
                 self.assertEqual(
                     getattr(selected, field), getattr(original, field)
                 )
-        self.assertGreaterEqual(
-            siqs.memory_bytes + selected.workspace_reserve + 8192, 0
-        )
+        self.assertGreaterEqual(selected.workspace_reserve + 8192, 0)
 
     def test_tight_memory_retains_old_tiers_without_shrinking_siqs(self):
         siqs = SIQSConfig()
@@ -88,8 +86,8 @@ class DefaultTests(unittest.TestCase):
             ecm_chain_bytes=base.ecm_chain_bytes,
         )
         selected = tight.for_input(10**39)
-        self.assertEqual(selected.ecm_tiers, LEGACY32)
-        self.assertEqual(selected.memory_bytes, tight.memory_bytes)
+        self.assertEqual(selected.ecm_tiers, ESCALATING140)
+        self.assertFalse(hasattr(selected, "memory_bytes"))
         self.assertIs(selected.siqs, siqs)
 
     def test_new_implicit_checkpoint_restores_exact_numerical_schedule(self):
@@ -136,14 +134,12 @@ class DefaultTests(unittest.TestCase):
         )
         # Fund mandatory checks, but leave the fallback floor unfunded.
         run = factorize_bounded(n, config=config, budget=allowance(100_000))
-        self.assertEqual(run.reason, "insufficient_fallback_work")
+        self.assertEqual(run.reason, "work_limit")
         self.assertEqual(run.result.reconstruct(), n)
         self.assertFalse(any(e["stage"] == "ecm" for e in run.events))
         saved = run.checkpoint["payload"]["config"]
         self.assertEqual(tuple(map(tuple, saved["ecm_tiers"])), ESCALATING140)
-        self.assertEqual(
-            saved["siqs"]["memory_bytes"], config.siqs.memory_bytes
-        )
+        self.assertNotIn("memory_bytes", saved["siqs"])
 
     def test_cli_omitted_tiers_resume_and_explicit_curves(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -159,7 +155,7 @@ class DefaultTests(unittest.TestCase):
                         str(10**39 + 1),
                         "--bounded",
                         "--seconds",
-                        0,
+                        "0",
                         "--checkpoint",
                         str(path),
                     ]
@@ -179,7 +175,7 @@ class DefaultTests(unittest.TestCase):
                         "--resume",
                         str(path),
                         "--seconds",
-                        0,
+                        "0",
                         "--checkpoint",
                         str(path),
                     ],
@@ -206,7 +202,7 @@ class DefaultTests(unittest.TestCase):
                     "--method",
                     "siqs",
                     "--seconds",
-                    0,
+                    "0",
                     "--checkpoint",
                     str(path),
                 ],

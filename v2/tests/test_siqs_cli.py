@@ -172,7 +172,7 @@ class SIQSCLITests(unittest.TestCase):
                     NUMBER,
                     *selection,
                     "--seconds",
-                    0,
+                    "0",
                     "--checkpoint",
                     path,
                 )
@@ -193,7 +193,7 @@ class SIQSCLITests(unittest.TestCase):
                 self.assertEqual(first.returncode, 1, first.stderr)
                 self.assertIn("unresolved", first.stdout)
                 self.assertEqual(
-                    checkpoint["payload"]["state"]["current"]["stage"], "siqs"
+                    checkpoint["payload"]["state"]["current"], None
                 )
                 self.assertEqual(
                     checkpoint["payload"]["config"]["siqs"]["mode"], mode
@@ -284,7 +284,7 @@ class SIQSCLITests(unittest.TestCase):
                 "--qs-dlp-split-call-limit",
                 64,
                 "--seconds",
-                0,
+                "0",
             )
             first = cli(NUMBER, *options, "--checkpoint", path)
 
@@ -309,7 +309,7 @@ class SIQSCLITests(unittest.TestCase):
                 NUMBER,
                 "--bounded",
                 "--seconds",
-                0,
+                "0",
                 "--checkpoint",
                 path,
             )
@@ -318,7 +318,7 @@ class SIQSCLITests(unittest.TestCase):
             self.assertEqual(run.returncode, 1, run.stderr)
             self.assertIsNone(config["siqs"])
             self.assertIsNone(config["sss"])
-            self.assertEqual(config["memory_bytes"], 16 * 1024 * 1024)
+            self.assertNotIn("memory_bytes", config)
             self.assertEqual(config["ecm_chain_mode"], "reuse")
             self.assertEqual(config["ecm_tiers"], [[2000, 147396, 32]])
 
