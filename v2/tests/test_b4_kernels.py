@@ -15,6 +15,7 @@ from v2.benchmarks.support.prac_oracle import (
 )
 from v2.common import arithmetic
 from v2.ecm import core as ecm
+from v2.execution.resources import UnsupportedResourceVersionError
 
 
 def primitive(point, n):
@@ -265,6 +266,19 @@ class B4KernelTests(unittest.TestCase):
                 # Canonical X:Z and the existing a24 convention also resume in
                 # the unmodified engine; no candidate identity is serialized.
                 for plain in (self.engines["baseline"], portfolio):
+                    if plain is portfolio:
+                        with self.assertRaises(
+                            UnsupportedResourceVersionError
+                        ):
+                            plain.factorize_bounded(
+                                fixture["n"],
+                                checkpoint=checkpoint,
+                                budget=recording_budget(
+                                    plain.Budget,
+                                    work_limit=protocol["work_limit"],
+                                ),
+                            )
+                        continue
                     cross = plain.factorize_bounded(
                         fixture["n"],
                         config=common.config(

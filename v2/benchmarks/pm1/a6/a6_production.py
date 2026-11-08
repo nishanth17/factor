@@ -49,6 +49,12 @@ def load_control(name):
         module = importlib.util.module_from_spec(spec)
         sys.modules[qualified] = module
         loader.exec_module(module)
+        if hasattr(module, "SieveContext"):
+            from functools import partial
+
+            module.SieveContext = partial(
+                adapt_resource_configuration, module.SieveContext
+            )
         if name == "portfolio":
             module.advance_job = load_control("stage_jobs").advance_job
     return sys.modules[qualified]

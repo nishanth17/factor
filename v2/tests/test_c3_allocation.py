@@ -21,6 +21,7 @@ from v2.execution.allocation import (
     fallback_refusal,
 )
 from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
 from v2.tests.resource_stops import InterruptBudget as Budget
@@ -414,14 +415,14 @@ class AllocationPortfolioTests(unittest.TestCase):
             seed=7,
             budget=old_budget(work_limit=8000, seconds=None, cpu_seconds=None),
         )
-        restored = factorize_bounded(
-            number,
-            config=native_config,
-            checkpoint=original.checkpoint,
-            budget=ledger(),
-        )
-        self.assertEqual(restored.result.reconstruct(), number)
-        self.assertGreater(restored.work_used, original.work_used)
+        self.assertEqual(original.result.reconstruct(), number)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            factorize_bounded(
+                number,
+                config=native_config,
+                checkpoint=original.checkpoint,
+                budget=ledger(),
+            )
 
     def test_cli_policy_resume_restores_fallback_and_rejects_override(self):
         with tempfile.TemporaryDirectory() as directory:

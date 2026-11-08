@@ -258,11 +258,11 @@ class DensityKernelTests(unittest.TestCase):
         )
         original_config = first.config
         first.config = replace(first.config)
-        with self.assertRaises(MemoryError):
-            first.set_polynomial(next_poly, roots)
-        self.assertEqual(
-            (first.polynomial, first._roots, first._power_plans), old
-        )
+        first.set_polynomial(next_poly, roots)
+        self.assertEqual(first.polynomial, next_poly)
+        self.assertEqual(first._roots, roots)
+        first.set_polynomial(poly, old[1])
+        old = (first.polynomial, first._roots, dict(first._power_plans))
         first.config = original_config
 
         first.budget.work_limit = first.budget.used

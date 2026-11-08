@@ -177,7 +177,7 @@ class FrozenRunnerTests(unittest.TestCase):
             path = Path(directory) / "checkpoint.json"
             path.write_text(json.dumps(first.checkpoint))
             resumed = cli(
-                "--resume", path, "--seconds", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(

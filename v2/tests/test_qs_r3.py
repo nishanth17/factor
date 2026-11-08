@@ -12,6 +12,7 @@ from v2.benchmarks.qs.p38.p38_r3_experiments import (
     live_compaction,
 )
 from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.qs import linear_algebra
 from v2.qs.checkpoint import _restore_store, _store
 from v2.qs.extraction import (
@@ -138,13 +139,8 @@ class StableRowTests(unittest.TestCase):
 
             self.assertEqual(checkpoint["version"], 1)
 
-            restored = SIQSJob.from_checkpoint(
-                checkpoint, budget=unlimited_budget()
-            )
-
-            result = restored.run()
-
-            self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
+            with self.assertRaises(UnsupportedResourceVersionError):
+                SIQSJob.from_checkpoint(checkpoint, budget=unlimited_budget())
 
     def test_new_version_requires_the_mixed_order_field(self):
         from v2.qs.siqs import SIQSJob

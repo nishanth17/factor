@@ -32,6 +32,7 @@ from v2.ecm.chains import (
 )
 from v2.ecm.programs import ECMPrograms
 from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.execution.schedules import SieveContext
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -428,14 +429,15 @@ class ProductionChainTests(unittest.TestCase):
                 old.Budget, work_limit=10000, seconds=None, cpu_seconds=None
             ),
         )
-        restored = factorize_bounded(
-            n,
-            config=config,
-            checkpoint=first.checkpoint,
-            budget=allowance(),
-            ecm_executor=None,
-        )
-        self.assertEqual(restored.result.reconstruct(), n)
+        self.assertEqual(first.result.reconstruct(), n)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            factorize_bounded(
+                n,
+                config=config,
+                checkpoint=first.checkpoint,
+                budget=allowance(),
+                ecm_executor=None,
+            )
         second = factorize_bounded(
             n,
             seed=19,
@@ -455,16 +457,26 @@ class ProductionChainTests(unittest.TestCase):
                 if k != "stage_seconds"
             },
         )
-        old_restored = old.factorize_bounded(
+        with self.assertRaises(ValueError):
+            old.factorize_bounded(
+                n,
+                config=old_config,
+                checkpoint=second.checkpoint,
+                budget=recording_budget(
+                    old.Budget,
+                    work_limit=10**8,
+                    seconds=None,
+                    cpu_seconds=None,
+                ),
+            )
+        restored = factorize_bounded(
             n,
-            config=old_config,
+            config=config,
             checkpoint=second.checkpoint,
-            budget=recording_budget(
-                old.Budget, work_limit=10**8, seconds=None, cpu_seconds=None
-            ),
+            budget=allowance(),
+            ecm_executor=None,
         )
-        self.assertEqual(old_restored.result.reconstruct(), n)
-        self.assertEqual(restored.work_used, old_restored.work_used)
+        self.assertEqual(restored.result.reconstruct(), n)
 
     def test_supported_size_band_uses_exact_boundaries(self):
         self.assertFalse(supports_modulus(10**39 - 1))

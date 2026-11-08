@@ -9,7 +9,7 @@ from v2.benchmarks.infrastructure.resource_control import (
 )
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
-from v2.qs.defaults import C9_MEMORY_BYTES, default_siqs_budget
+from v2.qs.defaults import default_siqs_budget
 from v2.tests.qs_default_controls import previous_siqs_config
 from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.resource_stops import recipe_values as asdict
@@ -77,8 +77,8 @@ class LargerBandDefaultTests(unittest.TestCase):
 
     def test_portfolio_checkpoint_repeats_concrete_51_digit_choice(self):
         selected = PortfolioConfig().for_input(NUMBER_51)
-        self.assertEqual(selected.memory_bytes, 1040 * 2**20)
-        self.assertEqual(selected.siqs.memory_bytes, C9_MEMORY_BYTES)
+        self.assertFalse(hasattr(selected, "memory_bytes"))
+        self.assertFalse(hasattr(selected.siqs, "memory_bytes"))
         self.assertEqual(selected.siqs.solve_policy, "collection")
 
         first = factorize_bounded(NUMBER_51, budget=no_work())

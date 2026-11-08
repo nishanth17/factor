@@ -244,7 +244,7 @@ class SIQSCLITests(unittest.TestCase):
             ("--siqs", "--method", "sss"),
             ("--siqs-base-bound", 400),
             ("--method", "siqs", "--siqs-half-width", 0),
-            ("--method", "siqs", "--rss-bytes", 8388608),
+            ("--method", "siqs", "--memory-mib", 8),
             ("--method", "qs", "--qs-assignment-policy", "nearest"),
             ("--method", "mpqs", "--qs-polynomials-per-family", 2),
             ("--method", "siqs", "--qs-dlp"),

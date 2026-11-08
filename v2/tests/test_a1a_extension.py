@@ -275,18 +275,19 @@ class ExtendedKernelTests(unittest.TestCase):
         reserve = workspace(BOTH, 64, len(base.entries))
         selected = worker(poly, base, BOTH, block_width=64)
         self.assertEqual(selected._workspace, scalar._workspace + reserve)
-        with self.assertRaises(TypeError):
-            worker(
-                poly,
-                base,
-                BOTH,
-                block_width=64,
-                # Optional reuse caches may decline their allocation. Test
-                # the required presieve floor independently of those caches.
-                memory_bytes=(
-                    scalar._workspace - scalar._reuse_workspace + reserve - 1
-                ),
-            )
+        uncapped = worker(
+            poly,
+            base,
+            BOTH,
+            block_width=64,
+            # Optional reuse caches may decline their allocation. Test
+            # the required presieve floor independently of those caches.
+            memory_bytes=(
+                scalar._workspace - scalar._reuse_workspace + reserve - 1
+            ),
+        )
+
+        self.assertEqual(uncapped._workspace, selected._workspace)
         with self.assertRaises(ValueError):
             config(marking="presieve+presieve_powers")
         with self.assertRaises(ValueError):

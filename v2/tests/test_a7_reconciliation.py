@@ -15,6 +15,7 @@ from v2.benchmarks.infrastructure.performance.performance_audit import (
 from v2.benchmarks.infrastructure.resource_control import recording_budget
 from v2.benchmarks.qs.phase_three.phase_three_comparison import OutputCheck
 from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.qs.checkpoint import _solver_digest
 from v2.qs.linear_algebra import DependencySolver, FilteredMatrix
 from v2.qs.sss import SSSConfig, SSSJob
@@ -172,13 +173,8 @@ class ReconciliationTests(unittest.TestCase):
                     checkpoint = job.checkpoint()
                     self.assertEqual(checkpoint["version"], version)
 
-                    restored = SSSJob.from_checkpoint(
-                        checkpoint, budget=allowance()
-                    )
-
-                    self.assertEqual(restored.checkpoint()["version"], 3)
-                    result = restored.run()
-                    self.assertEqual(result.divisor * result.cofactor, job.n)
+                    with self.assertRaises(UnsupportedResourceVersionError):
+                        SSSJob.from_checkpoint(checkpoint, budget=allowance())
 
     def test_sss_checkpoint_hashes_wide_valid_lifted_masks(self):
         # Isolate packing's solver fingerprint from relation-store encoding.

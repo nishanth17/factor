@@ -42,6 +42,11 @@ class RecordingBudget(ResourceBudget):
             raise BudgetExhaustedError(self.reason)
         self._recorded_work = value
 
+    def restore_charges(self, *, work, wall, cpu):
+        if work > self.work_limit:
+            raise ValueError("recorder frontier is below saved work")
+        return super().restore_charges(work=work, wall=wall, cpu=cpu)
+
 
 RETIRED_CONFIG_FIELDS = frozenset(
     (

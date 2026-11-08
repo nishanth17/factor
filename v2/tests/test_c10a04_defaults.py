@@ -49,10 +49,7 @@ class LargerDefaultTests(unittest.TestCase):
                         self.assertEqual(config.gray_limit, 64)
                     self.assertEqual(config.half_width, 65536)
                     self.assertEqual(config.memory_bytes, 2**30)
-                    self.assertEqual(
-                        default_siqs_budget(signed).seconds,
-                        1200 if digits <= 55 else 1800,
-                    )
+                    self.assertIsNone(default_siqs_budget(signed).seconds)
         self.assertFalse(uses_siqs_defaults(10**49 - 1))
         self.assertFalse(uses_siqs_defaults(10**60))
         self.assertEqual(
@@ -120,7 +117,7 @@ class LargerDefaultTests(unittest.TestCase):
             saved = json.loads(path.read_text())["payload"]["config"]
             self.assertEqual(saved["siqs"]["base_count"], 5000)
             resumed = cli(
-                "--resume", path, "--seconds", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(
@@ -151,7 +148,7 @@ class LargerDefaultTests(unittest.TestCase):
     def test_portfolio_serialization_and_zero_work_resume_keep_policy(self):
         n = 10**59 + 123
         selected = PortfolioConfig().for_input(n)
-        self.assertEqual(selected.memory_bytes, 1040 * 2**20)
+        self.assertFalse(hasattr(selected, "memory_bytes"))
         self.assertIs(type(selected.siqs), CountedSIQSConfig)
         self.assertEqual(
             adapt_resource_configuration(

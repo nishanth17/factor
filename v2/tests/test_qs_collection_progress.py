@@ -128,9 +128,6 @@ class CollectionProgressTests(unittest.TestCase):
             ("cancelled", lambda: Budget(cancelled=lambda: True)),
             ("wall_limit", lambda: Budget(seconds=0)),
             ("cpu_limit", lambda: Budget(cpu_seconds=0)),
-            ("atom_limit", None),
-            ("relation_limit", None),
-            ("memory_limit", None),
         )
         for reason, budget in cases:
             with self.subTest(reason=reason):

@@ -102,7 +102,9 @@ class C10DefaultTests(unittest.TestCase):
             )
             self.assertEqual(selected.memory_bytes, 128 * 2**20)
             self.assertEqual(selected.collector.power_plan_bytes, 0)
-            self.assertEqual(default_siqs_budget(number).work_limit, 10**13)
+            self.assertFalse(
+                hasattr(default_siqs_budget(number), "work_limit")
+            )
             explicit = SIQSConfig()
             self.assertIs(SIQSJob(number, config=explicit).config, explicit)
             granted = no_work()
@@ -111,7 +113,7 @@ class C10DefaultTests(unittest.TestCase):
     def test_portfolio_and_checkpoint_keep_concrete_selection(self):
         for number in (NUMBER_40, NUMBER_50, NUMBER_51):
             selected = PortfolioConfig().for_input(number)
-            self.assertEqual(selected.memory_bytes, 1040 * 2**20)
+            self.assertFalse(hasattr(selected, "memory_bytes"))
             self.assertEqual(
                 selected.siqs.collector.power_plan_bytes,
                 C10_POWER_PLAN_BYTES,
@@ -126,7 +128,7 @@ class C10DefaultTests(unittest.TestCase):
                 PortfolioConfig()
                 .for_input(number)
                 .siqs.collector.power_plan_bytes,
-                0,
+                C10_POWER_PLAN_BYTES,
             )
             self.assertIsNone(
                 PortfolioConfig(siqs=None).for_input(number).siqs
@@ -159,14 +161,14 @@ class C10DefaultTests(unittest.TestCase):
             )
             self.assertEqual(first.returncode, 1, first.stderr)
             saved = json.loads(path.read_text())["payload"]["config"]
-            self.assertEqual(saved["memory_bytes"], 1040 * 2**20)
+            self.assertNotIn("memory_bytes", saved)
             self.assertEqual(
                 saved["siqs"]["collector"]["power_plan_bytes"],
                 C10_POWER_PLAN_BYTES,
             )
 
             restored = cli(
-                "--resume", path, "--seconds", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(restored.returncode, 1, restored.stderr)
             self.assertEqual(

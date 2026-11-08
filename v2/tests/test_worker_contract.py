@@ -392,8 +392,8 @@ class StagedContractTests(unittest.TestCase):
             manifest(),
             WorkerSettings(stage_policy="staged", residue_capacity=1),
         )
-        ledger = Ledger(100, 2)
-        token = ledger.reserve(search.manifest.assignment(0)["id"], 50, 1)
+        ledger = Ledger()
+        token = ledger.reserve(search.manifest.assignment(0)["id"])
         search.dispatch(0, token)
         msg = boundary(search, 0, token)
         search.receive(0, token, msg)
@@ -405,9 +405,10 @@ class StagedContractTests(unittest.TestCase):
             boundary_sha256=msg["residue"]["sha256"],
         )
         search.check_leases(ledger.receipts, dict(work=7, cpu=0.2))
-        for saved in (dict(work=0, cpu=0.2), dict(work=7, cpu=0)):
-            with self.assertRaises(ValueError):
-                search.check_leases(ledger.receipts, saved)
+        with self.assertRaises(ValueError):
+            search.check_leases(ledger.receipts, dict(work=0, cpu=0.2))
+        with self.assertRaises(ValueError):
+            search.check_leases(ledger.receipts, dict(work=7, cpu=0))
         with self.assertRaises(ValueError):
             search.check_leases([], dict(work=7, cpu=0.2))
         with self.assertRaises(ValueError):
@@ -443,8 +444,9 @@ class OptimizationContractTests(unittest.TestCase):
     def test_explicit_wider_workers_and_simultaneous_cache_ownership(self):
         with self.assertRaises(ValueError):
             WorkerSettings(workers=6)
-        with self.assertRaises(MemoryError):
-            WorkerSettings(workers=10, allow_wide_workers=True)
+        self.assertEqual(
+            WorkerSettings(workers=10, allow_wide_workers=True).workers, 10
+        )
         settings = WorkerSettings(
             workers=10,
             allow_wide_workers=True,
@@ -513,9 +515,8 @@ class OptimizationContractTests(unittest.TestCase):
         self.assertEqual(
             decoder.feed(raw + struct.pack("!I", 2048)), dict(a=1)
         )
-        self.assertTrue(decoder.complete)
-        with self.assertRaises(ValueError):
-            decoder.feed(b"")
+        self.assertFalse(decoder.complete)
+        self.assertIsNone(decoder.feed(b""))
 
 
 class DurablePositionTests(unittest.TestCase):
@@ -574,8 +575,9 @@ class DurablePositionTests(unittest.TestCase):
                 WorkerSettings(workers=count)
         with self.assertRaises(ValueError):
             WorkerSettings(workers=17, allow_wide_workers=True)
-        with self.assertRaises(MemoryError):
-            WorkerSettings(workers=16, allow_wide_workers=True)
+        self.assertEqual(
+            WorkerSettings(workers=16, allow_wide_workers=True).workers, 16
+        )
 
 
 if __name__ == "__main__":

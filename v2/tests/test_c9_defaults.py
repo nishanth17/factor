@@ -15,10 +15,6 @@ from v2.qs import (
     default_siqs_config,
 )
 from v2.qs.defaults import (
-    C9_MEMORY_BYTES,
-    C9_PORTFOLIO_MEMORY_BYTES,
-    C9_SECONDS,
-    C9_WORK_LIMIT,
     C10_POWER_PLAN_BYTES,
     uses_c9_defaults,
 )
@@ -59,7 +55,7 @@ class C9DefaultTests(unittest.TestCase):
         # Remove the later A1a marking and C10 plan/pacing deltas.
         selected["collector"]["marking"] = "sparse"
         selected["collector"]["power_plan_bytes"] = 0
-        self.assertEqual(selected, accepted)
+        self.assertEqual(selected, asdict(accepted))
         self.assertEqual(SIQSJob(NUMBER).config, default_siqs_config(NUMBER))
         explicit = SIQSConfig()
         self.assertIs(SIQSJob(NUMBER, config=explicit).config, explicit)
@@ -68,9 +64,9 @@ class C9DefaultTests(unittest.TestCase):
         self,
     ):
         job = SIQSJob(NUMBER)
-        self.assertEqual(job.budget.work_limit, C9_WORK_LIMIT)
-        self.assertEqual(job.budget.seconds, C9_SECONDS)
-        self.assertEqual(job.budget.cpu_seconds, C9_SECONDS)
+        self.assertFalse(hasattr(job.budget, "work_limit"))
+        self.assertIsNone(job.budget.seconds)
+        self.assertIsNone(job.budget.cpu_seconds)
         explicit = no_work()
         self.assertIs(SIQSJob(NUMBER, budget=explicit).budget, explicit)
 
@@ -80,9 +76,9 @@ class C9DefaultTests(unittest.TestCase):
         ):
             run = factorize_bounded(NUMBER)
         limits = run.checkpoint["payload"]["limits"]
-        self.assertEqual(limits["work"], C9_WORK_LIMIT)
-        self.assertEqual(limits["seconds"], C9_SECONDS)
-        self.assertEqual(limits["cpu_seconds"], C9_SECONDS)
+        self.assertIsNone(limits["work"])
+        self.assertIsNone(limits["seconds"])
+        self.assertIsNone(limits["cpu_seconds"])
 
     def test_exact_size_backend_and_sign_scope(self):
         for number, enabled in (
@@ -108,18 +104,8 @@ class C9DefaultTests(unittest.TestCase):
             self.assertIsInstance(
                 selected.siqs.collector, GrowingDoubleLargeSieveConfig
             )
-            expected_memory = (
-                128 * 2**20
-                if not original._automatic_memory
-                else C9_PORTFOLIO_MEMORY_BYTES
-            )
-            self.assertEqual(selected.memory_bytes, expected_memory)
-            self.assertEqual(
-                selected.siqs.memory_bytes,
-                selected.memory_bytes - selected.workspace_reserve - 8192
-                if not original._automatic_memory
-                else C9_MEMORY_BYTES,
-            )
+            self.assertFalse(hasattr(selected, "memory_bytes"))
+            self.assertFalse(hasattr(selected.siqs, "memory_bytes"))
             self.assertIs(selected.for_input(10**29), selected)
             self.assertIsNone(selected.siqs.collector.max_partials)
         self.assertIsNone(PortfolioConfig(siqs=None).for_input(NUMBER).siqs)
@@ -155,18 +141,18 @@ class C9DefaultTests(unittest.TestCase):
             ):
                 path = Path(directory) / "checkpoint.json"
                 first = cli(
-                    NUMBER, *options, "--seconds", 0, "--checkpoint", path
+                    NUMBER, *options, "--seconds", "0", "--checkpoint", path
                 )
                 self.assertEqual(first.returncode, 1, first.stderr)
                 self.assertNotIn("Traceback", first.stderr)
                 saved = json.loads(path.read_text())["payload"]["config"]
-                self.assertEqual(saved["memory_bytes"], memory * 2**20)
+                self.assertNotIn("memory_bytes", saved)
                 self.assertEqual(
                     saved["siqs"]["collector"].get("storage_policy") == "grow",
                     growing,
                 )
                 resumed = cli(
-                    "--resume", path, "--seconds", 0, "--checkpoint", path
+                    "--resume", path, "--seconds", "0", "--checkpoint", path
                 )
                 self.assertEqual(resumed.returncode, 1, resumed.stderr)
                 self.assertNotIn("Traceback", resumed.stderr)

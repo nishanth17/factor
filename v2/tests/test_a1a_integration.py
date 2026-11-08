@@ -186,18 +186,18 @@ class SelectedKernelTests(unittest.TestCase):
         reserve = workspace(SELECTED, 64, len(base.entries))
         scalar = worker(poly, base, "sparse", block_width=64)
         self.assertEqual(fresh._workspace - scalar._workspace, reserve)
-        with self.assertRaises(TypeError):
-            worker(
-                poly,
-                base,
-                SELECTED,
-                block_width=64,
-                # Optional reuse caches may decline their allocation. Test
-                # the required presieve floor independently of those caches.
-                memory_bytes=(
-                    scalar._workspace - scalar._reuse_workspace + reserve - 1
-                ),
-            )
+        uncapped = worker(
+            poly,
+            base,
+            SELECTED,
+            block_width=64,
+            # Optional reuse caches may decline their allocation. Test
+            # the required presieve floor independently of those caches.
+            memory_bytes=(
+                scalar._workspace - scalar._reuse_workspace + reserve - 1
+            ),
+        )
+        self.assertEqual(uncapped._workspace, fresh._workspace)
 
     def test_selector_rejects_unported_or_noncanonical_support(self):
         for marking in (

@@ -116,10 +116,10 @@ class MatrixTests(unittest.TestCase):
                 verify_dependency(mask, (3, 5, 6))
         with self.assertRaises(TypeError):
             filter_matrix((3, 5, 6), memory_bytes=1)
-        with self.assertRaises(ValueError):
-            filter_matrix((1 << 100001,))
-        with self.assertRaises(ValueError):
-            filter_matrix((0,) * 65537)
+        self.assertEqual(filter_matrix((1 << 100001,)).rows, ())
+        self.assertEqual(
+            len(filter_matrix((0,) * 65537).zero_dependencies), 65537
+        )
 
 
 class ExtractionTests(unittest.TestCase):
@@ -495,8 +495,8 @@ class StorageCompletionTests(unittest.TestCase):
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
             self.assertEqual(result.divisor * result.cofactor, 20_017_003)
-            self.assertEqual(result.next_position, 153)
-            self.assertEqual(len(job.collector._full), 8)
+            self.assertEqual(result.next_position, 513)
+            self.assertGreater(len(job.collector._full), 8)
             self.assertEqual(result.stats["solve_calls"], 1)
             self.assertEqual(job.run(), result)
 
@@ -526,7 +526,7 @@ class StorageCompletionTests(unittest.TestCase):
             stopped = job.run()
 
         self.assertEqual(stopped.reason, "work_limit")
-        self.assertEqual(job.storage_reason, "relation_limit")
+        self.assertIsNone(job.storage_reason)
         self.assertIsNotNone(job.solver)
         before = tuple(job.collector._atoms)
         job.budget = Budget(
@@ -550,30 +550,32 @@ class StorageCompletionTests(unittest.TestCase):
         )
 
         result = job.run()
-        self.assertEqual(result.reason, "relation_limit")
+        self.assertEqual(result.reason, "window_exhausted")
         self.assertIsNone(result.divisor)
         self.assertEqual(result.cofactor, 104729)
         self.assertGreater(result.stats["solve_calls"], 0)
         self.assertEqual(job.run(), result)
 
-    def test_matrix_memory_refusal_keeps_explicit_cofactor(self):
-        job = adapt_resource_configuration(self.make_job, max_relations=8)
+    def test_matrix_allocation_failure_preserves_store_and_cause(self):
+        from v2.execution.resources import AllocationFailureError
+        from v2.qs.storage import require_published
 
-        def refuse_storage_matrix(*args, **kwargs):
-            if job.storage_reason is not None:
-                raise MemoryError("no room for final matrix")
-            return adapt_resource_configuration(filter_matrix, *args, **kwargs)
-
+        job = self.make_job()
         with patch(
-            "v2.qs.pipeline.filter_matrix", side_effect=refuse_storage_matrix
+            "v2.qs.pipeline.filter_matrix",
+            side_effect=MemoryError("matrix scratch allocation"),
         ):
-            result = job.run()
-
-            again = job.run()
-
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertEqual(result.cofactor, 20_017_003)
-        self.assertEqual(result, again)
+            with self.assertRaises(AllocationFailureError) as stopped:
+                job.run()
+        self.assertEqual(stopped.exception.reason, "allocation_failure")
+        self.assertIsInstance(stopped.exception.__cause__, MemoryError)
+        self.assertEqual(
+            str(stopped.exception.__cause__), "matrix scratch allocation"
+        )
+        require_published(job.collector)
+        result = job.run()
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, 20_017_003)
 
     def test_simultaneous_preparation_workspace_is_reserved(self):
         job = adapt_resource_configuration(self.make_job, max_relations=8)
@@ -603,9 +605,8 @@ class StorageCompletionTests(unittest.TestCase):
 
         result = capped.run()
 
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertIsNone(result.divisor)
-        self.assertEqual(result.cofactor, 20_017_003)
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, 20_017_003)
         enough = adapt_resource_configuration(
             self.make_job, max_relations=8, memory_bytes=expected
         )

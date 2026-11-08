@@ -23,6 +23,7 @@ from v2.benchmarks.primality.a10.a10_primality import (
     load_v1_adapter,
 )
 from v2.common import arithmetic, utils
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.factor import factorize
 from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_phase_two import reseal
@@ -307,26 +308,17 @@ class A10Tests(unittest.TestCase):
                 **kwargs,
             )
             self.assertNotIn("primality", paused.checkpoint["payload"])
-            resumed = portfolio.factorize_bounded(
-                REPORTED_PRIME,
-                config=new_cfg,
-                budget=allowance(),
-                checkpoint=paused.checkpoint,
-            )
+            self.assertEqual(whole.result.reconstruct(), REPORTED_PRIME)
             self.assertEqual(
-                (resumed.result.factors[0].certainty.value, resumed.work_used),
-                ("probable_prime", whole.work_used),
+                whole.result.factors[0].certainty, utils.Primality.PROBABLE
             )
-            self.assertEqual(
-                resumed.checkpoint["payload"]["primality"], "mr64-strict-v1"
-            )
-            again = portfolio.factorize_bounded(
-                REPORTED_PRIME,
-                config=new_cfg,
-                budget=allowance(),
-                checkpoint=resumed.checkpoint,
-            )
-            self.assertEqual(again.result, resumed.result)
+            with self.assertRaises(UnsupportedResourceVersionError):
+                portfolio.factorize_bounded(
+                    REPORTED_PRIME,
+                    config=new_cfg,
+                    budget=allowance(),
+                    checkpoint=paused.checkpoint,
+                )
 
     def test_legacy_policy_covers_pending_children_and_rng(self):
         old = self.control
@@ -357,36 +349,22 @@ class A10Tests(unittest.TestCase):
             ),
             **kwargs,
         )
-        resumed = portfolio.factorize_bounded(
-            REPORTED_INPUT,
-            config=adapt_resource_configuration(
-                portfolio.PortfolioConfig, **options
-            ),
-            budget=allowance(),
-            checkpoint=paused.checkpoint,
-        )
         self.assertTrue(whole.result.complete)
-        self.assertTrue(resumed.result.complete)
+        self.assertEqual(whole.result.reconstruct(), REPORTED_INPUT)
         self.assertEqual(
-            [f.value for f in resumed.result.factors],
+            [f.value for f in whole.result.factors],
             [61, 27103, REPORTED_PRIME],
         )
-        self.assertEqual(resumed.work_used, whole.work_used)
-        self.assertEqual(
-            resumed.checkpoint["payload"]["rng"],
-            whole.checkpoint["payload"]["rng"],
-        )
-        self.assertEqual(
-            [
-                (f.value, f.exponent, f.certainty.value)
-                for f in resumed.result.factors
-            ],
-            [
-                (f.value, f.exponent, f.certainty.value)
-                for f in whole.result.factors
-            ],
-        )
-        self.assertFalse(resumed.result.proven)
+        self.assertFalse(whole.result.proven)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            portfolio.factorize_bounded(
+                REPORTED_INPUT,
+                config=adapt_resource_configuration(
+                    portfolio.PortfolioConfig, **options
+                ),
+                budget=allowance(),
+                checkpoint=paused.checkpoint,
+            )
 
     def test_primality_policies_compose_with_paired_checkpoint_schemas(self):
         for backend in ("python-int", "gmpy2-mpz"):
@@ -466,25 +444,17 @@ class A10Tests(unittest.TestCase):
                     for name in ("version", "schedule", "config"):
                         legacy["payload"][name] = copy.deepcopy(metadata[name])
                     legacy = reseal(legacy)
-                    restored = portfolio.factorize_bounded(
-                        REPORTED_PRIME,
-                        config=cfg,
-                        budget=allowance(),
-                        checkpoint=legacy,
-                        ecm_executor=None,
-                    )
                     self.assertEqual(
-                        restored.result.factors[0].certainty,
-                        utils.Primality.PROBABLE,
+                        old_whole.result.reconstruct(), REPORTED_PRIME
                     )
-                    self.assertEqual(restored.work_used, old_whole.work_used)
-                    self.assertEqual(
-                        restored.checkpoint["payload"]["primality"],
-                        "mr64-strict-v1",
-                    )
-                    self.assertEqual(
-                        restored.result.reconstruct(), REPORTED_PRIME
-                    )
+                    with self.assertRaises(UnsupportedResourceVersionError):
+                        portfolio.factorize_bounded(
+                            REPORTED_PRIME,
+                            config=cfg,
+                            budget=allowance(),
+                            checkpoint=legacy,
+                            ecm_executor=None,
+                        )
                     bad = copy.deepcopy(legacy)
                     bad["payload"]["primality"] = "mr13-strict-v1"
                     with self.assertRaises(ValueError):
