@@ -107,6 +107,34 @@ class G1Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 stage_driver.validate(plan, self.approve(plan))
 
+    def test_stage_observation_policy_precedes_execution(self):
+        for stage in ("G2H", "G3", "G4"):
+            plan = self.plan()
+            plan["stage"] = stage
+            if stage == "G2H":
+                plan["batches"] = [
+                    batch
+                    for batch in plan["batches"]
+                    if batch["cells"][0]["digits"] in (50, 65)
+                    and batch["cells"][0]["lifetime"] == "cold"
+                ]
+            for batch in plan["batches"]:
+                batch["cells"][0]["arm"] = "C4"
+                if stage == "G4":
+                    batch["cells"][0]["timeline_path"] = "timelines/cell"
+            with patch.object(stage_driver, "source", return_value="pin"):
+                with self.assertRaises(ValueError):
+                    stage_driver.validate(plan, self.approve(plan))
+                for batch in plan["batches"]:
+                    spec = batch["cells"][0]
+                    if stage == "G4":
+                        spec.pop("timeline_path")
+                    else:
+                        spec["timeline_path"] = (
+                            f"timelines/{batch['identity']}"
+                        )
+                stage_driver.validate(plan, self.approve(plan))
+
     def test_restart_skips_completed_batches(self):
         calls = []
 

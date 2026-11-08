@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .combined import corpus_identity, fixtures, run
 from .confirmation import BANDS
+from .protocol import validate_worker_timeline
 from .runner import source, write
 
 ROWS = {(d, "cold") for d in BANDS} | {(40, "warm"), (50, "warm")}
@@ -80,6 +81,7 @@ def validate(plan, approval):
             raise ValueError("batch source differs from stage")
         reserved_wall = reserved_cpu = 0
         for cell in batch["cells"]:
+            validate_worker_timeline(plan["stage"], cell)
             if cell.keys() - CELL_FIELDS:
                 raise ValueError("unsupported cell fields")
             if any(

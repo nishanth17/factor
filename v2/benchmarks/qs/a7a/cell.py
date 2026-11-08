@@ -10,7 +10,7 @@ from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
-from .protocol import INPUTS
+from .protocol import INPUTS, validate_worker_timeline
 
 
 def configuration(n, policy):
@@ -277,6 +277,7 @@ def execute(request):
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
     n, spec = request["n"], request["cell"]
+    validate_worker_timeline(spec.get("stage"), spec)
     warm_target = spec.get("warmup_seconds", 3)
     if type(warm_target) is not int or warm_target not in (3, 10, 20):
         raise ValueError("unadmitted warmup duration")

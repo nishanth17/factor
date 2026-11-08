@@ -36,6 +36,19 @@ LIMITS = {
 }
 
 
+def validate_worker_timeline(stage, spec):
+    """Enforce the gated observation policy without changing old stages."""
+    timeline = spec.get("timeline_path")
+    process_arm = spec["arm"] not in ("S0", "M0", "MAINLINE")
+    if stage in ("G2H", "G3") and process_arm:
+        if not isinstance(timeline, str) or not timeline.strip():
+            raise ValueError(
+                "worker timelines required in G2H/G3 process cells"
+            )
+    if stage == "G4" and timeline:
+        raise ValueError("worker timelines must be off for G4 confirmation")
+
+
 def cell(
     stage,
     fixture,

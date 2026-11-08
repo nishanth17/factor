@@ -18,7 +18,7 @@ from pathlib import Path
 
 from .diagnostics import _events
 from .performance_lock import open_lock
-from .protocol import INPUTS, schedule
+from .protocol import INPUTS, schedule, validate_worker_timeline
 from .runner import (
     host_pressure_status,
     source,
@@ -215,6 +215,10 @@ def run(plan_path, output):
     panel = plan.get("corpus_kind", "combined")
     if plan["corpus_sha256"] != corpus_identity(panel):
         raise ValueError("panel identity mismatch")
+    for cell_spec in plan["cells"]:
+        validate_worker_timeline(
+            plan.get("stage", cell_spec.get("stage")), cell_spec
+        )
     if plan.get("analyze_profiles", False):
         # Admission fails before spending a factoring window if the optional
         # analysis reader is missing. It is never sent into worker imports.

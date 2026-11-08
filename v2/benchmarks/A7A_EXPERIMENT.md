@@ -138,6 +138,9 @@ Required before coverage:
    G1 overhead was approximately 1%. Keep worker timelines off for G4 clean
    confirmation. Preserve already launched historical cells' actual settings;
    do not relabel them as timeline-enabled observations.
+   The stage driver, combined runner and direct cell entry point reject
+   G2H/G3 process calls without a declared timeline directory and G4 calls
+   with timelines enabled. Serial controls have no worker timeline.
 5. Exact-output, lease, crash, resume, telemetry/recorder failure, near-limit,
    no-leaked-child and pure planning checks. Code changes require full suite,
    lint and benchmark imports from a committed-files-only checkout under the
