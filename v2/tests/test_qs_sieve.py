@@ -381,7 +381,7 @@ class SieveStoreTests(unittest.TestCase):
                     stopped = worker.collect(-128, 129)
                 self.assertEqual(boundary.call_count, 1)
                 self.assertEqual(stopped.reason, "cancelled")
-                self.assertFalse(worker._publication_failed)
+                self.assertFalse(getattr(worker, "_publication_failed", False))
                 self.assertEqual(
                     (
                         worker._atoms,

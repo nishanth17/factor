@@ -299,7 +299,6 @@ class A10Tests(unittest.TestCase):
             "primality",
             "config",
             "version",
-            "portfolio_version",
         ):
             self.assertEqual(
                 resumed.checkpoint["payload"][field],

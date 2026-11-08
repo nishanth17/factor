@@ -308,14 +308,11 @@ class ProductionPM1Tests(unittest.TestCase):
             (saved_config["pm1_chunk_size"], saved_config["pm1_gap_mode"]),
             (64, "recurrence"),
         )
-        whole = portfolio.factorize_bounded(
-            n, budget=allowance(), ecm_executor=None
-        )
+        whole = portfolio.factorize_bounded(n, budget=allowance())
         finished = portfolio.factorize_bounded(
             n,
             budget=allowance(),
             checkpoint=resumed.checkpoint,
-            ecm_executor=None,
         )
         self.assertEqual(
             (finished.result, finished.work_used),
@@ -362,7 +359,7 @@ class ProductionPM1Tests(unittest.TestCase):
         from v2.pm1.bounded import PM1Config
 
         # The original arithmetic executor supports current resource markers.
-        legacy_config = PM1Config(bounds=((7, 13), (10, 31)))
+        legacy_config = PM1Config()
         current = factorize_pm1_bounded(
             n, config=legacy_config, budget=allowance(), max_actions=0
         )
