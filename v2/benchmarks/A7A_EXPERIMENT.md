@@ -1,7 +1,8 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
-Status: revised execution design, not a completed campaign or approval to
-launch it. No successor stage is pre-approved. Follow the
+Status: G2H accepted. The 7 November instruction authorizes the pre-G3
+cleanup/diagnostics and the restricted G3 below, then stop. G4 and the 75/80
+probes still require separate approval. Follow the
 [joint-search policy](../POLICY.md#joint-parameter-searches) and
 [evidence tiers](../POLICY.md#evidence-tiers-and-sample-sizing).
 Preserve historical freezes, failures, charges and captures unchanged.
@@ -409,90 +410,120 @@ resume and overshoot; test alone/combined and run committed-checkout QA.
 Keep K=0 evidence distinct. After G2K stop and report before anchor tuning.
 Admitted allocations have total collection plus cofactor processes at most ten.
 
-## G3: tune only (c), then verify interpolation
+## Pre-G3 cleanup and diagnostics — authorized 7 November
 
-After G2H (and any approved G2K), freeze the implementation and (a)/(b) choices.
-Initial (c) ranges:
+Retain the accepted G2H implementation bundle. Remove disabled mechanisms
+from default per-block/per-root loops by construction-time specialization;
+preserve explicitly selected alternatives. Validate committed sources with
+full tests, lint and benchmark imports. Compare accepted `d24e6bb` against
+the cleaned source at 50/65 digits: input 0, three repetitions/source,
+512 polynomials/p16, equal signatures and 67,109,376 scanned positions.
+Report timing ratios without adding a speedup or adoption claim.
 
-| Tunable | Declared levels / conditional constraints |
-| --- | --- |
-| Collection workers | Serial, 1/2/4/6/8/10 initially; 3/5/7/9 as adjacent refinements. |
-| Packet width | Valid family fractions g/16, g/8, g/4, g, plus adjacent valid powers of two; integer width <= actual gray limit g. |
-| Lookahead | 0/2/4/8; inactive with no process pool. |
-| Admission order | Ordered/arrival; arrival is a separately labeled mathematical trajectory. |
-| Nursery | 4/16/64/128 MiB, selected before interpreter startup. |
-| State cache | 16/64/128 MiB within charged per-worker memory; inactive without retained state. |
-| Sparse queue | 0/8/32 MiB, only supported collector paths. |
-| Power plan | 0/2/8 MiB, with preparation charged. |
-| Other implemented root/inverse cache capacities | Only actual validated configuration fields; enumerate levels/dependencies at G2H or exclude with a reason. Never invent unsupported runner fields. |
-| K, only after G2K | K=0/1/2 and collection allocation with total <=10; fixed quota, no oversubscription. |
+Run two independent-packet diagnostics at 65 digits on calibration inputs
+0/1/2, fixed 512 polynomials/p16:
 
-Filter invalid/inactive dimensions before design construction. Larger caches
-must coexist with worker/runtime/parent allowances. Serial has no process
-scheduling dimensions. Reclassified options enter only with their measured
-interaction and approved count/budget adjustment.
+- N=1 normal versus `taskpolicy -c background`; report positions per worker
+  CPU-second and wall time. Background QoS influences placement; it does not
+  establish exclusive E-core residency or a pure E/P efficiency ratio.
+- N=1/4/8, native versus byte stamps. Report throughput/scaling and the
+  per-worker buffer payload in bytes, accounted cache ownership and observed
+  RSS separately. A byte-stamp scaling gain supports a footprint hypothesis;
+  it does not alone establish the cause of every scaling loss.
 
-At each anchor/lifetime, form a small deterministic covering/space-filling
-pool over (c), holding (a)/(b) fixed. Force serial plus one valid recipe at
-1/2/4/6/8/10 workers. Choose remaining proposals by uncovered meaningful
-parameter pairs, with frozen tie order; report actual conditional coverage.
-Maximum **16 initial + 8 refinement** distinct recipes per anchor/lifetime;
-for calibrated calls over five minutes, **8 + 4**. Controls count toward
-these maxima; repetitions are not new configurations. Price the executable
-subset inside the row cap, leaving room for independent-input survivors,
-exploration and diagnostics before issuing it.
+The cumulative pre-G3 ceiling is 3,600 wall seconds, 36,000 CPU-seconds and
+1 GiB output, including failed and successful QA and cleanup. Batch owner
+reservations: prefix 750 seconds (16 calls), QoS 630 (10 calls), footprint
+1,350 (22 calls); the remainder funds QA/preparation. Expected measurement
+runtime is about 20 minutes. No revised attempts or enlarged limits are
+implicit. Preserve all failed validation and stopped batches.
 
-The G2H repricing proposes a funded first pass of eight initial joint recipes
-per anchor/lifetime: the seven mandatory worker allocations plus one proposal
-outside that neighborhood. Reserve two further inputs for the incumbent and
-one selected challenger at every anchor, and three intermediate input pairs
-at each of 50/60/65. This is 78 calls. With actor/owner walls
-40=30/50, 50=90/110, 55=180/200, 60=300/320, 65=900/920 and 70=1,800/1,820
-seconds, the ceiling is 34,860 owner seconds plus 600 for diagnostics, QA and
-cleanup: **35,460 seconds and 358,080 CPU-seconds**. Use CPU 900 for 40/50
-and ten times actor wall otherwise, plus 60 owner CPU-seconds per call.
-The 40-digit CPU allowance funds prepaid packet leases.
+### Quiet window and drift gates — all remaining timed work
 
-This is a proposal for the separately approved G3 grant. Actual recipe/source
-and admission checks must be frozen before timing. Unused within-stage call
-allowances may fund more proposals, survivors or refinement within the maxima
-above, only after reserving every remaining mandatory call and diagnostic.
-Unissued recipes remain untested. The initial worker allocations form part
-of the joint design; do not describe differing packet/cache recipes as a pure
-worker-scaling comparison.
+The user has cleared the other Factor workstreams. Hold the real nonblocking
+performance flock through cleanup; other builds, suites and benchmarks may
+not overlap cells. Record the process inventory. Capture `pmset -g therm`
+before/after cells and every 60 seconds during a batch. Missing readings
+remain explicit; telemetry does not establish absence of throttling.
 
-Use complete-factor input 0 to prioritize proposals, retaining uncertain/
-near-tied candidates. Advance up to four to calibration inputs 1/2. A Tier 1
-selection or rejection needs all three independent inputs and comparison
-against measured noise; candidates not advanced remain deferred/untested,
-not demonstrated losers. Inconclusive choices retain the simpler valid path.
-Nine-input screening is not required. Reserve at least one proposal outside
-the current neighborhood; refine one/two (c) levels and adjacent worker/
-packet/cache levels.
-An unrelated reference timeout does not block a valid candidate. Prefixes do
-not rank complete-factor candidates without validated predictive agreement.
-Finish a breadth round at every anchor before a second deep round at one.
+Each batch begins and ends with an A/A pair using identical source, input,
+seed, work, lifetime and settings. Define drift as `max(time)/min(time)-1`:
+stop/report above 10% within either pair, or between the geometric mean times
+of the start/end pairs. The pre-G3 endpoint is full external cold actor wall;
+G3 cold uses that endpoint and warm uses the timed complete library call.
+No automatic retry/restart after drift. The end gate determines validity of
+that batch; retain earlier observations if it fails, without presenting them
+as a quiet-window-confirmed comparison.
 
-Freeze this interpolation rule before intermediate outcomes: nearest cold
-anchor by decimal digits, lower anchor on an exact tie. Inherit its worker,
-lookahead, order and capacity levels; map packet fraction onto the target's
-actual family using the declared valid integer levels. Apply only publicly
-observable size/backend/allowance inputs. Verify cold 50/60/65 against literal
-mainline on all three calibration inputs 0/1/2, at most one proposed recipe
-plus the reference per row. If a check fails, stop at G3 and propose a separately
-bounded new anchor; do not quietly optimize every intermediate row. Label
-unmeasured boundaries and do not adopt a routing table before their checks.
+Production calls keep Tier A, owned RSS and active/task-wait/publication
+worker timelines on both arms. Independent packets have active private
+streams, startup-barrier wait and final publication spans; they have no
+production task queue. G4 timelines remain off. These diagnostics do not
+add full CPU/heap captures or a 75/80 call.
 
-At G3 freeze every recipe, reference commit, interpolation label, analysis,
-confirmation cost tier and complete priced schedule. Include the exact resolved
-75-digit probe recipe and its derivation before any probe result: the source/
-identity of the cold 70-digit anchor, inherited worker count, lookahead,
-admission order and capacity levels, fixed G2H implementation/(a)/(b) choices,
-source packet fraction, actual 75-digit family and mapped valid integer packet
-width, resolved Y0 numerical settings and admission under the probe allowances.
-Configuration resolution does not authorize a factoring call. Report and stop;
-the 75-digit call needs explicit approval at or after this report. G4 can
-proceed independently under its own approval, before or after that probe.
+## G3: restricted worker-count and packet-width search — then stop
+
+The latest scope supersedes the earlier broader joint-search proposal. Tune
+only workers **{4,6,8,10}** by two valid packet fractions **{g/4,g}** at
+**40 cold, 40 warm, 55 cold and 70 cold**. Actual families are g=16 at 40
+(widths 4/16) and g=64 at 55/70 (widths 16/64). These are (c) tunables:
+process count changes CPU economics and packet width trades scheduling cost
+against imbalance. Width must divide and not exceed the actual family.
+K=0; total collection/cofactor allocation is at most ten. No other flags,
+cache levels, lookahead, admission order or numerical work enter this grid.
+
+Keep Y0, lookahead 4, ordered admission, 4 MiB nursery, 64 MiB state cache,
+512/256 MiB worker/runtime, 4 GiB parent, 22 GiB aggregate, worker verification,
+private semaphore, packed transport and coefficient reuse. Native stamps,
+ordinary queues, scalar leases, no affinity and no CPU snapshot remain the
+incumbent (a)/(b) choices unless the authorized byte-footprint diagnostic
+establishes a clear choice; freeze that decision before G3 outcomes. Keep
+numerical base/report/product/residual limits unchanged.
+
+Maximum eight distinct configurations per row, no extra refinement. At
+40 cold/warm and 55 cold run all eight on three calibration inputs. At 70,
+run all eight on input 0, then the incumbent C8/p16 and the best distinct
+complete challenger on inputs 1/2 (four calls). Prioritize by complete cold
+actor wall; if input 0 has no complete challenger, stop and report rather
+than selecting from partial timings. Recipes not advanced have insufficient
+coverage, not demonstrated losses. Require all three inputs for a Tier 1
+choice, compare against A/A noise and retain incumbent when inconclusive.
+Counterbalance order and match input/hash/factoring seeds. No fresh
+confirmation inputs are used for tuning.
+
+Each row adds four identical-incumbent A/A controls (start/end pairs).
+Maximum calls: 28 each at 40 cold, 40 warm and 55 cold; 16 at 70 cold,
+100 calls total. Price the executable manifest before starting:
+
+| Row | Calls | Actor wall / CPU | Owner wall / CPU per call |
+| --- | ---: | ---: | ---: |
+| 40 cold | 28 | 30 s / 650 s | 45 s / 710 s |
+| 40 warm | 28 | 30 s / 650 s | 45 s / 710 s |
+| 55 cold | 28 | 100 s / 1,000 s | 120 s / 1,060 s |
+| 70 cold | 16 | 1,800 s / 18,000 s | 1,820 s / 18,060 s |
+
+The calls reserve 35,000 wall seconds and 358,400 CPU-seconds, within the
+10-hour/100-core-hour G3 ceiling, leaving 1,000 wall and 1,600 CPU-seconds
+for preparation/telemetry/cleanup. Output ceiling 16 GiB. Actual expected
+runtime is approximately 3–6 hours from accepted current costs, not a target
+to spend. Funding must include outstanding leases; refusals are censored and
+never automatically retried. Packet CPU stays at incumbent 30 seconds.
+Warm includes validated >=3-second warmup, reported outside its timing;
+all cold costs include spawn/import/JIT/preparation/validation/shutdown.
+
+Report wall versus aggregate CPU for every worker/packet recipe, completion,
+noise, timelines, RSS, exact charges, exclusions and all untested interactions.
+No intermediate validation, broader tuning, G4, routing adoption, merge,
+push or probes are authorized by this scope cut. Stop at the G3 report.
+Interpolation remains a proposed routing rule: nearest cold anchor by size,
+lower anchor on ties, inherit settings and map the selected fraction to the
+actual family's valid integer packet widths; label rows interpolated. No
+routing table is adopted without separately authorized intermediate checks.
+
+Freeze the exact 75/80 probe derivations in the G3 report before outcomes,
+using the frozen cold 70 anchor, its implementation bundle and Y0 resolved
+at the target size. Configuration resolution is not a factoring call.
+Keep the separate probe allowances and approval gates below unchanged.
 
 ## G4: independent confirmation against literal mainline
 
