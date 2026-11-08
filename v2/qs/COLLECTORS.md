@@ -30,16 +30,16 @@ configurations retain their existing policies.
 
 | Field | Opt-in behavior |
 | --- | --- |
-| `preparation_policy="target-v1"` | Prepare at base-column count plus row excess; use bounded 5% top-ups after unsuccessful attempts. Immediate squares, equal-parity checks and final/storage-cap extraction remain available. |
+| `preparation_policy="target-v1"` | Prepare at base-column count plus row excess; use bounded 5% top-ups after unsuccessful attempts. Immediate squares, equal-parity checks and final numerical-exhaustion extraction remain available. |
 | `large_product_bound=P`, `candidate_bound=C` | Admit recovered products up to P while holding the reporting allowance C fixed. `candidate_bound=0` instead derives reporting from the configured admission domain. |
 | `small_prime_bound=S` | Require proven ordered endpoints p≤q with p≤S, q≤`large_prime_bound` and pq≤P, including equality and squares. SLP admission retains its separate `residual_bound`. |
 | `cycle_policy="short-v1"` | Search all retained components for shorter exact paths, including earlier closing edges. `cycle_search_edges` bounds visits (default 4096, maximum 65536); the original forest path remains the fallback. |
 | `duplicate_policy="pair-v1"` | Check equal-parity two-row dependencies before ordinary preparation. Keep both rows; bound representatives by `duplicate_bytes` (default 16 MiB, maximum 64 MiB). |
-| `record_policy="packed-v1"` | Retain immutable packed exponent bytes with exact original identities, provenance and checked interchange. Existing conservative storage reservations remain in force. |
+| `record_policy="packed-v1"` | Retain immutable packed exponent bytes with exact original identities, provenance and checked interchange. Storage grows under the root guard; workspace estimates remain diagnostic. |
 
 These `YieldSieveConfig` fields default to disabled policies. Its checkpoints use
-schema 11 and bind the complete configuration; legacy checkpoints remain
-readable. Restoring cannot silently change these policies. Packed records can
+schema 11 and bind the complete configuration plus the H3 resource marker.
+Old resource checkpoints are refused without migration. Restoring cannot silently change these policies. Packed records can
 reduce payload storage but add decoding work; no performance or capacity gain
 is established. The [benchmark runners](../benchmarks/qs/README.md) prepare
 matched explicit experiments without changing production routing.
@@ -183,10 +183,10 @@ Integer ownership follows digit storage, with separate bounds for atom/row
 metadata and temporary packing. Allocations remain charged after an interrupted
 packing operation, and resetting retained history releases its arena charges.
 Its batch scratch uses exact norm/prime-product bounds, with a high-water
-reservation established before each block. Work, memory and spill grants stay
-binding. Schema 14 checkpoints save FIFO order and independently validate staged
-arithmetic, caps and ownership on restore. Earlier variants/schemas remain
-available. A completed checkpoint divisor survives factor-base reconstruction.
+reservation established before each block. Workspace and work accounting stay diagnostic; root observed limits apply.
+Spill storage grows subject to root resources and actual I/O failures. Schema 14 checkpoints save FIFO order and independently validate staged
+arithmetic, retained FIFO/cache capacities and ownership on restore. Earlier
+numerical variants remain available with the current resource marker. A completed checkpoint divisor survives factor-base reconstruction.
 In-memory restore rebuilds packed factors and shared contexts. Existing cold
 file references are preserved; older checkpoints do not encode cold references
 for derived rows, so that restore path reserves resident row exponents instead.

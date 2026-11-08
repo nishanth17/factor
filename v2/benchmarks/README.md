@@ -4,6 +4,23 @@ Runners and required numerical inputs for PyPy implementing Python 3.11.
 [Results and historical decisions](RESULTS.md) hold measurements;
 [STATUS](../STATUS.md) owns current routing and next work.
 
+## H3 correctness and recorder boundary
+
+H3's fixed-work oracle is `infrastructure/h3_correctness.py`. Under the shared
+lock, run it on committed base `40d2367` and the candidate: three fixed QS inputs
+each at 50/65 digits plus two nonempty witnesses, nine fixed ECM cases and four
+manifest assignments compare exact JSON signatures and scanned positions. This
+is a correctness comparison; no durations establish a speedup. Source-bound
+receipts, including failures, remain local in `v2/audit/h3_resource_limits/`.
+
+`infrastructure/resource_control.py` keeps historical recorder work frontiers
+and source-pinned grant metadata at an explicit adapter boundary. Production
+constructors reject removed resource arguments. Frozen controls, source pins,
+experimental accounts and immutable baselines are retained; successful imports
+do not authorize replaying an old frozen campaign against changed code.
+Revalidate C3a allocation/handoff, B12 selection/startup, A7a packet/cache and
+B4a native engagement costs on the final combined source before new decisions.
+
 ## Before a measurement
 
 Follow [policy](../POLICY.md#experiment-design-and-prompt-review): establish a
