@@ -68,6 +68,7 @@ class QSWorkerConfig:
     stop_backend: str = "event"
     coefficient_cache: bool = False
     family_affinity: bool = False
+    grouped_lease_charging: bool = False
 
     def __post_init__(self):
         if type(self.observe) is not bool:
@@ -101,6 +102,10 @@ class QSWorkerConfig:
             and (self.mode != "process" or not self.reuse_state)
         ):
             raise ValueError("family affinity requires reused process state")
+        if type(self.grouped_lease_charging) is not bool or (
+            self.grouped_lease_charging and not self.lease_budget
+        ):
+            raise ValueError("grouped charging requires packet leases")
         if self.stop_backend not in ("event", "semaphore") or (
             self.stop_backend == "semaphore" and not self.private_stop
         ):
@@ -188,6 +193,8 @@ class QSWorkerConfig:
             values.pop("coefficient_cache")
         if not self.family_affinity:
             values.pop("family_affinity")
+        if not self.grouped_lease_charging:
+            values.pop("grouped_lease_charging")
         return values
 
     @property
@@ -341,6 +348,8 @@ class CurrentParallelSIQSJob:
         self._backlog_time = None
         if self.workers.lease_budget:
             self.stats["lease_reconciliations"] = 0
+        if self.workers.grouped_lease_charging:
+            self.stats["grouped_marking_pairs"] = 0
         if self.workers.reuse_state:
             self.stats.update(
                 state_install_work=0,
@@ -544,6 +553,10 @@ class CurrentParallelSIQSJob:
         ):
             raise ValueError("stale or malformed QS assignment report")
         work = checked_int(report["work"], "reported work", 0, task["work"])
+        if self.workers.grouped_lease_charging:
+            checked_int(
+                report.get("grouped_marking_pairs"), "marking groups", 0, work
+            )
         checked_int(
             report["split_calls"],
             "reported splitting",
@@ -697,6 +710,10 @@ class CurrentParallelSIQSJob:
             receipt["arrival_seq"] = checked["arrival_seq"]
         if self.workers.lease_budget:
             self.stats["lease_reconciliations"] += 1
+        if self.workers.grouped_lease_charging:
+            self.stats["grouped_marking_pairs"] += report[
+                "grouped_marking_pairs"
+            ]
         checked["received_at"] = time.monotonic()
         self.stats["received_packets"] += 1
         self.stats["received_atoms"] += len(checked["rows"])

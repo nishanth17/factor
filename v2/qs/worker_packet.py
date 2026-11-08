@@ -267,6 +267,9 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
 
         if collector is not None:
             collector._admit = admit
+            collector._group_lease = (
+                budget if settings.grouped_lease_charging else None
+            )
 
         recovery_bound = False
         while ordinal < task["end"]:
@@ -293,6 +296,9 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
                 # Use the actual current collector, including DLP/extended
                 # recovery. Only publication is replaced; no subclass bypass.
                 collector._admit = admit
+                collector._group_lease = (
+                    budget if settings.grouped_lease_charging else None
+                )
                 if runtime is not None:
                     runtime.collector = collector
                     runtime.recovery = getattr(
@@ -403,6 +409,8 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
         )
     if settings.packed_transport:
         report["encoding"] = "packed-v1"
+    if settings.grouped_lease_charging:
+        report["grouped_marking_pairs"] = budget.marking_pairs
     if settings.reuse_state:
         from .worker_state import context_key
 
@@ -428,6 +436,7 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
             # Rows are already encoded; do not keep the publication closure,
             # its old lease or its temporary row objects in the warm context.
             collector._admit = None
+            collector._group_lease = None
     return report
 
 

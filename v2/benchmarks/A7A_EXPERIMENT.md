@@ -248,6 +248,7 @@ Do not silently run the old 32-row all-binary design.
 | Option(s) | Class | Reason / initial screen |
 | --- | --- | --- |
 | Per-packet budget leases | (a) | Replace repeated shared budget calls with bounded exact reservations/reconciliation for the same work. |
+| Grouped exact lease charging (`grouped_lease_charging`) | (a) | Combine two already-polled affordable marking reservations; retain scalar paid prefixes at every boundary. |
 | Persistent worker state (`reuse_state`) | (a) | Avoid rebuilding identical immutable context between packets; charge retained memory. |
 | Coefficient reuse (`coefficient_cache`) | (a) | Avoid recalculating identical coefficients without changing assignment coverage. |
 | Family-affinity placement (`family_affinity`) | (b) | Pin original packets to reuse contiguous family state; compare a matched credit window separately from the incumbent window. |

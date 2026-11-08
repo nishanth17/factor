@@ -512,6 +512,7 @@ class SieveCollector:
             self._scores = [0] * width
 
         self._hits = [0] * width
+        self._group_lease = None
         self._resieved = {}
         self._scratch_bytes = 0
         self._scratch_peak_bytes = 0
@@ -1116,6 +1117,7 @@ class SieveCollector:
             and self.config.score_backend == "list"
         )
         words = self._word_hits if self._hits is self._word_hits else None
+        grouped_budget = self._group_lease
         if words is not None:
             words.begin(initial_hit, self.budget)
         # Both periodic implementations replace the full active slices,
@@ -1219,6 +1221,51 @@ class SieveCollector:
                             stats["power_hits"] += width
                             first_level = False
                             continue
+                        if (
+                            grouped_budget is not None
+                            and density
+                            and first_level
+                            and buckets
+                            and words is not None
+                            and len(lifted) == 2
+                            and index not in presieved
+                            and not power_period
+                        ):
+                            first_hits = range(
+                                (lifted[0] - lo) % modulus, width, modulus
+                            )
+                            second_hits = range(
+                                (lifted[1] - lo) % modulus, width, modulus
+                            )
+                            first_count = len(first_hits)
+                            second_count = len(second_hits)
+                            if grouped_budget._precharge_marking_pair(
+                                first_count + 1, second_count + 1
+                            ):
+                                # These are the same two logical actions,
+                                # already inside a checked polling interval.
+                                # Preserve their original marking order and
+                                # keep scalar refusal behavior on boundaries.
+                                stats["root_hits"] += (
+                                    first_count + second_count
+                                )
+                                stats["power_hits"] += (
+                                    first_count + second_count
+                                )
+                                words.add(
+                                    index,
+                                    first_hits,
+                                    self._scores,
+                                    power_weight,
+                                )
+                                words.add(
+                                    index,
+                                    second_hits,
+                                    self._scores,
+                                    power_weight,
+                                )
+                                first_level = False
+                                continue
                         for root in lifted:
                             if (first_level and index in presieved) or (
                                 power_period

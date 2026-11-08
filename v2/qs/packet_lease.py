@@ -59,6 +59,7 @@ class PacketLeaseBudget(PollingBudget):
         self.interval = 64
         self.poll = poll
         self._actions_left = 0
+        self.marking_pairs = 0
 
     # This private view has no shared-ledger forwarding on its hot path.
     __setattr__ = object.__setattr__
@@ -122,3 +123,18 @@ class PacketLeaseBudget(PollingBudget):
         """Retain every paid action even when publication is cancelled."""
         self.budget.used = self.used
         return self.used
+
+    def _precharge_marking_pair(self, first, second):
+        """Fund two certified hit ranges without crossing a poll boundary.
+
+        The internal caller supplies positive native range lengths plus one.
+        On a boundary return false without any mutation: the original scalar
+        path must retain its first affordable action and exact refusal prefix.
+        """
+        amount = first + second
+        if self._actions_left < 2 or amount > self.work_limit - self.used:
+            return False
+        self.used += amount
+        self._actions_left -= 2
+        self.marking_pairs += 1
+        return True

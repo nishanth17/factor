@@ -220,6 +220,15 @@ policy is part of execution identity and cannot change across resume. Disabled
 options are omitted from legacy settings/checkpoint identities. No default or
 performance adoption follows from this option.
 
+`grouped_lease_charging=True` additionally permits the two original
+first-level root-marking reservations to share one private ledger update.
+It requires `lease_budget=True` and is off by default. Both actions must fit
+the already checked polling interval and remaining work; boundaries use the
+original scalar path, retaining its paid prefix and refusal behavior.
+`grouped_marking_pairs` reports actual use. Scores, hit masks, logical work
+charges and the 64-action cancellation bound remain unchanged. This is an
+experimental option without a demonstrated performance gain.
+
 The opt-in `packed_queue` marking component stores each sparse hit in one
 64-bit word instead of three 32-bit words. For example, select
 `marking="presieve+unroll4+parity_two+packed_queue"` with a funded sparse

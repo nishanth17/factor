@@ -72,6 +72,7 @@ def settings(
         "stop_backend",
         "coefficient_cache",
         "family_affinity",
+        "grouped_lease_charging",
         "worker_memory_bytes",
         "packet_bytes",
         "assignment_cpu",
