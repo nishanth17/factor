@@ -7,7 +7,6 @@ from collections import defaultdict
 from dataclasses import asdict, replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     CountedSIQSConfig,
@@ -20,6 +19,7 @@ from v2.qs.collector_kernels import combine, workspace
 from v2.qs.count_policy import endpoint_for_count
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
 from v2.qs.polynomial import polynomial_roots
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_a1a_density import config, worker
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
@@ -183,7 +183,7 @@ class SelectedKernelTests(unittest.TestCase):
         reserve = workspace(SELECTED, 64, len(base.entries))
         scalar = worker(poly, base, "sparse", block_width=64)
         self.assertEqual(fresh._workspace - scalar._workspace, reserve)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             worker(
                 poly,
                 base,
@@ -272,7 +272,6 @@ class CountedIntegrationTests(unittest.TestCase):
             base_count=30,
             base_bound=500,
             factor_count=3,
-            memory_bytes=64 * 2**20,
             batch_width=1,
             collector=config(marking=SELECTED, power_plan_bytes=2**20),
         )
@@ -325,12 +324,7 @@ class CountedIntegrationTests(unittest.TestCase):
             ]
             for count in (1, 3, len(eligible)):
                 bound, divisor = endpoint_for_count(
-                    n,
-                    multiplier,
-                    count,
-                    unlimited_budget(),
-                    ceiling=100,
-                    memory_bytes=2**20,
+                    n, multiplier, count, unlimited_budget(), ceiling=100
                 )
                 self.assertEqual(
                     (bound, divisor), (eligible[count - 1] + 1, None)
@@ -341,7 +335,7 @@ class CountedIntegrationTests(unittest.TestCase):
         )
         job = SIQSJob(n, config=cfg, budget=Budget(work_limit=0))
         result = job.run()
-        self.assertEqual(result.reason, "work_limit")
+        self.assertEqual(result.reason, "cancelled")
         checkpoint = json.loads(json.dumps(job.checkpoint()))
         resumed = SIQSJob.from_checkpoint(
             checkpoint, budget=unlimited_budget()
@@ -354,7 +348,10 @@ class CountedIntegrationTests(unittest.TestCase):
         for digits in (40, *range(50, 61)):
             for memory in (None, 128 * 2**20, 2**30):
                 cfg = default_siqs_config(
-                    10 ** (digits - 1), memory_bytes=memory
+                    10 ** (digits - 1),
+                    recipe="calibrated"
+                    if memory in (None, 2**30)
+                    else "reference",
                 )
                 selected = 50 <= digits <= 55 and memory in (None, 2**30)
                 self.assertEqual(

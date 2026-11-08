@@ -10,9 +10,10 @@ from math import gcd
 from v2 import portfolio
 from v2.benchmarks.pm1.a6.a6_production import load_control
 from v2.execution import stage_jobs
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import SieveContext
 from v2.pm1.gaps import verify_powers
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=1000000):

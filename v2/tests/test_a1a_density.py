@@ -6,11 +6,12 @@ from collections import defaultdict
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SIQSConfig, SIQSJob, build_factor_base
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
 
@@ -253,7 +254,7 @@ class DensityKernelTests(unittest.TestCase):
             polynomial_roots(next_poly, base, e) for e in base.entries
         )
         original_config = first.config
-        first.config = replace(first.config, memory_bytes=first._workspace)
+        first.config = replace(first.config)
         with self.assertRaises(MemoryError):
             first.set_polynomial(next_poly, roots)
         self.assertEqual(
@@ -290,7 +291,6 @@ class DensityKernelTests(unittest.TestCase):
             base_bound=1000,
             half_width=512,
             batch_width=1,
-            memory_bytes=64 * 2**20,
             collector=config(marking="density", power_plan_bytes=2**20),
         )
         job = SIQSJob(

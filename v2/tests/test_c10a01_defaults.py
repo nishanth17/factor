@@ -7,10 +7,10 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.collector_kernels import components
 from v2.qs.defaults import default_siqs_budget
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 
@@ -64,7 +64,12 @@ class CoupledDefaultTests(unittest.TestCase):
             config.collector.marking, "density+presieve+scan_fused+parity_two"
         )
         self.assertEqual(config.collector.sparse_queue_bytes, 32 * 2**20)
-        limited = default_siqs_config(10**49 + 123, memory_bytes=128 * 2**20)
+        limited = default_siqs_config(
+            10**49 + 123,
+            recipe="calibrated"
+            if 128 * 2**20 in (None, 2**30)
+            else "reference",
+        )
         self.assertEqual(limited.memory_bytes, 128 * 2**20)
         self.assertEqual(limited.collector.power_plan_bytes, 0)
         explicit = SIQSConfig()

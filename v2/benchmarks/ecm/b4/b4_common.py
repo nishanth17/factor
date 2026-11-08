@@ -108,7 +108,6 @@ def config(engine, protocol, case, backend):
         pm1_attempts=0,
         ecm_tiers=(tuple(protocol["cases"][case]),),
         backend=backend,
-        memory_bytes=protocol["memory_bytes"],
         max_input_bits=protocol["max_input_bits"],
         trace_limit=256,
     )

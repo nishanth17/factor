@@ -54,10 +54,7 @@ def resume(config, fixture, output):
     # Checkpoint verification reserves eight simultaneous encoded copies.
     # This is a correctness diagnostic, separately bounded from timing arms.
     config = replace(
-        config,
-        memory_bytes=1024 * 2**20,
-        checkpoint_bytes=16 * 2**20,
-        collector=replace(config.collector, memory_bytes=1024 * 2**20),
+        config, collector=replace(config.collector, memory_bytes=1024 * 2**20)
     )
     start, cpu = time.monotonic(), time.process_time()
     last_poll = time.monotonic()

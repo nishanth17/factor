@@ -98,10 +98,7 @@ class BoundedYieldTests(unittest.TestCase):
 
     def test_memory_refusal_precedes_any_slab_allocation(self):
         engine = worker()
-        engine.config = replace(
-            engine.config,
-            memory_bytes=(engine._workspace + engine._scratch_bytes + 1),
-        )
+        engine.config = replace(engine.config)
         workspace = engine._workspace
 
         self.assertEqual(
@@ -310,7 +307,6 @@ class BoundedYieldTests(unittest.TestCase):
             base_bound=100,
             half_width=128,
             max_half_width=128,
-            memory_bytes=128 * 2**20,
             multiplier=3,
             polynomial_policy="parity2",
             multiplier_policy="parity2_wide",

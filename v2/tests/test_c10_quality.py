@@ -6,7 +6,7 @@ from dataclasses import replace
 from math import prod
 
 from v2.common import arithmetic
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     GrowingDoubleLargeSieveConfig,
     SieveConfig,
@@ -19,6 +19,7 @@ from v2.qs.assignment_stream import (
     AssignmentStream,
     quality_workspace,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class QualityAssignmentTests(unittest.TestCase):
@@ -112,7 +113,7 @@ class QualityAssignmentTests(unittest.TestCase):
             quality.metadata_reserve - config.metadata_reserve,
             quality_workspace(config.factor_count),
         )
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             self.stream(memory_bytes=self.base.workspace_bytes + 65536)
 
         first, restored = self.stream(), self.stream()
@@ -201,7 +202,6 @@ class QualityAssignmentTests(unittest.TestCase):
             family_count=20,
             assignment_policy="quality",
             max_stalled=100,
-            memory_bytes=64 * 2**20,
             collector=SieveConfig(block_width=32, residual_bound=10000),
         )
         job = SIQSJob(self.n, config=config, budget=Budget(work_limit=10**9))

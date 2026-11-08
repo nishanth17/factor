@@ -311,12 +311,7 @@ def compact_report(
             assert check_cycle(pairs, mask)
             rows.append(xor_selected(parity, mask))
         rows = tuple(rows)
-        filtered = filter_matrix(
-            rows,
-            weight_two=True,
-            budget=budget,
-            memory_bytes=memory_bytes - graph["reserve"],
-        )
+        filtered = filter_matrix(rows, weight_two=True, budget=budget)
         # Verify every filter discovery and each lifted solver dependency.
         dependencies = list(filtered.zero_dependencies)
         for mask in kernel(filtered.rows, budget):

@@ -41,7 +41,6 @@ def main():
         pool_size=16,
         batch_width=256,
         max_batch_atoms=256,
-        assignment_work=50_000_000,
     )
     results = {}
 

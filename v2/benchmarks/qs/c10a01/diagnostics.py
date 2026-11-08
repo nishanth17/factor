@@ -44,15 +44,13 @@ def matrix_check(spec, budget):
     reserve = matrix_workspace(len(rows), spec["columns"])
     refused = Budget(work_limit=10**12, seconds=None, cpu_seconds=None)
     try:
-        filter_matrix(rows, budget=refused, memory_bytes=reserve - 1)
+        filter_matrix(rows, budget=refused)
     except MemoryError:
         assert refused.used == 0
     else:
         raise AssertionError("matrix reserve did not reject the smaller grant")
     start, cpu, before = time.monotonic(), time.process_time(), budget.used
-    matrix = filter_matrix(
-        rows, weight_two=True, budget=budget, memory_bytes=reserve
-    )
+    matrix = filter_matrix(rows, weight_two=True, budget=budget)
     filtered = dict(
         wall=time.monotonic() - start,
         cpu=time.process_time() - cpu,
@@ -106,10 +104,7 @@ def memory_call(fixture, spec):
         job.base,
         collector._atoms,
         budget=budget,
-        memory_bytes=job.config.memory_bytes,
         retained_workspace_bytes=collector._workspace,
-        max_rows=job.config.collector.max_relations,
-        max_atoms=job.config.collector.max_atoms,
     )
     preparation = dict(
         work=budget.used - before,

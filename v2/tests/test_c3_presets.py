@@ -4,10 +4,10 @@ import unittest
 from dataclasses import replace
 
 from v2.execution.allocation import ECMAllocation
-from v2.execution.budget import Budget
 from v2.execution.ecm_presets import ECM_PRESETS, with_ecm_preset
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def base_config(**changes):
@@ -17,7 +17,6 @@ def base_config(**changes):
         pm1_attempts=0,
         max_input_bits=128,
         segment_size=16,
-        memory_bytes=64 * 2**20,
         siqs=SIQSConfig(
             base_bound=100, half_width=64, memory_bytes=32 * 2**20
         ),
@@ -84,12 +83,7 @@ class PresetTests(unittest.TestCase):
 
     def test_unfunded_larger_workspace_cannot_shrink_siqs_storage(self):
         base = base_config()
-        tight = replace(
-            base,
-            memory_bytes=base.siqs.memory_bytes
-            + base.workspace_reserve
-            + 8192,
-        )
+        tight = replace(base)
         with self.assertRaisesRegex(MemoryError, "coexistence"):
             with_ecm_preset(tight, "single214")
         self.assertEqual(tight.siqs.memory_bytes, 32 * 2**20)

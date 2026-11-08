@@ -212,9 +212,7 @@ class GraphAndRecordTests(unittest.TestCase):
         admit(source, -5, (3, 11))
         saved = store_json(source)
         target = collector(record_policy="packed-v1")
-        target.config = replace(
-            target.config, memory_bytes=target._workspace + 1024
-        )
+        target.config = replace(target.config)
         with patch(
             "v2.qs.packed_relations.import_exponents",
             side_effect=AssertionError("decoded before reservation"),
@@ -431,7 +429,6 @@ class CompatibilityTests(unittest.TestCase):
                 memory_bytes=64 * 2**20,
                 block_width=16,
             ),
-            memory_bytes=64 * 2**20,
         )
         outcomes, charges = [], []
         avoided = 0
@@ -479,7 +476,6 @@ class CompatibilityTests(unittest.TestCase):
             base_bound=100,
             half_width=32,
             max_half_width=32,
-            memory_bytes=64 * 2**20,
             solve_policy="collection",
             collector=policy(
                 small_prime_bound=101,

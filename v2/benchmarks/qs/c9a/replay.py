@@ -171,7 +171,6 @@ def replay(
         bound=cell["resolved"]["bound"],
         multiplier=cell["resolved"]["multiplier"],
         budget=budget,
-        memory_bytes=source.memory_limit,
     )
     if built.divisor is not None or built.factor_base is None:
         raise ValueError("replay source lacks its original factor base")
@@ -200,9 +199,7 @@ def replay(
                     base,
                     data["lo"],
                     data["hi"],
-                    config=replace(
-                        collector, memory_bytes=data["memory_bytes"]
-                    ),
+                    config=replace(collector),
                     budget=budget,
                     weight_two=source.weight_two,
                     row_excess=source.row_excess,

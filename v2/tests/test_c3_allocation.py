@@ -17,9 +17,10 @@ from v2.execution.allocation import (
     PretestBudget,
     fallback_refusal,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def configuration(**changes):
@@ -30,7 +31,6 @@ def configuration(**changes):
         ecm_tiers=((50, 1000, 3),),
         max_input_bits=128,
         segment_size=16,
-        memory_bytes=64 * 2**20,
         siqs=SIQSConfig(
             base_bound=100, half_width=64, memory_bytes=32 * 2**20
         ),
@@ -112,7 +112,7 @@ class AllocationBudgetTests(unittest.TestCase):
             ECMAllocation("campaign", pretest_work=1)
         with self.assertRaises(ValueError):
             configuration(siqs=None)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             configuration(memory_bytes=32 * 2**20)
 
 
@@ -480,9 +480,7 @@ class AllocationPortfolioTests(unittest.TestCase):
         for mode in ("sss", "sssf"):
             config = configuration(
                 siqs=None,
-                sss=SSSConfig(
-                    mode=mode, base_bound=100, memory_bytes=32 * 2**20
-                ),
+                sss=SSSConfig(mode=mode, base_bound=100),
                 allocation=ECMAllocation(
                     "pretest", pretest_work=0, fallback_work=10_000
                 ),

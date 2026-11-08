@@ -119,12 +119,7 @@ class PollingAndCacheTests(unittest.TestCase):
 
 class PacketAndStageTests(unittest.TestCase):
     def test_packets_reserve_each_job_and_shrink_to_funding_and_frames(self):
-        settings = WorkerSettings(
-            packet_curves=4,
-            assignment_work=10,
-            assignment_cpu=2,
-            frame_bytes=2048,
-        )
+        settings = WorkerSettings(packet_curves=4)
         config = configuration()
         plan = Manifest(
             1000003, 7, "root", arithmetic_options(config, settings)
@@ -485,7 +480,7 @@ class RetainedPoolTests(unittest.TestCase):
 
 class ParentHeadroomTests(unittest.TestCase):
     def test_live_leases_leave_parent_cpu_to_process_results(self):
-        settings = WorkerSettings(workers=4, memory_bytes=2**31)
+        settings = WorkerSettings(workers=4)
         owner = ECMExecutor(settings=settings)
         plan = Manifest(
             35,

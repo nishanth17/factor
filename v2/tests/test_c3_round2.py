@@ -132,7 +132,7 @@ class RoundTwoControlsTests(unittest.TestCase):
 
         from v2.benchmarks.ecm.c3 import c3_study
         from v2.execution.allocation import ECMAllocation, PretestBudget
-        from v2.execution.budget import Budget
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         path = c3_study.INPUTS / "baselines/c3_round2_before_optimization.json"
         snapshot = json.loads(path.read_text())

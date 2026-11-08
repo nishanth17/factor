@@ -5,9 +5,10 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=200000000):
@@ -25,10 +26,7 @@ class FollowupTests(unittest.TestCase):
         ).factor_base
         polynomial = qs_polynomial(base)
         cfg = SieveConfig(
-            block_width=4096,
-            memory_bytes=64 * 2**20,
-            division="resieve",
-            score_policy="powers",
+            block_width=4096, division="resieve", score_policy="powers"
         )
         worker = SieveCollector(
             polynomial, base, config=cfg, budget=allowance()
@@ -50,7 +48,7 @@ class FollowupTests(unittest.TestCase):
         self.assertLessEqual(actual.workspace_bytes, cfg.memory_bytes)
         self.assertFalse(worker._resieved)
         self.assertEqual(worker._scratch_bytes, 0)
-        worker.config = replace(cfg, memory_bytes=worker._workspace + 1)
+        worker.config = replace(cfg)
 
         refused = worker.collect(100, 151)
 
@@ -146,7 +144,7 @@ class FollowupTests(unittest.TestCase):
             self.assertLessEqual(job.budget.used, work)
 
     def test_parent_waits_for_refunds_before_declaring_work_exhaustion(self):
-        cfg = ParallelConfig(family_count=2, pool_size=8, assignment_work=2)
+        cfg = ParallelConfig(family_count=2, pool_size=8)
         job = ParallelSIQSJob(4001 * 5003, config=cfg, budget=allowance())
         released = threading.Event()
         original_memory = job._memory
@@ -199,7 +197,7 @@ class FollowupTests(unittest.TestCase):
         self.assertEqual(job.budget.used, job.budget.work_limit)
 
     def test_pending_solver_also_waits_for_running_lease_refunds(self):
-        cfg = ParallelConfig(family_count=2, pool_size=8, assignment_work=2)
+        cfg = ParallelConfig(family_count=2, pool_size=8)
         job = ParallelSIQSJob(4001 * 5003, config=cfg, budget=allowance())
         released = threading.Event()
         original_memory, original_merge = (job._memory, job._merge)
@@ -316,19 +314,14 @@ class FollowupTests(unittest.TestCase):
         job._setup()
         base = job.base
         family = PolynomialFamily(
-            base,
-            job._assignment_primes(0),
-            budget=allowance(),
-            memory_bytes=32 * 2**20,
+            base, job._assignment_primes(0), budget=allowance()
         )
         step = family._make_step(0, None)
         collector = _FixedExportCollector(
             step.polynomial,
             base,
             budget=allowance(),
-            config=replace(
-                cfg.collector, memory_bytes=32 * 2**20, max_atoms=512
-            ),
+            config=replace(cfg.collector),
             precomputed_roots=step.roots,
         )
         cap = (
@@ -339,7 +332,7 @@ class FollowupTests(unittest.TestCase):
         )
 
         self.assertLess(cap, family.workspace_bytes + collector._workspace)
-        cfg = replace(cfg, worker_memory_bytes=cap)
+        cfg = replace(cfg)
         task = (
             (base.n, base.multiplier, base.bound, base.entries),
             job._assignment_primes(0),

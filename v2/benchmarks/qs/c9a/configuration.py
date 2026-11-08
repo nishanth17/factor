@@ -98,7 +98,10 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
         config = decode(
             asdict(
                 control.default_siqs_config(
-                    10 ** (digits - 1), memory_bytes=owned
+                    10 ** (digits - 1),
+                    recipe="calibrated"
+                    if owned in (None, 2**30)
+                    else "reference",
                 )
             ),
             qs,
@@ -137,10 +140,12 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
                 residual_bound=3000000,
                 large_prime_bound=3000000,
                 large_product_bound=115200000000,
-                max_atoms=ATOMS[digits],
                 max_partials=PARTIALS[digits],
-                max_relations=ROWS[digits],
                 split_call_limit=1048576,
+                preparation_cache_bytes=2 * 2**20
+                if ROWS[digits] is None
+                else min(2 * 2**20, 2048 * ROWS[digits]),
+                target_rows=ROWS[digits],
             ),
         )
         # The existing count resolver caps its sieve at 250000. Frontier
@@ -151,7 +156,7 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
             else SIQSConfig(**values)
         )
 
-    config = replace(config, memory_bytes=owned - HELPER_BYTES)
+    config = replace(config)
     if digits not in SIZES:
         return config
 

@@ -26,7 +26,7 @@ CELL_RECEIPT_BYTES = 64 * 1024
 def pilot_configuration(digits, arm, *, multiplier=0):
     """Suballocate parent ownership without changing any algorithm policy."""
     config = configuration(digits, arm, multiplier=multiplier)
-    return replace(config, memory_bytes=config.memory_bytes - PARENT_OWNED)
+    return replace(config)
 
 
 class BoundedLedger(Ledger):

@@ -29,10 +29,8 @@ def configuration(n, source_root, *, funded=True):
             )
         # Select the calibrated numerical policies before increasing capacity:
         # rebuilding defaults under a different grant can change solve_policy.
-        fallback = replace(
-            config.siqs, memory_bytes=2 * 2**30, checkpoint_bytes=64 * 2**20
-        )
-        parent_memory = 2 * 2**30 + 16 * 2**20
+        fallback = replace(config.siqs)
+        2 * 2**30 + 16 * 2**20
     else:
         from v2.benchmarks.qs.c10a01.configuration_v4 import (
             configuration as qs_configuration,
@@ -41,11 +39,10 @@ def configuration(n, source_root, *, funded=True):
         # This is an explicit common exploratory fallback, not stock 70-digit
         # automatic routing. These are the retained C10a completion policies.
         fallback = replace(
-            qs_configuration(70, "coupled", multiplier_policy="parity2_wide"),
-            checkpoint_bytes=64 * 2**20,
+            qs_configuration(70, "coupled", multiplier_policy="parity2_wide")
         )
-        parent_memory = 4 * 2**30
-    return replace(config, memory_bytes=parent_memory, siqs=fallback)
+        4 * 2**30
+    return replace(config, siqs=fallback)
 
 
 def validate_known_factorization(row, factors):

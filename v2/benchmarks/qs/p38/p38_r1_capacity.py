@@ -79,8 +79,6 @@ def configuration(digits, preset, policy):
         max_trivial=100000,
         row_excess=32,
         batch_width=4096,
-        memory_bytes=384 * 2**20,
-        checkpoint_bytes=16 * 2**20,
         collector=SieveConfig(
             block_width=4096,
             score_policy="powers",
@@ -146,7 +144,6 @@ def run_one(fixture, seed, config, arm, seconds):
         if arm in ("ecm", "ecm_siqs")
         else (),
         siqs=None if arm == "ecm" else config,
-        memory_bytes=MEMORY,
     )
     allowance = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
     start, cpu = time.perf_counter(), time.process_time()

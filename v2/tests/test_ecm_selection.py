@@ -13,7 +13,7 @@ from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_selection import (
     COMPATIBILITY,
     HEADER_BYTES,
@@ -32,6 +32,7 @@ from v2.execution.worker_contract import (
     WorkerSettings,
     digest,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class SelectionRuleTests(unittest.TestCase):
@@ -131,9 +132,7 @@ class LazySelectionTests(unittest.TestCase):
         self.config = PortfolioConfig(
             ecm_tiers=((50, 500, 4),), siqs=None, sss=None
         )
-        self.settings = WorkerSettings(
-            workers=2, parent_memory=1040 * 2**20, memory_bytes=8 * 2**30
-        )
+        self.settings = WorkerSettings(workers=2)
         options = digest(arithmetic_options(self.config, self.settings))
         costs = asdict(SelectionCosts(7, options, (1.0,), 2, 1, None))
         candidate = dict(settings=asdict(self.settings), costs=costs)
@@ -143,7 +142,7 @@ class LazySelectionTests(unittest.TestCase):
             executor_version=VERSION,
             search_version=SEARCH_VERSION,
             compatibility=COMPATIBILITY,
-            serial_settings=asdict(WorkerSettings(memory_bytes=8 * 2**30)),
+            serial_settings=asdict(WorkerSettings()),
             rows=[
                 dict(
                     digits=7,
@@ -316,12 +315,7 @@ class ArithmeticSelectionTests(unittest.TestCase):
         config = PortfolioConfig(
             ecm_tiers=((50, 500, 8),), siqs=None, sss=None
         )
-        settings = WorkerSettings(
-            workers=2,
-            assignment_cpu=60,
-            memory_bytes=8 * 2**30,
-            parent_memory=1040 * 2**20,
-        )
+        settings = WorkerSettings(workers=2)
         costs = dict(
             seconds_per_curve=(1,),
             cold_seconds=0.001,
@@ -329,7 +323,7 @@ class ArithmeticSelectionTests(unittest.TestCase):
             pool_seconds=None,
         )
         reviewed = dict(
-            serial_settings=asdict(WorkerSettings(memory_bytes=8 * 2**30)),
+            serial_settings=asdict(WorkerSettings()),
             rows=[
                 dict(
                     digits=len(str(n)),

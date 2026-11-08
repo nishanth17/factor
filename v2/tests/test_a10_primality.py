@@ -19,8 +19,8 @@ from v2.benchmarks.primality.a10.a10_primality import (
     load_v1_adapter,
 )
 from v2.common import arithmetic, utils
-from v2.execution.budget import Budget
 from v2.factor import factorize
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_phase_two import reseal
 
 

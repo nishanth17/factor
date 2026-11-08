@@ -266,15 +266,11 @@ def make_config(case, band, modules):
         filtered = mode == "sssf" and "unfiltered" not in case
         return modules["sss"].SSSConfig(
             mode=mode,
-            memory_bytes=(
-                128 if "feasible" in case or "memory128" in case else 64
-            )
-            * 2**20,
-            base_bound=(
-                {"40d": 8000, "60d": 82000, "80d": 82000}[band]
-                if "capacity" in case
-                else (400 if band == "small" else 5000)
-            ),
+            base_bound={"40d": 8000, "60d": 82000, "80d": 82000}[band]
+            if "capacity" in case
+            else 400
+            if band == "small"
+            else 5000,
             search_rounds=128 if band == "small" else 4096,
             selection_size=7 if mode == "sssf" and "six" not in case else 6,
             filter_divisor=2 if mode == "sssf" else 10,
@@ -285,7 +281,7 @@ def make_config(case, band, modules):
                 options,
                 score_policy="adaptive",
                 division="roots",
-                residual_bound=25_000_000 if "residual" in case else 10000,
+                residual_bound=25000000 if "residual" in case else 10000,
             ),
         )
 
@@ -330,8 +326,6 @@ def make_config(case, band, modules):
                 max_trivial=4096,
                 row_excess=32,
                 batch_width=4096,
-                memory_bytes=128 * 2**20,
-                checkpoint_bytes=2**20,
                 collector=replace(
                     options,
                     block_width=4096,
@@ -349,7 +343,6 @@ def make_config(case, band, modules):
             pool_size=64,
             max_stalled=64,
             max_trivial=4096,
-            memory_bytes=64 * 2**20,
             collector=options,
         )
 
@@ -416,7 +409,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
         elif case == "matrix":
             rows = (1 << 99999,) * 32
             matrix = modules["linear_algebra"].filter_matrix(
-                rows, weight_two=True, budget=budget, memory_bytes=64 * 2**20
+                rows, weight_two=True, budget=budget
             )
 
             masks = (
@@ -433,7 +426,7 @@ def run_one(case, fixture, seed, config, modules, pool=None):
             )
         elif case.startswith("collector") or case == "collision":
             base = modules["factor_base"].build_factor_base(
-                n, bound=1000, budget=budget, memory_bytes=64 * 2**20
+                n, bound=1000, budget=budget
             )
             divisor = base.divisor
             reason = "factor_found" if divisor else "complete"
@@ -502,7 +495,6 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                     factor_count=config.factor_count,
                     family_count=config.family_count,
                     pool_size=config.pool_size,
-                    memory_bytes=config.parent_memory_bytes,
                     max_stalled=64,
                     max_trivial=4096,
                     collector=config.collector,

@@ -9,7 +9,6 @@ from math import prod
 from unittest.mock import patch
 
 from v2.common import utils
-from v2.execution.budget import Budget
 from v2.qs import (
     build_factor_base,
     qs_polynomial,
@@ -18,6 +17,7 @@ from v2.qs import (
 )
 from v2.qs.smooth_batch import SmoothBatch, product_tree
 from v2.qs.sss import SSSCollector, SSSConfig, SSSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance():
@@ -255,10 +255,7 @@ class SSSJobTests(unittest.TestCase):
     def test_store_caps_final_solve_and_filter_loss(self):
         config = SSSConfig(
             base_bound=400,
-            collector=replace(
-                SSSConfig().collector,
-                max_relations=0,
-            ),
+            collector=replace(SSSConfig().collector),
         )
         job = SSSJob(4001 * 4003, config=config, budget=allowance())
 
@@ -300,10 +297,10 @@ class SSSJobTests(unittest.TestCase):
             "work_limit",
         )
         self.assertEqual(
-            SSSJob(10403, config=SSSConfig(memory_bytes=1)).run().reason,
+            SSSJob(10403, config=SSSConfig()).run().reason,
             "memory_limit",
         )
-        refused = SSSJob(1009 * 1013, config=SSSConfig(memory_bytes=100000))
+        refused = SSSJob(1009 * 1013, config=SSSConfig())
 
         result = refused.run()
 

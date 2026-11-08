@@ -76,12 +76,11 @@ class CostRegressionTests(unittest.TestCase):
             "density+presieve+scan_fused+parity_two",
         ):
             incumbent = qs.SIQSConfig(
-                memory_bytes=2**30,
                 collector=qs.GrowingDoubleLargeSieveConfig(
                     marking=marking,
                     large_prime_bound=3000000,
                     large_product_bound=115200000000,
-                ),
+                )
             )
             plain = extended.configuration(
                 60,

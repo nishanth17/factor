@@ -73,9 +73,7 @@ def full_steps(base, primes, budget):
 
 def cached_steps(base, primes, budget):
     """Consume the entire bounded stream of exact Gray/cache steps."""
-    family = PolynomialFamily(
-        base, primes, budget=budget, memory_bytes=MEMORY_BYTES
-    )
+    family = PolynomialFamily(base, primes, budget=budget)
     while (step := family.next()) is not None:
         yield step.polynomial, step.roots
 
@@ -87,12 +85,7 @@ def root_utility(cached):
         4001 * 5003, bound=2000, budget=budget
     ).factor_base
     primes = family_assignments(
-        base,
-        256,
-        factor_count=4,
-        family_count=1,
-        budget=budget,
-        memory_bytes=MEMORY_BYTES,
+        base, 256, factor_count=4, family_count=1, budget=budget
     )[0]
     steps = cached_steps if cached else full_steps
     return [
@@ -121,13 +114,7 @@ def attempt_cohort(cached):
         n = fixture["n"]
         base = build_factor_base(n, bound=200, budget=budget).factor_base
         assignments = family_assignments(
-            base,
-            256,
-            factor_count=3,
-            family_count=8,
-            seed=2934,
-            budget=budget,
-            memory_bytes=MEMORY_BYTES,
+            base, 256, factor_count=3, family_count=8, seed=2934, budget=budget
         )
         found = None
 
@@ -138,14 +125,15 @@ def attempt_cohort(cached):
                 collector = partial(SieveCollector, precomputed_roots=roots)
                 # Both arms supply independently validated roots to the same
                 # collector, avoiding an output-contract or validation bias.
-                family_reserve = 32768 + 640 * len(base.entries) + 8192
+                32768 + 640 * len(base.entries) + 8192
                 config = SieveConfig(
                     division="bucket",
                     residual_bound=1,
-                    max_atoms=4096,
-                    max_relations=4096,
                     max_partials=4096,
-                    memory_bytes=MEMORY_BYTES - family_reserve,
+                    preparation_cache_bytes=2 * 2**20
+                    if 4096 == None
+                    else min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 )
                 job = QSJob(
                     polynomial,

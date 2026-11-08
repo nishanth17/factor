@@ -52,7 +52,7 @@ class PairedExecutionTests(unittest.TestCase):
             replace(settings(), ecm_pair_distance=True)
         with self.assertRaises(ValueError):
             replace(settings(), ecm_program_bytes=0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             replace(settings(), memory_bytes=65536)
         self.assertIsNone(portfolio.PortfolioConfig().ecm_pair_distance)
 

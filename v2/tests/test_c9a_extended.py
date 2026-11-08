@@ -417,7 +417,6 @@ class ExpandedResourceTests(unittest.TestCase):
                 base_bound=40,
                 half_width=512,
                 max_half_width=512,
-                memory_bytes=128 * 2**20,
                 solve_policy="collection",
                 row_excess=0,
                 filter_row_growth=1,
@@ -560,11 +559,7 @@ class ExpandedResourceTests(unittest.TestCase):
             rows += suffix
             previous = dict(cache.cores)
             matrix = filter_matrix(
-                rows,
-                weight_two=True,
-                budget=allowance(),
-                _incremental=cache,
-                memory_bytes=16 * 2**20,
+                rows, weight_two=True, budget=allowance(), _incremental=cache
             )
             self.assertTrue(matrix.stats["incremental_core"])
             dependencies = DependencySolver(matrix, budget=allowance()).run()
@@ -623,7 +618,6 @@ class ExpandedResourceTests(unittest.TestCase):
             base_bound=100,
             half_width=256,
             max_half_width=256,
-            memory_bytes=128 * 2**20,
             solve_policy="collection",
             collector=policy(),
         )
@@ -695,7 +689,6 @@ class ExpandedResourceTests(unittest.TestCase):
                     family_count=2,
                     pool_size=8,
                     polynomials_per_family=4,
-                    memory_bytes=128 * 2**20,
                     polynomial_policy="parity2",
                     multiplier_policy="parity2_wide",
                     assignment_policy="windowed_pair",

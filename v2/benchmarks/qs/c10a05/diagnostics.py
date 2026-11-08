@@ -41,7 +41,7 @@ def profile(fixture, config, arm, path):
 
 def checkpoint(fixture, config):
     # This separate diagnostic shares a larger encoding allowance across arms.
-    config = replace(config, checkpoint_bytes=16 * 2**20)
+    config = replace(config)
     budget = Budget(work_limit=10**13, seconds=60, cpu_seconds=60)
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     records = []

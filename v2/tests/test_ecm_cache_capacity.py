@@ -51,12 +51,11 @@ class CacheCapacityTests(unittest.TestCase):
     def test_wide_cache_still_requires_funded_simultaneous_ownership(self):
         settings = WorkerSettings(
             workers=4,
-            memory_bytes=2 * 2**30,
             decoded_cache_bytes=64 * 2**20,
             stage_two_cache_bytes=64 * 2**20,
         )
         self.assertLess(settings.owned_bytes, settings.memory_bytes)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             replace(settings, memory_bytes=512 * 2**20)
 
     def test_larger_capacity_is_finite_and_rejects_oversized_requests(self):

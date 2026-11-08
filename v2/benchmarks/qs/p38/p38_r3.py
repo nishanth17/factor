@@ -323,9 +323,7 @@ def matrix_run(module, rows, variant, expected_rank, prepared=None):
             use_history=variant.startswith("history"),
         )
     else:
-        matrix = module.filter_matrix(
-            rows, weight_two=True, budget=budget, memory_bytes=remaining
-        )
+        matrix = module.filter_matrix(rows, weight_two=True, budget=budget)
         if variant == "live":
             matrix = live_compaction(matrix, budget, remaining)
 
@@ -372,8 +370,6 @@ def config(module, band):
             max_trivial=4096,
             row_excess=32,
             batch_width=4096,
-            memory_bytes=MEMORY,
-            checkpoint_bytes=2**20,
             collector=module.SieveConfig(
                 block_width=4096,
                 score_policy="powers",
@@ -400,7 +396,6 @@ def config(module, band):
         pool_size=32,
         max_stalled=4096,
         max_trivial=4096,
-        memory_bytes=MEMORY,
         collector=module.SieveConfig(
             score_policy="powers",
             division="bucket",
@@ -487,10 +482,11 @@ def prepare_fixture(mods, fixture):
         budget=budget,
         config=mods["qs.sieve_collector"].SieveConfig(
             residual_bound=1000,
-            max_atoms=8192,
-            max_relations=4096,
             max_partials=2048,
-            memory_bytes=MEMORY,
+            preparation_cache_bytes=2 * 2**20
+            if 4096 == None
+            else min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         ),
     )
 
@@ -519,18 +515,13 @@ def prepare_run(mods, fixture_data, cached):
             base,
             atoms,
             budget=budget,
-            memory_bytes=MEMORY - cache_reserve,
             verification_cache=cache,
         )
         costs.append(
             dict(count=count, work=budget.used, workspace=last.workspace_bytes)
         )
 
-    matrix = mods["qs.linear_algebra"].filter_matrix(
-        last.rows,
-        budget=budget,
-        memory_bytes=MEMORY - last.workspace_bytes - cache_reserve,
-    )
+    matrix = mods["qs.linear_algebra"].filter_matrix(last.rows, budget=budget)
 
     dependencies = (
         mods["qs.linear_algebra"].DependencySolver(matrix, budget=budget).run()
@@ -717,7 +708,6 @@ def main():
                         base,
                         atoms,
                         budget=allowance(current["budget"]),
-                        memory_bytes=MEMORY,
                     )
                     rows = prepared.rows
                 else:

@@ -65,16 +65,10 @@ class LowerDesignTests(unittest.TestCase):
                     cfg = defaults.default_siqs_config(10 ** (digits - 1) + 1)
                     collector = replace(
                         cfg.collector,
-                        max_relations=12000,
-                        max_atoms=65536,
                         max_partials=32768,
                         split_call_limit=1048576,
                     )
-                    expected = replace(
-                        cfg,
-                        collector=collector,
-                        memory_bytes=values["memory_bytes"],
-                    )
+                    expected = replace(cfg, collector=collector)
                     self.assertEqual(asdict(expected), values)
                     typ = (
                         module.CountedSIQSConfig

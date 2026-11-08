@@ -123,7 +123,7 @@ class ReconciliationTests(unittest.TestCase):
                 ),
                 (
                     1009 * 1013,
-                    SSSConfig(mode=mode, memory_bytes=3 * 2**20),
+                    SSSConfig(mode=mode),
                     "memory_limit",
                 ),
             ):

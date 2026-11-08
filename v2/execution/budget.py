@@ -17,7 +17,7 @@ from .resources import (
 class BudgetExhaustedError(Exception):
     """A cooperative boundary stopped before publishing its next action."""
 
-    def __init__(self, reason, payload=None):
+    def __init__(self, reason="cancelled", payload=None):
         self.payload = payload
         super().__init__(reason)
 

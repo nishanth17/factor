@@ -179,10 +179,11 @@ def collector_config():
     return SieveConfig(
         division="roots",
         residual_bound=10000,
-        max_atoms=8192,
-        max_relations=4096,
         max_partials=1024,
-        memory_bytes=MEMORY,
+        preparation_cache_bytes=2 * 2**20
+        if 4096 == None
+        else min(2 * 2**20, 2048 * 4096),
+        target_rows=4096,
     )
 
 
@@ -264,7 +265,6 @@ def train_siqs(corpus, band, args):
                     max_half_width=512,
                     family_count=64,
                     pool_size=64,
-                    memory_bytes=MEMORY,
                     collector=replace(
                         collector_config(),
                         score_policy="powers",
@@ -318,7 +318,6 @@ def train_siqs(corpus, band, args):
                 max_half_width=4096,
                 family_count=64,
                 pool_size=64,
-                memory_bytes=MEMORY,
                 collector=replace(
                     collector_config(),
                     score_policy="powers",
@@ -470,7 +469,6 @@ def main():
             factor_count=3,
             family_count=64,
             pool_size=32,
-            memory_bytes=MEMORY,
             collector=collector_config(),
         ),
         "sss": base,

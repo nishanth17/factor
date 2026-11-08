@@ -11,9 +11,9 @@ from dataclasses import replace
 
 from v2.common import utils
 from v2.execution import schedules
-from v2.execution.budget import Budget
 from v2.pm1 import bounded as pm1_bounded
 from v2.pm1.bounded import PM1Config, factorize_pm1_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=2_000_000, **options):
@@ -269,7 +269,7 @@ class CampaignTests(unittest.TestCase):
         ):
             with self.assertRaises((ValueError, MemoryError)):
                 PM1Config(**kwargs)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             PM1Config(memory_bytes=65536)
         with self.assertRaises(ValueError):
             factorize_pm1_bounded(

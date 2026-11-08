@@ -71,7 +71,7 @@ def config_values(digits, arm, *, multiplier=0, **options):
     if arm not in ("full", "nominee"):
         raise ValueError("unknown experiment arm")
     cfg = configuration(digits, "coupled", multiplier=multiplier, **options)
-    cfg = replace(cfg, memory_bytes=cfg.memory_bytes - PARENT_OWNED)
+    cfg = replace(cfg)
     return asdict(cfg)
 
 

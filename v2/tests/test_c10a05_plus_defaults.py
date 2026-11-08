@@ -5,11 +5,11 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import C9_MEMORY_BYTES, default_siqs_budget
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 ROOT = Path(__file__).resolve().parents[2]
 NUMBER_51 = 10**50 + 123
@@ -58,7 +58,10 @@ class LargerBandDefaultTests(unittest.TestCase):
         )
         self.assertEqual(
             default_siqs_config(
-                NUMBER_51, memory_bytes=128 * 2**20
+                NUMBER_51,
+                recipe="calibrated"
+                if 128 * 2**20 in (None, 2**30)
+                else "reference",
             ).solve_policy,
             "window",
         )

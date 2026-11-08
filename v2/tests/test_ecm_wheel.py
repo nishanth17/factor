@@ -82,7 +82,7 @@ class WheelExecutionTests(unittest.TestCase):
             settings(ecm_pair_distance=8)
         with self.assertRaises(ValueError):
             settings(ecm_program_bytes=0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             settings(memory_bytes=65536)
         for distance, version in ((None, 5), (8, 7)):
             config = configuration(ecm_pair_distance=distance)

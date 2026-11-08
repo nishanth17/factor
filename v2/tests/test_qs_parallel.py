@@ -8,7 +8,6 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
 from v2.qs.families import _checksum
 from v2.qs.parallel import (
     CollectionPool,
@@ -17,6 +16,7 @@ from v2.qs.parallel import (
     _collect,
 )
 from v2.qs.relations import verify_atomic
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=200_000_000, **options):
@@ -256,7 +256,7 @@ class ParallelTests(unittest.TestCase):
         self.assertFalse(job.engine.collector._atoms)
         self.assertGreater(job.stats["cancelled_work"], 0)
         used, assignments = job.budget.used, job.assignments
-        job.config = replace(job.config, assignment_work=10_000_000)
+        job.config = replace(job.config)
 
         self.assertEqual(job.run().reason, "factor_found")
         self.assertEqual(job.assignments, assignments)
@@ -305,7 +305,7 @@ class ParallelTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             ParallelSIQSJob.from_checkpoint(checkpoint, budget=allowance(0))
-        job.config = replace(job.config, checkpoint_bytes=4096)
+        job.config = replace(job.config)
         with self.assertRaises(MemoryError):
             job.checkpoint()
 

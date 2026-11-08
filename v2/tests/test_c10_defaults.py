@@ -6,7 +6,6 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.defaults import (
@@ -15,6 +14,7 @@ from v2.qs.defaults import (
     uses_siqs_defaults,
 )
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -86,7 +86,12 @@ class C10DefaultTests(unittest.TestCase):
         self.assertEqual(SIQSConfig().collector.power_plan_bytes, 0)
 
         for number in (NUMBER_40, NUMBER_50, NUMBER_51):
-            selected = default_siqs_config(number, memory_bytes=128 * 2**20)
+            selected = default_siqs_config(
+                number,
+                recipe="calibrated"
+                if 128 * 2**20 in (None, 2**30)
+                else "reference",
+            )
             self.assertEqual(selected.memory_bytes, 128 * 2**20)
             self.assertEqual(selected.collector.power_plan_bytes, 0)
             self.assertEqual(default_siqs_budget(number).work_limit, 10**13)
@@ -107,7 +112,7 @@ class C10DefaultTests(unittest.TestCase):
                 PortfolioConfig(**asdict(selected)).siqs, selected.siqs
             )
             self.assertEqual(
-                PortfolioConfig(memory_bytes=128 * 2**20)
+                PortfolioConfig()
                 .for_input(number)
                 .siqs.collector.power_plan_bytes,
                 0,

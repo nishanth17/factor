@@ -384,9 +384,7 @@ class ConfigurationCompatibilityTests(unittest.TestCase):
         config = SIQSConfig()
         self.assertEqual(_decode_siqs_config(asdict(config)), config)
         self.assertEqual(
-            PortfolioConfig(
-                siqs=asdict(config), memory_bytes=128 * 2**20
-            ).siqs,
+            PortfolioConfig(siqs=asdict(config)).siqs,
             config,
         )
 

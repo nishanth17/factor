@@ -144,8 +144,6 @@ def main():
             max_trivial=4096,
             row_excess=32,
             batch_width=4096,
-            memory_bytes=384 * 2**20,
-            checkpoint_bytes=16 * 2**20,
             collector=qs.SieveConfig(
                 block_width=4096,
                 score_policy="powers",

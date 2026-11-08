@@ -259,12 +259,7 @@ def incidence_report(records, n):
             fb_rows.append(fb)
         cycles = kernel(lp_rows, budget)
         rows = tuple(xor_selected(fb_rows, mask) for mask in cycles)
-        filtered = filter_matrix(
-            rows,
-            weight_two=True,
-            budget=budget,
-            memory_bytes=128 * 2**20 - reserve,
-        )
+        filtered = filter_matrix(rows, weight_two=True, budget=budget)
         dependencies = kernel(rows, budget)
         divisors = set()
         for dependency in dependencies:

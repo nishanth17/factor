@@ -38,8 +38,6 @@ def run(output):
     config = arm_config(configs[control["digits"]], control["arm"])
     config = replace(
         config,
-        memory_bytes=control["memory_bytes"],
-        checkpoint_bytes=control["checkpoint_bytes"],
         collector=replace(
             config.collector, memory_bytes=control["memory_bytes"]
         ),

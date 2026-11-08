@@ -227,9 +227,9 @@ class ResourceTests(unittest.TestCase):
         ledger.settle(ticket, "last", 7, 1)
         with self.assertRaises(LeaseRefusedError):
             Ledger(0, 0).reserve("zero", 1, 0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             WorkerSettings(memory_bytes=2**20)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             Search(manifest(), WorkerSettings(checkpoint_bytes=4096))
 
     def test_frame_fragmentation_coalescing_corruption_and_oversize(self):
@@ -450,7 +450,6 @@ class OptimizationContractTests(unittest.TestCase):
         settings = WorkerSettings(
             workers=10,
             allow_wide_workers=True,
-            memory_bytes=2**31,
             metadata_slots=2,
             decoded_cache_bytes=2**20,
         )
@@ -524,7 +523,7 @@ class OptimizationContractTests(unittest.TestCase):
 class DurablePositionTests(unittest.TestCase):
     def test_double_digit_positions_survive_actual_json_round_trip(self):
         plan = manifest(((10, 100, 16),))
-        settings = WorkerSettings(checkpoint_bytes=2**21)
+        settings = WorkerSettings()
         search = Search(plan, settings, fixed_work=True)
         for position in range(16):
             token = position + 1
@@ -539,7 +538,7 @@ class DurablePositionTests(unittest.TestCase):
 
     def test_noncanonical_position_is_rejected_after_resealing(self):
         plan = manifest(((10, 100, 16),))
-        settings = WorkerSettings(checkpoint_bytes=2**21)
+        settings = WorkerSettings()
         search = Search(plan, settings, fixed_work=True)
         search.dispatch(0, 1)
         search.receive(0, 1, message(search, 0, 1))
@@ -552,12 +551,7 @@ class DurablePositionTests(unittest.TestCase):
             Search.restore(saved, plan, settings, fixed_work=True)
 
     def test_sixteen_slot_traversal_round_trip_keeps_remaining_identity(self):
-        settings = WorkerSettings(
-            workers=16,
-            allow_wide_workers=True,
-            memory_bytes=4 * 2**30,
-            checkpoint_bytes=4 * 2**20,
-        )
+        settings = WorkerSettings(workers=16, allow_wide_workers=True)
         plan = manifest(((10, 100, 32),))
         search = Search(plan, settings, fixed_work=True)
         issued = []

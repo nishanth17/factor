@@ -566,7 +566,6 @@ class CombinedPipelineTests(unittest.TestCase):
             base_bound=100,
             half_width=256,
             max_half_width=256,
-            memory_bytes=128 * 2**20,
             solve_policy="collection",
             collector=policy(block_width=16),
         )

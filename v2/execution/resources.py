@@ -217,8 +217,24 @@ def removed_arguments(names, replacement="Budget(rss_bytes=...) at the root"):
     def decorate(target):
         original = target.__init__ if isinstance(target, type) else target
 
+        parameters = tuple(inspect.signature(original).parameters.values())
+        positional_count = sum(
+            parameter.kind
+            in (
+                inspect.Parameter.POSITIONAL_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+            for parameter in parameters
+        )
+        variadic = any(
+            parameter.kind == inspect.Parameter.VAR_POSITIONAL
+            for parameter in parameters
+        )
+
         @wraps(original)
         def checked(*args, **kwargs):
+            if not variadic and len(args) > positional_count:
+                raise RemovedResourceLimitError(names[0], replacement)
             for name in names:
                 if name in kwargs:
                     raise RemovedResourceLimitError(name, replacement)

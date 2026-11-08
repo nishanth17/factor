@@ -105,7 +105,7 @@ class HenselReuseTests(unittest.TestCase):
         plain = SieveCollector(
             cached.polynomial,
             cached.factor_base,
-            config=replace(cached.config, memory_bytes=required),
+            config=replace(cached.config),
             budget=allowance(),
         )
         self.assertIsNone(plain._shared_lift_inverses)

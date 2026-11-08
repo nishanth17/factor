@@ -54,7 +54,12 @@ class PacingDefaultTests(unittest.TestCase):
         number = 10**49 + 123
         for memory in (128 * 2**20, C9_MEMORY_BYTES - 1, C9_MEMORY_BYTES + 1):
             self.assertEqual(
-                default_siqs_config(number, memory_bytes=memory).solve_policy,
+                default_siqs_config(
+                    number,
+                    recipe="calibrated"
+                    if memory in (None, 2**30)
+                    else "reference",
+                ).solve_policy,
                 "window",
             )
         for other in (10**29, 10**40, 10**49 - 1, 10**60):
@@ -85,7 +90,7 @@ class PacingDefaultTests(unittest.TestCase):
         restored = SIQSJob.from_checkpoint(checkpoint, budget=allowance())
         self.assertEqual(restored.config, legacy)
 
-        config = PortfolioConfig(siqs=legacy, memory_bytes=1040 * 2**20)
+        config = PortfolioConfig(siqs=legacy)
         first = factorize_bounded(number, config=config, budget=allowance(0))
         saved = first.checkpoint["payload"]["config"]
         self.assertNotIn("solve_policy", saved["siqs"])

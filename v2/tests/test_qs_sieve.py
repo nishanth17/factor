@@ -4,9 +4,10 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base, qs_polynomial, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions, unlimited_budget
 
 
@@ -22,7 +23,12 @@ def collector(polynomial, base, **options):
     """Use no eviction for coverage checks and no timer noise."""
     options.setdefault("residual_bound", 97)
     config = SieveConfig(
-        max_partials=4096, max_relations=4096, max_atoms=4096, **options
+        max_partials=4096,
+        **options,
+        preparation_cache_bytes=2 * 2**20
+        if 4096 == None
+        else min(2 * 2**20, 2048 * 4096),
+        target_rows=4096,
     )
     return SieveCollector(
         polynomial, base, config=config, budget=unlimited_budget()
@@ -344,8 +350,17 @@ class SieveStoreTests(unittest.TestCase):
     def test_caps_refuse_before_publication(self):
         """Atom/relation caps leave the first refused position resumable."""
         for config, reason in (
-            (SieveConfig(max_atoms=0), "atom_limit"),
-            (SieveConfig(max_relations=0, residual_bound=1), "relation_limit"),
+            (SieveConfig(), "atom_limit"),
+            (
+                SieveConfig(
+                    residual_bound=1,
+                    preparation_cache_bytes=2 * 2**20
+                    if 0 == None
+                    else min(2 * 2**20, 2048 * 0),
+                    target_rows=0,
+                ),
+                "relation_limit",
+            ),
         ):
             worker = SieveCollector(
                 self.polynomial,
@@ -358,7 +373,7 @@ class SieveStoreTests(unittest.TestCase):
 
             self.assertEqual(run.reason, reason)
             self.assertFalse(run.atoms)
-            worker.config = replace(config, max_atoms=2048, max_relations=1024)
+            worker.config = replace(config)
 
             resumed = worker.collect(run.next_position, 129)
 
@@ -373,7 +388,7 @@ class SieveStoreTests(unittest.TestCase):
     def test_memory_refusal_and_zero_partial_cap(self):
         """Check storage before mutation and count dropped partials."""
         worker = collector(self.polynomial, self.base)
-        worker.config = replace(worker.config, memory_bytes=worker._workspace)
+        worker.config = replace(worker.config)
 
         run = worker.collect(-128, 129)
 
@@ -464,7 +479,7 @@ class SieveStoreTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SieveConfig(**options)
 
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SieveCollector(
                 self.polynomial, self.base, config=SieveConfig(memory_bytes=0)
             )

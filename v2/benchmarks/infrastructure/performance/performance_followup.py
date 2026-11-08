@@ -88,11 +88,9 @@ def main():
             )
         config = original_config(case, band, modules)
         if "lease" in case:
-            config = replace(config, assignment_work=10_000_000)
+            config = replace(config)
         if "mem10" in case:
-            config = replace(
-                config, base_bound=10000, worker_memory_bytes=10 * 2**20
-            )
+            config = replace(config, base_bound=10000)
         return config
 
     def run(case, fixture, seed, config, modules, pool=None):
@@ -191,10 +189,7 @@ def family_setup(fixture, seed, config, modules):
     )
     parallel = modules["parallel"]
     base = parallel.build_factor_base(
-        fixture["n"],
-        bound=config["base_bound"],
-        budget=budget,
-        memory_bytes=32 * 2**20,
+        fixture["n"], bound=config["base_bound"], budget=budget
     ).factor_base
     if base is None:
         raise ValueError("family fixture must not split in base setup")
@@ -211,9 +206,7 @@ def family_setup(fixture, seed, config, modules):
 
     for _ in range(config["repetitions"]):
         for primes in assignments:
-            family = parallel.PolynomialFamily(
-                base, primes, budget=budget, memory_bytes=32 * 2**20
-            )
+            family = parallel.PolynomialFamily(base, primes, budget=budget)
 
             for entry, inverse in zip(base.entries, family.inverses):
                 if (
@@ -251,10 +244,7 @@ def resieve_capacity(fixture, seed, config, modules):
     )
     stats, signature, divisor = {}, None, None
     base = modules["factor_base"].build_factor_base(
-        fixture["n"],
-        bound=config["base_bound"],
-        budget=budget,
-        memory_bytes=config["memory_bytes"],
+        fixture["n"], bound=config["base_bound"], budget=budget
     )
     if base.divisor:
         raise ValueError("capacity fixture must not split during base setup")
@@ -269,7 +259,6 @@ def resieve_capacity(fixture, seed, config, modules):
                 score_policy="powers",
                 division="resieve",
                 block_width=config["block_width"],
-                memory_bytes=config["memory_bytes"],
                 residual_bound=10000,
             ),
         )

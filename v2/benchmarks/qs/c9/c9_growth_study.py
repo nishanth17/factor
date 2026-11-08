@@ -89,9 +89,7 @@ def growing(config):
         split_call_limit=None,
     )
     return replace(
-        config,
-        memory_bytes=MEMORY,
-        collector=qs.GrowingDoubleLargeSieveConfig(**options),
+        config, collector=qs.GrowingDoubleLargeSieveConfig(**options)
     )
 
 
@@ -99,9 +97,7 @@ def configuration(registry, arm):
     if arm in ("slp", "dlp"):
         config = decode(registry["slp_aligned" if arm == "slp" else "dlp"])
         return replace(
-            config,
-            memory_bytes=MEMORY,
-            collector=replace(config.collector, memory_bytes=MEMORY),
+            config, collector=replace(config.collector, memory_bytes=MEMORY)
         )
     config = growing(decode(registry["dlp"]))
     if arm == "grow_aligned":
@@ -518,10 +514,8 @@ def select(output):
     ]
     configs = {}
     for digits in (30, 40):
-        slp = replace(decode(old[str(digits)]["slp"]), memory_bytes=MEMORY)
-        dlp = replace(
-            decode(old[str(digits)]["dlp_half"]), memory_bytes=MEMORY
-        )
+        slp = replace(decode(old[str(digits)]["slp"]))
+        dlp = replace(decode(old[str(digits)]["dlp_half"]))
         configs[str(digits)] = dict(
             slp=asdict(slp), dlp=asdict(dlp), challenger=asdict(growing(dlp))
         )

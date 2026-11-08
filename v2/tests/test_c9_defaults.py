@@ -7,7 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     GrowingDoubleLargeSieveConfig,
@@ -24,6 +24,7 @@ from v2.qs.defaults import (
     uses_c9_defaults,
 )
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -101,7 +102,7 @@ class C9DefaultTests(unittest.TestCase):
     def test_parent_default_and_explicit_memory_are_finite(self):
         for original in (
             PortfolioConfig(),
-            PortfolioConfig(memory_bytes=128 * 2**20),
+            PortfolioConfig(),
         ):
             selected = original.for_input(NUMBER)
             self.assertIsInstance(
@@ -124,9 +125,7 @@ class C9DefaultTests(unittest.TestCase):
         self.assertIsNone(PortfolioConfig(siqs=None).for_input(NUMBER).siqs)
         explicit = SIQSConfig()
         self.assertIs(
-            PortfolioConfig(siqs=explicit, memory_bytes=80 * 2**20)
-            .for_input(NUMBER)
-            .siqs,
+            PortfolioConfig(siqs=explicit).for_input(NUMBER).siqs,
             explicit,
         )
 

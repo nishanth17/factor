@@ -6,9 +6,9 @@ import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
 
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 SELECTED = "density+presieve+scan_fused"
@@ -29,7 +29,10 @@ class A1aDefaultTests(unittest.TestCase):
                         2**30 + 1,
                     ):
                         config = default_siqs_config(
-                            signed, memory_bytes=memory
+                            signed,
+                            recipe="calibrated"
+                            if memory in (None, 2**30)
+                            else "reference",
                         )
                         selected = 50 <= digits <= 55 and memory in (
                             None,
@@ -88,7 +91,7 @@ class A1aDefaultTests(unittest.TestCase):
             default, collector=replace(default.collector, marking=EXTENSION)
         )
         self.assertEqual(default.collector.marking, DEFAULT_SELECTED)
-        config = PortfolioConfig(siqs=extended, memory_bytes=1040 * 2**20)
+        config = PortfolioConfig(siqs=extended)
         self.assertEqual(PortfolioConfig(**asdict(config)).siqs, extended)
 
         first = factorize_bounded(

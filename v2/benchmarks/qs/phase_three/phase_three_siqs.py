@@ -39,7 +39,6 @@ def base_config():
         base_bound=200,
         half_width=256,
         family_count=8,
-        memory_bytes=MEMORY,
         collector=SieveConfig(
             division="bucket",
             residual_bound=1,
@@ -76,7 +75,6 @@ def run_one(fixture, seed, config, *, ecm=False, seconds=None):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=((2000, 147396, 2),),
-            memory_bytes=MEMORY,
         )
 
         result = factorize_bounded(

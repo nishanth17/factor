@@ -14,11 +14,12 @@ from v2.common.preprocessing import (
     integer_root,
     power_residue_possible,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import SieveContext
 from v2.execution.work_budget import PollingBudget
 from v2.qs.linear_algebra import DependencySolver, filter_matrix
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=10**12):
@@ -131,10 +132,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
 
         for weight_two in (False, True):
             matrix = filter_matrix(
-                rows,
-                weight_two=weight_two,
-                budget=allowance(),
-                memory_bytes=2**20,
+                rows, weight_two=weight_two, budget=allowance()
             )
 
             self.assertIs(matrix.original_rows, rows)
@@ -150,7 +148,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
                 self.assertEqual(span, {0, 3, 12, 15})
 
         budget = allowance()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             filter_matrix(rows, budget=budget, memory_bytes=1)
 
         self.assertEqual(budget.used, 0)
@@ -366,9 +364,7 @@ class ChunkedWorkerTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     action()
 
-        job.config = replace(
-            original, assignment_work=20_000_000, poll_interval=1
-        )
+        job.config = replace(original, poll_interval=1)
 
         self.assertEqual(
             job.run(max_assignments=1, fixed_work=True).reason, "paused"

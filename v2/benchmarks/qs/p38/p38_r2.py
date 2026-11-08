@@ -258,16 +258,10 @@ def collector_run(mods, fixture, seed, variant):
     atoms = {a.relation_id: a for a in result.atoms}
     extraction = mods["qs.extraction"]
     prepared = extraction.prepare_relations(
-        worker.matrix_relations,
-        job.base,
-        atoms,
-        budget=budget,
-        memory_bytes=MEMORY,
+        worker.matrix_relations, job.base, atoms, budget=budget
     )
     matrix = mods["qs.linear_algebra"].filter_matrix(
-        prepared.rows,
-        budget=budget,
-        memory_bytes=MEMORY,
+        prepared.rows, budget=budget
     )
     large_primes = sum(e.prime > hi - lo for e in job.base.entries)
     return dict(

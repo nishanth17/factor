@@ -15,7 +15,6 @@ from v2.benchmarks.support.prac_oracle import (
     twist_point,
 )
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
 from v2.execution.stage_jobs import advance_job, new_job
@@ -26,6 +25,7 @@ from v2.execution.worker_contract import (
     WorkerSettings,
 )
 from v2.portfolio import PortfolioConfig, _execution_context, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_programs import primes_between
 
 
@@ -45,7 +45,6 @@ def configuration(**changes):
             ecm_tiers=((20, 200, 4),),
             segment_size=16,
             max_input_bits=512,
-            memory_bytes=16 * 2**20,
         ),
         **changes,
     )

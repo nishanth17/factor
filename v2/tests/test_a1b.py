@@ -59,7 +59,6 @@ class A1bTests(unittest.TestCase):
                 expected = reference_positions(poly, base, -71, 80, 97)
                 for marking in ("sparse", "density+presieve+scan_fused"):
                     cfg = SieveConfig(
-                        memory_bytes=64 * 2**20,
                         score_policy="fixed",
                         score_backend="list",
                         division="bucket",
@@ -68,9 +67,11 @@ class A1bTests(unittest.TestCase):
                         block_width=17,
                         residual_bound=97,
                         marking=marking,
-                        max_atoms=4096,
-                        max_relations=4096,
                         max_partials=4096,
+                        preparation_cache_bytes=2 * 2**20
+                        if 4096 == None
+                        else min(2 * 2**20, 2048 * 4096),
+                        target_rows=4096,
                     )
                     worker = SieveCollector(
                         poly, base, config=cfg, budget=unlimited_budget()
@@ -93,16 +94,17 @@ class A1bTests(unittest.TestCase):
             checkpoint_bytes=2**20,
             memory_bytes=128 * 2**20,
             collector=SieveConfig(
-                memory_bytes=64 * 2**20,
                 score_policy="fixed",
                 division="bucket",
                 power_plan_bytes=2**20,
                 sparse_queue_bytes=2**20,
                 residual_bound=500,
                 marking="density+presieve+scan_fused",
-                max_atoms=4096,
-                max_relations=4096,
                 max_partials=4096,
+                preparation_cache_bytes=2 * 2**20
+                if 4096 == None
+                else min(2 * 2**20, 2048 * 4096),
+                target_rows=4096,
             ),
         )
         job = SIQSJob(4001 * 5003, config=cfg, seed=73, budget=allowance())

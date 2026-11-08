@@ -9,10 +9,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 from v2.execution.allocation import ECMAllocation
-from v2.execution.budget import Budget
 from v2.execution.ecm_defaults import COMPACT64, ESCALATING140
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 LEGACY32 = ((2000, 147396, 32),)
 
@@ -54,16 +54,14 @@ class DefaultTests(unittest.TestCase):
         self.assertIs(restored.for_input(10**29), restored)
 
     def test_cli_headroom_preserves_all_siqs_settings_and_allocation(self):
-        siqs = SIQSConfig(memory_bytes=64 * 2**20)
+        siqs = SIQSConfig()
         policy = ECMAllocation(
             "campaign",
             fallback_work=1000,
             fallback_seconds=1,
             fallback_cpu_seconds=1,
         )
-        original = PortfolioConfig(
-            memory_bytes=80 * 2**20, siqs=siqs, allocation=policy
-        )
+        original = PortfolioConfig(siqs=siqs, allocation=policy)
         selected = original.for_input(10**39)
         self.assertEqual(selected.ecm_tiers, ESCALATING140)
         self.assertIs(selected.siqs, siqs)
@@ -79,10 +77,9 @@ class DefaultTests(unittest.TestCase):
         )
 
     def test_tight_memory_retains_old_tiers_without_shrinking_siqs(self):
-        siqs = SIQSConfig(memory_bytes=64 * 2**20)
-        base = PortfolioConfig(memory_bytes=80 * 2**20, siqs=siqs)
+        siqs = SIQSConfig()
+        base = PortfolioConfig(siqs=siqs)
         tight = PortfolioConfig(
-            memory_bytes=siqs.memory_bytes + base.workspace_reserve + 8192,
             siqs=siqs,
             ecm_chain_mode=base.ecm_chain_mode,
             ecm_program_bytes=base.ecm_program_bytes,
@@ -132,9 +129,8 @@ class DefaultTests(unittest.TestCase):
     def test_protected_fallback_refuses_without_spending_reserve(self):
         n = 10**39 + 1
         config = PortfolioConfig(
-            memory_bytes=80 * 2**20,
             siqs=SIQSConfig(memory_bytes=64 * 2**20),
-            allocation=ECMAllocation("campaign", fallback_work=1_000_000),
+            allocation=ECMAllocation("campaign", fallback_work=1000000),
         )
         # Fund mandatory checks, but leave the fallback floor unfunded.
         run = factorize_bounded(n, config=config, budget=allowance(100_000))

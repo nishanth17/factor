@@ -57,8 +57,6 @@ def configuration(n, bound, width, residual, multiplier=1):
         max_trivial=4096,
         row_excess=32,
         batch_width=4096,
-        memory_bytes=768 * 1024 * 1024,
-        checkpoint_bytes=16 * 1024 * 1024,
         multiplier=multiplier,
         collector=SieveConfig(
             block_width=4096,
@@ -95,7 +93,6 @@ def run_one(
     seconds = allowance(fixture["digits"]) if seconds is None else seconds
     if varied:
         portfolio = PortfolioConfig(
-            memory_bytes=MEMORY,
             rho_attempts=4,
             rho_evaluations=100000,
             pm1_attempts=2,
@@ -107,7 +104,6 @@ def run_one(
         )
     else:
         portfolio = PortfolioConfig(
-            memory_bytes=MEMORY,
             trial_bound=2,
             rho_attempts=0,
             pm1_attempts=0,
@@ -322,9 +318,7 @@ def main():
                     choices = []
                     if inherited is not None:
                         config = replace(
-                            _config(inherited["configs"][str(digits)]),
-                            memory_bytes=768 * 1024 * 1024,
-                            checkpoint_bytes=16 * 1024 * 1024,
+                            _config(inherited["configs"][str(digits)])
                         )
                         rows = []
 

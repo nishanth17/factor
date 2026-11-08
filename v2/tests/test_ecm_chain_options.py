@@ -21,9 +21,10 @@ from v2.ecm.chain_options import (
     identity,
     verify_progress,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import SieveContext
 from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_chains import configuration
 
 
@@ -33,7 +34,7 @@ def allowance(work=10**8):
 
 class OptionalChainTests(unittest.TestCase):
     def test_finite_default_decision_and_fallbacks(self):
-        base = PortfolioConfig(memory_bytes=16 * 1024**2, ecm_chain_mode="off")
+        base = PortfolioConfig(ecm_chain_mode="off")
         options = default_options(base)
         candidate = replace(base, **options)
         automatic = replace(base, ecm_chain_mode="auto")
@@ -49,9 +50,7 @@ class OptionalChainTests(unittest.TestCase):
         fresh = PortfolioConfig()
         self.assertEqual(fresh.ecm_chain_mode, "reuse")
         self.assertEqual(fresh.memory_bytes, 16 * 1024**2)
-        self.assertEqual(
-            PortfolioConfig(memory_bytes=8 * 1024**2).ecm_chain_mode, "off"
-        )
+        self.assertEqual(PortfolioConfig().ecm_chain_mode, "off")
         self.assertEqual(
             PortfolioConfig(ecm_tiers=()).memory_bytes, 8 * 1024**2
         )
@@ -118,9 +117,9 @@ class OptionalChainTests(unittest.TestCase):
         # Exact terminal input keeps this test about serialized defaults;
         # arithmetic-bearing legacy/resume coverage is in test_ecm_chains.
         for config in (
-            PortfolioConfig(memory_bytes=8 * 1024**2, ecm_chain_mode="off"),
+            PortfolioConfig(ecm_chain_mode="off"),
             replace(
-                PortfolioConfig(memory_bytes=16 * 1024**2),
+                PortfolioConfig(),
                 ecm_chain_mode="reuse",
                 ecm_program_bytes=512 * 1024,
                 ecm_chain_bytes=ecm_chains.MIN_MEMORY_BYTES,

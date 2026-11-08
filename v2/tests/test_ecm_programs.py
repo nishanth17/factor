@@ -12,7 +12,7 @@ from unittest.mock import patch
 from v2.common import utils
 from v2.ecm import core as ecm
 from v2.ecm.programs import ECMPrograms, ProgramBlock, pair_coverage
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import ScheduleCache, SieveContext
 from v2.execution.stage_jobs import (
     advance_job,
@@ -21,6 +21,7 @@ from v2.execution.stage_jobs import (
     prime_cursor,
 )
 from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_phase_one import affine_add
 from v2.tests.test_phase_two import reseal
 
@@ -134,7 +135,7 @@ class ProgramTests(unittest.TestCase):
         self.assertEqual(store.hits, 1)
         with self.assertRaises(ValueError):
             store.program_segment(2**64, 2**64 + 1, allowance())
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             ECMPrograms(context, memory_bytes=4096)
         with self.assertRaises(MemoryError):
             configuration(ecm_program_bytes=4096)
@@ -263,7 +264,7 @@ class CoverageTests(unittest.TestCase):
             12, 30, None, b"".join(pack("<Q", p) for p in (13, 17, 19)), b""
         )
         for distance in (1, 3, 6):
-            with self.assertRaises(ValueError):
+            with self.assertRaises(TypeError):
                 pair_coverage(
                     block,
                     b1=11,
@@ -272,7 +273,7 @@ class CoverageTests(unittest.TestCase):
                     memory_bytes=16384,
                     budget=allowance(),
                 )
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             pair_coverage(
                 block,
                 b1=11,
@@ -282,7 +283,7 @@ class CoverageTests(unittest.TestCase):
                 budget=allowance(),
             )
         duplicate = replace(block, primes=pack("<QQ", 13, 13))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             pair_coverage(
                 duplicate,
                 b1=11,

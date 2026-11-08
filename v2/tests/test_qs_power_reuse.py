@@ -2,12 +2,13 @@
 
 import unittest
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.power_reuse import RootTransfers
 from v2.qs.power_sieve import prime_power_roots
 from v2.qs.sparse_queue import build
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_qs_loop_reuse import enumerated_queue, queue_worker
 

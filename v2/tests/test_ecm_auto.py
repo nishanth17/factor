@@ -13,7 +13,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 from v2.ecm.selection import COMPATIBILITY
-from v2.execution.budget import Budget
 from v2.execution.ecm_auto import (
     DEFAULT_MEMORY_BYTES,
     POLICY_PATH,
@@ -24,6 +23,7 @@ from v2.execution.ecm_auto import (
 from v2.execution.ecm_defaults import ESCALATING140
 from v2.execution.ecm_workers import WorkerRun
 from v2.portfolio import PortfolioConfig, _canonical, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -174,9 +174,7 @@ class AutomaticTests(unittest.TestCase):
                 settings = config(memory_bytes=parent)
                 generator = random.Random(7)
                 before = generator.getstate()
-                with AutomaticECMOwner(
-                    seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
-                ) as owner:
+                with AutomaticECMOwner(seed=7) as owner:
                     owner.configure(
                         settings, generator, None, automatic_memory=False
                     )
@@ -195,9 +193,7 @@ class AutomaticTests(unittest.TestCase):
             "v2.execution.ecm_selection.SelectedECMContext", FakeSelected
         ):
             settings = config(memory_bytes=maximum)
-            with AutomaticECMOwner(
-                seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
-            ) as owner:
+            with AutomaticECMOwner(seed=7) as owner:
                 owner.configure(
                     settings, random.Random(7), None, automatic_memory=False
                 )
@@ -321,12 +317,7 @@ class AutomaticTests(unittest.TestCase):
 
         n = 10**79 + 7
         settings = PortfolioConfig().for_input(n)
-        with SelectedECMContext(
-            POLICY_PATH,
-            POLICY_SHA256,
-            parent_memory=settings.memory_bytes,
-            memory_bytes=400 * 2**20,
-        ) as owner:
+        with SelectedECMContext(POLICY_PATH, POLICY_SHA256) as owner:
             owner._load(budget())
             with self.assertRaises(MemoryError):
                 owner._select(n, settings, None, None, portfolio=True)
@@ -340,12 +331,7 @@ class AutomaticTests(unittest.TestCase):
         settings = PortfolioConfig().for_input(n)
         ledger = budget()
         with (
-            SelectedECMContext(
-                POLICY_PATH,
-                POLICY_SHA256,
-                parent_memory=4 * 2**30,
-                memory_bytes=DEFAULT_MEMORY_BYTES,
-            ) as owner,
+            SelectedECMContext(POLICY_PATH, POLICY_SHA256) as owner,
             patch(
                 "v2.execution.ecm_workers.ECMExecutor",
                 side_effect=AssertionError("unadmitted worker construction"),
@@ -362,12 +348,7 @@ class AutomaticTests(unittest.TestCase):
             # Loading and validating metadata was real work, despite refusal.
             self.assertGreater(ledger.used, 0)
         # Component and portfolio modes intentionally require distinct owners.
-        with SelectedECMContext(
-            POLICY_PATH,
-            POLICY_SHA256,
-            parent_memory=4 * 2**30,
-            memory_bytes=DEFAULT_MEMORY_BYTES,
-        ) as component:
+        with SelectedECMContext(POLICY_PATH, POLICY_SHA256) as component:
             with self.assertRaisesRegex(MemoryError, "parent ownership"):
                 component.run(n, config=settings, budget=budget())
 
@@ -700,7 +681,7 @@ class AutomaticTests(unittest.TestCase):
             f"{n}/{n}/1",
             arithmetic_options(
                 PortfolioConfig().for_input(n),
-                WorkerSettings(worker_memory=64 * 2**20),
+                WorkerSettings(),
             ),
         )
         self.assertEqual(events[0]["stats"]["manifest"], manifest.identity)

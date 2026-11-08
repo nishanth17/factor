@@ -131,8 +131,6 @@ def common_config(
         row_excess=32,
         filter_row_growth=32,
         batch_width=4096,
-        memory_bytes=memory,
-        checkpoint_bytes=2**20,
         collector=SieveConfig(
             block_width=4096,
             score_policy="powers",

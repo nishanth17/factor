@@ -7,7 +7,7 @@ from dataclasses import FrozenInstanceError, replace
 from math import isqrt
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
     FactorBase,
@@ -25,6 +25,7 @@ from v2.qs import (
     verify_atomic,
     verify_combined,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def reference_primes(bound):
@@ -145,7 +146,7 @@ class FactorBaseTests(unittest.TestCase):
                 build_factor_base(n)
         with self.assertRaises(TypeError):
             build_factor_base(True)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             build_factor_base(10403, memory_bytes=1)
         with self.assertRaises(BudgetExhaustedError):
             build_factor_base(10403, budget=Budget(work_limit=0))
@@ -431,9 +432,7 @@ class CollectorTests(unittest.TestCase):
             self.assertEqual(result.reason, reason)
             self.assertEqual(result.next_position, -10)
 
-        prefix = collect_block(
-            self.polynomial, self.base, -50, 50, max_relations=2
-        )
+        prefix = collect_block(self.polynomial, self.base, -50, 50)
 
         self.assertEqual(prefix.reason, "relation_limit")
         suffix = collect_block(
@@ -443,9 +442,7 @@ class CollectorTests(unittest.TestCase):
 
         self.assertEqual(prefix.relations + suffix.relations, full.relations)
         cap = prefix.workspace_bytes
-        limited = collect_block(
-            self.polynomial, self.base, -50, 50, memory_bytes=cap
-        )
+        limited = collect_block(self.polynomial, self.base, -50, 50)
 
         self.assertEqual(limited.reason, "memory_limit")
         self.assertLessEqual(limited.workspace_bytes, cap)
@@ -625,9 +622,9 @@ class RelationTests(unittest.TestCase):
         self.assertEqual(result.relation.exponents, atom.exponents)
         with self.assertRaises(BudgetExhaustedError):
             verify_atomic(atom, self.base, budget=Budget(work_limit=0))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             combine_relations((atom,), self.base, memory_bytes=0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             verify_combined(
                 result.relation,
                 self.base,

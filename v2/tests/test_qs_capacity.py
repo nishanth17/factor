@@ -7,7 +7,7 @@ from dataclasses import replace
 from math import prod
 
 from v2.common.utils import DETERMINISTIC_LIMIT
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.assignment_stream import AssignmentStream, unrank_combination
 from v2.qs.capacity import capacity_report, validate_extension
 from v2.qs.external_square import CoefficientExhaustedError, external_square
@@ -19,6 +19,7 @@ from v2.qs.reference_collector import collect_block
 from v2.qs.relations import verify_atomic, verify_combined
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import SIQSConfig, SIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def budget(work=10**12):
@@ -145,16 +146,15 @@ class CapacityTests(unittest.TestCase):
             65,
             residual_bound=10000,
             budget=budget(),
-            memory_bytes=64 * 2**20,
-            max_relations=1024,
         )
         config = SieveConfig(
             residual_bound=10000,
-            max_atoms=4096,
             max_partials=4096,
-            max_relations=4096,
-            memory_bytes=64 * 2**20,
             score_policy="conservative",
+            preparation_cache_bytes=2 * 2**20
+            if 4096 == None
+            else min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         )
         collector = SieveCollector(
             polynomial, self.base, config=config, budget=budget()
@@ -182,11 +182,7 @@ class CapacityTests(unittest.TestCase):
         for combined in result.combined_relations:
             self.assertTrue(
                 verify_combined(
-                    combined,
-                    self.base,
-                    collector._atoms,
-                    budget=budget(),
-                    memory_bytes=64 * 2**20,
+                    combined, self.base, collector._atoms, budget=budget()
                 )
             )
 
@@ -209,9 +205,11 @@ class CapacityTests(unittest.TestCase):
             max_stalled=1000,
             collector=SieveConfig(
                 residual_bound=10000,
-                max_atoms=4096,
-                max_relations=2048,
                 max_partials=512,
+                preparation_cache_bytes=2 * 2**20
+                if 2048 == None
+                else min(2 * 2**20, 2048 * 2048),
+                target_rows=2048,
             ),
         )
         job = SIQSJob(self.base.n, config=cfg, budget=budget())
@@ -272,7 +270,7 @@ class CapacityTests(unittest.TestCase):
             replace(extended, base_bound=110),
             replace(extended, pool_size=9),
             replace(extended, polynomials_per_family=2),
-            replace(extended, checkpoint_bytes=2**21),
+            replace(extended),
             replace(extended, family_count=1),
         ):
             with self.assertRaises(ValueError):
@@ -281,41 +279,40 @@ class CapacityTests(unittest.TestCase):
     def test_extension_reserves_growth_of_verified_row_cache(self):
         original = SIQSConfig(
             assignment_policy="nearest",
-            collector=SieveConfig(max_relations=64),
+            collector=SieveConfig(
+                preparation_cache_bytes=2 * 2**20
+                if 64 == None
+                else min(2 * 2**20, 2048 * 64),
+                target_rows=64,
+            ),
         )
         enlarged = replace(
             original,
-            collector=replace(original.collector, max_relations=128),
+            collector=replace(original.collector),
         )
         with self.assertRaisesRegex(ValueError, "checkpoint/cache"):
             validate_extension(original, enlarged)
-        enlarged = replace(
-            enlarged, memory_bytes=original.memory_bytes + 64 * 2048
-        )
+        enlarged = replace(enlarged)
         validate_extension(original, enlarged)
         report = capacity_report(self.base, enlarged)
 
         self.assertEqual(report["preparation_cache_reserve_bytes"], 128 * 2048)
         saturated = replace(
-            enlarged,
-            collector=replace(enlarged.collector, max_relations=2048),
-            memory_bytes=enlarged.memory_bytes + 2 * 2**20,
+            enlarged, collector=replace(enlarged.collector, max_relations=2048)
         )
         validate_extension(enlarged, saturated)
         validate_extension(
             saturated,
             replace(
                 saturated,
-                collector=replace(saturated.collector, max_relations=4096),
+                collector=replace(saturated.collector),
             ),
         )
 
     def test_sparse_incidence_work_preserves_verified_dependencies(self):
         rows = tuple(1 << (i % 500) for i in range(2000))
         allowance = budget(2_000_000)
-        filtered = filter_matrix(
-            rows, budget=allowance, memory_bytes=32 * 2**20, weight_two=True
-        )
+        filtered = filter_matrix(rows, budget=allowance, weight_two=True)
 
         self.assertLess(allowance.used, 2_000_000)
         for mask in filtered.zero_dependencies:
@@ -323,12 +320,7 @@ class CapacityTests(unittest.TestCase):
 
         self.assertEqual(filtered.original_rows, rows)
         wide = (1 << 99999,) * 32
-        compact = filter_matrix(
-            wide,
-            budget=budget(2_000_000),
-            memory_bytes=8 * 2**20,
-            weight_two=True,
-        )
+        compact = filter_matrix(wide, budget=budget(2000000), weight_two=True)
 
         self.assertEqual(compact.stats["working_columns"], 1)
         for mask in compact.zero_dependencies:
@@ -341,9 +333,7 @@ class CapacityTests(unittest.TestCase):
             "333125016877336815730234617089075553677225251597802911492140000"
             "164835979295625386188653593061163021"
         )
-        base = build_factor_base(
-            n, bound=10000, budget=budget(), memory_bytes=32 * 2**20
-        ).factor_base
+        base = build_factor_base(n, bound=10000, budget=budget()).factor_base
         cfg = SIQSConfig(
             base_bound=10000,
             half_width=8192,

@@ -271,9 +271,11 @@ def _config(fixture, **options):
     return SieveConfig(
         residual_bound=fixture["residual"],
         max_partials=4096,
-        max_relations=4096,
-        max_atoms=4096,
         **options,
+        preparation_cache_bytes=2 * 2**20
+        if 4096 == None
+        else min(2 * 2**20, 2048 * 4096),
+        target_rows=4096,
     )
 
 

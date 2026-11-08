@@ -152,10 +152,11 @@ def oracle_audit(arm):
                                 block_width=17,
                                 small_prime_cutoff=11,
                                 residual_bound=97,
-                                max_atoms=4096,
                                 max_partials=4096,
-                                max_relations=4096,
-                                memory_bytes=33554432,
+                                preparation_cache_bytes=2 * 2**20
+                                if 4096 == None
+                                else min(2 * 2**20, 2048 * 4096),
+                                target_rows=4096,
                             )
                             worker = qs.sieve_collector.SieveCollector(
                                 polynomial,

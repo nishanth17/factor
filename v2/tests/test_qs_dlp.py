@@ -10,7 +10,7 @@ from math import gcd
 from unittest.mock import patch
 
 from v2.common import arithmetic
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     AtomicRelation,
@@ -35,6 +35,7 @@ from v2.qs.large_primes import (
     graph_reserve,
     split_two_primes,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs_pipeline import dense_kernel, span
 from v2.tests.test_siqs import mutate
 
@@ -527,7 +528,6 @@ class JobTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024**2,
             siqs=siqs,
         )
         n = 4001 * 5003

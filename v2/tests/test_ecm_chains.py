@@ -27,10 +27,11 @@ from v2.ecm.chains import (
     verify_progress,
 )
 from v2.ecm.programs import ECMPrograms
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import SieveContext
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_phase_two import reseal
 
 
@@ -47,7 +48,6 @@ def configuration(**changes):
             ecm_tiers=((2000, 2500, 8),),
             segment_size=128,
             max_input_bits=512,
-            memory_bytes=32 * 1024**2,
             ecm_program_bytes=262144,
             ecm_chain_mode="reuse",
             ecm_chain_bytes=MIN_MEMORY_BYTES,

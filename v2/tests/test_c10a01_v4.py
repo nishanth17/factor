@@ -154,7 +154,7 @@ class GrayTableTests(unittest.TestCase):
                 self.assertEqual(
                     len(family.root_updates), (quota - 1).bit_length()
                 )
-                with self.assertRaises(MemoryError):
+                with self.assertRaises(TypeError):
                     PolynomialFamily(
                         base,
                         primes,
@@ -182,7 +182,6 @@ class GrayTableTests(unittest.TestCase):
                 parity=True,
                 schedule=SignSchedule(4, (3, 1, 2), 10),
                 budget=allowance(),
-                memory_bytes=8 * 2**20,
                 root_update_policy=policy,
                 root_update_limit=5,
             )
@@ -206,7 +205,7 @@ class GrayTableTests(unittest.TestCase):
             bad = json.loads(json.dumps(saved))
             bad["payload"]["schema"] = "c10a01-coordinate-family-v2"
             bad["sha256"] = _checksum(bad["payload"])
-            with self.assertRaises(ValueError):
+            with self.assertRaises(TypeError):
                 CoordinateFamily.from_checkpoint(
                     base, bad, budget=allowance(), memory_bytes=8 * 2**20
                 )
@@ -304,7 +303,7 @@ class NormPreviewTests(unittest.TestCase):
         n = 4001 * 5003
         cfg = config_v4()
         result = select_norm_multiplier(
-            n, config=cfg, seed=73, budget=allowance(), memory_bytes=32 * 2**20
+            n, config=cfg, seed=73, budget=allowance()
         )
         density = dict(select_coupled_multiplier(n, budget=allowance()).scores)
         scores = []
@@ -322,17 +321,12 @@ class NormPreviewTests(unittest.TestCase):
                 seed=73,
                 policy=cfg.assignment_policy,
                 budget=allowance(),
-                memory_bytes=32 * 2**20,
             )
             logs, corrections, samples = 0, Fraction(0), 0
             for index in range(4):
                 primes = stream[index]
                 family = make_family(
-                    base,
-                    primes,
-                    config=cfg,
-                    budget=allowance(),
-                    memory_bytes=32 * 2**20,
+                    base, primes, config=cfg, budget=allowance()
                 )
                 expected = [
                     family.next().polynomial for _ in range(cfg.gray_limit)
@@ -397,11 +391,7 @@ class NormPreviewTests(unittest.TestCase):
             job._setup()
             primes = job.assignments[0]
             family = make_family(
-                job.base,
-                primes,
-                config=cfg,
-                budget=allowance(),
-                memory_bytes=32 * 2**20,
+                job.base, primes, config=cfg, budget=allowance()
             )
             self.assertEqual(
                 preview_polynomials(job.base, primes, cfg, allowance()),
@@ -410,7 +400,7 @@ class NormPreviewTests(unittest.TestCase):
 
     def test_refusal_cancellation_and_exceptional_gcd(self):
         cfg = config_v4()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             select_norm_multiplier(
                 4001 * 5003,
                 config=cfg,
@@ -432,11 +422,7 @@ class NormPreviewTests(unittest.TestCase):
                 )
             self.assertEqual(preview.call_count, 4)
         result = select_norm_multiplier(
-            101 * 4001,
-            config=cfg,
-            seed=7,
-            budget=allowance(),
-            memory_bytes=32 * 2**20,
+            101 * 4001, config=cfg, seed=7, budget=allowance()
         )
         self.assertEqual(result.divisor, 101)
         job = SIQSJob(4001 * 5003, config=cfg, budget=allowance())
@@ -587,7 +573,6 @@ class V4BoundaryTests(unittest.TestCase):
                 config=replace(cfg, family_count=count),
                 seed=7,
                 budget=allowance(),
-                memory_bytes=32 * 2**20,
             )
             for count in (1, 64)
         ]

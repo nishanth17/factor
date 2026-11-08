@@ -115,7 +115,6 @@ def warm_once(qs, budgets, template, deadline):
         base_bound=200,
         half_width=128,
         max_half_width=128,
-        memory_bytes=64 * 2**20,
         collector=collector,
         sign_policy="swap_high",
         solve_policy="collection",

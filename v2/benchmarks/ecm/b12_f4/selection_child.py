@@ -162,7 +162,9 @@ def child(request_path, source_root):
         (math.ceil(request["cpu"]), math.ceil(request["cpu"]) + 1),
     )
     sys.path.insert(0, source_root)
-    from v2.execution.budget import Budget
+    from v2.benchmarks.infrastructure.resource_control import (
+        RecordingBudget as Budget,
+    )
     from v2.portfolio import PortfolioConfig, factorize_bounded
 
     config = PortfolioConfig(**request["config"])

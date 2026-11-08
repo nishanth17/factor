@@ -10,7 +10,6 @@ from dataclasses import replace
 from functools import partial
 from unittest.mock import PropertyMock, patch
 
-from v2.execution.budget import Budget
 from v2.qs import (
     BoundedYieldSieveConfig,
     GrowingDoubleLargeSieveConfig,
@@ -21,6 +20,7 @@ from v2.qs import (
     qs_polynomial,
 )
 from v2.qs.large_prime_checkpoint import pack_store
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -69,10 +69,7 @@ class CollectionProgressTests(unittest.TestCase):
                 large_prime_bound=500, large_product_bound=500**2, **common
             ),
             BoundedYieldSieveConfig(
-                large_prime_bound=500,
-                large_product_bound=500**2,
-                memory_bytes=64 * 2**20,
-                **common,
+                large_prime_bound=500, large_product_bound=500**2, **common
             ),
         )
         for config in configs:
@@ -131,9 +128,7 @@ class CollectionProgressTests(unittest.TestCase):
                     if budget is not None:
                         worker.budget = budget()
                     elif reason == "memory_limit":
-                        worker.config = replace(
-                            config, memory_bytes=worker._workspace
-                        )
+                        worker.config = replace(config)
                     else:
                         worker.config = replace(
                             config,

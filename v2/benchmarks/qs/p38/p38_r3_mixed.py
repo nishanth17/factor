@@ -54,10 +54,7 @@ def run(mods, prepared, variant, rank):
         )
     else:
         matrix = algebra.filter_matrix(
-            prepared.rows,
-            weight_two=True,
-            budget=budget,
-            memory_bytes=remaining,
+            prepared.rows, weight_two=True, budget=budget
         )
         if variant == "live":
             matrix = live_compaction(matrix, budget, remaining)
@@ -121,11 +118,7 @@ def main():
             raise AssertionError("mixed trace requires 64 full and 64 matched")
         mixed = tuple(r for pair in zip(full, combined) for r in pair)
         prepared = mods["qs.extraction"].prepare_relations(
-            mixed,
-            base,
-            atoms,
-            budget=allowance(mods["budget"]),
-            memory_bytes=MEMORY,
+            mixed, base, atoms, budget=allowance(mods["budget"])
         )
         rank = rank_oracle(prepared.rows)
         variants = (

@@ -8,7 +8,7 @@ from dataclasses import replace
 from math import isqrt
 from types import SimpleNamespace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_stage_two import StageTwoSchedule, advance_prepared_job
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_worker_state import ActionBudget, ProspectiveActionBudget
@@ -21,6 +21,7 @@ from v2.execution.worker_contract import (
     WorkerSettings,
     digest,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_workers import allowance, configuration, task
 
 

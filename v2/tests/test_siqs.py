@@ -6,12 +6,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SieveConfig, SIQSConfig, SIQSJob
 from v2.qs.families import _checksum
 from v2.qs.multiplier import select_multiplier
 from v2.qs.pipeline import DependencyExtractor, DependencySolver
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=200_000_000):
@@ -24,9 +25,11 @@ def configuration(**options):
         half_width=256,
         collector=SieveConfig(
             residual_bound=500,
-            max_atoms=4096,
-            max_relations=4096,
             max_partials=4096,
+            preparation_cache_bytes=2 * 2**20
+            if 4096 == None
+            else min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         ),
     )
     values.update(options)
@@ -281,7 +284,13 @@ class SIQSTests(unittest.TestCase):
         config = configuration(
             mode="qs",
             base_bound=100,
-            collector=SieveConfig(residual_bound=1, max_relations=8),
+            collector=SieveConfig(
+                residual_bound=1,
+                preparation_cache_bytes=2 * 2**20
+                if 8 == None
+                else min(2 * 2**20, 2048 * 8),
+                target_rows=8,
+            ),
         )
         job = SIQSJob(4001 * 5003, config=config, budget=allowance())
 
@@ -390,7 +399,7 @@ class SIQSTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 configuration(**options)
 
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             configuration(memory_bytes=4 * 1024 * 1024)
         job = SIQSJob(
             4001 * 5003,
@@ -418,7 +427,6 @@ class SIQSTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=((5, 7, 1),),
-            memory_bytes=64 * 1024 * 1024,
             siqs=configuration(),
         )
 
@@ -441,7 +449,6 @@ class SIQSTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024 * 1024,
             siqs=configuration(),
         )
         n = 4001 * 5003

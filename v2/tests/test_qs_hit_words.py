@@ -4,11 +4,12 @@ import unittest
 from collections import Counter
 from dataclasses import replace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, build_factor_base
 from v2.qs.hit_words import WORD_MASK, WordHits
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_qs_sieve import signature
 
@@ -89,7 +90,6 @@ def make_worker(width=64, kernels=(), sparse=0):
             block_width=width,
             marking="+".join(kernels) if kernels else "sparse",
             sparse_queue_bytes=sparse,
-            memory_bytes=64 * 2**20,
             residual_bound=2003,
         ),
     )
@@ -153,12 +153,12 @@ class HitCollectorTests(unittest.TestCase):
         count, width = len(worker.factor_base.entries), 64
         self.assertLessEqual(WordHits.reservation(count, width), 32 * 2**20)
         self.assertEqual(len(worker._word_hits.descriptors), count)
-        limit = worker._workspace + 512 * count + 32768 - 1
+        worker._workspace + 512 * count + 32768 - 1
         fallback = SieveCollector(
             worker.polynomial,
             worker.factor_base,
             budget=unlimited_budget(),
-            config=replace(worker.config, memory_bytes=limit),
+            config=replace(worker.config),
         )
         self.assertIsNone(fallback._word_hits)
         self.assertIsInstance(fallback._hits, list)

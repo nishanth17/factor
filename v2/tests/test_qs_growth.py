@@ -75,7 +75,7 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertEqual(
             SIQSConfig(collector=capped).checkpoint_bytes, 1024**2
         )
-        self.assertEqual(replace(growing, max_atoms=100000).max_atoms, 100000)
+        self.assertEqual(replace(growing).max_atoms, 100000)
 
     def test_growing_storage_refuses_unsupported_worker_and_sss_adapters(self):
         from v2.qs.parallel import ParallelConfig
@@ -87,7 +87,7 @@ class GrowingStorageTests(unittest.TestCase):
 
     def test_growing_graph_preserves_complete_incidence_kernel(self):
         edges = [(1, 7), (3, 5), (5, 11), (3, 11), (13, 13), (3, 5)]
-        forest, cycles = LargePrimeForest(edge_limit=None), []
+        forest, cycles = LargePrimeForest(), []
         for index, (left, right) in enumerate(edges):
             plan = forest.plan(left, right, str(index), None, allowance())
             self.assertFalse(plan.evicted)
@@ -99,9 +99,7 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertEqual(
             span(cycles), dense_kernel([(1 << a) ^ (1 << b) for a, b in edges])
         )
-        self.assertGreater(
-            graph_reserve(65537, edge_limit=None), 256 * 1024**2
-        )
+        self.assertGreater(graph_reserve(65537), 256 * 1024**2)
         with self.assertRaises(MemoryError):
             graph_reserve(65537)
 
@@ -209,7 +207,6 @@ class GrowingStorageTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024**2,
             siqs=siqs,
         )
         self.assertEqual(
@@ -237,11 +234,10 @@ class GrowingStorageTests(unittest.TestCase):
             base_bound=3,
             half_width=8,
             factor_count=1,
-            memory_bytes=4 * 2**20,
             collector=collector.config,
         )
         engine = SimpleNamespace(
-            config=replace(collector.config, memory_bytes=4 * 2**20),
+            config=replace(collector.config),
             collector=collector,
             prepared=None,
             solver=None,
@@ -277,7 +273,6 @@ class GrowingStorageTests(unittest.TestCase):
             base_bound=3,
             half_width=8,
             factor_count=1,
-            memory_bytes=4 * 2**20,
             collector=growing_worker().config,
         )
         job = SIQSJob(91, config=config, budget=allowance())

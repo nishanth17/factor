@@ -8,7 +8,7 @@ from math import prod
 from unittest.mock import patch
 
 from v2.benchmarks.qs.c10.oracles import DiscriminantPolynomial
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.coordinate_family import CoordinateFamily
@@ -17,6 +17,7 @@ from v2.qs.multiplier import PARITY_MULTIPLIERS, select_multiplier
 from v2.qs.power_sieve import prime_power_roots
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import make_family
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
 from v2.tests.test_siqs import allowance, configuration, mutate
@@ -61,7 +62,6 @@ class ParityPolynomialTests(unittest.TestCase):
                     primes,
                     config=parity_configuration(sign_policy=policy),
                     budget=allowance(),
-                    memory_bytes=2**24,
                 )
                 actual = set()
                 for _ in range(family.count):
@@ -141,7 +141,6 @@ class ParityPolynomialTests(unittest.TestCase):
                     primes,
                     config=parity_configuration(),
                     budget=allowance(),
-                    memory_bytes=2**24,
                 )
                 self.assertEqual(family.parity, n * k % 4 == 1)
                 if not family.parity:
@@ -166,10 +165,9 @@ class ParityPolynomialTests(unittest.TestCase):
         base = build_factor_base(10403, multiplier=3, bound=97).factor_base
         family = make_family(
             base,
-            tuple(p for p in base.primes if p > 2 and base.n_prime % p)[:3],
+            tuple((p for p in base.primes if p > 2 and base.n_prime % p))[:3],
             config=parity_configuration(),
             budget=allowance(),
-            memory_bytes=2**24,
         )
         polynomial = family.next().polynomial
         expected = reference_positions(polynomial, base, -71, 80, 97)
@@ -180,7 +178,6 @@ class ParityPolynomialTests(unittest.TestCase):
             ("density+presieve+scan_fused", 2**20, 2**20),
         ):
             cfg = SieveConfig(
-                memory_bytes=64 * 2**20,
                 score_policy="powers",
                 marking=marking,
                 division="bucket",
@@ -188,9 +185,11 @@ class ParityPolynomialTests(unittest.TestCase):
                 residual_bound=97,
                 sparse_queue_bytes=queue,
                 power_plan_bytes=plan,
-                max_atoms=4096,
-                max_relations=4096,
                 max_partials=4096,
+                preparation_cache_bytes=2 * 2**20
+                if 4096 == None
+                else min(2 * 2**20, 2048 * 4096),
+                target_rows=4096,
             )
             collector = SieveCollector(
                 polynomial, base, config=cfg, budget=unlimited_budget()
@@ -218,12 +217,11 @@ class ParityPolynomialTests(unittest.TestCase):
             cfg = parity_configuration(sign_policy=policy)
             family = make_family(
                 base,
-                tuple(p for p in base.primes if p > 2 and base.n_prime % p)[
+                tuple((p for p in base.primes if p > 2 and base.n_prime % p))[
                     :3
                 ],
                 config=cfg,
                 budget=allowance(),
-                memory_bytes=2**24,
             )
             family.next()
             saved = family.checkpoint()

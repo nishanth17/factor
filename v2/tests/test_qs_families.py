@@ -7,7 +7,7 @@ from dataclasses import replace
 from functools import partial
 from math import prod
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     PolynomialFamily,
     QSJob,
@@ -19,6 +19,7 @@ from v2.qs import (
     polynomial_roots,
 )
 from v2.qs.families import _checksum
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -255,9 +256,9 @@ class FamilyTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             PolynomialFamily(base, [7, 13])
         values = family_assignments(base, 64, family_count=1)[0]
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             PolynomialFamily(base, values, memory_bytes=1)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             family_assignments(base, 64, memory_bytes=1)
         with self.assertRaises(BudgetExhaustedError):
             PolynomialFamily(base, values, budget=Budget(work_limit=0))
@@ -286,7 +287,7 @@ class FamilyTests(unittest.TestCase):
                 -256,
                 257,
                 budget=budget,
-                config=SieveConfig(residual_bound=1, memory_bytes=33554432),
+                config=SieveConfig(residual_bound=1),
                 collector_class=partial(
                     SieveCollector, precomputed_roots=step.roots
                 ),
@@ -317,14 +318,13 @@ class FamilyTests(unittest.TestCase):
                 34,
                 residual_bound=97,
                 budget=unlimited_budget(),
-                memory_bytes=33554432,
             )
             worker = SieveCollector(
                 step.polynomial,
                 base,
                 precomputed_roots=step.roots,
                 budget=unlimited_budget(),
-                config=SieveConfig(residual_bound=97, memory_bytes=33554432),
+                config=SieveConfig(residual_bound=97),
             )
 
             run = worker.collect(-31, 34)

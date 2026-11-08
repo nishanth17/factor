@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 from v2.benchmarks.ecm.b12_f4.selection_profile import build_profile
 from v2.common import utils
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_selection import (
     SelectedECMContext,
     SelectionCosts,
@@ -24,6 +24,7 @@ from v2.execution.ecm_workers import WorkerRun, arithmetic_options
 from v2.execution.portfolio_config import PortfolioConfig
 from v2.execution.worker_contract import Manifest, WorkerSettings, digest
 from v2.portfolio import _advance, _canonical, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(**changes):
@@ -211,7 +212,7 @@ class PortfolioSelectionTests(unittest.TestCase):
     def write_profile(self, *, threshold=1, rates=(1, 3)):
         rows = []
         for digits, workers, rate in zip((6, 8), (2, 4), rates):
-            settings = WorkerSettings(workers=workers, memory_bytes=8 * 2**30)
+            settings = WorkerSettings(workers=workers)
             candidate = dict(
                 settings=asdict(settings),
                 costs=dict(
@@ -231,7 +232,7 @@ class PortfolioSelectionTests(unittest.TestCase):
             )
         profile = build_profile(
             dict(
-                serial_settings=asdict(WorkerSettings(memory_bytes=8 * 2**30)),
+                serial_settings=asdict(WorkerSettings()),
                 rows=rows,
             )
         )

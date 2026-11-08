@@ -54,7 +54,6 @@ def configuration(band, bound=None):
         family_count=4,
         pool_size=16,
         max_batch_atoms=512,
-        assignment_work=50_000_000,
     )
 
 
@@ -67,7 +66,6 @@ def reference_config(config):
         pool_size=config.pool_size,
         max_stalled=64,
         max_trivial=4096,
-        memory_bytes=config.parent_memory_bytes,
         collector=config.collector,
     )
 

@@ -8,12 +8,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from v2.benchmarks.qs.c10a04 import configuration, short_decisions
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import CountedSIQSConfig, SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.count_policy import CountPolicyRefusedError, endpoint_for_count
 from v2.qs.defaults import default_siqs_budget, uses_siqs_defaults
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 
@@ -59,7 +60,12 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertIs(SIQSJob(n, config=explicit).config, explicit)
         grant = allowance(0)
         self.assertIs(SIQSJob(n, budget=grant).budget, grant)
-        limited = default_siqs_config(n, memory_bytes=128 * 2**20)
+        limited = default_siqs_config(
+            n,
+            recipe="calibrated"
+            if 128 * 2**20 in (None, 2**30)
+            else "reference",
+        )
         self.assertEqual(limited.memory_bytes, 128 * 2**20)
         self.assertEqual(limited.collector.power_plan_bytes, 0)
         self.assertEqual(limited.solve_policy, "window")
@@ -161,18 +167,14 @@ class LargerDefaultTests(unittest.TestCase):
         eligible = [
             p for p in primes if any(x * x % p == n % p for x in range(p))
         ]
-        bound, divisor = endpoint_for_count(
-            n, 1, 10, allowance(), ceiling=500, memory_bytes=2**20
-        )
+        bound, divisor = endpoint_for_count(n, 1, 10, allowance(), ceiling=500)
         self.assertIsNone(divisor)
         self.assertEqual(bound, eligible[9] + 1)
         self.assertEqual(
-            endpoint_for_count(
-                77, 7, 10, allowance(), ceiling=500, memory_bytes=2**20
-            ),
+            endpoint_for_count(77, 7, 10, allowance(), ceiling=500),
             (None, 7),
         )
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             endpoint_for_count(
                 n, 1, 10, allowance(), ceiling=500, memory_bytes=0
             )

@@ -6,7 +6,8 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.ecm.c3 import round2_prime_proofs as proofs
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class PrimeProofTests(unittest.TestCase):

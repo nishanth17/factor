@@ -89,7 +89,6 @@ class CombinedCollectionTests(unittest.TestCase):
             primes,
             schedule=schedule_for(4, "swap_high"),
             budget=unlimited_budget(),
-            memory_bytes=2**24,
         )
         actual = set()
         for _ in expected:
@@ -112,15 +111,16 @@ class CombinedCollectionTests(unittest.TestCase):
             expected = reference_positions(poly, base, -71, 80, 97)
             for cap in (0, 1, 2**20):
                 cfg = SieveConfig(
-                    memory_bytes=64 * 2**20,
                     score_policy="powers",
                     division="bucket",
                     block_width=17,
                     residual_bound=97,
                     sparse_queue_bytes=cap,
                     max_partials=4096,
-                    max_relations=4096,
-                    max_atoms=4096,
+                    preparation_cache_bytes=2 * 2**20
+                    if 4096 == None
+                    else min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 )
                 collector = SieveCollector(
                     poly, base, config=cfg, budget=unlimited_budget()
@@ -135,7 +135,6 @@ class CombinedCollectionTests(unittest.TestCase):
         base = build_factor_base(10403, bound=100).factor_base
         poly = Polynomial(10403, 1, 1, 102)
         cfg = SieveConfig(
-            memory_bytes=64 * 2**20,
             score_policy="powers",
             division="bucket",
             block_width=17,
@@ -163,14 +162,15 @@ class CombinedCollectionTests(unittest.TestCase):
         cfg = configuration(
             sign_policy="swap_high",
             collector=SieveConfig(
-                memory_bytes=64 * 2**20,
                 score_policy="powers",
                 division="bucket",
                 sparse_queue_bytes=2**20,
                 residual_bound=500,
-                max_atoms=4096,
-                max_relations=4096,
                 max_partials=4096,
+                preparation_cache_bytes=2 * 2**20
+                if 4096 == None
+                else min(2 * 2**20, 2048 * 4096),
+                target_rows=4096,
             ),
         )
         job = SIQSJob(4001 * 5003, config=cfg, seed=73, budget=allowance())

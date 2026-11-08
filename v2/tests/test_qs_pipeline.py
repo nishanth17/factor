@@ -9,7 +9,7 @@ import weakref
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     DependencyExtractor,
     DependencySolver,
@@ -24,6 +24,7 @@ from v2.qs import (
     verify_dependency,
 )
 from v2.qs.linear_algebra import matrix_workspace
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_qs_sieve import collector
 
@@ -110,7 +111,7 @@ class MatrixTests(unittest.TestCase):
         for mask in (0, 8, 1):
             with self.assertRaises(ValueError):
                 verify_dependency(mask, (3, 5, 6))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             filter_matrix((3, 5, 6), memory_bytes=1)
         with self.assertRaises(ValueError):
             filter_matrix((1 << 100001,))
@@ -295,7 +296,7 @@ class PipelineTests(unittest.TestCase):
                         row_excess=row_excess,
                         batch_width=64,
                         budget=unlimited_budget(),
-                        config=SieveConfig(memory_bytes=32 * 1024 * 1024),
+                        config=SieveConfig(),
                     )
 
                     result = job.run()
@@ -469,10 +470,8 @@ class StorageCompletionTests(unittest.TestCase):
         """Use a window whose first eight full rows contain a useful kernel."""
         budget = unlimited_budget()
         base = build_factor_base(n, bound=100, budget=budget).factor_base
-        memory_bytes = limits.pop("memory_bytes", 32 * 1024 * 1024)
-        config = SieveConfig(
-            residual_bound=1, memory_bytes=memory_bytes, **limits
-        )
+        limits.pop("memory_bytes", 32 * 1024 * 1024)
+        config = SieveConfig(residual_bound=1, **limits)
         return QSJob(
             qs_polynomial(base),
             base,
@@ -578,7 +577,6 @@ class StorageCompletionTests(unittest.TestCase):
             job.collector.factor_base,
             {atom.relation_id: atom for atom in collected.atoms},
             budget=unlimited_budget(),
-            memory_bytes=job.config.memory_bytes,
         )
         columns = max((row.bit_length() for row in prepared.rows), default=0)
         expected = (

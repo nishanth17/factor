@@ -16,9 +16,10 @@ from v2.benchmarks.qs.c1.c1_followup import (
     refine_prefixes,
     validate_records,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import SIQSConfig, build_factor_base, qs_polynomial
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -70,7 +71,7 @@ class CompleteOfflineGraphTests(unittest.TestCase):
         pairs = tuple((i, i + 1) for i in range(1000, 3000)) + ((1000, 3000),)
         cycles, _ = fundamental_cycles(pairs, unlimited_budget())
         self.assertEqual(cycles, ((1 << len(pairs)) - 1,))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             fundamental_cycles(pairs, unlimited_budget(), memory_bytes=1024)
         with self.assertRaises(BudgetExhaustedError):
             fundamental_cycles(pairs, Budget(work_limit=1))
@@ -208,7 +209,6 @@ class FollowupCensusTests(unittest.TestCase):
                 score_policy="powers",
                 residual_bound=500,
                 max_partials=4,
-                memory_bytes=256 * 2**20,
             ),
         )
         base = build_factor_base(10403, bound=100).factor_base

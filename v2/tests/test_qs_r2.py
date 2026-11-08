@@ -43,11 +43,7 @@ class R2CollectorTests(unittest.TestCase):
         worker = SieveCollector(
             polynomial,
             base,
-            config=SieveConfig(
-                score_policy="fixed",
-                power_plan_bytes=2**20,
-                memory_bytes=64 * 2**20,
-            ),
+            config=SieveConfig(score_policy="fixed", power_plan_bytes=2**20),
             budget=budget,
         )
         budget.work_limit = budget.used + 100
@@ -79,10 +75,11 @@ class R2CollectorTests(unittest.TestCase):
                     division="bucket",
                     residual_bound=97,
                     block_width=17,
-                    memory_bytes=64 * 2**20,
-                    max_atoms=4096,
                     max_partials=4096,
-                    max_relations=4096,
+                    preparation_cache_bytes=2 * 2**20
+                    if 4096 == None
+                    else min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 ),
                 budget=budget,
             )
@@ -143,10 +140,11 @@ class R2CollectorTests(unittest.TestCase):
                     division="bucket",
                     block_width=17,
                     residual_bound=97,
-                    max_atoms=4096,
-                    max_relations=4096,
                     max_partials=4096,
-                    memory_bytes=64 * 2**20,
+                    preparation_cache_bytes=2 * 2**20
+                    if 4096 == None
+                    else min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 ),
                 budget=unlimited_budget(),
             )
@@ -180,10 +178,11 @@ class R2CollectorTests(unittest.TestCase):
                                         small_prime_cutoff=cutoff,
                                         block_width=17,
                                         residual_bound=97,
-                                        max_atoms=4096,
                                         max_partials=4096,
-                                        max_relations=4096,
-                                        memory_bytes=64 * 2**20,
+                                        preparation_cache_bytes=2 * 2**20
+                                        if 4096 == None
+                                        else min(2 * 2**20, 2048 * 4096),
+                                        target_rows=4096,
                                     ),
                                     budget=unlimited_budget(),
                                 )
@@ -210,7 +209,6 @@ class R2CollectorTests(unittest.TestCase):
                 power_plan_bytes=2**20,
                 block_width=17,
                 residual_bound=97,
-                memory_bytes=64 * 2**20,
             ),
             budget=unlimited_budget(),
         )
@@ -246,10 +244,11 @@ class R2CollectorTests(unittest.TestCase):
                     score_policy=policy,
                     power_plan_bytes=2**20,
                     residual_bound=97,
-                    max_atoms=4096,
-                    max_relations=4096,
                     max_partials=4096,
-                    memory_bytes=64 * 2**20,
+                    preparation_cache_bytes=2 * 2**20
+                    if 4096 == None
+                    else min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 ),
                 budget=budget,
             )
@@ -279,11 +278,7 @@ class R2CollectorTests(unittest.TestCase):
 
     def test_array_saturation_and_plan_storage_reservation(self):
         base = build_factor_base(10403, bound=100).factor_base
-        config = SieveConfig(
-            score_backend="array",
-            score_policy="fixed",
-            memory_bytes=64 * 2**20,
-        )
+        config = SieveConfig(score_backend="array", score_policy="fixed")
         worker = SieveCollector(
             Polynomial(10403, 1, 1, 102),
             base,
@@ -294,7 +289,7 @@ class R2CollectorTests(unittest.TestCase):
 
         self.assertEqual(worker._scores[0], 2**32 - 1)
         self.assertEqual(worker._clip_threshold(2**40), 2**32 - 1)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SieveCollector(
                 worker.polynomial,
                 base,
@@ -317,7 +312,6 @@ class R2CollectorTests(unittest.TestCase):
             base_bound=1000,
             half_width=512,
             batch_width=1,
-            memory_bytes=64 * 2**20,
             collector=SieveConfig(
                 score_policy="fixed",
                 power_plan_bytes=2**20,

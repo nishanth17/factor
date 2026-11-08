@@ -185,8 +185,6 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
         row_excess=32,
         batch_width=4096,
         filter_row_growth=32,
-        memory_bytes=768 * 2**20 if large else MEMORY,
-        checkpoint_bytes=2**20,
         collector=SieveConfig(
             block_width=4096,
             division="bucket",

@@ -13,10 +13,10 @@ from unittest.mock import patch
 from v2.benchmarks.qs.a1a_extension import analysis, inputs, runtime, study
 from v2.benchmarks.qs.c10a04 import configuration
 from v2.benchmarks.qs.c10a04.accounting import Ledger
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_siqs_cli import cli
 
@@ -117,12 +117,7 @@ class ExtendedRunnerTests(unittest.TestCase):
 
         choice = select_multiplier(n, budget=count_budget)
         endpoint_for_count(
-            n,
-            choice.multiplier,
-            2500,
-            count_budget,
-            ceiling=250000,
-            memory_bytes=2**30,
+            n, choice.multiplier, 2500, count_budget, ceiling=250000
         )
         self.assertEqual(count_budget.used, prior_work)
 
@@ -171,7 +166,7 @@ class ExtendedRunnerTests(unittest.TestCase):
     def test_selected_counted_portfolio_checkpoint_survives_cli_resume(self):
         n = 10**54 + 123
         selected = study.configuration(n, "selected", self.control)
-        cfg = PortfolioConfig(siqs=selected, memory_bytes=1040 * 2**20)
+        cfg = PortfolioConfig(siqs=selected)
         first = factorize_bounded(n, config=cfg, budget=Budget(work_limit=0))
         saved = first.checkpoint["payload"]["config"]
         self.assertEqual(saved["siqs"]["collector"]["marking"], study.SELECTED)

@@ -7,8 +7,8 @@ from unittest.mock import Mock, patch
 
 from v2.benchmarks.ecm.p52 import p52_a3, p52_realistic
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class RealisticBenchmarkTests(unittest.TestCase):
@@ -31,7 +31,6 @@ class RealisticBenchmarkTests(unittest.TestCase):
             ecm_tiers=((50, 1000, 2),),
             segment_size=16,
             max_input_bits=329,
-            memory_bytes=16 * 2**20,
         )
         run = control.factorize_bounded(
             n,

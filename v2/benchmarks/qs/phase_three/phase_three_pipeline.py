@@ -82,7 +82,6 @@ def _collection(arm, fixture, config, *, exhaustive=False):
         multiplier=fixture["h"],
         bound=fixture["bound"],
         budget=budget,
-        memory_bytes=config.memory_bytes,
     ).factor_base
     polynomial = arm.qs.polynomial.Polynomial(
         fixture["n"],
@@ -105,7 +104,6 @@ def _collection(arm, fixture, config, *, exhaustive=False):
             129,
             residual_bound=fixture["residual"],
             budget=budget,
-            memory_bytes=config.memory_bytes,
         )
 
         if result.reason != "complete":
@@ -140,13 +138,7 @@ def _collection(arm, fixture, config, *, exhaustive=False):
     for relation in full:
         arm.qs.relations.verify_atomic(relation, base, budget=budget)
     for relation in combined:
-        arm.qs.relations.verify_combined(
-            relation,
-            base,
-            store,
-            budget=budget,
-            memory_bytes=config.memory_bytes,
-        )
+        arm.qs.relations.verify_combined(relation, base, store, budget=budget)
 
     return _signature(atoms), len(full), len(combined)
 
@@ -170,10 +162,7 @@ def _complete(
         budget = _budget()
         n = fixture["n"]
         setup = arm.qs.factor_base.build_factor_base(
-            n,
-            bound=200,
-            budget=budget,
-            memory_bytes=config.memory_bytes,
+            n, bound=200, budget=budget
         )
 
         if setup.divisor:
@@ -236,7 +225,6 @@ def _exhaustive_collector(arm):
                 hi,
                 residual_bound=self.config.residual_bound,
                 budget=self.budget,
-                memory_bytes=self.config.memory_bytes,
             )
 
             if raw.reason != "complete":
