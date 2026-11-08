@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from heapq import heapify, heappop, heappush
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget
-from ..execution.resources import removed_arguments
+from ..execution.resources import removed_arguments, resolve_budget
 
 MAX_MATRIX_ROWS = 65536
 MAX_MATRIX_COLUMNS = 100_001
@@ -117,7 +116,7 @@ def filter_matrix(
         reserve += 256 * columns + 16 * ((original_columns + 7) // 8)
         reserve += sum(128 + 8 * ((row.bit_length() + 7) // 8) for row in rows)
 
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     if _incremental is not None:
         survivor_mask = _incremental.observe(rows, budget)
     working_rows = rows
@@ -456,7 +455,7 @@ class DependencySolver:
         if pivot not in ("highest", "lowest"):
             raise ValueError("unknown pivot strategy")
         self.matrix, self.pivot = matrix, pivot
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.dependencies = list(matrix.zero_dependencies)
         for mask in self.dependencies:
             verify_dependency(mask, matrix.original_rows)

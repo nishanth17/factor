@@ -7,8 +7,7 @@ from math import isqrt
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd, pow
-from ..execution.budget import Budget
-from ..execution.resources import removed_arguments
+from ..execution.resources import removed_arguments, resolve_budget
 from .polynomial import Polynomial, checked_position
 
 MAX_RESIDUAL = 1_000_000_000_000
@@ -210,7 +209,7 @@ def _verify_atomic(
     exponents = relation.exponents
     if len(exponents) > len(factor_base.entries):
         raise ValueError("relation has too many factor-base exponents")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     value = polynomial.a * polynomial.value(relation.position)
     budget.consume((len(exponents) + 1) * abs(value).bit_length())
     if relation.u * relation.u - factor_base.n_prime != value:
@@ -418,7 +417,7 @@ def combine_relations(atoms, factor_base, *, budget=None):
     if len(set(identities)) != len(identities):
         raise ValueError("an atomic position cannot be used twice")
     _combination_workspace(atoms, factor_base)
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     for atom in atoms:
         verify_atomic(
             atom,
@@ -456,7 +455,7 @@ def verify_combined(relation, factor_base, atom_store, *, budget=None):
     payloads raise ValueError. Verification never forms an integer product
     of all atomic values. The original atom store must remain available.
     """
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     atoms = []
     for identity in relation.atom_ids:
         atom = atom_store.get(identity)

@@ -438,7 +438,6 @@ def main(*, budget=None):
         utils.require_integer(args.rss_bytes, "rss_bytes", 0)
         budget.rss_bytes = args.rss_bytes
 
-    implicit_memory = args.memory_mib is None
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
     if args.ecm_memory_mib is not None and args.ecm_workers != "auto":
@@ -515,11 +514,6 @@ def main(*, budget=None):
     try:
         checkpoint = None
         if args.resume:
-            (
-                max(args.memory_mib, 1040)
-                if implicit_memory
-                else args.memory_mib
-            )
             checkpoint = json.loads(args.resume.read_text())
         number = args.n
         if number is None:

@@ -5,8 +5,13 @@ from dataclasses import dataclass, field, replace
 from functools import partial
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import accounted_job, removed_arguments
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    accounted_job,
+    active_owner,
+    removed_arguments,
+    resolve_budget,
+)
 from ..execution.work_budget import PollingBudget
 from .assignment_stream import (
     AssignmentStream,
@@ -343,13 +348,17 @@ class SIQSJob:
             raise ValueError("seed exceeds 64 bits")
         self.n = arithmetic.get_backend(self.config.backend).integer(n)
         self.seed = seed
-        if budget is None and isinstance(
-            self.config.collector, GrowingDoubleLargeSieveConfig
+        if (
+            budget is None
+            and active_owner() is None
+            and isinstance(
+                self.config.collector, GrowingDoubleLargeSieveConfig
+            )
         ):
             from .defaults import default_siqs_budget
 
             budget = default_siqs_budget(n, backend=self.config.backend)
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.base = self.family = self.engine = self.pending_step = None
         self.assignments = None
         self.coefficient_cursor = 0
@@ -731,13 +740,8 @@ class SIQSJob:
         """Drain retained rows once; refusal leaves the stop pending."""
         self.engine.budget = self.budget
         self.budget.consume(0)
-        try:
-            self.divisor = self.engine._solve(True)
-            self.finished_reason = self.pending_final_reason
-        except MemoryError:
-            # A checked store survives an impossible downstream reservation;
-            # do not repeat that reservation at an unchanged terminal stop.
-            self.finished_reason = "allocation_failure"
+        self.divisor = self.engine._solve(True)
+        self.finished_reason = self.pending_final_reason
         self.pending_final_reason = None
 
     @accounted_job
@@ -829,11 +833,7 @@ class SIQSJob:
                         >= self.config.max_trivial
                     ):
                         self._recover("trivial_dependency_limit")
-                elif reason in (
-                    "relation_limit",
-                    "atom_limit",
-                    "allocation_failure",
-                ):
+                elif reason in ("allocation_failure",):
                     self.finished_reason = reason
                 elif reason not in ("paused", "factor_found"):
                     break
@@ -843,13 +843,6 @@ class SIQSJob:
             self.divisor = found.divisor
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            self._stop_collection("allocation_failure")
-            if self.pending_final_reason is not None:
-                try:
-                    self._finish_collection()
-                except BudgetExhaustedError:
-                    reason = self.budget.reason
 
         if self.divisor is not None:
             if not utils.valid_divisor(self.divisor, self.n):

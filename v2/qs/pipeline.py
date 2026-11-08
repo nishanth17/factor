@@ -4,8 +4,8 @@ import time
 from dataclasses import dataclass
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import accounted_job
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import accounted_job, resolve_budget
 from ..execution.work_budget import PollingBudget
 from .extraction import (
     DependencyExtractor,
@@ -81,7 +81,7 @@ class QSJob:
         checked_position(hi)
         if not 0 <= hi - lo <= 1_000_000:
             raise ValueError("window must be ordered and at most 1000000 wide")
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.config = config if config is not None else SieveConfig()
         self.collector = collector_class(
             polynomial,
@@ -158,7 +158,16 @@ class QSJob:
 
     def _solve(self, final):
         """Prepare changed stores; preserve pending solve/extraction state."""
-        return self._solve_impl(final)
+        try:
+            return self._solve_impl(final)
+        except MemoryError:
+            # Retain checked relations after an interrupted derived solve.
+            self.solver, self.extractor, self.prepared = None, None, None
+            self.last_count = -1
+            self.zero_checked_count = 0
+            self._full_view = self._retry_full_view = True
+            self._selected_subset = False
+            raise
 
     def _solve_impl(self, final):
         """Keep a reversible subset retry inside one solve boundary."""
@@ -484,11 +493,7 @@ class QSJob:
                     del result
                     if collection_reason != "complete":
                         reason = collection_reason
-                        if reason in (
-                            "relation_limit",
-                            "atom_limit",
-                            "allocation_failure",
-                        ):
+                        if reason in ("allocation_failure",):
                             self.storage_reason = reason
                             reason = self._finish_storage()
 

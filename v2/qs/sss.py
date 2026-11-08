@@ -7,8 +7,12 @@ from math import prod
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import pow
-from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import accounted_job, removed_arguments
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    accounted_job,
+    removed_arguments,
+    resolve_budget,
+)
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial
@@ -428,8 +432,6 @@ class SSSCollector(SieveCollector):
                 stats["assignments"] += 1
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "allocation_failure"
 
         self._last_stop = index
         return SieveResult(
@@ -464,7 +466,7 @@ class SSSJob:
         if not isinstance(self.config, SSSConfig):
             raise TypeError("config must be an SSSConfig")
         self.n = arithmetic.get_backend(self.config.backend).integer(n)
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self._original_budget = self.budget
         self._setup_memory_refused = False
         self.pipeline, self.divisor, self.base = None, None, None
@@ -560,9 +562,6 @@ class SSSJob:
             return result
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "allocation_failure"
-            self._setup_memory_refused = self.pipeline is None
 
         position = self.pipeline.next_position if self.pipeline else 0
         stats = dict(self.pipeline.stats) if self.pipeline else {}

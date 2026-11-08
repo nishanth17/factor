@@ -5,8 +5,7 @@ from dataclasses import dataclass
 
 from ..common import utils
 from ..common.arithmetic import gcd, pow
-from ..execution.budget import Budget
-from ..execution.resources import removed_arguments
+from ..execution.resources import removed_arguments, resolve_budget
 from .factor_base import FactorBase
 from .linear_algebra import verify_dependency
 from .relations import (
@@ -198,7 +197,7 @@ def _prepare_relations(
 
     # Shared atoms/base stay pinned once; private scratch must coexist.
     retained_workspace_bytes + reserve - shared_reserve
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     unique, indices, duplicates, seen, rows = [], [], [], set(), []
     identities = []
 
@@ -282,7 +281,7 @@ def extract_dependency(
         raise ValueError("unknown exponent-product policy")
     verify_dependency(mask, prepared.rows)
     base = prepared.factor_base
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     selected, bits = [], mask
     while bits:
         bit = bits & -bits
@@ -381,7 +380,7 @@ class DependencyExtractor:
         ):
             raise ValueError("dependency trial cap exceeded")
         self.prepared, self.dependencies = prepared, dependencies
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.next_dependency = 0
         self.trials = []
         self.tested_cache = tested_cache

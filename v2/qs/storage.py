@@ -21,6 +21,9 @@ class RelationPublicationError(AllocationFailureError):
 def require_published(collector):
     """Never reuse or serialize a store interrupted during publication."""
     if getattr(collector, "_publication_failed", False):
+        io_error = getattr(collector, "_publication_io_error", None)
+        if io_error is not None:
+            raise io_error
         raise RelationPublicationError(
             "relation publication was interrupted; restore a prior checkpoint"
         )

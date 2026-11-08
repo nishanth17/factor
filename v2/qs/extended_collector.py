@@ -218,12 +218,7 @@ def admit_retained(collector, atom, stats):
         if bounded or (config.spill_directory is not None)
         else 0
     )
-    try:
-        plan = collector._graph.plan_atom(
-            atom, arena.next_slot, config, budget
-        )
-    except MemoryError:
-        return "allocation_failure"
+    plan = collector._graph.plan_atom(atom, arena.next_slot, config, budget)
     if bounded:
         from .yield_memory import graph_reserve
 
@@ -277,10 +272,13 @@ def admit_retained(collector, atom, stats):
             stats["graph_cycles"] += 1
             stats["cycle_atoms"] += len(plan.cycle)
             collector._reporting.record(0, 0, 1)
-    except (MemoryError, OSError) as error:
+    except MemoryError as error:
         raise RelationPublicationError(
             "expanded relation publication failed"
         ) from error
+    except OSError as error:
+        collector._publication_io_error = error
+        raise
     else:
         collector._publication_failed = False
     # Packing publishes distinct objects. Keep raw witnesses through the

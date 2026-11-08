@@ -682,16 +682,11 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
     ):
         raise ValueError("incompatible checkpoint backend")
 
-    if budget.used == 0 and budget.prior_wall == 0 and budget.prior_cpu == 0:
-        budget.used = resources["work_used"]
-        budget.prior_wall = resources["wall_used"]
-        budget.prior_cpu = resources["cpu_used"]
-    elif (
-        budget.used < resources["work_used"]
-        or budget.wall_used < resources["wall_used"]
-        or budget.cpu_used < resources["cpu_used"]
-    ):
-        raise ValueError("resume must retain consumed resources")
+    budget.restore_charges(
+        work=resources["work_used"],
+        wall=resources["wall_used"],
+        cpu=resources["cpu_used"],
+    )
 
     public_config = config
     dynamic_snapshot = True
@@ -777,9 +772,6 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
         "coefficient_limit",
         "stalled_yield",
         "trivial_dependency_limit",
-        "relation_limit",
-        "atom_limit",
-        "memory_limit",
         "configuration_refusal",
     )
     if payload["finished_reason"] not in allowed:
@@ -981,12 +973,7 @@ def restore_job(checkpoint, *, budget, config=None, allow_extension=False):
                 raise ValueError("invalid SIQS engine completion flag")
             setattr(engine, name, saved[name])
         engine.storage_reason = saved["storage_reason"]
-        if engine.storage_reason not in (
-            None,
-            "relation_limit",
-            "atom_limit",
-            "memory_limit",
-        ):
+        if engine.storage_reason not in (None,):
             raise ValueError("invalid SIQS checkpoint storage reason")
 
         engine.stats = saved["stats"]

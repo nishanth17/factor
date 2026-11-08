@@ -220,16 +220,11 @@ def restore_job(checkpoint, *, budget, config=None):
     ):
         raise ValueError("incompatible checkpoint backend")
 
-    if budget.used == 0 and budget.prior_wall == 0 and budget.prior_cpu == 0:
-        budget.used = resources["work_used"]
-        budget.prior_wall = resources["wall_used"]
-        budget.prior_cpu = resources["cpu_used"]
-    elif (
-        budget.used < resources["work_used"]
-        or budget.wall_used < resources["wall_used"]
-        or budget.cpu_used < resources["cpu_used"]
-    ):
-        raise ValueError("resume must retain consumed resources")
+    budget.restore_charges(
+        work=resources["work_used"],
+        wall=resources["wall_used"],
+        cpu=resources["cpu_used"],
+    )
 
     budget.consume(0)
     job = SSSJob(
@@ -278,12 +273,9 @@ def restore_job(checkpoint, *, budget, config=None):
     if engine.final_solve_done and engine.next_position != engine.hi:
         raise ValueError("SSS final solve precedes assignment exhaustion")
     engine.storage_reason = saved["storage_reason"]
-    if engine.storage_reason not in (
-        None,
-        "relation_limit",
-        "atom_limit",
-        "memory_limit",
-    ) or (engine.storage_solve_done and engine.storage_reason is None):
+    if engine.storage_reason not in (None,) or (
+        engine.storage_solve_done and engine.storage_reason is None
+    ):
         raise ValueError("invalid SSS storage stop")
 
     stats = saved["stats"]

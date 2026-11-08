@@ -8,11 +8,11 @@ from dataclasses import dataclass
 from math import comb, prod
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget
 from ..execution.resources import (
     decode_checkpoint,
     encode_checkpoint,
     removed_arguments,
+    resolve_budget,
 )
 from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
 
@@ -61,15 +61,12 @@ def _checked_resources(resources):
     }:
         raise ValueError("invalid family checkpoint resource record")
 
-    work = utils.require_integer(resources["work_used"], "work_used", 0)
-    if work.bit_length() > 64:
-        raise ValueError("family checkpoint work exceeds 64 bits")
+    utils.require_integer(resources["work_used"], "work_used", 0)
     for name in ("wall_used", "cpu_used"):
         value = resources[name]
         if (
             isinstance(value, bool)
             or not isinstance(value, (int, float))
-            or (isinstance(value, int) and value.bit_length() > 64)
             or not math.isfinite(value)
             or value < 0
         ):
@@ -108,7 +105,7 @@ def family_assignments(
 
     reserve = base.workspace_bytes + 32768 + 256 * len(base.entries)
     reserve += family_count * factor_count * 256
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     target = a_target(base.n_prime, half_width)
     budget.consume(len(base.entries) * (factor_count + 1))
     eligible = [
@@ -175,7 +172,7 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
         raise ValueError("cached root tuple has the wrong base shape")
     if (polynomial.n, polynomial.multiplier) != (base.n, base.multiplier):
         raise ValueError("cached roots belong to a different target")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
 
     for entry, item in zip(base.entries, roots):
         prime = entry.prime
@@ -289,7 +286,7 @@ class PolynomialFamily:
             a.bit_length() + base.n.bit_length()
         )
         self.base, self.a_primes, self.a = base, a_primes, a
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.workspace_bytes = reserve
         entries = {
             entry.prime: entry
@@ -552,17 +549,11 @@ class PolynomialFamily:
         resources = _checked_resources(payload["resources"])
         if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("family checkpoint integrity mismatch")
-        prior = Budget(
-            used=resources["work_used"],
-            prior_wall=resources["wall_used"],
-            prior_cpu=resources["cpu_used"],
+        budget.restore_charges(
+            work=resources["work_used"],
+            wall=resources["wall_used"],
+            cpu=resources["cpu_used"],
         )
-        if (
-            budget.used < prior.used
-            or budget.wall_used < prior.prior_wall
-            or budget.cpu_used < prior.prior_cpu
-        ):
-            raise ValueError("resume budget must retain consumed resources")
 
         family = cls(
             base,

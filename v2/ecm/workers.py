@@ -347,9 +347,6 @@ class ECMExecutor:
                         self._budget.acknowledge(
                             slot["process"].pid, message["cpu"]
                         )
-                        self._budget.acknowledge(
-                            slot["process"].pid, message["cpu"]
-                        )
                         pending.remove(entry)
                         progress = True
                     elif not slot["process"].is_alive():

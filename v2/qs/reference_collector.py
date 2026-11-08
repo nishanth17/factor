@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from ..common import utils
 from ..common.arithmetic import gcd
-from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import removed_arguments
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import removed_arguments, resolve_budget
 from .polynomial import checked_position
 from .relations import AtomicRelation, checked_residual_bound, verify_atomic
 
@@ -55,7 +55,7 @@ def collect_block(
     ):
         raise ValueError("polynomial and factor-base identity mismatch")
 
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     relations, zero_positions = [], []
     position, reason, divisor = lo, "complete", None
     # A*x and its square are finite because coefficient/position bits are

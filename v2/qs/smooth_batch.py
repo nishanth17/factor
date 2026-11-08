@@ -2,8 +2,7 @@
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd
-from ..execution.budget import Budget
-from ..execution.resources import removed_arguments
+from ..execution.resources import removed_arguments, resolve_budget
 
 
 @removed_arguments(("max_bits", "max_nodes", "memory_bytes"))
@@ -33,7 +32,7 @@ def _tree_reservation(values):
 def product_tree(values, *, budget=None):
     """Return immutable levels; empty input has no root, one is permitted."""
     _tree_reservation(values)
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     budget.consume(len(values) + 1)
     levels, level = [], values
 
@@ -64,7 +63,7 @@ class SmoothBatch:
 
     @removed_arguments(("max_bits", "max_nodes", "memory_bytes"))
     def __init__(self, primes, *, backend="python-int", budget=None):
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         if not isinstance(primes, tuple):
             raise TypeError("primes must be a tuple")
         _tree_reservation(primes)

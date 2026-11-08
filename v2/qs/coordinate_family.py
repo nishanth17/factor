@@ -187,12 +187,11 @@ class CoordinateFamily:
             raise ValueError("coordinate family target/convention mismatch")
         if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("coordinate family integrity/size mismatch")
-        if (
-            budget.used < resources["work_used"]
-            or budget.wall_used < resources["wall_used"]
-            or budget.cpu_used < resources["cpu_used"]
-        ):
-            raise ValueError("resume must retain charged resources")
+        budget.restore_charges(
+            work=resources["work_used"],
+            wall=resources["wall_used"],
+            cpu=resources["cpu_used"],
+        )
         family = cls(
             base,
             tuple(primes),

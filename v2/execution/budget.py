@@ -1,9 +1,12 @@
 """One observed resource owner shared by stages and recursive children."""
 
 import itertools
+import math
 import os
 import sys
+import threading
 import time
+from functools import wraps
 
 from ..common import utils
 from .resources import (
@@ -16,6 +19,28 @@ from .resources import (
 )
 
 _PROCESS_REGISTRATIONS = itertools.count()
+
+
+def read_clock(clock, name):
+    value = clock()
+    try:
+        valid = type(value) in (int, float) and math.isfinite(value)
+    except OverflowError:
+        valid = False
+    if not valid:
+        raise ResourceProviderError("invalid " + name + " clock observation")
+    return value
+
+
+def synchronized(function):
+    """Serialize parent polling with an owned executor's reaping thread."""
+
+    @wraps(function)
+    def call(self, *args, **kwargs):
+        with self._accounting_lock:
+            return function(self, *args, **kwargs)
+
+    return call
 
 
 class BudgetExhaustedError(Exception):
@@ -79,7 +104,11 @@ class Budget:
             prior_wall,
             prior_cpu,
         )
+        self._history_work = used
+        self._history_wall = prior_wall
+        self._history_cpu = prior_cpu
         self.reason = self.stop = None
+        self._accounting_lock = threading.RLock()
         self._wall_clock = wall_clock or time.monotonic
         self._cpu_clock = cpu_clock or time.process_time
         self.provider = provider
@@ -105,17 +134,19 @@ class Budget:
         )
         self.start()
 
+    @synchronized
     def start(self):
         """Begin an active interval, including retained-context startup."""
         if self._active:
             return self
-        self._wall_start = self._wall_clock()
-        self._cpu_start = self._cpu_clock()
+        self._wall_start = read_clock(self._wall_clock, "wall")
+        self._cpu_start = read_clock(self._cpu_clock, "CPU")
         self._active = True
         self._last_sample = None
         self._sample(baseline=True)
         return self
 
+    @synchronized
     def close(self):
         """Settle an active interval after owned children have drained."""
         if self._active:
@@ -134,22 +165,31 @@ class Budget:
 
     @property
     def wall_used(self):
-        return self.prior_wall + (
-            self._wall_clock() - self._wall_start if self._active else 0
+        elapsed = (
+            read_clock(self._wall_clock, "wall") - self._wall_start
+            if self._active
+            else 0
         )
+        if elapsed < 0:
+            raise ResourceProviderError("wall clock moved backwards")
+        return self.prior_wall + elapsed
 
     @property
     def cpu_used(self):
-        return (
-            self.prior_cpu
-            + self._child_cpu
-            + (self._cpu_clock() - self._cpu_start if self._active else 0)
+        elapsed = (
+            read_clock(self._cpu_clock, "CPU") - self._cpu_start
+            if self._active
+            else 0
         )
+        if elapsed < 0:
+            raise ResourceProviderError("CPU clock moved backwards")
+        return self.prior_cpu + self._child_cpu + elapsed
 
     def register(self, pid):
         """Include an owned helper/worker even after it is reparented."""
         self.roots[pid] = None
 
+    @synchronized
     def observe_child(self, identity, cpu_total, *, baseline=False):
         """Reconcile OS samples, acknowledgments and final wait4 totals once.
 
@@ -167,6 +207,7 @@ class Budget:
         self._child_cpu += current - previous
         self._children[identity] = current
 
+    @synchronized
     def _sample(self, *, force=False, baseline=False):
         if self.provider is None:
             return
@@ -253,22 +294,31 @@ class Budget:
         reservation.check(amount, self.wall_used, self.cpu_used)
         self.used += amount
 
+    @synchronized
     def restore_charges(self, *, work, wall, cpu):
         """Restore saved history without erasing a retained owner's charges."""
         utils.require_integer(work, "saved work", 0)
         validate_seconds(wall, "saved wall")
         validate_seconds(cpu, "saved CPU")
-        self.used = max(self.used, work)
-        self.prior_wall = max(self.prior_wall, wall)
-        self.prior_cpu = max(self.prior_cpu, cpu)
+        if wall is None or cpu is None:
+            raise ValueError("saved charges must be finite and nonnegative")
+        self.used += max(0, work - self._history_work)
+        self.prior_wall += max(0, wall - self._history_wall)
+        self.prior_cpu += max(0, cpu - self._history_cpu)
+        self.record_charges(work=work, wall=wall, cpu=cpu)
 
+    @synchronized
+    def record_charges(self, *, work, wall, cpu):
+        """Remember an emitted/restored prefix without a durable ledger."""
+        self._history_work = max(self._history_work, work)
+        self._history_wall = max(self._history_wall, wall)
+        self._history_cpu = max(self._history_cpu, cpu)
+
+    @synchronized
     def charges(self):
-        return dict(
-            resource_version=RESOURCE_VERSION,
-            work=self.used,
-            wall=self.wall_used,
-            cpu=self.cpu_used,
-        )
+        values = dict(work=self.used, wall=self.wall_used, cpu=self.cpu_used)
+        self.record_charges(**values)
+        return dict(resource_version=RESOURCE_VERSION, **values)
 
     def acknowledge(self, pid, cpu_total):
         """Reconcile a process-lifetime acknowledgment with OS samples."""
@@ -280,6 +330,7 @@ class Budget:
             raise RuntimeError("CPU report from an unregistered process")
         self.observe_child(identity, cpu_total)
 
+    @synchronized
     def track_process(self, process):
         """Retain final wait4 usage through this owned Popen's sole reaper.
 
@@ -324,26 +375,43 @@ class Budget:
         if existing is not None:
             return
 
+        reap_lock = threading.RLock()
+
         def poll(flag=os.WNOHANG):
-            if popen.returncode is None:
+            with reap_lock:
+                if popen.returncode is not None:
+                    return popen.returncode
+                owner, key = binding
+                peek = getattr(owner.provider, "peek_exit", None)
                 try:
+                    final = None if peek is None else peek(popen.pid, flag)
+                    if peek is not None and final is None:
+                        return None
                     pid, status, usage = os.wait4(popen.pid, flag)
                 except OSError as error:
-                    # Match Popen's pre-creation/ECHILD handling; other
-                    # OS failures keep their original error identity.
                     if error.errno == 10:
-                        return None
+                        return popen.returncode
                     raise
                 if pid == popen.pid:
-                    owner, key = binding
-                    owner.observe_child(
-                        key,
-                        usage.ru_utime + usage.ru_stime,
-                        baseline=not owner._active,
-                    )
-                    owner.roots.pop(popen.pid, None)
-                    owner._process_bindings.pop(popen.pid, None)
-                    popen.returncode = os.waitstatus_to_exitcode(status)
-            return popen.returncode
+                    with owner._accounting_lock:
+                        if final is not None:
+                            identity = (final.pid, final.birth)
+                            if identity != key:
+                                previous = owner._children.pop(key, 0.0)
+                                owner._children[identity] = max(
+                                    previous,
+                                    owner._children.get(identity, 0.0),
+                                )
+                                binding[1] = key = identity
+                            total = final.cpu
+                        else:
+                            total = usage.ru_utime + usage.ru_stime
+                        owner.observe_child(
+                            key, total, baseline=not owner._active
+                        )
+                        owner.roots.pop(popen.pid, None)
+                        owner._process_bindings.pop(popen.pid, None)
+                        popen.returncode = os.waitstatus_to_exitcode(status)
+                return popen.returncode
 
         popen.poll = poll

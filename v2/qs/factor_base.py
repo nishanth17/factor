@@ -5,8 +5,7 @@ from types import MappingProxyType
 
 from ..common import arithmetic, prime_sieve, utils
 from ..common.arithmetic import gcd, pow
-from ..execution.budget import Budget
-from ..execution.resources import removed_arguments
+from ..execution.resources import removed_arguments, resolve_budget
 
 MAX_INPUT_BITS = 4096
 MAX_MULTIPLIER = 1_000_000
@@ -42,7 +41,7 @@ def modular_square_roots(value, prime, *, budget=None):
     utils.require_integer(prime, "prime", 2)
     if prime > MAX_FACTOR_BASE_BOUND:
         raise ValueError("prime exceeds the reference factor-base limit")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     budget.consume(prime.bit_length() ** 2)
     if utils.classify_prime(prime) != utils.Primality.PROVEN:
         raise ValueError("modulus must be a proven prime")
@@ -206,7 +205,7 @@ def build_factor_base(
     utils.require_integer(bound, "bound", 3)
     if bound > MAX_FACTOR_BASE_BOUND:
         raise ValueError("factor-base bound exceeds the reference limit")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     budget.consume(n.bit_length())
     divisor = gcd(multiplier, n)
     if utils.valid_divisor(divisor, n):

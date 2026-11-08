@@ -16,10 +16,12 @@ from ..common import arithmetic, utils
 from ..common.arithmetic import pow
 from ..execution.budget import Budget, BudgetExhaustedError
 from ..execution.resources import (
+    accounted_entry,
     accounted_job,
     decode_checkpoint,
     encode_checkpoint,
     removed_arguments,
+    resolve_budget,
 )
 from ..execution.work_budget import PollingBudget
 from .checkpoint import _restore_store, _store
@@ -323,6 +325,24 @@ def _collect(task, state=None):
     )
 
 
+class ObservedProcessPoolExecutor(ProcessPoolExecutor):
+    """Attach final-CPU observation before the manager can reap a child.
+
+    PyPy 3.11 starts and registers a process in _spawn_process before starting
+    its manager thread; replacements are spawned by that manager itself.
+    The root is rebound at begin() for retained pools. No global executor or
+    multiprocessing behavior is modified.
+    """
+
+    resource_owner = None
+
+    def _spawn_process(self):
+        before = set(self._processes)
+        super()._spawn_process()
+        for pid in self._processes.keys() - before:
+            self.resource_owner.track_process(self._processes[pid])
+
+
 class CollectionPool:
     """Reusable bounded executor; single active job, explicit close required.
 
@@ -373,7 +393,7 @@ class CollectionPool:
 
         self.executor = None
         if mode == "process":
-            self.executor = ProcessPoolExecutor(
+            self.executor = ObservedProcessPoolExecutor(
                 max_workers=workers,
                 mp_context=context,
                 initializer=_initialize_process,
@@ -390,8 +410,13 @@ class CollectionPool:
     def __exit__(self, *args):
         self.close()
 
-    def close(self):
+    @accounted_entry
+    def close(self, *, budget=None):
         self.state["stop"].set()
+        if self.mode == "process" and self.executor is not None:
+            self.executor.resource_owner = budget
+            for process in (self.executor._processes or {}).values():
+                budget.track_process(process)
         if self.executor is not None:
             self.executor.shutdown(wait=True, cancel_futures=True)
         self.closed = True
@@ -400,6 +425,8 @@ class CollectionPool:
         if self.closed or not self.lock.acquire(blocking=False):
             raise ValueError("pool is closed or already running a job")
         self.state["stop"].clear()
+        if self.mode == "process":
+            self.executor.resource_owner = getattr(budget, "budget", budget)
         for i, value in enumerate(self.state["cpu"]):
             self.state["cpu_base"][i] = value
         self.state["cpu_limit"].value = (
@@ -426,8 +453,11 @@ class CollectionPool:
     def poll(self, budget):
         """Charge all published worker CPU, including spawn/import startup."""
         if self.mode == "process":
+            base = getattr(budget, "budget", budget)
             for process in (self.executor._processes or {}).values():
-                budget.track_process(process)
+                binding = getattr(process._popen, "_factor_accounting", None)
+                if binding is None or binding[0] is not base:
+                    base.track_process(process)
             current = sum(
                 max(0, x - y)
                 for x, y in zip(self.state["cpu"], self.state["cpu_base"])
@@ -457,7 +487,7 @@ class ParallelSIQSJob:
         if not isinstance(self.config, ParallelConfig):
             raise TypeError("config must be a ParallelConfig")
         self.n = arithmetic.get_backend(self.config.backend).integer(n)
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self._original_budget = self.budget
         self._original_config = self._checked_config = self.config
         self.base = self.assignments = self.engine = None
@@ -1101,9 +1131,11 @@ class ParallelSIQSJob:
             raise ValueError("incompatible checkpoint backend")
         if payload["version"] == 1 and config.batch_width:
             raise ValueError("legacy checkpoint cannot contain chunk progress")
-        budget.used = max(budget.used, resources["work_used"])
-        budget.prior_wall = max(budget.prior_wall, resources["wall_used"])
-        budget.prior_cpu = max(budget.prior_cpu, resources["cpu_used"])
+        budget.restore_charges(
+            work=resources["work_used"],
+            wall=resources["wall_used"],
+            cpu=resources["cpu_used"],
+        )
         job = cls(
             payload["n"], seed=payload["seed"], config=config, budget=budget
         )

@@ -711,19 +711,14 @@ class SelectedECMContext:
         budget.consume(HEADER_BYTES)
         self.selector_work += HEADER_BYTES
         if self.inner is None or saved is not None:
-            try:
-                plan = self._select(
-                    n,
-                    config,
-                    saved,
-                    origin,
-                    portfolio=portfolio,
-                )
-                refusal = "unmeasured_selection_cost"
-            except MemoryError:
-                if not portfolio or checkpoint is not None:
-                    raise
-                plan, refusal = None, "worker_ownership_refused"
+            plan = self._select(
+                n,
+                config,
+                saved,
+                origin,
+                portfolio=portfolio,
+            )
+            refusal = "unmeasured_selection_cost"
             if plan is None:
                 self._stats(
                     started,

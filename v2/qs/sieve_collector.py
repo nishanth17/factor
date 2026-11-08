@@ -5,8 +5,12 @@ from dataclasses import dataclass, field
 
 from ..common import utils
 from ..common.arithmetic import gcd, isqrt
-from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import accounted_job, removed_arguments
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    accounted_job,
+    removed_arguments,
+    resolve_budget,
+)
 from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .families import verify_polynomial_roots
@@ -388,7 +392,7 @@ class SieveCollector:
                 self.config.residual_bound, self.config.large_product_bound
             )
         self.polynomial, self.factor_base = polynomial, factor_base
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         if (polynomial.n, polynomial.multiplier) != (
             factor_base.n,
             factor_base.multiplier,

@@ -8,13 +8,14 @@ from math import gcd, isqrt, prod
 
 from .. import constants
 from ..common import utils
-from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.budget import BudgetExhaustedError
 from ..execution.resources import (
     RESOURCE_VERSION,
     accounted_entry,
     decode_checkpoint,
     removed_arguments,
     require_resource_version,
+    resolve_budget,
 )
 from ..execution.schedules import (
     RATIO_VERSION,
@@ -442,7 +443,7 @@ def factorize_pm1_bounded(
             if execution == EXECUTION_VERSION
             else PM1TuningConfig(chunk_size=64, gap_mode="recurrence")
         )
-    budget = Budget() if budget is None else budget
+    budget = resolve_budget(budget)
     if max(n.bit_length(), base.bit_length()) > config.max_input_bits:
         raise ValueError("input or base exceeds configured bit cap")
     if max_actions is not None:
