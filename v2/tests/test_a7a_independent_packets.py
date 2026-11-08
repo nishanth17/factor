@@ -8,10 +8,11 @@ from v2.benchmarks.qs.a7a.independent_packets import partition, summarize
 class IndependentPacketTests(unittest.TestCase):
     def test_every_concurrency_preserves_the_same_disjoint_work(self):
         tasks = list(range(16))
-        for workers in (1, 4, 8):
+        for workers in (1, 4, 8, 10):
             groups = partition(tasks, workers)
             self.assertEqual(sorted(t for g in groups for t in g), tasks)
-            self.assertEqual(max(map(len, groups)), 16 // workers)
+            self.assertEqual(max(map(len, groups)), (16 + workers - 1) // workers)
+            self.assertLessEqual(max(map(len, groups)) - min(map(len, groups)), 1)
 
     def test_summary_rejects_missing_and_duplicate_work(self):
         def stream(index):

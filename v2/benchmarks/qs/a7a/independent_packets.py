@@ -21,7 +21,7 @@ SEEDS = (104729, 130363, 155921)
 
 def partition(tasks, workers):
     """Keep the same distinct ordered packets at every concurrency level."""
-    if workers not in (1, 4, 8) or len(tasks) < workers:
+    if workers not in (1, 4, 8, 10) or len(tasks) < workers:
         raise ValueError("unsupported fixed-packet allocation")
     return [tasks[index::workers] for index in range(workers)]
 
@@ -109,7 +109,7 @@ def execute(fixture, workers, *, longer_window=False):
     from ....qs.current_parallel import CurrentParallelSIQSJob
     from ....qs.worker_state import context_key
 
-    if workers not in (0, 1, 4, 8):
+    if workers not in (0, 1, 4, 8, 10):
         raise ValueError("unsupported concurrency")
     if type(longer_window) is not bool:
         raise ValueError("window selector must be Boolean")
