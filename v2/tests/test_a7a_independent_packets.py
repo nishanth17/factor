@@ -11,8 +11,9 @@ class IndependentPacketTests(unittest.TestCase):
         for workers in (1, 4, 8, 10):
             groups = partition(tasks, workers)
             self.assertEqual(sorted(t for g in groups for t in g), tasks)
-            self.assertEqual(max(map(len, groups)), (16 + workers - 1) // workers)
-            self.assertLessEqual(max(map(len, groups)) - min(map(len, groups)), 1)
+            lengths = [len(group) for group in groups]
+            self.assertEqual(max(lengths), (16 + workers - 1) // workers)
+            self.assertLessEqual(max(lengths) - min(lengths), 1)
 
     def test_summary_rejects_missing_and_duplicate_work(self):
         def stream(index):
