@@ -745,6 +745,23 @@ class SieveCollector:
             )
             self._sparse_square = isqrt(target) ** 2 == target
 
+        # Bind optional implementations once. Default block/root traversals
+        # must not repeatedly test disabled experimental mechanisms.
+        from types import MethodType
+
+        from . import scalar_kernels
+        from .sparse_queue import sieve as optional_sparse_sieve
+
+        if "presieve_powers" not in self.config._kernels:
+            self._sieve_direct = MethodType(scalar_kernels.direct_scalar, self)
+        if "scan_fused" not in self.config._kernels:
+            self._collect = MethodType(scalar_kernels.collect_scalar, self)
+        self._sparse_sieve = (
+            scalar_kernels.sieve_native
+            if "packed_queue" not in self.config._kernels
+            else optional_sparse_sieve
+        )
+
     def _recovery_mask(self, index):
         """Reuse a funded immutable prefix; larger indices stay exact."""
         masks = self._hit_masks
@@ -1058,9 +1075,7 @@ class SieveCollector:
             reserve_batch(self, lo, hi)
         self._piecewise_thresholds = None
         if self.config.sparse_queue_bytes:
-            from .sparse_queue import sieve
-
-            threshold = sieve(self, lo, hi, stats)
+            threshold = self._sparse_sieve(self, lo, hi, stats)
         else:
             threshold = self._sieve_direct(lo, hi, stats)
         if self._word_hits is not None and self._hits is self._word_hits:

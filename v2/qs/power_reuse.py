@@ -32,6 +32,8 @@ class RootTransfers:
         if type(pruned_replay) is not bool:
             raise ValueError("pruned replay must be Boolean")
         self.pruned_replay = pruned_replay
+        if not pruned_replay:
+            self.shifted_class = self._unpruned_class
         self.pruned_replays = 0
         self.byte_limit = max(0, byte_limit - 65536)
         self.used = 0
@@ -118,6 +120,12 @@ class RootTransfers:
         self.used += updated_charge - charge
         self.replays += 1
         return shifted
+
+    def _unpruned_class(
+        self, polynomial, prime, modulus, initial, active, cost, budget
+    ):
+        """Default replay has no experimental pruning guard."""
+        return None
 
     def shifted_class(
         self, polynomial, prime, modulus, initial, active, cost, budget

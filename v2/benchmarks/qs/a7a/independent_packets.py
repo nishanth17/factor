@@ -69,6 +69,46 @@ def stream_packets(tasks, payload):
         cpu=time.process_time() - cpu,
         rss_hwm=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         reports=reports,
+        hot_buffers=hot_buffers(runtime.collector),
+    )
+
+
+def hot_buffers(collector):
+    """Report exact bulk payload separately from accounted cache ownership.
+
+    This inventory is not a measurement of cache residency or unique RSS.
+    Native integer-list payload uses PyPy's native-width integer strategy.
+    """
+    if collector is None:
+        return {}
+    words = collector._word_hits
+    buffers = dict(scores=8 * len(collector._scores))
+    if words is not None:
+        buffers.update(
+            words=8 * sum(map(len, words.words)),
+            stamps=sum(
+                len(s) * (1 if isinstance(s, bytearray) else 8)
+                for s in words.stamps
+            ),
+            read_cache=8 * len(words.cache),
+            read_stamps=8 * len(words.cache_stamps),
+        )
+    queue = getattr(collector, "_sparse_queue", None)
+    buffers["queue_payload"] = (
+        0 if queue is None else sum(len(q) * q.itemsize for q in queue[1])
+    )
+    transfers = collector._power_transfers
+    return dict(
+        bulk_payload_bytes=sum(buffers.values()),
+        buffers=buffers,
+        transfer_accounted_bytes=0 if transfers is None else transfers.used,
+        transfer_capacity_bytes=0
+        if transfers is None
+        else transfers.byte_limit,
+        interpretation=(
+            "Bulk payload plus separately accounted cache ownership; "
+            "not exact total hot set or hardware cache residency."
+        ),
     )
 
 
@@ -103,7 +143,7 @@ def summarize(streams, expected_packets):
     )
 
 
-def execute(fixture, workers, *, longer_window=False):
+def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
     """Run local (zero) or one private stream per spawned owned process."""
     from ....execution.budget import Budget
     from ....qs.current_parallel import CurrentParallelSIQSJob
@@ -128,6 +168,18 @@ def execute(fixture, workers, *, longer_window=False):
         memory_bytes=4 * 2**30,
         checkpoint_bytes=64 * 2**20,
     )
+    if byte_stamps:
+        from ....qs.collector_kernels import combine, components
+
+        config = replace(
+            config,
+            collector=replace(
+                config.collector,
+                marking=combine(
+                    components(config.collector.marking) + ("byte_stamps",)
+                ),
+            ),
+        )
     options = settings(
         f"C{workers or 1}",
         22 * 2**30,
@@ -233,6 +285,7 @@ def execute(fixture, workers, *, longer_window=False):
         seed=SEEDS[index],
         polynomials=polynomials,
         packet=packet,
+        byte_stamps=byte_stamps,
         setup_wall=prepared - started,
         actor_wall=time.monotonic() - started,
         collection_wall=time.monotonic() - prepared,
@@ -256,11 +309,15 @@ def main():
     parser.add_argument("workers", type=int)
     parser.add_argument("output", type=Path)
     parser.add_argument("--longer-window", action="store_true")
+    parser.add_argument("--byte-stamps", action="store_true")
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("never overwrite a throughput receipt")
     result = execute(
-        args.fixture, args.workers, longer_window=args.longer_window
+        args.fixture,
+        args.workers,
+        longer_window=args.longer_window,
+        byte_stamps=args.byte_stamps,
     )
     with args.output.open("x") as stream:
         json.dump(result, stream, indent=2)

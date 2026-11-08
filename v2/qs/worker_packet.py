@@ -267,6 +267,14 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
 
         if collector is not None:
             collector._admit = admit
+            if settings.grouped_lease_charging:
+                from types import MethodType
+
+                from .sieve_collector import SieveCollector as GenericCollector
+
+                collector._sieve_direct = MethodType(
+                    GenericCollector._sieve_direct, collector
+                )
             collector._group_lease = (
                 budget if settings.grouped_lease_charging else None
             )
@@ -296,6 +304,16 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
                 # Use the actual current collector, including DLP/extended
                 # recovery. Only publication is replaced; no subclass bypass.
                 collector._admit = admit
+                if settings.grouped_lease_charging:
+                    from types import MethodType
+
+                    from .sieve_collector import (
+                        SieveCollector as GenericCollector,
+                    )
+
+                    collector._sieve_direct = MethodType(
+                        GenericCollector._sieve_direct, collector
+                    )
                 collector._group_lease = (
                     budget if settings.grouped_lease_charging else None
                 )

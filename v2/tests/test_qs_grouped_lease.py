@@ -52,6 +52,14 @@ class GroupedLeaseTests(unittest.TestCase):
         view = PacketLeaseBudget(raw, poll=lambda b: trace.append(b.used))
         collector.budget = view
         collector._group_lease = view if grouped else None
+        if grouped:
+            from types import MethodType
+
+            from v2.qs.sieve_collector import SieveCollector
+
+            collector._sieve_direct = MethodType(
+                SieveCollector._sieve_direct, collector
+            )
         original_add = WordHits.add
 
         def mark_and_stop(*args, **kwargs):
