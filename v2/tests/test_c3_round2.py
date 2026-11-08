@@ -211,7 +211,11 @@ class RoundTwoControlsTests(unittest.TestCase):
                 if policy.fallback_work and fallback and not cancel:
                     # Work is diagnostic; a reserve cannot spend it in advance.
                     view = PretestBudget(new, policy, fallback=fallback)
-                    view.consume(0)
+                    if clocks is not None and prior >= clocks:
+                        with self.assertRaisesRegex(Exception, "wall_limit"):
+                            view.consume(0)
+                    else:
+                        view.consume(0)
                     self.assertEqual(new.used, 7)
                     continue
                 self.assertEqual(

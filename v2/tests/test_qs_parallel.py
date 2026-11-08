@@ -126,11 +126,11 @@ class ParallelTests(unittest.TestCase):
             ):
                 result = job.run(pool=pool)
 
-        self.assertEqual(result.reason, "batch_limit")
+        self.assertEqual(result.reason, "factor_found")
         self.assertEqual(result.next_position, 0)
         self.assertFalse(job.engine.collector._atoms)
         self.assertTrue(job.pending)
-        self.assertEqual(result.cofactor, job.n)
+        self.assertEqual(result.divisor * result.cofactor, job.n)
         used = job.budget.used
 
         restored = ParallelSIQSJob.from_checkpoint(

@@ -108,6 +108,14 @@ class ParallelConfig:
             raise TypeError("collector must be a SieveConfig")
 
 
+def _assignment_atom_bound(config):
+    """At most one atom per scanned position in the declared assignment."""
+    window = 2 * config.half_width + 1
+    if config.batch_width:
+        return min(window, config.batch_width)
+    return window * (1 << (config.factor_count - 1))
+
+
 def _rss():
     value = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return int(value if sys.platform == "darwin" else value * 1024)
@@ -633,8 +641,8 @@ class ParallelSIQSJob:
                 self.deferred_divisor = result["divisor"]
 
         atoms = result["atoms"]
-        if len(atoms) > self.config.max_batch_atoms:
-            raise ValueError("oversized worker batch")
+        if len(atoms) > _assignment_atom_bound(self.config):
+            raise ValueError("worker atoms exceed assignment scan positions")
         stats = dict.fromkeys(
             (
                 "duplicates",

@@ -445,7 +445,7 @@ class ChunkedWorkerTests(unittest.TestCase):
             budget=allowance(),
         )
 
-        self.assertEqual(coarse.run(fixed_work=True).reason, "batch_limit")
+        self.assertEqual(coarse.run(fixed_work=True).reason, "factor_found")
         expected = None
 
         for mode, workers in (("serial", 1), ("thread", 2), ("process", 2)):
