@@ -1041,6 +1041,28 @@ requires a second pool implementation or waits for the other's unrelated path.
   This row's phase-H location does not defer it until final H1 reconciliation.
   H2 is an overhead sweep, not the integrated allocation tuning gated on D7/E1.
 
+#### H3 — simplify resource limits
+
+H3 is at its inventory/design checkpoint on `codex/h3-resource-limits`, based on
+committed mainline `40d2367f1154ad96f30775a40e4d895f788ee9e2`. The requested scope
+removes refusal-only internal ceilings, preserves capacities/numerical policy
+and exactness checks, and permits only top-level wall/CPU, sampled process-tree
+RSS and an optional checkpoint save cap. No timing, profiling, tuning, merge or
+push is included. Implementation and correctness acceptance remain open.
+
+A material resource-accounting decision remains: optional/skipped saves cannot
+persist charges incurred after the last valid snapshot. Strict cumulative
+recovery needs an accounting authority independent of that snapshot; saved-history
+recovery instead needs an explicit limit on its no-reset guarantee. The requested
+design gate stops implementation until this contract is resolved. No production
+behavior, API, checkpoint format or automatic selection has changed.
+
+Local inventory, literal enforcement branches, incident/source pins, proposed
+resource design, pending correctness stages and A7a/B4a/B12 adapter notes are in
+`v2/audit/h3_resource_limits/` in the task worktree. The retained 75/80 reports do
+not identify the internal `memory_limit` sub-limit; that attribution remains
+unvalidated. Do not substitute the suspected context cap for a recorded cause.
+
 ### Execution phase I — reproducible publication
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |

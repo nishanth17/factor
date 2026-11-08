@@ -106,6 +106,14 @@ explains residual/endpoint/product controls and charged base-count resolution.
 
 ## Work in flight
 
+H3 resource-limit simplification has reached its inventory/design checkpoint on
+`codex/h3-resource-limits`, based on committed mainline `40d2367`. Implementation
+awaits the accounting contract for consumption after a skipped or interrupted
+checkpoint save: an independent accounting authority versus charges through the
+last saved boundary. No limits, APIs, formats or defaults have changed. The local
+entry point is `v2/audit/h3_resource_limits/DESIGN.md` in the H3 worktree; the
+[roadmap checkpoint](ROADMAP.md#h3--simplify-resource-limits) records the scope.
+
 Inspected 6 November 2026. These are isolated experimental branches; their
 implementations are not mainline defaults. Checkpoint summaries and explicit
 remaining work live in [the roadmap's In progress section](ROADMAP.md#in-progress).
