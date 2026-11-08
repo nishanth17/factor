@@ -204,7 +204,7 @@ class ParityPolynomialTests(unittest.TestCase):
         )
         before = collector._workspace
         with patch(
-            "v2.qs.sparse_queue.build",
+            "v2.qs.scalar_kernels.build_native",
             side_effect=BudgetExhaustedError("work"),
         ):
             result = collector.collect(-71, 80)

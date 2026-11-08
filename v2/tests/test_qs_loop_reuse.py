@@ -15,7 +15,7 @@ from v2.qs.sparse_queue import ENTRY_BYTES, build
 from v2.tests.test_qs import unlimited_budget
 
 
-def queue_worker(width):
+def queue_worker(width, marking="sparse"):
     base = build_factor_base(1009 * 1013, bound=100).factor_base
     polynomial = Polynomial(base.n, 1, 1, 0)
     worker = SieveCollector(
@@ -24,6 +24,7 @@ def queue_worker(width):
         budget=unlimited_budget(),
         config=SieveConfig(
             division="bucket",
+            marking=marking,
             score_policy="powers",
             block_width=width,
             sparse_queue_bytes=2**20,

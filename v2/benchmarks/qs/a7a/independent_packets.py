@@ -115,8 +115,31 @@ def hot_buffers(collector):
 def _child(connection, tasks, payload, barrier):
     resource.setrlimit(resource.RLIMIT_CPU, (150, 150))
     try:
+        waiting, waiting_cpu = time.monotonic(), time.process_time()
         barrier.wait(timeout=15)
-        connection.send(dict(result=stream_packets(tasks, payload)))
+        wait_span = [
+            time.monotonic() - waiting,
+            time.process_time() - waiting_cpu,
+            1,
+        ]
+        result = stream_packets(tasks, payload)
+        publishing, publishing_cpu = time.monotonic(), time.process_time()
+        connection.send(dict(result=result))
+        # A separate small receipt measures the first send, including pipe
+        # backpressure. This harness has a startup barrier, not a task queue.
+        connection.send(
+            dict(
+                timeline=dict(
+                    active=[result["wall"], result["cpu"], len(tasks)],
+                    startup_barrier=wait_span,
+                    publication=[
+                        time.monotonic() - publishing,
+                        time.process_time() - publishing_cpu,
+                        1,
+                    ],
+                )
+            )
+        )
     except BaseException as error:
         connection.send(dict(error=repr(error)))
     finally:
@@ -258,6 +281,9 @@ def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
                 row = connection.recv()
                 if "error" in row:
                     raise RuntimeError(row["error"])
+                if not connection.poll(max(0, deadline - time.monotonic())):
+                    raise TimeoutError("independent timeline deadline")
+                row["result"]["timeline"] = connection.recv()["timeline"]
                 streams.append(row["result"])
             for process in processes:
                 process.join(timeout=max(0, deadline - time.monotonic()))
@@ -295,6 +321,8 @@ def execute(fixture, workers, *, longer_window=False, byte_stamps=False):
             "Private streams omit shared CPU publication, parent admission "
             "and graph work. Worker verification and packet encoding remain. "
             "Cold startup is included; state reuse varies with allocation. "
+            "Timelines measure active private streams, startup-barrier wait "
+            "and final result publication, not production task-queue wait. "
             "This is an empirical packet-throughput reference, not a proven "
             "upper bound or complete-factor speedup."
         ),

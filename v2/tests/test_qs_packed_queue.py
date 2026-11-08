@@ -90,8 +90,7 @@ class PackedQueueTests(unittest.TestCase):
                 self.assertLessEqual(collector._workspace, config.memory_limit)
 
     def test_interrupted_construction_releases_memory_before_replay(self):
-        worker = queue_worker(7)
-        worker.config = replace(worker.config, marking="packed_queue")
+        worker = queue_worker(7, marking="packed_queue")
         before = worker._workspace
         with patch(
             "v2.qs.sparse_queue.build",
