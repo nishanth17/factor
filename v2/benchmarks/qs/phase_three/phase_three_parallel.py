@@ -9,9 +9,19 @@ import resource
 import statistics
 import sys
 import time
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -47,7 +57,7 @@ ARMS = (
 
 def configuration(band, bound=None):
     return replace(
-        ParallelConfig(),
+        adapt_resource_configuration(ParallelConfig),
         base_bound=bound or (200 if band == "small" else 1000),
         half_width=256 if band == "small" else 512,
         factor_count=1 if band == "small" else 3,
@@ -59,7 +69,8 @@ def configuration(band, bound=None):
 
 
 def reference_config(config):
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=config.base_bound,
         half_width=config.half_width,
         factor_count=config.factor_count,
@@ -83,7 +94,9 @@ def run_one(
 ):
     """Include setup, transfer, verification, extraction and classification."""
     started, cpu_started = time.perf_counter(), process_cpu()
-    budget = Budget(work_limit=WORK, seconds=SECONDS, cpu_seconds=SECONDS)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=SECONDS, cpu_seconds=SECONDS
+    )
     own_pool = None
     if cold:
         own_pool = CollectionPool(pool.mode, pool.workers)
@@ -370,8 +383,10 @@ def main():
         if band not in output["training"]:
             raise ValueError("provide --training before held-out evaluation")
         options = dict(output["training"][band]["config"])
-        options["collector"] = SieveConfig(**options["collector"])
-        config = ParallelConfig(**options)
+        options["collector"] = adapt_resource_configuration(
+            SieveConfig, **options["collector"]
+        )
+        config = adapt_resource_configuration(ParallelConfig, **options)
         fixtures = [
             f
             for f in corpus["fixtures"]

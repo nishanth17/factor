@@ -81,7 +81,10 @@ def recover(
                 stats.get("split_domain_skips", 0) + 1
             )
             reason = "endpoint_bound"
-        elif collector._split_calls < config.split_limit:
+        elif (
+            config.split_limit is None
+            or collector._split_calls < config.split_limit
+        ):
             collector._split_calls += 1
             stats["split_attempts"] += 1
             primes, reason, evaluations = split_residual(
@@ -167,7 +170,11 @@ def atom_reserve(atom, config, base, plan=None, *, arena=None):
         )
     return (
         32768
-        + (0 if config.spill_bytes else 512 * len(atom.exponents))
+        + (
+            0
+            if (config.spill_directory is not None)
+            else 512 * len(atom.exponents)
+        )
         + 32 * base.n_prime.bit_length()
     )
 
@@ -202,85 +209,35 @@ def admit_retained(collector, atom, stats):
             stats["opaque_conversions"] = (
                 stats.get("opaque_conversions", 0) + 1
             )
-    if len(collector._atoms) >= config.atom_limit:
-        return "atom_limit"
-    if (
-        not atom.residual_primes
-        and len(collector._rows) >= config.relation_limit
-    ):
-        return "relation_limit"
     reserve = atom_reserve(
         atom, config, collector.factor_base, arena=arena if bounded else None
     )
-    slab_bound = (
-        arena.allocation_bound((len(atom.exponents),)) if bounded else 0
+    (arena.allocation_bound((len(atom.exponents),)) if bounded else 0)
+    (
+        512 * len(atom.exponents)
+        if bounded or (config.spill_directory is not None)
+        else 0
     )
-    construction = (
-        512 * len(atom.exponents) if bounded or config.spill_bytes else 0
-    )
-    if (
-        collector._workspace
-        + collector._scratch_bytes
-        + reserve
-        + construction
-        + slab_bound
-        > config.memory_limit
-    ):
-        return "memory_limit"
-    try:
-        plan = collector._graph.plan_atom(
-            atom, arena.next_slot, config, budget
-        )
-    except MemoryError:
-        return "memory_limit"
+    plan = collector._graph.plan_atom(atom, arena.next_slot, config, budget)
     if bounded:
         from .yield_memory import graph_reserve
 
         reserve += graph_reserve(plan, config.cycle_reduction_choices)
-    if (
-        collector._workspace
-        + collector._scratch_bytes
-        + reserve
-        + construction
-        + slab_bound
-        > config.memory_limit
-    ):
-        return "memory_limit"
     row = None
     if plan.cycle is not None:
-        if len(collector._rows) >= config.relation_limit:
-            return "relation_limit"
         leaves = tuple(
             atom if i == arena.next_slot else arena.atoms[i]
             for i in plan.cycle
         )
         exponent_count = sum(len(a.exponents) for a in leaves)
         extra = 8192 + 512 * exponent_count
-        row_scratch = 0
-        row_global_scratch = 0
         if bounded:
             from .yield_memory import row_reserve
 
             extra = row_reserve(leaves, collector.factor_base)
-            row_scratch = 512 * exponent_count
-            row_global_scratch = collector._scratch_bytes
-            slab_bound = arena.allocation_bound(
-                (len(atom.exponents), exponent_count)
-            )
-        if (
-            collector._workspace
-            + row_global_scratch
-            + reserve
-            + extra
-            + construction
-            + row_scratch
-            + slab_bound
-            > config.memory_limit
-        ):
-            return "memory_limit"
-        result = collector._checked.combine(
-            leaves, budget, config.memory_limit
-        )
+            512 * exponent_count
+            arena.allocation_bound((len(atom.exponents), exponent_count))
+        result = collector._checked.combine(leaves, budget)
         if result.divisor is not None:
             raise ArithmeticError("checked unit residual changed")
         row = result.relation
@@ -295,6 +252,7 @@ def admit_retained(collector, atom, stats):
     else:
         packed, row, slot = arena.plan(atom, row, budget)
     budget.consume(len(atom.exponents) + len(plan.provenance) + 1)
+    collector.budget.publication()
     collector._publication_failed = True
     try:
         arena.commit(packed, slot)
@@ -315,10 +273,13 @@ def admit_retained(collector, atom, stats):
             stats["graph_cycles"] += 1
             stats["cycle_atoms"] += len(plan.cycle)
             collector._reporting.record(0, 0, 1)
-    except (MemoryError, OSError) as error:
+    except MemoryError as error:
         raise RelationPublicationError(
             "expanded relation publication failed"
         ) from error
+    except OSError as error:
+        collector._publication_io_error = error
+        raise
     else:
         collector._publication_failed = False
     # Packing publishes distinct objects. Keep raw witnesses through the

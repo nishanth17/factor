@@ -14,8 +14,15 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .... import portfolio
 from ....common import utils
@@ -157,7 +164,7 @@ def config_for(n, arm, module):
             fallback_seconds=1 if band == 30 else 10,
             fallback_cpu_seconds=1 if band == 30 else 10,
         )
-    return module.PortfolioConfig(**options)
+    return adapt_resource_configuration(module.PortfolioConfig, **options)
 
 
 def validate(result, fixture):
@@ -198,8 +205,11 @@ def run_one(fixture, seed, arm, control, *, regime="service"):
         fixture["n"],
         seed=seed,
         config=config,
-        budget=ledger_module.Budget(
-            work_limit=work, seconds=seconds, cpu_seconds=seconds
+        budget=recording_budget(
+            ledger_module.Budget,
+            work_limit=work,
+            seconds=seconds,
+            cpu_seconds=seconds,
         ),
     )
     validate(run.result, fixture)

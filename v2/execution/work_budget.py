@@ -34,11 +34,7 @@ class PollingBudget:
     def consume(self, amount=1):
         """Refuse an overdraw immediately, even between external polls."""
         utils.require_integer(amount, "amount", 0)
-        if (
-            amount == 0
-            or self._remaining == 0
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if amount == 0 or self._remaining == 0:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
@@ -58,10 +54,7 @@ class PollingBudget:
         utils.require_integer(amount, "span amount", 1)
         if amount > self.interval:
             raise ValueError("span exceeds the cooperative polling interval")
-        if (
-            amount > self._remaining
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if amount > self._remaining:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
@@ -82,10 +75,7 @@ class PollingBudget:
         if count > self.interval:
             raise ValueError("group exceeds the cooperative polling interval")
         amount = count * work_each
-        if (
-            count > self._remaining
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if count > self._remaining:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)

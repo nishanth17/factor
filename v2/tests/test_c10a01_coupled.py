@@ -4,19 +4,29 @@ import itertools
 import json
 import unittest
 from collections import defaultdict
-from dataclasses import asdict, replace
 from fractions import Fraction
 from math import isqrt, prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.benchmarks.qs.c10a01.configuration import configuration as old_config
 from v2.benchmarks.qs.c10a01.configuration_v3 import (
     configuration as study_config,
 )
 from v2.benchmarks.qs.c10a01.inputs import CORPUS
 from v2.common.prime_sieve import small_sieve
-from v2.execution.budget import Budget, BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.assignment_stream import (
     AssignmentStream,
@@ -31,6 +41,7 @@ from v2.qs.multiplier import (
 )
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
 from v2.qs.siqs import make_family
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_positions
 from v2.tests.test_qs_sieve import signature
 from v2.tests.test_siqs import allowance, configuration, mutate
@@ -76,9 +87,9 @@ def coupled_config(**options):
             sparse_queue_bytes=2**20,
             power_plan_bytes=2**18,
             residual_bound=500,
-            max_atoms=4096,
-            max_relations=4096,
             max_partials=4096,
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         ),
     )
     values.update(options)
@@ -124,7 +135,7 @@ class CoupledMultiplierTests(unittest.TestCase):
             self.assertEqual(n % split.divisor, 0)
         self.assertIsNone(select_coupled_multiplier(101).divisor)
         ledger = allowance()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             select_coupled_multiplier(
                 4001 * 5003,
                 budget=ledger,
@@ -187,9 +198,15 @@ class PairedAssignmentTests(unittest.TestCase):
             policy="paired_flyer",
             memory_bytes=2**24,
         )
-        stream = AssignmentStream(base, 32, budget=allowance(), **options)
-        short = AssignmentStream(
-            base, 32, budget=allowance(), **dict(options, family_count=3)
+        stream = adapt_resource_configuration(
+            AssignmentStream, base, 32, budget=allowance(), **options
+        )
+        short = adapt_resource_configuration(
+            AssignmentStream,
+            base,
+            32,
+            budget=allowance(),
+            **dict(options, family_count=3),
         )
         values = [stream[i] for i in range(len(stream))]
         self.assertEqual(len(values), 15)
@@ -229,7 +246,7 @@ class PairedAssignmentTests(unittest.TestCase):
             if key != "budget":
                 self.assertEqual(stream.__dict__[key], before[key])
         ledger = allowance()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             AssignmentStream(
                 base,
                 32,
@@ -241,8 +258,12 @@ class PairedAssignmentTests(unittest.TestCase):
             stream.workspace_bytes, paired_workspace(len(base.entries), 4)
         )
         with self.assertRaises(ValueError):
-            AssignmentStream(
-                base, 32, budget=allowance(), **dict(options, factor_count=2)
+            adapt_resource_configuration(
+                AssignmentStream,
+                base,
+                32,
+                budget=allowance(),
+                **dict(options, factor_count=2),
             )
 
 
@@ -268,7 +289,9 @@ class ParityInitializationTests(unittest.TestCase):
                 polynomial,
                 base,
                 budget=allowance(),
-                config=SieveConfig(marking=kind, **values),
+                config=adapt_resource_configuration(
+                    SieveConfig, marking=kind, **values
+                ),
             )
             for kind in (marking, opt_marking)
         ]
@@ -392,7 +415,6 @@ class ParityInitializationTests(unittest.TestCase):
                 score_policy="powers",
                 block_width=17,
                 residual_bound=97,
-                memory_bytes=64 * 2**20,
             ),
         )
         used = collector.budget.used
@@ -442,11 +464,7 @@ class CoupledIntegrationTests(unittest.TestCase):
                 primes = job.assignments[index]
                 self.assertEqual(len(primes), job.config.factor_count)
                 family = make_family(
-                    job.base,
-                    primes,
-                    config=job.config,
-                    budget=job.budget,
-                    memory_bytes=64 * 2**20,
+                    job.base, primes, config=job.config, budget=job.budget
                 )
                 polynomial = family.next().polynomial
                 for x in (-65536, -1, 0, 1, 65536):

@@ -63,7 +63,6 @@ class EqualParityIndex:
                     row,
                     collector._atoms,
                     budget,
-                    collector.config.memory_limit,
                 )
                 if collector._checked is not None
                 else parity_bits(row, base)
@@ -77,13 +76,6 @@ class EqualParityIndex:
                         scratch = 65536 + 512 * sum(
                             len(r.exponents) for r in selected
                         )
-                        if (
-                            collector._workspace + scratch
-                            > collector.config.memory_limit
-                        ):
-                            raise MemoryError(
-                                "checked pair extraction scratch"
-                            )
                         # The incoming row was checked immediately above;
                         # only the retained representative needs a new witness.
                         parities = (
@@ -91,7 +83,6 @@ class EqualParityIndex:
                                 selected[0],
                                 collector._atoms,
                                 budget,
-                                collector.config.memory_limit,
                             ),
                             bits,
                         )
@@ -138,8 +129,6 @@ class EqualParityIndex:
         # temporary set/map before constructing either container;
         # preparation accounts for its other coexisting scratch.
         scratch = 65536 + 512 * sum(_weight(r)[0] for r in selected)
-        if collector._workspace + scratch > collector.config.memory_limit:
-            raise MemoryError("equal-parity provenance scratch")
         identities = set()
         for item in selected:
             budget.consume(_weight(item)[0])
@@ -154,10 +143,7 @@ class EqualParityIndex:
             base,
             store,
             budget=budget,
-            memory_bytes=collector.config.memory_limit,
             retained_workspace_bytes=collector._workspace + scratch,
-            max_rows=2,
-            max_atoms=512,
         )
         if len(prepared.rows) == 2:
             result = extract_dependency(prepared, 3, budget=budget)

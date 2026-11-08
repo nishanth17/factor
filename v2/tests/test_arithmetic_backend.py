@@ -16,7 +16,6 @@ from unittest.mock import patch
 from v2 import portfolio
 from v2.common import arithmetic, utils
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget
 from v2.execution.schedules import SieveContext
 from v2.execution.stage_jobs import advance_job, new_job, promote_job
 from v2.factor import factorize
@@ -30,6 +29,7 @@ from v2.qs.parallel import CollectionPool, ParallelSIQSJob
 from v2.qs.smooth_batch import SmoothBatch
 from v2.qs.sss import SSSConfig, SSSJob
 from v2.rho import brent as pollard_rho
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_ecm_programs import configuration as program_config
 from v2.tests.test_phase_two import reseal
 from v2.tests.test_qs_parallel import configuration as parallel_config
@@ -191,7 +191,6 @@ class EngineBackendTests(unittest.TestCase):
                 rho_attempts=0,
                 pm1_attempts=0,
                 ecm_tiers=(),
-                memory_bytes=64 * 2**20,
                 siqs=siqs_config(backend=name),
             )
             with patch(

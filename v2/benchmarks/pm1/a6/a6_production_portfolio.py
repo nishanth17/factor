@@ -5,6 +5,10 @@ import hashlib
 import json
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
+
 from ...support.paths import (
     BENCHMARK_ROOT,
     source_path,
@@ -35,7 +39,9 @@ def run(arm, backend, start):
             fixture["n"],
             seed=7,
             config=configuration,
-            budget=Budget(work_limit=500000, seconds=5, cpu_seconds=5),
+            budget=recording_budget(
+                Budget, work_limit=500000, seconds=5, cpu_seconds=5
+            ),
         )
         if outcome.result.reconstruct() != fixture["n"]:
             raise AssertionError("portfolio reconstruction failed")

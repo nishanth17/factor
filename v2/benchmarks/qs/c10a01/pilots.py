@@ -8,8 +8,11 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ..c10a04.accounting import Ledger, digest, output_lock
 from . import runner
@@ -57,7 +60,9 @@ def verify_plan(plan):
         for call in calls:
             assert call["work"] == work_limit(call["digits"], call["seconds"])
             assert call["tier"] == TIERS[call["digits"]]
-            from dataclasses import asdict
+            from v2.benchmarks.infrastructure.resource_control import (
+                historical_asdict as asdict,
+            )
 
             current = asdict(
                 pilot_configuration(

@@ -6,17 +6,22 @@ import sys
 import tempfile
 import time
 import unittest
-from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.benchmarks.qs.a1a_extension import analysis, inputs, runtime, study
 from v2.benchmarks.qs.c10a04 import configuration
 from v2.benchmarks.qs.c10a04.accounting import Ledger
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_siqs_cli import cli
 
@@ -108,7 +113,9 @@ class ExtendedRunnerTests(unittest.TestCase):
         self.assertEqual(
             previous_values["collector"].pop("sparse_queue_bytes"), 32 * 2**20
         )
-        self.assertEqual(values, previous_values)
+        from v2.tests.resource_stops import recipe_values
+
+        self.assertEqual(recipe_values(values), recipe_values(previous_values))
         # Count-stage reservations are identical; the new boundary additionally
         # preflights temporary sieve memory and then constructs the same base.
         count_budget = unlimited_budget()
@@ -117,12 +124,7 @@ class ExtendedRunnerTests(unittest.TestCase):
 
         choice = select_multiplier(n, budget=count_budget)
         endpoint_for_count(
-            n,
-            choice.multiplier,
-            2500,
-            count_budget,
-            ceiling=250000,
-            memory_bytes=2**30,
+            n, choice.multiplier, 2500, count_budget, ceiling=250000
         )
         self.assertEqual(count_budget.used, prior_work)
 
@@ -171,7 +173,7 @@ class ExtendedRunnerTests(unittest.TestCase):
     def test_selected_counted_portfolio_checkpoint_survives_cli_resume(self):
         n = 10**54 + 123
         selected = study.configuration(n, "selected", self.control)
-        cfg = PortfolioConfig(siqs=selected, memory_bytes=1040 * 2**20)
+        cfg = PortfolioConfig(siqs=selected)
         first = factorize_bounded(n, config=cfg, budget=Budget(work_limit=0))
         saved = first.checkpoint["payload"]["config"]
         self.assertEqual(saved["siqs"]["collector"]["marking"], study.SELECTED)
@@ -181,7 +183,7 @@ class ExtendedRunnerTests(unittest.TestCase):
             path = Path(directory) / "checkpoint.json"
             path.write_text(json.dumps(first.checkpoint))
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(

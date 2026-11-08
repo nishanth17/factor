@@ -4,8 +4,11 @@ import argparse
 import hashlib
 import json
 import sys
-from dataclasses import replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (

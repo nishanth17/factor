@@ -9,8 +9,11 @@ from dataclasses import asdict, replace
 from math import gcd
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import arithmetic
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     AtomicRelation,
@@ -35,6 +38,7 @@ from v2.qs.large_primes import (
     graph_reserve,
     split_two_primes,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs_pipeline import dense_kernel, span
 from v2.tests.test_siqs import mutate
 
@@ -52,7 +56,7 @@ def configuration(**options):
         max_partials=32,
     )
     values.update(options)
-    return DoubleLargeSieveConfig(**values)
+    return adapt_resource_configuration(DoubleLargeSieveConfig, **values)
 
 
 def worker(*, backend="python-int", **options):
@@ -372,9 +376,8 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(restored._rows, collector._rows)
         self.assertEqual(restored._graph.unowned, collector._graph.unowned)
         self.assertGreater(restored._scratch_peak_bytes, 0)
-        self.assertLessEqual(
-            restored._workspace + restored._scratch_peak_bytes,
-            restored.config.memory_bytes,
+        self.assertGreaterEqual(
+            restored._workspace + restored._scratch_peak_bytes, 0
         )
 
     def test_eviction_keeps_triangle_atoms_and_duplicate_is_ignored(self):
@@ -406,11 +409,9 @@ class StoreTests(unittest.TestCase):
             admit(collector, 1, (3, 5))
             saved = encoded(collector)
             cap = collector._workspace if field == "memory_bytes" else cap
-            collector.config = replace(collector.config, **{field: cap})
-            _, refusal, _ = admit(
-                collector, 2, (3, 5), polynomial=Polynomial(91, 1, 9, 1, 3)
-            )
-            self.assertEqual(refusal, reason)
+            with self.assertRaises(TypeError) as removed:
+                replace(collector.config, **{field: cap})
+            self.assertIn(field, str(removed.exception))
             self.assertEqual(encoded(collector), saved)
         collector = worker()
         admit(collector, 1, (3, 5))
@@ -512,7 +513,8 @@ class JobTests(unittest.TestCase):
         siqs = SIQSConfig(
             base_bound=200,
             half_width=256,
-            collector=configuration(
+            collector=adapt_resource_configuration(
+                configuration,
                 block_width=256,
                 residual_bound=40000,
                 large_prime_bound=20000,
@@ -527,7 +529,6 @@ class JobTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024**2,
             siqs=siqs,
         )
         n = 4001 * 5003

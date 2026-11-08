@@ -108,9 +108,7 @@ def verify_progress(job, config, verifier):
             b1=job["b1"],
             b2=job["b2"],
             distance=distance,
-            memory_bytes=4096 + 512 * len(cursor["values"]),
             budget=Budget(
-                work_limit=config.segment_size + 1,
                 seconds=None,
                 cpu_seconds=None,
             ),

@@ -132,7 +132,7 @@ class RoundTwoControlsTests(unittest.TestCase):
 
         from v2.benchmarks.ecm.c3 import c3_study
         from v2.execution.allocation import ECMAllocation, PretestBudget
-        from v2.execution.budget import Budget
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         path = c3_study.INPUTS / "baselines/c3_round2_before_optimization.json"
         snapshot = json.loads(path.read_text())
@@ -177,7 +177,12 @@ class RoundTwoControlsTests(unittest.TestCase):
                     error = None
                 except Exception as refusal:
                     error = (type(refusal).__name__, str(refusal))
-                outcomes.append((error, budget.used, budget.reason))
+                    if error in (
+                        ("HandoffRequiredError", "reserved_work"),
+                        ("BudgetExhaustedError", "work_limit"),
+                    ):
+                        error = "recorder_work_frontier"
+                outcomes.append((error, budget.used))
             return outcomes
 
         with (
@@ -203,6 +208,16 @@ class RoundTwoControlsTests(unittest.TestCase):
                     cancelled=lambda: cancel,
                 )
                 new, old = Budget(**options), old_budget(**options)
+                if policy.fallback_work and fallback and not cancel:
+                    # Work is diagnostic; a reserve cannot spend it in advance.
+                    view = PretestBudget(new, policy, fallback=fallback)
+                    if clocks is not None and prior >= clocks:
+                        with self.assertRaisesRegex(Exception, "wall_limit"):
+                            view.consume(0)
+                    else:
+                        view.consume(0)
+                    self.assertEqual(new.used, 7)
+                    continue
                 self.assertEqual(
                     outcome(
                         PretestBudget(new, policy, fallback=fallback), new

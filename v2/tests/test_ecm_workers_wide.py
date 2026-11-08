@@ -17,12 +17,7 @@ class SixteenWorkerTests(unittest.TestCase):
         n = 1009 * 1013
         config = configuration(ecm_tiers=((20, 200, 32),))
         settings = WorkerSettings(
-            workers=16,
-            allow_wide_workers=True,
-            startup_seconds=5,
-            assignment_cpu=2,
-            memory_bytes=4 * 2**30,
-            checkpoint_bytes=4 * 2**20,
+            workers=16, allow_wide_workers=True, startup_seconds=5
         )
         with ECMExecutor(seed=7919, force_workers=False) as serial:
             reference = serial.run(

@@ -2,7 +2,17 @@
 
 import time
 from collections import defaultdict
-from dataclasses import asdict, replace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .... import qs
 from ....execution.budget import Budget
@@ -30,8 +40,8 @@ def replay(
     if arm not in ARMS:
         raise ValueError("unknown replay policy")
     started, cpu = time.monotonic(), time.process_time()
-    budget = Budget(
-        work_limit=work_limit, seconds=seconds, cpu_seconds=seconds
+    budget = recording_budget(
+        Budget, work_limit=work_limit, seconds=seconds, cpu_seconds=seconds
     )
     header, terminal = None, None
     for record in records(path, budget=budget):
@@ -165,13 +175,13 @@ def replay(
                     for key in BOUNDED_FIELDS
                 }
             )
-    collector = cls(**values)
-    built = qs.build_factor_base(
+    collector = adapt_resource_configuration(cls, **values)
+    built = adapt_resource_configuration(
+        qs.build_factor_base,
         cell["n"],
         bound=cell["resolved"]["bound"],
         multiplier=cell["resolved"]["multiplier"],
         budget=budget,
-        memory_bytes=source.memory_limit,
     )
     if built.divisor is not None or built.factor_base is None:
         raise ValueError("replay source lacks its original factor base")

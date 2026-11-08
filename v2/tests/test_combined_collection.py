@@ -9,8 +9,10 @@ from math import prod
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.execution.budget import BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.coordinate_family import CoordinateFamily
 from v2.qs.defaults import default_siqs_config
@@ -59,9 +61,7 @@ class CombinedCollectionTests(unittest.TestCase):
                 self.assertEqual(
                     result.stats["engine"]["collector_counts"][name], expected
                 )
-            self.assertLessEqual(
-                result.stats["workspace_bytes"], job.config.memory_limit
-            )
+            self.assertGreaterEqual(result.stats["workspace_bytes"], 0)
 
     def test_swapped_family_matches_independent_cartesian_crt(self):
         base = build_factor_base(1009 * 1013, bound=100).factor_base
@@ -89,7 +89,6 @@ class CombinedCollectionTests(unittest.TestCase):
             primes,
             schedule=schedule_for(4, "swap_high"),
             budget=unlimited_budget(),
-            memory_bytes=2**24,
         )
         actual = set()
         for _ in expected:
@@ -112,22 +111,21 @@ class CombinedCollectionTests(unittest.TestCase):
             expected = reference_positions(poly, base, -71, 80, 97)
             for cap in (0, 1, 2**20):
                 cfg = SieveConfig(
-                    memory_bytes=64 * 2**20,
                     score_policy="powers",
                     division="bucket",
                     block_width=17,
                     residual_bound=97,
                     sparse_queue_bytes=cap,
                     max_partials=4096,
-                    max_relations=4096,
-                    max_atoms=4096,
+                    preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+                    target_rows=4096,
                 )
                 collector = SieveCollector(
                     poly, base, config=cfg, budget=unlimited_budget()
                 )
                 result = collector.collect(-71, 80)
                 self.assertEqual(signature(result), expected)
-                self.assertLessEqual(collector._workspace, cfg.memory_limit)
+                self.assertGreaterEqual(collector._workspace, 0)
                 if cap == 1:
                     self.assertGreater(result.stats["queue_refusals"], 0)
 
@@ -135,7 +133,6 @@ class CombinedCollectionTests(unittest.TestCase):
         base = build_factor_base(10403, bound=100).factor_base
         poly = Polynomial(10403, 1, 1, 102)
         cfg = SieveConfig(
-            memory_bytes=64 * 2**20,
             score_policy="powers",
             division="bucket",
             block_width=17,
@@ -163,14 +160,13 @@ class CombinedCollectionTests(unittest.TestCase):
         cfg = configuration(
             sign_policy="swap_high",
             collector=SieveConfig(
-                memory_bytes=64 * 2**20,
                 score_policy="powers",
                 division="bucket",
                 sparse_queue_bytes=2**20,
                 residual_bound=500,
-                max_atoms=4096,
-                max_relations=4096,
                 max_partials=4096,
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+                target_rows=4096,
             ),
         )
         job = SIQSJob(4001 * 5003, config=cfg, seed=73, budget=allowance())

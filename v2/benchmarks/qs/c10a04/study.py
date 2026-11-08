@@ -10,9 +10,15 @@ import sys
 import time
 from collections import Counter
 from contextlib import contextmanager
-from dataclasses import asdict
 from math import prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -179,8 +185,12 @@ def run_one(
             last_poll = now
         return False
 
-    budget = Budget(
-        work_limit=WORK, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        Budget,
+        work_limit=WORK,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     config, divisor, job = None, None, None
     stats, base_info = {}, {}

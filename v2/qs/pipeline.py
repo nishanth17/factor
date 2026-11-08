@@ -4,7 +4,8 @@ import time
 from dataclasses import dataclass
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import accounted_job, resolve_budget
 from ..execution.work_budget import PollingBudget
 from .extraction import (
     DependencyExtractor,
@@ -14,7 +15,7 @@ from .extraction import (
 from .linear_algebra import DependencySolver, filter_matrix
 from .polynomial import checked_position
 from .sieve_collector import SieveCollector, SieveConfig
-from .storage import require_published, storage_limit
+from .storage import require_published
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,7 @@ class QSResult:
     reason: str
     next_position: int
     stats: dict
+    resource_stop: dict | None = None
 
     def __post_init__(self):
         for name in ("divisor", "cofactor", "next_position", "stats"):
@@ -79,7 +81,7 @@ class QSJob:
         checked_position(hi)
         if not 0 <= hi - lo <= 1_000_000:
             raise ValueError("window must be ordered and at most 1000000 wide")
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.config = config if config is not None else SieveConfig()
         self.collector = collector_class(
             polynomial,
@@ -91,13 +93,9 @@ class QSJob:
             self.collector._set_plan_interval(lo, hi)
         # Only retained rows are cached. The collector owns the reservation,
         # including while matrix scratch coexists or a polynomial is switched.
-        cache_bytes = min(
-            2 * 2**20, 2048 * storage_limit(self.config.max_relations)
-        )
+        cache_bytes = self.config.preparation_cache_bytes
         self.collector._preparation_cache = None
-        if self.collector._workspace + cache_bytes < storage_limit(
-            self.config.memory_bytes
-        ):
+        if cache_bytes:
             self.collector._preparation_cache = _VerificationCache(
                 cache_bytes, checked=self.collector._checked
             )
@@ -115,13 +113,8 @@ class QSJob:
         ):
             from .equal_parity import EqualParityIndex
 
-            available = max(
-                0, self.config.memory_limit - self.collector._workspace - 65536
-            )
-            reserve = min(
-                self.config.duplicate_bytes
-                // (2 if self.collector._checked is not None else 1),
-                available,
+            reserve = self.config.duplicate_bytes // (
+                2 if self.collector._checked is not None else 1
             )
             self._pair_index = EqualParityIndex(reserve)
             self.collector._workspace += reserve
@@ -165,7 +158,16 @@ class QSJob:
 
     def _solve(self, final):
         """Prepare changed stores; preserve pending solve/extraction state."""
-        return self._solve_impl(final)
+        try:
+            return self._solve_impl(final)
+        except MemoryError:
+            # Retain checked relations after an interrupted derived solve.
+            self.solver, self.extractor, self.prepared = None, None, None
+            self.last_count = -1
+            self.zero_checked_count = 0
+            self._full_view = self._retry_full_view = True
+            self._selected_subset = False
+            raise
 
     def _solve_impl(self, final):
         """Keep a reversible subset retry inside one solve boundary."""
@@ -204,7 +206,6 @@ class QSJob:
                             row,
                             self.collector._atoms,
                             self.budget,
-                            self.config.memory_limit,
                         )
                         == 0
                         if self.collector._checked is not None
@@ -263,11 +264,8 @@ class QSJob:
                     self.collector.factor_base,
                     store,
                     budget=self.budget,
-                    memory_bytes=storage_limit(self.config.memory_bytes),
                     retained_workspace_bytes=self.collector._workspace,
                     verification_cache=self.collector._preparation_cache,
-                    max_rows=self.config.max_relations,
-                    max_atoms=self.config.max_atoms,
                 ),
             )
             # Collection buffers and preparation scratch coexist. Only
@@ -278,17 +276,12 @@ class QSJob:
                 - prepared.shared_workspace_bytes
             )
             self._workspace_peak = max(self._workspace_peak, live_workspace)
-            remaining = (
-                storage_limit(self.config.memory_bytes) - live_workspace
-            )
             matrix = self._timed(
                 "filtering",
                 lambda: filter_matrix(
                     prepared.rows,
                     weight_two=self.weight_two,
                     budget=self.budget,
-                    memory_bytes=max(0, remaining),
-                    max_rows=self.config.max_relations,
                     merge_policy="fill-v2"
                     if getattr(self.config, "filter_policy", "reference")
                     != "reference"
@@ -326,7 +319,7 @@ class QSJob:
                     matrix.stats,
                     self.row_excess,
                     self.filter_row_growth,
-                    self.config.relation_limit,
+                    self.config.target_rows,
                 )
             excess = len(matrix.rows) - matrix.stats["output_columns"]
             if (
@@ -357,7 +350,6 @@ class QSJob:
                 self.prepared,
                 dependencies,
                 budget=self.budget,
-                max_dependencies=self.config.max_relations,
                 tested_cache=(
                     self.collector._preparation_cache
                     if self.tested_dependencies
@@ -381,7 +373,7 @@ class QSJob:
                 skipped,
                 divisor,
                 self.filter_row_growth,
-                self.config.relation_limit,
+                self.config.target_rows,
             )
         self.stats["trivial_dependencies"] += skipped + sum(
             trial.divisor is None for trial in self.extractor.trials
@@ -414,14 +406,12 @@ class QSJob:
         without repeating preparation on every unchanged run.
         """
         if not self.storage_solve_done:
-            try:
-                self.divisor = self._solve(True)
-            except MemoryError:
-                self.storage_reason = "memory_limit"
+            self.divisor = self._solve(True)
             self.storage_solve_done = True
 
         return self.storage_reason
 
+    @accounted_job
     def run(self, *, batch_limit=None):
         """Amortize external polls while retaining the caller's work ledger."""
         require_published(self.collector)
@@ -500,11 +490,7 @@ class QSJob:
                     del result
                     if collection_reason != "complete":
                         reason = collection_reason
-                        if reason in (
-                            "relation_limit",
-                            "atom_limit",
-                            "memory_limit",
-                        ):
+                        if reason in ("allocation_failure",):
                             self.storage_reason = reason
                             reason = self._finish_storage()
 
@@ -521,8 +507,8 @@ class QSJob:
                     break
 
             self.budget.consume(0)
-        except BudgetExhaustedError:
-            reason = self.budget.reason
+        except BudgetExhaustedError as error:
+            reason = self.budget.reason or str(error)
 
         if self.divisor is not None:
             if not utils.valid_divisor(
@@ -535,12 +521,11 @@ class QSJob:
         self.stats["workspace_bytes"] = self._workspace_peak
         return QSResult(
             self.divisor,
-            (
-                self.collector.factor_base.n // self.divisor
-                if self.divisor
-                else self.collector.factor_base.n
-            ),
+            self.collector.factor_base.n // self.divisor
+            if self.divisor
+            else self.collector.factor_base.n,
             reason,
             self.next_position,
             dict(self.stats),
+            resource_stop=self.budget.stop,
         )

@@ -15,6 +15,11 @@ import time
 from collections import Counter
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from .... import portfolio
 from ...suites.build_phase_two_corpus import verify_certificates
 from ...support.paths import (
@@ -77,13 +82,18 @@ def signature(rows, *, work=True):
 
 def measure(policy, arm, corpus, engine):
     """Include preprocessing, classification, ECM and recursive validation."""
-    config = engine.PortfolioConfig(**options(policy, arm))
+    config = adapt_resource_configuration(
+        engine.PortfolioConfig, **options(policy, arm)
+    )
     rows = []
     cohort_started = time.perf_counter()
     for fixture in corpus["fixtures"]:
         for seed in corpus["seeds"]:
-            budget = engine.Budget(
-                work_limit=POLICIES[policy][1], seconds=120, cpu_seconds=120
+            budget = recording_budget(
+                engine.Budget,
+                work_limit=POLICIES[policy][1],
+                seconds=120,
+                cpu_seconds=120,
             )
             started = time.perf_counter()
             cpu_started = time.process_time()

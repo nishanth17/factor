@@ -1,5 +1,6 @@
 """Independent-process sampling and frozen-input contracts for the bakeoff."""
 
+import json
 import unittest
 
 from v2.benchmarks.ecm.b4 import b4_bakeoff as bakeoff
@@ -77,7 +78,15 @@ class BakeoffContracts(unittest.TestCase):
             bakeoff.compare(captures, "python-int", "candidate", protocol)
 
     def test_source_inputs_disjoint_and_certified(self):
-        protocol, corpus, pins = bakeoff.verify_inputs()
+        with self.assertRaisesRegex(ValueError, "sources changed"):
+            bakeoff.verify_inputs()
+        # Validate the immutable corpus separately; never bypass the run gate.
+        protocol = json.loads(
+            bakeoff.source_path(bakeoff.PROTOCOL).read_text()
+        )
+        corpus = json.loads(bakeoff.source_path(bakeoff.CORPUS).read_text())
+        pins = json.loads(bakeoff.source_path(bakeoff.FREEZE).read_text())
+        bakeoff.verify_certificates(corpus["certificates"])
         self.assertEqual(protocol["seeds"], [11, 29, 53])
         self.assertEqual(len(corpus["fixtures"]), 18)
         self.assertEqual(len(pins["arms"]), 6)

@@ -1,0 +1,71 @@
+{
+  "base": "40d2367f1154ad96f30775a40e4d895f788ee9e2",
+  "purpose": "Historical recorder metadata only; no production refusal or current performance evidence.",
+  "defaults": {
+    "SieveConfig": {
+      "max_relations": 1024,
+      "max_atoms": 2048,
+      "memory_bytes": 8388608
+    },
+    "DoubleLargeSieveConfig": {
+      "max_relations": 1024,
+      "max_atoms": 2048,
+      "memory_bytes": 8388608
+    },
+    "GrowingDoubleLargeSieveConfig": {
+      "max_relations": null,
+      "max_atoms": null,
+      "memory_bytes": null
+    },
+    "YieldSieveConfig": {
+      "max_relations": null,
+      "max_atoms": null,
+      "memory_bytes": null
+    },
+    "CombinedYieldSieveConfig": {
+      "max_relations": null,
+      "max_atoms": null,
+      "memory_bytes": null
+    },
+    "SIQSConfig": {
+      "memory_bytes": null,
+      "checkpoint_bytes": null
+    },
+    "CountedSIQSConfig": {
+      "memory_bytes": null,
+      "checkpoint_bytes": null
+    },
+    "ParallelConfig": {
+      "assignment_work": 10000000,
+      "parent_memory_bytes": 67108864,
+      "worker_memory_bytes": 33554432,
+      "memory_bytes": 536870912,
+      "checkpoint_bytes": 4194304
+    },
+    "SSSConfig": {
+      "max_candidates": 4096,
+      "max_tree_bits": 262144,
+      "max_tree_nodes": 8192,
+      "memory_bytes": 67108864,
+      "checkpoint_bytes": 262144
+    },
+    "PortfolioConfig": {
+      "memory_bytes": null
+    },
+    "WorkerSettings": {
+      "assignment_work": 32000000,
+      "assignment_cpu": 30.0,
+      "startup_work": 1000000,
+      "worker_memory": 67108864,
+      "parent_memory": 33554432,
+      "memory_bytes": 536870912,
+      "frame_bytes": 16384,
+      "checkpoint_bytes": 1048576,
+      "max_runs": 32,
+      "residue_bytes": 8192
+    },
+    "PM1TuningConfig": {
+      "memory_bytes": 8388608
+    }
+  }
+}

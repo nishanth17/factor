@@ -6,6 +6,7 @@ from math import comb, prod
 
 from ..common import utils
 from ..common.arithmetic import gcd
+from ..execution.resources import removed_arguments
 from .families import MAX_A_FACTORS, _checksum, _identity
 from .polynomial import a_target
 from .product_window import feasible_core_window
@@ -83,6 +84,7 @@ class AssignmentStream:
     Count is excluded from identity: increasing it preserves every prefix.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(
         self,
         base,
@@ -94,7 +96,6 @@ class AssignmentStream:
         seed,
         policy,
         budget,
-        memory_bytes,
     ):
         for name, value, low, high in (
             ("factor_count", factor_count, 1, MAX_A_FACTORS),
@@ -128,8 +129,6 @@ class AssignmentStream:
             self.workspace_bytes += paired_workspace(
                 len(base.entries), factor_count
             )
-        if self.workspace_bytes > memory_bytes:
-            raise MemoryError("assignment stream exceeds memory_bytes")
         self.budget = budget
         self.target = a_target(base.n_prime, half_width)
         budget.consume(len(base.entries) * (factor_count + 1))

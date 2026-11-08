@@ -2,21 +2,21 @@
 
 from math import gcd
 
+from ..execution.resources import removed_arguments
 from .smooth_batch import product_tree
 
 
 class BaseRecovery:
     """Reuse a base radical; recover valuations in the ordinary divider."""
 
-    def __init__(self, base, memory_bytes, budget):
-        bits = sum(p.bit_length() for p in base.primes)
-        if bits > 2**21 or 65536 + 16 * bits > memory_bytes:
-            raise MemoryError("factor-base product exceeds batch scratch")
+    @removed_arguments(("memory_bytes",))
+    def __init__(self, base, budget):
+        sum(p.bit_length() for p in base.primes)
         product = 1
         for prime in base.primes:
             budget.consume(product.bit_length() + prime.bit_length())
             product *= prime
-        self.radical, self.memory_bytes = product, memory_bytes
+        self.radical = product
 
     def residuals(self, values, budget):
         if len(values) > 256 or any(v < 1 for v in values):
@@ -24,8 +24,6 @@ class BaseRecovery:
         tree = product_tree(
             values,
             budget=budget,
-            max_bits=2**20,
-            memory_bytes=self.memory_bytes,
         )
         if not tree:
             return ()
@@ -57,6 +55,7 @@ class PendingHints:
     opt-in overlap mechanism, not a native-Python parallel speedup claim.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(self, residuals, budget):
         from concurrent.futures import ThreadPoolExecutor
 
@@ -70,7 +69,7 @@ class PendingHints:
         self.executor = ThreadPoolExecutor(
             max_workers=1, thread_name_prefix="c9a-hints"
         )
-        allowance = Budget(work_limit=reserve, seconds=None, cpu_seconds=None)
+        allowance = Budget(seconds=None, cpu_seconds=None)
         try:
             self.future = self.executor.submit(
                 batch_divisors, residuals, allowance

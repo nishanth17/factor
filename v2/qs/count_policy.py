@@ -3,6 +3,7 @@
 from math import gcd
 
 from ..common import prime_sieve, utils
+from ..execution.resources import removed_arguments
 from .factor_base import checked_target
 
 ENDPOINT_CEILING = 250000
@@ -12,7 +13,8 @@ class CountPolicyRefusedError(ValueError):
     """The requested base count cannot fit the finite endpoint ceiling."""
 
 
-def endpoint_for_count(n, multiplier, count, budget, *, ceiling, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def endpoint_for_count(n, multiplier, count, budget, *, ceiling):
     """Resolve the smallest exclusive bound, or return a proper divisor.
 
     Include 2 and singular multiplier primes as build_factor_base does. The
@@ -25,9 +27,7 @@ def endpoint_for_count(n, multiplier, count, budget, *, ceiling, memory_bytes):
     utils.require_integer(ceiling, "endpoint ceiling", 3)
     if ceiling > ENDPOINT_CEILING:
         raise ValueError("count policy endpoint exceeds its finite ceiling")
-    reserve = 8192 + 64 * ceiling + 8 * target.bit_length()
-    if reserve > memory_bytes:
-        raise MemoryError("count policy workspace exceeds memory_bytes")
+    8192 + 64 * ceiling + 8 * target.bit_length()
     budget.consume(n.bit_length())
     divisor = gcd(n, multiplier)
     if utils.valid_divisor(divisor, n):

@@ -5,6 +5,11 @@ import inspect
 import textwrap
 from functools import lru_cache
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    historical_asdict,
+)
+
 
 @lru_cache(maxsize=16)
 def experiment_collector(module, variant):
@@ -26,10 +31,14 @@ def experiment_collector(module, variant):
                 # Reserve the complete simultaneous tree and leaf storage,
                 # including construction, rather than subtracting base bytes.
                 reserve = 8 * 2**20 + 512 * self.config.block_width
-                if self._workspace + reserve > self.config.memory_bytes:
+                if (
+                    self._workspace + reserve
+                    > historical_asdict(self.config)["memory_bytes"]
+                ):
                     raise MemoryError("batch coexistence exceeds memory cap")
                 self._workspace += reserve
-                self._smooth = smooth.SmoothBatch(
+                self._smooth = adapt_resource_configuration(
+                    smooth.SmoothBatch,
                     tuple(entry.prime for entry in self.factor_base.entries),
                     budget=self.budget,
                     memory_bytes=8 * 2**20,

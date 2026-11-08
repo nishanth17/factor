@@ -14,8 +14,9 @@ from unittest.mock import patch
 
 from v2.benchmarks.qs.c10a01 import live_limits, pilots_live, plan_v4
 from v2.benchmarks.qs.c10a01.runner import state_digest
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import SIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_c10a01_v4 import config_v4
 
 
@@ -371,7 +372,8 @@ class LiveGrantTests(unittest.TestCase):
             code = """
 import json,os,sys,time
 from pathlib import Path
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import RecordingBudget
+Budget=RecordingBudget
 from v2.benchmarks.qs.c10a01 import live_limits,plan_v4
 out=sys.argv[1]
 b=Budget(seconds=2,cpu_seconds=2,work_limit=plan_v4.call_work(60,2))

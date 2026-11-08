@@ -9,11 +9,14 @@ import unittest
 from contextlib import redirect_stdout
 from dataclasses import replace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.execution import schedules
-from v2.execution.budget import Budget
 from v2.pm1 import bounded as pm1_bounded
 from v2.pm1.bounded import PM1Config, factorize_pm1_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=2_000_000, **options):
@@ -21,7 +24,9 @@ def allowance(work=2_000_000, **options):
 
 
 def config(bounds=((10, 200),), **options):
-    return PM1Config(bounds=bounds, segment_size=8, **options)
+    return adapt_resource_configuration(
+        PM1Config, bounds=bounds, segment_size=8, **options
+    )
 
 
 def resign(checkpoint):
@@ -268,8 +273,8 @@ class CampaignTests(unittest.TestCase):
             {"chunk_size": 257},
         ):
             with self.assertRaises((ValueError, MemoryError)):
-                PM1Config(**kwargs)
-        with self.assertRaises(MemoryError):
+                adapt_resource_configuration(PM1Config, **kwargs)
+        with self.assertRaises(TypeError):
             PM1Config(memory_bytes=65536)
         with self.assertRaises(ValueError):
             factorize_pm1_bounded(

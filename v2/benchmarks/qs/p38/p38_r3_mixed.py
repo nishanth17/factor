@@ -8,6 +8,10 @@ import platform
 import sys
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+
 from ...infrastructure.performance.performance_audit import (
     fingerprint,
     verify_corpus,
@@ -37,7 +41,8 @@ def run(mods, prepared, variant, rank):
     budget = allowance(mods["budget"])
     remaining = MEMORY - prepared.workspace_bytes
     if variant == "rebuild":
-        matrix = rebuilt_filter(algebra)(
+        matrix = adapt_resource_configuration(
+            rebuilt_filter(algebra),
             prepared.rows,
             weight_two=True,
             budget=budget,
@@ -53,7 +58,8 @@ def run(mods, prepared, variant, rank):
             use_history=variant.startswith("history"),
         )
     else:
-        matrix = algebra.filter_matrix(
+        matrix = adapt_resource_configuration(
+            algebra.filter_matrix,
             prepared.rows,
             weight_two=True,
             budget=budget,
@@ -120,7 +126,8 @@ def main():
         if len(full) != 64 or len(combined) != 64:
             raise AssertionError("mixed trace requires 64 full and 64 matched")
         mixed = tuple(r for pair in zip(full, combined) for r in pair)
-        prepared = mods["qs.extraction"].prepare_relations(
+        prepared = adapt_resource_configuration(
+            mods["qs.extraction"].prepare_relations,
             mixed,
             base,
             atoms,

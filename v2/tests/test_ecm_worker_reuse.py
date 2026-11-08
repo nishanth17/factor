@@ -11,6 +11,9 @@ from dataclasses import replace
 from math import isqrt
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_worker_state import DecodedPrograms
@@ -289,7 +292,7 @@ print(json.dumps({'passed':True}))
             {"manifest_cache_bytes": 16 * 2**20 + 1},
         ):
             with self.assertRaises(ValueError):
-                WorkerSettings(**changes)
+                adapt_resource_configuration(WorkerSettings, **changes)
         config = configuration()
         base = Manifest(
             35, 7919, "root", arithmetic_options(config, WorkerSettings())
@@ -377,16 +380,16 @@ class ConfigurationCompatibilityTests(unittest.TestCase):
     ):
         from dataclasses import asdict
 
-        from v2.execution.portfolio_config import _decode_siqs_config
         from v2.portfolio import PortfolioConfig
         from v2.qs import SIQSConfig
+        from v2.tests.resource_stops import (
+            historical_decode_siqs as _decode_siqs_config,
+        )
 
         config = SIQSConfig()
         self.assertEqual(_decode_siqs_config(asdict(config)), config)
         self.assertEqual(
-            PortfolioConfig(
-                siqs=asdict(config), memory_bytes=128 * 2**20
-            ).siqs,
+            PortfolioConfig(siqs=asdict(config)).siqs,
             config,
         )
 
@@ -439,11 +442,9 @@ class PackedBackingTests(unittest.TestCase):
     ):
         settings = WorkerSettings(packed_cache_bytes=4096)
         with ECMExecutor(settings=settings, force_workers=True) as owner:
-            with self.assertRaisesRegex(
-                MemoryError, "packed worker cache scratch"
-            ):
-                owner.run(35, config=configuration(), budget=allowance())
-            self.assertFalse(owner.slots)
+            result = owner.run(35, config=configuration(), budget=allowance())
+            self.assertEqual(result.reason, "curves_exhausted")
+            self.assertTrue(owner.slots)
         base = WorkerSettings()
         extra = WorkerSettings(packed_cache_bytes=2**20)
         self.assertEqual(extra.owned_bytes - base.owned_bytes, 2 * 2**20)

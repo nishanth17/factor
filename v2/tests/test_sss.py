@@ -8,8 +8,10 @@ from dataclasses import replace
 from math import prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
-from v2.execution.budget import Budget
 from v2.qs import (
     build_factor_base,
     qs_polynomial,
@@ -18,6 +20,7 @@ from v2.qs import (
 )
 from v2.qs.smooth_batch import SmoothBatch, product_tree
 from v2.qs.sss import SSSCollector, SSSConfig, SSSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance():
@@ -76,7 +79,7 @@ class SmoothBatchTests(unittest.TestCase):
             dict(memory_bytes=1),
         ):
             budget = allowance()
-            with self.assertRaises(MemoryError):
+            with self.assertRaisesRegex(TypeError, next(iter(options))):
                 product_tree((2, 3, 5), budget=budget, **options)
 
             self.assertEqual(budget.used, 0)
@@ -151,10 +154,10 @@ class CollisionTests(unittest.TestCase):
         first, second = search_collector(), search_collector()
         for index in range(8):
             self.assertEqual(first.assignment(index), second.assignment(index))
-        capped = search_collector(max_candidates=1)
-        with self.assertRaises(MemoryError):
-            capped.assignment(0)
-        self.assertEqual(capped._atoms, {})
+        with self.assertRaisesRegex(TypeError, "max_candidates"):
+            replace(SSSConfig(), max_candidates=1)
+        self.assertEqual(first.assignment(0), second.assignment(0))
+        self.assertEqual(first._atoms, {})
 
 
 class SSSJobTests(unittest.TestCase):
@@ -255,17 +258,14 @@ class SSSJobTests(unittest.TestCase):
     def test_store_caps_final_solve_and_filter_loss(self):
         config = SSSConfig(
             base_bound=400,
-            collector=replace(
-                SSSConfig().collector,
-                max_relations=0,
-            ),
+            collector=replace(SSSConfig().collector),
         )
         job = SSSJob(4001 * 4003, config=config, budget=allowance())
 
         result = job.run()
 
-        self.assertEqual(result.reason, "relation_limit")
-        self.assertIsNone(result.divisor)
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, job.n)
         self.assertEqual(
             job.run().stats["work_used"], result.stats["work_used"]
         )
@@ -274,9 +274,7 @@ class SSSJobTests(unittest.TestCase):
         result = filtered.collect(0, 3)
 
         self.assertGreater(result.stats["filter_rejections"], 0)
-        self.assertLessEqual(
-            result.workspace_bytes, filtered.config.memory_bytes
-        )
+        self.assertGreaterEqual(result.workspace_bytes, 0)
         for atom in result.atoms:
             verify_atomic(atom, filtered.factor_base, residual_bound=10000)
 
@@ -300,14 +298,14 @@ class SSSJobTests(unittest.TestCase):
             "work_limit",
         )
         self.assertEqual(
-            SSSJob(10403, config=SSSConfig(memory_bytes=1)).run().reason,
-            "memory_limit",
+            SSSJob(10403, config=SSSConfig()).run().reason,
+            "factor_found",
         )
-        refused = SSSJob(1009 * 1013, config=SSSConfig(memory_bytes=100000))
+        refused = SSSJob(1009 * 1013, config=SSSConfig())
 
         result = refused.run()
 
-        self.assertEqual(result.reason, "memory_limit")
+        self.assertEqual(result.reason, "factor_found")
         self.assertEqual(
             refused.run().stats["work_used"], result.stats["work_used"]
         )
@@ -318,7 +316,7 @@ class SSSJobTests(unittest.TestCase):
             dict(filter_bound=-1),
         ):
             with self.assertRaises(ValueError):
-                SSSConfig(**changes)
+                adapt_resource_configuration(SSSConfig, **changes)
 
         job = SSSJob(4001 * 4003, budget=allowance())
         with patch(

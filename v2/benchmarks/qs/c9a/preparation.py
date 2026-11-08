@@ -7,6 +7,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
+
 from .... import qs
 from ....execution.budget import Budget
 from ..c10a04.accounting import atomic, digest
@@ -24,7 +28,9 @@ def structural(corpus, *, configurations=None):
     """Resolve multiplier, base and assignments without sieving."""
     resolved, work = {}, 0
     for row in corpus["fixtures"]:
-        budget = Budget(work_limit=10**11, seconds=15, cpu_seconds=15)
+        budget = recording_budget(
+            Budget, work_limit=10**11, seconds=15, cpu_seconds=15
+        )
         job = qs.SIQSJob(
             row["n"],
             seed=SEEDS[0],

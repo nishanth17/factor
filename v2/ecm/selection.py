@@ -7,6 +7,7 @@ import time
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
+from ..execution.resources import accounted_entry, removed_arguments
 from ..execution.worker_contract import (
     SEARCH_VERSION,
     VERSION,
@@ -170,7 +171,7 @@ class SelectionRule:
         digits, options = len(str(manifest.n)), manifest.options
         cost, provenance = _size_cost(
             digits,
-            digest(options),
+            profile_options_digest(options, self.costs + self.rate_costs),
             _path_costs(digits, options, self.costs),
             _path_costs(digits, options, self.rate_costs),
         )
@@ -231,24 +232,9 @@ def _saved_budget(budget, saved):
     integer(saved["work"], "saved selector work")
     for key in ("cpu", "wall"):
         finite(saved[key], "saved selector " + key)
-    if (
-        saved["work"] > base.work_limit
-        or base.cpu_seconds is None
-        or saved["cpu"] > base.cpu_seconds
-        or base.seconds is None
-        or saved["wall"] > base.seconds
-    ):
-        raise ValueError("resume grant below selector charges")
-    if base.used == base.prior_cpu == base.prior_wall == 0:
-        base.used = saved["work"]
-        base.prior_cpu = saved["cpu"]
-        base.prior_wall = saved["wall"]
-    elif (
-        base.used < saved["work"]
-        or base.cpu_used < saved["cpu"]
-        or base.wall_used < saved["wall"]
-    ):
-        raise ValueError("resume would reset selector charges")
+    base.restore_charges(
+        work=saved["work"], cpu=saved["cpu"], wall=saved["wall"]
+    )
 
 
 class SelectedECMContext:
@@ -261,6 +247,7 @@ class SelectedECMContext:
     manager.
     """
 
+    @removed_arguments(("parent_memory", "memory_bytes"))
     def __init__(
         self,
         profile,
@@ -268,36 +255,15 @@ class SelectedECMContext:
         *,
         seed=0,
         prefer_warm=False,
-        parent_memory=1040 * 2**20,
-        memory_bytes=None,
     ):
         integer(seed, "method seed", 0, 2**256 - 1)
-        integer(parent_memory, "parent memory", 2**20, 4 * 2**30)
         if type(prefer_warm) is not bool:
             raise ValueError("pool preference must be Boolean")
-        if memory_bytes is not None:
-            integer(memory_bytes, "aggregate memory", 0, 2**63 - 1)
-        self.memory_bytes = memory_bytes
         self.profile = None if profile is None else Path(profile)
         self.profile_sha256 = _checksum(profile_sha256)
         self.seed, self.prefer_warm = seed, prefer_warm
-        self.settings = ParentOwnership(
-            parent_memory + MODEL_BYTES + PROFILE_SCRATCH + 3 * HEADER_BYTES
-        )
         self.identity = digest(
-            [
-                PROFILE_VERSION,
-                VERSION,
-                self.profile_sha256,
-                seed,
-                prefer_warm,
-                self.settings.parent_memory,
-            ]
-            + (
-                []
-                if memory_bytes is None
-                else ["owned-memory-cap", memory_bytes]
-            )
+            [PROFILE_VERSION, VERSION, self.profile_sha256, seed, prefer_warm]
         )
         self.inner = None
         self.catalogue = None
@@ -316,7 +282,8 @@ class SelectedECMContext:
     def __exit__(self, *args):
         self.close()
 
-    def close(self):
+    @accounted_entry
+    def close(self, *, budget=None):
         with self.lock:
             if self.inner is not None:
                 self.inner.close()
@@ -341,12 +308,10 @@ class SelectedECMContext:
             data = policy_data()
         else:
             size = self.profile.stat().st_size
-            if not 0 < size <= PROFILE_BYTES:
-                raise ValueError("profile exceeds bounded ownership")
             budget.consume(size)
             self.selector_work += size
             with self.profile.open("rb") as stream:
-                raw = stream.read(PROFILE_BYTES + 1)
+                raw = stream.read()
             if (
                 len(raw) != size
                 or hashlib.sha256(raw).hexdigest() != self.profile_sha256
@@ -363,7 +328,7 @@ class SelectedECMContext:
             "rows",
         } or (
             data["version"] != PROFILE_VERSION
-            or data["executor_version"] != VERSION
+            or data["executor_version"] not in (VERSION, "b12-f4-v7")
             or data["search_version"] != SEARCH_VERSION
             or data["status"]
             not in ("training", "frozen-for-confirmation", "confirmed")
@@ -374,7 +339,7 @@ class SelectedECMContext:
         if not isinstance(rows, list) or len(rows) > 256:
             raise ValueError("selector row capacity exceeded")
         keys, declared = set(), {}
-        serial = WorkerSettings(**data["serial_settings"])
+        serial = WorkerSettings(**profile_settings(data["serial_settings"]))
         if serial.workers != 1:
             raise ValueError("serial fallback must own one context")
         for row in rows:
@@ -406,7 +371,7 @@ class SelectedECMContext:
                 if set(candidate) != {"settings", "costs"}:
                     raise ValueError("invalid selection candidate")
                 candidate["settings"] = asdict(
-                    WorkerSettings(**candidate["settings"])
+                    WorkerSettings(**profile_settings(candidate["settings"]))
                 )
                 costs = SelectionCosts(**candidate["costs"])
                 if (costs.digits, costs.options) != key:
@@ -417,17 +382,13 @@ class SelectedECMContext:
         # The selector coexists with the caller's parent workspace. Refuse the
         # combined reservation before constructing bounded worker settings;
         # portfolio callers can then retain their incumbent serial search.
-        if self.settings.parent_memory > 4 * 2**30:
-            raise MemoryError("selector exceeds worker parent ownership bound")
         from ..execution.worker_contract import WorkerSettings
         from .workers import arithmetic_options
 
         data = self.catalogue
         mode = "warm" if self.prefer_warm else "cold"
-        mathematical = arithmetic_options(
-            config, WorkerSettings(worker_memory=64 * 2**20)
-        )
-        options = digest(mathematical)
+        mathematical = arithmetic_options(config, WorkerSettings())
+        options = profile_options_digest(mathematical, data["rows"])
         key = len(str(n)), options
         if origin is None:
             origin = next(
@@ -475,38 +436,20 @@ class SelectedECMContext:
             != (tuple(map(tuple, config.ecm_tiers)))
         ):
             raise ValueError("profile declared tiers differ from mathematics")
-        curves = sum(tier[2] for tier in tiers)
-        settings = WorkerSettings(**candidate)
-        if settings.worker_memory != 64 * 2**20:
-            raise ValueError("selector mathematical memory changed")
-        settings = replace(settings, parent_memory=self.settings.parent_memory)
-        required = settings.checkpoint_bound(curves)
-        settings = replace(
-            settings,
-            checkpoint_bytes=max(
-                2**20, (required + 2**20 - 1) // 2**20 * 2**20
-            ),
-        )
-        if self.memory_bytes is not None and (
-            settings.owned_bytes > self.memory_bytes
-        ):
-            raise MemoryError("selector exceeds aggregate memory allowance")
-        if settings.checkpoint_bound(sum(t[2] for t in config.ecm_tiers)) > (
-            settings.checkpoint_bytes
-        ):
-            raise MemoryError("retained selector checkpoint capacity refused")
+        sum(tier[2] for tier in tiers)
+        settings = WorkerSettings(**profile_settings(candidate))
         if saved is not None and asdict(settings) != saved:
             raise ValueError("saved selector settings differ from its policy")
         if self.inner is not None:
             if settings != self.inner.settings or origin != self.origin:
                 raise ValueError("retained selector cannot change workers")
             return self.inner.settings, self.inner.rule, self.origin
-        normalized = asdict(WorkerSettings(**candidate))
+        normalized = asdict(WorkerSettings(**profile_settings(candidate)))
         normalized.pop("parent_memory", None)
         normalized.pop("checkpoint_bytes", None)
         costs = []
         for entry in data["rows"]:
-            proposed = dict(entry[mode]["settings"])
+            proposed = profile_settings(entry[mode]["settings"])
             proposed.pop("parent_memory", None)
             proposed.pop("checkpoint_bytes", None)
             if proposed == normalized:
@@ -525,10 +468,13 @@ class SelectedECMContext:
 
     def _portfolio_decision(self, n, config, budget, lineage, settings, rule):
         from ..execution.worker_contract import Manifest
-        from .workers import _allowances, arithmetic_options
+        from .workers import arithmetic_options
 
         options = arithmetic_options(config, settings)
-        if not any(row.options == digest(options) for row in rule.costs):
+        if not any(
+            row.options == profile_options_digest(options, rule.costs)
+            for row in rule.costs
+        ):
             return dict(
                 engage=False,
                 state="pool" if self.inner is not None else "cold",
@@ -546,19 +492,8 @@ class SelectedECMContext:
             pool_started=started,
             execution=rule.execution,
         )
-        work, cpu, wall = _allowances(budget)
-        helper = self.inner is not None and self.inner.helper_funded
-        output = min(work, settings.checkpoint_bytes)
-        funded = started or (
-            wall > 0
-            and cpu
-            > (settings.workers + (not helper))
-            * (settings.startup_seconds + settings.shutdown_cpu)
-            and work - output
-            > settings.workers
-            * (settings.startup_work + 2 * settings.frame_bytes)
-            + (0 if helper else settings.startup_work)
-        )
+        budget.consume(0)
+        funded = True
         return dict(decision, funded=funded)
 
     def _stats(self, started, stats):
@@ -580,10 +515,12 @@ class SelectedECMContext:
         )
         return self.last_stats
 
+    @accounted_entry
     def run_portfolio(self, n, **kwargs):
         """Return None to retain incumbent curves and fallback RNG draws."""
         return self._invoke(n, portfolio=True, **kwargs)
 
+    @accounted_entry
     def run(
         self,
         n,
@@ -636,13 +573,7 @@ class SelectedECMContext:
                 self.profile_sha256,
                 self.seed,
                 self.prefer_warm,
-                self.settings.parent_memory,
             ]
-            + (
-                []
-                if self.memory_bytes is None
-                else ["owned-memory-cap", self.memory_bytes]
-            )
         )
         if actual_identity != self.identity:
             raise ValueError("selector configuration mutated")
@@ -780,19 +711,14 @@ class SelectedECMContext:
         budget.consume(HEADER_BYTES)
         self.selector_work += HEADER_BYTES
         if self.inner is None or saved is not None:
-            try:
-                plan = self._select(
-                    n,
-                    config,
-                    saved,
-                    origin,
-                    portfolio=portfolio,
-                )
-                refusal = "unmeasured_selection_cost"
-            except MemoryError:
-                if not portfolio or checkpoint is not None:
-                    raise
-                plan, refusal = None, "worker_ownership_refused"
+            plan = self._select(
+                n,
+                config,
+                saved,
+                origin,
+                portfolio=portfolio,
+            )
+            refusal = "unmeasured_selection_cost"
             if plan is None:
                 self._stats(
                     started,
@@ -880,3 +806,41 @@ class SelectedECMContext:
         )
         stats = self._stats(started, result.stats)
         return replace(result, checkpoint=checkpoint, stats=stats)
+
+
+REMOVED_PROFILE_FIELDS = frozenset(
+    (
+        "assignment_work",
+        "assignment_cpu",
+        "startup_work",
+        "worker_memory",
+        "parent_memory",
+        "memory_bytes",
+        "frame_bytes",
+        "checkpoint_bytes",
+        "max_runs",
+        "residue_bytes",
+    )
+)
+
+
+def profile_settings(values):
+    """Adapt the pinned historical cost model, never a user configuration."""
+    return {
+        key: value
+        for key, value in values.items()
+        if key not in REMOVED_PROFILE_FIELDS
+    }
+
+
+def profile_options_digest(options, rows):
+    """Match historical recipe identities without imposing a byte grant."""
+    current = digest(options)
+    identities = {
+        row["options"] if isinstance(row, dict) else row.options
+        for row in rows
+    }
+    if current in identities:
+        return current
+    historical = digest(dict(options, memory_bytes=64 * 2**20))
+    return historical if historical in identities else current

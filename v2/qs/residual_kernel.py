@@ -4,6 +4,7 @@ from collections import Counter
 from dataclasses import dataclass
 from heapq import nsmallest
 
+from ..execution.resources import UnsupportedEncodingError
 from .relations import MAX_COMBINED_ATOMS, MAX_RESIDUAL, AtomicRelation
 
 # Preserve the ordering (prime tokens, then opaque tokens) without retaining
@@ -92,13 +93,6 @@ class ResidualKernel:
         if handle in self.edges:
             raise ValueError("duplicate incidence handle")
         original = tokens(atom, self.resolutions)
-        if original and len(self.pivots) >= config.partial_limit:
-            # A closure does not consume another independent partial slot.
-            if (
-                original not in self.direct
-                and max(original) not in self.pivots
-            ):
-                raise MemoryError("incidence partial cap")
         vector, provenance = original, frozenset((handle,))
         direct = self.direct.get(original) if original else None
         if direct is not None:
@@ -114,7 +108,7 @@ class ResidualKernel:
             )
             vector, provenance = vector ^ old[0], provenance ^ old[1]
             if len(provenance) > 2 * MAX_COMBINED_ATOMS:
-                raise MemoryError("incidence lifting scratch cap")
+                raise UnsupportedEncodingError("incidence lifting scratch cap")
         cycle = None
         if not vector:
 
@@ -166,12 +160,12 @@ class ResidualKernel:
                 if (len(provenance), weight(provenance)) == before:
                     break
             if len(provenance) > MAX_COMBINED_ATOMS:
-                raise MemoryError("incidence cycle provenance cap")
+                raise UnsupportedEncodingError(
+                    "incidence cycle provenance cap"
+                )
             cycle = tuple(sorted(provenance))
         elif len(provenance) > MAX_COMBINED_ATOMS:
-            raise MemoryError("incidence pivot provenance cap")
-        if vector and len(self.pivots) >= config.partial_limit:
-            raise MemoryError("incidence partial cap")
+            raise UnsupportedEncodingError("incidence pivot provenance cap")
         replacement = None
         if original:
             old = self.pivots.get(max(original))

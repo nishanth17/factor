@@ -3,14 +3,13 @@
 from dataclasses import asdict
 from math import prod
 
-from .linear_algebra import matrix_workspace
 from .polynomial import a_target
 from .storage import storage_limit
 
 
 def preparation_cache_reserve(config):
     """Return the maximum verified-row cache reservation used by QSJob."""
-    return min(2 * 2**20, 2048 * config.collector.relation_limit)
+    return config.collector.preparation_cache_bytes
 
 
 def validate_extension(previous, proposed):
@@ -23,35 +22,25 @@ def validate_extension(previous, proposed):
     if type(proposed) is not type(previous):
         raise TypeError("extension requires the same configuration type")
     old, new = asdict(previous), asdict(proposed)
-    quotas = {"max_stalled", "max_trivial", "memory_bytes", "checkpoint_bytes"}
+    quotas = {"max_stalled", "max_trivial"}
     if previous.streaming:
         quotas.add("family_count")
     if previous.external_coefficients:
         quotas.add("coefficient_trials")
     for name in quotas:
-        if storage_limit(new[name]) < storage_limit(old[name]):
+        before, after = storage_limit(old[name]), storage_limit(new[name])
+        if after is not None and (before is None or after < before):
             raise ValueError(f"extension cannot reduce {name}")
         new[name] = old[name]
-    for name in ("max_atoms", "max_partials", "max_relations"):
-        if storage_limit(new["collector"][name]) < storage_limit(
-            old["collector"][name]
-        ):
+    for name in ("max_partials",):
+        before = old["collector"][name]
+        after = new["collector"][name]
+        if after is not None and (before is None or after < before):
             raise ValueError(f"extension cannot reduce {name}")
         new["collector"][name] = old["collector"][name]
     if new != old:
         raise ValueError(
             "extension changes mathematical or execution configuration"
-        )
-    if (
-        proposed.memory_limit
-        - proposed.metadata_reserve
-        - preparation_cache_reserve(proposed)
-        < previous.memory_limit
-        - previous.metadata_reserve
-        - preparation_cache_reserve(previous)
-    ):
-        raise ValueError(
-            "extension reduces live workspace after checkpoint/cache reserves"
         )
 
 
@@ -69,19 +58,6 @@ def capacity_report(base, config):
     enough = len(eligible) >= count
     low = prod(eligible[:count]) if enough else None
     high = prod(eligible[-count:]) if enough else None
-    matrix_bytes = (
-        None
-        if config.collector.max_relations is None
-        else matrix_workspace(
-            config.collector.max_relations, len(base.entries) + 1
-        )
-    )
-    available = (
-        config.memory_limit
-        - config.metadata_reserve
-        - base.workspace_bytes
-        - preparation_cache_reserve(config)
-    )
     return dict(
         base_bound=base.bound,
         base_cardinality=len(base.entries),
@@ -94,15 +70,13 @@ def capacity_report(base, config):
         polynomials_per_family=config.gray_limit,
         polynomial_allowance=config.polynomial_limit,
         residual_bound=config.collector.residual_bound,
-        atom_allowance=config.collector.max_atoms,
+        atom_allowance=None,
         partial_allowance=config.collector.max_partials,
-        relation_allowance=config.collector.max_relations,
-        matrix_reserve_bytes=matrix_bytes,
+        relation_allowance=None,
+        matrix_reserve_bytes=None,
         metadata_reserve_bytes=config.metadata_reserve,
         preparation_cache_reserve_bytes=preparation_cache_reserve(config),
         base_reserve_bytes=base.workspace_bytes,
-        matrix_alone_fits=None
-        if matrix_bytes is None
-        else matrix_bytes <= available,
-        owned_cap_bytes=config.memory_bytes,
+        matrix_alone_fits=None,
+        owned_cap_bytes=None,
     )

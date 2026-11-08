@@ -3,6 +3,7 @@
 from .. import constants
 from ..common import arithmetic, prime_sieve, utils
 from ..common.arithmetic import gcd, pow
+from ..execution.resources import accounted_entry
 
 
 def compute_bounds(n):
@@ -55,6 +56,7 @@ def _stage_two_terms(residue, n, primes):
         previous_prime = prime
 
 
+@accounted_entry
 def factorize_pm1(
     n,
     verbose=False,
@@ -65,12 +67,14 @@ def factorize_pm1(
     max_attempts=constants.PM1_ATTEMPTS,
     batch_size=constants.GCD_BATCH_SIZE,
     backend=None,
+    budget=None,
 ):
     """Return a proper divisor or None; bounds include B1 and B2.
 
     Stage 2 targets a divisor p whose p-1 has one eligible large prime,
     not a prime divisor of n between the bounds.
     """
+    budget.consume(0)
     utils.require_integer(n, minimum=1)
     engine = (
         arithmetic.backend_for(n)
@@ -98,6 +102,7 @@ def factorize_pm1(
     stage_two_primes = None
 
     for attempt in range(max_attempts):
+        budget.consume(0)
         candidate = base + attempt
         divisor = gcd(candidate, n)
         if utils.valid_divisor(divisor, n):

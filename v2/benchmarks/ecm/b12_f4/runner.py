@@ -20,6 +20,11 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -269,7 +274,7 @@ def child(request_path, source_root):
         from v2.execution.allocation import ECMAllocation
 
         options["allocation"] = ECMAllocation(**options["allocation"])
-    config = PortfolioConfig(**options)
+    config = adapt_resource_configuration(PortfolioConfig, **options)
     forced = forced_arm(request["arm"], request["workers"])
     executor = None
     if request["arm"] != "S0":
@@ -279,7 +284,7 @@ def child(request_path, source_root):
         settings = dict(request["settings"], workers=request["workers"] or 1)
         executor = ECMExecutor(
             seed=request["seed"],
-            settings=WorkerSettings(**settings),
+            settings=adapt_resource_configuration(WorkerSettings, **settings),
             rule=EngagementRule(**(request.get("rule") or {})),
             force_workers=forced,
         )
@@ -294,7 +299,8 @@ def child(request_path, source_root):
         remaining_cpu = request["cpu"] - time.process_time() - charged_children
         if remaining_wall <= 0 or remaining_cpu <= 0:
             raise TimeoutError("cell startup/warmup allowance exhausted")
-        budget = Budget(
+        budget = recording_budget(
+            Budget,
             work_limit=max(0, request["work"] - total_work),
             seconds=remaining_wall,
             cpu_seconds=remaining_cpu,

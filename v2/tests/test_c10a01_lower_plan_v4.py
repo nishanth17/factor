@@ -6,8 +6,16 @@ import json
 import sys
 import tempfile
 import unittest
-from dataclasses import asdict, replace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.benchmarks.qs.c10a01 import control_v4
 from v2.benchmarks.qs.c10a01 import lower_plan_v4 as plan
 from v2.benchmarks.suites.build_phase_two_corpus import verify_certificates
@@ -65,8 +73,8 @@ class LowerDesignTests(unittest.TestCase):
                     cfg = defaults.default_siqs_config(10 ** (digits - 1) + 1)
                     collector = replace(
                         cfg.collector,
-                        max_relations=12000,
                         max_atoms=65536,
+                        max_relations=12000,
                         max_partials=32768,
                         split_call_limit=1048576,
                     )
@@ -81,10 +89,11 @@ class LowerDesignTests(unittest.TestCase):
                         if "base_count" in values
                         else module.SIQSConfig
                     )
-                    values["collector"] = module.GrowingDoubleLargeSieveConfig(
-                        **values["collector"]
+                    values["collector"] = adapt_resource_configuration(
+                        module.GrowingDoubleLargeSieveConfig,
+                        **values["collector"],
                     )
-                    typ(**values)
+                    adapt_resource_configuration(typ, **values)
             finally:
                 for name in tuple(sys.modules):
                     if name == control_v4.PACKAGE or name.startswith(
@@ -95,11 +104,11 @@ class LowerDesignTests(unittest.TestCase):
     def test_nominee_retains_lower_marking_and_extra_scratch_bound(self):
         for digits in (50, 51, 52, 55, 56):
             values = plan.configuration(digits, "nominee")
-            values["collector"] = GrowingDoubleLargeSieveConfig(
-                **values["collector"]
+            values["collector"] = adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig, **values["collector"]
             )
             typ = CountedSIQSConfig if "base_count" in values else SIQSConfig
-            cfg = typ(**values)
+            cfg = adapt_resource_configuration(typ, **values)
             self.assertEqual(cfg.multiplier, 0)
             self.assertIn("parity_two", cfg.collector.marking)
             if digits <= 55:

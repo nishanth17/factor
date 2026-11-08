@@ -130,16 +130,16 @@ def restore_store(payload, collector, budget):
     if not isinstance(payload, dict) or set(payload) != keys:
         raise ValueError("invalid DLP checkpoint store shape")
     config, base = collector.config, collector.factor_base
-    for name, cap in (
-        ("polynomials", config.atom_limit),
-        ("atoms", config.atom_limit),
-        ("full", config.relation_limit),
-        ("combined", config.relation_limit),
-        ("row_order", config.relation_limit),
-        ("forest", config.atom_limit),
+    for name in (
+        "polynomials",
+        "atoms",
+        "full",
+        "combined",
+        "row_order",
+        "forest",
     ):
-        if not isinstance(payload[name], list) or len(payload[name]) > cap:
-            raise ValueError("DLP checkpoint exceeds its store cap")
+        if not isinstance(payload[name], list):
+            raise ValueError("invalid DLP checkpoint sequence")
     decode_scratch = 0
     if packed:
         from .families import _identity
@@ -183,8 +183,6 @@ def restore_store(payload, collector, budget):
                 decode_scratch += 512 + 512 * (
                     count if indexed else (3 * len(text) // 4) // 8
                 )
-        if collector._workspace + decode_scratch > config.memory_limit:
-            raise MemoryError("packed checkpoint expansion exceeds memory cap")
         decoded = dict(payload)
         for name, size in (("atoms", 6), ("combined", 5)):
             decoded[name] = []
@@ -201,12 +199,12 @@ def restore_store(payload, collector, budget):
         payload = decoded
     calls = payload["split_calls"]
     utils.require_integer(calls, "split_calls", 0)
-    if calls > config.split_limit:
+    if config.split_limit is not None and calls > config.split_limit:
         raise ValueError("DLP checkpoint exceeds its splitting quota")
     count = len(payload["atoms"])
     row_count = len(payload["full"]) + len(payload["combined"])
     order = payload["row_order"]
-    if row_count > config.relation_limit or len(order) != row_count:
+    if len(order) != row_count:
         raise ValueError("invalid DLP mixed row count")
     for index in order:
         _index(index, row_count)
@@ -277,10 +275,6 @@ def restore_store(payload, collector, budget):
     ) - collector._graph_reserve(0)
     if collector._short_cycles is not None:
         reserve += 2048 * (count - len(payload["full"]))
-    if reserve + decode_scratch > config.memory_limit:
-        raise MemoryError(
-            "restored DLP provenance and graph exceed memory cap"
-        )
     polynomials = []
     for record in payload["polynomials"]:
         budget.consume(1)
@@ -319,7 +313,7 @@ def restore_store(payload, collector, budget):
                 raise ValueError("nonunit residual cannot enter a DLP store")
         atoms.append(atom)
         store[atom.relation_id], sizes[atom.relation_id] = atom, reserves[i]
-    graph = LargePrimeForest(edge_limit=collector._graph.edge_limit)
+    graph = LargePrimeForest()
     forest = set(forest_indices)
     for index in forest_indices:
         atom = atoms[index]
@@ -376,13 +370,8 @@ def restore_store(payload, collector, budget):
             check_prior_path(indices, atoms, closing, budget)
             path = tuple(atoms[i].relation_id for i in indices if i != closing)
         selected = tuple(atoms[i] for i in indices)
-        scratch = (
-            _combination_workspace(selected, base, config.memory_limit)
-            - base.workspace_bytes
-        )
+        scratch = _combination_workspace(selected, base) - base.workspace_bytes
         scratch_peak = max(scratch_peak, scratch)
-        if reserve + decode_scratch + scratch > config.memory_limit:
-            raise MemoryError("restored DLP verification scratch exceeds cap")
         item = CombinedRelation(
             tuple(a.relation_id for a in selected),
             arithmetic.backend_for(base.n).integer(u),
@@ -400,7 +389,6 @@ def restore_store(payload, collector, budget):
                 base,
                 store,
                 budget=budget,
-                memory_bytes=config.memory_limit,
             )
         for identity in path:
             graph.unowned.pop(identity, None)
@@ -408,7 +396,10 @@ def restore_store(payload, collector, budget):
         closing_edges.add(closing)
         sizes[atom.relation_id] += row_bytes
         combined.append(item)
-    if len(used) != count or len(graph.unowned) > config.partial_limit:
+    if len(used) != count or (
+        config.partial_limit is not None
+        and len(graph.unowned) > config.partial_limit
+    ):
         raise ValueError("DLP checkpoint has unowned overflow or orphan atoms")
     rows = full + combined
     ordered_rows = [rows[i] for i in order]
@@ -497,8 +488,6 @@ def restore_store(payload, collector, budget):
                 raise ValueError("invalid saved canonical representative")
             seen_keys.add(key)
             checked.remember(atom, key=key)
-        if len(checked.canonical) != len(saved_index):
-            raise MemoryError("saved congruence index exceeds its cap")
         if config.duplicate_policy != "congruence-v2" and saved_index:
             raise ValueError("disabled congruence policy has saved entries")
         if config.batch_policy == "off" and saved_primes:

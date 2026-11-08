@@ -31,8 +31,6 @@ def build_root_updates(family, policy, limit):
     extra = root_update_workspace(
         len(family.base.entries), len(family.terms), limit
     )
-    if family.workspace_bytes + extra > family.memory_bytes:
-        raise MemoryError("root-update table exceeds memory_bytes")
     count = (limit - 1).bit_length()
     family.budget.consume((count + 1) * (family.a.bit_length() + 1))
     rows = [[] for _ in range(count)]

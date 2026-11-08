@@ -483,7 +483,6 @@ class CofactorBatch:
                             try:
                                 helper = BaseRecovery(
                                     collector.factor_base,
-                                    collector._batch_reserve // 2,
                                     collector.budget,
                                 )
                             except MemoryError:

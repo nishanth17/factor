@@ -30,12 +30,10 @@ def convert(collector, residual, primes, budget, *, replay=False):
     if product != residual or not 1 <= len(primes) <= config.residual_arity:
         raise ValueError("opaque conversion does not reconstruct")
     bounded = config.extension_policy == "extended-v2"
-    compact_rows = bounded and not (replay and config.spill_bytes)
-    scratch = 2**21 if bounded else 2**20 + 32768 * len(collector._atoms)
-    if collector._workspace + scratch > config.memory_limit:
-        if replay:
-            raise MemoryError("opaque conversion replay exceeds its cap")
-        return False
+    compact_rows = bounded and not (
+        replay and (config.spill_directory is not None)
+    )
+    2**21 if bounded else 2**20 + 32768 * len(collector._atoms)
     kernel = ResidualKernel()
     kernel.resolutions = dict(collector._graph.resolutions)
     kernel.resolutions[residual] = tuple(primes)
@@ -50,43 +48,18 @@ def convert(collector, residual, primes, budget, *, replay=False):
             from .yield_memory import graph_reserve
 
             reserve += graph_reserve(plan, config.cycle_reduction_choices)
-            if collector._workspace + scratch + reserve > config.memory_limit:
-                if replay:
-                    raise MemoryError(
-                        "opaque rebuilt incidence exceeds its cap"
-                    )
-                return False
         if plan.cycle is not None and plan.cycle not in existing:
             leaves = tuple(collector._arena.atoms[i] for i in plan.cycle)
             exponent_count = sum(len(a.exponents) for a in leaves)
             row_charge = 8192 + 512 * exponent_count
-            construction = slab_bound = 0
             if compact_rows:
                 from .yield_memory import row_reserve
 
                 row_charge = row_reserve(leaves, collector.factor_base)
-                construction = 512 * exponent_count
-                slab_bound = collector._arena.allocation_bound(
-                    (exponent_count,)
-                )
+                512 * exponent_count
+                collector._arena.allocation_bound((exponent_count,))
             reserve += row_charge
-            if (
-                collector._workspace
-                + scratch
-                + reserve
-                + construction
-                + slab_bound
-                > config.memory_limit
-                or (len(collector._rows) + len(added) >= config.relation_limit)
-            ):
-                if replay:
-                    raise MemoryError(
-                        "opaque conversion rows exceed their cap"
-                    )
-                return False
-            row = collector._checked.combine(
-                leaves, budget, config.memory_limit
-            ).relation
+            row = collector._checked.combine(leaves, budget).relation
             if row is None:
                 raise ValueError("opaque conversion encountered a nonunit")
             if compact_rows:

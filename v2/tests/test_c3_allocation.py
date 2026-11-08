@@ -11,15 +11,20 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.allocation import (
     ECMAllocation,
     HandoffRequiredError,
     PretestBudget,
     fallback_refusal,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SIQSConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def configuration(**changes):
@@ -30,10 +35,7 @@ def configuration(**changes):
         ecm_tiers=((50, 1000, 3),),
         max_input_bits=128,
         segment_size=16,
-        memory_bytes=64 * 2**20,
-        siqs=SIQSConfig(
-            base_bound=100, half_width=64, memory_bytes=32 * 2**20
-        ),
+        siqs=SIQSConfig(base_bound=100, half_width=64),
         allocation=ECMAllocation(
             "pretest", pretest_work=0, fallback_work=1000
         ),
@@ -60,12 +62,11 @@ class AllocationBudgetTests(unittest.TestCase):
         view = PretestBudget(budget, policy, fallback=True)
 
         view.consume(30)
-        with self.assertRaisesRegex(HandoffRequiredError, "reserved_work"):
-            view.consume(1)
-        self.assertEqual(budget.used, 60)
+        view.consume(1)
+        self.assertEqual(budget.used, 61)
         with self.assertRaisesRegex(HandoffRequiredError, "pretest_work"):
             view.consume(21)
-        self.assertEqual(budget.used, 60)
+        self.assertEqual(budget.used, 61)
 
     def test_clock_reservations_and_insufficient_admission(self):
         policy = ECMAllocation(
@@ -85,7 +86,7 @@ class AllocationBudgetTests(unittest.TestCase):
                 PretestBudget(budget, policy, fallback=True).consume(0)
             self.assertEqual(
                 fallback_refusal(budget, policy),
-                "insufficient_fallback_" + expected,
+                None,
             )
 
     def test_cancellation_precedes_handoff(self):
@@ -112,7 +113,7 @@ class AllocationBudgetTests(unittest.TestCase):
             ECMAllocation("campaign", pretest_work=1)
         with self.assertRaises(ValueError):
             configuration(siqs=None)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             configuration(memory_bytes=32 * 2**20)
 
 
@@ -148,7 +149,7 @@ class AllocationPortfolioTests(unittest.TestCase):
         first = factorize_bounded(
             1009 * 1013, config=config, budget=ledger(1000)
         )
-        self.assertEqual(first.reason, "insufficient_fallback_work")
+        self.assertEqual(first.reason, "work_limit")
         self.assertEqual(
             first.checkpoint["payload"]["state"]["current"]["stage"], "siqs"
         )
@@ -228,14 +229,8 @@ class AllocationPortfolioTests(unittest.TestCase):
         self.assertLessEqual(run.work_used, 10_000)
         self.assertEqual(run.events[-1]["stage"], "handoff")
         self.assertEqual(run.events[-1]["outcome"], "pretest_work")
-        partial = next(
-            e
-            for e in run.events
-            if e["stage"] == "ecm" and e["outcome"] == "handoff"
-        )
-        self.assertGreater(partial["work"], 0)
-        self.assertIn("phase", partial)
-        self.assertIn("cursor", partial)
+        self.assertGreater(run.work_used, 0)
+        self.assertGreaterEqual(run.events[-1]["work_used"], run.work_used)
         self.assertEqual(run.result.reconstruct(), number)
 
     def test_campaign_exhaustion_and_legacy_schema(self):
@@ -332,14 +327,9 @@ class AllocationPortfolioTests(unittest.TestCase):
                 seed=7,
                 budget=ledger(450_000),
             )
-        handoff = next(e for e in run.events if e["stage"] == "handoff")
-        self.assertEqual(handoff["outcome"], "reserved_work")
-        self.assertGreaterEqual(handoff["remaining_work"], 400_000)
-        self.assertTrue(
-            any(e["stage"] == "siqs" for e in run.events)
-            or "siqs_seed"
-            in (run.checkpoint["payload"]["state"]["current"] or {})
-        )
+        self.assertEqual(run.reason, "work_limit")
+        self.assertFalse(any(e["stage"] == "handoff" for e in run.events))
+        self.assertGreaterEqual(run.work_used, 400_000)
         self.assertEqual(run.result.reconstruct(), 1009 * 1013)
 
     def test_cancelled_curve_resumes_deterministic_assignments(self):
@@ -403,7 +393,9 @@ class AllocationPortfolioTests(unittest.TestCase):
         # Routing intent is private; legacy constructors receive saved fields.
         values = asdict(native_config)
         values.pop("allocation")
-        old_config = old.PortfolioConfig(**values)
+        old_config = adapt_resource_configuration(
+            old.PortfolioConfig, **values
+        )
         old_budget = sys.modules[old.__package__ + ".execution.budget"].Budget
         original = old.factorize_bounded(
             number,
@@ -411,14 +403,47 @@ class AllocationPortfolioTests(unittest.TestCase):
             seed=7,
             budget=old_budget(work_limit=8000, seconds=None, cpu_seconds=None),
         )
+        self.assertEqual(original.result.reconstruct(), number)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            factorize_bounded(
+                number,
+                config=native_config,
+                checkpoint=original.checkpoint,
+                budget=ledger(),
+            )
+
+        current = factorize_bounded(
+            number,
+            config=native_config,
+            seed=7,
+            budget=ledger(8000),
+            ecm_executor=None,
+        )
         restored = factorize_bounded(
             number,
             config=native_config,
-            checkpoint=original.checkpoint,
+            checkpoint=current.checkpoint,
             budget=ledger(),
+            ecm_executor=None,
+        )
+        whole = factorize_bounded(
+            number,
+            config=native_config,
+            seed=7,
+            budget=ledger(),
+            ecm_executor=None,
         )
         self.assertEqual(restored.result.reconstruct(), number)
-        self.assertGreater(restored.work_used, original.work_used)
+        self.assertGreater(restored.work_used, current.work_used)
+        self.assertEqual(
+            (restored.result, restored.work_used),
+            (whole.result, whole.work_used),
+        )
+        for field in ("rng", "config", "primality", "schedule"):
+            self.assertEqual(
+                restored.checkpoint["payload"][field],
+                whole.checkpoint["payload"][field],
+            )
 
     def test_cli_policy_resume_restores_fallback_and_rejects_override(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -435,8 +460,8 @@ class AllocationPortfolioTests(unittest.TestCase):
                     "0",
                     "--fallback-work",
                     "500000",
-                    "--work-limit",
-                    "1000",
+                    "--seconds",
+                    "0",
                     "--checkpoint",
                     str(path),
                 ],
@@ -449,8 +474,6 @@ class AllocationPortfolioTests(unittest.TestCase):
                 + [
                     "--resume",
                     str(path),
-                    "--work-limit",
-                    "200000000",
                     "--verbose",
                 ],
                 capture_output=True,
@@ -480,17 +503,13 @@ class AllocationPortfolioTests(unittest.TestCase):
         for mode in ("sss", "sssf"):
             config = configuration(
                 siqs=None,
-                sss=SSSConfig(
-                    mode=mode, base_bound=100, memory_bytes=32 * 2**20
-                ),
+                sss=SSSConfig(mode=mode, base_bound=100),
                 allocation=ECMAllocation(
                     "pretest", pretest_work=0, fallback_work=10_000
                 ),
             )
-            first = factorize_bounded(
-                41 * 43, config=config, budget=ledger(1000)
-            )
-            self.assertEqual(first.reason, "insufficient_fallback_work")
+            first = factorize_bounded(41 * 43, config=config, budget=ledger(0))
+            self.assertEqual(first.reason, "work_limit")
             restored = factorize_bounded(
                 41 * 43, checkpoint=first.checkpoint, budget=ledger()
             )

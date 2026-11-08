@@ -5,6 +5,7 @@ from itertools import islice
 from math import isqrt
 
 from ..common import utils
+from ..execution.resources import removed_arguments
 from ..rho.brent import RhoStats, factorize_rho
 from .relations import MAX_COMBINED_ATOMS, MAX_RESIDUAL
 
@@ -63,7 +64,8 @@ def split_two_primes(residual, bound, budget, *, known_composite=False):
     return pair, "square" if pair[0] == pair[1] else "double", evaluations
 
 
-def graph_reserve(edges, *, edge_limit=MAX_GRAPH_EDGES):
+@removed_arguments(("edge_limit",))
+def graph_reserve(edges):
     """Cover two forests plus traversal/planning scratch, not shared atoms.
 
     A forest has at most 2E vertices, each a <=40-bit label. Maps retain
@@ -71,8 +73,6 @@ def graph_reserve(edges, *, edge_limit=MAX_GRAPH_EDGES):
     edge reserves simultaneous old/new maps during a staged FIFO rebuild.
     """
     utils.require_integer(edges, "graph edges", 0)
-    if edge_limit is not None and edges > edge_limit:
-        raise MemoryError("large-prime graph edge cap")
     return 32768 + 4096 * edges
 
 
@@ -110,10 +110,8 @@ class LargePrimeForest:
     cancellation points after its caller's final resource check.
     """
 
-    def __init__(self, *, edge_limit=MAX_GRAPH_EDGES):
-        if edge_limit is not None:
-            utils.require_integer(edge_limit, "edge_limit", 0)
-        self.edge_limit = edge_limit
+    @removed_arguments(("edge_limit",))
+    def __init__(self):
         self.edges, self.adjacency = {}, {}
         self.parent, self.depth, self.component, self.sizes = {}, {}, {}, {}
         self.unowned = {}
@@ -156,8 +154,6 @@ class LargePrimeForest:
         """Precompute a union by rerooting only the smaller component."""
         self._vertices(left, right)
         self._identity(identity)
-        if self.edge_limit is not None and len(self.edges) >= self.edge_limit:
-            raise MemoryError("large-prime graph edge cap")
         a, b = self.component.get(left, left), self.component.get(right, right)
         if a == b:
             raise ValueError("link would make a forest cycle")
@@ -200,8 +196,6 @@ class LargePrimeForest:
         self._identity(identity)
         if max_partials is not None:
             utils.require_integer(max_partials, "max_partials", 0)
-            if self.edge_limit is not None and max_partials > self.edge_limit:
-                raise ValueError("partial cap exceeds graph limit")
         path = self.path(left, right, budget)
         if path is not None:
             return GraphPlan(cycle=path)
@@ -213,7 +207,7 @@ class LargePrimeForest:
             )
         evicted = tuple(islice(self.unowned, max(1, max_partials // 8)))
         removed = set(evicted)
-        rebuilt = LargePrimeForest(edge_limit=self.edge_limit)
+        rebuilt = LargePrimeForest()
         for edge, (a, b) in self.edges.items():
             budget.consume(1)
             if edge in removed:

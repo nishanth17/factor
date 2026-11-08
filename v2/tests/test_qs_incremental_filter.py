@@ -3,12 +3,13 @@
 import random
 import unittest
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.linear_algebra import (
     DependencySolver,
     filter_matrix,
     verify_dependency,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs_pipeline import dense_kernel, span
 
 
@@ -27,9 +28,7 @@ class IncrementalFilterTests(unittest.TestCase):
             for index in range(count)
         )
         budget = allowance(20_000_000)
-        matrix = filter_matrix(
-            rows, weight_two=True, budget=budget, memory_bytes=8 * 1024**2
-        )
+        matrix = filter_matrix(rows, weight_two=True, budget=budget)
 
         self.assertIs(matrix.original_rows, rows)
         self.assertEqual(matrix.rows, ())
@@ -96,7 +95,7 @@ class IncrementalFilterTests(unittest.TestCase):
     def test_memory_refusal_precedes_incidence_and_work(self):
         rows = (3, 5, 6)
         budget = allowance()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             filter_matrix(rows, weight_two=True, budget=budget, memory_bytes=1)
         self.assertEqual(budget.used, 0)
 

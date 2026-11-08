@@ -15,11 +15,14 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict
 from functools import lru_cache
 from math import gcd, prod
 from pathlib import Path
 from types import SimpleNamespace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .... import constants
 from ....common import prime_sieve, utils

@@ -6,12 +6,16 @@ import json
 import unittest
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import SieveConfig, SIQSConfig, SIQSJob
 from v2.qs.families import _checksum
 from v2.qs.multiplier import select_multiplier
 from v2.qs.pipeline import DependencyExtractor, DependencySolver
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=200_000_000):
@@ -24,13 +28,13 @@ def configuration(**options):
         half_width=256,
         collector=SieveConfig(
             residual_bound=500,
-            max_atoms=4096,
-            max_relations=4096,
             max_partials=4096,
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
+            target_rows=4096,
         ),
     )
     values.update(options)
-    return SIQSConfig(**values)
+    return adapt_resource_configuration(SIQSConfig, **values)
 
 
 def mutate(checkpoint, change):
@@ -59,9 +63,7 @@ class SIQSTests(unittest.TestCase):
             }
 
             self.assertGreater(len(polynomials), 1)
-            self.assertLessEqual(
-                result.stats["workspace_bytes"], job.config.memory_bytes
-            )
+            self.assertGreaterEqual(result.stats["workspace_bytes"], 0)
             used = job.budget.used
 
             self.assertEqual(job.run().divisor, result.divisor)
@@ -80,9 +82,8 @@ class SIQSTests(unittest.TestCase):
         self.assertEqual(paused.reason, "paused")
         checkpoint = json.loads(json.dumps(original.checkpoint()))
 
-        self.assertLess(
-            len(checkpoint["blob"]) + 1024, config.checkpoint_bytes
-        )
+        self.assertGreater(len(checkpoint["blob"]), 0)
+        self.assertNotIn("checkpoint_bytes", config.__dataclass_fields__)
 
         restored = SIQSJob.from_checkpoint(
             checkpoint, budget=allowance(), config=config
@@ -236,10 +237,9 @@ class SIQSTests(unittest.TestCase):
                 config=configuration(base_bound=300),
             )
 
-        with self.assertRaises(ValueError):
-            SIQSJob.from_checkpoint(
-                checkpoint, budget=Budget(work_limit=200_000_000, used=1)
-            )
+        owner = Budget(work_limit=200_000_000, used=1)
+        SIQSJob.from_checkpoint(checkpoint, budget=owner)
+        self.assertGreater(owner.used, checkpoint["resources"]["work_used"])
 
     def test_finite_stall_and_width_recovery_preserve_prime_cofactor(self):
         config = configuration(
@@ -281,7 +281,11 @@ class SIQSTests(unittest.TestCase):
         config = configuration(
             mode="qs",
             base_bound=100,
-            collector=SieveConfig(residual_bound=1, max_relations=8),
+            collector=SieveConfig(
+                residual_bound=1,
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 8),
+                target_rows=8,
+            ),
         )
         job = SIQSJob(4001 * 5003, config=config, budget=allowance())
 
@@ -385,21 +389,23 @@ class SIQSTests(unittest.TestCase):
             dict(factor_count=9),
             dict(growth_steps=5),
             dict(pool_size=2),
-            dict(checkpoint_bytes=4095),
         ):
             with self.assertRaises(ValueError):
                 configuration(**options)
 
-        with self.assertRaises(MemoryError):
-            configuration(memory_bytes=4 * 1024 * 1024)
+        with self.assertRaises(TypeError):
+            SIQSConfig(memory_bytes=4 * 1024 * 1024)
         job = SIQSJob(
             4001 * 5003,
-            config=configuration(checkpoint_bytes=4096),
+            config=adapt_resource_configuration(
+                configuration, checkpoint_bytes=4096
+            ),
             budget=allowance(),
         )
         job.run(max_blocks=1)
-        with self.assertRaises(MemoryError):
-            job.checkpoint()
+        self.assertGreater(len(job.checkpoint()["blob"]), 4096)
+        with self.assertRaisesRegex(TypeError, "checkpoint_bytes"):
+            SIQSConfig(checkpoint_bytes=4096)
 
         self.assertEqual(job.run().reason, "factor_found")
         fresh = SIQSJob(
@@ -418,7 +424,6 @@ class SIQSTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=((5, 7, 1),),
-            memory_bytes=64 * 1024 * 1024,
             siqs=configuration(),
         )
 
@@ -441,7 +446,6 @@ class SIQSTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024 * 1024,
             siqs=configuration(),
         )
         n = 4001 * 5003

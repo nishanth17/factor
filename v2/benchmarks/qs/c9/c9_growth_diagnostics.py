@@ -7,8 +7,14 @@ import json
 import os
 import pstats
 import time
-from dataclasses import replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ....common import utils
 from ....execution.budget import Budget
@@ -72,8 +78,8 @@ def resume(config, fixture, output):
             last_poll = now
         return False
 
-    budget = Budget(
-        work_limit=10**13, seconds=240, cpu_seconds=240, cancelled=poll
+    budget = recording_budget(
+        Budget, work_limit=10**13, seconds=240, cpu_seconds=240, cancelled=poll
     )
     job = SIQSJob(fixture["n"], seed=7, config=config, budget=budget)
     receipts = []

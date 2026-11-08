@@ -10,7 +10,9 @@ from dataclasses import replace
 from functools import partial
 from unittest.mock import PropertyMock, patch
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.qs import (
     BoundedYieldSieveConfig,
     GrowingDoubleLargeSieveConfig,
@@ -21,6 +23,7 @@ from v2.qs import (
     qs_polynomial,
 )
 from v2.qs.large_prime_checkpoint import pack_store
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -64,14 +67,19 @@ class CollectionProgressTests(unittest.TestCase):
     def test_signed_batches_preserve_stats_work_and_serialized_store(self):
         common = dict(residual_bound=500, block_width=17, division="full")
         configs = (
-            SieveConfig(max_partials=2, **common),
-            GrowingDoubleLargeSieveConfig(
-                large_prime_bound=500, large_product_bound=500**2, **common
+            adapt_resource_configuration(
+                SieveConfig, max_partials=2, **common
             ),
-            BoundedYieldSieveConfig(
+            adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig,
                 large_prime_bound=500,
                 large_product_bound=500**2,
-                memory_bytes=64 * 2**20,
+                **common,
+            ),
+            adapt_resource_configuration(
+                BoundedYieldSieveConfig,
+                large_prime_bound=500,
+                large_product_bound=500**2,
                 **common,
             ),
         )
@@ -120,9 +128,6 @@ class CollectionProgressTests(unittest.TestCase):
             ("cancelled", lambda: Budget(cancelled=lambda: True)),
             ("wall_limit", lambda: Budget(seconds=0)),
             ("cpu_limit", lambda: Budget(cpu_seconds=0)),
-            ("atom_limit", None),
-            ("relation_limit", None),
-            ("memory_limit", None),
         )
         for reason, budget in cases:
             with self.subTest(reason=reason):
@@ -131,9 +136,7 @@ class CollectionProgressTests(unittest.TestCase):
                     if budget is not None:
                         worker.budget = budget()
                     elif reason == "memory_limit":
-                        worker.config = replace(
-                            config, memory_bytes=worker._workspace
-                        )
+                        worker.config = replace(config)
                     else:
                         worker.config = replace(
                             config,

@@ -13,13 +13,25 @@ import sys
 import time
 from collections import Counter
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+
 from ....common import utils
 from ....execution import budget as live_budget
-from ....portfolio import _decode_siqs_config
 from ....qs import defaults, siqs
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..c9 import c9_growth_study as c9
@@ -69,7 +81,9 @@ def sources():
 def policy():
     configurations = {}
     for digits in CAPS:
-        cfg = defaults.default_siqs_config(10 ** (digits - 1))
+        cfg = adapt_resource_configuration(
+            defaults.default_siqs_config, 10 ** (digits - 1)
+        )
         selected = replace(
             cfg, collector=replace(cfg.collector, marking=SELECTED)
         )
@@ -165,7 +179,9 @@ def configuration(n, arm, control_runtime):
         raise ValueError("outside frozen band/arm")
     # Decode the owned historical control into current classes. Inheriting
     # today's factory would change more than the frozen marking treatment.
-    cfg = control_runtime[0].default_siqs_config(n)
+    cfg = adapt_resource_configuration(
+        control_runtime[0].default_siqs_config, n
+    )
     if arm == "selected":
         cfg = _decode_siqs_config(asdict(cfg))
         # Retain the previously integrated face/queue compatibility delta.
@@ -226,8 +242,12 @@ def run_one(fixture, arm, seconds, control_runtime, *, blocks=None):
     qs_module, budget_module, utils_module = (
         control_runtime if arm == "control" else (siqs, live_budget, utils)
     )
-    budget = budget_module.Budget(
-        work_limit=WORK, seconds=seconds, cpu_seconds=seconds, cancelled=poll
+    budget = recording_budget(
+        budget_module.Budget,
+        work_limit=WORK,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=poll,
     )
     cfg = configuration(fixture["n"], arm, control_runtime)
     job = result = None

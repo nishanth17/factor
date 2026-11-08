@@ -5,6 +5,9 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.ecm_stage_two import StageTwoSchedule
 from v2.execution.ecm_workers import arithmetic_options
 from v2.execution.portfolio_config import PortfolioConfig
@@ -26,7 +29,9 @@ class CacheCapacityTests(unittest.TestCase):
         fixture = json.loads(VECTORS.read_text())
         self.assertEqual(fixture["search_version"], "b12-f4-v1")
         for vector in fixture["vectors"]:
-            config = PortfolioConfig(**vector["config"])
+            config = adapt_resource_configuration(
+                PortfolioConfig, **vector["config"]
+            )
             for mebibytes in (16, 64):
                 settings = WorkerSettings(
                     decoded_cache_bytes=mebibytes * 2**20,
@@ -51,19 +56,20 @@ class CacheCapacityTests(unittest.TestCase):
     def test_wide_cache_still_requires_funded_simultaneous_ownership(self):
         settings = WorkerSettings(
             workers=4,
-            memory_bytes=2 * 2**30,
             decoded_cache_bytes=64 * 2**20,
             stage_two_cache_bytes=64 * 2**20,
         )
-        self.assertLess(settings.owned_bytes, settings.memory_bytes)
-        with self.assertRaises(MemoryError):
+        self.assertGreaterEqual(settings.owned_bytes, 4 * (128 * 2**20))
+        with self.assertRaises(TypeError):
             replace(settings, memory_bytes=512 * 2**20)
 
     def test_larger_capacity_is_finite_and_rejects_oversized_requests(self):
         StageTwoSchedule(1024, 64 * 2**20)
         for keyword in ("decoded_cache_bytes", "stage_two_cache_bytes"):
             with self.assertRaises(ValueError):
-                WorkerSettings(**{keyword: 64 * 2**20 + 1})
+                adapt_resource_configuration(
+                    WorkerSettings, **{keyword: 64 * 2**20 + 1}
+                )
         with self.assertRaises(ValueError):
             StageTwoSchedule(1024, 64 * 2**20 + 1)
 

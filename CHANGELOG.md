@@ -3,6 +3,22 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## H3 observed resource limits (8 November 2026, unmerged branch)
+
+- Replace internal byte/count/work refusal ceilings and prepaid worker leases
+  with one root wall/aggregate-CPU/current-tree-RSS owner. Omitted wall/CPU are
+  unlimited; RSS defaults to floor(80% of physical memory). Preserve numerical
+  recipes, actual cache/FIFO/packet capacities and exact validation.
+- Use saved-history accounting without a durable ledger; retained live owners
+  keep unsaved charges. Stage shares hand remaining root resources to fallback.
+- Reject removed arguments by name and old resource checkpoint versions without
+  migration. Make atomic checkpoint saves optional and uncapped by default;
+  oversized saves record `checkpoint_size_skip` and preserve the result.
+- Committed-only `5feff32` passes 1,404 tests (9 optional skips), lint and 267
+  benchmark imports. Fixed-work QS/ECM confirmation on `508c490` matches base
+  `40d2367`. No performance evidence or retuning is added; dependent costs
+  require revalidation.
+
 ## ECM package and bundled-data cleanup (6 November 2026)
 
 - Move engine-specific execution into the flat `v2/ecm/` package, retaining

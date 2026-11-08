@@ -13,8 +13,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.ecm.b12_f4.selection_profile import build_profile
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_selection import (
     SelectedECMContext,
     SelectionCosts,
@@ -24,6 +27,7 @@ from v2.execution.ecm_workers import WorkerRun, arithmetic_options
 from v2.execution.portfolio_config import PortfolioConfig
 from v2.execution.worker_contract import Manifest, WorkerSettings, digest
 from v2.portfolio import _advance, _canonical, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(**changes):
@@ -42,7 +46,7 @@ def configuration(**changes):
         sss=None,
     )
     values.update(changes)
-    return PortfolioConfig(**values)
+    return adapt_resource_configuration(PortfolioConfig, **values)
 
 
 class InterpolatedCostTests(unittest.TestCase):
@@ -211,7 +215,7 @@ class PortfolioSelectionTests(unittest.TestCase):
     def write_profile(self, *, threshold=1, rates=(1, 3)):
         rows = []
         for digits, workers, rate in zip((6, 8), (2, 4), rates):
-            settings = WorkerSettings(workers=workers, memory_bytes=8 * 2**30)
+            settings = WorkerSettings(workers=workers)
             candidate = dict(
                 settings=asdict(settings),
                 costs=dict(
@@ -231,7 +235,7 @@ class PortfolioSelectionTests(unittest.TestCase):
             )
         profile = build_profile(
             dict(
-                serial_settings=asdict(WorkerSettings(memory_bytes=8 * 2**30)),
+                serial_settings=asdict(WorkerSettings()),
                 rows=rows,
             )
         )
@@ -314,21 +318,16 @@ class PortfolioSelectionTests(unittest.TestCase):
                 )
                 self.assertEqual(pool.calls, [1000003, 10000019])
 
-    def test_unfunded_start_stays_incumbent_without_constructing_executor(
-        self,
-    ):
+    def test_cpu_limit_does_not_prepay_startup_or_assignments(self):
         with self.owner() as owner:
-            with patch("v2.execution.ecm_workers.ECMExecutor") as factory:
-                self.assertIsNone(
-                    owner.run_portfolio(
-                        1000003,
-                        config=self.config,
-                        budget=allowance(cpu_seconds=3),
-                    )
+            with patch("v2.execution.ecm_workers.ECMExecutor", FakePool):
+                result = owner.run_portfolio(
+                    1000003,
+                    config=self.config,
+                    budget=allowance(cpu_seconds=3),
                 )
-                factory.assert_not_called()
-                self.assertFalse(owner.last_stats["engagement"]["funded"])
-                self.assertTrue(owner.last_stats["legacy_serial"])
+                self.assertEqual(result.reason, "curves_exhausted")
+                self.assertEqual(owner.inner.calls, [1000003])
 
     def test_unknown_large_quota_declines_before_worker_manifest_limits(self):
         config = configuration(ecm_tiers=((2, 2, 4097),))
@@ -353,18 +352,14 @@ class PortfolioSelectionTests(unittest.TestCase):
         self.path.write_text(json.dumps(profile))
         self.sha = hashlib.sha256(self.path.read_bytes()).hexdigest()
         with self.owner() as owner:
-            self.assertIsNone(
-                owner.run_portfolio(
+            with patch("v2.execution.ecm_workers.ECMExecutor", FakePool):
+                result = owner.run_portfolio(
                     1000003,
                     config=self.config,
                     budget=allowance(),
                 )
-            )
-            self.assertIsNone(owner.inner)
-            self.assertEqual(
-                owner.last_stats["engagement"]["reason"],
-                "worker_ownership_refused",
-            )
+                self.assertEqual(result.reason, "curves_exhausted")
+                self.assertEqual(owner.inner.settings.workers, 2)
 
     def test_zero_expired_and_cancelled_allowances_do_not_load_profile(self):
         for budget in (
@@ -571,7 +566,8 @@ class FallbackStreamTests(unittest.TestCase):
     def test_serial_decline_preserves_curve_and_later_siqs_seed(self):
         from v2.qs import SIQSConfig
 
-        config = configuration(
+        config = adapt_resource_configuration(
+            configuration,
             ecm_tiers=((2, 2, 3), (3, 3, 2)),
             siqs=SIQSConfig(),
             memory_bytes=2**31,
@@ -646,7 +642,9 @@ class FallbackStreamTests(unittest.TestCase):
             return seeds, rng.getstate()
 
         selector = SimpleNamespace(
-            settings=SimpleNamespace(parent_memory=4 * 2**30),
+            settings=adapt_resource_configuration(
+                SimpleNamespace, parent_memory=4 * 2**30
+            ),
             run=lambda *a, **kw: self.fail("component stream must not run"),
             run_portfolio=lambda *a, **kw: None,
             last_stats={},

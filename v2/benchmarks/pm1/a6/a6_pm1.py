@@ -13,9 +13,16 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .... import portfolio
 from ....common import utils
@@ -90,11 +97,14 @@ def require_runtime():
 
 
 def budget():
-    return Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30)
+    return recording_budget(
+        Budget, work_limit=2_000_000, seconds=30, cpu_seconds=30
+    )
 
 
 def stage(n, b1, b2, *, base=2, chunk=16, context=None, gaps="cached"):
-    config = portfolio.PortfolioConfig(
+    config = adapt_resource_configuration(
+        portfolio.PortfolioConfig,
         trial_bound=2,
         rho_attempts=0,
         pm1_b1=b1,
@@ -384,7 +394,8 @@ def continuations(samples=9):
                     prior_work = result.work_used
                     # Independent fresh stages share the campaign's total
                     # allowance, just as in-memory and resumed execution do.
-                    remaining = Budget(
+                    remaining = recording_budget(
+                        Budget,
                         work_limit=2_000_000 - prior_work,
                         seconds=max(0, 30 - result.wall_seconds),
                         cpu_seconds=max(0, 30 - result.cpu_seconds),
@@ -446,7 +457,8 @@ def portfolio_screen(samples=9):
     records = []
 
     def run(attempts):
-        config = portfolio.PortfolioConfig(
+        config = adapt_resource_configuration(
+            portfolio.PortfolioConfig,
             trial_bound=100,
             rho_attempts=1,
             rho_evaluations=512,
@@ -462,7 +474,9 @@ def portfolio_screen(samples=9):
                 fixture["n"],
                 seed=7,
                 config=config,
-                budget=Budget(work_limit=500000, seconds=5, cpu_seconds=5),
+                budget=recording_budget(
+                    Budget, work_limit=500000, seconds=5, cpu_seconds=5
+                ),
             )
             assert outcome.result.reconstruct() == fixture["n"]
             completed += outcome.result.complete

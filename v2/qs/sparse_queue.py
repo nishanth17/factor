@@ -72,12 +72,7 @@ def build(collector, window, byte_cap):
                         # limit. Keep its first event separate, then group
                         # only the remaining already-polled actions.
                         remaining = budget._remaining or 1
-                        affordable = max(
-                            1,
-                            (budget.budget.work_limit - budget.budget.used)
-                            // 4,
-                        )
-                        chunk = min(hit_count - emitted, remaining, affordable)
+                        chunk = min(hit_count - emitted, remaining)
                         if chunk == 1:
                             budget.consume(4)
                         else:
@@ -137,7 +132,7 @@ def sieve(collector, lo, hi, stats):
         # published queue and every subsequent atom compete for this same cap.
         cap = min(
             cfg.sparse_queue_bytes,
-            max(0, cfg.memory_limit - collector._workspace),
+            cfg.sparse_queue_bytes,
         )
         collector._workspace += cap
         collector._queue_workspace = cap

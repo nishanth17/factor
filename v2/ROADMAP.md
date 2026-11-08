@@ -1,8 +1,8 @@
 # Factor live backlog
 
 Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
-eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 6 November
-2026 with the active-worktree snapshot and H2 integrated-production overhead sweep.
+eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 8 November
+2026 with H3 locally integrated and its dependent tables awaiting revalidation.
 The acceleration-first relative order is retained, with H2 inserted at rank 7;
 active items live in [In progress](#in-progress), outside the remaining
 preparation queue.
@@ -1040,6 +1040,36 @@ requires a second pool implementation or waits for the other's unrelated path.
   Refresh affected cost tables and engagement thresholds after accepted changes.
   This row's phase-H location does not defer it until final H1 reconciliation.
   H2 is an overhead sweep, not the integrated allocation tuning gated on D7/E1.
+
+#### H3 — simplify resource limits
+
+**Done — locally integrated on master on 8 November 2026** from approved
+`codex/h3-resource-limits` source `e3c371e`, based on
+`40d2367f1154ad96f30775a40e4d895f788ee9e2`. That committed source passes
+1,404 tests (9 optional skips), full lint and 267 benchmark imports, including
+27 restored assertion-review cases. Fresh fixed-work QS/ECM confirmation
+against `40d2367` passes on the same source. Post-merge validation receipts
+remain local with the H3 evidence.
+
+The resource refusal boundaries are root wall, aggregate CPU, sampled current
+owned-tree RSS and an optional checkpoint save cap. Capacities, numerical effort,
+exactness checks and literal selected recipes are retained. This correctness
+integration makes no timing, profiling, tuning or performance-adoption claim.
+No remote push is authorized.
+
+Saved-history option 2 is implemented: saved charges plus the new invocation;
+unsaved consumption is retained only by a live accounting owner, with no durable
+ledger. Stage-share exhaustion hands remaining root resources to fallback.
+Removed arguments raise named errors, old resource checkpoints are refused,
+and published snapshots use optional atomic saves with explicit oversize skips.
+
+Local inventory, enforcement sites, source pins, all failed/passing QA receipts,
+fixed-work confirmation and A7a/B4a/B12 ready-first merge notes remain in
+`v2/audit/h3_resource_limits/`. The 75/80 internal `memory_limit` cause remains
+unattributed. Deterministic candidate coverage does not reconstruct its cause.
+C3a allocation/handoff, B12 cold/pool/warm and startup/engagement, A7a packet/cache
+worker economics and B4a native engagement tables need revalidation on combined
+committed code before using their historical costs for new optimization claims.
 
 ### Execution phase I — reproducible publication
 

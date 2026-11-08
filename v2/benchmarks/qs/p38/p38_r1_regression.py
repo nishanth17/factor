@@ -15,6 +15,19 @@ import time
 from math import gcd, isqrt, prod
 from pathlib import Path
 
+
+def adapt_resource_configuration(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.adapt_resource_configuration(*args, **kwargs)
+
+
+def recording_budget(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.recording_budget(*args, **kwargs)
+
+
 if __package__ in (None, ""):
     # Select a historical runtime before importing any v2 implementation.
     from runpy import run_path
@@ -133,7 +146,8 @@ def main():
         budget_module = runtime_module("budget")
         qs = importlib.import_module("v2.qs")
         utils = runtime_module("utils")
-        config = qs.SIQSConfig(
+        config = adapt_resource_configuration(
+            qs.SIQSConfig,
             base_bound=3000,
             half_width=32768,
             max_half_width=32768,
@@ -146,7 +160,8 @@ def main():
             batch_width=4096,
             memory_bytes=384 * 2**20,
             checkpoint_bytes=16 * 2**20,
-            collector=qs.SieveConfig(
+            collector=adapt_resource_configuration(
+                qs.SieveConfig,
                 block_width=4096,
                 score_policy="powers",
                 division="bucket",
@@ -168,8 +183,11 @@ def main():
             rows = []
 
             for seed in corpus["seeds"]:
-                allowance = budget_module.Budget(
-                    work_limit=10**13, seconds=30, cpu_seconds=30
+                allowance = recording_budget(
+                    budget_module.Budget,
+                    work_limit=10**13,
+                    seconds=30,
+                    cpu_seconds=30,
                 )
                 started = time.perf_counter()
 

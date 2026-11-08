@@ -3,7 +3,7 @@
 This package implements Suyama Montgomery-curve setup, scalar arithmetic,
 two-stage ECM, verified stage-one plans and optional paired continuations.
 Use the [bounded portfolio](../docs/API.md#bounded-recursive-factoring) when
-curves must share a deadline, work allowance and checkpoints.
+curves must share root resource limits and checkpoints.
 
 ## Standalone split
 
@@ -20,7 +20,8 @@ if divisor is not None:
 an unusable curve counts as an attempt, and the final permitted curve can
 still return a factor. Singular setup and saturated batches produce proper
 factors, checked recovery or a finite retry. The standalone call has a finite
-curve count but no shared portfolio deadline or portable checkpoint.
+curve count, accepts a shared `budget`, and otherwise owns default root
+resources. It has no portable standalone checkpoint.
 
 ## Bounded stage-one plans
 
@@ -31,21 +32,21 @@ Automatic GMP jobs keep the ladder, while explicit GMP reuse has its own
 validated route. The [status table](../STATUS.md#current-automatic-defaults)
 records current routing and the adoption boundary.
 
-A plan requires compatible bounds, chunks, curve count and owned storage;
+A plan requires compatible bounds, chunks and curve count;
 execution is restricted to supported 40–80-digit cofactors. Unsupported jobs
 keep the ladder. See [eligibility](chain_options.py) and [plan bounds](chains.py)
 for exact admission tests. The CLI exposes `--ecm-chain auto|off|prac|lucas|cf`.
 
 Each invocation owns a finite plan LRU shared across its curves and children.
 Plans contain immutable verified records, never shared curve points. Explicit
-reuse needs program and chain caps that fit with the rest of the job. A miss
+reuse retains program and chain cache capacities under root resources. A miss
 charges reading, verification and construction; a hit still incurs its charge.
 Fast chunks reserve execution and bounded strict recovery before arithmetic.
 These work units differ from ladder units.
 
 Checkpoints pin the catalog, executor, backend/build, chunk and recovery
 identities. Restore checks the committed prefix, rebuilds disposable plans
-and charges the work. Legacy snapshots retain their original executor.
+and charges the work. Old resource snapshots are refused without migration.
 
 ## Arithmetic helpers
 
