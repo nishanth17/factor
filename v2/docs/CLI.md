@@ -13,7 +13,7 @@ lists all current flags.
 
 ```sh
 pypy3 -m v2.factor 626100403 --bounded --seed 7 \
-  --work-limit 2000000 --seconds 30 --cpu-seconds 30 --memory-mib 16
+  --seconds 30 --cpu-seconds 30 --rss-bytes 1073741824
 ```
 
 The bounded portfolio shares its allowances across preprocessing, attempts
@@ -39,7 +39,7 @@ Explicit method selections also enable bounded execution. Direct relation
 methods disable rho/p−1/ECM; all routes recursively validate returned splits.
 Omitted native configurations enable SIQS in the calibrated bands documented
 in [current status](../STATUS.md#current-automatic-defaults). That table also
-records larger omitted resource grants and unmeasured routing scopes.
+records numerical recipes and their evidence limits.
 
 ```sh
 pypy3 -m v2.factor 10002200057 --method siqs --seed 7
@@ -50,10 +50,13 @@ pypy3 -m v2.factor 10002200057 --siqs --ecm-curves 2 --seed 7
 
 ## Resource and search options
 
-`--work-limit`, `--seconds`, `--cpu-seconds` and `--memory-mib` set explicit
-allowances. They take precedence over omitted limits. Time checks are
-cooperative; the memory allowance bounds owned workspace, not total process
-RSS. Increasing a deadline cannot restart an exhausted candidate schedule.
+`--seconds` and `--cpu-seconds` set cumulative root limits; both default to
+unlimited. `--rss-bytes` sets the sampled current process-tree RSS cap, whose
+default is floor(0.8 × physical RAM). `--no-rss-limit` explicitly disables it.
+`--checkpoint-bytes` optionally caps encoded saves; the default has no cap.
+Checks are cooperative and RSS may overshoot. Increasing a deadline does not
+restart an exhausted numerical schedule. `--work-limit`, `--memory-mib` and
+`--ecm-memory-mib` raise named removed-argument errors.
 
 QS controls include `--qs-base-bound`, `--qs-half-width`, `--qs-max-half-width`,
 `--qs-factor-count`, `--qs-family-count`, `--qs-pool-size`,
@@ -75,11 +78,12 @@ filter may lose candidates; it remains an explicit experimental policy.
 flags declare finite independent tiers and cannot be combined with
 `--ecm-curves`. `--ecm-policy pretest` needs `--pretest-work`; optional
 `--fallback-work`, `--fallback-seconds` and `--fallback-cpu-seconds` protect
-configured SIQS/SSS admission. `--ecm-policy campaign` uses the declared tiers.
+configured SIQS/SSS ordering. Exhausting a stage share hands remaining root
+resources to the next configured stage; it does not veto fallback admission. `--ecm-policy campaign` uses the declared tiers.
 These policies require the auto portfolio. See [execution](../execution/README.md).
 
 `--ecm-chain auto|off|prac|lucas|cf` chooses bounded chain routing and implies
-`--bounded`. Supported schedules, cofactor size and memory determine whether
+`--bounded`. Supported schedules and cofactor size determine whether
 a chain plan is used; [ECM](../ecm/README.md) describes the fallback rules.
 
 `--backend python-int|gmpy2-mpz` explicitly selects arithmetic. GMP must be
@@ -88,7 +92,8 @@ installed in the chosen PyPy environment; no runtime or backend fallback occurs.
 ## Save and resume
 
 Use `--checkpoint PATH` to save state and `--resume PATH` to restore it.
-Resume grants are cumulative totals. Preserve the saved method and compatible
+Limits apply to checkpoint-recorded cumulative charges plus the current call.
+Charges after a skipped save or crash are not recovered from an older file. Preserve the saved method and compatible
 configuration; see [checkpoints](CHECKPOINTS.md) for examples and restore rules.
 
 ## Automatic ECM selection
@@ -96,22 +101,15 @@ configuration; see [checkpoints](CHECKPOINTS.md) for examples and restore rules.
 The normal auto command now uses the bounded portfolio and automatic cost-gated
 process ECM. `--bounded` remains accepted. Omitted tiers choose escalating140
 at exactly 60/80/100 original digits; explicit tiers and saved configurations
-win. Unsupported/unfunded regimes and cheap calls stay serial. Direct QS/SSS
+win. Unsupported regimes and cheap calls stay serial. Direct QS/SSS
 methods keep their own execution path.
 
 Use `--ecm-workers serial` for an explicit serial run, or leave the default
-`--ecm-workers auto`. `--ecm-memory-mib` sets aggregate ECM ownership including
-the parent and workers. Omitted ordinary memory permits up to 8 GiB; an explicit
-`--memory-mib` workspace cap is also respected conservatively unless a separate
-aggregate cap is granted. Worker count is selected by the packaged policy.
+`--ecm-workers auto`. The packaged policy selects worker counts and numerical
+recipes. Workers share root resources without independent grants.
 
-Fresh non-QS omitted grants are 30 wall seconds, 4,096 aggregate CPU seconds and
-10^13 work units in both auto and serial mode. Explicit limits are never raised;
-a small explicit CPU/work grant can select serial. Calibrated QS grants and
-stock fallback/checkpoint settings remain. This is finite bounded execution,
-not a guarantee of completion. The legacy `factorize()` API remains available.
-
-Automatic snapshots use schema 13; resume retains the policy, implementation,
-method seed and resource identity. Old serial snapshots stay serial. Switching
-an automatic snapshot to `--ecm-workers serial` is rejected; use a fresh run
-for a new execution policy. See [adoption limits](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).
+Snapshots bind numerical policy, implementation and method seed together with
+resource version `observed-resources/saved-history-v2`. Old resource schemas are
+refused; no migration is provided. Switching an automatic snapshot to serial
+mid-search is rejected; use a fresh run for a different execution policy.
+See [adoption limits](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).

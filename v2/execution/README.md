@@ -21,17 +21,14 @@ children. The public entry point is
 
 ## One shared allowance
 
-`Budget` carries `work_limit`, `seconds`, `cpu_seconds` and an optional
-`cancelled` callback. Operations reserve work before mutation; refused work
-leaves checked state available for continuation. Work units are versioned
-algorithmic charges, not elapsed time or comparable bigint-operation counts.
-Time/cancellation checks are cooperative.
+`Budget` carries cumulative root `seconds`, `cpu_seconds` and `rss_bytes`, plus
+cancellation. Wall and CPU default to unlimited; RSS defaults to floor(0.8 ×
+physical memory) and explicit `None` disables it. Work is an exact diagnostic
+counter, not a grant. Nested/recursive calls borrow one root. Live child samples,
+acknowledgments and final wait4 totals reconcile by process birth identity.
 
-Portfolio limits include preprocessing, attempts, recovery, child calls and
-restore verification. Memory bounds conservatively cover simultaneous owned
-workspace; process/JIT RSS is separate. Cached schedules are shared only
-where their immutable integer identities match; curve/residue state stays
-private. See [checkpoint rules](../docs/CHECKPOINTS.md).
+See the [resource API](../README.md#resource-api) for sampled RSS overshoot,
+stop payloads, removed arguments, allocation recovery and saved-history resumes.
 
 ## Pretesting and fallback
 
@@ -51,7 +48,7 @@ without a fallback, reaching a pretest ceiling returns `pretest_exhausted`.
 ```sh
 pypy3 -m v2.factor 1000036000099 --siqs --ecm-policy pretest \
   --pretest-work 1000000 --fallback-work 5000000 \
-  --work-limit 20000000 --seconds 30 --cpu-seconds 30 --memory-mib 80
+  --seconds 30 --cpu-seconds 30 --rss-bytes 1073741824
 ```
 
 A fresh cofactor hands off once; resumed admitted relation work does not need

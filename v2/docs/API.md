@@ -28,9 +28,8 @@ reconstructs its original input, including unresolved cofactors. `complete`
 means no unresolved composite remains; `proven` also requires proven certainty
 for every terminal factor. A probable prime stays labelled probable.
 
-`factorize()` is the compatibility API. Its per-method controls do not create
-a single shared deadline or resumable portfolio. Use the bounded API below
-for those contracts. Zero is invalid; one and negative inputs are defined.
+`factorize()` accepts a shared `budget` for its recursive calls. Use the bounded
+API below for resumable portfolio state. Zero is invalid; one and negative inputs are defined.
 
 ## Bounded recursive factoring
 
@@ -43,7 +42,7 @@ run = factorize_bounded(
     n,
     seed=7,
     config=PortfolioConfig(),
-    budget=Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30),
+    budget=Budget(seconds=30, cpu_seconds=30),
 )
 assert run.result.reconstruct() == n
 print(run.reason, run.work_used)
@@ -63,7 +62,7 @@ Current size/resource choices and evidence live in [STATUS](../STATUS.md).
 `PortfolioConfig(siqs=SIQSConfig(...))` supplies an explicit SIQS fallback;
 `PortfolioConfig(sss=SSSConfig(...))` supplies experimental SSS. Import those
 classes from `v2.qs` and `v2.qs.sss`. A fallback's arithmetic backend must
-match its portfolio, and simultaneous storage must fit the outer allowance.
+match its portfolio. Storage grows under the root observed RSS guard.
 
 ## Low-level components
 
@@ -78,7 +77,8 @@ match its portfolio, and simultaneous storage must fit the outer allowance.
 
 Standalone splitters return a proper divisor or `None`; callers retain the
 cofactor and perform recursive classification themselves. They do not inherit
-the portfolio's shared deadline. Direct QS/SSS jobs likewise split a modulus;
+a new independent owner when called from a portfolio; they borrow the active
+root. Direct QS/SSS jobs likewise split a modulus;
 full recursive terminal classification belongs to `factorize_bounded`.
 
 ## Backends and resume
@@ -102,14 +102,10 @@ a funded process pool and owns its cleanup, including exception exits. Explicit
 borrowed; the caller closes them. A serial override retains the declared current
 numerical schedule, not a historical version of all defaults.
 
-`ecm_memory_bytes` supplies a finite aggregate ownership cap for automatic ECM,
-including the parent; omitted ordinary memory permits up to 8 GiB. An explicit
-parent workspace cap remains conservative unless this aggregate cap is given.
-Existing explicit Budgets are unchanged; workers require finite wall/CPU grants
-and startup work. Fresh non-QS omitted grants are 30 wall / 4,096 aggregate CPU
-seconds and 10^13 work units. Existing calibrated QS grants remain.
-
-For repeated compatible calls, use a caller-owned context:
+Automatic ECM borrows the same root wall, aggregate CPU and observed RSS guard.
+There are no prepaid startup/packet grants or internal ownership caps. Cost and
+numerical eligibility still select the existing worker recipes. Removed
+`ecm_memory_bytes` raises `RemovedResourceLimitError`.
 
 ```python
 from v2.ecm.auto import selected_context
@@ -118,7 +114,7 @@ with selected_context(seed=7, prefer_warm=True) as context:
     for n in inputs:
         run = factorize_bounded(
             n, seed=7, ecm_executor=context,
-            budget=Budget(work_limit=10**13, seconds=30, cpu_seconds=4096),
+            budget=Budget(seconds=30, cpu_seconds=4096),
         )
         assert run.result.reconstruct() == n
 ```
@@ -128,8 +124,8 @@ calls; the first call still pays cold startup. Use cold intent for short or
 uncertain reuse. The context fixes its first engaged worker configuration and
 needs a parent-memory reserve matching any explicit portfolio workspace.
 Automatic schema-13 snapshots require the same packaged policy/implementation,
-seed and cap on resume; legacy serial snapshots retain their execution.
+seed on resume. Pre-H3 resource schemas are refused without migration.
 
-Concurrent independent calls own separate contexts and grants. Service callers
+Concurrent independent calls own separate contexts and resource owners. Service callers
 coordinate machine-wide concurrency; nested process calls default to serial.
 A shared retained context admits one active call at a time.

@@ -1,92 +1,53 @@
-# Checkpoints and limits
+# Checkpoints and saved resource history
 
-H3 replaces internal refusal quotas with observed root limits. See the
-[resource API](../README.md#resource-api) for defaults, removed arguments,
-sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
-
-
-Bounded execution preserves checked progress and cumulative resource charges.
-See [CLI options](CLI.md) or the [Python API](API.md) for starting a run.
-
-## Save and resume from the CLI
+Run on PyPy implementing Python 3.11 with the same committed source and numerical
+configuration. A checkpoint stores published arithmetic state, cursor/RNG/search
+identities and cumulative charges. Derived stores are revalidated and rebuilt
+with the current invocation charged to the same root owner.
 
 ```sh
-mkdir -p v2/audit/results
-pypy3 -m v2.factor 626100403 --bounded --seed 7 --work-limit 1000 \
-  --checkpoint v2/audit/results/example-checkpoint.json
-pypy3 -m v2.factor --resume v2/audit/results/example-checkpoint.json \
-  --work-limit 2000000 --seconds 60 --cpu-seconds 60
+pypy3 -m v2.factor 626100403 --bounded --seed 7 --seconds 0 \
+  --checkpoint /tmp/factor-progress.json
+pypy3 -m v2.factor --resume /tmp/factor-progress.json --seconds 60 \
+  --cpu-seconds 60 --checkpoint /tmp/factor-progress.json
 ```
 
-Preserve the saved method and compatible settings. For explicit QS/MPQS/SIQS
-jobs, repeat the method and search options:
+Limits apply to recorded checkpoint charges plus the current invocation. They
+are cumulative totals. Work and resources consumed after the last valid save
+are not recovered when that save was skipped or a process died. A library caller
+retaining the live `Budget` across retries keeps exact cumulative charges. There
+is no durable ledger. Benchmark and study ledgers remain the authority for
+experiment charges. Restore, replay, validation and failed encoding are charged;
+paused/idle intervals between owned calls are excluded.
 
-```sh
-pypy3 -m v2.factor 10002200057 --method siqs --qs-base-bound 400 \
-  --seed 7 --work-limit 130000 \
-  --checkpoint v2/audit/results/siqs-checkpoint.json
-pypy3 -m v2.factor --method siqs --qs-base-bound 400 \
-  --resume v2/audit/results/siqs-checkpoint.json --work-limit 200000000
-```
+Resource version `observed-resources/saved-history-v2` binds this contract.
+`UnsupportedResourceVersionError` names `unsupported-resource-version` for old
+resource schemas; there is no migration. Integrity hashes, mathematical shape,
+proper-divisor checks, provenance and exact reconstruction remain mandatory.
+Changing an exhausted numerical schedule is distinct from extending root limits.
 
-Omitted allocation, tiers, relation bundle and memory settings restore saved
-choices. Repeat other nondefault CLI options such as backend and Fermat
-settings. Explicit incompatible overrides are rejected.
+Saving is optional. `atomic_save(path, snapshot, checkpoint_bytes=None)` encodes
+published state with no default size cap. CLI `--checkpoint-bytes` supplies an
+optional cap. An oversized proposal records `checkpoint_size_skip` with requested
+bytes, cap and scope, leaves the old file valid and continues computation.
+A temporary sibling is flushed and fsynced before atomic `os.replace`, followed
+by directory fsync. Interrupted writes leave the previous file valid; allocation,
+I/O and unsupported-encoding failures retain distinct identities and causes.
+A store poisoned by interrupted publication cannot be reused or checkpointed;
+recover a prior valid snapshot or the original run identity.
 
-## Cumulative allowances
+Wall/CPU checks are cooperative. macOS RSS sums sampled current resident bytes
+for the owned tree, including parent, workers and helpers; it can overshoot and
+can count shared pages more than once. See the [resource API](../README.md#resource-api).
 
-A resumed grant is a total allowance, not a new grant. Previously consumed
-work and active-run wall/CPU time remain charged; paused time is excluded.
-Verification, schedule reconstruction and disposable-cache rebuilding also
-consume resources. A grant only equal to prior work can refuse reconstruction.
-
-A deadline extension does not restart exhausted families, curves or campaigns.
-ECM tiers and p−1 campaign rungs are declared up front. Direct SIQS quota
-extensions require `allow_extension=True` and a compatible identity; they are
-not arbitrary configuration changes. Follow the package-specific rules.
-
-## Restore validation
-
-Checkpoints bind the modulus, concrete configuration, backend/build and
-execution policy. Restore checks reconstruction and arithmetic/provenance,
-then charges replay. Checksums detect accidental corruption and are not an
-authentication mechanism. Derived caches are rebuilt rather than trusted.
-
-Supported older formats retain their saved executor, sign schedule, scoring,
-primality and work identities. A legacy job is not silently upgraded to newer
-defaults. Unknown or incompatible identities are rejected. Backend/build
-mismatches cannot silently become a different arithmetic track.
-
-## Resource boundaries
-
-Time and cancellation checks are cooperative; an integer operation finishes
-before the next check. Owned-workspace caps exclude interpreter/JIT memory and
-caller-retained output. The bounded portfolio's input bit cap is an admission
-limit, not a practical factorization-size claim.
+Automatic ECM snapshots retain their checked envelope, implementation, method
+seed, exact curve identities and worker policy. No live process handles or
+interpreter internals are serialized. Retained contexts own startup, each active
+call and close separately. Owned children drain before a final snapshot is built.
 
 | Component | Additional continuation rules |
 | --- | --- |
-| [ECM](../ecm/README.md) | Saved finite tiers, charged plans/recovery; no same-curve B1 migration |
-| [p−1](../pm1/README.md) | Same n/base/config, exact rung replay and cumulative verification |
-| [QS/SSS](../qs/README.md#resume-and-resource-bounds) | Original relations reverified, derived queues rebuilt, quota rules preserved |
-| [Execution](../execution/README.md) | Shared child allowances and protected fallback admission |
-
-## Automatic ECM portfolio snapshots
-
-Automatically managed ECM uses outer schema 13. `portfolio_version` identifies
-the checked mathematical subschema (2–12); older factorers reject 13 before
-ignoring worker metadata. Stripping the envelope or recursively declaring 13
-as its subschema is rejected. Existing serial schemas remain readable and do
-not adopt workers during resume.
-
-The `ecm_auto` header binds policy, implementation bytes, deterministic method
-seed and aggregate memory cap. Native worker state remains canonical/drained
-with its existing resource and search versions. Recreate the automatic owner
-with the same policy and cap; changing worker count or switching to serial
-mid-search is unsupported. Integer seeds retain the measured mapping. Every
-normal return closes its owned pool before recording final clocks and packing
-the snapshot; exceptions also close it. Explicit retained contexts are borrowed.
-
-Preserve the exact committed source for a later resume. Deliberate policy
-repinning after a code change does not make an old automatic snapshot compatible.
-No live process handles or interpreter internals are serialized.
+| [ECM](../ecm/README.md) | Finite declared tiers; exact curve/boundary replay |
+| [p−1](../pm1/README.md) | Same n/base/config and charged rung verification |
+| [QS/SSS](../qs/README.md) | Reverify relations, rebuild derived queues, preserve numerical quotas |
+| [Execution](../execution/README.md) | Shared root owner and stage handoff |
