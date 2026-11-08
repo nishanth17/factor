@@ -94,10 +94,17 @@ def validate_observation(result):
 class OwnedRSS:
     """Bounded outer samples; child HWM sums are never called aggregate RSS."""
 
-    def __init__(self, pool, *, limit, samples=16000, interval=0.5):
+    def __init__(
+        self, pool, *, limit, samples=16000, interval=0.5, owner_pid=None
+    ):
         if not 0.1 <= interval <= 60:
             raise ValueError("unadmitted RSS interval")
         self.interval = interval
+        if owner_pid is not None and (
+            type(owner_pid) is not int or owner_pid <= 0
+        ):
+            raise ValueError("RSS owner PID must be positive")
+        self.owner_pid = owner_pid
         self.pool, self.limit, self.maximum = pool, limit, samples
         self.rows, self.error, self.exceeded = [], None, False
         self.reader = DarwinRSS() if sys.platform == "darwin" else None
@@ -112,6 +119,8 @@ class OwnedRSS:
                 mapping = self.pool.executor._processes or {}
                 processes = list(mapping.copy().values())
             pids = [os.getpid()] + [p.pid for p in processes if p.pid]
+            if self.owner_pid is not None and self.owner_pid not in pids:
+                pids.append(self.owner_pid)
             try:
                 from multiprocessing import resource_tracker
 
@@ -142,6 +151,8 @@ class OwnedRSS:
                     missing = sorted(set(pids) - rss.keys())
                 if os.getpid() not in rss:
                     raise RuntimeError("RSS recorder lost its parent process")
+                if self.owner_pid is not None and self.owner_pid not in rss:
+                    raise RuntimeError("RSS recorder lost its controller")
                 total = sum(rss.values())
                 self.rows.append(
                     dict(

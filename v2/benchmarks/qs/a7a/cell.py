@@ -76,6 +76,7 @@ def settings(
         "worker_memory_bytes",
         "packet_bytes",
         "assignment_cpu",
+        "checkpoint_bytes",
     }
     if features.keys() - allowed:
         raise ValueError("unknown experimental worker features")
@@ -194,6 +195,7 @@ def complete(
     endpoint,
     *,
     memory_bytes=16 * 2**30,
+    preserve_checkpoint=False,
 ):
     from ....portfolio import PortfolioConfig, factorize_bounded
     from ....qs.defaults import uses_siqs_defaults
@@ -237,6 +239,8 @@ def complete(
         endpoint=endpoint,
     )
     validate_result(result, n)
+    if preserve_checkpoint:
+        result["checkpoint"] = run.checkpoint
     return result
 
 
@@ -254,6 +258,11 @@ def complete_call(n, config, workers, budget, pool, spec, *, seconds_cap=None):
     )
     child.a7a_seed = spec["seed"]
     child.cancelled = budget.cancelled
+    checkpoint_options = (
+        {"preserve_checkpoint": True}
+        if spec.get("preserve_checkpoint", False)
+        else {}
+    )
     try:
         return complete(
             n,
@@ -263,6 +272,7 @@ def complete_call(n, config, workers, budget, pool, spec, *, seconds_cap=None):
             pool,
             spec["endpoint"],
             memory_bytes=spec["memory"],
+            **checkpoint_options,
         )
     finally:
         # Parent CPU is already on the encompassing process clock. Publish
@@ -278,6 +288,18 @@ def execute(request):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
     n, spec = request["n"], request["cell"]
     validate_worker_timeline(spec.get("stage"), spec)
+    rss_limit = spec.get("rss_stop_bytes", spec["memory"])
+    if (
+        type(rss_limit) is not int
+        or not 0 < rss_limit <= spec["memory"]
+        or ("rss_stop_bytes" in spec and not spec["observe"])
+    ):
+        raise ValueError("live RSS guard requires observed, bounded bytes")
+    preserve_checkpoint = spec.get("preserve_checkpoint", False)
+    if type(preserve_checkpoint) is not bool or (
+        preserve_checkpoint and spec["endpoint"] != "complete"
+    ):
+        raise ValueError("checkpoint preservation requires a complete call")
     warm_target = spec.get("warmup_seconds", 3)
     if type(warm_target) is not int or warm_target not in (3, 10, 20):
         raise ValueError("unadmitted warmup duration")
@@ -396,8 +418,9 @@ def execute(request):
 
         observer = OwnedRSS(
             pool,
-            limit=spec["memory"],
+            limit=rss_limit,
             interval=spec.get("rss_interval", 0.5),
+            owner_pid=spec.get("rss_owner_pid"),
         )
         observer.__enter__()
         budget.cancelled = (
@@ -514,6 +537,7 @@ def execute(request):
         rss_backend=None if observer is None else observer.backend,
         observer_failure=None if observer is None else observer.error,
         observer_exhausted=False if observer is None else observer.exceeded,
+        rss_stop_bytes=rss_limit,
         worker_configuration=None if workers is None else asdict(workers),
         transition="new QS pool"
         if workers and spec["endpoint"] == "portfolio"

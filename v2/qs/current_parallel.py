@@ -131,7 +131,7 @@ class QSWorkerConfig:
             ("shutdown_work", 1, 2**63 - 1),
             ("worker_memory_bytes", 4 * 2**20, 4 * 2**30),
             ("runtime_memory_bytes", 16 * 2**20, 2**30),
-            ("memory_bytes", 16 * 2**20, 22 * 2**30),
+            ("memory_bytes", 16 * 2**20, 24 * 2**30),
             ("coexistence_bytes", 0, 20 * 2**30),
             ("packet_bytes", 4096, 16 * 2**20),
             ("max_batch_atoms", 1, 65536),

@@ -595,6 +595,13 @@ class OwnershipTests(unittest.TestCase):
                 budget=allowance(),
             )
 
+    def test_explicit_aggregate_grant_accepts_24_gib_but_stays_finite(self):
+        self.assertEqual(
+            settings(memory_bytes=24 * 2**30).memory_bytes, 24 * 2**30
+        )
+        with self.assertRaises(ValueError):
+            settings(memory_bytes=24 * 2**30 + 1)
+
 
 class SharedCPUReadingTests(unittest.TestCase):
     def test_snapshot_observes_live_updates_and_new_run_baselines(self):

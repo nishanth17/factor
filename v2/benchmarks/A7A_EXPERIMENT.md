@@ -649,6 +649,25 @@ permission to merge/change defaults.
 
 ## Separate 75/80 feasibility probes: one candidate, then stop
 
+The 8 November bounds amendment raises only these probes' aggregate
+owned-memory admission grant to **24 GiB** and requires a distinct **18 GiB
+live aggregate owned-RSS stop guard**. Keep worker/runtime 768/256 MiB,
+parent 4 GiB and both parent/worker checkpoint caps 256 MiB. The bookkeeping
+bound sums concurrent caps; it is not expected physical use. Preserve a
+cooperative memory stop's progress and checkpoint, report a memory outcome
+and do not substitute another recipe. Poll aggregate owned RSS every 0.5 s
+at 75 digits; retain 60-second progress and thermal observations. No CPU
+profile, heap dump, extra candidate or repetition is included.
+
+Recomputed with the portfolio coexistence reservation: C10/p64 needs
+25,578,184,704 bytes (23.822 GiB) at 75 digits, admitted within
+25,769,803,776 bytes; 80 needs 26,090,151,936 bytes (24.298 GiB), refused.
+These revised bounds include the worker checkpoint's 256 MiB cap, unlike
+the earlier inherited 64 MiB request. The earlier frozen G3 derivations and
+their 22 GiB refusals remain historical, not edited receipts. The 75 call is
+explicitly approved now if admitted; 80 still requires a separate instruction
+after the 75 report and must satisfy admission before execution.
+
 75 has a **two-hour actor budget**; 80 has **three times that, six hours**.
 Run 75 **only after G3**, once the G2H fixes and frozen G3 recipes exist, and
 only with explicit approval at or after the G3 report. It may run before or
@@ -665,7 +684,8 @@ confirmation is implied by any outcome. Report admission refusal as an outcome.
 | Actor wall | 7,200 s | 21,600 s |
 | Owner wall, including observation and cleanup | 7,500 s | 22,500 s |
 | Actor / owner aggregate CPU | 72,000 / 75,000 s | 216,000 / 225,000 s |
-| Aggregate owned RAM | 22 GiB | 22 GiB |
+| Aggregate owned RAM | 24 GiB | 24 GiB |
+| Live aggregate owned RSS stop | Over 18 GiB | Over 18 GiB |
 | Worker / runtime per worker | 768 / 256 MiB | 768 / 256 MiB |
 | Parent QS / checkpoint | 4 GiB / 256 MiB | 4 GiB / 256 MiB |
 | Logical work ceiling | 96,000,000,000,000 | 96,000,000,000,000 |

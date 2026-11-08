@@ -100,6 +100,30 @@ class ObserverTests(unittest.TestCase):
             else:
                 self.assertIn("sample allowance", observer.error)
 
+    def test_live_guard_counts_the_external_controller(self):
+        parent = os.getpid()
+        controller = parent + 100000
+
+        def read(pids):
+            self.assertEqual(set(pids), {parent, controller})
+            return {parent: 99, controller: 2}, []
+
+        with (
+            patch("sys.platform", "darwin"),
+            patch(
+                "v2.benchmarks.qs.a7a.observer.DarwinRSS", return_value=read
+            ),
+            patch(
+                "multiprocessing.resource_tracker._resource_tracker._pid", None
+            ),
+        ):
+            observer = OwnedRSS(None, limit=100, owner_pid=controller)
+        observer._run()
+
+        self.assertTrue(observer.exceeded)
+        self.assertEqual(observer.rows[0]["bytes"], 101)
+        self.assertIsNone(observer.error)
+
     def test_failed_observation_never_passes_as_factorer_cancellation(self):
         result = dict(
             cell=dict(observe=True),

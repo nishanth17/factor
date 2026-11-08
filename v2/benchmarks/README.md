@@ -44,6 +44,13 @@ fixed packet work. Background QoS is not core pinning. Buffer payload,
 accounted cache ownership and observed RSS are distinct memory measurements;
 the byte/native screen does not establish a working-set scaling limit.
 
+Probe cells may declare `rss_stop_bytes` below their admission allowance.
+The RSS observer then cooperatively cancels work at that sampled live bound;
+`preserve_checkpoint=True` includes the validated portfolio checkpoint in the
+sample result. Recorder failure and a live-memory stop remain distinct.
+The amended 75/80 probes use a 24 GiB admission grant with an 18 GiB live
+guard and 256 MiB checkpoint caps; this does not change G3's historical grants.
+
 G2's corrected coverage is reported locally in
 `v2/audit/a7a/g2-report-20261107/REPORT.md`. All serial/process cells complete;
 literal mainline is incomplete at 60/65/70. This is exposed-input feasibility,
