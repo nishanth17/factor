@@ -6,7 +6,7 @@ import unittest
 from collections import Counter
 from types import MethodType
 
-from v2.qs import scalar_kernels, sparse_queue
+from v2.qs import power_sieve, power_sieve_native, scalar_kernels, sparse_queue
 from v2.qs.sieve_collector import SieveCollector
 from v2.tests.test_qs_hit_words import make_worker
 from v2.tests.test_qs_sieve import signature
@@ -19,6 +19,7 @@ class ScalarKernelTests(unittest.TestCase):
             scalar_kernels.collect_scalar,
             scalar_kernels.build_native,
             scalar_kernels.sieve_native,
+            power_sieve_native.prime_power_roots,
         ):
             tree = ast.parse(inspect.getsource(function))
             forbidden = {
@@ -30,6 +31,13 @@ class ScalarKernelTests(unittest.TestCase):
             self.assertFalse(
                 {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)}
                 & forbidden
+            )
+            self.assertFalse(
+                any(
+                    isinstance(n, ast.Attribute)
+                    and n.attr in ("pruned_replay", "shifted_class")
+                    for n in ast.walk(tree)
+                )
             )
             self.assertFalse(
                 any(
@@ -49,6 +57,7 @@ class ScalarKernelTests(unittest.TestCase):
             )
             generic._collect = MethodType(SieveCollector._collect, generic)
             generic._sparse_sieve = sparse_queue.sieve
+            generic._power_roots = power_sieve.prime_power_roots
             for lo, hi in ((-79, -15), (3, 16), (-31, 33)):
                 a, b = Counter(), Counter()
                 self.assertEqual(

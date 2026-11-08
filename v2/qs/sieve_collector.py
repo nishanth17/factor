@@ -518,6 +518,13 @@ class SieveCollector:
         self._scratch_peak_bytes = 0
         self._omitted_allowance = 0
         self._lift_inverses = {}
+        from .power_sieve_native import prime_power_roots as native_power_roots
+
+        self._power_roots = (
+            prime_power_roots
+            if "pruned_transfers" in self.config._kernels
+            else native_power_roots
+        )
         if "presieve_powers" in self.config._kernels:
             self._presieve = kernels.PowerPresieve()
         elif "presieve" in self.config._kernels:
@@ -916,7 +923,7 @@ class SieveCollector:
                 window_lo, window_hi, window_maximum = self._plan_window
                 plan, reserve = [], 256
 
-                for mark in prime_power_roots(
+                for mark in self._power_roots(
                     self.polynomial,
                     roots,
                     window_maximum,
@@ -956,7 +963,7 @@ class SieveCollector:
                 stats["plan_replays"] += 1
                 return plan
 
-        return prime_power_roots(
+        return self._power_roots(
             self.polynomial,
             roots,
             maximum,
@@ -1210,7 +1217,7 @@ class SieveCollector:
                     marks = (
                         self._power_marks(index, maximum, lo, hi, stats)
                         if self.config.power_plan_bytes
-                        else prime_power_roots(
+                        else self._power_roots(
                             self.polynomial,
                             roots,
                             maximum,

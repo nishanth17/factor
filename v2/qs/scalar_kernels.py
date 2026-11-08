@@ -15,7 +15,6 @@ from .sieve_collector import (
     _CollectionProgress,
     checked_position,
     kernels,
-    prime_power_roots,
     require_published,
 )
 from .sparse_queue import ENTRY_BYTES, array, clear
@@ -97,7 +96,7 @@ def direct_scalar(self, lo, hi, stats):
                 marks = (
                     self._power_marks(index, maximum, lo, hi, stats)
                     if self.config.power_plan_bytes
-                    else prime_power_roots(
+                    else self._power_roots(
                         self.polynomial,
                         roots,
                         maximum,
@@ -448,7 +447,7 @@ def build_native(collector, window, byte_cap):
     grouped = isinstance(budget, PollingBudget)
     for index in range(split, len(roots)):
         root = roots[index]
-        marks = prime_power_roots(
+        marks = collector._power_roots(
             collector.polynomial,
             root,
             maximum,

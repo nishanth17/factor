@@ -3,7 +3,6 @@
 from array import array
 
 from ..execution.work_budget import PollingBudget
-from .power_sieve import prime_power_roots
 
 HELPER_BYTES = 32 * 2**20
 # Four copies of a three-word entry cover buffer growth and coexistence.
@@ -47,7 +46,7 @@ def build(collector, window, byte_cap):
     grouped = isinstance(budget, PollingBudget)
     for index in range(split, len(roots)):
         root = roots[index]
-        marks = prime_power_roots(
+        marks = collector._power_roots(
             collector.polynomial,
             root,
             maximum,

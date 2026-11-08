@@ -6,7 +6,6 @@ order, paid work and conservative reservations remain identical.
 """
 
 from ..common.arithmetic import gcd
-from .power_sieve import prime_power_roots
 
 KERNELS = (
     "density",
@@ -202,7 +201,7 @@ class PowerPresieve:
             scores, hits, levels = [0] * period, [0] * period, set()
             for index, limit in limits.items():
                 weight = collector._logs[index]
-                marks = prime_power_roots(
+                marks = collector._power_roots(
                     collector.polynomial,
                     collector._roots[index],
                     limit,
