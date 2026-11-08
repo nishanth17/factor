@@ -133,9 +133,7 @@ def attempt_cohort(cached):
                     division="bucket",
                     residual_bound=1,
                     max_partials=4096,
-                    preparation_cache_bytes=2 * 2**20
-                    if 4096 == None
-                    else min(2 * 2**20, 2048 * 4096),
+                    preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
                     target_rows=4096,
                 )
                 job = QSJob(

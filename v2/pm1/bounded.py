@@ -14,6 +14,7 @@ from ..execution.resources import (
     accounted_entry,
     decode_checkpoint,
     removed_arguments,
+    require_resource_version,
 )
 from ..execution.schedules import (
     RATIO_VERSION,
@@ -421,6 +422,8 @@ def factorize_pm1_bounded(
     Changing bounds/base/config requires a fresh explicitly declared campaign.
     No primality claim is made: even a successful split remains unclassified.
     """
+    if checkpoint is not None:
+        require_resource_version(checkpoint)
     utils.require_integer(n, "n", 2)
     utils.require_integer(base, "base", 2)
     if type(n) is not int or type(base) is not int:

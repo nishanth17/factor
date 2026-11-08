@@ -68,9 +68,7 @@ class A1bTests(unittest.TestCase):
                         residual_bound=97,
                         marking=marking,
                         max_partials=4096,
-                        preparation_cache_bytes=2 * 2**20
-                        if 4096 == None
-                        else min(2 * 2**20, 2048 * 4096),
+                        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
                         target_rows=4096,
                     )
                     worker = SieveCollector(
@@ -101,9 +99,7 @@ class A1bTests(unittest.TestCase):
                 residual_bound=500,
                 marking="density+presieve+scan_fused",
                 max_partials=4096,
-                preparation_cache_bytes=2 * 2**20
-                if 4096 == None
-                else min(2 * 2**20, 2048 * 4096),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
                 target_rows=4096,
             ),
         )

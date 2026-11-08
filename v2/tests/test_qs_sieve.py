@@ -29,9 +29,7 @@ def collector(polynomial, base, **options):
         SieveConfig,
         max_partials=4096,
         **options,
-        preparation_cache_bytes=2 * 2**20
-        if 4096 == None
-        else min(2 * 2**20, 2048 * 4096),
+        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
         target_rows=4096,
     )
     return SieveCollector(
@@ -358,9 +356,7 @@ class SieveStoreTests(unittest.TestCase):
             (
                 SieveConfig(
                     residual_bound=1,
-                    preparation_cache_bytes=2 * 2**20
-                    if 0 == None
-                    else min(2 * 2**20, 2048 * 0),
+                    preparation_cache_bytes=min(2 * 2**20, 2048 * 0),
                     target_rows=0,
                 ),
                 "relation_limit",

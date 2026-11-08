@@ -300,19 +300,18 @@ def _fake_worker(channel, frame_bytes, startup_work, mode):
     os._exit(17)
 
 
-def crash_before_report(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def crash_before_report(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "crash")
 
 
-def publish_then_crash(channel, frame_bytes, startup_work, settings_data=None):
+def publish_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "ack")
 
 
-def truncate_then_crash(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def truncate_then_crash(channel, settings_data=None):
+    frame_bytes, startup_work = 16384, 0
     _fake_worker(channel, frame_bytes, startup_work, "truncated")
 
 
@@ -322,9 +321,8 @@ def oversize_then_crash(
     _fake_worker(channel, frame_bytes, startup_work, "oversized")
 
 
-def exit_during_startup(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def exit_during_startup(channel, settings_data=None):
+    _frame_bytes, _startup_work = 16384, 0
     os._exit(23)
 
 

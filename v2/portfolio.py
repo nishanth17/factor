@@ -47,6 +47,7 @@ from .execution.resources import (
     decode_checkpoint,
     encode_checkpoint,
     removed_arguments,
+    require_resource_version,
 )
 from .execution.schedules import SieveContext
 from .execution.stage_jobs import (
@@ -1303,6 +1304,8 @@ def factorize_bounded(
     Explicit contexts remain borrowed. Omitted budgets/memory receive finite
     parallel-capable grants; explicit allowances and legacy checkpoints win.
     """
+    if checkpoint is not None:
+        require_resource_version(checkpoint)
     options = dict(
         seed=seed,
         config=config,

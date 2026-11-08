@@ -292,3 +292,169 @@ class ChildReaperTests(unittest.TestCase):
             self.assertEqual(process._popen.poll(0), 0)
         self.assertEqual(first.cpu_used, 0)
         self.assertEqual(second.cpu_used, 2)
+
+
+class IncidentCoverageTests(unittest.TestCase):
+    def test_75_80_metadata_is_not_a_memory_grant(self):
+        from v2.qs.siqs import SIQSConfig
+
+        for estimate in (17541809920, 17721011200):
+            with self.subTest(estimate=estimate):
+                with patch(
+                    "v2.qs.siqs.root_update_workspace", return_value=estimate
+                ):
+                    config = SIQSConfig(
+                        assignment_policy="flyer",
+                        factor_count=8,
+                        pool_size=64,
+                        family_count=100000,
+                        polynomials_per_family=64,
+                        root_update_policy="batch",
+                    )
+                with patch(
+                    "v2.qs.siqs.root_update_workspace", return_value=estimate
+                ):
+                    self.assertGreater(config.metadata_reserve, 12884901888)
+        provider = Provider()
+        budget = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        budget.publication()
+        provider.rows[0] = ProcessSample(os.getpid(), 1, 801, 0)
+        with self.assertRaises(BudgetExhaustedError) as stopped:
+            budget.publication()
+        self.assertEqual(
+            stopped.exception.payload,
+            dict(
+                reason="rss_limit",
+                limit="rss",
+                observed=801,
+                limit_value=800,
+                scope="factorization",
+            ),
+        )
+
+    def test_unattributed_incident_candidate_sites_have_no_byte_veto(self):
+        import ast
+
+        import v2.qs
+
+        directory = Path(v2.qs.__file__).parent
+        names = (
+            "sieve_collector",
+            "large_prime_collector",
+            "extended_collector",
+            "opaque_conversion",
+            "yield_memory",
+            "checkpoint",
+            "large_prime_checkpoint",
+            "extended_checkpoint",
+            "linear_algebra",
+            "factor_base",
+            "families",
+            "assignment_stream",
+            "root_updates",
+            "multiplier",
+            "norm_multiplier",
+            "relations",
+            "recovery_batch",
+            "smooth_batch",
+            "sss",
+            "sss_checkpoint",
+            "parallel",
+        )
+        for name in names:
+            with self.subTest(candidate=name):
+                tree = ast.parse((directory / (name + ".py")).read_text())
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.If):
+                        predicate = ast.unparse(node.test)
+                        self.assertFalse(
+                            any(
+                                isinstance(item, ast.Attribute)
+                                and item.attr == "memory_limit"
+                                for item in ast.walk(node.test)
+                            )
+                        )
+                        self.assertNotIn("config.memory_bytes", predicate)
+
+    def test_actual_cpu_does_not_preapprove_packet_grants(self):
+        from v2.ecm.workers import ECMExecutor, arithmetic_options
+        from v2.execution.worker_contract import (
+            Ledger,
+            Manifest,
+            Search,
+            WorkerSettings,
+        )
+        from v2.portfolio import PortfolioConfig
+
+        settings = WorkerSettings(workers=4)
+        config = PortfolioConfig(
+            ecm_tiers=((30, 100, 4),), ecm_chain_mode="off"
+        )
+        manifest = Manifest(
+            1009 * 1013, 7, "incident", arithmetic_options(config, settings)
+        )
+        search = Search(manifest, settings, fixed_work=True)
+        ledger = Ledger()
+        executor = ECMExecutor(settings=settings)
+        for index in range(4):
+            packet, issued = executor._packet(
+                manifest,
+                search,
+                ledger,
+                None,
+                dict(index=index, metadata_cache=[]),
+            )
+            self.assertEqual(len(issued), 1)
+            self.assertNotIn("cpu", packet["jobs"][0])
+            self.assertNotIn("work", packet["jobs"][0])
+        self.assertEqual((ledger.work, ledger.cpu), (0, 0))
+        cpu = Clock()
+        budget = Budget(
+            cpu_seconds=440,
+            cpu_clock=cpu,
+            wall_clock=lambda: 0,
+            provider=Provider(),
+        )
+        cpu.value = 100
+        budget.consume(1)
+        cpu.value = 440
+        with self.assertRaisesRegex(BudgetExhaustedError, "cpu_limit"):
+            budget.consume(1)
+
+    def test_allocation_interruption_poison_is_not_an_rss_stop(self):
+        from collections import Counter
+
+        from v2.qs.factor_base import build_factor_base
+        from v2.qs.polynomial import qs_polynomial
+        from v2.qs.reference_collector import collect_block
+        from v2.qs.sieve_collector import SieveCollector, SieveConfig
+        from v2.qs.storage import RelationPublicationError, require_published
+
+        budget = Budget(
+            provider=Provider(), wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        base = build_factor_base(
+            1009 * 1013, bound=100, budget=budget
+        ).factor_base
+        polynomial = qs_polynomial(base)
+        atom = collect_block(polynomial, base, 0, 1, budget=budget).relations[
+            0
+        ]
+        owner = SieveCollector(
+            polynomial, base, config=SieveConfig(), budget=budget
+        )
+
+        class BrokenList(list):
+            def append(self, value):
+                raise MemoryError("injected publication")
+
+        owner._full = BrokenList()
+        with self.assertRaises(RelationPublicationError) as failed:
+            owner._admit(atom, Counter())
+        self.assertEqual(failed.exception.reason, "allocation_failure")
+        self.assertIsInstance(failed.exception.__cause__, MemoryError)
+        self.assertIsNone(budget.stop)
+        with self.assertRaises(RelationPublicationError):
+            require_published(owner)

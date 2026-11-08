@@ -72,9 +72,7 @@ def terminal_job():
         filter_row_growth=32,
         weight_two=False,
         collector=SieveConfig(
-            preparation_cache_bytes=2 * 2**20
-            if 64 == None
-            else min(2 * 2**20, 2048 * 64),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 64),
             target_rows=64,
         ),
     )

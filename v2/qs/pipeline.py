@@ -113,9 +113,8 @@ class QSJob:
         ):
             from .equal_parity import EqualParityIndex
 
-            reserve = min(
-                self.config.duplicate_bytes
-                // (2 if self.collector._checked is not None else 1),
+            reserve = self.config.duplicate_bytes // (
+                2 if self.collector._checked is not None else 1
             )
             self._pair_index = EqualParityIndex(reserve)
             self.collector._workspace += reserve

@@ -29,9 +29,7 @@ def configuration(**options):
         collector=SieveConfig(
             residual_bound=500,
             max_partials=4096,
-            preparation_cache_bytes=2 * 2**20
-            if 4096 == None
-            else min(2 * 2**20, 2048 * 4096),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
             target_rows=4096,
         ),
     )
@@ -289,9 +287,7 @@ class SIQSTests(unittest.TestCase):
             base_bound=100,
             collector=SieveConfig(
                 residual_bound=1,
-                preparation_cache_bytes=2 * 2**20
-                if 8 == None
-                else min(2 * 2**20, 2048 * 8),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 8),
                 target_rows=8,
             ),
         )

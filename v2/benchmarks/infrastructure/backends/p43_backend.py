@@ -199,9 +199,7 @@ def _qs_call(mode, backend, before=None):
         collector=SieveConfig(
             residual_bound=500,
             max_partials=4096,
-            preparation_cache_bytes=2 * 2**20
-            if 4096 == None
-            else min(2 * 2**20, 2048 * 4096),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
             target_rows=4096,
         ),
     )

@@ -68,9 +68,7 @@ def configuration(n, bound, width, residual, multiplier=1):
             residual_bound=residual,
             max_partials=32768,
             target_rows=32768,
-            preparation_cache_bytes=2 * 2**20
-            if 32768 == None
-            else min(2 * 2**20, 2048 * 32768),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 32768),
         ),
     )
 

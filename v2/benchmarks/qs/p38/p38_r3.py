@@ -380,9 +380,7 @@ def config(module, band):
                 residual_bound=10000000,
                 max_partials=32768,
                 target_rows=32768,
-                preparation_cache_bytes=2 * 2**20
-                if 32768 == None
-                else min(2 * 2**20, 2048 * 32768),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 32768),
             ),
         )
 
@@ -407,9 +405,7 @@ def config(module, band):
             residual_bound=bound**2,
             max_partials=2048,
             target_rows=4096,
-            preparation_cache_bytes=2 * 2**20
-            if 4096 == None
-            else min(2 * 2**20, 2048 * 4096),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
         ),
     )
 
@@ -493,9 +489,7 @@ def prepare_fixture(mods, fixture):
         config=mods["qs.sieve_collector"].SieveConfig(
             residual_bound=1000,
             max_partials=2048,
-            preparation_cache_bytes=2 * 2**20
-            if 4096 == None
-            else min(2 * 2**20, 2048 * 4096),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
             target_rows=4096,
         ),
     )

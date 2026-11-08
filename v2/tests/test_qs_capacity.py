@@ -156,9 +156,7 @@ class CapacityTests(unittest.TestCase):
             residual_bound=10000,
             max_partials=4096,
             score_policy="conservative",
-            preparation_cache_bytes=2 * 2**20
-            if 4096 == None
-            else min(2 * 2**20, 2048 * 4096),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
             target_rows=4096,
         )
         collector = SieveCollector(
@@ -211,9 +209,7 @@ class CapacityTests(unittest.TestCase):
             collector=SieveConfig(
                 residual_bound=10000,
                 max_partials=512,
-                preparation_cache_bytes=2 * 2**20
-                if 2048 == None
-                else min(2 * 2**20, 2048 * 2048),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 2048),
                 target_rows=2048,
             ),
         )
@@ -285,9 +281,7 @@ class CapacityTests(unittest.TestCase):
         original = SIQSConfig(
             assignment_policy="nearest",
             collector=SieveConfig(
-                preparation_cache_bytes=2 * 2**20
-                if 64 == None
-                else min(2 * 2**20, 2048 * 64),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 64),
                 target_rows=64,
             ),
         )

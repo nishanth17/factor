@@ -328,7 +328,7 @@ class SelectedECMContext:
             "rows",
         } or (
             data["version"] != PROFILE_VERSION
-            or data["executor_version"] != VERSION
+            or data["executor_version"] not in (VERSION, "b12-f4-v7")
             or data["search_version"] != SEARCH_VERSION
             or data["status"]
             not in ("training", "frozen-for-confirmation", "confirmed")

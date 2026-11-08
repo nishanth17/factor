@@ -32,9 +32,9 @@ def validate_extension(previous, proposed):
             raise ValueError(f"extension cannot reduce {name}")
         new[name] = old[name]
     for name in ("max_partials",):
-        if storage_limit(new["collector"][name]) < storage_limit(
-            old["collector"][name]
-        ):
+        before = old["collector"][name]
+        after = new["collector"][name]
+        if after is not None and (before is None or after < before):
             raise ValueError(f"extension cannot reduce {name}")
         new["collector"][name] = old["collector"][name]
     if new != old:

@@ -199,9 +199,7 @@ def qs_configuration(digits, backend, mode="siqs", *, large=False):
             residual_bound=bound**2,
             max_partials=16384,
             target_rows=16384,
-            preparation_cache_bytes=2 * 2**20
-            if 16384 == None
-            else min(2 * 2**20, 2048 * 16384),
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 16384),
         ),
     )
 

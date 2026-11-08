@@ -306,6 +306,7 @@ class SieveResult:
     reason: str
     stats: dict
     workspace_bytes: int
+    resource_stop: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -1935,4 +1936,5 @@ class SieveCollector:
             reason,
             stats,
             self._workspace + self._scratch_peak_bytes,
+            resource_stop=getattr(self.budget, "stop", None),
         )

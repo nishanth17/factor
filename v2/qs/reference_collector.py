@@ -28,6 +28,7 @@ class CollectionResult:
     reason: str
     zero_positions: tuple[int, ...]
     workspace_bytes: int
+    resource_stop: dict | None = None
 
 
 @removed_arguments(("max_relations", "memory_bytes"))
@@ -134,4 +135,5 @@ def collect_block(
         reason,
         tuple(zero_positions),
         workspace,
+        resource_stop=getattr(budget, "stop", None),
     )

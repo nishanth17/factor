@@ -153,9 +153,7 @@ def main():
                 residual_bound=3000**2,
                 max_partials=2048,
                 target_rows=2048,
-                preparation_cache_bytes=2 * 2**20
-                if 2048 == None
-                else min(2 * 2**20, 2048 * 2048),
+                preparation_cache_bytes=min(2 * 2**20, 2048 * 2048),
             ),
         )
         corpus = json.loads(source_path(args.corpus).read_text())

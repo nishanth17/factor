@@ -81,7 +81,10 @@ def recover(
                 stats.get("split_domain_skips", 0) + 1
             )
             reason = "endpoint_bound"
-        elif collector._split_calls < config.split_limit:
+        elif (
+            config.split_limit is None
+            or collector._split_calls < config.split_limit
+        ):
             collector._split_calls += 1
             stats["split_attempts"] += 1
             primes, reason, evaluations = split_residual(

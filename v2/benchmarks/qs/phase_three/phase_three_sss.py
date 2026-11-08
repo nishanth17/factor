@@ -187,9 +187,7 @@ def collector_config():
         division="roots",
         residual_bound=10000,
         max_partials=1024,
-        preparation_cache_bytes=2 * 2**20
-        if 4096 == None
-        else min(2 * 2**20, 2048 * 4096),
+        preparation_cache_bytes=min(2 * 2**20, 2048 * 4096),
         target_rows=4096,
     )
 

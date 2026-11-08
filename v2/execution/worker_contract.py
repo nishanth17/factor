@@ -15,7 +15,7 @@ from .resources import (
 )
 
 SEARCH_VERSION = "b12-f4-v1"
-VERSION = "b12-f4-v7"
+VERSION = "b12-f4-observed-v8"
 RESIDUE_VERSION = "ecm-stage-boundary-v1"
 RESULT_BYTES = 4096
 
@@ -334,7 +334,14 @@ class Manifest:
         self.tiers = tuple(tuple(t) for t in tiers)
         self.schedule = digest([VERSION, "cost", options, n.bit_length()])
         self.metadata = metadata_identity(options)
-        self.identity = digest([SEARCH_VERSION, n, seed, lineage, options])
+        # The former 64 MiB worker grant entered the established curve hash.
+        # Retain that hash input solely as a compatibility identity; no byte
+        # allowance is constructed or enforced from it. Removing a resource
+        # argument must not silently change sigmas for the same root seed.
+        search_options = dict(options, memory_bytes=64 * 2**20)
+        self.identity = digest(
+            [SEARCH_VERSION, n, seed, lineage, search_options]
+        )
         self._assignments = {}
         self.jobs = tuple(
             (tier, index)

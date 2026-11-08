@@ -421,7 +421,10 @@ def main(*, budget=None):
     rss_group.add_argument("--rss-bytes", type=int, default=DEFAULT_RSS)
     rss_group.add_argument("--no-rss-limit", action="store_true")
     parser.add_argument("--checkpoint-bytes", type=int)
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except RemovedResourceLimitError as error:
+        parser.error(str(error))
     budget.seconds, budget.cpu_seconds = args.seconds, args.cpu_seconds
     if args.no_rss_limit:
         budget.rss_bytes = None
