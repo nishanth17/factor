@@ -3,6 +3,18 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental QS worker overhead checks (7 November 2026)
+
+- Add explicit family-affinity placement, grouped exact marking leases and
+  byte-sized recovery-word stamps on the isolated A7a branch. Preserve exact
+  arithmetic, paid-prefix refusal, resume validation and conservative memory
+  reservations. The experimental selectors remain disabled by default.
+- Require worker active, queue-wait and publication timelines for G2H/G3
+  process experiments; disable them for G4 confirmation. Reject incompatible
+  observation settings before starting actors.
+- Report the bounded overhead comparisons and full-factor remeasurement.
+  Configuration tuning and fresh performance confirmation remain open.
+
 ## QS reference allowance correction (7 November 2026)
 
 - Apply the explicitly declared checkpoint allowance in the experimental

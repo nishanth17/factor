@@ -696,6 +696,18 @@ The approval object names `stage`, `plan_sha256=stage_driver.digest(plan)` and
 running and refuses automatic retries of unfinished work. It starts no successor.
 The separately certified `inputs/a7a/confirmation_g4.json` corpus is reserved
 for three/six/nine-input confirmation; generation is exclusive and bounded.
-Optional benchmark observers record parent stages, worker service/queue spans
-and minute-level progress. Their overhead needs matched calibration before
-use in clean performance claims. No automatic factoring defaults are changed.
+Benchmark observers record parent stages, worker service/queue spans and
+minute-level progress. After the G1 calibration and explicit addendum, worker
+active/queue-wait/publication spans are required on both arms of G2H/G3
+process experiments and disabled for G4 confirmation. The stage driver,
+combined runner and direct cell entry point reject conflicting settings.
+Historical cells retain their actual observation settings.
+
+G2H includes independent packet references through ten workers, matched
+family-affinity comparisons, exact grouped marking charges and an explicit
+byte-stamp collector selector. The requested byte/native remeasurement uses
+complete cold factorizations at 50 and 65 digits, three independent paired
+inputs per band and matched factoring/interpreter hash seeds. Clean timings
+exclude CPU/heap captures; timeline tables and full evidence remain local.
+See [the execution specification](A7A_EXPERIMENT.md) for the protocol and
+gates. No automatic factoring defaults are changed.

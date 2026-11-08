@@ -175,6 +175,17 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **G2H reported (7 November):** independent packet references include N=10;
+  static family affinity, grouped exact marking leases and byte hit stamps
+  have explicit implementations and exactness tests. Full comparisons and
+  the requested three-input byte/native remeasurement remain inconclusive
+  about new wall-time gains. Retain the existing reference mechanisms for
+  now. Current cold coverage completes across 40–70 digits; G3/G2K/G4 and
+  75/80 probes remain separately gated. All G2H/G3 process arms now require
+  worker timelines; G4 disables them. Committed-only QA `1b5ab81` passes
+  1,572 tests (nine optional skips), lint and imports. Detailed local report:
+  `v2/audit/a7a/g2h-report-20261107-r2/REPORT.md`.
+
 - **G2 reported (7 November):** the approved corrected continuation covers all
   24 cold/warm arm cells. Serial/process controls complete every row; literal
   mainline is incomplete at 60/65/70. Single balanced inputs establish costs
@@ -182,8 +193,8 @@ does not establish a free increase in B1.
   is analyzed without rerunning factoring; scope repair `88430a5` retains the
   failed review/charge and all-process requirements for full captures. QA:
   1,548 tests (9 optional skips), lint and 291 imports, including separately
-  passing host-inspection tests. G2H overhead removal needs approval before
-  anchor tuning; confirmation, probes and adoption remain pending. Local
+  passing host-inspection tests. The subsequent overhead stage is reported
+  above; anchor tuning, confirmation, probes and adoption remain pending. Local
   report and priced next stage: `v2/audit/a7a/g2-report-20261107/REPORT.md`.
 
 - **G1 preparation gate (7 November):** bounded stage driver, certified fresh

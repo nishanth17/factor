@@ -322,6 +322,48 @@ results and the repriced search/confirmation bill; stop for approval. New
 hotspots discovered later require a separately gated fix and retuning of
 only affected rows, not an automatically repeated whole campaign.
 
+### Byte-stamp complete-call remeasurement — 7 November
+
+This explicitly requested G2H block uses source `1b5ab81` and the committed
+`regime_calibration_50_{0,1,2}` and `regime_calibration_65_{0,1,2}` inputs.
+Keep it separate from the earlier layout screens. The only implementation
+difference is the `byte_stamps` marking component; native stamps are the
+control. Both arms retain Y0, packet 16, lookahead 4, ordinary placement,
+scalar leases, worker verification, ordinary sparse queues, coefficient
+reuse, nursery 4 MiB, worker 512 MiB/state 64 MiB, parent 4 GiB and total
+22 GiB. CPU/heap captures are excluded from clean timing; Tier A, RSS and
+all-worker timelines are enabled in both arms.
+
+| Digits | Workers | Actor wall/CPU seconds | Owner wall/CPU seconds per call |
+| --- | ---: | --- | --- |
+| 50 | 4 | 45 / 450 | 65 / 510 |
+| 65 | 8 | 400 / 4,000 | 420 / 4,060 |
+
+Use one fresh cold call per arm/input: twelve calls, at most 2,910 owner
+seconds, 27,420 CPU-seconds and 128 MiB new capture storage, charged within
+the G2H grant. The 65-digit allowance funds outstanding private CPU leases;
+the earlier underfunded collection screen is not a performance loss.
+
+Visit input indices 0, 1, 2, running the 50-digit pair then the 65-digit pair
+at each index. Native goes first for 50-digit indices 0/2 and 65-digit index
+1; byte goes first in the other pairs. Match factoring seeds
+104729/130363/155921 by index and set `PYTHONHASHSEED` to that same declared
+value before each actor starts; spawned workers inherit it. This pins an
+additional source of incidental container order without attributing earlier
+variation to it. Earlier unset-hash observations are not pooled.
+
+Validate complete reconstruction against the certified oracle. Retain
+timeouts as censored. For each band report all three actor-time ratios,
+worker CPU/work/scanned counts, RSS and worker timelines. Form a paired
+log-ratio mean, across-input standard deviation and 98 1/3% paired-t interval
+with two degrees of freedom, explicitly conditional on its distribution and
+independence assumptions. An interval below one supports an exploratory gain,
+above one supports a loss, and an interval spanning one is inconclusive.
+There is no 5% practical-effect cutoff or all-three-faster requirement in this
+block. Stop after the twelve calls; extensions and adoption are not automatic.
+Use the existing combined runner with the frozen per-call JSON plans and
+their recorded `PYTHONHASHSEED`; retain the enclosing grant and all charges.
+
 ### Conditional G2K: shared cofactor jobs
 
 K is unimplemented and offers no guaranteed speedup. At G2H report measured
@@ -366,6 +408,25 @@ for calibrated calls over five minutes, **8 + 4**. Controls count toward
 these maxima; repetitions are not new configurations. Price the executable
 subset inside the row cap, leaving room for independent-input survivors,
 exploration and diagnostics before issuing it.
+
+The G2H repricing proposes a funded first pass of eight initial joint recipes
+per anchor/lifetime: the seven mandatory worker allocations plus one proposal
+outside that neighborhood. Reserve two further inputs for the incumbent and
+one selected challenger at every anchor, and three intermediate input pairs
+at each of 50/60/65. This is 78 calls. With actor/owner walls
+40=30/50, 50=90/110, 55=180/200, 60=300/320, 65=900/920 and 70=1,800/1,820
+seconds, the ceiling is 34,860 owner seconds plus 600 for diagnostics, QA and
+cleanup: **35,460 seconds and 358,080 CPU-seconds**. Use CPU 900 for 40/50
+and ten times actor wall otherwise, plus 60 owner CPU-seconds per call.
+The 40-digit CPU allowance funds prepaid packet leases.
+
+This is a proposal for the separately approved G3 grant. Actual recipe/source
+and admission checks must be frozen before timing. Unused within-stage call
+allowances may fund more proposals, survivors or refinement within the maxima
+above, only after reserving every remaining mandatory call and diagnostic.
+Unissued recipes remain untested. The initial worker allocations form part
+of the joint design; do not describe differing packet/cache recipes as a pure
+worker-scaling comparison.
 
 Use complete-factor input 0 to prioritize proposals, retaining uncertain/
 near-tied candidates. Advance up to four to calibration inputs 1/2. A Tier 1
