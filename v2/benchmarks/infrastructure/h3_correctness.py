@@ -9,7 +9,10 @@ from pathlib import Path
 
 from ...common.prime_sieve import prime_sieve
 from ...ecm.core import EcmStats, factorize_ecm
+from ...ecm.workers import arithmetic_options
 from ...execution.budget import Budget
+from ...execution.portfolio_config import PortfolioConfig
+from ...execution.worker_contract import Manifest, WorkerSettings
 from ...qs.factor_base import build_factor_base
 from ...qs.polynomial import qs_polynomial
 from ...qs.sieve_collector import SieveCollector, SieveConfig
@@ -124,6 +127,25 @@ def ecm_cases():
                 )
             )
     return results
+
+
+def manifest_cases():
+    config = PortfolioConfig(
+        trial_bound=2,
+        rho_attempts=0,
+        pm1_attempts=0,
+        ecm_tiers=((30, 100, 4),),
+        ecm_chain_mode="off",
+        max_input_bits=512,
+        segment_size=16,
+    )
+    manifest = Manifest(
+        1009 * 1013,
+        7,
+        "fixed-h3",
+        arithmetic_options(config, WorkerSettings()),
+    )
+    return [manifest.assignment(position) for position in range(4)]
 
 
 def main():
