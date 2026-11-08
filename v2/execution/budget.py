@@ -101,9 +101,7 @@ class Budget:
             if type(physical) is not int or physical <= 0:
                 raise ResourceProviderError("invalid physical memory size")
         self.rss_bytes = (
-            4 * physical // 5
-            if rss_bytes is DEFAULT_RSS
-            else rss_bytes
+            4 * physical // 5 if rss_bytes is DEFAULT_RSS else rss_bytes
         )
         self.start()
 

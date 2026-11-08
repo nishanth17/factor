@@ -31,6 +31,10 @@ class UnsupportedResourceVersionError(ValueError):
 
 
 def require_resource_version(payload):
+    if not isinstance(payload, dict):
+        raise UnsupportedResourceVersionError(
+            "unsupported-resource-version: checkpoint must be an object"
+        )
     if payload.get("resource_version") != RESOURCE_VERSION:
         raise UnsupportedResourceVersionError(
             "unsupported-resource-version: "
@@ -329,6 +333,10 @@ def accounted_entry(function):
         token = _ACTIVE_OWNER.set(owner)
         try:
             return function(*args, **kwargs)
+        except MemoryError as error:
+            raise AllocationFailureError(
+                function.__qualname__, "unpublished_scratch"
+            ) from error
         finally:
             _ACTIVE_OWNER.reset(token)
             if own_interval:
@@ -350,6 +358,10 @@ def accounted_job(function):
         token = _ACTIVE_OWNER.set(owner)
         try:
             return function(self, *args, **kwargs)
+        except MemoryError as error:
+            raise AllocationFailureError(
+                function.__qualname__, type(self).__name__
+            ) from error
         finally:
             _ACTIVE_OWNER.reset(token)
             if own_interval:

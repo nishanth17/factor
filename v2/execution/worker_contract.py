@@ -801,6 +801,16 @@ class Search:
                 raise ValueError("completed result lacks a matching receipt")
             if receipt["reason"] != message["reason"]:
                 raise ValueError("completed receipt outcome changed")
+        for position, residue in self.boundaries.items():
+            receipt = reported.get(
+                (position, "stage_one", self.attempts[position])
+            )
+            if (
+                receipt is None
+                or receipt["reason"] != "boundary"
+                or receipt.get("boundary_sha256") != residue["sha256"]
+            ):
+                raise ValueError("boundary lacks a matching receipt")
         if saved["work"] < work or saved["cpu"] + 1e-9 < cpu:
             raise ValueError("resume would reset observed charges")
 
