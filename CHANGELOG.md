@@ -14,8 +14,10 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Reject removed arguments by name and old resource checkpoint versions without
   migration. Make atomic checkpoint saves optional and uncapped by default;
   oversized saves record `checkpoint_size_skip` and preserve the result.
-- Correctness acceptance is pending. No performance evidence or retuning is
-  added; C3a/B12/A7a/B4a dependent costs require revalidation.
+- Committed-only `5feff32` passes 1,404 tests (9 optional skips), lint and 267
+  benchmark imports. Fixed-work QS/ECM confirmation on `508c490` matches base
+  `40d2367`. No performance evidence or retuning is added; dependent costs
+  require revalidation.
 
 ## ECM package and bundled-data cleanup (6 November 2026)
 

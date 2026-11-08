@@ -1044,8 +1044,9 @@ requires a second pool implementation or waits for the other's unrelated path.
 #### H3 — simplify resource limits
 
 H3 implementation is complete on `codex/h3-resource-limits`, based on
-`40d2367f1154ad96f30775a40e4d895f788ee9e2`; final committed-only acceptance is
-pending. The only resource refusals are root wall, aggregate CPU, sampled current
+`40d2367f1154ad96f30775a40e4d895f788ee9e2`; **Done for the requested isolated delivery.** Committed-only source `5feff32`
+passes 1,404 tests (9 optional skips), full lint and 267 benchmark imports.
+Fresh identical-work confirmation passed on `508c490` against `40d2367`. The only resource refusals are root wall, aggregate CPU, sampled current
 owned-tree RSS and an optional checkpoint save cap. Capacities, numerical effort,
 exactness checks and literal selected recipes are retained. There is no merge,
 push, timing, profiling, tuning or performance adoption in this scope.

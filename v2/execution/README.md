@@ -25,7 +25,8 @@ children. The public entry point is
 cancellation. Wall and CPU default to unlimited; RSS defaults to floor(0.8 ×
 physical memory) and explicit `None` disables it. Work is an exact diagnostic
 counter, not a grant. Nested/recursive calls borrow one root. Live child samples,
-acknowledgments and final wait4 totals reconcile by process birth identity.
+acknowledgments and final libproc self CPU before wait4 reaping reconcile by
+process birth identity.
 
 See the [resource API](../README.md#resource-api) for sampled RSS overshoot,
 stop payloads, removed arguments, allocation recovery and saved-history resumes.

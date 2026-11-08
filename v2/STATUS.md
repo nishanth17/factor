@@ -7,7 +7,9 @@ This checkout contains the unmerged H3 implementation on
 RSS defaults to floor(80% of physical memory), and checkpoint save size is
 uncapped unless requested. Internal refusal ceilings and prepaid worker leases
 are removed. Numerical recipes, cache/FIFO capacities and selected worker/cost
-values are retained. Final committed-only acceptance is pending. Local evidence
+values are retained. Committed-only source `5feff32` passes 1,404 tests (9 optional skips), full
+lint and all 267 benchmark imports. Fresh fixed-work equivalence against
+`40d2367` passes on `508c490`. Local evidence
 and branch adapter notes: `v2/audit/h3_resource_limits/`.
 
 
@@ -122,7 +124,9 @@ checkpoint's charges plus its invocation; unsaved consumption after a skipped
 save or process death is not recovered. A retained live owner keeps exact
 charges. No durable ledger is built. Stage shares hand off remaining root
 resources; optional save-size refusal records a skip and preserves factoring.
-Full committed-only acceptance is pending. The local entry point is
+Committed-only source `5feff32` passes 1,404 tests (9 optional skips), full
+lint and 267 benchmark imports; fresh identical-work confirmation passed on
+`508c490` against `40d2367`. The local entry point is
 `v2/audit/h3_resource_limits/DESIGN.md`; QA receipts and per-branch adapter notes
 are in the same directory. No merge, push, timing, profiling or tuning was done.
 The historical 75/80 `memory_limit` sub-limit remains unattributed; candidate
