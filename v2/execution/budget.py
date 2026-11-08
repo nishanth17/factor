@@ -1,117 +1,196 @@
-"""Shared cooperative work, wall-time, CPU-time, and cancellation limits."""
+"""One observed resource owner shared by stages and recursive children."""
 
-import math
+import os
 import time
-from dataclasses import dataclass, field
-from typing import Callable, Optional
 
 from ..common import utils
+from .resources import (
+    DEFAULT_RSS, RESOURCE_VERSION, RemovedResourceLimitError,
+    default_provider, validate_seconds,
+)
 
 
 class BudgetExhaustedError(Exception):
-    """An atomic operation was refused; its input state remains resumable."""
+    """A cooperative boundary stopped before publishing its next action."""
+
+    def __init__(self, reason, payload=None):
+        self.payload = payload
+        super().__init__(reason)
 
 
-@dataclass
 class Budget:
-    """Charge work before mutation across every stage and recursive child.
+    """Cumulative active wall/CPU and sampled current owned-tree RSS.
 
-    Work units are algorithmic allowances, not seconds or bigint operations.
-    Deadlines are cooperative: a running native integer operation cannot be
-    interrupted. Input sizes and chunk sizes therefore also have finite caps.
-    A resumed run includes previously consumed work, wall time, and CPU time.
+    Omitted wall/CPU are unlimited. Omitted RSS is floor(0.8 * physical RAM);
+    explicit None disables it. Work is an exact diagnostic counter, not a
+    refusal allowance. Checkpoint resumes inherit saved charges; unsaved
+    consumption survives only when the caller retains this live owner.
+    Paused/idle intervals are excluded by close()/start(). No durable ledger
+    is created. The RSS guard can overshoot between cooperative samples.
     """
 
-    work_limit: int = 2_000_000
-    seconds: Optional[float] = 30.0
-    cpu_seconds: Optional[float] = 30.0
-    cancelled: Optional[Callable[[], bool]] = None
-    used: int = 0
-    prior_wall: float = 0.0
-    prior_cpu: float = 0.0
-    reason: Optional[str] = None
-    _wall_start: float = field(default_factory=time.monotonic, repr=False)
-    _cpu_start: float = field(default_factory=time.process_time, repr=False)
+    def __init__(
+        self, *, seconds=None, cpu_seconds=None, rss_bytes=DEFAULT_RSS,
+        cancelled=None, used=0, prior_wall=0.0, prior_cpu=0.0,
+        wall_clock=None, cpu_clock=None, provider=None, scope="factorization",
+        **removed,
+    ):
+        if removed:
+            name = next(iter(removed))
+            if name == "work_limit":
+                raise RemovedResourceLimitError(
+                    name, "seconds/cpu_seconds; used remains diagnostic"
+                )
+            raise TypeError("unexpected Budget argument: " + name)
+        for name, value in (
+            ("seconds", seconds), ("cpu_seconds", cpu_seconds),
+            ("prior_wall", prior_wall), ("prior_cpu", prior_cpu),
+        ):
+            validate_seconds(value, name)
+        utils.require_integer(used, "used", 0)
+        if rss_bytes is not DEFAULT_RSS and rss_bytes is not None:
+            utils.require_integer(rss_bytes, "rss_bytes", 0)
+        self.seconds, self.cpu_seconds = seconds, cpu_seconds
+        self.cancelled, self.scope = cancelled, scope
+        self.used, self.prior_wall, self.prior_cpu = used, prior_wall, prior_cpu
+        self.reason = self.stop = None
+        self._wall_clock = wall_clock or time.monotonic
+        self._cpu_clock = cpu_clock or time.process_time
+        self.provider = provider
+        self.roots = {os.getpid()}
+        self._children = {}
+        self._child_cpu = 0.0
+        self._last_sample = None
+        self.observed_rss = 0
+        self._active = False
+        if rss_bytes is not None and self.provider is None:
+            self.provider = default_provider()
+        self.rss_bytes = (
+            4 * self.provider.physical_memory() // 5
+            if rss_bytes is DEFAULT_RSS else rss_bytes
+        )
+        self.start()
 
-    def __post_init__(self):
-        """Reject invalid limits before any work or clock comparison."""
-        utils.require_integer(self.work_limit, "work_limit", 0)
-        utils.require_integer(self.used, "used", 0)
-        for name in ("seconds", "cpu_seconds", "prior_wall", "prior_cpu"):
-            value = getattr(self, name)
-            if value is not None and (
-                isinstance(value, bool)
-                or not isinstance(value, (int, float))
-                or not math.isfinite(value)
-                or value < 0
-            ):
-                raise ValueError(f"{name} must be finite and nonnegative")
+    def start(self):
+        """Begin an active interval, including retained-context startup."""
+        if self._active:
+            return self
+        self._wall_start = self._wall_clock()
+        self._cpu_start = self._cpu_clock()
+        self._active = True
+        self._last_sample = None
+        self._sample(baseline=True)
+        return self
 
-        if self.used > self.work_limit:
-            raise ValueError("work_limit is below work already consumed")
+    def close(self):
+        """Settle an active interval after owned children have drained."""
+        if self._active:
+            self._sample(force=True)
+            self.prior_wall = self.wall_used
+            self.prior_cpu = self.cpu_used
+            self._child_cpu = 0.0
+            self._active = False
+        return self
+
+    def __enter__(self):
+        return self.start()
+
+    def __exit__(self, *exception):
+        self.close()
 
     @property
     def wall_used(self):
-        """Total active-run wall seconds; time spent paused is excluded."""
-        return self.prior_wall + time.monotonic() - self._wall_start
+        return self.prior_wall + (
+            self._wall_clock() - self._wall_start if self._active else 0
+        )
 
     @property
     def cpu_used(self):
-        """Total process CPU seconds across all resumptions."""
-        return self.prior_cpu + time.process_time() - self._cpu_start
+        return self.prior_cpu + self._child_cpu + (
+            self._cpu_clock() - self._cpu_start if self._active else 0
+        )
+
+    def register(self, pid):
+        """Include an owned helper/worker even after it is reparented."""
+        self.roots.add(pid)
+
+    def observe_child(self, identity, cpu_total, *, baseline=False):
+        """Reconcile OS samples, acknowledgments and final wait4 totals once.
+
+        identity is (pid, birth), never a reusable PID or a packet identity.
+        Reports use process-lifetime CPU. Out-of-order smaller observations
+        cannot erase charges; a duplicate acknowledgment cannot add charges.
+        """
+        validate_seconds(cpu_total, "child CPU")
+        previous = self._children.get(identity)
+        if baseline or previous is None:
+            previous = cpu_total if baseline else 0.0
+        current = max(previous, cpu_total)
+        self._child_cpu += current - previous
+        self._children[identity] = current
+
+    def _sample(self, *, force=False, baseline=False):
+        if self.provider is None:
+            return
+        now = self._wall_clock()
+        if (
+            not force and self._last_sample is not None
+            and now - self._last_sample < 0.05
+        ):
+            return
+        samples = self.provider.sample(self.roots)
+        self.observed_rss = sum(sample.rss for sample in samples)
+        for sample in samples:
+            if sample.pid != os.getpid():
+                self.observe_child(
+                    (sample.pid, sample.birth), sample.cpu, baseline=baseline
+                )
+        self._last_sample = now
+
+    def _check(self, *, publication=False):
+        self._sample(force=publication)
+        if self.cancelled is not None and self.cancelled():
+            self.reason, self.stop = "cancelled", None
+            raise BudgetExhaustedError(self.reason)
+        for name, observed, limit in (
+            ("wall", self.wall_used, self.seconds),
+            ("cpu", self.cpu_used, self.cpu_seconds),
+            ("rss", self.observed_rss, self.rss_bytes),
+        ):
+            if limit is not None and observed >= limit:
+                self.reason = name + "_limit"
+                self.stop = dict(
+                    reason=self.reason, limit=name, observed=observed,
+                    limit_value=limit, scope=self.scope,
+                )
+                raise BudgetExhaustedError(self.reason, self.stop)
 
     def consume(self, amount=1):
-        """Reserve an atomic action or raise without charging it."""
         utils.require_integer(amount, "amount", 0)
-        reason = None
-        if self.cancelled is not None and self.cancelled():
-            reason = "cancelled"
-        elif self.seconds is not None and self.wall_used >= self.seconds:
-            reason = "wall_limit"
-        elif (
-            self.cpu_seconds is not None and self.cpu_used >= self.cpu_seconds
-        ):
-            reason = "cpu_limit"
-        elif amount > self.work_limit - self.used:
-            reason = "work_limit"
-
-        if reason is not None:
-            self.reason = reason
-            raise BudgetExhaustedError(reason)
-
-        # Refused actions leave the ledger unchanged for an exact retry.
+        self._check()
         self.used += amount
+
+    def publication(self):
+        """Force a current tree sample before atomic state publication."""
+        self._check(publication=True)
 
     def _consume_reserved(self, amount, reservation):
-        """Check real limits and an optional reservation before one charge.
-
-        The allocation view shares this ledger and sampled clocks. Calling
-        consume twice and reading clocks again in between made every small
-        ECM action pay for several redundant system calls. The ordinary
-        consume path stays unchanged; this path retains real cancellation
-        and deadline precedence, then checks policy before any mutation.
-        """
         utils.require_integer(amount, "amount", 0)
-        if self.cancelled is not None and self.cancelled():
-            self.reason = "cancelled"
-            raise BudgetExhaustedError(self.reason)
-
-        wall = None
-        if self.seconds is not None or reservation.needs_wall:
-            wall = self.wall_used
-        if self.seconds is not None and wall >= self.seconds:
-            self.reason = "wall_limit"
-            raise BudgetExhaustedError(self.reason)
-
-        cpu = None
-        if self.cpu_seconds is not None or reservation.needs_cpu:
-            cpu = self.cpu_used
-        if self.cpu_seconds is not None and cpu >= self.cpu_seconds:
-            self.reason = "cpu_limit"
-            raise BudgetExhaustedError(self.reason)
-
-        reservation.check(amount, wall, cpu)
-        if amount > self.work_limit - self.used:
-            self.reason = "work_limit"
-            raise BudgetExhaustedError(self.reason)
+        self._check()
+        reservation.check(amount, self.wall_used, self.cpu_used)
         self.used += amount
+
+    def restore_charges(self, *, work, wall, cpu):
+        """Restore saved history without erasing a retained owner's charges."""
+        utils.require_integer(work, "saved work", 0)
+        validate_seconds(wall, "saved wall")
+        validate_seconds(cpu, "saved CPU")
+        self.used = max(self.used, work)
+        self.prior_wall = max(self.prior_wall, wall)
+        self.prior_cpu = max(self.prior_cpu, cpu)
+
+    def charges(self):
+        return dict(
+            resource_version=RESOURCE_VERSION, work=self.used,
+            wall=self.wall_used, cpu=self.cpu_used,
+        )

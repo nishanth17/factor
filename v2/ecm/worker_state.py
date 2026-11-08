@@ -29,7 +29,7 @@ class ActionBudget(Budget):
 
     def consume(self, amount=1):
         integer(amount, "atomic work")
-        if self.until_poll <= 0 or amount > self.work_limit - self.used:
+        if self.until_poll <= 0:
             # A refused work reservation still checks cancel/time precedence.
             super().consume(amount)
             self.until_poll = self.poll_every
@@ -44,7 +44,7 @@ class ProspectiveActionBudget(ActionBudget):
     def consume(self, amount=1):
         integer(amount, "atomic work")
         prospective_used = self.used + amount
-        if self.until_poll <= 0 or prospective_used > self.work_limit:
+        if self.until_poll <= 0:
             Budget.consume(self, amount)
             self.until_poll = self.poll_every
         else:

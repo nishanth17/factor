@@ -37,7 +37,6 @@ class PollingBudget:
         if (
             amount == 0
             or self._remaining == 0
-            or amount > self.budget.work_limit - self.budget.used
         ):
             if self.poll is not None:
                 self.poll(self.budget)
@@ -60,7 +59,6 @@ class PollingBudget:
             raise ValueError("span exceeds the cooperative polling interval")
         if (
             amount > self._remaining
-            or amount > self.budget.work_limit - self.budget.used
         ):
             if self.poll is not None:
                 self.poll(self.budget)
@@ -84,7 +82,6 @@ class PollingBudget:
         amount = count * work_each
         if (
             count > self._remaining
-            or amount > self.budget.work_limit - self.budget.used
         ):
             if self.poll is not None:
                 self.poll(self.budget)
