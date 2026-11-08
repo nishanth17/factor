@@ -15,6 +15,7 @@ from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
 )
 from v2.common import utils
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.execution.schedules import SieveContext
 from v2.pm1 import bounded as pm1_bounded
 from v2.pm1.tuning import PM1TuningConfig
@@ -49,6 +50,11 @@ def frozen_control():
         module = importlib.util.module_from_spec(spec)
         sys.modules[name] = module
         spec.loader.exec_module(module)
+        from functools import partial
+
+        module.SieveContext = partial(
+            adapt_resource_configuration, module.SieveContext
+        )
     return sys.modules[name]
 
 
@@ -240,13 +246,10 @@ class ExecutionTests(unittest.TestCase):
         checkpoint = frozen.factorize_pm1_bounded(
             1000003, config=old_cfg, budget=allowance(), max_actions=12
         ).checkpoint
-        resumed = pm1_bounded.factorize_pm1_bounded(
-            1000003, config=cfg, budget=allowance(), checkpoint=checkpoint
-        )
-        self.assertEqual(resumed.reason, "exhausted")
-        self.assertEqual(
-            resumed.checkpoint["payload"]["execution"], "pm1-campaign-v1"
-        )
+        with self.assertRaises(UnsupportedResourceVersionError):
+            pm1_bounded.factorize_pm1_bounded(
+                1000003, config=cfg, budget=allowance(), checkpoint=checkpoint
+            )
 
     def test_every_boundary_resume_atomic_refusal_and_cancellation(self):
         for cfg in (
@@ -417,10 +420,13 @@ class ExecutionTests(unittest.TestCase):
             {"wheel": 60},
             {"gap_entries": 257},
             {"chunk_bits": 31},
-            {"memory_bytes": 65536, "wheel": 210},
         ):
             with self.assertRaises((ValueError, MemoryError)):
                 configured(**options)
+        with self.assertRaises(TypeError):
+            from v2.pm1.tuning import PM1TuningConfig
+
+            PM1TuningConfig(memory_bytes=65536)
 
 
 if __name__ == "__main__":

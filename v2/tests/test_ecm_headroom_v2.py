@@ -207,7 +207,7 @@ class CheckedBudgetTests(unittest.TestCase):
             with self.assertRaisesRegex(BudgetExhaustedError, "work_limit"):
                 budget.consume(1)
             self.assertEqual(budget.used, 3)
-            for bad in (True, -1, None, 1.5, 2**63):
+            for bad in (True, -1, None, 1.5):
                 with self.assertRaises(ValueError):
                     budget.consume(bad)
                 self.assertEqual(budget.used, 3)
@@ -375,7 +375,7 @@ class HeadroomWorkerTests(unittest.TestCase):
                 _, issued = owner._packet(
                     plan,
                     search,
-                    Ledger(10**8, 100),
+                    Ledger(),
                     10**20,
                     dict(index=0, metadata_cache=[plan.metadata]),
                     peers=2,

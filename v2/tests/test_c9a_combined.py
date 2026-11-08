@@ -203,7 +203,8 @@ class CofactorTests(unittest.TestCase):
                     residual_floor(incomplete, allowance()),
                     omitted.prime,
                 )
-        self.assertEqual(residual_floor(base, allowance()), 2)
+        with self.assertRaises(TypeError):
+            residual_floor(base, allowance(), 0)
 
     def test_hole_rejection_does_not_start_split_or_primality(self):
         from v2.qs.yield_collector import divide_yield_residual

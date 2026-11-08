@@ -318,21 +318,16 @@ class PortfolioSelectionTests(unittest.TestCase):
                 )
                 self.assertEqual(pool.calls, [1000003, 10000019])
 
-    def test_unfunded_start_stays_incumbent_without_constructing_executor(
-        self,
-    ):
+    def test_cpu_limit_does_not_prepay_startup_or_assignments(self):
         with self.owner() as owner:
-            with patch("v2.execution.ecm_workers.ECMExecutor") as factory:
-                self.assertIsNone(
-                    owner.run_portfolio(
-                        1000003,
-                        config=self.config,
-                        budget=allowance(cpu_seconds=3),
-                    )
+            with patch("v2.execution.ecm_workers.ECMExecutor", FakePool):
+                result = owner.run_portfolio(
+                    1000003,
+                    config=self.config,
+                    budget=allowance(cpu_seconds=3),
                 )
-                factory.assert_not_called()
-                self.assertFalse(owner.last_stats["engagement"]["funded"])
-                self.assertTrue(owner.last_stats["legacy_serial"])
+                self.assertEqual(result.reason, "curves_exhausted")
+                self.assertEqual(owner.inner.calls, [1000003])
 
     def test_unknown_large_quota_declines_before_worker_manifest_limits(self):
         config = configuration(ecm_tiers=((2, 2, 4097),))
@@ -357,18 +352,14 @@ class PortfolioSelectionTests(unittest.TestCase):
         self.path.write_text(json.dumps(profile))
         self.sha = hashlib.sha256(self.path.read_bytes()).hexdigest()
         with self.owner() as owner:
-            self.assertIsNone(
-                owner.run_portfolio(
+            with patch("v2.execution.ecm_workers.ECMExecutor", FakePool):
+                result = owner.run_portfolio(
                     1000003,
                     config=self.config,
                     budget=allowance(),
                 )
-            )
-            self.assertIsNone(owner.inner)
-            self.assertEqual(
-                owner.last_stats["engagement"]["reason"],
-                "worker_ownership_refused",
-            )
+                self.assertEqual(result.reason, "curves_exhausted")
+                self.assertEqual(owner.inner.settings.workers, 2)
 
     def test_zero_expired_and_cancelled_allowances_do_not_load_profile(self):
         for budget in (

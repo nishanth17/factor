@@ -5,9 +5,11 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.benchmarks.qs.a1b import CONTROL
 from v2.execution.budget import BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
 from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_factors

@@ -146,7 +146,8 @@ class RootTransferTests(unittest.TestCase):
         cache.bind(first)
         modulus, residues, _ = expected[1]
         refused = Budget(work_limit=0, seconds=None, cpu_seconds=None)
-        cache.remember(first, entry.prime, modulus, residues, refused)
+        with self.assertRaises(BudgetExhaustedError):
+            cache.remember(first, entry.prime, modulus, residues, refused)
         self.assertEqual(
             (cache.values, cache.used, cache.extra_work), ({}, 0, 0)
         )

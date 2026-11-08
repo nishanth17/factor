@@ -73,10 +73,16 @@ class LowerDesignTests(unittest.TestCase):
                     cfg = defaults.default_siqs_config(10 ** (digits - 1) + 1)
                     collector = replace(
                         cfg.collector,
+                        max_atoms=65536,
+                        max_relations=12000,
                         max_partials=32768,
                         split_call_limit=1048576,
                     )
-                    expected = replace(cfg, collector=collector)
+                    expected = replace(
+                        cfg,
+                        collector=collector,
+                        memory_bytes=values["memory_bytes"],
+                    )
                     self.assertEqual(asdict(expected), values)
                     typ = (
                         module.CountedSIQSConfig
@@ -87,7 +93,7 @@ class LowerDesignTests(unittest.TestCase):
                         module.GrowingDoubleLargeSieveConfig,
                         **values["collector"],
                     )
-                    typ(**values)
+                    adapt_resource_configuration(typ, **values)
             finally:
                 for name in tuple(sys.modules):
                     if name == control_v4.PACKAGE or name.startswith(
@@ -102,7 +108,7 @@ class LowerDesignTests(unittest.TestCase):
                 GrowingDoubleLargeSieveConfig, **values["collector"]
             )
             typ = CountedSIQSConfig if "base_count" in values else SIQSConfig
-            cfg = typ(**values)
+            cfg = adapt_resource_configuration(typ, **values)
             self.assertEqual(cfg.multiplier, 0)
             self.assertIn("parity_two", cfg.collector.marking)
             if digits <= 55:

@@ -15,12 +15,14 @@ from math import exp, log
 from pathlib import Path
 
 from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
     recording_budget,
 )
 
 from ...common.utils import classify_prime
 from ...execution.budget import Budget
-from ...portfolio import _decode_siqs_config
 from ...qs import SIQSJob, verify_atomic
 from .c10a04.accounting import Ledger, digest, output_lock, receipt
 

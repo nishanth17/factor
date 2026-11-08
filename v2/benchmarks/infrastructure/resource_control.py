@@ -38,6 +38,7 @@ class RecordingBudget(ResourceBudget):
     @used.setter
     def used(self, value):
         if value > self.work_limit:
+            self._check()
             self.reason = self.frontier_reason
             raise BudgetExhaustedError(self.reason)
         self._recorded_work = value
@@ -106,7 +107,9 @@ def adapt_resource_configuration(factory, *args, **values):
         )
         values["recipe"] = recipe
         historical["memory_bytes"] = (
-            2**30 if legacy_memory is None else legacy_memory
+            (2**30 if recipe == "calibrated" else 128 * 2**20)
+            if legacy_memory is None
+            else legacy_memory
         )
         historical.setdefault("checkpoint_bytes", 2**20)
     if "preparation_cache_bytes" in fields and "max_relations" in values:
@@ -171,6 +174,9 @@ def historical_asdict(value):
         metadata = dict(
             metadata, **getattr(value, "_historical_resources", {})
         )
+        metadata = {
+            key: item for key, item in metadata.items() if key not in result
+        }
         if "preparation_cache_bytes" in result:
             result.pop("preparation_cache_bytes")
             metadata["max_relations"] = result.pop("target_rows")
@@ -187,6 +193,13 @@ def historical_replace(value, **changes):
     """Retain recorder-only grant metadata across literal policy changes."""
     metadata = dict(getattr(value, "_historical_resources", {}))
     accepted = {f.name for f in fields(value)}
+    if "target_rows" in accepted and "max_relations" in changes:
+        rows = changes["max_relations"]
+        changes.setdefault("target_rows", rows)
+        changes.setdefault(
+            "preparation_cache_bytes",
+            2 * 2**20 if rows is None else min(2 * 2**20, 2048 * rows),
+        )
     for key in tuple(changes):
         if key in RETIRED_CONFIG_FIELDS and key not in accepted:
             metadata[key] = changes.pop(key)
@@ -207,3 +220,11 @@ def _attach_metadata(result, supplied):
     for key, value in metadata.items():
         if key not in actual:
             object.__setattr__(result, key, value)
+
+
+def decode_historical_siqs(values):
+    """Bridge a historical recorder recipe to current numerical settings."""
+    from v2 import qs
+    from v2.benchmarks.qs.c9a.configuration import decode
+
+    return decode(values, qs)

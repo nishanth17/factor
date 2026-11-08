@@ -21,6 +21,9 @@ from v2.benchmarks.infrastructure.resource_control import (
     recording_budget,
 )
 from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
     historical_asdict as asdict,
 )
 from v2.benchmarks.infrastructure.resource_control import (
@@ -29,7 +32,6 @@ from v2.benchmarks.infrastructure.resource_control import (
 
 from ....common import utils
 from ....execution import budget as live_budget
-from ....portfolio import _decode_siqs_config
 from ....qs import defaults, siqs
 from ...infrastructure.performance.performance_audit import fingerprint
 from ..c9 import c9_growth_study as c9

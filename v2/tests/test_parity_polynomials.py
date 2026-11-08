@@ -7,9 +7,11 @@ from dataclasses import asdict, replace
 from math import prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.benchmarks.qs.c10.oracles import DiscriminantPolynomial
 from v2.execution.budget import BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.coordinate_family import CoordinateFamily
 from v2.qs.families import PolynomialFamily

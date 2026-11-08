@@ -127,6 +127,99 @@ class ResourceTests(unittest.TestCase):
         fresh.restore_charges(work=10, wall=20, cpu=40)
         self.assertEqual(fresh.cpu_used, 40)
 
+    def test_saved_prefix_adds_fresh_startup_and_keeps_unsaved_costs(self):
+        budget = self.budget(cpu_seconds=100)
+        budget.consume(5)
+        self.wall.value, self.cpu.value = 10, 7
+        budget.close()
+        self.wall.value, self.cpu.value = 110, 57
+        budget.start()
+        budget.restore_charges(work=100, wall=20, cpu=40)
+        self.assertEqual(
+            (budget.used, budget.wall_used, budget.cpu_used), (105, 30, 47)
+        )
+        saved = budget.charges()
+        self.wall.value, self.cpu.value = 112, 60
+        budget.close()
+        budget.start()
+        budget.restore_charges(
+            work=saved["work"], wall=saved["wall"], cpu=saved["cpu"]
+        )
+        self.assertEqual((budget.wall_used, budget.cpu_used), (32, 50))
+        budget.restore_charges(work=100, wall=20, cpu=40)
+        self.assertEqual(
+            (budget.used, budget.wall_used, budget.cpu_used), (105, 32, 50)
+        )
+
+    def test_fresh_stale_resume_inherits_only_recorded_history(self):
+        for _ in range(3):
+            owner = self.budget()
+            owner.restore_charges(work=10, wall=20, cpu=40)
+            self.assertEqual(
+                (owner.used, owner.wall_used, owner.cpu_used), (10, 20, 40)
+            )
+            owner.close()
+
+    def test_recorded_encoding_overhead_is_not_added_twice(self):
+        from v2.execution.resources import record_checkpoint
+
+        owner = self.budget()
+        owner.consume(5)
+        self.wall.value, self.cpu.value = 12, 10
+        record_checkpoint(
+            owner,
+            {
+                "payload": {"work_used": 5, "wall_used": 10, "cpu_used": 7},
+                "serialization_overhead": [2, 3],
+            },
+        )
+        owner.close()
+        self.wall.value, self.cpu.value = 112, 60
+        owner.start()
+        owner.restore_charges(work=5, wall=12, cpu=10)
+        self.assertEqual(
+            (owner.used, owner.wall_used, owner.cpu_used), (5, 12, 10)
+        )
+
+    def test_family_resource_prefix_is_remembered(self):
+        from v2.execution.resources import record_checkpoint
+
+        owner = self.budget()
+        owner.consume(5)
+        self.wall.value, self.cpu.value = 12, 10
+        record_checkpoint(
+            owner,
+            {
+                "payload": {
+                    "resources": {
+                        "work_used": 5,
+                        "wall_used": 12,
+                        "cpu_used": 10,
+                    }
+                }
+            },
+        )
+        owner.close().start()
+        owner.restore_charges(work=5, wall=12, cpu=10)
+        self.assertEqual(
+            (owner.used, owner.wall_used, owner.cpu_used), (5, 12, 10)
+        )
+
+    def test_invalid_resource_observations_are_provider_errors(self):
+        from v2.execution.resources import ResourceProviderError
+
+        budget = self.budget()
+        self.wall.value = float("nan")
+        with self.assertRaises(ResourceProviderError):
+            budget.consume()
+        self.wall.value = -1
+        with self.assertRaises(ResourceProviderError):
+            budget.consume()
+        self.wall.value = 0
+        self.provider.rows[0] = ProcessSample(os.getpid(), 1, -1, 0)
+        with self.assertRaises(ResourceProviderError):
+            budget.publication()
+
     def test_atomic_optional_oversized_and_interrupted_save(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "checkpoint.json"
@@ -388,9 +481,9 @@ class IncidentCoverageTests(unittest.TestCase):
         )
         from v2.portfolio import PortfolioConfig
 
-        settings = WorkerSettings(workers=4)
+        settings = WorkerSettings(workers=4, packet_curves=3)
         config = PortfolioConfig(
-            ecm_tiers=((30, 100, 4),), ecm_chain_mode="off"
+            ecm_tiers=((30, 100, 12),), ecm_chain_mode="off"
         )
         manifest = Manifest(
             1009 * 1013, 7, "incident", arithmetic_options(config, settings)
@@ -398,6 +491,8 @@ class IncidentCoverageTests(unittest.TestCase):
         search = Search(manifest, settings, fixed_work=True)
         ledger = Ledger()
         executor = ECMExecutor(settings=settings)
+        from v2.ecm.worker import CurveEngine
+
         for index in range(4):
             packet, issued = executor._packet(
                 manifest,
@@ -405,11 +500,25 @@ class IncidentCoverageTests(unittest.TestCase):
                 ledger,
                 None,
                 dict(index=index, metadata_cache=[]),
+                peers=4 - index,
             )
-            self.assertEqual(len(issued), 1)
+            self.assertEqual(len(issued), 3)
             self.assertNotIn("cpu", packet["jobs"][0])
             self.assertNotIn("work", packet["jobs"][0])
-        self.assertEqual((ledger.work, ledger.cpu), (0, 0))
+            engine = CurveEngine(settings)
+            for job, (position, token) in zip(packet["jobs"], issued):
+                task = dict(
+                    job,
+                    schedule=manifest.metadata,
+                    options=packet.get("options"),
+                    packet=packet["packet"],
+                )
+                result = engine.execute(task, cancelled=lambda: False)
+                self.assertEqual(result["reason"], "complete")
+                search.receive(position, token, result)
+                ledger.settle(token, result["id"], result["work"], 0)
+        self.assertEqual(len(search.completed), 12)
+        self.assertFalse(ledger.active)
         cpu = Clock()
         budget = Budget(
             cpu_seconds=440,
@@ -611,3 +720,329 @@ class ProcessIdentityRaceTests(unittest.TestCase):
             with patch("os.wait4", return_value=(123, 0, usage)):
                 process._popen.poll()
         self.assertEqual(budget.cpu_used, 4)
+
+
+class ExecutorObservationTests(unittest.TestCase):
+    def test_process_is_registered_before_manager_visibility(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+
+        from v2.qs.parallel import ObservedProcessPoolExecutor
+
+        process = object()
+        owner = SimpleNamespace(track_process=Mock())
+        executor = object.__new__(ObservedProcessPoolExecutor)
+        executor._processes = {}
+        executor.resource_owner = owner
+
+        def spawn(instance):
+            instance._processes[123] = process
+
+        with patch(
+            "concurrent.futures.ProcessPoolExecutor._spawn_process", new=spawn
+        ):
+            executor._spawn_process()
+        owner.track_process.assert_called_once_with(process)
+
+
+class SharedEntryTests(unittest.TestCase):
+    def test_nested_entry_keeps_root_and_stage_view(self):
+        from v2.execution.allocation import (
+            ECMAllocation,
+            HandoffRequiredError,
+            PretestBudget,
+        )
+        from v2.execution.resources import accounted_entry, active_owner
+        from v2.qs.factor_base import build_factor_base
+
+        owner = Budget(
+            provider=Provider(), wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        policy = ECMAllocation("pretest", pretest_work=1)
+        view = PretestBudget(owner, policy, fallback=True)
+
+        @accounted_entry
+        def inner(*, budget):
+            self.assertIs(budget, view)
+            self.assertIs(active_owner(), owner)
+            with self.assertRaises(HandoffRequiredError):
+                budget.consume(2)
+            build_factor_base(1009 * 1013, bound=40)
+
+        @accounted_entry
+        def outer(*, budget):
+            self.assertIs(budget, owner)
+            inner(budget=view)
+
+        outer(budget=owner)
+        self.assertGreater(owner.used, 1)
+        self.assertIsNone(owner.reason)
+        self.assertFalse(owner._active)
+
+    def test_nested_entry_does_not_create_an_independent_limit(self):
+        from v2.execution.resources import accounted_entry
+
+        owner = Budget(
+            provider=Provider(), wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        other = Budget(
+            seconds=0,
+            provider=Provider(),
+            wall_clock=lambda: 0,
+            cpu_clock=lambda: 0,
+        )
+
+        @accounted_entry
+        def inner(*, budget):
+            self.assertIs(budget, owner)
+            budget.consume(7)
+
+        @accounted_entry
+        def outer(*, budget):
+            inner(budget=other)
+
+        outer(budget=owner)
+        self.assertEqual(owner.used, 7)
+        self.assertEqual(other.used, 0)
+
+    def test_qs_context_close_owns_only_its_active_interval(self):
+        from types import SimpleNamespace
+
+        from v2.qs.parallel import CollectionPool
+
+        wall, cpu = Clock(), Clock()
+        owner = Budget(provider=Provider(), wall_clock=wall, cpu_clock=cpu)
+        owner.close()
+        wall.value, cpu.value = 100, 50
+
+        def shutdown():
+            wall.value += 2
+            cpu.value += 1
+
+        pool = object.__new__(CollectionPool)
+        pool.mode, pool.executor = "serial", None
+        pool.state = {"stop": SimpleNamespace(set=shutdown)}
+        pool.close(budget=owner)
+        self.assertEqual((owner.wall_used, owner.cpu_used), (2, 1))
+        self.assertTrue(pool.closed)
+
+
+class CandidateBoundaryTests(unittest.TestCase):
+    def test_candidate_stores_grow_and_keep_state_on_root_rss_stop(self):
+        from v2.qs.checkpoint import _restore_store, _store
+        from v2.qs.extended_policy import (
+            BoundedYieldSieveConfig,
+            ExtendedYieldSieveConfig,
+        )
+        from v2.qs.factor_base import build_factor_base
+        from v2.qs.polynomial import qs_polynomial
+        from v2.qs.sieve_collector import (
+            CombinedYieldSieveConfig,
+            DoubleLargeSieveConfig,
+            GrowingDoubleLargeSieveConfig,
+            SieveCollector,
+            SieveConfig,
+            YieldSieveConfig,
+        )
+
+        for factory in (
+            SieveConfig,
+            DoubleLargeSieveConfig,
+            GrowingDoubleLargeSieveConfig,
+            YieldSieveConfig,
+            CombinedYieldSieveConfig,
+            ExtendedYieldSieveConfig,
+            BoundedYieldSieveConfig,
+        ):
+            with self.subTest(candidate=factory.__name__):
+                clock, provider = Clock(), Provider()
+                budget = Budget(
+                    provider=provider, wall_clock=clock, cpu_clock=lambda: 0
+                )
+                base = build_factor_base(
+                    1009 * 1013, bound=100, budget=budget
+                ).factor_base
+                polynomial = qs_polynomial(base)
+                config = (
+                    factory()
+                    if factory is SieveConfig
+                    else factory(
+                        large_prime_bound=1000, large_product_bound=1000000
+                    )
+                )
+                collector = SieveCollector(
+                    polynomial, base, config=config, budget=budget
+                )
+                collector._workspace = 10**30
+                before = _store(collector)
+                provider.rows[0] = ProcessSample(os.getpid(), 1, 900, 0)
+                clock.value = 1
+                stopped = collector.collect(-2, 3)
+                self.assertEqual(stopped.reason, "rss_limit")
+                self.assertEqual(stopped.resource_stop["observed"], 900)
+                self.assertEqual(_store(collector), before)
+                provider.rows[0] = ProcessSample(os.getpid(), 1, 100, 0)
+                clock.value = 2
+                result = collector.collect(stopped.next_position, 3)
+                self.assertIn(result.reason, ("complete", "factor_found"))
+                published = json.loads(json.dumps(_store(collector)))
+                restored = SieveCollector(
+                    polynomial, base, config=config, budget=budget
+                )
+                restored._workspace = 10**30
+                _restore_store(published, restored, budget)
+                self.assertEqual(
+                    json.loads(json.dumps(_store(restored))), published
+                )
+
+    def test_encoding_allocation_and_unsupported_values_keep_old_save(self):
+        from v2.execution.resources import (
+            AllocationFailureError,
+            UnsupportedEncodingError,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checkpoint.json"
+            atomic_save(path, {"published": "old"})
+            with patch(
+                "v2.execution.resources.json.dumps",
+                side_effect=MemoryError("encoder allocation"),
+            ):
+                with self.assertRaises(AllocationFailureError) as failed:
+                    atomic_save(path, {"published": "new"})
+            self.assertIsInstance(failed.exception.__cause__, MemoryError)
+            self.assertEqual(failed.exception.owner, "checkpoint_save")
+            with self.assertRaises(UnsupportedEncodingError):
+                atomic_save(path, {"unsupported": object()})
+            self.assertEqual(
+                json.loads(path.read_text()), {"published": "old"}
+            )
+
+    def test_allocation_failure_keeps_owner_through_process_serialization(
+        self,
+    ):
+        import pickle
+
+        from v2.execution.resources import AllocationFailureError
+
+        original = AllocationFailureError("matrix elimination", "QSJob")
+        decoded = pickle.loads(pickle.dumps(original))
+        self.assertEqual(decoded.payload, original.payload)
+        self.assertEqual(str(decoded), str(original))
+
+
+class DeadlineContinuationTests(unittest.TestCase):
+    def test_stage_wall_share_hands_remaining_root_to_qs(self):
+        from v2 import portfolio
+        from v2.execution.allocation import ECMAllocation
+        from v2.qs.siqs import SIQSConfig
+
+        clock = Clock()
+        budget = Budget(
+            seconds=100,
+            provider=Provider(),
+            wall_clock=clock,
+            cpu_clock=lambda: 0,
+        )
+        config = portfolio.PortfolioConfig(
+            trial_bound=2,
+            rho_attempts=0,
+            pm1_attempts=0,
+            fermat_steps=0,
+            ecm_tiers=((2, 2, 1),),
+            allocation=ECMAllocation(
+                "pretest", pretest_work=10**20, pretest_seconds=35
+            ),
+            siqs=SIQSConfig(
+                mode="qs", base_bound=100, half_width=128, max_half_width=128
+            ),
+        )
+        advance = portfolio.advance_job
+
+        def expire_share(*args, **kwargs):
+            clock.value = 36
+            return advance(*args, **kwargs)
+
+        with patch("v2.portfolio.advance_job", side_effect=expire_share):
+            run = portfolio.factorize_bounded(
+                1009 * 1013, config=config, budget=budget, ecm_executor=None
+            )
+        self.assertTrue(run.result.complete)
+        self.assertEqual(run.result.reconstruct(), 1009 * 1013)
+        self.assertIsNone(run.resource_stop)
+        self.assertTrue(
+            any(event.get("outcome") == "pretest_wall" for event in run.events)
+        )
+        self.assertEqual(budget.wall_used, 36)
+
+    def test_deadline_checkpoint_resumes_fresh_and_retained_history(self):
+        from v2.qs.sieve_collector import SieveCollector, SieveConfig
+        from v2.qs.siqs import SIQSConfig, SIQSJob
+
+        clock = Clock()
+        budget = Budget(
+            seconds=3,
+            provider=Provider(),
+            wall_clock=clock,
+            cpu_clock=lambda: 0,
+        )
+        config = SIQSConfig(
+            mode="qs",
+            base_bound=100,
+            half_width=16,
+            max_half_width=16,
+            batch_width=17,
+            collector=SieveConfig(block_width=17),
+        )
+        job = SIQSJob(1009 * 1013, config=config, budget=budget)
+        collect = SieveCollector._collect_progress
+
+        def expire_after_publication(instance, *args):
+            result = collect(instance, *args)
+            clock.value = 4
+            return result
+
+        with patch.object(
+            SieveCollector, "_collect_progress", new=expire_after_publication
+        ):
+            stopped = job.run()
+        self.assertEqual(stopped.reason, "wall_limit")
+        self.assertEqual(stopped.resource_stop["observed"], 4)
+        self.assertEqual(job.engine.next_position, 1)
+        saved = json.loads(json.dumps(job.checkpoint()))
+        clock.value = 104
+        budget.seconds = 10
+        fresh = Budget(
+            seconds=10,
+            provider=Provider(),
+            wall_clock=clock,
+            cpu_clock=lambda: 0,
+        )
+        for owner in (fresh, budget):
+            restored = SIQSJob.from_checkpoint(saved, budget=owner)
+            result = restored.run()
+            self.assertEqual(result.reason, "factor_found")
+            self.assertEqual(result.divisor * result.cofactor, job.n)
+            self.assertEqual(owner.wall_used, 4)
+
+
+class FinalCpuTests(unittest.TestCase):
+    def test_final_self_cpu_does_not_add_descendant_usage_twice(self):
+        from types import SimpleNamespace
+
+        provider = Provider()
+        owner = Budget(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        provider.rows.extend(
+            (ProcessSample(123, 10, 100, 3), ProcessSample(456, 11, 100, 7))
+        )
+        process = SimpleNamespace(
+            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+        )
+        owner.track_process(process)
+        provider.peek_exit = lambda pid, flag: ProcessSample(pid, 10, 0, 5)
+        rolled = SimpleNamespace(ru_utime=10, ru_stime=2)
+        with patch("os.wait4", return_value=(123, 0, rolled)):
+            self.assertEqual(process._popen.poll(), 0)
+        self.assertEqual(owner.cpu_used, 12)

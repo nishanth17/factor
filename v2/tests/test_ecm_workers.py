@@ -334,7 +334,7 @@ class StartupOwnershipTests(unittest.TestCase):
                 workers=workers, startup_seconds=startup_seconds
             )
         )
-        executor._active_owner = allowance()
+        executor._budget = executor._active_owner = allowance()
         events, processes = [], []
 
         def process_factory(**options):

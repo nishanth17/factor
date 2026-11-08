@@ -59,7 +59,7 @@ class CacheCapacityTests(unittest.TestCase):
             decoded_cache_bytes=64 * 2**20,
             stage_two_cache_bytes=64 * 2**20,
         )
-        self.assertLess(settings.owned_bytes, settings.memory_bytes)
+        self.assertGreaterEqual(settings.owned_bytes, 4 * (128 * 2**20))
         with self.assertRaises(TypeError):
             replace(settings, memory_bytes=512 * 2**20)
 

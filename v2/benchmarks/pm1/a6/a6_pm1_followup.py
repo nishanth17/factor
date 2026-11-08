@@ -60,6 +60,11 @@ def frozen_control():
         module = importlib.util.module_from_spec(spec)
         sys.modules[name] = module
         spec.loader.exec_module(module)
+        from functools import partial
+
+        module.SieveContext = partial(
+            adapt_resource_configuration, module.SieveContext
+        )
     return sys.modules[name]
 
 

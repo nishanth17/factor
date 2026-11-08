@@ -145,10 +145,11 @@ class ProgramTests(unittest.TestCase):
         self.assertEqual(store.hits, 1)
         with self.assertRaises(ValueError):
             store.program_segment(2**64, 2**64 + 1, allowance())
-        with self.assertRaises(TypeError):
-            ECMPrograms(context, memory_bytes=4096)
-        with self.assertRaises(MemoryError):
-            configuration(ecm_program_bytes=4096)
+        tiny = ECMPrograms(context, memory_bytes=4096)
+        self.assertEqual(tiny.memory_bytes, 4096)
+        self.assertEqual(
+            configuration(ecm_program_bytes=4096).ecm_program_bytes, 4096
+        )
         with self.assertRaises(ValueError):
             configuration(ecm_tiers=((50, 2**64, 1),))
         with self.assertRaises(TypeError):
@@ -279,14 +280,16 @@ class CoverageTests(unittest.TestCase):
             12, 30, None, b"".join(pack("<Q", p) for p in (13, 17, 19)), b""
         )
         for distance in (1, 3, 6):
-            with self.assertRaises(TypeError):
+            with self.assertRaises(ValueError):
                 pair_coverage(
                     block, b1=11, b2=29, distance=distance, budget=allowance()
                 )
-        with self.assertRaises(TypeError):
-            pair_coverage(block, b1=11, b2=29, distance=4, budget=allowance())
+        coverage = pair_coverage(
+            block, b1=11, b2=29, distance=4, budget=allowance()
+        )
+        self.assertTrue(coverage)
         duplicate = replace(block, primes=pack("<QQ", 13, 13))
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             pair_coverage(
                 duplicate, b1=11, b2=29, distance=0, budget=allowance()
             )

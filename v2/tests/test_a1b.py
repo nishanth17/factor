@@ -8,8 +8,10 @@ from unittest.mock import patch
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
 )
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.benchmarks.qs.a1b import CONTROL, ready
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
 from v2.qs.sieve_collector import SieveConfig
 from v2.tests.test_qs import reference_positions, unlimited_budget

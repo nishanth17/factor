@@ -119,7 +119,9 @@ class QualityAssignmentTests(unittest.TestCase):
             quality_workspace(config.factor_count),
         )
         with self.assertRaises(TypeError):
-            self.stream(memory_bytes=self.base.workspace_bytes + 65536)
+            AssignmentStream(
+                self.base, 128, memory_bytes=self.base.workspace_bytes + 65536
+            )
 
         first, restored = self.stream(), self.stream()
         before = first.budget.used

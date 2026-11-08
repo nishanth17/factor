@@ -12,6 +12,9 @@ from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
 )
 from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
     historical_asdict as asdict,
 )
 from v2.benchmarks.infrastructure.resource_control import (
@@ -24,7 +27,6 @@ from v2.benchmarks.qs.c10a01.configuration_v3 import (
 from v2.benchmarks.qs.c10a01.inputs import CORPUS
 from v2.common.prime_sieve import small_sieve
 from v2.execution.budget import BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.assignment_stream import (
     AssignmentStream,
@@ -245,8 +247,7 @@ class PairedAssignmentTests(unittest.TestCase):
                 self.assertEqual(stream.__dict__[key], before[key])
         ledger = allowance()
         with self.assertRaises(TypeError):
-            adapt_resource_configuration(
-                AssignmentStream,
+            AssignmentStream(
                 base,
                 32,
                 budget=ledger,

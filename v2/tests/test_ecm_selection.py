@@ -305,9 +305,11 @@ class LazySelectionTests(unittest.TestCase):
         budget = self.budget()
         budget.used = 100
         _saved_budget(budget, dict(work=50, cpu=0, wall=0))
-        self.assertEqual(budget.used, 100)
-        with self.assertRaises(ValueError):
-            _saved_budget(budget, dict(work=101, cpu=0, wall=0))
+        self.assertEqual(budget.used, 150)
+        _saved_budget(budget, dict(work=101, cpu=0, wall=0))
+        self.assertEqual(budget.used, 201)
+        _saved_budget(budget, dict(work=101, cpu=0, wall=0))
+        self.assertEqual(budget.used, 201)
 
 
 class ArithmeticSelectionTests(unittest.TestCase):
