@@ -974,7 +974,7 @@ class CurrentParallelSIQSJob:
                     from .packet_lease import ParentCPUSnapshot
 
                     parent_budget = PollingBudget(
-                        self.budget, poll=ParentCPUSnapshot(pool)
+                        self.budget, poll=ParentCPUSnapshot(pool)._account_cpu
                     )
                 else:
                     parent_budget = _ParentBudget(self.budget, pool)

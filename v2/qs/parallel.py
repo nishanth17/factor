@@ -129,7 +129,9 @@ class _ParentBudget(PollingBudget):
     """Poll aggregate CPU during parent verification and matrix work."""
 
     def __init__(self, budget, pool, interval=64):
-        super().__init__(budget, interval=interval, poll=pool.poll)
+        # PollingBudget checks the raw ledger immediately after this callback.
+        # Publish CPU first, without a second adjacent consume(0) check.
+        super().__init__(budget, interval=interval, poll=pool._account_cpu)
 
 
 class _ExportCollector(SieveCollector):
@@ -489,8 +491,8 @@ class CollectionPool:
 
         self.poll(budget)
 
-    def poll(self, budget):
-        """Charge all published worker CPU, including spawn/import startup."""
+    def _account_cpu(self, budget):
+        """Publish CPU; the caller must check before its next paid action."""
         if self.mode == "process":
             current = sum(
                 max(0, x - y)
@@ -500,6 +502,10 @@ class CollectionPool:
             self.accounted_cpu = current
 
         self.state["parent_cpu"].value = budget.cpu_used - self.accounted_cpu
+
+    def poll(self, budget):
+        """Charge all published worker CPU and enforce the current limits."""
+        self._account_cpu(budget)
         budget.consume(0)
 
 

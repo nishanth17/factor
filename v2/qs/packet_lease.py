@@ -30,12 +30,16 @@ class ParentCPUSnapshot:
 
         self.worker_cpu = used
 
-    def __call__(self, budget):
+    def _account_cpu(self, budget):
+        """Publish one snapshot before PollingBudget checks its reservation."""
         pool = self.pool
         current = self.worker_cpu()
         budget.prior_cpu += max(0, current - pool.accounted_cpu)
         pool.accounted_cpu = current
         pool.state["parent_cpu"].value = budget.cpu_used - current
+
+    def __call__(self, budget):
+        self._account_cpu(budget)
         budget.consume(0)
 
 
