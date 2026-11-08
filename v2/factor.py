@@ -18,6 +18,12 @@ if __package__ in (None, ""):
 from . import constants
 from .common import arithmetic, prime_sieve, utils
 from .ecm import core as ecm
+from .execution.resources import (
+    DEFAULT_RSS,
+    RemovedResourceLimitError,
+    accounted_entry,
+    atomic_save,
+)
 from .rho import brent as pollard_rho
 
 
@@ -79,8 +85,10 @@ def _trial_primes(bound):
     return tuple(prime_sieve.prime_sieve(bound + 1))
 
 
-def factorize_bf(n, *, bound=constants.TRIAL_BOUND, backend=None):
+@accounted_entry
+def factorize_bf(n, *, bound=constants.TRIAL_BOUND, backend=None, budget=None):
     """Return (factor/exponent pairs, remainder) using exact trial division."""
+    budget.consume(0)
     utils.require_integer(n, minimum=1)
     utils.require_integer(bound, "bound", 2)
     engine = (
@@ -96,6 +104,7 @@ def factorize_bf(n, *, bound=constants.TRIAL_BOUND, backend=None):
     root = utils.isqrt(n)
 
     for prime in _trial_primes(bound):
+        budget.consume(0)
         # Every smaller prime was exhausted, so this remainder is prime.
         if prime > root:
             if n > 1:
@@ -114,6 +123,7 @@ def factorize_bf(n, *, bound=constants.TRIAL_BOUND, backend=None):
     return arithmetic.canonical((factors, n))
 
 
+@accounted_entry
 def factorize(
     n,
     verbose=False,
@@ -128,6 +138,7 @@ def factorize(
     ecm_b2=constants.ECM_B2,
     primality_rounds=constants.PRIMALITY_ROUNDS,
     backend="python-int",
+    budget=None,
 ):
     """Factor n, retaining unresolved composites and probable-prime labels.
 
@@ -136,6 +147,7 @@ def factorize(
     Local algorithm allowances are explicit; a global time/memory scheduler
     and default p-1 integration remain Phase 2 work.
     """
+    budget.consume(0)
     utils.require_integer(n)
     if n == 0:
         raise ValueError("zero has no finite prime factorization")
@@ -191,6 +203,7 @@ def factorize(
     pending = [n] if n > 1 else []
 
     while pending:
+        budget.consume(0)
         cofactor = pending.pop()
         classification = classifications.get(cofactor)
         if classification is None:
@@ -274,7 +287,16 @@ def print_factorization(n, result):
     return f"{n} = {expression}"
 
 
-def main():
+class RemovedCLIResourceAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        raise RemovedResourceLimitError(
+            option_string,
+            "--seconds/--cpu-seconds/--rss-bytes/--checkpoint-bytes",
+        )
+
+
+@accounted_entry
+def main(*, budget=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("n", nargs="?", type=int)
     parser.add_argument("--seed", type=int)
@@ -346,10 +368,14 @@ def main():
     qs_options.add_argument("--qs-dlp-split-call-limit", type=int)
     parser.add_argument("--sss-base-bound", type=int, default=1000)
     parser.add_argument("--sss-rounds", type=int, default=256)
-    parser.add_argument("--work-limit", type=int)
+    parser.add_argument(
+        "--work-limit", type=int, action=RemovedCLIResourceAction
+    )
     parser.add_argument("--seconds", type=float)
     parser.add_argument("--cpu-seconds", type=float)
-    parser.add_argument("--memory-mib", type=int)
+    parser.add_argument(
+        "--memory-mib", type=int, action=RemovedCLIResourceAction
+    )
     parser.add_argument("--fermat-steps", type=int, default=0)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--resume", type=Path)
@@ -364,6 +390,7 @@ def main():
         "--ecm-memory-mib",
         type=int,
         help="aggregate ECM ownership cap including parent and workers",
+        action=RemovedCLIResourceAction,
     )
     parser.add_argument(
         "--ecm-policy",
@@ -390,15 +417,19 @@ def main():
     parser.add_argument(
         "--backend", choices=("python-int", "gmpy2-mpz"), default="python-int"
     )
+    rss_group = parser.add_mutually_exclusive_group()
+    rss_group.add_argument("--rss-bytes", type=int, default=DEFAULT_RSS)
+    rss_group.add_argument("--no-rss-limit", action="store_true")
+    parser.add_argument("--checkpoint-bytes", type=int)
     args = parser.parse_args()
+    budget.seconds, budget.cpu_seconds = args.seconds, args.cpu_seconds
+    if args.no_rss_limit:
+        budget.rss_bytes = None
+    elif args.rss_bytes is not DEFAULT_RSS:
+        utils.require_integer(args.rss_bytes, "rss_bytes", 0)
+        budget.rss_bytes = args.rss_bytes
+
     implicit_memory = args.memory_mib is None
-    implicit_work = args.work_limit is None
-    implicit_seconds = args.seconds is None
-    implicit_cpu_seconds = args.cpu_seconds is None
-    if implicit_seconds:
-        args.seconds = 30
-    if implicit_cpu_seconds:
-        args.cpu_seconds = 30
     use_sss = args.method in ("sss", "sssf")
     use_qs = args.siqs or args.method in ("qs", "mpqs", "siqs")
     if args.ecm_memory_mib is not None and args.ecm_workers != "auto":
@@ -472,20 +503,14 @@ def main():
         qs_parameters or args.qs_residual_bound is not None or args.qs_dlp
     )
 
-    if args.memory_mib is None:
-        args.memory_mib = 80 if use_sss or use_qs else 8
-    if args.work_limit is None:
-        args.work_limit = 200_000_000 if use_sss or use_qs else 2_000_000
     try:
         checkpoint = None
         if args.resume:
-            read_memory_mib = (
+            (
                 max(args.memory_mib, 1040)
                 if implicit_memory
                 else args.memory_mib
             )
-            if args.resume.stat().st_size > read_memory_mib * 1024 * 1024:
-                raise ValueError("checkpoint file exceeds configured cap")
             checkpoint = json.loads(args.resume.read_text())
         number = args.n
         if number is None:
@@ -496,8 +521,6 @@ def main():
             )
 
         from .qs.defaults import (
-            C9_SECONDS,
-            C9_WORK_LIMIT,
             default_siqs_config,
             uses_siqs_defaults,
         )
@@ -513,14 +536,6 @@ def main():
         )
         if automatic_qs:
             use_qs = True
-            if implicit_memory and calibrated_qs:
-                args.memory_mib = 1040
-            if implicit_work and calibrated_qs:
-                args.work_limit = C9_WORK_LIMIT
-            if implicit_seconds and calibrated_qs:
-                args.seconds = C9_SECONDS
-            if implicit_cpu_seconds and calibrated_qs:
-                args.cpu_seconds = C9_SECONDS
 
         if (
             args.method == "auto"
@@ -530,12 +545,7 @@ def main():
                 or "ecm_auto" in checkpoint["payload"]["state"]
             )
         ):
-            from .ecm.auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
-
-            if implicit_work and not automatic_qs:
-                args.work_limit = DEFAULT_WORK
-            if implicit_cpu_seconds and not automatic_qs:
-                args.cpu_seconds = DEFAULT_CPU_SECONDS
+            pass
 
         if (
             args.method == "auto"
@@ -549,14 +559,11 @@ def main():
             or args.ecm_tier is not None
         ):
             from .execution.allocation import ECMAllocation
-            from .execution.budget import Budget
             from .portfolio import PortfolioConfig, factorize_bounded
             from .qs.sss import SSSConfig
 
             parameters = dict(
-                backend=args.backend,
-                memory_bytes=args.memory_mib * 1024 * 1024,
-                fermat_steps=args.fermat_steps,
+                backend=args.backend, fermat_steps=args.fermat_steps
             )
             if args.ecm_curves is not None:
                 parameters["ecm_tiers"] = (
@@ -576,26 +583,17 @@ def main():
                 parameters["allocation"] = ECMAllocation(
                     mode=args.ecm_policy, **allocation_options
                 )
-            if implicit_memory and not (use_qs or use_sss):
-                parameters.pop("memory_bytes")
             if use_qs:
                 from .qs import SIQSConfig
 
                 # Leave headroom for the parent, schedules and packed resume
                 # state; the portfolio validates simultaneous ownership.
-                qs_parameters["memory_bytes"] = max(
-                    0, args.memory_mib * 1024 * 1024 - 16 * 1024 * 1024
-                )
                 qs_parameters["backend"] = args.backend
                 qs_parameters["mode"] = (
                     "siqs" if args.method == "auto" else args.method
                 )
                 qs_config = (
-                    default_siqs_config(
-                        number,
-                        backend=args.backend,
-                        memory_bytes=qs_parameters["memory_bytes"],
-                    )
+                    default_siqs_config(number, backend=args.backend)
                     if automatic_qs
                     else SIQSConfig(**qs_parameters)
                 )
@@ -644,9 +642,6 @@ def main():
                         backend=args.backend,
                         base_bound=args.sss_base_bound,
                         search_rounds=args.sss_rounds,
-                        memory_bytes=max(
-                            0, args.memory_mib * 1024 * 1024 - 16 * 1024 * 1024
-                        ),
                     ),
                 )
 
@@ -669,18 +664,6 @@ def main():
                     and not use_sss
                     and args.method in ("auto", saved["siqs"]["mode"])
                 )
-                if (
-                    restore_saved_qs
-                    and uses_siqs_defaults(number, backend=args.backend)
-                    and saved["siqs"]["collector"].get("storage_policy")
-                    == "grow"
-                ):
-                    if implicit_work:
-                        args.work_limit = C9_WORK_LIMIT
-                    if implicit_seconds:
-                        args.seconds = C9_SECONDS
-                    if implicit_cpu_seconds:
-                        args.cpu_seconds = C9_SECONDS
                 if restore_saved_qs and args.method == "auto":
                     # An omitted method retains direct-SIQS pretest settings;
                     # restoring the collector alone would change its identity.
@@ -738,8 +721,6 @@ def main():
                                 **values["collector"]
                             )
                             parameters["sss"] = SSSConfig(**values)
-                    if implicit_memory:
-                        parameters["memory_bytes"] = saved["memory_bytes"]
                 parameters.update(
                     pm1_gap_mode=saved.get("pm1_gap_mode", "cached"),
                     pm1_chunk_size=saved.get("pm1_chunk_size"),
@@ -748,10 +729,6 @@ def main():
                     ecm_chain_bytes=saved.get("ecm_chain_bytes", 0),
                     ecm_program_bytes=saved.get("ecm_program_bytes", 0),
                 )
-                if implicit_memory:
-                    parameters["memory_bytes"] = saved.get(
-                        "memory_bytes", 8_388_608
-                    )
             if args.ecm_chain is not None:
                 parameters.update(
                     ecm_chain_mode="off"
@@ -767,31 +744,23 @@ def main():
             worker_options = {}
             if args.method != "auto" or args.ecm_workers == "serial":
                 worker_options["ecm_executor"] = None
-            elif args.ecm_memory_mib is not None:
-                worker_options["ecm_memory_bytes"] = (
-                    args.ecm_memory_mib * 2**20
-                )
-            elif implicit_memory and checkpoint is None:
-                from .ecm.auto import DEFAULT_MEMORY_BYTES
-
-                worker_options["ecm_memory_bytes"] = DEFAULT_MEMORY_BYTES
             run = factorize_bounded(
                 number,
                 seed=args.seed,
                 config=config,
                 checkpoint=checkpoint,
                 **worker_options,
-                budget=Budget(
-                    work_limit=args.work_limit,
-                    seconds=args.seconds,
-                    cpu_seconds=args.cpu_seconds,
-                ),
+                budget=budget,
             )
             result = run.result
             if args.checkpoint:
-                args.checkpoint.write_text(
-                    json.dumps(run.checkpoint, indent=2) + "\n"
+                save_event = atomic_save(
+                    args.checkpoint,
+                    run.checkpoint,
+                    checkpoint_bytes=args.checkpoint_bytes,
                 )
+                if save_event is not None and args.verbose:
+                    print(save_event)
             if args.verbose:
                 print(f"Portfolio: {run.reason}, work={run.work_used}")
                 for event in run.events:

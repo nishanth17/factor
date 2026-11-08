@@ -1,5 +1,10 @@
 # Budgets, stages and allocation
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 This layer coordinates finite work across factoring stages and recursive
 children. The public entry point is
 [`factorize_bounded`](../docs/API.md#bounded-recursive-factoring) in

@@ -262,7 +262,7 @@ class Budget:
                     pid, status, usage = os.wait4(popen.pid, flag)
                 except OSError as error:
                     # Match Popen's pre-creation/ECHILD handling. Other OS
-                    # failures stay explicit rather than hiding accounting loss.
+                    # Other OS failures keep their original error identity.
                     if error.errno == 10:
                         return None
                     raise

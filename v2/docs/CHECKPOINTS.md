@@ -1,5 +1,10 @@
 # Checkpoints and limits
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 Bounded execution preserves checked progress and cumulative resource charges.
 See [CLI options](CLI.md) or the [Python API](API.md) for starting a run.
 

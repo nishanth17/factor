@@ -8,7 +8,7 @@ from math import prod
 from ..common import arithmetic, utils
 from ..common.arithmetic import pow
 from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import removed_arguments
+from ..execution.resources import accounted_job, removed_arguments
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial
@@ -518,6 +518,7 @@ class SSSJob:
         ) as error:
             raise ValueError("malformed SSS checkpoint") from error
 
+    @accounted_job
     def run(self, *, batch_limit=None):
         """Charge setup, collection and common QS factor extraction."""
         if self.budget is not self._original_budget:
@@ -534,6 +535,7 @@ class SSSJob:
                     "allocation_failure",
                     0,
                     {"work_used": self.budget.used},
+                    resource_stop=self.budget.stop,
                 )
 
             if self.pipeline is None and self.divisor is None:
@@ -545,6 +547,7 @@ class SSSJob:
                     "factor_found",
                     0,
                     {"work_used": self.budget.used},
+                    resource_stop=self.budget.stop,
                 )
 
             self.pipeline.budget = self.budget
@@ -566,4 +569,11 @@ class SSSJob:
         stats["work_used"] = self.budget.used
         if "workspace_bytes" in stats:
             stats["workspace_bytes"] += self.config.metadata_reserve
-        return QSResult(None, self.n, reason, position, stats)
+        return QSResult(
+            None,
+            self.n,
+            reason,
+            position,
+            stats,
+            resource_stop=self.budget.stop,
+        )

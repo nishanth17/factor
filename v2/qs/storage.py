@@ -14,6 +14,9 @@ def storage_limit(value):
 class RelationPublicationError(AllocationFailureError):
     """Allocation interrupted publication; restart a prior checked snapshot."""
 
+    def __init__(self, operation, owner="relation_store"):
+        super().__init__(operation, owner)
+
 
 def require_published(collector):
     """Never reuse or serialize a store interrupted during publication."""

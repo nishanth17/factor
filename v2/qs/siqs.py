@@ -6,7 +6,7 @@ from functools import partial
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import removed_arguments
+from ..execution.resources import accounted_job, removed_arguments
 from ..execution.work_budget import PollingBudget
 from .assignment_stream import (
     AssignmentStream,
@@ -740,6 +740,7 @@ class SIQSJob:
             self.finished_reason = "allocation_failure"
         self.pending_final_reason = None
 
+    @accounted_job
     def run(self, *, max_blocks=None):
         """Run or pause at block boundaries; all exhausted results retain n."""
         original = self.budget
@@ -917,6 +918,7 @@ class SIQSJob:
             reason,
             self.engine.next_position if self.engine else 0,
             dict(self.stats),
+            resource_stop=self.budget.stop,
         )
 
     def checkpoint(self):

@@ -38,6 +38,7 @@ class WorkerRun:
     reason: str
     checkpoint: dict
     stats: dict
+    resource_stop: dict | None = None
 
 
 def arithmetic_options(config, settings):
@@ -915,6 +916,7 @@ class ECMExecutor:
             "factor_found" if search.factor is not None else reason,
             snapshot,
             stats,
+            resource_stop=base.stop,
         )
 
     def _task(self, manifest, search, position, token, deadline):

@@ -9,7 +9,12 @@ from math import gcd, isqrt, prod
 from .. import constants
 from ..common import utils
 from ..execution.budget import Budget, BudgetExhaustedError
-from ..execution.resources import removed_arguments
+from ..execution.resources import (
+    RESOURCE_VERSION,
+    accounted_entry,
+    decode_checkpoint,
+    removed_arguments,
+)
 from ..execution.schedules import (
     RATIO_VERSION,
     SieveContext,
@@ -95,6 +100,7 @@ class PM1Run:
     cpu_seconds: float
     verification_work: int
     checkpoint: dict
+    resource_stop: dict | None = None
 
 
 def _initial(n, base, config):
@@ -339,6 +345,7 @@ def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+@decode_checkpoint
 def _restore(checkpoint, n, base, config):
     """Check finite metadata before charged deterministic reconstruction."""
     try:
@@ -402,6 +409,7 @@ def _restore(checkpoint, n, base, config):
     return payload
 
 
+@accounted_entry
 def factorize_pm1_bounded(
     n, *, base=2, config=None, budget=None, checkpoint=None, max_actions=None
 ):
@@ -508,6 +516,7 @@ def factorize_pm1_bounded(
     }
     encoded = _canonical(payload)
     snapshot = {
+        "resource_version": RESOURCE_VERSION,
         "payload": json.loads(encoded),
         "sha256": hashlib.sha256(encoded.encode()).hexdigest(),
     }
@@ -528,4 +537,5 @@ def factorize_pm1_bounded(
         budget.cpu_used,
         verification_work,
         snapshot,
+        resource_stop=budget.stop,
     )

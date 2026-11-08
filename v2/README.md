@@ -17,7 +17,7 @@ With PyPy implementing Python 3.11 installed, run from the repository root:
 ```sh
 make -C v2 runtime
 pypy3 -m v2.factor 626100403 --bounded --seed 7 \
-  --work-limit 2000000 --seconds 30 --cpu-seconds 30
+  --seconds 30 --cpu-seconds 30
 pypy3 -m v2.factor --help
 ```
 
@@ -49,7 +49,7 @@ The package guides below describe the available techniques and configuration.
 ## Python usage
 
 Use the bounded portfolio when stages and recursive children must share one
-work/time allowance:
+root resource owner:
 
 ```python
 from v2.execution.budget import Budget
@@ -59,7 +59,7 @@ n = 626100403
 run = factorize_bounded(
     n,
     seed=7,
-    budget=Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30),
+    budget=Budget(seconds=30, cpu_seconds=30),
 )
 assert run.result.reconstruct() == n
 print(run.reason, run.result.complete)
@@ -85,10 +85,11 @@ process executor for independent ECM curves on supported macOS/arm64 PyPy.
 The normal portfolio retains preprocessing, recursive completion and its
 existing SIQS/SSS fallback. The ECM-only benchmark runner is separate.
 
-Use `--ecm-workers serial` or `ecm_executor=None` to keep incumbent serial
-execution. `--ecm-memory-mib` / `ecm_memory_bytes` set the aggregate owned ECM
-allowance, capped at 8 GiB; caller work, CPU, wall and parent-memory limits
-still apply. Unsupported, unmeasured and unfunded calls stay serial.
+Use `--ecm-workers serial` or `ecm_executor=None` for serial execution.
+Worker counts, numerical schedules, packet widths, caches and cost/size guards
+retain their selected values. Worker admission no longer requires prepaid work,
+CPU or estimated storage grants. Their dependent cost tables need revalidation;
+H3 makes no performance claim.
 
 For repeated library calls, a caller-owned context keeps its pool and immutable
 programs warm:
@@ -100,9 +101,9 @@ with selected_context(seed=7, prefer_warm=True) as context:
     run = factorize_bounded(n, seed=7, ecm_executor=context)
 ```
 
-The context's seed, resource grants and selected worker configuration remain
+The context's seed and selected worker configuration remain
 bound for its lifetime. Do not share one active context across concurrent
-calls. Use the same declared configuration and adequate finite budgets.
+calls. Use the same declared numerical configuration and shared root limits.
 Cold CLI startup and warm retained-pool performance are separate endpoints.
 The compact64 default at 30 digits and fixed32 defaults at 50/70 digits stay
 serial cold before loading the cost catalogue. Twenty-digit automatic calls
@@ -110,15 +111,60 @@ also remain serial. Larger explicit numerical schedules retain selection. See th
 [selected regime table](STATUS.md#selected-ecm-regimes) for cold/warm worker
 counts and retained performance limitations.
 
-Worker arithmetic remains exact. Stable curve identities, checked divisor
-publication, bounded parent-owned leases, explicit spawn, cancellation/drain
-and quiescent checkpoints preserve finite execution and checked resume.
-Automatic checkpoint schema 13 binds policy, semantic implementation version,
-seed and grants;
-older serial checkpoints remain serial. Worker-count changes on resume are
-rejected. The worker parent ceiling is 4 GiB including selector bookkeeping;
-portfolio admission failures retain serial execution, while direct selected
-component calls can raise `MemoryError`.
+Worker arithmetic remains exact. Tokens identify assignments; they carry no
+resource grants. The root observes parent, workers, owned helpers and descendants.
+Live samples, process-lifetime acknowledgments and final wait4 usage reconcile
+by process birth identity, including crashes and shutdown. Retained context
+startup, each call and close own active intervals; idle time is excluded.
+
+## Resource API
+
+`Budget(seconds=None, cpu_seconds=None)` leaves wall and aggregate CPU unlimited.
+The default RSS guard is `floor(4 * physical_memory / 5)`. Set `rss_bytes` to an
+integer byte cap or explicitly pass `rss_bytes=None` to disable it. CLI equivalents
+are `--seconds`, `--cpu-seconds`, `--rss-bytes` and `--no-rss-limit`. Library calls
+remain quiet. `used` counts algorithmic work for diagnostics; it cannot refuse work.
+
+macOS uses libproc through ctypes to sum current RSS over the owned process tree.
+The parent is included; shared pages can be counted multiple times. Samples run
+at entry and publication boundaries and during cooperative polls, at intervals
+of at most 50 ms. Allocations, native operations and active worker stages can
+overshoot the guard. Provider failures are explicit errors.
+
+Only root wall, aggregate CPU, observed RSS and an optional checkpoint save cap
+refuse resources. Internal stores, graphs, matrices and scratch grow as needed.
+Partial FIFO capacities, caches, packet widths, numerical search effort and exact
+representation/provenance checks retain their policies. Stage allocations order
+work: exhausting a stage share hands remaining root resources to the next stage;
+an underfunded fallback reserve no longer vetoes that handoff.
+
+Removed arguments raise `RemovedResourceLimitError`, naming the argument and its
+replacement. This includes `work_limit`, internal `memory_bytes`, `max_atoms`,
+`max_relations`, child `checkpoint_bytes`, worker grants and the former CLI flags
+`--work-limit`, `--memory-mib`, `--ecm-memory-mib`. Cache byte capacities remain
+supported where they control retention. `default_siqs_config(recipe="calibrated")`
+retains the omitted-grant recipe; `recipe="reference"` selects the former explicit
+non-calibrated recipe without making a resource cap select mathematics.
+
+Resource stops expose the limit name, observed/requested value, limit value and
+scope. Cancellation, finite numerical exhaustion, `allocation_failure`, I/O
+failure and unsupported encoding retain distinct identities. Interrupted
+publication poisons its owner; it cannot be reused or checkpointed.
+
+Checkpoints use resource version `observed-resources/saved-history-v1`. Older
+resource schemas raise `UnsupportedResourceVersionError`; there is no migration.
+Resumes inherit recorded cumulative charges plus the current invocation. Work
+and resource consumption after the last valid save are **not recovered** after
+a crash or skipped save. A caller retaining the live `Budget` keeps those unsaved
+charges across retries. No durable ledger is built; benchmark/study ledgers remain
+the authority for experiment charges. Paused intervals are excluded.
+
+Saving is optional. `atomic_save(path, snapshot, checkpoint_bytes=None)` has no
+size cap by default; CLI `--checkpoint-bytes` supplies one. Oversize records
+`checkpoint_size_skip` with requested/limit bytes, preserves the old file and
+continues factoring. Saves use only published state, a temporary sibling,
+flush/fsync, atomic `os.replace` and directory fsync. An interrupted write leaves
+the previous checkpoint valid. Allocation or I/O failure retains its own cause.
 
 ## Optional GMP backend
 

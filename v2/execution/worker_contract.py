@@ -132,7 +132,7 @@ class WorkerSettings:
 
     @property
     def owned_bytes(self):
-        """Retained-cache estimate, diagnostic only; current RSS is observed."""
+        """Diagnostic retained-cache estimate; current RSS is observed."""
         return self.manifest_cache_bytes + (
             self.workers + 1
         ) * self.metadata_slots * (

@@ -1653,6 +1653,7 @@ class SieveCollector:
         # A failed insertion must not expose a partially published smooth
         # row (or legacy SLP match) as a resumable memory-limit result.
         self._publication_failed = True
+        self.budget.publication()
         try:
             evicted_atoms = (self._atoms[evicted],) if evicted else ()
             if evicted:

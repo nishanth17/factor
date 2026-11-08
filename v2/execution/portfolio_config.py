@@ -142,8 +142,6 @@ class PortfolioConfig:
             raise ValueError("ECM chain family must be auto, lucas or cf")
         utils.require_integer(self.ecm_chain_bytes, "ecm_chain_bytes", 0)
         if self.ecm_chain_mode == "reuse":
-            from ..ecm.chains import MIN_MEMORY_BYTES
-
             if not self.ecm_program_bytes:
                 raise ValueError(
                     "ECM chains require bounded reusable programs"
@@ -203,7 +201,6 @@ class PortfolioConfig:
 
         if self.ecm_chain_mode == "auto":
             from ..ecm.chain_options import default_options
-            from ..ecm.chains import MIN_MEMORY_BYTES
 
             # Store the resolved policy, never an auto decision, so resume
             # retains its executor even if future defaults change again.
@@ -213,7 +210,7 @@ class PortfolioConfig:
                 object.__setattr__(self, name, value)
             if self.ecm_chain_mode == "reuse":
                 utils.require_integer(
-                    self.ecm_chain_bytes, "ecm_chain_bytes", MIN_MEMORY_BYTES
+                    self.ecm_chain_bytes, "ecm_chain_bytes", 0
                 )
             elif self.ecm_chain_bytes:
                 raise ValueError("ECM chain memory requires reuse mode")

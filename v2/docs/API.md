@@ -1,5 +1,10 @@
 # Python API and results
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 Import through the `v2` package from the repository root on PyPy 3.11.
 The [CLI](CLI.md) and [package index](../README.md#methods-and-packages)
 provide other entry points.

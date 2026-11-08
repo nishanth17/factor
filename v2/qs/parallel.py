@@ -16,6 +16,7 @@ from ..common import arithmetic, utils
 from ..common.arithmetic import pow
 from ..execution.budget import Budget, BudgetExhaustedError
 from ..execution.resources import (
+    accounted_job,
     decode_checkpoint,
     encode_checkpoint,
     removed_arguments,
@@ -244,13 +245,6 @@ def _collect(task, state=None):
             base,
             primes,
             budget=budget,
-        )
-        # The family and collector share this exact immutable base. Reserve
-        # its storage once while their private metadata/buffers coexist.
-        (
-            config.worker_memory_bytes
-            - family.workspace_bytes
-            + base.workspace_bytes
         )
         options = replace(
             config.collector,
@@ -731,6 +725,7 @@ class ParallelSIQSJob:
 
         self._checked_config = self.config
 
+    @accounted_job
     def run(self, *, pool=None, max_assignments=None, fixed_work=False):
         """Run ordered collection; extend the original Budget to resume.
 
@@ -998,6 +993,7 @@ class ParallelSIQSJob:
             reason,
             self.next_assignment,
             stats,
+            resource_stop=self.budget.stop,
         )
 
     @encode_checkpoint

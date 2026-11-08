@@ -188,12 +188,6 @@ def admit_large_relation(collector, atom, stats):
             plan = graph.plan(
                 *endpoints, atom.relation_id, config.max_partials, budget
             )
-    except MemoryError:
-        return (
-            "atom_limit"
-            if len(collector._atoms) >= config.atom_limit
-            else "allocation_failure"
-        )
     except CycleTooLongError:
         if shortcuts is None:
             stats["long_cycle_rejections"] += 1
@@ -280,6 +274,7 @@ def admit_large_relation(collector, atom, stats):
     # old external checkpoints remain valid, but this live store must never
     # masquerade as a resumable resource refusal or publish a partial row.
     collector._publication_failed = True
+    collector.budget.publication()
     try:
         evicted_atoms = tuple(collector._atoms[i] for i in plan.evicted)
         graph.commit(plan)

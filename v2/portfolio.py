@@ -43,6 +43,7 @@ from .execution.portfolio_config import (
     _execution_context as _execution_context,
 )
 from .execution.resources import (
+    accounted_entry,
     decode_checkpoint,
     encode_checkpoint,
     removed_arguments,
@@ -1285,6 +1286,7 @@ def _promote_state(state, name):
 
 
 @removed_arguments(("ecm_memory_bytes",))
+@accounted_entry
 def factorize_bounded(
     n,
     *,

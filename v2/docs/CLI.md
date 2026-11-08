@@ -1,5 +1,10 @@
 # Command-line guide
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 Run from the repository root with PyPy implementing Python 3.11.
 [Getting started](../README.md) covers setup; `pypy3 -m v2.factor --help`
 lists all current flags.

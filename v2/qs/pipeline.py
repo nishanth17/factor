@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from ..common import arithmetic, utils
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.resources import accounted_job
 from ..execution.work_budget import PollingBudget
 from .extraction import (
     DependencyExtractor,
@@ -26,6 +27,7 @@ class QSResult:
     reason: str
     next_position: int
     stats: dict
+    resource_stop: dict | None = None
 
     def __post_init__(self):
         for name in ("divisor", "cofactor", "next_position", "stats"):
@@ -404,6 +406,7 @@ class QSJob:
 
         return self.storage_reason
 
+    @accounted_job
     def run(self, *, batch_limit=None):
         """Amortize external polls while retaining the caller's work ledger."""
         require_published(self.collector)
@@ -517,12 +520,11 @@ class QSJob:
         self.stats["workspace_bytes"] = self._workspace_peak
         return QSResult(
             self.divisor,
-            (
-                self.collector.factor_base.n // self.divisor
-                if self.divisor
-                else self.collector.factor_base.n
-            ),
+            self.collector.factor_base.n // self.divisor
+            if self.divisor
+            else self.collector.factor_base.n,
             reason,
             self.next_position,
             dict(self.stats),
+            resource_stop=self.budget.stop,
         )

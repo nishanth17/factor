@@ -1,5 +1,10 @@
 # QS and SIQS configuration
 
+H3 replaces internal refusal quotas with observed root limits. See the
+[resource API](../README.md#resource-api) for defaults, removed arguments,
+sampled RSS, stage handoff, saved-history accounting and optional atomic saves.
+
+
 Use the [package guide](README.md) for jobs and relation invariants.
 [STATUS](../STATUS.md#current-automatic-defaults) is the single current
 size/resource routing table, including adopted and unmeasured bands.
