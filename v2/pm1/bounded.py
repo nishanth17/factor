@@ -8,7 +8,15 @@ from math import gcd, isqrt, prod
 
 from .. import constants
 from ..common import utils
-from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    RESOURCE_VERSION,
+    accounted_entry,
+    decode_checkpoint,
+    removed_arguments,
+    require_resource_version,
+    resolve_budget,
+)
 from ..execution.schedules import (
     RATIO_VERSION,
     SieveContext,
@@ -21,6 +29,7 @@ CHECKPOINT_VERSION = 1
 EXECUTION_VERSION = "pm1-campaign-v1"
 
 
+@removed_arguments(("memory_bytes",), positional=(5, "memory_bytes"))
 @dataclass(frozen=True)
 class PM1Config:
     """Predeclare inclusive (B1, B2) rungs for one explicit base.
@@ -37,7 +46,6 @@ class PM1Config:
     gcd_batch: int = constants.GCD_BATCH_SIZE
     recovery_limit: int = constants.RHO_RECOVERY_LIMIT
     segment_size: int = 1024
-    memory_bytes: int = 8_388_608
     max_input_bits: int = 4096
 
     def __post_init__(self):
@@ -46,7 +54,6 @@ class PM1Config:
             ("gcd_batch", 1),
             ("recovery_limit", 0),
             ("segment_size", 1),
-            ("memory_bytes", 65_536),
             ("max_input_bits", 2),
         ):
             utils.require_integer(getattr(self, name), name, minimum)
@@ -66,8 +73,6 @@ class PM1Config:
                 raise ValueError("campaign bounds must increase monotonically")
             previous = pair
         object.__setattr__(self, "bounds", bounds)
-        if self.memory_bytes - self.workspace_reserve < 8192:
-            raise MemoryError("p-1 state exceeds configured workspace cap")
 
     def advance(self, state, budget, context):
         """Apply this configuration's versioned execution action."""
@@ -97,6 +102,7 @@ class PM1Run:
     cpu_seconds: float
     verification_work: int
     checkpoint: dict
+    resource_stop: dict | None = None
 
 
 def _initial(n, base, config):
@@ -341,12 +347,11 @@ def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+@decode_checkpoint
 def _restore(checkpoint, n, base, config):
     """Check finite metadata before charged deterministic reconstruction."""
     try:
         encoded = _canonical(checkpoint["payload"])
-        if len(encoded.encode()) > config.memory_bytes // 2:
-            raise ValueError("checkpoint exceeds storage cap")
         if (
             hashlib.sha256(encoded.encode()).hexdigest()
             != checkpoint["sha256"]
@@ -406,6 +411,7 @@ def _restore(checkpoint, n, base, config):
     return payload
 
 
+@accounted_entry
 def factorize_pm1_bounded(
     n, *, base=2, config=None, budget=None, checkpoint=None, max_actions=None
 ):
@@ -417,6 +423,8 @@ def factorize_pm1_bounded(
     Changing bounds/base/config requires a fresh explicitly declared campaign.
     No primality claim is made: even a successful split remains unclassified.
     """
+    if checkpoint is not None:
+        require_resource_version(checkpoint)
     utils.require_integer(n, "n", 2)
     utils.require_integer(base, "base", 2)
     if type(n) is not int or type(base) is not int:
@@ -435,22 +443,20 @@ def factorize_pm1_bounded(
             if execution == EXECUTION_VERSION
             else PM1TuningConfig(chunk_size=64, gap_mode="recurrence")
         )
-    budget = Budget() if budget is None else budget
+    budget = resolve_budget(budget)
     if max(n.bit_length(), base.bit_length()) > config.max_input_bits:
         raise ValueError("input or base exceeds configured bit cap")
-    if budget.used or budget.prior_wall or budget.prior_cpu:
-        raise ValueError("supply an unused Budget with total allowances")
     if max_actions is not None:
         utils.require_integer(max_actions, "max_actions", 0)
     state = _initial(n, base, config)
     saved = None
     if checkpoint is not None:
         payload = _restore(checkpoint, n, base, config)
-        if budget.work_limit < payload["work_used"]:
-            raise ValueError("budget is below consumed work")
-        budget.used = payload["work_used"]
-        budget.prior_wall = payload["wall_used"]
-        budget.prior_cpu = payload["cpu_used"]
+        budget.restore_charges(
+            work=payload["work_used"],
+            wall=payload["wall_used"],
+            cpu=payload["cpu_used"],
+        )
         saved = payload["state"]
 
     reason, verification_work = "paused", 0
@@ -458,9 +464,7 @@ def factorize_pm1_bounded(
         budget.consume(0)
         budget.consume((isqrt(config.bounds[-1][1]) + 1) // 2)
         context = SieveContext(
-            config.bounds[-1][1] + 1,
-            segment_size=config.segment_size,
-            memory_bytes=config.memory_bytes - config.workspace_reserve,
+            config.bounds[-1][1] + 1, segment_size=config.segment_size
         )
         if saved is not None:
             started = budget.used
@@ -515,9 +519,8 @@ def factorize_pm1_bounded(
         "cpu_used": budget.cpu_used,
     }
     encoded = _canonical(payload)
-    if len(encoded.encode()) > config.memory_bytes // 2:
-        raise MemoryError("serialized p-1 checkpoint exceeds storage cap")
     snapshot = {
+        "resource_version": RESOURCE_VERSION,
         "payload": json.loads(encoded),
         "sha256": hashlib.sha256(encoded.encode()).hexdigest(),
     }
@@ -538,4 +541,5 @@ def factorize_pm1_bounded(
         budget.cpu_used,
         verification_work,
         snapshot,
+        resource_stop=budget.stop,
     )

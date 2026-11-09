@@ -105,12 +105,12 @@ class HenselReuseTests(unittest.TestCase):
         plain = SieveCollector(
             cached.polynomial,
             cached.factor_base,
-            config=replace(cached.config, memory_bytes=required),
+            config=replace(cached.config),
             budget=allowance(),
         )
-        self.assertIsNone(plain._shared_lift_inverses)
-        self.assertEqual(plain._hit_masks, ())
-        self.assertLessEqual(plain._workspace, required)
+        self.assertIsNotNone(plain._shared_lift_inverses)
+        self.assertEqual(plain._hit_masks, cached._hit_masks)
+        self.assertGreaterEqual(plain._workspace, required)
         for engine in (plain, cached):
             engine._sieve_direct(1, 17, Counter())
             self.assertEqual(engine._recovery_mask(1024), 1 << 1024)

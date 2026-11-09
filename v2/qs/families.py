@@ -8,8 +8,12 @@ from dataclasses import dataclass
 from math import comb, prod
 
 from ..common import arithmetic, utils
-from ..execution.budget import Budget
-from .factor_base import DEFAULT_MEMORY_BYTES
+from ..execution.resources import (
+    decode_checkpoint,
+    encode_checkpoint,
+    removed_arguments,
+    resolve_budget,
+)
 from .polynomial import Polynomial, PolynomialRoots, a_target, polynomial_roots
 
 MAX_A_FACTORS = 32
@@ -57,15 +61,12 @@ def _checked_resources(resources):
     }:
         raise ValueError("invalid family checkpoint resource record")
 
-    work = utils.require_integer(resources["work_used"], "work_used", 0)
-    if work.bit_length() > 64:
-        raise ValueError("family checkpoint work exceeds 64 bits")
+    utils.require_integer(resources["work_used"], "work_used", 0)
     for name in ("wall_used", "cpu_used"):
         value = resources[name]
         if (
             isinstance(value, bool)
             or not isinstance(value, (int, float))
-            or (isinstance(value, int) and value.bit_length() > 64)
             or not math.isfinite(value)
             or value < 0
         ):
@@ -74,6 +75,7 @@ def _checked_resources(resources):
     return resources
 
 
+@removed_arguments(("memory_bytes",))
 def family_assignments(
     base,
     half_width,
@@ -83,7 +85,6 @@ def family_assignments(
     pool_size=16,
     seed=7,
     budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
 ):
     """Return reproducible distinct squarefree A sets near the integer target.
 
@@ -102,12 +103,9 @@ def family_assignments(
         if value > maximum:
             raise ValueError(f"{name} exceeds the family limit")
 
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     reserve = base.workspace_bytes + 32768 + 256 * len(base.entries)
     reserve += family_count * factor_count * 256
-    if reserve > memory_bytes:
-        raise MemoryError("family assignment workspace exceeds memory_bytes")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     target = a_target(base.n_prime, half_width)
     budget.consume(len(base.entries) * (factor_count + 1))
     eligible = [
@@ -174,7 +172,7 @@ def verify_polynomial_roots(polynomial, base, roots, *, budget=None):
         raise ValueError("cached root tuple has the wrong base shape")
     if (polynomial.n, polynomial.multiplier) != (base.n, base.multiplier):
         raise ValueError("cached roots belong to a different target")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
 
     for entry, item in zip(base.entries, roots):
         prime = entry.prime
@@ -249,13 +247,13 @@ class PolynomialFamily:
     the actual recentered B difference; 2 and p|A use their exact branches.
     """
 
+    @removed_arguments(("memory_bytes",))
     def __init__(
         self,
         base,
         a_primes,
         *,
         budget=None,
-        memory_bytes=DEFAULT_MEMORY_BYTES,
         parity=False,
         root_update_policy="standard",
         root_update_limit=None,
@@ -278,7 +276,6 @@ class PolynomialFamily:
             p not in base.primes or base.n_prime % p == 0 for p in a_primes
         ):
             raise ValueError("A primes must be nonsingular base members")
-        utils.require_integer(memory_bytes, "memory_bytes", 0)
         a = arithmetic.backend_for(base.n).integer(prod(a_primes))
         if parity:
             # CRT terms modulo 2a are even. Adding odd a to the initial
@@ -288,11 +285,9 @@ class PolynomialFamily:
         reserve += 512 * len(a_primes) + 16 * (
             a.bit_length() + base.n.bit_length()
         )
-        if reserve > memory_bytes:
-            raise MemoryError("family roots/CRT state exceeds memory_bytes")
         self.base, self.a_primes, self.a = base, a_primes, a
-        self.budget = budget if budget is not None else Budget()
-        self.memory_bytes, self.workspace_bytes = memory_bytes, reserve
+        self.budget = resolve_budget(budget)
+        self.workspace_bytes = reserve
         entries = {
             entry.prime: entry
             for entry in base.entries
@@ -447,6 +442,7 @@ class PolynomialFamily:
         self.next_index += 1
         return step
 
+    @encode_checkpoint
     def checkpoint(self):
         """Save compact family progress/resources; root caches are rebuilt.
 
@@ -472,22 +468,12 @@ class PolynomialFamily:
             payload["root_update_policy"] = self.root_update_policy
             payload["root_update_limit"] = self.root_update_limit
         _checked_resources(payload["resources"])
-        if (
-            len(json.dumps(payload, default=arithmetic.json_integer).encode())
-            > MAX_CHECKPOINT_BYTES
-        ):
-            raise ValueError("family checkpoint exceeds its byte limit")
         return {"payload": payload, "sha256": _checksum(payload)}
 
     @classmethod
-    def from_checkpoint(
-        cls,
-        base,
-        checkpoint,
-        *,
-        budget,
-        memory_bytes=DEFAULT_MEMORY_BYTES,
-    ):
+    @removed_arguments(("memory_bytes",))
+    @decode_checkpoint
+    def from_checkpoint(cls, base, checkpoint, *, budget):
         """Verify progress and reconstruct charged caches on resume."""
         if not isinstance(checkpoint, dict) or set(checkpoint) != {
             "payload",
@@ -561,31 +547,18 @@ class PolynomialFamily:
         if index > 1 << (len(primes) - 1):
             raise ValueError("family checkpoint index exceeds its limit")
         resources = _checked_resources(payload["resources"])
-        if (
-            len(json.dumps(payload, default=arithmetic.json_integer).encode())
-            > MAX_CHECKPOINT_BYTES
-        ):
-            raise ValueError("family checkpoint exceeds its byte limit")
         if checkpoint["sha256"] != _checksum(payload):
             raise ValueError("family checkpoint integrity mismatch")
-        prior = Budget(
-            work_limit=budget.work_limit,
-            used=resources["work_used"],
-            prior_wall=resources["wall_used"],
-            prior_cpu=resources["cpu_used"],
+        budget.restore_charges(
+            work=resources["work_used"],
+            wall=resources["wall_used"],
+            cpu=resources["cpu_used"],
         )
-        if (
-            budget.used < prior.used
-            or budget.wall_used < prior.prior_wall
-            or budget.cpu_used < prior.prior_cpu
-        ):
-            raise ValueError("resume budget must retain consumed resources")
 
         family = cls(
             base,
             tuple(primes),
             budget=budget,
-            memory_bytes=memory_bytes,
             parity=parity,
             root_update_policy=policy,
             root_update_limit=limit,

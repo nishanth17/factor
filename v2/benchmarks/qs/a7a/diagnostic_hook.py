@@ -229,7 +229,9 @@ def _logical_owners(frame):
                 )
                 if type(candidate).__name__ == "SieveCollector":
                     derived = dict(
-                        collector_memory_limit=candidate.config.memory_limit,
+                        root_rss_limit=getattr(
+                            candidate.budget, "rss_bytes", None
+                        ),
                         factor_base_bound=candidate.factor_base.bound,
                         factor_base_count=len(candidate.factor_base.entries),
                         residual_floor=state.get("_residual_floor"),

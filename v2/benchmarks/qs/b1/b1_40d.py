@@ -8,8 +8,14 @@ import argparse
 import json
 import platform
 import sys
-from dataclasses import asdict, replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...support.paths import (
     source_path,

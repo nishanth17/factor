@@ -19,7 +19,10 @@ class OutcomeTarget(UsefulTarget):
             extra = min(
                 max(growth, (count + 3) // 4), growth * (1 + self.streak)
             )
-            self.next_target = min(limit, max(self.next_target, count + extra))
+            desired = max(self.next_target, count + extra)
+            self.next_target = (
+                desired if limit is None else min(limit, desired)
+            )
 
     def state(self):
         return dict(

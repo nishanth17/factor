@@ -12,7 +12,7 @@ from unittest.mock import patch
 from v2.common import utils
 from v2.common.preprocessing import fermat_step, integer_root, strip_twos
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import (
     ScheduleCache,
     SieveContext,
@@ -21,6 +21,7 @@ from v2.execution.schedules import (
 )
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def reference_primes(lo, hi):
@@ -142,7 +143,7 @@ class ScheduleTests(unittest.TestCase):
         self.assertEqual(list(context.primes(2, 5)), [2, 3])
         with self.assertRaises(ValueError):
             list(context.primes(2, 1001))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SieveContext(10**12, memory_bytes=8192)
 
     def test_prime_power_schedule(self):

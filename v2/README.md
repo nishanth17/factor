@@ -17,7 +17,7 @@ With PyPy implementing Python 3.11 installed, run from the repository root:
 ```sh
 make -C v2 runtime
 pypy3 -m v2.factor 626100403 --bounded --seed 7 \
-  --work-limit 2000000 --seconds 30 --cpu-seconds 30
+  --seconds 30 --cpu-seconds 30
 pypy3 -m v2.factor --help
 ```
 
@@ -49,7 +49,7 @@ The package guides below describe the available techniques and configuration.
 ## Python usage
 
 Use the bounded portfolio when stages and recursive children must share one
-work/time allowance:
+root resource owner:
 
 ```python
 from v2.execution.budget import Budget
@@ -59,7 +59,7 @@ n = 626100403
 run = factorize_bounded(
     n,
     seed=7,
-    budget=Budget(work_limit=2_000_000, seconds=30, cpu_seconds=30),
+    budget=Budget(seconds=30, cpu_seconds=30),
 )
 assert run.result.reconstruct() == n
 print(run.reason, run.result.complete)
@@ -85,10 +85,11 @@ process executor for independent ECM curves on supported macOS/arm64 PyPy.
 The normal portfolio retains preprocessing, recursive completion and its
 existing SIQS/SSS fallback. The ECM-only benchmark runner is separate.
 
-Use `--ecm-workers serial` or `ecm_executor=None` to keep incumbent serial
-execution. `--ecm-memory-mib` / `ecm_memory_bytes` set the aggregate owned ECM
-allowance, capped at 8 GiB; caller work, CPU, wall and parent-memory limits
-still apply. Unsupported, unmeasured and unfunded calls stay serial.
+Use `--ecm-workers serial` or `ecm_executor=None` for serial execution.
+Worker counts, numerical schedules, packet widths, caches and cost/size guards
+retain their selected values. Worker admission no longer requires prepaid work,
+CPU or estimated storage grants. Their dependent cost tables need revalidation;
+H3 makes no performance claim.
 
 For repeated library calls, a caller-owned context keeps its pool and immutable
 programs warm:
@@ -100,9 +101,9 @@ with selected_context(seed=7, prefer_warm=True) as context:
     run = factorize_bounded(n, seed=7, ecm_executor=context)
 ```
 
-The context's seed, resource grants and selected worker configuration remain
+The context's seed and selected worker configuration remain
 bound for its lifetime. Do not share one active context across concurrent
-calls. Use the same declared configuration and adequate finite budgets.
+calls. Use the same declared numerical configuration and shared root limits.
 Cold CLI startup and warm retained-pool performance are separate endpoints.
 The compact64 default at 30 digits and fixed32 defaults at 50/70 digits stay
 serial cold before loading the cost catalogue. Twenty-digit automatic calls
@@ -110,15 +111,62 @@ also remain serial. Larger explicit numerical schedules retain selection. See th
 [selected regime table](STATUS.md#selected-ecm-regimes) for cold/warm worker
 counts and retained performance limitations.
 
-Worker arithmetic remains exact. Stable curve identities, checked divisor
-publication, bounded parent-owned leases, explicit spawn, cancellation/drain
-and quiescent checkpoints preserve finite execution and checked resume.
-Automatic checkpoint schema 13 binds policy, semantic implementation version,
-seed and grants;
-older serial checkpoints remain serial. Worker-count changes on resume are
-rejected. The worker parent ceiling is 4 GiB including selector bookkeeping;
-portfolio admission failures retain serial execution, while direct selected
-component calls can raise `MemoryError`.
+Worker arithmetic remains exact. Tokens identify assignments; they carry no
+resource grants. The root observes parent, workers, owned helpers and descendants.
+Live samples, process-lifetime acknowledgments and final libproc self CPU
+before wait4 reaping reconcile
+by process birth identity, including crashes and shutdown. Retained context
+startup, each call and close own active intervals; idle time is excluded.
+
+## Resource API
+
+`Budget(seconds=None, cpu_seconds=None)` leaves wall and aggregate CPU unlimited.
+The default RSS guard is `floor(4 * physical_memory / 5)`. Set `rss_bytes` to an
+integer byte cap or explicitly pass `rss_bytes=None` to disable it. CLI equivalents
+are `--seconds`, `--cpu-seconds`, `--rss-bytes` and `--no-rss-limit`. Library calls
+remain quiet. `used` counts algorithmic work for diagnostics; it cannot refuse work.
+
+macOS uses libproc through ctypes to sum current RSS over the owned process tree.
+The parent is included; shared pages can be counted multiple times. Samples run
+at entry and publication boundaries. Ordinary cooperative polls throttle
+sampling to once per 50 ms; a long atomic operation can delay the next sample. Allocations, native operations and active worker stages can
+overshoot the guard. Provider failures are explicit errors.
+
+Only root wall, aggregate CPU, observed RSS and an optional checkpoint save cap
+refuse resources. Internal stores, graphs, matrices and scratch grow as needed.
+Partial FIFO capacities, caches, packet widths, numerical search effort and exact
+representation/provenance checks retain their policies. Stage allocations order
+work: exhausting a stage share hands remaining root resources to the next stage;
+an underfunded fallback reserve no longer vetoes that handoff.
+
+Removed arguments raise `RemovedResourceLimitError`, naming the argument and its
+replacement. This includes `work_limit`, internal `memory_bytes`, `max_atoms`,
+`max_relations`, child `checkpoint_bytes`, worker grants and the former CLI flags
+`--work-limit`, `--memory-mib`, `--ecm-memory-mib`. Cache byte capacities remain
+supported where they control retention. `default_siqs_config(recipe="calibrated")`
+retains the omitted-grant recipe; `recipe="reference"` selects the former explicit
+non-calibrated recipe without making a resource cap select mathematics.
+
+Resource stops expose the limit name, observed/requested value, limit value and
+scope. Cancellation, finite numerical exhaustion, `allocation_failure`, I/O
+failure and unsupported encoding retain distinct identities. Interrupted
+publication poisons its owner; it cannot be reused or checkpointed.
+
+Checkpoints use resource version `observed-resources/saved-history-v3`. Older
+resource schemas raise `UnsupportedResourceVersionError`; there is no migration.
+Resumes inherit recorded cumulative charges plus the current invocation. Work
+and resource consumption after the last valid save are **not recovered** after
+a crash or skipped save. A caller retaining the live `Budget` keeps those unsaved
+charges across retries. No durable ledger is built; benchmark/study ledgers remain
+the authority for experiment charges. Paused intervals are excluded.
+
+Saving is optional. `atomic_save(path, snapshot, checkpoint_bytes=None)` has no
+size cap by default; CLI `--checkpoint-bytes` supplies one. Oversize records
+`checkpoint_size_skip` with requested/limit bytes, preserves the old file and
+continues factoring. Saves use only published state, a temporary sibling,
+flush/fsync, atomic `os.replace` and directory fsync. Before replacement, an interrupted write leaves the previous checkpoint valid.
+Atomic replacement exposes a complete old or new file; a later directory-fsync
+failure can leave the complete new file installed. Allocation or I/O failure retains its own cause.
 
 ## Optional GMP backend
 
@@ -181,204 +229,80 @@ this new grant; its original source notices and provenance remain unchanged.
 ## Opt-in current QS workers
 
 `v2.qs.current_parallel.CurrentParallelSIQSJob` accepts a concrete current
-`SIQSConfig` or `CountedSIQSConfig`, an explicit parent memory allowance,
-`Budget`, and `QSWorkerConfig`. Growing DLP and the bounded C9a cost-report
-configuration are supported. This experimental interface preserves current
-width, multiplier, parity/sign, root, queue and exact recovery policies; it
-uses one parent-owned relation/partial/cycle store.
+`SIQSConfig` or `CountedSIQSConfig`, a root `Budget`, and `QSWorkerConfig`.
+Growing DLP and the C9a cost-report configuration are supported. The interface
+preserves width, multiplier, parity/sign, roots, queues and exact recovery,
+with one authoritative parent relation/partial/cycle store.
 
-`QSWorkerConfig(workers=1)` through `QSWorkerConfig(workers=10)` select spawned
-PyPy3.11 processes, subject to the explicit aggregate ownership allowance;
-`QSWorkerConfig(mode="serial")` executes the packet stream locally. Pass an
-explicit `CollectionPool` to `run(pool=...)` to retain processes across jobs.
-`factorize_bounded(..., qs_workers=settings, qs_pool=pool)` applies the opt-in
-path only at SIQS handoff, including recursive cofactors. With no pool argument
-it owns one lazy QS pool for the full call. Retained ECM pool ownership is
-charged alongside QS workers using its finite memory cap or executor ownership
-bound; a borrowed ECM context with unknown ownership is refused. An unused
-automatically owned ECM context with an empty curve schedule needs no pool
-reserve. Warm B12 ECM processes cannot yet dispatch QS packets.
+`QSWorkerConfig(workers=1)` through `workers=10` select spawned PyPy3.11
+processes; `mode="serial"` executes the same packets locally. Pass an explicit
+`CollectionPool` to retain processes across jobs. The portfolio accepts
+`factorize_bounded(..., qs_workers=settings, qs_pool=pool)` at SIQS handoff,
+including recursive cofactors. Defaults remain serial. Retained ECM and QS
+processes share the root's observed wall, aggregate CPU and current-tree RSS.
+There are no parent/worker memory reservations, provenance/history quotas,
+prepaid work/CPU leases or aggregate logical-byte admission checks. Former
+resource keywords raise `RemovedResourceLimitError` naming the argument.
 
-Configuration and worker count/mode remain fixed across resume. Extend the
-original budget or restore `CurrentParallelSIQSJob.from_checkpoint(...)` with
-cumulative allowances. Quiescent v2 checkpoints retain paid prefixes, pending
-admission, original provenance and split-call leases. Derived solver/root/proof
-state rebuilds with additional charges. Lost reports retain full work and finite
-split grants; unknown uncapped split counts stay explicit. Positive splitter
-leases stop before additional recovery and resume the same unpublished cursor.
-Quota scarcity can change scheduling/yield and must be separated from pure
-concurrency. Nested recovery, spill, width growth and native-thread execution
-are refused. Ownership accounting is prospective; it is not an OS RSS sandbox.
+Root wall/CPU limits are optional; RSS defaults to 80% of physical RAM.
+For an explicit guard, use `Budget(rss_bytes=18 * 2**30, seconds=...)`.
+OS observations include process startup and final CPU at reaping. Reported
+work remains diagnostic; missing private reports leave its amount unknown
+rather than inventing a full lease. Root limits are cooperative and may
+overshoot between observations or indivisible arithmetic operations.
 
-Defaults remain serial. The experimental `lease_budget=True` option uses plain
-packet-local work
-counters and parent aggregate CPU guarding. It retains immediate work refusal,
-private CPU/wall limits, forced publication checks and the 64-action stop
-cadence. Lost reports retain full grants. Stop latency is cooperative, including
-indivisible integer operations and the funded publication tail. Enabled lease
-policy is part of execution identity and cannot change across resume. Disabled
-options are omitted from legacy settings/checkpoint identities. No default or
-performance adoption follows from this option.
+Configuration and execution settings remain fixed across resume. Version-3
+current-worker checkpoints carry the H3 resource version, observed saved
+history, published prefixes, pending admission, provenance and numerical
+split-call allocations. Old resource schemas are rejected. Checkpoint encoding
+has no internal size cap; optional file persistence uses
+`atomic_save(..., checkpoint_bytes=...)`, which records an oversized-save skip
+without discarding the factoring result. Derived solver/root/proof caches
+rebuild with their actual execution cost. Width growth, nested recovery and
+native threads remain unsupported by this experimental interface.
 
-`grouped_lease_charging=True` additionally permits the two original
-first-level root-marking reservations to share one private ledger update.
-It requires `lease_budget=True` and is off by default. Both actions must fit
-the already checked polling interval and remaining work; boundaries use the
-original scalar path, retaining its paid prefix and refusal behavior.
-`grouped_marking_pairs` reports actual use. Scores, hit masks, logical work
-charges and the 64-action cancellation bound remain unchanged. This is an
-experimental option without a demonstrated performance gain.
+Scheduling and representation options remain explicit:
 
-The opt-in `packed_queue` marking component stores each sparse hit in one
-64-bit word instead of three 32-bit words. For example, select
-`marking="presieve+unroll4+parity_two+packed_queue"` with a funded sparse
-queue. Offset/index/weight widths are checked before construction; unsupported
-shapes use the exact direct path. Hit order, work charges, polling and the
-older conservative memory reservation remain unchanged. Derived queues are
-rebuilt after interruption/restore; the marking selection pins configuration
-identity. This changes no automatic default or admission policy.
+- `polynomials_per_task` selects a packet's original Gray prefix.
+  `whole_family=True` groups a configured family without adding polynomials.
+  `lookahead=N` adds at most four queued/pending credits per worker. Atom and
+  wire capacities continue the same unpublished cursor when a packet fills.
+- `reuse_state=True` retains an identity-bound context and reusable family and
+  collector scratch. `state_cache_bytes` controls retention; an oversized
+  context uses uncached packets. Recovery hints and polynomial queues are
+  invalidated at their original boundaries. Missing installation acknowledgments
+  retire only the owned pool. Retained pools pin worker settings.
+- `lease_budget=True` retains the experimental packet-local diagnostic counter
+  and 64-action root-cancellation cadence. It no longer introduces resource
+  leases. `grouped_lease_charging=True` combines two marking-counter updates
+  only within that polling interval and remains disabled by default.
+- `packed_transport=True` publishes checked varint rows with private reusable
+  buffers, unchanged numerical publication boundaries and strict checkpoint
+  base64. `verification="worker"` verifies before publication; the parent still
+  checks ordered insertion. `verification="batch"` prevalidates bounded groups.
+  The default is full parent verification.
+- `private_stop=True` gives each process its own stop flag and requires the
+  packet-local counter. `stop_backend="semaphore"` replaces each Event with
+  an exclusive-reader nonblocking semaphore. Both preserve cooperative polling.
+  `cpu_snapshot=True` selects a private coherent counter snapshot; these
+  diagnostics do not add worker CPU a second time to the observed root ledger.
+- `family_affinity=True` pins a family to one process and requires retained
+  state; use the same option on `CollectionPool`. Small credit windows can leave
+  workers idle. `arrival_order=True` is a separate trajectory-changing option,
+  rejects fixed-work execution and validates its arrival witnesses on restore.
+- `coefficient_cache=True` retains a bounded parent CRT template during merge.
+  `packed_queue` stores sparse events in 64-bit words; unsupported shapes use
+  exact direct marking. `byte_stamps` selects checked byte epochs with charged
+  wraparound clears. These mechanisms remain disabled unless selected.
+- `wide_hits`, `wide_inverses` and `wide_transfers` enlarge the corresponding
+  real cache capacities. `pruned_transfers` replays a complete cached root pair
+  after window pruning. Their exact arithmetic and fallback paths are unchanged;
+  removed total-memory estimates no longer select or refuse these caches.
 
-The experimental `byte_stamps` marking component stores bulk recovery-word
-epochs in byte arrays. It follows `packed_queue` in component order and keeps
-the original conservative scratch reservation. Each reused epoch triggers a
-charged clear before any stale words can become visible; interrupted clears
-retain the old epoch until all buffers are funded. Native recovery words and
-candidate-read caches keep their existing representation. It composes with
-packed or ordinary sparse queues and falls back exactly when the word helper
-is ineligible. Extra wraparound work remains charged. No automatic default
-selects this layout.
-
-Explicit QS worker aggregate grants may reach 32 GiB; the default remains
-12 GiB. Prospective ownership still includes parent state, every worker,
-decoded/in-flight publication, coexistence and checkpoint reserves. This is
-an ownership bound, separate from measured RSS and physical-memory pressure.
-
-The opt-in `wide_hits` marking component permits up to 128 MiB of lazy
-native-word hit scratch per collector instead of the usual 32 MiB ceiling.
-The actual reservation and construction work must fit the existing collector
-grant, leaving polynomial-switch coexistence funded; otherwise the ordinary
-exact mask path remains available. This can keep larger bases off repeated
-large-integer mask operations. It follows `packed_queue` in component order.
-
-`QSWorkerConfig(coefficient_cache=True)` retains one bounded parent CRT
-template within each packet merge. It uses the factor base's checked column
-map, selected roots and cached modular terms while preserving every original
-per-coordinate work reservation and poll. The 64 KiB reserve is included in
-aggregate ownership. The cache is discarded on merge exit and rebuilt after
-resume; the enabled setting pins execution identity. The default is false.
-
-The opt-in `wide_inverses` marking component permits up to 32 MiB of shared
-Hensel-derivative inverse scratch instead of 8 MiB. A fixed target has at
-most two opposite nonsingular derivatives per odd prime, so the existing
-checked cache reuses inverses across polynomials and A values. Its complete
-reservation and the next polynomial switch must fit the collector grant;
-scarce memory retains independent exact inversion. No default changes.
-
-The opt-in `wide_transfers` marking component permits up to 128 MiB of
-within-family prime-power root transfers instead of 32 MiB. It funds multiple
-power levels per base prime inside the collector grant, leaving the next
-polynomial switch funded. Insufficient memory keeps exact ordinary lifting.
-Cached pairs remain derived state and are rebuilt after resume. This follows
-`wide_inverses` in component order and changes no automatic selection.
-
-The independent opt-in `pruned_transfers` component replays a complete cached
-prime-power pair when window pruning has retained only one first-level root
-class. It selects that surviving class modulo the original prime, while
-keeping both roots in derived storage. Both replayed roots remain charged;
-the extra charge is counted separately. Cache misses use ordinary lifting.
-It follows `wide_transfers` and changes no default or checkpoint format.
-
-`private_stop=True` requires process packet leases and gives each worker its
-own synchronized stop flag. The parent sets or clears every flag, while each
-worker retains the same 64-action polling cadence and exact budget checks.
-This avoids sharing one flag lock among all worker readers. Broadcast is
-cooperative and sequential; it does not promise a wall-time cancellation bound.
-The option pins execution/checkpoint identity and must be selected before a
-pool spawns any processes. Reused pools cannot change the policy after spawn.
-Aggregate ownership reserves an additional 64 KiB per worker for these handles.
-The disabled option preserves the legacy identity and remains the default.
-
-With private process flags, `stop_backend="semaphore"` selects one nonblocking
-semaphore per worker instead of an Event condition. Each flag has exactly one
-worker reader. The parent sets idempotently during a run and clears only after
-all packets and snapshot barriers drain. Setup checks also select that worker's
-own flag; parent observation reads parent-owned state. These ownership rules
-permit removing the Event condition lock while retaining the polling cadence.
-The backend is pinned before spawn and across checkpoints. Default `"event"`
-preserves existing private-flag identities. No raw shared-memory atomics or
-change to arithmetic, work reservations or private deadline checks is involved.
-
-`cpu_snapshot=True` also requires process packet leases. Parent verification
-and solving read the worker CPU array under one lock against a run-local
-baseline, instead of locking each scalar read. Aggregate charging, immediate
-budget refusal and the parent polling cadence remain unchanged. The baseline
-is rebuilt after each quiescent pool `begin`; the enabled option pins execution
-identity and defaults off.
-The parent copies into a reused private buffer while locked, then releases
-the lock before clipping and summing differences, allowing worker publication
-during that arithmetic.
-
-`reuse_state=True` installs an identity-bound immutable context on every worker
-before sending packet deltas. `state_cache_bytes` bounds that context; aggregate
-admission also reserves setup-message coexistence. Private family roots and
-collector buffers can persist, with current-lease budget rebinding. Proven
-prime/unit caches remain reusable; polynomial queues and packet-dependent
-recovery hints are invalidated. Checkpoints store paid progress and context
-identity, rebuild disposable caches, and charge new installation. A missing
-installation acknowledgement retains prepaid setup work and conservative CPU
-charges, and retires only the owned pool.
-A retained-state pool pins its worker settings for its lifetime; changing or
-disabling them requires a fresh pool. Independent jobs with the same settings
-may install a different target/configuration context after checked retirement.
-
-`packed_transport=True` publishes bounded varint relation rows. The legacy JSON
-admission limit and work charge remain in force, so encoding cannot change a
-packet's accepted prefix. Decoding checks dimensions and expansion against the
-norm/support bound before exact relation verification. Mutable transport buffers
-are private and reusable during an active run; quiescent pool finish releases
-them. Published bytes do not alias those buffers. Pending packed checkpoint
-payloads use strict base64 with an explicit encoding marker; disabled transport
-retains the legacy JSON format.
-
-`verification="worker"` fully checks atoms before worker publication and uses
-the parent's checked ordered insertion without a redundant standalone check.
-The parent still independently rejects inconsistent arithmetic; a worker claim
-is not a proof. `verification="batch"` prevalidates bounded groups before
-ordered insertion, reusing only object-bound proofs in the parent. Its
-`verification_batch_atoms` allowance is included in aggregate memory admission.
-Unsupported unchecked collector paths retain full parent verification. Default
-`verification="parent"` preserves the original checks and legacy identity.
-
-`lookahead=N` adds at most N queued/pending packet credits beyond the worker
-count (maximum four extra credits per worker), with prospective response-memory
-and work/CPU reservations. Complete portfolio calls then keep the executor
-active instead of draining each worker-sized wave. Explicit fixed-work quotas
-still bound total issuance; admission remains ordinal. `whole_family=True`
-groups the entire configured family prefix without adding polynomials. Recovery
-hint boundaries retain the original chunk scope. Flagged checkpoints validate
-contiguous paid receipts for fully admitted partial packets as well as pending
-work; legacy off identities and formats remain unchanged.
-
-`family_affinity=True` is an experimental process-only placement option that
-requires `reuse_state=True`. Each family index selects one of the same N
-worker processes; consecutive original packets can retain that family's root
-state. Packet identities, paid leases, ordered admission and resume coverage
-are unchanged. Pass the same option when constructing a retained
-`CollectionPool`. The option does not enlarge lookahead or memory allowances:
-a small packet-credit window can leave pinned workers idle. Any wider window
-must be explicitly funded and compared separately from placement.
-
-`arrival_order=True` is a separate, trajectory-changing experiment. Complete
-packets can enter the graph in observed arrival order while paid witnesses
-retain the bounded ordinal frontier. Partial packets retain their admission
-cursor; checkpoints validate each arrival against its acknowledgement. This
-option rejects fixed-work execution and is excluded from the combined
-fixed-order comparison. It defaults off.
-
-The numerical runner is
-`pypy3 -B -m v2.benchmarks.qs.a7a.runner`; its `plan`/`freeze` commands are
-metadata-only. `qa` and `run` require `--execute-phase3`; full runtime checks and
-exploratory performance screens have run. Population confirmation, broader
-size coverage and automatic worker selection remain pending. Detailed local
-contracts,
-research, budgets and handoff are under `v2/audit/a7a/`.
+The recorder entry point remains `pypy3 -B -m v2.benchmarks.qs.a7a.runner`.
+Frozen pre-H3 recipes are translated only at the benchmark boundary; their old
+resource fields remain historical metadata. Production constructors and
+checkpoint restoration do not accept those fields. Historical G2H/G3 timings
+need revalidation on the combined H3 source. No automatic worker selection or
+performance adoption follows from this integration. Detailed local evidence
+and handoff remain under `v2/audit/a7a/`.

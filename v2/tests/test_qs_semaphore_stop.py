@@ -4,9 +4,12 @@ import multiprocessing
 import os
 import unittest
 from concurrent.futures.process import BrokenProcessPool
-from dataclasses import replace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.packet_lease import PacketLeaseBudget
 from v2.qs.parallel import CollectionPool

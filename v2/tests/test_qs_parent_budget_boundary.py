@@ -4,7 +4,8 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.parallel import CollectionPool, _ParentBudget
 
 
@@ -12,6 +13,7 @@ def pool_view():
     """Exercise the real accounting methods without launching any process."""
     pool = CollectionPool.__new__(CollectionPool)
     pool.mode = "process"
+    pool.executor = SimpleNamespace(_processes={})
     pool.accounted_cpu = 0.0
     pool.state = dict(
         cpu=[3.0, 5.0],
@@ -29,7 +31,7 @@ class ParentBudgetBoundaryTests(unittest.TestCase):
             pool.poll(budget)
         self.assertEqual(budget.reason, "cancelled")
         self.assertEqual(budget.used, 0)
-        self.assertEqual(budget.prior_cpu, 5.0)
+        self.assertEqual(budget.prior_cpu, 0.0)
 
     def test_one_raw_check_per_boundary_retains_every_work_unit(self):
         pool = pool_view()
@@ -43,7 +45,7 @@ class ParentBudgetBoundaryTests(unittest.TestCase):
             view.consume(1)
             self.assertEqual(checked.call_count, 2)
         self.assertEqual(budget.used, 65)
-        self.assertEqual(budget.prior_cpu, 5.0)
+        self.assertEqual(budget.prior_cpu, 0.0)
 
     def test_exhausted_limits_refuse_before_any_work_is_committed(self):
         for options, reason in (

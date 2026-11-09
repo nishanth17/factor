@@ -7,6 +7,11 @@ from math import isqrt, prod
 from pathlib import Path
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....execution.budget import Budget
 from ....qs import parallel
 from ....qs.relations import verify_atomic
@@ -107,7 +112,8 @@ def main():
         namespace,
     )
     current = parallel.ParallelSIQSJob._memory
-    config = parallel.ParallelConfig(
+    config = adapt_resource_configuration(
+        parallel.ParallelConfig,
         base_bound=10000,
         half_width=512,
         factor_count=3,
@@ -128,8 +134,8 @@ def main():
                 parallel.ParallelSIQSJob._memory = method
 
                 def run():
-                    budget = Budget(
-                        work_limit=10**10, seconds=5, cpu_seconds=5
+                    budget = recording_budget(
+                        Budget, work_limit=10**10, seconds=5, cpu_seconds=5
                     )
                     job = parallel.ParallelSIQSJob(
                         fixture["n"], config=config, budget=budget

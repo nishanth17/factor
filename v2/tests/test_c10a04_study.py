@@ -10,10 +10,11 @@ from unittest.mock import patch
 
 from v2.benchmarks.qs.c10a04 import configuration, selection, study
 from v2.benchmarks.qs.c10a04.accounting import Ledger, digest, receipt
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import SIQSJob
 from v2.qs.factor_base import build_factor_base
 from v2.qs.multiplier import select_multiplier
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance():

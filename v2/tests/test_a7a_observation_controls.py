@@ -4,6 +4,9 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
 from v2.benchmarks.qs.a7a import cell
 from v2.benchmarks.qs.a7a.combined import cell as make_cell
 
@@ -32,7 +35,7 @@ class ObservationControlTests(unittest.TestCase):
             observer.exceeded = False
             observer.rows = [dict(bytes=123)]
             observer.backend = "test"
-            pool = SimpleNamespace(close=lambda: None)
+            pool = SimpleNamespace(close=lambda **kwargs: None)
 
             with (
                 patch("v2.qs.parallel.CollectionPool", return_value=pool),
@@ -70,7 +73,7 @@ class ObservationControlTests(unittest.TestCase):
                 cell.execute(dict(n=91, cell=spec))
 
     def test_cooperative_cancel_preserves_a_valid_resumable_checkpoint(self):
-        from v2.execution.budget import Budget
+        from v2.benchmarks.infrastructure.resource_control import Budget
         from v2.portfolio import PortfolioConfig, factorize_bounded
 
         n = 91
@@ -91,7 +94,8 @@ class ObservationControlTests(unittest.TestCase):
         resumed = factorize_bounded(
             n,
             seed=7,
-            config=PortfolioConfig(
+            config=resource_configuration(
+                PortfolioConfig,
                 siqs=config,
                 rho_attempts=0,
                 pm1_attempts=0,

@@ -15,9 +15,10 @@ from v2.benchmarks.qs.c1.c1_feasibility import (
     verify_square,
     xor_selected,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import SIQSConfig, build_factor_base, qs_polynomial
 from v2.qs.sieve_collector import SieveCollector, SieveConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -108,7 +109,6 @@ class DiagnosticSamplingTests(unittest.TestCase):
                 block_width=32,
                 residual_bound=500,
                 max_partials=4,
-                memory_bytes=256 * 2**20,
             ),
         )
 

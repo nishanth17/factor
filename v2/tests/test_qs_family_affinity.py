@@ -2,9 +2,11 @@
 
 import multiprocessing
 import unittest
-from dataclasses import replace
 from unittest.mock import Mock, patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.qs.affinity_executor import FamilyAffinityExecutor
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.parallel import CollectionPool
@@ -30,7 +32,7 @@ def affinity_settings():
 
 class AffinityPlacementTests(unittest.TestCase):
     def test_broadcast_and_explicit_packet_placement_visit_correct_slots(self):
-        with patch("v2.qs.affinity_executor.ProcessPoolExecutor") as factory:
+        with patch("v2.qs.parallel.ObservedProcessPoolExecutor") as factory:
             factory.side_effect = [Mock() for _ in range(3)]
             executor = FamilyAffinityExecutor(
                 3, mp_context=None, initializer=None, initargs=()
@@ -96,7 +98,7 @@ class AffinityPlacementTests(unittest.TestCase):
 
         self.assertEqual(result.reason, "worker_failure")
         self.assertTrue(pool.closed)
-        self.assertGreater(job.stats["lost_work"], 0)
+        self.assertGreater(job.stats["lost_packets"], 0)
         self.assertGreaterEqual(job.budget.used, job.stats["lost_work"])
         self.assertTrue(all(not p.is_alive() for p in pool._owned_processes))
         self.assertEqual(

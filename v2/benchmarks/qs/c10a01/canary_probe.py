@@ -8,6 +8,10 @@ import sys
 import time
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
+
 from ....execution.budget import Budget
 from ..c10a04.accounting import digest, output_lock
 from . import host_state, pilots_v4, plan_v4
@@ -37,7 +41,9 @@ def source_identity():
 
 
 def worker():
-    budget = Budget(work_limit=WORK, seconds=15, cpu_seconds=15)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=15, cpu_seconds=15
+    )
     before = host_state.power_state()
     if before != dict(source="AC Power", low_power=0):
         raise RuntimeError("native probe requires the declared power mode")

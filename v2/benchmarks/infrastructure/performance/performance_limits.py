@@ -7,6 +7,11 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....execution.budget import Budget
 from ....qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
 from ...support.paths import (
@@ -33,7 +38,8 @@ def main():
     )
     root = REPOSITORY_ROOT
     before = fingerprint(root)
-    config = ParallelConfig(
+    config = adapt_resource_configuration(
+        ParallelConfig,
         base_bound=400,
         half_width=8192,
         factor_count=3,
@@ -58,7 +64,8 @@ def main():
             for resource in ("wall", "cpu"):
 
                 def run():
-                    budget = Budget(
+                    budget = recording_budget(
+                        Budget,
                         work_limit=10**10,
                         seconds=0.02 if resource == "wall" else 5,
                         cpu_seconds=0.02 if resource == "cpu" else 5,

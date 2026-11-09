@@ -16,17 +16,17 @@ CF_PREPARATION_WORK = 62430
 
 
 def default_options(config, tiers=None, *, automatic_memory=False):
-    """Resolve fresh automatic routing within the existing finite cap.
+    """Resolve fresh numerical/cache routing independently of root limits.
 
     This pure preparation decision never loads records or runs arithmetic.
-    Unsupported schedules and smaller user caps retain streamed execution.
+    Unsupported schedules retain streamed execution.
     """
     tiers = config.ecm_tiers if tiers is None else tiers
     program_bytes = config.ecm_program_bytes or max(
         512 * 1024, 4096 + 256 * config.segment_size
     )
     chain_bytes = config.ecm_chain_bytes or core.MIN_MEMORY_BYTES
-    extra = (
+    (
         program_bytes
         - config.ecm_program_bytes
         + chain_bytes
@@ -38,21 +38,8 @@ def default_options(config, tiers=None, *, automatic_memory=False):
         and any(b1 == 2000 and curves >= 8 for b1, _, curves in tiers)
         and all(b2 < 2**64 for _, b2, curves in tiers if curves)
     )
-    memory_bytes = (
-        16 * 1024**2 if automatic_memory and eligible else config.memory_bytes
-    )
-    available = memory_bytes - config.workspace_reserve - 8192
-    fallback = config.siqs or config.sss
-    if fallback is not None:
-        # An allocator-grown child owns the remaining parent allowance.
-        # Do not reserve optional ECM plans from that same space twice.
-        if fallback.memory_bytes is None:
-            available = min(0, available)
-        else:
-            available -= fallback.memory_bytes
-    supported = eligible and available >= extra
+    supported = eligible
     return dict(
-        memory_bytes=memory_bytes if supported else config.memory_bytes,
         ecm_chain_mode="reuse" if supported else "off",
         ecm_program_bytes=program_bytes
         if supported
@@ -100,8 +87,6 @@ class ChainPlan(core.ChainPlan):
             record = core.Record(scalar, code, output, slots)
             actions[scalar] = core.Action(record, masks, engine)
             owned += 4096 + 512 * steps
-        if owned > core.PLAN_BYTES:
-            raise MemoryError("optional ECM plan exceeds its reserve")
         budget.consume(bound)
         self.entries = {}
         for prime in prime_sieve.prime_sieve(bound + 1):
@@ -148,8 +133,9 @@ class ChainPlans(core.ChainPlans):
             del old
         self.misses += 1
         plan = ChainPlan(bound, self.backend, budget, self.family)
-        self.plans[key] = plan
-        self.used_bytes += plan.owned_bytes
+        if self.used_bytes + plan.owned_bytes <= self.memory_bytes:
+            self.plans[key] = plan
+            self.used_bytes += plan.owned_bytes
         return plan
 
 

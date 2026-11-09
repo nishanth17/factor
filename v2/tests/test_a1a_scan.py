@@ -4,9 +4,9 @@ import unittest
 from array import array
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
 from v2.qs import Polynomial, build_factor_base
 from v2.qs.collector_kernels import word_candidates
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_a1a_density import worker
 from v2.tests.test_qs import unlimited_budget
 

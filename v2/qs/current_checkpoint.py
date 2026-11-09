@@ -6,13 +6,14 @@ import json
 import time
 
 from ..common import utils
+from ..execution.resources import decode_checkpoint, encode_checkpoint
 from .checkpoint import _restore_store, _store
 from .current_parallel import QSWorkerConfig
 from .families import _checked_resources, _checksum, _identity
 from .worker_configuration import decode_config, encode_config
 from .worker_packet import checked_int, decode_atom, digest, polynomial_at
 
-SCHEMA = "a7a-current-checkpoint-v2"
+SCHEMA = "a7a-current-checkpoint-v3"
 
 
 def _paid_prefix(job, index, receipts, pending):
@@ -72,6 +73,7 @@ def _unpack_report(report, settings):
     return dict(report, packet=raw)
 
 
+@encode_checkpoint
 def pack(job):
     if job._running or any(r["status"] == "issued" for r in job.receipts):
         raise ValueError("checkpoint requires drained and settled workers")
@@ -108,17 +110,9 @@ def pack(job):
             [i, _pack_report(r, job.workers)]
             for i, r in sorted(job.ahead.items())
         ]
-    # Eight coexisting representations are reserved in QSWorkerConfig before
-    # execution. Stop encoding prospectively; never build an unbounded blob.
-    chunks, size = [], 0
-    for chunk in json.JSONEncoder(
-        sort_keys=True, separators=(",", ":"), allow_nan=False
-    ).iterencode(payload):
-        size += len(chunk.encode("ascii"))
-        if size > job.workers.checkpoint_bytes:
-            raise MemoryError("current-worker checkpoint exceeds cap")
-        chunks.append(chunk)
-    blob = "".join(chunks)
+    blob = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
     resources = dict(
         work_used=job.budget.used,
         wall_used=job.budget.wall_used,
@@ -134,8 +128,7 @@ def pack(job):
 
 def _restore(cls, checkpoint, budget, workers):
     blob = checkpoint["blob"]
-    limit = workers.checkpoint_bytes if workers is not None else 256 * 2**20
-    if type(blob) is not str or len(blob) > limit or not blob.isascii():
+    if type(blob) is not str or not blob.isascii():
         raise ValueError("current-worker checkpoint size/encoding")
     if (
         hashlib.sha256(blob.encode("ascii")).hexdigest()
@@ -153,13 +146,11 @@ def _restore(cls, checkpoint, budget, workers):
         raise ValueError(
             "resume execution settings changed, including workers"
         )
-    if len(blob) > settings.checkpoint_bytes:
-        raise ValueError("checkpoint exceeds its declared cap")
-    budget.used = max(budget.used, resources["work_used"])
-    budget.prior_wall = max(budget.prior_wall, resources["wall_used"])
-    budget.prior_cpu = max(budget.prior_cpu, resources["cpu_used"])
-    if budget.used > budget.work_limit:
-        raise ValueError("restored charges exceed work allowance")
+    budget.restore_charges(
+        work=resources["work_used"],
+        wall=resources["wall_used"],
+        cpu=resources["cpu_used"],
+    )
     job = cls(
         saved["n"],
         seed=saved["seed"],
@@ -181,7 +172,7 @@ def _restore(cls, checkpoint, budget, workers):
         saved["next_assignment"], "next assignment", 0, job.assignment_count
     )
     job.next_assignment = next_index
-    job.runs = checked_int(saved["runs"], "runs", 0, settings.max_runs)
+    job.runs = checked_int(saved["runs"], "runs", 0)
     if (
         saved["fixed_work"] is not None
         and type(saved["fixed_work"]) is not bool
@@ -213,10 +204,7 @@ def _restore(cls, checkpoint, budget, workers):
             raise ValueError("invalid checkpoint divisor")
         setattr(job, name, value)
     receipts = saved["receipts"]
-    if (
-        not isinstance(receipts, list)
-        or len(receipts) > settings.receipt_limit
-    ):
+    if not isinstance(receipts, list):
         raise ValueError("checkpoint receipt limit")
     charged, attempts, acknowledged = 0, {}, {}
     for receipt in receipts:
@@ -226,9 +214,7 @@ def _restore(cls, checkpoint, budget, workers):
             0,
             max(0, job.assignment_count - 1),
         )
-        attempt = checked_int(
-            receipt["attempt"], "receipt attempt", 1, settings.max_attempts
-        )
+        attempt = checked_int(receipt["attempt"], "receipt attempt", 1)
         if attempt != attempts.get(index, 0) + 1:
             raise ValueError("receipt attempt sequence changed")
         if receipt["token"] != digest(
@@ -242,20 +228,12 @@ def _restore(cls, checkpoint, budget, workers):
         ):
             raise ValueError("receipt token differs from assignment identity")
         attempts[index] = attempt
-        grant = checked_int(
-            receipt["work"], "lease work", 1, settings.assignment_work
-        )
-        spent = checked_int(receipt["charged_work"], "charged work", 0, grant)
-        if receipt["status"] not in ("reported", "lost") or (
-            receipt["status"] == "lost" and spent != grant
-        ):
-            raise ValueError("unsettled or refunded lost lease")
-        charged += spent + checked_int(
-            receipt.get("controller_work", 0),
-            "controller tail",
-            0,
-            settings.packet_bytes + 1024,
-        )
+        spent = checked_int(receipt["charged_work"], "charged work", 0)
+        if receipt["status"] not in ("reported", "lost"):
+            raise ValueError("unsettled packet receipt")
+        if receipt["status"] == "lost" and spent != 0:
+            raise ValueError("missing report cannot invent work")
+        charged += spent
         if receipt["status"] == "reported":
             acknowledged[(index, attempt)] = receipt
     if charged > resources["work_used"]:
@@ -266,7 +244,7 @@ def _restore(cls, checkpoint, budget, workers):
                 r["arrival_seq"],
                 "arrival sequence",
                 0,
-                settings.receipt_limit - 1,
+                max(0, len(receipts) - 1),
             )
             for r in acknowledged.values()
         ]
@@ -390,7 +368,7 @@ def _restore(cls, checkpoint, budget, workers):
                 report.get("arrival_seq"),
                 "arrival sequence",
                 0,
-                settings.receipt_limit - 1,
+                max(0, len(receipts) - 1),
             )
             != receipt["arrival_seq"]
         ):
@@ -411,7 +389,7 @@ def _restore(cls, checkpoint, budget, workers):
                 report.get("arrival_seq"),
                 "arrival sequence",
                 0,
-                settings.receipt_limit - 1,
+                max(0, len(receipts) - 1),
             )
             != receipt["arrival_seq"]
         ):
@@ -431,10 +409,7 @@ def _restore(cls, checkpoint, budget, workers):
         if job.engine.collector._split_calls != job.split_used:
             raise ValueError("store resets cumulative splitting charges")
     contexts = saved["contexts"]
-    if (
-        not isinstance(contexts, dict)
-        or len(contexts) > settings.context_limit
-    ):
+    if not isinstance(contexts, dict):
         raise ValueError("checkpoint context bound")
     verified = {}
     for identity, pair in contexts.items():
@@ -530,6 +505,7 @@ def math_is_nonnegative(value):
     return 0 <= value < float("inf")
 
 
+@decode_checkpoint
 def restore(cls, checkpoint, *, budget, workers=None):
     try:
         return _restore(cls, checkpoint, budget, workers)

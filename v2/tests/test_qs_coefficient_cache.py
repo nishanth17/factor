@@ -1,9 +1,12 @@
 """Independent CRT peers, paid-prefix refusal and cached-merge resume."""
 
 import unittest
-from dataclasses import replace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.work_budget import PollingBudget
 from v2.qs.coefficient_cache import CoefficientCache
 from v2.qs.current_parallel import CurrentParallelSIQSJob

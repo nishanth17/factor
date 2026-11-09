@@ -6,14 +6,21 @@ import math
 import time
 from collections import defaultdict
 from concurrent.futures import wait
+from concurrent.futures.process import BrokenProcessPool
 from dataclasses import asdict, dataclass, replace
 
 from ..common import utils
 from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    AllocationFailureError,
+    accounted_job,
+    removed_arguments,
+)
 from .parallel import CollectionPool, _ParentBudget
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial
 from .siqs import SIQSConfig, SIQSJob
+from .storage import require_published
 from .worker_packet import (
     VERSION,
     checked_int,
@@ -24,34 +31,38 @@ from .worker_packet import (
 )
 
 
+@removed_arguments(
+    (
+        "assignment_work",
+        "assignment_seconds",
+        "assignment_cpu",
+        "parent_work_reserve",
+        "parent_cpu_reserve",
+        "startup_work",
+        "shutdown_work",
+        "shutdown_cpu",
+        "helper_cpu",
+        "worker_memory_bytes",
+        "runtime_memory_bytes",
+        "memory_bytes",
+        "coexistence_bytes",
+        "checkpoint_bytes",
+        "context_limit",
+        "receipt_limit",
+        "max_attempts",
+        "max_runs",
+    )
+)
 @dataclass(frozen=True)
 class QSWorkerConfig:
-    """Prospective owned bounds, not an OS memory/CPU sandbox."""
+    """Retained scheduling/cache capacities under one observed root owner."""
 
     mode: str = "process"
     workers: int = 1
     polynomials_per_task: int = 4
-    assignment_work: int = 2 * 10**12
-    assignment_seconds: float = 30.0
-    assignment_cpu: float = 30.0
-    parent_work_reserve: int = 10**7
-    parent_cpu_reserve: float = 1.0
-    startup_work: int = 1000000
-    shutdown_work: int = 1000000
-    shutdown_cpu: float = 1.0
-    helper_cpu: float = 1.0
-    worker_memory_bytes: int = 512 * 2**20
-    runtime_memory_bytes: int = 256 * 2**20
-    memory_bytes: int = 12 * 2**30
-    coexistence_bytes: int = 0
     packet_bytes: int = 4 * 2**20
     max_batch_atoms: int = 8192
     split_calls_per_task: int = 4096
-    checkpoint_bytes: int = 64 * 2**20
-    context_limit: int = 65536
-    receipt_limit: int = 100000
-    max_attempts: int = 256
-    max_runs: int = 65536
     drain_seconds: float = 2.0
     observe: bool = False
     lease_budget: bool = False
@@ -125,46 +136,22 @@ class QSWorkerConfig:
             raise ValueError("serial execution requires one worker")
         for name, low, high in (
             ("polynomials_per_task", 1, 64),
-            ("assignment_work", 1, 2**63 - 1),
-            ("parent_work_reserve", 1, 2**63 - 1),
-            ("startup_work", 1, 2**63 - 1),
-            ("shutdown_work", 1, 2**63 - 1),
-            ("worker_memory_bytes", 4 * 2**20, 4 * 2**30),
-            ("runtime_memory_bytes", 16 * 2**20, 2**30),
-            ("memory_bytes", 16 * 2**20, 32 * 2**30),
-            ("coexistence_bytes", 0, 20 * 2**30),
             ("packet_bytes", 4096, 16 * 2**20),
             ("max_batch_atoms", 1, 65536),
             ("split_calls_per_task", 1, 1048576),
-            ("checkpoint_bytes", 4096, 256 * 2**20),
-            ("context_limit", 1, 2**20),
-            ("receipt_limit", 1, 10**6),
-            ("max_attempts", 1, 65536),
-            ("max_runs", 1, 65536),
             ("state_cache_bytes", 4096, 256 * 2**20),
             ("verification_batch_atoms", 1, 256),
         ):
             checked_int(getattr(self, name), name, low, high)
-        if self.assignment_work <= 2 * self.packet_bytes + 1024:
-            raise ValueError("assignment cannot fund publication")
-        for name in (
-            "assignment_seconds",
-            "assignment_cpu",
-            "parent_cpu_reserve",
-            "drain_seconds",
-            "shutdown_cpu",
-            "helper_cpu",
+        if (
+            type(self.drain_seconds) not in (int, float)
+            or not math.isfinite(self.drain_seconds)
+            or not 0 < self.drain_seconds <= 3600
         ):
-            value = getattr(self, name)
-            if (
-                type(value) not in (int, float)
-                or not math.isfinite(value)
-                or not 0 < value <= 3600
-            ):
-                raise ValueError(name + " must be finite and positive")
+            raise ValueError("drain_seconds must be finite and positive")
 
     def record(self):
-        """Retain the legacy identity when experimental options are off."""
+        """Serialize retained capacities and enabled execution options."""
         values = asdict(self)
         if not self.lease_budget:
             values.pop("lease_budget")
@@ -202,47 +189,6 @@ class QSWorkerConfig:
         """Bound both executing leases and paid queued/pending responses."""
         return self.workers + self.lookahead
 
-    def owned_bytes(self, config, n):
-        # Four wire/decoded copies plus worst decoded atom expansion and CRT
-        # contexts coexist with worker scratch, parent matrices and encoding.
-        norm_bits = 2 + max(
-            n.bit_length() + 20,
-            2
-            * (
-                config.factor_count * config.base_bound.bit_length()
-                + config.half_width.bit_length()
-                + 2
-            ),
-        )
-        # Apart from 2 and 3, distinct prime factors are at least four;
-        # their product proves this support ceiling without a dense base.
-        support = min(config.base_bound, norm_bits // 2 + 1)
-        atom_bound = 8192 + 512 * support + 32 * norm_bits
-        atoms = self.max_batch_atoms * atom_bound
-        return (
-            config.memory_limit
-            + (self.workers + 2) * self.runtime_memory_bytes
-            + self.workers
-            * (self.worker_memory_bytes + 4 * self.packet_bytes + atoms)
-            + 8 * self.checkpoint_bytes
-            + 4096 * self.context_limit
-            + 1024 * self.receipt_limit
-            + self.coexistence_bytes
-            + (
-                4 * (self.workers + 2) * self.state_cache_bytes
-                if self.reuse_state
-                else 0
-            )
-            + (
-                self.verification_batch_atoms * atom_bound
-                if self.verification == "batch"
-                else 0
-            )
-            + self.lookahead * (4 * self.packet_bytes + atoms)
-            + (self.workers * 65536 if self.private_stop else 0)
-            + (65536 if self.coefficient_cache else 0)
-        )
-
 
 class CurrentParallelSIQSJob:
     """Ordered bounded packets and one authoritative current relation store.
@@ -269,17 +215,8 @@ class CurrentParallelSIQSJob:
             raise ValueError(
                 "current workers require fixed-width native shared SIQS"
             )
-        if config.memory_bytes is None:
-            raise ValueError("current workers require explicit parent memory")
-        if getattr(config.collector, "spill_bytes", 0) or getattr(
-            config.collector, "recovery_workers", 0
-        ):
+        if getattr(config.collector, "recovery_workers", 0):
             raise ValueError("worker recovery must be resident and non-nested")
-        if (
-            self.workers.owned_bytes(config, self.source.n)
-            > self.workers.memory_bytes
-        ):
-            raise MemoryError("aggregate current-worker ownership refused")
         self.n, self.seed = self.source.n, seed
         self.identity = digest(
             [
@@ -319,6 +256,7 @@ class CurrentParallelSIQSJob:
             worker_work=0,
             cancelled_work=0,
             lost_work=0,
+            lost_packets=0,
             admitted_atoms=0,
             useful_rows=0,
             received_atoms=0,
@@ -385,8 +323,7 @@ class CurrentParallelSIQSJob:
         self.divisor = self.source.divisor
         if self.divisor is not None or self.engine is not None:
             return
-        memory = self.config.memory_limit - self.config.metadata_reserve
-        options = replace(self.config.collector, memory_bytes=memory)
+        options = replace(self.config.collector)
         self.engine = QSJob(
             qs_polynomial(self.source.base),
             self.source.base,
@@ -425,11 +362,6 @@ class CurrentParallelSIQSJob:
     def _task(self, index, lease, cpu, seconds):
         primes, start, end = self._spec(index)
         attempt = self.attempts.get(index, 0) + 1
-        if (
-            attempt > self.workers.max_attempts
-            or len(self.receipts) >= self.workers.receipt_limit
-        ):
-            raise MemoryError("finite lease history exhausted")
         cursor = self.progress.get(index, [start, -self.config.half_width])
         limit = getattr(self.config.collector, "split_call_limit", None)
         reserved = sum(
@@ -552,7 +484,7 @@ class CurrentParallelSIQSJob:
             )
         ):
             raise ValueError("stale or malformed QS assignment report")
-        work = checked_int(report["work"], "reported work", 0, task["work"])
+        work = checked_int(report["work"], "reported work", 0)
         if self.workers.grouped_lease_charging:
             checked_int(
                 report.get("grouped_marking_pairs"), "marking groups", 0, work
@@ -578,7 +510,6 @@ class CurrentParallelSIQSJob:
             report["workspace_bytes"],
             "worker ownership",
             0,
-            self.workers.worker_memory_bytes,
         )
         if type(raw) is not bytes or len(raw) > self.workers.packet_bytes:
             raise ValueError("oversized QS packet")
@@ -692,7 +623,7 @@ class CurrentParallelSIQSJob:
         checked, work = self._validate_report(report, task)
         if task["id"] in self.pending:
             raise ValueError("repeated assignment publication")
-        self.budget.used -= task["work"] - work
+        self.budget.used += work
         self.split_used += report["split_calls"]
         self.engine.collector._split_calls = self.split_used
         receipt.update(
@@ -785,11 +716,6 @@ class CurrentParallelSIQSJob:
                     coefficient_cache=coefficient_cache,
                 )
             polynomial = polynomials[gray]
-            if (
-                polynomial.identity not in self.contexts
-                and len(self.contexts) >= self.workers.context_limit
-            ):
-                raise MemoryError("polynomial provenance registry exhausted")
             started = time.perf_counter() if self.workers.observe else 0
             checked = collector._checked
             if self.workers.verification == "batch" and checked is not None:
@@ -894,10 +820,9 @@ class CurrentParallelSIQSJob:
     def _lost(self, task, receipt):
         if receipt["status"] != "issued":
             return
-        receipt.update(
-            status="lost", charged_work=task["work"], cpu=task["cpu"]
-        )
-        self.stats["lost_work"] += task["work"]
+        receipt.update(status="lost", charged_work=0, cpu=None)
+        self.stats["lost_packets"] += 1
+        # Missing private work is unknown; root CPU retains OS observations.
         grant = task["split_grant"]
         receipt["split_grant"] = grant
         receipt["split_calls"] = grant
@@ -907,11 +832,8 @@ class CurrentParallelSIQSJob:
             self.split_used += grant
         if self.engine is not None:
             self.engine.collector._split_calls = self.split_used
-        # Published CPU remains charged by the pool; unknown tails retain a
-        # full CPU grant additionally. This is a conservative charge, not an
-        # observation or a claim about simultaneous CPU use.
-        self.budget.prior_cpu += task["cpu"]
 
+    @accounted_job
     def run(self, *, pool=None, max_assignments=None, fixed_work=False):
         """Drain before return; extend the same Budget to continue a pause."""
         if (
@@ -930,12 +852,12 @@ class CurrentParallelSIQSJob:
             )
         if self._running:
             raise ValueError("job already running")
+        if self.engine is not None:
+            require_published(self.engine.collector)
         if max_assignments is not None:
             checked_int(max_assignments, "max assignments", 1)
         if self.divisor is not None:
             return self._result("factor_found")
-        if self.runs >= self.workers.max_runs:
-            return self._result("run_limit")
         self.fixed_work = fixed_work
         own_pool = pool is None
         pool = (
@@ -980,22 +902,6 @@ class CurrentParallelSIQSJob:
                 from .worker_state import ensure_context
 
                 state_key = ensure_context(self, pool)
-            if pool.mode == "process" and not getattr(
-                pool, "_a7a_lifecycle_charged", False
-            ):
-                charge = pool.workers * (
-                    self.workers.startup_work + self.workers.shutdown_work
-                )
-                self.budget.consume(charge)
-                self.stats["lifecycle_work"] += charge
-                # The last post-transfer snapshot cannot observe interpreter
-                # teardown or the spawn helper's lifetime. Retain fixed CPU
-                # allowances explicitly; these are charges, not observations.
-                self.budget.prior_cpu += (
-                    pool.workers * self.workers.shutdown_cpu
-                    + self.workers.helper_cpu
-                )
-                pool._a7a_lifecycle_charged = True
             self._backlog_time = None
             self._backlog()
             if self.engine is not None:
@@ -1054,52 +960,15 @@ class CurrentParallelSIQSJob:
                 for index in range(self.next_assignment, upper):
                     if index in occupied:
                         continue
-                    available = (
-                        self.budget.work_limit
-                        - self.budget.used
-                        - self.workers.parent_work_reserve
+                    self.budget.consume(0)
+                    seconds = (
+                        None
+                        if self.budget.seconds is None
+                        else max(
+                            0, self.budget.seconds - self.budget.wall_used
+                        )
                     )
-                    cpu_reserved = sum(t["cpu"] for t, _ in inflight.values())
-                    cpu = self.workers.assignment_cpu
-                    if self.budget.cpu_seconds is not None:
-                        peers = max(
-                            1,
-                            self.workers.workers
-                            - len(inflight)
-                            - len(self.pending),
-                        )
-                        cpu = min(
-                            cpu,
-                            (
-                                self.budget.cpu_seconds
-                                - self.budget.cpu_used
-                                - cpu_reserved
-                                - self.workers.parent_cpu_reserve
-                            )
-                            / peers,
-                        )
-                    if (
-                        available <= 2 * self.workers.packet_bytes + 1024
-                        or cpu <= 0
-                    ):
-                        if not inflight:
-                            reason = (
-                                "work_limit"
-                                if available
-                                <= 2 * self.workers.packet_bytes + 1024
-                                else "cpu_limit"
-                            )
-                        break
-                    lease = min(self.workers.assignment_work, available)
-                    seconds = self.workers.assignment_seconds
-                    if self.budget.seconds is not None:
-                        seconds = min(
-                            seconds,
-                            max(
-                                0, self.budget.seconds - self.budget.wall_used
-                            ),
-                        )
-                    task = self._task(index, lease, cpu, seconds)
+                    task = self._task(index, None, None, seconds)
                     split_limit = getattr(
                         self.config.collector, "split_call_limit", None
                     )
@@ -1111,26 +980,17 @@ class CurrentParallelSIQSJob:
                         # Other leases own the remaining splitter calls.
                         # Wait for settlement rather than discard DLP intake.
                         break
-                    # Receive/decode must remain funded after a child spends
-                    # its lease. Prepay its bounded controller tail as well.
-                    controller_work = self.workers.packet_bytes + 1024
-                    lease = min(lease, available - controller_work)
-                    if lease <= 2 * self.workers.packet_bytes + 1024:
-                        reason = "work_limit"
-                        break
-                    task["work"] = lease
-                    self.budget.consume(lease + controller_work)
                     self.attempts[index] = task["attempt"]
                     receipt = dict(
                         id=index,
                         attempt=task["attempt"],
                         token=task["token"],
                         start=task["cursor"],
-                        work=lease,
-                        cpu_grant=cpu,
+                        work=None,
+                        cpu_grant=None,
                         status="issued",
-                        charged_work=lease,
-                        controller_work=controller_work,
+                        charged_work=0,
+                        controller_work=0,
                         split_grant=task["split_grant"],
                     )
                     self.receipts.append(receipt)
@@ -1178,6 +1038,7 @@ class CurrentParallelSIQSJob:
                             )
                         except BaseException:
                             self._lost(task, receipt)
+                            broken = True
                             raise
                         inflight[future] = task, receipt
                 if self._ready_assignment() is not None:
@@ -1194,6 +1055,10 @@ class CurrentParallelSIQSJob:
                     task, receipt = inflight.pop(future)
                     try:
                         self._receive(future.result(), task, receipt)
+                    except AllocationFailureError:
+                        self._lost(task, receipt)
+                        broken = True
+                        raise
                     except Exception:
                         self._lost(task, receipt)
                         broken = True
@@ -1208,16 +1073,27 @@ class CurrentParallelSIQSJob:
                 self._solve(True)
                 if self.divisor is None:
                     self.divisor = self.deferred_divisor
+        except BrokenProcessPool:
+            # Submission can fail before a future reaches the tracking table.
+            # A dead worker may own the stop lock: retire without broadcasting.
+            broken = True
+            reason = "worker_failure"
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "memory_limit"
+        except MemoryError as error:
+            # A failed parent publication can leave the packet cursor behind
+            # an inserted atom. Never serialize or resume that uncertain store.
+            if self.engine is not None:
+                self.engine.collector._publication_failed = True
+            raise AllocationFailureError(
+                "current SIQS worker collection", "qs_worker"
+            ) from error
         finally:
             try:
                 if begun:
                     started = time.monotonic()
-                    # A detected dead worker may own the stop lock. Retain
-                    # missing grants and use hard retirement in that case.
+                    # A detected dead worker may own the stop lock. Preserve
+                    # missing-report uncertainty and use hard retirement.
                     if not broken:
                         pool.state["stop"].set()
                     deadline = started + self.workers.drain_seconds
@@ -1268,7 +1144,7 @@ class CurrentParallelSIQSJob:
                         if continuation is not None:
                             continuation.budget = self.budget
                 if own_pool:
-                    pool.close()
+                    pool.close(budget=self.budget)
                 self._backlog()
                 self._running = False
                 self.stats["parent_cpu_seconds"] += (
@@ -1289,7 +1165,7 @@ class CurrentParallelSIQSJob:
             execution=self.execution_identity,
             pending_assignments=sorted(self.pending),
             schedule_complete=self.next_assignment == self.assignment_count,
-            owned_bytes=self.workers.owned_bytes(self.config, self.n),
+            observed_rss_bytes=self.budget.observed_rss,
             split_calls_charged=self.split_used,
             split_calls_unknown=self.split_unknown,
         )
@@ -1301,6 +1177,7 @@ class CurrentParallelSIQSJob:
             reason,
             self.next_assignment,
             stats,
+            resource_stop=self.budget.stop,
         )
 
     def checkpoint(self):

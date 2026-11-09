@@ -1,9 +1,12 @@
 """One-class cache replay against independent Hensel and queue oracles."""
 
 import unittest
-from dataclasses import replace
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SIQSJob, build_factor_base
 from v2.qs.polynomial import polynomial_roots
 from v2.qs.power_reuse import RootTransfers

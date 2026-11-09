@@ -1,7 +1,16 @@
 """Exact, charged translation from eligible base counts to prime endpoints."""
 
-from dataclasses import asdict, replace
 from math import gcd
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import prime_sieve, utils
 from ....qs.defaults import default_siqs_config
@@ -25,7 +34,7 @@ def template(digits, arm):
     """Use the accepted 50/51-digit collector in every configuration arm."""
     if digits not in BANDS or arm not in ARMS:
         raise ValueError("unfrozen band or arm")
-    control = default_siqs_config(10**49)
+    control = adapt_resource_configuration(default_siqs_config, 10**49)
     # Preserve this historical collector when automatic marking advances.
     control = replace(
         control,

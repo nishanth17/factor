@@ -6,20 +6,29 @@ import json
 import resource
 import sys
 import time
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from math import prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .protocol import INPUTS, validate_worker_timeline
 
 
 def configuration(n, policy):
     from ....qs.defaults import default_siqs_config
-    from ....qs.worker_configuration import decode_config
+    from .resource_compat import decode_policy as decode_config
 
     digits = len(str(n))
     if policy == "G0" or digits < 50:
-        return default_siqs_config(n, memory_bytes=2**30)
+        return resource_configuration(
+            default_siqs_config, n, memory_bytes=2**30
+        )
     templates = json.loads((INPUTS / "policies.json").read_text())["policies"]
     config = decode_config(templates["60" if digits <= 65 else "70"])
     if digits in (60, 70):
@@ -39,7 +48,7 @@ def configuration(n, policy):
         factor_count=factors[digits],
         collector=config.collector,
     )
-    return SIQSConfig(**values)
+    return resource_configuration(SIQSConfig, **values)
 
 
 def settings(
@@ -80,7 +89,8 @@ def settings(
     }
     if features.keys() - allowed:
         raise ValueError("unknown experimental worker features")
-    return QSWorkerConfig(
+    return resource_configuration(
+        QSWorkerConfig,
         mode="serial" if arm == "M0" else "process",
         workers=1 if arm == "M0" else int(arm[1:]),
         memory_bytes=memory,
@@ -204,9 +214,12 @@ def complete(
         # Preserve the unconditioned production dispatch population. A bigger
         # global worker grant must not retune the child's collector policy.
         child = configuration(n, "G0") if uses_siqs_defaults(n) else None
-        options = PortfolioConfig(siqs=child, memory_bytes=memory_bytes)
+        options = resource_configuration(
+            PortfolioConfig, siqs=child, memory_bytes=memory_bytes
+        )
     else:
-        options = PortfolioConfig(
+        options = resource_configuration(
+            PortfolioConfig,
             siqs=config,
             rho_attempts=0,
             pm1_attempts=0,
@@ -233,6 +246,7 @@ def complete(
         remaining=list(run.result.remaining),
         reason=run.reason,
         events=list(run.events),
+        resource_stop=run.resource_stop,
         dropped_events=run.dropped_events,
         portfolio_stage_seconds=state["stage_seconds"],
         active_stage=None if current is None else current["stage"],
@@ -246,18 +260,17 @@ def complete(
 
 def complete_call(n, config, workers, budget, pool, spec, *, seconds_cap=None):
     """Use the real entry point and reconcile each warm/sample child ledger."""
-    from ....execution.budget import Budget
-
-    seconds = max(0, budget.seconds - budget.wall_used)
-    if seconds_cap is not None:
-        seconds = min(seconds, seconds_cap)
-    child = Budget(
-        work_limit=budget.work_limit - budget.used,
-        seconds=seconds,
-        cpu_seconds=max(0, budget.cpu_seconds - budget.cpu_used),
-    )
-    child.a7a_seed = spec["seed"]
-    child.cancelled = budget.cancelled
+    # Every call in this owned lifetime uses one observed root. A short
+    # warmup diagnostic can request cancellation without creating a second
+    # CPU/RSS owner or reconciling the same process observations twice.
+    original_cancelled = budget.cancelled
+    deadline = None if seconds_cap is None else time.monotonic() + seconds_cap
+    if deadline is not None:
+        budget.cancelled = lambda: (
+            (original_cancelled is not None and original_cancelled())
+            or time.monotonic() >= deadline
+        )
+    budget.a7a_seed = spec["seed"]
     checkpoint_options = (
         {"preserve_checkpoint": True}
         if spec.get("preserve_checkpoint", False)
@@ -268,21 +281,19 @@ def complete_call(n, config, workers, budget, pool, spec, *, seconds_cap=None):
             n,
             config,
             workers,
-            child,
+            budget,
             pool,
             spec["endpoint"],
             memory_bytes=spec["memory"],
             **checkpoint_options,
         )
     finally:
-        # Parent CPU is already on the encompassing process clock. Publish
-        # only this child's worker CPU once, including on exceptional exit.
-        budget.used += child.used
-        budget.prior_cpu += child.prior_cpu
+        budget.cancelled = original_cancelled
 
 
 def execute(request):
-    from ....execution.budget import Budget
+    from ....execution.resources import RESOURCE_VERSION
+    from ...infrastructure.resource_control import Budget
 
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("PyPy implementing Python 3.11 is required")
@@ -383,6 +394,7 @@ def execute(request):
         work_limit=spec["work"],
         seconds=max(0, spec["wall"] - 10),
         cpu_seconds=max(0, spec["cpu"] - 10),
+        rss_bytes=rss_limit,
     )
     budget.a7a_seed = spec["seed"]
     if workers is not None:
@@ -508,13 +520,14 @@ def execute(request):
         if observer is not None:
             observer.__exit__()
         if pool is not None:
-            pool.close()
+            pool.close(budget=budget)
         if counters is not None:
             counters.close()
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
     own = resource.getrusage(resource.RUSAGE_SELF)
     return dict(
         cell=spec,
+        resource_version=RESOURCE_VERSION,
         n=n,
         samples=samples,
         warm_seconds=warm_seconds,

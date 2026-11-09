@@ -1,6 +1,11 @@
 """Literal configurations: resource tiers never reroute collector policies."""
 
-from dataclasses import replace
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....qs.sieve_collector import GrowingDoubleLargeSieveConfig
 from ....qs.siqs import CountedSIQSConfig
@@ -29,7 +34,8 @@ def configuration(digits, arm, *, multiplier=0):
         "representation",
     ):
         raise ValueError("unfrozen size or arm")
-    config = CountedSIQSConfig(
+    config = adapt_resource_configuration(
+        CountedSIQSConfig,
         base_count=COUNTS[digits],
         base_bound=250000,
         multiplier=multiplier,
@@ -49,7 +55,8 @@ def configuration(digits, arm, *, multiplier=0):
         solve_policy="collection",
         memory_bytes=OWNED[TIERS[digits]] - outside_job_reserve(digits),
         checkpoint_bytes=1048576,
-        collector=GrowingDoubleLargeSieveConfig(
+        collector=adapt_resource_configuration(
+            GrowingDoubleLargeSieveConfig,
             sparse_queue_bytes=32 * 2**20,
             marking="sparse",
             block_width=4096,

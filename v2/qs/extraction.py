@@ -5,9 +5,9 @@ from dataclasses import dataclass
 
 from ..common import utils
 from ..common.arithmetic import gcd, pow
-from ..execution.budget import Budget
-from .factor_base import DEFAULT_MEMORY_BYTES, FactorBase
-from .linear_algebra import MAX_MATRIX_ROWS, verify_dependency
+from ..execution.resources import removed_arguments, resolve_budget
+from .factor_base import FactorBase
+from .linear_algebra import verify_dependency
 from .relations import (
     AtomicRelation,
     CombinedRelation,
@@ -58,11 +58,12 @@ class _VerificationCache:
         self.tested_dependencies.clear()
         self.used = 0
 
-    def check(self, relation, base, store, budget, memory_bytes):
+    @removed_arguments(("max_atoms", "max_rows", "memory_bytes"))
+    def check(self, relation, base, store, budget):
         if self.checked is not None:
             if self.checked.base is not base:
                 raise ValueError("checked preparation uses a foreign base")
-            return self.checked.row(relation, store, budget, memory_bytes)
+            return self.checked.row(relation, store, budget)
         record = self.records.get(id(relation))
         atoms = (
             tuple(store.get(identity) for identity in relation.atom_ids)
@@ -81,7 +82,7 @@ class _VerificationCache:
             return record[3]
 
         self.misses += 1
-        _verify_row(relation, base, store, budget, memory_bytes)
+        _verify_row(relation, base, store, budget)
         row = parity_bits(relation, base)
         reserve = 1024 + 256 * len(atoms) + 8 * ((row.bit_length() + 7) // 8)
         if record is None and self.used + reserve <= self.memory_bytes:
@@ -122,27 +123,24 @@ class _VerificationCache:
             self.used += reserve
 
 
-def _verify_row(relation, base, store, budget, memory_bytes):
+@removed_arguments(("max_atoms", "max_rows", "memory_bytes"))
+def _verify_row(relation, base, store, budget):
     if isinstance(relation, AtomicRelation):
         if relation.residual != 1 or getattr(relation, "large_primes", ()):
             raise ValueError("partial atom is not a full matrix row")
         verify_atomic(relation, base, budget=budget)
     else:
-        verify_combined(
-            relation, base, store, budget=budget, memory_bytes=memory_bytes
-        )
+        verify_combined(relation, base, store, budget=budget)
 
 
+@removed_arguments(("max_atoms", "max_rows", "memory_bytes"))
 def prepare_relations(
     relations,
     factor_base,
     atom_store,
     *,
     budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
     retained_workspace_bytes=0,
-    max_rows=MAX_MATRIX_ROWS,
-    max_atoms=MAX_MATRIX_ROWS,
 ):
     """Verify and deduplicate immutable rows, with full public validation."""
     return _prepare_relations(
@@ -150,24 +148,19 @@ def prepare_relations(
         factor_base,
         atom_store,
         budget=budget,
-        memory_bytes=memory_bytes,
         retained_workspace_bytes=retained_workspace_bytes,
-        max_rows=max_rows,
-        max_atoms=max_atoms,
     )
 
 
+@removed_arguments(("max_atoms", "max_rows", "memory_bytes"))
 def _prepare_relations(
     relations,
     factor_base,
     atom_store,
     *,
     budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
     retained_workspace_bytes=0,
     verification_cache=None,
-    max_rows=MAX_MATRIX_ROWS,
-    max_atoms=MAX_MATRIX_ROWS,
 ):
     """Verify all inputs before removing exact provenance/payload duplicates.
 
@@ -179,11 +172,6 @@ def _prepare_relations(
     """
     if not isinstance(relations, tuple):
         raise TypeError("relations must be an immutable tuple")
-    if len(relations) > storage_limit(max_rows) or len(
-        atom_store
-    ) > storage_limit(max_atoms):
-        raise ValueError("relation/provenance row cap exceeded")
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     utils.require_integer(
         retained_workspace_bytes, "retained_workspace_bytes", 0
     )
@@ -208,22 +196,18 @@ def _prepare_relations(
             reserve += 128 * len(relation.atom_ids)
 
     # Shared atoms/base stay pinned once; private scratch must coexist.
-    simultaneous = retained_workspace_bytes + reserve - shared_reserve
-    if max(reserve, simultaneous) > memory_bytes:
-        raise MemoryError("relation provenance exceeds memory_bytes")
-    budget = budget if budget is not None else Budget()
+    retained_workspace_bytes + reserve - shared_reserve
+    budget = resolve_budget(budget)
     unique, indices, duplicates, seen, rows = [], [], [], set(), []
     identities = []
 
     for index, relation in enumerate(relations):
         if verification_cache is None:
-            _verify_row(
-                relation, factor_base, atom_store, budget, memory_bytes
-            )
+            _verify_row(relation, factor_base, atom_store, budget)
             row = parity_bits(relation, factor_base)
         else:
             row = verification_cache.check(
-                relation, factor_base, atom_store, budget, memory_bytes
+                relation, factor_base, atom_store, budget
             )
 
         if isinstance(relation, AtomicRelation):
@@ -297,7 +281,7 @@ def extract_dependency(
         raise ValueError("unknown exponent-product policy")
     verify_dependency(mask, prepared.rows)
     base = prepared.factor_base
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     selected, bits = [], mask
     while bits:
         bit = bits & -bits
@@ -385,16 +369,18 @@ class DependencyExtractor:
         *,
         budget=None,
         tested_cache=None,
-        max_dependencies=MAX_MATRIX_ROWS,
+        max_dependencies=None,
         product_policy="reference",
     ):
         """Honor an optional trial-count limit; validate each mask exactly."""
         if not isinstance(dependencies, tuple):
             raise TypeError("dependencies must be an immutable tuple")
-        if len(dependencies) > storage_limit(max_dependencies):
+        if max_dependencies is not None and len(dependencies) > storage_limit(
+            max_dependencies
+        ):
             raise ValueError("dependency trial cap exceeded")
         self.prepared, self.dependencies = prepared, dependencies
-        self.budget = budget if budget is not None else Budget()
+        self.budget = resolve_budget(budget)
         self.next_dependency = 0
         self.trials = []
         self.tested_cache = tested_cache

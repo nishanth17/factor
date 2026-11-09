@@ -10,6 +10,12 @@ import time
 from collections import OrderedDict
 from dataclasses import asdict, dataclass, replace
 
+from ..execution.resources import (
+    RESOURCE_VERSION,
+    UnsupportedEncodingError,
+    accounted_entry,
+    require_resource_version,
+)
 from ..execution.worker_contract import (
     VERSION,
     Decoder,
@@ -33,6 +39,7 @@ class WorkerRun:
     reason: str
     checkpoint: dict
     stats: dict
+    resource_stop: dict | None = None
 
 
 def arithmetic_options(config, settings):
@@ -42,19 +49,7 @@ def arithmetic_options(config, settings):
         siqs=None,
         sss=None,
         allocation=None,
-        memory_bytes=settings.worker_memory,
     )
-    if (
-        settings.packed_cache_bytes
-        and not selected.ecm_program_bytes
-        and settings.packed_cache_bytes < 4096 + 256 * selected.segment_size
-    ):
-        raise MemoryError("packed worker cache scratch refused")
-    if (
-        settings.stage_two_cache_bytes
-        and settings.stage_two_cache_bytes < 4096 + 256 * selected.segment_size
-    ):
-        raise MemoryError("stage-two worker cache scratch refused")
     return asdict(selected)
 
 
@@ -62,34 +57,13 @@ def _base_budget(budget):
     return getattr(budget, "budget", budget)
 
 
-def _allowances(budget):
-    """Child CPU/work cannot borrow protected relation-engine reservations."""
+def _deadline(budget):
+    """Root/stage ordering deadline; no worker receives a CPU/work lease."""
     base = _base_budget(budget)
-    work, cpu = base.work_limit - base.used, base.cpu_seconds
-    if cpu is None or base.seconds is None:
-        raise ValueError("workers require finite parent wall and CPU limits")
-    cpu -= base.cpu_used
-    wall = base.seconds - base.wall_used
-    policy = getattr(budget, "policy", None)
-    if policy is not None:
-        if policy.pretest_work is not None:
-            work = min(work, policy.pretest_work - base.used)
-        if policy.pretest_cpu_seconds is not None:
-            cpu = min(cpu, policy.pretest_cpu_seconds - base.cpu_used)
-        if policy.pretest_seconds is not None:
-            wall = min(wall, policy.pretest_seconds - base.wall_used)
-        if budget.fallback:
-            work = min(
-                work, base.work_limit - base.used - policy.fallback_work
-            )
-            cpu = min(
-                cpu,
-                base.cpu_seconds - base.cpu_used - policy.fallback_cpu_seconds,
-            )
-            wall = min(
-                wall, base.seconds - base.wall_used - policy.fallback_seconds
-            )
-    return max(0, work), max(0, cpu), max(0, wall)
+    remaining = (
+        None if base.seconds is None else max(0, base.seconds - base.wall_used)
+    )
+    return None if remaining is None else time.monotonic() + remaining
 
 
 class ECMExecutor:
@@ -113,6 +87,7 @@ class ECMExecutor:
         self.slots = []
         self.packet_sequence = 0
         self.helper_funded = False
+        self.startup_in_progress = False
         self.cost_identity = digest(
             [VERSION, "cost-policy", asdict(self.settings)]
         )
@@ -211,7 +186,7 @@ class ECMExecutor:
         return [slot for slot in active if slot["channel"] in channels]
 
     def _send(self, slot, message):
-        slot["channel"].sendall(frame(message, self.settings.frame_bytes))
+        slot["channel"].sendall(frame(message))
 
     def _read(self, slot):
         from .worker import read_message
@@ -250,16 +225,22 @@ class ECMExecutor:
             else:
                 slot["process"].close()
         self.slots = survivors
+        if not survivors:
+            self.startup_in_progress = False
         if survivors:
             raise RuntimeError(
                 "owned workers did not exit: "
                 + repr([slot["process"].pid for slot in survivors])
             )
 
-    def close(self):
+    @accounted_entry
+    def close(self, *, budget=None):
         if not self.lock.acquire(blocking=False):
             raise ValueError("cannot close an active ECM call")
         try:
+            self._budget = budget
+            for slot in self.slots:
+                budget.track_process(slot["process"])
             started = time.monotonic()
             self._destroy()
             self.serial_engine = None
@@ -282,42 +263,16 @@ class ECMExecutor:
         context = multiprocessing.get_context("spawn")
         if context.get_start_method() != "spawn":
             raise RuntimeError("explicit spawn context unavailable")
-        if not self.helper_funded:
-            # POSIX spawn may own a runtime resource tracker outside worker
-            # reports. Leave shared runtime helper internals alone; its
-            # unpublished CPU/RSS is zero. Retain its full conservative grant.
-            helper_cpu = (
-                self.settings.startup_seconds + self.settings.shutdown_cpu
-            )
-            token = ledger.reserve(
-                "spawn_runtime_helper", self.settings.startup_work, helper_cpu
-            )
-            ledger.settle(
-                token,
-                "spawn_runtime_helper",
-                self.settings.startup_work,
-                helper_cpu,
-            )
-            self.helper_funded = True
+        self.helper_funded = True
+        self.startup_in_progress = True
         startup_tokens, pending = [], []
         try:
             # Start all funded children before collecting ready reports.
             # Waiting after each start serializes interpreter/import costs.
             for index in range(self.settings.workers):
                 poll()
-                startup = ledger.reserve(
-                    "startup",
-                    self.settings.startup_work,
-                    self.settings.startup_seconds,
-                )
+                startup = ledger.reserve("startup")
                 startup_tokens.append(startup)
-                shutdown = ledger.reserve(
-                    "shutdown", 0, self.settings.shutdown_cpu
-                )
-                # Pay unreported teardown now, including retained-pool calls.
-                ledger.settle(
-                    shutdown, "shutdown", 0, self.settings.shutdown_cpu
-                )
                 parent, child = socket.socketpair()
                 names = (
                     "OMP_NUM_THREADS",
@@ -327,18 +282,15 @@ class ECMExecutor:
                     "NUMEXPR_NUM_THREADS",
                 )
                 previous = {name: os.environ.get(name) for name in names}
-                end = min(
-                    deadline,
-                    time.monotonic() + self.settings.startup_seconds,
-                )
+                end = time.monotonic() + self.settings.startup_seconds
+                if deadline is not None:
+                    end = min(end, deadline)
                 try:
                     parent.settimeout(0.01)
                     process = context.Process(
                         target=worker_main,
                         args=(
                             child,
-                            self.settings.frame_bytes,
-                            self.settings.startup_work,
                             asdict(self.settings),
                         ),
                         daemon=True,
@@ -346,6 +298,7 @@ class ECMExecutor:
                     for name in names:
                         os.environ[name] = "1"
                     process.start()
+                    self._budget.track_process(process)
                 except BaseException:
                     parent.close()
                     child.close()
@@ -360,7 +313,7 @@ class ECMExecutor:
                 slot = dict(
                     process=process,
                     channel=parent,
-                    decoder=Decoder(self.settings.frame_bytes),
+                    decoder=Decoder(),
                     schedule=None,
                     active=[],
                     metadata_cache=[],
@@ -389,29 +342,19 @@ class ECMExecutor:
                         integer(message["rss"], "startup RSS")
                         used = integer(message["work"], "startup work")
                         consumed = finite(message["cpu"], "startup CPU")
-                        if (
-                            used > self.settings.startup_work
-                            or consumed > self.settings.startup_seconds
-                        ):
-                            ledger.work += max(
-                                0, used - self.settings.startup_work
-                            )
-                            ledger.cpu += max(
-                                0, consumed - self.settings.startup_seconds
-                            )
-                            ledger.receipts[startup - 1].update(
-                                overrun_work=used, overrun_cpu=consumed
-                            )
-                            raise ValueError("startup exceeded reservation")
                         ledger.settle(startup, "startup", used, consumed)
                         slot["rss"] = message["rss"]
                         slot["reported_cpu"] = message["cpu"]
+                        self._budget.acknowledge(
+                            slot["process"].pid, message["cpu"]
+                        )
                         pending.remove(entry)
                         progress = True
                     elif not slot["process"].is_alive():
                         raise EOFError("worker exited during startup")
                 if pending and not progress:
                     time.sleep(0.001)
+            self.startup_in_progress = False
         except BaseException:
             # Every launched child without a checked report keeps its full
             # lease, even if a different child's startup caused the failure.
@@ -420,6 +363,7 @@ class ECMExecutor:
                     ledger.lose(startup)
             raise
 
+    @accounted_entry
     def start(self, *, budget):
         """Measure cold pool readiness separately; no curve or plan is run."""
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
@@ -431,19 +375,21 @@ class ECMExecutor:
         if self.closed or not self.lock.acquire(blocking=False):
             raise ValueError("ECM context closed or active")
         base = _base_budget(budget)
+        self._budget = base
+        for slot in self.slots:
+            base.track_process(slot["process"])
         started, cpu_start = time.monotonic(), time.process_time()
         ledger = None
         reported_before = sum(s["reported_cpu"] for s in self.slots)
         helper_before = self.helper_funded
         try:
-            work, cpu, wall = _allowances(budget)
-            ledger = Ledger(work, cpu)
-            deadline = started + wall
+            ledger = Ledger()
+            deadline = _deadline(budget)
 
             def poll():
                 budget.consume(0)
-                if time.monotonic() >= deadline:
-                    raise LeaseRefusedError("wall_limit")
+                if deadline is not None and time.monotonic() >= deadline:
+                    budget.consume(0)
                 ledger.charge(parent_cpu=time.process_time() - cpu_start)
 
             poll()
@@ -458,7 +404,6 @@ class ECMExecutor:
                 for token in list(ledger.active):
                     ledger.lose(token)
                 base.used += ledger.work
-                base.prior_cpu += ledger.cpu
             self.lock.release()
         self.last_stats = dict(
             cold_pool_start_seconds=time.monotonic() - started,
@@ -467,14 +412,13 @@ class ECMExecutor:
             - reported_before,
             charged_child_cpu=ledger.cpu,
             owned_bytes=self.settings.owned_bytes,
-            helper_cpu_reserved=0
-            if helper_before
-            else self.settings.startup_seconds + self.settings.shutdown_cpu,
+            helper_cpu_reserved=0 if helper_before else 0.0,
             helper_cpu_observed=None,
         )
         self._record(self.last_stats)
         return dict(self.last_stats)
 
+    @accounted_entry
     def run(
         self,
         n,
@@ -543,13 +487,15 @@ class ECMExecutor:
 
         call_started = time.monotonic()
         base = _base_budget(budget)
-        if base.cpu_seconds is None or base.seconds is None:
-            raise ValueError("finite wall/CPU grants required")
+        self._budget = base
+        for slot in self.slots:
+            base.track_process(slot["process"])
         if n.bit_length() > config.max_input_bits:
             raise ValueError("cofactor exceeds configured input bound")
         manifest, manifest_hit = self._manifest(n, config, lineage)
         search = Search(manifest, self.settings, fixed_work=fixed_work)
         if checkpoint is not None:
+            require_resource_version(checkpoint)
             payload = dict(checkpoint)
             overhead = payload.pop("serialization_overhead")
             overhead_hash = payload.pop("overhead_sha256")
@@ -571,22 +517,9 @@ class ECMExecutor:
             for key in ("work", "cpu", "wall"):
                 finite(saved[key], "saved " + key)
             integer(saved["work"], "saved work")
-            if (
-                saved["work"] > base.work_limit
-                or saved["cpu"] > base.cpu_seconds
-                or saved["wall"] > base.seconds
-            ):
-                raise ValueError("resume grant below prior charges")
-            # A new Budget must retain all prior active-run charges.
-            if base.used == 0 and base.prior_cpu == 0 and base.prior_wall == 0:
-                base.used = saved["work"]
-                base.prior_cpu, base.prior_wall = saved["cpu"], saved["wall"]
-            elif (
-                base.used < saved["work"]
-                or base.cpu_used < saved["cpu"]
-                or base.wall_used < saved["wall"]
-            ):
-                raise ValueError("resume would reset cumulative charges")
+            base.restore_charges(
+                work=saved["work"], cpu=saved["cpu"], wall=saved["wall"]
+            )
             search = Search.restore(
                 checkpoint["search"],
                 manifest,
@@ -594,14 +527,10 @@ class ECMExecutor:
                 fixed_work=fixed_work,
             )
             search.check_leases(checkpoint["leases"], saved)
-        if search.runs >= self.settings.max_runs:
-            raise LeaseRefusedError("run_limit")
         search.runs += 1
-        work, cpu, wall = _allowances(budget)
-        output_reserve = min(work, self.settings.checkpoint_bytes)
-        ledger = Ledger(work - output_reserve, cpu)
+        ledger = Ledger()
         start_cpu, started = time.process_time(), time.monotonic()
-        deadline = started + wall
+        deadline = _deadline(budget)
         reported_before = sum(s["reported_cpu"] for s in self.slots)
         helper_before = self.helper_funded
         ready = self.ready(manifest)
@@ -631,17 +560,7 @@ class ECMExecutor:
             execution=self.cost_identity,
         )
         engaged = self.force_workers or decision["engage"]
-        funded = self.pool_started() or (
-            cpu
-            > (self.settings.workers + (not self.helper_funded))
-            * (self.settings.startup_seconds + self.settings.shutdown_cpu)
-            and work - output_reserve
-            > self.settings.workers
-            * (self.settings.startup_work + 2 * self.settings.frame_bytes)
-            + (0 if self.helper_funded else self.settings.startup_work)
-        )
-        if not self.force_workers and not funded:
-            engaged = False
+        funded = True
         stats = dict(
             decision_seconds=time.monotonic() - decision_started,
             planning_seconds=decision_started - call_started,
@@ -694,8 +613,8 @@ class ECMExecutor:
 
         def poll():
             budget.consume(0)
-            if time.monotonic() >= deadline:
-                raise LeaseRefusedError("wall_limit")
+            if deadline is not None and time.monotonic() >= deadline:
+                budget.consume(0)
             ledger.charge(parent_cpu=time.process_time() - start_cpu)
 
         def receive(slot, message, publish):
@@ -706,17 +625,10 @@ class ECMExecutor:
             position, token = slot["active"][0]
             if message.get("stage") != search.stage(position):
                 raise ValueError("missing or stale wire stage")
-            identity, grant_work, grant_cpu = ledger.active[token]
+            identity = ledger.active[token]
             used = integer(message["work"], "worker work")
             consumed = finite(message["cpu"], "worker CPU")
             integer(message["rss"], "worker RSS")
-            if used > grant_work or consumed > grant_cpu:
-                ledger.work += max(0, used - grant_work)
-                ledger.cpu += max(0, consumed - grant_cpu)
-                ledger.receipts[token - 1].update(
-                    overrun_work=used, overrun_cpu=consumed
-                )
-                raise ValueError("worker exceeded reservation")
             keys = message.get("metadata_cache")
             if (
                 not isinstance(keys, list)
@@ -771,6 +683,7 @@ class ECMExecutor:
             slot["metadata_cache"] = keys
             slot["rss"] = max(slot["rss"], message["rss"])
             slot["reported_cpu"] += consumed
+            base.acknowledge(slot["process"].pid, slot["reported_cpu"])
             stats["residue_queue_peak"] = max(
                 stats["residue_queue_peak"], len(search.boundaries)
             )
@@ -816,11 +729,10 @@ class ECMExecutor:
                         stats["worker_dispatches"] += len(issued)
                         self._send(slot, packet)
                     if not search.active:
-                        raise LeaseRefusedError("lease_refused")
-                    wait = min(
-                        self.settings.parent_poll_seconds,
-                        max(0, deadline - time.monotonic()),
-                    )
+                        raise LeaseRefusedError("attempts_exhausted")
+                    wait = self.settings.parent_poll_seconds
+                    if deadline is not None:
+                        wait = min(wait, max(0, deadline - time.monotonic()))
                     for slot in self._readable(wait):
                         message = self._read(slot)
                         if message is not None:
@@ -844,7 +756,7 @@ class ECMExecutor:
                         manifest, search, ledger, deadline, slot, serial=True
                     )
                     if not issued:
-                        raise LeaseRefusedError("lease_refused")
+                        raise LeaseRefusedError("attempts_exhausted")
                     cancelled_after_factor = False
                     for index, (task, (position, token)) in enumerate(
                         zip(packet["jobs"], issued)
@@ -883,12 +795,14 @@ class ECMExecutor:
                             raise LeaseRefusedError(result["reason"])
         except (BudgetExhaustedError, LeaseRefusedError) as error:
             reason = str(error)
-            damaged = reason == "error"
+            damaged = reason in ("error", "allocation_failure")
+        except (MemoryError, UnsupportedEncodingError):
+            damaged = True
+            raise
         except (
             OSError,
             EOFError,
             ValueError,
-            MemoryError,
             KeyError,
             TypeError,
         ) as error:
@@ -933,26 +847,31 @@ class ECMExecutor:
             stats["reported_child_cpu"] = (
                 sum(s["reported_cpu"] for s in self.slots) - reported_before
             )
-            damaged = damaged or any(s["active"] for s in self.slots)
+            damaged = (
+                damaged
+                or self.startup_in_progress
+                or any(s["active"] for s in self.slots)
+            )
             if damaged:
+                self.serial_engine = None
                 try:
                     self._destroy()
                 except RuntimeError as error:
                     stats["cleanup_failure"] = str(error)
+            if reason == "worker_failure":
+                for position in search.active:
+                    search.record_failure(position)
             search.active.clear()
             for token in list(ledger.active):
                 ledger.lose(token)
             base.used += ledger.work
-            base.prior_cpu += ledger.cpu
             if not engaged and self.serial_engine is not None:
                 for key in counter_names:
                     stats[key] = (
                         getattr(self.serial_engine, key) - serial_before[key]
                     )
             stats["helper_cpu_reserved"] = (
-                self.settings.startup_seconds + self.settings.shutdown_cpu
-                if self.helper_funded and not helper_before
-                else 0
+                0.0 if self.helper_funded and not helper_before else 0
             )
             stats["helper_cpu_observed"] = None
             stats.update(
@@ -963,6 +882,10 @@ class ECMExecutor:
                 lost_reports=ledger.lost,
                 elapsed=time.monotonic() - started,
             )
+        try:
+            base.publication()
+        except BudgetExhaustedError as error:
+            reason = str(error)
         # A proper factor may coexist with an interrupted fixed-work search.
         # Keep the public factor outcome and expose the actual traversal stop.
         stats["termination_reason"] = reason
@@ -979,6 +902,7 @@ class ECMExecutor:
             if sigma is not None and len(positions) > 1
         ]
         snapshot = dict(
+            resource_version=RESOURCE_VERSION,
             executor=self.identity,
             leases=([] if checkpoint is None else checkpoint["leases"])
             + ledger.receipts,
@@ -987,14 +911,7 @@ class ECMExecutor:
                 work=base.used, cpu=base.cpu_used, wall=base.wall_used
             ),
         )
-        if len(canonical(snapshot)) > self.settings.checkpoint_bytes:
-            raise MemoryError("complete checkpoint exceeds encoding allowance")
-        # Serialization is finite work even when search exhausted its grant.
-        # Reserve output before work leases by withholding checkpoint_bytes.
-        # Fixed header reserve covers the two integrity/overhead envelopes.
         output_work = len(canonical(snapshot)) + 512
-        if output_work > output_reserve:
-            raise LeaseRefusedError("checkpoint_work_limit")
         base.used += output_work
         snapshot["budget"]["work"] = base.used
         snapshot["sha256"] = digest(snapshot)
@@ -1014,16 +931,15 @@ class ECMExecutor:
             "factor_found" if search.factor is not None else reason,
             snapshot,
             stats,
+            resource_stop=base.stop,
         )
 
-    def _task(self, manifest, search, position, token, deadline, work, cpu):
+    def _task(self, manifest, search, position, token, deadline):
         task = dict(
             assignment=manifest.assignment(position),
             token=token,
             attempt=search.attempt(position) + 1,
             stage=search.stage(position),
-            work=work,
-            cpu=cpu,
             deadline=deadline,
         )
         if position in search.boundaries:
@@ -1066,58 +982,12 @@ class ECMExecutor:
             and count <= 2 * self.settings.workers
         ):
             limit = 1
-        remaining_cpu = ledger.cpu_limit - ledger.cpu - ledger.parent_cpu
-        # Pending leases must leave CPU for polling, validation and draining.
-        # This is withheld capacity, not a charge; actual parent CPU is charged
-        # by poll(). Preserve the serial assignment grant path.
-        parent_room = 0 if serial else min(1.0, remaining_cpu / 8)
-        cpu_share = max(0, remaining_cpu - parent_room) / peers
-        work_share = (ledger.work_limit - ledger.work) // peers
         for _ in range(limit):
             position = search.next(slot["index"])
             if position is None:
                 break
-            transport = (
-                0
-                if serial
-                else self.settings.frame_bytes * (2 if not issued else 1)
-            )
-            available_work = (
-                min(ledger.work_limit - ledger.work, work_share) - transport
-            )
-            available_cpu = min(
-                ledger.cpu_limit - ledger.cpu - ledger.parent_cpu, cpu_share
-            )
-            grant_work = min(self.settings.assignment_work, available_work)
-            grant_cpu = min(self.settings.assignment_cpu, available_cpu)
-            if grant_work <= 0 or grant_cpu <= 0:
-                break
-            token = ledger.next_token + 1
-            task = self._task(
-                manifest,
-                search,
-                position,
-                token,
-                deadline,
-                grant_work,
-                grant_cpu,
-            )
-            trial = dict(packet, jobs=packet["jobs"] + [task])
-            if (
-                len(canonical(trial).encode("ascii"))
-                > self.settings.frame_bytes
-            ):
-                if issued:
-                    break
-                raise ValueError("one assignment exceeds transport allowance")
-            ledger.charge(transport)
-            actual = ledger.reserve(
-                manifest.assignment(position)["id"],
-                grant_work,
-                0 if serial else grant_cpu,
-            )
-            if actual != token:
-                raise ValueError("lease sequence changed")
+            token = ledger.reserve(manifest.assignment(position)["id"])
+            task = self._task(manifest, search, position, token, deadline)
             search.dispatch(position, token)
             ledger.receipts[token - 1].update(
                 stage=task["stage"], attempt=task["attempt"]
@@ -1128,9 +998,6 @@ class ECMExecutor:
                 ]["sha256"]
             packet["jobs"].append(task)
             issued.append((position, token))
-            work_share -= grant_work + transport
-            if not serial:
-                cpu_share -= grant_cpu
         if issued:
             self.packet_sequence += 1
         return packet, issued

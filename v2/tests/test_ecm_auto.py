@@ -12,10 +12,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.ecm.selection import COMPATIBILITY
-from v2.execution.budget import Budget
 from v2.execution.ecm_auto import (
-    DEFAULT_MEMORY_BYTES,
     POLICY_PATH,
     POLICY_SHA256,
     SELECTOR_OWNERSHIP,
@@ -23,7 +25,12 @@ from v2.execution.ecm_auto import (
 )
 from v2.execution.ecm_defaults import ESCALATING140
 from v2.execution.ecm_workers import WorkerRun
+from v2.execution.resources import (
+    AllocationFailureError,
+    RemovedResourceLimitError,
+)
 from v2.portfolio import PortfolioConfig, _canonical, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -38,7 +45,7 @@ def config(**changes):
         sss=None,
     )
     values.update(changes)
-    return PortfolioConfig(**values)
+    return adapt_resource_configuration(PortfolioConfig, **values)
 
 
 def budget(**changes):
@@ -118,7 +125,7 @@ class AutomaticTests(unittest.TestCase):
         self.assertGreaterEqual(run.cpu_seconds, 0.125)
         self.assertGreaterEqual(run.checkpoint["payload"]["cpu_used"], 0.125)
         self.assertEqual(run.work_used, owner.ledger.used)
-        self.assertEqual(owner.arguments["memory_bytes"], DEFAULT_MEMORY_BYTES)
+        self.assertNotIn("memory_bytes", owner.arguments)
 
     def test_small_or_unbounded_grants_stay_serial_without_profile_load(self):
         for options in (
@@ -131,31 +138,30 @@ class AutomaticTests(unittest.TestCase):
                 self.subTest(options=options),
                 patch(
                     "v2.execution.ecm_selection.SelectedECMContext",
-                    side_effect=AssertionError("unfunded profile load"),
+                    FakeSelected,
                 ),
             ):
                 run = factorize_bounded(
                     1009 * 1013, config=config(), budget=budget(**options)
                 )
                 self.assertEqual(run.result.reconstruct(), 1009 * 1013)
-                self.assertTrue(
-                    any(e["stage"] == "ecm_selection" for e in run.events)
-                )
+                self.assertTrue(run.result.complete)
+                self.assertTrue(FakeSelected.instances)
 
     def test_explicit_parent_memory_or_zero_aggregate_cap_stays_serial(self):
         for settings, cap in (
-            (config(memory_bytes=16 * 2**20), None),
+            (
+                adapt_resource_configuration(config, memory_bytes=16 * 2**20),
+                None,
+            ),
             (config(), 0),
         ):
             with patch(
                 "v2.execution.ecm_selection.SelectedECMContext",
-                side_effect=AssertionError("unfunded pool"),
+                FakeSelected,
             ):
                 run = factorize_bounded(
-                    1009 * 1013,
-                    config=settings,
-                    budget=budget(),
-                    ecm_memory_bytes=cap,
+                    1009 * 1013, config=settings, budget=budget()
                 )
             self.assertEqual(run.result.reconstruct(), 1009 * 1013)
 
@@ -168,36 +174,32 @@ class AutomaticTests(unittest.TestCase):
                 self.subTest(parent=parent),
                 patch(
                     "v2.execution.ecm_selection.SelectedECMContext",
-                    side_effect=AssertionError("unadmitted selector"),
+                    FakeSelected,
                 ),
             ):
-                settings = config(memory_bytes=parent)
+                settings = adapt_resource_configuration(
+                    config, memory_bytes=parent
+                )
                 generator = random.Random(7)
                 before = generator.getstate()
-                with AutomaticECMOwner(
-                    seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
-                ) as owner:
+                with AutomaticECMOwner(seed=7) as owner:
                     owner.configure(
                         settings, generator, None, automatic_memory=False
                     )
                     result = owner.run_portfolio(
                         1009 * 1013, config=settings, budget=budget()
                     )
-                    self.assertIsNone(result)
-                    self.assertTrue(owner.last_stats["legacy_serial"])
-                    self.assertEqual(
-                        owner.last_stats["engagement"]["reason"],
-                        "worker_ownership_refused",
-                    )
+                    self.assertEqual(result.divisor, 1009)
+                    self.assertTrue(FakeSelected.instances)
                 self.assertEqual(generator.getstate(), before)
 
         with patch(
             "v2.execution.ecm_selection.SelectedECMContext", FakeSelected
         ):
-            settings = config(memory_bytes=maximum)
-            with AutomaticECMOwner(
-                seed=7, memory_bytes=DEFAULT_MEMORY_BYTES
-            ) as owner:
+            settings = adapt_resource_configuration(
+                config, memory_bytes=maximum
+            )
+            with AutomaticECMOwner(seed=7) as owner:
                 owner.configure(
                     settings, random.Random(7), None, automatic_memory=False
                 )
@@ -269,7 +271,9 @@ class AutomaticTests(unittest.TestCase):
         with patch(
             "v2.execution.ecm_selection.SelectedECMContext", FakeSelected
         ):
-            with self.assertRaisesRegex(MemoryError, "injected"):
+            with self.assertRaisesRegex(
+                AllocationFailureError, "factorize_bounded"
+            ):
                 factorize_bounded(
                     1009 * 1013, config=config(), budget=budget()
                 )
@@ -294,7 +298,7 @@ class AutomaticTests(unittest.TestCase):
             ),
             patch("v2.portfolio._pack", side_effect=MemoryError("checkpoint")),
         ):
-            with self.assertRaises(MemoryError):
+            with self.assertRaises(AllocationFailureError):
                 factorize_bounded(
                     1009 * 1013, config=config(), budget=budget()
                 )
@@ -321,55 +325,27 @@ class AutomaticTests(unittest.TestCase):
 
         n = 10**79 + 7
         settings = PortfolioConfig().for_input(n)
-        with SelectedECMContext(
-            POLICY_PATH,
-            POLICY_SHA256,
-            parent_memory=settings.memory_bytes,
-            memory_bytes=400 * 2**20,
-        ) as owner:
+        with SelectedECMContext(POLICY_PATH, POLICY_SHA256) as owner:
             owner._load(budget())
-            with self.assertRaises(MemoryError):
-                owner._select(n, settings, None, None, portfolio=True)
+            selected = owner._select(n, settings, None, None, portfolio=True)
+            self.assertIsNotNone(selected)
 
-    def test_retained_parent_coexistence_refuses_with_accounted_serial_path(
-        self,
-    ):
+    def test_retained_parent_coexistence_uses_root_resources(self):
         from v2.execution.ecm_selection import SelectedECMContext
+        from v2.tests.test_ecm_selection_integration import FakePool
 
         n = 10**59 + 7
         settings = PortfolioConfig().for_input(n)
         ledger = budget()
-        with (
-            SelectedECMContext(
-                POLICY_PATH,
-                POLICY_SHA256,
-                parent_memory=4 * 2**30,
-                memory_bytes=DEFAULT_MEMORY_BYTES,
-            ) as owner,
-            patch(
-                "v2.execution.ecm_workers.ECMExecutor",
-                side_effect=AssertionError("unadmitted worker construction"),
-            ),
-        ):
-            result = owner.run_portfolio(n, config=settings, budget=ledger)
-            self.assertIsNone(result)
-            self.assertIsNone(owner.inner)
-            self.assertEqual(
-                owner.last_stats["engagement"]["reason"],
-                "worker_ownership_refused",
-            )
-            self.assertTrue(owner.last_stats["legacy_serial"])
-            # Loading and validating metadata was real work, despite refusal.
-            self.assertGreater(ledger.used, 0)
-        # Component and portfolio modes intentionally require distinct owners.
-        with SelectedECMContext(
-            POLICY_PATH,
-            POLICY_SHA256,
-            parent_memory=4 * 2**30,
-            memory_bytes=DEFAULT_MEMORY_BYTES,
-        ) as component:
-            with self.assertRaisesRegex(MemoryError, "parent ownership"):
-                component.run(n, config=settings, budget=budget())
+        with patch("v2.execution.ecm_workers.ECMExecutor", FakePool):
+            with SelectedECMContext(POLICY_PATH, POLICY_SHA256) as owner:
+                result = owner.run_portfolio(n, config=settings, budget=ledger)
+                self.assertEqual(result.reason, "curves_exhausted")
+                self.assertIsNotNone(owner.inner)
+                self.assertGreater(ledger.used, 0)
+            with SelectedECMContext(POLICY_PATH, POLICY_SHA256) as component:
+                result = component.run(n, config=settings, budget=budget())
+                self.assertEqual(result.reason, "curves_exhausted")
 
     def test_borrowed_context_is_not_closed(self):
         class Borrowed:
@@ -415,7 +391,12 @@ class AutomaticTests(unittest.TestCase):
             FakeSelected.instances[0].arguments["seed"], header["seed"]
         )
         for options in (dict(ecm_memory_bytes=0), dict(ecm_executor=None)):
-            with self.assertRaises(ValueError):
+            expected = (
+                RemovedResourceLimitError
+                if "ecm_memory_bytes" in options
+                else ValueError
+            )
+            with self.assertRaises(expected):
                 factorize_bounded(
                     1009 * 1013,
                     config=settings,
@@ -474,9 +455,13 @@ class AutomaticTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             old.factorize_bounded(
                 1009 * 1013,
-                config=old.PortfolioConfig(**options),
+                config=adapt_resource_configuration(
+                    old.PortfolioConfig, **options
+                ),
                 checkpoint=first.checkpoint,
-                budget=old.Budget(work_limit=1000, seconds=10, cpu_seconds=10),
+                budget=recording_budget(
+                    old.Budget, work_limit=1000, seconds=10, cpu_seconds=10
+                ),
             )
 
     def test_legacy_checkpoint_does_not_adopt_workers(self):
@@ -642,7 +627,7 @@ class AutomaticTests(unittest.TestCase):
                         "-m",
                         "v2.factor",
                         str(10**79 + 7),
-                        "--work-limit",
+                        "--seconds",
                         "0",
                         "--checkpoint",
                         str(path),
@@ -700,7 +685,7 @@ class AutomaticTests(unittest.TestCase):
             f"{n}/{n}/1",
             arithmetic_options(
                 PortfolioConfig().for_input(n),
-                WorkerSettings(worker_memory=64 * 2**20),
+                WorkerSettings(),
             ),
         )
         self.assertEqual(events[0]["stats"]["manifest"], manifest.identity)

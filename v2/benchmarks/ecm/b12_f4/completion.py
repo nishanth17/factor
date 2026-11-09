@@ -8,7 +8,16 @@ import argparse
 import json
 import math
 import sys
-from dataclasses import asdict, replace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 
 def configuration(n, source_root, *, funded=True):
@@ -19,7 +28,7 @@ def configuration(n, source_root, *, funded=True):
     digits = len(str(n))
     if digits not in (60, 70):
         raise ValueError("balanced completion preparation supports 60/70 only")
-    config = PortfolioConfig().for_input(n)
+    config = adapt_resource_configuration(PortfolioConfig).for_input(n)
     if not funded:
         return config
     if digits == 60:

@@ -6,6 +6,7 @@ from dataclasses import asdict
 from math import isfinite
 
 from ..common import arithmetic, utils
+from ..execution.resources import decode_checkpoint, encode_checkpoint
 from .checkpoint import _restore_store, _solver_digest, _store
 from .extraction import (
     DependencyExtractor,
@@ -13,17 +14,16 @@ from .extraction import (
     prepare_relations,
 )
 from .families import _checked_resources, _checksum, _identity
-from .linear_algebra import MAX_MATRIX_ROWS, DependencySolver, filter_matrix
+from .linear_algebra import DependencySolver, filter_matrix
 from .sieve_collector import SieveConfig
 
 VERSION = 3
 MAX_BLOB_BYTES = 1024 * 1024
 
 
+@encode_checkpoint
 def pack_job(job):
     """Encode a checked store once; regenerate candidate batches on resume."""
-    if job.config.metadata_reserve > job.config.memory_bytes:
-        raise MemoryError("SSS checkpoint reserve exceeds memory_bytes")
     engine = job.pipeline
     divisor = job.divisor or (engine.divisor if engine else None)
     if divisor is not None:
@@ -79,8 +79,6 @@ def pack_job(job):
     )
     for part in encoder.iterencode(payload):
         size += len(part.encode())
-        if size + 1024 > job.config.checkpoint_bytes:
-            raise MemoryError("SSS checkpoint exceeds checkpoint_bytes")
         parts.append(part)
 
     blob = "".join(parts)
@@ -109,7 +107,6 @@ def _restore_solver(engine, prefix, resources):
         collector.factor_base,
         collector._atoms,
         budget=budget,
-        memory_bytes=engine.config.memory_bytes,
         retained_workspace_bytes=collector._workspace,
     )
     live = collector._workspace + prepared.workspace_bytes
@@ -118,13 +115,10 @@ def _restore_solver(engine, prefix, resources):
         prepared.rows,
         weight_two=engine.weight_two,
         budget=budget,
-        memory_bytes=max(0, engine.config.memory_bytes - live),
     )
     solver = DependencySolver(matrix, budget=budget)
     actions = utils.require_integer(prefix["actions"], "solver actions", 0)
-    if actions > min(
-        resources["work_used"], MAX_MATRIX_ROWS**2 + MAX_MATRIX_ROWS
-    ):
+    if actions > resources["work_used"]:
         raise ValueError("SSS solver prefix exceeds its bound")
     for _ in range(actions):
         if solver.next_row == len(matrix.rows):
@@ -171,6 +165,7 @@ def _restore_solver(engine, prefix, resources):
     )
 
 
+@decode_checkpoint
 def restore_job(checkpoint, *, budget, config=None):
     """Validate all arithmetic and retain prior resources before rebuilding."""
     from .sss import SSSConfig, SSSJob
@@ -189,11 +184,7 @@ def restore_job(checkpoint, *, budget, config=None):
     ):
         raise ValueError("unsupported SSS checkpoint version")
     blob = checkpoint["blob"]
-    if (
-        not isinstance(blob, str)
-        or len(blob) > MAX_BLOB_BYTES
-        or (len(blob.encode()) > MAX_BLOB_BYTES)
-    ):
+    if not isinstance(blob, str):
         raise ValueError("SSS checkpoint exceeds its hard byte cap")
 
     if hashlib.sha256(blob.encode()).hexdigest() != checkpoint["sha256"]:
@@ -229,20 +220,11 @@ def restore_job(checkpoint, *, budget, config=None):
     ):
         raise ValueError("incompatible checkpoint backend")
 
-    if len(blob.encode()) + 1024 > config.checkpoint_bytes:
-        raise ValueError("SSS checkpoint exceeds configured byte cap")
-    if budget.work_limit < resources["work_used"]:
-        raise ValueError("resume allowance is below consumed work")
-    if budget.used == 0 and budget.prior_wall == 0 and budget.prior_cpu == 0:
-        budget.used = resources["work_used"]
-        budget.prior_wall = resources["wall_used"]
-        budget.prior_cpu = resources["cpu_used"]
-    elif (
-        budget.used < resources["work_used"]
-        or budget.wall_used < resources["wall_used"]
-        or budget.cpu_used < resources["cpu_used"]
-    ):
-        raise ValueError("resume must retain consumed resources")
+    budget.restore_charges(
+        work=resources["work_used"],
+        wall=resources["wall_used"],
+        cpu=resources["cpu_used"],
+    )
 
     budget.consume(0)
     job = SSSJob(
@@ -291,12 +273,9 @@ def restore_job(checkpoint, *, budget, config=None):
     if engine.final_solve_done and engine.next_position != engine.hi:
         raise ValueError("SSS final solve precedes assignment exhaustion")
     engine.storage_reason = saved["storage_reason"]
-    if engine.storage_reason not in (
-        None,
-        "relation_limit",
-        "atom_limit",
-        "memory_limit",
-    ) or (engine.storage_solve_done and engine.storage_reason is None):
+    if engine.storage_reason not in (None,) or (
+        engine.storage_solve_done and engine.storage_reason is None
+    ):
         raise ValueError("invalid SSS storage stop")
 
     stats = saved["stats"]
@@ -331,8 +310,6 @@ def restore_job(checkpoint, *, budget, config=None):
 
     engine.stats = stats
     peak = utils.require_integer(saved["workspace_peak"], "workspace peak", 0)
-    if peak > engine.config.memory_bytes:
-        raise ValueError("SSS workspace peak exceeds its bound")
     engine._workspace_peak = max(peak, collector._workspace)
     assignment = saved["assignment"]
     if assignment is not None:

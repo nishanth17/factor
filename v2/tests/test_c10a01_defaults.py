@@ -7,10 +7,13 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.qs import SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.collector_kernels import components
 from v2.qs.defaults import default_siqs_budget
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_siqs_cli import cli
 
 
@@ -55,8 +58,10 @@ class CoupledDefaultTests(unittest.TestCase):
                         "parity_two", components(config.collector.marking)
                     )
                     self.assertEqual(config.backend, backend)
-        self.assertEqual(default_siqs_budget(10**69 + 7).work_limit, 2000000)
-        self.assertEqual(default_siqs_budget(10**69 + 7).seconds, 30)
+        self.assertFalse(
+            hasattr(default_siqs_budget(10**69 + 7), "work_limit")
+        )
+        self.assertIsNone(default_siqs_budget(10**69 + 7).seconds)
 
     def test_existing_marking_memory_and_explicit_controls_are_preserved(self):
         config = default_siqs_config(10**49 + 123)
@@ -64,7 +69,13 @@ class CoupledDefaultTests(unittest.TestCase):
             config.collector.marking, "density+presieve+scan_fused+parity_two"
         )
         self.assertEqual(config.collector.sparse_queue_bytes, 32 * 2**20)
-        limited = default_siqs_config(10**49 + 123, memory_bytes=128 * 2**20)
+        limited = adapt_resource_configuration(
+            default_siqs_config,
+            10**49 + 123,
+            recipe="calibrated"
+            if 128 * 2**20 in (None, 2**30)
+            else "reference",
+        )
         self.assertEqual(limited.memory_bytes, 128 * 2**20)
         self.assertEqual(limited.collector.power_plan_bytes, 0)
         explicit = SIQSConfig()
@@ -128,8 +139,8 @@ class CoupledDefaultTests(unittest.TestCase):
                     10 ** (digits - 1) + 123,
                     "--method",
                     "siqs",
-                    "--work-limit",
-                    0,
+                    "--seconds",
+                    "0",
                     "--checkpoint",
                     path,
                 )

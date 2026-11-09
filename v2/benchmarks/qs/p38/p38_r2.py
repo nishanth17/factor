@@ -13,8 +13,18 @@ import sys
 import tempfile
 import time
 import types
-from dataclasses import asdict, replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ...infrastructure.performance.performance_audit import (
     checked_baseline,
@@ -146,7 +156,8 @@ def selected_config(module, band, variant):
 
 def factor_run(mods, fixture, seed, variant):
     module = mods["qs.siqs"]
-    budget = mods["budget"].Budget(
+    budget = recording_budget(
+        mods["budget"].Budget,
         work_limit=WORK,
         seconds=2 if fixture["band"] == "30d" else 0.2,
         cpu_seconds=2 if fixture["band"] == "30d" else 0.2,
@@ -215,7 +226,9 @@ def factor_run(mods, fixture, seed, variant):
 def collector_run(mods, fixture, seed, variant):
     module = mods["qs.siqs"]
     selected = selected_config(module, fixture["band"], variant)
-    budget = mods["budget"].Budget(work_limit=WORK, seconds=30, cpu_seconds=30)
+    budget = recording_budget(
+        mods["budget"].Budget, work_limit=WORK, seconds=30, cpu_seconds=30
+    )
     job = module.SIQSJob(
         fixture["n"], seed=seed, config=selected, budget=budget
     )
@@ -227,7 +240,8 @@ def collector_run(mods, fixture, seed, variant):
     if variant in ("tiny", "batch", "chunks"):
         cls = experiment_collector(mods["qs.sieve_collector"], variant)
     try:
-        worker = cls(
+        worker = adapt_resource_configuration(
+            cls,
             polynomial,
             job.base,
             config=selected.collector,
@@ -257,14 +271,16 @@ def collector_run(mods, fixture, seed, variant):
         raise AssertionError("collector returned an improper divisor")
     atoms = {a.relation_id: a for a in result.atoms}
     extraction = mods["qs.extraction"]
-    prepared = extraction.prepare_relations(
+    prepared = adapt_resource_configuration(
+        extraction.prepare_relations,
         worker.matrix_relations,
         job.base,
         atoms,
         budget=budget,
         memory_bytes=MEMORY,
     )
-    matrix = mods["qs.linear_algebra"].filter_matrix(
+    matrix = adapt_resource_configuration(
+        mods["qs.linear_algebra"].filter_matrix,
         prepared.rows,
         budget=budget,
         memory_bytes=MEMORY,

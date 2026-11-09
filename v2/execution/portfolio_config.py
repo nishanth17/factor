@@ -10,6 +10,7 @@ from ..common import arithmetic, utils
 from ..common.arithmetic import isqrt
 from ..ecm.programs import ECMPrograms
 from .allocation import ECMAllocation
+from .resources import removed_arguments
 from .schedules import ScheduleCache, SieveContext
 
 if TYPE_CHECKING:
@@ -22,6 +23,7 @@ _AUTO_SIQS = object()
 def _decode_siqs_config(values):
     """Rebuild a concrete SIQS child from an asdict-style mapping."""
     from ..qs import (
+        CombinedYieldSieveConfig,
         CountedSIQSConfig,
         DoubleLargeSieveConfig,
         GrowingDoubleLargeSieveConfig,
@@ -29,23 +31,18 @@ def _decode_siqs_config(values):
         SIQSConfig,
         YieldSieveConfig,
     )
+    from ..qs.extended_policy import (
+        BoundedYieldSieveConfig,
+        ExtendedYieldSieveConfig,
+    )
 
     decoded = dict(values)
     collector = decoded["collector"]
-    if "extension_policy" in collector:
-        from ..qs.extended_policy import (
-            BoundedYieldSieveConfig,
-            ExtendedYieldSieveConfig,
-        )
-
-        collector_type = (
-            BoundedYieldSieveConfig
-            if collector["extension_policy"] == "extended-v2"
-            else ExtendedYieldSieveConfig
-        )
-    elif "recovery_policy" in collector:
-        from ..qs import CombinedYieldSieveConfig
-
+    if collector.get("extension_policy") == "extended-v2":
+        collector_type = BoundedYieldSieveConfig
+    elif collector.get("extension_policy") == "extended-v1":
+        collector_type = ExtendedYieldSieveConfig
+    elif collector.get("yield_policy") == "yield-v2":
         collector_type = CombinedYieldSieveConfig
     elif "yield_policy" in collector or "small_prime_bound" in collector:
         collector_type = YieldSieveConfig
@@ -60,6 +57,7 @@ def _decode_siqs_config(values):
     return config_type(**decoded)
 
 
+@removed_arguments(("memory_bytes",))
 @dataclass(frozen=True)
 class PortfolioConfig:
     """Finite allowances; ECM tiers are (inclusive B1, B2, curve count).
@@ -86,7 +84,6 @@ class PortfolioConfig:
     gcd_batch: int = constants.GCD_BATCH_SIZE
     primality_rounds: int = constants.PRIMALITY_ROUNDS
     fermat_steps: int = 0
-    memory_bytes: int | None = None
     segment_size: int = 1024
     trial_chunk: int = 64
     schedule_cache_bytes: int = 0
@@ -127,9 +124,7 @@ class PortfolioConfig:
         )
         if automatic_siqs:
             object.__setattr__(self, "siqs", None)
-        object.__setattr__(
-            self, "_automatic_memory", self.memory_bytes is None
-        )
+        object.__setattr__(self, "_automatic_memory", True)
 
         if self.allocation is not None:
             if not isinstance(self.allocation, ECMAllocation):
@@ -144,9 +139,7 @@ class PortfolioConfig:
                 raise ValueError(
                     "fallback reservations require a relation engine"
                 )
-        automatic_memory = self.memory_bytes is None
-        if automatic_memory:
-            object.__setattr__(self, "memory_bytes", 8_388_608)
+        automatic_memory = True
         if self.pm1_gap_mode not in ("cached", "recurrence"):
             raise ValueError("p-1 gap mode must be cached or recurrence")
         if self.pm1_chunk_size is not None:
@@ -160,15 +153,9 @@ class PortfolioConfig:
             raise ValueError("ECM chain family must be auto, lucas or cf")
         utils.require_integer(self.ecm_chain_bytes, "ecm_chain_bytes", 0)
         if self.ecm_chain_mode == "reuse":
-            from ..ecm.chains import MIN_MEMORY_BYTES
-
             if not self.ecm_program_bytes:
                 raise ValueError(
                     "ECM chains require bounded reusable programs"
-                )
-            if self.ecm_chain_bytes < MIN_MEMORY_BYTES:
-                raise MemoryError(
-                    "ECM chain preparation exceeds configured cap"
                 )
         elif self.ecm_chain_bytes and self.ecm_chain_mode == "off":
             raise ValueError("ECM chain memory requires reuse mode")
@@ -189,7 +176,6 @@ class PortfolioConfig:
             "gcd_batch": 1,
             "primality_rounds": 1,
             "fermat_steps": 0,
-            "memory_bytes": 65_536,
             "segment_size": 1,
             "trial_chunk": 1,
             "schedule_cache_bytes": 0,
@@ -226,7 +212,6 @@ class PortfolioConfig:
 
         if self.ecm_chain_mode == "auto":
             from ..ecm.chain_options import default_options
-            from ..ecm.chains import MIN_MEMORY_BYTES
 
             # Store the resolved policy, never an auto decision, so resume
             # retains its executor even if future defaults change again.
@@ -236,14 +221,12 @@ class PortfolioConfig:
                 object.__setattr__(self, name, value)
             if self.ecm_chain_mode == "reuse":
                 utils.require_integer(
-                    self.ecm_chain_bytes, "ecm_chain_bytes", MIN_MEMORY_BYTES
+                    self.ecm_chain_bytes, "ecm_chain_bytes", 0
                 )
             elif self.ecm_chain_bytes:
                 raise ValueError("ECM chain memory requires reuse mode")
 
         if self.ecm_program_bytes:
-            if self.ecm_program_bytes < 4096 + 256 * self.segment_size:
-                raise MemoryError("ECM program scratch exceeds configured cap")
             if any(b2 >= 2**64 for _, b2, curves in tiers if curves):
                 raise ValueError("ECM programs require B2 below 2**64")
 
@@ -292,80 +275,27 @@ class PortfolioConfig:
 
             if not isinstance(self.sss, SSSConfig):
                 raise TypeError("sss must be an SSSConfig or None")
-            if (
-                self.sss.memory_bytes + self.workspace_reserve + 8192
-                > self.memory_bytes
-            ):
-                raise MemoryError(
-                    "portfolio/SSS coexistence exceeds memory cap"
-                )
 
         if self.siqs is not None:
             from ..qs import SIQSConfig
 
             if not isinstance(self.siqs, SIQSConfig):
                 raise TypeError("siqs must be a SIQSConfig or None")
-            if self.siqs.memory_bytes is None:
-                # A growing child still shares an explicit parent's allowance.
-                # Resolve once so checked resume serializes the same ownership.
-                object.__setattr__(
-                    self,
-                    "siqs",
-                    replace(
-                        self.siqs,
-                        memory_bytes=self.memory_bytes
-                        - self.workspace_reserve
-                        - 8192,
-                    ),
-                )
-            if (
-                self.siqs.memory_bytes + self.workspace_reserve + 8192
-                > self.memory_bytes
-            ):
-                raise MemoryError(
-                    "portfolio/SIQS coexistence exceeds memory cap"
-                )
-
-        if self.memory_bytes - self.workspace_reserve < 8192:
-            raise MemoryError(
-                "candidate/checkpoint reserve exceeds memory cap"
-            )
 
     def for_input(self, n):
-        """Resolve omitted ECM tiers once, retaining all explicit limits."""
+        """Resolve the same size-based numerical and cache recipes once."""
         utils.require_integer(n)
         if not self._automatic_ecm_tiers:
             return self
         from ..ecm.defaults import resolve_defaults
-        from ..qs.defaults import (
-            C9_MEMORY_BYTES,
-            C9_PORTFOLIO_MEMORY_BYTES,
-            default_siqs_config,
-            uses_siqs_defaults,
-        )
+        from ..qs.defaults import default_siqs_config, uses_siqs_defaults
 
         selected = resolve_defaults(self, n)
         if self._automatic_siqs and uses_siqs_defaults(
             n, backend=self.backend
         ):
-            memory = (
-                C9_PORTFOLIO_MEMORY_BYTES
-                if self._automatic_memory
-                else self.memory_bytes
-            )
-            # Resolve at the root; children and checkpoints retain concrete
-            # settings and finite parent/child coexistence allowances.
-            child_memory = (
-                C9_MEMORY_BYTES
-                if self._automatic_memory
-                else memory - selected.workspace_reserve - 8192
-            )
             return replace(
-                selected,
-                memory_bytes=memory,
-                siqs=default_siqs_config(
-                    n, backend=self.backend, memory_bytes=child_memory
-                ),
+                selected, siqs=default_siqs_config(n, backend=self.backend)
             )
         return selected
 
@@ -443,16 +373,7 @@ def _execution_context(state, config, budget):
     if config.allocation is not None or not state.get("context_ready"):
         budget.consume((isqrt(config.max_hi - 1) + 1) // 2)
     context = SieveContext(
-        config.max_hi,
-        memory_bytes=config.memory_bytes
-        - config.workspace_reserve
-        - (
-            (config.siqs or config.sss).memory_bytes
-            if (config.siqs or config.sss)
-            else 0
-        ),
-        segment_size=config.segment_size,
-        rolling=config.rolling,
+        config.max_hi, segment_size=config.segment_size, rolling=config.rolling
     )
     state["context_ready"] = True
     if config.schedule_cache_bytes:

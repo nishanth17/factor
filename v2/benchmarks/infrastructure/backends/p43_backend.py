@@ -18,9 +18,16 @@ import statistics
 import subprocess
 import sys
 import time
-from dataclasses import asdict
 from pathlib import Path
 from types import SimpleNamespace
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .... import portfolio
 from ....common import arithmetic, utils
@@ -100,7 +107,9 @@ def load_baseline():
 
 
 def _budget():
-    return Budget(work_limit=200_000, seconds=None, cpu_seconds=None)
+    return recording_budget(
+        Budget, work_limit=200_000, seconds=None, cpu_seconds=None
+    )
 
 
 def _result_signature(result):
@@ -148,7 +157,7 @@ def _portfolio_call(module, fixtures, seeds, backend=None):
     )
     if backend is not None:
         options["backend"] = backend
-    config = module.PortfolioConfig(**options)
+    config = adapt_resource_configuration(module.PortfolioConfig, **options)
     outputs = []
     for fixture in fixtures:
         for seed in seeds:
@@ -160,7 +169,8 @@ def _portfolio_call(module, fixtures, seeds, backend=None):
 
 
 def _stage_call(kind, n, backend, module=stage_jobs):
-    config = portfolio.PortfolioConfig(
+    config = adapt_resource_configuration(
+        portfolio.PortfolioConfig,
         trial_bound=10,
         rho_evaluations=2048,
         chunk_size=16,
@@ -190,7 +200,8 @@ def _qs_call(mode, backend, before=None):
         mode=mode,
         base_bound=200,
         half_width=256,
-        collector=SieveConfig(
+        collector=adapt_resource_configuration(
+            SieveConfig,
             residual_bound=500,
             max_atoms=4096,
             max_relations=4096,
@@ -198,13 +209,15 @@ def _qs_call(mode, backend, before=None):
         ),
     )
     if before is not None:
-        options["collector"] = module.SieveConfig(
-            **asdict(options["collector"])
+        options["collector"] = adapt_resource_configuration(
+            module.SieveConfig, **asdict(options["collector"])
         )
     else:
         options["backend"] = backend
-    config = module.SIQSConfig(**options)
-    budget = Budget(work_limit=20_000_000, seconds=None, cpu_seconds=None)
+    config = adapt_resource_configuration(module.SIQSConfig, **options)
+    budget = recording_budget(
+        Budget, work_limit=20_000_000, seconds=None, cpu_seconds=None
+    )
     job = module.SIQSJob(4001 * 5003, seed=73, config=config, budget=budget)
     result = job.run()
     if result.divisor is not None:
@@ -230,8 +243,10 @@ def _sss_call(mode, backend, before=None):
     job = module.SSSJob(
         4001 * 4003,
         seed=73,
-        config=module.SSSConfig(**options),
-        budget=Budget(work_limit=20_000_000, seconds=None, cpu_seconds=None),
+        config=adapt_resource_configuration(module.SSSConfig, **options),
+        budget=recording_budget(
+            Budget, work_limit=20_000_000, seconds=None, cpu_seconds=None
+        ),
     )
     result = job.run()
     if result.divisor is not None:
@@ -258,10 +273,15 @@ def _matrix_call(rows, backend, before=None):
     matrix = module.filter_matrix(
         typed,
         weight_two=True,
-        budget=Budget(work_limit=10**9, seconds=None, cpu_seconds=None),
+        budget=recording_budget(
+            Budget, work_limit=10**9, seconds=None, cpu_seconds=None
+        ),
     )
     solver = module.DependencySolver(
-        matrix, budget=Budget(work_limit=10**9, seconds=None, cpu_seconds=None)
+        matrix,
+        budget=recording_budget(
+            Budget, work_limit=10**9, seconds=None, cpu_seconds=None
+        ),
     )
     masks = solver.run()
     return tuple(int(mask) for mask in masks), solver.xors

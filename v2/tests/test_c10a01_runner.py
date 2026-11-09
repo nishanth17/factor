@@ -27,7 +27,7 @@ class CalibrationContractTests(unittest.TestCase):
 
     def test_capacity_fixture_kernels_and_reservation(self):
         from v2.benchmarks.qs.c10a01.diagnostics import matrix_check
-        from v2.execution.budget import Budget
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         for kind in ("cycle", "sparse35"):
             budget = Budget(work_limit=10**9, seconds=None, cpu_seconds=None)
@@ -63,9 +63,9 @@ class CalibrationContractTests(unittest.TestCase):
         self.assertFalse(result["adoption"])
 
     def test_lower_band_explicit_control_and_promoted_default_boundaries(self):
-        from v2.execution.budget import Budget
         from v2.qs import SIQSJob, default_siqs_config
         from v2.tests.qs_default_controls import previous_siqs_config
+        from v2.tests.resource_stops import InterruptBudget as Budget
 
         files = ("c10_fresh_corpus.json", "c10a05_plus_feasibility.json")
         for digits, name in zip((50, 55), files):

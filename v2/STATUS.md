@@ -2,6 +2,42 @@
 
 Last updated: 8 November 2026 (America/Los_Angeles).
 
+**H3 — Done, integrated locally on master on 8 November 2026** from
+`codex/h3-resource-limits` at `e3c371e`, based on `40d2367`. Only root wall,
+aggregate CPU, sampled current owned-process-tree RSS and an optional checkpoint
+save cap may refuse resources. Wall/CPU default to unlimited; RSS defaults to
+floor(80% of physical memory). Internal refusal ceilings and prepaid worker
+leases are removed. Numerical recipes and retained capacities are unchanged.
+
+Premerge committed-only source `e3c371e` passes 1,404 tests (9 optional skips),
+full lint and all 267 benchmark imports. Fresh fixed-work QS/ECM equivalence
+against `40d2367` also passes. Post-merge QA receipts, the retained incident
+qualifications and branch adapters live in `v2/audit/h3_resource_limits/`.
+No performance adoption or remote push is included.
+
+| Dependent tables | Revalidation required after H3 |
+| --- | --- |
+| C3a | Portfolio allocation, pretest/fallback handoff and completion costs |
+| B12 | Cold/pool/warm, startup/engagement and worker-selection cost tables |
+| A7a | Packet/cache, worker economics and engagement/dispatch tables |
+| B4a | Native startup/preparation, engagement and worker-economics tables |
+
+Retain existing selected values until their owners validate the combined
+committed source; historical measurements do not establish current costs.
+
+
+The isolated A7a branch now integrates local master `755c312`, retaining its
+G2H kernels and frozen G3 settings under H3 observed resources. The pre-H3
+cap/diagnostic patch is preserved separately. Committed-only validation passes
+1,628 tests (nine optional skips), lint and 295 benchmark imports. A final
+format-only test change has identical ASTs to the full-suite source `5764f28`.
+The integration also handles pool failure during submission without touching a
+dead worker's stop lock. No 75/80 probe or performance adoption is added.
+Historical timings require revalidation on the combined source; prior probe
+reports retain their original resource model. Local integration receipts:
+`v2/audit/a7a/master-integration-20261108/`.
+
+
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate
 [ready-first startup follow-up](ROADMAP.md#b12-f4-in-progress) remains In progress:
 real-spawn/arithmetic, failure/restart and full committed-checkout QA, then a
@@ -61,17 +97,17 @@ Omitted native configurations automatically enable SIQS at exactly 40 and
 fields. SSS remains opt-in. ECM workers use the selected automatic cost gate; QS
 workers remain opt-in/experimental.
 
-| Decimal digits / scope | Owned memory allowance | Automatic SIQS selection | Adoption evidence and limits |
+| Decimal digits / scope | Root resources / numerical recipe | Automatic SIQS selection | Adoption evidence and limits |
 | --- | --- | --- | --- |
-| Exactly 40, native | 1 GiB child; omitted outer portfolio adds 16 MiB | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; parity_two marking; window pacing; coupled scored multiplier | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
-| Exactly 50, native | Same | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused+parity_two; collection pacing; coupled scored multiplier | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
-| Exactly 51, native | Same | Same concrete bundle as 50 | [51-digit completion adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open). A1a marking at 51 is an **unmeasured interpolation**. |
-| 52–54, native | Same | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; coupled odd/even scored multiplier (`multiplier=0`); 2 MiB plan; A1a marking plus parity_two; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
-| Exactly 55, native | Same | Same counted bundle as 52–54 | Same [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
-| 56–59, native | Same | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; coupled scored multiplier; 2 MiB plan; parity_two marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
-| Exactly 60, native | Same | Same counted bundle as 56–59 | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
-| Exactly 40 or 50–60, native, different explicit allowance | Caller grant; outer portfolio subtracts coexistence reserve before child selection | Same size/base/multiplier/growing policy; power plan off, parity_two marking, window pacing. Finite refusal remains possible. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
-| Other sizes, or other backends, when SIQS is selected | Reference/caller allowance | Reference size parameters with the coupled policies below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No calibrated size preset at 41–49 or 61+; the coupled-policy promotion below still applies. |
+| Exactly 40, native | Root limits; calibrated recipe | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; parity_two marking; window pacing; coupled scored multiplier | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
+| Exactly 50, native | Same root defaults; calibrated recipe | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused+parity_two; collection pacing; coupled scored multiplier | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
+| Exactly 51, native | Same root defaults; calibrated recipe | Same concrete bundle as 50 | [51-digit completion adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open). A1a marking at 51 is an **unmeasured interpolation**. |
+| 52–54, native | Same root defaults; calibrated recipe | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; coupled odd/even scored multiplier (`multiplier=0`); 2 MiB plan; A1a marking plus parity_two; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
+| Exactly 55, native | Same root defaults; calibrated recipe | Same counted bundle as 52–54 | Same [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
+| 56–59, native | Same root defaults; calibrated recipe | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; coupled scored multiplier; 2 MiB plan; parity_two marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
+| Exactly 60, native | Same root defaults; calibrated recipe | Same counted bundle as 56–59 | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
+| Exactly 40 or 50–60, native, explicit reference recipe | Caller root limits; `recipe="reference"` | Same size/base/multiplier/growing policy; power plan off, parity_two marking, window pacing. The root guard still applies. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
+| Other sizes, or other backends, when SIQS is selected | Root limits; reference size parameters | Reference size parameters with the coupled policies below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No calibrated size preset at 41–49 or 61+; the coupled-policy promotion below still applies. |
 
 Every fresh automatic SIQS configuration at every supported size/backend
 selects `sign_policy="swap_high"`, `polynomial_policy="parity2"`,
@@ -80,29 +116,30 @@ selects `sign_policy="swap_high"`, `polynomial_policy="parity2"`,
 `parity_two` marking. The C10a-01 all-size promotion is an explicit policy
 decision before fresh confirmation; the [results and limits](benchmarks/RESULTS.md#c10a-01-coupled-polynomial-defaults)
 retain the 65-digit failed canary and censored 70-digit control. Other sizes
-keep generic reference parameters and grants with these selected policies;
+keep generic reference parameters with these selected policies;
 there are no new calibrated 61+ presets or portfolio bands.
 Native calibrated collectors above select a 32 MiB sparse-queue ceiling within
 the existing owned allowance, with charged rebuild and exact fallback for
 unsupported paths or capacity refusal. The combined C10a-07 policy is adopted.
 Its 50/55/60 panel is exploratory; drift acceptance was unmet and the additional
 18-call confirmation was not run. Other sizes,
-backends and grants are unmeasured policy extrapolations. See the
+backends and explicit recipes are unmeasured policy extrapolations. See the
 [adoption and limitations](benchmarks/RESULTS.md#c10a-07-face-and-queue).
 
-Omitted calibrated SIQS grants are 10^13 work units and 1,200 wall/CPU seconds
-through 55 digits, 1,800 at 56–60. All calibrated bundles use half-width 65,536,
-windowed paired assignments and a 64-polynomial family prefix. Explicit limits win;
-these grants promise no completion. The [configuration guide](qs/CONFIGURATION.md#explicit-and-automatic-selection)
-explains residual/endpoint/product controls and charged base-count resolution.
+All calibrated bundles retain half-width 65,536, windowed paired assignments
+and a 64-polynomial family prefix. Root wall and CPU are unlimited when omitted;
+there is no work grant. Root RSS does not choose a different numerical recipe.
+The [configuration guide](qs/CONFIGURATION.md#explicit-and-automatic-selection)
+explains endpoint/product controls, explicit reference recipes and charged
+base-count resolution. Historical experiment ledgers retain their own limits.
 
-| ECM / shared portfolio scope | Owned memory / eligibility | Current automatic choice | Adoption evidence and limits |
+| ECM / shared portfolio scope | Numerical/cache eligibility | Current automatic choice | Adoption evidence and limits |
 | --- | --- | --- | --- |
-| Exactly 30 digits | Existing funded cap; retain previous plan if coexistence fails | compact64: `(2000, 50000, 64)` | [C3 decision](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026): **Adopted before fresh confirmation**; oversized comparison Inconclusive, source screen unstable. |
-| Exactly 40 digits | Same; SIQS headroom above applies | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
-| Other sizes, or explicitly selected paired executors | Caller/retained cap | Retained fixed32 numerical schedule | [C3 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#calibrate-automatic-selection-and-handoff-c3-then-g1); not a measured optimum for every size/backend. |
-| Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Omitted eligible allowance resolves to 16 MiB; explicit cap must fund programs and chains without shrinking a child | Reused PRAC/batch16; unsupported/small-cap jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
-| Bounded p−1 / portfolio p−1 | Existing finite grants | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
+| Exactly 30 digits | Root observed resources; retained numerical eligibility | compact64: `(2000, 50000, 64)` | [C3 decision](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026): **Adopted before fresh confirmation**; oversized comparison Inconclusive, source screen unstable. |
+| Exactly 40 digits | Same root resources | escalating140: `(200, 7700, 10)`, `(2000, 81000, 30)`, `(10000, 554000, 100)` | Same [C3 adoption](benchmarks/RESULTS.md#c3-bounded-ecm-allocation-and-handoff-10-october-2026) and limitations. |
+| Other sizes, or explicitly selected paired executors | Retained size/backend policy | Retained fixed32 numerical schedule | [C3 scope](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#calibrate-automatic-selection-and-handoff-c3-then-g1); not a measured optimum for every size/backend. |
+| Supported native schedule with B1=2,000, at least 8 curves, chunk 16 and B2 below 2^64 | Compatible numerical schedule and retained program/chain caches | Reused PRAC/batch16; unsupported jobs use B4 ladder | [B3 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#b3-production-integration-acceptance-9-october-2026). Wider allocation/population confirmation remains open. |
+| Bounded p−1 / portfolio p−1 | Root resources; finite numerical bounds | Direct gap recurrence, p−1 chunk 64 | [A6 adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p53--improve-p1-powering-and-continuation-independently): stage evidence favorable; extended integer portfolio remains Inconclusive. |
 
 ## A7a 75/80 probes reported — 8 November 2026
 
@@ -233,6 +270,10 @@ remain delivered mainline scopes.
 
 ## Recent completed review
 
+- **H3 — Done, 8 November:** locally integrated resource-limit simplification
+  and 27 restored assertion-review cases. Saved-history option 2 and stage-share
+  handoff are documented in the [resource API](docs/API.md). C3a, B12, A7a and
+  B4a tables require revalidation on the combined committed source.
 - **C9a — Done, 4 November:** delivered and integrated; policies remain opt-in.
   Complete60/70 evidence is exploratory; one exposed input per size and no
   disjoint fresh confirmation establish no population speedup.
@@ -263,7 +304,12 @@ prioritizes current acceleration and shorter later experiment turnaround:
 6. **B15:** native helper/SIMD opportunity selection across E4/A10a/A2a/C5 —
    Sol / high evidence review; Sol / xhigh for boundary/protocol design. Deliver
    at most one justified candidate or a no-go; implementation retains its owner.
-7. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
+7. **H2:** profile-driven overhead sweep after the B12/A7a/B4a integration
+   checkpoint — Sol / xhigh. Rank time/heap costs, remove measured overhead,
+   justify memory reservations and compare the combined result with the
+   pre-sweep control; a no-conflict CLI/preprocessing/reconstruction subset
+   may start earlier.
+8. **C3a/C11:** policy/handoff screen on the settled worker cost identity —
    Sol / xhigh. Reuse accelerator receipts rather than repeating broad studies.
 
 Then A1d, B3a, F3, broader C9b and the remaining ranked rows. F3 is the first
@@ -282,7 +328,9 @@ losses do not settle the native question. B4a's native
 thread screen centers on cold-CLI startup/heap savings against B12 processes,
 using a C-side multi-curve team and a pthread alternative when OpenMP is absent.
 E6/B15 at ranks 5–6 are conditional screens. B15 is not a C3a prerequisite;
-its selected helper implementation does not inherit rank 6 automatically.
+its selected helper implementation does not inherit rank 6 automatically. H2
+is rank 7, ahead of broader policy tuning; its removable overhead is unmeasured.
+Reuse compatible H2 evidence in C11/C9b and retain their algorithmic owners.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
 native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
 this priority increase. Small cost/A/A checks belong in each task; C9b is not
@@ -299,7 +347,8 @@ prerequisites. Closed C9a/C10a-01 evidence and active grants are unchanged.
 The bounded auto CLI/API use these defaults on supported macOS arm64/PyPy.
 Explicit arithmetic/resource settings and checked resumes take precedence.
 Worker counts are selected configurations, not a guarantee of optimality for
-every input; the observable-cost and resource gates still apply.
+every input; the observable-cost guards and root resources still apply. Dependent C3a,
+C3a, B12, A7a and B4a cost/dispatch tables require revalidation after H3.
 
 | Total decimal digits | Numerical plan | Cold default | Retained warm preference |
 | --- | --- | --- | --- |
@@ -317,8 +366,8 @@ escalating140 is `(200, 7700, 10)`, `(2000, 81000, 30)`,
 `(10000, 554000, 100)`, as `(B1, B2, curves)`. Other sizes/cofactors use
 the bounded existing cost model or serial fallback. Warm 30-digit easy calls
 and some cold 40-digit calls regressed in the retained fixtures; hidden factor
-sizes never select the runtime path. No QS eligibility or fallback grant is
-changed by this table.
+sizes never select the runtime path. This table preserves QS numerical eligibility; H3 changes resource admission
+and stage handoff independently.
 
 ## Known gaps and unresolved conflicts
 

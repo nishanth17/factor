@@ -38,7 +38,12 @@ def witness_job(*, paced=True, maximum=64):
         200,
         201,
         budget=allowance(),
-        config=SieveConfig(max_relations=maximum),
+        config=SieveConfig(
+            preparation_cache_bytes=2 * 2**20
+            if maximum is None
+            else min(2 * 2**20, 2048 * maximum),
+            target_rows=maximum,
+        ),
         row_excess=32,
         filter_row_growth=32,
         weight_two=False,
@@ -66,7 +71,10 @@ def terminal_job():
         row_excess=32,
         filter_row_growth=32,
         weight_two=False,
-        collector=SieveConfig(max_relations=64),
+        collector=SieveConfig(
+            preparation_cache_bytes=min(2 * 2**20, 2048 * 64),
+            target_rows=64,
+        ),
     )
     job = SIQSJob(10403, config=config, budget=allowance())
     job._setup()
@@ -381,9 +389,7 @@ class PacingTests(unittest.TestCase):
                 self.assertIs(type(restored.config.collector), type(collector))
 
         for policy in ("window", "collection"):
-            config = PortfolioConfig(
-                siqs=SIQSConfig(solve_policy=policy), memory_bytes=64 * 2**20
-            )
+            config = PortfolioConfig(siqs=SIQSConfig(solve_policy=policy))
             first = factorize_bounded(
                 4001 * 5003, config=config, budget=allowance(0)
             )

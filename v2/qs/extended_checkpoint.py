@@ -161,13 +161,7 @@ def restore_store(payload, collector, budget):
     if collector._atoms or collector._rows:
         raise ValueError("expanded restore requires an empty collector")
     atoms, rows = payload["atoms"], payload["rows"]
-    if (
-        not isinstance(atoms, list)
-        or not isinstance(rows, list)
-        or (
-            len(atoms) > config.atom_limit or len(rows) > config.relation_limit
-        )
-    ):
+    if not isinstance(atoms, list) or not isinstance(rows, list):
         raise ValueError("expanded checkpoint exceeds its retained caps")
     if payload["row_order"] != list(range(len(rows))):
         raise ValueError("invalid expanded row order")
@@ -279,13 +273,10 @@ def restore_store(payload, collector, budget):
             scratch += 256 + 64 * len(cycle)
         scratch += 64 * len(saved_kernel["unowned"]) + 512 * largest_decode
     budget.consume(len(atoms) + len(staged) + len(rows) + 1)
-    if collector._workspace + scratch > config.memory_limit:
-        raise MemoryError("expanded restore coexistence exceeds memory cap")
     spill = None
-    if config.spill_bytes:
+    if config.spill_directory is not None:
         spill = SpillStore(
             config.spill_directory,
-            config.spill_bytes,
             config.spill_cache_bytes,
             budget,
         )
@@ -407,7 +398,7 @@ def restore_store(payload, collector, budget):
             leaves = tuple(
                 atom if i == handle else arena.atoms[i] for i in plan.cycle
             )
-            row = checked.combine(leaves, budget, config.memory_limit).relation
+            row = checked.combine(leaves, budget).relation
             if row is None:
                 raise ValueError("checkpoint combination exposed a nonunit")
             expected = list(plan.cycle)
@@ -418,14 +409,14 @@ def restore_store(payload, collector, budget):
                 raise ValueError(
                     "expanded cycle differs from exact incidence replay"
                 )
-            if bounded and not config.spill_bytes:
+            if bounded and not (config.spill_directory is not None):
                 from .yield_memory import row_reserve
 
                 cost += row_reserve(leaves, base)
             else:
                 cost += 8192 + 512 * sum(len(a.exponents) for a in leaves)
         reserve += cost
-        slab_bound = (
+        (
             arena.allocation_bound(
                 [len(atom.exponents)]
                 + ([] if row is None else [len(row.exponents)])
@@ -433,9 +424,7 @@ def restore_store(payload, collector, budget):
             if bounded
             else 0
         )
-        if reserve + scratch + slab_bound > config.memory_limit:
-            raise MemoryError("expanded restored ownership exceeds memory cap")
-        if bounded and not config.spill_bytes:
+        if bounded and not (config.spill_directory is not None):
             before = arena.allocated_bytes
             atom, row, _ = arena.plan(atom, row, budget)
             delta = arena.allocated_bytes - before
@@ -472,7 +461,11 @@ def restore_store(payload, collector, budget):
     for row in rebuilt_rows:
         checked._record(row, atoms=tuple(store[i] for i in row.atom_ids))
     calls = payload["split_calls"]
-    if type(calls) is not int or not 0 <= calls <= config.split_limit:
+    if (
+        type(calls) is not int
+        or calls < 0
+        or (config.split_limit is not None and calls > config.split_limit)
+    ):
         raise ValueError("invalid expanded split charges")
     endpoints = type(collector._endpoints)()
     saved = payload["endpoints"]
@@ -541,8 +534,6 @@ def restore_store(payload, collector, budget):
         if divisor is not None or key in checked.canonical:
             raise ValueError("invalid canonical representative")
         checked.remember(atom, key=key)
-    if len(checked.canonical) != len(canonical):
-        raise MemoryError("saved canonical cache exceeds its allowance")
     staging = None
     if bounded:
         from .opaque_staging import OpaqueStaging, entry_bytes
@@ -572,8 +563,6 @@ def restore_store(payload, collector, budget):
             if checked.unit(opaque, budget) != 1:
                 raise ValueError("nonunit staged opaque")
             staging.used += entry_bytes(atom, base)
-            if staging.used > config.opaque_cache_bytes:
-                raise MemoryError("opaque staging bytes exceed their cap")
             staging.atoms[opaque] = atom
     original_reporting = collector._reporting
     reporting = type(original_reporting)(

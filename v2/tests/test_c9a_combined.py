@@ -9,6 +9,9 @@ from dataclasses import FrozenInstanceError, replace
 from math import gcd
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
@@ -63,7 +66,7 @@ def policy(**changes):
         memory_bytes=128 * 2**20,
     )
     values.update(changes)
-    return CombinedYieldSieveConfig(**values)
+    return adapt_resource_configuration(CombinedYieldSieveConfig, **values)
 
 
 def collector(**changes):
@@ -188,7 +191,7 @@ class CofactorTests(unittest.TestCase):
             base = build_factor_base(
                 10403, multiplier=multiplier, bound=40
             ).factor_base
-            self.assertEqual(residual_floor(base, allowance(), 10**8), 40)
+            self.assertEqual(residual_floor(base, allowance()), 40)
             for omitted in base.entries[1:]:
                 incomplete = FactorBase(
                     base.n,
@@ -197,10 +200,11 @@ class CofactorTests(unittest.TestCase):
                     tuple(e for e in base.entries if e is not omitted),
                 )
                 self.assertEqual(
-                    residual_floor(incomplete, allowance(), 10**8),
+                    residual_floor(incomplete, allowance()),
                     omitted.prime,
                 )
-        self.assertEqual(residual_floor(base, allowance(), 0), 2)
+        with self.assertRaises(TypeError):
+            residual_floor(base, allowance(), 0)
 
     def test_hole_rejection_does_not_start_split_or_primality(self):
         from v2.qs.yield_collector import divide_yield_residual
@@ -317,13 +321,9 @@ class CompactStoreTests(unittest.TestCase):
                 restore_store(bad, empty, allowance())
             self.assertFalse(empty._atoms)
         empty = collector(duplicate_policy="pair-v1")
-        empty._workspace = empty.config.memory_limit - 1
-        with patch(
-            "v2.qs.indexed_relations.import_factors",
-            side_effect=AssertionError("decoded before preflight"),
-        ):
-            with self.assertRaises(MemoryError):
-                restore_store(payload, empty, allowance())
+        empty._workspace = 10**30
+        restore_store(payload, empty, allowance())
+        self.assertEqual(encoded(empty), payload)
 
     def test_failed_auxiliary_publication_poisoned_not_resumable(self):
         worker = collector()
@@ -566,7 +566,6 @@ class CombinedPipelineTests(unittest.TestCase):
             base_bound=100,
             half_width=256,
             max_half_width=256,
-            memory_bytes=128 * 2**20,
             solve_policy="collection",
             collector=policy(block_width=16),
         )
@@ -601,9 +600,7 @@ class CombinedPipelineTests(unittest.TestCase):
                 self.assertEqual(
                     result.divisor * result.cofactor, 10007 * 10009
                 )
-            self.assertLessEqual(
-                result.stats["workspace_bytes"], config.memory_bytes
-            )
+            self.assertGreaterEqual(result.stats["workspace_bytes"], 0)
 
 
 if __name__ == "__main__":

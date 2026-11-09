@@ -5,10 +5,13 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    decode_historical_siqs as _decode_siqs_config,
+)
 from v2.benchmarks.qs.a1b import CONTROL
-from v2.execution.budget import Budget, BudgetExhaustedError
-from v2.portfolio import _decode_siqs_config
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import reference_factors
 
 
@@ -54,10 +57,7 @@ class A1bContractTests(unittest.TestCase):
     def test_selected_growing_dlp_windows_exceptions_and_recovery(self):
         saw_pair = False
         for digits in (50, 55, 60):
-            cfg = replace(
-                selected(digits).collector,
-                memory_bytes=selected(digits).memory_bytes,
-            )
+            cfg = replace(selected(digits).collector)
             for multiplier in (1, 3):
                 base = build_factor_base(
                     10403, bound=100, multiplier=multiplier
@@ -129,11 +129,7 @@ class A1bContractTests(unittest.TestCase):
         poly = Polynomial(b * b, 1, 1, b)
         base = build_factor_base(b * b, bound=3).factor_base
         for backend in ("list", "array", "bytearray"):
-            cfg = replace(
-                selected().collector,
-                score_backend=backend,
-                memory_bytes=selected().memory_bytes,
-            )
+            cfg = replace(selected().collector, score_backend=backend)
             worker = SieveCollector(poly, base, config=cfg, budget=allowance())
             result = worker.collect(2, 3)
             self.assertEqual(result.reason, "complete")
@@ -151,9 +147,7 @@ class A1bContractTests(unittest.TestCase):
     def test_fixed_growing_refusal_cancellation_and_exact_resume(self):
         base = build_factor_base(10403, bound=100).factor_base
         poly = Polynomial(10403, 1, 49, 8)
-        cfg = replace(
-            selected().collector, memory_bytes=selected().memory_bytes
-        )
+        cfg = replace(selected().collector)
         worker = SieveCollector(poly, base, config=cfg, budget=allowance())
         worker.budget.work_limit = worker.budget.used
         refused = worker.collect(-71, 80)
@@ -170,7 +164,7 @@ class A1bContractTests(unittest.TestCase):
             poly, base, config=cfg, budget=allowance()
         ).collect(-71, 80)
         self.assertEqual(resumed, clean)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             SieveCollector(
                 poly,
                 base,

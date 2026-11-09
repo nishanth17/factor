@@ -8,11 +8,17 @@ from dataclasses import replace
 from math import gcd
 
 from v2 import portfolio
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.pm1.a6.a6_production import load_control
 from v2.execution import stage_jobs
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.execution.schedules import SieveContext
 from v2.pm1.gaps import verify_powers
+from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values
 
 
 def allowance(work=1000000):
@@ -20,7 +26,8 @@ def allowance(work=1000000):
 
 
 def configuration(**changes):
-    return portfolio.PortfolioConfig(
+    return adapt_resource_configuration(
+        portfolio.PortfolioConfig,
         trial_bound=5,
         rho_attempts=0,
         ecm_tiers=(),
@@ -128,9 +135,14 @@ class ProductionPM1Tests(unittest.TestCase):
             segment_size=16,
             gcd_batch=4,
         )
-        oldconfig = old.PortfolioConfig(**options)
-        legacy = portfolio.PortfolioConfig(
-            **options, pm1_gap_mode="cached", pm1_chunk_size=None
+        oldconfig = adapt_resource_configuration(
+            old.PortfolioConfig, **options
+        )
+        legacy = adapt_resource_configuration(
+            portfolio.PortfolioConfig,
+            **options,
+            pm1_gap_mode="cached",
+            pm1_chunk_size=None,
         )
         n = 1009 * 1013
         oldrun = old.factorize_bounded(
@@ -141,30 +153,42 @@ class ProductionPM1Tests(unittest.TestCase):
         )
         for key in ("version", "config", "rng", "work_used", "schedule"):
             self.assertEqual(
-                oldrun.checkpoint["payload"][key],
-                newrun.checkpoint["payload"][key],
+                recipe_values(oldrun.checkpoint["payload"][key]),
+                recipe_values(newrun.checkpoint["payload"][key]),
             )
+        whole = old.factorize_bounded(
+            n, seed=7, config=oldconfig, budget=allowance()
+        )
+        self.assertEqual(whole.result.reconstruct(), n)
+        for cfg in (legacy, configuration()):
+            with self.assertRaises(UnsupportedResourceVersionError):
+                portfolio.factorize_bounded(
+                    n,
+                    config=cfg,
+                    budget=allowance(),
+                    checkpoint=json.loads(json.dumps(oldrun.checkpoint)),
+                    ecm_executor=None,
+                )
+
+        current_whole = portfolio.factorize_bounded(
+            n, seed=7, config=legacy, budget=allowance(), ecm_executor=None
+        )
         resumed = portfolio.factorize_bounded(
             n,
             config=legacy,
             budget=allowance(),
-            checkpoint=json.loads(json.dumps(oldrun.checkpoint)),
+            checkpoint=json.loads(json.dumps(newrun.checkpoint)),
             ecm_executor=None,
-        )
-        whole = old.factorize_bounded(
-            n, seed=7, config=oldconfig, budget=allowance()
         )
         self.assertEqual(
             (resumed.result, resumed.work_used),
-            (whole.result, whole.work_used),
+            (current_whole.result, current_whole.work_used),
         )
-        with self.assertRaisesRegex(ValueError, "incompatible"):
-            portfolio.factorize_bounded(
-                n,
-                config=configuration(),
-                budget=allowance(),
-                checkpoint=oldrun.checkpoint,
-                ecm_executor=None,
+        self.assertEqual(resumed.result.reconstruct(), n)
+        for field in ("rng", "config", "schedule", "primality"):
+            self.assertEqual(
+                resumed.checkpoint["payload"][field],
+                current_whole.checkpoint["payload"][field],
             )
 
     def test_new_schema_resume_and_table_corruption(self):
@@ -267,17 +291,41 @@ class ProductionPM1Tests(unittest.TestCase):
             n, budget=allowance(0), checkpoint=fresh.checkpoint
         )
         self.assertEqual(resumed.reason, "work_limit")
+        self.assertEqual(resumed.work_used, fresh.work_used)
+        for field in (
+            "version",
+            "portfolio_version",
+            "config",
+            "rng",
+            "primality",
+        ):
+            self.assertEqual(
+                resumed.checkpoint["payload"][field],
+                fresh.checkpoint["payload"][field],
+            )
+        saved_config = resumed.checkpoint["payload"]["config"]
+        self.assertEqual(
+            (saved_config["pm1_chunk_size"], saved_config["pm1_gap_mode"]),
+            (64, "recurrence"),
+        )
+        whole = portfolio.factorize_bounded(n, budget=allowance())
+        finished = portfolio.factorize_bounded(
+            n,
+            budget=allowance(),
+            checkpoint=resumed.checkpoint,
+        )
+        self.assertEqual(
+            (finished.result, finished.work_used),
+            (whole.result, whole.work_used),
+        )
+        self.assertEqual(finished.result.reconstruct(), n)
 
         old = load_control("portfolio")
         paused = old.factorize_bounded(n, budget=allowance(0))
-        resumed = portfolio.factorize_bounded(
-            n, budget=allowance(0), checkpoint=paused.checkpoint
-        )
-        self.assertEqual(resumed.checkpoint["payload"]["version"], 4)
-        self.assertNotIn(
-            "pm1_gap_mode", resumed.checkpoint["payload"]["config"]
-        )
-        self.assertEqual(resumed.work_used, paused.work_used)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            portfolio.factorize_bounded(
+                n, budget=allowance(0), checkpoint=paused.checkpoint
+            )
 
     def test_implicit_bounded_campaign_default_and_legacy_resume(self):
         from v2.pm1.bounded import factorize_pm1_bounded
@@ -300,15 +348,42 @@ class ProductionPM1Tests(unittest.TestCase):
         paused = old.factorize_pm1_bounded(
             n, budget=allowance(), max_actions=0
         )
-        resumed = factorize_pm1_bounded(
-            n, budget=allowance(), checkpoint=paused.checkpoint, max_actions=0
+        with self.assertRaises(UnsupportedResourceVersionError):
+            factorize_pm1_bounded(
+                n,
+                budget=allowance(),
+                checkpoint=paused.checkpoint,
+                max_actions=0,
+            )
+
+        from v2.pm1.bounded import PM1Config
+
+        # The original arithmetic executor supports current resource markers.
+        legacy_config = PM1Config()
+        current = factorize_pm1_bounded(
+            n, config=legacy_config, budget=allowance(), max_actions=0
+        )
+        restored = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=current.checkpoint, max_actions=0
         )
         self.assertEqual(
-            resumed.checkpoint["payload"]["execution"], "pm1-campaign-v1"
+            restored.checkpoint["payload"]["execution"], "pm1-campaign-v1"
         )
         self.assertEqual(
-            resumed.checkpoint["payload"]["config"]["chunk_size"], 16
+            restored.checkpoint["payload"]["config"]["chunk_size"], 16
         )
+        self.assertEqual(
+            restored.checkpoint["payload"]["config"],
+            current.checkpoint["payload"]["config"],
+        )
+        whole = factorize_pm1_bounded(
+            n, config=legacy_config, budget=allowance()
+        )
+        finished = factorize_pm1_bounded(
+            n, budget=allowance(), checkpoint=restored.checkpoint
+        )
+        self.assertEqual(finished.result, whole.result)
+        self.assertEqual(finished.result.reconstruct(), n)
 
     def test_malformed_implicit_resume_is_rejected(self):
         from v2.pm1.bounded import factorize_pm1_bounded

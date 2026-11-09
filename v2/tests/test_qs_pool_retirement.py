@@ -1,5 +1,6 @@
 """A crash can wake the owner while the executor manager is still reaping."""
 
+import faulthandler
 import multiprocessing
 import os
 import signal
@@ -22,6 +23,7 @@ def _poisoned_stop_scenario(connection):
     os.setsid()
     from v2.tests.test_current_qs_workers import prepared, settings
 
+    faulthandler.dump_traceback_later(5)
     try:
         job = prepared(worker_settings=settings("process", 2))
         with CollectionPool("process", 2) as pool:
@@ -40,6 +42,7 @@ def _poisoned_stop_scenario(connection):
                 )
             )
     finally:
+        faulthandler.cancel_dump_traceback_later()
         connection.close()
 
 
@@ -53,6 +56,29 @@ class RetirementTests(unittest.TestCase):
             pool.state["stop"] = PoisonedEvent()
             pool.abort()
             self.assertTrue(pool.closed)
+
+    def test_submit_failure_never_signals_a_poisoned_event(self):
+        from concurrent.futures.process import BrokenProcessPool
+
+        from v2.tests.test_current_qs_workers import prepared, settings
+
+        class PoisonedEvent:
+            def clear(self):
+                pass
+
+            def set(self):
+                raise AssertionError("acquired a dead worker's stop lock")
+
+        job = prepared(worker_settings=settings("process", 2))
+        with CollectionPool("process", 2) as pool:
+            pool.state["stop"] = PoisonedEvent()
+            with patch.object(
+                pool.executor, "submit", side_effect=BrokenProcessPool()
+            ):
+                result = job.run(pool=pool, fixed_work=True)
+        self.assertEqual(result.reason, "worker_failure")
+        self.assertEqual(job.stats["lost_packets"], 1)
+        self.assertTrue(pool.closed)
 
     @unittest.skipUnless(os.name == "posix", "requires an owned process group")
     def test_detected_crash_while_polling_stop_has_finite_retirement(self):
@@ -77,7 +103,7 @@ class RetirementTests(unittest.TestCase):
             self.assertTrue(receive.poll(1))
             result = receive.recv()
             self.assertEqual(result["reason"], "worker_failure")
-            self.assertGreater(result["lost_work"], 0)
+            self.assertEqual(result["lost_work"], 0)
             self.assertTrue(result["closed"])
             self.assertTrue(result["retired"])
         finally:

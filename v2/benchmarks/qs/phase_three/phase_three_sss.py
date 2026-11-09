@@ -9,9 +9,19 @@ import resource
 import statistics
 import sys
 import time
-from dataclasses import asdict, replace
 from math import isfinite, prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -54,7 +64,9 @@ def rss_bytes():
 
 def run_one(fixture, seed, config, seconds):
     """Time setup through factor classification; hide the known factors."""
-    budget = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
+    budget = recording_budget(
+        Budget, work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    )
     started, cpu = time.perf_counter(), time.process_time()
     job_type = SSSJob if isinstance(config, SSSConfig) else SIQSJob
     job = job_type(fixture["n"], seed=seed, config=config, budget=budget)
@@ -176,7 +188,8 @@ def measure(fixtures, seeds, config, seconds, args):
 
 
 def collector_config():
-    return SieveConfig(
+    return adapt_resource_configuration(
+        SieveConfig,
         division="roots",
         residual_bound=10000,
         max_atoms=8192,
@@ -196,7 +209,8 @@ def train(corpus, args):
 
     for bound in (400, 1000):
         for size in (3, 6):
-            config = SSSConfig(
+            config = adapt_resource_configuration(
+                SSSConfig,
                 base_bound=bound,
                 selection_size=size,
                 search_rounds=128,
@@ -229,8 +243,10 @@ def train(corpus, args):
 
 def deserialize_config(data):
     data = dict(data)
-    data["collector"] = SieveConfig(**data["collector"])
-    return SSSConfig(**data)
+    data["collector"] = adapt_resource_configuration(
+        SieveConfig, **data["collector"]
+    )
+    return adapt_resource_configuration(SSSConfig, **data)
 
 
 def band_bound(band):
@@ -257,7 +273,8 @@ def train_siqs(corpus, band, args):
 
         for bound in (200, 400):
             for count in (1, 3):
-                config = SIQSConfig(
+                config = adapt_resource_configuration(
+                    SIQSConfig,
                     base_bound=bound,
                     factor_count=count,
                     half_width=256,
@@ -311,7 +328,8 @@ def train_siqs(corpus, band, args):
 
     for count in counts:
         for width in (512, 4096):
-            config = SIQSConfig(
+            config = adapt_resource_configuration(
+                SIQSConfig,
                 base_bound=bound,
                 factor_count=count,
                 half_width=width,
@@ -464,7 +482,8 @@ def main():
             base, base_bound=band_bound(args.band), search_rounds=4096
         )
     configs = {
-        "siqs": SIQSConfig(
+        "siqs": adapt_resource_configuration(
+            SIQSConfig,
             base_bound=base.base_bound,
             half_width=512,
             factor_count=3,
@@ -489,8 +508,10 @@ def main():
         if control_training.get("band", args.band) != args.band:
             raise ValueError("SIQS settings were trained for another band")
         data = dict(control_training["frozen"])
-        data["collector"] = SieveConfig(**data["collector"])
-        configs["siqs"] = SIQSConfig(**data)
+        data["collector"] = adapt_resource_configuration(
+            SieveConfig, **data["collector"]
+        )
+        configs["siqs"] = adapt_resource_configuration(SIQSConfig, **data)
         for name, digest in control_training["source_sha256"].items():
             if name.startswith("qs/") and manifest.get(name) != digest:
                 raise ValueError("SIQS training and evaluation sources differ")

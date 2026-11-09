@@ -7,8 +7,7 @@ from math import isqrt
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import gcd, pow
-from ..execution.budget import Budget
-from .factor_base import DEFAULT_MEMORY_BYTES
+from ..execution.resources import removed_arguments, resolve_budget
 from .polynomial import Polynomial, checked_position
 
 MAX_RESIDUAL = 1_000_000_000_000
@@ -210,7 +209,7 @@ def _verify_atomic(
     exponents = relation.exponents
     if len(exponents) > len(factor_base.entries):
         raise ValueError("relation has too many factor-base exponents")
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     value = polynomial.a * polynomial.value(relation.position)
     budget.consume((len(exponents) + 1) * abs(value).bit_length())
     if relation.u * relation.u - factor_base.n_prime != value:
@@ -382,9 +381,9 @@ def combined_storage_reserve(exponent_count, modulus_bits):
     return 4096 + 256 * exponent_count + 16 * modulus_bits
 
 
-def _combination_workspace(atoms, factor_base, memory_bytes):
+@removed_arguments(("memory_bytes",))
+def _combination_workspace(atoms, factor_base):
     """Reserve referenced atoms, exponent counters, and modular temporaries."""
-    utils.require_integer(memory_bytes, "memory_bytes", 0)
     reserve = factor_base.workspace_bytes + 8192
     reserve += 256 * len(factor_base.entries)
     for atom in atoms:
@@ -397,16 +396,11 @@ def _combination_workspace(atoms, factor_base, memory_bytes):
         )
         reserve += 2048 + 128 * len(atom.exponents) + 4 * numeric_bits
 
-    if reserve > memory_bytes:
-        raise MemoryError(
-            "combination/provenance workspace exceeds memory_bytes"
-        )
     return reserve
 
 
-def combine_relations(
-    atoms, factor_base, *, budget=None, memory_bytes=DEFAULT_MEMORY_BYTES
-):
+@removed_arguments(("memory_bytes",))
+def combine_relations(atoms, factor_base, *, budget=None):
     """Combine a bounded explicit tuple of checked atoms, without inversion.
 
     Retain residual square corrections rather than dividing U by residuals.
@@ -422,8 +416,8 @@ def combine_relations(
     identities = tuple(atom.relation_id for atom in atoms)
     if len(set(identities)) != len(identities):
         raise ValueError("an atomic position cannot be used twice")
-    _combination_workspace(atoms, factor_base, memory_bytes)
-    budget = budget if budget is not None else Budget()
+    _combination_workspace(atoms, factor_base)
+    budget = resolve_budget(budget)
     for atom in atoms:
         verify_atomic(
             atom,
@@ -449,27 +443,19 @@ def combine_relations(
     values = _combined_values(atoms, factor_base.n)
     combined = CombinedRelation(identities, *values)
     store = {atom.relation_id: atom for atom in atoms}
-    verify_combined(
-        combined, factor_base, store, budget=budget, memory_bytes=memory_bytes
-    )
+    verify_combined(combined, factor_base, store, budget=budget)
     return CombinationResult(combined, None)
 
 
-def verify_combined(
-    relation,
-    factor_base,
-    atom_store,
-    *,
-    budget=None,
-    memory_bytes=DEFAULT_MEMORY_BYTES,
-):
+@removed_arguments(("memory_bytes",))
+def verify_combined(relation, factor_base, atom_store, *, budget=None):
     """Recheck every atom, provenance fields, and the combined congruence.
 
     Missing or altered provenance and plausible but incorrect modular
     payloads raise ValueError. Verification never forms an integer product
     of all atomic values. The original atom store must remain available.
     """
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     atoms = []
     for identity in relation.atom_ids:
         atom = atom_store.get(identity)
@@ -477,7 +463,7 @@ def verify_combined(
             raise ValueError("missing or mismatched atomic provenance")
         atoms.append(atom)
 
-    _combination_workspace(atoms, factor_base, memory_bytes)
+    _combination_workspace(atoms, factor_base)
     for atom in atoms:
         verify_atomic(
             atom,

@@ -12,8 +12,15 @@ import subprocess
 import sys
 import time
 from contextlib import ExitStack
-from dataclasses import asdict
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ... import portfolio
 from ...common import utils
@@ -85,7 +92,7 @@ def _baseline_one(n, seed, config):
 
 def _sample(request):
     """Time one validated answer under identical external time/CPU caps."""
-    config = PortfolioConfig(**request["config"])
+    config = adapt_resource_configuration(PortfolioConfig, **request["config"])
     n, seed = request["n"], request["seed"]
     started = time.perf_counter()
     cpu_started = time.process_time()
@@ -116,7 +123,8 @@ def _sample(request):
                 seed=seed,
                 config=config,
                 stop_after_split=request["mode"] == "factor_one",
-                budget=Budget(
+                budget=recording_budget(
+                    Budget,
                     work_limit=request["work_limit"],
                     seconds=request["seconds"],
                     cpu_seconds=request["cpu_seconds"],
@@ -362,11 +370,12 @@ def run(args):
     if not fixtures:
         raise ValueError("no matching fixtures")
     if args.config:
-        config = PortfolioConfig(
-            **json.loads(source_path(args.config).read_text())
+        config = adapt_resource_configuration(
+            PortfolioConfig, **json.loads(source_path(args.config).read_text())
         )
     else:
-        config = PortfolioConfig(
+        config = adapt_resource_configuration(
+            PortfolioConfig,
             trial_bound=args.trial_bound,
             max_input_bits=512,
             ecm_tiers=((2000, 147396, args.curves),),

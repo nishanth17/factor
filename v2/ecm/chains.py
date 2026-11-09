@@ -130,8 +130,6 @@ class ChainPlan:
             record = Record(scalar, code, output, slots)
             actions[scalar] = Action(record, masks, engine)
             owned += 4096 + 512 * steps
-        if owned > PLAN_BYTES:
-            raise MemoryError("verified ECM chain plan exceeds its reserve")
         budget.consume(bound)
         primes = prime_sieve.prime_sieve(bound + 1)
         self.entries = {}
@@ -212,7 +210,7 @@ class ChainPlans:
     """
 
     def __init__(self, memory_bytes, backend, bounds):
-        utils.require_integer(memory_bytes, "chain memory", MIN_MEMORY_BYTES)
+        utils.require_integer(memory_bytes, "chain cache bytes", 0)
         self.memory_bytes, self.backend = memory_bytes, backend
         self.bounds = frozenset(bounds)
         self.plans = OrderedDict()
@@ -237,8 +235,9 @@ class ChainPlans:
             del old
         self.misses += 1
         plan = ChainPlan(bound, self.backend, budget)
-        self.plans[key] = plan
-        self.used_bytes += plan.owned_bytes
+        if self.used_bytes + plan.owned_bytes <= self.memory_bytes:
+            self.plans[key] = plan
+            self.used_bytes += plan.owned_bytes
         return plan
 
 

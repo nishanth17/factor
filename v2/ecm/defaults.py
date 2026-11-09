@@ -14,8 +14,6 @@ def resolve_defaults(config, n):
 
     C3 selected 30/40 digits; automatic ECM adds 60/80/100. Other sizes and
     explicitly selected paired executors retain the previous numerical plan.
-    A tight existing memory cap also retains that plan rather than reducing
-    the relation engine's storage or enlarging the parent's allowance.
     """
     utils.require_integer(n)
     magnitude = abs(n)
@@ -28,9 +26,4 @@ def resolve_defaults(config, n):
             for digits in (40, 60, 80, 100)
         ):
             tiers = ESCALATING140
-    try:
-        return replace(config, ecm_tiers=tiers)
-    except MemoryError:
-        # Admission remains conservative even when ECM and SIQS coexist.
-        # Freeze the old plan too, so children cannot trigger a new choice.
-        return replace(config, ecm_tiers=config.ecm_tiers)
+    return replace(config, ecm_tiers=tiers)

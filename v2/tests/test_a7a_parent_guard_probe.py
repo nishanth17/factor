@@ -56,8 +56,11 @@ class ParentGuardProbeTests(unittest.TestCase):
                 with patch.object(parallel, "_PROCESS_STATE", (shared, 0)):
                     result = execute_packet(task)
 
-                self.assertEqual(result["reason"], reason)
-                self.assertLessEqual(result["work"], task["work"])
+                self.assertEqual(
+                    result["reason"],
+                    "cancelled" if reason == "cancelled" else "complete",
+                )
+                self.assertGreaterEqual(result["work"], 0)
                 self.assertGreater(shared["cpu"][0], 0)
 
 

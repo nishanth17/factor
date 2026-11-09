@@ -16,9 +16,19 @@ import sys
 import time
 from collections import Counter
 from contextlib import contextmanager
-from dataclasses import asdict, replace
 from math import isqrt, prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -117,7 +127,8 @@ def common_config(
     partials=2048,
     memory=MEMORY,
 ):
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=bound,
         half_width=width,
         max_half_width=width,
@@ -133,7 +144,8 @@ def common_config(
         batch_width=4096,
         memory_bytes=memory,
         checkpoint_bytes=2**20,
-        collector=SieveConfig(
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             score_policy="powers",
             division="bucket",
@@ -290,7 +302,8 @@ def run_one(fixture, seed, config, seconds, *, job_type=SIQSJob):
             last_poll = time.monotonic()
         return False
 
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=WORK,
         seconds=seconds,
         cpu_seconds=seconds,
@@ -676,14 +689,18 @@ def confirm(protocol_path, selected_path, corpus_path, output):
             job = SIQSJob(
                 fixture["n"],
                 config=config,
-                budget=Budget(work_limit=WORK, seconds=60, cpu_seconds=60),
+                budget=recording_budget(
+                    Budget, work_limit=WORK, seconds=60, cpu_seconds=60
+                ),
             )
             first = job.run(max_blocks=1)
             checkpoint = job.checkpoint()
             resumed = SIQSJob.from_checkpoint(
                 checkpoint,
                 config=config,
-                budget=Budget(work_limit=WORK, seconds=60, cpu_seconds=60),
+                budget=recording_budget(
+                    Budget, work_limit=WORK, seconds=60, cpu_seconds=60
+                ),
             )
             if resumed.budget.used < first.stats["work_used"]:
                 raise AssertionError("resume reset consumed work")
@@ -698,9 +715,16 @@ def confirm(protocol_path, selected_path, corpus_path, output):
             for bad_config, bad_budget in (
                 (
                     replace(config, row_excess=config.row_excess + 1),
-                    Budget(work_limit=WORK, seconds=60, cpu_seconds=60),
+                    recording_budget(
+                        Budget, work_limit=WORK, seconds=60, cpu_seconds=60
+                    ),
                 ),
-                (config, Budget(work_limit=0, seconds=60, cpu_seconds=60)),
+                (
+                    config,
+                    recording_budget(
+                        Budget, work_limit=0, seconds=60, cpu_seconds=60
+                    ),
+                ),
             ):
                 try:
                     SIQSJob.from_checkpoint(

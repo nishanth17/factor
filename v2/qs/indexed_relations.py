@@ -201,12 +201,11 @@ class RecordArena:
         self.next_slot = 0
         self.recompute_limit = getattr(config, "recompute_prime_limit", 0)
         self.spill = None
-        if getattr(config, "spill_bytes", 0):
+        if getattr(config, "spill_directory", None) is not None:
             from .cold_factors import SpillStore
 
             self.spill = SpillStore(
                 config.spill_directory,
-                config.spill_bytes,
                 config.spill_cache_bytes,
                 budget,
             )

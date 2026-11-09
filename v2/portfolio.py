@@ -42,6 +42,13 @@ from .execution.portfolio_config import (
 from .execution.portfolio_config import (
     _execution_context as _execution_context,
 )
+from .execution.resources import (
+    accounted_entry,
+    decode_checkpoint,
+    encode_checkpoint,
+    removed_arguments,
+    require_resource_version,
+)
 from .execution.schedules import SieveContext
 from .execution.stage_jobs import (
     advance_job,
@@ -74,6 +81,7 @@ class PortfolioRun:
     events: tuple
     dropped_events: int
     checkpoint: dict
+    resource_stop: dict | None = None
 
 
 def _canonical(value):
@@ -243,7 +251,7 @@ def _handoff(state, config, budget, reason):
             outcome=reason,
             from_stage=current["stage"],
             work_used=budget.used,
-            remaining_work=budget.work_limit - budget.used,
+            remaining_work=None,
         )
     current["job"] = None
     if config.siqs is not None:
@@ -437,9 +445,6 @@ def _advance(
         result = job.run(batch_limit=1)
         if result.divisor is not None or result.reason in (
             "search_exhausted",
-            "relation_limit",
-            "atom_limit",
-            "memory_limit",
         ):
             _event(
                 state,
@@ -556,10 +561,6 @@ def _advance(
         if current["tier"] >= len(config.ecm_tiers):
             _handoff(state, config, budget, "schedule_exhausted")
             return
-        if ecm_executor.settings.parent_memory < config.memory_bytes:
-            raise ValueError(
-                "worker parent reserve must include portfolio ownership"
-            )
         run = getattr(ecm_executor, "run_portfolio", ecm_executor.run)
         if hasattr(ecm_executor, "run_portfolio") and (
             current["job"] is not None or current["attempt"] or current["tier"]
@@ -705,6 +706,7 @@ def _legacy_pm1(config):
     )
 
 
+@encode_checkpoint
 def _pack(state, config, budget, generator, policy):
     """Snapshot RNG, pending work, schedule identity, and resource use."""
     wall_used, cpu_used = budget.wall_used, budget.cpu_used
@@ -777,10 +779,10 @@ def _pack(state, config, budget, generator, policy):
         "wall_used": wall_used,
         "cpu_used": cpu_used,
         "limits": {
-            "work": budget.work_limit,
+            "work": None,
             "seconds": budget.seconds,
             "cpu_seconds": budget.cpu_seconds,
-            "remaining_work": budget.work_limit - budget.used,
+            "remaining_work": None,
             "remaining_seconds": max(0, budget.seconds - wall_used)
             if budget.seconds is not None
             else None,
@@ -799,8 +801,6 @@ def _pack(state, config, budget, generator, policy):
         payload["portfolio_version"] = payload["version"]
         payload["version"] = AUTOMATIC_CHECKPOINT_VERSION
     encoded = _canonical(payload)
-    if len(encoded.encode()) > config.memory_bytes // 2:
-        raise MemoryError("serialized checkpoint exceeds output reserve")
     checkpoint = {
         "payload": json.loads(encoded),
         "sha256": hashlib.sha256(encoded.encode()).hexdigest(),
@@ -948,6 +948,7 @@ def _verify_progress(current, config, policy):
         verify_progress(current["job"], config, verifier)
 
 
+@decode_checkpoint
 def _unpack(checkpoint, config):
     """Reject corrupt, incompatible, oversized, or inconsistent snapshots."""
     try:
@@ -969,8 +970,6 @@ def _unpack(checkpoint, config):
         ):
             raise ValueError("serialization overhead checksum mismatch")
 
-        if len(encoded.encode()) > config.memory_bytes // 2:
-            raise ValueError("checkpoint exceeds configured cap")
         if (
             hashlib.sha256(encoded.encode()).hexdigest()
             != checkpoint["sha256"]
@@ -1321,28 +1320,8 @@ def _promote_state(state, name):
             promote_job(current["job"], backend)
 
 
-def _qs_coexistence_bytes(config, executor, *, owned_ecm=False):
-    """Reserve retained ECM ownership alongside the QS process allowance."""
-    reserve = config.workspace_reserve + 8192
-    if executor is None or (
-        owned_ecm and not any(curves for _, _, curves in config.ecm_tiers)
-    ):
-        return reserve
-
-    # A borrowed or selected pool can remain resident through QS fallback.
-    # Reserve its finite cap even before startup so resume cannot change the
-    # QS execution identity merely by warming that pool. Unknown ownership
-    # must be refused rather than silently excluded from the global bound.
-    memory = getattr(executor, "memory_bytes", None)
-    if memory is None:
-        memory = getattr(
-            getattr(executor, "settings", None), "owned_bytes", None
-        )
-    if type(memory) is not int or memory < 0:
-        raise ValueError("QS workers require finite ECM coexistence ownership")
-    return reserve + memory
-
-
+@removed_arguments(("ecm_memory_bytes",))
+@accounted_entry
 def factorize_bounded(
     n,
     *,
@@ -1352,7 +1331,6 @@ def factorize_bounded(
     checkpoint=None,
     stop_after_split=False,
     ecm_executor="auto",
-    ecm_memory_bytes=None,
     qs_workers=None,
     qs_pool=None,
 ):
@@ -1362,6 +1340,8 @@ def factorize_bounded(
     Explicit contexts remain borrowed. Omitted budgets/memory receive finite
     parallel-capable grants; explicit allowances and legacy checkpoints win.
     """
+    if checkpoint is not None:
+        require_resource_version(checkpoint)
     options = dict(
         seed=seed,
         config=config,
@@ -1376,14 +1356,10 @@ def factorize_bounded(
             raise ValueError("ECM executor must be auto, None or a context")
         from .ecm.auto import AutomaticECMOwner
 
-        with AutomaticECMOwner(
-            seed=seed, memory_bytes=ecm_memory_bytes
-        ) as owner:
+        with AutomaticECMOwner(seed=seed) as owner:
             return _factorize_bounded(
                 n, ecm_executor=owner, _owned_ecm=True, **options
             )
-    if ecm_memory_bytes is not None:
-        raise ValueError("aggregate ECM memory requires automatic execution")
     return _factorize_bounded(n, ecm_executor=ecm_executor, **options)
 
 
@@ -1457,7 +1433,6 @@ def _factorize_bounded(
                 ),
                 "ecm_chain_bytes": saved_config.get("ecm_chain_bytes", 0),
                 "ecm_program_bytes": saved_config.get("ecm_program_bytes", 0),
-                "memory_bytes": saved_config.get("memory_bytes", 8_388_608),
                 "ecm_tiers": saved_config.get(
                     "ecm_tiers", ((constants.ECM_B1, constants.ECM_B2, 32),)
                 ),
@@ -1494,39 +1469,13 @@ def _factorize_bounded(
                 else 64,
             )
     automatic_memory = config._automatic_memory
-    automatic_policy = _owned_ecm
     if checkpoint is not None:
         try:
-            automatic_policy = _owned_ecm and (
-                "ecm_auto" in checkpoint["payload"]["state"]
-            )
+            _owned_ecm and ("ecm_auto" in checkpoint["payload"]["state"])
         except (KeyError, TypeError) as error:
             raise ValueError("malformed checkpoint") from error
-    default_policy_budget = automatic_policy or (
-        checkpoint is None
-        and ecm_executor is None
-        and config._automatic_ecm_tiers
-    )
     if budget is None:
-        from .qs.defaults import default_siqs_budget, uses_siqs_defaults
-
-        growing = (
-            config.siqs is not None
-            and getattr(config.siqs.collector, "storage_policy", None)
-            == "grow"
-        )
-        if (config._automatic_siqs or growing) and uses_siqs_defaults(
-            n, backend=config.backend
-        ):
-            budget = default_siqs_budget(n, backend=config.backend)
-        elif default_policy_budget and config.backend == "python-int":
-            from .ecm.auto import DEFAULT_CPU_SECONDS, DEFAULT_WORK
-
-            budget = Budget(
-                work_limit=DEFAULT_WORK, cpu_seconds=DEFAULT_CPU_SECONDS
-            )
-        else:
-            budget = Budget()
+        budget = Budget()
     if abs(n).bit_length() > config.max_input_bits:
         raise ValueError("input exceeds max_input_bits")
     if checkpoint is None:
@@ -1563,11 +1512,11 @@ def _factorize_bounded(
         state = payload["state"]
         if state["original"] != n:
             raise ValueError("checkpoint belongs to another input")
-        if budget.work_limit < payload["work_used"]:
-            raise ValueError("budget is below already consumed work")
-        budget.used = payload["work_used"]
-        budget.prior_wall = payload["wall_used"]
-        budget.prior_cpu = payload["cpu_used"]
+        budget.restore_charges(
+            work=payload["work_used"],
+            wall=payload["wall_used"],
+            cpu=payload["cpu_used"],
+        )
 
     if _owned_ecm:
         if checkpoint is not None and "ecm_auto" not in state:
@@ -1599,17 +1548,7 @@ def _factorize_bounded(
         raise ValueError("resume QS worker settings changed")
     if worker_marker is not None:
         state["qs_workers"] = worker_marker
-    effective_qs_workers = (
-        replace(
-            qs_workers,
-            coexistence_bytes=qs_workers.coexistence_bytes
-            + _qs_coexistence_bytes(
-                config, ecm_executor, owned_ecm=_owned_ecm
-            ),
-        )
-        if qs_workers is not None
-        else None
-    )
+    effective_qs_workers = qs_workers
 
     reason = "exhausted"
     siqs_runtime = {}
@@ -1741,4 +1680,5 @@ def _factorize_bounded(
         arithmetic.canonical(tuple(state["events"])),
         state["dropped_events"],
         snapshot,
+        budget.stop,
     )

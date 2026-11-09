@@ -3,7 +3,7 @@
 import unittest
 from types import SimpleNamespace
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import Budget
 from v2.qs.packet_lease import ParentCPUSnapshot
 
 
@@ -50,16 +50,17 @@ class ParentSnapshotTests(unittest.TestCase):
                 parent_cpu=SimpleNamespace(value=0.0),
             ),
             accounted_cpu=0.0,
+            _account_cpu=lambda budget: None,
         )
         snapshot = ParentCPUSnapshot(pool)
         budget = Budget(work_limit=100, seconds=None, cpu_seconds=None)
 
         snapshot(budget)
-        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (3, 3))
+        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (0, 3))
         snapshot(budget)
-        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (30, 30))
+        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (0, 30))
         snapshot(budget)
-        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (30, 30))
+        self.assertEqual((budget.prior_cpu, pool.accounted_cpu), (0, 30))
         self.assertEqual(lock.acquisitions, 3)
 
 

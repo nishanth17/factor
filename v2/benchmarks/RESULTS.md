@@ -130,6 +130,24 @@ Reproduction uses `v2.benchmarks.qs.a7a.combined` with source-bound plans and
 the versioned `regime_corpus.json`. Detailed plans, all failures, capture
 indices and charges remain under local `v2/audit/a7a/`; start at `HANDOFF.md`.
 
+## H3 resource-limit correctness delivery (8 November 2026)
+
+The unmerged H3 branch removes internal refusal ceilings and prepaid resource
+leases while preserving concrete numerical recipes and retention capacities.
+Root wall/CPU are optional, current tree RSS is sampled with an 80% physical-RAM
+default, and checkpoint save size is optional. Stage shares hand off remaining
+root resources. Saved-history accounting has no durable ledger.
+
+Committed-only `5feff32` passes 1,404 tests (9 optional skips), lint and all 267
+benchmark imports. Fixed-work candidate `508c490` matches base `40d2367` on three
+QS inputs each at 50/65 digits, two nonempty witnesses, nine fixed ECM cases
+and four manifest assignments. These are exact prefix/identity comparisons;
+no speedup or 60–80-digit completion claim follows. Historical 75/80 internal
+`memory_limit` attribution remains unresolved despite candidate-site coverage.
+All failures, receipts, source identities and controller revisions remain local
+under `v2/audit/h3_resource_limits/qa/`. C3a, B12, A7a and B4a cost/dispatch tables
+need revalidation; no timing, profiling, tuning or native build was performed.
+
 ## B12/F4 cold serial repair and component closure (5 November 2026)
 
 The normal production admission path now skips catalogue/source validation for

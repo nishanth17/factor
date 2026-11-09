@@ -3,7 +3,8 @@
 import unittest
 from collections import Counter
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.byte_hit_words import ByteStampWordHits
 from v2.qs.hit_words import WORD_MASK, WordHits
 from v2.tests.test_qs import unlimited_budget

@@ -8,6 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
 from v2.benchmarks.qs.a7a import confirmation, stage_driver
 from v2.benchmarks.qs.a7a.combined import corpus_identity, fixtures
 from v2.benchmarks.qs.a7a.progress import Progress
@@ -185,15 +188,17 @@ class G1Tests(unittest.TestCase):
         from v2.qs.defaults import default_siqs_config
 
         n = fixtures("regimes")["regime_calibration_60_0"]["n"]
-        original = default_siqs_config(n, memory_bytes=4 * 2**30)
+        original = resource_configuration(
+            default_siqs_config, n, memory_bytes=4 * 2**30
+        )
         self.assertEqual(original.checkpoint_bytes, 2**20)
         declared = reference_configuration(
             n, dict(qs_memory_bytes=4 * 2**30, checkpoint_bytes=64 * 2**20)
         )
         self.assertEqual(declared.checkpoint_bytes, 64 * 2**20)
         before, after = asdict(original), asdict(declared)
-        before.pop("checkpoint_bytes")
-        after.pop("checkpoint_bytes")
+        before.pop("checkpoint_bytes", None)
+        after.pop("checkpoint_bytes", None)
         self.assertEqual(before, after)
 
     def test_confirmation_proofs_and_disjointness(self):

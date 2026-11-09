@@ -6,12 +6,18 @@ import json
 import multiprocessing
 import os
 import unittest
-from dataclasses import replace
 from itertools import product
 from pathlib import Path
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.work_budget import PollingBudget
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.packet_lease import PacketLeaseBudget
@@ -40,10 +46,18 @@ def crash_packet(task, state=None):
 
 
 class PacketLeaseTests(unittest.TestCase):
-    def test_mixed_reservations_match_incumbent_poll_prefixes(self):
+    def test_mixed_counters_match_and_root_cancellation_keeps_prefixes(self):
+        from v2.execution.budget import Budget as RootBudget
+
         traces = []
         for cls in (PollingBudget, PacketLeaseBudget):
-            raw = Budget(work_limit=100, seconds=None, cpu_seconds=None)
+            stopped = [False]
+            raw = RootBudget(
+                seconds=None,
+                cpu_seconds=None,
+                rss_bytes=None,
+                cancelled=lambda: stopped[0],
+            )
             trace = []
             view = cls(raw, poll=lambda b: trace.append(b.used))
             view.consume(0)
@@ -52,9 +66,11 @@ class PacketLeaseTests(unittest.TestCase):
             view.consume_actions(4, 3)
             view.consume_span(10)
             view.consume(0)
+            view.consume(100)
             before = view.used
+            stopped[0] = True
             with self.assertRaises(BudgetExhaustedError):
-                view.consume(100)
+                view.consume(0)
             self.assertEqual(view.used, before)
             traces.append((view.used, trace, view.reason))
         self.assertEqual(traces[0], traces[1])
@@ -158,10 +174,10 @@ class PacketLeaseTests(unittest.TestCase):
         receipt = dict(status="issued")
         job._lost(task, receipt)
         self.assertEqual(job.budget.used, before)
-        self.assertEqual(receipt["charged_work"], task["work"])
-        self.assertEqual(job.budget.prior_cpu, cpu + task["cpu"])
+        self.assertEqual(receipt["charged_work"], 0)
+        self.assertEqual(job.budget.prior_cpu, cpu)
         job._lost(task, receipt)
-        self.assertEqual(job.budget.prior_cpu, cpu + task["cpu"])
+        self.assertEqual(job.budget.prior_cpu, cpu)
 
     def test_publication_stop_retains_a_completed_paid_prefix(self):
         job = prepared(worker_settings=replace(settings(), lease_budget=True))
@@ -211,7 +227,7 @@ class PacketLeaseTests(unittest.TestCase):
                 result = job.run(pool=pool, fixed_work=True)
         self.assertEqual(result.reason, "worker_failure")
         self.assertTrue(pool.closed)
-        self.assertTrue(job.stats["lost_work"])
+        self.assertTrue(job.stats["lost_packets"])
         self.assertGreaterEqual(job.budget.used, job.stats["lost_work"])
         self.assertTrue(all(r["status"] == "lost" for r in job.receipts))
         self.assertTrue(all(not p.is_alive() for p in pool._owned_processes))
@@ -240,8 +256,11 @@ class PacketLeaseTests(unittest.TestCase):
             "benchmarks/inputs/a7a/incumbent_worker_settings.json"
         )
         legacy = json.loads(path.read_text())
-        current = QSWorkerConfig(**legacy)
-        self.assertEqual(current.record(), legacy)
+        current = resource_configuration(QSWorkerConfig, **legacy)
+        self.assertEqual(
+            current.record(),
+            {k: v for k, v in legacy.items() if k in current.record()},
+        )
         self.assertNotIn("lease_budget", current.record())
         self.assertTrue(
             replace(current, lease_budget=True).record()["lease_budget"]
@@ -294,17 +313,22 @@ class PersistentStateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             WorkerState(dict(payload, key="stale"), allowance())
 
-    def test_cache_is_an_explicit_refusable_owned_allowance(self):
+    def test_small_cache_degrades_to_uncached_packets(self):
+        reference = prepared()
+        reference.run(fixed_work=True)
         job = prepared(
             worker_settings=replace(
                 settings(), reuse_state=True, state_cache_bytes=4096
             )
         )
-        with self.assertRaises(MemoryError):
-            WorkerState(self.payload(job), allowance())
         result = job.run(fixed_work=True)
-        self.assertEqual(result.reason, "memory_limit")
+        self.assertTrue(result.stats["schedule_complete"])
         self.assertEqual(job.stats["state_install_work"], 0)
+        self.assertEqual(job.stats["state_context_hits"], 0)
+        self.assertEqual(
+            dict(job.engine.collector._atoms),
+            dict(reference.engine.collector._atoms),
+        )
 
     def test_state_alone_and_with_leases_preserves_exact_serial_atoms(self):
         for extended in (False, True):
@@ -373,11 +397,11 @@ class PersistentStateTests(unittest.TestCase):
         self.assertGreaterEqual(
             job.budget.used, before + job.stats["state_install_work"]
         )
-        self.assertGreaterEqual(
-            job.budget.prior_cpu, job.workers.assignment_cpu
-        )
+        self.assertTrue(all(r.get("cpu_grant") is None for r in job.receipts))
 
-    def test_install_crash_retires_only_owned_workers_without_free_setup(self):
+    def test_install_crash_returns_failure_and_retires_only_owned_workers(
+        self,
+    ):
         owned_before = {p.pid for p in multiprocessing.active_children()}
         job = prepared(
             worker_settings=replace(settings("process", 2), reuse_state=True)
@@ -385,8 +409,8 @@ class PersistentStateTests(unittest.TestCase):
         before = job.budget.used
         with CollectionPool("process", 2) as pool:
             with patch("v2.qs.worker_state.install_context", crash_packet):
-                with self.assertRaises(Exception):
-                    job.run(pool=pool, fixed_work=True)
+                result = job.run(pool=pool, fixed_work=True)
+                self.assertEqual(result.reason, "worker_failure")
         self.assertTrue(pool.closed)
         self.assertTrue(all(not p.is_alive() for p in pool._owned_processes))
         self.assertGreaterEqual(
@@ -726,7 +750,9 @@ class SchedulingTests(unittest.TestCase):
     def test_small_whole_family_lease_keeps_its_paid_partial_checkpoint(self):
         job = prepared(worker_settings=replace(settings(), whole_family=True))
         first = job.run(fixed_work=True)
-        self.assertEqual(first.reason, "work_limit")
+        self.assertIn(
+            first.reason, ("paused", "factor_found", "families_exhausted")
+        )
         self.assertGreater(first.stats["scanned"], 0)
         restored = CurrentParallelSIQSJob.from_checkpoint(
             job.checkpoint(), budget=allowance()

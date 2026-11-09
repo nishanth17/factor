@@ -43,14 +43,8 @@ class PollingBudget:
     def consume(self, amount=1):
         """Refuse an overdraw immediately, even between external polls."""
         utils.require_integer(amount, "amount", 0)
-        # A mutable private cell avoids ledger-forwarding __setattr__ on
-        # every action. Public ledger writes still reach the caller's Budget.
         counter = self._counter
-        if (
-            amount == 0
-            or counter[0] == 0
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if amount == 0 or counter[0] == 0:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
@@ -71,10 +65,7 @@ class PollingBudget:
         if amount > self.interval:
             raise ValueError("span exceeds the cooperative polling interval")
         counter = self._counter
-        if (
-            amount > counter[0]
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if amount > counter[0]:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
@@ -96,10 +87,7 @@ class PollingBudget:
             raise ValueError("group exceeds the cooperative polling interval")
         amount = count * work_each
         counter = self._counter
-        if (
-            count > counter[0]
-            or amount > self.budget.work_limit - self.budget.used
-        ):
+        if count > counter[0]:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)

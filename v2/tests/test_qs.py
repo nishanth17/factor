@@ -7,7 +7,10 @@ from dataclasses import FrozenInstanceError, replace
 from math import isqrt
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     AtomicRelation,
     FactorBase,
@@ -25,6 +28,7 @@ from v2.qs import (
     verify_atomic,
     verify_combined,
 )
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def reference_primes(bound):
@@ -129,7 +133,9 @@ class FactorBaseTests(unittest.TestCase):
             ({"multiplier": 7, "bound": 3}, 7),
             ({"bound": 20}, 7),
         ):
-            result = build_factor_base(77, **kwargs)
+            result = adapt_resource_configuration(
+                build_factor_base, 77, **kwargs
+            )
 
             self.assertIsNone(result.factor_base)
             self.assertEqual(result.divisor, expected)
@@ -145,7 +151,7 @@ class FactorBaseTests(unittest.TestCase):
                 build_factor_base(n)
         with self.assertRaises(TypeError):
             build_factor_base(True)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             build_factor_base(10403, memory_bytes=1)
         with self.assertRaises(BudgetExhaustedError):
             build_factor_base(10403, budget=Budget(work_limit=0))
@@ -424,30 +430,45 @@ class CollectorTests(unittest.TestCase):
             ({"max_relations": 0}, "relation_limit"),
             ({"memory_bytes": 0}, "memory_limit"),
         ):
-            result = collect_block(
-                self.polynomial, self.base, -10, 10, **changes
+            with self.assertRaisesRegex(TypeError, next(iter(changes))):
+                collect_block(self.polynomial, self.base, -10, 10, **changes)
+
+        full = collect_block(self.polynomial, self.base, -50, 50)
+        self.assertGreaterEqual(len(full.relations), 3)
+        midpoint = full.relations[len(full.relations) // 2].position
+        cancelled = [False]
+        verify = verify_atomic
+
+        def stop_after_verified_atom(atom, *args, **kwargs):
+            result = verify(atom, *args, **kwargs)
+            if atom.position == midpoint:
+                cancelled[0] = True
+            return result
+
+        owner = Budget(cancelled=lambda: cancelled[0])
+        with patch(
+            "v2.qs.reference_collector.verify_atomic",
+            side_effect=stop_after_verified_atom,
+        ):
+            prefix = collect_block(
+                self.polynomial, self.base, -50, 50, budget=owner
             )
 
-            self.assertEqual(result.reason, reason)
-            self.assertEqual(result.next_position, -10)
-
-        prefix = collect_block(
-            self.polynomial, self.base, -50, 50, max_relations=2
-        )
-
-        self.assertEqual(prefix.reason, "relation_limit")
+        self.assertEqual(prefix.reason, "cancelled")
+        self.assertTrue(prefix.relations)
+        self.assertGreater(prefix.next_position, -50)
+        self.assertLess(prefix.next_position, 50)
         suffix = collect_block(
             self.polynomial, self.base, prefix.next_position, 50
         )
         full = collect_block(self.polynomial, self.base, -50, 50)
 
         self.assertEqual(prefix.relations + suffix.relations, full.relations)
-        cap = prefix.workspace_bytes
-        limited = collect_block(
-            self.polynomial, self.base, -50, 50, memory_bytes=cap
-        )
+        self.assertTrue(suffix.relations)
+        cap = full.workspace_bytes
+        limited = collect_block(self.polynomial, self.base, -50, 50)
 
-        self.assertEqual(limited.reason, "memory_limit")
+        self.assertEqual(limited.reason, "complete")
         self.assertLessEqual(limited.workspace_bytes, cap)
         for atom in limited.relations:
             self.assertTrue(verify_atomic(atom, self.base))
@@ -625,9 +646,9 @@ class RelationTests(unittest.TestCase):
         self.assertEqual(result.relation.exponents, atom.exponents)
         with self.assertRaises(BudgetExhaustedError):
             verify_atomic(atom, self.base, budget=Budget(work_limit=0))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             combine_relations((atom,), self.base, memory_bytes=0)
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             verify_combined(
                 result.relation,
                 self.base,

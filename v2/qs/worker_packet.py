@@ -8,6 +8,7 @@ from dataclasses import replace
 
 from ..common import utils
 from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.resources import AllocationFailureError
 from ..execution.work_budget import PollingBudget
 from .factor_base import FactorBase
 from .polynomial import Polynomial
@@ -17,7 +18,7 @@ from .sieve_collector import SieveCollector
 from .sign_schedule import schedule_for
 from .siqs import make_family
 
-VERSION = "a7a-current-packet-v2"
+VERSION = "a7a-current-packet-v3"
 
 
 def canonical(value):
@@ -143,14 +144,13 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
     """
     config, settings = task["config"], task["settings"]
     started, cpu_started = time.monotonic(), time.process_time()
-    # Reserve the bounded final encoding even if collection subsequently stops.
-    tail_work = 2 * settings.packet_bytes + 1024
+    # Root ownership includes final encoding after collection stops; the
+    # private counter records only the reported mathematical prefix.
     raw_budget = Budget(
-        work_limit=task["work"],
         seconds=task["seconds"],
-        cpu_seconds=task["cpu"],
+        cpu_seconds=None,
+        rss_bytes=None,
         cancelled=cancelled,
-        used=min(task["work"], tail_work),
     )
     if settings.lease_budget:
         from .packet_lease import PacketLeaseBudget
@@ -195,32 +195,17 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
                 tuple(task["primes"]),
                 config=config,
                 budget=budget,
-                memory_bytes=settings.worker_memory_bytes,
             )
             family.next_index = ordinal
         if runtime is not None:
             runtime.family, runtime.primes = family, tuple(task["primes"])
         lo, hi = -config.half_width, config.half_width + 1
-        memory = (
-            settings.worker_memory_bytes
-            - family.workspace_bytes
-            + base.workspace_bytes
+        cache_extra = (
+            (runtime.bytes - base.workspace_bytes)
+            if runtime is not None
+            else 0
         )
-        cache_extra = 0
-        if runtime is not None:
-            # A rounded root reservation keeps reusable collector capacity
-            # stable across nearby A sizes, with conservative coexistence.
-            family_reserve = (
-                (family.workspace_bytes + 2**20 - 1) // 2**20
-            ) * 2**20
-            cache_extra = runtime.bytes - base.workspace_bytes
-            memory = (
-                settings.worker_memory_bytes
-                - family_reserve
-                + base.workspace_bytes
-                - cache_extra
-            )
-        options = replace(config.collector, memory_bytes=memory)
+        options = replace(config.collector)
         if task["split_grant"] is not None:
             options = replace(options, split_call_limit=task["split_grant"])
         if (
@@ -379,8 +364,10 @@ def collect_packet(task, *, cancelled=None, publish_cpu=None):
             reason = "complete"
     except BudgetExhaustedError:
         reason = budget.reason
-    except MemoryError:
-        reason = "memory_limit"
+    except MemoryError as error:
+        raise AllocationFailureError(
+            "current SIQS packet", "qs_worker"
+        ) from error
     publication_stop = None
     if settings.lease_budget:
         budget.reconcile()
@@ -517,7 +504,8 @@ def execute_packet(task, state=None):
         if leased:
             return False
         external = cpu_used() if process else 0
-        return state["parent_cpu"].value + external >= state["cpu_limit"].value
+        limit = state["cpu_limit"].value
+        return limit >= 0 and state["parent_cpu"].value + external >= limit
 
     try:
         return collect_packet(

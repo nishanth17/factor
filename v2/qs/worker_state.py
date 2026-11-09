@@ -4,7 +4,7 @@ import time
 from concurrent.futures import wait
 from dataclasses import asdict
 
-from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.budget import Budget
 from .factor_base import FactorBase
 from .worker_packet import digest
 
@@ -43,10 +43,6 @@ class WorkerState:
         self.bytes = (
             self.base.workspace_bytes + 65536 + 512 * len(self.base.entries)
         )
-        if self.bytes > self.settings.state_cache_bytes:
-            raise MemoryError(
-                "immutable worker context exceeds cache allowance"
-            )
         budget.consume(0)
         self.family = self.collector = self.recovery = None
         self.primes = None
@@ -102,9 +98,9 @@ def install_context(payload, state=None):
     # Retire old derived objects before constructing a different context.
     state.pop("_qs_context", None)
     budget = Budget(
-        work_limit=payload["work"],
         seconds=payload["seconds"],
-        cpu_seconds=payload["cpu"],
+        cpu_seconds=None,
+        rss_bytes=None,
         cancelled=state["stop"].is_set,
     )
     try:
@@ -124,22 +120,9 @@ def ensure_context(job, pool):
     base = job.source.base
     context_bytes = base.workspace_bytes + 65536 + 512 * len(base.entries)
     if context_bytes > job.workers.state_cache_bytes:
-        raise MemoryError("immutable worker context exceeds cache allowance")
+        # A cache capacity controls retention, not factoring feasibility.
+        return None
     work = 1 + len(base.entries) * base.bound.bit_length() ** 2
-    cpu = job.workers.assignment_cpu
-    if job.budget.cpu_seconds is not None:
-        cpu = min(
-            cpu,
-            (
-                job.budget.cpu_seconds
-                - job.budget.cpu_used
-                - job.workers.parent_cpu_reserve
-            )
-            / pool.workers,
-        )
-    if cpu <= 0:
-        job.budget.reason = "cpu_limit"
-        raise BudgetExhaustedError("cpu_limit")
     payload = dict(
         job=job.identity,
         execution=job.execution_identity,
@@ -147,8 +130,8 @@ def ensure_context(job, pool):
         settings=job.workers,
         base=(base.n, base.multiplier, base.bound, base.entries),
         work=work,
-        cpu=cpu,
-        seconds=job.workers.assignment_seconds,
+        cpu=None,
+        seconds=30.0,
     )
     payload["key"] = context_key(payload)
     if getattr(pool, "_qs_context_key", None) == payload["key"]:
@@ -180,9 +163,8 @@ def ensure_context(job, pool):
         ):
             raise ValueError("worker context acknowledgement mismatch")
     except BaseException:
-        # Unknown initialization CPU is conservatively charged; paid setup
-        # work is never refunded. Only this pool's processes are retired.
-        job.budget.prior_cpu += cpu * pool.workers
+        # Retain the attempted setup's diagnostic count. The root observes
+        # actual CPU, including final reaping; retire only this owned pool.
         pool.abort()
         raise
     pool._qs_context_key = payload["key"]

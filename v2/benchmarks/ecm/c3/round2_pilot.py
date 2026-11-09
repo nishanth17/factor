@@ -7,9 +7,16 @@ import os
 import resource
 import sys
 import time
-from dataclasses import asdict
 from importlib import import_module
 from unittest.mock import patch
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .... import portfolio
 from ....execution.allocation import ECMAllocation
@@ -67,7 +74,7 @@ def configuration(n, arm, engine):
             fallback_seconds=1 if band == 30 else 10,
             fallback_cpu_seconds=1 if band == 30 else 10,
         )
-    return engine.PortfolioConfig(**options)
+    return adapt_resource_configuration(engine.PortfolioConfig, **options)
 
 
 @contextlib.contextmanager
@@ -123,8 +130,11 @@ def run_one(
             fixture["n"],
             seed=seed,
             config=config,
-            budget=ledger.Budget(
-                work_limit=work, seconds=seconds, cpu_seconds=seconds
+            budget=recording_budget(
+                ledger.Budget,
+                work_limit=work,
+                seconds=seconds,
+                cpu_seconds=seconds,
             ),
         )
     first.validate(run.result, fixture)

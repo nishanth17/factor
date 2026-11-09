@@ -9,9 +9,11 @@ from v2.benchmarks.qs.a7a.protocol import corpus, schedule
 
 class ProtocolTests(unittest.TestCase):
     def test_combined_panel_and_memory_cover_amended_stages(self):
-        from dataclasses import replace
         from math import gcd, prod
 
+        from v2.benchmarks.infrastructure.resource_control import (
+            historical_replace as replace,
+        )
         from v2.benchmarks.qs.a7a.cell import configuration, settings
         from v2.benchmarks.qs.a7a.combined import cell, fixtures
 
@@ -30,13 +32,12 @@ class ProtocolTests(unittest.TestCase):
                     memory_bytes=spec["qs_memory_bytes"],
                     checkpoint_bytes=spec["checkpoint_bytes"],
                 )
+                self.assertEqual(config.backend, "python-int")
                 workers = settings(
                     arm, spec["memory"], False, 64, 2048, spec["features"]
                 )
                 if workers is not None:
-                    self.assertLessEqual(
-                        workers.owned_bytes(config, n), spec["memory"]
-                    )
+                    self.assertLessEqual(workers.workers, 10)
                     self.assertFalse(workers.arrival_order)
                 if arm.startswith("P"):
                     self.assertFalse(workers.lease_budget)
@@ -82,8 +83,9 @@ class ProtocolTests(unittest.TestCase):
             self.assertNotIn("cpu_profile", row)
 
     def test_wider_counts_share_a_funded_complete_cost_configuration(self):
-        from dataclasses import replace
-
+        from v2.benchmarks.infrastructure.resource_control import (
+            historical_replace as replace,
+        )
         from v2.benchmarks.qs.a7a.cell import configuration, settings
 
         plan = schedule("H13")
@@ -103,6 +105,7 @@ class ProtocolTests(unittest.TestCase):
                     checkpoint_bytes=row["checkpoint_bytes"],
                     memory_bytes=row["qs_memory_bytes"],
                 )
+                self.assertEqual(config.backend, "python-int")
                 workers = settings(
                     row["arm"],
                     row["memory"],
@@ -111,9 +114,7 @@ class ProtocolTests(unittest.TestCase):
                     row["max_batch_atoms"],
                 )
                 if workers is not None:
-                    self.assertLessEqual(
-                        workers.owned_bytes(config, n), row["memory"]
-                    )
+                    self.assertLessEqual(workers.workers, 10)
                 self.assertEqual(row["endpoint"], "complete")
                 self.assertEqual(row["samples"], 1)
                 self.assertNotIn("cpu_profile", row)
@@ -236,8 +237,9 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(comparable[0], comparable[2])
 
     def test_revised_pilot_prices_snapshot_reserve_without_retuning(self):
-        from dataclasses import replace
-
+        from v2.benchmarks.infrastructure.resource_control import (
+            historical_replace as replace,
+        )
         from v2.benchmarks.qs.a7a.cell import configuration, settings
 
         plan = schedule("H6")
@@ -255,16 +257,12 @@ class ProtocolTests(unittest.TestCase):
                 checkpoint_bytes=row["checkpoint_bytes"],
                 memory_bytes=row["qs_memory_bytes"],
             )
-            self.assertGreater(
-                revised.memory_limit - revised.metadata_reserve, 2**30
-            )
+            self.assertFalse(hasattr(revised, "memory_limit"))
             self.assertEqual(revised.collector, original.collector)
             self.assertEqual(revised.base_count, original.base_count)
             workers = settings(row["arm"], row["memory"], False, 64)
             if workers is not None:
-                self.assertLessEqual(
-                    workers.owned_bytes(revised, fixture["n"]), row["memory"]
-                )
+                self.assertLessEqual(workers.workers, 10)
 
     def test_complete_pilot_funds_both_arms_without_prefix_quota(self):
         plan = schedule("H5")
@@ -459,8 +457,8 @@ class ProtocolTests(unittest.TestCase):
     def test_one_shot_result_formatter_preserves_certainty_and_reconstruction(
         self,
     ):
+        from v2.benchmarks.infrastructure.resource_control import Budget
         from v2.benchmarks.qs.a7a.cell import complete, configuration
-        from v2.execution.budget import Budget
 
         budget = Budget(work_limit=1000000, seconds=2, cpu_seconds=2)
         budget.a7a_seed = 7

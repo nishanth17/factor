@@ -118,7 +118,7 @@ class ObserverTests(unittest.TestCase):
             ),
         ):
             observer = OwnedRSS(None, limit=100, owner_pid=controller)
-        observer._run()
+            observer._run()
 
         self.assertTrue(observer.exceeded)
         self.assertEqual(observer.rows[0]["bytes"], 101)

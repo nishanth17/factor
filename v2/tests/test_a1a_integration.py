@@ -7,7 +7,9 @@ from collections import defaultdict
 from dataclasses import asdict, replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
     CountedSIQSConfig,
@@ -20,6 +22,7 @@ from v2.qs.collector_kernels import combine, workspace
 from v2.qs.count_policy import endpoint_for_count
 from v2.qs.factor_base import FactorBase, FactorBaseEntry
 from v2.qs.polynomial import polynomial_roots
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_a1a_density import config, worker
 from v2.tests.test_qs import reference_positions, unlimited_budget
 from v2.tests.test_qs_sieve import signature
@@ -183,18 +186,18 @@ class SelectedKernelTests(unittest.TestCase):
         reserve = workspace(SELECTED, 64, len(base.entries))
         scalar = worker(poly, base, "sparse", block_width=64)
         self.assertEqual(fresh._workspace - scalar._workspace, reserve)
-        with self.assertRaises(MemoryError):
-            worker(
-                poly,
-                base,
-                SELECTED,
-                block_width=64,
-                # Optional reuse caches may decline their allocation. Test
-                # the required presieve floor independently of those caches.
-                memory_bytes=(
-                    scalar._workspace - scalar._reuse_workspace + reserve - 1
-                ),
-            )
+        uncapped = worker(
+            poly,
+            base,
+            SELECTED,
+            block_width=64,
+            # Optional reuse caches may decline their allocation. Test
+            # the required presieve floor independently of those caches.
+            memory_bytes=(
+                scalar._workspace - scalar._reuse_workspace + reserve - 1
+            ),
+        )
+        self.assertEqual(uncapped._workspace, fresh._workspace)
 
     def test_selector_rejects_unported_or_noncanonical_support(self):
         for marking in (
@@ -272,7 +275,6 @@ class CountedIntegrationTests(unittest.TestCase):
             base_count=30,
             base_bound=500,
             factor_count=3,
-            memory_bytes=64 * 2**20,
             batch_width=1,
             collector=config(marking=SELECTED, power_plan_bytes=2**20),
         )
@@ -325,12 +327,7 @@ class CountedIntegrationTests(unittest.TestCase):
             ]
             for count in (1, 3, len(eligible)):
                 bound, divisor = endpoint_for_count(
-                    n,
-                    multiplier,
-                    count,
-                    unlimited_budget(),
-                    ceiling=100,
-                    memory_bytes=2**20,
+                    n, multiplier, count, unlimited_budget(), ceiling=100
                 )
                 self.assertEqual(
                     (bound, divisor), (eligible[count - 1] + 1, None)
@@ -353,8 +350,12 @@ class CountedIntegrationTests(unittest.TestCase):
     def test_scoped_defaults_explicit_configs_and_saved_jobs(self):
         for digits in (40, *range(50, 61)):
             for memory in (None, 128 * 2**20, 2**30):
-                cfg = default_siqs_config(
-                    10 ** (digits - 1), memory_bytes=memory
+                cfg = adapt_resource_configuration(
+                    default_siqs_config,
+                    10 ** (digits - 1),
+                    recipe="calibrated"
+                    if memory in (None, 2**30)
+                    else "reference",
                 )
                 selected = 50 <= digits <= 55 and memory in (None, 2**30)
                 self.assertEqual(

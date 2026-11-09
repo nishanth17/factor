@@ -7,6 +7,7 @@ from collections import OrderedDict
 from collections.abc import Sequence
 from dataclasses import FrozenInstanceError
 
+from ..execution.resources import removed_arguments
 from .indexed_relations import decode_factors
 
 
@@ -69,9 +70,12 @@ class SpillStore:
     A refused append never publishes an offset; partial files remain owned.
     """
 
-    def __init__(self, directory, limit, cache_bytes, budget):
+    @removed_arguments(
+        ("limit",), "spill_directory; OS I/O failures remain errors"
+    )
+    def __init__(self, directory, cache_bytes, budget):
         self.directory = os.path.realpath(directory)
-        self.limit, self.cache_limit, self.budget = limit, cache_bytes, budget
+        self.cache_limit, self.budget = cache_bytes, budget
         self.used, self.cache_used = 0, 0
         self.cache = OrderedDict()
         self.files = {}
@@ -87,14 +91,8 @@ class SpillStore:
         return os.path.join(self.directory, name)
 
     def append(self, data):
-        if len(data) + self.used > self.limit:
-            raise MemoryError("production disk allowance exhausted")
         self.budget.consume(len(data) + 1)
         if self.writer is None:
-            if len(self.files) >= 1024:
-                raise MemoryError(
-                    "production spill file-count allowance exhausted"
-                )
             fd, path = tempfile.mkstemp(
                 prefix="c9a-cold-", suffix=".bin", dir=self.directory
             )
@@ -129,7 +127,7 @@ class SpillStore:
             or type(length) is not int
             or (
                 offset < 0
-                or not 0 <= length <= self.cache_limit
+                or length < 0
                 or offset + length > self.files.get(name, -1)
             )
         ):
@@ -179,11 +177,7 @@ class SpillStore:
         return [[name, size] for name, size in sorted(self.files.items())]
 
     def restore_manifest(self, manifest):
-        if (
-            self.files
-            or not isinstance(manifest, list)
-            or len(manifest) > 1024
-        ):
+        if self.files or not isinstance(manifest, list):
             raise ValueError("invalid spill manifest")
         files, total = {}, 0
         for name, size in manifest:
@@ -191,8 +185,6 @@ class SpillStore:
             if name in files or type(size) is not int or size < 0:
                 raise ValueError("invalid spill extent")
             total += size
-            if total > self.limit:
-                raise MemoryError("saved production disk allowance exhausted")
             if (
                 os.path.islink(self._path(name))
                 or os.stat(self._path(name)).st_size < size

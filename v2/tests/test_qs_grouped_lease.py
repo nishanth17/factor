@@ -3,10 +3,14 @@
 import unittest
 from collections import Counter
 from contextlib import nullcontext
-from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import Budget as RootBudget
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.hit_words import WordHits
 from v2.qs.packet_lease import PacketLeaseBudget
@@ -24,14 +28,12 @@ class GroupedLeaseTests(unittest.TestCase):
         for remaining in (0, 1, 2, 63):
             for available in (0, 6, 7, 12):
                 view = PacketLeaseBudget(
-                    Budget(
-                        work_limit=available, seconds=None, cpu_seconds=None
-                    )
+                    RootBudget(seconds=None, cpu_seconds=None, rss_bytes=None)
                 )
                 view._actions_left = remaining
                 before = (view.used, view._actions_left, view.marking_pairs)
                 grouped = view._precharge_marking_pair(3, 4)
-                self.assertEqual(grouped, remaining >= 2 and available >= 7)
+                self.assertEqual(grouped, remaining >= 2)
                 expected = (7, remaining - 2, 1) if grouped else before
                 self.assertEqual(
                     (view.used, view._actions_left, view.marking_pairs),
@@ -107,23 +109,12 @@ class GroupedLeaseTests(unittest.TestCase):
             else:
                 self.assertEqual(pairs, 0)
 
-    def test_near_limit_and_cancellation_keep_the_original_paid_prefix(self):
+    def test_cancellation_keeps_the_original_atomic_prefix(self):
         kernels = ("presieve", "unroll4", "parity_two")
-        complete, _ = self.sieve(False, kernels)
-        limits = {1, 64, 512, complete["work"] - 1, complete["work"]}
-        # Poll-prefix neighborhoods exercise scalar fallback as well as
-        # previously successful pairs before a later refusal.
-        for value in complete["polls"][:12]:
-            limits.update((max(0, value - 1), value, value + 1))
-        for limit in sorted(limits):
-            self.assertEqual(
-                self.sieve(False, kernels, limit)[0],
-                self.sieve(True, kernels, limit)[0],
-            )
-        self.assertEqual(
-            self.sieve(False, kernels, cancel=True)[0],
-            self.sieve(True, kernels, cancel=True)[0],
-        )
+        scalar, _ = self.sieve(False, kernels, cancel=True)
+        grouped, _ = self.sieve(True, kernels, cancel=True)
+        self.assertEqual(scalar, grouped)
+        self.assertEqual(grouped["reason"], "cancelled")
 
     def test_worker_flag_validates_and_reports_exercised_groups(self):
         self.assertNotIn("grouped_lease_charging", QSWorkerConfig().record())

@@ -1,7 +1,5 @@
 """One bounded process per logical slot for current-QS family placement."""
 
-from concurrent.futures import ProcessPoolExecutor
-
 
 class FamilyAffinityExecutor:
     """Pin packets explicitly; round-robin broadcast calls visit every slot.
@@ -12,9 +10,15 @@ class FamilyAffinityExecutor:
     ordered admission, leases and checkpoint coverage unchanged.
     """
 
-    def __init__(self, workers, *, mp_context, initializer, initargs):
+    def __init__(
+        self, workers, *, mp_context, initializer, initargs, executor_type=None
+    ):
+        if executor_type is None:
+            from .parallel import ObservedProcessPoolExecutor
+
+            executor_type = ObservedProcessPoolExecutor
         self.executors = [
-            ProcessPoolExecutor(
+            executor_type(
                 max_workers=1,
                 mp_context=mp_context,
                 initializer=initializer,
@@ -23,6 +27,15 @@ class FamilyAffinityExecutor:
             for _ in range(workers)
         ]
         self.next_slot = 0
+
+    @property
+    def resource_owner(self):
+        return self.executors[0].resource_owner
+
+    @resource_owner.setter
+    def resource_owner(self, budget):
+        for executor in self.executors:
+            executor.resource_owner = budget
 
     @property
     def _processes(self):

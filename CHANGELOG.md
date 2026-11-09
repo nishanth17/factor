@@ -3,6 +3,33 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## H3 observed resource limits (8 November 2026)
+
+- Replace internal byte/count/work refusal ceilings and prepaid worker leases
+  with one root wall/aggregate-CPU/current-tree-RSS owner. Omitted wall/CPU are
+  unlimited; RSS defaults to floor(80% of physical memory). Preserve numerical
+  recipes, actual cache/FIFO/packet capacities and exact validation.
+- Use saved-history accounting without a durable ledger; retained live owners
+  keep unsaved charges. Stage shares hand remaining root resources to fallback.
+- Reject removed arguments by name and old resource checkpoint versions without
+  migration. Make atomic checkpoint saves optional and uncapped by default;
+  oversized saves record `checkpoint_size_skip` and preserve the result.
+- Committed-only `5feff32` passes 1,404 tests (9 optional skips), lint and 267
+  benchmark imports. Fixed-work QS/ECM confirmation on `508c490` matches base
+  `40d2367`. No performance evidence or retuning is added; dependent costs
+  require revalidation.
+
+## Experimental QS integration with H3 (8 November 2026)
+
+- Integrate local master into the isolated A7a branch. Replace current-worker
+  reservations and synthetic charges with the observed root resource owner;
+  retain numerical policies, packet/cache settings and exact validation.
+- Version worker snapshots for saved-history accounting, retain arithmetic and
+  corruption/cleanup coverage, and adapt historical recipes at recorder ingress.
+  Preserve earlier diagnostic work separately. Handle failed process submission
+  without broadcasting through a dead worker's stop lock. Pass 1,628 tests,
+  lint and 295 benchmark imports. No new probe or timing claim.
+
 ## Experimental QS kernel specialization and restricted tuning (8 November 2026)
 
 - Report both approved 75/80 feasibility probes on the isolated A7a branch.

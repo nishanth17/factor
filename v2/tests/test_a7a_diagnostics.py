@@ -69,9 +69,7 @@ class DiagnosticTests(unittest.TestCase):
             for owner in owners
             if owner["owner"] == "worker"
         )
-        self.assertEqual(
-            snapshot["collector_memory_limit"], worker.config.memory_limit
-        )
+        self.assertEqual(snapshot["root_rss_limit"], worker.budget.rss_bytes)
         self.assertEqual(
             snapshot["factor_base_bound"], worker.factor_base.bound
         )

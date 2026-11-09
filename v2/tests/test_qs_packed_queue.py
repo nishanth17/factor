@@ -2,9 +2,14 @@
 
 import json
 import unittest
-from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.work_budget import PollingBudget
 from v2.qs import Polynomial, SieveCollector, SIQSJob, build_factor_base
@@ -17,15 +22,16 @@ from v2.tests.test_siqs import allowance, configuration
 
 
 class PackedQueueTests(unittest.TestCase):
-    def test_explicit_large_memory_grant_retains_a_finite_ceiling(self):
+    def test_worker_resource_cap_is_removed_but_packet_capacity_is_validated(
+        self,
+    ):
+        from v2.execution.resources import RemovedResourceLimitError
         from v2.qs.current_parallel import QSWorkerConfig
 
-        self.assertEqual(
-            QSWorkerConfig(memory_bytes=32 * 2**30).memory_bytes,
-            32 * 2**30,
-        )
+        with self.assertRaises(RemovedResourceLimitError):
+            QSWorkerConfig(memory_bytes=32 * 2**30)
         with self.assertRaises(ValueError):
-            QSWorkerConfig(memory_bytes=32 * 2**30 + 1)
+            QSWorkerConfig(packet_bytes=0)
 
     def test_packed_words_match_independent_events_and_paid_work(self):
         for width in (4, 7, 16):
@@ -70,7 +76,8 @@ class PackedQueueTests(unittest.TestCase):
             polynomial = Polynomial(10403, 1, a, b)
             expected = reference_positions(polynomial, base, -71, 80, 97)
             for cap in (1, 2**20):
-                config = SieveConfig(
+                config = resource_configuration(
+                    SieveConfig,
                     memory_bytes=64 * 2**20,
                     score_policy="powers",
                     division="bucket",
@@ -87,7 +94,7 @@ class PackedQueueTests(unittest.TestCase):
                 )
                 result = collector.collect(-71, 80)
                 self.assertEqual(signature(result), expected)
-                self.assertLessEqual(collector._workspace, config.memory_limit)
+                self.assertGreater(collector._workspace, 0)
 
     def test_interrupted_construction_releases_memory_before_replay(self):
         worker = queue_worker(7, marking="packed_queue")
@@ -106,7 +113,8 @@ class PackedQueueTests(unittest.TestCase):
     def test_checkpoint_rebuilds_derived_queue_and_pins_layout(self):
         config = configuration(
             sign_policy="swap_high",
-            collector=SieveConfig(
+            collector=resource_configuration(
+                SieveConfig,
                 memory_bytes=64 * 2**20,
                 score_policy="powers",
                 division="bucket",

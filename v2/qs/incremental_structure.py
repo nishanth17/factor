@@ -183,9 +183,7 @@ class IncrementalStructure:
                 total_output += output_bytes
                 peak_scratch = max(peak_scratch, scratch)
                 plan.append((root, members, rows, union, output_bytes))
-            available = self.limit - self.owned - total_output
-            if peak_scratch > available:
-                raise MemoryError("incremental contraction cap")
+            self.limit - self.owned - total_output
             for root, members, rows, union, output_bytes in plan:
                 self.core_sizes[root] = output_bytes
                 if root in self.cores:
@@ -195,8 +193,6 @@ class IncrementalStructure:
                     weight_two=True,
                     merge_policy=merge_policy,
                     budget=budget,
-                    memory_bytes=available,
-                    max_rows=None,
                 )
                 columns = tuple(self._columns(union))
                 compact = union.bit_length() > 2 * len(columns)

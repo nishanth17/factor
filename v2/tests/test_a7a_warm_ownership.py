@@ -4,9 +4,9 @@ import itertools
 import unittest
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import Budget
 from v2.benchmarks.qs.a7a.cell import complete_call, execute
 from v2.benchmarks.qs.a7a.combined import cell
-from v2.execution.budget import Budget
 
 
 class WarmOwnershipTests(unittest.TestCase):
@@ -117,10 +117,10 @@ class WarmOwnershipTests(unittest.TestCase):
         )
 
         def fail(n, config, workers, child, pool, endpoint, **kwargs):
-            self.assertLessEqual(child.seconds, 3)
-            self.assertEqual(child.work_limit, 90)
+            self.assertIs(child, budget)
+            self.assertIsNotNone(child.cancelled)
             child.consume(5)
-            child.prior_cpu = 7
+            child.prior_cpu += 7
             raise ValueError("owned failure")
 
         with patch("v2.benchmarks.qs.a7a.cell.complete", side_effect=fail):

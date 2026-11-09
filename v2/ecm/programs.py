@@ -5,6 +5,7 @@ from math import gcd
 from struct import iter_unpack, pack
 
 from ..common import utils
+from ..execution.resources import removed_arguments
 
 PROGRAM_VERSION = "ecm-packed-blocks-v1"
 PAIRED_VERSION = "ecm-packed-pairs-v1"
@@ -42,14 +43,12 @@ class ECMPrograms:
     """
 
     def __init__(self, context, *, memory_bytes):
-        utils.require_integer(memory_bytes, "program memory", 4096)
+        utils.require_integer(memory_bytes, "program cache bytes", 0)
         self.context = context
         self.segment_size = context.segment_size
         self.base_primes = context.base_primes
         self.memory_bytes = memory_bytes
         self.used_bytes = 4096 + 256 * self.segment_size
-        if self.used_bytes > memory_bytes:
-            raise MemoryError("ECM program scratch exceeds configured cap")
         self.blocks = {}
         self.last_key = None
         self.last_block = None
@@ -92,7 +91,6 @@ class ECMPrograms:
                 b1=b1,
                 b2=b2,
                 distance=distance,
-                memory_bytes=4096 + 512 * len(values),
                 budget=budget,
                 wheel=wheel,
             )
@@ -197,9 +195,8 @@ class CoverageBlock:
         return iter_unpack("<QQQQ", self.data)
 
 
-def pair_coverage(
-    block, *, b1, b2, distance, memory_bytes, budget, wheel=None
-):
+@removed_arguments(("memory_bytes",))
+def pair_coverage(block, *, b1, b2, distance, budget, wheel=None):
     """Compile bounded coverage for a positive existing giant recurrence.
 
     Centers are odd and spaced by 2*D, so odd-prime distances are even.
@@ -210,7 +207,6 @@ def pair_coverage(
     utils.require_integer(b1, "B1", 2)
     utils.require_integer(b2, "B2", b1)
     utils.require_integer(distance, "distance", 0)
-    utils.require_integer(memory_bytes, "coverage memory", 4096)
     origin = b1 if b1 % 2 else b1 - 1
     if b2 >= WORD_LIMIT or block.lo < b1 + 1 or block.hi > b2 + 1:
         raise ValueError("coverage block lies outside inclusive bounds")
@@ -222,8 +218,6 @@ def pair_coverage(
     elif distance and (distance < 2 or distance % 2 or 2 * distance >= origin):
         raise ValueError("D needs even distances and positive initialization")
     count = len(block.primes) // 8
-    if 4096 + 512 * count > memory_bytes:
-        raise MemoryError("coverage construction exceeds configured cap")
     budget.consume(count)
     records = {}
     previous = block.lo - 1

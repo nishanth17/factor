@@ -16,9 +16,19 @@ import sys
 import tempfile
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import isqrt, prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....common import utils
 from ....execution.budget import Budget
@@ -66,7 +76,8 @@ def configuration(digits, preset, policy):
     target = isqrt(2 * 10**digits) // width
     count = next(k for k in range(1, 33) if (bound // 3) ** k >= target)
     rows = min(8192, max(2048, bound // 8))
-    return SIQSConfig(
+    return adapt_resource_configuration(
+        SIQSConfig,
         base_bound=bound,
         half_width=width,
         max_half_width=width,
@@ -81,7 +92,8 @@ def configuration(digits, preset, policy):
         batch_width=4096,
         memory_bytes=384 * 2**20,
         checkpoint_bytes=16 * 2**20,
-        collector=SieveConfig(
+        collector=adapt_resource_configuration(
+            SieveConfig,
             block_width=4096,
             score_policy="powers",
             division="bucket",
@@ -95,8 +107,10 @@ def configuration(digits, preset, policy):
 
 def decode_config(values):
     values = dict(values)
-    values["collector"] = SieveConfig(**values["collector"])
-    return SIQSConfig(**values)
+    values["collector"] = adapt_resource_configuration(
+        SieveConfig, **values["collector"]
+    )
+    return adapt_resource_configuration(SIQSConfig, **values)
 
 
 def validate(row, fixture):
@@ -135,7 +149,8 @@ def run_one(fixture, seed, config, arm, seconds):
             polynomials_per_family=1,
         )
 
-    portfolio = PortfolioConfig(
+    portfolio = adapt_resource_configuration(
+        PortfolioConfig,
         trial_bound=1000,
         rho_attempts=0,
         pm1_attempts=1,
@@ -148,7 +163,9 @@ def run_one(fixture, seed, config, arm, seconds):
         siqs=None if arm == "ecm" else config,
         memory_bytes=MEMORY,
     )
-    allowance = Budget(work_limit=WORK, seconds=seconds, cpu_seconds=seconds)
+    allowance = recording_budget(
+        Budget, work_limit=WORK, seconds=seconds, cpu_seconds=seconds
+    )
     start, cpu = time.perf_counter(), time.process_time()
 
     result = factorize_bounded(

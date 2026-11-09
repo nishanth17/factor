@@ -4,9 +4,11 @@ import copy
 import json
 import unittest
 from dataclasses import asdict, replace
-from types import SimpleNamespace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import (
@@ -40,7 +42,9 @@ def growing_worker(**options):
     return SieveCollector(
         qs_polynomial(base),
         base,
-        config=GrowingDoubleLargeSieveConfig(**values),
+        config=adapt_resource_configuration(
+            GrowingDoubleLargeSieveConfig, **values
+        ),
         budget=allowance(),
     )
 
@@ -49,17 +53,16 @@ class GrowingStorageTests(unittest.TestCase):
     def test_absent_quotas_and_legacy_defaults_are_distinct(self):
         growing = growing_worker().config
         for name in (
-            "memory_bytes",
-            "max_atoms",
             "max_partials",
-            "max_relations",
             "split_call_limit",
         ):
             self.assertIsNone(getattr(growing, name))
         self.assertEqual(asdict(growing)["storage_policy"], "grow")
         config = SIQSConfig(collector=growing)
-        self.assertIsNone(config.memory_bytes)
-        self.assertIsNone(config.checkpoint_bytes)
+        for name in ("memory_bytes", "checkpoint_bytes"):
+            self.assertNotIn(name, config.__dataclass_fields__)
+        for name in ("memory_bytes", "max_atoms", "max_relations"):
+            self.assertNotIn(name, growing.__dataclass_fields__)
         self.assertEqual(
             config.metadata_reserve, 65536 + 512 * config.polynomial_limit
         )
@@ -67,15 +70,10 @@ class GrowingStorageTests(unittest.TestCase):
             large_prime_bound=1000, large_product_bound=1000000
         )
         self.assertEqual(capped.max_partials, 256)
-        self.assertEqual(capped.max_atoms, 2048)
+        self.assertNotIn("max_atoms", capped.__dataclass_fields__)
         self.assertNotIn("storage_policy", asdict(capped))
-        self.assertEqual(
-            SIQSConfig(collector=capped).memory_bytes, 32 * 1024**2
-        )
-        self.assertEqual(
-            SIQSConfig(collector=capped).checkpoint_bytes, 1024**2
-        )
-        self.assertEqual(replace(growing, max_atoms=100000).max_atoms, 100000)
+        self.assertEqual(SIQSConfig(collector=capped).collector, capped)
+        self.assertIsNone(replace(growing).max_partials)
 
     def test_growing_storage_refuses_unsupported_worker_and_sss_adapters(self):
         from v2.qs.parallel import ParallelConfig
@@ -87,7 +85,7 @@ class GrowingStorageTests(unittest.TestCase):
 
     def test_growing_graph_preserves_complete_incidence_kernel(self):
         edges = [(1, 7), (3, 5), (5, 11), (3, 11), (13, 13), (3, 5)]
-        forest, cycles = LargePrimeForest(edge_limit=None), []
+        forest, cycles = LargePrimeForest(), []
         for index, (left, right) in enumerate(edges):
             plan = forest.plan(left, right, str(index), None, allowance())
             self.assertFalse(plan.evicted)
@@ -99,11 +97,8 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertEqual(
             span(cycles), dense_kernel([(1 << a) ^ (1 << b) for a, b in edges])
         )
-        self.assertGreater(
-            graph_reserve(65537, edge_limit=None), 256 * 1024**2
-        )
-        with self.assertRaises(MemoryError):
-            graph_reserve(65537)
+        self.assertGreater(graph_reserve(65537), 256 * 1024**2)
+        self.assertGreater(graph_reserve(65537), 256 * 1024**2)
 
     def test_growth_keeps_partials_and_explicit_fifo_keeps_owned_paths(self):
         for cap in (None, 3):
@@ -127,7 +122,7 @@ class GrowingStorageTests(unittest.TestCase):
                 restore_store(payload, restored, restored.budget)
                 self.assertGreater(restored.budget.used, before)
                 self.assertEqual(encoded(restored), payload)
-                self.assertIsNone(restored._graph.edge_limit)
+                self.assertFalse(hasattr(restored._graph, "edge_limit"))
 
     def test_explicit_refusals_and_interrupted_publication_preserve_store(
         self,
@@ -141,11 +136,9 @@ class GrowingStorageTests(unittest.TestCase):
             admit(collector, 1, (3, 5))
             before = encoded(collector)
             value = collector._workspace if field == "memory_bytes" else limit
-            collector.config = replace(collector.config, **{field: value})
-            _, refusal, _ = admit(
-                collector, 2, (3, 5), polynomial=Polynomial(91, 1, 9, 1, 3)
-            )
-            self.assertEqual(refusal, reason)
+            with self.assertRaises(TypeError) as removed:
+                replace(collector.config, **{field: value})
+            self.assertIn(field, str(removed.exception))
             self.assertEqual(encoded(collector), before)
         collector = growing_worker()
         admit(collector, 1, (3, 5))
@@ -209,13 +202,10 @@ class GrowingStorageTests(unittest.TestCase):
             rho_attempts=0,
             pm1_attempts=0,
             ecm_tiers=(),
-            memory_bytes=64 * 1024**2,
             siqs=siqs,
         )
-        self.assertEqual(
-            config.siqs.memory_bytes,
-            config.memory_bytes - config.workspace_reserve - 8192,
-        )
+        self.assertIs(config.siqs, siqs)
+        self.assertFalse(hasattr(config.siqs, "memory_bytes"))
         self.assertIsNone(config.siqs.collector.max_partials)
         n = 4001 * 5003
         first = factorize_bounded(n, config=config, budget=allowance(150000))
@@ -228,48 +218,22 @@ class GrowingStorageTests(unittest.TestCase):
         self.assertGreater(resumed.work_used, first.work_used)
 
     def test_uncapped_checkpoint_counts_live_solver_and_preparation(self):
-        from v2.qs.checkpoint import _reserve_growing_checkpoint
-
-        collector = growing_worker()
-        admit(collector, 1, (3, 5))
         config = SIQSConfig(
             mode="qs",
             base_bound=3,
             half_width=8,
             factor_count=1,
-            memory_bytes=4 * 2**20,
-            collector=collector.config,
+            collector=growing_worker().config,
         )
-        engine = SimpleNamespace(
-            config=replace(collector.config, memory_bytes=4 * 2**20),
-            collector=collector,
-            prepared=None,
-            solver=None,
-        )
-        job = SimpleNamespace(config=config, engine=engine)
-        _reserve_growing_checkpoint(job)
-
-        # Model each independently retained reservation at a solver pause.
-        # Refusal must precede any snapshot allocation and leave atoms intact.
-        before = encoded(collector)
-        for stage in ("prepared", "solver"):
-            if stage == "prepared":
-                engine.prepared = SimpleNamespace(
-                    workspace_bytes=4 * 2**20, shared_workspace_bytes=0
-                )
-            else:
-                engine.solver = SimpleNamespace(
-                    matrix=SimpleNamespace(workspace_bytes=4 * 2**20)
-                )
-            with self.assertRaises(MemoryError):
-                _reserve_growing_checkpoint(job)
-            self.assertEqual(encoded(collector), before)
-            setattr(engine, stage, None)
-
-        # Completed solves release these containers; a historical high-water
-        # mark must not become an artificial checkpoint refusal.
-        engine._workspace_peak = 4 * 2**20
-        _reserve_growing_checkpoint(job)
+        job = SIQSJob(91, config=config, budget=allowance())
+        job.run(max_blocks=1)
+        before = encoded(job.engine.collector)
+        # Diagnostic ownership high-water marks are not snapshot ceilings.
+        job.engine._workspace_peak = 10**30
+        checkpoint = job.checkpoint()
+        self.assertEqual(encoded(job.engine.collector), before)
+        restored = SIQSJob.from_checkpoint(checkpoint, budget=allowance())
+        self.assertEqual(encoded(restored.engine.collector), before)
 
     def test_dynamic_restore_reserves_input_and_preserves_public_policy(self):
         config = SIQSConfig(
@@ -277,20 +241,18 @@ class GrowingStorageTests(unittest.TestCase):
             base_bound=3,
             half_width=8,
             factor_count=1,
-            memory_bytes=4 * 2**20,
             collector=growing_worker().config,
         )
         job = SIQSJob(91, config=config, budget=allowance())
         job.run(max_blocks=1)
-        child_limit = job.engine.config.memory_limit
         snapshot = job.checkpoint()
         for _ in range(2):
             restored = SIQSJob.from_checkpoint(
                 snapshot, config=config, budget=allowance()
             )
             self.assertEqual(restored.config, config)
-            self.assertIsNone(restored.config.checkpoint_bytes)
-            self.assertEqual(restored.engine.config.memory_limit, child_limit)
+            self.assertFalse(hasattr(restored.config, "checkpoint_bytes"))
+            self.assertFalse(hasattr(restored.engine.config, "memory_limit"))
             self.assertIs(
                 restored.engine.collector.config, restored.engine.config
             )
@@ -301,11 +263,10 @@ class GrowingStorageTests(unittest.TestCase):
             snapshot = restored.checkpoint()
 
         oversized = dict(snapshot, blob=snapshot["blob"] + " " * 2**20)
-        with patch("v2.qs.checkpoint.json.loads", side_effect=AssertionError):
-            with self.assertRaises(MemoryError):
-                SIQSJob.from_checkpoint(
-                    oversized, config=config, budget=allowance()
-                )
+        with self.assertRaises(ValueError):
+            SIQSJob.from_checkpoint(
+                oversized, config=config, budget=allowance()
+            )
 
     def test_version_five_full_job_restore_is_charged_and_checked(self):
         config = SIQSConfig(
@@ -322,8 +283,8 @@ class GrowingStorageTests(unittest.TestCase):
         )
         checkpoint = job.checkpoint()
         self.assertEqual(checkpoint["version"], 5)
-        self.assertIsNone(
-            json.loads(checkpoint["blob"])["config"]["memory_bytes"]
+        self.assertNotIn(
+            "memory_bytes", json.loads(checkpoint["blob"])["config"]
         )
         restored = SIQSJob.from_checkpoint(checkpoint, budget=allowance())
         self.assertEqual(restored.config, config)

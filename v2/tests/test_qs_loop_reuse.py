@@ -2,16 +2,19 @@
 
 import unittest
 from collections import Counter
-from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.work_budget import PollingBudget
 from v2.qs import Polynomial, SieveCollector, SieveConfig, build_factor_base
 from v2.qs.families import verify_polynomial_roots
 from v2.qs.polynomial import PolynomialRoots, polynomial_roots
 from v2.qs.power_sieve import prime_power_roots
 from v2.qs.sparse_queue import ENTRY_BYTES, build
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
@@ -28,7 +31,6 @@ def queue_worker(width, marking="sparse"):
             score_policy="powers",
             block_width=width,
             sparse_queue_bytes=2**20,
-            memory_bytes=64 * 2**20,
         ),
     )
     # This oracle isolates event grouping charges from optional higher-root
@@ -239,7 +241,6 @@ class RootAndScoreLoopTests(unittest.TestCase):
                             score_policy="powers",
                             division="bucket",
                             marking=marking,
-                            memory_bytes=64 * 2**20,
                         ),
                     )
                     worker._scores[:] = [-777] * 64

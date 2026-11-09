@@ -8,6 +8,10 @@ from unittest.mock import patch
 
 from v2.benchmarks.ecm.c6 import c6_b4, c6_fast
 from v2.benchmarks.ecm.p41.p41_campaign import PYTHON_BACKEND
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.benchmarks.support.prac_oracle import (
     affine_multiply,
     historical_points,
@@ -27,10 +31,12 @@ from v2.ecm.chains import (
     verify_progress,
 )
 from v2.ecm.programs import ECMPrograms
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.execution.schedules import SieveContext
 from v2.execution.stage_jobs import advance_job, new_job
 from v2.portfolio import PortfolioConfig, factorize_bounded
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_phase_two import reseal
 
 
@@ -47,7 +53,6 @@ def configuration(**changes):
             ecm_tiers=((2000, 2500, 8),),
             segment_size=128,
             max_input_bits=512,
-            memory_bytes=32 * 1024**2,
             ecm_program_bytes=262144,
             ecm_chain_mode="reuse",
             ecm_chain_bytes=MIN_MEMORY_BYTES,
@@ -187,8 +192,9 @@ class ProductionChainTests(unittest.TestCase):
             self.assertGreater(budget.used, 0)
         with self.assertRaises(ValueError):
             self.native.execute([[2, 2]], (2, 1), 101, 2, allowance())
-        with self.assertRaises(MemoryError):
-            configuration(ecm_chain_bytes=4096)
+        self.assertEqual(
+            configuration(ecm_chain_bytes=4096).ecm_chain_bytes, 4096
+        )
         with self.assertRaises(ValueError):
             configuration(ecm_chain_mode="off")
 
@@ -224,7 +230,9 @@ class ProductionChainTests(unittest.TestCase):
             context = SieveContext(
                 config.max_hi, segment_size=config.segment_size
             )
-            store = ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+            store = adapt_resource_configuration(
+                ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+            )
             store.chains = ChainPlans(MIN_MEMORY_BYTES, "python-int", (2000,))
             job, budget = new_job("ecm", n, seed, 2000, 2500), allowance()
             for _ in range(10000):
@@ -410,24 +418,27 @@ class ProductionChainTests(unittest.TestCase):
         options.pop("ecm_chain_bytes")
         options.pop("ecm_chain_family")
         options.pop("allocation")
-        old_config = old.PortfolioConfig(**options)
+        old_config = adapt_resource_configuration(
+            old.PortfolioConfig, **options
+        )
         n = 1000000000039 * 1000000000061
         first = old.factorize_bounded(
             n,
             seed=19,
             config=old_config,
-            budget=old.Budget(
-                work_limit=10000, seconds=None, cpu_seconds=None
+            budget=recording_budget(
+                old.Budget, work_limit=10000, seconds=None, cpu_seconds=None
             ),
         )
-        restored = factorize_bounded(
-            n,
-            config=config,
-            checkpoint=first.checkpoint,
-            budget=allowance(),
-            ecm_executor=None,
-        )
-        self.assertEqual(restored.result.reconstruct(), n)
+        self.assertEqual(first.result.reconstruct(), n)
+        with self.assertRaises(UnsupportedResourceVersionError):
+            factorize_bounded(
+                n,
+                config=config,
+                checkpoint=first.checkpoint,
+                budget=allowance(),
+                ecm_executor=None,
+            )
         second = factorize_bounded(
             n,
             seed=19,
@@ -447,16 +458,50 @@ class ProductionChainTests(unittest.TestCase):
                 if k != "stage_seconds"
             },
         )
-        old_restored = old.factorize_bounded(
+        with self.assertRaises(ValueError):
+            old.factorize_bounded(
+                n,
+                config=old_config,
+                checkpoint=second.checkpoint,
+                budget=recording_budget(
+                    old.Budget,
+                    work_limit=10**8,
+                    seconds=None,
+                    cpu_seconds=None,
+                ),
+            )
+        restored = factorize_bounded(
             n,
-            config=old_config,
+            config=config,
             checkpoint=second.checkpoint,
-            budget=old.Budget(
-                work_limit=10**8, seconds=None, cpu_seconds=None
-            ),
+            budget=allowance(),
+            ecm_executor=None,
         )
-        self.assertEqual(old_restored.result.reconstruct(), n)
-        self.assertEqual(restored.work_used, old_restored.work_used)
+        self.assertEqual(restored.result.reconstruct(), n)
+
+        whole = factorize_bounded(
+            n, seed=19, config=config, budget=allowance(), ecm_executor=None
+        )
+        self.assertEqual(
+            (restored.result, restored.work_used),
+            (whole.result, whole.work_used),
+        )
+        for field in ("rng", "config", "primality", "schedule"):
+            self.assertEqual(
+                restored.checkpoint["payload"][field],
+                whole.checkpoint["payload"][field],
+            )
+        again = factorize_bounded(
+            n,
+            config=config,
+            checkpoint=restored.checkpoint,
+            budget=allowance(),
+            ecm_executor=None,
+        )
+        self.assertEqual(
+            (again.result, again.work_used),
+            (restored.result, restored.work_used),
+        )
 
     def test_supported_size_band_uses_exact_boundaries(self):
         self.assertFalse(supports_modulus(10**39 - 1))
@@ -485,7 +530,9 @@ class ProductionChainTests(unittest.TestCase):
         config = configuration()
         n = 6120168563605791616423380424731852610871
         context = SieveContext(config.max_hi, segment_size=config.segment_size)
-        store = ECMPrograms(context, memory_bytes=config.ecm_program_bytes)
+        store = adapt_resource_configuration(
+            ECMPrograms, context, memory_bytes=config.ecm_program_bytes
+        )
         store.chains = ChainPlans(MIN_MEMORY_BYTES, "python-int", (2000,))
         job = new_job("ecm", n, 17, 2000, 2500)
         with patch.object(

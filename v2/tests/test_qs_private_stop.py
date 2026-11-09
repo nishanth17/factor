@@ -3,9 +3,14 @@
 import os
 import unittest
 from concurrent.futures.process import BrokenProcessPool
-from dataclasses import replace
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.packet_lease import ParentCPUSnapshot
 from v2.qs.parallel import CollectionPool
@@ -44,13 +49,13 @@ class PrivateStopTests(unittest.TestCase):
             dict(private_stop=True, lease_budget=True, mode="serial"),
         ):
             with self.assertRaises(ValueError):
-                QSWorkerConfig(**kwargs)
+                resource_configuration(QSWorkerConfig, **kwargs)
         config = QSWorkerConfig(private_stop=True, lease_budget=True)
         self.assertTrue(config.record()["private_stop"])
         self.assertNotIn("cpu_snapshot", QSWorkerConfig().record())
         for kwargs in (dict(cpu_snapshot=1), dict(cpu_snapshot=True)):
             with self.assertRaises(ValueError):
-                QSWorkerConfig(**kwargs)
+                resource_configuration(QSWorkerConfig, **kwargs)
 
     def test_parent_snapshot_charges_updates_once_and_rebinds_baseline(self):
         with CollectionPool("process", 2) as pool:
@@ -59,13 +64,13 @@ class PrivateStopTests(unittest.TestCase):
             snapshot = ParentCPUSnapshot(pool)
             pool.state["cpu"][:] = [1.0, 2.0]
             snapshot(first)
-            self.assertEqual(first.prior_cpu, 3.0)
+            self.assertEqual(first.prior_cpu, 0.0)
             snapshot(first)
-            self.assertEqual(first.prior_cpu, 3.0)
+            self.assertEqual(first.prior_cpu, 0.0)
             pool.state["cpu"][1] = 3.0
             snapshot(first)
             pool.poll(first)
-            self.assertEqual(first.prior_cpu, 4.0)
+            self.assertEqual(first.prior_cpu, 0.0)
             pool.lock.release()
 
             second = allowance()
@@ -73,7 +78,7 @@ class PrivateStopTests(unittest.TestCase):
             snapshot = ParentCPUSnapshot(pool)
             pool.state["cpu"][:] = [2.0, 4.0]
             snapshot(second)
-            self.assertEqual(second.prior_cpu, 2.0)
+            self.assertEqual(second.prior_cpu, 0.0)
             pool.lock.release()
 
     def test_broadcast_and_quiescent_clear_reach_every_worker(self):

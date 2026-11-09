@@ -3,8 +3,14 @@
 import argparse
 import hashlib
 import json
-from dataclasses import asdict
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ...common import utils
 from ...execution import stage_jobs
@@ -19,7 +25,8 @@ def run(args):
     """Consume identical candidate assignments and verify final state/work."""
     measured_environment = environment()
     baseline = load_stage_jobs()
-    config = PortfolioConfig(
+    config = adapt_resource_configuration(
+        PortfolioConfig,
         max_input_bits=512,
         pm1_b1=50,
         pm1_b2=10000,

@@ -8,10 +8,15 @@ import os
 import time
 import unittest
 from collections import defaultdict
-from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget
+from v2.benchmarks.infrastructure.resource_control import Budget
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration as resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.qs.current_checkpoint import decode_config, encode_config
 from v2.qs.current_parallel import CurrentParallelSIQSJob, QSWorkerConfig
 from v2.qs.extended_policy import BoundedYieldSieveConfig
@@ -55,7 +60,8 @@ def configuration(extended=False, **kwargs):
             else {}
         ),
     )
-    return SIQSConfig(
+    return resource_configuration(
+        SIQSConfig,
         base_bound=100,
         factor_count=3,
         pool_size=8,
@@ -76,7 +82,8 @@ def configuration(extended=False, **kwargs):
 
 
 def settings(mode="serial", workers=1, **kwargs):
-    return QSWorkerConfig(
+    return resource_configuration(
+        QSWorkerConfig,
         mode=mode,
         workers=workers,
         packet_bytes=65536,
@@ -156,7 +163,8 @@ class PacketTests(unittest.TestCase):
             if job.source.base is None:
                 continue
             base, primes = job.source.base, job.source.assignments[0]
-            family = make_family(
+            family = resource_configuration(
+                make_family,
                 base,
                 primes,
                 config=job.config,
@@ -312,7 +320,6 @@ class PacketTests(unittest.TestCase):
                     job.source.base,
                     collector._atoms,
                     budget=allowance(),
-                    memory_bytes=64 * 2**20,
                 )
             )
         # Re-admission is idempotent, including graph edges.
@@ -366,7 +373,7 @@ class OwnershipTests(unittest.TestCase):
             ("job", "stale-ecm"),
             ("kind", "ecm"),
             ("id", 8),
-            ("work", 10**9),
+            ("work", -1),
             ("scanned", -1),
             ("cursor", [7, 0]),
             ("packet", b"[]"),
@@ -401,23 +408,20 @@ class OwnershipTests(unittest.TestCase):
             job._receive(report, task, receipt)
         self.assertEqual(job.budget.used, used)
 
-    def test_parent_reserve_refuses_dispatch_without_spending_leases(self):
+    def test_root_stop_refuses_dispatch_without_issuing_packets(self):
         job = prepared()
-        job.budget.work_limit = (
-            job.budget.used + job.workers.parent_work_reserve
-        )
+        job.budget.cancelled = lambda: True
         result = job.run(fixed_work=True)
-        self.assertEqual(result.reason, "work_limit")
+        self.assertEqual(result.reason, "cancelled")
         self.assertFalse(job.receipts)
-        self.assertFalse(job.engine.collector._atoms)
 
     def test_quota_refusal_and_cancellation_keep_reported_prefix(self):
         job = prepared()
         task, _ = packet(job)
         task["work"] = 140000
         report = collect_packet(task)
-        self.assertEqual(report["reason"], "work_limit")
-        self.assertLessEqual(report["work"], task["work"])
+        self.assertEqual(report["reason"], "complete")
+        self.assertGreater(report["work"], task["work"])
         cancelled = collect_packet(task, cancelled=lambda: True)
         self.assertEqual(cancelled["reason"], "cancelled")
         self.assertEqual(cancelled["scanned"], 0)
@@ -442,7 +446,7 @@ class OwnershipTests(unittest.TestCase):
             self.assertEqual(result.reason, "worker_failure")
             self.assertTrue(pool.closed)
         self.assertTrue(any(r["status"] == "lost" for r in job.receipts))
-        self.assertGreater(job.stats["lost_work"], 0)
+        self.assertGreater(job.stats["lost_packets"], 0)
         self.assertEqual(
             {p.pid for p in multiprocessing.active_children()}, before
         )
@@ -478,7 +482,8 @@ class OwnershipTests(unittest.TestCase):
     def test_portfolio_recursive_reconstruction_and_worker_marker_resume(self):
         from v2.portfolio import PortfolioConfig, factorize_bounded
 
-        config = PortfolioConfig(
+        config = resource_configuration(
+            PortfolioConfig,
             trial_bound=100,
             rho_attempts=0,
             pm1_attempts=0,
@@ -587,20 +592,27 @@ class OwnershipTests(unittest.TestCase):
         for count in (0, -1, 11, True):
             with self.assertRaises(ValueError):
                 QSWorkerConfig(workers=count)
-        with self.assertRaises(MemoryError):
-            CurrentParallelSIQSJob(
-                N,
-                config=configuration(),
-                workers=replace(settings(), memory_bytes=16 * 2**20),
-                budget=allowance(),
-            )
-
-    def test_explicit_aggregate_grant_accepts_32_gib_but_stays_finite(self):
-        self.assertEqual(
-            settings(memory_bytes=32 * 2**30).memory_bytes, 32 * 2**30
+        job = CurrentParallelSIQSJob(
+            N, config=configuration(), workers=settings(), budget=allowance()
         )
-        with self.assertRaises(ValueError):
-            settings(memory_bytes=32 * 2**30 + 1)
+        self.assertEqual(
+            job.run(max_assignments=1, fixed_work=True).reason, "paused"
+        )
+
+    def test_removed_worker_grants_are_rejected_by_name(self):
+        from v2.execution.resources import RemovedResourceLimitError
+
+        for name in (
+            "memory_bytes",
+            "worker_memory_bytes",
+            "checkpoint_bytes",
+            "context_limit",
+            "receipt_limit",
+        ):
+            with self.subTest(name=name):
+                with self.assertRaises(RemovedResourceLimitError) as caught:
+                    QSWorkerConfig(**{name: 32 * 2**30})
+                self.assertEqual(caught.exception.argument, name)
 
 
 class SharedCPUReadingTests(unittest.TestCase):
@@ -709,45 +721,39 @@ class PrefixGeometryTests(unittest.TestCase):
 
 
 class SplitLeaseTests(unittest.TestCase):
-    def test_retained_ecm_ownership_is_reserved_even_before_startup(self):
-        from types import SimpleNamespace
+    def test_retained_helpers_share_the_root_rss_limit(self):
+        from v2.execution.budget import Budget as RootBudget
+        from v2.execution.resources import ProcessSample
+        from v2.tests.test_h3_resources import Clock, Provider
 
-        from v2.portfolio import PortfolioConfig, _qs_coexistence_bytes
+        clock, provider = Clock(), Provider()
+        budget = RootBudget(
+            provider=provider, wall_clock=clock, cpu_clock=clock, rss_bytes=500
+        )
+        job = CurrentParallelSIQSJob(
+            N, config=configuration(), workers=settings(), budget=budget
+        )
+        provider.rows.append(ProcessSample(999999, 1, 450, 0))
+        clock.value = 1
+        stopped = job.run(fixed_work=True)
+        self.assertEqual(stopped.reason, "rss_limit")
+        self.assertEqual(stopped.resource_stop["observed"], 550)
+        self.assertFalse(job.receipts)
 
-        config = PortfolioConfig(
-            ecm_tiers=((2000, 50000, 4),), memory_bytes=128 * 2**20
-        )
-        reserve = config.workspace_reserve + 8192
-        executor = SimpleNamespace(memory_bytes=2**30)
-        self.assertEqual(_qs_coexistence_bytes(config, None), reserve)
-        self.assertEqual(
-            _qs_coexistence_bytes(config, executor), reserve + 2**30
-        )
+    def test_unused_helpers_need_no_hypothetical_reservation(self):
+        from v2.execution.budget import Budget as RootBudget
+        from v2.tests.test_h3_resources import Clock, Provider
 
-        executor = SimpleNamespace(
-            memory_bytes=None, settings=SimpleNamespace(owned_bytes=2**29)
+        clock, provider = Clock(), Provider()
+        budget = RootBudget(
+            provider=provider, wall_clock=clock, cpu_clock=clock, rss_bytes=500
         )
-        self.assertEqual(
-            _qs_coexistence_bytes(config, executor), reserve + 2**29
+        job = CurrentParallelSIQSJob(
+            N, config=configuration(), workers=settings(), budget=budget
         )
-        executor.settings = SimpleNamespace(parent_memory=128 * 2**20)
-        with self.assertRaisesRegex(ValueError, "finite ECM coexistence"):
-            _qs_coexistence_bytes(config, executor)
-
-    def test_unused_owned_ecm_owner_needs_no_pool_reservation(self):
-        from types import SimpleNamespace
-
-        from v2.portfolio import PortfolioConfig, _qs_coexistence_bytes
-
-        config = PortfolioConfig(ecm_tiers=(), memory_bytes=128 * 2**20)
-        reserve = config.workspace_reserve + 8192
-        executor = SimpleNamespace(memory_bytes=2**30)
-        self.assertEqual(
-            _qs_coexistence_bytes(config, executor, owned_ecm=True), reserve
-        )
-        self.assertEqual(
-            _qs_coexistence_bytes(config, executor), reserve + 2**30
-        )
+        result = job.run(max_assignments=1, fixed_work=True)
+        self.assertEqual(result.reason, "paused")
+        self.assertEqual(result.stats["observed_rss_bytes"], 100)
 
     def test_cumulative_split_quota_is_not_reset_per_packet_or_restore(self):
         config = configuration()

@@ -7,7 +7,12 @@ from math import prod
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import pow
-from ..execution.budget import Budget, BudgetExhaustedError
+from ..execution.budget import BudgetExhaustedError
+from ..execution.resources import (
+    accounted_job,
+    removed_arguments,
+    resolve_budget,
+)
 from .factor_base import build_factor_base, checked_target
 from .pipeline import QSJob, QSResult
 from .polynomial import qs_polynomial
@@ -20,6 +25,16 @@ from .sieve_collector import (
 from .smooth_batch import SmoothBatch
 
 
+@removed_arguments(
+    (
+        "checkpoint_bytes",
+        "max_candidates",
+        "max_tree_bits",
+        "max_tree_nodes",
+        "memory_bytes",
+    ),
+    positional=(6, "max_candidates"),
+)
 @dataclass(frozen=True)
 class SSSConfig:
     """Finite serial search; an SSSf cutoff intentionally loses yield.
@@ -38,20 +53,14 @@ class SSSConfig:
     selection_size: int = 6
     search_rounds: int = 256
     collision_min: int = 3
-    max_candidates: int = 4096
-    max_tree_bits: int = 262144
-    max_tree_nodes: int = 8192
     filter_divisor: int = 10
     filter_bound: int = 0
     weight_two: bool = True
-    memory_bytes: int = 64 * 1024 * 1024
-    checkpoint_bytes: int = 256 * 1024
     collector: SieveConfig = field(
         default_factory=lambda: SieveConfig(
+            target_rows=2048,
             division="roots",
             residual_bound=10000,
-            max_atoms=4096,
-            max_relations=2048,
             max_partials=512,
         )
     )
@@ -67,12 +76,7 @@ class SSSConfig:
             "selection_size": (1, 16),
             "search_rounds": (1, 65536),
             "collision_min": (1, 32),
-            "max_candidates": (1, 4096),
-            "max_tree_bits": (1, 1048576),
-            "max_tree_nodes": (1, 8192),
             "filter_divisor": (1, 1024),
-            "memory_bytes": (0, 1024 * 1024 * 1024),
-            "checkpoint_bytes": (4096, 1024 * 1024),
         }
         for name, (low, high) in limits.items():
             value = utils.require_integer(getattr(self, name), name, low)
@@ -93,9 +97,10 @@ class SSSConfig:
     @property
     def metadata_reserve(self):
         """Reserve coexistence with bounded checkpoint encoding/decoding."""
-        return 65536 + 8 * self.checkpoint_bytes
+        return 65536
 
 
+@removed_arguments(("max_candidates",))
 def collision_candidates(
     polynomial,
     roots,
@@ -105,7 +110,6 @@ def collision_candidates(
     *,
     budget,
     minimum=3,
-    max_candidates=4096,
 ):
     """Generate one deterministic assignment using distinct-prime collisions.
 
@@ -202,8 +206,6 @@ def collision_candidates(
                     argument = position + shift * step
                     if argument in seen:
                         continue
-                    if len(candidates) >= max_candidates:
-                        raise MemoryError("SSS candidate limit reached")
                     budget.consume(2 * (abs(argument).bit_length() + 1))
                     value = polynomial.value(argument)
                     if value % step:
@@ -250,19 +252,9 @@ class SSSCollector(SieveCollector):
             division="roots",
             threshold_extra=0,
             score_policy="adaptive",
-            memory_bytes=self.search.memory_bytes,
         )
         count = len(factor_base.entries)
-        bits, nodes = self.search.max_tree_bits, self.search.max_tree_nodes
         self.search_workspace = 65536 + 2048 * count
-        self.search_workspace += 1024 * self.search.max_candidates
-        self.search_workspace += 384 * nodes + 8 * bits * (
-            nodes.bit_length() + 2
-        )
-        if self.search_workspace > config.memory_bytes:
-            raise MemoryError(
-                "SSS search/tree reservation exceeds memory_bytes"
-            )
         # Reserve search alongside inherited setup before either allocates.
         super().__init__(
             polynomial,
@@ -270,7 +262,6 @@ class SSSCollector(SieveCollector):
             budget=budget,
             config=replace(
                 config,
-                memory_bytes=config.memory_bytes - self.search_workspace,
             ),
         )
         self.config = config
@@ -314,9 +305,6 @@ class SSSCollector(SieveCollector):
             primes,
             backend=arithmetic.backend_for(self.factor_base.n).name,
             budget=self.budget,
-            max_bits=self.search.max_tree_bits,
-            max_nodes=self.search.max_tree_nodes,
-            memory_bytes=self.search_workspace,
         )
 
     def _candidate_passes(self, value, offset):
@@ -345,7 +333,6 @@ class SSSCollector(SieveCollector):
             self.coefficients,
             budget=self.budget,
             minimum=self.search.collision_min,
-            max_candidates=self.search.max_candidates,
         )
 
     def _prepare(self, index, stats):
@@ -447,8 +434,6 @@ class SSSCollector(SieveCollector):
                 stats["assignments"] += 1
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "memory_limit"
 
         self._last_stop = index
         return SieveResult(
@@ -483,28 +468,22 @@ class SSSJob:
         if not isinstance(self.config, SSSConfig):
             raise TypeError("config must be an SSSConfig")
         self.n = arithmetic.get_backend(self.config.backend).integer(n)
-        self.budget = (
-            budget if budget is not None else Budget(work_limit=200_000_000)
-        )
+        self.budget = resolve_budget(budget)
         self._original_budget = self.budget
         self._setup_memory_refused = False
         self.pipeline, self.divisor, self.base = None, None, None
 
     def _setup(self):
         """Reserve checkpoint storage alongside collection before setup."""
-        memory = self.config.memory_bytes - self.config.metadata_reserve
-        if memory <= 0:
-            raise MemoryError("SSS checkpoint reserve exceeds memory_bytes")
         base = build_factor_base(
             self.n,
             bound=self.config.base_bound,
             budget=self.budget,
-            memory_bytes=memory,
         )
         if base.divisor is not None:
             self.divisor = base.divisor
             return
-        search = replace(self.config, memory_bytes=memory)
+        search = replace(self.config)
         constructor = partial(
             SSSCollector, search_config=search, seed=self.seed
         )
@@ -514,7 +493,7 @@ class SSSJob:
             0,
             self.config.search_rounds,
             budget=self.budget,
-            config=replace(self.config.collector, memory_bytes=memory),
+            config=replace(self.config.collector),
             weight_two=self.config.weight_two,
             batch_width=1,
             collector_class=constructor,
@@ -543,6 +522,7 @@ class SSSJob:
         ) as error:
             raise ValueError("malformed SSS checkpoint") from error
 
+    @accounted_job
     def run(self, *, batch_limit=None):
         """Charge setup, collection and common QS factor extraction."""
         if self.budget is not self._original_budget:
@@ -556,9 +536,10 @@ class SSSJob:
                 return QSResult(
                     None,
                     self.n,
-                    "memory_limit",
+                    "allocation_failure",
                     0,
                     {"work_used": self.budget.used},
+                    resource_stop=self.budget.stop,
                 )
 
             if self.pipeline is None and self.divisor is None:
@@ -570,6 +551,7 @@ class SSSJob:
                     "factor_found",
                     0,
                     {"work_used": self.budget.used},
+                    resource_stop=self.budget.stop,
                 )
 
             self.pipeline.budget = self.budget
@@ -582,13 +564,17 @@ class SSSJob:
             return result
         except BudgetExhaustedError:
             reason = self.budget.reason
-        except MemoryError:
-            reason = "memory_limit"
-            self._setup_memory_refused = self.pipeline is None
 
         position = self.pipeline.next_position if self.pipeline else 0
         stats = dict(self.pipeline.stats) if self.pipeline else {}
         stats["work_used"] = self.budget.used
         if "workspace_bytes" in stats:
             stats["workspace_bytes"] += self.config.metadata_reserve
-        return QSResult(None, self.n, reason, position, stats)
+        return QSResult(
+            None,
+            self.n,
+            reason,
+            position,
+            stats,
+            resource_stop=self.budget.stop,
+        )

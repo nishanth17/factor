@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.ecm_worker import CurveEngine
-from v2.execution.ecm_worker_state import ActionBudget, DecodedPrograms
+from v2.execution.ecm_worker_state import DecodedPrograms
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
 from v2.execution.worker_contract import (
     EngagementRule,
@@ -16,6 +16,7 @@ from v2.execution.worker_contract import (
     Search,
     WorkerSettings,
 )
+from v2.tests.resource_stops import ActionBudget
 from v2.tests.test_ecm_workers import allowance, configuration, task
 
 
@@ -111,7 +112,7 @@ class PollingAndCacheTests(unittest.TestCase):
             side_effect=MemoryError("injected"),
         ):
             result = engine.execute(task(third, 0), cancelled=lambda: False)
-        self.assertEqual(result["reason"], "error")
+        self.assertEqual(result["reason"], "allocation_failure")
         self.assertEqual(len(engine.contexts), 1)
         self.assertNotIn(first.metadata, engine.contexts)
         self.assertIsNone(engine.identity)
@@ -119,19 +120,13 @@ class PollingAndCacheTests(unittest.TestCase):
 
 class PacketAndStageTests(unittest.TestCase):
     def test_packets_reserve_each_job_and_shrink_to_funding_and_frames(self):
-        settings = WorkerSettings(
-            packet_curves=4,
-            assignment_work=10,
-            assignment_cpu=2,
-            frame_bytes=2048,
-        )
-        config = configuration()
+        settings = WorkerSettings(packet_curves=4)
         plan = Manifest(
-            1000003, 7, "root", arithmetic_options(config, settings)
+            1000003, 7, "root", arithmetic_options(configuration(), settings)
         )
         search = Search(plan, settings, fixed_work=True)
+        ledger = Ledger()
         with ECMExecutor(settings=settings) as owner:
-            ledger = Ledger(1_000_000, 5)
             packet, issued = owner._packet(
                 plan,
                 search,
@@ -139,19 +134,20 @@ class PacketAndStageTests(unittest.TestCase):
                 time.monotonic() + 60,
                 dict(index=0, metadata_cache=[plan.metadata]),
             )
-        self.assertEqual(len(issued), 3)
-        grants = [job["cpu"] for job in packet["jobs"]]
-        self.assertEqual(grants[:2], [2, 2])
-        self.assertTrue(0 < grants[2] < 1)
-        self.assertEqual(len(ledger.active), 3)
-        reserved = sum(cpu for _, _, cpu in ledger.active.values())
-        self.assertEqual(reserved, sum(grants))
-        self.assertLess(reserved, ledger.cpu_limit)
+        self.assertEqual(len(issued), 4)
+        self.assertEqual(len(ledger.active), 4)
+        self.assertEqual(
+            [job["assignment"]["id"] for job in packet["jobs"]],
+            [plan.assignment(i)["id"] for i in range(4)],
+        )
+        for job in packet["jobs"]:
+            self.assertNotIn("cpu", job)
+            self.assertNotIn("work", job)
         ledger.charge(parent_cpu=0.01)
         for token in list(ledger.active):
             ledger.lose(token)
-        self.assertEqual(ledger.cpu, reserved)
-        self.assertEqual(ledger.work, 3 * 10 + 4 * settings.frame_bytes)
+        self.assertEqual((ledger.work, ledger.cpu), (0, 0))
+        self.assertEqual(ledger.lost, 4)
 
     def test_packet_admission_keeps_ready_work_for_other_idle_slots(self):
         settings = WorkerSettings(workers=4, packet_curves=4)
@@ -159,7 +155,7 @@ class PacketAndStageTests(unittest.TestCase):
             1000003, 7, "root", arithmetic_options(configuration(), settings)
         )
         search = Search(plan, settings, fixed_work=True)
-        ledger = Ledger(200_000_000, 240)
+        ledger = Ledger()
         with ECMExecutor(settings=settings) as owner:
             packets = []
             for index in range(4):
@@ -405,21 +401,19 @@ class PoolShutdownTests(unittest.TestCase):
         )
 
 
-def packet_factor_worker(
-    channel, frame_bytes, startup_work, settings_data=None
-):
+def packet_factor_worker(channel, settings_data=None):
+    _frame_bytes, startup_work = 16384, 0
     """Finite fake service for real spawn/healthy reuse QA; no ECM calls."""
     from v2.execution.ecm_worker import read_message
     from v2.execution.worker_contract import Decoder, frame
 
     channel.settimeout(0.01)
-    decoder = Decoder(frame_bytes)
+    decoder = Decoder()
     channel.sendall(
         frame(
             dict(
                 kind="ready", cpu=time.process_time(), rss=1, work=startup_work
-            ),
-            frame_bytes,
+            )
         )
     )
     while True:
@@ -448,8 +442,7 @@ def packet_factor_worker(
                         rss=1,
                         prepared_schedule=packet["schedule"],
                         metadata_cache=[packet["schedule"]],
-                    ),
-                    frame_bytes,
+                    )
                 )
             )
     channel.close()
@@ -485,7 +478,7 @@ class RetainedPoolTests(unittest.TestCase):
 
 class ParentHeadroomTests(unittest.TestCase):
     def test_live_leases_leave_parent_cpu_to_process_results(self):
-        settings = WorkerSettings(workers=4, memory_bytes=2**31)
+        settings = WorkerSettings(workers=4)
         owner = ECMExecutor(settings=settings)
         plan = Manifest(
             35,
@@ -497,7 +490,7 @@ class ParentHeadroomTests(unittest.TestCase):
             ),
         )
         search = Search(plan, settings, fixed_work=True)
-        ledger = Ledger(10**8, 5)
+        ledger = Ledger()
         for slot in range(4):
             packet, issued = owner._packet(
                 plan,
@@ -511,4 +504,4 @@ class ParentHeadroomTests(unittest.TestCase):
             self.assertEqual(len(packet["jobs"]), 1)
         self.assertEqual(len(ledger.active), 4)
         ledger.charge(parent_cpu=0.01)
-        self.assertLess(ledger.cpu + ledger.parent_cpu, ledger.cpu_limit)
+        self.assertEqual((ledger.cpu, ledger.parent_cpu), (0, 0.01))

@@ -8,8 +8,11 @@ import os
 import resource
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from .cell import configuration, settings
 from .combined import fixtures
@@ -28,10 +31,10 @@ def partition(tasks, workers):
 
 def stream_packets(tasks, payload):
     """Retain private state and exact verification, returning only hashes."""
-    from ....execution.budget import Budget
     from ....qs.worker_packet import collect_packet
     from ....qs.worker_state import WorkerState
     from ....qs.worker_wire import PackedRows
+    from ...infrastructure.resource_control import Budget
 
     started, cpu = time.monotonic(), time.process_time()
     seconds = payload["seconds"]
@@ -170,9 +173,9 @@ def execute(
     fixture, workers, *, longer_window=False, byte_stamps=False, seconds=None
 ):
     """Run local (zero) or one private stream per spawned owned process."""
-    from ....execution.budget import Budget
     from ....qs.current_parallel import CurrentParallelSIQSJob
     from ....qs.worker_state import context_key
+    from ...infrastructure.resource_control import Budget
 
     if workers not in (0, 1, 4, 8, 10):
         raise ValueError("unsupported concurrency")

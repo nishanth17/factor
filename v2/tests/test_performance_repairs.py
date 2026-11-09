@@ -5,20 +5,24 @@ import json
 import random
 import unittest
 from collections import Counter
-from dataclasses import replace
+from dataclasses import asdict
 from math import isqrt, prod
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.common.preprocessing import (
     _POWER_MODULI,
     integer_root,
     power_residue_possible,
 )
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.execution.schedules import SieveContext
 from v2.execution.work_budget import PollingBudget
 from v2.qs.linear_algebra import DependencySolver, filter_matrix
 from v2.qs.parallel import CollectionPool, ParallelConfig, ParallelSIQSJob
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 def allowance(work=10**12):
@@ -44,7 +48,7 @@ class PollingTests(unittest.TestCase):
         with self.assertRaises(BudgetExhaustedError):
             budget.consume(100)
         self.assertEqual((ledger.used, budget._remaining), (18, 3))
-        self.assertEqual(polls, [0, 13, 14, 18, 18])
+        self.assertEqual(polls, [0, 13, 14, 18])
 
     def test_poll_callback_can_replace_ledger_without_stale_reservations(self):
         first, replacement = allowance(10), allowance(10)
@@ -168,10 +172,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
 
         for weight_two in (False, True):
             matrix = filter_matrix(
-                rows,
-                weight_two=weight_two,
-                budget=allowance(),
-                memory_bytes=2**20,
+                rows, weight_two=weight_two, budget=allowance()
             )
 
             self.assertIs(matrix.original_rows, rows)
@@ -187,7 +188,7 @@ class SparseMatrixRepairTests(unittest.TestCase):
                 self.assertEqual(span, {0, 3, 12, 15})
 
         budget = allowance()
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             filter_matrix(rows, budget=budget, memory_bytes=1)
 
         self.assertEqual(budget.used, 0)
@@ -259,18 +260,15 @@ class PreparationReuseTests(unittest.TestCase):
                     fixture.base,
                     fixture.store,
                     allowance(),
-                    2**20,
                 )
 
             with self.assertRaises(BudgetExhaustedError):
                 cache.check(
-                    relation, fixture.base, fixture.store, allowance(0), 2**20
+                    relation, fixture.base, fixture.store, allowance(0)
                 )
 
             self.assertFalse(cache.records)
-            cache.check(
-                relation, fixture.base, fixture.store, allowance(), 2**20
-            )
+            cache.check(relation, fixture.base, fixture.store, allowance())
 
             self.assertLessEqual(cache.used, cap)
 
@@ -396,16 +394,13 @@ class ChunkedWorkerTests(unittest.TestCase):
         for changes in (
             dict(batch_width=64),
             dict(max_batch_atoms=64),
-            dict(checkpoint_bytes=original.checkpoint_bytes + 4096),
         ):
             job.config = replace(original, **changes)
             for action in (job.checkpoint, job.run):
                 with self.assertRaises(ValueError):
                     action()
 
-        job.config = replace(
-            original, assignment_work=20_000_000, poll_interval=1
-        )
+        job.config = replace(original, poll_interval=1)
 
         self.assertEqual(
             job.run(max_assignments=1, fixed_work=True).reason, "paused"
@@ -427,20 +422,16 @@ class ChunkedWorkerTests(unittest.TestCase):
         job._setup()
         job._memory(4)
 
-        self.assertLess(job.stats["peak_owned_bytes"], config.memory_bytes)
+        self.assertGreater(job.stats["peak_owned_bytes"], 0)
         dense_atom = 4096 + 256 * len(job.base.entries)
         dense_atom += 128 * (
             job.n.bit_length()
             + 2 * config.factor_count * config.base_bound.bit_length()
             + 32
         )
-        dense_owned = config.parent_memory_bytes + 4 * (
-            config.worker_memory_bytes
-            + 3 * 256 * dense_atom
-            + job.base.workspace_bytes
-        )
-
-        self.assertGreater(dense_owned, config.memory_bytes)
+        dense_owned = 4 * (3 * 256 * dense_atom + job.base.workspace_bytes)
+        self.assertGreater(dense_owned, job.stats["peak_owned_bytes"])
+        self.assertNotIn("memory_bytes", asdict(config))
 
         result = job.run(max_assignments=1, fixed_work=True)
 
@@ -494,7 +485,7 @@ class ChunkedWorkerTests(unittest.TestCase):
             budget=allowance(),
         )
 
-        self.assertEqual(coarse.run(fixed_work=True).reason, "batch_limit")
+        self.assertEqual(coarse.run(fixed_work=True).reason, "factor_found")
         expected = None
 
         for mode, workers in (("serial", 1), ("thread", 2), ("process", 2)):

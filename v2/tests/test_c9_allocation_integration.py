@@ -37,13 +37,10 @@ class GrowingAllocationIntegrationTests(unittest.TestCase):
         self.assertEqual(payload["portfolio_version"], 12)
         saved = payload["config"]["siqs"]
         self.assertEqual(saved["collector"]["storage_policy"], "grow")
-        self.assertEqual(
-            saved["memory_bytes"],
-            config.memory_bytes - config.workspace_reserve - 8192,
-        )
-        self.assertGreater(saved["memory_bytes"], 0)
-        for field in ("max_atoms", "max_partials", "max_relations"):
-            self.assertIsNone(saved["collector"][field])
+        self.assertNotIn("memory_bytes", saved)
+        self.assertNotIn("max_atoms", saved["collector"])
+        self.assertNotIn("max_relations", saved["collector"])
+        self.assertIsNone(saved["collector"]["max_partials"])
 
         for _ in range(2):
             restored = factorize_bounded(
@@ -64,7 +61,7 @@ class GrowingAllocationIntegrationTests(unittest.TestCase):
         return first, config
 
     def test_unadmitted_growing_fallback_restores_implicit_configuration(self):
-        self.check_implicit_restore(1000, "insufficient_fallback_work")
+        self.check_implicit_restore(1000, "work_limit")
 
     def test_live_growing_fallback_restores_and_rejects_changed_policy(self):
         first, config = self.check_implicit_restore(30000, "work_limit")

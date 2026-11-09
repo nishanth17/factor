@@ -1,5 +1,15 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
+H3 integration amendment (8 November): local master `755c312` replaces the
+resource model used by the historical stages below. Internal logical-byte,
+work/CPU lease and checkpoint refusal caps no longer admit or stop production
+QS workers. Keep the frozen numerical recipes, packet/cache capacities and
+historical receipts. New execution uses a fresh source/protocol identity,
+root wall/aggregate CPU and the approved 18 GiB observed-RSS guard. Checkpoint
+file limits apply only to optional atomic saves. Cost tables require
+revalidation; the old ownership sums are historical, not current admission.
+
+
 Status: restricted G3 reported on 8 November; the approved stage is finished
 and stopped. All 100 calls complete on runtime `60bfd95`. Frozen experimental
 process recipes: C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold (ranking

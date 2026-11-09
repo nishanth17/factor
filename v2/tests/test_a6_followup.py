@@ -11,7 +11,11 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from pathlib import Path
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.common import utils
+from v2.execution.resources import UnsupportedResourceVersionError
 from v2.execution.schedules import SieveContext
 from v2.pm1 import bounded as pm1_bounded
 from v2.pm1.tuning import PM1TuningConfig
@@ -19,7 +23,9 @@ from v2.tests.test_a6_pm1 import allowance, resign
 
 
 def configured(**options):
-    return PM1TuningConfig(bounds=((10, 101),), segment_size=3, **options)
+    return adapt_resource_configuration(
+        PM1TuningConfig, bounds=((10, 101),), segment_size=3, **options
+    )
 
 
 def prime_oracle(lo, hi):
@@ -44,6 +50,11 @@ def frozen_control():
         module = importlib.util.module_from_spec(spec)
         sys.modules[name] = module
         spec.loader.exec_module(module)
+        from functools import partial
+
+        module.SieveContext = partial(
+            adapt_resource_configuration, module.SieveContext
+        )
     return sys.modules[name]
 
 
@@ -235,12 +246,32 @@ class ExecutionTests(unittest.TestCase):
         checkpoint = frozen.factorize_pm1_bounded(
             1000003, config=old_cfg, budget=allowance(), max_actions=12
         ).checkpoint
+        with self.assertRaises(UnsupportedResourceVersionError):
+            pm1_bounded.factorize_pm1_bounded(
+                1000003, config=cfg, budget=allowance(), checkpoint=checkpoint
+            )
+
+        current = pm1_bounded.factorize_pm1_bounded(
+            1000003, config=cfg, budget=allowance(), max_actions=12
+        )
         resumed = pm1_bounded.factorize_pm1_bounded(
-            1000003, config=cfg, budget=allowance(), checkpoint=checkpoint
+            1000003,
+            config=cfg,
+            budget=allowance(),
+            checkpoint=current.checkpoint,
+        )
+        whole = pm1_bounded.factorize_pm1_bounded(
+            1000003, config=cfg, budget=allowance()
         )
         self.assertEqual(resumed.reason, "exhausted")
+        self.assertEqual(resumed.result, whole.result)
+        self.assertEqual(resumed.result.reconstruct(), 1000003)
         self.assertEqual(
             resumed.checkpoint["payload"]["execution"], "pm1-campaign-v1"
+        )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["config"],
+            current.checkpoint["payload"]["config"],
         )
 
     def test_every_boundary_resume_atomic_refusal_and_cancellation(self):
@@ -412,10 +443,13 @@ class ExecutionTests(unittest.TestCase):
             {"wheel": 60},
             {"gap_entries": 257},
             {"chunk_bits": 31},
-            {"memory_bytes": 65536, "wheel": 210},
         ):
             with self.assertRaises((ValueError, MemoryError)):
                 configured(**options)
+        with self.assertRaises(TypeError):
+            from v2.pm1.tuning import PM1TuningConfig
+
+            PM1TuningConfig(memory_bytes=65536)
 
 
 if __name__ == "__main__":

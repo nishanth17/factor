@@ -1,4 +1,4 @@
-"""Private packet lease counter; not a shared or checkpointed Budget view."""
+"""Private packet counters; resource limits belong to the observed root."""
 
 from ..common import utils
 from ..execution.work_budget import PollingBudget
@@ -33,8 +33,8 @@ class ParentCPUSnapshot:
     def _account_cpu(self, budget):
         """Publish one snapshot before PollingBudget checks its reservation."""
         pool = self.pool
+        pool._account_cpu(budget)
         current = self.worker_cpu()
-        budget.prior_cpu += max(0, current - pool.accounted_cpu)
         pool.accounted_cpu = current
         pool.state["parent_cpu"].value = budget.cpu_used - current
 
@@ -44,17 +44,16 @@ class ParentCPUSnapshot:
 
 
 class PacketLeaseBudget(PollingBudget):
-    """Keep prepaid work in plain fields and poll at most every 64 actions.
+    """Keep diagnostic work locally and poll at most every 64 actions.
 
-    Only this private packet may access the backing ledger. Synchronization
-    before a poll gives callbacks the same paid prefix as PollingBudget;
-    reconciliation after a packet copies that prefix once to its report.
-    The raw Budget retains deadline/cancellation precedence and exact refusal.
+    Only this private packet accesses the backing counter. Synchronization
+    before a poll gives callbacks the same prefix as PollingBudget;
+    reconciliation copies that prefix once to its report. The root controls
+    resources; worker callbacks propagate its cancellation and deadline.
     """
 
     def __init__(self, budget, *, poll=None):
         self.budget = budget
-        self.work_limit = budget.work_limit
         self.used = budget.used
         self.interval = 64
         self.poll = poll
@@ -81,17 +80,12 @@ class PacketLeaseBudget(PollingBudget):
         if self.poll is not None:
             self.poll(self.budget)
         self.budget.consume(amount)
-        self.work_limit = self.budget.work_limit
         self.used = self.budget.used
         self._actions_left = self.interval - actions
 
     def consume(self, amount=1):
         utils.require_integer(amount, "amount", 0)
-        if (
-            amount == 0
-            or not self._actions_left
-            or amount > self.work_limit - self.used
-        ):
+        if amount == 0 or not self._actions_left:
             self._charge_poll(amount, 1)
         else:
             self.used += amount
@@ -101,7 +95,7 @@ class PacketLeaseBudget(PollingBudget):
         utils.require_integer(amount, "span amount", 1)
         if amount > self.interval:
             raise ValueError("span exceeds cooperative polling interval")
-        if amount > self._actions_left or amount > self.work_limit - self.used:
+        if amount > self._actions_left:
             self._charge_poll(amount, amount)
         else:
             self.used += amount
@@ -113,7 +107,7 @@ class PacketLeaseBudget(PollingBudget):
         if count > self.interval:
             raise ValueError("group exceeds cooperative polling interval")
         amount = count * work_each
-        if count > self._actions_left or amount > self.work_limit - self.used:
+        if count > self._actions_left:
             self._charge_poll(amount, count)
         else:
             self.used += amount
@@ -132,7 +126,7 @@ class PacketLeaseBudget(PollingBudget):
         path must retain its first affordable action and exact refusal prefix.
         """
         amount = first + second
-        if self._actions_left < 2 or amount > self.work_limit - self.used:
+        if self._actions_left < 2:
             return False
         self.used += amount
         self._actions_left -= 2

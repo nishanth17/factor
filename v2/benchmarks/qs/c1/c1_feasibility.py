@@ -15,6 +15,11 @@ from math import gcd, isqrt, prod
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
 from ....qs import SIQSJob
@@ -233,7 +238,9 @@ def verify_square(records, mask, n):
 
 def incidence_report(records, n):
     """Optimistic no-eviction LP elimination followed by existing filtering."""
-    budget = Budget(work_limit=10**10, seconds=20, cpu_seconds=20)
+    budget = recording_budget(
+        Budget, work_limit=10**10, seconds=20, cpu_seconds=20
+    )
     labels = sorted({p for r in records for p in r["lp"]})
     base_labels = sorted({p for r in records for p, _ in r["exponents"]})
     # Reserve simultaneous LP, FB, pivot and provenance integers before work.
@@ -259,7 +266,8 @@ def incidence_report(records, n):
             fb_rows.append(fb)
         cycles = kernel(lp_rows, budget)
         rows = tuple(xor_selected(fb_rows, mask) for mask in cycles)
-        filtered = filter_matrix(
+        filtered = adapt_resource_configuration(
+            filter_matrix,
             rows,
             weight_two=True,
             budget=budget,
@@ -296,7 +304,9 @@ class ResidualAudit:
         self.config, self.seed = config, seed
         self.prime_limit = 100 * config.base_bound
         self.product_limit = self.prime_limit**2
-        self.budget = Budget(work_limit=10**11, seconds=60, cpu_seconds=60)
+        self.budget = recording_budget(
+            Budget, work_limit=10**11, seconds=60, cpu_seconds=60
+        )
         self.rng = random.Random(380054 + seed)
         self.counts, self.bits, self.samples, self.sample_seen = (
             Counter(),
@@ -504,7 +514,8 @@ def decision(report, control, digits):
 
 def probe(fixture, seed, config, control):
     audit = ResidualAudit(config, seed)
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=10**13,
         seconds=90,
         cpu_seconds=90,

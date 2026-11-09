@@ -2,8 +2,10 @@
 
 import tempfile
 import unittest
-from dataclasses import asdict
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 from v2.benchmarks.qs.c1.c1_implementation import (
     ARMS,
     arm_config,
@@ -48,9 +50,13 @@ class ImplementationHarnessTests(unittest.TestCase):
         for arm in ARMS:
             candidate = arm_config(config, arm)
             self.assertEqual(decode_config(asdict(candidate)), candidate)
-            self.assertEqual(candidate.memory_bytes, config.memory_bytes)
             self.assertEqual(
-                candidate.collector.max_atoms, config.collector.max_atoms
+                asdict(candidate)["memory_bytes"],
+                asdict(config)["memory_bytes"],
+            )
+            self.assertEqual(
+                asdict(candidate.collector)["max_atoms"],
+                asdict(config.collector)["max_atoms"],
             )
         self.assertEqual(arm_config(config, "dlp_half").base_bound, 100)
         self.assertEqual(

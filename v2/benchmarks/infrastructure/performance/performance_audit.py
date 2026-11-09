@@ -19,9 +19,33 @@ import sys
 import tempfile
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import gcd, isqrt, prod
 from pathlib import Path
+
+
+def adapt_resource_configuration(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.adapt_resource_configuration(*args, **kwargs)
+
+
+def recording_budget(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.recording_budget(*args, **kwargs)
+
+
+def asdict(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.historical_asdict(*args, **kwargs)
+
+
+def replace(*args, **kwargs):
+    from v2.benchmarks.infrastructure import resource_control
+
+    return resource_control.historical_replace(*args, **kwargs)
+
 
 if __package__ in (None, ""):
     # Resolve driver inputs without importing the selected runtime early.
@@ -157,10 +181,38 @@ def apply_revert(variant):
             module.__dict__,
             namespace,
         )
+        implementation = namespace[function]
+        if variant == "sssf_trees":
+            import types
+
+            historical_globals = dict(module.__dict__, replace=replace)
+            historical_globals["SSSConfig"] = (
+                lambda: adapt_resource_configuration(module.SSSConfig)
+            )
+            implementation = types.FunctionType(
+                implementation.__code__,
+                historical_globals,
+                implementation.__name__,
+                implementation.__defaults__,
+                implementation.__closure__,
+            )
+            implementation.__kwdefaults__ = namespace[function].__kwdefaults__
+            original = implementation
+
+            def implementation(self, *args, **kwargs):
+                search = kwargs.get("search_config")
+                if search is not None:
+                    values = asdict(search)
+                    values["collector"] = search.collector
+                    kwargs["search_config"] = adapt_resource_configuration(
+                        type(search), **values
+                    )
+                return original(self, *args, **kwargs)
+
         setattr(
             module if owner is None else getattr(module, owner),
             function,
-            namespace[function],
+            implementation,
         )
 
     if variant == "preprocessing":
@@ -252,7 +304,8 @@ def make_config(case, band, modules):
         return choices[case]
 
     sieve = modules["sieve_collector"].SieveConfig
-    options = sieve(
+    options = adapt_resource_configuration(
+        sieve,
         score_policy="powers",
         division="bucket",
         residual_bound=10000,
@@ -264,7 +317,8 @@ def make_config(case, band, modules):
     if case.startswith("sss"):
         mode = "sssf" if case.startswith("sssf") else "sss"
         filtered = mode == "sssf" and "unfiltered" not in case
-        return modules["sss"].SSSConfig(
+        return adapt_resource_configuration(
+            modules["sss"].SSSConfig,
             mode=mode,
             memory_bytes=(
                 128 if "feasible" in case or "memory128" in case else 64
@@ -314,11 +368,14 @@ def make_config(case, band, modules):
             params["poll_interval"] = 1
         if "cap" in case:
             params["max_batch_atoms"] = 1024
-        return modules["parallel"].ParallelConfig(**params)
+        return adapt_resource_configuration(
+            modules["parallel"].ParallelConfig, **params
+        )
 
     if case.startswith("siqs"):
         if "feasible" in case:
-            return modules["siqs"].SIQSConfig(
+            return adapt_resource_configuration(
+                modules["siqs"].SIQSConfig,
                 base_bound=5000 if "base5k" in case else 10000,
                 multiplier=0 if "multiplier" in case else 1,
                 half_width=2048 if "width2k" in case else 8192,
@@ -341,7 +398,8 @@ def make_config(case, band, modules):
                     max_partials=32768,
                 ),
             )
-        return modules["siqs"].SIQSConfig(
+        return adapt_resource_configuration(
+            modules["siqs"].SIQSConfig,
             base_bound=200 if band == "small" else 5000,
             half_width=256 if band == "small" else 512,
             factor_count=1 if band == "small" else 4,
@@ -374,7 +432,8 @@ def run_one(case, fixture, seed, config, modules, pool=None):
         if "feasible" in case
         else (0.2 if fixture["band"] in ("40d", "60d", "80d") else 5)
     )
-    budget = modules["budget"].Budget(
+    budget = recording_budget(
+        modules["budget"].Budget,
         work_limit=10**13 if "feasible" in case else 2_000_000_000,
         seconds=seconds,
         cpu_seconds=seconds,
@@ -390,7 +449,9 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                 n,
                 seed=seed,
                 budget=budget,
-                config=portfolio.PortfolioConfig(**config),
+                config=adapt_resource_configuration(
+                    portfolio.PortfolioConfig, **config
+                ),
             )
 
             if outcome.result.reconstruct() != n:
@@ -415,8 +476,12 @@ def run_one(case, fixture, seed, config, modules, pool=None):
             ]
         elif case == "matrix":
             rows = (1 << 99999,) * 32
-            matrix = modules["linear_algebra"].filter_matrix(
-                rows, weight_two=True, budget=budget, memory_bytes=64 * 2**20
+            matrix = adapt_resource_configuration(
+                modules["linear_algebra"].filter_matrix,
+                rows,
+                weight_two=True,
+                budget=budget,
+                memory_bytes=64 * 2**20,
             )
 
             masks = (
@@ -432,8 +497,12 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                 str(masks),
             )
         elif case.startswith("collector") or case == "collision":
-            base = modules["factor_base"].build_factor_base(
-                n, bound=1000, budget=budget, memory_bytes=64 * 2**20
+            base = adapt_resource_configuration(
+                modules["factor_base"].build_factor_base,
+                n,
+                bound=1000,
+                budget=budget,
+                memory_bytes=64 * 2**20,
             )
             divisor = base.divisor
             reason = "factor_found" if divisor else "complete"
@@ -445,7 +514,9 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                     collector = modules["sss"].SSSCollector(
                         polynomial,
                         base.factor_base,
-                        search_config=modules["sss"].SSSConfig(),
+                        search_config=adapt_resource_configuration(
+                            modules["sss"].SSSConfig
+                        ),
                         budget=budget,
                         seed=seed,
                     )
@@ -496,7 +567,8 @@ def run_one(case, fixture, seed, config, modules, pool=None):
                         )
                     )
             elif case.startswith("native"):
-                native = modules["siqs"].SIQSConfig(
+                native = adapt_resource_configuration(
+                    modules["siqs"].SIQSConfig,
                     base_bound=config.base_bound,
                     half_width=config.half_width,
                     factor_count=config.factor_count,

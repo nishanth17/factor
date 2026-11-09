@@ -1,6 +1,8 @@
 """Numerical finite cells; creating a plan never executes a campaign."""
 
-from dataclasses import asdict
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from .configuration import (
     COMPLETE_CAPS,

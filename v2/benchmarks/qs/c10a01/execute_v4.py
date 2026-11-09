@@ -8,8 +8,15 @@ import os
 import resource
 import signal
 import time
-from dataclasses import asdict
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....common import utils
 from ....qs import CountedSIQSConfig, GrowingDoubleLargeSieveConfig, SIQSJob
@@ -41,10 +48,10 @@ def identity(row, corpus):
 def instantiate(row, fixture, modules, *, seconds, work, observer=False):
     qs, budgets, _ = modules
     values = dict(row["configuration"])
-    values["collector"] = qs.GrowingDoubleLargeSieveConfig(
-        **values["collector"]
+    values["collector"] = adapt_resource_configuration(
+        qs.GrowingDoubleLargeSieveConfig, **values["collector"]
     )
-    cfg = qs.CountedSIQSConfig(**values)
+    cfg = adapt_resource_configuration(qs.CountedSIQSConfig, **values)
     cap_rss = plan_v4.RSS[row["tier"]]
     last_poll = 0.0
 
@@ -56,8 +63,12 @@ def instantiate(row, fixture, modules, *, seconds, work, observer=False):
         last_poll = now
         return rss() > cap_rss
 
-    budget = budgets.Budget(
-        work_limit=work, seconds=seconds, cpu_seconds=seconds, cancelled=cancel
+    budget = recording_budget(
+        budgets.Budget,
+        work_limit=work,
+        seconds=seconds,
+        cpu_seconds=seconds,
+        cancelled=cancel,
     )
     job = qs.SIQSJob(fixture["n"], seed=7, config=cfg, budget=budget)
     return job, budget, cfg

@@ -288,7 +288,6 @@ def collect_scalar(self, lo, hi, *, snapshot):
     span_budget = (
         self.budget if isinstance(self.budget, PollingBudget) else None
     )
-    span_ledger = None if span_budget is None else span_budget.budget
     reporting = (
         self._reporting
         if getattr(self.config, "extension_policy", None)
@@ -327,17 +326,12 @@ def collect_scalar(self, lo, hi, *, snapshot):
                 batcher.hints.clear()
             threshold = self._sieve(block_lo, block_hi, stats)
             if self.config.division == "resieve":
-                if not self._resieve(block_lo, block_hi, threshold, stats):
-                    reason = "memory_limit"
-                    break
+                self._resieve(block_lo, block_hi, threshold, stats)
             while position < block_hi:
                 offset = position - block_lo
                 selected = self._scores[offset] >= threshold
                 if not selected and span_budget:
-                    affordable = span_ledger.work_limit - span_ledger.used
                     amount = span_budget._remaining
-                    if amount > affordable:
-                        amount = affordable
                     if amount < 1:
                         amount = 1
                     stop = min(block_hi - block_lo, offset + amount)
@@ -345,6 +339,9 @@ def collect_scalar(self, lo, hi, *, snapshot):
                     while end < stop and self._scores[end] < threshold:
                         end += 1
                     amount = end - offset
+                    recorder_span = getattr(self.budget, "recorder_span", None)
+                    if recorder_span is not None:
+                        amount = recorder_span(amount)
                     span_budget.consume_span(amount)
                     position += amount
                     stats["scanned"] += amount
@@ -386,8 +383,8 @@ def collect_scalar(self, lo, hi, *, snapshot):
                 and position % self.config.block_width == 0
             ):
                 self._candidate_bound = self._reporting.decide()
-    except BudgetExhaustedError:
-        reason = self.budget.reason
+    except BudgetExhaustedError as error:
+        reason = self.budget.reason or str(error)
     if stats["blocks"] == 0:
         stats["threshold_min"] = 0
     self._resieved.clear()
@@ -417,6 +414,7 @@ def collect_scalar(self, lo, hi, *, snapshot):
         reason,
         stats,
         self._workspace + self._scratch_peak_bytes,
+        resource_stop=getattr(self.budget, "stop", None),
     )
 
 
@@ -477,12 +475,12 @@ def build_native(collector, window, byte_cap):
                 while emitted < hit_count:
                     if grouped:
                         remaining = budget._remaining or 1
-                        affordable = max(
-                            1,
-                            (budget.budget.work_limit - budget.budget.used)
-                            // 4,
-                        )
-                        chunk = min(hit_count - emitted, remaining, affordable)
+                        chunk = min(hit_count - emitted, remaining)
+                        recorder_span = getattr(budget, "recorder_span", None)
+                        if recorder_span is not None:
+                            chunk = min(
+                                chunk, max(1, recorder_span(4 * chunk) // 4)
+                            )
                         if chunk == 1:
                             budget.consume(4)
                         else:
@@ -526,10 +524,7 @@ def sieve_native(collector, lo, hi, stats):
     )
     if getattr(collector, "_sparse_queue_key", None) != key:
         clear(collector)
-        cap = min(
-            cfg.sparse_queue_bytes,
-            max(0, cfg.memory_limit - collector._workspace),
-        )
+        cap = cfg.sparse_queue_bytes
         collector._workspace += cap
         collector._queue_workspace = cap
         try:

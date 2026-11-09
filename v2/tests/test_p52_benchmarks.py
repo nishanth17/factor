@@ -6,9 +6,13 @@ import unittest
 from unittest.mock import Mock, patch
 
 from v2.benchmarks.ecm.p52 import p52_a3, p52_realistic
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+    recording_budget,
+)
 from v2.ecm import core as ecm
-from v2.execution.budget import Budget
 from v2.portfolio import PortfolioConfig
+from v2.tests.resource_stops import InterruptBudget as Budget
 
 
 class RealisticBenchmarkTests(unittest.TestCase):
@@ -31,12 +35,13 @@ class RealisticBenchmarkTests(unittest.TestCase):
             ecm_tiers=((50, 1000, 2),),
             segment_size=16,
             max_input_bits=329,
-            memory_bytes=16 * 2**20,
         )
         run = control.factorize_bounded(
             n,
             config=config,
-            budget=control.Budget(work_limit=100, seconds=5, cpu_seconds=5),
+            budget=recording_budget(
+                control.Budget, work_limit=100, seconds=5, cpu_seconds=5
+            ),
         )
 
         self.assertEqual(run.reason, "work_limit")
@@ -53,7 +58,9 @@ class RealisticBenchmarkTests(unittest.TestCase):
                 for shape in ("small10", "target", "balanced")
             },
         )
-        config = PortfolioConfig(**p52_realistic.options("deep", "programs"))
+        config = adapt_resource_configuration(
+            PortfolioConfig, **p52_realistic.options("deep", "programs")
+        )
 
         self.assertEqual(config.ecm_tiers, ((11000, 1900000, 256),))
         self.assertLess(config.workspace_reserve, config.memory_bytes)

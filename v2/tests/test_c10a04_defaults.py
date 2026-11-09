@@ -3,17 +3,22 @@
 import json
 import tempfile
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
 from v2.benchmarks.qs.c10a04 import configuration, short_decisions
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.budget import BudgetExhaustedError
 from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs import CountedSIQSConfig, SIQSConfig, SIQSJob, default_siqs_config
 from v2.qs.count_policy import CountPolicyRefusedError, endpoint_for_count
 from v2.qs.defaults import default_siqs_budget, uses_siqs_defaults
 from v2.tests.qs_default_controls import previous_siqs_config
+from v2.tests.resource_stops import InterruptBudget as Budget
+from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 
@@ -43,11 +48,8 @@ class LargerDefaultTests(unittest.TestCase):
                         self.assertEqual(config.base_bound, 250000)
                         self.assertEqual(config.gray_limit, 64)
                     self.assertEqual(config.half_width, 65536)
-                    self.assertEqual(config.memory_bytes, 2**30)
-                    self.assertEqual(
-                        default_siqs_budget(signed).seconds,
-                        1200 if digits <= 55 else 1800,
-                    )
+                    self.assertFalse(hasattr(config, "memory_bytes"))
+                    self.assertIsNone(default_siqs_budget(signed).seconds)
         self.assertFalse(uses_siqs_defaults(10**49 - 1))
         self.assertFalse(uses_siqs_defaults(10**60))
         self.assertEqual(
@@ -59,7 +61,13 @@ class LargerDefaultTests(unittest.TestCase):
         self.assertIs(SIQSJob(n, config=explicit).config, explicit)
         grant = allowance(0)
         self.assertIs(SIQSJob(n, budget=grant).budget, grant)
-        limited = default_siqs_config(n, memory_bytes=128 * 2**20)
+        limited = adapt_resource_configuration(
+            default_siqs_config,
+            n,
+            recipe="calibrated"
+            if 128 * 2**20 in (None, 2**30)
+            else "reference",
+        )
         self.assertEqual(limited.memory_bytes, 128 * 2**20)
         self.assertEqual(limited.collector.power_plan_bytes, 0)
         self.assertEqual(limited.solve_policy, "window")
@@ -100,8 +108,8 @@ class LargerDefaultTests(unittest.TestCase):
                 10**59 + 123,
                 "--method",
                 "siqs",
-                "--work-limit",
-                0,
+                "--seconds",
+                "0",
                 "--checkpoint",
                 path,
             )
@@ -109,7 +117,7 @@ class LargerDefaultTests(unittest.TestCase):
             saved = json.loads(path.read_text())["payload"]["config"]
             self.assertEqual(saved["siqs"]["base_count"], 5000)
             resumed = cli(
-                "--resume", path, "--work-limit", 0, "--checkpoint", path
+                "--resume", path, "--seconds", "0", "--checkpoint", path
             )
             self.assertEqual(resumed.returncode, 1, resumed.stderr)
             self.assertEqual(
@@ -140,10 +148,13 @@ class LargerDefaultTests(unittest.TestCase):
     def test_portfolio_serialization_and_zero_work_resume_keep_policy(self):
         n = 10**59 + 123
         selected = PortfolioConfig().for_input(n)
-        self.assertEqual(selected.memory_bytes, 1040 * 2**20)
+        self.assertFalse(hasattr(selected, "memory_bytes"))
         self.assertIs(type(selected.siqs), CountedSIQSConfig)
         self.assertEqual(
-            PortfolioConfig(**asdict(selected)).siqs, selected.siqs
+            adapt_resource_configuration(
+                PortfolioConfig, **asdict(selected)
+            ).siqs,
+            selected.siqs,
         )
         self.assertIsNone(PortfolioConfig(siqs=None).for_input(n).siqs)
         first = factorize_bounded(n, budget=allowance(0))
@@ -161,25 +172,19 @@ class LargerDefaultTests(unittest.TestCase):
         eligible = [
             p for p in primes if any(x * x % p == n % p for x in range(p))
         ]
-        bound, divisor = endpoint_for_count(
-            n, 1, 10, allowance(), ceiling=500, memory_bytes=2**20
-        )
+        bound, divisor = endpoint_for_count(n, 1, 10, allowance(), ceiling=500)
         self.assertIsNone(divisor)
         self.assertEqual(bound, eligible[9] + 1)
         self.assertEqual(
-            endpoint_for_count(
-                77, 7, 10, allowance(), ceiling=500, memory_bytes=2**20
-            ),
+            endpoint_for_count(77, 7, 10, allowance(), ceiling=500),
             (None, 7),
         )
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             endpoint_for_count(
                 n, 1, 10, allowance(), ceiling=500, memory_bytes=0
             )
         with self.assertRaises(BudgetExhaustedError):
-            endpoint_for_count(
-                n, 1, 10, allowance(0), ceiling=500, memory_bytes=2**20
-            )
+            endpoint_for_count(n, 1, 10, allowance(0), ceiling=500)
         config = CountedSIQSConfig(base_bound=10, base_count=9)
         result = SIQSJob(n, config=config, budget=allowance()).run()
         self.assertEqual(result.reason, "configuration_refusal")
@@ -188,6 +193,4 @@ class LargerDefaultTests(unittest.TestCase):
             "v2.qs.count_policy.prime_sieve.prime_sieve", return_value=[]
         ):
             with self.assertRaises(CountPolicyRefusedError):
-                endpoint_for_count(
-                    n, 1, 10, allowance(), ceiling=500, memory_bytes=2**20
-                )
+                endpoint_for_count(n, 1, 10, allowance(), ceiling=500)

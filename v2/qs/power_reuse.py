@@ -163,10 +163,6 @@ class RootTransfers:
         if self.used + charge > self.byte_limit:
             return
         work = polynomial.a.bit_length() * modulus.bit_length() + 1
-        if work > budget.work_limit - budget.used:
-            # This inverse is optional; do not refuse an already completed
-            # ordinary lift merely because its reusable copy is unaffordable.
-            return
         budget.consume(work)
         self.extra_work += work
         previous = self.values.get(parent_modulus)

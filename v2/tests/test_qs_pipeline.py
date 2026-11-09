@@ -9,7 +9,10 @@ import weakref
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.execution.budget import BudgetExhaustedError
 from v2.qs import (
     DependencyExtractor,
     DependencySolver,
@@ -17,6 +20,7 @@ from v2.qs import (
     SieveCollector,
     SieveConfig,
     build_factor_base,
+    collect_block,
     extract_dependency,
     filter_matrix,
     prepare_relations,
@@ -24,6 +28,7 @@ from v2.qs import (
     verify_dependency,
 )
 from v2.qs.linear_algebra import matrix_workspace
+from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 from v2.tests.test_qs_sieve import collector
 
@@ -110,12 +115,12 @@ class MatrixTests(unittest.TestCase):
         for mask in (0, 8, 1):
             with self.assertRaises(ValueError):
                 verify_dependency(mask, (3, 5, 6))
-        with self.assertRaises(MemoryError):
+        with self.assertRaises(TypeError):
             filter_matrix((3, 5, 6), memory_bytes=1)
-        with self.assertRaises(ValueError):
-            filter_matrix((1 << 100001,))
-        with self.assertRaises(ValueError):
-            filter_matrix((0,) * 65537)
+        self.assertEqual(filter_matrix((1 << 100001,)).rows, ())
+        self.assertEqual(
+            len(filter_matrix((0,) * 65537).zero_dependencies), 65537
+        )
 
 
 class ExtractionTests(unittest.TestCase):
@@ -295,7 +300,7 @@ class PipelineTests(unittest.TestCase):
                         row_excess=row_excess,
                         batch_width=64,
                         budget=unlimited_budget(),
-                        config=SieveConfig(memory_bytes=32 * 1024 * 1024),
+                        config=SieveConfig(),
                     )
 
                     result = job.run()
@@ -325,7 +330,7 @@ class PipelineTests(unittest.TestCase):
         job.budget = unlimited_budget()
         with patch(
             "v2.qs.pipeline.DependencySolver.run",
-            side_effect=BudgetExhaustedError,
+            side_effect=BudgetExhaustedError("work_limit"),
         ):
             job.budget.reason = "work_limit"
 
@@ -469,9 +474,9 @@ class StorageCompletionTests(unittest.TestCase):
         """Use a window whose first eight full rows contain a useful kernel."""
         budget = unlimited_budget()
         base = build_factor_base(n, bound=100, budget=budget).factor_base
-        memory_bytes = limits.pop("memory_bytes", 32 * 1024 * 1024)
-        config = SieveConfig(
-            residual_bound=1, memory_bytes=memory_bytes, **limits
+        limits.pop("memory_bytes", 32 * 1024 * 1024)
+        config = adapt_resource_configuration(
+            SieveConfig, residual_bound=1, **limits
         )
         return QSJob(
             qs_polynomial(base),
@@ -483,6 +488,16 @@ class StorageCompletionTests(unittest.TestCase):
         )
 
     def test_relation_and_atom_caps_extract_existing_rows(self):
+        oracle_job = self.make_job()
+        oracle = collect_block(
+            oracle_job.collector.polynomial,
+            oracle_job.collector.factor_base,
+            -256,
+            513,
+            budget=unlimited_budget(),
+        )
+        self.assertEqual(oracle.reason, "complete")
+        self.assertGreater(len(oracle.relations), 8)
         for limits in ({"max_relations": 8}, {"max_atoms": 8}):
             job = self.make_job(**limits)
 
@@ -491,13 +506,14 @@ class StorageCompletionTests(unittest.TestCase):
             self.assertEqual(result.reason, "factor_found")
             self.assertEqual({result.divisor, result.cofactor}, {4001, 5003})
             self.assertEqual(result.divisor * result.cofactor, 20_017_003)
-            self.assertEqual(result.next_position, 153)
-            self.assertEqual(len(job.collector._full), 8)
+            self.assertEqual(result.next_position, 513)
+            self.assertEqual(len(job.collector._full), len(oracle.relations))
+            self.assertEqual(tuple(job.collector._full), oracle.relations)
             self.assertEqual(result.stats["solve_calls"], 1)
             self.assertEqual(job.run(), result)
 
     def test_memory_stop_can_extract_retained_rows(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
         collect = job.collector.collect
 
         def memory_stop(lo, hi):
@@ -513,7 +529,7 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(result.divisor * result.cofactor, 20_017_003)
 
     def test_refused_storage_extraction_resumes_without_collection(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
 
         def refuse(solver):
             solver.budget.consume(solver.budget.work_limit + 1)
@@ -522,7 +538,7 @@ class StorageCompletionTests(unittest.TestCase):
             stopped = job.run()
 
         self.assertEqual(stopped.reason, "work_limit")
-        self.assertEqual(job.storage_reason, "relation_limit")
+        self.assertIsNone(job.storage_reason)
         self.assertIsNotNone(job.solver)
         before = tuple(job.collector._atoms)
         job.budget = Budget(
@@ -541,36 +557,40 @@ class StorageCompletionTests(unittest.TestCase):
         self.assertEqual(tuple(job.collector._atoms), before)
 
     def test_unsuccessful_storage_stop_is_idempotent(self):
-        job = self.make_job(n=104729, max_relations=8)
+        job = adapt_resource_configuration(
+            self.make_job, n=104729, max_relations=8
+        )
 
         result = job.run()
-        self.assertEqual(result.reason, "relation_limit")
+        self.assertEqual(result.reason, "window_exhausted")
         self.assertIsNone(result.divisor)
         self.assertEqual(result.cofactor, 104729)
         self.assertGreater(result.stats["solve_calls"], 0)
         self.assertEqual(job.run(), result)
 
-    def test_matrix_memory_refusal_keeps_explicit_cofactor(self):
-        job = self.make_job(max_relations=8)
+    def test_matrix_allocation_failure_preserves_store_and_cause(self):
+        from v2.execution.resources import AllocationFailureError
+        from v2.qs.storage import require_published
 
-        def refuse_storage_matrix(*args, **kwargs):
-            if job.storage_reason is not None:
-                raise MemoryError("no room for final matrix")
-            return filter_matrix(*args, **kwargs)
-
+        job = self.make_job()
         with patch(
-            "v2.qs.pipeline.filter_matrix", side_effect=refuse_storage_matrix
+            "v2.qs.pipeline.filter_matrix",
+            side_effect=MemoryError("matrix scratch allocation"),
         ):
-            result = job.run()
-
-            again = job.run()
-
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertEqual(result.cofactor, 20_017_003)
-        self.assertEqual(result, again)
+            with self.assertRaises(AllocationFailureError) as stopped:
+                job.run()
+        self.assertEqual(stopped.exception.reason, "allocation_failure")
+        self.assertIsInstance(stopped.exception.__cause__, MemoryError)
+        self.assertEqual(
+            str(stopped.exception.__cause__), "matrix scratch allocation"
+        )
+        require_published(job.collector)
+        result = job.run()
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, 20_017_003)
 
     def test_simultaneous_preparation_workspace_is_reserved(self):
-        job = self.make_job(max_relations=8)
+        job = adapt_resource_configuration(self.make_job, max_relations=8)
 
         collected = job.collector.collect(-256, 513)
         prepared = prepare_relations(
@@ -578,7 +598,6 @@ class StorageCompletionTests(unittest.TestCase):
             job.collector.factor_base,
             {atom.relation_id: atom for atom in collected.atoms},
             budget=unlimited_budget(),
-            memory_bytes=job.config.memory_bytes,
         )
         columns = max((row.bit_length() for row in prepared.rows), default=0)
         expected = (
@@ -592,14 +611,17 @@ class StorageCompletionTests(unittest.TestCase):
         ) + matrix_workspace(len(prepared.rows), columns)
 
         self.assertGreater(expected, old_maximum)
-        capped = self.make_job(max_relations=8, memory_bytes=expected - 1)
+        capped = adapt_resource_configuration(
+            self.make_job, max_relations=8, memory_bytes=expected - 1
+        )
 
         result = capped.run()
 
-        self.assertEqual(result.reason, "memory_limit")
-        self.assertIsNone(result.divisor)
-        self.assertEqual(result.cofactor, 20_017_003)
-        enough = self.make_job(max_relations=8, memory_bytes=expected)
+        self.assertEqual(result.reason, "factor_found")
+        self.assertEqual(result.divisor * result.cofactor, 20_017_003)
+        enough = adapt_resource_configuration(
+            self.make_job, max_relations=8, memory_bytes=expected
+        )
 
         result = enough.run()
 

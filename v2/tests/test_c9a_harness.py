@@ -412,7 +412,7 @@ class WorkerFailureTests(unittest.TestCase):
     ):
         from v2.benchmarks.qs.c9a import worker
 
-        config = SIQSConfig(collector=policy(), memory_bytes=64 * 2**20)
+        config = SIQSConfig(collector=policy())
         selected = dict(
             worker_cell(),
             source="candidate",
@@ -527,11 +527,7 @@ class WorkerFailureTests(unittest.TestCase):
         from v2.benchmarks.qs.c9a import worker
 
         config = SIQSConfig(
-            base_bound=40,
-            half_width=32,
-            max_half_width=32,
-            collector=policy(),
-            memory_bytes=64 * 2**20,
+            base_bound=40, half_width=32, max_half_width=32, collector=policy()
         )
         selected = dict(
             worker_cell(),

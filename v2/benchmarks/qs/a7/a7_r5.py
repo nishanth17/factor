@@ -3,7 +3,13 @@
 import hashlib
 import json
 import sys
-from dataclasses import asdict
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 
 from ....qs import SieveConfig
 from ....qs.parallel import ParallelConfig
@@ -86,8 +92,10 @@ def worker_configuration(band, *, plan=None):
     """Retain the accepted fixed-family contract, independent of B1 flyer."""
     plan = load_plan() if plan is None else plan
     values = dict(plan["workers"]["configurations"][band])
-    values["collector"] = SieveConfig(**values["collector"])
-    return ParallelConfig(**values)
+    values["collector"] = adapt_resource_configuration(
+        SieveConfig, **values["collector"]
+    )
+    return adapt_resource_configuration(ParallelConfig, **values)
 
 
 def run_serial(fixture, seed, band, arm):

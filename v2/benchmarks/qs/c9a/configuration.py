@@ -1,7 +1,16 @@
 """Independent full-arm policies with input-resolved numerical admission."""
 
-from dataclasses import asdict, replace
 from math import isqrt
+
+from v2.benchmarks.infrastructure.resource_control import (
+    adapt_resource_configuration,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 
 from ....qs import (
     CountedSIQSConfig,
@@ -97,8 +106,10 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
         control, _ = control_modules()
         config = decode(
             asdict(
-                control.default_siqs_config(
-                    10 ** (digits - 1), memory_bytes=owned
+                adapt_resource_configuration(
+                    control.default_siqs_config,
+                    10 ** (digits - 1),
+                    memory_bytes=owned,
                 )
             ),
             qs,
@@ -127,7 +138,8 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
             solve_policy="collection",
             memory_bytes=owned,
             checkpoint_bytes=1048576,
-            collector=GrowingDoubleLargeSieveConfig(
+            collector=adapt_resource_configuration(
+                GrowingDoubleLargeSieveConfig,
                 sparse_queue_bytes=32 * 2**20,
                 marking="sparse",
                 block_width=4096,
@@ -146,9 +158,11 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
         # The existing count resolver caps its sieve at 250000. Frontier
         # bands instead declare literal bounds; no hidden ceiling extension.
         config = (
-            CountedSIQSConfig(base_count=COUNTS[digits], **values)
+            adapt_resource_configuration(
+                CountedSIQSConfig, base_count=COUNTS[digits], **values
+            )
             if digits <= 70
-            else SIQSConfig(**values)
+            else adapt_resource_configuration(SIQSConfig, **values)
         )
 
     config = replace(config, memory_bytes=owned - HELPER_BYTES)
@@ -171,7 +185,8 @@ def configuration(digits, arm="C0", *, admission_base_bound=None):
             large_product_bound=envelope["large_product_bound"],
         )
     if set(flags) - {"I"}:
-        collector = YieldSieveConfig(
+        collector = adapt_resource_configuration(
+            YieldSieveConfig,
             **asdict(collector),
             small_prime_bound=envelope["small_prime_bound"]
             if "E" in flags
@@ -203,7 +218,9 @@ def decode(values, qs):
         if "large_prime_bound" in collector
         else "SieveConfig"
     )
-    values["collector"] = getattr(qs, name)(**collector)
+    values["collector"] = adapt_resource_configuration(
+        getattr(qs, name), **collector
+    )
     cls = qs.CountedSIQSConfig if "base_count" in values else qs.SIQSConfig
     for key in (
         "polynomial_policy",
@@ -216,4 +233,4 @@ def decode(values, qs):
                     "target runtime cannot implement coupled policy " + key
                 )
             values.pop(key)
-    return cls(**values)
+    return adapt_resource_configuration(cls, **values)

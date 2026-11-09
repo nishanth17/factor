@@ -7,9 +7,18 @@ import json
 import platform
 import time
 from collections import Counter
-from dataclasses import asdict, replace
 from math import prod
 from pathlib import Path
+
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    recording_budget,
+)
 
 from ....common import utils
 from ....execution.budget import Budget, BudgetExhaustedError
@@ -60,7 +69,8 @@ def run(output):
         ),
     )
     started, cpu = time.monotonic(), time.process_time()
-    prior = Budget(
+    prior = recording_budget(
+        Budget,
         work_limit=control["work"],
         seconds=control["pause_seconds"],
         cpu_seconds=control["pause_seconds"],
@@ -83,7 +93,8 @@ def run(output):
     # Charge encoding, disk roundtrip and collection of the released old job.
     # No old live atom store is intentionally retained beside the restored one.
     checkpoint = json.loads(source_path(checkpoint_path).read_text())
-    budget = Budget(
+    budget = recording_budget(
+        Budget,
         work_limit=control["work"],
         seconds=control["cumulative_seconds"],
         cpu_seconds=control["cumulative_seconds"],

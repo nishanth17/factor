@@ -29,7 +29,7 @@ from v2.pm1.bounded import PM1Config, factorize_pm1_bounded
 config = PM1Config(bounds=((15, 15), (16, 16)))
 run = factorize_pm1_bounded(
     17 * 1019, base=3, config=config,
-    budget=Budget(work_limit=100000),
+    budget=Budget(seconds=30, cpu_seconds=30),
 )
 assert run.divisor == 17
 assert run.result.reconstruct() == 17 * 1019
@@ -45,7 +45,7 @@ ECM-like smooth-order trials.
 `max_actions` pauses at committed boundaries. Restore with the same modulus,
 base and configuration, `checkpoint=run.checkpoint`, and an unused `Budget`
 containing total cumulative allowances. Saved arithmetic is reconstructed
-and verified with charges before reuse. A small grant may be spent entirely
+and verified with charges before reuse. A small root deadline may be spent entirely
 on replay. New rungs or bases require a new declared campaign.
 
 `PM1Run` carries the divisor, reason, reconstructible result, cumulative

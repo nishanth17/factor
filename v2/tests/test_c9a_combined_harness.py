@@ -2,9 +2,11 @@
 
 import json
 import unittest
-from dataclasses import asdict
 
 from v2 import qs
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_asdict as asdict,
+)
 from v2.benchmarks.qs.c9a import combined
 from v2.benchmarks.qs.c9a.configuration import configuration, decode
 from v2.benchmarks.qs.c9a.journal import atom_record, canonical

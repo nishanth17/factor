@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from ..common import arithmetic, utils
 from ..common.arithmetic import isqrt
-from ..execution.budget import Budget
+from ..execution.resources import resolve_budget
 from .factor_base import MAX_INPUT_BITS, checked_target
 
 MAX_COEFFICIENT_BITS = MAX_INPUT_BITS
@@ -126,7 +126,7 @@ def mpqs_polynomial(factor_base, half_width, *, budget=None, prime=None):
     Missing eligible primes or inversion failure raise ValueError.
     """
     target = a_target(factor_base.n_prime, half_width)
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     budget.consume(len(factor_base.entries))
     eligible = [
         entry
@@ -186,7 +186,7 @@ def polynomial_roots(polynomial, factor_base, entry, *, budget=None):
     ) or entry not in factor_base.entries:
         raise ValueError("polynomial and factor-base identity mismatch")
 
-    budget = budget if budget is not None else Budget()
+    budget = resolve_budget(budget)
     prime = entry.prime
     budget.consume(prime.bit_length() ** 2)
     if prime == 2:
