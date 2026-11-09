@@ -3,6 +3,16 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental B4a pthread correctness (9 November 2026)
+
+- Synchronize committed A7a into the B4a branch. Add C-only pthread dispatch
+  with checked dynamic/static chunks, private GMP contexts, joined cleanup,
+  deterministic faults/cancellation and saved-history resume coverage.
+- Admit scalar/pthread correctness from committed source `0f2fee3`: native
+  builds, 1,712 tests (20 optional skips), lint and 308 ordinary runner imports.
+  Retain failed diagnostic receipts; no performance gain, default change,
+  mainline integration or push is adopted.
+
 ## B4a native correctness preparation (8 November 2026)
 
 - Correct the owned-group observer's Mach CPU-unit conversion without adding

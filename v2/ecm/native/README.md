@@ -1,135 +1,146 @@
-# Optional experimental ECM packets and OpenMP team
+# Optional ordinary-GMP ECM packets and pthread slices
 
-The default remains Python integers on PyPy3.11. This preparation implements an
-optional ordinary-GMP C packet and a separate OpenMP owner. Build, executable
-correctness checks and performance acceptance are pending. Do not interpret
-source preparation as a demonstrated speedup or a completed optimization gate.
+Python integers on PyPy3.11 remain the default. The isolated B4a continuation
+admits scalar and pthread correctness on committed source `0f2fee3`: full QA
+runs 1,712 tests with 20 explicit optional skips, plus lint and 308 ordinary
+benchmark imports. Actual scalar/pthread arithmetic tests execute. Performance
+adoption, engagement recalibration and mainline integration remain open.
 
-Build explicitly from the repository root, under the shared performance-window
-rules. Factoring startup never compiles code or installs dependencies:
+Build explicitly from the repository root under the shared performance lock:
 
 ```sh
 pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp
-pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp \
-  --openmp-prefix "$PROJECT_LOCAL_OPENMP_PREFIX"
+pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --pthread
 ```
 
-The first build is independent of OpenMP. The second uses the supplied omp.h and
-libomp with explicit Apple Clang flags and creates build/openmp separately.
-Build manifests record compiler/flags/target, PyPy/CFFI, GMP header/runtime
-versions, resolved header/library paths and hashes, actual dylib linkage,
-OpenMP header/runtime hashes, source, library hash and ABI1. No binary is vendored.
-The initial build target is ARM64 macOS; installed files do not establish that
-compilation/linking/runtime tests have passed. No system package changes occur.
+Both retain `-std=c11 -O2 -Wall -Wextra -Werror`. The scalar artifact is in
+`build/`; pthread is separately in `build/pthread/`, with `-DB4_PTHREAD -pthread`.
+Pthreads use libSystem on macOS; no OpenMP runtime or new dependency is needed.
+The retained `--openmp-prefix` build is a separate legacy C capability, not the
+current Python team owner and not validated by this continuation. A pthread
+binary reports pthread capability and zero OpenMP capability. Explicit missing
+backends raise named errors; the team never falls back to scalar or Python.
+Factoring startup does not compile or install anything.
 
-Scalar use is explicit:
+Manifests record compiler/version/flags/target, PyPy/CFFI, C sources including
+`team.c`, GMP header/runtime and resolved library hashes, actual dylib linkage,
+backend and binary hash. Canonical packet ABI1 is retained with additive team
+entry points; source/capability validation refuses stale or mismatched builds.
+The continuation's local `BUILD_PROVENANCE.json` also retains the compiler hash.
+No binary is vendored.
 
-```sh
-pypy3 -B -m v2.factor NUMBER --bounded --ecm-kernel c-gmp
-```
+Scalar selection is explicit, using `PortfolioConfig(ecm_kernel="c-gmp")` or
+CLI `--ecm-kernel c-gmp`. `auto` may fall back only for unavailable dependencies
+or ineligible widths; corruption/identity mismatch raises. Cheap exits do not
+load the library. Scalar packets also work inside B12 spawned processes.
+Python-level gmpy2 operators are a separate backend.
 
-The library option is PortfolioConfig(ecm_kernel="c-gmp"). "auto" falls back for
-unavailable dependencies or ineligible modulus/scalar widths; corruption and
-identity mismatch raise. Explicit c-gmp refuses unavailable/unsupported inputs.
-Cheap exits do not load a library. Scalar packets also work in existing B12
-spawned processes. Python-level gmpy2 operators are a different intervention.
+The packet accepts odd 3..1024-bit n, canonical unsigned big-endian values,
+scalars below `2**4096`, and up to 16 verified records with at most 512 operations
+and 16 point registers each. It preserves the fused Montgomery ladder, accepted
+PRAC programs/eligibility, frontier order and exact Python recovery. Full n,
+not the unknown factor size, determines arithmetic width. Public/checkpoint
+values remain canonical. No interpreter-private integer layout, custom GMP
+allocator, external factorer, new reducer or SIMD arithmetic is used.
 
-The packet accepts odd3..1024-bit moduli, canonical unsigned big-endian values,
-<=4096-bit combined scalars or<=16 verified accepted records (<=512 operations,
-<=16 point registers each). It preserves formulas, B4's fused ladder, accepted
-PRAC eligibility/programs, strict frontiers and Python exact recovery. Bounds,
-curve families and prime coverage are unchanged. Public/checkpoint values remain
-canonical. The adapter uses documented CFFI/GMP interfaces and explicit release;
-no interpreter-private bigint casts or global allocator hooks are used.
+GMP contexts, scratch, input/output transport and immutable verified programs
+are reused. Their memory estimates are diagnostics, not quotas. H3 root wall,
+aggregate CPU and observed current owned-process-tree RSS govern resources.
+Process CPU already includes native threads; no thread CPU is added again.
+GMP allocation failure may terminate the process; the last saved checkpoint
+is its recovery boundary, retaining saved history rather than unsaved work.
 
-Each scalar context has a 2 MiB diagnostic scratch estimate alongside the
-ordinary portfolio workspace. H3 root RSS observation governs memory refusal;
-there is no per-packet memory grant. Inputs/descriptors/output
-buffers and GMP scratch are reused. Canonical n/a24 identity bytes permit native
-import reuse. Program packing/verification is cached within its retained owner.
-Setup, file/dependency hashing, copies and unused preparation are charged;
-mathematical/recovery work is counted diagnostically before dispatch. GMP's default
-allocation failure may terminate the process; it is not a catchable quota refusal.
-The last saved checkpoint remains the recovery boundary after process death.
-Saved-history accounting retains that checkpoint prefix, not unsaved work.
-
-OpenMP use is a separately selected library owner, with one active team per
-process and no Python callbacks in native worker threads:
+## Explicit pthread ownership
 
 ```python
 from v2.execution.budget import Budget
 from v2.execution.ecm_native import NativeECMExecutor
-from v2.execution.portfolio_config import PortfolioConfig
 from v2.execution.worker_contract import WorkerSettings
-from v2.portfolio import factorize_bounded
 
-budget = Budget(seconds=30, cpu_seconds=120)
-settings = WorkerSettings(workers=2)
-owner = NativeECMExecutor(seed=7, settings=settings, schedule="dynamic")
+owner = NativeECMExecutor(
+    seed=7,
+    settings=WorkerSettings(workers=2),
+    schedule="dynamic",
+    chunk_size=1,
+)
 try:
-    run = factorize_bounded(
-        NUMBER, seed=7, config=PortfolioConfig(ecm_kernel="c-gmp"),
-        budget=budget, ecm_executor=owner,
+    run = owner.run(
+        NUMBER,
+        config=CONFIG_WITH_EXPLICIT_C_GMP,
+        budget=Budget(seconds=30, cpu_seconds=120),
     )
 finally:
     owner.close()
 ```
 
-The owner follows H3 root wall/CPU/RSS limits; omitted wall/CPU are unlimited.
-Retired packet/team memory and worker-assignment caps are rejected explicitly.
-Process CPU already includes native thread CPU; no child CPU is added.
-Setup/recovery/classical stage two remain in the Python parent. Accepted stage-one
-PRAC/ladder continuations are parallelized; a whole-curve C port is not assumed.
-The owner rejects paired/wheel continuation and supports the current classical
-path, including selected B12 metadata caches. It owns stable B12 curve IDs and
-private curve jobs, respecting tier order and a bounded ready set. First proper
-factor stops future slices; stable queue order resolves simultaneously ready
-results. Late/uncommitted work remains charged.
+The scheduled unit is **one independently owned continuation slice**, not
+concurrent operations on one dependent curve point. Immutable program data may
+be shared. The C entry checks distinct contexts; every job has private mutable
+GMP state. Dynamic scheduling uses a bounded shared atomic chunk index; static
+scheduling assigns cyclic chunks to fixed thread ranks. Supported workers are
+1/2/4, `schedule="dynamic"/"static"`, and `chunk_size=1..32`. The ready capacity
+is 1..32, default `2*workers`. Correctness covers chunks 1/3, uneven tails,
+fewer jobs than threads, empty queues and repeated dispatch. No performance
+choice of worker count, schedule or chunk is implied.
 
-Choose workers1/2/4 and schedule="dynamic"/"static"/"guided". All use chunk1;
-dynamic1 is the baseline hypothesis, not a measured optimum. Default ready-set
-capacity is2*workers, explicit1..32 supported; memory estimates are diagnostic.
-Before the first runtime load, the experiment launcher sets passive wait,
-KMP_BLOCKTIME=0, OMP_DYNAMIC=FALSE, OMP_MAX_ACTIVE_LEVELS=1, OMP_THREAD_LIMIT=4,
-KMP_STACKSIZE=4M and no hidden helper threads. Library users must control/account
-for their runtime environment and other parallel work. No portable M4 P/E pinning
-or process x thread hybrid is selected.
+Contexts/programs persist across useful calls; **threads do not**. Every dispatch
+creates joinable C threads, holds them behind a start gate until all requested
+threads exist, and joins every created thread before returning. Partial creation
+failure cancels and joins the created subset without arithmetic publication.
+Worker errors cancel peers. Each returning error path drains before borrowed
+buffers can be freed. A failed join invariant aborts rather than return live
+borrowed state. This deliberately small owner leaves persistent teams as a
+separate, measured lifecycle candidate.
 
-C checks a common wall/process-CPU deadline at point/opcode boundaries, with a
-5ms cooperative work target and128 actions/context per call. Startup, one GMP
-operation, barriers and OS descheduling can exceed this target; it is not a hard
-real-time bound. Budget/signal publication checks run between native returns.
-Every region drains before Python frees borrowed inputs. Runtime workers may
-remain parked until process exit, so its DSO stays mapped; close clears curve
-contexts/programs/transport, not libomp's process-wide pool. Runtime thread
-creation failure may terminate; checked reduced-team admission publishes no
-native result. The future owned-group watchdog covers process lifetime/failure.
+No native worker accesses Python or calls Python APIs/callbacks. Checked exports
+and publication happen in the Python owner after join. All ready exports are
+validated before any publication; stable queue order resolves simultaneous
+successes. First proper factor prevents future slices, and discarded work stays
+charged. `NativeTeam.cancel()` sets the C cooperative flag during active work;
+root-budget cancellation/resource polls also run before/after native returns.
+The per-owner C fault/start-gate hooks are inert unless explicitly injected by
+diagnostics. They are not process-global runtime policy.
 
-The native owner checkpoint records completed curves, attempts and cumulative
-charges after drain. Unfinished curves restart from their stable assignment
-boundary on resume, retaining saved history; retry attempts remain bounded.
-Native H3 checkpoints have a new identity; earlier native checkpoints reject.
-Changing source, schedule, capacity or team count on resume rejects. No native pointers,
-partially evaluated points or live thread state are serialized.
+Close is idempotent, releases every context/program/transport and unloads the
+pthread DSO once after borrowing contexts are destroyed. Active close and
+use-after-close reject. The caller must keep the owner live until a concurrent
+cancel call returns; close/cancel may not race. No parked native worker survives
+a dispatch. One active team per process is enforced by the adapter.
 
-No field-SIMD implementation is integrated into the executor. The retained
-two-curve NEON feasibility prototype lost its measured comparison and is closed. OpenMP simd/declare-simd and ARM NEON
-were assessed separately from threading. Opaque mpz calls do not become vector
-multiprecision arithmetic from a pragma; full60/80/100-digit moduli still need
-full-width arithmetic. Metadata SIMD and compiler reports are separate from point
-SIMD. No ornamental immintrin.h/arm_neon.h include or custom arithmetic is added.
+C work targets five milliseconds and at most 128 actions per context, with
+common wall/process-CPU deadlines and opcode/bit cancellation checks. Startup,
+one GMP operation, join and OS descheduling can exceed that cooperative target;
+it is not a hard real-time limit. H3 root resources include setup, conversion,
+recovery and cleanup; no prepaid work/CPU/memory leases are restored.
 
-Targeted tests are test_native_ecm.py and test_native_team.py. The B4a QA runner
-builds both variants and then runs exact arithmetic, resource and scheduling
-checks under a finite locked grant. Stage Q also runs the full suite and a fresh
-committed-source archive check. Compilation, actual PyPy GIL/signal behavior,
-OpenMP startup/teardown and generated-code diagnostics remain pending until that
-window is released. The prospective runner permits no performance execution
-without exact integrated source, passed Q, pins and a separately admitted freeze.
+Setup, prime/program metadata, classical stage-two preparation/execution,
+GCD/strict nonunit recovery and final publication **remain Python**. Only accepted
+stage-one ladder/PRAC slices are dispatched to C. Paired/wheel continuation is
+refused by this owner. Selected B12 metadata caches remain supported; no
+whole-curve native coverage or universal modular-multiplication bottleneck is
+claimed.
 
-The 8 November Step 1 request permits only an existing project-local OpenMP
-runtime. None was found in the task or main repository, including ignored
-files. The historical Homebrew runtime is excluded from this admission. A
-missing explicitly requested backend raises a named error; no scalar/team
-fallback is inferred. The scalar build can proceed independently when the
-shared lock is available. The pthread alternative remains optional/unimplemented.
+Pthread owner checkpoints use `b4a-pthread-owner-h3-v3`. They retain stable
+completed IDs, attempts and cumulative saved wall/CPU/work history after drain.
+Unfinished curves restart at their assignment boundary, with no charge refund.
+Source, settings, worker count, schedule, capacity and chunk changes reject on
+resume. No pointers or partial native state serialize. Historical OpenMP owner
+checkpoints do not migrate silently.
+
+## Validation and retained limits
+
+Tests: `test_native_ecm`, `test_native_correctness`, `test_native_team`,
+`test_native_pthread`, and Mach-timebase accounting regressions. The 11 fixed
+fixtures run against Python/scalar and 1/2/4 pthreads with both schedules/chunks;
+all committed boundaries, factors, failed searches and saturation/recovery agree.
+The 60/80/100-digit fixtures have shallow B1=11/B2=47; additional tests cover
+accepted production PRAC, ineligible ladder paths, independent affine checks,
+carry/width/exceptional operands, actual native signal cancellation, root stops,
+creation/worker/preparation failures and repeated saved-history resume.
+
+Local evidence: `v2/audit/b4a/native_admission_research_20261109/`. A bounded warm
+fixed-work calibration is retained, with no adopted speedup. Its CPU profiler
+attempt failed PyPy timer handling and exhausted recorder output; profile files
+are invalid. Exactness and clean timing results remain separate. No further
+measurement or compiler tuning follows automatically. The previous two-curve
+NEON loss remains scoped; no field-SIMD implementation is integrated.

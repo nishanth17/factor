@@ -819,3 +819,16 @@ relation signatures and scanned positions. Its requested Tier 1 criterion
 checks aggregate collector-time ratios within roughly 3%; cold actor times
 and default-path diff touches are also reported. This is not a statistical
 equivalence or full-factor speedup claim. G3 remains separately gated.
+
+### B4a native admission continuation (9 November 2026)
+
+Committed A7a/H3 source `0f2fee3` passes scalar/pthread builds, 1,712 tests
+(20 optional skips), lint and 308 ordinary imports. The new owner creates/joins
+pthreads per slice and preserves process CPU accounting without a thread
+surcharge. Warm fixed-work calibration at actual 4/5/6-limb moduli is exploratory
+and supports no adopted speedup. Its CPU profiler attempts failed PyPy timer
+handling and recorder output; invalid profiles and every charge remain local.
+No repeated diagnostic campaign follows. Detailed matrix, build provenance,
+research and next decision are in local
+`v2/audit/b4a/native_admission_research_20261109/`. Historical OpenMP freezes do
+not authorize a current pthread performance campaign.

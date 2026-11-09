@@ -364,3 +364,20 @@ checkpoint restoration do not accept those fields. Historical G2H/G3 timings
 need revalidation on the combined H3 source. No automatic worker selection or
 performance adoption follows from this integration. Detailed local evidence
 and handoff remain under `v2/audit/a7a/`.
+
+## Experimental pthread ECM owner on B4a
+
+The B4a branch adds `pypy3 -B -m v2.ecm.native.build --gmp-prefix PREFIX
+--pthread` alongside the separate ordinary-GMP scalar build. Both retain O2.
+`NativeECMExecutor(..., settings=WorkerSettings(workers=1|2|4),
+schedule="dynamic"|"static", chunk_size=1..32)` reuses contexts/programs and
+creates/joins C-only threads per independent continuation-slice dispatch.
+Checked publication, root wall/process-CPU/RSS and saved-history accounting
+remain authoritative; native-thread CPU is included in process CPU once.
+`NativeTeam.cancel()` cooperatively cancels active native work; close is
+idempotent, active close/use-after-close reject, and close/cancel must not race.
+The new `b4a-pthread-owner-h3-v3` checkpoints bind source, settings and chunk
+size; old OpenMP checkpoints do not migrate. Scalar/pthread correctness is
+validated on `0f2fee3`; setup, classical stage two and exact recovery remain
+Python. See [native ownership and validation](ecm/native/README.md). No automatic
+routing, performance adoption or mainline integration follows.
