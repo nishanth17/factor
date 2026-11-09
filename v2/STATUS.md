@@ -65,8 +65,10 @@ drift, then stop at the first loss/tie. Test best±1 only after both even
 neighbours are measurably worse; skip odd tests on a flat drift band and favor
 fewer workers. Lower sizes also get this refinement, with C2 when needed for
 C4's lower bracket and C1/C3 if C2 strictly wins. Input-0 racing precedes
-inputs 1–2 for the new 5% window. Explicit twenty-worker support and its
-committed-source validation precede a separate frozen execution grant.
+inputs 1–2 for the new 5% window. Explicit twenty-worker support passes 1,629 tests (nine optional skips), lint,
+295 benchmark imports and a C20 prefix/timeline smoke. The
+[directional protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
+records its finite conditional grant and controls before execution.
 The running race's historical 10% rule is not rewritten. No automatic-default
 adoption, merge or push; new 75/80 probes remain deferred until after B5a.
 

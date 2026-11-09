@@ -185,7 +185,9 @@ does not establish a free increase in B1.
   Next authorized: bounded directional even steps to 20 at 65/70, odd
   neighbours only around strict brackets, flat ties toward fewer workers,
   C2/C1 lower-bound checks where needed, and a 5% input-0 continuation window.
-  Validate explicit twenty-worker support and freeze resources before calls.
+  Twenty-worker committed-source QA and the C20 timeline smoke pass; the
+  [frozen local protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
+  records the conditional catalogue, drift-aware tie pruning and resources.
   No adoption, merge/push, G4-heldout selection or 75/80 probes before B5a.
 
 

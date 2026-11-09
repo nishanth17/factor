@@ -2,6 +2,98 @@
 
 ## Directional extension amendment — approved after the reduced race
 
+
+### Frozen local execution protocol
+
+Committed numerical/worker implementation `0ca030d` passes 1,629 tests (nine
+optional skips), lint and 295 benchmark imports. Its exact-work coverage fixture
+has 28 packets for up to 20 workers. A committed-source C20 prefix smoke captures
+all twenty timelines and the expected 33,554,688 scanned positions. The earlier
+16-packet fixture failure is retained; no timed extension result selected a fix.
+The final documentation commit has identical runtime Python and input files.
+
+Local driver: `v2/audit/a7a/directional-extension-20261108/controller.py`.
+After its synthetic branch checks pass, inspect the generated source-pinned
+plan and run from the isolated task worktree with process inspection enabled:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/preflight-test.py
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/controller.py
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/controller.py --execute
+```
+
+The local owner script, exact plan, committed source archive, grants, decisions,
+noise controls and every result are captured under the main repository's ignored
+`v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/`.
+It is a task-local execution protocol, not a new automatic tuning framework or
+public import API. Do not edit a historical protocol or replay favorable cells.
+
+| Digits | Fixed packet | Incumbent | Allowed conditional catalogue | Maximum input-0 configurations on one path |
+| --- | ---: | ---: | --- | ---: |
+| 50 | 8 | C4 | C1/C2/C3/C4/C5/C6 | 5 |
+| 55 | 16 | C4 | C1/C2/C3/C4/C5/C6 | 5 |
+| 60 | 16 | C8 | C6/C7/C8/C9/C10 | 5 |
+| 65 | 64 | C14 | C12 through C20 | 6 |
+| 70 | 64 | C8 | C8 plus C12 through C20 | 7 |
+
+At 50/55 compare C2 with C4 first. A clear C2 gain admits endpoint C1/C3.
+A clear C2 loss admits the C6 right-bracket check; only a clear C6 loss to C4
+admits C3/C5. Flat/censored/unbracketed results skip odd tests. At 60 measure
+C8/C6/C10; only both neighbours clearly losing to C8 admits C7/C9.
+
+At 65/70 the first group includes C14/C16 and, when different, the separate
+current incumbent. Continue C18/C20 only on clear improvements, stopping at
+first loss/tie. A strict C16 loss admits a C12 check before C13/C15. After a
+later strict bracket admit best±1 only if that basin remains the global best
+noise-band representative; do not refine an inferior local basin. A winning
+C20 is an unresolved upper boundary. No C21/C22 is admitted.
+
+A clear gain/loss requires a symmetric timing gap `max(ratio,1/ratio)-1`
+greater than the measured noise bound. Otherwise it is a tie. The noise bound
+is the maximum of fresh row controls and the preceding completed race's row
+floor: 2.27/4.55/1.91/1.08/7.42% at 50/55/60/65/70. Carrying those conservative
+floors prevents shortening a batch from artificially lowering measured noise.
+Old timings are not pooled: all compared extension input-0 arms use the new
+committed source. Record the ratio, bound and signed margin for every branch.
+
+Before each decision group, run an opening A/A pair on a fixed prefix using
+the row's incumbent process configuration; repeat it after the group. Use
+512 polynomials below 65 digits and 2,048 at 65/70. These are parallel controls,
+not the prior race's S0 controls. Signatures and scanned positions must match.
+Any within-pair or start/end geometric drift above 10% stops and reports;
+no automatic retry. All process arms, including controls, have worker timelines.
+CPU/heap profiling and Tier-A are off. Keep the 0.5 s owned-RSS observer and
+before/after plus 60-second `pmset -g therm` observations. Report sampled RSS
+and OS whole-actor CPU; retain the known inner-counter qualification.
+
+Finish input-0 coverage across all five sizes before continuation. Let `T` be
+the fastest completed input-0 wall and `d` the row noise bound. Within the best
+noise band `time <= T * (1+d)`, retain only the fewest-worker representative.
+Also retain distinguishable contenders outside that band with `time <= 1.05*T`.
+Thus flat higher-worker ties do not consume continuation calls. If noise exceeds
+5%, the preferred lower-worker representative is retained even if outside the
+nominal raw-time window; this enforces the explicit tie rule. In particular the
+70-digit 7.42% floor admits one representative for inputs 1–2. Freeze this
+selection before continuation and run each survivor once per independent input.
+Keep n=1/n=3 summaries distinct and preserve every rejected result.
+
+Root wall per call is 30/100/300/900/1,800 s by increasing size; root CPU is ten
+times wall, with the same 18 GiB observed-RSS guard on every arm. The actor
+spec adds 10 s for cooperative cleanup; the owner reserves root wall plus 40 s.
+All calls use a fresh PyPy 3.11 interpreter/pool, 4 MiB nursery and matched
+seeds 104729/130363/155921 on the original certified balanced calibration inputs.
+Never select using G4 heldouts, known factors or future outcomes.
+
+The finite maximum is 28 input-0 configurations, 72 full-factor calls and
+84 prefix controls: 156 actors. The mutually exclusive branch bound funds
+38,850 root factoring seconds, 10,080 root control seconds, 6,240 owner cleanup
+seconds and a 420 s final reserve. Aggregate ceilings are 56,000 wall seconds,
+560,000 CPU-seconds and 4 GiB recorder storage. These are conservative complete
+branch reservations, not spending targets or authorization for extra arms.
+Expected elapsed time from current costs is about 1–3 hours. Price the actual
+survivor continuation schedule at the input-0 report. Preserve all failures and
+charges, report the first informative result, then stop after this extension.
+
 The reduced race is complete on `bce0ad0`: 36 factoring calls, 40 controls,
 provisional C4/C4/C8/C14/C8 at 50/55/60/65/70. Its 10% freeze is historical.
 The next, separately source-pinned extension uses a 5% input-0 race, followed
