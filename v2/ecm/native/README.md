@@ -15,8 +15,11 @@ and publication ordering are retained. A live child, multiple roots or a
 custom provider uses the original provider. Observations are never replaced
 with a cancellation flag or an estimated memory quota. The provider is restored
 after each poll, including errors, and its buffer is released before unload.
-Builds and focused tests admit investigation; full QA and complete-cost
-selection remain pending. No default or worker recipe is changed.
+Committed-only QA on `ef061f3` passes 1,748 tests (20 optional skips), lint and
+308 imports. Its first complete-cost screen establishes no improvement over
+C1 and stops with three final A/A cells unrun. The child-list sizing query can
+force fallback for childless roots; the actual-ID-query correction is a draft
+awaiting native build/QA and remeasurement. No default or worker recipe changes.
 
 Build explicitly from the repository root under the shared performance lock:
 

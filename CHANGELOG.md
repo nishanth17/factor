@@ -12,6 +12,9 @@ below record decisions in their dated scope; later entries may supersede routes.
   cancellation/publication ordering. Defaults and numerical work are unchanged.
 - Add field/unit, birth, child fallback, observation-error, resource-refusal
   and provider-lifetime tests. Complete-cost selection remains experimental.
+- Preserve the first screen's inconclusive C1 comparison and timed-stage stop.
+  A follow-up actual-child-query correction and engagement regression are a
+  draft awaiting native rebuild, QA and a newly priced comparison.
 
 ## B4a whole-ECM C continuation (9 November 2026)
 

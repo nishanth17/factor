@@ -126,7 +126,11 @@ class NativeResourceTests(unittest.TestCase):
         original = MacResources()
         provider = NativeRootProvider(packet)
         self.addCleanup(provider.close)
-        provider.fallback = original
+        provider.fallback = SimpleNamespace(
+            sample=Mock(
+                side_effect=AssertionError("childless fast path fell back")
+            )
+        )
         roots = {os.getpid(): None}
 
         before = original.sample(roots)[0]
@@ -138,6 +142,7 @@ class NativeResourceTests(unittest.TestCase):
         self.assertGreater(actual.rss, 0)
         self.assertLessEqual(before.cpu, actual.cpu)
         self.assertLessEqual(actual.cpu, after.cpu)
+        provider.fallback.sample.assert_not_called()
 
     def test_actual_live_child_is_included_by_fallback(self):
         packet = self.packet()

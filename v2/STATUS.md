@@ -135,19 +135,26 @@ the earlier candidate-count restriction. Subsequent work is selected from
 measured complete costs, uncertainty and remaining resources. This planning
 update launches no implementation, profiling or performance campaign.
 
-B4a Phase 2 has resumed after the initial sandbox observer failure. A bounded
-host-access preflight validates CPU/RSS observation and owned-group cleanup;
-`drift-r1` and its charges remain preserved. The reviewed `drift-r2` completes
-90 matched calls with identical curve identities/outcomes. Fixed retained
-metadata does not establish accumulation as the cause of remaining warm
-history variation; cold comparisons are usable. Targeted counters identify
-forced root resource observation as a material driver cost. An experimental
-native bridge uses the same macOS usage/child queries at existing poll sites,
-with the original full-tree provider for children or unsupported roots.
-Both native builds and 36 focused resource/transaction tests pass; full
-committed-checkout QA and complete-cost screening remain pending. Defaults and
-other active owners' implementations are unchanged. Local progress and exact
-receipts: `v2/audit/b4a/phase2_20261109/RESUMPTION.md`.
+B4a Phase 2 resumes successfully past the original permission failure: the
+host-access preflight validates CPU/RSS monitoring and child cleanup, and
+`drift-r2` completes 90 matched calls. Retained metadata stays fixed; remaining
+warm variation is not explained solely by owner accumulation. Targeted
+counters identify forced root sampling as a material cost. Experimental
+`ef061f3` bridges the same macOS resource APIs at existing poll sites and passes
+committed-only QA: 1,748 tests (20 optional skips), lint and 308 imports.
+Its complete-cost screen reaches the frozen controller deadline after all
+216 clean calls, with three final A/A observations missing. No speedup over
+C1 is established: the initial bridge's child-list sizing query can force
+fallback even for a childless root. The actual-child-query correction and a
+fast-path-engagement regression are preserved as an unvalidated draft.
+Phase 2 is incomplete at this timed-stage stop; no detailed cold-preparation,
+arithmetic/compiler/vector or final screen has followed. A smaller revised screen must be priced
+from these actual costs after the draft passes targeted QA. Defaults and
+other owners' implementations remain unchanged. Current local handoff:
+`v2/audit/b4a/phase2_20261109/RESUMPTION_HANDOFF.md`.
+The screen CPU reservation is charged in full because final CPU reconciliation
+can omit orphaned warm servers. Nested exited-child CPU observation also needs
+validation before any further factoring reservation; monitoring access works.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the

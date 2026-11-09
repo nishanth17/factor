@@ -199,8 +199,13 @@ does not establish a free increase in B1.
   `fa2a4cc`; local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
   Earlier evidence remains under `native_admission_research_20261109/` and
   the stopped delivery is archived within this phase. B4a stays In progress
-  overall; this authorization stops after Phase 1. No defaults, mainline merge,
-  push or phase-2 campaign follow. The rolling plan remains local at
+  overall. Phase 2 resumes with validated host monitoring, drift/counter
+  evidence and an experimental root-observation bridge; its first screen
+  reaches the frozen timed-stage deadline without an established C1 speedup.
+  A child-inventory correction remains an unvalidated draft; later phase-2
+  steps and final screening are pending. No defaults, mainline merge or push.
+  Current local handoff: `v2/audit/b4a/phase2_20261109/RESUMPTION_HANDOFF.md`.
+  The rolling plan remains local at
   `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>

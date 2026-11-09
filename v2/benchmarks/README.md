@@ -848,3 +848,16 @@ Local handoff, all raw rows, source freezes, binaries and exact accounting:
 `v2/audit/b4a/phase1_20261109/`. The previous checkpoint-design stop is resolved;
 its stopped report is archived unchanged. No automatic numerical/dispatch
 policy changes, repeated diagnostic campaign or mainline integration follow.
+
+### B4a Phase 2 driver checkpoint (9 November 2026)
+
+Host-access resource monitoring and cleanup pass a bounded preflight. Matched
+drift and targeted counter runs identify forced resource sampling as material;
+they do not establish retained-owner accumulation as its cause. Experimental
+`ef061f3` passes committed-only full QA, lint and imports. Its complete-cost
+screen finishes all clean cells but reaches its controller deadline before
+three final A/A observations. No gain over C1 is established; child-list sizing
+can keep the proposed fast path on the original provider. The actual-ID-query
+correction is unvalidated. No default, worker or full-factorization claim.
+Literal freezes, incomplete cells, all charges and current handoff remain local
+under `v2/audit/b4a/phase2_20261109/`.
