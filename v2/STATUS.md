@@ -38,6 +38,13 @@ reports retain their original resource model. Local integration receipts:
 `v2/audit/a7a/master-integration-20261108/`.
 
 
+**A7a next authorized stage:** slim G4 at 55/65/70 cold only, three fresh
+inputs per row, frozen recipes versus matched Y0 S0, one run per arm/input.
+No sample expansion or default adoption. The 65-digit recipe is interpolated.
+All new 75/80 probes are deferred until after B5a, superseding their earlier
+conditional pre-approval. Stop after reporting this G4.
+
+
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate
 [ready-first startup follow-up](ROADMAP.md#b12-f4-in-progress) remains In progress:
 real-spawn/arithmetic, failure/restart and full committed-checkout QA, then a

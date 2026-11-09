@@ -1,5 +1,43 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
+## Slim G4 amendment — approved 8 November 2026
+
+Defer all new 75/80 probes until after B5a. The earlier conditional probe
+instructions below are historical and do not authorize another call.
+
+After the H3 integration passes, confirm only cold 55, 65 and 70 against S0,
+using three fresh independent balanced inputs per row, one repetition per
+arm/input: 18 calls, no sample extensions. Frozen process recipes are C4/p16
+at 55 and C10/p64 at 70. The unchanged nearest-anchor interpolation selects
+70's C10/p64 for 65; label this row interpolated. Use target-resolved Y0 and
+the frozen implementation/cache/queue/packet choices on both arms. S0 is the
+same-policy serial control, replacing literal mainline for this scoped G4.
+No tuning, default adoption, merge to master, push or successor follows.
+
+Use committed confirmation inputs g4_{55,65,70}_{0,1,2}, in that order, matched
+factoring/hash seeds 104729/130363/155921 and counterbalanced arm order.
+Each run uses a fresh interpreter, no warmup, 4 MiB nursery, matched root
+wall/CPU/RSS allowances and complete cold actor wall through validation and
+shutdown. Root wall limits are 100/900/1800 seconds, CPU is ten times root
+wall and RSS is 18 GiB. CPU/heap profiles, Tier-A hooks and worker timelines
+are off; retain low-rate RSS and 60-second thermal observations.
+
+Predeclare one 98 1/3% paired-log t interval (df 2) per row, threshold 1 for
+candidate/S0 actor time. Compare the effect with measured A/A variability;
+report ambiguous or censored results as inconclusive. Never replace a timeout
+with a completed time, discard failures or select settings from these inputs.
+Preserve the 70-digit completion guardrail; this reduced scope does not verify
+fresh 60-digit completion or establish a population/p90 or master speedup.
+
+Each row has opening/closing identical S0 fixed-prefix A/A pairs on its
+calibration input, separate from the fresh confirmation sample. Freeze exact
+prefix work/signatures before outcomes and retain the 10% drift stop, with no
+automatic restart. Keep resource ceilings and exact resolved recipes in the
+new source-pinned local protocol. Expected elapsed time is about 2–3 hours;
+owner ceilings price all 18 calls, controls, telemetry and cleanup separately.
+Stop and report after this slim G4.
+
+
 H3 integration amendment (8 November): local master `755c312` replaces the
 resource model used by the historical stages below. Internal logical-byte,
 work/CPU lease and checkpoint refusal caps no longer admit or stop production

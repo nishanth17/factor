@@ -177,6 +177,13 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
+- **Current scope amendment (8 November):** after the passing H3 integration,
+  run slim G4 at 55/65/70 cold only, frozen C4/p16, interpolated C10/p64 and
+  C10/p64 versus matched Y0 S0. Three fresh independent inputs per row, one
+  repetition per arm/input, no extensions or retuning; then stop/report.
+  New 75/80 probes are deferred until after B5a. No automatic-default adoption.
+
+
 - **75/80 probes reported (8 November):** both single-input C10/p64 recipes
   pass the amended 32 GiB bookkeeping grant (1 GiB worker / 256 MiB runtime,
   6 GiB parent, 256 MiB checkpoints). Both stop with internal QS `memory_limit`
