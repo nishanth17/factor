@@ -24,6 +24,9 @@ struct b4_context {
     size_t count, record, opcode;
     long bit;
     unsigned mode, done, completed, starting;
+    /* Per-context deterministic clock scripts; inert in normal execution. */
+    uint64_t clock_script[2][16];
+    unsigned clock_count[2], clock_index[2];
 };
 
 unsigned b4_abi(void) { return ABI; }
@@ -208,20 +211,54 @@ static void guard_point(b4_context *c, unsigned slot, unsigned mask) {
     mpz_mod(c->guard, c->guard, c->n);
 }
 
-static uint64_t nanoseconds(clockid_t clock) {
+static uint64_t nanoseconds(b4_context *c, clockid_t clock) {
+    unsigned kind = clock == CLOCK_MONOTONIC ? 0 : 1;
+    if (c && c->clock_count[kind]) {
+        unsigned index = c->clock_index[kind]++;
+        if (index >= c->clock_count[kind]) index = c->clock_count[kind] - 1;
+        return c->clock_script[kind][index];
+    }
     struct timespec value;
     if (clock_gettime(clock, &value)) return 0;
     return (uint64_t)value.tv_sec * 1000000000u + (uint64_t)value.tv_nsec;
 }
 
+int b4_test_clocks(b4_context *c, const unsigned long long *wall, size_t nw,
+                    const unsigned long long *cpu, size_t nc) {
+    if (!c || nw > 16 || nc > 16 || (nw && !wall) || (nc && !cpu)) return -1;
+    for (unsigned k = 0; k < 2; ++k) {
+        size_t count = k ? nc : nw;
+        const unsigned long long *values = k ? cpu : wall;
+        for (size_t i = 0; i < count; ++i) c->clock_script[k][i] = values[i];
+        c->clock_count[k] = (unsigned)count;
+        c->clock_index[k] = 0;
+    }
+    return 0;
+}
+
+unsigned b4_test_clock_reads(const b4_context *c, unsigned kind) {
+    return c && kind < 2 ? c->clock_index[kind] : 0;
+}
+
 static int step_until(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
                       unsigned actions, const atomic_uint *cancel) {
+    uint64_t cpu_wall = 0;
     for (unsigned i = 0; i < actions && !c->done; ++i) {
         if (cancel && atomic_load(cancel)) return -3;
-        uint64_t wall = nanoseconds(CLOCK_MONOTONIC);
-        uint64_t cpu = nanoseconds(CLOCK_PROCESS_CPUTIME_ID);
-        if (!wall || !cpu) return -1;
-        if (wall >= wall_end || cpu >= cpu_end) break;
+        uint64_t wall = nanoseconds(c, CLOCK_MONOTONIC);
+        if (!wall) return -1;
+        if (wall >= wall_end) break;
+        /* Keep the cheap wall check at every action boundary: the first
+         * boundary after an exceptionally slow GMP operation must return.
+         * Process CPU is aggregate across the team and relatively expensive;
+         * sample at entry and after one ms of wall progress. Root resource
+         * polls still run before and after every bounded foreign slice. */
+        if (!cpu_wall || wall < cpu_wall || wall - cpu_wall >= 1000000u) {
+            uint64_t cpu = nanoseconds(c, CLOCK_PROCESS_CPUTIME_ID);
+            if (!cpu) return -1;
+            if (cpu >= cpu_end) break;
+            cpu_wall = wall;
+        }
         if (c->mode == 1) {
             if (mpz_tstbit(c->scalar, (mp_bitcnt_t)c->bit)) {
                 ladder_bit(c, 2, 1);
@@ -264,8 +301,8 @@ int b4_slice(b4_context *c, unsigned long long wall_end,
 int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
     if (!c || !c->mode || !milliseconds || milliseconds > 5 ||
         !actions || actions > 128) return -1;
-    uint64_t wall = nanoseconds(CLOCK_MONOTONIC);
-    uint64_t cpu = nanoseconds(CLOCK_PROCESS_CPUTIME_ID);
+    uint64_t wall = nanoseconds(c, CLOCK_MONOTONIC);
+    uint64_t cpu = nanoseconds(c, CLOCK_PROCESS_CPUTIME_ID);
     if (!wall || !cpu) return -1;
     uint64_t interval = (uint64_t)milliseconds * 1000000u;
     return step_until(c, wall + interval, cpu + interval, actions, NULL);
@@ -302,8 +339,8 @@ int b4_team_step(b4_context *const *contexts, size_t count, unsigned workers,
      * five-ms work target; the external owner bounds the whole process.
      */
     if (omp_in_parallel()) return -2;
-    uint64_t wall = nanoseconds(CLOCK_MONOTONIC);
-    uint64_t cpu = nanoseconds(CLOCK_PROCESS_CPUTIME_ID);
+    uint64_t wall = nanoseconds(NULL, CLOCK_MONOTONIC);
+    uint64_t cpu = nanoseconds(NULL, CLOCK_PROCESS_CPUTIME_ID);
     if (!wall || !cpu) return -1;
     uint64_t interval = (uint64_t)milliseconds * 1000000u;
     uint64_t wall_end = wall + interval, cpu_end = cpu + workers * interval;

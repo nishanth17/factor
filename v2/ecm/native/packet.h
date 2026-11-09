@@ -32,6 +32,11 @@ int b4_step(b4_context *ctx, unsigned milliseconds, unsigned actions);
 int b4_slice(b4_context *ctx, unsigned long long wall_end,
              unsigned long long cpu_end, unsigned actions, const void *cancel);
 int b4_ready(const b4_context *ctx);
+/* Per-context deterministic test clocks, copied and bounded; zero counts
+ * restore real clocks. No Python callbacks or global clock replacement. */
+int b4_test_clocks(b4_context *ctx, const unsigned long long *wall, size_t nw,
+                    const unsigned long long *cpu, size_t nc);
+unsigned b4_test_clock_reads(const b4_context *ctx, unsigned kind);
 typedef struct b4_pthread_team b4_pthread_team;
 unsigned b4_pthread(void);
 b4_pthread_team *b4_pthread_create(void);
