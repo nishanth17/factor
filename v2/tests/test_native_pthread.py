@@ -2,6 +2,7 @@
 
 import json
 import os
+import signal
 import threading
 import unittest
 from dataclasses import replace
@@ -11,11 +12,13 @@ from v2.ecm import chains, core
 from v2.ecm.native_packet import SOURCE, NativePacket
 from v2.ecm.native_team import NativeTeam, TeamRefusedError
 from v2.execution.budget import Budget, BudgetExhaustedError
+from v2.execution.ecm_native import NativeECMExecutor
 from v2.execution.portfolio_config import (
     _execution_context,
     close_execution_context,
 )
 from v2.execution.stage_jobs import stage_one_plan
+from v2.execution.worker_contract import WorkerSettings
 from v2.tests.test_h3_resources import Clock, Provider
 from v2.tests.test_native_correctness import (
     FIXTURES,
@@ -183,7 +186,11 @@ class PthreadTests(unittest.TestCase):
             owner.lib.b4_pthread_wait(owner.owner, 4)
             with self.assertRaises(RuntimeError):
                 owner.close()
-            owner.cancel()
+            previous = signal.signal(signal.SIGUSR1, lambda *_: owner.cancel())
+            try:
+                signal.raise_signal(signal.SIGUSR1)
+            finally:
+                signal.signal(signal.SIGUSR1, previous)
         finally:
             owner.lib.b4_pthread_release(owner.owner)
             thread.join(10)
@@ -201,6 +208,71 @@ class PthreadTests(unittest.TestCase):
             lambda i, r: seen.append(r) or False,
         )
         self.assertEqual(seen, [core.scalar_multiply(13, 2, 1, 1013, 2)])
+
+    def test_interrupted_team_checkpoint_repeated_resume_keeps_history(self):
+        owner = NativeECMExecutor(seed=17, settings=WorkerSettings(workers=2))
+        self.addCleanup(owner.close)
+        selected = config(ecm_kernel="c-gmp", ecm_tiers=((11, 47, 3),))
+        checkpoint = None
+        for _ in range(2):
+            start = 0 if owner.team is None else owner.team.slices
+            wall, cpu = Clock(), Clock()
+
+            def cancel_after_slice():
+                if owner.team is not None and owner.team.slices > start:
+                    wall.value, cpu.value = 2, 3
+                    return True
+                return False
+
+            grant = Budget(
+                wall_clock=wall,
+                cpu_clock=cpu,
+                provider=Provider(),
+                cancelled=cancel_after_slice,
+            )
+            paused = owner.run(
+                1013,
+                config=selected,
+                budget=grant,
+                checkpoint=checkpoint,
+                fixed_work=True,
+            )
+            self.assertEqual(paused.reason, "cancelled")
+            saved = paused.checkpoint["payload"]["budget"]
+            if checkpoint is not None:
+                before = checkpoint["payload"]["budget"]
+                self.assertGreaterEqual(saved["wall"], before["wall"] + 2)
+                self.assertGreaterEqual(saved["cpu"], before["cpu"] + 3)
+                self.assertGreater(saved["work"], before["work"])
+            grant.restore_charges(**saved)
+            once = grant.charges()
+            grant.restore_charges(**saved)
+            self.assertEqual(grant.charges(), once)
+            checkpoint = json.loads(json.dumps(paused.checkpoint))
+        resumed = owner.run(
+            1013,
+            config=selected,
+            budget=deterministic_budget(),
+            checkpoint=checkpoint,
+            fixed_work=True,
+        )
+        control = NativeECMExecutor(
+            seed=17, settings=WorkerSettings(workers=2)
+        )
+        self.addCleanup(control.close)
+        expected = control.run(
+            1013,
+            config=selected,
+            budget=deterministic_budget(),
+            fixed_work=True,
+        )
+        self.assertEqual(resumed.reason, "curves_exhausted")
+        self.assertEqual(
+            resumed.checkpoint["payload"]["completed"],
+            expected.checkpoint["payload"]["completed"],
+        )
+        self.assertEqual(resumed.stats["charged_child_cpu"], 0)
+        self.assertEqual(resumed.checkpoint["payload"]["runs"], 3)
 
     def test_root_stops_after_real_team_work_and_before_publication(self):
         for cause in ("wall", "cpu", "rss", "cancelled"):
