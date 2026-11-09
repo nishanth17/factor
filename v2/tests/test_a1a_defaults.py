@@ -16,7 +16,7 @@ from v2.tests.resource_stops import recipe_values as asdict
 from v2.tests.test_siqs_cli import cli
 
 SELECTED = "density+presieve+scan_fused"
-DEFAULT_SELECTED = SELECTED + "+parity_two"
+DEFAULT_SELECTED = "presieve+unroll4+parity_two"
 EXTENSION = "density+presieve_powers+unroll4+scan_fused"
 
 
@@ -39,7 +39,7 @@ class A1aDefaultTests(unittest.TestCase):
                             if memory in (None, 2**30)
                             else "reference",
                         )
-                        selected = 50 <= digits <= 55 and memory in (
+                        selected = digits >= 50 and memory in (
                             None,
                             2**30,
                         )

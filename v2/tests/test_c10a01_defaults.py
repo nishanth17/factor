@@ -66,7 +66,7 @@ class CoupledDefaultTests(unittest.TestCase):
     def test_existing_marking_memory_and_explicit_controls_are_preserved(self):
         config = default_siqs_config(10**49 + 123)
         self.assertEqual(
-            config.collector.marking, "density+presieve+scan_fused+parity_two"
+            config.collector.marking, "presieve+unroll4+parity_two"
         )
         self.assertEqual(config.collector.sparse_queue_bytes, 32 * 2**20)
         limited = adapt_resource_configuration(

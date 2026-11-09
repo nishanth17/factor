@@ -13,7 +13,7 @@ from v2.benchmarks.infrastructure.resource_control import (
 )
 
 from ....common import prime_sieve, utils
-from ....qs.defaults import default_siqs_config
+from ....qs.defaults import legacy_siqs_config as default_siqs_config
 from ....qs.factor_base import checked_target
 from ....qs.multiplier import select_multiplier
 

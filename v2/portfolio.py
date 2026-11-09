@@ -1549,7 +1549,9 @@ def _factorize_bounded(
             # A saved serial call stays serial; a saved process call retains
             # its exact recipe even if automatic routing changes later.
             saved_workers = state.get("qs_workers")
-            if saved_workers is None:
+            if saved_workers is None or not state.get(
+                "qs_workers_auto", False
+            ):
                 qs_workers = None
             else:
                 from .qs.current_parallel import QSWorkerConfig
@@ -1559,6 +1561,8 @@ def _factorize_bounded(
             from .qs.production_policy import default_qs_workers
 
             qs_workers = default_qs_workers(n, config.siqs)
+            if qs_workers is not None:
+                state["qs_workers_auto"] = True
     worker_marker = qs_workers.record() if qs_workers is not None else None
     if checkpoint is not None and state.get("qs_workers") != worker_marker:
         raise ValueError("resume QS worker settings changed")

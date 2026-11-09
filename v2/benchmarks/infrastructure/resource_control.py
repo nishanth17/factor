@@ -113,7 +113,8 @@ def adapt_resource_configuration(factory, *args, **values):
     }
     recipe = values.get("recipe")
     if (
-        getattr(factory, "__name__", "") == "default_siqs_config"
+        getattr(factory, "__name__", "")
+        in ("default_siqs_config", "legacy_siqs_config")
         and "recipe" in parameters
     ):
         legacy_memory = historical.get("memory_bytes")

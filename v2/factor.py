@@ -694,35 +694,13 @@ def main(*, budget=None):
                     # when a resumed CLI invocation omits its original flags.
                     if not (use_qs or use_sss) or restore_saved_qs:
                         if saved.get("siqs") is not None:
-                            from .qs import (
-                                CountedSIQSConfig,
-                                DoubleLargeSieveConfig,
-                                GrowingDoubleLargeSieveConfig,
-                                SieveConfig,
-                                SIQSConfig,
-                                YieldSieveConfig,
+                            from .execution.portfolio_config import (
+                                _decode_siqs_config,
                             )
 
-                            values = dict(saved["siqs"])
-                            collector = values["collector"]
-                            if (
-                                "yield_policy" in collector
-                                or "small_prime_bound" in collector
-                            ):
-                                collector_type = YieldSieveConfig
-                            elif collector.get("storage_policy") == "grow":
-                                collector_type = GrowingDoubleLargeSieveConfig
-                            elif "large_prime_bound" in collector:
-                                collector_type = DoubleLargeSieveConfig
-                            else:
-                                collector_type = SieveConfig
-                            values["collector"] = collector_type(**collector)
-                            config_type = (
-                                CountedSIQSConfig
-                                if "base_count" in values
-                                else SIQSConfig
+                            parameters["siqs"] = _decode_siqs_config(
+                                saved["siqs"]
                             )
-                            parameters["siqs"] = config_type(**values)
                         if saved.get("sss") is not None:
                             from .qs import SieveConfig
 

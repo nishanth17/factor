@@ -13,10 +13,44 @@ from v2.portfolio import PortfolioConfig, factorize_bounded
 from v2.qs.defaults import default_siqs_config
 from v2.qs.production_policy import default_qs_workers, qs_recipe
 from v2.qs.siqs import SIQSConfig
+from v2.tests.test_current_qs_workers import configuration as small_config
+from v2.tests.test_current_qs_workers import settings as small_workers
 from v2.tests.test_siqs_cli import cli
 
 
 class ProductionQSTests(unittest.TestCase):
+    def test_automatic_pool_executes_and_drains_on_a_real_small_factorization(
+        self,
+    ):
+        import multiprocessing
+
+        n = 97 * 4001 * 5003
+        config = PortfolioConfig(
+            trial_bound=100,
+            rho_attempts=0,
+            pm1_attempts=0,
+            ecm_tiers=(),
+            siqs=small_config(),
+        )
+        before = {p.pid for p in multiprocessing.active_children()}
+        with patch(
+            "v2.qs.production_policy.default_qs_workers",
+            return_value=small_workers("process", 2),
+        ):
+            run = factorize_bounded(
+                n,
+                seed=29,
+                config=config,
+                ecm_executor=None,
+                budget=Budget(seconds=15, cpu_seconds=60),
+            )
+        self.assertEqual(run.result.reconstruct(), n)
+        self.assertTrue(run.result.complete)
+        self.assertTrue(any(e["stage"] == "siqs" for e in run.events))
+        self.assertEqual(
+            {p.pid for p in multiprocessing.active_children()}, before
+        )
+
     def test_y0_anchors_match_frozen_experiment_policy(self):
         for digits in (40, 50, 55, 60, 65, 70):
             n = 10 ** (digits - 1) + 123
