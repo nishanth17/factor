@@ -10,6 +10,9 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Retain native points/tables/cursors and shared checked metadata across slices.
   Export canonical scalar checkpoints transactionally; preserve incurred work
   and the existing pthread assignment/history resume contract.
+- Validate committed-only full QA (1,741 tests, 20 optional skips), lint and
+  benchmark imports; complete the cold/warm Tier 1 screen with all charges and
+  warm drift/regressions retained. Resolve the earlier checkpoint-design stop.
 - Keep Python and the previous stage-one native executor as independent controls.
   No automatic defaults, mainline integration or push are changed.
 

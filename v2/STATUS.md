@@ -107,26 +107,26 @@ so further measurements stop pending a revised diagnostic plan. Startup,
 engagement and worker economics still require recalibration. Local entry:
 `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`.
 
-B4a Phase 1 has resumed past its earlier checkpoint-design stop. Full native
-Suyama setup, both ECM stages, GCD and strict/ordered recovery are implemented
-on the task branch in `0df3dc3`, selected explicitly with `c-gmp-full`.
-Canonical scalar checkpoint export is transactional; pthread assignment/history
-resume is retained. Actual C arithmetic and checkpoint/fault tests pass targeted
-checks. Committed-only full QA and the cold/warm Tier 1 screen are in progress.
-The earlier stopped delivery below is historical; evidence and charges remain
-under `v2/audit/b4a/phase1_20261109/`, with continuation artifacts in
-`continuation_01/`. Automatic defaults remain unchanged.
+B4a Phase 1 steps 0–3 are complete on the task branch. `0df3dc3` adds
+explicit `c-gmp-full` Suyama setup, both classical ECM stages, normal GCD and
+strict/ordered recovery in retained C/GMP contexts. Scalar canonical checkpoint
+export is transactional; threaded assignment/history resume remains intact.
+Full committed-only QA on `fa2a4cc` runs 1,741 tests (20 explicit optional
+skips), full lint and 308 ordinary benchmark imports with both builds present.
+All 20 new whole-native tests execute. The earlier checkpoint-design stop is
+resolved; its original delivery and charges are preserved locally.
 
-Earlier B4a Phase 1 overhead continuation implements process-CPU polling amortization
-(`7124730`) and a persistent pthread team (`621da17`), with deterministic
-clock/generation/drain/close coverage. Committed-only QA on `c819cbe` passes
-1,721 tests (20 explicit optional skips), full lint and 308 ordinary benchmark
-imports with both native builds present. Same-cell warm re-baselining and a
-matched lifetime comparison establish no complete-ECM speedup or consistent
-A/A noise reduction. The full-ECM port stops on an unresolved canonical
-recovery/checkpoint export design; setup, classical stage two and strict
-recovery remain Python. Steps 2–3 and their Tier 1 screen are incomplete.
-Local phase handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
+Polling amortization (`7124730`) and persistent pthreads (`621da17`) have
+deterministic clock/generation/drain/close coverage. The same-cell step-1 warm
+re-baseline and matched lifetime comparison established no consistent complete
+speedup or noise reduction. The full-native Tier 1 screen now completes all
+720 clean cold/warm calls, 120 A/A and 120 separate phase calls, across three
+inputs per 60/80/100-digit anchor and four bounds. Full-native scalar loses;
+cold parallel gains are scoped, and large warm drift makes most warm gains
+ties. No default or universal worker selection is adopted. Startup, engagement,
+process/thread economics and combined-source dispatch still need recalibration.
+Local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`; raw continuation
+receipts, freezes and retained builds: `continuation_01/` below that directory.
 
 B4a planning update: the expanded rolling candidate ranking and first coherent
 execution bundle are in
@@ -339,7 +339,7 @@ The snapshot does not assert that any process or performance window is active.
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
 | [A7a — Done](ROADMAP.md#a7a-completion) | Selected Y0 and nearest-row process recipes integrated locally; larger probes remain deferred until after B5a. | `results/a7a/final-merge-20261109/`; retained G4 and calibration receipts |
-| [B4a](ROADMAP.md#b4a-in-progress) | Scalar/pthread correctness admitted; complete-cost adoption, recalibration and integration remain. | `codex/b4a-native-ecm` / correctness source `0f2fee3` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Whole-classical scalar/pthread correctness and Phase 1 Tier 1 screen complete; adoption, recalibration and integration remain. | `codex/b4a-native-ecm` / QA source `fa2a4cc` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
 startup follow-up is unfinished. The tuple-decoding microcheck is complete;

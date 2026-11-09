@@ -380,8 +380,9 @@ remain authoritative; native-thread CPU is included in process CPU once.
 idempotent, active close/use-after-close reject, and close/cancel must not race.
 The new `b4a-pthread-owner-h3-v3` checkpoints bind source, settings and chunk
 size; old OpenMP checkpoints do not migrate. Scalar/pthread correctness is
-validated on `0f2fee3`; setup, classical stage two and exact recovery remain
-Python. See [native ownership and validation](ecm/native/README.md). No automatic
+validated initially on `0f2fee3`; the retained `c-gmp` stage-one control
+keeps setup, classical stage two and recovery in Python. The separately selected
+whole-ECM C owner is described below. See [native ownership and validation](ecm/native/README.md). No automatic
 routing, performance adoption or mainline integration follows.
 
 

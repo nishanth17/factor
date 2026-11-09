@@ -59,7 +59,7 @@ evidence remain separate acceptance follow-ups.
 | A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **In progress with D1.** Exact operator/lifting adapters, independent oracles and fixtures are implemented. Current nonempty target-size fixtures, heavy QA and capacity measurements remain open; no matrix-memory improvement is established. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) ; [implementation and remaining work](#a8-d1-in-progress) |
 | D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **In progress after the A8 contract.** Genuine selected-block recurrence, original-kernel correction, bounded restarts/resume and default-off ablations are implemented. Complete QA, representative matrix measurements, confirmation and integration remain open. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) ; [implementation and remaining work](#a8-d1-in-progress) |
 | F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **In progress; opt-in package preparation.** Suyama-11, enhanced Edwards/setup/scalar options and scheduled execution/plan reuse are committed. Further optimization edits are uncommitted at this snapshot; heavy QA, feasibility, yield/cost evidence and integration remain pending. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) ; [implementation and remaining work](#f2-in-progress) |
-| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **In progress; isolated optional native executor.** Scalar/pthread correctness is admitted from committed source; complete-cost adoption, recalibration and integration remain pending. The scoped NEON loss is retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
+| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **In progress; isolated optional native executor.** Whole-classical scalar/pthread correctness and Phase 1 Tier 1 screening are complete; adoption, recalibration and integration remain pending. The scoped NEON loss is retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
 
 <a id="b12-f4-in-progress"></a>
 
@@ -176,36 +176,32 @@ does not establish a free increase in B1.
 
 ### B4a — optional coarse native ECM
 
-- **Implemented and correctness admitted on the task branch:** ordinary-GMP
-  scalar packets and a C-only pthread owner with reusable contexts/programs,
-  dynamic atomic chunks, static partitions, checked publication and joined
-  failure/cancellation paths. Committed A7a `cb37da3` is synchronized through
-  `21003b6`; H3 remains present. Correctness source `0f2fee3` passes committed
-  archive builds, 1,712 tests (20 optional skips), lint and 308 benchmark imports.
-  Scalar/pthread tests actually execute, including fixed state/recovery,
-  production PRAC, widths, signal/resource stops and repeated resume history.
-- **Phase 1 overhead continuation:** process-CPU clock amortization and a
-  persistent team are implemented in `7124730`/`621da17`, with deterministic
-  clock/lifecycle tests. Warm re-baselining does not establish native
-  superiority or consistent noise reduction; matched lifetime costs remain
-  within observed variation. The full-ECM port stopped before implementation
-  on the canonical recovery/checkpoint export design. Phase 1 steps 2–3
-  remain incomplete; local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
-- **Remaining:** complete-cost cold/warm and native B12-process comparisons,
-  engagement/worker economics, applicable fresh confirmation and integration.
-  Bounded warm fixed-work calibration supports no adopted speedup. Its CPU
-  profiler lane failed timer handling/recorder output; further measurements
-  stop pending a revised diagnostic plan. Classical stage two and exact recovery
-  remain Python. C5, new formulas/chains, polynomial continuation and any SME
-  spike remain separate implementation scopes. Retain the scoped NEON loss.
-- **Checkpoint:** `codex/b4a-native-ecm`, implementation/QA `0f2fee3`. Local entry:
-  `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`; source-derived
-  `RESEARCH.md` and `OPTIMIZATION_PLAN.md` are local. B4a stays In progress;
-  no defaults, B4a-to-mainline merge or push is authorized by this continuation.
-  The follow-up rolling selection plan is local at
-  `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`; it ranks
-  the full credible uncovered inventory and a coherent first execution bundle,
-  without limiting the number of later candidates that evidence/resources permit.
+- **Phase 1 steps 0–3 complete on the task branch:** polling amortization
+  (`7124730`), persistent pthreads (`621da17`) and complete unchanged-classical
+  C/GMP execution (`0df3dc3`). Explicit `c-gmp-full` covers Suyama, both stages,
+  normal GCD and strict/ordered recovery. Retained native contexts share checked
+  immutable metadata; scalar canonical export is transactional and threaded
+  assignment/history resume remains intact. The earlier design stop is resolved.
+- **Admission:** committed-only `fa2a4cc` builds scalar/pthread libraries and runs
+  1,741 tests (20 explicit optional skips), full lint and 308 benchmark imports.
+  All 20 new whole-native methods execute; canonical traces, strict nonunits,
+  faults, signal/root stops, stable factors, ownership and resume are covered.
+  The A7a/H3 synchronization already present in `0f2fee3` is retained.
+- **Tier 1 and remaining:** cold/warm fixed-work screening is complete against
+  Python and exact step-1 controls across three inputs per 60/80/100-digit band
+  and four bounds, with A/A and separate phase diagnostics. Scalar regressions
+  and large warm drift remain explicit. Scoped cold parallel gains do not adopt
+  defaults. Native B12-process economics, combined-source recalibration, fresh
+  complete-call confirmation and integration remain open. C5/chains/C2/E6 and
+  justified vectors remain phase-2 work; F2/F3/ready-first/dispatch retain their
+  active owners. The historical profiler failure and scoped NEON loss remain.
+- **Checkpoint:** `codex/b4a-native-ecm`, implementation `0df3dc3`, QA/timing
+  `fa2a4cc`; local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
+  Earlier evidence remains under `native_admission_research_20261109/` and
+  the stopped delivery is archived within this phase. B4a stays In progress
+  overall; this authorization stops after Phase 1. No defaults, mainline merge,
+  push or phase-2 campaign follow. The rolling plan remains local at
+  `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>
@@ -735,13 +731,16 @@ compared even if an unrelated reference fails. This review launches no runs.
 
 #### B4a — coarse native arithmetic and whole-portfolio costs
 
-Task-branch Phase1–2 preparation implements an optional scalar C/GMP packet,
-lazy adapter and prospective staged runner from validated B12 `787190aa`.
-Build/correctness and later integrated-source gates remain explicit; no
-performance/default adoption follows. Optional OpenMP stage-one teams and
-static/dynamic/guided scheduling are prepared, with executable QA and generated-
-code inspection pending. Full classical-continuation native execution remains
-a documented boundary gap.
+Task-branch Phase 1 implements explicit `c-gmp-full` scalar/pthread ordinary-GMP
+execution for Suyama setup, both classical stages, normal GCD and strict/ordered
+recovery, with retained private contexts and shared immutable metadata. Scalar
+canonical export and existing threaded assignment/history resume are validated.
+Polling is amortized and the pthread team persists across drained generations.
+Committed-only QA on `fa2a4cc` runs 1,741 tests (20 optional skips), lint and
+308 benchmark imports with both builds. The cold/warm Tier 1 screen is complete;
+scalar regressions and large warm drift prevent a general performance claim.
+The earlier classical-coverage gap/checkpoint-design stop is resolved. Adoption,
+combined-source recalibration and integration remain open; defaults are unchanged.
 The optional two-curve NEON product/square screen at 200/266/333 bits is closed
 without integration: its complete hybrid costs 2.27–3.14x the B4a scalar GMP
 path on source c485f2b. Exact checks and lint pass; all six measured cases lose.

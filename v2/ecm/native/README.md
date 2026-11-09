@@ -1,10 +1,12 @@
 # Optional ordinary-GMP ECM packets and pthread slices
 
-Python integers on PyPy3.11 remain the default. The isolated B4a continuation
-admits scalar and pthread correctness on committed source `0f2fee3`: full QA
-runs 1,712 tests with 20 explicit optional skips, plus lint and 308 ordinary
-benchmark imports. Actual scalar/pthread arithmetic tests execute. Performance
-adoption, engagement recalibration and mainline integration remain open.
+Python integers on PyPy3.11 remain the default. The isolated B4a branch admits
+whole-classical scalar/pthread correctness on `fa2a4cc`: full QA runs 1,741 tests
+with 20 explicit optional skips, lint and 308 ordinary benchmark imports. All
+20 new whole-native test methods execute. The earlier `c-gmp` stage-one owner
+remains an independent control; select `c-gmp-full` explicitly for the complete
+C owner described below. Performance adoption, recalibration and integration
+remain open after the cold/warm Tier 1 screen.
 
 Build explicitly from the repository root under the shared performance lock:
 
@@ -121,12 +123,12 @@ boundary. Startup, one GMP operation, join and OS descheduling can exceed the ta
 it is not a hard real-time limit. H3 root resources include setup, conversion,
 recovery and cleanup; no prepaid work/CPU/memory leases are restored.
 
-Setup, prime/program metadata, classical stage-two preparation/execution,
-GCD/strict nonunit recovery and final publication **remain Python**. Only accepted
-stage-one ladder/PRAC slices are dispatched to C. Paired/wheel continuation is
-refused by this owner. Selected B12 metadata caches remain supported; no
-whole-curve native coverage or universal modular-multiplication bottleneck is
-claimed.
+In the retained `c-gmp` stage-one control, setup, prime/program metadata,
+classical stage two, GCD/recovery and publication remain Python. Only its
+accepted ladder/PRAC slices execute in C. The separate `c-gmp-full` owner below
+executes all classical curve arithmetic/recovery in C; Python supplies metadata
+and validates/publishes canonical results. Both refuse paired/wheel policy.
+No universal modular-multiplication bottleneck is claimed.
 
 Pthread owner checkpoints use `b4a-pthread-owner-h3-v3`. They retain stable
 completed IDs, attempts and cumulative saved wall/CPU/work history after drain.
@@ -135,20 +137,18 @@ Source, settings, worker count, schedule, capacity and chunk changes reject on
 resume. No pointers or partial native state serialize. Historical OpenMP owner
 checkpoints do not migrate silently.
 
-## Phase 1 overhead continuation
+## Phase 1 delivery
 
-Polling commit `7124730` and persistent-team commit `621da17` have committed-only
-targeted correctness coverage, including deterministic injected clocks,
-generation reuse, partial startup, cancellation, drain and final joins. Final
-committed-only QA on `c819cbe` passes 1,721 tests (20 explicit optional skips),
-full lint and 308 ordinary benchmark imports with both native builds present. The
-same-cell warm re-baseline does not establish native superiority or consistently
-lower A/A noise. The matched lifetime screen is inconclusive for complete
-ECM; its empty-dispatch probe supports a narrower coordination-cost saving.
-The full-ECM port stopped before implementation on an unresolved canonical
-recovery/checkpoint export design. Setup, classical stage two and strict
-recovery therefore remain Python. Exact reports, failed harness attempts and
-charges are retained under `v2/audit/b4a/phase1_20261109/`.
+Polling `7124730` and persistent-team `621da17` have deterministic injected-clock,
+generation, partial startup, cancellation, drain and final-join coverage. Their
+warm re-baseline establishes no consistent superiority or noise reduction;
+empty-dispatch savings do not establish a whole-ECM speedup. `0df3dc3` then adds
+the complete classical C owner. Full committed-only QA and cold/warm Tier 1
+screening on `fa2a4cc` are complete. Full-native scalar loses these comparisons;
+cold parallel gains are scoped and large warm drift makes most warm differences
+ties. The earlier checkpoint-design stop is resolved, with its stopped delivery
+preserved in `continuation_01/stopped_delivery/`. Exact reports, every failed
+attempt and charges remain under `v2/audit/b4a/phase1_20261109/`.
 
 ## Validation and retained limits
 

@@ -832,3 +832,19 @@ No repeated diagnostic campaign follows. Detailed matrix, build provenance,
 research and next decision are in local
 `v2/audit/b4a/native_admission_research_20261109/`. Historical OpenMP freezes do
 not authorize a current pthread performance campaign.
+
+### B4a Phase 1 whole-native screen (9 November 2026)
+
+Whole-classical `c-gmp-full` execution is admitted by committed-only QA on
+`fa2a4cc`: 1,741 tests (20 explicit optional skips), lint, 308 ordinary imports
+and scalar/pthread builds. All 20 new native methods execute, including strict
+recovery and canonical/history resume. The fixed-work screen compares current
+Python, exact step-1 Python/native controls and full-native scalar/T1/T2/T4,
+with three independent inputs per 60/80/100-digit band, four bounds, separate
+cold/warm lifetimes, start/end A/A and separate phase diagnostics. All measured
+calls agree. Scalar regressions and large warm drift are retained; scoped cold
+parallel gains do not establish default adoption or complete-factorization gains.
+Local handoff, all raw rows, source freezes, binaries and exact accounting:
+`v2/audit/b4a/phase1_20261109/`. The previous checkpoint-design stop is resolved;
+its stopped report is archived unchanged. No automatic numerical/dispatch
+policy changes, repeated diagnostic campaign or mainline integration follow.
