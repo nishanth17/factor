@@ -259,7 +259,12 @@ class PacketTests(unittest.TestCase):
             job = CurrentParallelSIQSJob(
                 N,
                 seed=29,
-                config=replace(configuration(), family_count=6),
+                config=replace(
+                    configuration(),
+                    base_bound=200,
+                    pool_size=12,
+                    family_count=12,
+                ),
                 workers=replace(settings(mode, count), polynomials_per_task=1),
                 budget=allowance(),
             )
