@@ -26,7 +26,9 @@ class RegimeSearchTests(unittest.TestCase):
         for count in (12, 14):
             selected = candidate(count)
             self.assertEqual(selected["arm"], f"C{count}")
-            self.assertEqual(settings(f"C{count}", 2**30, False).workers, count)
+            self.assertEqual(
+                settings(f"C{count}", 2**30, False).workers, count
+            )
         with self.assertRaises(ValueError):
             candidate(15)
         self.assertNotIn(12, COUNTS)
