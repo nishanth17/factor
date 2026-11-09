@@ -3,6 +3,14 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a native correctness preparation (8 November 2026)
+
+- Correct the owned-group observer's Mach CPU-unit conversion without adding
+  native-thread CPU twice. Add deterministic counter regressions.
+- Add fixed 60/80/100-digit curve, nonunit recovery and native H3 lifecycle
+  admission checks, and build header/linkage provenance. Runtime validation
+  remains separate from source preparation.
+
 ## B4a H3 integration (8 November 2026)
 
 - B4a branch: integrate H3 root resource accounting into optional native ECM

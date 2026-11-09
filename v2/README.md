@@ -243,3 +243,8 @@ estimates are diagnostics, not admission caps. Native team checkpoints use a
 new H3 identity and retain saved wall/CPU history. Historical B4a recorder
 work frontiers remain benchmark controls and do not restore production limits.
 Native builds and performance admission remain separate pending checks.
+
+B4a's owned-group CPU observer converts Mach absolute counters through the
+host timebase. Process totals include native-thread CPU; thread totals are not
+added again. Native build manifests retain GMP header/runtime identities and
+actual linked libraries. Missing explicit native backends report named errors.

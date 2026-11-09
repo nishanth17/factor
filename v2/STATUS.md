@@ -53,13 +53,14 @@ Original delivered-component evidence: `v2/audit/b12_f4/`; that task worktree
 and its temporary checkouts are removed. The ready-first prototype remains
 isolated on `codex/ecm-ready-start` with local `v2/audit/ecm_ready_start/` notes.
 
-B4a task branch includes local master `755c312` and H3. Optional native
-packet/team ownership now uses root observed resources without internal
-memory/work/assignment ceilings; diagnostic cache/scratch estimates remain.
-Native checkpoints use a new H3 identity and saved-history accounting.
-Historical protocols and the scoped NEON loss remain unchanged. Native
-startup, engagement and worker costs require combined-source revalidation.
-Local merge validation: `v2/audit/b4a/merge_h3_20261108/`.
+B4a task branch includes local master `755c312` and H3 at combined checkpoint
+`409f065`. Step 1 adds native correctness fixtures and deterministic lifecycle
+checks, explicit backend refusal and Mach-timebase CPU observer correction.
+No project-local OpenMP runtime was found; the historical Homebrew runtime is
+excluded from Step 1. Native build/runtime and current-source full QA require
+the shared lock; source preparation does not establish admission. Historical
+NEON evidence and protocols remain unchanged. Startup, engagement and worker
+costs still require revalidation. Local entry: `v2/audit/b4a/step1_20261108/`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -150,7 +151,7 @@ The snapshot does not assert that any process or performance window is active.
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
 | [A7a](ROADMAP.md#a7a-in-progress) | Current-collector workers and combined options; exploratory 60/70 completions exist, with K3 diagnostics, fresh confirmation and integration pending. | `codex/a7a-current-qs-workers` / `37c4cae` |
-| [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team sources and Step 1 correctness checks; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / combined base `409f065` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
 startup follow-up is unfinished. The tuple-decoding microcheck is complete;

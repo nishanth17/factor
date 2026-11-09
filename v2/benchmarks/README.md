@@ -588,3 +588,9 @@ Historical work frontiers in its runners use the recorder adapter, while native
 production ownership follows root wall/CPU/RSS resources. Existing native cost
 and engagement tables need revalidation on the combined source; a new protocol
 identity and native build/correctness admission must precede further timing.
+
+B4a Step 1 corrects the live owned-group CPU observer to convert Mach ticks
+using the host timebase; process totals include native threads once. The new
+fixed-curve and injected-stop checks are correctness admission, with no timing,
+profiling or tuning. Team admission requires a project-local OpenMP runtime;
+the previously observed Homebrew runtime is excluded from this Step 1 scope.

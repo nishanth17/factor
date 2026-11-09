@@ -205,8 +205,11 @@ does not establish a free increase in B1.
   with reusable native objects/scratch, accepted ladder/PRAC actions, canonical
   handoffs and Python fallback; native-team executor sources, lifecycle and
   bounded scheduling/cancellation/checkpoint contracts are prepared. The rebase
-  onto current mainline reports committed-only Python QA: 1,416 tests
-  (43 optional skips), lint and 277 benchmark imports. The separately scoped
+  onto current mainline and H3 is at `409f065`. Its prior committed-only QA
+  passed 1,463 tests (43 optional skips), lint and 279 benchmark imports.
+  Step 1 adds fixed full-width and H3 native admission tests and corrects the
+  observer's Mach CPU units. No project-local OpenMP runtime was found;
+  native Step 1 build/runtime and fresh full QA remain pending. The scoped
   two-curve NEON prototype lost its direct comparison and remains a retained loss.
 - **Remaining:** combined-source native build and lifecycle/resource admission,
   including actual team execution; matched cold/warm scalar/team versus Python/
@@ -215,9 +218,9 @@ does not establish a free increase in B1.
   then complete integration and applicable confirmation. Python QA with optional
   skips does not establish native admission. C5 limb/modular contexts and any
   reopened SIMD hypothesis remain separate tasks; no native speedup is adopted.
-- **Checkpoint:** `codex/b4a-native-ecm` at `02e73d2`.
-  Local entry: `v2/audit/b4a/rebase_20261106/HANDOFF.md`;
-  `NEON_DIRECT_RESULT_v5.md` retains the historical arithmetic-only result.
+- **Checkpoint:** `codex/b4a-native-ecm`, combined base `409f065` with Step 1
+  preparation commits. Local entry: `v2/audit/b4a/step1_20261108/`;
+  `v2/audit/b4a/NEON_DIRECT_RESULT_v5.md` retains the historical SIMD result.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>

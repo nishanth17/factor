@@ -11,12 +11,13 @@ rules. Factoring startup never compiles code or installs dependencies:
 ```sh
 pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp
 pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp \
-  --openmp-prefix /opt/homebrew/opt/libomp --vector-report
+  --openmp-prefix "$PROJECT_LOCAL_OPENMP_PREFIX"
 ```
 
 The first build is independent of OpenMP. The second uses the supplied omp.h and
 libomp with explicit Apple Clang flags and creates build/openmp separately.
-Build manifests record compiler/flags/target, PyPy/CFFI, GMP version/library hash,
+Build manifests record compiler/flags/target, PyPy/CFFI, GMP header/runtime
+versions, resolved header/library paths and hashes, actual dylib linkage,
 OpenMP header/runtime hashes, source, library hash and ABI1. No binary is vendored.
 The initial build target is ARM64 macOS; installed files do not establish that
 compilation/linking/runtime tests have passed. No system package changes occur.
@@ -108,11 +109,11 @@ The native owner checkpoint records completed curves, attempts and cumulative
 charges after drain. Unfinished curves restart from their stable assignment
 boundary on resume, retaining saved history; retry attempts remain bounded.
 Native H3 checkpoints have a new identity; earlier native checkpoints reject.
-Changing
-source, schedule, capacity or team count on resume rejects. No native pointers,
+Changing source, schedule, capacity or team count on resume rejects. No native pointers,
 partially evaluated points or live thread state are serialized.
 
-There is no new field-SIMD implementation. OpenMP simd/declare-simd and ARM NEON
+No field-SIMD implementation is integrated into the executor. The retained
+two-curve NEON feasibility prototype lost its measured comparison and is closed. OpenMP simd/declare-simd and ARM NEON
 were assessed separately from threading. Opaque mpz calls do not become vector
 multiprecision arithmetic from a pragma; full60/80/100-digit moduli still need
 full-width arithmetic. Metadata SIMD and compiler reports are separate from point
@@ -125,3 +126,10 @@ committed-source archive check. Compilation, actual PyPy GIL/signal behavior,
 OpenMP startup/teardown and generated-code diagnostics remain pending until that
 window is released. The prospective runner permits no performance execution
 without exact integrated source, passed Q, pins and a separately admitted freeze.
+
+The 8 November Step 1 request permits only an existing project-local OpenMP
+runtime. None was found in the task or main repository, including ignored
+files. The historical Homebrew runtime is excluded from this admission. A
+missing explicitly requested backend raises a named error; no scalar/team
+fallback is inferred. The scalar build can proceed independently when the
+shared lock is available. The pthread alternative remains optional/unimplemented.

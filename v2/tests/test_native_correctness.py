@@ -1,8 +1,10 @@
 """Fixed-curve native admission and deterministic H3 interruption checks."""
 
 import copy
+import io
 import json
 import os
+import tempfile
 import unittest
 from contextlib import contextmanager
 from dataclasses import replace
@@ -113,6 +115,39 @@ def fixed_curve(case, kernel):
 
 
 class ExplicitBackendTests(unittest.TestCase):
+    def test_missing_team_build_fails_before_invoking_compiler(self):
+        from v2.ecm.native import build
+
+        with tempfile.TemporaryDirectory() as directory:
+            prefix = Path(directory)
+            for name in ("include/gmp.h", "lib/libgmp.10.dylib"):
+                path = prefix / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+            arguments = [
+                "native-build",
+                "--gmp-prefix",
+                directory,
+                "--openmp-prefix",
+                str(prefix / "missing-openmp"),
+            ]
+            error = io.StringIO()
+            with (
+                patch("sys.argv", arguments),
+                patch("sys.stderr", error),
+                patch.object(
+                    build.subprocess,
+                    "run",
+                    side_effect=AssertionError("compiler invoked"),
+                ),
+            ):
+                with self.assertRaises(SystemExit) as stopped:
+                    build.main()
+            self.assertEqual(stopped.exception.code, 2)
+            self.assertIn(
+                "requested OpenMP backend unavailable", error.getvalue()
+            )
+
     def test_missing_explicit_team_fails_without_scalar_fallback(self):
         owner = NativeTeam()
         self.addCleanup(owner.close)
