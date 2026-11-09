@@ -23,14 +23,14 @@ from v2.benchmarks.qs.a7a.regime_search import (
 
 class RegimeSearchTests(unittest.TestCase):
     def test_oversubscription_is_explicit_and_not_in_default_grid(self):
-        for count in (12, 14):
+        for count in (12, 14, 16, 18, 20):
             selected = candidate(count)
             self.assertEqual(selected["arm"], f"C{count}")
             self.assertEqual(
                 settings(f"C{count}", 2**30, False).workers, count
             )
         with self.assertRaises(ValueError):
-            candidate(15)
+            candidate(21)
         self.assertNotIn(12, COUNTS)
         self.assertNotIn(14, COUNTS)
 

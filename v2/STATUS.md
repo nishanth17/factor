@@ -48,14 +48,27 @@ is 2.56 GiB. Process-arm inner CPU undercounts OS actor totals; reports use OS
 CPU, and this experiment does not validate a binding CPU cap. Detailed local
 receipts: `v2/benchmarks/results/a7a/g4-slim-20261108/` in the main repository.
 
-**Next authorized scope:** a separate worker race at frozen packet widths:
-50/55 C4/C6/C8; 60 C4/C6/C8/C10; 65/70 C8/C10/C12/C14. Run input 0 for all
-18 configurations; advance only configurations within 10% of the fastest
-completed row cell to inputs 1–2 (at most 54 factoring calls). Report wall,
-CPU, sampled peak RSS and sample counts; flag C12/C14 oversubscription.
-The collector's ten-worker opt-in limit needs validation at fourteen before
-execution. No G4 heldout input is reused for selection. New 75/80 probes
-remain deferred until after B5a; no default adoption is authorized.
+**A7a reduced worker race complete:** runtime `bce0ad0`, 36/36 factoring
+calls and 40 controls, with all results reconstructing. Input-0 pruning leaves
+provisional process recipes C4/p8, C4/p16, C8/p16, C14/p64 and C8/p64 at
+50/55/60/65/70. All four 70-digit worker counts are wall-time ties under the
+measured 7.42% A/A drift; C8 wins the fewer-workers tie-break and uses less CPU
+and RSS. Rejected counts generally have one input, survivors three; this is
+internal calibration, not global optimality, routing adoption or fresh guardrails.
+The campaign used 2.81 wall hours including its retained recorder-only launch
+failure. Report and verified raw evidence remain local in the main repository:
+`v2/benchmarks/results/a7a/worker-count-race-20261108-r2/`.
+
+**Next authorized scope:** a separate directional worker extension, capped at
+20. At 65/70 compare C16 with C14, continue C18/C20 only while gains exceed A/A
+drift, then stop at the first loss/tie. Test best±1 only after both even
+neighbours are measurably worse; skip odd tests on a flat drift band and favor
+fewer workers. Lower sizes also get this refinement, with C2 when needed for
+C4's lower bracket and C1/C3 if C2 strictly wins. Input-0 racing precedes
+inputs 1–2 for the new 5% window. Explicit twenty-worker support and its
+committed-source validation precede a separate frozen execution grant.
+The running race's historical 10% rule is not rewritten. No automatic-default
+adoption, merge or push; new 75/80 probes remain deferred until after B5a.
 
 
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate

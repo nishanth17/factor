@@ -6,7 +6,9 @@ numerical recipe and packet/cache capacities stay fixed. Committed-only QA
 covers 1,628 tests (nine optional skips), lint and 295 benchmark imports; the
 final formatting-only test change preserves its AST. Earlier timing tables
 remain historical and need revalidation. This integration validation itself establishes no speedup. The subsequent
-[slim G4](RESULTS.md#a7a-slim-g4-8-november-2026) reports scoped S0 comparisons. Local receipts: `v2/audit/a7a/master-integration-20261108/`.
+[slim G4](RESULTS.md#a7a-slim-g4-8-november-2026) reports scoped S0 comparisons. The subsequent
+[worker race](RESULTS.md#a7a-reduced-worker-count-race-8-november-2026)
+reports provisional per-size process counts, including drift ties and CPU/RSS. Local receipts: `v2/audit/a7a/master-integration-20261108/`.
 
 
 Runners and required numerical inputs for PyPy implementing Python 3.11.

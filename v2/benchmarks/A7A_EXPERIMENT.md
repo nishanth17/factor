@@ -1,5 +1,27 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
+## Directional extension amendment — approved after the reduced race
+
+The reduced race is complete on `bce0ad0`: 36 factoring calls, 40 controls,
+provisional C4/C4/C8/C14/C8 at 50/55/60/65/70. Its 10% freeze is historical.
+The next, separately source-pinned extension uses a 5% input-0 race, followed
+by inputs 1–2 only for survivors. Keep packets 8/16/16/64/64 and all other
+options fixed. Validate explicit counts through 20 before execution.
+
+At 65/70 test C16 against C14, continue C18 then C20 only while wall gains
+exceed A/A drift, stopping at the first loss/tie. After a strict even bracket,
+test best±1 only when both even neighbours are measurably worse. Skip odd tests
+on a flat drift band and break ties toward fewer workers. Apply odd refinement
+at lower sizes too, including C2 when needed to bracket C4 and endpoint C1/C3
+if C2 strictly wins. A still-winning C20 is an unresolved boundary, not approval
+for C21/C22. Report every comparison's wall/CPU/RSS and margin versus A/A drift.
+Unimodality is a search heuristic, not a proved property of these inputs.
+
+Resolve current-source references, the finite conditional catalogue, exact
+noise-control placement, call/resource ceilings and expected runtime before
+launch. Retain all outcomes and source labels; no reuse of G4 heldouts for
+selection. No default adoption, merge, push or new 75/80 probe before B5a.
+
 ## Worker-count race amendment — approved after slim G4
 
 Slim G4 is complete; its source-pinned evidence is separate. The later user

@@ -3,6 +3,13 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Directional QS count extension (8 November 2026)
+
+- Permit explicit current QS process counts through twenty for the bounded
+  directional study. Automatic defaults and default search grids stay fixed.
+- Extend exact fixed-work coverage, checkpoint restore and child cleanup
+  validation to sixteen, eighteen and twenty spawned workers.
+
 ## Opt-in QS oversubscription experiments (8 November 2026)
 
 - Permit explicit current QS process counts up to fourteen for the authorized

@@ -1,5 +1,41 @@
 # Benchmark results and decisions
 
+## A7a reduced worker-count race (8 November 2026)
+
+Current H3-integrated runtime `bce0ad0`; 18 input-0 screens at frozen packets,
+then only configurations within 10% of the fastest completed row cell get
+inputs 1–2. All 36 full-factor calls complete and reconstruct, as do 40 fixed
+prefix controls. One recorder-only launch failure precedes these calls and is
+retained. No G4 heldout input was reused for selection.
+
+| Digits / provisional survivor | Three-input wall geometric mean(s) | OS CPU mean(s) | Peak sampled RSS(GiB) | Maximum A/A drift |
+| --- | ---: | ---: | ---: | ---: |
+| 50 C4/p8 | 15.79 | 70.29 | 0.823 | 2.27% |
+| 55 C4/p16 | 26.78 | 123.48 | 0.874 | 4.55% |
+| 60 C8/p16 | 62.87 | 423.93 | 1.729 | 1.91% |
+| 65 C14/p64 | 173.52 | 1470.90 | 3.082 | 1.08% |
+| 70 C8/p64 | 580.75 | 4567.31 | 2.154 | 7.42% |
+
+C6 at 55 also has three inputs: 28.48 s / 143.05 CPU-seconds / 1.115 GiB.
+At 70 the three-input C10/C12/C14 means are 582.23/597.51/595.16 s, with
+5352/5544/5433 CPU-seconds and 2.585/2.977/3.278 GiB sampled peak RSS.
+Those wall differences are ties inside the measured drift; C8 wins the
+fewer-workers tie-break and also has lower CPU and RSS. C12/C14 are explicitly
+oversubscribed on the ten-core host. No wall winner is invented from that noise.
+
+Other rejected configurations have input-0 evidence only; do not compare
+n=1 means to n=3 means or claim a global optimum. All prefix signatures/scanned
+positions match; no 10% drift stop occurs. Total owner wall including the prior
+recorder launch is 2.81 h, with 77,679 observed CPU-seconds. The inner CPU
+counter still underreports for process arms, so costs use OS whole-actor totals;
+these nonbinding-grant runs do not validate binding CPU-cap enforcement.
+
+This is internal worker calibration, not default/dispatch adoption, fresh
+60/70 guardrails, a mainline or population/p90 claim. Full report, observations,
+comparison margins against A/A drift, timelines, failed QA/recorder attempts,
+source archives and verified hashes remain local under
+`v2/benchmarks/results/a7a/worker-count-race-20261108-r2/` in the main repository.
+
 ## A7a slim G4 (8 November 2026)
 
 Runtime `a51de80` after H3 integration; three fresh certified balanced inputs

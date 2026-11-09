@@ -177,15 +177,16 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
-- **Slim G4 complete / worker race authorized (8 November):** H3-integrated
-  frozen recipes versus S0 confirm 1.97x at 55 and 3.10x at interpolated 65;
-  70 completes 3/3 candidate versus 2/3 S0, with a censored latency conclusion.
-  See [results](benchmarks/RESULTS.md#a7a-slim-g4-8-november-2026).
-  Next, at frozen packets: 50/55 C4/C6/C8; 60 C4/C6/C8/C10; 65/70
-  C8/C10/C12/C14. Screen input 0, advance <=1.10x fastest completed row cell
-  to inputs 1–2; at most 54 factoring calls. Validate opt-in fourteen-worker
-  support first; report oversubscription, wall/CPU/RSS and unequal sample
-  counts. No G4 heldout reuse, default adoption or new 75/80 probe before B5a.
+- **Slim G4 and reduced worker race complete (8 November):** G4 confirms
+  scoped S0 gains at 55/65 and preserves 70 censoring. The subsequent 36-call
+  race retains provisional C4/C4/C8/C14/C8 at 50/55/60/65/70 with frozen
+  packets; at 70 all counts tie inside 7.42% A/A drift, so C8 wins the
+  fewer-worker tie-break. See [results](benchmarks/RESULTS.md#a7a-reduced-worker-count-race-8-november-2026).
+  Next authorized: bounded directional even steps to 20 at 65/70, odd
+  neighbours only around strict brackets, flat ties toward fewer workers,
+  C2/C1 lower-bound checks where needed, and a 5% input-0 continuation window.
+  Validate explicit twenty-worker support and freeze resources before calls.
+  No adoption, merge/push, G4-heldout selection or 75/80 probes before B5a.
 
 
 - **75/80 probes reported (8 November):** both single-input C10/p64 recipes
