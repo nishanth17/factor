@@ -73,12 +73,42 @@ class TaskInfo(ctypes.Structure):
     ]
 
 
+class Timebase(ctypes.Structure):
+    """mach_timebase_info_data_t from the public Mach SDK."""
+
+    _fields_ = [("numer", ctypes.c_uint32), ("denom", ctypes.c_uint32)]
+
+
+def cpu_seconds(records, numer, denom):
+    """Convert process and reaped-child CPU ticks, including native threads.
+
+    libproc rusage_info CPU uses Mach absolute units on this host. Process
+    totals already contain thread CPU; proc_taskinfo thread totals must not
+    be added again. Live children are not yet in their parent's reaped totals.
+    """
+    if numer <= 0 or denom <= 0:
+        raise RuntimeError("invalid Mach CPU timebase")
+    ticks = sum(
+        usage.user + usage.system + usage.child_user + usage.child_system
+        for usage in records
+    )
+    return ticks * numer / (denom * 1_000_000_000)
+
+
 class GroupObserver:
     """Bounded PID inventory; no ps subprocesses or interpreter callbacks."""
 
     def __init__(self):
         if sys.platform != "darwin":
             raise RuntimeError("B4a ownership observer requires macOS")
+        system = ctypes.CDLL(None, use_errno=True)
+        system.mach_timebase_info.argtypes = [ctypes.POINTER(Timebase)]
+        system.mach_timebase_info.restype = ctypes.c_int
+        timebase = Timebase()
+        if system.mach_timebase_info(ctypes.byref(timebase)):
+            raise RuntimeError("Mach CPU timebase unavailable")
+        self.numer, self.denom = timebase.numer, timebase.denom
+        cpu_seconds([], self.numer, self.denom)
         self.lib = ctypes.CDLL("/usr/lib/libproc.dylib", use_errno=True)
         self.lib.proc_listpids.argtypes = [
             ctypes.c_uint32,
@@ -148,12 +178,8 @@ class GroupObserver:
             records.append((pid, usage))
         # Reaped descendants are counted by their still-live ancestor. A live
         # child has not yet been added to its parent's reaped-child counters.
-        cpu = (
-            sum(
-                u.user + u.system + u.child_user + u.child_system
-                for _, u in records
-            )
-            / 1e9
+        cpu = cpu_seconds(
+            [usage for _, usage in records], self.numer, self.denom
         )
         return dict(
             pids=inventory,
@@ -243,7 +269,8 @@ def guard(request, pipe, receipt):
                     sampled_peak_threads=peak_threads,
                     wall=time.monotonic() - started,
                     cpu_scope=(
-                        "process CPU incl native threads + reaped "
+                        "Mach-timebase-converted process CPU incl native "
+                        "threads + reaped "
                         "descendants; live snapshots"
                     ),
                 ),

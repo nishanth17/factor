@@ -216,8 +216,12 @@ class NativePacket:
                 if self.mode == "auto":
                     self.unavailable = True
                     return False
+                backend = (
+                    "OpenMP team" if self.variant == "openmp" else "C/GMP"
+                )
                 raise BackendUnavailableError(
-                    "native ECM unavailable; build v2.ecm.native.build"
+                    f"native ECM {backend} backend unavailable; "
+                    "build v2.ecm.native.build explicitly"
                 ) from error
             raise
 

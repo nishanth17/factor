@@ -143,3 +143,55 @@ class OwnershipTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CpuAccountingTests(unittest.TestCase):
+    def test_absolute_ticks_convert_process_and_reaped_cpu_once(self):
+        from v2.benchmarks.ecm.b4a.ownership import Usage, cpu_seconds
+
+        parent = Usage(
+            user=24_000_000,
+            system=12_000_000,
+            child_user=6_000_000,
+            child_system=6_000_000,
+        )
+        self.assertEqual(cpu_seconds([parent], 125, 3), 2)
+        # A live child's process total is separate from already-reaped work.
+        child = Usage(user=24_000_000)
+        self.assertEqual(cpu_seconds([parent, child], 125, 3), 3)
+        # Intel's 1:1 clock is supported without an arm64 frequency constant.
+        self.assertEqual(cpu_seconds([Usage(user=1_000_000_000)], 1, 1), 1)
+        for numer, denom in ((0, 1), (1, 0)):
+            with self.assertRaisesRegex(RuntimeError, "timebase"):
+                cpu_seconds([parent], numer, denom)
+
+    def test_observer_does_not_add_native_thread_cpu_twice(self):
+        import ctypes
+        from types import SimpleNamespace
+
+        from v2.benchmarks.ecm.b4a.ownership import TaskInfo, Usage
+
+        def pids(kind, group, buffer, capacity):
+            buffer[0] = 1234
+            return ctypes.sizeof(ctypes.c_int)
+
+        def usage(pid, version, pointer):
+            result = ctypes.cast(pointer, ctypes.POINTER(Usage)).contents
+            result.user = 24_000_000
+            return 0
+
+        def task(pid, kind, argument, pointer, size):
+            result = ctypes.cast(pointer, ctypes.POINTER(TaskInfo)).contents
+            result.user = result.threads_user = 24_000_000
+            result.thread_count = 4
+            return ctypes.sizeof(TaskInfo)
+
+        observer = object.__new__(GroupObserver)
+        observer.numer, observer.denom = 125, 3
+        observer.lib = SimpleNamespace(
+            proc_listpids=pids, proc_pid_rusage=usage, proc_pidinfo=task
+        )
+        for _ in range(2):
+            sample = observer.sample(1234)
+            self.assertEqual(sample["cpu"], 1)
+            self.assertEqual(sample["threads"], 4)

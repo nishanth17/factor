@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import platform
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -22,6 +23,20 @@ def main():
     args = parser.parse_args()
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("build requires PyPy implementing Python 3.11")
+
+    required = [
+        args.gmp_prefix / "include/gmp.h",
+        args.gmp_prefix / "lib/libgmp.10.dylib",
+    ]
+    if args.openmp_prefix is not None:
+        required += [
+            args.openmp_prefix / "include/omp.h",
+            args.openmp_prefix / "lib/libomp.dylib",
+        ]
+    for path in required:
+        if not path.is_file():
+            backend = "OpenMP" if "omp" in path.name else "C/GMP"
+            parser.error(f"requested {backend} backend unavailable: {path}")
 
     import cffi
 
@@ -85,6 +100,22 @@ def main():
         cffi=cffi.__version__,
         gmp_prefix=str(args.gmp_prefix.resolve()),
         gmp_runtime=gmp_runtime,
+        gmp_header=str((args.gmp_prefix / "include/gmp.h").resolve()),
+        gmp_header_sha256=sha(args.gmp_prefix / "include/gmp.h"),
+        gmp_header_version=".".join(
+            re.search(
+                r"#define\s+" + name + r"\s+(\d+)",
+                (args.gmp_prefix / "include/gmp.h").read_text(),
+            )[1]
+            for name in (
+                "__GNU_MP_VERSION",
+                "__GNU_MP_VERSION_MINOR",
+                "__GNU_MP_VERSION_PATCHLEVEL",
+            )
+        ),
+        linked_libraries=subprocess.check_output(
+            ["/usr/bin/otool", "-L", str(library)], text=True
+        ),
         gmp_library=str((args.gmp_prefix / "lib/libgmp.10.dylib").resolve()),
         gmp_library_sha256=sha(args.gmp_prefix / "lib/libgmp.10.dylib"),
         source={name: sha(source / name) for name in ("packet.c", "packet.h")},
