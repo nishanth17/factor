@@ -4,7 +4,7 @@ import copy
 import hashlib
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
@@ -47,6 +47,52 @@ def mutate(checkpoint, change):
 
 
 class SIQSTests(unittest.TestCase):
+    def test_partial_statistics_do_not_materialize_retained_id_history(self):
+        from v2.qs import (
+            DoubleLargeSieveConfig,
+            ExtendedYieldSieveConfig,
+            SieveCollector,
+        )
+
+        for collector_type in (
+            SieveConfig,
+            DoubleLargeSieveConfig,
+            ExtendedYieldSieveConfig,
+        ):
+            with self.subTest(collector=collector_type.__name__):
+                bounds = (
+                    {}
+                    if collector_type is SieveConfig
+                    else dict(
+                        large_prime_bound=1000, large_product_bound=10**6
+                    )
+                )
+                collector = collector_type(
+                    residual_bound=1000,
+                    division="full",
+                    **bounds,
+                )
+                job = SIQSJob(
+                    4001 * 5003,
+                    seed=73,
+                    config=configuration(collector=collector),
+                    budget=allowance(),
+                )
+                first = job.run(max_blocks=1)
+                expected = len(job.engine.collector.partial_ids)
+                self.assertGreater(expected, 0)
+                self.assertEqual(first.stats["partials"], expected)
+
+                with patch.object(
+                    SieveCollector,
+                    "partial_ids",
+                    new_callable=PropertyMock,
+                    side_effect=AssertionError("materialized ID history"),
+                ):
+                    paused = job.run(max_blocks=0)
+
+                self.assertEqual(paused.stats["partials"], expected)
+
     def test_shared_families_complete_previously_exhausted_inputs(self):
         for n in (13643477, 16187767, 18513647, 4001 * 5003):
             job = SIQSJob(n, config=configuration(), budget=allowance())

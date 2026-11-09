@@ -33,20 +33,22 @@ class LargerDefaultTests(unittest.TestCase):
                 for signed in (n, -n):
                     self.assertTrue(uses_siqs_defaults(signed))
                     config = default_siqs_config(signed)
-                    if digits < 52:
-                        self.assertIs(type(config), SIQSConfig)
-                        self.assertEqual(config.factor_count, 6)
-                    else:
-                        self.assertIs(type(config), CountedSIQSConfig)
-                        self.assertEqual(
-                            config.base_count, 2500 if digits <= 55 else 5000
-                        )
-                        self.assertEqual(
-                            config.factor_count, 7 if digits <= 55 else 8
-                        )
-                        self.assertEqual(config.multiplier, 0)
-                        self.assertEqual(config.base_bound, 250000)
-                        self.assertEqual(config.gray_limit, 64)
+                    expected = (
+                        (1800, 6)
+                        if digits <= 52
+                        else (2500, 7)
+                        if digits <= 57
+                        else (5000, 8)
+                    )
+                    self.assertIs(type(config), CountedSIQSConfig)
+                    self.assertEqual(
+                        (config.base_count, config.factor_count), expected
+                    )
+                    self.assertEqual(config.multiplier, 0)
+                    self.assertEqual(config.base_bound, 250000)
+                    self.assertEqual(
+                        config.gray_limit, 32 if digits <= 52 else 64
+                    )
                     self.assertEqual(config.half_width, 65536)
                     self.assertFalse(hasattr(config, "memory_bytes"))
                     self.assertIsNone(default_siqs_budget(signed).seconds)

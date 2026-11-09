@@ -49,7 +49,7 @@ def _coupled_policies(config):
 
 
 @removed_arguments(("memory_bytes",))
-def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
+def legacy_siqs_config(n, *, backend="python-int", recipe="calibrated"):
     """Select coupled policies at every size without enlarging grants.
 
     The existing 40 and 50–60-digit parameter/resource presets remain intact.
@@ -126,6 +126,26 @@ def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
         ),
     )
     return _coupled_policies(config)
+
+
+@removed_arguments(("memory_bytes",))
+def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
+    """Select Y0 for native 50+ digit QS; retain explicit reference recipes.
+
+    Between defined numerical geometries, inherit the nearest row, preferring
+    the smaller size on a tie. Above 70 is extrapolated; existing 75/80
+    geometry stays intact. Smaller sizes and other backends retain their
+    existing numerical policy.
+    """
+    utils.require_integer(n)
+    if recipe not in ("calibrated", "reference"):
+        raise ValueError("unknown SIQS recipe")
+    if backend != "python-int" or abs(n) < 10**49 or recipe == "reference":
+        return legacy_siqs_config(n, backend=backend, recipe=recipe)
+
+    from .production_policy import y0_config
+
+    return y0_config(n)
 
 
 def default_siqs_budget(n, *, backend="python-int"):

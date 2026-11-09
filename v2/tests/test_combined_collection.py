@@ -4,13 +4,16 @@ import hashlib
 import itertools
 import json
 import unittest
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from math import prod
 from pathlib import Path
 from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     decode_historical_siqs as _decode_siqs_config,
+)
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
 )
 from v2.execution.budget import BudgetExhaustedError
 from v2.qs import Polynomial, SIQSJob, build_factor_base
@@ -144,7 +147,7 @@ class CombinedCollectionTests(unittest.TestCase):
         )
         before = collector._workspace
         with patch(
-            "v2.qs.sparse_queue.build",
+            "v2.qs.scalar_kernels.build_native",
             side_effect=BudgetExhaustedError("work"),
         ):
             result = collector.collect(-71, 80)

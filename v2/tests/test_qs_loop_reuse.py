@@ -2,9 +2,11 @@
 
 import unittest
 from collections import Counter
-from dataclasses import replace
 from unittest.mock import patch
 
+from v2.benchmarks.infrastructure.resource_control import (
+    historical_replace as replace,
+)
 from v2.execution.budget import BudgetExhaustedError
 from v2.execution.work_budget import PollingBudget
 from v2.qs import Polynomial, SieveCollector, SieveConfig, build_factor_base
@@ -16,7 +18,7 @@ from v2.tests.resource_stops import InterruptBudget as Budget
 from v2.tests.test_qs import unlimited_budget
 
 
-def queue_worker(width):
+def queue_worker(width, marking="sparse"):
     base = build_factor_base(1009 * 1013, bound=100).factor_base
     polynomial = Polynomial(base.n, 1, 1, 0)
     worker = SieveCollector(
@@ -25,6 +27,7 @@ def queue_worker(width):
         budget=unlimited_budget(),
         config=SieveConfig(
             division="bucket",
+            marking=marking,
             score_policy="powers",
             block_width=width,
             sparse_queue_bytes=2**20,

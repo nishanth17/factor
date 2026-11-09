@@ -14,14 +14,18 @@ from ..execution.resources import (
 from ..execution.work_budget import PollingBudget
 from . import collector_kernels as kernels
 from .families import verify_polynomial_roots
-from .hit_words import MAX_HIT_BYTES, WordHits
+from .hit_words import MAX_EXTENDED_HIT_BYTES, MAX_HIT_BYTES, WordHits
 from .polynomial import (
     MAX_COEFFICIENT_BITS,
     MAX_POSITION_BITS,
     checked_position,
     polynomial_roots,
 )
-from .power_reuse import MAX_TRANSFER_BYTES, RootTransfers
+from .power_reuse import (
+    MAX_EXTENDED_TRANSFER_BYTES,
+    MAX_TRANSFER_BYTES,
+    RootTransfers,
+)
 from .power_sieve import HenselInverses, prime_power_roots
 from .relations import (
     AtomicRelation,
@@ -42,6 +46,8 @@ MAX_BLOCK_WIDTH = 4096
 MAX_WINDOW_WIDTH = 1_000_000
 MAX_STORED_ATOMS = 65536
 MAX_METADATA_CHUNK = 1024
+MAX_SHARED_INVERSE_BYTES = 8 * 2**20
+MAX_WIDE_INVERSE_BYTES = 32 * 2**20
 
 
 @removed_arguments(
@@ -504,11 +510,19 @@ class SieveCollector:
             self._scores = [0] * width
 
         self._hits = [0] * width
+        self._group_lease = None
         self._resieved = {}
         self._scratch_bytes = 0
         self._scratch_peak_bytes = 0
         self._omitted_allowance = 0
         self._lift_inverses = {}
+        from .power_sieve_native import prime_power_roots as native_power_roots
+
+        self._power_roots = (
+            prime_power_roots
+            if "pruned_transfers" in self.config._kernels
+            else native_power_roots
+        )
         if "presieve_powers" in self.config._kernels:
             self._presieve = kernels.PowerPresieve()
         elif "presieve" in self.config._kernels:
@@ -618,9 +632,15 @@ class SieveCollector:
         self._shared_lift_inverses = None
         self._reuse_workspace = 0
         inverse_bytes = 256 + 512 * count
+        wide_inverses = "wide_inverses" in self.config._kernels
+        inverse_limit = (
+            MAX_WIDE_INVERSE_BYTES
+            if wide_inverses
+            else MAX_SHARED_INVERSE_BYTES
+        )
         if (
             self.config.score_policy in ("powers", "fixed")
-            and inverse_bytes <= 8 * 2**20
+            and inverse_bytes <= inverse_limit
         ):
             self._workspace += inverse_bytes
             self._reuse_workspace += inverse_bytes
@@ -642,28 +662,53 @@ class SieveCollector:
                 self._workspace += reserved
                 self._reuse_workspace += reserved
         self._power_transfers = None
-        transfer_bytes = min(MAX_TRANSFER_BYTES, 65536 + 4096 * count)
-        512 * count + 32768
+        wide_transfers = "wide_transfers" in self.config._kernels
+        transfer_limit = (
+            MAX_EXTENDED_TRANSFER_BYTES
+            if wide_transfers
+            else MAX_TRANSFER_BYTES
+        )
+        # Multiple powers of one prime own separate cached pairs. A larger
+        # experiment therefore funds more than one entry per base member;
+        # the default capacity and refusal behavior remain unchanged.
+        transfer_bytes = min(
+            transfer_limit, 65536 + (8192 if wide_transfers else 4096) * count
+        )
         if self.config.score_policy in ("powers", "fixed"):
             # Leave the mandatory old/new polynomial metadata coexistence
             # funded; an optional cache must not prevent the next switch.
             self._workspace += transfer_bytes
             self._reuse_workspace += transfer_bytes
-            self._power_transfers = RootTransfers(transfer_bytes)
+            self._power_transfers = RootTransfers(
+                transfer_bytes,
+                capacity_limit=transfer_limit,
+                pruned_replay="pruned_transfers" in self.config._kernels,
+            )
             self._power_transfers.bind(polynomial)
         self._word_hits = None
         hit_bytes = WordHits.reservation(count, width)
-        WordHits.construction_work(count, width)
+        hit_limit = (
+            MAX_EXTENDED_HIT_BYTES
+            if "wide_hits" in self.config._kernels
+            else MAX_HIT_BYTES
+        )
         if (
             count > 60
             and self.config.score_backend == "list"
             and self.config.division == "bucket"
             and self.config.score_policy in ("powers", "fixed")
-            and hit_bytes <= MAX_HIT_BYTES
+            and hit_bytes <= hit_limit
         ):
             # Existing helpers keep priority. Construction and lazy reads
             # have explicit extra work; scarce memory keeps the list path.
-            self._word_hits = WordHits(count, self._hits, self.budget)
+            word_type = WordHits
+            if "byte_stamps" in self.config._kernels:
+                from .byte_hit_words import ByteStampWordHits
+
+                word_type = ByteStampWordHits
+            self._word_hits = word_type(
+                count, self._hits, self.budget, byte_limit=hit_limit
+            )
             self._hits = self._word_hits
             self._workspace += hit_bytes
             self._reuse_workspace += hit_bytes
@@ -684,6 +729,23 @@ class SieveCollector:
                 for entry in factor_base.entries[self._sparse_split :]
             )
             self._sparse_square = isqrt(target) ** 2 == target
+
+        # Bind optional implementations once. Default block/root traversals
+        # must not repeatedly test disabled experimental mechanisms.
+        from types import MethodType
+
+        from . import scalar_kernels
+        from .sparse_queue import sieve as optional_sparse_sieve
+
+        if "presieve_powers" not in self.config._kernels:
+            self._sieve_direct = MethodType(scalar_kernels.direct_scalar, self)
+        if "scan_fused" not in self.config._kernels:
+            self._collect = MethodType(scalar_kernels.collect_scalar, self)
+        self._sparse_sieve = (
+            scalar_kernels.sieve_native
+            if "packed_queue" not in self.config._kernels
+            else optional_sparse_sieve
+        )
 
     def _recovery_mask(self, index):
         """Reuse a funded immutable prefix; larger indices stay exact."""
@@ -845,7 +907,7 @@ class SieveCollector:
                 window_lo, window_hi, window_maximum = self._plan_window
                 plan, reserve = [], 256
 
-                for mark in prime_power_roots(
+                for mark in self._power_roots(
                     self.polynomial,
                     roots,
                     window_maximum,
@@ -885,7 +947,7 @@ class SieveCollector:
                 stats["plan_replays"] += 1
                 return plan
 
-        return prime_power_roots(
+        return self._power_roots(
             self.polynomial,
             roots,
             maximum,
@@ -1004,9 +1066,7 @@ class SieveCollector:
             reserve_batch(self, lo, hi)
         self._piecewise_thresholds = None
         if self.config.sparse_queue_bytes:
-            from .sparse_queue import sieve
-
-            threshold = sieve(self, lo, hi, stats)
+            threshold = self._sparse_sieve(self, lo, hi, stats)
         else:
             threshold = self._sieve_direct(lo, hi, stats)
         if self._word_hits is not None and self._hits is self._word_hits:
@@ -1068,6 +1128,7 @@ class SieveCollector:
             and self.config.score_backend == "list"
         )
         words = self._word_hits if self._hits is self._word_hits else None
+        grouped_budget = self._group_lease
         if words is not None:
             words.begin(initial_hit, self.budget)
         # Both periodic implementations replace the full active slices,
@@ -1140,7 +1201,7 @@ class SieveCollector:
                     marks = (
                         self._power_marks(index, maximum, lo, hi, stats)
                         if self.config.power_plan_bytes
-                        else prime_power_roots(
+                        else self._power_roots(
                             self.polynomial,
                             roots,
                             maximum,
@@ -1171,6 +1232,51 @@ class SieveCollector:
                             stats["power_hits"] += width
                             first_level = False
                             continue
+                        if (
+                            grouped_budget is not None
+                            and density
+                            and first_level
+                            and buckets
+                            and words is not None
+                            and len(lifted) == 2
+                            and index not in presieved
+                            and not power_period
+                        ):
+                            first_hits = range(
+                                (lifted[0] - lo) % modulus, width, modulus
+                            )
+                            second_hits = range(
+                                (lifted[1] - lo) % modulus, width, modulus
+                            )
+                            first_count = len(first_hits)
+                            second_count = len(second_hits)
+                            if grouped_budget._precharge_marking_pair(
+                                first_count + 1, second_count + 1
+                            ):
+                                # These are the same two logical actions,
+                                # already inside a checked polling interval.
+                                # Preserve their original marking order and
+                                # keep scalar refusal behavior on boundaries.
+                                stats["root_hits"] += (
+                                    first_count + second_count
+                                )
+                                stats["power_hits"] += (
+                                    first_count + second_count
+                                )
+                                words.add(
+                                    index,
+                                    first_hits,
+                                    self._scores,
+                                    power_weight,
+                                )
+                                words.add(
+                                    index,
+                                    second_hits,
+                                    self._scores,
+                                    power_weight,
+                                )
+                                first_level = False
+                                continue
                         for root in lifted:
                             if (first_level and index in presieved) or (
                                 power_period

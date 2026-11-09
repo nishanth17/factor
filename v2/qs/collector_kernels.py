@@ -1,10 +1,11 @@
 """Exact density, bounded periodic scores and fused scanning.
 
 Selectors are explicit; automatic adoption requires separate acceptance.
+The packed_queue component changes sparse event storage only; scores, event
+order, paid work and conservative reservations remain identical.
 """
 
 from ..common.arithmetic import gcd
-from .power_sieve import prime_power_roots
 
 KERNELS = (
     "density",
@@ -13,6 +14,12 @@ KERNELS = (
     "unroll4",
     "scan_fused",
     "parity_two",
+    "packed_queue",
+    "byte_stamps",
+    "wide_hits",
+    "wide_inverses",
+    "wide_transfers",
+    "pruned_transfers",
 )
 SCAN_CHUNK = 64
 
@@ -194,7 +201,7 @@ class PowerPresieve:
             scores, hits, levels = [0] * period, [0] * period, set()
             for index, limit in limits.items():
                 weight = collector._logs[index]
-                marks = prime_power_roots(
+                marks = collector._power_roots(
                     collector.polynomial,
                     collector._roots[index],
                     limit,

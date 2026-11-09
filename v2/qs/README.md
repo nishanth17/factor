@@ -123,5 +123,12 @@ storage does not automatically spill the growing relation graph.
 | [parallel.py](parallel.py) | Experimental bounded family workers and central result verification |
 
 [QS benchmarks](../benchmarks/qs/README.md) describe the runners.
+
+The incumbent collector binds scalar marking, scanning and native sparse
+queue implementations at construction. Disabled grouped charging, fused
+scanning, packed queues and pruned replay add no option guards to those
+selected block/root loops. Optional implementations remain available through
+their explicit selectors. `scalar_kernels.py` contains static specializations;
+the generic implementations remain the arithmetic and work-accounting oracle.
 [Results](../benchmarks/RESULTS.md) retain measurement scope;
 [STATUS](../STATUS.md) and [ROADMAP](../ROADMAP.md) track current work.

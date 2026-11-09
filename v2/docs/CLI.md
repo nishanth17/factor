@@ -114,3 +114,17 @@ resource version `observed-resources/saved-history-v3`. Old resource schemas are
 refused; no migration is provided. Switching an automatic snapshot to serial
 mid-search is rejected; use a fresh run for a different execution policy.
 See [adoption limits](../POLICY.md#recorded-automatic-ecm-adoption-exception--5-november-2026).
+
+## Selected process QS and serial override
+
+`--qs-workers auto` is the default when SIQS is selected. It uses nearest
+worker rows 40:C4/p4, 50:C4/p8, 55:C4/p16, 60:C8/p16, 65:C14/p64 and
+70:C8/p64, with ties to the smaller size and serial below 40. Above 70 is
+extrapolated. Pools are started only at SIQS handoff; existing ECM choices
+and automatic portfolio SIQS eligibility do not change.
+
+Use `--qs-workers serial` to force S0 while retaining the same Y0 numerical
+policy. For example, `pypy3 -m v2.factor N --method siqs --qs-workers serial`.
+Saved recipes are restored without reselecting; changing worker mode during
+resume is refused. Non-native or unsupported explicit relation engines retain
+their serial implementation.

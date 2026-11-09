@@ -33,14 +33,14 @@ by this document.
 ## In progress
 
 Implementation snapshot checked on 6 November 2026 against mainline
-`bf243dba2edef25c74812887f45473036b4db845`. The six workstreams below are
+`bf243dba2edef25c74812887f45473036b4db845`. The remaining workstreams below are
 unfinished tasks with isolated implementations; none of their task code is
 integrated by this documentation update. A8 and D1 share one worktree but keep
 their separate contracts. This is a checkpoint inventory, not a claim that a
 process is currently running or that an experimental acceptance gate passed.
 In progress remains acceptance-open; phase-catalogue gates below still apply.
 
-Current preparation positions are A7a (2), B4a (3), F3 (11), F2 (14), and
+A7a is Done. Current preparation positions retain B4a (3), F3 (11), F2 (14), and
 A8/D1 within the matrix branch (16). Adding H2 at rank 7 shifts the previous
 rank-7-and-later items by one; their relative order and task scopes are retained.
 Detailed local entry points below are in each named task worktree, not mainline.
@@ -48,8 +48,8 @@ Detailed local entry points below are in each named task worktree, not mainline.
 **B12 → F4 has an unfinished ready-first startup follow-up.** Its earlier
 process-ECM delivery and selected defaults remain recorded in the
 [completed register](#completed-register), but do not validate this new
-prototype. Native ECM continues under B4a; current-collector QS workers
-continue under A7a. Broader portfolio, balanced completion and population-p90
+prototype. Native ECM continues under B4a; the selected current-collector
+QS worker integration is recorded under completed A7a. Broader portfolio, balanced completion and population-p90
 evidence remain separate acceptance follow-ups.
 
 | ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
@@ -59,7 +59,6 @@ evidence remain separate acceptance follow-ups.
 | A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **In progress with D1.** Exact operator/lifting adapters, independent oracles and fixtures are implemented. Current nonempty target-size fixtures, heavy QA and capacity measurements remain open; no matrix-memory improvement is established. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) ; [implementation and remaining work](#a8-d1-in-progress) |
 | D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **In progress after the A8 contract.** Genuine selected-block recurrence, original-kernel correction, bounded restarts/resume and default-off ablations are implemented. Complete QA, representative matrix measurements, confirmation and integration remain open. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) ; [implementation and remaining work](#a8-d1-in-progress) |
 | F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **In progress; opt-in package preparation.** Suyama-11, enhanced Edwards/setup/scalar options and scheduled execution/plan reuse are committed. Further optimization edits are uncommitted at this snapshot; heavy QA, feasibility, yield/cost evidence and integration remain pending. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) ; [implementation and remaining work](#f2-in-progress) |
-| A7a — current-collector parallel SIQS collection | Adapt A7 collection to integrated C9a/C10a policies; compare processes and conditional B5a native threads under the [current-worker contract](#a7a--current-collector-parallel-relation-collection). | Completed A7; selected B12 lease/RNG/resource contract; current committed serial feasibility; B5a ABI only for the native-thread alternative; no F4 win or E1 prerequisite | **In progress; isolated implementation and exploratory experiments.** Current-collector workers and combined lease/state/transport/verification/scheduling options are implemented. Remaining diagnostics, fresh confirmation, integration and adoption gates are open. | Sol / **xhigh** implementation, ownership and experiment design; separately selected new graph/provenance mathematics uses Astra / **xhigh**; optional separate Sol / **high** frozen execution | [current parallel QS gates](#a7a--current-collector-parallel-relation-collection); [A7 framework](qs/parallel.py) ; [implementation and remaining work](#a7a-in-progress) |
 | B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **In progress; isolated optional native executor.** Scalar GMP and native-team sources are prepared and rebased; Python-side committed-only QA passes. Native lifecycle admission, complete-cost measurements, recalibration and integration remain pending. The scoped NEON loss is retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
 
 <a id="b12-f4-in-progress"></a>
@@ -172,30 +171,6 @@ does not establish a free increase in B1.
   uncommitted implementation edits observed. Local entries:
   `v2/audit/f2/focused/README.md` and `v2/audit/f2/headroom/README.md`.
   Existing prospective panels are unexecuted; no package/yield win is established.
-
-<a id="a7a-in-progress"></a>
-
-### A7a — current-collector parallel QS
-
-- **Implemented on the task branch:** calibrated growing-DLP/current-collector
-  worker compatibility, checked parent admission, finite leases and drained
-  resume. Independent default-off packet-lease, persistent-state, packed
-  transport, worker/batch-verification and lookahead/whole-family scheduling
-  options are implemented. Combined Stage 1 and targeted L/R/S ablations have
-  exploratory complete-factor observations at 60/70 digits; censored controls,
-  exposed inputs, drift and CPU costs remain part of the evidence.
-- **Remaining:** complete the bounded K3 recovery/stop-poll diagnostics,
-  outstanding T/V removals and only justified interactions; explain the worker
-  CPU/packet-wall gap before further changes. Revalidate the resulting source,
-  freeze fresh confirmation with the strong serial/P4 controls, and settle
-  finite-resource, restart and cheap-path behavior before integration/adoption.
-  No optimal worker count or general factoring speedup is established.
-  Native QS kernels/threads and ECM-to-QS pool reuse remain separately scoped.
-- **Checkpoint:** `codex/a7a-current-qs-workers` at `37c4cae`.
-  Local entries: that worktree's `v2/STATUS.md`,
-  `v2/benchmarks/RESULTS.md` combined-process section, and
-  `v2/audit/a7a/K3-approved-plan-20261106-01.json`. Older handoffs retain their
-  historical state and are not evidence of current process or lock ownership.
 
 <a id="b4a-in-progress"></a>
 
@@ -419,6 +394,11 @@ authorizes no runtime experiment or native dependency installation.
 | C1a — cheaper SLP anchor reuse follow-up | Compare an anchor-only SLP implementation or changed retention regime (AP01) with ordinary SLP and the existing graph-SLP/DLP controls. Prove residual cancellation and bounded pinned ownership without adopting source dependency-discard policies. | Completed C1; C9 decision; a new cost/retention hypothesis | **Conditional.** Priority / trigger: Low/conditional. C1 graph-SLP training totaled 20.055 s versus 20.160 s for SLP, with no established win; DLP already retains anchors. Do not repeat that arm or promote on raw cancellation counts. | Astra / **xhigh** | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#new-source-derived-deltas--separate-follow-up-items) |
 
 #### A7a — current-collector parallel relation collection
+
+**Done for the selected pure-PyPy process integration, 9 November 2026.**
+See the [completion record](#a7a-completion). The original design requirements
+below are retained as historical context, not an open execution grant. Native
+thread work remains a separately selected follow-up after B5a.
 
 The wall-time and repeated-experiment objectives make this an immediate QS
 workstream following the delivered B12/F4 scope. Completed P3.6/A7 supplied
@@ -1200,7 +1180,7 @@ Done for the bounded core; see the completed register below.
 | --- | --- | --- | --- | --- |
 | P6.1 | Conditional | F2 | Whole curve-family/stage-one cost/yield, nonunit maps and chosen-point order; isolated feasibility can precede E1, which remains for combined acceptance. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p61--compare-edwardswindowed-and-torsion-aware-ecm) |
 | P6.2 | Open selected F3/F7 design; other implementations Conditional | F3/F5/F6/F7/F8/F9 | F3 owns exact polynomial ECM kernels/trees; F8 owns distinct fast P±1; F9 is the conditional genus-two branch. F7 and C9a own their SIQS/batch domains; F6 higher arity has its own proof. Isolated F2/F3/F4/F6/F7 feasibility uses current controls without E1; later combined acceptance and F5 retain their gates. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p62--investigate-polynomial-continuations-and-richer-relation-collectors) |
-| P6.3 | Delivered ECM core Done; ready-first startup In progress; QS adaptation Open | B12/A7a/F4 | B12/F4 delivered stable bounded process ECM and the selected automatic policy. Its [ready-first prototype](#b12-f4-in-progress) still needs runtime QA and a startup comparison. A7a retains current-collector QS work; G1 mixed-engine concurrency and E1 combined portfolio acceptance remain separate. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
+| P6.3 | Delivered ECM/QS process integrations Done; ready-first startup In progress | B12/A7a/F4 | B12/F4 delivered stable bounded process ECM and the selected automatic policy. Its [ready-first prototype](#b12-f4-in-progress) still needs runtime QA and a startup comparison. A7a current-collector QS is Done; G1 mixed-engine concurrency and E1 combined portfolio acceptance remain separate. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
 | P6.4 | Open | C11 protocol preparation; I1 final publication | Prepare comparable pinned Python competitor feasibility now, separating runtime/backend/worker classes and complete versus factor-one outcomes. Final claims retain H1, selected P6 decisions, committed-only validation and fresh matched confirmation. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p64--publish-reproducible-workload-specific-results) |
 
 ### Phase 7 — Implement and scale GNFS
@@ -1332,6 +1312,151 @@ each linked location. Remaining scopes are listed above.
 <a id="c9a-completion"></a>
 
 - **C9a** — 4 November 2026; **Done, integrated; policies remain opt-in**; exact complete60/70 observations are exploratory, with one exposed modulus per size and no fresh confirmation. Historical timing flags remain recorded; future timing judgments use calibrated variability rather than the uncalibrated 15% veto. C9b owns further validation/headroom. [Results](benchmarks/RESULTS.md#c9a-preparation).
+
+<a id="a7a-in-progress"></a>
+<a id="a7a-completion"></a>
+
+### A7a — Done: current-collector parallel QS
+
+Local integration is explicitly selected on 9 November 2026: Y0 numerical
+policy, nearest-row process counts/packets (ties to smaller size), and an
+explicit serial override. Rows are S0 below 40; C4/p4 at 40, C4/p8 at 50,
+C4/p16 at 55, C8/p16 at 60, C14/p64 at 65 and C8/p64 at 70. Above 70 is
+extrapolated. No ECM or portfolio eligibility default changes are included.
+
+G4 supports 1.97x/3.10x at 55/65 versus Y0 S0. At 70 the completed pairs
+are about 3x, with C10 completing 3/3 against S0's 2/3; retain censoring.
+The selected 50/60/65/70 recipes come from three-input worker calibration.
+The 65/70 selections differ from G4 C10 and are faster/tied within drift;
+this is not exact-recipe fresh confirmation. C6@60 and C12@65 remain possible
+cheaper ties, with only input-0 evidence from the stopped extension. No
+completed odd-count or global-optimum claim follows. New 75/80 probes stay
+deferred until after B5a. C3a/B12 dispatch and cost tables need revalidation.
+Full committed-only premerge/master QA, including benchmark imports, is
+recorded locally in `results/a7a/final-merge-20261109/`. Historical reports
+below retain their original scope and adoption limits.
+
+- **Slim G4 and reduced worker race complete (8 November):** G4 confirms
+  scoped S0 gains at 55/65 and preserves 70 censoring. The subsequent 36-call
+  race retains provisional C4/C4/C8/C14/C8 at 50/55/60/65/70 with frozen
+  packets; at 70 all counts tie inside 7.42% A/A drift, so C8 wins the
+  fewer-worker tie-break. See [results](benchmarks/RESULTS.md#a7a-reduced-worker-count-race-8-november-2026).
+  The directional extension is stopped and reported on 9 November: all
+  19 input-0 factorizations complete, but 12.20% drift at 70 triggers the
+  predeclared 10% stop before continuation inputs. C6/C8 at 60 and C12/C14
+  at 65 are single-input ties; C16 loses at 65 and the 70 comparisons are
+  inside drift. No C18/C20 full-factor calls or three-input extension choices
+  are established. Preserve earlier calibration; no automatic restart.
+  Twenty-worker committed-source QA and the C20 timeline smoke pass; the
+  [frozen local protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
+  records the conditional catalogue, drift-aware tie pruning and resources.
+  This historical extension made no adoption decision; final local adoption
+  is recorded above. No G4-heldout selection or new 75/80 probe is included.
+
+
+- **75/80 probes reported (8 November):** both single-input C10/p64 recipes
+  pass the amended 32 GiB bookkeeping grant (1 GiB worker / 256 MiB runtime,
+  6 GiB parent, 256 MiB checkpoints). Both stop with internal QS `memory_limit`
+  before filtering or a matrix solve; neither RSS guard nor wall/CPU grants
+  cause the stops. Exact attribution is missing; physical exhaustion is not
+  established. The terminal QS path clears collection state before outer
+  checkpointing. Preserve these failures; expose the precise refusal and
+  retain live state before proposing another expensive capacity experiment.
+  No retry or adoption. QA `5526118`: 1,579 tests, nine optional skips, lint
+  and 292 imports. Canonical local report in main:
+  `v2/benchmarks/results/a7a/probes-20261108/REPORT.md`.
+
+- **Restricted G3 reported (8 November):** the approved four-row worker/packet
+  grid completes all 100 current-source calls on `60bfd95`. Experimental
+  process recipes are C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold and
+  C10/p64 at 70 cold. Control drift leaves the 55-digit ranking inconclusive;
+  nonadvanced 70 recipes have insufficient input coverage. Construction-time
+  specialization removes disabled guards from default block/root loops,
+  including transitive root lifting. Exact 50/65 prefix checks pass; full
+  committed-only QA passes 1,575 tests (nine optional skips), lint and 292
+  imports. Native stamps remain selected. Current evidence is calibration,
+  not fresh mainline confirmation, adoption or a global optimum. Intermediate
+  50/60/65 proposals remain unverified. Static 75/80 candidate derivations
+  exceed their prescribed owned-memory allowance; neither probe was run.
+  Stage stopped and lock released after cleanup. Canonical local report:
+  `v2/benchmarks/results/a7a/g3-restricted-20261107-r2/REPORT.md` in main.
+
+- **G2H complete (7 November):** independent packet references include N=10;
+  static family affinity, grouped exact marking leases and byte hit stamps
+  have explicit implementations and exactness tests. Full comparisons and
+  the requested three-input byte/native remeasurement remain inconclusive
+  about new wall-time gains. Retain the existing reference mechanisms for
+  now. Current cold coverage completes across 40–70 digits; G3/G2K/G4 and
+  75/80 probes remain separately gated. All G2H/G3 process arms now require
+  worker timelines; G4 disables them. Committed-only QA `1b5ab81` passes
+  1,572 tests (nine optional skips), lint and imports. The final 36-call
+  intermediate/final fixed-work comparison passes the requested Tier 1 3%
+  aggregate criterion with identical signatures/scanned work. Default-path
+  touches are explicitly audited. Final closure and fixed options:
+  `v2/audit/a7a/g2h-closure-20261107/REPORT.md`; preceding full evidence and
+  prices: `v2/audit/a7a/g2h-report-20261107-r2/REPORT.md`.
+
+- **G2 reported (7 November):** the approved corrected continuation covers all
+  24 cold/warm arm cells. Serial/process controls complete every row; literal
+  mainline is incomplete at 60/65/70. Single balanced inputs establish costs
+  and feasibility, not per-regime winners. The bounded parent/worker capture
+  is analyzed without rerunning factoring; scope repair `88430a5` retains the
+  failed review/charge and all-process requirements for full captures. QA:
+  1,548 tests (9 optional skips), lint and 291 imports, including separately
+  passing host-inspection tests. The subsequent overhead stage is reported
+  above; anchor tuning, confirmation, probes and adoption remain pending. Local
+  report and priced next stage: `v2/audit/a7a/g2-report-20261107/REPORT.md`.
+
+- **G1 preparation gate (7 November):** bounded stage driver, certified fresh
+  confirmation corpus, literal-mainline adapter and optional timeline/progress
+  observers validated on `62854f9`. Committed-only QA passes 1,546 tests
+  (9 optional skips), lint and 291 benchmark imports. G2 is reported above;
+  search, confirmation and integration remain open. Detailed
+  local gate report: `v2/audit/a7a/g1-20261107/REPORT.md`.
+
+- **Implemented on the task branch:** calibrated growing-DLP/current-collector
+  worker compatibility, checked parent admission, finite leases and drained
+  resume. Independent default-off packet-lease, persistent-state, packed
+  transport, worker/batch-verification and lookahead/whole-family scheduling
+  options are implemented. Combined Stage 1 and targeted L/R/S ablations have
+  exploratory complete-factor observations at 60/70 digits; censored controls,
+  exposed inputs, drift and CPU costs remain part of the evidence.
+- **Current continuation:** refreshed onto mainline `e62ec18` with private
+  semaphore stop checks, optional parent coefficient reuse and bounded cache
+  alternatives. Worker CPU/packet-wall utilization reaches approximately one
+  in representative captures after the stop-check repair. Every new clean
+  repetition has a matching parent/all-worker CPU diagnostic, owned RSS and
+  parent/representative-worker heap. A fresh, certified corpus separates
+  calibration and confirmation at nine 40–80-digit anchors. Full 60/70-digit
+  feasibility, inconclusive cache/GC screens and an exploratory joint starting
+  design are recorded in
+  [results](benchmarks/RESULTS.md#a7a-current-mainline-feasibility-6-november-2026).
+  The separately identified continuation completes all 92 planned cells with
+  matched diagnostics, including opposite-order joint reruns, a third balanced
+  60-digit training input, packet refinements, full 62-digit feasibility and
+  fresh-process complete costs. C8/p16 remains the provisional 60-digit
+  incumbent; close six-/ten-worker alternatives are not globally rejected.
+- **Remaining:** resolve measurement drift with matched ordering and host
+  pressure records and finish per-regime joint count/packet/feature selection.
+  The earlier failed gates remain historical. Subsequent controls show an
+  initial ramp and tighter later timings, while a serial arm can cool the host
+  before its closing control. Endpoint agreement alone does not bound middle
+  calls. Separate transient/sustained conditions from PyPy warmup and retain
+  the entire sequence; no confirmed all-regime routing table exists.
+  Establish useful full-factor feasibility at 75/80 digits. The shared
+  cofactor queue remains unimplemented; price it against measured recovery
+  costs rather than assuming a gain. Freeze
+  independent confirmation and validate cold admission, finite resources and
+  restart before integration/adoption. No optimal count or general factoring
+  speedup is established. Native QS kernels/threads remain B5a work;
+  ECM-to-QS pool reuse retains its separate owner.
+- **Checkpoint:** `codex/a7a-regime-tuning`; committed QA `d9443d9` passes
+  1,539 tests (9 skips), lint and 285 benchmark imports. Experimental source
+  `ae1cfd9` changes only documentation after that QA; joint design `d389c17`.
+  Local entry: `v2/audit/a7a/HANDOFF.md` in the continuation worktree. The old
+  `codex/a7a-current-qs-workers` evidence and protocols remain preserved.
+  Historical checkpoints do not assert current process or lock ownership.
+
 
 ## Documentation history and local evidence
 

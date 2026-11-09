@@ -248,3 +248,119 @@ B4a's owned-group CPU observer converts Mach absolute counters through the
 host timebase. Process totals include native-thread CPU; thread totals are not
 added again. Native build manifests retain GMP header/runtime identities and
 actual linked libraries. Missing explicit native backends report named errors.
+
+## Current QS workers and selected defaults
+
+`v2.qs.current_parallel.CurrentParallelSIQSJob` accepts a concrete current
+`SIQSConfig` or `CountedSIQSConfig`, a root `Budget`, and `QSWorkerConfig`.
+Growing DLP and the C9a cost-report configuration are supported. The interface
+preserves width, multiplier, parity/sign, roots, queues and exact recovery,
+with one authoritative parent relation/partial/cycle store.
+
+`QSWorkerConfig(workers=1)` through `workers=20` select spawned PyPy3.11
+processes; counts above the host's ten cores are explicit oversubscription
+experiments. `mode="serial"` executes the same packets locally. Pass an explicit
+`CollectionPool` to retain processes across jobs. The portfolio accepts
+`factorize_bounded(..., qs_workers=settings, qs_pool=pool)` at SIQS handoff,
+including recursive cofactors. Omitted `qs_workers` selects the digit-based
+process recipe below; explicit `qs_workers=None` forces serial S0. Retained ECM and QS
+processes share the root's observed wall, aggregate CPU and current-tree RSS.
+There are no parent/worker memory reservations, provenance/history quotas,
+prepaid work/CPU leases or aggregate logical-byte admission checks. Former
+resource keywords raise `RemovedResourceLimitError` naming the argument.
+
+Native automatic QS uses the Y0 numerical policy measured by S0 and the
+worker calibration. Routing uses the original call's decimal input size and
+the nearest row; exact ties choose the smaller size. Below 40 remains serial.
+
+| Anchor digits | Workers / polynomials per task |
+| --- | --- |
+| 40 | C4/p4 |
+| 50 | C4/p8 |
+| 55 | C4/p16 |
+| 60 | C8/p16 |
+| 65 | C14/p64 |
+| 70 | C8/p64 |
+
+Above 70 inherits C8/p64: **extrapolated**, not validated larger-size
+performance. Numerical policy retains Y0's existing 62/75/80 definitions
+without adding calibration rows or running probes. Intermediate 50+ numerical
+recipes inherit the nearest defined Y0 geometry; above 80 inherits 80. Existing numerical settings below 50,
+non-native backends, explicit constructors and `recipe="reference"` remain
+available. Automatic portfolio SIQS eligibility is unchanged; explicit
+`--siqs` or `--method siqs` selects the engine outside those bands.
+
+The selected worker bundle retains 64 MiB state cache, lookahead 4, packet
+transport, worker verification, coefficient caching and private semaphore
+stops. It keeps max_batch_atoms 2048 and all frozen capacities. Pools start
+only when SIQS is reached. Worker timelines and full profiling stay off.
+Use `--qs-workers serial` at the CLI or
+`factorize_bounded(..., qs_workers=None)` in Python to force serial QS with
+the same numerical policy. Saved automatic calls retain their concrete
+worker recipe; saved serial calls stay serial. Explicit worker checkpoints
+continue to require their original settings. Changing execution mode mid-resume
+is refused. The checkpoint's `qs_routing` marks above-70 extrapolation.
+
+Root wall/CPU limits are optional; RSS defaults to 80% of physical RAM.
+For an explicit guard, use `Budget(rss_bytes=18 * 2**30, seconds=...)`.
+OS observations include process startup and final CPU at reaping. Reported
+work remains diagnostic; missing private reports leave its amount unknown
+rather than inventing a full lease. Root limits are cooperative and may
+overshoot between observations or indivisible arithmetic operations.
+
+Configuration and execution settings remain fixed across resume. Version-3
+current-worker checkpoints carry the H3 resource version, observed saved
+history, published prefixes, pending admission, provenance and numerical
+split-call allocations. Old resource schemas are rejected. Checkpoint encoding
+has no internal size cap; optional file persistence uses
+`atomic_save(..., checkpoint_bytes=...)`, which records an oversized-save skip
+without discarding the factoring result. Derived solver/root/proof caches
+rebuild with their actual execution cost. Width growth, nested recovery and
+native threads remain unsupported by this experimental interface.
+
+Scheduling and representation options remain explicit:
+
+- `polynomials_per_task` selects a packet's original Gray prefix.
+  `whole_family=True` groups a configured family without adding polynomials.
+  `lookahead=N` adds at most four queued/pending credits per worker. Atom and
+  wire capacities continue the same unpublished cursor when a packet fills.
+- `reuse_state=True` retains an identity-bound context and reusable family and
+  collector scratch. `state_cache_bytes` controls retention; an oversized
+  context uses uncached packets. Recovery hints and polynomial queues are
+  invalidated at their original boundaries. Missing installation acknowledgments
+  retire only the owned pool. Retained pools pin worker settings.
+- `lease_budget=True` retains the experimental packet-local diagnostic counter
+  and 64-action root-cancellation cadence. It no longer introduces resource
+  leases. `grouped_lease_charging=True` combines two marking-counter updates
+  only within that polling interval and remains disabled by default.
+- `packed_transport=True` publishes checked varint rows with private reusable
+  buffers, unchanged numerical publication boundaries and strict checkpoint
+  base64. `verification="worker"` verifies before publication; the parent still
+  checks ordered insertion. `verification="batch"` prevalidates bounded groups.
+  A bare `QSWorkerConfig()` uses full parent verification; the selected
+  automatic bundle uses worker verification.
+- `private_stop=True` gives each process its own stop flag and requires the
+  packet-local counter. `stop_backend="semaphore"` replaces each Event with
+  an exclusive-reader nonblocking semaphore. Both preserve cooperative polling.
+  `cpu_snapshot=True` selects a private coherent counter snapshot; these
+  diagnostics do not add worker CPU a second time to the observed root ledger.
+- `family_affinity=True` pins a family to one process and requires retained
+  state; use the same option on `CollectionPool`. Small credit windows can leave
+  workers idle. `arrival_order=True` is a separate trajectory-changing option,
+  rejects fixed-work execution and validates its arrival witnesses on restore.
+- `coefficient_cache=True` retains a bounded parent CRT template during merge.
+  `packed_queue` stores sparse events in 64-bit words; unsupported shapes use
+  exact direct marking. `byte_stamps` selects checked byte epochs with charged
+  wraparound clears. These mechanisms remain disabled unless selected.
+- `wide_hits`, `wide_inverses` and `wide_transfers` enlarge the corresponding
+  real cache capacities. `pruned_transfers` replays a complete cached root pair
+  after window pruning. Their exact arithmetic and fallback paths are unchanged;
+  removed total-memory estimates no longer select or refuse these caches.
+
+The recorder entry point remains `pypy3 -B -m v2.benchmarks.qs.a7a.runner`.
+Frozen pre-H3 recipes are translated only at the benchmark boundary; their old
+resource fields remain historical metadata. Production constructors and
+checkpoint restoration do not accept those fields. Historical G2H/G3 timings
+need revalidation on the combined H3 source. No automatic worker selection or
+performance adoption follows from this integration. Detailed local evidence
+and handoff remain under `v2/audit/a7a/`.
