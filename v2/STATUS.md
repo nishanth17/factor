@@ -109,7 +109,9 @@ engagement and worker economics still require recalibration. Local entry:
 
 B4a Phase 1 overhead continuation implements process-CPU polling amortization
 (`7124730`) and a persistent pthread team (`621da17`), with deterministic
-clock/generation/drain/close coverage. Same-cell warm re-baselining and a
+clock/generation/drain/close coverage. Committed-only QA on `c819cbe` passes
+1,721 tests (20 explicit optional skips), full lint and 308 ordinary benchmark
+imports with both native builds present. Same-cell warm re-baselining and a
 matched lifetime comparison establish no complete-ECM speedup or consistent
 A/A noise reduction. The full-ECM port stops on an unresolved canonical
 recovery/checkpoint export design; setup, classical stage two and strict

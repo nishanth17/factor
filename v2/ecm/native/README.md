@@ -139,7 +139,9 @@ checkpoints do not migrate silently.
 
 Polling commit `7124730` and persistent-team commit `621da17` have committed-only
 targeted correctness coverage, including deterministic injected clocks,
-generation reuse, partial startup, cancellation, drain and final joins. The
+generation reuse, partial startup, cancellation, drain and final joins. Final
+committed-only QA on `c819cbe` passes 1,721 tests (20 explicit optional skips),
+full lint and 308 ordinary benchmark imports with both native builds present. The
 same-cell warm re-baseline does not establish native superiority or consistently
 lower A/A noise. The matched lifetime screen is inconclusive for complete
 ECM; its empty-dispatch probe supports a narrower coordination-cost saving.
