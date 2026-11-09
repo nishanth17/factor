@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--openmp-prefix", type=Path)
     parser.add_argument("--pthread", action="store_true")
     parser.add_argument("--vector-report", action="store_true")
+    parser.add_argument("--limb-division", action="store_true")
     args = parser.parse_args()
     if args.pthread and args.openmp_prefix is not None:
         parser.error("select pthread or OpenMP, not both")
@@ -52,6 +53,8 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     library = output / "libfactor_ecm.dylib"
     flags = ["-std=c11", "-O2", "-Wall", "-Wextra", "-Werror"]
+    if args.limb_division:
+        flags.append("-DB4_MPN_DIVISION")
     if args.vector_report:
         flags += ["-Rpass=loop-vectorize", "-Rpass-missed=loop-vectorize"]
     omp_flags = []
@@ -148,6 +151,7 @@ def main():
         },
         library_sha256=sha(library),
         abi_binding=dict(file=binding.name, sha256=sha(binding)),
+        limb_division=args.limb_division,
         openmp=None
         if args.openmp_prefix is None
         else dict(

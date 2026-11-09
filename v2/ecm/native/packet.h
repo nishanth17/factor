@@ -18,6 +18,7 @@ typedef struct {
 } b4_output;
 
 unsigned b4_abi(void);
+unsigned b4_limb_division(void);
 const char *b4_gmp_version(void);
 typedef struct {
     unsigned long long birth, rss, user, system;
@@ -88,6 +89,10 @@ typedef struct {
     unsigned long long phase_ns[3];
 } b4_curve_info;
 typedef struct { unsigned char data[128]; size_t size; } b4_atom;
+/* Exactness hook: 1=limb path, 0=ordinary fallback, -1=invalid input. */
+int b4_test_product(b4_context *ctx, b4_value a, b4_value b,
+                     unsigned negative_a, unsigned negative_b,
+                     unsigned alias, b4_atom *output);
 unsigned b4_whole_ecm(void);
 b4_prime_block *b4_block_create(unsigned long long lo, unsigned long long hi,
                                unsigned long long bound, unsigned chain,

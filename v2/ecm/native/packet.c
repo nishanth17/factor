@@ -49,6 +49,55 @@ struct b4_context {
 unsigned b4_abi(void) { return ABI; }
 const char *b4_gmp_version(void) { return gmp_version; }
 
+unsigned b4_limb_division(void) {
+#ifdef B4_MPN_DIVISION
+    return 1;
+#else
+    return 0;
+#endif
+}
+
+static unsigned modular_product(b4_context *c, mpz_ptr result,
+                                 mpz_srcptr a, mpz_srcptr b) {
+#ifdef B4_MPN_DIVISION
+    _Static_assert(GMP_NUMB_BITS == 64 && GMP_NAIL_BITS == 0,
+                   "limb experiment requires ordinary 64-bit GMP limbs");
+    size_t width = mpz_size(c->n), na = mpz_size(a), nb = mpz_size(b);
+    if (width >= 4 && width <= 6 && na <= width && nb <= width) {
+        int negative = (mpz_sgn(a) < 0) != (mpz_sgn(b) < 0);
+        if (!na || !nb) { mpz_set_ui(result, 0); return 1; }
+        mp_limb_t left[6] = {0}, right[6] = {0};
+        mp_limb_t product[12], quotient[7], remainder[6] = {0};
+        mp_srcptr ap = mpz_limbs_read(a), bp = mpz_limbs_read(b);
+        if (na < width) { memcpy(left, ap, na * sizeof(*ap)); ap = left; }
+        if (nb < width) { memcpy(right, bp, nb * sizeof(*bp)); bp = right; }
+        if (a == b) mpn_sqr(product, ap, width);
+        else mpn_mul_n(product, ap, bp, width);
+        size_t used = 2 * width;
+        while (used && !product[used - 1]) --used;
+        mp_srcptr modulus = mpz_limbs_read(c->n);
+        if (used < width) memcpy(remainder, product, used * sizeof(*product));
+        else mpn_tdiv_qr(quotient, remainder, 0, product, used, modulus, width);
+        used = width;
+        while (used && !remainder[used - 1]) --used;
+        if (negative && used) {
+            /* 0<r<n makes n-r canonical and proves the subtraction borrow zero. */
+            if (mpn_sub_n(remainder, modulus, remainder, width)) abort();
+            used = width;
+            while (used && !remainder[used - 1]) --used;
+        }
+        /* Input pointers are no longer used, so resizing/aliasing is safe. */
+        mp_ptr destination = mpz_limbs_write(result, width);
+        memcpy(destination, remainder, width * sizeof(*destination));
+        mpz_limbs_finish(result, used);
+        return 1;
+    }
+#endif
+    mpz_mul(result, a, b);
+    mpz_mod(result, result, c->n);
+    return 0;
+}
+
 int b4_observe_root(int pid, b4_root_observation *output) {
     if (pid <= 0 || !output) return -EINVAL;
 #ifdef __APPLE__
@@ -110,6 +159,24 @@ static void import_value(mpz_t dest, b4_value v) {
     mpz_import(dest, v.size, 1, 1, 1, 0, v.data);
 }
 
+int b4_test_product(b4_context *c, b4_value a, b4_value b,
+                     unsigned negative_a, unsigned negative_b,
+                     unsigned alias, b4_atom *output) {
+    if (!b4_ready(c) || !canonical(a, 512) || !canonical(b, 512) ||
+        negative_a > 1 || negative_b > 1 || alias > 3 || !output) return -1;
+    import_value(c->scratch[1], a); import_value(c->scratch[2], b);
+    if (negative_a) mpz_neg(c->scratch[1], c->scratch[1]);
+    if (negative_b) mpz_neg(c->scratch[2], c->scratch[2]);
+    if (alias == 3 && mpz_cmp(c->scratch[1], c->scratch[2])) return -1;
+    mpz_ptr result = c->scratch[alias == 1 ? 1 : alias == 2 ? 2 : 0];
+    unsigned path = modular_product(c, result, c->scratch[1],
+                                   c->scratch[alias == 3 ? 1 : 2]);
+    output->size = 0;
+    if (!mpz_sgn(result)) { output->data[0] = 0; output->size = 1; }
+    else mpz_export(output->data, &output->size, 1, 1, 1, 0, result);
+    return (int)path;
+}
+
 static int begin(b4_context *c, unsigned abi, b4_value n, b4_value x,
                  b4_value z, b4_value a24) {
     if (c) c->mode = c->done = 0;
@@ -145,14 +212,14 @@ static void doubling(b4_context *c, unsigned dest, unsigned src) {
     mpz_t *s = c->scratch;
     mpz_add(s[0], c->x[src], c->z[src]);
     mpz_sub(s[1], c->x[src], c->z[src]);
-    mpz_mul(s[0], s[0], s[0]); mpz_mod(s[0], s[0], c->n);
-    mpz_mul(s[1], s[1], s[1]); mpz_mod(s[1], s[1], c->n);
+    modular_product(c, s[0], s[0], s[0]);
+    modular_product(c, s[1], s[1], s[1]);
     mpz_sub(s[2], s[0], s[1]);
     mpz_mul(s[3], c->a24, s[2]);
     /* a24=(A+2)/4 requires BB (s[1]) in this bracket. */
     mpz_add(s[3], s[3], s[1]);
-    mpz_mul(s[4], s[0], s[1]); mpz_mod(s[4], s[4], c->n);
-    mpz_mul(s[5], s[2], s[3]); mpz_mod(s[5], s[5], c->n);
+    modular_product(c, s[4], s[0], s[1]);
+    modular_product(c, s[5], s[2], s[3]);
     mpz_set(c->x[dest], s[4]); mpz_set(c->z[dest], s[5]);
 }
 
@@ -161,10 +228,10 @@ static void addition(b4_context *c, unsigned dest, unsigned left,
     mpz_t *s = c->scratch;
     mpz_sub(s[0], c->x[left], c->z[left]);
     mpz_add(s[1], c->x[right], c->z[right]);
-    mpz_mul(s[0], s[0], s[1]); mpz_mod(s[0], s[0], c->n);
+    modular_product(c, s[0], s[0], s[1]);
     mpz_add(s[1], c->x[left], c->z[left]);
     mpz_sub(s[2], c->x[right], c->z[right]);
-    mpz_mul(s[1], s[1], s[2]); mpz_mod(s[1], s[1], c->n);
+    modular_product(c, s[1], s[1], s[2]);
     mpz_add(s[2], s[0], s[1]); mpz_sub(s[3], s[0], s[1]);
     mpz_mul(s[2], s[2], s[2]); mpz_mul(s[3], s[3], s[3]);
     mpz_mul(s[4], c->z[difference], s[2]);
@@ -179,21 +246,19 @@ static void ladder_bit(b4_context *c, unsigned q, unsigned r) {
     mpz_t *s = c->scratch;
     mpz_add(s[0], c->x[q], c->z[q]);
     mpz_sub(s[1], c->x[q], c->z[q]);
-    mpz_mul(s[2], s[0], s[0]); mpz_mod(s[2], s[2], c->n);
-    mpz_mul(s[3], s[1], s[1]); mpz_mod(s[3], s[3], c->n);
+    modular_product(c, s[2], s[0], s[0]);
+    modular_product(c, s[3], s[1], s[1]);
     mpz_sub(s[4], s[2], s[3]);
     mpz_add(s[5], c->x[r], c->z[r]);
-    mpz_mul(s[5], s[1], s[5]); mpz_mod(s[5], s[5], c->n);
+    modular_product(c, s[5], s[1], s[5]);
     mpz_sub(s[6], c->x[r], c->z[r]);
-    mpz_mul(s[6], s[0], s[6]); mpz_mod(s[6], s[6], c->n);
+    modular_product(c, s[6], s[0], s[6]);
     mpz_add(s[0], s[5], s[6]); mpz_sub(s[1], s[5], s[6]);
-    mpz_mul(s[5], s[0], s[0]); mpz_mul(s[5], s[5], c->z[0]);
-    mpz_mod(s[5], s[5], c->n);
-    mpz_mul(s[6], s[1], s[1]); mpz_mul(s[6], s[6], c->x[0]);
-    mpz_mod(s[6], s[6], c->n);
-    mpz_mul(s[0], s[2], s[3]); mpz_mod(s[0], s[0], c->n);
+    mpz_mul(s[5], s[0], s[0]); modular_product(c, s[5], s[5], c->z[0]);
+    mpz_mul(s[6], s[1], s[1]); modular_product(c, s[6], s[6], c->x[0]);
+    modular_product(c, s[0], s[2], s[3]);
     mpz_mul(s[1], c->a24, s[4]); mpz_add(s[1], s[1], s[3]);
-    mpz_mul(s[1], s[1], s[4]); mpz_mod(s[1], s[1], c->n);
+    modular_product(c, s[1], s[1], s[4]);
     mpz_set(c->x[q], s[0]); mpz_set(c->z[q], s[1]);
     mpz_set(c->x[r], s[5]); mpz_set(c->z[r], s[6]);
 }
@@ -252,8 +317,7 @@ static void guard_point(b4_context *c, unsigned slot, unsigned mask) {
      */
     if (!mask || !mpz_sgn(c->guard)) return;
     if (mask & 1) mpz_mul(c->guard, c->guard, c->x[slot]);
-    if (mask & 2) mpz_mul(c->guard, c->guard, c->z[slot]);
-    mpz_mod(c->guard, c->guard, c->n);
+    if (mask & 2) modular_product(c, c->guard, c->guard, c->z[slot]);
 }
 
 static uint64_t nanoseconds(b4_context *c, clockid_t clock) {

@@ -247,6 +247,10 @@ class NativePacket:
                 raise ValueError("native pthread capability mismatch")
             if lib.b4_abi() != ABI:
                 raise ValueError("native library ABI mismatch")
+            if bool(lib.b4_limb_division()) != manifest.get(
+                "limb_division", False
+            ):
+                raise ValueError("native limb build identity mismatch")
             self._allocate(ffi, lib, manifest)
         except BaseException as error:
             if lib is not None and self.variant != "openmp":

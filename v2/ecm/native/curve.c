@@ -494,7 +494,7 @@ static int curve_action(b4_context *c) {
             i->phase = CS_TWO; w->operation = CO_IDLE; i->boundary = 1;
         } else {
             mpz_set(w->terms[i->terms_count], w->temporary[1]);
-            mpz_mul(w->product, w->product, w->temporary[1]); mpz_mod(w->product, w->product, c->n);
+            modular_product(c, w->product, w->product, w->temporary[1]);
             ++i->terms_count; ++i->index; w->operation = CO_IDLE; i->boundary = 1;
         }
         return 0;
@@ -557,8 +557,7 @@ static int curve_action(b4_context *c) {
         mpz_mul(c->scratch[1], w->bx[offset], w->giant[1]);
         mpz_sub(c->scratch[0], c->scratch[0], c->scratch[1]);
         mpz_mod(w->terms[i->terms_count + w->pending], c->scratch[0], c->n);
-        mpz_mul(w->temp_product, w->temp_product, w->terms[i->terms_count + w->pending]);
-        mpz_mod(w->temp_product, w->temp_product, c->n); ++w->pending;
+        modular_product(c, w->temp_product, w->temp_product, w->terms[i->terms_count + w->pending]); ++w->pending;
         if (i->index + w->pending == w->group_end) {
             i->terms_count += w->pending; i->index = w->group_end;
             mpz_set(w->product, w->temp_product); w->pending = 0;
