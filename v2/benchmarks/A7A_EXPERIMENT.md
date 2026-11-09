@@ -1,5 +1,19 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
+## Worker-count race amendment — approved after slim G4
+
+Slim G4 is complete; its source-pinned evidence is separate. The later user
+instruction authorizes a reduced worker-only race: 50/55 C4/C6/C8; 60
+C4/C6/C8/C10; 65/70 C8/C10/C12/C14. Keep each target's frozen/interpolated
+packet width and every other option fixed. Run all 18 input-0 cells; advance
+only configurations with completed wall <=1.10 times the fastest completed
+cell in that row to inputs 1–2, one repetition each, at most 54 factoring calls.
+Retain every screen outcome and distinguish n=1 from n=3. Explicitly flag
+C12/C14 as oversubscription. Report wall, whole-actor CPU and sampled peak RSS.
+Use a separate current-source protocol and original calibration inputs, never
+G4 heldouts. Validate opt-in fourteen-worker support and freeze aggregate
+resources before launching. No automatic-default adoption or 75/80 probes.
+
 ## Slim G4 amendment — approved 8 November 2026
 
 Defer all new 75/80 probes until after B5a. The earlier conditional probe

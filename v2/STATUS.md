@@ -38,11 +38,24 @@ reports retain their original resource model. Local integration receipts:
 `v2/audit/a7a/master-integration-20261108/`.
 
 
-**A7a next authorized stage:** slim G4 at 55/65/70 cold only, three fresh
-inputs per row, frozen recipes versus matched Y0 S0, one run per arm/input.
-No sample expansion or default adoption. The 65-digit recipe is interpolated.
-All new 75/80 probes are deferred until after B5a, superseding their earlier
-conditional pre-approval. Stop after reporting this G4.
+**A7a slim G4 complete (8 November):** committed runtime `a51de80`, three
+fresh balanced inputs at 55/65/70, frozen recipes versus matched strong serial
+S0. At 55/65, confirmed wall speedups are 1.97x/3.10x with 2.34x/2.90x CPU.
+The 65 recipe remains an interpolation. At 70, C10 completes 3/3 versus S0
+2/3 within 1,800 s; no aggregate latency interval is assigned to this censored
+row. Drift checks pass, all results reconstruct, and maximum sampled owned RSS
+is 2.56 GiB. Process-arm inner CPU undercounts OS actor totals; reports use OS
+CPU, and this experiment does not validate a binding CPU cap. Detailed local
+receipts: `v2/benchmarks/results/a7a/g4-slim-20261108/` in the main repository.
+
+**Next authorized scope:** a separate worker race at frozen packet widths:
+50/55 C4/C6/C8; 60 C4/C6/C8/C10; 65/70 C8/C10/C12/C14. Run input 0 for all
+18 configurations; advance only configurations within 10% of the fastest
+completed row cell to inputs 1–2 (at most 54 factoring calls). Report wall,
+CPU, sampled peak RSS and sample counts; flag C12/C14 oversubscription.
+The collector's ten-worker opt-in limit needs validation at fourteen before
+execution. No G4 heldout input is reused for selection. New 75/80 probes
+remain deferred until after B5a; no default adoption is authorized.
 
 
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate

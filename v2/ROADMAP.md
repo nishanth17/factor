@@ -177,11 +177,15 @@ does not establish a free increase in B1.
 
 ### A7a — current-collector parallel QS
 
-- **Current scope amendment (8 November):** after the passing H3 integration,
-  run slim G4 at 55/65/70 cold only, frozen C4/p16, interpolated C10/p64 and
-  C10/p64 versus matched Y0 S0. Three fresh independent inputs per row, one
-  repetition per arm/input, no extensions or retuning; then stop/report.
-  New 75/80 probes are deferred until after B5a. No automatic-default adoption.
+- **Slim G4 complete / worker race authorized (8 November):** H3-integrated
+  frozen recipes versus S0 confirm 1.97x at 55 and 3.10x at interpolated 65;
+  70 completes 3/3 candidate versus 2/3 S0, with a censored latency conclusion.
+  See [results](benchmarks/RESULTS.md#a7a-slim-g4-8-november-2026).
+  Next, at frozen packets: 50/55 C4/C6/C8; 60 C4/C6/C8/C10; 65/70
+  C8/C10/C12/C14. Screen input 0, advance <=1.10x fastest completed row cell
+  to inputs 1–2; at most 54 factoring calls. Validate opt-in fourteen-worker
+  support first; report oversubscription, wall/CPU/RSS and unequal sample
+  counts. No G4 heldout reuse, default adoption or new 75/80 probe before B5a.
 
 
 - **75/80 probes reported (8 November):** both single-input C10/p64 recipes

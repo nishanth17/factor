@@ -1,5 +1,34 @@
 # Benchmark results and decisions
 
+## A7a slim G4 (8 November 2026)
+
+Runtime `a51de80` after H3 integration; three fresh certified balanced inputs
+per cold row, one call per arm/input, matched Y0 strong serial S0 comparator.
+Complete actor wall includes startup, JIT, validation and process cleanup.
+
+| Digits / recipe | S0 / candidate complete | Wall speedup | Candidate CPU / S0 |
+| --- | --- | --- | --- |
+| 55, C4/p16 | 3/3 and 3/3 | 1.97x (98 1/3% CI 1.86–2.09x) | 2.34x |
+| 65, C10/p64 interpolation | 3/3 and 3/3 | 3.10x (98 1/3% CI 1.63–5.92x) | 2.90x |
+| 70, C10/p64 | 2/3 and 3/3 | Censored; no aggregate latency CI | Not pooled |
+
+At 70 the three candidate times are 500/691/548 s; matched S0 times are
+1,480/timeout at 1,800/1,637 s. Completed-pair speedups are 2.96x/2.99x;
+the censored pair gives a >2.60x lower bound. No failed control is replaced
+with a completed time. All factorizations and unresolved results reconstruct.
+A/A signatures/scanned work match; maximum drift is 2.17%, below the 10% stop.
+Total owner wall is 2.55 h; maximum sampled aggregate owned RSS is 2.56 GiB.
+
+CPU uses OS whole-actor totals: the process-arm inner counter underreports
+and its cause remains unverified. Observed CPU is below the matched limits;
+binding CPU-cap enforcement is not established. Profiles/Tier-A/timelines are
+off; RSS is sampled, not exact peak physical memory. Three-input t intervals
+assume log-normal ratios. This does not establish a mainline/population/p90
+claim, independently optimal 65 routing, fresh 60 guardrail or default adoption.
+All 75/80 probes remain deferred until after B5a. Detailed report, every raw
+receipt, protocol, source archive and verified hashes remain local under
+`v2/benchmarks/results/a7a/g4-slim-20261108/` in the main repository.
+
 ## A7a completed rerun tranche (7 November 2026)
 
 Named source `ae1cfd9` completes all 92 planned cells in five separately
