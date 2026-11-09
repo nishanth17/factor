@@ -404,7 +404,9 @@ class CompiledPacketTests(unittest.TestCase):
         outcomes = []
         for kernel in ("python", "c-gmp"):
             selected = config(
-                ecm_kernel=kernel, ecm_tiers=((2000, 200000, 8),)
+                ecm_kernel=kernel,
+                ecm_tiers=((2000, 200000, 8),),
+                ecm_chain_mode="auto",
             )
             budget = allowance()
             context, programs = _execution_context({}, selected, budget)
