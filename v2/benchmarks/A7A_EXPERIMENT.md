@@ -77,6 +77,13 @@ nominal raw-time window; this enforces the explicit tie rule. In particular the
 selection before continuation and run each survivor once per independent input.
 Keep n=1/n=3 summaries distinct and preserve every rejected result.
 
+A failed reference does not prevent its already-admitted candidate from running.
+A wall-censored arm can establish a directional bound only when its root wall
+cutoff divided by the completed arm's actor time is already beyond the noise
+bound. Record that bound separately; never substitute a timeout as a completed
+latency. Otherwise the comparison is inconclusive. An observed RSS stop preserves
+its memory outcome and stops the owner before admitting further cells.
+
 Root wall per call is 30/100/300/900/1,800 s by increasing size; root CPU is ten
 times wall, with the same 18 GiB observed-RSS guard on every arm. The actor
 spec adds 10 s for cooperative cleanup; the owner reserves root wall plus 40 s.
