@@ -371,7 +371,9 @@ The B4a branch adds `pypy3 -B -m v2.ecm.native.build --gmp-prefix PREFIX
 --pthread` alongside the separate ordinary-GMP scalar build. Both retain O2.
 `NativeECMExecutor(..., settings=WorkerSettings(workers=1|2|4),
 schedule="dynamic"|"static", chunk_size=1..32)` reuses contexts/programs and
-creates/joins C-only threads per independent continuation-slice dispatch.
+retains one fixed C-only pthread team across drained continuation-slice
+generations, joining on close. Cheap wall reads remain at each action; process
+CPU sampling is amortized to slice entry and one-millisecond wall intervals.
 Checked publication, root wall/process-CPU/RSS and saved-history accounting
 remain authoritative; native-thread CPU is included in process CPU once.
 `NativeTeam.cancel()` cooperatively cancels active native work; close is

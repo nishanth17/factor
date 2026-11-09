@@ -3,6 +3,17 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a Phase 1 overhead continuation (9 November 2026)
+
+- Amortize process-CPU clock reads while retaining per-action wall and
+  cancellation checks plus root resource polls around foreign slices.
+- Retain one fixed pthread team across drained generations; join on close
+  and on partial startup failure. Add deterministic clock and lifecycle tests.
+- Preserve the noisy same-cell re-baseline, matched lifetime comparison and
+  failed harness attempts locally. No complete-ECM speedup is established.
+  Stop before the full-ECM port on its canonical recovery/checkpoint design;
+  setup, classical stage two and strict recovery remain Python.
+
 ## Experimental B4a pthread correctness (9 November 2026)
 
 - Synchronize committed A7a into the B4a branch. Add C-only pthread dispatch

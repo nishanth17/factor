@@ -83,14 +83,16 @@ is 1..32, default `2*workers`. Correctness covers chunks 1/3, uneven tails,
 fewer jobs than threads, empty queues and repeated dispatch. No performance
 choice of worker count, schedule or chunk is implied.
 
-Contexts/programs persist across useful calls; **threads do not**. Every dispatch
-creates joinable C threads, holds them behind a start gate until all requested
-threads exist, and joins every created thread before returning. Partial creation
-failure cancels and joins the created subset without arithmetic publication.
-Worker errors cancel peers. Each returning error path drains before borrowed
-buffers can be freed. A failed join invariant aborts rather than return live
-borrowed state. This deliberately small owner leaves persistent teams as a
-separate, measured lifecycle candidate.
+Contexts/programs and one fixed pthread team persist across useful calls.
+Each generation publishes its queue only after the complete team exists and
+drains before returning borrowed contexts to Python. Idle workers wait on a
+condition variable; they join on close. Partial creation failure cancels and
+joins the created subset before any arithmetic publication. Worker errors
+cancel peers and drain the generation. A failed join invariant aborts rather
+than return live borrowed state. Per-owner creation fault injection explicitly
+rearms startup on an idle team; normal dispatch does not recreate live workers.
+`NativeTeam.lifecycle` retains create/join/generation/worker-entry counters
+after close for deterministic lifecycle diagnostics.
 
 No native worker accesses Python or calls Python APIs/callbacks. Checked exports
 and publication happen in the Python owner after join. All ready exports are
@@ -102,14 +104,20 @@ The per-owner C fault/start-gate hooks are inert unless explicitly injected by
 diagnostics. They are not process-global runtime policy.
 
 Close is idempotent, releases every context/program/transport and unloads the
-pthread DSO once after borrowing contexts are destroyed. Active close and
+pthread DSO once after its workers join and borrowing contexts are destroyed.
+Active close and
 use-after-close reject. The caller must keep the owner live until a concurrent
-cancel call returns; close/cancel may not race. No parked native worker survives
-a dispatch. One active team per process is enforced by the adapter.
+cancel call returns; close/cancel may not race. Parked workers retain their owner and DSO until close; no worker borrows a
+context between generations. One active team per process is enforced by the
+adapter.
 
 C work targets five milliseconds and at most 128 actions per context, with
-common wall/process-CPU deadlines and opcode/bit cancellation checks. Startup,
-one GMP operation, join and OS descheduling can exceed that cooperative target;
+common wall/process-CPU deadlines and opcode/bit cancellation checks. The cheap
+wall clock is checked at every action boundary; aggregate process CPU is checked
+at slice entry and after each millisecond of observed wall progress. Root
+wall/CPU/RSS and cancellation are still polled before/after foreign slices.
+An exceptionally slow operation encounters the wall check at the next action
+boundary. Startup, one GMP operation, join and OS descheduling can exceed the target;
 it is not a hard real-time limit. H3 root resources include setup, conversion,
 recovery and cleanup; no prepaid work/CPU/memory leases are restored.
 
@@ -126,6 +134,19 @@ Unfinished curves restart at their assignment boundary, with no charge refund.
 Source, settings, worker count, schedule, capacity and chunk changes reject on
 resume. No pointers or partial native state serialize. Historical OpenMP owner
 checkpoints do not migrate silently.
+
+## Phase 1 overhead continuation
+
+Polling commit `7124730` and persistent-team commit `621da17` have committed-only
+targeted correctness coverage, including deterministic injected clocks,
+generation reuse, partial startup, cancellation, drain and final joins. The
+same-cell warm re-baseline does not establish native superiority or consistently
+lower A/A noise. The matched lifetime screen is inconclusive for complete
+ECM; its empty-dispatch probe supports a narrower coordination-cost saving.
+The full-ECM port stopped before implementation on an unresolved canonical
+recovery/checkpoint export design. Setup, classical stage two and strict
+recovery therefore remain Python. Exact reports, failed harness attempts and
+charges are retained under `v2/audit/b4a/phase1_20261109/`.
 
 ## Validation and retained limits
 

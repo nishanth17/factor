@@ -107,6 +107,15 @@ so further measurements stop pending a revised diagnostic plan. Startup,
 engagement and worker economics still require recalibration. Local entry:
 `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`.
 
+B4a Phase 1 overhead continuation implements process-CPU polling amortization
+(`7124730`) and a persistent pthread team (`621da17`), with deterministic
+clock/generation/drain/close coverage. Same-cell warm re-baselining and a
+matched lifetime comparison establish no complete-ECM speedup or consistent
+A/A noise reduction. The full-ECM port stops on an unresolved canonical
+recovery/checkpoint export design; setup, classical stage two and strict
+recovery remain Python. Steps 2–3 and their Tier 1 screen are incomplete.
+Local phase handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
+
 B4a planning update: the expanded rolling candidate ranking and first coherent
 execution bundle are in
 `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`. It replaces

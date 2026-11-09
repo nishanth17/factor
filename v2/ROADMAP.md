@@ -184,6 +184,13 @@ does not establish a free increase in B1.
   archive builds, 1,712 tests (20 optional skips), lint and 308 benchmark imports.
   Scalar/pthread tests actually execute, including fixed state/recovery,
   production PRAC, widths, signal/resource stops and repeated resume history.
+- **Phase 1 overhead continuation:** process-CPU clock amortization and a
+  persistent team are implemented in `7124730`/`621da17`, with deterministic
+  clock/lifecycle tests. Warm re-baselining does not establish native
+  superiority or consistent noise reduction; matched lifetime costs remain
+  within observed variation. The full-ECM port stopped before implementation
+  on the canonical recovery/checkpoint export design. Phase 1 steps 2–3
+  remain incomplete; local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`.
 - **Remaining:** complete-cost cold/warm and native B12-process comparisons,
   engagement/worker economics, applicable fresh confirmation and integration.
   Bounded warm fixed-work calibration supports no adopted speedup. Its CPU
