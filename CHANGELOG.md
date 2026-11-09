@@ -3,6 +3,16 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a whole-ECM C continuation (9 November 2026)
+
+- Add explicit `c-gmp-full` scalar/pthread execution for Suyama setup,
+  both ECM stages, normal GCD and strict/ordered recovery, using ordinary GMP.
+- Retain native points/tables/cursors and shared checked metadata across slices.
+  Export canonical scalar checkpoints transactionally; preserve incurred work
+  and the existing pthread assignment/history resume contract.
+- Keep Python and the previous stage-one native executor as independent controls.
+  No automatic defaults, mainline integration or push are changed.
+
 ## B4a Phase 1 overhead continuation (9 November 2026)
 
 - Amortize process-CPU clock reads while retaining per-action wall and

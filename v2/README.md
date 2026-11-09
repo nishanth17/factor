@@ -383,3 +383,12 @@ size; old OpenMP checkpoints do not migrate. Scalar/pthread correctness is
 validated on `0f2fee3`; setup, classical stage two and exact recovery remain
 Python. See [native ownership and validation](ecm/native/README.md). No automatic
 routing, performance adoption or mainline integration follows.
+
+
+The B4a whole-ECM candidate is selected with
+`PortfolioConfig(ecm_kernel="c-gmp-full")` or `--ecm-kernel c-gmp-full`.
+It preserves scalar durable checkpoints and the persistent team's assignment
+resume contract while executing setup, both ECM stages, GCD and strict recovery
+in C. Python prepares immutable metadata and validates/publishes results.
+The existing `c-gmp` stage-one executor remains a control; automatic routing
+is unchanged. See [whole-native ownership and eligibility](ecm/native/README.md).

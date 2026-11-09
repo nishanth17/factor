@@ -287,7 +287,7 @@ class Budget:
 
     @synchronized
     def record_incurred_work(self, amount):
-        """Record completed foreign work before any cancellable publication poll."""
+        """Record completed foreign work before a publication poll."""
         utils.require_integer(amount, "amount", 0)
         self.used += amount
 

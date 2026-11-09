@@ -167,3 +167,56 @@ attempt failed PyPy timer handling and exhausted recorder output; profile files
 are invalid. Exactness and clean timing results remain separate. No further
 measurement or compiler tuning follows automatically. The previous two-curve
 NEON loss remains scoped; no field-SIMD implementation is integrated.
+
+
+## Whole-ECM C owner (Phase 1 continuation)
+
+Select `PortfolioConfig(ecm_kernel="c-gmp-full")` explicitly, or CLI
+`--ecm-kernel c-gmp-full`. `c-gmp` remains the retained stage-one control;
+Python remains the automatic default. `NativeECMExecutor` dispatches whole
+native continuations when its configuration selects `c-gmp-full`.
+
+Suyama setup/inversion/nonunits, accepted ladder/PRAC stage one, normal GCD,
+strict record/exceptional checked-ladder/prime-unit replay, classical baby/giant
+preparation, prime-index traversal, cross terms, product windows and ordered
+term replay execute in C using ordinary GMP mpz objects. Python supplies stable
+sigma identities and prime/program metadata, checks canonical exports/proper
+factors and performs stable parent publication. It remains the independent
+arithmetic oracle. No external factorer or new residue/limb representation is
+used. Setup and both stages use the same private context on the persistent team.
+
+Native points, baby tables, cursors and scratch persist across bounded slices.
+Immutable copied prime/program/index blocks are validated once per owner and
+shared by its contexts. Ordinary field/scratch/table capacity is sized and
+reused. The owner returns at meaningful checks, metadata refill, errors,
+cancellation or the existing 128-action/five-ms cooperative target. Normal
+completed-curve publication exports identity/outcome metadata without copying
+native tables. Explicit diagnostics can export every complete canonical action.
+
+Scalar checkpoints preserve the existing durable job representation. Canonical
+state is committed separately from speculative ladder/record/giant/group work.
+Close/checkpoint export retains complete baby/giant actions, the prime cursor,
+product/ordered terms and replay positions. An interrupted compound action
+exports its saved canonical input and restarts that action on resume; all
+incurred charges remain recorded. Failed restore preparation leaves the
+original saved job intact. No pointer or partially evaluated point serializes.
+Pthread checkpoints keep the existing completed-assignment/history contract
+and restart unfinished assignments. Source/kernel changes reject mismatched
+saves. GMP allocator death recovers at the last externally saved checkpoint.
+
+The explicit implementation supports odd 3–1024-bit moduli, classical Suyama
+with the accepted PRAC/ladder policy, chunks/GCD windows 1–256, segments
+1–32,768, uint64 bounds below UINT64_MAX and baby distance <=65,536.
+Immutable block geometry supports 4,096 blocks / 64 MiB per owner.
+Unsupported geometry or alternate formula/paired/wheel policies raise explicit
+errors; native tests do not silently fall back. H3 root wall/CPU/current RSS
+remain the resource guards. Geometry refusal is distinct from observed
+production exhaustion.
+
+`test_native_full` exercises actual scalar/pthread paths, every existing fixed
+fixture/action, strict nonunits/exceptional retry, short tails, table boundaries,
+root stops, preparation/worker/startup faults, signals, simultaneous factors,
+active/repeated close and durable scalar/assignment-history resume. Detailed
+receipts live in `v2/audit/b4a/phase1_20261109/continuation_01/`. The earlier
+checkpoint-design stop was resolved by this implementation. Performance
+adoption and cost/dispatch recalibration remain separate from correctness.

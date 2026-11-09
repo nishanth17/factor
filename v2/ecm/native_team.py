@@ -195,7 +195,7 @@ class NativeTeam:
             self.lock.release()
 
     def _before_close(self):
-        """Release optional derived owners while contexts and DSO remain live."""
+        """Release derived owners while contexts and the DSO remain live."""
 
     def close(self):
         if not self.lock.acquire(blocking=False):

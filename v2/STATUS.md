@@ -107,7 +107,17 @@ so further measurements stop pending a revised diagnostic plan. Startup,
 engagement and worker economics still require recalibration. Local entry:
 `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`.
 
-B4a Phase 1 overhead continuation implements process-CPU polling amortization
+B4a Phase 1 has resumed past its earlier checkpoint-design stop. Full native
+Suyama setup, both ECM stages, GCD and strict/ordered recovery are implemented
+on the task branch in `0df3dc3`, selected explicitly with `c-gmp-full`.
+Canonical scalar checkpoint export is transactional; pthread assignment/history
+resume is retained. Actual C arithmetic and checkpoint/fault tests pass targeted
+checks. Committed-only full QA and the cold/warm Tier 1 screen are in progress.
+The earlier stopped delivery below is historical; evidence and charges remain
+under `v2/audit/b4a/phase1_20261109/`, with continuation artifacts in
+`continuation_01/`. Automatic defaults remain unchanged.
+
+Earlier B4a Phase 1 overhead continuation implements process-CPU polling amortization
 (`7124730`) and a persistent pthread team (`621da17`), with deterministic
 clock/generation/drain/close coverage. Committed-only QA on `c819cbe` passes
 1,721 tests (20 explicit optional skips), full lint and 308 ordinary benchmark
