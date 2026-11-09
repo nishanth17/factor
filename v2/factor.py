@@ -319,6 +319,12 @@ def main(*, budget=None):
         help="enable SIQS after rho/p-1/ECM in the bounded auto portfolio",
     )
     qs_options.add_argument(
+        "--qs-workers",
+        choices=("auto", "serial"),
+        default="auto",
+        help="digit-selected process QS (default), or force serial QS",
+    )
+    qs_options.add_argument(
         "--qs-base-bound",
         "--siqs-base-bound",
         type=int,
@@ -746,6 +752,8 @@ def main(*, budget=None):
                     parameters["ecm_chain_bytes"] = 0
             config = PortfolioConfig(**parameters)
             worker_options = {}
+            if args.qs_workers == "serial":
+                worker_options["qs_workers"] = None
             if args.method != "auto" or args.ecm_workers == "serial":
                 worker_options["ecm_executor"] = None
             run = factorize_bounded(

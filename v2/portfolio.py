@@ -1331,10 +1331,10 @@ def factorize_bounded(
     checkpoint=None,
     stop_after_split=False,
     ecm_executor="auto",
-    qs_workers=None,
+    qs_workers="auto",
     qs_pool=None,
 ):
-    """Factor with automatic cost-gated ECM; None explicitly selects serial.
+    """Factor with automatic ECM and selected QS; None forces serial QS.
 
     Automatically created contexts are closed before returning or raising.
     Explicit contexts remain borrowed. Omitted budgets/memory receive finite
@@ -1390,14 +1390,15 @@ def _factorize_bounded(
         raise ValueError("zero has no finite prime factorization")
     if type(stop_after_split) is not bool:
         raise TypeError("stop_after_split must be Boolean")
-    if qs_workers is not None:
+    automatic_qs = isinstance(qs_workers, str) and qs_workers == "auto"
+    if qs_workers is not None and not automatic_qs:
         from .qs.current_parallel import QSWorkerConfig
 
         if not isinstance(qs_workers, QSWorkerConfig):
             raise TypeError("qs_workers must be a QSWorkerConfig")
     elif qs_pool is not None:
         raise ValueError("qs_pool requires explicit qs_workers")
-    if qs_workers is not None and qs_pool is None:
+    if qs_workers is not None and not automatic_qs and qs_pool is None:
         from .qs.parallel import CollectionPool
 
         with CollectionPool(qs_workers.mode, qs_workers.workers) as pool:
@@ -1543,6 +1544,21 @@ def _factorize_bounded(
 
     _promote_state(state, config.backend)
 
+    if automatic_qs:
+        if checkpoint is not None:
+            # A saved serial call stays serial; a saved process call retains
+            # its exact recipe even if automatic routing changes later.
+            saved_workers = state.get("qs_workers")
+            if saved_workers is None:
+                qs_workers = None
+            else:
+                from .qs.current_parallel import QSWorkerConfig
+
+                qs_workers = QSWorkerConfig(**saved_workers)
+        else:
+            from .qs.production_policy import default_qs_workers
+
+            qs_workers = default_qs_workers(n, config.siqs)
     worker_marker = qs_workers.record() if qs_workers is not None else None
     if checkpoint is not None and state.get("qs_workers") != worker_marker:
         raise ValueError("resume QS worker settings changed")
