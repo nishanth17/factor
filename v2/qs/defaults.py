@@ -132,9 +132,10 @@ def legacy_siqs_config(n, *, backend="python-int", recipe="calibrated"):
 def default_siqs_config(n, *, backend="python-int", recipe="calibrated"):
     """Select Y0 for native 50+ digit QS; retain explicit reference recipes.
 
-    Between measured numerical anchors, inherit the nearest row, preferring
-    the smaller size on a tie. Above 70 this is an extrapolation. Smaller
-    sizes and other backends retain their existing numerical policy.
+    Between defined numerical geometries, inherit the nearest row, preferring
+    the smaller size on a tie. Above 70 is extrapolated; existing 75/80
+    geometry stays intact. Smaller sizes and other backends retain their
+    existing numerical policy.
     """
     utils.require_integer(n)
     if recipe not in ("calibrated", "reference"):

@@ -136,10 +136,13 @@ previous numerical fields. Saved configurations are restored without rerouting.
 | 50 | 1,800 | 6 | Bounded yield, presieve+unroll4+parity_two |
 | 55 | 2,500 | 7 | Same Y0 collector |
 | 60 | 5,000 | 8 | Same Y0 collector |
+| 62 (retained numerical policy) | 6,000 | 9 | Same Y0 collector |
 | 65 | 8,500 | 9 | Same Y0 collector |
 | 70 | 10,500 | 10 | Y0 larger large-prime/product geometry |
+| 75 (unconfirmed) | Prime bound 400,000 | 11 | Retained Y0 larger geometry |
+| 80 (unconfirmed) | Prime bound 600,000 | 12 | Retained Y0 larger geometry |
 
-All 50+ anchors retain 65,536 half-width, a 64-polynomial family quota,
+All listed 50+ geometries retain 65,536 half-width, a 64-polynomial family quota,
 pool 64, 2 MiB
 power plan, 32 MiB sparse queue and collection pacing. The actual Gray
 limit at 50 is 32. The 40-digit numerical

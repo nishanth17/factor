@@ -259,9 +259,10 @@ the nearest row; exact ties choose the smaller size. Below 40 remains serial.
 | 65 | C14/p64 |
 | 70 | C8/p64 |
 
-Above 70 inherits C8/p64 and Y0's 70-digit numerical anchor: **extrapolated**,
-not validated larger-size performance. Intermediate 50+ numerical recipes
-also inherit the nearest Y0 anchor. Existing numerical settings below 50,
+Above 70 inherits C8/p64: **extrapolated**, not validated larger-size
+performance. Numerical policy retains Y0's existing 62/75/80 definitions
+without adding calibration rows or running probes. Intermediate 50+ numerical
+recipes inherit the nearest defined Y0 geometry; above 80 inherits 80. Existing numerical settings below 50,
 non-native backends, explicit constructors and `recipe="reference"` remain
 available. Automatic portfolio SIQS eligibility is unchanged; explicit
 `--siqs` or `--method siqs` selects the engine outside those bands.

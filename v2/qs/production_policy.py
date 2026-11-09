@@ -81,18 +81,23 @@ def default_qs_workers(n, config):
 def y0_config(n):
     """Reproduce the H3-adapted frozen Y0 numerical anchors exactly."""
     from .extended_policy import BoundedYieldSieveConfig
-    from .siqs import CountedSIQSConfig
+    from .siqs import CountedSIQSConfig, SIQSConfig
 
     digits = len(str(abs(n)))
-    anchor = min((50, 55, 60, 65, 70), key=lambda size: abs(size - digits))
+    anchor = min(
+        (50, 55, 60, 62, 65, 70, 75, 80), key=lambda size: abs(size - digits)
+    )
     base_count, factors = {
         50: (1800, 6),
         55: (2500, 7),
         60: (5000, 8),
+        62: (6000, 9),
         65: (8500, 9),
         70: (10500, 10),
+        75: (None, 11),
+        80: (None, 12),
     }[anchor]
-    large = anchor == 70
+    large = anchor >= 70
     collector = BoundedYieldSieveConfig(
         block_width=4096,
         marking="presieve+unroll4+parity_two",
@@ -114,8 +119,14 @@ def y0_config(n):
         recompute_prime_limit=0,
         solver_panel_bits=0,
     )
-    return CountedSIQSConfig(
-        base_count=base_count,
+    config_type = CountedSIQSConfig if base_count is not None else SIQSConfig
+    geometry = (
+        {"base_count": base_count}
+        if base_count is not None
+        else {"base_bound": 400000 if anchor == 75 else 600000}
+    )
+    return config_type(
+        **geometry,
         factor_count=factors,
         multiplier=0,
         half_width=65536,
