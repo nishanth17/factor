@@ -427,7 +427,7 @@ def main(*, budget=None):
     )
     parser.add_argument(
         "--ecm-kernel",
-        choices=("python", "c-gmp", "auto"),
+        choices=("python", "c-gmp", "c-gmp-full", "auto"),
         help="optional scalar ECM executor; explicit local build required",
     )
     rss_group = parser.add_mutually_exclusive_group()

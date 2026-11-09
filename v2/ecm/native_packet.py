@@ -58,8 +58,14 @@ def _sha_file(path):
 def source_identity():
     """Bind snapshots to the ABI, adapter and compiled source bytes."""
     digest = hashlib.sha256(Path(__file__).read_bytes())
-    for name in ("packet.c", "packet.h", "team.c"):
+    for name in ("packet.c", "packet.h", "team.c", "curve.c"):
         digest.update((SOURCE / name).read_bytes())
+    for path in (
+        Path(__file__).with_name("native_curve.py"),
+        Path(__file__).with_name("native_curve_team.py"),
+        Path(__file__).parents[1] / "execution/ecm_native_full.py",
+    ):
+        digest.update(path.read_bytes())
     return IDENTITY + "/" + digest.hexdigest()
 
 
@@ -136,7 +142,8 @@ class NativePacket:
             directory / "libfactor_ecm.dylib",
         ]
         paths.extend(
-            SOURCE / name for name in ("packet.c", "packet.h", "team.c")
+            SOURCE / name
+            for name in ("packet.c", "packet.h", "team.c", "curve.c")
         )
         ffi = lib = None
         try:
@@ -173,7 +180,12 @@ class NativePacket:
                     )
             if manifest["backend"] != self.variant:
                 raise ValueError("native build backend identity mismatch")
-            if set(manifest["source"]) != {"packet.c", "packet.h", "team.c"}:
+            if set(manifest["source"]) != {
+                "packet.c",
+                "packet.h",
+                "team.c",
+                "curve.c",
+            }:
                 raise ValueError("incomplete native build source identity")
             if library.stat().st_size > 256 * 1024:
                 raise ValueError("native library exceeds funded load size")

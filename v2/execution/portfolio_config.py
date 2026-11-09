@@ -148,8 +148,10 @@ class PortfolioConfig:
             if self.pm1_chunk_size > 256:
                 raise ValueError("limit p-1 chunks to 256 primes")
         arithmetic.get_backend(self.backend)
-        if self.ecm_kernel not in ("python", "c-gmp", "auto"):
-            raise ValueError("ECM kernel must be python, c-gmp or auto")
+        if self.ecm_kernel not in ("python", "c-gmp", "c-gmp-full", "auto"):
+            raise ValueError(
+                "ECM kernel must be python, c-gmp, c-gmp-full or auto"
+            )
         if self.ecm_kernel != "python" and self.backend != "python-int":
             raise ValueError("C/GMP ECM packets require python-int state")
         if self.ecm_chain_mode not in ("auto", "off", "reuse"):
@@ -412,9 +414,13 @@ def _execution_context(state, config, budget):
     if config.ecm_kernel != "python":
         from ..ecm.native_packet import NativePacket
 
-        (programs or context).native_packet = NativePacket(
-            mode=config.ecm_kernel
-        )
+        packet_type = NativePacket
+        mode = config.ecm_kernel
+        if mode == "c-gmp-full":
+            from ..ecm.native_curve import NativeCurvePacket
+
+            packet_type, mode = NativeCurvePacket, "c-gmp"
+        (programs or context).native_packet = packet_type(mode=mode)
     return context, programs
 
 

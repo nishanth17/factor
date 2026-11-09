@@ -68,4 +68,45 @@ int b4_team_step(b4_context *const *contexts, size_t count, unsigned workers,
                  unsigned schedule, unsigned milliseconds, unsigned actions,
                  int *statuses, unsigned *actual_workers);
 int b4_result(const b4_context *ctx, b4_output *output);
+/* Whole-curve ordinary-mpz owner. Metadata is immutable and copied once. */
+typedef struct b4_prime_block b4_prime_block;
+typedef struct {
+    unsigned long long prime, power, reserve;
+    b4_record fast, unit;
+} b4_curve_unit;
+typedef struct {
+    unsigned phase, done, setup_done, chain_chunks, chain_replays, boundary;
+    unsigned need, chain, strict_state, operation;
+    unsigned long long b1, b2, center, distance, replay_power;
+    unsigned long long left, next, hi, work, setup_ops, stage_one_ops, stage_two_ops;
+    size_t index, powers_count, baby_count, terms_count, replay_index, recovery;
+    unsigned long long phase_ns[3];
+} b4_curve_info;
+typedef struct { unsigned char data[128]; size_t size; } b4_atom;
+unsigned b4_whole_ecm(void);
+b4_prime_block *b4_block_create(unsigned long long lo, unsigned long long hi,
+                               unsigned long long bound, unsigned chain,
+                               const b4_curve_unit *units, size_t count);
+int b4_block_destroy(b4_prime_block *block);
+int b4_block_prepare(b4_prime_block *block, unsigned long long b1,
+                      unsigned long long b2);
+int b4_curve_begin(b4_context *ctx, b4_value n, b4_value sigma,
+                    unsigned long long b1, unsigned long long b2,
+                    unsigned chunk, unsigned gcd_batch, unsigned segment);
+int b4_curve_feed(b4_context *ctx, b4_prime_block *block);
+int b4_curve_info_get(const b4_context *ctx, b4_curve_info *info);
+/* Canonical fields: a24, value X/Z, replay X/Z, product, factor,
+ * baby X/Z, terms, giant X/Z, previous X/Z. No partial arithmetic exports. */
+int b4_curve_get(const b4_context *ctx, unsigned field, size_t index, b4_atom *out);
+int b4_curve_power(const b4_context *ctx, size_t index, unsigned long long *pair);
+/* Restore complete canonical actions; speculative scratch is discarded. */
+int b4_curve_restore(b4_context *ctx, const b4_curve_info *info,
+                      const b4_value *fields, const b4_value *baby,
+                      const b4_value *terms, b4_prime_block *powers,
+                      b4_prime_block *block);
+int b4_curve_options(b4_context *ctx, unsigned atomic_actions, unsigned phase_clocks);
+/* Inert per-owner deterministic failure/cancellation hooks. Zero disables. */
+int b4_curve_faults(b4_context *ctx, unsigned preparation_failure,
+                     unsigned cancel_after_actions);
+void b4_curve_cancel(b4_context *ctx);
 #endif

@@ -194,6 +194,9 @@ class NativeTeam:
             _PROCESS_TEAM_LOCK.release()
             self.lock.release()
 
+    def _before_close(self):
+        """Release optional derived owners while contexts and DSO remain live."""
+
     def close(self):
         if not self.lock.acquire(blocking=False):
             raise RuntimeError("cannot close an active native team")
@@ -207,6 +210,7 @@ class NativeTeam:
                 )
                 self.lib.b4_pthread_destroy(self.owner)
                 self.owner = None
+            self._before_close()
             # Borrowing packets share the first packet's DSO handle. Destroy
             # them before closing that handle, exactly once, in its owner.
             for packet in reversed(self.packets):

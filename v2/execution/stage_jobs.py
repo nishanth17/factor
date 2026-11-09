@@ -483,6 +483,14 @@ def advance_job(job, budget, context, config):
     """Commit one bounded candidate action; exhaustion preserves its state."""
     if job["done"]:
         return
+    packet = (
+        getattr(context, "native_packet", None)
+        if job["kind"] == "ecm"
+        else None
+    )
+    if getattr(packet, "full_ecm", False):
+        packet.advance_job(job, budget, context, config)
+        return
     if job["kind"] == "rho":
         _rho_step(job, budget, config)
         return

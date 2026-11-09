@@ -134,7 +134,7 @@ def main():
         gmp_library_sha256=sha(args.gmp_prefix / "lib/libgmp.10.dylib"),
         source={
             name: sha(source / name)
-            for name in ("packet.c", "packet.h", "team.c")
+            for name in ("packet.c", "packet.h", "team.c", "curve.c")
         },
         library_sha256=sha(library),
         openmp=None

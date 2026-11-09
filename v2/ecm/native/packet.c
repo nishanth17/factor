@@ -15,6 +15,12 @@
 
 #define ABI 1
 #define POINTS 16
+typedef struct b4_curve_state b4_curve_state;
+static void curve_free(b4_context *c);
+static void curve_abort(b4_context *c);
+static int curve_active(const b4_context *c);
+static int curve_slice(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
+                        unsigned actions, const atomic_uint *cancel);
 
 struct b4_context {
     mpz_t n, a24, scalar, x[POINTS], z[POINTS], scratch[7], guard;
@@ -27,6 +33,8 @@ struct b4_context {
     /* Per-context deterministic clock scripts; inert in normal execution. */
     uint64_t clock_script[2][16];
     unsigned clock_count[2], clock_index[2];
+    b4_curve_state *curve;
+    unsigned capacity_bits;
 };
 
 unsigned b4_abi(void) { return ABI; }
@@ -43,6 +51,7 @@ b4_context *b4_create(void) {
 
 void b4_destroy(b4_context *c) {
     if (!c) return;
+    curve_free(c);
     mpz_clears(c->n, c->a24, c->scalar, c->guard, NULL);
     for (unsigned i = 0; i < POINTS; ++i) mpz_clears(c->x[i], c->z[i], NULL);
     for (unsigned i = 0; i < 7; ++i) mpz_clear(c->scratch[i]);
@@ -51,6 +60,7 @@ void b4_destroy(b4_context *c) {
 
 void b4_abort(b4_context *c) {
     if (!c) return;
+    curve_abort(c);
     c->mode = c->done = 0;
     c->records = NULL;
     c->count = 0;
@@ -240,6 +250,33 @@ unsigned b4_test_clock_reads(const b4_context *c, unsigned kind) {
     return c && kind < 2 ? c->clock_index[kind] : 0;
 }
 
+static void arithmetic_action(b4_context *c) {
+    if (c->mode == 1) {
+        if (mpz_tstbit(c->scalar, (mp_bitcnt_t)c->bit)) ladder_bit(c, 2, 1);
+        else ladder_bit(c, 1, 2);
+        if (--c->bit < 0) c->done = 1;
+    } else {
+        const b4_record *r = &c->records[c->record];
+        if (c->starting) {
+            guard_point(c, 0, r->masks[0]); c->starting = 0;
+        }
+        if (c->opcode < r->code_size) {
+            const unsigned char *op = r->code + c->opcode;
+            if (op[3] == 255) doubling(c, op[0], op[1]);
+            else addition(c, op[0], op[1], op[2], op[3]);
+            c->opcode += 4;
+            guard_point(c, op[0], r->masks[c->opcode / 4]);
+        }
+        if (c->opcode == r->code_size) {
+            mpz_set(c->x[0], c->x[r->output]);
+            mpz_set(c->z[0], c->z[r->output]);
+            ++c->record; ++c->completed;
+            c->opcode = 0; c->starting = 1;
+            if (c->record == c->count || !mpz_sgn(c->guard)) c->done = 1;
+        }
+    }
+}
+
 static int step_until(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
                       unsigned actions, const atomic_uint *cancel) {
     uint64_t cpu_wall = 0;
@@ -259,53 +296,28 @@ static int step_until(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
             if (cpu >= cpu_end) break;
             cpu_wall = wall;
         }
-        if (c->mode == 1) {
-            if (mpz_tstbit(c->scalar, (mp_bitcnt_t)c->bit)) {
-                ladder_bit(c, 2, 1);
-            } else {
-                ladder_bit(c, 1, 2);
-            }
-            if (--c->bit < 0) c->done = 1;
-        } else {
-            const b4_record *r = &c->records[c->record];
-            if (c->starting) {
-                guard_point(c, 0, r->masks[0]); c->starting = 0;
-            }
-            if (c->opcode < r->code_size) {
-                const unsigned char *op = r->code + c->opcode;
-                if (op[3] == 255) doubling(c, op[0], op[1]);
-                else addition(c, op[0], op[1], op[2], op[3]);
-                c->opcode += 4;
-                guard_point(c, op[0], r->masks[c->opcode / 4]);
-            }
-            if (c->opcode == r->code_size) {
-                mpz_set(c->x[0], c->x[r->output]);
-                mpz_set(c->z[0], c->z[r->output]);
-                ++c->record; ++c->completed;
-                c->opcode = 0; c->starting = 1;
-                if (c->record == c->count || !mpz_sgn(c->guard)) c->done = 1;
-            }
-        }
+        arithmetic_action(c);
     }
     return c->done ? 1 : 0;
 }
 
-int b4_ready(const b4_context *c) { return c && c->mode; }
+int b4_ready(const b4_context *c) { return c && (c->mode || curve_active(c)); }
 
 int b4_slice(b4_context *c, unsigned long long wall_end,
              unsigned long long cpu_end, unsigned actions, const void *cancel) {
     if (!b4_ready(c) || !actions || actions > 128) return -1;
+    if (curve_active(c)) return curve_slice(c, wall_end, cpu_end, actions, cancel);
     return step_until(c, wall_end, cpu_end, actions, cancel);
 }
 
 int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
-    if (!c || !c->mode || !milliseconds || milliseconds > 5 ||
+    if (!b4_ready(c) || !milliseconds || milliseconds > 5 ||
         !actions || actions > 128) return -1;
     uint64_t wall = nanoseconds(c, CLOCK_MONOTONIC);
     uint64_t cpu = nanoseconds(c, CLOCK_PROCESS_CPUTIME_ID);
     if (!wall || !cpu) return -1;
     uint64_t interval = (uint64_t)milliseconds * 1000000u;
-    return step_until(c, wall + interval, cpu + interval, actions, NULL);
+    return b4_slice(c, wall + interval, cpu + interval, actions, NULL);
 }
 
 unsigned b4_openmp(void) {
@@ -378,6 +390,7 @@ static void export_value(unsigned char *data, size_t *size, const mpz_t value) {
 }
 
 int b4_result(const b4_context *c, b4_output *out) {
+    if (curve_active(c)) return -1;
     if (!c || !out || !c->mode || !c->done) return -1;
     memset(out, 0, sizeof(*out));
     unsigned slot = c->mode == 1 ? 1 : 0;
@@ -387,3 +400,5 @@ int b4_result(const b4_context *c, b4_output *out) {
     out->completed = c->completed;
     return 0;
 }
+
+#include "curve.c"

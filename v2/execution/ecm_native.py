@@ -251,6 +251,13 @@ class NativeECMExecutor:
         return dict(completed), list(attempts), payload["runs"]
 
     def _run(self, n, config, budget, lineage, checkpoint, fixed_work):
+        if config.ecm_kernel == "c-gmp-full":
+            from .ecm_native_full import run_full
+
+            return run_full(
+                self, n, config, budget, lineage, checkpoint, fixed_work
+            )
+
         from . import stage_jobs as jobs
 
         integer(

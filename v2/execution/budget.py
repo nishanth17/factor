@@ -285,6 +285,12 @@ class Budget:
         self._check()
         self.used += amount
 
+    @synchronized
+    def record_incurred_work(self, amount):
+        """Record completed foreign work before any cancellable publication poll."""
+        utils.require_integer(amount, "amount", 0)
+        self.used += amount
+
     def publication(self):
         """Force a current tree sample before atomic state publication."""
         self._check(publication=True)
