@@ -22,6 +22,8 @@ def main():
     parser.add_argument("--pthread", action="store_true")
     parser.add_argument("--vector-report", action="store_true")
     parser.add_argument("--limb-division", action="store_true")
+    parser.add_argument("--optimization", choices=("O2", "O3"), default="O2")
+    parser.add_argument("--cpu-target")
     args = parser.parse_args()
     if args.pthread and args.openmp_prefix is not None:
         parser.error("select pthread or OpenMP, not both")
@@ -52,7 +54,15 @@ def main():
         output /= "pthread"
     output.mkdir(parents=True, exist_ok=True)
     library = output / "libfactor_ecm.dylib"
-    flags = ["-std=c11", "-O2", "-Wall", "-Wextra", "-Werror"]
+    flags = [
+        "-std=c11",
+        "-" + args.optimization,
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ]
+    if args.cpu_target is not None:
+        flags.append("-mcpu=" + args.cpu_target)
     if args.limb_division:
         flags.append("-DB4_MPN_DIVISION")
     if args.vector_report:
@@ -152,6 +162,8 @@ def main():
         library_sha256=sha(library),
         abi_binding=dict(file=binding.name, sha256=sha(binding)),
         limb_division=args.limb_division,
+        optimization=args.optimization,
+        cpu_target=args.cpu_target,
         openmp=None
         if args.openmp_prefix is None
         else dict(
