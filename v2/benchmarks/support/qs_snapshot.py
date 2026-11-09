@@ -63,12 +63,19 @@ def load_qs_arm(name, changes=()):
     names.insert(names.index("budget") + 1, "work_budget")
     names.insert(names.index("qs.sieve_collector"), "qs.families")
     names.insert(names.index("qs.sieve_collector"), "qs.power_sieve")
+    names.insert(names.index("qs.sieve_collector"), "qs.power_sieve_native")
     names.insert(names.index("qs.sieve_collector"), "qs.score")
     names.insert(names.index("qs.sieve_collector"), "qs.storage")
     if "qs.sieve_collector" in changes:
         names.insert(names.index("qs.sieve_collector"), "qs.hit_words")
         names.insert(names.index("qs.sieve_collector"), "qs.power_reuse")
         names.insert(names.index("qs.sieve_collector"), "qs.collector_kernels")
+        names.insert(names.index("qs.sieve_collector"), "qs.sparse_queue")
+        # Specialized functions reference collector result classes, so load
+        # them after that module has defined its classes, before construction.
+        names.insert(
+            names.index("qs.sieve_collector") + 1, "qs.scalar_kernels"
+        )
     names += ["qs.linear_algebra", "qs.extraction", "qs.pipeline"]
     for module_name in names:
         current = module_name in changes or module_name not in sources

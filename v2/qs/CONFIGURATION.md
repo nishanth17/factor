@@ -135,7 +135,9 @@ lifting. Polynomial/span changes invalidate derived plans. Saved caches are
 never accepted as verification evidence.
 
 `marking` supports `density`, `presieve`, `presieve_powers`, `unroll4` and
-`scan_fused` and `parity_two` in valid duplicate-free combinations. The two presieve selectors
+`scan_fused`, `parity_two`, `packed_queue`, `wide_hits`, `wide_inverses`,
+`wide_transfers` and `pruned_transfers`
+in valid duplicate-free combinations. The two presieve selectors
 are mutually exclusive. Kernels specialize supported list-backed score/recovery
 modes and retain exact scalar paths for unsupported or exceptional cases.
 Scratch coexistence, rotation, cancellation and refused work stay bounded.
@@ -153,6 +155,34 @@ queues under root resources. Unsupported scores/recovery,
 singular sparse roots, unaligned blocks or capacity refusal use the ordinary
 exact path. All hits and candidate checks remain covered. Polynomial changes
 release queues; interruption/restore rebuilds them with charges.
+
+The opt-in `packed_queue` component uses one checked 64-bit word per hit,
+replacing three 32-bit words and the temporary append tuple. It preserves the
+older conservative reservation, work/event order and exact direct fallback.
+It follows `parity_two` in component order and changes no default.
+
+`wide_hits` follows `packed_queue` and raises the optional native-word scratch
+ceiling from 32 to 128 MiB. Its actual reservation, construction work and the
+next polynomial's metadata coexistence must still fit the caller's grant.
+Scarce resources retain exact large-integer masks. This selection is opt-in.
+
+`wide_inverses` follows `wide_hits` and permits 32 MiB of shared derivative
+inverse scratch instead of 8 MiB. It uses the existing exact fixed-target
+opposite-derivative cache, with independent inversion for unexpected values.
+The full reservation and subsequent polynomial-switch coexistence must fit
+the collector grant. No automatic default changes.
+
+`wide_transfers` follows `wide_inverses` and permits up to 128 MiB of
+within-family prime-power root pairs instead of 32 MiB, with a larger
+per-base-member allowance for distinct powers. The complete scratch and next
+polynomial switch must fit; otherwise ordinary exact lifting remains. The
+cache retains complete nonsingular pairs and is rebuilt after resume.
+
+`pruned_transfers` follows `wide_transfers` and independently allows complete
+cached pairs to serve a single surviving first-level class after window
+pruning. The class is selected modulo the original prime; cached state stays
+complete, and the extra replayed root remains charged. Ordinary lifting
+handles cache misses. The option changes no automatic selection.
 
 This selection was [adopted](../benchmarks/RESULTS.md#c10a-07-face-and-queue).
 Its exploratory performance label and unmet drift/confirmation gates remain

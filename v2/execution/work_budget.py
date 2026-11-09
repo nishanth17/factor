@@ -17,8 +17,17 @@ class PollingBudget:
         utils.require_integer(interval, "poll interval", 1)
         if interval > 64:
             raise ValueError("poll interval exceeds 64 atomic actions")
+        self._counter = [0]
         self.budget, self.interval, self.poll = budget, interval, poll
         self._remaining = 0
+
+    @property
+    def _remaining(self):
+        return self._counter[0]
+
+    @_remaining.setter
+    def _remaining(self, value):
+        self._counter[0] = value
 
     def __getattr__(self, name):
         return getattr(self.budget, name)
@@ -26,7 +35,7 @@ class PollingBudget:
     def __setattr__(self, name, value):
         # Public ledger updates, including cancellation installed during a
         # callback, must reach the shared Budget rather than shadow its fields.
-        if name in ("budget", "interval", "poll", "_remaining"):
+        if name in ("budget", "interval", "poll", "_remaining", "_counter"):
             object.__setattr__(self, name, value)
         else:
             setattr(self.budget, name, value)
@@ -34,15 +43,16 @@ class PollingBudget:
     def consume(self, amount=1):
         """Refuse an overdraw immediately, even between external polls."""
         utils.require_integer(amount, "amount", 0)
-        if amount == 0 or self._remaining == 0:
+        counter = self._counter
+        if amount == 0 or counter[0] == 0:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
-            self._remaining = self.interval - 1
+            counter[0] = self.interval - 1
         else:
             # Skip only the external poll; the reservation still costs work.
             self.budget.used += amount
-            self._remaining -= 1
+            counter[0] -= 1
 
     def consume_span(self, amount):
         """Reserve up to one interval of certified unit-cost actions.
@@ -54,14 +64,15 @@ class PollingBudget:
         utils.require_integer(amount, "span amount", 1)
         if amount > self.interval:
             raise ValueError("span exceeds the cooperative polling interval")
-        if amount > self._remaining:
+        counter = self._counter
+        if amount > counter[0]:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
-            self._remaining = self.interval - amount
+            counter[0] = self.interval - amount
         else:
             self.budget.used += amount
-            self._remaining -= amount
+            counter[0] -= amount
 
     def consume_actions(self, count, work_each):
         """Reserve a group while counting every original logical action.
@@ -75,11 +86,12 @@ class PollingBudget:
         if count > self.interval:
             raise ValueError("group exceeds the cooperative polling interval")
         amount = count * work_each
-        if count > self._remaining:
+        counter = self._counter
+        if count > counter[0]:
             if self.poll is not None:
                 self.poll(self.budget)
             self.budget.consume(amount)
-            self._remaining = self.interval - count
+            counter[0] = self.interval - count
         else:
             self.budget.used += amount
-            self._remaining -= count
+            counter[0] -= count

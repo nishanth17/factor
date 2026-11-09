@@ -357,10 +357,12 @@ class CountedIntegrationTests(unittest.TestCase):
                     if memory in (None, 2**30)
                     else "reference",
                 )
-                selected = 50 <= digits <= 55 and memory in (None, 2**30)
+                selected = digits >= 50 and memory in (None, 2**30)
                 self.assertEqual(
                     cfg.collector.marking,
-                    SELECTED + "+parity_two" if selected else "parity_two",
+                    "presieve+unroll4+parity_two"
+                    if selected
+                    else "parity_two",
                 )
                 self.assertNotIn("_kernels", asdict(cfg.collector))
         n = 10**54 + 123

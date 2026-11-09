@@ -55,6 +55,17 @@ class RecordingBudget(ResourceBudget):
 
 RETIRED_CONFIG_FIELDS = frozenset(
     (
+        "assignment_seconds",
+        "parent_work_reserve",
+        "parent_cpu_reserve",
+        "shutdown_work",
+        "shutdown_cpu",
+        "helper_cpu",
+        "runtime_memory_bytes",
+        "coexistence_bytes",
+        "context_limit",
+        "receipt_limit",
+        "max_attempts",
         "memory_bytes",
         "checkpoint_bytes",
         "max_atoms",
@@ -102,7 +113,8 @@ def adapt_resource_configuration(factory, *args, **values):
     }
     recipe = values.get("recipe")
     if (
-        getattr(factory, "__name__", "") == "default_siqs_config"
+        getattr(factory, "__name__", "")
+        in ("default_siqs_config", "legacy_siqs_config")
         and "recipe" in parameters
     ):
         legacy_memory = historical.get("memory_bytes")

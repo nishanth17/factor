@@ -1,20 +1,211 @@
 # A7a execution specification: overhead removal, then anchor tuning
 
-Status: revised execution design, not a completed campaign or approval to
-launch it. No successor stage is pre-approved. Follow the
+## Directional extension amendment — approved after the reduced race
+
+
+### Frozen local execution protocol
+
+Committed numerical/worker implementation `0ca030d` passes 1,629 tests (nine
+optional skips), lint and 295 benchmark imports. Its exact-work coverage fixture
+has 28 packets for up to 20 workers. A committed-source C20 prefix smoke captures
+all twenty timelines and the expected 33,554,688 scanned positions. The earlier
+16-packet fixture failure is retained; no timed extension result selected a fix.
+The final documentation commit has identical runtime Python and input files.
+
+Local driver: `v2/audit/a7a/directional-extension-20261108/controller.py`.
+After its synthetic branch checks pass, inspect the generated source-pinned
+plan and run from the isolated task worktree with process inspection enabled:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/preflight-test.py
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/controller.py
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/directional-extension-20261108/controller.py --execute
+```
+
+The local owner script, exact plan, committed source archive, grants, decisions,
+noise controls and every result are captured under the main repository's ignored
+`v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/`.
+It is a task-local execution protocol, not a new automatic tuning framework or
+public import API. Do not edit a historical protocol or replay favorable cells.
+
+| Digits | Fixed packet | Incumbent | Allowed conditional catalogue | Maximum input-0 configurations on one path |
+| --- | ---: | ---: | --- | ---: |
+| 50 | 8 | C4 | C1/C2/C3/C4/C5/C6 | 5 |
+| 55 | 16 | C4 | C1/C2/C3/C4/C5/C6 | 5 |
+| 60 | 16 | C8 | C6/C7/C8/C9/C10 | 5 |
+| 65 | 64 | C14 | C12 through C20 | 6 |
+| 70 | 64 | C8 | C8 plus C12 through C20 | 7 |
+
+At 50/55 compare C2 with C4 first. A clear C2 gain admits endpoint C1/C3.
+A clear C2 loss admits the C6 right-bracket check; only a clear C6 loss to C4
+admits C3/C5. Flat/censored/unbracketed results skip odd tests. At 60 measure
+C8/C6/C10; only both neighbours clearly losing to C8 admits C7/C9.
+
+At 65/70 the first group includes C14/C16 and, when different, the separate
+current incumbent. Continue C18/C20 only on clear improvements, stopping at
+first loss/tie. A strict C16 loss admits a C12 check before C13/C15. After a
+later strict bracket admit best±1 only if that basin remains the global best
+noise-band representative; do not refine an inferior local basin. A winning
+C20 is an unresolved upper boundary. No C21/C22 is admitted.
+
+A clear gain/loss requires a symmetric timing gap `max(ratio,1/ratio)-1`
+greater than the measured noise bound. Otherwise it is a tie. The noise bound
+is the maximum of fresh row controls and the preceding completed race's row
+floor: 2.27/4.55/1.91/1.08/7.42% at 50/55/60/65/70. Carrying those conservative
+floors prevents shortening a batch from artificially lowering measured noise.
+Old timings are not pooled: all compared extension input-0 arms use the new
+committed source. Record the ratio, bound and signed margin for every branch.
+
+Before each decision group, run an opening A/A pair on a fixed prefix using
+the row's incumbent process configuration; repeat it after the group. Use
+512 polynomials below 65 digits and 2,048 at 65/70. These are parallel controls,
+not the prior race's S0 controls. Signatures and scanned positions must match.
+Any within-pair or start/end geometric drift above 10% stops and reports;
+no automatic retry. All process arms, including controls, have worker timelines.
+CPU/heap profiling and Tier-A are off. Keep the 0.5 s owned-RSS observer and
+before/after plus 60-second `pmset -g therm` observations. Report sampled RSS
+and OS whole-actor CPU; retain the known inner-counter qualification.
+
+Finish input-0 coverage across all five sizes before continuation. Let `T` be
+the fastest completed input-0 wall and `d` the row noise bound. Within the best
+noise band `time <= T * (1+d)`, retain only the fewest-worker representative.
+Also retain distinguishable contenders outside that band with `time <= 1.05*T`.
+Thus flat higher-worker ties do not consume continuation calls. If noise exceeds
+5%, the preferred lower-worker representative is retained even if outside the
+nominal raw-time window; this enforces the explicit tie rule. In particular the
+70-digit 7.42% floor admits one representative for inputs 1–2. Freeze this
+selection before continuation and run each survivor once per independent input.
+Keep n=1/n=3 summaries distinct and preserve every rejected result.
+
+A failed reference does not prevent its already-admitted candidate from running.
+A wall-censored arm can establish a directional bound only when its root wall
+cutoff divided by the completed arm's actor time is already beyond the noise
+bound. Record that bound separately; never substitute a timeout as a completed
+latency. Otherwise the comparison is inconclusive. An observed RSS stop preserves
+its memory outcome and stops the owner before admitting further cells.
+
+Root wall per call is 30/100/300/900/1,800 s by increasing size; root CPU is ten
+times wall, with the same 18 GiB observed-RSS guard on every arm. The actor
+spec adds 10 s for cooperative cleanup; the owner reserves root wall plus 40 s.
+All calls use a fresh PyPy 3.11 interpreter/pool, 4 MiB nursery and matched
+seeds 104729/130363/155921 on the original certified balanced calibration inputs.
+Never select using G4 heldouts, known factors or future outcomes.
+
+The finite maximum is 28 input-0 configurations, 72 full-factor calls and
+84 prefix controls: 156 actors. The mutually exclusive branch bound funds
+38,850 root factoring seconds, 10,080 root control seconds, 6,240 owner cleanup
+seconds and a 420 s final reserve. Aggregate ceilings are 56,000 wall seconds,
+560,000 CPU-seconds and 4 GiB recorder storage. These are conservative complete
+branch reservations, not spending targets or authorization for extra arms.
+Expected elapsed time from current costs is about 1–3 hours. Price the actual
+survivor continuation schedule at the input-0 report. Preserve all failures and
+charges, report the first informative result, then stop after this extension.
+
+The reduced race is complete on `bce0ad0`: 36 factoring calls, 40 controls,
+provisional C4/C4/C8/C14/C8 at 50/55/60/65/70. Its 10% freeze is historical.
+The next, separately source-pinned extension uses a 5% input-0 race, followed
+by inputs 1–2 only for survivors. Keep packets 8/16/16/64/64 and all other
+options fixed. Validate explicit counts through 20 before execution.
+
+At 65/70 test C16 against C14, continue C18 then C20 only while wall gains
+exceed A/A drift, stopping at the first loss/tie. After a strict even bracket,
+test best±1 only when both even neighbours are measurably worse. Skip odd tests
+on a flat drift band and break ties toward fewer workers. Apply odd refinement
+at lower sizes too, including C2 when needed to bracket C4 and endpoint C1/C3
+if C2 strictly wins. A still-winning C20 is an unresolved boundary, not approval
+for C21/C22. Report every comparison's wall/CPU/RSS and margin versus A/A drift.
+Unimodality is a search heuristic, not a proved property of these inputs.
+
+Resolve current-source references, the finite conditional catalogue, exact
+noise-control placement, call/resource ceilings and expected runtime before
+launch. Retain all outcomes and source labels; no reuse of G4 heldouts for
+selection. No default adoption, merge, push or new 75/80 probe before B5a.
+
+## Worker-count race amendment — approved after slim G4
+
+Slim G4 is complete; its source-pinned evidence is separate. The later user
+instruction authorizes a reduced worker-only race: 50/55 C4/C6/C8; 60
+C4/C6/C8/C10; 65/70 C8/C10/C12/C14. Keep each target's frozen/interpolated
+packet width and every other option fixed. Run all 18 input-0 cells; advance
+only configurations with completed wall <=1.10 times the fastest completed
+cell in that row to inputs 1–2, one repetition each, at most 54 factoring calls.
+Retain every screen outcome and distinguish n=1 from n=3. Explicitly flag
+C12/C14 as oversubscription. Report wall, whole-actor CPU and sampled peak RSS.
+Use a separate current-source protocol and original calibration inputs, never
+G4 heldouts. Validate opt-in fourteen-worker support and freeze aggregate
+resources before launching. No automatic-default adoption or 75/80 probes.
+
+## Slim G4 amendment — approved 8 November 2026
+
+Defer all new 75/80 probes until after B5a. The earlier conditional probe
+instructions below are historical and do not authorize another call.
+
+After the H3 integration passes, confirm only cold 55, 65 and 70 against S0,
+using three fresh independent balanced inputs per row, one repetition per
+arm/input: 18 calls, no sample extensions. Frozen process recipes are C4/p16
+at 55 and C10/p64 at 70. The unchanged nearest-anchor interpolation selects
+70's C10/p64 for 65; label this row interpolated. Use target-resolved Y0 and
+the frozen implementation/cache/queue/packet choices on both arms. S0 is the
+same-policy serial control, replacing literal mainline for this scoped G4.
+No tuning, default adoption, merge to master, push or successor follows.
+
+Use committed confirmation inputs g4_{55,65,70}_{0,1,2}, in that order, matched
+factoring/hash seeds 104729/130363/155921 and counterbalanced arm order.
+Each run uses a fresh interpreter, no warmup, 4 MiB nursery, matched root
+wall/CPU/RSS allowances and complete cold actor wall through validation and
+shutdown. Root wall limits are 100/900/1800 seconds, CPU is ten times root
+wall and RSS is 18 GiB. CPU/heap profiles, Tier-A hooks and worker timelines
+are off; retain low-rate RSS and 60-second thermal observations.
+
+Predeclare one 98 1/3% paired-log t interval (df 2) per row, threshold 1 for
+candidate/S0 actor time. Compare the effect with measured A/A variability;
+report ambiguous or censored results as inconclusive. Never replace a timeout
+with a completed time, discard failures or select settings from these inputs.
+Preserve the 70-digit completion guardrail; this reduced scope does not verify
+fresh 60-digit completion or establish a population/p90 or master speedup.
+
+Each row has opening/closing identical S0 fixed-prefix A/A pairs on its
+calibration input, separate from the fresh confirmation sample. Freeze exact
+prefix work/signatures before outcomes and retain the 10% drift stop, with no
+automatic restart. Keep resource ceilings and exact resolved recipes in the
+new source-pinned local protocol. Expected elapsed time is about 2–3 hours;
+owner ceilings price all 18 calls, controls, telemetry and cleanup separately.
+Stop and report after this slim G4.
+
+
+H3 integration amendment (8 November): local master `755c312` replaces the
+resource model used by the historical stages below. Internal logical-byte,
+work/CPU lease and checkpoint refusal caps no longer admit or stop production
+QS workers. Keep the frozen numerical recipes, packet/cache capacities and
+historical receipts. New execution uses a fresh source/protocol identity,
+root wall/aggregate CPU and the approved 18 GiB observed-RSS guard. Checkpoint
+file limits apply only to optional atomic saves. Cost tables require
+revalidation; the old ownership sums are historical, not current admission.
+
+
+Status: restricted G3 reported on 8 November; the approved stage is finished
+and stopped. All 100 calls complete on runtime `60bfd95`. Frozen experimental
+process recipes: C4/p4 at 40 cold/warm, retained C4/p16 at 55 cold (ranking
+inconclusive), C10/p64 at 70 cold. Pre-G3 cleanup and diagnostics are complete.
+The subsequently approved generous-bounds 75/80 probes are also reported:
+both incomplete under internal memory outcomes before solving. No further
+probe is approved. Intermediate verification and G4 remain gated.
+Follow the
 [joint-search policy](../POLICY.md#joint-parameter-searches) and
 [evidence tiers](../POLICY.md#evidence-tiers-and-sample-sizing).
 Preserve historical freezes, failures, charges and captures unchanged.
 
 ## Deliverable, scope and source
 
-Deliver cold CLI rows for **40, 50, 55, 60, 65 and 70 digits**. Add warm rows
-only at **40 and 50 digits**. **62 digits is dropped** from new measurements;
+The broader deliverable remains cold CLI rows for **40, 50, 55, 60, 65 and
+70 digits**. The latest scope limits warm tuning to **40 digits**, superseding
+the earlier warm-50 proposal. **62 digits is dropped** from new measurements;
 retain its historical evidence without claiming an adopted interpolation.
 
-Tune cold anchors at **40, 55 and 70** and warm anchors at **40 and 50**.
-After architectural fixes, interpolate cold 50/60/65 from those anchors and
-verify each of these three rows. They remain labeled "interpolated, verified",
+Tune cold anchors at **40, 55 and 70** and the warm anchor at **40**.
+Cold 50/60/65 proposals are currently **interpolated, unverified**; their
+verification was excluded from the restricted G3 authorization. Once separately
+authorized checks pass, label them "interpolated, verified",
 not independently tuned optima. Warm/cold results are distinct lifetimes.
 Report full recipes, input coverage, completion, elapsed time, CPU, aggregate
 owned RSS, uncertainty, ties, exclusions and untested interactions. The claim
@@ -39,6 +230,11 @@ branch `codex/a7a-regime-tuning`. The implementation checkpoint is `276ebd8`,
 based on mainline `e62ec18`; historical experimental source is `ae1cfd9`.
 Later documentation commits do not establish fresh runtime evidence. Record
 actual committed source, corpus hash and runtime versions in each new freeze.
+Current G3 runtime and QA source is `60bfd95`; the earlier checkpoint above
+is historical. Canonical local evidence is main's ignored
+`v2/benchmarks/results/a7a/g3-restricted-20261107-r2/`. It contains the
+source archive, executable controller, frozen plan, per-call commands,
+receipts, progress/thermals, worker timelines, exact recipes, report and hashes.
 Pin literal current mainline separately. Do not merge implementation changes,
 push or change automatic defaults under this plan.
 
@@ -132,6 +328,15 @@ Required before coverage:
    Reuse these counters for the clean probes' 60-second progress and thermal
    log; preserve the last observation on timeout. No probe profiler, heap
    dumper, segment rotation or new capture-storage system is a prerequisite.
+   From the 7 November addendum, enable worker active, queue-wait and
+   publication timelines in every subsequent G2H and G3 cell, on both arms
+   of each comparison, and include their summaries in reports. The measured
+   G1 overhead was approximately 1%. Keep worker timelines off for G4 clean
+   confirmation. Preserve already launched historical cells' actual settings;
+   do not relabel them as timeline-enabled observations.
+   The stage driver, combined runner and direct cell entry point reject
+   G2H/G3 process calls without a declared timeline directory and G4 calls
+   with timelines enabled. Serial controls have no worker timeline.
 5. Exact-output, lease, crash, resume, telemetry/recorder failure, near-limit,
    no-leaked-child and pure planning checks. Code changes require full suite,
    lint and benchmark imports from a committed-files-only checkout under the
@@ -209,15 +414,27 @@ result before another fix; do not optimize a small matrix stage while the
 parent stalls collection. Price and freeze a bounded next iteration; if its
 need contradicts the stage assumptions or exceeds the cap, stop and report.
 
-Measure the **N-independent-workers throughput upper bound** at N=1/4/8 using
+Measure the **independent-packet throughput reference** at N=1/4/8/10 using
 matched deterministic disjoint packet work on three calibration inputs
 per regime at 50 and 65 digits. Remove shared
 parent admission/transport from that diagnostic, not arithmetic or validation.
 Compare aggregate useful-work throughput and a local-packet/no-pool control
-with the real timeline. This bounds a coordination opportunity on the actual
-heterogeneous host; N times serial rate is not an empirical bound, and
+with the real timeline. Report scanned positions per worker CPU-second for
+every allocation, local/no-pool and S0; label whole-factor S0 separately when
+it includes graph/solve work. Static independent streams can suffer tail
+imbalance, so this reference is not a proven upper bound. N times serial
+rate is not an empirical bound, and
 independent full factorizations do not model cooperative collection. Include
 startup, remaining serial stages and load imbalance in any completion model.
+
+After the CPU-snapshot screen, the first worker-side fix is family-affinity
+placement, then grouped exact lease charging. Validate any parent-budget fix
+already in progress, but do not treat it as the main G2H fix: the G2 workers
+were 90–97% busy while spending substantially more CPU on similar scanned
+work. Isolate affinity from an explicitly wider credit window; preserve paid
+packet identities, exact admission and aggregate memory/CPU reservations.
+Do not issue the G2H gate report before implementing and measuring affinity,
+or reporting a concrete reason it cannot be measured.
 
 ### Classify and screen before constructing a joint design
 
@@ -230,8 +447,10 @@ Do not silently run the old 32-row all-binary design.
 | Option(s) | Class | Reason / initial screen |
 | --- | --- | --- |
 | Per-packet budget leases | (a) | Replace repeated shared budget calls with bounded exact reservations/reconciliation for the same work. |
+| Grouped exact lease charging (`grouped_lease_charging`) | (a) | Combine two already-polled affordable marking reservations; retain scalar paid prefixes at every boundary. |
 | Persistent worker state (`reuse_state`) | (a) | Avoid rebuilding identical immutable context between packets; charge retained memory. |
 | Coefficient reuse (`coefficient_cache`) | (a) | Avoid recalculating identical coefficients without changing assignment coverage. |
+| Family-affinity placement (`family_affinity`) | (b) | Pin original packets to reuse contiguous family state; compare a matched credit window separately from the incumbent window. |
 | `density` | (a) | Skip redundant marking overhead while retaining exact hits. |
 | `unroll4` | (a) | Change loop shape for identical marking work; no gain is presumed. |
 | Packed versus object transport (`packed_transport`) | (b) | Alternative relation representation/publication with exact decode/admission. |
@@ -242,9 +461,10 @@ Do not silently run the old 32-row all-binary design.
 | `scan_fused` | (b) | Fuse scan stages instead of separate passes over identical candidates. |
 | `parity_two` | (b) | Alternative exact two-root marking implementation. |
 | `packed_queue` | (b) | Packed versus object queue representation for identical entries. |
-| `wide_hits` | (b) | Alternative hit computation at a fixed capacity and arithmetic domain. |
-| `wide_inverses` | (b) | Alternative inverse computation/cache layout at fixed capacity. |
-| `wide_transfers` | (b) | Alternative root-transfer representation at fixed capacity. |
+| `byte_stamps` | (b) | Alternative recovery-word epoch storage, with funded wraparound clears and the existing memory reservation. Screen its interaction with packed queues as one bounded memory-layout question. |
+| `wide_hits` | (c), conditionally inactive | Raise the hit-helper admission ceiling from 32 to 128 MiB; this is a capacity choice, not a different hit algorithm. |
+| `wide_inverses` | (c), conditionally inactive | Raise the inverse ceiling from 8 to 32 MiB and change coexistence reservations. |
+| `wide_transfers` | (c) | Raise the transfer ceiling from 32 to 128 MiB and requested bytes per base entry from 4,096 to 8,192. |
 | `pruned_transfers` | (b) | Omit provably redundant transfers while preserving exact roots. |
 | Serial/process worker count | (c) | Startup, parent pressure and heterogeneous-core throughput vary with size. |
 | Polynomials per packet, lookahead | (c) | Amortization and load balance interact with workers and family geometry. |
@@ -257,6 +477,14 @@ Do not silently run the old 32-row all-binary design.
 | Whole-family flag | Derived | Derive from packet width and actual family size; do not count a redundant independent dimension. |
 | Numerical/base/large-prime policy | Frozen boundary | Changing mathematical effort needs a separately priced design, not a hidden concurrency comparison. |
 | Native/NEON | Excluded | Deferred B5a implementation, not an available option in this process campaign. |
+
+The three `wide_*` classifications correct the initial inventory against the
+implementation before their trials, rather than reclassifying an observed
+interaction. With the frozen Y0 base-count bounds through 70 digits, hit
+scratch fits the default 32 MiB ceiling and the inverse table fits 8 MiB.
+Record exact capacity/coexistence eligibility before constructing G3; omit
+inactive levels with that bound, rather than timing equivalent recipes.
+`wide_transfers` can change admitted cache capacity within these regimes.
 
 Screen (a)/(b) once at **50 and 65 digits**, on identical packet work and
 fixed resources/seeds. Apply Tier 1: three independent calibration inputs per
@@ -290,6 +518,81 @@ results and the repriced search/confirmation bill; stop for approval. New
 hotspots discovered later require a separately gated fix and retuning of
 only affected rows, not an automatically repeated whole campaign.
 
+### Byte-stamp complete-call remeasurement — 7 November
+
+This explicitly requested G2H block uses source `1b5ab81` and the committed
+`regime_calibration_50_{0,1,2}` and `regime_calibration_65_{0,1,2}` inputs.
+Keep it separate from the earlier layout screens. The only implementation
+difference is the `byte_stamps` marking component; native stamps are the
+control. Both arms retain Y0, packet 16, lookahead 4, ordinary placement,
+scalar leases, worker verification, ordinary sparse queues, coefficient
+reuse, nursery 4 MiB, worker 512 MiB/state 64 MiB, parent 4 GiB and total
+22 GiB. CPU/heap captures are excluded from clean timing; Tier A, RSS and
+all-worker timelines are enabled in both arms.
+
+| Digits | Workers | Actor wall/CPU seconds | Owner wall/CPU seconds per call |
+| --- | ---: | --- | --- |
+| 50 | 4 | 45 / 450 | 65 / 510 |
+| 65 | 8 | 400 / 4,000 | 420 / 4,060 |
+
+Use one fresh cold call per arm/input: twelve calls, at most 2,910 owner
+seconds, 27,420 CPU-seconds and 128 MiB new capture storage, charged within
+the G2H grant. The 65-digit allowance funds outstanding private CPU leases;
+the earlier underfunded collection screen is not a performance loss.
+
+Visit input indices 0, 1, 2, running the 50-digit pair then the 65-digit pair
+at each index. Native goes first for 50-digit indices 0/2 and 65-digit index
+1; byte goes first in the other pairs. Match factoring seeds
+104729/130363/155921 by index and set `PYTHONHASHSEED` to that same declared
+value before each actor starts; spawned workers inherit it. This pins an
+additional source of incidental container order without attributing earlier
+variation to it. Earlier unset-hash observations are not pooled.
+
+Validate complete reconstruction against the certified oracle. Retain
+timeouts as censored. For each band report all three actor-time ratios,
+worker CPU/work/scanned counts, RSS and worker timelines. Form a paired
+log-ratio mean, across-input standard deviation and 98 1/3% paired-t interval
+with two degrees of freedom, explicitly conditional on its distribution and
+independence assumptions. An interval below one supports an exploratory gain,
+above one supports a loss, and an interval spanning one is inconclusive.
+There is no 5% practical-effect cutoff or all-three-faster requirement in this
+block. Stop after the twelve calls; extensions and adoption are not automatic.
+Use the existing combined runner with the frozen per-call JSON plans and
+their recorded `PYTHONHASHSEED`; retain the enclosing grant and all charges.
+
+### Final source-gap check — replacement instruction, 7 November
+
+For the later default-off additions, the explicitly requested Tier 1 bridge
+replaces remaining new full-factor gap calls. Preserve the completed and
+interrupted calls from the replaced protocol; do not pool them with prefixes.
+Compare intermediate `fabfa9f` with final `f589ea3`, whose runtime is `1b5ab81`
+plus documentation. The preceding three-input matched full checks remain
+labeled with their original sources.
+
+Run 512 polynomials/p16 on each of the three 50- and three 65-digit calibration
+inputs, three cold repetitions per source/input: 36 calls. Hold Y0, C4/C8,
+lookahead 4, native stamps, scalar leases and all other mechanisms fixed.
+Use packet CPU 5 and actor wall/CPU 30/300 seconds, with a 45-second owner
+allowance per call. Enclosing grant: 1,640 wall seconds, 16,400 CPU-seconds,
+128 MiB storage, charged within G2H. No CPU/heap capture; Tier A, RSS and
+worker active/queue-wait/publication timelines are on both arms.
+
+Visit repetitions 0/1/2, input indices 0/1/2, then sizes 50/65. Alternate
+source order by repetition + input index + regime. Pin both factoring and
+interpreter hash seeds to 104729/130363/155921 by input index. Require exactly
+67,109,376 scanned positions per call and identical relation signatures
+across all six calls for each input.
+
+Geometrically average paired collector-time ratios within each input, then
+equally across the three independent inputs. Report cold actor ratios and
+within-input A/A ranges separately. Record this gap as closed when work and
+signatures match and aggregate collector ratios at both sizes lie in
+[0.97, 1.03]. Do not add an all-inputs or uncertainty-interval requirement to
+this explicit Tier 1 point criterion, or interpret it as default adoption.
+Audit the exact source diff and list default-path touches rather than
+assuming default-off selectors leave the hot path unchanged. Stop and report;
+G3 still requires its own gate.
+
 ### Conditional G2K: shared cofactor jobs
 
 K is unimplemented and offers no guaranteed speedup. At G2H report measured
@@ -302,71 +605,171 @@ resume and overshoot; test alone/combined and run committed-checkout QA.
 Keep K=0 evidence distinct. After G2K stop and report before anchor tuning.
 Admitted allocations have total collection plus cofactor processes at most ten.
 
-## G3: tune only (c), then verify interpolation
+## Pre-G3 cleanup and diagnostics — authorized 7 November
 
-After G2H (and any approved G2K), freeze the implementation and (a)/(b) choices.
-Initial (c) ranges:
+Retain the accepted G2H implementation bundle. Remove disabled mechanisms
+from default per-block/per-root loops by construction-time specialization;
+preserve explicitly selected alternatives. Validate committed sources with
+full tests, lint and benchmark imports. Compare accepted `d24e6bb` against
+the cleaned source at 50/65 digits: input 0, three repetitions/source,
+512 polynomials/p16, equal signatures and 67,109,376 scanned positions.
+Report timing ratios without adding a speedup or adoption claim.
 
-| Tunable | Declared levels / conditional constraints |
-| --- | --- |
-| Collection workers | Serial, 1/2/4/6/8/10 initially; 3/5/7/9 as adjacent refinements. |
-| Packet width | Valid family fractions g/16, g/8, g/4, g, plus adjacent valid powers of two; integer width <= actual gray limit g. |
-| Lookahead | 0/2/4/8; inactive with no process pool. |
-| Admission order | Ordered/arrival; arrival is a separately labeled mathematical trajectory. |
-| Nursery | 4/16/64/128 MiB, selected before interpreter startup. |
-| State cache | 16/64/128 MiB within charged per-worker memory; inactive without retained state. |
-| Sparse queue | 0/8/32 MiB, only supported collector paths. |
-| Power plan | 0/2/8 MiB, with preparation charged. |
-| Other implemented root/inverse cache capacities | Only actual validated configuration fields; enumerate levels/dependencies at G2H or exclude with a reason. Never invent unsupported runner fields. |
-| K, only after G2K | K=0/1/2 and collection allocation with total <=10; fixed quota, no oversubscription. |
+Run two independent-packet diagnostics at 65 digits on calibration inputs
+0/1/2, fixed 512 polynomials/p16:
 
-Filter invalid/inactive dimensions before design construction. Larger caches
-must coexist with worker/runtime/parent allowances. Serial has no process
-scheduling dimensions. Reclassified options enter only with their measured
-interaction and approved count/budget adjustment.
+- N=1 normal versus `taskpolicy -c background`; report positions per worker
+  CPU-second and wall time. Background QoS influences placement; it does not
+  establish exclusive E-core residency or a pure E/P efficiency ratio.
+- N=1/4/8, native versus byte stamps. Report throughput/scaling and the
+  per-worker buffer payload in bytes, accounted cache ownership and observed
+  RSS separately. A byte-stamp scaling gain supports a footprint hypothesis;
+  it does not alone establish the cause of every scaling loss.
 
-At each anchor/lifetime, form a small deterministic covering/space-filling
-pool over (c), holding (a)/(b) fixed. Force serial plus one valid recipe at
-1/2/4/6/8/10 workers. Choose remaining proposals by uncovered meaningful
-parameter pairs, with frozen tie order; report actual conditional coverage.
-Maximum **16 initial + 8 refinement** distinct recipes per anchor/lifetime;
-for calibrated calls over five minutes, **8 + 4**. Controls count toward
-these maxima; repetitions are not new configurations. Price the executable
-subset inside the row cap, leaving room for independent-input survivors,
-exploration and diagnostics before issuing it.
+The cumulative pre-G3 ceiling is 3,600 wall seconds, 36,000 CPU-seconds and
+1 GiB output, including failed and successful QA and cleanup. Batch owner
+reservations: prefix 750 seconds (16 calls), QoS 630 (10 calls), footprint
+1,350 (22 calls); the remainder funds QA/preparation. Expected measurement
+runtime is about 20 minutes. No revised attempts or enlarged limits are
+implicit. Preserve all failed validation and stopped batches.
 
-Use complete-factor input 0 to prioritize proposals, retaining uncertain/
-near-tied candidates. Advance up to four to calibration inputs 1/2. A Tier 1
-selection or rejection needs all three independent inputs and comparison
-against measured noise; candidates not advanced remain deferred/untested,
-not demonstrated losers. Inconclusive choices retain the simpler valid path.
-Nine-input screening is not required. Reserve at least one proposal outside
-the current neighborhood; refine one/two (c) levels and adjacent worker/
-packet/cache levels.
-An unrelated reference timeout does not block a valid candidate. Prefixes do
-not rank complete-factor candidates without validated predictive agreement.
-Finish a breadth round at every anchor before a second deep round at one.
+### Quiet window and drift gates — all remaining timed work
 
-Freeze this interpolation rule before intermediate outcomes: nearest cold
-anchor by decimal digits, lower anchor on an exact tie. Inherit its worker,
-lookahead, order and capacity levels; map packet fraction onto the target's
-actual family using the declared valid integer levels. Apply only publicly
-observable size/backend/allowance inputs. Verify cold 50/60/65 against literal
-mainline on all three calibration inputs 0/1/2, at most one proposed recipe
-plus the reference per row. If a check fails, stop at G3 and propose a separately
-bounded new anchor; do not quietly optimize every intermediate row. Label
-unmeasured boundaries and do not adopt a routing table before their checks.
+The user has cleared the other Factor workstreams. Hold the real nonblocking
+performance flock through cleanup; other builds, suites and benchmarks may
+not overlap cells. Record the process inventory. Capture `pmset -g therm`
+before/after cells and every 60 seconds during a batch. Missing readings
+remain explicit; telemetry does not establish absence of throttling.
 
-At G3 freeze every recipe, reference commit, interpolation label, analysis,
-confirmation cost tier and complete priced schedule. Include the exact resolved
-75-digit probe recipe and its derivation before any probe result: the source/
-identity of the cold 70-digit anchor, inherited worker count, lookahead,
-admission order and capacity levels, fixed G2H implementation/(a)/(b) choices,
-source packet fraction, actual 75-digit family and mapped valid integer packet
-width, resolved Y0 numerical settings and admission under the probe allowances.
-Configuration resolution does not authorize a factoring call. Report and stop;
-the 75-digit call needs explicit approval at or after this report. G4 can
-proceed independently under its own approval, before or after that probe.
+Each batch begins and ends with an A/A pair using identical source, input,
+seed, work, lifetime and settings. Define drift as `max(time)/min(time)-1`.
+The later user amendment makes short pre-G3 and G3 40/55 checks report-only;
+continue while retaining their uncertainty. For the long G3 70-digit batch,
+stop/report above 10% within either pair, or between the geometric mean times
+of the start/end pairs. The pre-G3 endpoint is full external cold actor wall;
+G3 cold uses that endpoint and warm uses the timed complete library call.
+No automatic retry/restart after a long-run drift stop. The long-run end gate
+determines that batch's validity; retain observations if it fails, without
+presenting them as a quiet-window-confirmed comparison.
+
+Production calls keep Tier A, owned RSS and active/task-wait/publication
+worker timelines on both arms. Independent packets have active private
+streams, startup-barrier wait and final publication spans; they have no
+production task queue. G4 timelines remain off. These diagnostics do not
+add full CPU/heap captures or a 75/80 call.
+
+## G3: restricted worker-count and packet-width search — then stop
+
+The latest scope supersedes the earlier broader joint-search proposal. Tune
+only workers **{4,6,8,10}** by two valid packet fractions **{g/4,g}** at
+**40 cold, 40 warm, 55 cold and 70 cold**. Actual families are g=16 at 40
+(widths 4/16) and g=64 at 55/70 (widths 16/64). These are (c) tunables:
+process count changes CPU economics and packet width trades scheduling cost
+against imbalance. Width must divide and not exceed the actual family.
+K=0; total collection/cofactor allocation is at most ten. No other flags,
+cache levels, lookahead, admission order or numerical work enter this grid.
+
+Keep Y0, lookahead 4, ordered admission, 4 MiB nursery, 64 MiB state cache,
+512/256 MiB worker/runtime, 4 GiB parent, 22 GiB aggregate, worker verification,
+private semaphore, packed transport and coefficient reuse. Native stamps,
+ordinary queues, scalar leases, no affinity and no CPU snapshot remain the
+incumbent (a)/(b) choices unless the authorized byte-footprint diagnostic
+establishes a clear choice; freeze that decision before G3 outcomes. Keep
+numerical base/report/product/residual limits unchanged.
+
+The completed pre-G3 diagnostic retained native stamps. Current default hot
+loops use construction-time specialization through root lifting, validated
+on `60bfd95` with exact matched 50/65 prefixes and committed-only full QA
+(1,575 tests, nine optional skips, lint, 292 benchmark imports). An earlier
+77-call cheap G3 batch on `d1ae1ae` was closed before any 70-digit cell to
+finish the missing root specialization. Its outcomes and charges are retained,
+not pooled with the current-source search. All cheap rows were rerun.
+Represent whole-family packets canonically as explicit width g with
+`whole_family=False`; setting that flag with the same width describes the
+same allocation, not another tuning dimension.
+
+Maximum eight distinct configurations per row, no extra refinement. At
+40 cold/warm and 55 cold run all eight on three calibration inputs. At 70,
+run all eight on input 0, then the incumbent C8/p16 and the best distinct
+complete challenger on inputs 1/2 (four calls). Prioritize by complete cold
+actor wall; if input 0 has no complete challenger, stop and report rather
+than selecting from partial timings. Recipes not advanced have insufficient
+coverage, not demonstrated losses. Require all three inputs for a Tier 1
+choice, compare against A/A noise and retain incumbent when inconclusive.
+Counterbalance order and match input/hash/factoring seeds. No fresh
+confirmation inputs are used for tuning.
+
+Each row adds four identical-incumbent A/A controls (start/end pairs).
+Maximum calls: 28 each at 40 cold, 40 warm and 55 cold; 16 at 70 cold,
+100 calls total. Price the executable manifest before starting:
+
+| Row | Calls | Actor wall / CPU | Owner wall / CPU per call |
+| --- | ---: | ---: | ---: |
+| 40 cold | 28 | 30 s / 550 s | 45 s / 610 s |
+| 40 warm | 28 | 30 s / 550 s | 45 s / 610 s |
+| 55 cold | 28 | 100 s / 1,000 s | 120 s / 1,060 s |
+| 70 cold | 16 | 1,800 s / 18,000 s | 1,820 s / 18,060 s |
+
+The current calls reserve 35,000 wall seconds and 352,800 CPU-seconds.
+Carry the earlier batch's exact 589.638380584 wall / 5,896.383805838 charged
+CPU-seconds and reserve 100 wall / 1,000 CPU-seconds for static analysis.
+The combined ceiling bill is 35,689.638380584 wall / 359,696.383805838
+CPU-seconds, within 10 hours / 100 core-hours. There is no transfer of unused
+pre-G3 allowance. Output ceiling 16 GiB. Actual expected
+runtime is approximately 3–6 hours from accepted current costs, not a target
+to spend. Funding must include outstanding leases; refusals are censored and
+never automatically retried. Packet CPU stays at incumbent 30 seconds.
+Warm includes validated >=3-second warmup, reported outside its timing;
+all cold costs include spawn/import/JIT/preparation/validation/shutdown.
+
+Report wall versus aggregate CPU for every worker/packet recipe, completion,
+noise, timelines, RSS, exact charges, exclusions and all untested interactions.
+No intermediate validation, broader tuning, G4, routing adoption, merge,
+push or probes are authorized by this scope cut. Stop at the G3 report.
+Interpolation remains a proposed routing rule: nearest cold anchor by size,
+lower anchor on ties, inherit settings and map the selected fraction to the
+actual family's valid integer packet widths; label rows interpolated. No
+routing table is adopted without separately authorized intermediate checks.
+
+Freeze the exact 75/80 probe derivations in the G3 report before outcomes,
+using the frozen cold 70 anchor, its implementation bundle and Y0 resolved
+at the target size. Configuration resolution is not a factoring call.
+Keep the separate probe allowances and approval gates below unchanged.
+
+### Reported G3 outcome and reproduction
+
+The current 100-call search completed, reconstructed every input and drained
+owned children. The long 70-digit A/A gate passed. Short-call drift is retained
+as uncertainty, especially at 55 digits; it is not treated as proof of a new
+worker-count gain. The report freezes full recipes, CPU/wall tradeoffs and
+worker timelines, not merely worker counts. Intermediate proposals are
+50: C4/p8, 60: C4/p16 and 65: C10/p64, all unverified.
+
+The cumulative G3 charge, including the historical batch and analysis reserve,
+is 12,083.295227043 wall / 120,832.952270429 conservative CPU-seconds.
+Observed CPU is recorded separately. All historical failures remain retained.
+The versioned driver/runner imports are covered by committed-only QA; this
+reporting update changes documentation only.
+
+Exact historical execution from the task worktree was:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/pre-g3/g3-r2.py
+```
+
+The archived copy is `controller.py` beside `plan.json`; `batch-helpers.py`
+and `source.tar` preserve its dependencies and committed runtime. Paths in
+these immutable scripts identify the original evidence directories. Do not
+rerun into them. Any new run needs a new identity, fresh output directory,
+approved grant and nonblocking performance lock. No successor is authorized
+by this reproduction command.
+
+The mapped 75/80 recipe is C10/p64 from the frozen 70 anchor (actual family
+64 at both target sizes), with unchanged G2H choices and target-resolved Y0.
+Prospective owned bounds are 23,965,302,784 / 24,477,270,016 bytes against
+23,622,320,128 bytes allowed. These are accounting refusals, not observed
+physical exhaustion. No probe ran; do not silently change worker count,
+capacity or recipe. Exact derivations are saved before any probe outcome.
 
 ## G4: independent confirmation against literal mainline
 
@@ -391,8 +794,8 @@ Start each row with **three fresh independent inputs**, in committed order:
 | Otherwise | 3 inputs x 1 repetition |
 
 One cold repetition means one fresh interpreter/pool, with no warmup. Warm
-applies only at 40/50 with the separately frozen lifetime and at least three
-seconds of validated, charged warmup. Freeze the repetition count before
+applies only at 40 under the latest scope, with the frozen lifetime and at
+least three seconds of validated, charged warmup. Freeze the repetition count before
 confirmation; use one per input for calls at or above ten seconds. Treat
 repetitions as a cluster and form one paired log-ratio observation per input.
 Counterbalance arm order, preserve failures and reconstruct exact results.
@@ -431,55 +834,92 @@ permission to merge/change defaults.
 
 ## Separate 75/80 feasibility probes: one candidate, then stop
 
-75 has a **two-hour actor budget**; 80 has **three times that, six hours**.
-Run 75 **only after G3**, once the G2H fixes and frozen G3 recipes exist, and
-only with explicit approval at or after the G3 report. It may run before or
-after G4; **G4 does not depend on the probe**. After the 75 receipt, stop and
-notify. The 80-digit probe still needs that report and a separate instruction.
-Exactly one candidate, one input, one clean cold call per approved probe.
-No second seed, companion, repetition, configuration, larger grant or
-confirmation is implied by any outcome. Report admission refusal as an outcome.
+**Reported:** exactly one cold call per size on `5526118`; both ownership
+admissions pass. Both return internal QS `memory_limit` events before any
+filtering/matrix solve. Neither the 18 GiB RSS guard nor wall/CPU allowance
+causes the stops. Feasibility is unestablished. The precise internal cap or
+allocation error is unrecorded; do not substitute a guessed attribution.
+The terminal path drops live QS state, so saved outer checkpoints retain
+unresolved cofactors/accounting but cannot resume the collected rows.
+Progress and thermals remain durable. No further run or retuning follows
+automatically. Canonical local report:
+`v2/benchmarks/results/a7a/probes-20261108/REPORT.md` in main.
+
+The actors used 1,969.676906459 / 4,794.110493167 wall seconds, respectively.
+Cumulative owner charges including prior validation are 6,973.427729834 wall
+and 67,091.398186075 CPU-seconds, within 40,800 / 396,000. Runtime/QA source
+`5526118` passes 1,579 tests (nine optional skips), lint and 292 imports.
+The same-source 80 call reuses QA. Scripts, commands, exact recipes, source
+archives, progress, receipts and hashes are in each ignored probe directory.
+No test or benchmark overlapped a timed actor. The contracts below record
+what was approved and executed; they are not a new grant.
+
+Historical executed commands from the task worktree:
+
+```sh
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/probe75-20261108/generous-owner.py --digits 75
+PYTHONPATH=. /opt/homebrew/bin/pypy3 -B v2/audit/a7a/probe75-20261108/generous-owner.py --digits 80
+```
+
+Each controller is archived as `owner.py` alongside `batches.py`, committed
+`source.tar`, `plan.json` and `request.json` in its probe evidence directory.
+Do not execute these historical identities again. A future run needs a new
+approved identity, output directory and finite grant; retain old failures.
+
+The latest 8 November generous-bounds amendment supersedes the earlier
+24 GiB probe amendment. It raises only these probes' aggregate owned-memory
+admission grant to **32 GiB**, worker scratch to **1 GiB per worker** and
+parent QS to **6 GiB**. Runtime remains 256 MiB per worker and both
+parent/worker checkpoint caps remain 256 MiB. The bookkeeping bound sums
+concurrent caps; it is not expected physical use. The separate **18 GiB live
+aggregate owned-RSS stop guard** remains unchanged. On exceeding it, cancel
+cooperatively, preserve progress/checkpoint and report a memory outcome.
+
+Recomputed with portfolio coexistence: C10/p64 needs 30,410,022,912 bytes
+(28.322 GiB) at 75 digits and 30,921,990,144 bytes (28.798 GiB) at 80; both
+fit 34,359,738,368 bytes. Earlier 22/24 GiB calculations, failed validation
+and pre-lock attempts remain historical. No factoring call was issued by
+those attempts. The latest instruction approves 75 now and 80 after its
+report under the conditional continuation, with one fixed recipe per size.
+No fresh G4 or intermediate-size work is authorized.
+
+75 has a **three-hour actor budget**; 80 has **eight hours**. Owner wall is
+actor plus ten minutes, including setup, observation and cleanup. CPU is ten
+times actor wall, with exact preparation charges included in the cumulative
+stage ledger. A predecessor's unused allowance cannot fund extra candidates.
+Exactly one candidate, one input, one clean cold call per probe; no repetition,
+profile companion, extra seed, retuning or larger grant is implicit.
 
 | Field | 75 digits | 80 digits |
 | --- | ---: | ---: |
 | Input | `regime_calibration_75_0` | `regime_calibration_80_0` |
-| Collection workers / packet width | Frozen G3 cold 70-digit recipe, mapped to 75 | Frozen G3 cold 70-digit recipe, mapped to 80 |
-| Actor wall | 7,200 s | 21,600 s |
-| Owner wall, including observation and cleanup | 7,500 s | 22,500 s |
-| Actor / owner aggregate CPU | 72,000 / 75,000 s | 216,000 / 225,000 s |
-| Aggregate owned RAM | 22 GiB | 22 GiB |
-| Worker / runtime per worker | 768 / 256 MiB | 768 / 256 MiB |
-| Parent QS / checkpoint | 4 GiB / 256 MiB | 4 GiB / 256 MiB |
+| Collection workers / packet width | Frozen G3 cold 70 C10/p64, mapped to 75 | Same anchor, mapped to 80 |
+| Actor wall | 10,800 s | 28,800 s |
+| Owner wall including observation/cleanup | 11,400 s | 29,400 s |
+| Aggregate CPU ceiling | 108,000 s | 288,000 s |
+| Aggregate owned RAM admission | 32 GiB | 32 GiB |
+| Live aggregate owned RSS stop | Over 18 GiB | Over 18 GiB |
+| Worker / runtime per worker | 1 GiB / 256 MiB | 1 GiB / 256 MiB |
+| Parent QS / checkpoint | 6 GiB / 256 MiB | 6 GiB / 256 MiB |
 | Logical work ceiling | 96,000,000,000,000 | 96,000,000,000,000 |
 
-**75-digit candidate:** use the frozen G3 cold 70-digit anchor recipe,
-carried to 75 by the declared interpolation rule. Inherit worker count,
-lookahead, admission order and capacity levels; map its packet fraction onto
-the actual 75-digit family using the declared valid integer levels. Keep the
-G2H implementation bundle and (a)/(b) choices unchanged. Inactive settings
-remain inactive; do not force an eight-worker or packet-16 fallback. Use seed
-104729 and the Y0 numerical policy resolved for 75 digits, without retuning
-base/report/product/residual limits. Keep the allowances above, including
-actor 7,200 s, owner 7,500 s, worker/runtime 768/256 MiB and parent QS 4 GiB.
-If the mapped recipe is refused, report the refusal and stop; do not substitute
-another recipe. Record the exact resolved recipe and derivation in the G3
-report before any probe result; do not choose it from 75-digit outcomes.
+Use the frozen G3 cold-70 anchor, preserving its worker count, lookahead,
+ordered admission, packet fraction, implementation bundle and (a)/(b)
+choices. At both targets the actual family is 64, so fraction g maps to
+packet width 64. Apply only the explicitly amended memory grants. Use seed
+104729 and Y0 resolved at the target size without retuning base, reporting,
+product or residual limits. Record exact derivations before outcomes.
+A refusal ends that probe without another recipe. Never choose an 80-digit
+candidate from 80-digit outcomes. Any proposal motivated by 75 must be
+reported and approved before replacing the already frozen 80 candidate.
 
-**80-digit candidate:** use the same derivation as the 75-digit probe:
-the frozen G3 cold 70-digit anchor recipe, mapped to the actual 80-digit
-family by the declared interpolation rule and valid integer packet levels.
-Inherit worker count, lookahead, admission order and capacity levels; keep the
-G2H implementation bundle and (a)/(b) choices unchanged. Use seed 104729 and
-Y0 resolved for 80 digits without retuning base/report/product/residual limits.
-Keep the 80-digit table allowances. Record the exact resolved recipe and its
-derivation before the call; if refused, report the refusal and stop without
-substituting another recipe.
-
-If the 75-digit receipt motivates a different 80-digit candidate, propose it
-in the 75-digit report for separate approval and freeze it before the 80-digit
-call. A proposal does not authorize a switch. Never choose or tune the
-candidate from 80-digit outcomes. The 75-digit report and separate instruction
-remain prerequisites for the single clean 80-digit call.
+Poll aggregate owned RSS every two seconds at both sizes, covering the
+factoring parent, workers, spawn helper and external owner. This fits the
+existing bounded recorder even for eight hours; it is a sampled guard,
+not an instantaneous physical-memory cap. Preserve the 60-second progress
+and thermal log. Stop and notify after each receipt. The latest instruction
+pre-approves the conditional 80 continuation after the 75 report; no broader
+search, default adoption, merge or push is implied.
 
 ### Clean observation and useful timeout receipts
 
@@ -515,7 +955,9 @@ record their measured overhead without adding a second 75/80 call.
 Use the existing `combined.cell`, `configuration`, `settings`, `source()` and
 `corpus_identity("regimes")` to build a single-cell **clean-mode** plan.
 Required fields: complete endpoint, cold lifetime, samples=1, zero executed
-warmup, the exact table allowances and candidate settings. Disable automatic
+warmup, the exact table allowances and candidate settings. Set `rss_interval=60`
+and a new exclusive `progress_path` for minute-level probe logging; omit
+`timeline_path` so worker packet diagnostics remain off. Disable automatic
 profile companions and profile analysis. Validate the 60-second log and
 last-progress receipt on a short fixture first; unsupported fields must be
 rejected rather than silently ignored.
@@ -543,5 +985,5 @@ profile analysis may need its optional reader; a clean probe does not. Static
 freezing does not run factoring. The runner must acquire
 `/private/tmp/factor-performance.lock` with nonblocking exclusive flock; an owner file is not admission. If occupied,
 report without polling or claiming a reservation. Hold through cleanup/draining
-and preserve the lock file. After the single probe, **stop and notify for every
+and preserve the lock file. After each single probe, **stop and notify for every
 outcome**. No automatic 80 call, search, confirmation or budget escalation.

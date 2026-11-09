@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "seed": 202611060731,
+  "fixtures": [
+    {
+      "attempts": 6,
+      "digits": 60,
+      "factor_bits": [
+        99,
+        99
+      ],
+      "factors": [
+        500465929552582473140573689853,
+        385780732142156219402857311367
+      ],
+      "id": "exposed_60_0",
+      "n": 193070112715000043463672701849104128017320155141118109459051,
+      "n_mod8": 3,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 8,
+      "digits": 70,
+      "factor_bits": [
+        116,
+        116
+      ],
+      "factors": [
+        63692519882150384135701463277466297,
+        49452217099233404697943216015906213
+      ],
+      "id": "exposed_70_0",
+      "n": 3149736320809340824609289829613135545293504750460004039094209020403261,
+      "n_mod8": 5,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "id": "combined_60_1",
+      "n": 245366267242644468881153513218053033869938044081979457782217,
+      "digits": 60,
+      "factors": [
+        497907994322723971101911950279,
+        492794391816107105557955530223
+      ],
+      "factor_bits": [
+        99,
+        99
+      ],
+      "attempts": 1,
+      "uneven": false,
+      "exposure": "exposed optimization panel; no outcome conditioning"
+    },
+    {
+      "id": "combined_60_2",
+      "n": 257588479794078893330471094901705450384580351303371936576273,
+      "digits": 60,
+      "factors": [
+        471826610889640183126168134833,
+        545938855183241467092247235681
+      ],
+      "factor_bits": [
+        99,
+        99
+      ],
+      "attempts": 1,
+      "uneven": false,
+      "exposure": "exposed optimization panel; no outcome conditioning"
+    },
+    {
+      "id": "combined_70_1",
+      "n": 4819386367987921270668581176971396670830563274442136949707491808552887,
+      "digits": 70,
+      "factors": [
+        59639820945806806401551321197793599,
+        80808196462681796209820473237803913
+      ],
+      "factor_bits": [
+        116,
+        116
+      ],
+      "attempts": 1,
+      "uneven": false,
+      "exposure": "exposed optimization panel; no outcome conditioning"
+    }
+  ],
+  "certificates": {
+    "17117": {
+      "kind": "trial"
+    },
+    "85071491": {
+      "kind": "pocklington",
+      "q": 17117,
+      "witness": 2
+    },
+    "1407886556872933": {
+      "kind": "pocklington",
+      "q": 85071491,
+      "witness": 2
+    },
+    "497907994322723971101911950279": {
+      "kind": "pocklington",
+      "q": 1407886556872933,
+      "witness": 2
+    },
+    "24029": {
+      "kind": "trial"
+    },
+    "69636043": {
+      "kind": "pocklington",
+      "q": 24029,
+      "witness": 2
+    },
+    "2146053740036279": {
+      "kind": "pocklington",
+      "q": 69636043,
+      "witness": 2
+    },
+    "492794391816107105557955530223": {
+      "kind": "pocklington",
+      "q": 2146053740036279,
+      "witness": 2
+    },
+    "17909": {
+      "kind": "trial"
+    },
+    "85246841": {
+      "kind": "pocklington",
+      "q": 17909,
+      "witness": 2
+    },
+    "1321829673836629": {
+      "kind": "pocklington",
+      "q": 85246841,
+      "witness": 2
+    },
+    "471826610889640183126168134833": {
+      "kind": "pocklington",
+      "q": 1321829673836629,
+      "witness": 2
+    },
+    "28909": {
+      "kind": "trial"
+    },
+    "122921069": {
+      "kind": "pocklington",
+      "q": 28909,
+      "witness": 2
+    },
+    "2145287331986641": {
+      "kind": "pocklington",
+      "q": 122921069,
+      "witness": 2
+    },
+    "545938855183241467092247235681": {
+      "kind": "pocklington",
+      "q": 2145287331986641,
+      "witness": 2
+    },
+    "1583": {
+      "kind": "trial"
+    },
+    "180463": {
+      "kind": "pocklington",
+      "q": 1583,
+      "witness": 2
+    },
+    "2835795583": {
+      "kind": "pocklington",
+      "q": 180463,
+      "witness": 2
+    },
+    "859380342241446217": {
+      "kind": "pocklington",
+      "q": 2835795583,
+      "witness": 2
+    },
+    "59639820945806806401551321197793599": {
+      "kind": "pocklington",
+      "q": 859380342241446217,
+      "witness": 2
+    },
+    "2017": {
+      "kind": "trial"
+    },
+    "201701": {
+      "kind": "pocklington",
+      "q": 2017,
+      "witness": 2
+    },
+    "3483376271": {
+      "kind": "pocklington",
+      "q": 201701,
+      "witness": 2
+    },
+    "1075161001319321977": {
+      "kind": "pocklington",
+      "q": 3483376271,
+      "witness": 2
+    },
+    "80808196462681796209820473237803913": {
+      "kind": "pocklington",
+      "q": 1075161001319321977,
+      "witness": 2
+    }
+  },
+  "draws": 389,
+  "source": "Existing exposed fixtures retain the committed a7a corpus provenance. New factors use recursive Pocklington certificates; the factorer still reports its own probable/proven labels.",
+  "conditioning": "Exact decimal size, balanced prime bit lengths, coprime distinct moduli. No timing or factoring outcome conditioning.",
+  "generation_seconds": 0.006393874995410442
+}

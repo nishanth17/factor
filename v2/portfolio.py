@@ -285,6 +285,9 @@ def _advance(
     programs,
     policy,
     ecm_executor=None,
+    *,
+    qs_workers=None,
+    qs_pool=None,
 ):
     """Commit one portfolio transition or one resumable candidate action."""
     if state["current"] is None:
@@ -466,22 +469,41 @@ def _advance(
     if current["stage"] == "siqs":
         _admit_fallback(current, config, budget)
         job = siqs_runtime.get("job")
+        job_type = SIQSJob
+        if qs_workers is not None:
+            from .qs.current_parallel import CurrentParallelSIQSJob
+
+            job_type = CurrentParallelSIQSJob
         if job is None:
             if current.get("siqs_checkpoint") is not None:
-                job = SIQSJob.from_checkpoint(
-                    current["siqs_checkpoint"],
-                    budget=budget,
-                    config=config.siqs,
-                )
+                if qs_workers is None:
+                    job = job_type.from_checkpoint(
+                        current["siqs_checkpoint"],
+                        budget=budget,
+                        config=config.siqs,
+                    )
+                else:
+                    job = job_type.from_checkpoint(
+                        current["siqs_checkpoint"],
+                        budget=budget,
+                        workers=qs_workers,
+                    )
+                    if job.config != config.siqs:
+                        raise ValueError("parallel SIQS configuration changed")
             else:
                 if "siqs_seed" not in current:
                     budget.consume()
                     current["siqs_seed"] = generator.getrandbits(63)
-                job = SIQSJob(
+                job = job_type(
                     n,
                     seed=current["siqs_seed"],
                     config=config.siqs,
                     budget=budget,
+                    **(
+                        {"workers": qs_workers}
+                        if qs_workers is not None
+                        else {}
+                    ),
                 )
 
             if job.n != n or job.seed != current["siqs_seed"]:
@@ -491,8 +513,23 @@ def _advance(
             siqs_runtime["job"] = job
 
         job.budget = budget
-        result = job.run(max_blocks=1)
-        if result.divisor is not None or job.finished_reason is not None:
+        if qs_workers is None:
+            result = job.run(max_blocks=1)
+            finished = job.finished_reason is not None
+        else:
+            result = job.run(
+                pool=qs_pool,
+                max_assignments=None
+                if qs_workers.lookahead
+                else qs_workers.workers,
+            )
+            finished = result.reason in (
+                "families_exhausted",
+                "run_limit",
+                "worker_failure",
+                "memory_limit",
+            )
+        if result.divisor is not None or finished:
             _event(
                 state,
                 config,
@@ -1294,8 +1331,10 @@ def factorize_bounded(
     checkpoint=None,
     stop_after_split=False,
     ecm_executor="auto",
+    qs_workers="auto",
+    qs_pool=None,
 ):
-    """Factor with automatic cost-gated ECM; None explicitly selects serial.
+    """Factor with automatic ECM and selected QS; None forces serial QS.
 
     Automatically created contexts are closed before returning or raising.
     Explicit contexts remain borrowed. Omitted budgets/memory receive finite
@@ -1309,6 +1348,8 @@ def factorize_bounded(
         budget=budget,
         checkpoint=checkpoint,
         stop_after_split=stop_after_split,
+        qs_workers=qs_workers,
+        qs_pool=qs_pool,
     )
     if isinstance(ecm_executor, str):
         if ecm_executor != "auto":
@@ -1332,6 +1373,8 @@ def _factorize_bounded(
     stop_after_split=False,
     ecm_executor=None,
     _owned_ecm=False,
+    qs_workers=None,
+    qs_pool=None,
 ):
     """Factor under one budget, retaining exact state on pause/exhaustion.
 
@@ -1347,6 +1390,30 @@ def _factorize_bounded(
         raise ValueError("zero has no finite prime factorization")
     if type(stop_after_split) is not bool:
         raise TypeError("stop_after_split must be Boolean")
+    automatic_qs = isinstance(qs_workers, str) and qs_workers == "auto"
+    if qs_workers is not None and not automatic_qs:
+        from .qs.current_parallel import QSWorkerConfig
+
+        if not isinstance(qs_workers, QSWorkerConfig):
+            raise TypeError("qs_workers must be a QSWorkerConfig")
+    elif qs_pool is not None:
+        raise ValueError("qs_pool requires explicit qs_workers")
+    if qs_workers is not None and not automatic_qs and qs_pool is None:
+        from .qs.parallel import CollectionPool
+
+        with CollectionPool(qs_workers.mode, qs_workers.workers) as pool:
+            return _factorize_bounded(
+                n,
+                seed=seed,
+                config=config,
+                budget=budget,
+                checkpoint=checkpoint,
+                stop_after_split=stop_after_split,
+                qs_workers=qs_workers,
+                qs_pool=pool,
+                ecm_executor=ecm_executor,
+                _owned_ecm=_owned_ecm,
+            )
     if config is None:
         # A resume retains the saved p-1 executor; fresh calls use the accepted
         # default. Other configuration still has to match the snapshot.
@@ -1477,6 +1544,38 @@ def _factorize_bounded(
 
     _promote_state(state, config.backend)
 
+    if automatic_qs:
+        if checkpoint is not None:
+            # A saved serial call stays serial; a saved process call retains
+            # its exact recipe even if automatic routing changes later.
+            saved_workers = state.get("qs_workers")
+            if saved_workers is None or not state.get(
+                "qs_workers_auto", False
+            ):
+                qs_workers = None
+            else:
+                from .qs.current_parallel import QSWorkerConfig
+
+                qs_workers = QSWorkerConfig(**saved_workers)
+        else:
+            from .qs.production_policy import default_qs_workers, qs_recipe
+
+            qs_workers = default_qs_workers(n, config.siqs)
+            if qs_workers is not None:
+                state["qs_workers_auto"] = True
+                recipe = qs_recipe(n)
+                state["qs_routing"] = dict(
+                    policy="a7a-Y0",
+                    anchor=recipe.anchor,
+                    extrapolated=recipe.extrapolated,
+                )
+    worker_marker = qs_workers.record() if qs_workers is not None else None
+    if checkpoint is not None and state.get("qs_workers") != worker_marker:
+        raise ValueError("resume QS worker settings changed")
+    if worker_marker is not None:
+        state["qs_workers"] = worker_marker
+    effective_qs_workers = qs_workers
+
     reason = "exhausted"
     siqs_runtime = {}
     optional_budget = (
@@ -1559,6 +1658,8 @@ def _factorize_bounded(
                     programs,
                     policy,
                     ecm_executor,
+                    qs_workers=effective_qs_workers,
+                    qs_pool=qs_pool,
                 )
             except HandoffRequiredError as error:
                 # Any retained chunk is already atomic and charged. Do not

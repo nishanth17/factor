@@ -1,0 +1,993 @@
+{
+  "schema": 1,
+  "sources": {
+    "v2/benchmarks/inputs/c9a/corpus.json": "264c8ae620571156e5ddffb9710b673645b717acd67f229501a23106d7fc3cc6",
+    "v2/benchmarks/inputs/corpora/c10a01_exposed.json": "fd61d9ba7616174b524298a31c661d21183990657e96ac9cd6123b7b0fdaa92c"
+  },
+  "fixtures": [
+    {
+      "attempts": 3,
+      "digits": 50,
+      "factor_bits": [
+        82,
+        83
+      ],
+      "factors": [
+        4086976447361967978037837,
+        6840703737765741492479357
+      ],
+      "id": "exposed_50_0",
+      "n": 27957795059629565583568699085733876420881087430809,
+      "n_mod8": 1,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 3,
+      "digits": 50,
+      "factor_bits": [
+        57,
+        108
+      ],
+      "factors": [
+        121660610786963737,
+        290160518312962162749945159086459
+      ],
+      "id": "exposed_50_1",
+      "n": 35301105884216953448503244658304683619729280737283,
+      "n_mod8": 3,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 5,
+      "digits": 55,
+      "factor_bits": [
+        91,
+        91
+      ],
+      "factors": [
+        1840780957108437755797919123,
+        1982588448692489436501349399
+      ],
+      "id": "exposed_55_0",
+      "n": 3649511062136293545682436154588657894158080145766657077,
+      "n_mod8": 5,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 2,
+      "digits": 55,
+      "factor_bits": [
+        63,
+        119
+      ],
+      "factors": [
+        6116672128159105237,
+        390231082426006197149441685220506739
+      ],
+      "id": "exposed_55_1",
+      "n": 2386915585416510537313419257710553748222158713968692143,
+      "n_mod8": 7,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 6,
+      "digits": 60,
+      "factor_bits": [
+        99,
+        99
+      ],
+      "factors": [
+        500465929552582473140573689853,
+        385780732142156219402857311367
+      ],
+      "id": "exposed_60_0",
+      "n": 193070112715000043463672701849104128017320155141118109459051,
+      "n_mod8": 3,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 1,
+      "digits": 60,
+      "factor_bits": [
+        69,
+        129
+      ],
+      "factors": [
+        337037239294930149499,
+        536669384890657084151763036903465388843
+      ],
+      "id": "exposed_60_1",
+      "n": 180877567897655362455638736537421980266067425639638156639657,
+      "n_mod8": 1,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 1,
+      "digits": 62,
+      "factor_bits": [
+        102,
+        103
+      ],
+      "factors": [
+        2804746192498227998208187846433,
+        7029250826217890561998780257343
+      ],
+      "id": "exposed_62_0",
+      "n": 19715264490949651884088608953462995024432529819063036704607519,
+      "n_mod8": 7,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 3,
+      "digits": 62,
+      "factor_bits": [
+        71,
+        134
+      ],
+      "factors": [
+        1726668693419967449653,
+        18616311118567419730120823311791044238097
+      ],
+      "id": "exposed_62_1",
+      "n": 32144201595396419360201681678849809555501641889540297592030341,
+      "n_mod8": 5,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 13,
+      "digits": 65,
+      "factor_bits": [
+        107,
+        108
+      ],
+      "factors": [
+        144144512037154661387059930488929,
+        256755271052166233293919526023017
+      ],
+      "id": "exposed_65_0",
+      "n": 37009863258781883396316209725659166110742620278501918347717678793,
+      "n_mod8": 1,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 5,
+      "digits": 65,
+      "factor_bits": [
+        75,
+        140
+      ],
+      "factors": [
+        32471327130704435997299,
+        1366847953929979845242783132776207812261497
+      ],
+      "id": "exposed_65_1",
+      "n": 44383367049994401570767948334721038569724277675323312599773696603,
+      "n_mod8": 3,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 8,
+      "digits": 70,
+      "factor_bits": [
+        116,
+        116
+      ],
+      "factors": [
+        63692519882150384135701463277466297,
+        49452217099233404697943216015906213
+      ],
+      "id": "exposed_70_0",
+      "n": 3149736320809340824609289829613135545293504750460004039094209020403261,
+      "n_mod8": 5,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 8,
+      "digits": 70,
+      "factor_bits": [
+        81,
+        151
+      ],
+      "factors": [
+        2253592215976004210602381,
+        2173432444581529595107204591554460849512611507
+      ],
+      "id": "exposed_70_1",
+      "n": 4898030439058633245697097340403081180702665078964270964916700902198167,
+      "n_mod8": 7,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 4,
+      "digits": 75,
+      "factor_bits": [
+        124,
+        124
+      ],
+      "factors": [
+        12032567052105719536681718991515893619,
+        18642088906733619173786893457172899953
+      ],
+      "id": "exposed_75_0",
+      "n": 224312184761588480013222927826114533461680718331986703276891456288478099907,
+      "n_mod8": 3,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 10,
+      "digits": 75,
+      "factor_bits": [
+        86,
+        162
+      ],
+      "factors": [
+        41132559589119867629248063,
+        5586188904268348633898492726873300717296432688519
+      ],
+      "id": "exposed_75_1",
+      "n": 229774247980898069850942979174049464124326769479327937931056573033463088697,
+      "n_mod8": 1,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 1,
+      "digits": 80,
+      "factor_bits": [
+        132,
+        133
+      ],
+      "factors": [
+        2988889136403673899564944779231980877337,
+        8869503019320708966294800572144117983383
+      ],
+      "id": "exposed_80_0",
+      "n": 26509961219747252000188561948384145946272447209209175309496676660346227527291071,
+      "n_mod8": 7,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 6,
+      "digits": 80,
+      "factor_bits": [
+        92,
+        173
+      ],
+      "factors": [
+        4793985760628266245766392181,
+        8753223167636838530690353628599812812490784726603217
+      ],
+      "id": "exposed_80_1",
+      "n": 41962827225252451425435482126444902391189516667051664403032831298533093198246277,
+      "n_mod8": 5,
+      "uneven": true,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 2,
+      "digits": 50,
+      "factor_bits": [
+        82,
+        83
+      ],
+      "factors": [
+        4070309074973777767339433,
+        6246967909137601683253753
+      ],
+      "id": "regression_50_0",
+      "n": 25427090171632746109146524401611306442861422142049,
+      "n_mod8": 1,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 1,
+      "digits": 50,
+      "factor_bits": [
+        82,
+        83
+      ],
+      "factors": [
+        4182720669562609282036073,
+        5091193303172163501097579
+      ],
+      "id": "regression_50_1",
+      "n": 21295039461916944150492801714924795587103370967267,
+      "n_mod8": 3,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 2,
+      "digits": 50,
+      "factor_bits": [
+        82,
+        83
+      ],
+      "factors": [
+        4106309821669602668509307,
+        7542972010252476328839151
+      ],
+      "id": "regression_50_2",
+      "n": 30973780050278650425238301229625169814066949478357,
+      "n_mod8": 5,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 3,
+      "digits": 55,
+      "factor_bits": [
+        91,
+        91
+      ],
+      "factors": [
+        1770928795228358567805873091,
+        2063567199792842461918168091
+      ],
+      "id": "regression_55_0",
+      "n": 3654430575001896001025444285245737795987929505551739281,
+      "n_mod8": 1,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 9,
+      "digits": 55,
+      "factor_bits": [
+        91,
+        91
+      ],
+      "factors": [
+        2345431889226363765845795143,
+        1657129243005680667169130629
+      ],
+      "id": "regression_55_1",
+      "n": 3886683771115067660869231990928815911657908430540734947,
+      "n_mod8": 3,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 1,
+      "digits": 55,
+      "factor_bits": [
+        91,
+        91
+      ],
+      "factors": [
+        1872804694513591293924401327,
+        2253964823694241396875385411
+      ],
+      "id": "regression_55_2",
+      "n": 4221235903083074419098549280489552376638766350564840397,
+      "n_mod8": 5,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "attempts": 2,
+      "digits": 40,
+      "factor_bits": [
+        66,
+        66
+      ],
+      "factors": [
+        46714467445582600603,
+        42636615308138649901
+      ],
+      "id": "routing_40",
+      "n": 1991746777801871722134917581184928490303,
+      "n_mod8": 7,
+      "uneven": false,
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 0,
+      "digits": 60,
+      "factor_bits": [
+        99,
+        99
+      ],
+      "factors": [
+        379356077523489268563212911249,
+        526304533220740552274772009433
+      ],
+      "generation_attempts": 5,
+      "id": "c10a01_60_balanced",
+      "n": 199656823305451086082999598054945329220356677854497619811817,
+      "n_mod8": 1,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 1,
+      "digits": 60,
+      "factor_bits": [
+        69,
+        129
+      ],
+      "factors": [
+        546481770321930542467,
+        352543188423685219129617568743925863529
+      ],
+      "generation_attempts": 7,
+      "id": "c10a01_60_35_65",
+      "n": 192658425724713428365074045615924832142092083387122380986043,
+      "n_mod8": 3,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 0,
+      "digits": 62,
+      "factor_bits": [
+        102,
+        103
+      ],
+      "factors": [
+        5065034723311903993084392259421,
+        9813323133149128246131211035473
+      ],
+      "generation_attempts": 5,
+      "id": "c10a01_62_balanced",
+      "n": 49704822420480301574491326584783763008496197244999535449441133,
+      "n_mod8": 5,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 1,
+      "digits": 62,
+      "factor_bits": [
+        71,
+        134
+      ],
+      "factors": [
+        1755443497497874354801,
+        19308137367990095529517151924149691117551
+      ],
+      "generation_attempts": 1,
+      "id": "c10a01_62_35_65",
+      "n": 33894344191433935592196803017126318992162688671541144772212351,
+      "n_mod8": 7,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 0,
+      "digits": 65,
+      "factor_bits": [
+        107,
+        108
+      ],
+      "factors": [
+        92775086952925116284537899357631,
+        272942027750777104256993728266053
+      ],
+      "generation_attempts": 5,
+      "id": "c10a01_65_balanced",
+      "n": 25322220357686045947620401628201883463886151956680557676163800443,
+      "n_mod8": 3,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 1,
+      "digits": 65,
+      "factor_bits": [
+        75,
+        140
+      ],
+      "factors": [
+        32889540768737335999507,
+        1028389360992935980827004204360008420821579
+      ],
+      "generation_attempts": 1,
+      "id": "c10a01_65_35_65",
+      "n": 33823253814512905398793912623995442838912900670858087622078961553,
+      "n_mod8": 1,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 0,
+      "digits": 70,
+      "factor_bits": [
+        116,
+        116
+      ],
+      "factors": [
+        64458883969618137267051511608601031,
+        52219215030379942810339819853720849
+      ],
+      "generation_attempts": 2,
+      "id": "c10a01_70_balanced",
+      "n": 3365992322627800186463004496997852520926853956936116520981616887595319,
+      "n_mod8": 7,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "balance_index": 1,
+      "digits": 70,
+      "factor_bits": [
+        81,
+        151
+      ],
+      "factors": [
+        1272773731572188250712187,
+        2509935616955894823742001513501638643984393903
+      ],
+      "generation_attempts": 10,
+      "id": "c10a01_70_35_65",
+      "n": 3194580121198896787323901951361089655861996553424956988611553290595861,
+      "n_mod8": 5,
+      "source": "v2/benchmarks/inputs/corpora/c10a01_exposed.json",
+      "exposure": "previously exposed"
+    },
+    {
+      "id": "derived_60_12",
+      "n": 346510677637276536313235079252411236441321114958263117892677,
+      "digits": 60,
+      "factors": [
+        103957005431,
+        3333211419477335024402671890507615640067148664867
+      ],
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "derived from exposed certified primes",
+      "population": "uneven_diagnostic"
+    },
+    {
+      "id": "derived_60_18",
+      "n": 103139835731706523459222065668625217885483389752337217680211,
+      "digits": 60,
+      "factors": [
+        117463365224143693,
+        878059602114199619321605125603940346378527
+      ],
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "derived from exposed certified primes",
+      "population": "uneven_diagnostic"
+    },
+    {
+      "id": "derived_70_21",
+      "n": 1158042195088217639727639129753895897677413518510937991396029922614477,
+      "digits": 70,
+      "factors": [
+        289532997241936787489,
+        3999689866507842359924262774681212879595797602093
+      ],
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "derived from exposed certified primes",
+      "population": "uneven_diagnostic"
+    },
+    {
+      "id": "recursive_60",
+      "n": 102008592475464419323830205735310034324285467091427760410703,
+      "digits": 60,
+      "factors": [
+        39733150518205001717,
+        40482933843490771177,
+        63417887891644222267
+      ],
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "derived from exposed certified primes",
+      "population": "recursive_diagnostic"
+    },
+    {
+      "id": "repeated_60",
+      "n": 100119294086922045704512181306338489696902315320627568897763,
+      "digits": 60,
+      "factors": [
+        39733150518205001717,
+        39733150518205001717,
+        63417887891644222267
+      ],
+      "source": "v2/benchmarks/inputs/c9a/corpus.json",
+      "exposure": "derived from exposed certified primes",
+      "population": "recursive_diagnostic"
+    },
+    {
+      "id": "random_60_00",
+      "n": 246337806120140671659833556883986880021077713644898759685350,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_01",
+      "n": 914397161958602212220432544337846472106426889205153381407572,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_02",
+      "n": 842277512575375206298849492689786586423112197545727235968846,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_03",
+      "n": 400007744701798989690897662658048171510023127350786078449725,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_04",
+      "n": 885041205971841780418408309740480019776547112355308608576095,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_05",
+      "n": 640164608077122995714700755341358045145045355397354354788364,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_06",
+      "n": 517500856546834743865656539396592984984381435433113837045629,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_07",
+      "n": 302347477141217504321848804061445554353151994434979159468454,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_08",
+      "n": 409253348969980613056103765871784862183244341450386713088902,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_09",
+      "n": 351429537359133198742832654031342822750257804724499150896162,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_10",
+      "n": 777067134550233655407354132218100914648875467059493302833252,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_60_11",
+      "n": 407039331829455630971188175713806675576590534554540900773628,
+      "digits": 60,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_00",
+      "n": 40395777219059789112229440055557519178560912390336308198688179984834877557164280,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_01",
+      "n": 94435382992276343638592036237045362224982943164646177989873218618460363123292833,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_02",
+      "n": 65987157737804184972242052040633861359117264328596773045870562612155325828697203,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_03",
+      "n": 78187378738062475332986892816495246453176692936897230839728013986355598994419464,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_04",
+      "n": 24418985512117907870960872011551805951781605785817811289594787302295866667237477,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_05",
+      "n": 71790153729328119768682061063061322390676351882212973812412477996629545669711522,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_06",
+      "n": 22535002140196741235194851009497179536266092469336218254339107988767017939311546,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_07",
+      "n": 48970025676508003630337143703665635194998324316402208537634961498613851172177884,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_08",
+      "n": 26425218250630575163127453100579363831058411265814158396666735312201548271406061,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_09",
+      "n": 58460282231149003774904150397465753043486439691204111512852477024076186876879804,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_10",
+      "n": 26807316492684019055268744655562074642298482235830233038758291020254571526260725,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_80_11",
+      "n": 76832675416014091186627302892149399329782496535092572196840039936721411144276653,
+      "digits": 80,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_00",
+      "n": 7758663504903584724721219340545758976385559388403155673657852891789940057556748399490800727953822028,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_01",
+      "n": 1034387111187723059529254696822336612092592458944708019460685698393212563537108047314702980534625425,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_02",
+      "n": 1161870557970626675763443032384616437125295726050023256152350380420161050724067914270371292407288911,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_03",
+      "n": 6733064818971836314799014752614204902315151212047274747200343247613688959218991337572497169194725331,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_04",
+      "n": 9393120557269806775983283180065016209367451941967594299572698457206762191275705077011316162603826118,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_05",
+      "n": 2697869153790134918198245605659257506186641544857876745394182271898679522580962255063097555335528999,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_06",
+      "n": 1076546881034686145729593111879005609189855066625717197912958484801895642272149590640550681833597239,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_07",
+      "n": 5328059766173135533817398379545006867628337299013280772048267569067369065964321299113124675712375707,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_08",
+      "n": 4732789245881017776691331121539843493175961984772899155015453590884446651055356307652236852088901717,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_09",
+      "n": 1721474781316559446900370794588857029577198958144161265487651187251295588978158190663613374906349077,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_10",
+      "n": 3885844391109869645820535313042849998242574585906886715441701852550070827455243631918749055541989592,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "random_100_11",
+      "n": 6405634952927791748771521944464261798125054468409843293122318513710100781445800622322534360506413937,
+      "digits": 100,
+      "population": "uniform_integer",
+      "exposure": "unfactored",
+      "generation_seed": 202611040701
+    },
+    {
+      "id": "exact_0",
+      "n": 20017003,
+      "digits": 8,
+      "population": "exact"
+    },
+    {
+      "id": "exact_1",
+      "n": 16008001,
+      "digits": 8,
+      "population": "exact"
+    },
+    {
+      "id": "exact_2",
+      "n": 80088029003,
+      "digits": 11,
+      "population": "exact"
+    },
+    {
+      "id": "exact_3",
+      "n": 100265168027,
+      "digits": 12,
+      "population": "exact"
+    },
+    {
+      "id": "exact_4",
+      "n": 1099511627776,
+      "digits": 13,
+      "population": "exact"
+    },
+    {
+      "id": "exact_5",
+      "n": 1,
+      "digits": 1,
+      "population": "exact"
+    },
+    {
+      "id": "exact_6",
+      "n": 65537,
+      "digits": 5,
+      "population": "exact"
+    },
+    {
+      "id": "engage_30_0",
+      "n": 100000000000034700000000001147,
+      "digits": 30,
+      "population": "startup_product",
+      "exposure": "unfactored"
+    },
+    {
+      "id": "engage_30_1",
+      "n": 100000000000036700000000001221,
+      "digits": 30,
+      "population": "startup_product",
+      "exposure": "unfactored"
+    },
+    {
+      "id": "engage_40_0",
+      "n": 1000000000000000003470000000000000001147,
+      "digits": 40,
+      "population": "startup_product",
+      "exposure": "unfactored"
+    },
+    {
+      "id": "engage_40_1",
+      "n": 1000000000000000003670000000000000001221,
+      "digits": 40,
+      "population": "startup_product",
+      "exposure": "unfactored"
+    }
+  ],
+  "seeds": [
+    104729,
+    130363
+  ],
+  "uniform_seed": 202611040701,
+  "confirmation_seed": 202611040799
+}

@@ -67,8 +67,11 @@ class PacingDefaultTests(unittest.TestCase):
                 ).solve_policy,
                 "window",
             )
-        for other in (10**29, 10**40, 10**49 - 1, 10**60):
+        for other in (10**29, 10**40, 10**49 - 1):
             self.assertEqual(default_siqs_config(other).solve_policy, "window")
+        self.assertEqual(
+            default_siqs_config(10**60).solve_policy, "collection"
+        )
         self.assertEqual(
             default_siqs_config(number, backend="gmpy2-mpz").solve_policy,
             "window",

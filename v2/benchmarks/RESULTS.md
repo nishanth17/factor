@@ -1,5 +1,257 @@
 # Benchmark results and decisions
 
+## A7a final local adoption (9 November 2026)
+
+The selected current-collector implementation is adopted locally with H3,
+production Y0, nearest-row workers/packets and an explicit serial override.
+Rows are S0 below 40; C4/p4 at 40, C4/p8 at 50, C4/p16 at 55, C8/p16 at 60,
+C14/p64 at 65 and C8/p64 at 70. Ties choose the smaller size; above 70 is
+extrapolated. Existing ECM defaults and portfolio SIQS eligibility stay fixed.
+
+G4 supports 1.97x at 55 and 3.10x at 65 versus matched Y0 S0. At 70,
+completed pairs are 2.96x/2.99x, the censored pair gives >2.60x, and C10
+completes 3/3 against S0's 2/3. This is approximately 3x on completed pairs,
+not an identified aggregate censored-row speedup. The selected 50/60/65/70
+recipes come from the three-input worker calibration below. Selected 65/70
+recipes differ from G4's C10; calibration indicates faster/tied outcomes
+within drift rather than fresh exact-recipe confirmation. C6@60 and C12@65
+remain possible cheaper ties from single-input extension screens. No claim
+of complete odd-count validation or global optimality follows.
+
+A7a is Done for this explicitly selected integration. New 75/80 probes stay
+deferred until after B5a. C3a/B12 dispatch, engagement, allocation and worker
+cost tables require revalidation. This adoption does not establish primary
+population/p90 gains or a fresh 60-digit balanced guardrail. Existing failed
+and censored receipts are preserved. Full premerge and postmerge committed-
+files-only tests, lint and benchmark imports are captured locally under
+`v2/benchmarks/results/a7a/final-merge-20261109/`; no remote push is included.
+
+## A7a directional worker extension (reported 9 November 2026)
+
+Runtime `42dd142`; 19/19 cold input-0 factorizations and 40 exact prefix
+controls reconstruct. Packets and numerical Y0 remain frozen. At 70 the
+opening/closing control geometric means shift from 29.99 to 26.73 seconds:
+12.20% symmetric drift triggers the predeclared 10% stop. No continuation
+inputs, automatic restart or new three-input regime choices follow.
+
+Single-input screens retain C4 at 50/55. At 60, C6/C8 tie while C6 uses
+less OS CPU; at 65 C12/C14 tie and C16 loses beyond drift. The C8/C14/C16
+differences at 70 are inside drift; no higher-worker gain is established.
+Odd counts C3/C5 run once each at 50 and 55; no three-input odd-count
+validation runs. C7/C9 at 60 and C13/C15 at 65 are excluded by the frozen
+flat-even-bracket rule. The drift stop prevents 70 refinement and all
+continuation inputs. Odd-count coverage is therefore incomplete.
+C12/C14/C16 oversubscribe the ten-core host. C18/C20 full-factor calls did
+not run. These screens do not replace earlier three-input calibration or
+establish global optima, fresh guardrails, mainline speedups or defaults.
+
+Owner wall is 66.10 minutes and observed CPU 31,349 seconds; sampled actor
+peak owned RSS is 3.586 GiB. The known inner CPU undercount remains qualified.
+Five owner-telemetry process reads failed and are retained; per-cell RSS
+observers report no failures. Their cause is unverified. All owned actor
+groups and the owner have exited; the lock file remains. Implementation QA
+passes 1,629 tests (nine optional skips), lint and 295 imports. No new runtime
+change accompanies this report.
+
+Full per-configuration wall/CPU/RSS, worker timelines, comparison margins,
+controls, stopped ledger, source, failed/passing QA and verified hashes remain
+local under `v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/`
+in the main repository. No default adoption, merge, push or 75/80 probe follows.
+
+## A7a reduced worker-count race (8 November 2026)
+
+Current H3-integrated runtime `bce0ad0`; 18 input-0 screens at frozen packets,
+then only configurations within 10% of the fastest completed row cell get
+inputs 1–2. All 36 full-factor calls complete and reconstruct, as do 40 fixed
+prefix controls. One recorder-only launch failure precedes these calls and is
+retained. No G4 heldout input was reused for selection.
+
+| Digits / provisional survivor | Three-input wall geometric mean(s) | OS CPU mean(s) | Peak sampled RSS(GiB) | Maximum A/A drift |
+| --- | ---: | ---: | ---: | ---: |
+| 50 C4/p8 | 15.79 | 70.29 | 0.823 | 2.27% |
+| 55 C4/p16 | 26.78 | 123.48 | 0.874 | 4.55% |
+| 60 C8/p16 | 62.87 | 423.93 | 1.729 | 1.91% |
+| 65 C14/p64 | 173.52 | 1470.90 | 3.082 | 1.08% |
+| 70 C8/p64 | 580.75 | 4567.31 | 2.154 | 7.42% |
+
+C6 at 55 also has three inputs: 28.48 s / 143.05 CPU-seconds / 1.115 GiB.
+At 70 the three-input C10/C12/C14 means are 582.23/597.51/595.16 s, with
+5352/5544/5433 CPU-seconds and 2.585/2.977/3.278 GiB sampled peak RSS.
+Those wall differences are ties inside the measured drift; C8 wins the
+fewer-workers tie-break and also has lower CPU and RSS. C12/C14 are explicitly
+oversubscribed on the ten-core host. No wall winner is invented from that noise.
+
+Other rejected configurations have input-0 evidence only; do not compare
+n=1 means to n=3 means or claim a global optimum. All prefix signatures/scanned
+positions match; no 10% drift stop occurs. Total owner wall including the prior
+recorder launch is 2.81 h, with 77,679 observed CPU-seconds. The inner CPU
+counter still underreports for process arms, so costs use OS whole-actor totals;
+these nonbinding-grant runs do not validate binding CPU-cap enforcement.
+
+This is internal worker calibration, not default/dispatch adoption, fresh
+60/70 guardrails, a mainline or population/p90 claim. Full report, observations,
+comparison margins against A/A drift, timelines, failed QA/recorder attempts,
+source archives and verified hashes remain local under
+`v2/benchmarks/results/a7a/worker-count-race-20261108-r2/` in the main repository.
+
+## A7a slim G4 (8 November 2026)
+
+Runtime `a51de80` after H3 integration; three fresh certified balanced inputs
+per cold row, one call per arm/input, matched Y0 strong serial S0 comparator.
+Complete actor wall includes startup, JIT, validation and process cleanup.
+
+| Digits / recipe | S0 / candidate complete | Wall speedup | Candidate CPU / S0 |
+| --- | --- | --- | --- |
+| 55, C4/p16 | 3/3 and 3/3 | 1.97x (98 1/3% CI 1.86–2.09x) | 2.34x |
+| 65, C10/p64 interpolation | 3/3 and 3/3 | 3.10x (98 1/3% CI 1.63–5.92x) | 2.90x |
+| 70, C10/p64 | 2/3 and 3/3 | Censored; no aggregate latency CI | Not pooled |
+
+At 70 the three candidate times are 500/691/548 s; matched S0 times are
+1,480/timeout at 1,800/1,637 s. Completed-pair speedups are 2.96x/2.99x;
+the censored pair gives a >2.60x lower bound. No failed control is replaced
+with a completed time. All factorizations and unresolved results reconstruct.
+A/A signatures/scanned work match; maximum drift is 2.17%, below the 10% stop.
+Total owner wall is 2.55 h; maximum sampled aggregate owned RSS is 2.56 GiB.
+
+CPU uses OS whole-actor totals: the process-arm inner counter underreports
+and its cause remains unverified. Observed CPU is below the matched limits;
+binding CPU-cap enforcement is not established. Profiles/Tier-A/timelines are
+off; RSS is sampled, not exact peak physical memory. Three-input t intervals
+assume log-normal ratios. This does not establish a mainline/population/p90
+claim, independently optimal 65 routing, fresh 60 guardrail or default adoption.
+All 75/80 probes remain deferred until after B5a. Detailed report, every raw
+receipt, protocol, source archive and verified hashes remain local under
+`v2/benchmarks/results/a7a/g4-slim-20261108/` in the main repository.
+
+## A7a completed rerun tranche (7 November 2026)
+
+Named source `ae1cfd9` completes all 92 planned cells in five separately
+identified protocols: 44 clean completions, two clean timeouts and 46 valid
+CPU/heap/RSS companions, covering 390 process CPU streams and 90 heap dumps.
+All prior failures, freezes and charges remain preserved. The new owners cost
+6,432.520 wall seconds, 41,621.052 CPU seconds and 5,022,838,440 capture bytes.
+Peak diagnostic summed RSS is 3.520 GiB, including possible shared-page counts.
+No arithmetic or worker source changed after the applicable committed QA.
+
+| Exposed balanced input / scope | Configuration | Clean seconds |
+| --- | --- | ---: |
+| 60 digits, third calibration modulus, warm library interval | C8/p16 | 33.253 / 35.141 |
+| Same input and numerical policy, warm library interval | Serial Y0 | 116.871 |
+| Same input, fresh-process complete actor | C8/p16 | 35.401 |
+| Same input and numerical policy, fresh-process complete actor | Serial Y0 | 115.463 |
+| 62 digits, first full-factor calibration screen, warm library interval | C8/p16 | 74.936 |
+| Same 62-digit input and policy | C8/p32, arrival admission, lookahead 4 | 102.472 |
+
+The opposite-order 60-digit joint rerun retains all ten candidates and frequent
+controls. Controls initially rise from 35.953 to 57.411 seconds, then cluster
+near 55–57 seconds. Six-/ten-worker alternatives remain near ties in some
+blocks; none establishes an improvement over the provisional C8/p16 incumbent.
+The third-input serial arm changes thermal state from fair to nominal, so its
+similar endpoint controls do not establish comparable intermediate conditions.
+Whole-family and 32-polynomial proposals reduce some coordination costs but
+do not establish a complete-factor gain. These are exploratory observations,
+not nine-sample independent confirmation, individual-flag rejection, a literal
+current-master comparison or an all-regime optimum. Confirmation inputs remain
+untouched; no defaults, merge or push occurred. Full configurations, complete
+cost tables, raw captures and release audits remain under local `v2/audit/a7a/`.
+
+## A7a joint starting screen (7 November 2026)
+
+Source `768727d` tests eight joint configurations on one exposed certified
+balanced 60-digit input. Five complete in 45.289–97.284 seconds and three
+censor at their wall limits. The same-source C8/p16 incumbent completes in
+32.988 seconds. Its closing bracket was unissued when the next whole pair
+could not fit M2's remaining allowance; a separately charged M3 supplement
+on `c156298` completes in 33.229 seconds, a 0.73% end/start difference.
+Only design/test/documentation files changed between these sources.
+
+This block uses ten-second warmup, uninstrumented clean calls with tier-A
+timers off, and CPU/heap/RSS companions for every issued repetition. All ten
+companions, including the supplementary control and censored factor runs,
+pass observation validation. The joint block costs 1,591.585 wall seconds,
+6,912.573 CPU seconds and 982,568,746 capture bytes; the closing supplement
+costs 92.697 wall seconds and 701.922 CPU seconds. No tested bundle beats
+the incumbent on this input. A single bracket cannot exclude transient drift;
+one observation per bundle cannot establish independent-input gains, individual
+flag effects or per-regime optimality. Untested combinations remain eligible.
+Plans, complete cost tables, captures, failures and charges remain local under
+`v2/audit/a7a/`.
+
+A conditional local design on a second independent 60-digit calibration input
+uses `d389c17`: eight joint local bundles, two prespecified broad exploration
+rows and bracketing C8/p16 controls. Its pilot and continuation finish all
+24 calls with valid observations, costing 1,721.221 wall seconds, 11,188.663
+CPU seconds and 1,316,835,512 capture bytes. The control changes from 37.127
+to 56.709 seconds despite identical scanned positions (801,118,176), packet
+counts and 5,013 useful rows. Worker CPU rises from 271.451 to 424.386 seconds.
+The 52.74% control drift prevents ranking close configurations; raw times
+cannot establish individual flag losses or a new optimum. Host snapshots
+show background analysis/cloud activity and unchanged swap counters, without
+isolating a cause. Further selection requires a separately identified
+measurement-stability decision, not an automatic larger repeat of this matrix.
+
+A separate four-control repeatability screen on `d9443d9` writes new captures
+outside Documents and records unprivileged Foundation thermal/low-power hints.
+Identical C8/p16 calls take 37.159, 40.257, 44.734 and 49.126 seconds, with the
+same 801,118,176 scanned positions, assignments and useful rows. The 32.20%
+range fails its prospective 10% measurement-admission gate. All observations
+are valid; low-power mode stays off and OS thermal state changes from nominal
+to fair. Capture relocation alone does not establish stable timing or isolate
+the cause. The screen costs 439.963 wall seconds and 3,395.649 CPU seconds.
+Configuration selection stops under that protocol. A new comparison must
+declare transient versus sustained machine conditions separately from PyPy
+warmup and use suitably frequent controls; the drifting matrix is not repaired
+by retrospective timing corrections. No per-regime optimum is established.
+
+## A7a current-mainline feasibility (6 November 2026)
+
+The isolated `codex/a7a-regime-tuning` continuation starts from mainline
+`e62ec18`. One certified balanced 60-digit calibration modulus completes in
+every tested arm under the same Y0 numerical policy, seed and finite grants.
+These are exploratory warmed observations with a ten-second warmup and
+tier-A counters; S0 is the strong experimental serial control. They are not
+a literal master comparison, an accepted speedup or an optimal worker table.
+
+| Arm | Warm factor seconds | Whole-call CPU seconds, including warmup |
+| --- | ---: | ---: |
+| S0 | 109.148 | 119.351 |
+| C4, 16-polynomial packets | 59.136 | 282.707 |
+| C6, 16-polynomial packets | 38.095 | 287.134 |
+| C8, 16-polynomial packets | 34.854 | 345.741 |
+| C10, 16-polynomial packets | 35.006 | 392.062 |
+
+The original four-arm source is `12e4f34`; C8 uses `0c853bc` with its optional
+parent CPU snapshot disabled. Every result reconstructs the certified input.
+CPU/heap/RSS companions are separate from clean timing. The C4 recorder
+failure, repaired missing capture and conservatively reserved unknown worker
+CPU remain explicit in the local receipts; its valid clean run was retained.
+Its 42.6-second diagnostic versus 59.1-second clean run also exposes drift.
+
+The new parent CPU snapshot has no established benefit: C8 clean times were
+34.854 seconds disabled and 36.601 enabled. The memory nursery screen likewise
+retains 4 MiB. Its 60-digit 4 MiB controls drifted from 36.262 to 48.996 seconds
+on identical scanned work, preventing a setting ranking. At 80 digits, fixed
+640-polynomial 4 MiB controls were 11.240/11.185 seconds; 16/64/128 MiB settings
+were 11.370/11.332/11.992 seconds. Larger nurseries reduced sampled GC shares
+while increasing diagnostic owned RSS sums to approximately 5.4–6.5 GiB at
+60 digits and 6.3–6.4 GiB at 80 digits. These sums include shared pages and may
+miss peaks. Heap census is live GC-object data, not allocation attribution.
+
+Packed event storage, fused scan, larger inverse/root-transfer caches and
+pruned replay have no established full-factor gain in this continuation.
+Larger hit storage remains an 80-digit collection lead. Per-regime removals,
+independent confirmation, 75/80-digit completion and cold admission remain
+open. One balanced 70-digit input completes in 533.568 seconds on `535edd7`
+with C10/p16 and tier-A counters. Its original RSS recorder timed out; this
+was an observation failure, not production memory exhaustion. The repaired
+native-RSS companion on `7c452e3` completes with all CPU streams and heaps;
+its instrumented time is not a performance comparison. Automatic QS settings
+retain their existing behavior;
+native/NEON QS work stays with B5a.
+
+Reproduction uses `v2.benchmarks.qs.a7a.combined` with source-bound plans and
+the versioned `regime_corpus.json`. Detailed plans, all failures, capture
+indices and charges remain under local `v2/audit/a7a/`; start at `HANDOFF.md`.
 
 ## H3 resource-limit correctness delivery (8 November 2026)
 

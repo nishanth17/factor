@@ -3,7 +3,34 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
-## H3 observed resource limits (8 November 2026, unmerged branch)
+## A7a selected QS integration (9 November 2026)
+
+- Adopt Y0 numerical policy and nearest-row process QS: serial below 40;
+  C4/p4, C4/p8, C4/p16, C8/p16, C14/p64 and C8/p64 at 40/50/55/60/65/70.
+  Ties choose the smaller size; above 70 is explicitly extrapolated.
+- Add CLI `--qs-workers serial` and retain API `qs_workers=None` as S0.
+  Preserve H3 resources, explicit and saved recipes, lazy pool startup, ECM
+  defaults and existing portfolio SIQS eligibility. Restore all supported
+  collector subtypes through the shared checkpoint decoder.
+- Close the selected A7a scope with its G4/calibration evidence and retained
+  censoring/drift limits. Defer 75/80 probes until after B5a and flag C3a/B12
+  dispatch and cost tables for revalidation.
+
+## Directional QS count extension (8 November 2026)
+
+- Permit explicit current QS process counts through twenty for the bounded
+  directional study. Automatic defaults and default search grids stay fixed.
+- Extend exact fixed-work coverage, checkpoint restore and child cleanup
+  validation to sixteen, eighteen and twenty spawned workers.
+
+## Opt-in QS oversubscription experiments (8 November 2026)
+
+- Permit explicit current QS process counts up to fourteen for the authorized
+  worker-count race. Automatic choices and default search grids are unchanged.
+- Extend fixed-work coverage, checkpoint restore and child cleanup checks to
+  twelve and fourteen spawned workers; larger counts remain rejected.
+
+## H3 observed resource limits (8 November 2026)
 
 - Replace internal byte/count/work refusal ceilings and prepaid worker leases
   with one root wall/aggregate-CPU/current-tree-RSS owner. Omitted wall/CPU are
@@ -18,6 +45,89 @@ below record decisions in their dated scope; later entries may supersede routes.
   benchmark imports. Fixed-work QS/ECM confirmation on `508c490` matches base
   `40d2367`. No performance evidence or retuning is added; dependent costs
   require revalidation.
+
+## Experimental QS integration with H3 (8 November 2026)
+
+- Integrate local master into the isolated A7a branch. Replace current-worker
+  reservations and synthetic charges with the observed root resource owner;
+  retain numerical policies, packet/cache settings and exact validation.
+- Version worker snapshots for saved-history accounting, retain arithmetic and
+  corruption/cleanup coverage, and adapt historical recipes at recorder ingress.
+  Preserve earlier diagnostic work separately. Handle failed process submission
+  without broadcasting through a dead worker's stop lock. Pass 1,628 tests,
+  lint and 295 benchmark imports. No new probe or timing claim.
+
+## Experimental QS kernel specialization and restricted tuning (8 November 2026)
+
+- Report both approved 75/80 feasibility probes on the isolated A7a branch.
+  Retain incomplete internal memory outcomes, missing sub-limit attribution
+  and the terminal path's discarded QS state. No automatic retry or adoption.
+- Admit explicit QS bookkeeping grants through 32 GiB without changing the
+  default. Probe cells can enforce a lower sampled live-RSS cancellation
+  bound and retain their portfolio checkpoint, separately from recorder errors.
+- Select default scalar marking, collection and native-stamp kernels at
+  construction, including prime-power root lifting. Preserve explicitly
+  selected alternatives, exact signatures, work accounting and resume behavior.
+- Finish the approved four-row worker/packet calibration on the isolated A7a
+  branch. Preserve noisy/inconclusive rankings, complete worker timelines and
+  earlier failed or superseded measurements. Recipes remain experimental;
+  automatic defaults and numerical policies are unchanged. Intermediate
+  verification, fresh confirmation and feasibility probes remain gated.
+
+## Experimental QS worker overhead checks (7 November 2026)
+
+- Add explicit family-affinity placement, grouped exact marking leases and
+  byte-sized recovery-word stamps on the isolated A7a branch. Preserve exact
+  arithmetic, paid-prefix refusal, resume validation and conservative memory
+  reservations. The experimental selectors remain disabled by default.
+- Require worker active, queue-wait and publication timelines for G2H/G3
+  process experiments; disable them for G4 confirmation. Reject incompatible
+  observation settings before starting actors.
+- Report the bounded overhead comparisons and full-factor remeasurement.
+  Configuration tuning and fresh performance confirmation remain open.
+- Close the final source gap with the requested interleaved fixed-work
+  comparison. Preserve exact signatures/scanned positions and explicitly
+  list default-path changes; this Tier 1 check is not a new speedup claim.
+
+## QS reference allowance correction (7 November 2026)
+
+- Apply the explicitly declared checkpoint allowance in the experimental
+  mainline reference adapter, preserving its numerical policy. Retain thermal
+  readings outside actor timing. G2 stopped before continuation; no production
+  factoring defaults change.
+
+## Bounded QS diagnostic review (7 November 2026)
+
+- Review explicitly selected parent/worker CPU streams for bounded windows,
+  retaining the unreviewed process inventory. Full profiles still require
+  every owned process; missing targets and unflushed streams fail review.
+- Finish the approved G2 breadth report on the isolated branch. Preserve
+  incomplete mainline controls and historical recorder failures; architectural
+  fixes, configuration tuning and fresh confirmation remain separately gated.
+
+## Experimental QS campaign preparation (7 November 2026)
+
+- Add bounded, explicitly gated stage proposals, checked coverage and durable
+  per-stage accounting on the isolated A7a branch.
+- Add independent certified confirmation inputs and a literal-mainline
+  complete-QS reference adapter with bounded cold/warm ownership.
+- Add optional worker service/queue spans and minute-level progress, including
+  fixed/adaptive relation targets. Keep unresolved observer costs diagnostic.
+- Pass the G1 preparation gate; coverage/search/confirmation and default
+  adoption remain pending. No automatic factoring settings change.
+
+## Experimental current-collector QS continuation (6 November 2026)
+
+- On the isolated A7a branch, add bounded worker/cache configuration controls,
+  checked resource accounting and a certified per-regime calibration corpus.
+- Pair every clean benchmark repetition with parent/all-worker CPU tracing,
+  owned RSS and parent/representative-worker heaps, analyzed before selection.
+  Preserve recorder failures and unknown CPU charges separately.
+- Add bounded joint designs with explicit geometry, conditional validity and
+  pair-coverage checks. Record exploratory full 60/70-digit feasibility,
+  cache/GC screens and the first joint 60-digit block. Worker
+  selection, fresh confirmation and integration remain open; QS automatic
+  settings retain their existing behavior.
 
 ## ECM package and bundled-data cleanup (6 November 2026)
 

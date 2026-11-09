@@ -96,10 +96,23 @@ def prime_power_roots(
         if target_bits is None:
             target_bits = polynomial.n_prime.bit_length()
         cost = target_bits + 4 * modulus_bits + 1
-        if transferable and len(current) == 2:
-            shifted = root_transfers.shifted(
-                polynomial, prime, next_modulus, initial, cost, budget
-            )
+        if transferable and (
+            len(current) == 2 or root_transfers.pruned_replay
+        ):
+            if len(current) == 2:
+                shifted = root_transfers.shifted(
+                    polynomial, prime, next_modulus, initial, cost, budget
+                )
+            else:
+                shifted = root_transfers.shifted_class(
+                    polynomial,
+                    prime,
+                    next_modulus,
+                    initial,
+                    current[0],
+                    cost,
+                    budget,
+                )
             if shifted is not None:
                 current, modulus = shifted, next_modulus
                 continue
