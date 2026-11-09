@@ -2,7 +2,7 @@
 
 from ..execution.budget import BudgetExhaustedError
 from .native_curve import BlockStore, NativeCurvePacket
-from .native_packet import poll_budget
+from .native_resources import close_resource_checks, poll_native_budget
 from .native_team import (
     _PROCESS_TEAM_LOCK,
     SCHEDULES,
@@ -63,7 +63,7 @@ class NativeCurveTeam(NativeTeam):
         try:
             if not jobs or len(jobs) > self.capacity:
                 raise ValueError("whole native curve queue exceeds capacity")
-            poll_budget(budget)
+            poll_native_budget(budget, self)
             self._grow(self.capacity, jobs[0][1]["n"], budget)
             if self.lib.b4_pthread_reset(self.owner):
                 raise RuntimeError("whole native pthread owner is active")
@@ -127,7 +127,7 @@ class NativeCurveTeam(NativeTeam):
                 raise ValueError(
                     "whole native pthread generation returned invalid status"
                 )
-            poll_budget(budget)
+            poll_native_budget(budget, self)
             # Validate every ready divisor before any stable-order publication.
             ready = []
             for index, ((position, job), packet) in enumerate(
@@ -158,5 +158,6 @@ class NativeCurveTeam(NativeTeam):
         # Parked workers have no borrowed contexts between generations. Stop
         # them, release curve metadata references, free shared blocks, and only
         # then allow the first packet to unload the DSO.
+        close_resource_checks(self)
         self.clear_jobs()
         self.blocks.close()

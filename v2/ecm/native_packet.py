@@ -63,6 +63,7 @@ def source_identity():
     for path in (
         Path(__file__).with_name("native_curve.py"),
         Path(__file__).with_name("native_curve_team.py"),
+        Path(__file__).with_name("native_resources.py"),
         Path(__file__).parents[1] / "execution/ecm_native_full.py",
     ):
         digest.update(path.read_bytes())

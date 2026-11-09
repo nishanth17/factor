@@ -4,7 +4,7 @@ import time
 
 from ..common import utils
 from ..ecm.native_curve_team import NativeCurveTeam
-from ..ecm.native_packet import poll_budget
+from ..ecm.native_resources import poll_native_budget
 from .budget import BudgetExhaustedError
 from .ecm_native import VERSION, _BudgetView
 from .ecm_workers import WorkerRun, _base_budget, arithmetic_options
@@ -91,7 +91,7 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
         while len(completed) < len(manifest.jobs) and not (
             factor is not None and not fixed_work
         ):
-            poll_budget(budget)
+            poll_native_budget(budget, owner.team)
             remaining = [
                 position
                 for position in range(len(manifest.jobs))
@@ -145,7 +145,7 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
                     break
         if factor is not None and not fixed_work:
             reason = "factor"
-        poll_budget(budget)
+        poll_native_budget(budget, owner.team)
     except BudgetExhaustedError as error:
         reason, factor = str(error), None
     except Exception as error:

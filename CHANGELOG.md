@@ -3,6 +3,16 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Experimental B4a native root observations (9 November 2026)
+
+- Retain native ECM's existing resource polls while using the same macOS
+  usage/child queries through one CFFI call for a proved childless root.
+  Children, multiple roots and custom providers retain full-tree observation.
+  Preserve failures, provider restoration, native-buffer lifetime and existing
+  cancellation/publication ordering. Defaults and numerical work are unchanged.
+- Add field/unit, birth, child fallback, observation-error, resource-refusal
+  and provider-lifetime tests. Complete-cost selection remains experimental.
+
 ## B4a whole-ECM C continuation (9 November 2026)
 
 - Add explicit `c-gmp-full` scalar/pthread execution for Suyama setup,

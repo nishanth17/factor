@@ -2,6 +2,10 @@
  * Only documented GMP mpz APIs are used. No allocator hooks or global state.
  */
 #define _POSIX_C_SOURCE 200809L
+#ifdef __APPLE__
+/* libproc is a Darwin extension; retain its SDK declarations with POSIX clocks. */
+#define _DARWIN_C_SOURCE 1
+#endif
 #include "packet.h"
 #include <gmp.h>
 #include <stdint.h>
@@ -9,6 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
+#ifdef __APPLE__
+#include <libproc.h>
+#include <sys/resource.h>
+#endif
 #ifdef B4_OPENMP
 #include <omp.h>
 #endif
@@ -39,6 +48,27 @@ struct b4_context {
 
 unsigned b4_abi(void) { return ABI; }
 const char *b4_gmp_version(void) { return gmp_version; }
+
+int b4_observe_root(int pid, b4_root_observation *output) {
+    if (pid <= 0 || !output) return -EINVAL;
+#ifdef __APPLE__
+    struct rusage_info_v0 usage;
+    if (proc_pid_rusage(pid, RUSAGE_INFO_V0, (rusage_info_t *)&usage))
+        return -(errno ? errno : EIO);
+    /* Match MacResources' usage-then-children order. A child requires the
+     * original tree traversal; this fast path never omits a known child. */
+    int children = proc_listchildpids(pid, NULL, 0);
+    if (children < 0) return -(errno ? errno : EIO);
+    if (children) return 1;
+    output->birth = usage.ri_proc_start_abstime;
+    output->rss = usage.ri_proc_exit_abstime ? 0 : usage.ri_resident_size;
+    output->user = usage.ri_user_time;
+    output->system = usage.ri_system_time;
+    return 0;
+#else
+    return 1;
+#endif
+}
 
 b4_context *b4_create(void) {
     b4_context *c = calloc(1, sizeof(*c));

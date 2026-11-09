@@ -8,6 +8,16 @@ remains an independent control; select `c-gmp-full` explicitly for the complete
 C owner described below. Performance adoption, recalibration and integration
 remain open after the cold/warm Tier 1 screen.
 
+The Phase-2 experimental whole-ECM driver observes a childless macOS root
+through one CFFI bridge using the same libproc usage/child queries as the
+Python resource provider. Poll locations, cancellation, wall/CPU/RSS decisions
+and publication ordering are retained. A live child, multiple roots or a
+custom provider uses the original provider. Observations are never replaced
+with a cancellation flag or an estimated memory quota. The provider is restored
+after each poll, including errors, and its buffer is released before unload.
+Builds and focused tests admit investigation; full QA and complete-cost
+selection remain pending. No default or worker recipe is changed.
+
 Build explicitly from the repository root under the shared performance lock:
 
 ```sh

@@ -19,6 +19,11 @@ typedef struct {
 
 unsigned b4_abi(void);
 const char *b4_gmp_version(void);
+typedef struct {
+    unsigned long long birth, rss, user, system;
+} b4_root_observation;
+/* 0=observed childless root, 1=use full tree provider, negative=errno. */
+int b4_observe_root(int pid, b4_root_observation *output);
 b4_context *b4_create(void);
 void b4_destroy(b4_context *ctx);
 void b4_abort(b4_context *ctx);

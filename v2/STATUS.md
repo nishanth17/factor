@@ -135,18 +135,19 @@ the earlier candidate-count restriction. Subsequent work is selected from
 measured complete costs, uncertainty and remaining resources. This planning
 update launches no implementation, profiling or performance campaign.
 
-B4a Phase 2 is stopped before its first comparison cell. The inspected task
-worktree was clean at `65519aa`; runtime code matches the `fa2a4cc` control.
-That committed source, exact scalar/pthread builds and input identities are
-preserved locally. The initial drift pilot acquired the performance lock,
-but sandbox permission denied its required process-tree observer. It cancelled
-and drained its owned group, retained charges and released the lock. This
-triggers the authorized protocol-invalidating-result stop; no driver,
-arithmetic, compiler or vector decision is established. A permitted, validated
-resource observer and a new frozen pilot identity are required before resuming.
-Detailed stopped handoff and new accounting:
-`v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`. Phase-1 evidence, defaults
-and the other active owners' implementations are unchanged.
+B4a Phase 2 has resumed after the initial sandbox observer failure. A bounded
+host-access preflight validates CPU/RSS observation and owned-group cleanup;
+`drift-r1` and its charges remain preserved. The reviewed `drift-r2` completes
+90 matched calls with identical curve identities/outcomes. Fixed retained
+metadata does not establish accumulation as the cause of remaining warm
+history variation; cold comparisons are usable. Targeted counters identify
+forced root resource observation as a material driver cost. An experimental
+native bridge uses the same macOS usage/child queries at existing poll sites,
+with the original full-tree provider for children or unsupported roots.
+Both native builds and 36 focused resource/transaction tests pass; full
+committed-checkout QA and complete-cost screening remain pending. Defaults and
+other active owners' implementations are unchanged. Local progress and exact
+receipts: `v2/audit/b4a/phase2_20261109/RESUMPTION.md`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the

@@ -8,6 +8,7 @@ from ..common import utils
 from ..execution import stage_jobs
 from .chain_records import verify_frontier
 from .native_packet import NativePacket, _bytes, poll_budget
+from .native_resources import close_resource_checks, poll_native_budget
 
 PHASES = (
     "setup",
@@ -345,7 +346,7 @@ class NativeCurvePacket(NativePacket):
 
     @exclusive_curve
     def advance_job(self, job, budget, context, config):
-        poll_budget(budget)
+        poll_native_budget(budget, self)
         self.bind_job(job, budget, context, config)
         try:
             status = self.lib.b4_step(self.context, 5, self.actions)
@@ -360,7 +361,7 @@ class NativeCurvePacket(NativePacket):
             self._status(status)
         if status == 2:
             self.feed(budget)
-        poll_budget(budget)
+        poll_native_budget(budget, self)
         if status == 1:
             self.sync(allow_result=True, compact=not self.atomic_actions)
         elif self.atomic_actions:
@@ -603,6 +604,7 @@ class NativeCurvePacket(NativePacket):
                 self.discard(sync=not self.published)
         finally:
             if not self.closed:
+                close_resource_checks(self)
                 if self.owns_blocks:
                     self.blocks.close()
                 for owner in (self.info, self.atom, self.pair):
