@@ -5,6 +5,10 @@ below record decisions in their dated scope; later entries may supersede routes.
 
 ## Experimental B4a native root observations (9 November 2026)
 
+- Prepare and validate out-of-line CFFI ABI descriptors during the explicit
+  native build, retaining source/binary/GMP admission and legacy inline builds.
+  Add first-use parser-bypass and missing/corrupt descriptor refusal checks.
+
 - Retain native ECM's existing resource polls while using the same macOS
   usage/child queries through one CFFI call for a proved childless root.
   Children, multiple roots and custom providers retain full-tree observation.

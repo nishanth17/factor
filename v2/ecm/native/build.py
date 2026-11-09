@@ -101,6 +101,16 @@ def main():
             raise RuntimeError("built pthread capability differs from request")
     finally:
         ffi.dlclose(lib)
+    declarations = "\n".join(
+        line
+        for line in (source / "packet.h").read_text().splitlines()
+        if not line.startswith("#")
+    )
+    builder = cffi.FFI()
+    builder.cdef(declarations)
+    builder.set_source("_factor_ecm_abi", None)
+    binding = output / "_factor_ecm_abi.abi"
+    builder.emit_python_code(str(binding))
     manifest = dict(
         abi=1,
         backend="pthread"
@@ -137,6 +147,7 @@ def main():
             for name in ("packet.c", "packet.h", "team.c", "curve.c")
         },
         library_sha256=sha(library),
+        abi_binding=dict(file=binding.name, sha256=sha(binding)),
         openmp=None
         if args.openmp_prefix is None
         else dict(

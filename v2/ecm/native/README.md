@@ -28,6 +28,14 @@ pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp
 pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --pthread
 ```
 
+The explicit build also prepares an out-of-line CFFI ABI descriptor in the
+ignored build directory. Its bounded bytes and filename are hash-checked
+against the manifest before loading. Source, binary and GMP checks still run;
+the first native call avoids parsing C declarations. Older manifests without
+a descriptor retain inline binding. No compilation or preparation occurs on
+default/ineligible calls. Declared missing/corrupt descriptors raise instead
+of silently changing backend.
+
 Both retain `-std=c11 -O2 -Wall -Wextra -Werror`. The scalar artifact is in
 `build/`; pthread is separately in `build/pthread/`, with `-DB4_PTHREAD -pthread`.
 Pthreads use libSystem on macOS; no OpenMP runtime or new dependency is needed.

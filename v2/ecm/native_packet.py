@@ -156,8 +156,6 @@ class NativePacket:
             ):
                 raise ValueError("native load exceeds funded buffer sizes")
             budget.consume(4096 + sum(sizes))
-            import cffi
-
             manifest = json.loads(paths[0].read_text())
             library = paths[1]
             dependency = Path(manifest["gmp_library"])
@@ -200,14 +198,34 @@ class NativePacket:
                 != manifest["library_sha256"]
             ):
                 raise ValueError("native library identity mismatch")
-            ffi = cffi.FFI()
-            ffi.cdef(
-                "\n".join(
-                    line
-                    for line in (SOURCE / "packet.h").read_text().splitlines()
-                    if not line.startswith("#")
+            binding = manifest.get("abi_binding")
+            if binding is None:
+                import cffi
+
+                ffi = cffi.FFI()
+                ffi.cdef(
+                    "\n".join(
+                        line
+                        for line in (SOURCE / "packet.h")
+                        .read_text()
+                        .splitlines()
+                        if not line.startswith("#")
+                    )
                 )
-            )
+            else:
+                if binding.get("file") != "_factor_ecm_abi.abi":
+                    raise ValueError("native binding name mismatch")
+                path = directory / binding["file"]
+                if not path.is_file() or path.stat().st_size > 128 * 1024:
+                    raise ValueError("native binding missing or oversized")
+                budget.consume(path.stat().st_size)
+                raw = path.read_bytes()
+                if hashlib.sha256(raw).hexdigest() != binding["sha256"]:
+                    raise ValueError("native binding identity mismatch")
+                # Execute the validated bytes, not a second path lookup.
+                namespace = {}
+                exec(compile(raw, str(path), "exec"), namespace)
+                ffi = namespace["ffi"]
             if self.variant == "openmp" and _OPENMP_BINDINGS:
                 ffi, lib, bound = _OPENMP_BINDINGS[0]
                 if bound != manifest:
