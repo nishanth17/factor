@@ -195,6 +195,10 @@ does not establish a free increase in B1.
   `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`; source-derived
   `RESEARCH.md` and `OPTIMIZATION_PLAN.md` are local. B4a stays In progress;
   no defaults, B4a-to-mainline merge or push is authorized by this continuation.
+  The follow-up rolling selection plan is local at
+  `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`; it ranks
+  the full credible uncovered inventory and a coherent first execution bundle,
+  without limiting the number of later candidates that evidence/resources permit.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>

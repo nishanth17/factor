@@ -107,6 +107,13 @@ so further measurements stop pending a revised diagnostic plan. Startup,
 engagement and worker economics still require recalibration. Local entry:
 `v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`.
 
+B4a planning update: the expanded rolling candidate ranking and first coherent
+execution bundle are in
+`v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`. It replaces
+the earlier candidate-count restriction. Subsequent work is selected from
+measured complete costs, uncertainty and remaining resources. This planning
+update launches no implementation, profiling or performance campaign.
+
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
 [completed register](ROADMAP.md#completed-register) holds delivered milestones.
