@@ -1,4 +1,4 @@
-"""Reusable private contexts with joined C-only pthread continuation slices."""
+"""Reusable private contexts and one persistent C-only pthread team."""
 
 import threading
 
@@ -54,6 +54,7 @@ class NativeTeam:
         self.closed = False
         self.owner = None
         self.slices = self.discarded = self.completed = 0
+        self.lifecycle = (0, 0, 0, 0)
 
     def _grow(self, count, n, budget):
         while len(self.packets) < count:
@@ -151,8 +152,8 @@ class NativeTeam:
                     self.statuses,
                     self.actual,
                 )
-                # No region survives this return, including a signal raised
-                # by CFFI on reentry. Borrowed data can now be released.
+                # The generation has drained, including when CFFI raises a
+                # signal on reentry. Parked workers no longer borrow contexts.
                 self.slices += 1
                 if status == -3:
                     raise BudgetExhaustedError("cancelled")
@@ -198,6 +199,12 @@ class NativeTeam:
             raise RuntimeError("cannot close an active native team")
         try:
             if self.owner is not None:
+                if self.lib.b4_pthread_shutdown(self.owner):
+                    raise RuntimeError("cannot stop an active pthread team")
+                self.lifecycle = tuple(
+                    int(self.lib.b4_pthread_counter(self.owner, kind))
+                    for kind in range(4)
+                )
                 self.lib.b4_pthread_destroy(self.owner)
                 self.owner = None
             # Borrowing packets share the first packet's DSO handle. Destroy

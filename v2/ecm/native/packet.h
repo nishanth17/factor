@@ -40,10 +40,14 @@ unsigned b4_test_clock_reads(const b4_context *ctx, unsigned kind);
 typedef struct b4_pthread_team b4_pthread_team;
 unsigned b4_pthread(void);
 b4_pthread_team *b4_pthread_create(void);
+int b4_pthread_shutdown(b4_pthread_team *team);
 void b4_pthread_destroy(b4_pthread_team *team);
+/* Creates, joins, dispatched generations and worker generation entries. */
+unsigned long long b4_pthread_counter(b4_pthread_team *team, unsigned kind);
 void b4_pthread_cancel(b4_pthread_team *team);
 int b4_pthread_reset(b4_pthread_team *team);
-/* Dynamic=0, static cyclic chunks=1. All threads join before return.
+/* Dynamic=0, static cyclic chunks=1. Each generation drains before return;
+ * fixed workers join on shutdown/close, including partial creation failure.
  * -2=create failure/unavailable, -3=cancelled, -4=worker failure. */
 int b4_pthread_step(b4_pthread_team *team, b4_context *const *contexts,
                     size_t count, unsigned workers, unsigned schedule,

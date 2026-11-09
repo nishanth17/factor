@@ -1,4 +1,4 @@
-/* Owned pthread dispatch. Threads borrow distinct GMP contexts until joined. */
+/* One owned persistent pthread team; borrowed contexts drain each generation. */
 #define _POSIX_C_SOURCE 200809L
 #include "packet.h"
 #include <stdlib.h>
@@ -8,12 +8,21 @@
 #include <stdint.h>
 #include <time.h>
 
+typedef struct {
+    b4_pthread_team *team;
+    unsigned rank;
+    unsigned long long generation;
+} worker_arg;
+
 struct b4_pthread_team {
     pthread_mutex_t mutex;
     pthread_cond_t condition;
+    pthread_t threads[4];
+    worker_arg args[4];
     atomic_uint cancelled, failed;
     atomic_size_t next;
-    unsigned active, started, waiting, pause;
+    unsigned active, live, completed, waiting, pause, stop;
+    unsigned long long generation, counters[4];
     int create_at, job_at;
     b4_context *const *contexts;
     int *statuses;
@@ -21,8 +30,6 @@ struct b4_pthread_team {
     unsigned workers, schedule, chunk, actions;
     uint64_t wall_end, cpu_end;
 };
-
-typedef struct { b4_pthread_team *team; unsigned rank; } worker_arg;
 
 unsigned b4_pthread(void) { return 1; }
 
@@ -40,12 +47,40 @@ b4_pthread_team *b4_pthread_create(void) {
     return t;
 }
 
+/* Only idle owners may shut down. Join before changing handles/arguments or
+ * releasing the DSO; parked workers still execute code from that DSO. */
+int b4_pthread_shutdown(b4_pthread_team *t) {
+    if (!t) return -1;
+    pthread_mutex_lock(&t->mutex);
+    if (t->active) { pthread_mutex_unlock(&t->mutex); return -1; }
+    t->stop = 1;
+    pthread_cond_broadcast(&t->condition);
+    unsigned live = t->live;
+    pthread_mutex_unlock(&t->mutex);
+    for (unsigned i = 0; i < live; ++i) {
+        if (pthread_join(t->threads[i], NULL)) abort();
+    }
+    pthread_mutex_lock(&t->mutex);
+    t->counters[1] += live;
+    t->live = t->workers = t->waiting = t->stop = 0;
+    pthread_mutex_unlock(&t->mutex);
+    return 0;
+}
+
 void b4_pthread_destroy(b4_pthread_team *t) {
     if (!t) return;
-    /* The Python owner forbids close during dispatch. All workers have joined. */
+    if (b4_pthread_shutdown(t)) abort();
     pthread_cond_destroy(&t->condition);
     pthread_mutex_destroy(&t->mutex);
     free(t);
+}
+
+unsigned long long b4_pthread_counter(b4_pthread_team *t, unsigned kind) {
+    if (!t || kind >= 4) return 0;
+    pthread_mutex_lock(&t->mutex);
+    unsigned long long value = t->counters[kind];
+    pthread_mutex_unlock(&t->mutex);
+    return value;
 }
 
 void b4_pthread_cancel(b4_pthread_team *t) {
@@ -69,10 +104,14 @@ int b4_pthread_inject(b4_pthread_team *t, int create_at, int job_at,
                       unsigned pause) {
     if (!t || create_at < -1 || create_at > 3 || job_at < -1 ||
         job_at > 31 || pause > 1) return -1;
+    /* A creation injection explicitly rearms startup on this idle owner.
+     * Normal dispatch never destroys/recreates an already-live team. */
+    if (create_at >= 0 && b4_pthread_shutdown(t)) return -1;
     pthread_mutex_lock(&t->mutex);
     int result = t->active ? -1 : 0;
     if (!result) {
         t->create_at = create_at; t->job_at = job_at; t->pause = pause;
+        t->waiting = 0;
     }
     pthread_mutex_unlock(&t->mutex);
     return result;
@@ -94,17 +133,8 @@ void b4_pthread_release(b4_pthread_team *t) {
     pthread_mutex_unlock(&t->mutex);
 }
 
-static void *worker(void *opaque) {
-    worker_arg *arg = opaque;
-    b4_pthread_team *t = arg->team;
-    pthread_mutex_lock(&t->mutex);
-    ++t->waiting;
-    pthread_cond_broadcast(&t->condition);
-    while ((!t->started || t->pause) && !atomic_load(&t->cancelled))
-        pthread_cond_wait(&t->condition, &t->mutex);
-    pthread_mutex_unlock(&t->mutex);
-
-    size_t start = (size_t)arg->rank * t->chunk;
+static void work(b4_pthread_team *t, unsigned rank) {
+    size_t start = (size_t)rank * t->chunk;
     while (!atomic_load(&t->cancelled)) {
         if (!t->schedule) start = atomic_fetch_add(&t->next, t->chunk);
         if (start >= t->count) break;
@@ -124,6 +154,29 @@ static void *worker(void *opaque) {
         }
         if (t->schedule) start += (size_t)t->workers * t->chunk;
     }
+}
+
+static void *worker(void *opaque) {
+    worker_arg *arg = opaque;
+    b4_pthread_team *t = arg->team;
+    unsigned long long generation = arg->generation;
+    pthread_mutex_lock(&t->mutex);
+    for (;;) {
+        while (!t->stop && generation == t->generation)
+            pthread_cond_wait(&t->condition, &t->mutex);
+        if (t->stop) break;
+        generation = t->generation;
+        ++t->waiting; ++t->counters[3];
+        pthread_cond_broadcast(&t->condition);
+        while (t->pause && !atomic_load(&t->cancelled))
+            pthread_cond_wait(&t->condition, &t->mutex);
+        pthread_mutex_unlock(&t->mutex);
+        work(t, arg->rank);
+        pthread_mutex_lock(&t->mutex);
+        ++t->completed;
+        pthread_cond_broadcast(&t->condition);
+    }
+    pthread_mutex_unlock(&t->mutex);
     return NULL;
 }
 
@@ -150,52 +203,54 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
         statuses[i] = -3;
     }
     pthread_mutex_lock(&t->mutex);
-    if (t->active) { pthread_mutex_unlock(&t->mutex); return -1; }
-    t->active = 1; t->started = t->waiting = 0;
-    t->contexts = contexts; t->statuses = statuses; t->count = count;
-    t->workers = workers; t->schedule = schedule; t->chunk = chunk;
-    t->actions = actions;
-    atomic_store(&t->next, 0); atomic_store(&t->failed, 0);
-    pthread_mutex_unlock(&t->mutex);
-
-    pthread_t threads[4];
-    worker_arg args[4];
-    unsigned created = 0;
-    int result = 0;
-    if (!count || atomic_load(&t->cancelled)) goto finish;
-    for (unsigned i = 0; i < workers; ++i) {
-        args[i].team = t; args[i].rank = i;
-        if ((int)i == t->create_at ||
-            pthread_create(&threads[i], NULL, worker, &args[i])) {
-            result = -2;
-            b4_pthread_cancel(t);
-            break;
-        }
-        ++created;
+    if (t->active || (t->live && t->workers != workers)) {
+        pthread_mutex_unlock(&t->mutex); return -1;
     }
-    /* No arithmetic before the complete team exists. Set shared deadlines
-     * after creation so short work is not starved by thread startup. CPU is
-     * the process total, already including all native threads exactly once. */
+    if (!count || atomic_load(&t->cancelled)) {
+        int result = atomic_load(&t->cancelled) ? -3 : 0;
+        pthread_mutex_unlock(&t->mutex); return result;
+    }
+    t->active = 1;
+    /* Workers cannot see a new generation until all requested handles exist.
+     * Partial creation failure publishes no arithmetic and joins its subset. */
+    if (!t->live) {
+        t->workers = workers;
+        for (unsigned i = 0; i < workers; ++i) {
+            t->args[i] = (worker_arg){t, i, t->generation};
+            if ((int)i == t->create_at ||
+                pthread_create(&t->threads[i], NULL, worker, &t->args[i])) {
+                *actual = t->live;
+                atomic_store(&t->cancelled, 1);
+                t->active = 0;
+                pthread_mutex_unlock(&t->mutex);
+                if (b4_pthread_shutdown(t)) abort();
+                return -2;
+            }
+            ++t->live; ++t->counters[0];
+        }
+    }
+    *actual = t->live;
     uint64_t wall = clock_ns(CLOCK_MONOTONIC);
     uint64_t cpu = clock_ns(CLOCK_PROCESS_CPUTIME_ID);
-    if (!wall || !cpu) { result = -4; b4_pthread_cancel(t); }
+    if (!wall || !cpu) {
+        t->active = 0;
+        pthread_mutex_unlock(&t->mutex);
+        return -4;
+    }
+    t->contexts = contexts; t->statuses = statuses; t->count = count;
+    t->schedule = schedule; t->chunk = chunk; t->actions = actions;
     t->wall_end = wall + (uint64_t)milliseconds * 1000000u;
     t->cpu_end = cpu + (uint64_t)workers * milliseconds * 1000000u;
-    pthread_mutex_lock(&t->mutex);
-    t->started = 1;
+    t->completed = t->waiting = 0;
+    atomic_store(&t->next, 0); atomic_store(&t->failed, 0);
+    ++t->generation; ++t->counters[2];
     pthread_cond_broadcast(&t->condition);
-    pthread_mutex_unlock(&t->mutex);
-    for (unsigned i = 0; i < created; ++i) {
-        /* Valid, joinable, exclusively owned handles cannot return EINVAL,
-         * ESRCH or EDEADLK. If that invariant fails, returning borrowed data
-         * to Python would be unsafe; fail the process, never free live state. */
-        if (pthread_join(threads[i], NULL)) abort();
-    }
-finish:
-    *actual = created;
-    if (!result && atomic_load(&t->failed)) result = -4;
-    if (!result && atomic_load(&t->cancelled)) result = -3;
-    pthread_mutex_lock(&t->mutex);
+    while (t->completed < t->live)
+        pthread_cond_wait(&t->condition, &t->mutex);
+    /* Every worker has relinquished this generation's borrowed buffers.
+     * They may remain parked, but cannot use contexts after this barrier. */
+    int result = atomic_load(&t->failed) ? -4 :
+        atomic_load(&t->cancelled) ? -3 : 0;
     t->active = 0; t->contexts = NULL; t->statuses = NULL;
     pthread_mutex_unlock(&t->mutex);
     return result;
@@ -203,7 +258,11 @@ finish:
 #else
 unsigned b4_pthread(void) { return 0; }
 b4_pthread_team *b4_pthread_create(void) { return NULL; }
+int b4_pthread_shutdown(b4_pthread_team *t) { (void)t; return -2; }
 void b4_pthread_destroy(b4_pthread_team *t) { (void)t; }
+unsigned long long b4_pthread_counter(b4_pthread_team *t, unsigned k) {
+    (void)t; (void)k; return 0;
+}
 void b4_pthread_cancel(b4_pthread_team *t) { (void)t; }
 int b4_pthread_reset(b4_pthread_team *t) { (void)t; return -2; }
 int b4_pthread_inject(b4_pthread_team *t, int c, int j, unsigned p) {
