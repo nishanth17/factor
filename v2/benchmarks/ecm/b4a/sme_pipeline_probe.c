@@ -11,8 +11,8 @@ __arm_locally_streaming __attribute__((noinline))
 static unsigned lanes(void) { return (unsigned)svcntd(); }
 
 __arm_locally_streaming __attribute__((noinline))
-static void vector_product(mp_limb_t product[12][32],
-                            mp_limb_t left[6][32], mp_limb_t right[6][32],
+static void vector_product(uint64_t product[12][32],
+                            uint64_t left[6][32], uint64_t right[6][32],
                             unsigned width, unsigned count) {
     svbool_t pg = svwhilelt_b64_u64(0, count);
     svuint64_t zero = svdup_u64(0);
@@ -38,7 +38,7 @@ static void vector_product(mp_limb_t product[12][32],
     }
 }
 
-static void vector_reduce(mp_limb_t x[6][32], mp_limb_t p[12][32],
+static void vector_reduce(uint64_t x[6][32], uint64_t p[12][32],
                            const mp_limb_t *n, unsigned width, unsigned count) {
     for (unsigned lane = 0; lane < count; ++lane) {
         mp_limb_t product[12], remainder[6];
@@ -57,7 +57,7 @@ static uint64_t batch(mpz_t *output, const mpz_t n, mpz_t *x, mpz_t *a,
     } else {
         unsigned width = (unsigned)mpz_size(n);
         if (width < 4 || width > 6 || count > lanes() || count > 8) abort();
-        mp_limb_t xp[6][32] = {{0}}, ap[6][32] = {{0}}, product[12][32];
+        uint64_t xp[6][32] = {{0}}, ap[6][32] = {{0}}, product[12][32];
         mp_limb_t modulus[6], temporary[6];
         export_limbs(modulus, n, width);
         for (unsigned i = 0; i < count; ++i) {
