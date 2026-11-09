@@ -52,7 +52,7 @@ class ProductionQSTests(unittest.TestCase):
         )
 
     def test_y0_anchors_match_frozen_experiment_policy(self):
-        for digits in (40, 50, 55, 60, 65, 70):
+        for digits in (40, 50, 55, 60, 62, 65, 70, 75, 80):
             n = 10 ** (digits - 1) + 123
             self.assertEqual(
                 asdict(default_siqs_config(n)), asdict(configuration(n, "Y0"))
