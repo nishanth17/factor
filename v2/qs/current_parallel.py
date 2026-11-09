@@ -129,8 +129,8 @@ class QSWorkerConfig:
             raise ValueError(
                 "current workers support serial or spawn processes"
             )
-        if type(self.workers) is not int or not 1 <= self.workers <= 10:
-            raise ValueError("current preparation supports 1 to 10 workers")
+        if type(self.workers) is not int or not 1 <= self.workers <= 14:
+            raise ValueError("current preparation supports 1 to 14 workers")
         checked_int(self.lookahead, "lookahead", 0, 4 * self.workers)
         if self.mode == "serial" and self.workers != 1:
             raise ValueError("serial execution requires one worker")

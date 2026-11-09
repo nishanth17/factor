@@ -12,7 +12,7 @@ COUNTS = (1, 2, 4, 6, 8, 10)
 
 def candidate(count, packet=64, *, features=None, collector=None, name=None):
     """Keep numerical packet width and compatible features fully explicit."""
-    if type(count) is not int or not 0 <= count <= 10:
+    if type(count) is not int or not 0 <= count <= 14:
         raise ValueError("invalid worker count")
     if packet not in (4, 8, 16, 32, 64):
         raise ValueError("invalid packet width")

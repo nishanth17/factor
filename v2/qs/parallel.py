@@ -400,8 +400,8 @@ class CollectionPool:
         if mode not in ("serial", "thread", "process"):
             raise ValueError("unknown execution mode")
         utils.require_integer(workers, "workers", 1)
-        if workers > 10 or (mode == "serial" and workers != 1):
-            raise ValueError("use one serial or at most ten workers")
+        if workers > 14 or (mode == "serial" and workers != 1):
+            raise ValueError("use one serial or at most fourteen workers")
         if type(family_affinity) is not bool or (
             family_affinity and mode != "process"
         ):

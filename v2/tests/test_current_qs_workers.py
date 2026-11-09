@@ -254,7 +254,7 @@ class PacketTests(unittest.TestCase):
     def test_wider_counts_cover_more_packets_than_slots_and_resume(self):
         expected = None
         owned_before = {p.pid for p in multiprocessing.active_children()}
-        for count in (1, 3, 6, 8, 10):
+        for count in (1, 3, 6, 8, 10, 12, 14):
             mode = "serial" if count == 1 else "process"
             job = CurrentParallelSIQSJob(
                 N,
@@ -268,7 +268,7 @@ class PacketTests(unittest.TestCase):
                 job.checkpoint(), budget=allowance()
             )
             self.assertEqual(job.workers.workers, count)
-            self.assertGreater(job.assignment_count, 10)
+            self.assertGreater(job.assignment_count, 14)
             with CollectionPool(mode, count) as pool:
                 result = job.run(pool=pool, fixed_work=True)
 
@@ -589,7 +589,7 @@ class OwnershipTests(unittest.TestCase):
     def test_unknown_native_or_nested_backends_are_refused(self):
         with self.assertRaises(ValueError):
             settings("thread", 2)
-        for count in (0, -1, 11, True):
+        for count in (0, -1, 15, True):
             with self.assertRaises(ValueError):
                 QSWorkerConfig(workers=count)
         job = CurrentParallelSIQSJob(

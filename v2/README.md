@@ -234,8 +234,9 @@ Growing DLP and the C9a cost-report configuration are supported. The interface
 preserves width, multiplier, parity/sign, roots, queues and exact recovery,
 with one authoritative parent relation/partial/cycle store.
 
-`QSWorkerConfig(workers=1)` through `workers=10` select spawned PyPy3.11
-processes; `mode="serial"` executes the same packets locally. Pass an explicit
+`QSWorkerConfig(workers=1)` through `workers=14` select spawned PyPy3.11
+processes; counts above the host's ten cores are explicit oversubscription
+experiments. `mode="serial"` executes the same packets locally. Pass an explicit
 `CollectionPool` to retain processes across jobs. The portfolio accepts
 `factorize_bounded(..., qs_workers=settings, qs_pool=pool)` at SIQS handoff,
 including recursive cofactors. Defaults remain serial. Retained ECM and QS

@@ -3,6 +3,13 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Opt-in QS oversubscription experiments (8 November 2026)
+
+- Permit explicit current QS process counts up to fourteen for the authorized
+  worker-count race. Automatic choices and default search grids are unchanged.
+- Extend fixed-work coverage, checkpoint restore and child cleanup checks to
+  twelve and fourteen spawned workers; larger counts remain rejected.
+
 ## H3 observed resource limits (8 November 2026)
 
 - Replace internal byte/count/work refusal ceilings and prepaid worker leases
