@@ -141,10 +141,6 @@ class OwnershipTests(unittest.TestCase):
                 os.close(write_pipe)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class CpuAccountingTests(unittest.TestCase):
     def test_absolute_ticks_convert_process_and_reaped_cpu_once(self):
         from v2.benchmarks.ecm.b4a.ownership import Usage, cpu_seconds
@@ -195,3 +191,7 @@ class CpuAccountingTests(unittest.TestCase):
             sample = observer.sample(1234)
             self.assertEqual(sample["cpu"], 1)
             self.assertEqual(sample["threads"], 4)
+
+
+if __name__ == "__main__":
+    unittest.main()

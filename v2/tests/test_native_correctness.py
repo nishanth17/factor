@@ -350,3 +350,43 @@ class NativeCorrectnessTests(unittest.TestCase):
             [child.pid for child in multiprocessing.active_children()],
             children,
         )
+
+    def test_scalar_build_refuses_all_team_sizes_and_schedules(self):
+        packet = NativePacket()
+        self.addCleanup(packet.close)
+        allowance = deterministic_budget()
+        packet.available(1013, allowance)
+        self.assertEqual(packet.lib.b4_openmp(), 0)
+        ffi = packet.ffi
+        owners = [
+            ffi.new("b4_context *[1]"),
+            ffi.new("int[1]"),
+            ffi.new("unsigned *"),
+        ]
+        for owner in owners:
+            self.addCleanup(ffi.release, owner)
+        contexts, statuses, actual = owners
+        for workers in (1, 2, 4):
+            for schedule in range(3):
+                packet.prepare_ladder(13, (2, 1), 1013, 2, allowance)
+                contexts[0] = packet.context
+                try:
+                    self.assertEqual(
+                        packet.lib.b4_team_step(
+                            contexts,
+                            1,
+                            workers,
+                            schedule,
+                            5,
+                            128,
+                            statuses,
+                            actual,
+                        ),
+                        -2,
+                    )
+                    self.assertEqual(actual[0], 0)
+                    self.assertEqual(
+                        packet.lib.b4_result(packet.context, packet.output), -1
+                    )
+                finally:
+                    packet.end()
