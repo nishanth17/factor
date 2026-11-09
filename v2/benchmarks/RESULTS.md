@@ -1,5 +1,37 @@
 # Benchmark results and decisions
 
+## A7a directional worker extension (reported 9 November 2026)
+
+Runtime `42dd142`; 19/19 cold input-0 factorizations and 40 exact prefix
+controls reconstruct. Packets and numerical Y0 remain frozen. At 70 the
+opening/closing control geometric means shift from 29.99 to 26.73 seconds:
+12.20% symmetric drift triggers the predeclared 10% stop. No continuation
+inputs, automatic restart or new three-input regime choices follow.
+
+Single-input screens retain C4 at 50/55. At 60, C6/C8 tie while C6 uses
+less OS CPU; at 65 C12/C14 tie and C16 loses beyond drift. The C8/C14/C16
+differences at 70 are inside drift; no higher-worker gain is established.
+Odd counts C3/C5 run once each at 50 and 55; no three-input odd-count
+validation runs. C7/C9 at 60 and C13/C15 at 65 are excluded by the frozen
+flat-even-bracket rule. The drift stop prevents 70 refinement and all
+continuation inputs. Odd-count coverage is therefore incomplete.
+C12/C14/C16 oversubscribe the ten-core host. C18/C20 full-factor calls did
+not run. These screens do not replace earlier three-input calibration or
+establish global optima, fresh guardrails, mainline speedups or defaults.
+
+Owner wall is 66.10 minutes and observed CPU 31,349 seconds; sampled actor
+peak owned RSS is 3.586 GiB. The known inner CPU undercount remains qualified.
+Five owner-telemetry process reads failed and are retained; per-cell RSS
+observers report no failures. Their cause is unverified. All owned actor
+groups and the owner have exited; the lock file remains. Implementation QA
+passes 1,629 tests (nine optional skips), lint and 295 imports. No new runtime
+change accompanies this report.
+
+Full per-configuration wall/CPU/RSS, worker timelines, comparison margins,
+controls, stopped ledger, source, failed/passing QA and verified hashes remain
+local under `v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/`
+in the main repository. No default adoption, merge, push or 75/80 probe follows.
+
 ## A7a reduced worker-count race (8 November 2026)
 
 Current H3-integrated runtime `bce0ad0`; 18 input-0 screens at frozen packets,

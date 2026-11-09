@@ -10,6 +10,12 @@ remain historical and need revalidation. This integration validation itself esta
 [worker race](RESULTS.md#a7a-reduced-worker-count-race-8-november-2026)
 reports provisional per-size process counts, including drift ties and CPU/RSS. Local receipts: `v2/audit/a7a/master-integration-20261108/`.
 
+The [directional extension](RESULTS.md#a7a-directional-worker-extension-reported-9-november-2026)
+completes 19 input-0 factorizations, then stops at 12.20% A/A drift before
+continuation. Its single-input ties do not replace three-input calibration.
+Full wall/CPU/RSS and timeline tables, comparisons and failed controls remain
+local in `results/a7a/directional-worker-extension-20261108-r1/` in main.
+
 
 Runners and required numerical inputs for PyPy implementing Python 3.11.
 [Results and historical decisions](RESULTS.md) hold measurements;
@@ -51,8 +57,8 @@ remain separate from clean performance evidence.
 
 The current [gated A7a plan](A7A_EXPERIMENT.md) supersedes the older broad
 designs described below. G2 covers cold 40/50/55/60/65/70 and warm 40/50;
-62 is excluded, and 75/80 remain separately approved post-G3 feasibility
-probes. Fix measured architectural overhead, classify options, then tune only
+62 is excluded, and new 75/80 feasibility probes remain deferred until after
+B5a. Fix measured architectural overhead, classify options, then tune only
 real tunables at anchors and verify interpolation. Fresh G4 inputs live in
 `inputs/a7a/confirmation_g4.json` and remain outside tuning.
 

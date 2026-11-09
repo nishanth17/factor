@@ -1,6 +1,6 @@
 # Factor status
 
-Last updated: 8 November 2026 (America/Los_Angeles).
+Last updated: 9 November 2026 (America/Los_Angeles).
 
 **H3 — Done, integrated locally on master on 8 November 2026** from
 `codex/h3-resource-limits` at `e3c371e`, based on `40d2367`. Only root wall,
@@ -59,18 +59,20 @@ The campaign used 2.81 wall hours including its retained recorder-only launch
 failure. Report and verified raw evidence remain local in the main repository:
 `v2/benchmarks/results/a7a/worker-count-race-20261108-r2/`.
 
-**Next authorized scope:** a separate directional worker extension, capped at
-20. At 65/70 compare C16 with C14, continue C18/C20 only while gains exceed A/A
-drift, then stop at the first loss/tie. Test best±1 only after both even
-neighbours are measurably worse; skip odd tests on a flat drift band and favor
-fewer workers. Lower sizes also get this refinement, with C2 when needed for
-C4's lower bracket and C1/C3 if C2 strictly wins. Input-0 racing precedes
-inputs 1–2 for the new 5% window. Explicit twenty-worker support passes 1,629 tests (nine optional skips), lint,
+**A7a directional extension stopped and reported (9 November):** runtime
+`42dd142`, 19/19 input-0 factorizations and 40 prefix controls reconstruct.
+The 70-digit closing controls trigger the frozen 10% stop with 12.20%
+start/end drift; no inputs 1–2 or automatic restart follow. Single-input
+screens retain C4 at 50/55, tie C6/C8 at 60 and C12/C14 at 65. C16 loses at
+65; the 70 C8/C14/C16 differences are inside drift. These findings do not
+replace the earlier three-input calibration. No C18/C20 full-factor call ran.
+Explicit twenty-worker support passes 1,629 tests (nine optional skips), lint,
 295 benchmark imports and a C20 prefix/timeline smoke. The
-[directional protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
-records its finite conditional grant and controls before execution.
-The running race's historical 10% rule is not rewritten. No automatic-default
-adoption, merge or push; new 75/80 probes remain deferred until after B5a.
+[frozen protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
+and original receipts remain unchanged. Local report in main:
+`v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/REPORT.md`.
+The owner released its lock after cleanup. No default adoption, merge or push;
+75/80 probes remain deferred until after B5a.
 
 
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate

@@ -182,9 +182,12 @@ does not establish a free increase in B1.
   race retains provisional C4/C4/C8/C14/C8 at 50/55/60/65/70 with frozen
   packets; at 70 all counts tie inside 7.42% A/A drift, so C8 wins the
   fewer-worker tie-break. See [results](benchmarks/RESULTS.md#a7a-reduced-worker-count-race-8-november-2026).
-  Next authorized: bounded directional even steps to 20 at 65/70, odd
-  neighbours only around strict brackets, flat ties toward fewer workers,
-  C2/C1 lower-bound checks where needed, and a 5% input-0 continuation window.
+  The directional extension is stopped and reported on 9 November: all
+  19 input-0 factorizations complete, but 12.20% drift at 70 triggers the
+  predeclared 10% stop before continuation inputs. C6/C8 at 60 and C12/C14
+  at 65 are single-input ties; C16 loses at 65 and the 70 comparisons are
+  inside drift. No C18/C20 full-factor calls or three-input extension choices
+  are established. Preserve earlier calibration; no automatic restart.
   Twenty-worker committed-source QA and the C20 timeline smoke pass; the
   [frozen local protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
   records the conditional catalogue, drift-aware tie pruning and resources.
