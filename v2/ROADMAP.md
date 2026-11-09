@@ -392,6 +392,11 @@ authorizes no runtime experiment or native dependency installation.
 
 #### A7a — current-collector parallel relation collection
 
+**Done for the selected pure-PyPy process integration, 9 November 2026.**
+See the [completion record](#a7a-completion). The original design requirements
+below are retained as historical context, not an open execution grant. Native
+thread work remains a separately selected follow-up after B5a.
+
 The wall-time and repeated-experiment objectives make this an immediate QS
 workstream following the delivered B12/F4 scope. Completed P3.6/A7 supplied
 bounded workers, stable assignments, checked parent admission, drained
@@ -1157,7 +1162,7 @@ Done for the bounded core; see the completed register below.
 | --- | --- | --- | --- | --- |
 | P6.1 | Conditional | F2 | Whole curve-family/stage-one cost/yield, nonunit maps and chosen-point order; isolated feasibility can precede E1, which remains for combined acceptance. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p61--compare-edwardswindowed-and-torsion-aware-ecm) |
 | P6.2 | Open selected F3/F7 design; other implementations Conditional | F3/F5/F6/F7/F8/F9 | F3 owns exact polynomial ECM kernels/trees; F8 owns distinct fast P±1; F9 is the conditional genus-two branch. F7 and C9a own their SIQS/batch domains; F6 higher arity has its own proof. Isolated F2/F3/F4/F6/F7 feasibility uses current controls without E1; later combined acceptance and F5 retain their gates. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p62--investigate-polynomial-continuations-and-richer-relation-collectors) |
-| P6.3 | Delivered ECM core Done; ready-first startup In progress; QS adaptation Open | B12/A7a/F4 | B12/F4 delivered stable bounded process ECM and the selected automatic policy. Its [ready-first prototype](#b12-f4-in-progress) still needs runtime QA and a startup comparison. A7a retains current-collector QS work; G1 mixed-engine concurrency and E1 combined portfolio acceptance remain separate. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
+| P6.3 | Delivered ECM/QS process integrations Done; ready-first startup In progress | B12/A7a/F4 | B12/F4 delivered stable bounded process ECM and the selected automatic policy. Its [ready-first prototype](#b12-f4-in-progress) still needs runtime QA and a startup comparison. A7a current-collector QS is Done; G1 mixed-engine concurrency and E1 combined portfolio acceptance remain separate. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p63--add-reproducible-process-level-parallelism) |
 | P6.4 | Open | C11 protocol preparation; I1 final publication | Prepare comparable pinned Python competitor feasibility now, separating runtime/backend/worker classes and complete versus factor-one outcomes. Final claims retain H1, selected P6 decisions, committed-only validation and fresh matched confirmation. | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#p64--publish-reproducible-workload-specific-results) |
 
 ### Phase 7 — Implement and scale GNFS

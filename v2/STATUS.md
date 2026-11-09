@@ -57,7 +57,8 @@ stops at 12.20% drift before continuation; odd-count validation is incomplete.
 The requested local adoption closes A7a without claiming global optimality,
 mainline population/p90 gains or a fresh 60-digit guardrail.
 
-Final committed-only QA receipts (full tests, lint and benchmark imports)
+Committed-only premerge QA on `a265f87` passes 1,636 tests (nine optional
+skips), lint and all 295 benchmark imports. Exact master QA receipts
 remain local under `v2/benchmarks/results/a7a/final-merge-20261109/`.
 Earlier G4, reduced worker race and stopped-extension evidence retain their
 source identities in adjacent `results/a7a/` directories. The existing H3
@@ -138,8 +139,10 @@ previous numerical fields. Saved configurations are restored without rerouting.
 | 65 | 8,500 | 9 | Same Y0 collector |
 | 70 | 10,500 | 10 | Y0 larger large-prime/product geometry |
 
-All anchors retain 65,536 half-width, 64 polynomials/family, pool 64, 2 MiB
-power plan, 32 MiB sparse queue and collection pacing. The 40-digit numerical
+All 50+ anchors retain 65,536 half-width, a 64-polynomial family quota,
+pool 64, 2 MiB
+power plan, 32 MiB sparse queue and collection pacing. The actual Gray
+limit at 50 is 32. The 40-digit numerical
 recipe retains its existing 5,000 prime bound, five A factors and window pacing.
 
 Every fresh automatic SIQS configuration at every supported size/backend
