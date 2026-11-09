@@ -6,7 +6,7 @@ import json
 import os
 import tempfile
 import unittest
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
@@ -75,7 +75,7 @@ def after_native_slice(packet, callback):
         packet.lib = original
 
 
-def fixed_curve(case, kernel):
+def fixed_curve(case, kernel, team=None):
     config = selected(kernel, case["b1"], case["b2"])
     budget = deterministic_budget()
     context, programs = _execution_context({}, config, budget)
@@ -96,11 +96,30 @@ def fixed_curve(case, kernel):
         calls.append(True)
         return result
 
+    def team_call(kind):
+        def execute(packet, payload, point, n, a24, allowance):
+            results = []
+            team.execute(
+                [(kind, payload, point, n, a24)],
+                allowance,
+                lambda index, result: results.append(result) or False,
+            )
+            calls.append(True)
+            return results[0]
+
+        return execute
+
     try:
-        with (
-            patch.object(stage_jobs, "gcd", observe_gcd),
-            patch.object(NativePacket, "_finish", observe_finish),
-        ):
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(stage_jobs, "gcd", observe_gcd))
+            stack.enter_context(
+                patch.object(NativePacket, "_finish", observe_finish)
+            )
+            if team is not None:
+                for kind in ("ladder", "records"):
+                    stack.enter_context(
+                        patch.object(NativePacket, kind, team_call(kind))
+                    )
             for _ in range(256):
                 stage_jobs.advance_job(
                     job, budget, programs or context, config
@@ -153,7 +172,7 @@ class ExplicitBackendTests(unittest.TestCase):
         self.addCleanup(owner.close)
         with patch("v2.ecm.native_packet.SOURCE", SOURCE / "missing"):
             with self.assertRaisesRegex(
-                BackendUnavailableError, "OpenMP team backend unavailable"
+                BackendUnavailableError, "pthread team backend unavailable"
             ):
                 owner.execute(
                     [("ladder", 13, (2, 1), 1013, 2)],

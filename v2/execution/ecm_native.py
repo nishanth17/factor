@@ -1,4 +1,4 @@
-"""Opt-in single-process ECM owner with C-only OpenMP stage-one chunks."""
+"""Opt-in single-process ECM owner with C-only pthread stage-one chunks."""
 
 import hashlib
 import sys
@@ -29,7 +29,7 @@ from .worker_contract import (
     integer,
 )
 
-VERSION = "b4a-openmp-owner-h3-v2"
+VERSION = "b4a-pthread-owner-h3-v3"
 
 
 class _BudgetView:
@@ -50,18 +50,25 @@ class NativeECMExecutor:
 
     Stable B12 assignments are evaluated in tier order, at most capacity curves
     live at once. Setup, strict recovery and classical stage two run in the
-    Python owner. Only prepared stage-one packets enter OpenMP. Pauses drain C,
+    Python owner. Only stage-one packets enter pthreads. Pauses drain C,
     retain completed curves and charges, and restart unfinished curve IDs on
     resume; partial native/curve state is deliberately never serialized.
     """
 
     def __init__(
-        self, *, seed=0, settings=None, schedule="dynamic", capacity=None
+        self,
+        *,
+        seed=0,
+        settings=None,
+        schedule="dynamic",
+        capacity=None,
+        chunk_size=1,
     ):
         self.seed = integer(seed, "method seed", 0, 2**256 - 1)
         self.settings = settings or WorkerSettings(workers=2)
         if self.settings.workers not in (1, 2, 4) or schedule not in SCHEDULES:
-            raise ValueError("unsupported OpenMP team configuration")
+            raise ValueError("unsupported pthread team configuration")
+        self.chunk_size = integer(chunk_size, "team chunk size", 1, 32)
         if (
             self.settings.stage_policy != "whole"
             or self.settings.assignment_policy != "dynamic"
@@ -107,6 +114,7 @@ class NativeECMExecutor:
                 asdict(self.settings),
                 self.schedule,
                 self.capacity,
+                self.chunk_size,
             ]
         )
 
@@ -116,11 +124,12 @@ class NativeECMExecutor:
                 workers=self.settings.workers,
                 schedule=self.schedule,
                 capacity=self.capacity,
+                chunk_size=self.chunk_size,
             )
         return self.team
 
     def start(self, *, budget):
-        """Explicit startup diagnostic, including first OpenMP region entry."""
+        """Start explicitly, including the first pthread dispatch."""
         if self.closed or not self.lock.acquire(blocking=False):
             raise ValueError("native executor closed or active")
         try:
@@ -308,7 +317,7 @@ class NativeECMExecutor:
                 and self.engine.identity != manifest.metadata
             ):
                 # A changed immutable program family starts a fresh useful
-                # native context/store. Parked libomp workers keep their DSO.
+                # native context/store after all previous workers have joined.
                 self.team.close()
                 self.team = None
                 slices_before = 0
@@ -419,6 +428,7 @@ class NativeECMExecutor:
             manifest=manifest.identity,
             native_threads=self.settings.workers,
             schedule=self.schedule,
+            chunk_size=self.chunk_size,
             capacity=self.capacity,
             chunks=chunks,
             lost_chunks=lost_chunks,

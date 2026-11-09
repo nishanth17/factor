@@ -1,9 +1,7 @@
-"""Tiny exact OpenMP queues, owner publication and cumulative resume checks."""
+"""Exact pthread queues, publication and cumulative resume checks."""
 
 import copy
 import os
-import subprocess
-import sys
 import unittest
 from dataclasses import replace
 from unittest.mock import patch
@@ -135,8 +133,8 @@ class NativeObservedResourceTests(unittest.TestCase):
 
 
 @unittest.skipUnless(
-    (SOURCE / "build/openmp/manifest.json").exists(),
-    "optional OpenMP build absent",
+    (SOURCE / "build/pthread/manifest.json").exists(),
+    "optional pthread build absent",
 )
 class CompiledTeamTests(unittest.TestCase):
     def setUp(self):
@@ -151,7 +149,7 @@ class CompiledTeamTests(unittest.TestCase):
         # verifies scheduling semantics, not a timing or worker-count study.
         exponents = (1, 3, 13, 257, 2**65 + 3, 2**127 + 7)
         for workers in (1, 2, 4):
-            for schedule in ("dynamic", "static", "guided"):
+            for schedule in ("dynamic", "static"):
                 owner = team(workers, schedule)
                 requests, expected, seen = [], {}, {}
                 for index, scalar in enumerate(exponents):
@@ -236,11 +234,13 @@ class CompiledTeamTests(unittest.TestCase):
             packet.prepare_ladder(13, (2, 1), 1013, 2, budget())
             try:
                 owner.contexts[0] = owner.contexts[1] = packet.context
-                code = owner.lib.b4_team_step(
+                code = owner.lib.b4_pthread_step(
+                    owner.owner,
                     owner.contexts,
                     2,
                     2,
                     0,
+                    1,
                     5,
                     128,
                     owner.statuses,
@@ -317,61 +317,6 @@ class CompiledTeamTests(unittest.TestCase):
         finally:
             owner.close()
         self.assertIsNone(retained.context)
-
-    @unittest.skipUnless(
-        os.environ.get("FACTOR_B4A_LIFECYCLE_QA") == "1",
-        "future Stage Q runtime lane",
-    )
-    def test_reduced_team_refuses_before_publication_in_fresh_process(self):
-        script = """
-from v2.tests.test_native_team import budget, team
-from v2.ecm.native_team import TeamRefusedError
-owner = team(workers=2)
-seen = []
-try:
-    try:
-        owner.execute([('ladder', 13, (2, 1), 1013, 2)], budget(),
-                      lambda index, result: seen.append(index) or False)
-    except TeamRefusedError:
-        pass
-    else:
-        raise AssertionError('runtime did not refuse reduced team')
-    assert not seen
-    assert all(p.lib.b4_step(p.context, 5, 128) == -1 for p in owner.packets)
-finally:
-    owner.close()
-"""
-        result = subprocess.run(
-            [sys.executable, "-B", "-c", script],
-            env=dict(os.environ, OMP_THREAD_LIMIT="1"),
-            capture_output=True,
-            text=True,
-            timeout=8,
-        )
-        self.assertEqual(result.returncode, 0, result.stderr)
-
-    @unittest.skipUnless(
-        os.environ.get("FACTOR_B4A_LIFECYCLE_QA") == "1",
-        "future Stage Q runtime lane",
-    )
-    def test_repeated_teardown_preserves_bounded_parked_runtime_pool(self):
-        from v2.benchmarks.ecm.b4a.ownership import GroupObserver
-
-        observer, counts = GroupObserver(), []
-        for _ in range(4):
-            owner = team(workers=4)
-            try:
-                owner.execute(
-                    [("ladder", 1, (2, 1), 1013, 2)],
-                    budget(),
-                    lambda *_: False,
-                )
-            finally:
-                owner.close()
-            counts.append(observer.sample(os.getpgrp())["threads"])
-        # OpenMP parking is allowed. Repeated context closure must not create
-        # a new retained worker pool on every call; process exit owns the pool.
-        self.assertEqual(counts[1:], [counts[0]] * 3)
 
     def test_native_owner_uses_same_b12_assignments_and_exact_curve_outcomes(
         self,

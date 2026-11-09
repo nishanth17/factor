@@ -5,6 +5,7 @@
 #include "packet.h"
 #include <gmp.h>
 #include <stdint.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -214,8 +215,9 @@ static uint64_t nanoseconds(clockid_t clock) {
 }
 
 static int step_until(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
-                      unsigned actions) {
+                      unsigned actions, const atomic_uint *cancel) {
     for (unsigned i = 0; i < actions && !c->done; ++i) {
+        if (cancel && atomic_load(cancel)) return -3;
         uint64_t wall = nanoseconds(CLOCK_MONOTONIC);
         uint64_t cpu = nanoseconds(CLOCK_PROCESS_CPUTIME_ID);
         if (!wall || !cpu) return -1;
@@ -251,6 +253,14 @@ static int step_until(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
     return c->done ? 1 : 0;
 }
 
+int b4_ready(const b4_context *c) { return c && c->mode; }
+
+int b4_slice(b4_context *c, unsigned long long wall_end,
+             unsigned long long cpu_end, unsigned actions, const void *cancel) {
+    if (!b4_ready(c) || !actions || actions > 128) return -1;
+    return step_until(c, wall_end, cpu_end, actions, cancel);
+}
+
 int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
     if (!c || !c->mode || !milliseconds || milliseconds > 5 ||
         !actions || actions > 128) return -1;
@@ -258,7 +268,7 @@ int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
     uint64_t cpu = nanoseconds(CLOCK_PROCESS_CPUTIME_ID);
     if (!wall || !cpu) return -1;
     uint64_t interval = (uint64_t)milliseconds * 1000000u;
-    return step_until(c, wall + interval, cpu + interval, actions);
+    return step_until(c, wall + interval, cpu + interval, actions, NULL);
 }
 
 unsigned b4_openmp(void) {
@@ -307,15 +317,15 @@ int b4_team_step(b4_context *const *contexts, size_t count, unsigned workers,
             if (schedule == 0) {
 #pragma omp for schedule(dynamic, 1)
                 for (size_t i = 0; i < count; ++i)
-                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions);
+                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions, NULL);
             } else if (schedule == 1) {
 #pragma omp for schedule(static, 1)
                 for (size_t i = 0; i < count; ++i)
-                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions);
+                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions, NULL);
             } else {
 #pragma omp for schedule(guided, 1)
                 for (size_t i = 0; i < count; ++i)
-                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions);
+                    statuses[i] = step_until(contexts[i], wall_end, cpu_end, actions, NULL);
             }
         }
     }

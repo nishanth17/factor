@@ -58,7 +58,7 @@ def _sha_file(path):
 def source_identity():
     """Bind snapshots to the ABI, adapter and compiled source bytes."""
     digest = hashlib.sha256(Path(__file__).read_bytes())
-    for name in ("packet.c", "packet.h"):
+    for name in ("packet.c", "packet.h", "team.c"):
         digest.update((SOURCE / name).read_bytes())
     return IDENTITY + "/" + digest.hexdigest()
 
@@ -90,6 +90,8 @@ class NativePacket:
     ):
         if mode not in ("c-gmp", "auto"):
             raise ValueError("invalid native packet mode")
+        if _variant not in ("scalar", "pthread", "openmp"):
+            raise ValueError("invalid native packet variant")
         self.mode = mode
         self.ffi = self.lib = self.context = None
         self.variant = _variant
@@ -127,13 +129,15 @@ class NativePacket:
         # Fund hashing, context creation and unused setup before loading.
         budget.consume(1)
         directory = SOURCE / "build"
-        if self.variant == "openmp":
-            directory /= "openmp"
+        if self.variant != "scalar":
+            directory /= self.variant
         paths = [
             directory / "manifest.json",
             directory / "libfactor_ecm.dylib",
         ]
-        paths.extend(SOURCE / name for name in ("packet.c", "packet.h"))
+        paths.extend(
+            SOURCE / name for name in ("packet.c", "packet.h", "team.c")
+        )
         ffi = lib = None
         try:
             sizes = [path.stat().st_size for path in paths]
@@ -167,7 +171,9 @@ class NativePacket:
                     raise ValueError(
                         "native OpenMP dependency identity mismatch"
                     )
-            if set(manifest["source"]) != {"packet.c", "packet.h"}:
+            if manifest["backend"] != self.variant:
+                raise ValueError("native build backend identity mismatch")
+            if set(manifest["source"]) != {"packet.c", "packet.h", "team.c"}:
                 raise ValueError("incomplete native build source identity")
             if library.stat().st_size > 256 * 1024:
                 raise ValueError("native library exceeds funded load size")
@@ -206,6 +212,8 @@ class NativePacket:
                 raise ValueError("loaded native GMP version mismatch")
             if bool(lib.b4_openmp()) != (self.variant == "openmp"):
                 raise ValueError("native team capability mismatch")
+            if bool(lib.b4_pthread()) != (self.variant == "pthread"):
+                raise ValueError("native pthread capability mismatch")
             if lib.b4_abi() != ABI:
                 raise ValueError("native library ABI mismatch")
             self._allocate(ffi, lib, manifest)
@@ -216,9 +224,11 @@ class NativePacket:
                 if self.mode == "auto":
                     self.unavailable = True
                     return False
-                backend = (
-                    "OpenMP team" if self.variant == "openmp" else "C/GMP"
-                )
+                backend = {
+                    "openmp": "OpenMP team",
+                    "pthread": "pthread team",
+                    "scalar": "C/GMP",
+                }[self.variant]
                 raise BackendUnavailableError(
                     f"native ECM {backend} backend unavailable; "
                     "build v2.ecm.native.build explicitly"
@@ -465,7 +475,11 @@ class NativePacket:
             self.transport = self.inputs = self.records_buffer = (
                 self.output
             ) = None
-            if self.lib is not None and self.variant != "openmp":
+            if (
+                self.lib is not None
+                and self.variant != "openmp"
+                and self._binding is None
+            ):
                 self.ffi.dlclose(self.lib)
             self.lib = self.ffi = None
             self.closed = True

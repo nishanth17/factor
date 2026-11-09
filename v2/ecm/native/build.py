@@ -19,8 +19,11 @@ def main():
     parser.add_argument("--cc", default="/usr/bin/clang")
     parser.add_argument("--gmp-prefix", type=Path, required=True)
     parser.add_argument("--openmp-prefix", type=Path)
+    parser.add_argument("--pthread", action="store_true")
     parser.add_argument("--vector-report", action="store_true")
     args = parser.parse_args()
+    if args.pthread and args.openmp_prefix is not None:
+        parser.error("select pthread or OpenMP, not both")
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("build requires PyPy implementing Python 3.11")
 
@@ -44,12 +47,16 @@ def main():
     output = source / "build"
     if args.openmp_prefix is not None:
         output /= "openmp"
+    elif args.pthread:
+        output /= "pthread"
     output.mkdir(parents=True, exist_ok=True)
     library = output / "libfactor_ecm.dylib"
     flags = ["-std=c11", "-O2", "-Wall", "-Wextra", "-Werror"]
     if args.vector_report:
         flags += ["-Rpass=loop-vectorize", "-Rpass-missed=loop-vectorize"]
     omp_flags = []
+    if args.pthread:
+        omp_flags = ["-DB4_PTHREAD", "-pthread"]
     if args.openmp_prefix is not None:
         omp_flags = [
             "-DB4_OPENMP",
@@ -66,6 +73,7 @@ def main():
         *omp_flags,
         "-dynamiclib",
         str(source / "packet.c"),
+        str(source / "team.c"),
         "-I" + str(args.gmp_prefix / "include"),
         "-L" + str(args.gmp_prefix / "lib"),
         "-Wl,-rpath," + str(args.gmp_prefix / "lib"),
@@ -77,6 +85,7 @@ def main():
     ffi = cffi.FFI()
     ffi.cdef(
         "unsigned b4_abi(void); unsigned b4_openmp(void); "
+        "unsigned b4_pthread(void); "
         "const char *b4_gmp_version(void);"
     )
     lib = ffi.dlopen(str(library))
@@ -88,10 +97,15 @@ def main():
             raise RuntimeError(
                 "built ECM team capability differs from request"
             )
+        if bool(lib.b4_pthread()) != args.pthread:
+            raise RuntimeError("built pthread capability differs from request")
     finally:
         ffi.dlclose(lib)
     manifest = dict(
         abi=1,
+        backend="pthread"
+        if args.pthread
+        else ("openmp" if args.openmp_prefix is not None else "scalar"),
         compiler=subprocess.check_output([args.cc, "--version"], text=True),
         command=command,
         target=platform.machine(),
@@ -118,7 +132,10 @@ def main():
         ),
         gmp_library=str((args.gmp_prefix / "lib/libgmp.10.dylib").resolve()),
         gmp_library_sha256=sha(args.gmp_prefix / "lib/libgmp.10.dylib"),
-        source={name: sha(source / name) for name in ("packet.c", "packet.h")},
+        source={
+            name: sha(source / name)
+            for name in ("packet.c", "packet.h", "team.c")
+        },
         library_sha256=sha(library),
         openmp=None
         if args.openmp_prefix is None
