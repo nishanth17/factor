@@ -87,17 +87,170 @@ Links preserve the detailed task contracts without duplicating them here.
 
 ## In progress
 
-The delivered B12/F4 ECM component is complete; its ready-first follow-up remains separate.
-A8 and D1 share a worktree but keep separate acceptance contracts.
+Implementation snapshot checked on 6 November 2026 against mainline
+`bf243dba2edef25c74812887f45473036b4db845`. The remaining workstreams below are
+unfinished tasks with isolated implementations; none of their task code is
+integrated by this documentation update. A8 and D1 share one worktree but keep
+their separate contracts. This is a checkpoint inventory, not a claim that a
+process is currently running or that an experimental acceptance gate passed.
+In progress remains acceptance-open; phase-catalogue gates below still apply.
 
-| Item | Remaining work | Dependency | Model / effort |
-| --- | --- | --- | --- |
-| <a id="b12-f4-in-progress"></a>[B12/F4](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#b12-f4-in-progress) | Real-spawn and arithmetic checks, failure/restart handling, full QA, then a small matched startup comparison. | Delivered B12/F4 process ECM; current flat ECM package and unchanged numerical manifests | Sol / xhigh |
-| <a id="f3-in-progress"></a>[F3](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#f3-in-progress) | Full QA, clean feasibility, one selected continuation screen and crossover evidence before integration. | Current B2/classical control and C11/C3a bound-specific opportunity; selected polynomial oracles/contracts; E1 only for combined acceptance; C2 win unnecessary | Astra / xhigh |
-| <a id="a8-d1-in-progress"></a>[A8](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#a8-d1-in-progress) | Current nonempty target-size fixtures, full QA and complete operator/lifting capacity comparisons. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | Astra / xhigh |
-| [D1](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#a8-d1-in-progress) | Full QA, genuine matrix solve/correction/lift/extraction comparisons, bounded restarts and fresh confirmation. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | Astra / xhigh |
-| <a id="f2-in-progress"></a>[F2](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#f2-in-progress) | Commit remaining optimization work, full QA, clean feasibility and matched package cost/yield evidence. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | Astra / xhigh |
-| <a id="b4a-in-progress"></a>[B4a](https://github.com/nishanth17/factor/blob/cb37da3ea5fbbeb44923faa87fd45d4e5d926bc4/v2/ROADMAP.md#b4a-in-progress) | Native lifecycle admission, complete-cost comparisons, cost recalibration and integration. | B3/B4 oracles; current scalar baseline, root resources and exact cancellation/resume contracts | Sol / xhigh |
+A7a is Done. Current preparation positions retain B4a (3), F3 (11), F2 (14), and
+A8/D1 within the matrix branch (16). Adding H2 at rank 7 shifts the previous
+rank-7-and-later items by one; their relative order and task scopes are retained.
+Detailed local entry points below are in each named task worktree, not mainline.
+
+**B12 → F4 has an unfinished ready-first startup follow-up.** Its earlier
+process-ECM delivery and selected defaults remain recorded in the
+[completed register](#completed-register), but do not validate this new
+prototype. Native ECM continues under B4a; the selected current-collector
+QS worker integration is recorded under completed A7a. Broader portfolio, balanced completion and population-p90
+evidence remain separate acceptance follow-ups.
+
+| ID / scope | Deliverable and boundary | Predecessors | Status, trigger and existing priority | Model / effort | Evidence and research |
+| --- | --- | --- | --- | --- | --- |
+| B12/F4 — ready-first worker startup follow-up | Dispatch to checked-ready workers and accept results while peers start, preserving original startup deadlines, conservative leases, partial-pool cleanup and the default barrier path. | Delivered B12/F4 process ECM; current flat ECM package and unchanged numerical manifests | **In progress; runtime verification pending.** Prototype and 15 mock-only tests are present; real spawn/arithmetic, lifecycle failures, committed-only full QA and a small matched startup comparison remain. | Sol / **xhigh** validation/design; separately frozen execution can use Sol / **high** | [implemented and remaining work](#b12-f4-in-progress) |
+| F3 — P6.2 exact polynomial ECM continuation | Select bounded product/remainder-tree and multipoint continuation from GMP-ECM and Yamaquasi. Compare schoolbook/Karatsuba and exact Kronecker packing on native ints, with optional coarse GMP multiplication as a separate track. Include monic reciprocal reduction, blocked/tree storage, exact evaluation/recovery and a separately flagged Brent–Suyama power/Dickson extension; see the current gates below. | Current B2/classical control and C11/C3a bound-specific opportunity; selected polynomial oracles/contracts; E1 only for combined acceptance; C2 win unnecessary | **In progress; opt-in polynomial continuation.** Exact degree-one continuation, P/G arithmetic, recovery/resume and explicit ablations are committed. Full QA, the unexecuted prospective screen, whole-continuation crossover and integration remain pending. | Astra / **xhigh** research, implementation, exactness and experiment design; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers) ; [implementation and remaining work](#f3-in-progress) |
+| A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **In progress with D1.** Exact operator/lifting adapters, independent oracles and fixtures are implemented. Current nonempty target-size fixtures, heavy QA and capacity measurements remain open; no matrix-memory improvement is established. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) ; [implementation and remaining work](#a8-d1-in-progress) |
+| D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **In progress after the A8 contract.** Genuine selected-block recurrence, original-kernel correction, bounded restarts/resume and default-off ablations are implemented. Complete QA, representative matrix measurements, confirmation and integration remain open. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) ; [implementation and remaining work](#a8-d1-in-progress) |
+| F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **In progress; opt-in package preparation.** Suyama-11, enhanced Edwards/setup/scalar options and scheduled execution/plan reuse are committed. Further optimization edits are uncommitted at this snapshot; heavy QA, feasibility, yield/cost evidence and integration remain pending. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) ; [implementation and remaining work](#f2-in-progress) |
+| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **In progress; isolated optional native executor.** Scalar GMP and native-team sources are prepared and rebased; Python-side committed-only QA passes. Native lifecycle admission, complete-cost measurements, recalibration and integration remain pending. The scoped NEON loss is retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
+
+<a id="b12-f4-in-progress"></a>
+
+### B12 / F4 — ready-first startup follow-up
+
+- **Implemented on the task branch:** dispatch/publication while peers are
+  still starting, checked readiness, unchanged startup deadlines, conservative
+  resource leases and partial-pool cleanup. Barrier startup remains the default;
+  curve manifests and exact arithmetic are unchanged. Fifteen mock-only
+  controller/startup tests, lint and import-normalized AST checks passed.
+- **Remaining:** real-spawn early-publication/cleanup tests; identical-manifest
+  serial/P1/P2/P4 arithmetic checks; persistent reuse and existing worker
+  failure/restart regressions; committed-only validation and the full suite.
+  Then run a small matched barrier-versus-ready-first cold-start comparison,
+  including first dispatch/factor and total return/drain/close costs. Revisit
+  startup-dependent cost/engagement tables if the comparison supports integration.
+  No startup speedup or production adoption is established.
+- **Checkpoint:** `codex/ecm-ready-start` at `636a755`, clean, opt-in and
+  unmerged onto mainline base `bf243db`. Local entries:
+  `v2/audit/ecm_ready_start/REBASE.md` and `HANDOFF.md`. Prepared `qa.py`
+  covers focused tests, lint and imports under a finite locked allowance;
+  it does not run the full suite, which remains required before merging.
+  The tuple-decoding microcheck is complete and is not this pending test;
+  direct runtime tuples remain the separate open B3b follow-up.
+
+<a id="f3-in-progress"></a>
+
+### F3 — exact polynomial ECM continuation
+
+Target useful 20–35-digit smaller factors within larger inputs; production
+remains classical continuation until an explicit integration/adoption decision.
+Establish a complete-continuation crossover before enlarging B2 or claiming
+that a packed multiplication backend pays off.
+
+- **Implemented on the task branch:** exact nonnegative Kronecker packing,
+  monic reciprocal reduction, product/remainder trees, degree-one wheel
+  continuation, checked normalization, bounded saturation recovery and
+  source/backend-bound block resume. Python-int P and optional coarse-gmpy2 G
+  paths are available in the task environment. Default-off arithmetic,
+  packing/reuse and redundant-work profiles have focused exactness checks;
+  the latest handoff reports 63 focused tests, including P-only validation.
+- **Remaining:** committed-only full QA and runner lifecycle checks; execute
+  one selected source-pinned screen, not every historical panel; measure
+  complete construction/evaluation/recovery cost and establish the crossover
+  at useful deeper bounds. Freeze later independent comparisons from those
+  results; reconcile B4a costs before production integration or promotion.
+  Power/Dickson extension implementation and the F3a representation/accounting/
+  scalar-backend candidates remain separate, unimplemented follow-ups.
+- **Checkpoint:** `codex/f3-polynomial-stage2` at `66c07f3`.
+  Local entry: `v2/audit/f3/CURRENT.md`, then
+  `HEADROOM_OPTIONS_HANDOFF_20261106.md`. Its replacement 36-cell screen is
+  unexecuted and replaces an earlier panel within the existing allowance;
+  it is not an additional grant or performance result.
+
+<a id="a8-d1-in-progress"></a>
+
+### A8 / D1 — matrix controls and packed block Lanczos
+
+Capacity can justify sparse work before solve CPU dominates. Synthetic
+operator gains or an unrelated control's failure do not settle adoption.
+
+- **Implemented on the task branch:** constraint-by-relation operators,
+  packed forward/transpose products, independent oracles, exact fixture and
+  filtering/lifting adapters, and a genuine Thomé selected-block recurrence.
+  Original-kernel correction, finite seeded restarts, transactional resource
+  handling, checked resume and exact extraction adapters are implemented.
+  Default-off kernel/layout, joint terminal recovery and further recurrence/
+  recovery ablations have focused correctness checks. The solver returns some
+  verified independent dependencies, not a complete basis or proved nullity.
+- **Remaining:** current genuine nonempty target-size fixtures, particularly
+  60–80-digit matrices; committed-only full QA and runner/resource checks;
+  matched complete preparation/solve/correction/lift/extraction measurements,
+  including restart costs, useful dependencies and peak memory. The existing
+  dense-fill/provenance reservation is still a pipeline constraint: no
+  capacity improvement is established. Integration and adoption are pending.
+  Compact provenance, stronger filtering, Four Russians and a second sparse
+  solver retain B7/C4/B6/D2 ownership; they are not delivered by this prototype.
+- **Checkpoint:** `codex/a8-d1-lanczos` at `9dd1968`.
+  Local entries: `v2/audit/a8_d1/HANDOFF.md` and
+  `implementation-i5.json`; retained historical fixture replays and small
+  exact tests do not replace target-size performance evidence.
+
+<a id="f2-in-progress"></a>
+
+### F2 — torsion-aware curve and formula packages
+
+Current Suyama already has favorable divisibility. Compare complete cost and
+chosen-point behavior, distinguish point order from curve order, and preserve
+finite family exhaustion and nonunit/close-factor recovery. Higher torsion
+does not establish a free increase in B1.
+
+- **Implemented on the task branch:** a Suyama-11 chosen-point package with
+  full twist/point checks, bounded deterministic sampling, duplicate accounting,
+  saturation recovery, attempt-boundary resume and checked Montgomery
+  continuation. Enhanced setup/auxiliary-reuse, extended-Edwards stage one,
+  signed-scalar options, coordinate scheduling, cached addition terms and
+  bounded scalar-plan reuse are committed with independent tiny oracles and
+  explicit experiment preparations.
+- **Remaining:** finish and commit the in-flight optimized setup/quotient/
+  sparse-execution edits before treating them as a validated checkpoint;
+  perform full QA and runner lifecycle checks; establish an uninstrumented
+  complete-call feasibility baseline, then measure setup, stage one, conversion
+  and successful/unsuccessful searches under matched resources. Family-yield
+  inference needs independent moduli and residue-class coverage, not repeated
+  timings or tiny-field order checks. Fresh confirmation, backend recalibration
+  and integration remain open. Alternative families/formulas and identified
+  preparation/plan-capacity headroom remain conditional research candidates.
+- **Checkpoint:** `codex/f2-curve-packages` at `794e1d5`, with additional
+  uncommitted implementation edits observed. Local entries:
+  `v2/audit/f2/focused/README.md` and `v2/audit/f2/headroom/README.md`.
+  Existing prospective panels are unexecuted; no package/yield win is established.
+
+<a id="b4a-in-progress"></a>
+
+### B4a — optional coarse native ECM
+
+- **Implemented on the task branch:** optional scalar C/CFFI/GMP execution
+  with reusable native objects/scratch, accepted ladder/PRAC actions, canonical
+  handoffs and Python fallback; native-team executor sources, lifecycle and
+  bounded scheduling/cancellation/checkpoint contracts are prepared. The rebase
+  onto current mainline reports committed-only Python QA: 1,416 tests
+  (43 optional skips), lint and 277 benchmark imports. The separately scoped
+  two-curve NEON prototype lost its direct comparison and remains a retained loss.
+- **Remaining:** combined-source native build and lifecycle/resource admission,
+  including actual team execution; matched cold/warm scalar/team versus Python/
+  B12 comparisons with setup, conversion, recovery, startup and cancellation
+  included. Recalibrate engagement, useful team size and dependent cost tables,
+  then complete integration and applicable confirmation. Python QA with optional
+  skips does not establish native admission. C5 limb/modular contexts and any
+  reopened SIMD hypothesis remain separate tasks; no native speedup is adopted.
+- **Checkpoint:** `codex/b4a-native-ecm` at `02e73d2`.
+  Local entry: `v2/audit/b4a/rebase_20261106/HANDOFF.md`;
+  `NEON_DIRECT_RESULT_v5.md` retains the historical arithmetic-only result.
+
+<a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
+<a id="model-and-effort-for-the-new-qs-work"></a>
 
 <a id="completed-register"></a>
 
@@ -157,12 +310,9 @@ One entry per delivered scope. Detailed measurements, failures and adoption limi
 <a id="a1c--same-modulus-two-root-interleaving-conditional"></a>
 <a id="a7a--current-collector-parallel-relation-collection"></a>
 <a id="a7a--done-current-collector-parallel-qs"></a>
-<a id="a8--d1--matrix-controls-and-packed-block-lanczos"></a>
 <a id="acceptance-evidence-and-stop-rules"></a>
-<a id="b12--f4--ready-first-startup-follow-up"></a>
 <a id="b3-production-integration-acceptance-9-october-2026"></a>
 <a id="b4a--coarse-native-arithmetic-and-whole-portfolio-costs"></a>
-<a id="b4a--optional-coarse-native-ecm"></a>
 <a id="broader-portfolio-opportunities-and-relative-value"></a>
 <a id="c10--source-derived-collection-strategies-closed-bounded-tranche"></a>
 <a id="c10a--conditional-collection-policy-questions-open"></a>
@@ -196,8 +346,6 @@ One entry per delivered scope. Detailed measurements, failures and adoption limi
 <a id="execution-phase-h--final-phase-8-reconciliation"></a>
 <a id="execution-phase-i--reproducible-publication"></a>
 <a id="existing-evidence-to-reuse"></a>
-<a id="f2--torsion-aware-curve-and-formula-packages"></a>
-<a id="f3--exact-polynomial-ecm-continuation"></a>
 <a id="f3a--polynomial-representation-accounting-and-native-backend-headroom"></a>
 <a id="factor-live-backlog"></a>
 <a id="factor-phased-todos-and-decision-gates"></a>
@@ -207,7 +355,6 @@ One entry per delivered scope. Detailed measurements, failures and adoption limi
 <a id="later-integrated-preprocessing-tuning-e3"></a>
 <a id="later-tranche--gnfs-after-current-engine-optimization"></a>
 <a id="master-execution-sequence-and-model-recommendations"></a>
-<a id="model-and-effort-for-the-new-qs-work"></a>
 <a id="model-and-effort-key"></a>
 <a id="new-source-derived-deltas--separate-follow-up-items"></a>
 <a id="numbered-phase-catalogue-and-acceptance-gates"></a>
@@ -282,7 +429,6 @@ One entry per delivered scope. Detailed measurements, failures and adoption limi
 <a id="phase-7--implement-and-scale-gnfs"></a>
 <a id="phase-8--revisit-phase-2-portfolio-optimization"></a>
 <a id="phase-checkpoints"></a>
-<a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="ranked-next-work--expected-benefit-and-cost"></a>
 <a id="sources-and-verification-scope"></a>
 <a id="why-acceleration-leads-and-where-the-argument-stops"></a>
