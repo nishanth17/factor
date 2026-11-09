@@ -3,6 +3,19 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## A7a selected QS integration (9 November 2026)
+
+- Adopt Y0 numerical policy and nearest-row process QS: serial below 40;
+  C4/p4, C4/p8, C4/p16, C8/p16, C14/p64 and C8/p64 at 40/50/55/60/65/70.
+  Ties choose the smaller size; above 70 is explicitly extrapolated.
+- Add CLI `--qs-workers serial` and retain API `qs_workers=None` as S0.
+  Preserve H3 resources, explicit and saved recipes, lazy pool startup, ECM
+  defaults and existing portfolio SIQS eligibility. Restore all supported
+  collector subtypes through the shared checkpoint decoder.
+- Close the selected A7a scope with its G4/calibration evidence and retained
+  censoring/drift limits. Defer 75/80 probes until after B5a and flag C3a/B12
+  dispatch and cost tables for revalidation.
+
 ## Directional QS count extension (8 November 2026)
 
 - Permit explicit current QS process counts through twenty for the bounded

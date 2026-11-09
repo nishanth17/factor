@@ -1,5 +1,11 @@
 # Factor benchmarks
 
+A7a is locally adopted with Y0, digit-selected process recipes and a serial
+override. The [final adoption record](RESULTS.md#a7a-final-local-adoption-9-november-2026)
+keeps G4 gains separate from the three-input worker calibration and incomplete
+extension. C3a/B12 tables require revalidation; 75/80 remain deferred after B5a.
+Committed-only premerge/master QA: `results/a7a/final-merge-20261109/` in main.
+
 A7a integrates local master `755c312`'s H3 resource model on its isolated
 branch. Current-worker resources use observed root wall/CPU/RSS, while the
 numerical recipe and packet/cache capacities stay fixed. Committed-only QA

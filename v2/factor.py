@@ -329,8 +329,8 @@ def main(*, budget=None):
         "--siqs-base-bound",
         type=int,
         help=(
-            "factor-base prime bound "
-            "(50-digit SIQS default: 30000; otherwise 1000)"
+            "explicit factor-base prime bound "
+            "(automatic native 50+ digit SIQS uses counted Y0 bases)"
         ),
     )
     qs_options.add_argument(

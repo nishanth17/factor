@@ -46,7 +46,9 @@ class LargerDefaultTests(unittest.TestCase):
                     )
                     self.assertEqual(config.multiplier, 0)
                     self.assertEqual(config.base_bound, 250000)
-                    self.assertEqual(config.gray_limit, 64)
+                    self.assertEqual(
+                        config.gray_limit, 32 if digits <= 52 else 64
+                    )
                     self.assertEqual(config.half_width, 65536)
                     self.assertFalse(hasattr(config, "memory_bytes"))
                     self.assertIsNone(default_siqs_budget(signed).seconds)

@@ -226,7 +226,7 @@ This grant covers v2 project code and documentation. External dependencies
 and linked papers retain their own terms. The preserved v1 baseline is outside
 this new grant; its original source notices and provenance remain unchanged.
 
-## Opt-in current QS workers
+## Current QS workers and selected defaults
 
 `v2.qs.current_parallel.CurrentParallelSIQSJob` accepts a concrete current
 `SIQSConfig` or `CountedSIQSConfig`, a root `Budget`, and `QSWorkerConfig`.
@@ -239,11 +239,43 @@ processes; counts above the host's ten cores are explicit oversubscription
 experiments. `mode="serial"` executes the same packets locally. Pass an explicit
 `CollectionPool` to retain processes across jobs. The portfolio accepts
 `factorize_bounded(..., qs_workers=settings, qs_pool=pool)` at SIQS handoff,
-including recursive cofactors. Defaults remain serial. Retained ECM and QS
+including recursive cofactors. Omitted `qs_workers` selects the digit-based
+process recipe below; explicit `qs_workers=None` forces serial S0. Retained ECM and QS
 processes share the root's observed wall, aggregate CPU and current-tree RSS.
 There are no parent/worker memory reservations, provenance/history quotas,
 prepaid work/CPU leases or aggregate logical-byte admission checks. Former
 resource keywords raise `RemovedResourceLimitError` naming the argument.
+
+Native automatic QS uses the Y0 numerical policy measured by S0 and the
+worker calibration. Routing uses the original call's decimal input size and
+the nearest row; exact ties choose the smaller size. Below 40 remains serial.
+
+| Anchor digits | Workers / polynomials per task |
+| --- | --- |
+| 40 | C4/p4 |
+| 50 | C4/p8 |
+| 55 | C4/p16 |
+| 60 | C8/p16 |
+| 65 | C14/p64 |
+| 70 | C8/p64 |
+
+Above 70 inherits C8/p64 and Y0's 70-digit numerical anchor: **extrapolated**,
+not validated larger-size performance. Intermediate 50+ numerical recipes
+also inherit the nearest Y0 anchor. Existing numerical settings below 50,
+non-native backends, explicit constructors and `recipe="reference"` remain
+available. Automatic portfolio SIQS eligibility is unchanged; explicit
+`--siqs` or `--method siqs` selects the engine outside those bands.
+
+The selected worker bundle retains 64 MiB state cache, lookahead 4, packet
+transport, worker verification, coefficient caching and private semaphore
+stops. It keeps max_batch_atoms 2048 and all frozen capacities. Pools start
+only when SIQS is reached. Worker timelines and full profiling stay off.
+Use `--qs-workers serial` at the CLI or
+`factorize_bounded(..., qs_workers=None)` in Python to force serial QS with
+the same numerical policy. Saved automatic calls retain their concrete
+worker recipe; saved serial calls stay serial. Explicit worker checkpoints
+continue to require their original settings. Changing execution mode mid-resume
+is refused. The checkpoint's `qs_routing` marks above-70 extrapolation.
 
 Root wall/CPU limits are optional; RSS defaults to 80% of physical RAM.
 For an explicit guard, use `Budget(rss_bytes=18 * 2**30, seconds=...)`.
@@ -281,7 +313,8 @@ Scheduling and representation options remain explicit:
   buffers, unchanged numerical publication boundaries and strict checkpoint
   base64. `verification="worker"` verifies before publication; the parent still
   checks ordered insertion. `verification="batch"` prevalidates bounded groups.
-  The default is full parent verification.
+  A bare `QSWorkerConfig()` uses full parent verification; the selected
+  automatic bundle uses worker verification.
 - `private_stop=True` gives each process its own stop flag and requires the
   packet-local counter. `stop_backend="semaphore"` replaces each Event with
   an exclusive-reader nonblocking semaphore. Both preserve cooperative polling.

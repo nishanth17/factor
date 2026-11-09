@@ -1558,11 +1558,17 @@ def _factorize_bounded(
 
                 qs_workers = QSWorkerConfig(**saved_workers)
         else:
-            from .qs.production_policy import default_qs_workers
+            from .qs.production_policy import default_qs_workers, qs_recipe
 
             qs_workers = default_qs_workers(n, config.siqs)
             if qs_workers is not None:
                 state["qs_workers_auto"] = True
+                recipe = qs_recipe(n)
+                state["qs_routing"] = dict(
+                    policy="a7a-Y0",
+                    anchor=recipe.anchor,
+                    extrapolated=recipe.extrapolated,
+                )
     worker_marker = qs_workers.record() if qs_workers is not None else None
     if checkpoint is not None and state.get("qs_workers") != worker_marker:
         raise ValueError("resume QS worker settings changed")

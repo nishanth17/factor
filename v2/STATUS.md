@@ -26,53 +26,45 @@ Retain existing selected values until their owners validate the combined
 committed source; historical measurements do not establish current costs.
 
 
-The isolated A7a branch now integrates local master `755c312`, retaining its
-G2H kernels and frozen G3 settings under H3 observed resources. The pre-H3
-cap/diagnostic patch is preserved separately. Committed-only validation passes
-1,628 tests (nine optional skips), lint and 295 benchmark imports. A final
-format-only test change has identical ASTs to the full-suite source `5764f28`.
-The integration also handles pool failure during submission without touching a
-dead worker's stop lock. No 75/80 probe or performance adoption is added.
-Historical timings require revalidation on the combined source; prior probe
-reports retain their original resource model. Local integration receipts:
-`v2/audit/a7a/master-integration-20261108/`.
+**A7a — Done, local integration on 9 November 2026.** The selected
+current-collector implementation uses H3 observed root resources, Y0 numerical
+policy and automatic process-QS routing by original input digits. Select the
+nearest worker row, ties toward the smaller size; below 40 use serial S0.
+Above 70 inherits C8/p64 and is explicitly extrapolated. Pools start only at
+an eligible SIQS handoff. `qs_workers=None` or CLI `--qs-workers serial`
+forces serial S0. Explicit configurations and saved execution recipes win.
+Existing ECM policy, pretests and portfolio SIQS eligibility are unchanged.
 
+| Digits | Selected worker / packet | Evidence |
+| --- | --- | --- |
+| <40 | Serial S0 | Retained serial path |
+| 40 | C4/p4 | Restricted G3 cold/warm calibration |
+| 50 | C4/p8 | Three-input worker calibration |
+| 55 | C4/p16 | G4 and three-input worker calibration |
+| 60 | C8/p16 | Three-input worker calibration |
+| 65 | C14/p64 | Three-input worker calibration; G4 used C10/p64 |
+| 70 | C8/p64 | Three-input calibration tie; G4 used C10/p64 |
+| >70 | C8/p64 | Extrapolated; new 75/80 probes deferred until after B5a |
 
-**A7a slim G4 complete (8 November):** committed runtime `a51de80`, three
-fresh balanced inputs at 55/65/70, frozen recipes versus matched strong serial
-S0. At 55/65, confirmed wall speedups are 1.97x/3.10x with 2.34x/2.90x CPU.
-The 65 recipe remains an interpolation. At 70, C10 completes 3/3 versus S0
-2/3 within 1,800 s; no aggregate latency interval is assigned to this censored
-row. Drift checks pass, all results reconstruct, and maximum sampled owned RSS
-is 2.56 GiB. Process-arm inner CPU undercounts OS actor totals; reports use OS
-CPU, and this experiment does not validate a binding CPU cap. Detailed local
-receipts: `v2/benchmarks/results/a7a/g4-slim-20261108/` in the main repository.
+G4 confirms 1.97x at 55 and 3.10x at 65 against matched Y0 serial S0.
+At 70, C10 completes 3/3 versus S0's 2/3; completed pairs are about 3x
+and the censored pair is >2.60x. No aggregate censored-row interval is
+assigned. Selected 65/70 recipes differ from G4's C10: worker calibration
+supports faster/tied outcomes within measured drift, not fresh confirmation
+of those exact recipes. C6@60 and C12@65 are possible cheaper ties from
+single-input extension screens, not adopted replacements. The extension
+stops at 12.20% drift before continuation; odd-count validation is incomplete.
+The requested local adoption closes A7a without claiming global optimality,
+mainline population/p90 gains or a fresh 60-digit guardrail.
 
-**A7a reduced worker race complete:** runtime `bce0ad0`, 36/36 factoring
-calls and 40 controls, with all results reconstructing. Input-0 pruning leaves
-provisional process recipes C4/p8, C4/p16, C8/p16, C14/p64 and C8/p64 at
-50/55/60/65/70. All four 70-digit worker counts are wall-time ties under the
-measured 7.42% A/A drift; C8 wins the fewer-workers tie-break and uses less CPU
-and RSS. Rejected counts generally have one input, survivors three; this is
-internal calibration, not global optimality, routing adoption or fresh guardrails.
-The campaign used 2.81 wall hours including its retained recorder-only launch
-failure. Report and verified raw evidence remain local in the main repository:
-`v2/benchmarks/results/a7a/worker-count-race-20261108-r2/`.
-
-**A7a directional extension stopped and reported (9 November):** runtime
-`42dd142`, 19/19 input-0 factorizations and 40 prefix controls reconstruct.
-The 70-digit closing controls trigger the frozen 10% stop with 12.20%
-start/end drift; no inputs 1–2 or automatic restart follow. Single-input
-screens retain C4 at 50/55, tie C6/C8 at 60 and C12/C14 at 65. C16 loses at
-65; the 70 C8/C14/C16 differences are inside drift. These findings do not
-replace the earlier three-input calibration. No C18/C20 full-factor call ran.
-Explicit twenty-worker support passes 1,629 tests (nine optional skips), lint,
-295 benchmark imports and a C20 prefix/timeline smoke. The
-[frozen protocol](benchmarks/A7A_EXPERIMENT.md#frozen-local-execution-protocol)
-and original receipts remain unchanged. Local report in main:
-`v2/benchmarks/results/a7a/directional-worker-extension-20261108-r1/REPORT.md`.
-The owner released its lock after cleanup. No default adoption, merge or push;
-75/80 probes remain deferred until after B5a.
+Final committed-only QA receipts (full tests, lint and benchmark imports)
+remain local under `v2/benchmarks/results/a7a/final-merge-20261109/`.
+Earlier G4, reduced worker race and stopped-extension evidence retain their
+source identities in adjacent `results/a7a/` directories. The existing H3
+integration already includes local master `755c312`; numerical anchors and
+worker fields match their frozen receipts. C3a/B12 dispatch, engagement,
+allocation and worker cost tables require revalidation on this integration.
+No remote push or new 75/80 probe is included.
 
 
 B12/F4's delivered process-ECM scope is integrated on mainline. Its separate
@@ -126,25 +118,29 @@ an experimental gate. Sources: [SIQS selector](qs/defaults.py),
 [chain eligibility](ecm/chain_options.py). Explicit settings and saved policies
 win. Native means Python integers on PyPy implementing Python 3.11.
 
-The bounded portfolio runs exact preprocessing, rho and p−1 serially, then
-selects bounded process ECM or the incumbent serial path.
-Omitted native configurations automatically enable SIQS at exactly 40 and
-50–60 digits. Direct automatic SIQS calls use the same size selector. Explicit
-`siqs=None` disables that fallback; reference `SIQSConfig()` keeps its own
-fields. SSS remains opt-in. ECM workers use the selected automatic cost gate; QS
-workers remain opt-in/experimental.
+The bounded portfolio retains exact preprocessing, rho, p−1 and its
+existing ECM selection. Automatic SIQS eligibility remains exactly 40 and
+50–60 native digits; explicit `--siqs`/`--method siqs` selects it elsewhere.
+Whenever eligible native SIQS is reached, omitted `qs_workers` uses the table
+above. Explicit `qs_workers=None` forces serial. Unsupported explicit engines
+and non-native backends retain their serial implementation; SSS stays opt-in.
 
-| Decimal digits / scope | Root resources / numerical recipe | Automatic SIQS selection | Adoption evidence and limits |
-| --- | --- | --- | --- |
-| Exactly 40, native | Root limits; calibrated recipe | Growing DLP; B=5,000, 5 A factors, pool 32; 2 MiB power plan; parity_two marking; window pacing; coupled scored multiplier | [C10 plan adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche). Growing versus fixed DLP was not separately confirmed at 40. Face/queue adoption below applies. |
-| Exactly 50, native | Same root defaults; calibrated recipe | Growing DLP; B=30,000, 6 A factors, pool 32; 2 MiB plan; density+presieve+scan_fused+parity_two; collection pacing; coupled scored multiplier | [C9](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c9--source-derived-large-prime-yield-and-dlp-economics-complete-and-integrated), [C10](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10--source-derived-collection-strategies-closed-bounded-tranche), [C10a-05](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open), [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension). A1a's 50-digit integration gate passed. |
-| Exactly 51, native | Same root defaults; calibrated recipe | Same concrete bundle as 50 | [51-digit completion adoption](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#c10a--conditional-collection-policy-questions-open). A1a marking at 51 is an **unmeasured interpolation**. |
-| 52–54, native | Same root defaults; calibrated recipe | Counted base 2,500 (endpoint ceiling 250,000), 7 A factors, pool 64; coupled odd/even scored multiplier (`multiplier=0`); 2 MiB plan; A1a marking plus parity_two; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **unmeasured interpolated bands**. |
-| Exactly 55, native | Same root defaults; calibrated recipe | Same counted bundle as 52–54 | Same [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing) and [A1a adoption](benchmarks/RESULTS.md#a1a-integration-and-extension): **Adopted**; compact training unstable, A1a fresh integration Inconclusive due to drift. |
-| 56–59, native | Same root defaults; calibrated recipe | Counted base 5,000, ceiling 250,000; 8 A factors, pool 64; coupled scored multiplier; 2 MiB plan; parity_two marking; collection pacing | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **unmeasured interpolated bands**. |
-| Exactly 60, native | Same root defaults; calibrated recipe | Same counted bundle as 56–59 | [C10a-04 adoption](benchmarks/RESULTS.md#c10a-04-larger-band-routing): **Adopted**; preliminary fresh compact confirmation; original campaign incomplete. |
-| Exactly 40 or 50–60, native, explicit reference recipe | Caller root limits; `recipe="reference"` | Same size/base/multiplier/growing policy; power plan off, parity_two marking, window pacing. The root guard still applies. | [C9/C10 routing scope](qs/CONFIGURATION.md#explicit-and-automatic-selection); resource variants are **unmeasured**, not additional accepted gains. |
-| Other sizes, or other backends, when SIQS is selected | Root limits; reference size parameters | Reference size parameters with the coupled policies below; no automatic queue. No size-based portfolio SIQS enablement. | [Retained policy](qs/defaults.py) and [C10a-07 adoption](benchmarks/RESULTS.md#c10a-07-face-and-queue). No calibrated size preset at 41–49 or 61+; the coupled-policy promotion below still applies. |
+`default_siqs_config()` uses Y0 at native 50+ digits, with the nearest numerical
+anchor (ties toward smaller) and explicit extrapolation above 70. Below 50,
+other backends, explicit constructors and `recipe="reference"` retain their
+previous numerical fields. Saved configurations are restored without rerouting.
+
+| Y0 numerical anchor | Counted factor-base entries | A factors | Collector |
+| --- | ---: | ---: | --- |
+| 50 | 1,800 | 6 | Bounded yield, presieve+unroll4+parity_two |
+| 55 | 2,500 | 7 | Same Y0 collector |
+| 60 | 5,000 | 8 | Same Y0 collector |
+| 65 | 8,500 | 9 | Same Y0 collector |
+| 70 | 10,500 | 10 | Y0 larger large-prime/product geometry |
+
+All anchors retain 65,536 half-width, 64 polynomials/family, pool 64, 2 MiB
+power plan, 32 MiB sparse queue and collection pacing. The 40-digit numerical
+recipe retains its existing 5,000 prime bound, five A factors and window pacing.
 
 Every fresh automatic SIQS configuration at every supported size/backend
 selects `sign_policy="swap_high"`, `polynomial_policy="parity2"`,
@@ -297,7 +293,7 @@ The snapshot does not assert that any process or performance window is active.
 | [F3](ROADMAP.md#f3-in-progress) | Exact polynomial continuation, P/G arithmetic, recovery/resume and opt-in profiles; full QA, selected screen, crossover evidence and integration remain. | `codex/f3-polynomial-stage2` / `66c07f3` |
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
-| [A7a](ROADMAP.md#a7a-in-progress) | G3 and amended 75/80 probes reported; both probes incomplete under internal memory outcomes. Exact refusal attribution, state retention, intermediate verification and fresh confirmation remain. | `codex/a7a-regime-tuning`; probes/QA `5526118`, G3 `60bfd95`; ignored `probes-20261108/REPORT.md` |
+| [A7a — Done](ROADMAP.md#a7a-completion) | Selected Y0 and nearest-row process recipes integrated locally; larger probes remain deferred until after B5a. | `results/a7a/final-merge-20261109/`; retained G4 and calibration receipts |
 | [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
@@ -332,7 +328,7 @@ prioritizes current acceleration and shorter later experiment turnaround:
 
 1. **B12/F4 ready-first:** validate real spawn/arithmetic, failure/restart and
    full committed-checkout QA, then compare cold startup — Sol / xhigh.
-2. **A7a:** current-collector parallel QS preparation — Sol / xhigh.
+2. **A7a — Done:** selected current-collector QS integration; C3a/B12 revalidation remains separate.
 3. **B4a:** coarse ECM C/CFFI, then selected native SIMD/threads — Sol / xhigh;
    separately selected new arithmetic proofs retain Astra / xhigh.
 4. **B5a:** QS C/CFFI and ARM NEON, with A1c/B5 controls — Sol / xhigh.

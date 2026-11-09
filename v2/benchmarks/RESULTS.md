@@ -1,5 +1,31 @@
 # Benchmark results and decisions
 
+## A7a final local adoption (9 November 2026)
+
+The selected current-collector implementation is adopted locally with H3,
+production Y0, nearest-row workers/packets and an explicit serial override.
+Rows are S0 below 40; C4/p4 at 40, C4/p8 at 50, C4/p16 at 55, C8/p16 at 60,
+C14/p64 at 65 and C8/p64 at 70. Ties choose the smaller size; above 70 is
+extrapolated. Existing ECM defaults and portfolio SIQS eligibility stay fixed.
+
+G4 supports 1.97x at 55 and 3.10x at 65 versus matched Y0 S0. At 70,
+completed pairs are 2.96x/2.99x, the censored pair gives >2.60x, and C10
+completes 3/3 against S0's 2/3. This is approximately 3x on completed pairs,
+not an identified aggregate censored-row speedup. The selected 50/60/65/70
+recipes come from the three-input worker calibration below. Selected 65/70
+recipes differ from G4's C10; calibration indicates faster/tied outcomes
+within drift rather than fresh exact-recipe confirmation. C6@60 and C12@65
+remain possible cheaper ties from single-input extension screens. No claim
+of complete odd-count validation or global optimality follows.
+
+A7a is Done for this explicitly selected integration. New 75/80 probes stay
+deferred until after B5a. C3a/B12 dispatch, engagement, allocation and worker
+cost tables require revalidation. This adoption does not establish primary
+population/p90 gains or a fresh 60-digit balanced guardrail. Existing failed
+and censored receipts are preserved. Full premerge and postmerge committed-
+files-only tests, lint and benchmark imports are captured locally under
+`v2/benchmarks/results/a7a/final-merge-20261109/`; no remote push is included.
+
 ## A7a directional worker extension (reported 9 November 2026)
 
 Runtime `42dd142`; 19/19 cold input-0 factorizations and 40 exact prefix

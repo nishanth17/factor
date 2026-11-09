@@ -149,6 +149,10 @@ class ProductionQSTests(unittest.TestCase):
             )
         state = automatic.checkpoint["payload"]["state"]
         self.assertEqual(state["qs_workers"]["workers"], 14)
+        self.assertEqual(
+            state["qs_routing"],
+            dict(policy="a7a-Y0", anchor=65, extrapolated=False),
+        )
         self.assertNotIn("qs_workers", serial.checkpoint["payload"]["state"])
         with patch(
             "v2.qs.production_policy.default_qs_workers",
@@ -179,6 +183,18 @@ class ProductionQSTests(unittest.TestCase):
                 ecm_executor=None,
                 qs_workers=None,
             )
+        large = 10**74 + 123
+        extrapolated = factorize_bounded(
+            large,
+            config=PortfolioConfig(siqs=default_siqs_config(large)),
+            budget=Budget(seconds=0),
+            ecm_executor=None,
+        )
+        self.assertTrue(
+            extrapolated.checkpoint["payload"]["state"]["qs_routing"][
+                "extrapolated"
+            ]
+        )
 
     def test_cli_auto_and_serial_checkpoint_resume(self):
         with tempfile.TemporaryDirectory() as directory:
