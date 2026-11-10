@@ -135,9 +135,8 @@ the earlier candidate-count restriction. Subsequent work is selected from
 measured complete costs, uncertainty and remaining resources. This planning
 update launches no implementation, profiling or performance campaign.
 
-B4a Phase 2 continues through the corrected driver and cold-preparation
-screens. The actual-child query and checked, build-prepared CFFI descriptors
-support complete-cost improvements over C1 on the two 80-digit anchors.
+B4a Phase 2 is complete on the task branch. The actual-child query and checked,
+build-prepared CFFI descriptors support complete-cost improvements over C1.
 Numerical work, semantic checks, root resource polls and defaults are unchanged.
 The controller now uses the repository's Mach time conversion with libproc
 exited-child CPU fields; nested reaping and CPU/RSS/wall cleanup are validated.
@@ -148,9 +147,14 @@ does not establish a complete-cost win; it stays disabled. O3 and exact M4
 compiler screens retain generic O2 under uncertainty. A complete exact-M4
 SME multiply/carry/division/square pipeline passes real-width/tail exactness
 but loses to both scalar controls; no vector path is integrated. The scoped
-NEON loss is unchanged. Final committed-only QA and size-band screen are in
-progress; no Phase-3 tuning, promotion, merge or push follows. Current local
-evidence: `v2/audit/b4a/phase2_20261109/`.
+NEON loss is unchanged. Final committed-only ordinary and optional-limb builds
+each pass 1,751 tests (20 optional skips), lint and 308 benchmark imports on
+`b620d6f`. The final 972-call cold size screen and separate 288-request warm
+anchor screen retain Python, C1 and scalar/T1/T2/T4 comparisons, uncertainty
+and all charges. Improvements over C1 do not establish universal superiority
+over Python. Phase 3 owns fresh adoption, worker/dispatch tuning and combined
+recalibration. No defaults, merge or push change. Current local handoff:
+`v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -356,7 +360,7 @@ The snapshot does not assert that any process or performance window is active.
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
 | [A7a — Done](ROADMAP.md#a7a-completion) | Selected Y0 and nearest-row process recipes integrated locally; larger probes remain deferred until after B5a. | `results/a7a/final-merge-20261109/`; retained G4 and calibration receipts |
-| [B4a](ROADMAP.md#b4a-in-progress) | Whole-classical scalar/pthread correctness and Phase 1 Tier 1 screen complete; adoption, recalibration and integration remain. | `codex/b4a-native-ecm` / QA source `fa2a4cc` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Phase 2 component optimization complete; Phase 3 adoption, recalibration and integration remain. | `codex/b4a-native-ecm` / final QA source `b620d6f` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
 startup follow-up is unfinished. The tuple-decoding microcheck is complete;
@@ -414,10 +418,11 @@ can start before every conditional native port is settled.
 A7a can prepare alongside B12 with pinned shared contracts; timed execution
 uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
 saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
-C5 is the separate low-level limb-buffer/modular-context follow-up. B4a already
-owns reusable ordinary GMP objects/scratch; C5 research, specification,
-implementation and handoff are outside that phase. Select C5 from remaining
-allocation/dispatch/arithmetic cost against B4a's scalar baseline. Existing
+C5 retains the low-level limb-buffer/modular-context scope. B4a already owns
+reusable ordinary GMP objects/scratch; Phase 2 evaluates one owned-limb ordinary
+division prototype and leaves it disabled after inconclusive packet evidence.
+New modular domains remain proof-bearing follow-ups selected from remaining
+allocation/dispatch/arithmetic cost against the current scalar baseline. Existing
 Montgomery curves do not supply a residue backend, and earlier Python-reducer
 losses do not settle the native question. B4a's native
 thread screen centers on cold-CLI startup/heap savings against B12 processes,
@@ -427,7 +432,8 @@ its selected helper implementation does not inherit rank 6 automatically. H2
 is rank 7, ahead of broader policy tuning; its removable overhead is unmeasured.
 Reuse compatible H2 evidence in C11/C9b and retain their algorithmic owners.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
-native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
+kernel gains do not establish complete-path gains; the measured M4 SME pipeline
+loses and remains unintegrated. x86-specific ports are outside
 this priority increase. Small cost/A/A checks belong in each task; C9b is not
 a gate on preparation. The local pressure test is
 `v2/audit/research/acceleration_priority_20261104.md`.

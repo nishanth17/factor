@@ -3,22 +3,26 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
-## Experimental B4a native root observations (9 November 2026)
+## B4a Phase 2 component optimization (9 November 2026)
 
 - Prepare and validate out-of-line CFFI ABI descriptors during the explicit
   native build, retaining source/binary/GMP admission and legacy inline builds.
   Add first-use parser-bypass and missing/corrupt descriptor refusal checks.
-
 - Retain native ECM's existing resource polls while using the same macOS
   usage/child queries through one CFFI call for a proved childless root.
   Children, multiple roots and custom providers retain full-tree observation.
   Preserve failures, provider restoration, native-buffer lifetime and existing
   cancellation/publication ordering. Defaults and numerical work are unchanged.
-- Add field/unit, birth, child fallback, observation-error, resource-refusal
-  and provider-lifetime tests. Complete-cost selection remains experimental.
-- Preserve the first screen's inconclusive C1 comparison and timed-stage stop.
-  A follow-up actual-child-query correction and engagement regression are a
-  draft awaiting native rebuild, QA and a newly priced comparison.
+- Validate field/unit, birth, child fallback, observation-error, resource-refusal
+  and provider lifetime. Complete the corrected bridge and prepared-binding
+  comparison against immutable C1 and Python; retain the first failed screen.
+- Keep the exact owned-limb division experiment disabled after inconclusive
+  complete-path evidence. Retain generic O2 after O3/exact-M4 screening and
+  reject the measured complete SME pipeline without integrating a vector path.
+- Complete final committed-only ordinary/optional-limb QA, lint, benchmark
+  imports and cold/warm component screening. Preserve history uncertainty and
+  all failures/charges. Fresh adoption and process/thread/dispatch tuning remain
+  Phase 3; no defaults, merge or push change.
 
 ## B4a whole-ECM C continuation (9 November 2026)
 

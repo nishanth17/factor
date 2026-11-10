@@ -19,6 +19,13 @@ in the wrapper/scalar control. Admission inspects the explicit NEON symbol for
 vector widening products and verifies that its scalar counterpart lacks them.
 The prebuilt GMP library's own implementation remains unchanged.
 
+These restrictions belong to this historical diagnostic prototype. Disabling
+automatic vectorization keeps the matched-layout scalar26 control scalar, so
+its comparison isolates explicit NEON. Disabling LTO preserves the opaque
+cross-file benchmark sink described below. The current scalar/pthread builder
+and later SME pipeline do not disable loop or SLP vectorization. These flags
+are not a requirement for future production builds or compiler experiments.
+
 The radix is 2^26, with 8/11/13 digits respectively. Each NEON uint64 lane sums a
 Comba product diagonal using vmull_u32. At most 13 products plus a carry<13*2^26
 fit below13*2^52<2^56. Carry propagation produces canonical 26-bit digits and the

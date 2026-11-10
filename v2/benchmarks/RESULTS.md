@@ -1,5 +1,22 @@
 # Benchmark results and decisions
 
+## B4a Phase 2 component selection (9 November 2026)
+
+The optional native ECM branch retains corrected childless-root resource
+queries and checked build-prepared CFFI binding. Numerical work, semantic
+checks, resource decisions and automatic defaults remain unchanged. The
+ordinary-division limb prototype stays disabled after inconclusive complete
+packet evidence. Generic O2 is retained after the bounded compiler screen;
+the measured complete exact-M4 SME pipeline loses and is not integrated.
+
+Final source `b620d6f` passes committed-only ordinary/optional-limb full QA,
+lint and benchmark imports. The final cold size matrix and separate warm
+anchors compare Python, immutable C1 and selected scalar/T1/T2/T4, retaining
+input/history uncertainty and all failures/charges. These component decisions
+do not establish a universal Python crossover or full-factor adoption. Phase 3
+owns worker/dispatch tuning, combined-cost recalibration and fresh confirmation.
+Detailed local handoff: `v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
+
 ## A7a final local adoption (9 November 2026)
 
 The selected current-collector implementation is adopted locally with H3,

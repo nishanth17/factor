@@ -849,15 +849,24 @@ Local handoff, all raw rows, source freezes, binaries and exact accounting:
 its stopped report is archived unchanged. No automatic numerical/dispatch
 policy changes, repeated diagnostic campaign or mainline integration follow.
 
-### B4a Phase 2 driver checkpoint (9 November 2026)
+### B4a Phase 2 component selection (9 November 2026)
 
-Host-access resource monitoring and cleanup pass a bounded preflight. Matched
-drift and targeted counter runs identify forced resource sampling as material;
-they do not establish retained-owner accumulation as its cause. Experimental
-`ef061f3` passes committed-only full QA, lint and imports. Its complete-cost
-screen finishes all clean cells but reaches its controller deadline before
-three final A/A observations. No gain over C1 is established; child-list sizing
-can keep the proposed fast path on the original provider. The actual-ID-query
-correction is unvalidated. No default, worker or full-factorization claim.
-Literal freezes, incomplete cells, all charges and current handoff remain local
-under `v2/audit/b4a/phase2_20261109/`.
+The corrected actual-child query and checked build-prepared CFFI ABI remove
+measured driver/first-use overhead on explicitly selected native paths. Exact
+numerical work, semantic GCD/recovery, poll locations and defaults are unchanged.
+Owned-limb division remains disabled after an inconclusive complete-path
+comparison; generic O2 remains the build choice. The complete exact-M4 SME
+pipeline loses to both scalar controls and is not integrated. Reusable kernel
+probes are in `ecm/b4a/`; explicit native build commands and identity checks are
+documented in [the native guide](../ecm/native/README.md).
+
+Final source `b620d6f` passes committed-only ordinary and optional-limb full
+suite/lint and 308 benchmark imports. One final cold matrix covers three
+independent inputs per 60/80/100-digit band, four bounds and Python/C1/selected
+scalar/T1/T2/T4 paths. Separate 80-digit warm anchors retain explicit history
+uncertainty. Batch times include eight curves; derived cold per-curve times
+amortize interpreter startup, first loading/preparation and shutdown. These
+are component screens, not fresh full-factor adoption evidence. Phase 3 owns
+worker/dispatch tuning and recalibration. Literal freezes, complete cost tables,
+observer preflights, stopped stages and all charges remain local at
+`v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
