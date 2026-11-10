@@ -24,11 +24,14 @@ def main():
     parser.add_argument("--limb-division", action="store_true")
     parser.add_argument("--coalesce-unit-yields", action="store_true")
     parser.add_argument("--extended-quantum", action="store_true")
+    parser.add_argument("--split-team-signals", action="store_true")
     parser.add_argument("--optimization", choices=("O2", "O3"), default="O2")
     parser.add_argument("--cpu-target")
     args = parser.parse_args()
     if args.pthread and args.openmp_prefix is not None:
         parser.error("select pthread or OpenMP, not both")
+    if args.split_team_signals and not args.pthread:
+        parser.error("split team signals require pthreads")
     if sys.implementation.name != "pypy" or sys.version_info[:2] != (3, 11):
         raise RuntimeError("build requires PyPy implementing Python 3.11")
 
@@ -71,6 +74,8 @@ def main():
         flags.append("-DB4_COALESCE_UNIT_YIELDS")
     if args.extended_quantum:
         flags.append("-DB4_EXTENDED_QUANTUM")
+    if args.split_team_signals:
+        flags.append("-DB4_SPLIT_SIGNALS")
     if args.vector_report:
         flags += ["-Rpass=loop-vectorize", "-Rpass-missed=loop-vectorize"]
     omp_flags = []
@@ -170,6 +175,7 @@ def main():
         limb_division=args.limb_division,
         coalesce_unit_yields=args.coalesce_unit_yields,
         slice_actions=256 if args.extended_quantum else 128,
+        split_team_signals=args.split_team_signals,
         optimization=args.optimization,
         cpu_target=args.cpu_target,
         openmp=None

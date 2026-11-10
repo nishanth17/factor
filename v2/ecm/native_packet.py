@@ -258,6 +258,12 @@ class NativePacket:
             ):
                 raise ValueError("native unit-yield build identity mismatch")
             if (
+                "split_team_signals" in manifest
+                and bool(lib.b4_split_signals())
+                != manifest["split_team_signals"]
+            ):
+                raise ValueError("native team signal identity mismatch")
+            if (
                 "slice_actions" in manifest
                 and int(lib.b4_slice_actions()) != manifest["slice_actions"]
             ):

@@ -81,6 +81,12 @@ binary reports pthread capability and zero OpenMP capability. Explicit missing
 backends raise named errors; the team never falls back to scalar or Python.
 Factoring startup does not compile or install anything.
 
+`--pthread --split-team-signals` is an opt-in coordination experiment. Work
+release and completion use separate condition variables; cancellation still
+wakes both, and the last relinquished borrower releases the caller. Arithmetic,
+deadlines and publication checks are unchanged. Its manifest capability is
+checked on load. Complete-cost evidence is required before retaining it.
+
 Manifests record compiler/version/flags/target, PyPy/CFFI, C sources including
 `team.c`, GMP header/runtime and resolved library hashes, actual dylib linkage,
 backend and binary hash. Canonical packet ABI1 is retained with additive team
