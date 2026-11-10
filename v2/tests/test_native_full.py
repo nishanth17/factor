@@ -585,7 +585,7 @@ class WholeThreadTests(unittest.TestCase):
                 break
         self.assertTrue(job["done"])
         team.close()
-        self.assertEqual(team.lifecycle[:2], (4, 4))
+        self.assertEqual(team.lifecycle[:2], (team.workers, team.workers))
 
     def test_repeated_cancelled_owner_resume_keeps_all_saved_history(self):
         config = replace(
