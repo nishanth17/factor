@@ -210,11 +210,16 @@ def serve(stream, output, *, once=False):
                 useful, calls = 0.0, 0
                 while useful < 3:
                     row = session.call(request)
-                    split = row["reason"] in ("factor", "factor_found") and any(
+                    split = row["reason"] in (
+                        "factor",
+                        "factor_found",
+                    ) and any(
                         outcome[3] is not None for outcome in row["outcomes"]
                     )
                     if not row["exhausted"] and not split:
-                        raise ValueError("warmup did not finish a valid search")
+                        raise ValueError(
+                            "warmup did not finish a valid search"
+                        )
                     useful += row["wall"]
                     calls += 1
                 row = dict(request, useful=useful, calls=calls)
