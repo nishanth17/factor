@@ -61,7 +61,9 @@ class NativeTeamAdmissionTests(unittest.TestCase):
         with self.assertRaises(RemovedResourceLimitError):
             NativeTeam(memory_bytes=TEAM_OVERHEAD)
         for options in (
-            dict(workers=3),
+            dict(workers=0),
+            dict(workers=11),
+            dict(workers=True),
             dict(schedule="auto"),
             dict(capacity=33),
         ):

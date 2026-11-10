@@ -1,5 +1,12 @@
 # Optional ordinary-GMP ECM packets and pthread slices
 
+Pthread owners accept 1–10 threads; higher-level worker settings require
+`allow_wide_workers=True` for counts outside 1, 2 and 4. The fixed handle and
+argument arrays, startup-failure injection and cancellation barriers cover
+this range. Capacity remains at most 32 contexts, with the same 128-action,
+five-ms slices and root CPU/RSS enforcement. Supported counts are an opt-in
+admission range; defaults and automatic worker selection remain unchanged.
+
 Python integers on PyPy3.11 remain the default. The isolated B4a branch admits
 whole-classical scalar/pthread correctness on `fa2a4cc`: full QA runs 1,741 tests
 with 20 explicit optional skips, lint and 308 ordinary benchmark imports. All

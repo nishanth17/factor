@@ -8,6 +8,7 @@ from .native_packet import RESERVE, NativePacket, ProgramStore, poll_budget
 
 SCHEDULES = {"dynamic": 0, "static": 1}
 MAX_TASKS = 32
+MAX_WORKERS = 10
 TEAM_OVERHEAD = 64 * 2**20
 _PROCESS_TEAM_LOCK = threading.Lock()
 
@@ -29,8 +30,8 @@ class NativeTeam:
     def __init__(
         self, *, workers=2, schedule="dynamic", capacity=8, chunk_size=1
     ):
-        if type(workers) is not int or workers not in (1, 2, 4):
-            raise ValueError("native team supports 1, 2 or 4 workers")
+        if type(workers) is not int or not 1 <= workers <= MAX_WORKERS:
+            raise ValueError("native pthread team supports 1..10 workers")
         if schedule not in SCHEDULES:
             raise ValueError("unknown native team schedule")
         if type(capacity) is not int or not 1 <= capacity <= MAX_TASKS:

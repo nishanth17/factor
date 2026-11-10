@@ -403,3 +403,8 @@ The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
 yields within the same bounded slice while retaining checks and publication
 ordering. It is disabled by default pending continuation validation.
 These component experiments do not change automatic factoring selection.
+
+The opt-in pthread owner supports 1–10 threads. Counts outside 1, 2 and 4
+also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
+Useful counts, scheduling, queue chunks and capacity require source-bound
+cost calibration; the larger supported range does not select a default.

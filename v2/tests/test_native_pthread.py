@@ -84,7 +84,7 @@ class PthreadTests(unittest.TestCase):
                 stream.write(json.dumps(dict(pthread=rows)) + "\n")
 
     def test_uneven_chunks_empty_queue_and_reuse_preserve_identity(self):
-        for workers in (1, 2, 4):
+        for workers in (1, 2, 4, 6, 8, 10):
             for schedule in ("static", "dynamic"):
                 for chunk in (1, 3):
                     owner = self.owner(

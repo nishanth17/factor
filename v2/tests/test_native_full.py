@@ -494,7 +494,7 @@ class WholeScalarTests(unittest.TestCase):
     "pthread native build required",
 )
 class WholeThreadTests(unittest.TestCase):
-    def environment(self, workers=4):
+    def environment(self, workers=10):
         config = selected("c-gmp-full", 31, 233)
         budget = deterministic_budget()
         context, programs = _execution_context({}, config, budget)
@@ -692,8 +692,11 @@ class WholeThreadTests(unittest.TestCase):
         config = replace(
             selected("c-gmp-full", 11, 47), ecm_tiers=((11, 47, 32),)
         )
-        for workers in (1, 2, 4):
-            settings = WorkerSettings(workers=workers)
+        for workers in (1, 2, 4, 6, 8, 10):
+            settings = WorkerSettings(
+                workers=workers,
+                allow_wide_workers=workers not in (1, 2, 4),
+            )
             manifest = Manifest(
                 15, 73, "root", arithmetic_options(config, settings)
             )
@@ -725,7 +728,7 @@ class WholeThreadTests(unittest.TestCase):
     ):
         for case in json.loads(FIXTURES.read_text())["cases"]:
             expected, trace, _ = drive(case, "python")
-            for workers in (1, 2, 4):
+            for workers in (1, 2, 4, 6, 8, 10):
                 for schedule in ("static", "dynamic"):
                     for chunk in (1, 3):
                         with self.subTest(
@@ -786,7 +789,7 @@ class WholeThreadTests(unittest.TestCase):
         from v2.ecm.workers import ECMExecutor
 
         config = selected("c-gmp-full", 31, 233)
-        config = replace(config, ecm_tiers=((31, 233, 5),))
+        config = replace(config, ecm_tiers=((31, 233, 37),))
         control = ECMExecutor(seed=73, settings=WorkerSettings(workers=1))
         try:
             expected = control.run(
@@ -797,11 +800,14 @@ class WholeThreadTests(unittest.TestCase):
             )
         finally:
             control.close()
-        for workers in (1, 2, 4):
+        for workers in (1, 2, 4, 6, 8, 10):
             for schedule in ("static", "dynamic"):
                 owner = NativeECMExecutor(
                     seed=73,
-                    settings=WorkerSettings(workers=workers),
+                    settings=WorkerSettings(
+                        workers=workers,
+                        allow_wide_workers=workers not in (1, 2, 4),
+                    ),
                     schedule=schedule,
                 )
                 try:

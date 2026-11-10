@@ -11,6 +11,7 @@ from pathlib import Path
 from ..common import utils
 from ..ecm.native_packet import poll_budget, source_identity
 from ..ecm.native_team import (
+    MAX_WORKERS,
     SCHEDULES,
     TEAM_OVERHEAD,
     NativeTeam,
@@ -66,7 +67,10 @@ class NativeECMExecutor:
     ):
         self.seed = integer(seed, "method seed", 0, 2**256 - 1)
         self.settings = settings or WorkerSettings(workers=2)
-        if self.settings.workers not in (1, 2, 4) or schedule not in SCHEDULES:
+        if (
+            not 1 <= self.settings.workers <= MAX_WORKERS
+            or schedule not in SCHEDULES
+        ):
             raise ValueError("unsupported pthread team configuration")
         self.chunk_size = integer(chunk_size, "team chunk size", 1, 32)
         if (

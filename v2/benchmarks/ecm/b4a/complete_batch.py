@@ -137,7 +137,10 @@ class BatchSession:
                 max_input_bits=1024,
             )
             result = owner.run(
-                request["n"], config=config, budget=budget, fixed_work=True
+                request["n"],
+                config=config,
+                budget=budget,
+                fixed_work=request.get("fixed_work", True),
             )
             payload = (
                 result.checkpoint["payload"]
@@ -181,6 +184,7 @@ class BatchSession:
                 observed_rss=budget.observed_rss,
                 state=state,
                 native_returns=state["returns"] - before_state["returns"],
+                native_slices=result.stats.get("native_slices", 0),
                 stats=result.stats,
             )
         finally:

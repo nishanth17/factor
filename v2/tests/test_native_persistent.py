@@ -21,7 +21,7 @@ class PersistentTeamTests(unittest.TestCase):
         )
 
     def test_generations_reuse_handles_and_close_joins_exactly_once(self):
-        for workers in (1, 2, 4):
+        for workers in range(1, 11):
             for schedule in ("static", "dynamic"):
                 owner = NativeTeam(workers=workers, schedule=schedule)
                 self.addCleanup(owner.close)
@@ -47,29 +47,29 @@ class PersistentTeamTests(unittest.TestCase):
                 self.assertEqual(owner.lifecycle, saved)
 
     def test_partial_startup_never_publishes_and_joins_created_subset(self):
-        owner = NativeTeam(workers=4)
+        owner = NativeTeam(workers=10)
         self.addCleanup(owner.close)
         owner._grow(1, 1013, deterministic_budget())
-        owner.lib.b4_pthread_inject(owner.owner, 2, -1, 0)
+        owner.lib.b4_pthread_inject(owner.owner, 9, -1, 0)
         with self.assertRaises(TeamRefusedError):
             owner.execute(
                 [("ladder", 1, (2, 1), 1013, 2)],
                 deterministic_budget(),
                 lambda *_: self.fail("partial startup published"),
             )
-        self.assertEqual(self.counters(owner), (2, 2, 0, 0))
+        self.assertEqual(self.counters(owner), (9, 9, 0, 0))
         owner.lib.b4_pthread_inject(owner.owner, -1, -1, 0)
         owner.execute(
             [("ladder", 1, (2, 1), 1013, 2)],
             deterministic_budget(),
             lambda *_: False,
         )
-        self.assertEqual(self.counters(owner), (6, 2, 1, 4))
+        self.assertEqual(self.counters(owner), (19, 9, 1, 10))
         owner.close()
-        self.assertEqual(owner.lifecycle, (6, 6, 1, 4))
+        self.assertEqual(owner.lifecycle, (19, 19, 1, 10))
 
     def test_cancelled_generation_drains_then_reuses_the_same_workers(self):
-        owner = NativeTeam(workers=4)
+        owner = NativeTeam(workers=10)
         self.addCleanup(owner.close)
         owner._grow(1, 1013, deterministic_budget())
         owner.lib.b4_pthread_inject(owner.owner, -1, -1, 1)
@@ -88,7 +88,7 @@ class PersistentTeamTests(unittest.TestCase):
         caller = threading.Thread(target=dispatch)
         caller.start()
         try:
-            owner.lib.b4_pthread_wait(owner.owner, 4)
+            owner.lib.b4_pthread_wait(owner.owner, 10)
             self.assertEqual(owner.lib.b4_pthread_shutdown(owner.owner), -1)
             owner.cancel()
         finally:
@@ -97,13 +97,13 @@ class PersistentTeamTests(unittest.TestCase):
         self.assertFalse(caller.is_alive())
         self.assertEqual(len(errors), 1)
         self.assertIsInstance(errors[0], BudgetExhaustedError)
-        self.assertEqual(self.counters(owner), (4, 0, 1, 4))
+        self.assertEqual(self.counters(owner), (10, 0, 1, 10))
         owner.lib.b4_pthread_inject(owner.owner, -1, -1, 0)
         owner.execute(
             [("ladder", 1, (2, 1), 1013, 2)],
             deterministic_budget(),
             lambda *_: False,
         )
-        self.assertEqual(self.counters(owner), (4, 0, 2, 8))
+        self.assertEqual(self.counters(owner), (10, 0, 2, 20))
         owner.close()
-        self.assertEqual(owner.lifecycle, (4, 4, 2, 8))
+        self.assertEqual(owner.lifecycle, (10, 10, 2, 20))

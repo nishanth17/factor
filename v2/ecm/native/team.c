@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <time.h>
 
+#define MAX_WORKERS 10
+
 typedef struct {
     b4_pthread_team *team;
     unsigned rank;
@@ -17,8 +19,8 @@ typedef struct {
 struct b4_pthread_team {
     pthread_mutex_t mutex;
     pthread_cond_t condition;
-    pthread_t threads[4];
-    worker_arg args[4];
+    pthread_t threads[MAX_WORKERS];
+    worker_arg args[MAX_WORKERS];
     atomic_uint cancelled, failed;
     atomic_size_t next;
     unsigned active, live, completed, waiting, pause, stop;
@@ -102,7 +104,7 @@ int b4_pthread_reset(b4_pthread_team *t) {
 
 int b4_pthread_inject(b4_pthread_team *t, int create_at, int job_at,
                       unsigned pause) {
-    if (!t || create_at < -1 || create_at > 3 || job_at < -1 ||
+    if (!t || create_at < -1 || create_at >= MAX_WORKERS || job_at < -1 ||
         job_at > 31 || pause > 1) return -1;
     /* A creation injection explicitly rearms startup on this idle owner.
      * Normal dispatch never destroys/recreates an already-live team. */
@@ -118,7 +120,7 @@ int b4_pthread_inject(b4_pthread_team *t, int create_at, int job_at,
 }
 
 void b4_pthread_wait(b4_pthread_team *t, unsigned waiting) {
-    if (!t || !waiting || waiting > 4) return;
+    if (!t || !waiting || waiting > MAX_WORKERS) return;
     pthread_mutex_lock(&t->mutex);
     while (t->waiting < waiting && !atomic_load(&t->cancelled))
         pthread_cond_wait(&t->condition, &t->mutex);
@@ -193,7 +195,7 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
     if (actual) *actual = 0;
     if (!t || !actual || count > 32 ||
         (count && (!contexts || !statuses)) ||
-        (workers != 1 && workers != 2 && workers != 4) || schedule > 1 ||
+        (!workers || workers > MAX_WORKERS) || schedule > 1 ||
         !chunk || chunk > 32 || !milliseconds || milliseconds > 5 ||
         !actions || actions > 128) return -1;
     for (size_t i = 0; i < count; ++i) {
