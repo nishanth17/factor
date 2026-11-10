@@ -1,18 +1,25 @@
 # Factor status
 
-Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` is the current phase index. It preserves active requests, freezes and charges; the current 10 November request pre-approves research followed by bounded native coordination/OpenMP execution. Generic word/multiword reduction contexts belong to C5; GCD/inverse/divisibility/exact-quotient helpers belong to A2a. This navigation update authorizes no execution or new grant.
+Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
+requests, freezes and charges. The 10 November native coordination/OpenMP phase
+is delivered; no automatic successor is authorized. C5 retains generic reducers
+and A2a retains GCD/inverse/divisibility helpers.
 
 
-Last updated: 9 November 2026 (America/Los_Angeles).
+Last updated: 10 November 2026 (America/Los_Angeles).
 
-**B4a native backend execution — 10 November 2026:** base `bc8ea7d`;
-the completed six-item continuation and its qualified confirmation are preserved.
-The new request pre-approves research followed automatically by justified
-pthread coordination, a whole-curve OpenMP experiment, matched common settings,
-targeted refinement and final committed-only QA. The standalone R0 review stop
-is superseded. New9,000 wall /36,000 CPU,8 GiB/256 MiB allowances are separate from
-historical charges. No broad confirmation, defaults, merge or push. Local request:
-`v2/audit/b4a/native_backends_20261110/REQUEST.md`.
+**B4a native backend phase — delivered 10 November 2026.**
+Real whole-curve OpenMP is admitted and compared with matched LLVM pthreads;
+existing pthread signaling and explicit four/dynamic/chunk 1/capacity 32 remain
+selected. Generic O2/ordinary GMP, coalesced yields and scalar 256/pthread 128 remain.
+The broad common comparison is inconclusive; a limited deep-cold OpenMP gain
+in refinement does not establish general adoption. Short-active wait is rejected
+for added CPU without a supported wall gain. Committed source `5194951` passes
+1,761 tests (14 optional skips), lint and 310 ordinary benchmark imports
+with required native builds.
+Request, current costs, limitations and exact separate charges:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+No broad confirmation, routing/default promotion, merge or push.
 
 **H3 — Done, integrated locally on master on 8 November 2026** from
 `codex/h3-resource-limits` at `e3c371e`, based on `40d2367`. Only root wall,

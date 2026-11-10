@@ -1,5 +1,32 @@
 # Benchmark results and decisions
 
+## B4a native coordination/OpenMP (10 November 2026)
+
+The native coordination/backend phase is complete. A real benchmark-only
+OpenMP executor uses the provided LLVM/libomp 22.1.8, `-fopenmp -lomp` and
+parallel/for worksharing over the same whole-curve `b4_slice` kernel. Requested
+counts include the caller; constrained teams refuse before arithmetic. Private
+contexts drain before publication/close, while libomp's parked threads and DSO
+have process lifetime. The build uses an explicit installed SDK override.
+
+The two-anchor, three-input 1/2/4-thread static/dynamic comparison preserves
+37 fixed curves, scalar 256/team 128 and compiler controls. Runtime/compiler
+contrasts are inconclusive under the frozen intervals and A/A gates. One
+small refinement supports a limited 4.5% deep-cold passive-OpenMP advantage;
+warm/broader results remain inconclusive. Short-active waiting increases CPU
+without an established wall gain, so passive waiting remains experimental.
+Separate pthread signaling is removed after an inconclusive matched screen.
+
+Keep the existing explicit generic-O2/ordinary-GMP/coalesced recipe:
+scalar 256, pthread 128, four/dynamic/chunk 1/capacity 32. No default, merge or push.
+H3/B12 child-CPU accounting and combined-source engagement recalibration remain
+integration dependencies. Broad fresh confirmation is outside this phase.
+
+Committed source `5194951` passes 1,761 tests (14 optional skips), lint and 310 ordinary benchmark imports with scalar/pthread/OpenMP builds.
+Current cold, warm API, full owner CPU/close and telemetry-inclusive owner wall
+scopes are separate. Full local table/delivery:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+
 ## Remaining B4a native ECM request (9 November 2026)
 
 The scoped explicit recipe uses generic O2/ordinary GMP, coalesced unit yields,

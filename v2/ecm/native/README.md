@@ -347,3 +347,12 @@ builds retain normal compiler auto-vectorization; no new SIMD kernel is
 selected. Historical compiler comparisons, NEON and SME losses remain scoped.
 Local delivery, complete cost/censoring tables and all resource accounting:
 `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
+
+The 10 November coordination/backend phase retains pthread signaling and the
+explicit recipe above. The real whole-curve OpenMP challenger is admitted;
+common runtime/compiler results are inconclusive, with only a limited deep-cold
+benefit in refinement. Short-active waiting adds CPU without an established
+wall gain. Committed-only source `5194951` passes 1,761 tests (14 optional skips),
+lint and 310 ordinary benchmark imports.
+Current local costs, delivery and all separate charges:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.

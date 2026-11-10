@@ -3,6 +3,18 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a native coordination/backend phase (10 November 2026)
+
+- Admit an explicitly selected benchmark whole-curve OpenMP owner with provided
+  LLVM/libomp, actual-team refusal, owner-local cancellation, barrier drain and
+  backend/build-bound checkpoints. No production routing change.
+- Preserve the simpler pthread signaling after a matched inconclusive screen.
+  Keep generic O2/ordinary GMP/coalesced scalar 256/pthread 128 and four/dynamic/
+  chunk 1/capacity 32. Reject short-active waiting after a bounded refinement.
+- Complete common compiler/runtime settings, targeted CPU/heap diagnostics and
+  committed-only QA. Preserve limited deep-cold evidence, uncertainty, process
+  accounting dependencies, all failures and historical charges separately.
+
 ## Remaining B4a native ECM request (9 November 2026)
 
 - Add opt-in post-unit-GCD yield coalescing and a source-bound 256-action

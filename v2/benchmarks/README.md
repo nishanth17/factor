@@ -888,3 +888,34 @@ outside the engine. Conditional 3/6/9-input comparisons, cheap-path costs,
 full QA, precise H3/B12 dependency and all failures/charges remain local at
 `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`. No default, population
 or balanced-completion adoption is implied.
+
+### Native coordination/OpenMP phase (10 November 2026)
+
+The native coordination/backend phase is complete. A real benchmark-only
+OpenMP executor uses the provided LLVM/libomp 22.1.8, `-fopenmp -lomp` and
+parallel/for worksharing over the same whole-curve `b4_slice` kernel. Requested
+counts include the caller; constrained teams refuse before arithmetic. Private
+contexts drain before publication/close, while libomp's parked threads and DSO
+have process lifetime. The build uses an explicit installed SDK override.
+
+The two-anchor, three-input 1/2/4-thread static/dynamic comparison preserves
+37 fixed curves, scalar 256/team 128 and compiler controls. Runtime/compiler
+contrasts are inconclusive under the frozen intervals and A/A gates. One
+small refinement supports a limited 4.5% deep-cold passive-OpenMP advantage;
+warm/broader results remain inconclusive. Short-active waiting increases CPU
+without an established wall gain, so passive waiting remains experimental.
+Separate pthread signaling is removed after an inconclusive matched screen.
+
+Keep the existing explicit generic-O2/ordinary-GMP/coalesced recipe:
+scalar 256, pthread 128, four/dynamic/chunk 1/capacity 32. No default, merge or push.
+H3/B12 child-CPU accounting and combined-source engagement recalibration remain
+integration dependencies. Broad fresh confirmation is outside this phase.
+
+The benchmark-only `ecm/b4a/omp_owner.py` supplies the whole-curve challenger.
+Cold includes fresh interpreter/import/preparation/output/shutdown. Common
+warm API time is separate from owner CPU/cleanup and telemetry-inclusive owner
+wall. The refinement also measures request/output/IPC roundtrip. CPU counts
+native helpers/idle/close once. Three inputs and A/A are exploratory evidence;
+no population/p90 or broad factorization-adoption claim follows. Current costs,
+all receipts and exact separate expenditure:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.

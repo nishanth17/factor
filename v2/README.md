@@ -10,16 +10,12 @@ The default Python-integer backend uses only the standard library. The active
 implementation lives here; [v1](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/V1_BASELINE.md) is the preserved
 Python 2 baseline.
 
-An experimental [coarse scalar C/GMP ECM packet](ecm/native/README.md) is
-available through `PortfolioConfig(ecm_kernel="c-gmp")` or
-`--ecm-kernel c-gmp`. It requires an explicit local build and retains the Python
-fallback. A separate experimental OpenMP owner supplies static/dynamic/guided
-continuation scheduling. Both builds and executable QA are pending; no performance
-or default adoption is claimed.
-
-A separate optional [ECM NEON feasibility prototype](ecm/native/neon/README.md)
-provides two-curve products/squares at 200/266/333 bits. It is not integrated into
-the executor; only a separately admitted Stage A screen may measure it.
+Optional [native scalar/pthread ECM](ecm/native/README.md) uses exact GMP
+behind explicit `c-gmp` or whole-curve `c-gmp-full` selection. Builds are explicit;
+factoring calls never compile. A benchmark-only whole-curve OpenMP challenger
+uses provided LLVM/libomp and static/dynamic worksharing; it is an alternative
+executor, with no automatic selection. The retained NEON prototype lost its
+scoped comparison and remains outside the executor.
 
 ## Setup and first run
 
@@ -426,3 +422,20 @@ keep default Python exits. H3/B12 child accounting and combined integration
 need revalidation. Committed-only ordinary/optional-limb checks pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb cleanup-monitor failure and its charge are
 retained with a validated completion supplement. See the
 [build, ownership and evidence guide](ecm/native/README.md).
+
+## Whole-curve OpenMP experiment (10 November 2026)
+
+`v2.benchmarks.ecm.b4a.omp_owner.OpenMPExecutor` reuses the exact whole-curve
+assignment/history contract with a separate backend/build checkpoint identity.
+Select it explicitly with 1/2/4 compute threads and static/dynamic scheduling.
+The caller counts among OpenMP compute threads; the pthread implementation uses
+a waiting caller plus its requested workers. They are alternative team owners.
+Use the explicit LLVM/libomp build in the [native guide](ecm/native/README.md),
+with `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 OMP_DYNAMIC=FALSE`.
+Private contexts/metadata close after the region drains; libomp workers/DSO may
+remain until process exit. Explicit unavailable/constrained teams refuse.
+
+The common study and one refinement retain the existing pthread recipe; no
+broad OpenMP adoption follows. Committed-only validation passes 1,761 tests (14 optional skips), lint
+and 310 ordinary benchmark imports.
+Current local evidence: `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.

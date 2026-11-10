@@ -765,14 +765,16 @@ compared even if an unrelated reference fails. This review launches no runs.
 
 #### B4a — coarse native arithmetic and whole-portfolio costs
 
-The backend sequence starts with separate R0 research/design and a reviewed
-decision before any new threading implementation, builds or timing. Then
-implement/admit the selected OpenMP experiment against the admitted
-persistent pthread control, compare common configurations, profile/tune both
-backends, compare tuned finalists, then fresh complete-call confirmation and
-integration readiness. The added phases are detailed in the current B4a entry
-and `v2/audit/b4a/PARALLEL_BACKEND_SCOPE_20261109.md`; no new numerical effort or
-encoded arithmetic is included in this comparison.
+The 10 November coordination/backend request is delivered on the task branch.
+Its authorization superseded the older standalone R0 review stop: research,
+justified signaling, real whole-curve OpenMP, common settings, one wait refinement
+and committed-only QA are complete. Original signaling and the existing explicit
+pthread recipe remain selected. OpenMP is a validated experimental challenger;
+a limited deep-cold gain does not establish a general replacement. Short-active
+waiting adds CPU without a supported wall gain. Detailed outcomes and exact
+separate charges: `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+Fresh broad confirmation and combined-source integration remain separately
+scoped; no new numerical effort, routing or encoded arithmetic is included.
 
 Task-branch Phase 1 implements explicit `c-gmp-full` scalar/pthread ordinary-GMP
 execution for Suyama setup, both classical stages, normal GCD and strict/ordered
