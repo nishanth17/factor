@@ -855,7 +855,8 @@ The corrected actual-child query and checked build-prepared CFFI ABI remove
 measured driver/first-use overhead on explicitly selected native paths. Exact
 numerical work, semantic GCD/recovery, poll locations and defaults are unchanged.
 Owned-limb division remains disabled after an inconclusive complete-path
-comparison; generic O2 remains the build choice. The complete exact-M4 SME
+comparison; generic O2 remains the build choice after O3, exact-M4, LTO and
+independently trained PGO comparisons. The complete exact-M4 SME
 pipeline loses to both scalar controls and is not integrated. Reusable kernel
 probes are in `ecm/b4a/`; explicit native build commands and identity checks are
 documented in [the native guide](../ecm/native/README.md).

@@ -17,7 +17,7 @@ below record decisions in their dated scope; later entries may supersede routes.
   and provider lifetime. Complete the corrected bridge and prepared-binding
   comparison against immutable C1 and Python; retain the first failed screen.
 - Keep the exact owned-limb division experiment disabled after inconclusive
-  complete-path evidence. Retain generic O2 after O3/exact-M4 screening and
+  complete-path evidence. Retain generic O2 after O3/exact-M4/LTO/PGO screening and
   reject the measured complete SME pipeline without integrating a vector path.
 - Complete final committed-only ordinary/optional-limb QA, lint, benchmark
   imports and cold/warm component screening. Preserve history uncertainty and

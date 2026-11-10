@@ -47,9 +47,11 @@ Pthreads use libSystem on macOS; no OpenMP runtime or new dependency is needed.
 choices; generic O2 remains the default after the bounded screen. Unsupported
 CPU names are compiler errors. These builds permit the compiler's usual
 automatic vectorization; the old NEON diagnostic's disabling flags do not
-apply. LTO/PGO were not exercised. Dynamic GMP linkage limits LTO's reach but
-does not rule out improvements across the C packet/team boundary; that remains
-an untested follow-up, not a Phase-3 prerequisite or a demonstrated tie.
+apply. Separate LTO and PGO comparisons also retain ordinary O2 under complete
+cost uncertainty. PGO uses disjoint training inputs and separately validated
+scalar/pthread profiles. Six compiler configurations include baseline and the
+training-only instrumented build; no LTO/PGO combination was tested. Exact
+experimental compiler wrappers and profiles remain in the local phase audit.
 `--limb-division` enables a separate 4/5/6-limb
 GMP division prototype with ordinary-GMP fallback for other widths/operands.
 It passes exactness tests but is disabled by default because complete-cost

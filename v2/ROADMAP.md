@@ -194,7 +194,8 @@ does not establish a free increase in B1.
   defaults. Native B12-process economics, combined-source recalibration, fresh
   complete-call confirmation and integration remain open. Phase 2 selects the
   corrected resource bridge and prepared CFFI binding; ordinary division stays
-  disabled after inconclusive packet evidence, generic O2 is retained, and the
+  disabled after inconclusive packet evidence, generic O2 is retained after
+  O3/M4/LTO/PGO screening, and the
   complete SME pipeline is rejected. Other arithmetic/chains/E6 candidates have
   explicit deferred or covered dispositions. F2/F3/ready-first/dispatch retain
   their active owners; historical profiler failure and scoped NEON loss remain.

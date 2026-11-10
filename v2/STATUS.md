@@ -143,8 +143,9 @@ exited-child CPU fields; nested reaping and CPU/RSS/wall cleanup are validated.
 Historical stopped stages, observer failures and conservative charges remain.
 
 The optional owned-limb packet passes signed/alias/width/recovery tests but
-does not establish a complete-cost win; it stays disabled. O3 and exact M4
-compiler screens retain generic O2 under uncertainty. A complete exact-M4
+does not establish a complete-cost win; it stays disabled. O3, exact M4, LTO
+and independently trained PGO screens retain generic O2 under uncertainty.
+A complete exact-M4
 SME multiply/carry/division/square pipeline passes real-width/tail exactness
 but loses to both scalar controls; no vector path is integrated. The scoped
 NEON loss is unchanged. Final committed-only ordinary and optional-limb builds

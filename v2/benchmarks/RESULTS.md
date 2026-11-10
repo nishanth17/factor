@@ -6,7 +6,7 @@ The optional native ECM branch retains corrected childless-root resource
 queries and checked build-prepared CFFI binding. Numerical work, semantic
 checks, resource decisions and automatic defaults remain unchanged. The
 ordinary-division limb prototype stays disabled after inconclusive complete
-packet evidence. Generic O2 is retained after the bounded compiler screen;
+packet evidence. Generic O2 is retained after bounded O3/M4/LTO/PGO screens;
 the measured complete exact-M4 SME pipeline loses and is not integrated.
 
 Final source `b620d6f` passes committed-only ordinary/optional-limb full QA,
