@@ -151,6 +151,9 @@ finally:
         with self.assertRaises(RuntimeError):
             team.advance_jobs([(0, job)], budget, source, config)
         self.assertFalse(job["done"])
+        # Clear the prior failed generation before the diagnostic waiter can
+        # inspect its cancellation flag, independently of thread scheduling.
+        self.assertEqual(team._native_reset(team.owner), 0)
         team._native_inject(team.owner, -1, -1, 1)
         errors = []
 
