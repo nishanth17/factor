@@ -158,9 +158,13 @@ class BatchSession:
             exhausted = result.reason == "curves_exhausted"
             if exhausted and len(outcomes) != request["curves"]:
                 raise ValueError("complete batch omitted a numerical curve")
-            if role == "process" and exhausted and not (
-                result.stats.get("engaged")
-                and result.stats.get("worker_dispatches", 0)
+            if (
+                role == "process"
+                and exhausted
+                and not (
+                    result.stats.get("engaged")
+                    and result.stats.get("worker_dispatches", 0)
+                )
             ):
                 raise ValueError("process control did not dispatch workers")
             state = self.state(owner)
