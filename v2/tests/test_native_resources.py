@@ -8,6 +8,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+from v2.ecm.native_curve import BlockStore
 from v2.ecm.native_packet import SOURCE, NativePacket
 from v2.ecm.native_resources import (
     NativeRootProvider,
@@ -120,6 +121,85 @@ class NativeResourceTests(unittest.TestCase):
         with self.assertRaisesRegex(BudgetExhaustedError, "cancelled"):
             poll_native_budget(budget, owner)
         self.assertIs(budget.provider, original)
+
+    def block_store(self, rss=10):
+        packet = self.packet()
+        owner = self.fake(rss=rss)
+        store = BlockStore()
+        store.bind(
+            SimpleNamespace(
+                ffi=packet.ffi,
+                lib=SimpleNamespace(
+                    b4_observe_root=owner.lib.b4_observe_root,
+                    b4_block_create=packet.lib.b4_block_create,
+                    b4_block_destroy=packet.lib.b4_block_destroy,
+                    b4_block_prepare=packet.lib.b4_block_prepare,
+                ),
+            )
+        )
+        self.addCleanup(store.close)
+        return store
+
+    def test_registration_reuses_observer_and_releases_it_with_store(self):
+        original = object.__new__(MacResources)
+        original.sample = Mock(
+            return_value=[ProcessSample(os.getpid(), 7, 10, 0)]
+        )
+        budget = Budget(
+            provider=original,
+            rss_bytes=10000,
+            wall_clock=lambda: 0,
+            cpu_clock=lambda: 0,
+        )
+        store = self.block_store()
+
+        first = store.register(
+            "first", (3, 5, 7), 3, 11, 31, None, budget, b1=31, b2=997
+        )
+        provider = store._resource_provider
+        cached = store.register(
+            "first", (), 3, 11, 31, None, budget, b1=31, b2=997
+        )
+        store.register(
+            "second", (11, 13), 11, 17, 31, None, budget, b1=31, b2=997
+        )
+
+        self.assertIs(first, cached)
+        self.assertIs(store._resource_provider, provider)
+        self.assertEqual(store.lib.b4_observe_root.call_count, 2)
+        self.assertIs(budget.provider, original)
+        self.assertIsNone(provider.fallback)
+        store.close()
+        self.assertIsNone(store._resource_provider)
+        self.assertEqual(store.blocks, {})
+        store.close()
+
+    def test_registration_refusal_keeps_checked_block_and_restores_provider(
+        self,
+    ):
+        original = object.__new__(MacResources)
+        original.sample = Mock(
+            return_value=[ProcessSample(os.getpid(), 7, 10, 0)]
+        )
+        budget = Budget(
+            provider=original,
+            rss_bytes=100,
+            wall_clock=lambda: 0,
+            cpu_clock=lambda: 0,
+        )
+        store = self.block_store(rss=100)
+
+        with self.assertRaisesRegex(BudgetExhaustedError, "rss_limit"):
+            store.register(
+                "first", (3, 5), 3, 7, 31, None, budget, b1=31, b2=997
+            )
+
+        self.assertIn("first", store.blocks)
+        self.assertEqual(budget.observed_rss, 100)
+        self.assertIs(budget.provider, original)
+        self.assertIsNone(store._resource_provider.fallback)
+        store.close()
+        self.assertIsNone(store._resource_provider)
 
     def test_actual_os_fields_match_original_usage_units(self):
         if os.environ.get("FACTOR_RESOURCE_TEST_CHILD") != "1":

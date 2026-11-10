@@ -7,7 +7,7 @@ from functools import wraps
 from ..common import utils
 from ..execution import stage_jobs
 from .chain_records import verify_frontier
-from .native_packet import NativePacket, _bytes, poll_budget
+from .native_packet import NativePacket, _bytes
 from .native_resources import close_resource_checks, poll_native_budget
 
 PHASES = (
@@ -53,6 +53,7 @@ class BlockStore:
             raise ValueError("native metadata belongs to another library")
 
     def close(self):
+        close_resource_checks(self)
         for block, _ in self.blocks.values():
             if self.lib.b4_block_destroy(block):
                 raise RuntimeError("native metadata still borrowed by a curve")
@@ -140,7 +141,9 @@ class BlockStore:
         finally:
             for owner in reversed(owners):
                 ffi.release(owner)
-        poll_budget(budget)
+        # Registration uses the same exact root transport as native slices;
+        # child trees and custom providers retain the original observation.
+        poll_native_budget(budget, self)
         return self.blocks[key]
 
 
