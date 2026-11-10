@@ -75,17 +75,34 @@ factor/nonunit/recovery, phase, metadata and atomic diagnostic returns. The
 128-action/five-ms limits, cancellation and fresh root checks around every
 foreign call and before publication remain. It remains disabled by default;
 the scoped explicit delivery recipe enables it.
-The retained `--openmp-prefix` build is a separate legacy C capability, not the
-current Python team owner and not validated by this continuation. A pthread
-binary reports pthread capability and zero OpenMP capability. Explicit missing
-backends raise named errors; the team never falls back to scalar or Python.
-Factoring startup does not compile or install anything.
+A separate whole-curve OpenMP experiment uses `b4_omp_step` with a real
+parallel region and static/dynamic worksharing over the same `b4_slice` kernel.
+It is selected only through `v2.benchmarks.ecm.b4a.omp_owner.OpenMPExecutor`;
+production routing and the pthread owner remain unchanged. The legacy
+`b4_step_until` capability remains a separate entry point.
 
-`--pthread --split-team-signals` is an opt-in coordination experiment. Work
-release and completion use separate condition variables; cancellation still
-wakes both, and the last relinquished borrower releases the caller. Arithmetic,
-deadlines and publication checks are unchanged. Its manifest capability is
-checked on load. Complete-cost evidence is required before retaining it.
+Use the provided compatible LLVM/libomp explicitly, under the same build lock:
+
+```sh
+pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --coalesce-unit-yields --cc /opt/homebrew/opt/llvm/bin/clang --sysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk --openmp-prefix /opt/homebrew/opt/libomp
+```
+
+The explicit SDK overrides this host's stale LLVM default SDK path. OpenMP
+builds use `-DB4_OPENMP -fopenmp -lomp`, record linkage/runtime hashes, and live
+in `build/openmp/`. A pthread binary reports zero OpenMP capability and links
+libSystem. Neither executor combines the two team implementations.
+
+Requested OpenMP counts include the caller. Actual-size mismatch refuses
+before kernel execution. Each implicit barrier drains all borrowers before
+return; cancellation is owner-local. Contexts and metadata are freed at close,
+while libomp's parked runtime threads and the loaded DSO have process lifetime.
+Counters do not claim those runtime threads were owner-created or joined.
+Use `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 OMP_DYNAMIC=FALSE` for the common
+blocking comparison. No compiler, runtime or SDK is installed automatically.
+
+Separate pthread work/completion signaling was admitted and screened, then
+removed from retained source because the apparent gain did not clear measured
+A/A noise. Its opt-in implementation and exact evidence remain in history.
 
 Manifests record compiler/version/flags/target, PyPy/CFFI, C sources including
 `team.c`, GMP header/runtime and resolved library hashes, actual dylib linkage,
@@ -324,7 +341,7 @@ Both committed-only configurations on `742cffb` pass 1,756 tests (14 optional sk
 its failed receipt and full 900-CPU-second charge remain. A separately
 validated observer rejects live access failures, safely handles proven
 file disappearance, verifies saved evidence and completes owned cleanup.
-The retained OpenMP capability is not an admitted whole-curve executor;
+The whole-curve OpenMP challenger is an explicitly selected experiment;
 selected teams use pthreads and do not combine the two runtimes. Current
 builds retain normal compiler auto-vectorization; no new SIMD kernel is
 selected. Historical compiler comparisons, NEON and SME losses remain scoped.

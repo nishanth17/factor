@@ -2,15 +2,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "packet.h"
 #include <stdlib.h>
-
-unsigned b4_split_signals(void) {
-#if defined(B4_PTHREAD) && defined(B4_SPLIT_SIGNALS)
-    return 1;
-#else
-    return 0;
-#endif
-}
-
 #ifdef B4_PTHREAD
 #include <pthread.h>
 #include <stdatomic.h>
@@ -28,10 +19,6 @@ typedef struct {
 struct b4_pthread_team {
     pthread_mutex_t mutex;
     pthread_cond_t condition;
-#ifdef B4_SPLIT_SIGNALS
-    pthread_cond_t finished;
-    unsigned observers;
-#endif
     pthread_t threads[MAX_WORKERS];
     worker_arg args[MAX_WORKERS];
     atomic_uint cancelled, failed;
@@ -55,12 +42,6 @@ b4_pthread_team *b4_pthread_create(void) {
     if (pthread_cond_init(&t->condition, NULL)) {
         pthread_mutex_destroy(&t->mutex); free(t); return NULL;
     }
-#ifdef B4_SPLIT_SIGNALS
-    if (pthread_cond_init(&t->finished, NULL)) {
-        pthread_cond_destroy(&t->condition);
-        pthread_mutex_destroy(&t->mutex); free(t); return NULL;
-    }
-#endif
     atomic_init(&t->cancelled, 0);
     atomic_init(&t->failed, 0);
     atomic_init(&t->next, 0);
@@ -76,9 +57,6 @@ int b4_pthread_shutdown(b4_pthread_team *t) {
     if (t->active) { pthread_mutex_unlock(&t->mutex); return -1; }
     t->stop = 1;
     pthread_cond_broadcast(&t->condition);
-#ifdef B4_SPLIT_SIGNALS
-    pthread_cond_broadcast(&t->finished);
-#endif
     unsigned live = t->live;
     pthread_mutex_unlock(&t->mutex);
     for (unsigned i = 0; i < live; ++i) {
@@ -95,9 +73,6 @@ void b4_pthread_destroy(b4_pthread_team *t) {
     if (!t) return;
     if (b4_pthread_shutdown(t)) abort();
     pthread_cond_destroy(&t->condition);
-#ifdef B4_SPLIT_SIGNALS
-    pthread_cond_destroy(&t->finished);
-#endif
     pthread_mutex_destroy(&t->mutex);
     free(t);
 }
@@ -115,9 +90,6 @@ void b4_pthread_cancel(b4_pthread_team *t) {
     atomic_store(&t->cancelled, 1);
     pthread_mutex_lock(&t->mutex);
     pthread_cond_broadcast(&t->condition);
-#ifdef B4_SPLIT_SIGNALS
-    pthread_cond_broadcast(&t->finished);
-#endif
     pthread_mutex_unlock(&t->mutex);
 }
 
@@ -150,15 +122,8 @@ int b4_pthread_inject(b4_pthread_team *t, int create_at, int job_at,
 void b4_pthread_wait(b4_pthread_team *t, unsigned waiting) {
     if (!t || !waiting || waiting > MAX_WORKERS) return;
     pthread_mutex_lock(&t->mutex);
-#ifdef B4_SPLIT_SIGNALS
-    ++t->observers;
-    while (t->waiting < waiting && !atomic_load(&t->cancelled))
-        pthread_cond_wait(&t->finished, &t->mutex);
-    --t->observers;
-#else
     while (t->waiting < waiting && !atomic_load(&t->cancelled))
         pthread_cond_wait(&t->condition, &t->mutex);
-#endif
     pthread_mutex_unlock(&t->mutex);
 }
 
@@ -204,24 +169,14 @@ static void *worker(void *opaque) {
         if (t->stop) break;
         generation = t->generation;
         ++t->waiting; ++t->counters[3];
-#ifdef B4_SPLIT_SIGNALS
-        /* Entry notifications serve diagnostic waiters, not parked workers. */
-        if (t->observers || t->pause) pthread_cond_broadcast(&t->finished);
-#else
         pthread_cond_broadcast(&t->condition);
-#endif
         while (t->pause && !atomic_load(&t->cancelled))
             pthread_cond_wait(&t->condition, &t->mutex);
         pthread_mutex_unlock(&t->mutex);
         work(t, arg->rank);
         pthread_mutex_lock(&t->mutex);
         ++t->completed;
-#ifdef B4_SPLIT_SIGNALS
-        /* Only the last relinquished borrower can release the caller. */
-        if (t->completed == t->live) pthread_cond_signal(&t->finished);
-#else
         pthread_cond_broadcast(&t->condition);
-#endif
     }
     pthread_mutex_unlock(&t->mutex);
     return NULL;
@@ -293,11 +248,7 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
     ++t->generation; ++t->counters[2];
     pthread_cond_broadcast(&t->condition);
     while (t->completed < t->live)
-#ifdef B4_SPLIT_SIGNALS
-        pthread_cond_wait(&t->finished, &t->mutex);
-#else
         pthread_cond_wait(&t->condition, &t->mutex);
-#endif
     /* Every worker has relinquished this generation's borrowed buffers.
      * They may remain parked, but cannot use contexts after this barrier. */
     int result = atomic_load(&t->failed) ? -4 :

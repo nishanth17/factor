@@ -31,7 +31,10 @@ class NativeBindingTests(unittest.TestCase):
         for missing in (False, True):
             with tempfile.TemporaryDirectory() as directory:
                 target = Path(directory)
-                for name in ("packet.c", "packet.h", "team.c", "curve.c"):
+                source_manifest = json.loads(
+                    (SOURCE / "build/manifest.json").read_text()
+                )
+                for name in source_manifest["source"]:
                     shutil.copy2(SOURCE / name, target / name)
                 build = target / "build"
                 build.mkdir()

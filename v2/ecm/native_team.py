@@ -27,6 +27,9 @@ class NativeTeam:
     export. A true return stops further slices and discards unfinished state.
     """
 
+    variant = "pthread"
+    owner_prefix = "b4_pthread_"
+
     def __init__(
         self, *, workers=2, schedule="dynamic", capacity=8, chunk_size=1
     ):
@@ -57,6 +60,30 @@ class NativeTeam:
         self.slices = self.discarded = self.completed = 0
         self.lifecycle = (0, 0, 0, 0)
 
+    def _bind_owner_functions(self):
+        """Resolve one admitted backend once, outside the generation loop."""
+        if self.variant == "openmp" and not self.lib.b4_omp_whole_kernel():
+            raise TeamRefusedError("whole-curve OpenMP capability required")
+        for name in (
+            "create",
+            "shutdown",
+            "destroy",
+            "counter",
+            "cancel",
+            "reset",
+            "inject",
+            "wait",
+            "release",
+        ):
+            setattr(
+                self,
+                "_native_" + name,
+                getattr(self.lib, self.owner_prefix + name),
+            )
+
+    def _native_step(self, *args):
+        return getattr(self.lib, self.owner_prefix + "step")(*args)
+
     def _grow(self, count, n, budget):
         while len(self.packets) < count:
             binding = (
@@ -65,7 +92,9 @@ class NativeTeam:
                 else (self.ffi, self.lib, self.packets[0].manifest)
             )
             packet = NativePacket(
-                _variant="pthread", _binding=binding, _programs=self.programs
+                _variant=self.variant,
+                _binding=binding,
+                _programs=self.programs,
             )
             self.packets.append(packet)
             try:
@@ -75,7 +104,8 @@ class NativeTeam:
                     self.contexts = self.ffi.new("b4_context *[32]")
                     self.statuses = self.ffi.new("int[32]")
                     self.actual = self.ffi.new("unsigned *")
-                    self.owner = self.lib.b4_pthread_create()
+                    self._bind_owner_functions()
+                    self.owner = self._native_create()
                     if self.owner == self.ffi.NULL:
                         self.owner = None
                         raise MemoryError("pthread owner creation failed")
@@ -89,7 +119,7 @@ class NativeTeam:
                 if not self.packets:
                     if self.ffi is not None:
                         if self.owner is not None:
-                            self.lib.b4_pthread_destroy(self.owner)
+                            self._native_destroy(self.owner)
                             self.owner = None
                         for owner in (
                             self.actual,
@@ -123,7 +153,7 @@ class NativeTeam:
             if not requests:
                 return
             self._grow(len(requests), requests[0][3], budget)
-            if self.lib.b4_pthread_reset(self.owner):
+            if self._native_reset(self.owner):
                 raise RuntimeError("pthread owner is active")
             for packet, request in zip(self.packets, requests):
                 kind, payload, point, n, a24 = request
@@ -141,7 +171,7 @@ class NativeTeam:
                 poll_budget(budget)
                 for slot, index in enumerate(pending):
                     self.contexts[slot] = prepared[index].context
-                status = self.lib.b4_pthread_step(
+                status = self._native_step(
                     self.owner,
                     self.contexts,
                     len(pending),
@@ -203,13 +233,13 @@ class NativeTeam:
             raise RuntimeError("cannot close an active native team")
         try:
             if self.owner is not None:
-                if self.lib.b4_pthread_shutdown(self.owner):
+                if self._native_shutdown(self.owner):
                     raise RuntimeError("cannot stop an active pthread team")
                 self.lifecycle = tuple(
-                    int(self.lib.b4_pthread_counter(self.owner, kind))
+                    int(self._native_counter(self.owner, kind))
                     for kind in range(4)
                 )
-                self.lib.b4_pthread_destroy(self.owner)
+                self._native_destroy(self.owner)
                 self.owner = None
             self._before_close()
             # Borrowing packets share the first packet's DSO handle. Destroy
@@ -234,4 +264,4 @@ class NativeTeam:
         if self.closed:
             raise RuntimeError("native team is closed")
         if self.owner is not None:
-            self.lib.b4_pthread_cancel(self.owner)
+            self._native_cancel(self.owner)

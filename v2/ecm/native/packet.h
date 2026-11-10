@@ -21,7 +21,22 @@ unsigned b4_abi(void);
 unsigned b4_limb_division(void);
 unsigned b4_coalesced_unit_yields(void);
 unsigned b4_slice_actions(void);
-unsigned b4_split_signals(void);
+typedef struct b4_omp_team b4_omp_team;
+unsigned b4_omp_whole_kernel(void);
+b4_omp_team *b4_omp_create(void);
+int b4_omp_shutdown(b4_omp_team *team);
+void b4_omp_destroy(b4_omp_team *team);
+unsigned long long b4_omp_counter(b4_omp_team *team, unsigned kind);
+unsigned b4_omp_participants(b4_omp_team *team);
+void b4_omp_cancel(b4_omp_team *team);
+int b4_omp_reset(b4_omp_team *team);
+int b4_omp_inject(b4_omp_team *team, int create_at, int job_at, unsigned pause);
+void b4_omp_wait(b4_omp_team *team, unsigned waiting);
+void b4_omp_release(b4_omp_team *team);
+int b4_omp_step(b4_omp_team *team, b4_context *const *contexts, size_t count,
+                unsigned workers, unsigned schedule, unsigned chunk,
+                unsigned milliseconds, unsigned actions, int *statuses,
+                unsigned *actual_workers);
 const char *b4_gmp_version(void);
 typedef struct {
     unsigned long long birth, rss, user, system;

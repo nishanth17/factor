@@ -60,6 +60,8 @@ def source_identity():
     digest = hashlib.sha256(Path(__file__).read_bytes())
     for name in ("packet.c", "packet.h", "team.c", "curve.c"):
         digest.update((SOURCE / name).read_bytes())
+    if (SOURCE / "openmp.c").exists():
+        digest.update((SOURCE / "openmp.c").read_bytes())
     for path in (
         Path(__file__).with_name("native_curve.py"),
         Path(__file__).with_name("native_curve_team.py"),
@@ -146,6 +148,8 @@ class NativePacket:
             SOURCE / name
             for name in ("packet.c", "packet.h", "team.c", "curve.c")
         )
+        if (SOURCE / "openmp.c").exists():
+            paths.append(SOURCE / "openmp.c")
         ffi = lib = None
         try:
             sizes = [path.stat().st_size for path in paths]
@@ -179,12 +183,15 @@ class NativePacket:
                     )
             if manifest["backend"] != self.variant:
                 raise ValueError("native build backend identity mismatch")
-            if set(manifest["source"]) != {
+            expected_sources = {
                 "packet.c",
                 "packet.h",
                 "team.c",
                 "curve.c",
-            }:
+            }
+            if "whole_curve_openmp" in manifest:
+                expected_sources.add("openmp.c")
+            if set(manifest["source"]) != expected_sources:
                 raise ValueError("incomplete native build source identity")
             if library.stat().st_size > 256 * 1024:
                 raise ValueError("native library exceeds funded load size")
@@ -258,11 +265,11 @@ class NativePacket:
             ):
                 raise ValueError("native unit-yield build identity mismatch")
             if (
-                "split_team_signals" in manifest
-                and bool(lib.b4_split_signals())
-                != manifest["split_team_signals"]
+                "whole_curve_openmp" in manifest
+                and bool(lib.b4_omp_whole_kernel())
+                != manifest["whole_curve_openmp"]
             ):
-                raise ValueError("native team signal identity mismatch")
+                raise ValueError("native whole-curve OpenMP identity mismatch")
             if (
                 "slice_actions" in manifest
                 and int(lib.b4_slice_actions()) != manifest["slice_actions"]

@@ -75,7 +75,7 @@ class BatchSession:
                 list(team.lifecycle)
                 if team.owner is None
                 else [
-                    int(team.lib.b4_pthread_counter(team.owner, index))
+                    int(team._native_counter(team.owner, index))
                     for index in range(4)
                 ]
             )

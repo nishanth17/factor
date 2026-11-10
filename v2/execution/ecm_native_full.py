@@ -74,7 +74,7 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
         context = owner.engine.programs or owner.engine.context
         selected = owner.engine.config
         if owner.team is None:
-            owner.team = NativeCurveTeam(
+            owner.team = getattr(owner, "_full_team_type", NativeCurveTeam)(
                 workers=owner.settings.workers,
                 schedule=owner.schedule,
                 capacity=owner.capacity,

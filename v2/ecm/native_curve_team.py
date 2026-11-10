@@ -29,7 +29,7 @@ class NativeCurveTeam(NativeTeam):
                 else (self.ffi, self.lib, self.packets[0].manifest)
             )
             packet = NativeCurvePacket(
-                _variant="pthread",
+                _variant=self.variant,
                 _binding=binding,
                 _programs=self.programs,
                 _blocks=self.blocks,
@@ -42,7 +42,8 @@ class NativeCurveTeam(NativeTeam):
                     self.contexts = self.ffi.new("b4_context *[32]")
                     self.statuses = self.ffi.new("int[32]")
                     self.actual = self.ffi.new("unsigned *")
-                    self.owner = self.lib.b4_pthread_create()
+                    self._bind_owner_functions()
+                    self.owner = self._native_create()
                     if self.owner == self.ffi.NULL:
                         self.owner = None
                         raise MemoryError(
@@ -65,7 +66,7 @@ class NativeCurveTeam(NativeTeam):
                 raise ValueError("whole native curve queue exceeds capacity")
             poll_native_budget(budget, self)
             self._grow(self.capacity, jobs[0][1]["n"], budget)
-            if self.lib.b4_pthread_reset(self.owner):
+            if self._native_reset(self.owner):
                 raise RuntimeError("whole native pthread owner is active")
             positions = {position for position, _ in jobs}
             for position in list(self.bindings):
@@ -96,7 +97,7 @@ class NativeCurveTeam(NativeTeam):
                 borrowed.append(packet)
                 self.contexts[index] = packet.context
             try:
-                status = self.lib.b4_pthread_step(
+                status = self._native_step(
                     self.owner,
                     self.contexts,
                     len(prepared),
