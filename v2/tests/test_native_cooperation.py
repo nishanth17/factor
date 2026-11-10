@@ -13,13 +13,37 @@ from v2.tests.test_native_correctness import deterministic_budget, selected
 from v2.tests.test_native_full import drive
 
 
+def finish_python(case, job=None):
+    """Run the large resume oracle without hashing every intermediate state."""
+    config = selected("python", case["b1"], case["b2"])
+    budget = deterministic_budget()
+    context, programs = _execution_context({}, config, budget)
+    source = programs or context
+    job = (
+        copy.deepcopy(job)
+        if job is not None
+        else stage_jobs.new_job(
+            "ecm", case["n"], case["seed"], case["b1"], case["b2"]
+        )
+    )
+    try:
+        for _ in range(1000000):
+            stage_jobs.advance_job(job, budget, source, config)
+            if job["done"]:
+                return copy.deepcopy(job)
+        raise AssertionError("finite Python resume oracle did not finish")
+    finally:
+        close_execution_context(source)
+        budget.close()
+
+
 @unittest.skipUnless(
     (SOURCE / "build/manifest.json").exists(), "scalar native build required"
 )
 class NativeCooperationTests(unittest.TestCase):
     def test_build_quantum_and_smaller_override_preserve_resume(self):
         case = dict(n=2**127 - 1, seed=7, b1=11000, b2=1100000)
-        expected, _, _ = drive(case, "python")
+        expected = finish_python(case)
         for explicit in (None, 1):
             config = selected("c-gmp-full", case["b1"], case["b2"])
             budget = deterministic_budget()
@@ -59,7 +83,7 @@ class NativeCooperationTests(unittest.TestCase):
                     self.fail("selected finite action quantum was not reached")
             finally:
                 close_execution_context(source)
-            resumed, _, _ = drive(case, "python", job=job)
+            resumed = finish_python(case, job=job)
             self.assertEqual(resumed, expected)
 
     def test_bounded_actions_and_canonical_result_with_nonatomic_yields(self):
