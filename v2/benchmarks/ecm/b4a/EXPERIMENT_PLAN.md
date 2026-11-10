@@ -22,7 +22,7 @@ retry. A lock-busy attempt creates no reservation and does no workload.
 
 ## Measurement contracts
 
-Use retained shallow `(2000,50000)` and deep `(11000,1100000)` anchors,
+Use retained shallow `(2000,81000)` and deep `(11000,1100000)` anchors,
 37 fixed curves/unchanged seeds and three independent representative moduli per
 anchor. Three repetitions estimate short-call noise and remain input clusters.
 Cold includes interpreter/import/JIT/preparation/validation/normal shutdown;
