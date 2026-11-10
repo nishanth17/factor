@@ -15,11 +15,12 @@ and publication ordering are retained. A live child, multiple roots or a
 custom provider uses the original provider. Observations are never replaced
 with a cancellation flag or an estimated memory quota. The provider is restored
 after each poll, including errors, and its buffer is released before unload.
-Committed-only QA on `ef061f3` passes 1,748 tests (20 optional skips), lint and
-308 imports. Its first complete-cost screen establishes no improvement over
-C1 and stops with three final A/A cells unrun. The child-list sizing query can
-force fallback for childless roots; the actual-ID-query correction is a draft
-awaiting native build/QA and remeasurement. No default or worker recipe changes.
+The initial sizing-query implementation is superseded by an actual child-ID
+query with explicit fast-path admission. Focused correctness and matched
+three-input complete-cost screens support the corrected driver and generated
+bindings. Final committed-only QA and size screening remain in progress.
+Historical failures and charges are retained locally. No worker recipe or
+automatic selection changes.
 
 Build explicitly from the repository root under the shared performance lock:
 
@@ -39,6 +40,12 @@ of silently changing backend.
 Both retain `-std=c11 -O2 -Wall -Wextra -Werror`. The scalar artifact is in
 `build/`; pthread is separately in `build/pthread/`, with `-DB4_PTHREAD -pthread`.
 Pthreads use libSystem on macOS; no OpenMP runtime or new dependency is needed.
+`--optimization O2|O3` and `--cpu-target NAME` are explicit experimental build
+choices; generic O2 remains the default after the bounded screen. Unsupported
+CPU names are compiler errors. `--limb-division` enables a separate 4/5/6-limb
+GMP division prototype with ordinary-GMP fallback for other widths/operands.
+It passes exactness tests but is disabled by default because complete-cost
+evidence is inconclusive. No SME/NEON probe is a production backend.
 The retained `--openmp-prefix` build is a separate legacy C capability, not the
 current Python team owner and not validated by this continuation. A pthread
 binary reports pthread capability and zero OpenMP capability. Explicit missing

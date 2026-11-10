@@ -135,26 +135,22 @@ the earlier candidate-count restriction. Subsequent work is selected from
 measured complete costs, uncertainty and remaining resources. This planning
 update launches no implementation, profiling or performance campaign.
 
-B4a Phase 2 resumes successfully past the original permission failure: the
-host-access preflight validates CPU/RSS monitoring and child cleanup, and
-`drift-r2` completes 90 matched calls. Retained metadata stays fixed; remaining
-warm variation is not explained solely by owner accumulation. Targeted
-counters identify forced root sampling as a material cost. Experimental
-`ef061f3` bridges the same macOS resource APIs at existing poll sites and passes
-committed-only QA: 1,748 tests (20 optional skips), lint and 308 imports.
-Its complete-cost screen reaches the frozen controller deadline after all
-216 clean calls, with three final A/A observations missing. No speedup over
-C1 is established: the initial bridge's child-list sizing query can force
-fallback even for a childless root. The actual-child-query correction and a
-fast-path-engagement regression are preserved as an unvalidated draft.
-Phase 2 is incomplete at this timed-stage stop; no detailed cold-preparation,
-arithmetic/compiler/vector or final screen has followed. A smaller revised screen must be priced
-from these actual costs after the draft passes targeted QA. Defaults and
-other owners' implementations remain unchanged. Current local handoff:
-`v2/audit/b4a/phase2_20261109/RESUMPTION_HANDOFF.md`.
-The screen CPU reservation is charged in full because final CPU reconciliation
-can omit orphaned warm servers. Nested exited-child CPU observation also needs
-validation before any further factoring reservation; monitoring access works.
+B4a Phase 2 continues through the corrected driver and cold-preparation
+screens. The actual-child query and checked, build-prepared CFFI descriptors
+support complete-cost improvements over C1 on the two 80-digit anchors.
+Numerical work, semantic checks, root resource polls and defaults are unchanged.
+The controller now uses the repository's Mach time conversion with libproc
+exited-child CPU fields; nested reaping and CPU/RSS/wall cleanup are validated.
+Historical stopped stages, observer failures and conservative charges remain.
+
+The optional owned-limb packet passes signed/alias/width/recovery tests but
+does not establish a complete-cost win; it stays disabled. O3 and exact M4
+compiler screens retain generic O2 under uncertainty. A complete exact-M4
+SME multiply/carry/division/square pipeline passes real-width/tail exactness
+but loses to both scalar controls; no vector path is integrated. The scoped
+NEON loss is unchanged. Final committed-only QA and size-band screen are in
+progress; no Phase-3 tuning, promotion, merge or push follows. Current local
+evidence: `v2/audit/b4a/phase2_20261109/`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the

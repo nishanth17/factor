@@ -393,3 +393,10 @@ resume contract while executing setup, both ECM stages, GCD and strict recovery
 in C. Python prepares immutable metadata and validates/publishes results.
 The existing `c-gmp` stage-one executor remains a control; automatic routing
 is unchanged. See [whole-native ownership and eligibility](ecm/native/README.md).
+
+Explicit native builds prepare hash-checked CFFI ABI descriptors; first use
+retains source/binary/GMP validation while avoiding declaration parsing.
+Childless native resource polls use the same macOS observation APIs, with
+the full tree provider for children or custom resource views. Compiler options
+and the disabled limb-division experiment are documented in the native guide.
+These component experiments do not change automatic factoring selection.
