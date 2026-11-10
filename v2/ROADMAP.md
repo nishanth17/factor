@@ -1,5 +1,8 @@
 # Factor live backlog
 
+Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` is the current phase index. It preserves active requests, freezes and charges; the separate research/review gate precedes new threading work. Generic word/multiword reduction contexts belong to C5; GCD/inverse/divisibility/exact-quotient helpers belong to A2a. This navigation update authorizes no execution or new grant.
+
+
 Start with [STATUS.md](STATUS.md) for current defaults, work in flight and next
 eligible items. [POLICY.md](POLICY.md) holds stable rules. Updated 8 November
 2026 with H3 locally integrated and its dependent tables awaiting revalidation.
@@ -175,6 +178,16 @@ does not establish a free increase in B1.
 <a id="b4a-in-progress"></a>
 
 ### B4a — optional coarse native ECM
+
+- **Current native-backend execution — 10 November 2026:** request
+  `v2/audit/b4a/native_backends_20261110/REQUEST.md` pre-approves source-backed
+  research/design, justified pthread coordination, a whole-curve OpenMP
+  challenger, common-settings comparisons, targeted refinement and final QA.
+  It supersedes the standalone R0 review stop. Preserve completed `bc8ea7d`
+  and historical charges; new9,000 wall /36,000 CPU,8 GiB/256 MiB ceilings are separate.
+  Production OpenMP integration/broad confirmation remain conditional future
+  work. No defaults, merge or push. Decision: `ecm/native/RESEARCH_DECISION.md`;
+  reusable protocol: `benchmarks/ecm/b4a/EXPERIMENT_PLAN.md`.
 
 - **Phase 1 steps 0–3 complete on the task branch:** polling amortization
   (`7124730`), persistent pthreads (`621da17`) and complete unchanged-classical
@@ -751,6 +764,15 @@ silently bind before the intended time allowance. A valid candidate can be
 compared even if an unrelated reference fails. This review launches no runs.
 
 #### B4a — coarse native arithmetic and whole-portfolio costs
+
+The backend sequence starts with separate R0 research/design and a reviewed
+decision before any new threading implementation, builds or timing. Then
+implement/admit the selected OpenMP experiment against the admitted
+persistent pthread control, compare common configurations, profile/tune both
+backends, compare tuned finalists, then fresh complete-call confirmation and
+integration readiness. The added phases are detailed in the current B4a entry
+and `v2/audit/b4a/PARALLEL_BACKEND_SCOPE_20261109.md`; no new numerical effort or
+encoded arithmetic is included in this comparison.
 
 Task-branch Phase 1 implements explicit `c-gmp-full` scalar/pthread ordinary-GMP
 execution for Suyama setup, both classical stages, normal GCD and strict/ordered
