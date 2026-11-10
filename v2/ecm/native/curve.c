@@ -44,6 +44,14 @@ struct b4_curve_state {
 
 unsigned b4_whole_ecm(void) { return 1; }
 
+unsigned b4_coalesced_unit_yields(void) {
+#ifdef B4_COALESCE_UNIT_YIELDS
+    return 1;
+#else
+    return 0;
+#endif
+}
+
 static unsigned bits64(uint64_t value) {
     unsigned bits = 0;
     do { ++bits; value >>= 1; } while (value);
@@ -695,8 +703,24 @@ static int curve_slice(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
         if (old == 0) ++w->info.setup_ops;
         else if (old == 1) ++w->info.stage_one_ops;
         else ++w->info.stage_two_ops;
+#ifdef B4_COALESCE_UNIT_YIELDS
+        unsigned unit_commit;
+        unsigned previous_phase = w->info.phase, previous_operation = w->operation;
+        size_t previous_terms = w->info.terms_count;
+#endif
         result = curve_action(c);
         if (result) break;
+#ifdef B4_COALESCE_UNIT_YIELDS
+        /* Consume only a successful normal check, never a recovery frontier.
+         * All clocks/action limits and the caller's resource polls remain. */
+        unit_commit = !w->atomic_actions && !w->info.done && w->info.boundary &&
+            ((previous_phase == CS_ONE && previous_operation == CO_FAST_CHECK &&
+              w->info.phase == CS_ONE && w->operation == CO_IDLE && !w->info.powers_count) ||
+             (previous_phase == CS_TWO && previous_operation == CO_IDLE && previous_terms &&
+              w->info.phase == CS_TWO && w->operation == CO_IDLE && !w->info.terms_count)) &&
+            mpz_cmp_ui(w->divisor, 1) == 0;
+        if (unit_commit) w->info.boundary = 0;
+#endif
         if (w->phase_clocks && phase_group(w->info.phase) != group) {
             uint64_t now = nanoseconds(NULL, CLOCK_MONOTONIC);
             w->info.phase_ns[group] += now - meter; meter = now;

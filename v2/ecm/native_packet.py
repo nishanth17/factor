@@ -251,6 +251,12 @@ class NativePacket:
                 "limb_division", False
             ):
                 raise ValueError("native limb build identity mismatch")
+            if (
+                "coalesce_unit_yields" in manifest
+                and bool(lib.b4_coalesced_unit_yields())
+                != manifest["coalesce_unit_yields"]
+            ):
+                raise ValueError("native unit-yield build identity mismatch")
             self._allocate(ffi, lib, manifest)
         except BaseException as error:
             if lib is not None and self.variant != "openmp":

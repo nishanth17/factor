@@ -56,6 +56,12 @@ experimental compiler wrappers and profiles remain in the local phase audit.
 GMP division prototype with ordinary-GMP fallback for other widths/operands.
 It passes exactness tests but is disabled by default because complete-cost
 evidence is inconclusive. No SME/NEON probe is a production backend.
+`--coalesce-unit-yields` is a separate experimental driver option. It keeps
+normal GCD checks inside the same bounded slice after a unit result, retaining
+factor/nonunit/recovery, phase, metadata and atomic diagnostic returns. The
+128-action/five-ms limits, cancellation and fresh root checks around every
+foreign call and before publication remain. It is disabled by default pending
+the continuation's complete-cost comparison and confirmation.
 The retained `--openmp-prefix` build is a separate legacy C capability, not the
 current Python team owner and not validated by this continuation. A pthread
 binary reports pthread capability and zero OpenMP capability. Explicit missing

@@ -399,4 +399,7 @@ retains source/binary/GMP validation while avoiding declaration parsing.
 Childless native resource polls use the same macOS observation APIs, with
 the full tree provider for children or custom resource views. Compiler options
 and the disabled limb-division experiment are documented in the native guide.
+The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
+yields within the same bounded slice while retaining checks and publication
+ordering. It is disabled by default pending continuation validation.
 These component experiments do not change automatic factoring selection.
