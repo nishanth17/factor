@@ -196,7 +196,10 @@ class CompiledPacketTests(unittest.TestCase):
         "future Stage Q actual PyPy runtime lane",
     )
     def test_actual_cffi_foreign_call_releases_the_gil(self):
-        ffi = self.packet.ffi
+        import cffi
+
+        # The prepared Factor ABI is immutable; libc needs its own binding.
+        ffi = cffi.FFI()
         ffi.cdef("int usleep(unsigned int);")
         libc = ffi.dlopen(None)
         ready, start = threading.Event(), threading.Event()
