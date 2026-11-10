@@ -122,6 +122,27 @@ class NativeResourceTests(unittest.TestCase):
         self.assertIs(budget.provider, original)
 
     def test_actual_os_fields_match_original_usage_units(self):
+        if os.environ.get("FACTOR_RESOURCE_TEST_CHILD") != "1":
+            # Full-suite multiprocessing helpers may remain live. Prove the
+            # childless fast path in its own interpreter rather than weakening
+            # that assertion or rejecting the correct full-tree fallback.
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    "-m",
+                    "unittest",
+                    "v2.tests.test_native_resources.NativeResourceTests."
+                    "test_actual_os_fields_match_original_usage_units",
+                ],
+                env=dict(os.environ, FACTOR_RESOURCE_TEST_CHILD="1"),
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            return
+
         packet = self.packet()
         original = MacResources()
         provider = NativeRootProvider(packet)
