@@ -7,6 +7,12 @@ this range. Capacity remains at most 32 contexts, with the same 128-action,
 five-ms slices and root CPU/RSS enforcement. Supported counts are an opt-in
 admission range; defaults and automatic worker selection remain unchanged.
 
+The separate experimental build option `--extended-quantum` permits and selects
+256 actions for whole-native scalar/pthread slices. The default remains 128.
+Both retain the five-ms target, native clock/cancellation checks, root CPU/RSS
+polling and publication ordering. An explicit smaller scalar `packet.actions`
+override still takes precedence. Legacy generic packet callers keep 128 actions.
+
 Python integers on PyPy3.11 remain the default. The isolated B4a branch admits
 whole-classical scalar/pthread correctness on `fa2a4cc`: full QA runs 1,741 tests
 with 20 explicit optional skips, lint and 308 ordinary benchmark imports. All

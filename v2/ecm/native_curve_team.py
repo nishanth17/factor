@@ -104,7 +104,7 @@ class NativeCurveTeam(NativeTeam):
                     SCHEDULES[self.schedule],
                     self.chunk_size,
                     5,
-                    128,
+                    self.packets[0].manifest.get("slice_actions", 128),
                     self.statuses,
                     self.actual,
                 )

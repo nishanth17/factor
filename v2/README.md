@@ -408,3 +408,6 @@ The opt-in pthread owner supports 1–10 threads. Counts outside 1, 2 and 4
 also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
 Useful counts, scheduling, queue chunks and capacity require source-bound
 cost calibration; the larger supported range does not select a default.
+The independent `--extended-quantum` build experiment selects at most 256
+whole-native actions per slice with the same five-ms target and resource
+checks. It is disabled by default pending a complete-cost screen.

@@ -49,6 +49,14 @@ struct b4_context {
 unsigned b4_abi(void) { return ABI; }
 const char *b4_gmp_version(void) { return gmp_version; }
 
+unsigned b4_slice_actions(void) {
+#ifdef B4_EXTENDED_QUANTUM
+    return 256;
+#else
+    return 128;
+#endif
+}
+
 unsigned b4_limb_division(void) {
 #ifdef B4_MPN_DIVISION
     return 1;
@@ -404,14 +412,14 @@ int b4_ready(const b4_context *c) { return c && (c->mode || curve_active(c)); }
 
 int b4_slice(b4_context *c, unsigned long long wall_end,
              unsigned long long cpu_end, unsigned actions, const void *cancel) {
-    if (!b4_ready(c) || !actions || actions > 128) return -1;
+    if (!b4_ready(c) || !actions || actions > b4_slice_actions()) return -1;
     if (curve_active(c)) return curve_slice(c, wall_end, cpu_end, actions, cancel);
     return step_until(c, wall_end, cpu_end, actions, cancel);
 }
 
 int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
     if (!b4_ready(c) || !milliseconds || milliseconds > 5 ||
-        !actions || actions > 128) return -1;
+        !actions || actions > b4_slice_actions()) return -1;
     uint64_t wall = nanoseconds(c, CLOCK_MONOTONIC);
     uint64_t cpu = nanoseconds(c, CLOCK_PROCESS_CPUTIME_ID);
     if (!wall || !cpu) return -1;

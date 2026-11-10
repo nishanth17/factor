@@ -257,6 +257,11 @@ class NativePacket:
                 != manifest["coalesce_unit_yields"]
             ):
                 raise ValueError("native unit-yield build identity mismatch")
+            if (
+                "slice_actions" in manifest
+                and int(lib.b4_slice_actions()) != manifest["slice_actions"]
+            ):
+                raise ValueError("native action quantum identity mismatch")
             self._allocate(ffi, lib, manifest)
         except BaseException as error:
             if lib is not None and self.variant != "openmp":

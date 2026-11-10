@@ -197,7 +197,7 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
         (count && (!contexts || !statuses)) ||
         (!workers || workers > MAX_WORKERS) || schedule > 1 ||
         !chunk || chunk > 32 || !milliseconds || milliseconds > 5 ||
-        !actions || actions > 128) return -1;
+        !actions || actions > b4_slice_actions()) return -1;
     for (size_t i = 0; i < count; ++i) {
         if (!b4_ready(contexts[i])) return -1;
         for (size_t j = 0; j < i; ++j)

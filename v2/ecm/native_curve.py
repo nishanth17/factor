@@ -153,7 +153,7 @@ class NativeCurvePacket(NativePacket):
     full_ecm = True
     atomic_actions = False
     phase_clocks = False
-    actions = 128
+    actions = None
 
     def __init__(self, *, mode="c-gmp", _blocks=None, **kwargs):
         super().__init__(mode=mode, **kwargs)
@@ -352,7 +352,12 @@ class NativeCurvePacket(NativePacket):
         poll_native_budget(budget, self)
         self.bind_job(job, budget, context, config)
         try:
-            status = self.lib.b4_step(self.context, 5, self.actions)
+            actions = (
+                self.manifest.get("slice_actions", 128)
+                if self.actions is None
+                else self.actions
+            )
+            status = self.lib.b4_step(self.context, 5, actions)
             self.calls += 1
         finally:
             self.settle(budget)
