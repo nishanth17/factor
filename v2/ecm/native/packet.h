@@ -20,7 +20,6 @@ typedef struct {
 unsigned b4_abi(void);
 unsigned b4_limb_division(void);
 unsigned b4_coalesced_unit_yields(void);
-unsigned b4_fused_expressions(void);
 const char *b4_gmp_version(void);
 typedef struct {
     unsigned long long birth, rss, user, system;

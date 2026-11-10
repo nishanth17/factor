@@ -49,14 +49,6 @@ struct b4_context {
 unsigned b4_abi(void) { return ABI; }
 const char *b4_gmp_version(void) { return gmp_version; }
 
-unsigned b4_fused_expressions(void) {
-#ifdef B4_FUSED_EXPRESSIONS
-    return 1;
-#else
-    return 0;
-#endif
-}
-
 unsigned b4_limb_division(void) {
 #ifdef B4_MPN_DIVISION
     return 1;
@@ -215,7 +207,7 @@ static int begin(b4_context *c, unsigned abi, b4_value n, b4_value x,
     return 0;
 }
 
-/* All old point reads finish before either output, including aliased slots. */
+/* Stage the two results before writing: destination may alias any input. */
 static void doubling(b4_context *c, unsigned dest, unsigned src) {
     mpz_t *s = c->scratch;
     mpz_add(s[0], c->x[src], c->z[src]);
@@ -223,20 +215,12 @@ static void doubling(b4_context *c, unsigned dest, unsigned src) {
     modular_product(c, s[0], s[0], s[0]);
     modular_product(c, s[1], s[1], s[1]);
     mpz_sub(s[2], s[0], s[1]);
-#ifdef B4_FUSED_EXPRESSIONS
-    /* X consumes BB's last independent use. The same signed bracket can
-     * then accumulate in BB without a temporary or copying either output. */
-    modular_product(c, c->x[dest], s[0], s[1]);
-    mpz_addmul(s[1], c->a24, s[2]);
-    modular_product(c, c->z[dest], s[2], s[1]);
-#else
     mpz_mul(s[3], c->a24, s[2]);
     /* a24=(A+2)/4 requires BB (s[1]) in this bracket. */
     mpz_add(s[3], s[3], s[1]);
     modular_product(c, s[4], s[0], s[1]);
     modular_product(c, s[5], s[2], s[3]);
     mpz_set(c->x[dest], s[4]); mpz_set(c->z[dest], s[5]);
-#endif
 }
 
 static void addition(b4_context *c, unsigned dest, unsigned left,
@@ -270,15 +254,6 @@ static void ladder_bit(b4_context *c, unsigned q, unsigned r) {
     mpz_sub(s[6], c->x[r], c->z[r]);
     modular_product(c, s[6], s[0], s[6]);
     mpz_add(s[0], s[5], s[6]); mpz_sub(s[1], s[5], s[6]);
-#ifdef B4_FUSED_EXPRESSIONS
-    /* q/r are distinct slots 1/2; slot 0 is the immutable difference.
-     * All old q/r reads are dead, so publish only into private point slots. */
-    mpz_mul(s[5], s[0], s[0]); modular_product(c, c->x[r], s[5], c->z[0]);
-    mpz_mul(s[6], s[1], s[1]); modular_product(c, c->z[r], s[6], c->x[0]);
-    modular_product(c, c->x[q], s[2], s[3]);
-    mpz_addmul(s[3], c->a24, s[4]);
-    modular_product(c, c->z[q], s[4], s[3]);
-#else
     mpz_mul(s[5], s[0], s[0]); modular_product(c, s[5], s[5], c->z[0]);
     mpz_mul(s[6], s[1], s[1]); modular_product(c, s[6], s[6], c->x[0]);
     modular_product(c, s[0], s[2], s[3]);
@@ -286,7 +261,6 @@ static void ladder_bit(b4_context *c, unsigned q, unsigned r) {
     modular_product(c, s[1], s[1], s[4]);
     mpz_set(c->x[q], s[0]); mpz_set(c->z[q], s[1]);
     mpz_set(c->x[r], s[5]); mpz_set(c->z[r], s[6]);
-#endif
 }
 
 int b4_ladder(b4_context *c, unsigned abi, b4_value n, b4_value x,

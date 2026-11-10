@@ -291,10 +291,6 @@ class CompiledPacketTests(unittest.TestCase):
             )
 
     def test_reused_ladder_signed_bracket_and_scalar_constants(self):
-        self.assertEqual(
-            bool(self.packet.lib.b4_fused_expressions()),
-            self.packet.build["fuse_ordinary_expressions"],
-        )
         for n in (1013, 2**127 - 1, 2**267 - 1, 2**333 - 9, 2**1024 - 109):
             for a24 in (0, 1, n - 1):
                 # X=n-1,Z=1 makes AA-BB negative, including a24=n-1.
