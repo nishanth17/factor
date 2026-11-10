@@ -402,4 +402,8 @@ and the disabled limb-division experiment are documented in the native guide.
 The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
 yields within the same bounded slice while retaining checks and publication
 ordering. It is disabled by default pending continuation validation.
+The independent `--fuse-ordinary-expressions` experiment consumes temporary
+values at their last use to fuse the existing doubling bracket with GMP
+`addmul` and avoid output copies. It is disabled by default and requires an
+ordinary-GMP build, with no change to point formulas or reduction.
 These component experiments do not change automatic factoring selection.

@@ -287,6 +287,23 @@ class CompiledPacketTests(unittest.TestCase):
                 matches(actual, affine_multiply(scalar, point, n, a, b), n)
             )
 
+    def test_reused_ladder_signed_bracket_and_scalar_constants(self):
+        self.assertEqual(
+            bool(self.packet.lib.b4_fused_expressions()),
+            self.packet.build["fuse_ordinary_expressions"],
+        )
+        for n in (1013, 2**127 - 1, 2**267 - 1, 2**333 - 9, 2**1024 - 109):
+            for a24 in (0, 1, n - 1):
+                # X=n-1,Z=1 makes AA-BB negative, including a24=n-1.
+                for point in ((n - 1, 1), (1, n - 1), (2, 1)):
+                    for scalar in (2, 3, 13, 2**31 + 19):
+                        self.assertEqual(
+                            self.packet.ladder(
+                                scalar, point, n, a24, allowance()
+                            ),
+                            core.scalar_multiply(scalar, *point, n, a24),
+                        )
+
     def test_malformed_abi_canonical_bounds_and_program_references(self):
         ffi, lib, ctx = self.packet.ffi, self.packet.lib, self.packet.context
         owners, values = self.packet._values([1013, 2, 1, 2, 13])

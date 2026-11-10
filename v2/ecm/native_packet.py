@@ -257,6 +257,12 @@ class NativePacket:
                 != manifest["coalesce_unit_yields"]
             ):
                 raise ValueError("native unit-yield build identity mismatch")
+            if (
+                "fuse_ordinary_expressions" in manifest
+                and bool(lib.b4_fused_expressions())
+                != manifest["fuse_ordinary_expressions"]
+            ):
+                raise ValueError("native expression build identity mismatch")
             self._allocate(ffi, lib, manifest)
         except BaseException as error:
             if lib is not None and self.variant != "openmp":

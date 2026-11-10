@@ -1,5 +1,12 @@
 # Optional ordinary-GMP ECM packets and pthread slices
 
+`--fuse-ordinary-expressions` is a separate, disabled-by-default ordinary-GMP
+experiment. Doubling computes X before the last use of BB, then accumulates
+`BB + a24*E` with `mpz_addmul`. Private output slots avoid temporary result
+copies once old point inputs are dead. Formulas, reductions, canonical exits
+and semantic checks are unchanged. It cannot be combined with limb division.
+The retained compiler recipe remains generic O2.
+
 Python integers on PyPy3.11 remain the default. The isolated B4a branch admits
 whole-classical scalar/pthread correctness on `fa2a4cc`: full QA runs 1,741 tests
 with 20 explicit optional skips, lint and 308 ordinary benchmark imports. All
