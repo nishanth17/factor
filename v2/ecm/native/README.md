@@ -73,8 +73,8 @@ evidence is inconclusive. No SME/NEON probe is a production backend.
 normal GCD checks inside the same bounded slice after a unit result, retaining
 factor/nonunit/recovery, phase, metadata and atomic diagnostic returns. The
 128-action/five-ms limits, cancellation and fresh root checks around every
-foreign call and before publication remain. It is disabled by default pending
-the continuation's complete-cost comparison and confirmation.
+foreign call and before publication remain. It remains disabled by default;
+the scoped explicit delivery recipe enables it.
 The retained `--openmp-prefix` build is a separate legacy C capability, not the
 current Python team owner and not validated by this continuation. A pthread
 binary reports pthread capability and zero OpenMP capability. Explicit missing
@@ -137,7 +137,8 @@ concurrent operations on one dependent curve point. Immutable program data may
 be shared. The C entry checks distinct contexts; every job has private mutable
 GMP state. Dynamic scheduling uses a bounded shared atomic chunk index; static
 scheduling assigns cyclic chunks to fixed thread ranks. Supported workers are
-1/2/4, `schedule="dynamic"/"static"`, and `chunk_size=1..32`. The ready capacity
+1..10 (with explicit wide-worker admission above),
+`schedule="dynamic"/"static"`, and `chunk_size=1..32`. The ready capacity
 is 1..32, default `2*workers`. Correctness covers chunks 1/3, uneven tails,
 fewer jobs than threads, empty queues and repeated dispatch. No performance
 choice of worker count, schedule or chunk is implied.
@@ -277,3 +278,49 @@ active/repeated close and durable scalar/assignment-history resume. Detailed
 receipts live in `v2/audit/b4a/phase1_20261109/continuation_01/`. The earlier
 checkpoint-design stop was resolved by this implementation. Performance
 adoption and cost/dispatch recalibration remain separate from correctness.
+
+## Remaining request delivery (9 November 2026)
+
+The explicit recipe retains generic O2/ordinary GMP and exact root checks,
+with coalesced unit yields, scalar 256 actions and pthread 128 actions.
+Registration uses the same exact root transport. Independent GMP expression
+fusion did not establish useful improvement and was removed. Defaults stay
+unchanged; 1–10-thread admission does not select automatic worker counts.
+
+Build the selected scalar and pthread pair explicitly, under the shared lock:
+
+```sh
+pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --coalesce-unit-yields --extended-quantum
+pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --pthread --coalesce-unit-yields
+```
+
+Use `NativeECMExecutor(settings=WorkerSettings(workers=4),
+schedule="dynamic", chunk_size=1, capacity=32)` with an explicit
+`c-gmp-full` configuration. This is a measured opt-in recipe, with existing
+Python/B12 controls still applicable. It is not an automatic engagement rule.
+Reuse the built dylib, checked ABI descriptor and manifest across calls;
+rebuild when source, flags, toolchain or dependency identity changes.
+A relocatable `.o` alone cannot be loaded by CFFI's dynamic-library loader.
+Factoring calls never compile. CFFI is imported lazily by
+`NativePacket._load` in `ecm/native_packet.py`; `ffi.dlopen` loads the checked
+scalar or pthread dylib, and explicit owner close releases it after all users.
+
+Fresh cold/warm 60/80/100-digit ECM and failed-search comparisons include
+balanced 60/70 cases, startup/preparation and explicit cleanup. They retain
+quota outcomes, A/A uncertainty and incomplete 80-digit warm confirmation;
+no uniform-population/p90 gain or balanced completion pass is established.
+Cheap paths never load CFFI/DSOs or start workers. Explicit native selection
+still incurs cold Python-module/checkpoint setup; keep default Python exits.
+H3/B12 child CPU units/history and combined-source engagement tables require
+owner revalidation before broader integration.
+
+Both committed-only configurations on `742cffb` pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb controller then hit a capture/delete cleanup race;
+its failed receipt and full 900-CPU-second charge remain. A separately
+validated observer rejects live access failures, safely handles proven
+file disappearance, verifies saved evidence and completes owned cleanup.
+The retained OpenMP capability is not an admitted whole-curve executor;
+selected teams use pthreads and do not combine the two runtimes. Current
+builds retain normal compiler auto-vectorization; no new SIMD kernel is
+selected. Historical compiler comparisons, NEON and SME losses remain scoped.
+Local delivery, complete cost/censoring tables and all resource accounting:
+`v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.

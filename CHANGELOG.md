@@ -3,6 +3,23 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## Remaining B4a native ECM request (9 November 2026)
+
+- Add opt-in post-unit-GCD yield coalescing and a source-bound 256-action
+  whole-native quantum. Select 256 for explicit scalar builds and retain 128
+  for pthreads, with the same time/cancellation/resource/publication checks.
+- Reuse exact native-root observation for metadata registration. Keep existing
+  once-owner validation and immutable registration; no numerical recipe changes.
+- Admit 1–10 pthread workers with explicit wide-count settings and full lifecycle
+  coverage. Bounded fixed-work tuning selects four/dynamic/chunk1/capacity32;
+  larger supported counts do not change automatic choices.
+- Test independent ordinary-GMP expression fusion, then remove the candidate
+  after inconclusive complete-cost results; preserve regression oracles/evidence.
+- Complete bounded native CPU/heap/FFI diagnostics, fresh conditional-input
+  cold/warm confirmation, cheap-path guards/costs and committed-only ordinary/
+  optional-limb QA. Retain failed searches, uncertainty, H3/B12 accounting
+  dependency and all historical charges. No merge, push or default changes.
+
 ## B4a Phase 2 component optimization (9 November 2026)
 
 - Prepare and validate out-of-line CFFI ABI descriptors during the explicit

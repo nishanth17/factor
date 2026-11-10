@@ -214,6 +214,16 @@ does not establish a free increase in B1.
   The rolling plan remains local at
   `v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`.
 
+- **Remaining native ECM REQUEST delivered — 9 November 2026:** overhead and
+  registration fixes, independent expression no-improvement decision, bounded
+  CPU/heap diagnostics, team tuning, fresh comparisons, cheap paths and final
+  committed-only QA are delivered. Explicit generic O2 ordinary GMP uses
+  coalesced yields, scalar 256/pthread 128 and four/dynamic/chunk 1/capacity 32.
+  Defaults stay unchanged. Censoring, unresolved balanced searches and H3/B12
+  child-accounting/integration dependencies remain explicit. This closes that
+  REQUEST; separate backend research/phases remain pending. Local delivery:
+  `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
+
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>
 

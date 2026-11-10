@@ -157,6 +157,16 @@ over Python. Phase 3 owns fresh adoption, worker/dispatch tuning and combined
 recalibration. No defaults, merge or push change. Current local handoff:
 `v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
 
+**Remaining B4a native ECM REQUEST delivered — 9 November 2026:** explicit
+coalesced unit yields, scalar 256/pthread 128, exact registration observation
+and four threads/dynamic/chunk 1/capacity 32 are selected. Bounded expression,
+profile/heap, team and fresh confirmation work is delivered with failed-search,
+80-digit warm and H3/B12 integration qualifications. Ordinary/optional-limb
+committed-only checks pass 1,756 tests (14 optional skips), lint and 309 benchmark imports;
+the failed limb cleanup receipt/charge has a validated completion supplement.
+Defaults are unchanged. Separate backend research/phases remain pending.
+Local delivery: `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
+
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
 [completed register](ROADMAP.md#completed-register) holds delivered milestones.

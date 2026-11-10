@@ -1,5 +1,20 @@
 # Benchmark results and decisions
 
+## Remaining B4a native ECM request (9 November 2026)
+
+The scoped explicit recipe uses generic O2/ordinary GMP, coalesced unit yields,
+scalar 256/pthread 128 and four threads/dynamic/chunk 1/capacity 32. Registration
+uses exact native-root observation. Independent GMP expression fusion supplies
+no useful complete-cost improvement and is removed; defaults are unchanged.
+
+Fresh conditional-input comparisons retain failed searches, uncertainty,
+observer-censored data and incomplete 80-digit warm confirmation. Explicit
+native cheap setup remains measurable; H3/B12 child accounting and combined
+integration tables require revalidation. No population/p90 or balanced
+completion pass follows. Both committed-only configurations pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb cleanup-monitor failure and full charge remain;
+a validated supplement verifies archived evidence and completes cleanup.
+Current tables and every charge: `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
+
 ## B4a Phase 2 component selection (9 November 2026)
 
 The optional native ECM branch retains corrected childless-root resource

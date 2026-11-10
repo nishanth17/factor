@@ -401,7 +401,7 @@ the full tree provider for children or custom resource views. Compiler options
 and the disabled limb-division experiment are documented in the native guide.
 The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
 yields within the same bounded slice while retaining checks and publication
-ordering. It is disabled by default pending continuation validation.
+ordering. It remains opt-in after the bounded continuation and fresh comparisons.
 These component experiments do not change automatic factoring selection.
 
 The opt-in pthread owner supports 1–10 threads. Counts outside 1, 2 and 4
@@ -410,4 +410,19 @@ Useful counts, scheduling, queue chunks and capacity require source-bound
 cost calibration; the larger supported range does not select a default.
 The independent `--extended-quantum` build experiment selects at most 256
 whole-native actions per slice with the same five-ms target and resource
-checks. It is disabled by default pending a complete-cost screen.
+checks. The selected explicit scalar build uses 256; the selected pthread
+build keeps 128. Both build defaults remain unchanged.
+
+## Remaining native ECM delivery (9 November 2026)
+
+The explicit recipe uses coalesced unit yields, scalar 256 actions and pthread
+128 actions, with four workers/dynamic/chunk 1/capacity 32. Native registration
+uses the existing exact root-observation bridge; mathematical work, resource
+checks, publication and resume remain intact. Defaults are unchanged.
+
+Fresh comparisons retain uncertainty, failed searches and incomplete 80-digit
+warm confirmation. Existing explicit-native cold cheap-path setup remains;
+keep default Python exits. H3/B12 child accounting and combined integration
+need revalidation. Committed-only ordinary/optional-limb checks pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb cleanup-monitor failure and its charge are
+retained with a validated completion supplement. See the
+[build, ownership and evidence guide](ecm/native/README.md).

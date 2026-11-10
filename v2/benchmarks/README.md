@@ -871,3 +871,20 @@ are component screens, not fresh full-factor adoption evidence. Phase 3 owns
 worker/dispatch tuning and recalibration. Literal freezes, complete cost tables,
 observer preflights, stopped stages and all charges remain local at
 `v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
+
+### Remaining B4a native ECM request (9 November 2026)
+
+`ecm/b4a/complete_batch.py` compares Python, scalar GMP, real B12 processes
+and persistent pthreads. Fixed-work tuning uses 37 curves with uneven tails;
+fresh calls stop at split or quota. Cold includes startup/preparation/shutdown;
+warm retains declared owners and records close wall separately. CPU includes
+threads once and live/reaped children. Censored work receives no affected ratio.
+
+The scoped explicit choice is generic O2/ordinary GMP with coalesced unit yields,
+scalar 256/pthread 128, and four threads/dynamic/chunk 1/capacity 32. Versioned
+inputs are `inputs/corpora/b4a_remaining_native_confirmation_v1.json` and the
+disjoint `b4a_remaining_native_pilot_v1.json`. Certificates validate outputs
+outside the engine. Conditional 3/6/9-input comparisons, cheap-path costs,
+full QA, precise H3/B12 dependency and all failures/charges remain local at
+`v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`. No default, population
+or balanced-completion adoption is implied.
