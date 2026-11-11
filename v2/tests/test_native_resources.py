@@ -70,7 +70,9 @@ class NativeResourceTests(unittest.TestCase):
             / "benchmarks/ecm/b4a/resource_query_probe.c"
         )
         prefix = Path(manifest["gmp_prefix"])
-        with tempfile.TemporaryDirectory(prefix="b4a-resource-proof-") as folder:
+        with tempfile.TemporaryDirectory(
+            prefix="b4a-resource-proof-"
+        ) as folder:
             binary = Path(folder) / "probe"
             command = [
                 manifest["command"][0], "-std=c11", "-O2", "-Wall",
@@ -79,7 +81,9 @@ class NativeResourceTests(unittest.TestCase):
                 str(probe), "-I" + str(prefix / "include"),
                 "-L" + str(prefix / "lib"), "-lgmp", "-o", str(binary),
             ]
-            subprocess.run(command, check=True, capture_output=True, timeout=20)
+            subprocess.run(
+                command, check=True, capture_output=True, timeout=20
+            )
             subprocess.run([str(binary)], check=True, timeout=3)
 
     def test_exact_fields_and_expected_birth(self):
