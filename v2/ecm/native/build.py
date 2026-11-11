@@ -114,7 +114,7 @@ def main():
     ffi.cdef(
         "unsigned b4_wide_remainder(void); "
         "unsigned b4_abi(void); unsigned b4_openmp(void); "
-        "unsigned b4_pthread(void); "
+        "unsigned b4_pthread(void); unsigned b4_team_max_workers(void); "
         "const char *b4_gmp_version(void);"
     )
     lib = ffi.dlopen(str(library))
@@ -123,6 +123,7 @@ def main():
             raise RuntimeError("built ECM packet has an incompatible ABI")
         gmp_runtime = ffi.string(lib.b4_gmp_version()).decode("ascii")
         wide_gmp_remainder = bool(lib.b4_wide_remainder())
+        native_team_max_workers = int(lib.b4_team_max_workers())
         if bool(lib.b4_openmp()) != (args.openmp_prefix is not None):
             raise RuntimeError(
                 "built ECM team capability differs from request"
@@ -143,6 +144,7 @@ def main():
     builder.emit_python_code(str(binding))
     manifest = dict(
         abi=1,
+        native_team_max_workers=native_team_max_workers,
         backend="pthread"
         if args.pthread
         else ("openmp" if args.openmp_prefix is not None else "scalar"),

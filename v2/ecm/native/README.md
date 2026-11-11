@@ -1,6 +1,6 @@
 # Optional ordinary-GMP ECM packets and pthread slices
 
-Pthread owners accept 1–10 threads; higher-level worker settings require
+Pthread owners accept 1–16 threads; higher-level worker settings require
 `allow_wide_workers=True` for counts outside 1, 2 and 4. The fixed handle and
 argument arrays, startup-failure injection and cancellation barriers cover
 this range. Capacity remains at most 32 contexts, with the same 128-action,
@@ -160,7 +160,7 @@ concurrent operations on one dependent curve point. Immutable program data may
 be shared. The C entry checks distinct contexts; every job has private mutable
 GMP state. Dynamic scheduling uses a bounded shared atomic chunk index; static
 scheduling assigns cyclic chunks to fixed thread ranks. Supported workers are
-1..10 (with explicit wide-worker admission above),
+1..16 (with explicit wide-worker admission above),
 `schedule="dynamic"/"static"`, and `chunk_size=1..32`. The ready capacity
 is 1..32, default `2*workers`. Correctness covers chunks 1/3, uneven tails,
 fewer jobs than threads, empty queues and repeated dispatch. No performance
@@ -308,7 +308,7 @@ The explicit recipe retains generic O2/ordinary GMP and exact root checks,
 with coalesced unit yields, scalar 256 actions and pthread 128 actions.
 Registration uses the same exact root transport. Independent GMP expression
 fusion did not establish useful improvement and was removed. Defaults stay
-unchanged; 1–10-thread admission does not select automatic worker counts.
+unchanged; 1–16-thread admission does not select automatic worker counts.
 
 Build the selected scalar and pthread pair explicitly, under the shared lock:
 
@@ -390,3 +390,10 @@ recovery, cheap guards, exactness and CPU/heap/JIT attribution are documented in
 `v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`. Fresh 3F is frozen and
 unexecuted. The measured 5.5% deep warm pthread/entry point effect has an
 individual model interval; it is not a general factorization/default claim.
+
+The current whole-owner capability is checked against the build manifest and
+`b4_team_max_workers()`. The legacy stage-one `b4_team_step` control retains
+its explicit1/2/4count contract. `NativeTeam.worker_activity()` reads idle-only
+per-rank identities and task/curve counters; sampled explanatory thread clocks
+are opt-in and excluded from clean comparisons. Process CPU already includes
+all native threads; these diagnostic values are not added to H3 accounting.

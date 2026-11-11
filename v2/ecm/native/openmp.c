@@ -75,7 +75,7 @@ static void pause_briefly(void) {
 }
 
 void b4_omp_wait(b4_omp_team *t, unsigned waiting) {
-    if (!t || !waiting || waiting > 10) return;
+    if (!t || !waiting || waiting > B4_NATIVE_MAX_WORKERS) return;
     while (atomic_load(&t->entered) < waiting && !atomic_load(&t->cancelled))
         pause_briefly();
 }
@@ -109,7 +109,7 @@ int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
                 unsigned *actual_workers) {
     if (actual_workers) *actual_workers = 0;
     if (!t || !actual_workers || count > 32 ||
-        (count && (!contexts || !statuses)) || !workers || workers > 10 ||
+        (count && (!contexts || !statuses)) || !workers || workers > B4_NATIVE_MAX_WORKERS ||
         schedule > 1 || !chunk || chunk > 32 || !milliseconds || milliseconds > 5 ||
         !actions || actions > b4_slice_actions() || omp_get_level()) return -1;
     unsigned inactive = 0;

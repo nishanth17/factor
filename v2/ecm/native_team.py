@@ -4,11 +4,17 @@ import threading
 
 from ..execution.budget import BudgetExhaustedError
 from ..execution.resources import removed_arguments
-from .native_packet import RESERVE, NativePacket, ProgramStore, poll_budget
+from .native_packet import (
+    NATIVE_MAX_WORKERS,
+    RESERVE,
+    NativePacket,
+    ProgramStore,
+    poll_budget,
+)
 
 SCHEDULES = {"dynamic": 0, "static": 1}
 MAX_TASKS = 32
-MAX_WORKERS = 10
+MAX_WORKERS = NATIVE_MAX_WORKERS
 TEAM_OVERHEAD = 64 * 2**20
 _PROCESS_TEAM_LOCK = threading.Lock()
 
@@ -34,7 +40,7 @@ class NativeTeam:
         self, *, workers=2, schedule="dynamic", capacity=8, chunk_size=1
     ):
         if type(workers) is not int or not 1 <= workers <= MAX_WORKERS:
-            raise ValueError("native pthread team supports 1..10 workers")
+            raise ValueError("native pthread team supports 1..16 workers")
         if schedule not in SCHEDULES:
             raise ValueError("unknown native team schedule")
         if type(capacity) is not int or not 1 <= capacity <= MAX_TASKS:
@@ -223,6 +229,63 @@ class NativeTeam:
                 if packet._lock.locked():
                     packet.end()
             _PROCESS_TEAM_LOCK.release()
+            self.lock.release()
+
+    def worker_activity(self):
+        """Read identities and task counters only after all borrowers drain."""
+        if not self.lock.acquire(blocking=False):
+            raise RuntimeError("native team is active")
+        try:
+            if self.closed or self.owner is None:
+                return dict(actual=0, entered_mask=0, workers=[])
+            actual = int(self.actual[0])
+            if self.variant == "openmp":
+                mask = int(self.lib.b4_omp_participants(self.owner))
+                return dict(
+                    actual=actual,
+                    entered_mask=mask,
+                    identity_kind="openmp-rank-including-caller",
+                    workers=[dict(identity=i) for i in range(actual)],
+                )
+            actual = int(self._native_counter(self.owner, 0)) - int(
+                self._native_counter(self.owner, 1)
+            )
+            query = self.lib.b4_pthread_diagnostic
+            values = [
+                [int(query(self.owner, rank, field)) for field in range(15)]
+                for rank in range(actual)
+            ]
+            if any(value == 2**64 - 1 for row in values for value in row):
+                raise RuntimeError("native worker metrics are unavailable")
+            return dict(
+                actual=actual,
+                entered_mask=int(self.lib.b4_pthread_participants(self.owner)),
+                identity_kind="opaque-pthread-token",
+                workers=[
+                    dict(identity=row[14], tasks=row[12], curves=row[13])
+                    for row in values
+                ],
+                sampled=values,
+                aggregate=[
+                    int(query(self.owner, MAX_WORKERS, field))
+                    for field in range(7)
+                ],
+            )
+        finally:
+            self.lock.release()
+
+    def measure_workers(self, enabled):
+        """Toggle sampled clocks, disabled during normal dispatch."""
+        if type(enabled) is not bool or self.variant != "pthread":
+            raise ValueError("worker clocks require a Boolean pthread setting")
+        if not self.lock.acquire(blocking=False):
+            raise RuntimeError("native team is active")
+        try:
+            if self.closed or self.owner is None:
+                raise RuntimeError("native team is not prepared")
+            if self.lib.b4_pthread_measure(self.owner, int(enabled)):
+                raise RuntimeError("native team is active")
+        finally:
             self.lock.release()
 
     def _before_close(self):

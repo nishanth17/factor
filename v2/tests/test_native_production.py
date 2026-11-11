@@ -229,6 +229,22 @@ class NativeProductionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.call(other, checkpoint=checkpoint)
 
+    def test_extended_openmp_counts_preserve_results_and_participation(self):
+        for count in (8, 10, 12, 14, 16):
+            with self.subTest(workers=count):
+                settings = WorkerSettings(
+                    workers=count, allow_wide_workers=True
+                )
+                with OpenMPExecutor(seed=73, settings=settings) as owner:
+                    run = self.call(owner)
+                    self.assertEqual(run.result.reconstruct(), N)
+                    self.assertEqual(owner.team.actual[0], count)
+                    activity = owner.team.worker_activity()
+                    self.assertEqual(
+                        activity["entered_mask"], (1 << count) - 1
+                    )
+                    self.assertEqual(len(activity["workers"]), count)
+
     def test_openmp_explicit_start_uses_the_selected_runtime(self):
         with OpenMPExecutor(
             seed=73, settings=WorkerSettings(workers=4)

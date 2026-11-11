@@ -13,7 +13,7 @@ from unittest.mock import patch
 from v2.ecm import core
 from v2.ecm.chains import ChainPlan
 from v2.ecm.native_curve import NativeCurvePacket
-from v2.ecm.native_curve_team import NativeCurveTeam
+from v2.ecm.native_curve_team import NativeCurveTeam, OpenMPCurveTeam
 from v2.ecm.native_packet import SOURCE
 from v2.ecm.native_team import TeamRefusedError
 from v2.execution import stage_jobs
@@ -534,7 +534,7 @@ class WholeScalarTests(unittest.TestCase):
     "pthread native build required",
 )
 class WholeThreadTests(unittest.TestCase):
-    def environment(self, workers=10):
+    def environment(self, workers=16):
         config = selected("c-gmp-full", 31, 233)
         budget = deterministic_budget()
         context, programs = _execution_context({}, config, budget)
@@ -546,10 +546,84 @@ class WholeThreadTests(unittest.TestCase):
         job = stage_jobs.new_job("ecm", 2**199 - 189, 7, 31, 233)
         return config, budget, source, team, job
 
+    def test_extended_openmp_canonical_fixture_actions(self):
+        for case in json.loads(FIXTURES.read_text())["cases"]:
+            expected, trace, _ = drive(case, "python")
+            for count in (8, 10, 12, 14, 16):
+                with self.subTest(case=case["id"], workers=count):
+                    config = selected("c-gmp-full", case["b1"], case["b2"])
+                    budget = deterministic_budget()
+                    context, programs = _execution_context({}, config, budget)
+                    source = programs or context
+                    team = OpenMPCurveTeam(workers=count)
+                    team.atomic_actions = True
+                    job = stage_jobs.new_job(
+                        "ecm", case["n"], case["seed"], case["b1"], case["b2"]
+                    )
+                    observed = []
+                    try:
+                        for _ in range(10000):
+                            team.advance_jobs(
+                                [(0, job)], budget, source, config
+                            )
+                            info = team.bindings[0]._read()
+                            if info.boundary or info.done:
+                                observed.append(signature(job))
+                            if job["done"]:
+                                break
+                        else:
+                            self.fail("OpenMP fixture did not complete")
+                        self.assertEqual(job, expected)
+                        self.assertEqual(observed, trace)
+                        self.assertEqual(
+                            team.worker_activity()["entered_mask"],
+                            (1 << count) - 1,
+                        )
+                    finally:
+                        team.close()
+                        close_execution_context(source)
+
+    def test_extended_count_bounds_and_actual_workers(self):
+        for count in (0, 17, -1, True, 8.0):
+            with self.subTest(invalid=count):
+                with self.assertRaises(ValueError):
+                    NativeCurveTeam(workers=count)
+        for count in (8, 10, 12, 14, 16):
+            with self.subTest(workers=count):
+                config, budget, source, team, job = self.environment(count)
+                self.assertEqual(
+                    team.lib.b4_pthread_inject(team.owner, 16, -1, 0), -1
+                )
+                for _ in range(10000):
+                    team.advance_jobs([(0, job)], budget, source, config)
+                    if job["done"]:
+                        break
+                else:
+                    self.fail("undersupplied team did not complete")
+                team.bindings[0].sync(allow_result=True)
+                activity = team.worker_activity()
+                self.assertEqual(activity["actual"], count)
+                self.assertEqual(activity["entered_mask"], (1 << count) - 1)
+                ids = [row["identity"] for row in activity["workers"]]
+                self.assertEqual(len(set(ids)), count)
+                self.assertTrue(all(ids))
+                self.assertEqual(
+                    sum(row["curves"] for row in activity["workers"]), 1
+                )
+                self.assertEqual(
+                    job,
+                    drive(dict(n=job["n"], seed=7, b1=31, b2=233), "python")[
+                        0
+                    ],
+                )
+                team.close()
+                self.assertEqual(team.lifecycle[:2], (count, count))
+
     def test_partial_startup_worker_and_metadata_failures_drain(self):
         for create_at, job_at, error in (
             (0, -1, TeamRefusedError),
             (2, -1, TeamRefusedError),
+            (15, -1, TeamRefusedError),
             (-1, 0, RuntimeError),
         ):
             config, budget, source, team, job = self.environment()
@@ -557,6 +631,10 @@ class WholeThreadTests(unittest.TestCase):
             with self.assertRaises(error):
                 team.advance_jobs([(0, job)], budget, source, config)
             self.assertFalse(job["done"])
+            if create_at >= 0:
+                self.assertEqual(team.bindings[0]._read().setup_ops, 0)
+                self.assertEqual(team.lib.b4_pthread_counter(team.owner, 2), 0)
+                self.assertEqual(team.worker_activity()["actual"], 0)
             team.lib.b4_pthread_inject(team.owner, -1, -1, 0)
             for _ in range(10000):
                 team.advance_jobs([(0, job)], budget, source, config)
@@ -732,7 +810,7 @@ class WholeThreadTests(unittest.TestCase):
         config = replace(
             selected("c-gmp-full", 11, 47), ecm_tiers=((11, 47, 32),)
         )
-        for workers in (1, 2, 4, 6, 8, 10):
+        for workers in (1, 2, 4, 6, 8, 10, 12, 14, 16):
             settings = WorkerSettings(
                 workers=workers,
                 allow_wide_workers=workers not in (1, 2, 4),
@@ -768,7 +846,7 @@ class WholeThreadTests(unittest.TestCase):
     ):
         for case in json.loads(FIXTURES.read_text())["cases"]:
             expected, trace, _ = drive(case, "python")
-            for workers in (1, 2, 4, 6, 8, 10):
+            for workers in (1, 2, 4, 6, 8, 10, 12, 14, 16):
                 for schedule in ("static", "dynamic"):
                     for chunk in (1, 3):
                         with self.subTest(
@@ -923,7 +1001,7 @@ class WholeThreadTests(unittest.TestCase):
             )
         finally:
             control.close()
-        for workers in (1, 2, 4, 6, 8, 10):
+        for workers in (1, 2, 4, 6, 8, 10, 12, 14, 16):
             for schedule in ("static", "dynamic"):
                 owner = NativeECMExecutor(
                     seed=73,

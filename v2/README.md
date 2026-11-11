@@ -413,8 +413,12 @@ yields within the same bounded slice while retaining checks and publication
 ordering. It remains opt-in after the bounded continuation and fresh comparisons.
 These component experiments do not change automatic factoring selection.
 
-The opt-in pthread owner supports 1–10 threads. Counts outside 1, 2 and 4
+The opt-in pthread owner supports 1–16 threads. Counts outside 1, 2 and 4
 also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
+Build manifests verify the native sixteen-thread capability. Counts remain
+explicit; saved execution recipes reject unsupported changes. Idle-only
+`worker_activity()` reports identities and completed tasks. Optional sampled
+worker clocks are disabled in clean execution and never add CPU to H3 charges.
 Useful counts, scheduling, queue chunks and capacity require source-bound
 cost calibration; the larger supported range does not select a default.
 The renewed 37-curve `(11000, 1100000, 37)` comparison supports explicit

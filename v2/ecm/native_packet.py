@@ -11,6 +11,7 @@ from ..common.arithmetic import BackendUnavailableError
 from ..execution.resources import removed_arguments
 from .chain_records import verify_frontier
 
+NATIVE_MAX_WORKERS = 16
 ABI = 1
 IDENTITY = "b4a-c-gmp-packet-v1"
 RESERVE = 2 * 2**20
@@ -125,6 +126,13 @@ class NativePacket:
         if self._binding is not None:
             budget.consume(4096)
             ffi, lib, manifest = self._binding
+            maximum = 0 if self.variant == "scalar" else NATIVE_MAX_WORKERS
+            if (
+                type(manifest.get("native_team_max_workers")) is not int
+                or manifest["native_team_max_workers"] != maximum
+                or int(lib.b4_team_max_workers()) != maximum
+            ):
+                raise ValueError("native team-count capability mismatch")
             self._allocate(ffi, lib, manifest)
             return True
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (

@@ -92,3 +92,27 @@ class NativeBindingTests(unittest.TestCase):
                 self.assertIsNone(packet.context)
             finally:
                 packet.close()
+
+    def test_changed_team_count_capability_refuses_in_auto_mode(self):
+        manifest = json.loads((SOURCE / "build/manifest.json").read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory)
+            for name in manifest["source"]:
+                shutil.copy2(SOURCE / name, target / name)
+            build = target / "build"
+            build.mkdir()
+            for name in (
+                "libfactor_ecm.dylib",
+                manifest["abi_binding"]["file"],
+            ):
+                shutil.copy2(SOURCE / "build" / name, build / name)
+            manifest["native_team_max_workers"] = 17
+            (build / "manifest.json").write_text(json.dumps(manifest))
+            packet = NativePacket(mode="auto")
+            try:
+                with patch.object(native_packet, "SOURCE", target):
+                    with self.assertRaisesRegex(ValueError, "team-count"):
+                        packet.available(1013, deterministic_budget())
+                self.assertIsNone(packet.context)
+            finally:
+                packet.close()

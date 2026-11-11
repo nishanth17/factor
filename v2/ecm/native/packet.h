@@ -2,6 +2,7 @@
 #ifndef FACTOR_ECM_PACKET_H
 #define FACTOR_ECM_PACKET_H
 #include <stddef.h>
+#define B4_NATIVE_MAX_WORKERS 16
 
 typedef struct b4_context b4_context;
 typedef struct { const unsigned char *data; size_t size; } b4_value;
@@ -18,6 +19,7 @@ typedef struct {
 } b4_output;
 
 unsigned b4_abi(void);
+unsigned b4_team_max_workers(void);
 unsigned b4_limb_division(void);
 unsigned b4_wide_remainder(void);
 unsigned b4_coalesced_unit_yields(void);
@@ -69,6 +71,13 @@ int b4_pthread_shutdown(b4_pthread_team *team);
 void b4_pthread_destroy(b4_pthread_team *team);
 /* Creates, joins, dispatched generations and worker generation entries. */
 unsigned long long b4_pthread_counter(b4_pthread_team *team, unsigned kind);
+/* Idle-only metrics. Fields0..11 retain the validated sampled-clock layout;
+ * 12=completed slice tasks,13=completed curves,14=opaque pthread identity.
+ * rank==B4_NATIVE_MAX_WORKERS selects aggregate diagnostic fields. */
+unsigned long long b4_pthread_diagnostic(b4_pthread_team *team,
+                                         unsigned rank, unsigned field);
+int b4_pthread_measure(b4_pthread_team *team, unsigned enabled);
+unsigned b4_pthread_participants(b4_pthread_team *team);
 void b4_pthread_cancel(b4_pthread_team *team);
 int b4_pthread_reset(b4_pthread_team *team);
 /* Dynamic=0, static cyclic chunks=1. Each generation drains before return;
@@ -84,7 +93,8 @@ int b4_pthread_inject(b4_pthread_team *team, int create_at, int job_at,
                       unsigned pause);
 void b4_pthread_wait(b4_pthread_team *team, unsigned waiting);
 void b4_pthread_release(b4_pthread_team *team);
-/* schedule: 0=dynamic,1=static,2=guided, all chunk1. Scalar builds refuse.
+/* Legacy stage-one control: only1/2/4workers. Whole owners use the APIs above.
+ * schedule: 0=dynamic,1=static,2=guided, all chunk1. Scalar builds refuse.
  * All contexts must be distinct. Return only after the OpenMP region drains.
  * -2=team unavailable/size mismatch, -1=invalid, 0=checked statuses written.
  */
