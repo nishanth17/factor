@@ -8,6 +8,14 @@ and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 10 November 2026 (America/Los_Angeles).
 
+**B4a3P — active production integration and tuning,10November2026.**
+Entry `4f30d87` includes the H3 accounting repair and native CPU-unit adapter.
+The request authorizes production owner/portfolio integration, accounting
+admission, clean cold/warm controls, post-integration CPU/heap work, bounded
+recalibration and a committed-only QA/3F handoff. The staged plan is
+`v2/benchmarks/ecm/b4a/PRODUCTION_3P_PLAN.md`. New phase ceilings and historical
+charges are separate under `v2/audit/b4a/production_3p_20261110/`.
+
 **B4a native backend phase — delivered 10 November 2026.**
 Real whole-curve OpenMP is admitted and compared with matched LLVM pthreads;
 existing pthread signaling and explicit four/dynamic/chunk 1/capacity 32 remain
