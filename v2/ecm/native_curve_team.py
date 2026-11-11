@@ -65,7 +65,9 @@ class NativeCurveTeam(NativeTeam):
             if not jobs or len(jobs) > self.capacity:
                 raise ValueError("whole native curve queue exceeds capacity")
             poll_native_budget(budget, self)
-            self._grow(self.capacity, jobs[0][1]["n"], budget)
+            # Capacity is a ceiling, not a preparation request. Retain prior
+            # contexts, but allocate new private scratch only for live jobs.
+            self._grow(len(jobs), jobs[0][1]["n"], budget)
             if self._native_reset(self.owner):
                 raise RuntimeError("whole native pthread owner is active")
             positions = {position for position, _ in jobs}

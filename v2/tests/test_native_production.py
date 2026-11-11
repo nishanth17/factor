@@ -3,6 +3,7 @@
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -112,6 +113,51 @@ class NativeProductionTests(unittest.TestCase):
                         for event in run.events
                     )
                 )
+
+    def test_private_contexts_grow_on_demand_and_survive_quota_changes(self):
+        for kind in (NativeECMExecutor, OpenMPExecutor):
+            with kind(
+                seed=73, settings=WorkerSettings(workers=4), capacity=32
+            ) as owner:
+                retained = []
+                for curves, expected in (
+                    (3, 3),
+                    (9, 9),
+                    (3, 9),
+                    (37, 32),
+                    (9, 32),
+                ):
+                    config = replace(
+                        configuration(), ecm_tiers=((31, 233, curves),)
+                    )
+                    run = factorize_bounded(
+                        N,
+                        seed=73,
+                        config=config,
+                        budget=deterministic_budget(),
+                        ecm_executor=owner,
+                        qs_workers=None,
+                    )
+                    self.assertEqual(run.result.reconstruct(), N)
+                    self.assertFalse(run.result.complete)
+                    packets = owner.team.packets
+                    self.assertEqual(len(packets), expected)
+                    self.assertEqual(packets[: len(retained)], retained)
+                    self.assertEqual(
+                        len(
+                            {
+                                int(
+                                    owner.team.ffi.cast("uintptr_t", p.context)
+                                )
+                                for p in packets
+                            }
+                        ),
+                        expected,
+                    )
+                    retained = list(packets)
+                team = owner.team
+            self.assertEqual(team.packets, [])
+            self.assertEqual(team.blocks.used, 0)
 
     def test_portfolio_interruption_reopens_same_backend_and_rejects_another(
         self,
