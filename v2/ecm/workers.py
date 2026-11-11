@@ -298,7 +298,6 @@ class ECMExecutor:
                     for name in names:
                         os.environ[name] = "1"
                     process.start()
-                    self._budget.track_process(process)
                 except BaseException:
                     parent.close()
                     child.close()
@@ -324,6 +323,8 @@ class ECMExecutor:
                     index=index,
                 )
                 self.slots.append(slot)
+                # A failed CPU preflight still leaves an owned worker to drain.
+                self._budget.track_process(process)
                 pending.append((slot, startup, end))
 
             while pending:

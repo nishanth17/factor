@@ -1,5 +1,6 @@
 """One observed resource owner shared by stages and recursive children."""
 
+import errno
 import itertools
 import math
 import os
@@ -12,6 +13,7 @@ from ..common import utils
 from .resources import (
     DEFAULT_RSS,
     RESOURCE_VERSION,
+    ProcessObservationDeniedError,
     RemovedResourceLimitError,
     ResourceProviderError,
     default_provider,
@@ -118,6 +120,9 @@ class Budget:
         self._process_identities = {}
         self._live_identities = {}
         self._children = {}
+        self._descendants = {}
+        self._reaped_cpu = {}
+        self._settled = set()
         self._child_cpu = 0.0
         self._last_sample = None
         self.observed_rss = 0
@@ -144,7 +149,13 @@ class Budget:
         self._cpu_start = read_clock(self._cpu_clock, "CPU")
         self._active = True
         self._last_sample = None
-        self._sample(baseline=True)
+        self._descendants.clear()
+        self._reaped_cpu.clear()
+        try:
+            self._sample(baseline=True)
+        except BaseException:
+            self._active = False
+            raise
         return self
 
     @synchronized
@@ -201,6 +212,8 @@ class Budget:
         validate_seconds(cpu_total, "child CPU")
         if cpu_total is None:
             raise ResourceProviderError("invalid observed child CPU")
+        if identity in self._settled:
+            return
         previous = self._children.get(identity)
         if baseline or previous is None:
             previous = cpu_total if baseline else 0.0
@@ -208,8 +221,40 @@ class Budget:
         self._child_cpu += current - previous
         self._children[identity] = current
 
+    def _departed_cpu(self, identity):
+        """Lifetime CPU already represented by missing direct subtrees."""
+        total = 0.0
+        for child in self._descendants.get(identity, ()):
+            if self._live_identities.get(child[0]) == child:
+                continue
+            baseline, reaped, _ = self._reaped_cpu.get(child, (0, 0, 0))
+            total += self._children[child] + max(
+                reaped, baseline + self._departed_cpu(child)
+            )
+        return total
+
+    def _observe_reaped(self, identity, total, *, baseline=False):
+        validate_seconds(total, "reaped child CPU")
+        if total is None:
+            raise ResourceProviderError("invalid reaped child CPU")
+        initial, previous, charged = self._reaped_cpu.get(
+            identity, (0.0, 0.0, 0.0)
+        )
+        if baseline:
+            self._reaped_cpu[identity] = (total, total, 0.0)
+            return
+
+        # A parent's reaped total includes the entire lifetime of each child,
+        # even when only part of that lifetime belonged to this call.
+        if total <= previous:
+            return
+        uncovered = total - initial - self._departed_cpu(identity)
+        current = max(charged, uncovered)
+        self._child_cpu += current - charged
+        self._reaped_cpu[identity] = (initial, total, current)
+
     @synchronized
-    def _sample(self, *, force=False, baseline=False):
+    def _sample(self, *, force=False, baseline=False, retained_pid=None):
         if self.provider is None:
             return
         now = self._wall_clock()
@@ -230,7 +275,11 @@ class Budget:
                 self.roots[sample.pid] = sample.birth
             binding = self._process_bindings.get(sample.pid)
             identity = (sample.pid, sample.birth)
-            if binding is not None and binding[1] != identity:
+            if (
+                binding is not None
+                and isinstance(binding[1][1], tuple)
+                and binding[1] != identity
+            ):
                 # A child may finish exec before libproc first observes it.
                 # Move its report counter to the now-known birth identity;
                 # otherwise report -> sample -> exit could bill it twice.
@@ -241,10 +290,29 @@ class Budget:
                 binding[1] = identity
                 self._process_identities[sample.pid] = identity
         self.observed_rss = sum(sample.rss for sample in samples)
+        retained = set()
         for sample in samples:
+            if sample.pid == os.getpid():
+                continue
+            identity = (sample.pid, sample.birth)
+            if sample.pid == retained_pid or sample.parent in retained:
+                retained.add(identity)
+            if sample.parent is not None and sample.parent[0] != os.getpid():
+                self._descendants.setdefault(sample.parent, set()).add(
+                    identity
+                )
+            self.observe_child(
+                identity, sample.cpu, baseline=baseline or identity in retained
+            )
+        # Update descendant counters before reconciling rollups. Providers
+        # enumerate each parent before its children.
+        for sample in reversed(samples):
             if sample.pid != os.getpid():
-                self.observe_child(
-                    (sample.pid, sample.birth), sample.cpu, baseline=baseline
+                identity = (sample.pid, sample.birth)
+                self._observe_reaped(
+                    identity,
+                    sample.reaped_cpu,
+                    baseline=baseline or identity in retained,
                 )
         self._last_sample = now
 
@@ -321,17 +389,22 @@ class Budget:
         self.record_charges(**values)
         return dict(resource_version=RESOURCE_VERSION, **values)
 
+    @synchronized
     def acknowledge(self, pid, cpu_total):
         """Reconcile a process-lifetime acknowledgment with OS samples."""
         self._sample(force=True)
-        identity = self._process_identities.get(pid)
-        if identity is None:
-            identity = self._live_identities.get(pid)
+        binding = self._process_bindings.get(pid)
+        identity = (
+            binding[1]
+            if binding is not None
+            else self._live_identities.get(
+                pid, self._process_identities.get(pid)
+            )
+        )
         if identity is None:
             raise RuntimeError("CPU report from an unregistered process")
         self.observe_child(identity, cpu_total)
 
-    @synchronized
     def track_process(self, process):
         """Retain final wait4 usage through this owned Popen's sole reaper.
 
@@ -342,77 +415,130 @@ class Budget:
         or multiprocessing runtime is modified.
         """
         popen = process._popen
-        existing = getattr(popen, "_factor_accounting", None)
-        self.register(process.pid)
-        self._sample(force=True)
-        identity = (
-            existing[1]
-            if existing is not None
-            else self._live_identities.get(
-                process.pid,
-                (process.pid, ("unobserved", next(_PROCESS_REGISTRATIONS))),
-            )
+        reap_lock = popen.__dict__.setdefault(
+            "_factor_reap_lock", threading.RLock()
         )
+        with reap_lock, self._accounting_lock:
+            self._track_process(popen, process.pid, reap_lock)
+
+    def _track_process(self, popen, pid, reap_lock):
+        existing = getattr(popen, "_factor_accounting", None)
+        if popen.returncode is None:
+            birth = None if existing is None else existing[1][1]
+            self.roots[pid] = None if isinstance(birth, tuple) else birth
+        retained_pid = None
+        if (
+            existing is not None
+            and existing[0] is not self
+            and existing[1] not in self._children
+            and popen.returncode is None
+        ):
+            # A retained process can be reachable only by its explicit
+            # registration. Its first reading is still a handover baseline.
+            retained_pid = pid
+        if popen.returncode is None:
+            self._sample(force=True, retained_pid=retained_pid)
+            if retained_pid is not None and pid not in self._live_identities:
+                if self._last_sample is not None:
+                    raise ResourceProviderError(
+                        f"retained CPU baseline unavailable for PID {pid}"
+                    )
+                # Without a live sampling provider, carry forward the last
+                # counter received from the retained process itself.
+                previous_owner, key = existing
+                self._children[key] = previous_owner._children[key]
+        identity = existing[1] if existing is not None else None
+        if identity is None or isinstance(identity[1], tuple):
+            identity = self._live_identities.get(pid, identity)
+        if identity is None:
+            identity = (pid, ("unobserved", next(_PROCESS_REGISTRATIONS)))
         if existing is not None:
             previous_owner = existing[0]
             if previous_owner is not self:
-                previous_owner.roots.pop(process.pid, None)
-                previous_owner._process_bindings.pop(process.pid, None)
+                previous_owner.roots.pop(pid, None)
+                previous_owner._process_bindings.pop(pid, None)
             if popen.returncode is not None:
                 # An idle exit predates this new active interval.
-                self._children.setdefault(
-                    identity, previous_owner._children.get(identity, 0.0)
-                )
+                self._settled.add(identity)
             existing[0], existing[1] = self, identity
             binding = existing
         else:
             self._children.setdefault(identity, 0.0)
             binding = [self, identity]
             popen._factor_accounting = binding
-        self._process_identities[process.pid] = identity
-        self._process_bindings[process.pid] = binding
-        if popen.returncode is not None:
-            self.roots.pop(process.pid, None)
+        self._process_identities[pid] = identity
+        if popen.returncode is None:
+            self._process_bindings[pid] = binding
         if existing is not None:
             return
-
-        reap_lock = threading.RLock()
 
         def poll(flag=os.WNOHANG):
             with reap_lock:
                 if popen.returncode is not None:
                     return popen.returncode
-                owner, key = binding
+                owner = binding[0]
                 peek = getattr(owner.provider, "peek_exit", None)
+                final = None
+                denial = failure = None
                 try:
-                    final = None if peek is None else peek(popen.pid, flag)
-                    if peek is not None and final is None:
-                        return None
+                    if peek is not None:
+                        try:
+                            final = peek(popen.pid, flag)
+                        except ProcessObservationDeniedError as error:
+                            # wait4 still provides a verified inclusive total
+                            # for this exact Popen, in seconds.
+                            denial = error
+                        except ResourceProviderError as error:
+                            # waitid already found the zombie. Preserve the
+                            # sole reaper's cleanup before reporting failure.
+                            failure = error
+                        else:
+                            if final is None:
+                                return None
                     pid, status, usage = os.wait4(popen.pid, flag)
                 except OSError as error:
-                    if error.errno == 10:
+                    if denial or failure:
+                        raise (denial or failure) from error
+                    if error.errno == errno.ECHILD:
                         return popen.returncode
                     raise
                 if pid == popen.pid:
                     with owner._accounting_lock:
-                        if final is not None:
-                            identity = (final.pid, final.birth)
-                            if identity != key:
-                                previous = owner._children.pop(key, 0.0)
-                                owner._children[identity] = max(
-                                    previous,
-                                    owner._children.get(identity, 0.0),
-                                )
-                                binding[1] = key = identity
-                            total = final.cpu
-                        else:
-                            total = usage.ru_utime + usage.ru_stime
-                        owner.observe_child(
-                            key, total, baseline=not owner._active
-                        )
                         owner.roots.pop(popen.pid, None)
                         owner._process_bindings.pop(popen.pid, None)
                         popen.returncode = os.waitstatus_to_exitcode(status)
+                        if failure is not None:
+                            raise failure
+                        owner._settle_process(
+                            binding, final, usage.ru_utime + usage.ru_stime
+                        )
+                elif denial or failure:
+                    raise denial or failure
                 return popen.returncode
 
         popen.poll = poll
+
+    def _settle_process(self, binding, final, inclusive_cpu):
+        key = binding[1]
+        if final is not None:
+            identity = (final.pid, final.birth)
+            if identity != key:
+                if final.pid != key[0] or not isinstance(key[1], tuple):
+                    raise ResourceProviderError(
+                        "process birth changed before reap"
+                    )
+                self._children[identity] = self._children.pop(key, 0.0)
+                self._process_identities[final.pid] = identity
+                binding[1] = key = identity
+            self.observe_child(key, final.cpu, baseline=not self._active)
+            reaped = final.reaped_cpu
+        else:
+            # The inclusive counter covers any unobserved self CPU as well as
+            # descendants. Settle that tail together and seal the identity.
+            reaped = max(0.0, inclusive_cpu - self._children[key])
+
+        if self._active and key in self._descendants:
+            # The last live snapshot can still list a now-reaped child.
+            self._sample(force=True)
+        self._observe_reaped(key, reaped, baseline=not self._active)
+        self._settled.add(key)

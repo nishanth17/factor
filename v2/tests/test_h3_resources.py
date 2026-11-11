@@ -1,14 +1,17 @@
 """Deterministic resource ownership; no elapsed-time assertions."""
 
+import errno
 import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.resources import (
+    ProcessObservationDeniedError,
     ProcessSample,
     RemovedResourceLimitError,
     atomic_save,
@@ -1184,22 +1187,107 @@ class DeadlineContinuationTests(unittest.TestCase):
 
 
 class FinalCpuTests(unittest.TestCase):
-    def test_final_self_cpu_does_not_add_descendant_usage_twice(self):
-        from types import SimpleNamespace
+    def test_rollup_charges_only_unobserved_tail_across_retained_call(self):
+        for denied in (False, True):
+            for observe_rollup in (False, True):
+                with self.subTest(denied=denied, live_rollup=observe_rollup):
+                    self.check_nested_settlement(denied, observe_rollup)
 
+    def check_nested_settlement(self, denied, observe_rollup):
+        provider = Provider()
+        process = SimpleNamespace(
+            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
+        )
+        root = provider.rows[0]
+        provider.rows += [
+            ProcessSample(123, 10, 100, 8, 6),
+            ProcessSample(456, 11, 100, 2, parent=(123, 10)),
+        ]
+        options = dict(
+            provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
+        )
+        first = Budget(**options)
+        first.track_process(process)
+        first.close()
+
+        owner = Budget(cpu_seconds=5, **options)
+        owner.track_process(process)
+        owner.acknowledge(123, 8)
+        self.assertEqual(owner.cpu_used, 0)
+        provider.rows = [
+            root,
+            ProcessSample(123, 10, 100, 9, 6),
+            ProcessSample(456, 11, 100, 4, parent=(123, 10)),
+        ]
+        owner.acknowledge(123, 9)
+        owner.acknowledge(123, 8)
+        owner.acknowledge(123, 9)
+        self.assertEqual(owner.cpu_used, 3)
+        owner.consume(1)
+
+        # The leaf used 5 seconds in total. Its first 4 were sampled
+        # (2 before the call); another unsampled child used 1 second.
+        if observe_rollup:
+            provider.rows = [root, ProcessSample(123, 10, 100, 9, 12)]
+            with self.assertRaisesRegex(
+                BudgetExhaustedError, "cpu_limit"
+            ) as stop:
+                owner.publication()
+            self.assertEqual(stop.exception.payload["observed"], 5)
+        self.assertEqual(owner.used, 1)
+
+        # Final observations may come before another live sample. Include
+        # one more second each of worker CPU and unseen descendant CPU.
+        def peek(pid, flag):
+            if denied:
+                raise ProcessObservationDeniedError(
+                    "proc_pid_rusage", pid, errno.EPERM
+                )
+            return ProcessSample(pid, 10, 0, 10, 13)
+
+        provider.peek_exit = peek
+        provider.rows = [root]
+        rolled = SimpleNamespace(ru_utime=20, ru_stime=3)
+        with patch("os.wait4", return_value=(123, 0, rolled)) as wait:
+            self.assertEqual(process._popen.poll(), 0)
+            self.assertEqual(process._popen.poll(), 0)
+            wait.assert_called_once_with(123, os.WNOHANG)
+        owner.acknowledge(123, 10)
+        owner.acknowledge(123, 9)
+        owner.close()
+        self.assertEqual(owner.cpu_used, 7)
+        self.assertEqual(first.cpu_used, 0)
+
+    def test_parent_rollup_arriving_after_leaf_disappears_keeps_charge(self):
         provider = Provider()
         owner = Budget(
             provider=provider, wall_clock=lambda: 0, cpu_clock=lambda: 0
         )
-        provider.rows.extend(
-            (ProcessSample(123, 10, 100, 3), ProcessSample(456, 11, 100, 7))
-        )
-        process = SimpleNamespace(
-            pid=123, _popen=SimpleNamespace(pid=123, returncode=None)
-        )
-        owner.track_process(process)
-        provider.peek_exit = lambda pid, flag: ProcessSample(pid, 10, 0, 5)
-        rolled = SimpleNamespace(ru_utime=10, ru_stime=2)
-        with patch("os.wait4", return_value=(123, 0, rolled)):
-            self.assertEqual(process._popen.poll(), 0)
-        self.assertEqual(owner.cpu_used, 12)
+        root = provider.rows[0]
+        parent = ProcessSample(123, 10, 100, 3)
+        provider.rows += [
+            parent,
+            ProcessSample(456, 11, 100, 7, parent=(123, 10)),
+        ]
+        owner.publication()
+        self.assertEqual(owner.cpu_used, 10)
+        provider.rows = [root, parent]
+        owner.publication()
+        self.assertEqual(owner.cpu_used, 10)
+        provider.rows[-1] = ProcessSample(123, 10, 100, 3, 8)
+        owner.publication()
+        self.assertEqual(owner.cpu_used, 11)
+
+    def test_live_access_denial_stops_before_charging_work(self):
+        provider = Provider()
+        owner = Budget(provider=provider)
+        with patch.object(
+            provider,
+            "sample",
+            side_effect=ProcessObservationDeniedError(
+                "proc_pid_rusage", 123, errno.EPERM
+            ),
+        ):
+            with self.assertRaises(ProcessObservationDeniedError):
+                owner.publication()
+        self.assertEqual(owner.used, 0)
