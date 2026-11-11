@@ -102,3 +102,23 @@ Builds, worker tests, heavy QA and timing use nonblocking exclusive flock on
 When busy, analyze captures or edit; never poll or sleep-wait for availability.
 Before long runs, state the question and decision; report the first informative
 result. Commit owned changes and stop at the tuning handoff.
+
+## B15a deltas within this continuation
+
+The source audit at `ef0c6b0` supplies hypotheses, not runtime acceptance.
+Its relevant findings are phased in the local
+`v2/audit/b4a/post_integration_tuning_20261110/B15A_PHASE_DELTA.md`.
+At entry, bind the exact interpreter, arithmetic image, native build and retained
+runtime-map evidence. During CPU/heap investigation, distinguish existing ARM
+basecase arithmetic from avoidable normalization, alias scratch, copies and
+ordinary reduction in the current representation. Optimize demonstrated costs
+and validate each kept change at matching canonical per-curve checkpoints.
+
+New residue representations/reducers remain C5.M; deeper chains, formula
+packages and continuations remain B3a/F2/C2/F3. Capture their relevant cost signals
+and hand off precise consumer requirements without expanding this execution.
+Retain pthread unless a kept change materially changes synchronization/grain.
+Before a revised 3F freeze, refresh affected attribution and state every relevant
+delta's implemented, rejected, inconclusive or cross-owner disposition.
+This documentation amendment creates no new runs, resource allowance, default,
+merge or push authority; issued freezes and earlier charges remain unchanged.
