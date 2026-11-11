@@ -254,15 +254,24 @@ class NativeResourceTests(unittest.TestCase):
             # Full-suite multiprocessing helpers may remain live. Prove the
             # childless fast path in its own interpreter rather than weakening
             # that assertion or rejecting the correct full-tree fallback.
+            test = (
+                "v2.tests.test_native_resources.NativeResourceTests."
+                "test_actual_os_fields_match_original_usage_units"
+            )
+            script = "\n".join((
+                "from pathlib import Path",
+                "import unittest",
+                "from v2.ecm import native_packet",
+                "native_packet.SOURCE = Path(" + repr(str(SOURCE)) + ")",
+                "suite = unittest.defaultTestLoader.loadTestsFromName("
+                + repr(test) + ")",
+                "result = unittest.TextTestRunner().run(suite)",
+                "assert result.testsRun == 1 and not result.skipped",
+                "raise SystemExit(not result.wasSuccessful())",
+            ))
             result = subprocess.run(
-                [
-                    sys.executable,
-                    "-B",
-                    "-m",
-                    "unittest",
-                    "v2.tests.test_native_resources.NativeResourceTests."
-                    "test_actual_os_fields_match_original_usage_units",
-                ],
+                [sys.executable, "-B", "-c", script],
+                cwd=Path(__file__).resolve().parents[2],
                 env=dict(os.environ, FACTOR_RESOURCE_TEST_CHILD="1"),
                 capture_output=True,
                 text=True,
