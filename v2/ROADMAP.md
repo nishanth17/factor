@@ -271,6 +271,16 @@ does not establish a free increase in B1.
 
 ### B4a — optional coarse native ECM
 
+- **Active tuning continuation:** from `2b46e3f`, analyze raw CPU/heap evidence,
+  fill attribution/ownership gaps and implement measured B4a improvements.
+  The contract from `8fc233b` requires ranked active/self/inclusive CPU,
+  allocation churn/lifetimes and retained ownership, then exact admission,
+  clean remeasurement and refreshed attribution. Initial summaries and one
+  allocation fix do not close this exit. GMP call patterns and required resource
+  checks may have cheaper exact implementations; C5 retains new reducers.
+  See `benchmarks/ecm/b4a/POST_INTEGRATION_TUNING_PLAN.md`. Preserve historical
+  3P evidence and revise 3F under a new identity only after this continuation.
+
 - **3P delivered:** explicit scalar/pthread/OpenMP production owner, portfolio,
   publication and checked checkpoint/replay paths. H3 repair `98bf836` and
   native-unit adapter `4f30d87` are included. OpenMP remains an explicit optional

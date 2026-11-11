@@ -7,6 +7,15 @@ C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 10 November 2026 (America/Los_Angeles).
 
+**B4a post-integration tuning continuation — active.**
+Entry `2b46e3f` preserves the delivered 3P scope and its historical freeze.
+The new request and roadmap contract `8fc233b` require deeper CPU/heap ownership,
+allocation/JIT evidence and measured optimization before a revised 3F freeze.
+The committed execution plan is
+`v2/benchmarks/ecm/b4a/POST_INTEGRATION_TUNING_PLAN.md`.
+New receipts and the separate cumulative allowance live under
+`v2/audit/b4a/post_integration_tuning_20261110/`.
+
 **B4a 3P — delivered production integration and tuning.**
 Entry `4f30d87` includes repaired H3 accounting. Explicit scalar/pthread/OpenMP
 owners use the real portfolio, publication and checked replay paths. Private
