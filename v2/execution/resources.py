@@ -46,12 +46,27 @@ class ResourceProviderError(RuntimeError):
     """An OS resource observation failed; the guard remains enabled."""
 
 
+class ProcessObservationDeniedError(ResourceProviderError):
+    """libproc denied access to an owned process."""
+
+    def __init__(self, operation, pid, error):
+        super().__init__(f"{operation}({pid}): {error} ({os.strerror(error)})")
+
+
 @dataclass(frozen=True)
 class ProcessSample:
+    """Lifetime self and reaped-descendant CPU in seconds, with birth IDs."""
+
     pid: int
     birth: int
     rss: int
     cpu: float
+    reaped_cpu: float = 0.0
+    parent: tuple | None = None
+
+
+class _Timebase(ctypes.Structure):
+    _fields_ = [("numer", ctypes.c_uint32), ("denom", ctypes.c_uint32)]
 
 
 class _RUsage(ctypes.Structure):
@@ -68,6 +83,14 @@ class _RUsage(ctypes.Structure):
             "physical",
             "start",
             "exit",
+            "child_user",
+            "child_system",
+            "child_idle",
+            "child_interrupt",
+            "child_pageins",
+            "child_elapsed",
+            "disk_read",
+            "disk_written",
         )
     ]
 
@@ -118,12 +141,61 @@ class MacResources:
             ctypes.c_int,
         ]
         self.system.waitid.restype = ctypes.c_int
+        self.system.mach_timebase_info.argtypes = [ctypes.POINTER(_Timebase)]
+        self.system.mach_timebase_info.restype = ctypes.c_int
+        timebase = _Timebase()
+        if (
+            self.system.mach_timebase_info(ctypes.byref(timebase))
+            or not timebase.numer
+            or not timebase.denom
+        ):
+            raise ResourceProviderError("invalid Mach CPU timebase")
+        self._cpu_numer = timebase.numer
+        self._cpu_denom = timebase.denom * 1_000_000_000
+
+    def _usage(self, pid, *, final=False):
+        usage = _RUsage()
+        if self.lib.proc_pid_rusage(pid, 2, ctypes.byref(usage)):
+            error = ctypes.get_errno()
+            if error == errno.ESRCH and not final and pid != os.getpid():
+                return None
+            self._proc_error("proc_pid_rusage", pid, error)
+        return usage
+
+    @staticmethod
+    def _proc_error(operation, pid, error):
+        if error in (errno.EPERM, errno.EACCES):
+            raise ProcessObservationDeniedError(operation, pid, error)
+        raise ResourceProviderError(f"{operation}({pid}): {error}")
+
+    def _sample_usage(self, pid, usage, *, parent=None, final=False):
+        # Mach absolute ticks cover the entire process, including its threads.
+        return ProcessSample(
+            pid,
+            usage.start,
+            0 if final or usage.exit else usage.resident,
+            (usage.user + usage.system) * self._cpu_numer / self._cpu_denom,
+            (usage.child_user + usage.child_system)
+            * self._cpu_numer
+            / self._cpu_denom,
+            parent,
+        )
+
+    def _child_pids(self, pid, buffer, size):
+        ctypes.set_errno(0)
+        count = self.lib.proc_listchildpids(pid, buffer, size)
+        error = ctypes.get_errno()
+        if count <= 0 and error == errno.ESRCH:
+            return 0
+        if count < 0 or (count == 0 and error):
+            self._proc_error("proc_listchildpids", pid, error)
+        return count
 
     def peek_exit(self, pid, flag):
         """Read final self CPU before the sole reaper consumes the zombie.
 
         macOS wait4 rolls reaped descendant CPU into its returned rusage.
-        libproc V0 retains self CPU separately, including for zombies.
+        libproc V2 splits self and reaped descendant CPU, even for zombies.
         WNOWAIT leaves reaping and status ownership with the original Popen.
         """
         info = _SigInfo()
@@ -133,11 +205,8 @@ class MacResources:
             raise OSError(error, os.strerror(error))
         if info.pid == 0:
             return None
-        usage = _RUsage()
-        if self.lib.proc_pid_rusage(pid, 0, ctypes.byref(usage)):
-            raise ResourceProviderError("final proc_pid_rusage failed")
-        return ProcessSample(
-            pid, usage.start, 0, (usage.user + usage.system) / 1_000_000_000
+        return self._sample_usage(
+            pid, self._usage(pid, final=True), final=True
         )
 
     def physical_memory(self):
@@ -150,18 +219,18 @@ class MacResources:
         return value.value
 
     def sample(self, roots):
-        pending, seen, result = list(roots), set(), []
+        # Read each ancestor before enumerating its children. A child already
+        # rolled into the ancestor's CPU cannot then appear as a live child.
+        pending = [(pid, None) for pid in roots]
+        seen, result = set(), []
         while pending:
-            pid = pending.pop()
+            pid, parent = pending.pop()
             if pid in seen:
                 continue
             seen.add(pid)
-            usage = _RUsage()
-            if self.lib.proc_pid_rusage(pid, 0, ctypes.byref(usage)):
-                error = ctypes.get_errno()
-                if error == errno.ESRCH:
-                    continue
-                raise ResourceProviderError(f"proc_pid_rusage({pid}): {error}")
+            usage = self._usage(pid)
+            if usage is None:
+                continue
             if isinstance(roots, dict):
                 expected_birth = roots.get(pid)
                 if (
@@ -169,32 +238,20 @@ class MacResources:
                     and expected_birth != usage.start
                 ):
                     continue
-            result.append(
-                ProcessSample(
-                    pid,
-                    usage.start,
-                    0 if usage.exit else usage.resident,
-                    (usage.user + usage.system) / 1_000_000_000,
-                )
-            )
+            result.append(self._sample_usage(pid, usage, parent=parent))
             # Size can change between calls. Retry with the returned size;
             # this grows an observation buffer, never a production quota.
-            size = self.lib.proc_listchildpids(pid, None, 0)
-            if size < 0:
-                raise ResourceProviderError(
-                    f"proc_listchildpids({pid}) failed"
-                )
+            size = self._child_pids(pid, None, 0)
             while size:
                 children = (ctypes.c_int * (size + 1))()
-                count = self.lib.proc_listchildpids(
+                count = self._child_pids(
                     pid, children, ctypes.sizeof(children)
                 )
-                if count < 0:
-                    raise ResourceProviderError(
-                        f"proc_listchildpids({pid}) failed"
-                    )
                 if count < len(children):
-                    pending.extend(children[:count])
+                    identity = (pid, usage.start)
+                    pending.extend(
+                        (child, identity) for child in children[:count]
+                    )
                     break
                 size = count + 1
         return result

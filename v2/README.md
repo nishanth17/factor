@@ -137,7 +137,10 @@ macOS uses libproc through ctypes to sum current RSS over the owned process tree
 The parent is included; shared pages can be counted multiple times. Samples run
 at entry and publication boundaries. Ordinary cooperative polls throttle
 sampling to once per 50 ms; a long atomic operation can delay the next sample. Allocations, native operations and active worker stages can
-overshoot the guard. Provider failures are explicit errors.
+overshoot the guard. Denied live libproc observations raise
+`ProcessObservationDeniedError`. If the final libproc query is denied, the
+worker's reaper uses `wait4` CPU seconds. Retained workers start from their
+current lifetime counter, including a separate baseline for reaped descendants.
 
 Only root wall, aggregate CPU, observed RSS and an optional checkpoint save cap
 refuse resources. Internal stores, graphs, matrices and scratch grow as needed.

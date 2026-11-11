@@ -1,5 +1,8 @@
 """Same-counter RSS observation, portable fallback and native failures."""
 
+import ctypes
+import errno
+import os
 import resource
 import sys
 import unittest
@@ -8,6 +11,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from v2.benchmarks.support.resources import PeakRSSReader
+from v2.execution.resources import (
+    MacResources,
+    ProcessObservationDeniedError,
+    ProcessSample,
+)
 
 
 class ResourceReaderTests(unittest.TestCase):
@@ -65,3 +73,69 @@ class ResourceReaderTests(unittest.TestCase):
         reader._native = fail
         with self.assertRaisesRegex(OSError, "resource query failed"):
             reader()
+
+
+class MacCpuReaderTests(unittest.TestCase):
+    def setUp(self):
+        self.pid = os.getpid()
+        self.reader = MacResources.__new__(MacResources)
+        self.reader._cpu_numer = 125
+        self.reader._cpu_denom = 3_000_000_000
+        self.reader.system = SimpleNamespace(waitid=self.waitid)
+        self.reader.lib = SimpleNamespace(
+            proc_pid_rusage=self.rusage,
+            proc_listchildpids=lambda *args: 0,
+        )
+
+    def waitid(self, kind, pid, info, flags):
+        self.assertEqual(
+            (kind, pid, flags), (1, self.pid, 4 | 32 | os.WNOHANG)
+        )
+        info._obj.pid = pid
+        return 0
+
+    def rusage(self, pid, version, pointer):
+        self.assertEqual((pid, version), (self.pid, 2))
+        usage = pointer._obj
+        usage.start = 42
+        usage.resident = 2048
+        usage.user, usage.system = 3_000_000, 3_000_000
+        usage.child_user, usage.child_system = 12_000_000, 0
+        return 0
+
+    def test_live_and_final_use_same_seconds_conversion(self):
+        self.assertEqual(
+            self.reader.sample({self.pid: 42}),
+            [ProcessSample(self.pid, 42, 2048, 0.25, 0.5)],
+        )
+        self.assertEqual(
+            self.reader.peek_exit(self.pid, os.WNOHANG),
+            ProcessSample(self.pid, 42, 0, 0.25, 0.5),
+        )
+        self.assertEqual(self.reader.sample({self.pid: 43}), [])
+
+    def test_live_preflight_and_final_report_access_denial(self):
+        def denied(*args):
+            ctypes.set_errno(errno.EPERM)
+            return -1
+
+        self.reader.lib.proc_pid_rusage = denied
+        for observe in (
+            lambda: self.reader.sample([self.pid]),
+            lambda: self.reader.peek_exit(self.pid, os.WNOHANG),
+        ):
+            with self.assertRaisesRegex(
+                ProcessObservationDeniedError, f"proc_pid_rusage.*{self.pid}"
+            ):
+                observe()
+
+    def test_empty_child_list_cannot_hide_access_denial(self):
+        def denied(*args):
+            ctypes.set_errno(errno.EPERM)
+            return 0
+
+        self.reader.lib.proc_listchildpids = denied
+        with self.assertRaisesRegex(
+            ProcessObservationDeniedError, f"proc_listchildpids.*{self.pid}"
+        ):
+            self.reader.sample([self.pid])

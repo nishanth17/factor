@@ -134,10 +134,18 @@ A shared retained context admits one active call at a time.
 
 Import `Budget` from `v2.execution.budget`, and `RemovedResourceLimitError`,
 `UnsupportedResourceVersionError`, `AllocationFailureError`,
-`UnsupportedEncodingError`, `ResourceProviderError` and `atomic_save` from
+`UnsupportedEncodingError`, `ResourceProviderError`,
+`ProcessObservationDeniedError` and `atomic_save` from
 `v2.execution.resources`. Resource stops carry `reason`, `limit`, `observed`
 (or `requested`), `limit_value` and `scope`; factoring run results expose
 `resource_stop`. Cancellation and finite numerical exhaustion remain separate.
+
+On macOS, live CPU/RSS access denial raises `ProcessObservationDeniedError`
+before publication. The worker's owning reaper can settle a denied final
+libproc query using the inclusive CPU from `wait4`. Process CPU includes
+native thread CPU. Sampled limits can overshoot between observations, and
+brief descendants are visible in reaped CPU only if an observed worker
+reaps them.
 
 A retained `Budget` starts with an active interval. `close()` settles it;
 `start()` resumes accounting while excluding idle intervals. Public factoring

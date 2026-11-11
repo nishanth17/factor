@@ -145,6 +145,13 @@ below record decisions in their dated scope; later entries may supersede routes.
   `40d2367`. No performance evidence or retuning is added; dependent costs
   require revalidation.
 
+## H3 child CPU accounting (10 November 2026)
+
+- Convert macOS libproc CPU to seconds with the Mach timebase. Retained
+  workers exclude pre-call CPU and settle reaped descendant increments once.
+- Raise a named error on denied live observations. If libproc denies the
+  final zombie query, settle with the owning reaper's inclusive wait4 usage.
+
 ## Experimental QS integration with H3 (8 November 2026)
 
 - Integrate local master into the isolated A7a branch. Replace current-worker

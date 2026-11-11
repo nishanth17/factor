@@ -4,8 +4,11 @@ import itertools
 import json
 import multiprocessing
 import os
+import resource
 import subprocess
 import sys
+import threading
+import time
 import unittest
 from dataclasses import replace
 from math import isqrt
@@ -14,7 +17,7 @@ from unittest.mock import patch
 from v2.benchmarks.infrastructure.resource_control import (
     adapt_resource_configuration,
 )
-from v2.execution.budget import BudgetExhaustedError
+from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.ecm_worker import CurveEngine
 from v2.execution.ecm_worker_state import DecodedPrograms
 from v2.execution.ecm_workers import ECMExecutor, arithmetic_options
@@ -448,3 +451,124 @@ class PackedBackingTests(unittest.TestCase):
         base = WorkerSettings()
         extra = WorkerSettings(packed_cache_bytes=2**20)
         self.assertEqual(extra.owned_bytes - base.owned_bytes, 2 * 2**20)
+
+
+def _burn_cpu(seconds):
+    start = time.process_time()
+    while time.process_time() - start < seconds:
+        pass
+
+
+def _receive(connection):
+    if not connection.poll(10):
+        raise TimeoutError("CPU accounting test phase timed out")
+    return connection.recv()
+
+
+def _cpu_leaf(channel):
+    burner = threading.Thread(target=_burn_cpu, args=(0.12,))
+    burner.start()
+    burner.join()
+    channel.send(time.process_time())
+    if _receive(channel) != "exit":
+        raise ValueError("expected leaf exit")
+    _burn_cpu(0.04)
+
+
+def _cpu_worker(channel):
+    with channel:
+        _burn_cpu(0.15)
+        channel.send(time.process_time())
+        if _receive(channel) != "second":
+            raise ValueError("expected second call")
+        ctx = multiprocessing.get_context("spawn")
+        worker_start = time.process_time()
+        monitor, peer = ctx.Pipe()
+        leaf = ctx.Process(target=_cpu_leaf, args=(peer,))
+        with monitor, peer:
+            leaf.start()
+            peer.close()
+            try:
+                leaf_live = _receive(monitor)
+                _burn_cpu(0.06)
+                channel.send((leaf.pid, leaf_live, time.process_time()))
+                if _receive(channel) != "reap":
+                    raise ValueError("expected leaf reap")
+                monitor.send("exit")
+                leaf.join(10)
+                if leaf.exitcode != 0:
+                    raise RuntimeError("leaf failed to exit")
+            finally:
+                if leaf.is_alive():
+                    leaf.kill()
+                    leaf.join(10)
+                leaf.close()
+        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+        channel.send((worker_start, usage.ru_utime + usage.ru_stime))
+        if _receive(channel) != "exit":
+            raise ValueError("expected worker exit")
+        _burn_cpu(0.06)
+        channel.send(time.process_time())
+
+
+@unittest.skipUnless(sys.platform == "darwin", "requires macOS libproc")
+class RetainedWorkerCpuTests(unittest.TestCase):
+    def test_second_call_charges_live_and_reaped_descendant_once(self):
+        ctx = multiprocessing.get_context("spawn")
+        monitor, peer = ctx.Pipe()
+        worker = ctx.Process(target=_cpu_worker, args=(peer,))
+        # Isolate child charges from the observing test process's CPU.
+        first = Budget(rss_bytes=None, cpu_clock=lambda: 0)
+        with monitor, peer:
+            worker.start()
+            peer.close()
+            try:
+                first.track_process(worker)
+                first_report = _receive(monitor)
+                first.acknowledge(worker.pid, first_report)
+                first.close()
+
+                second = Budget(rss_bytes=None, cpu_clock=lambda: 0)
+                second.track_process(worker)
+                second.acknowledge(worker.pid, first_report)
+                # Two clocks bracket pipe handoffs. Allow 30 ms for their CPU
+                # and bookkeeping, well below either burn or a double charge.
+                tolerance = 0.03
+                self.assertAlmostEqual(second.cpu_used, 0, delta=tolerance)
+                monitor.send("second")
+                leaf_pid, leaf_live, worker_live = _receive(monitor)
+                second.acknowledge(worker.pid, worker_live)
+                self.assertIn(leaf_pid, second._live_identities)
+                self.assertAlmostEqual(
+                    second.cpu_used,
+                    worker_live - first_report + leaf_live,
+                    delta=tolerance,
+                )
+
+                monitor.send("reap")
+                worker_start, leaf_final = _receive(monitor)
+                second.publication()
+                self.assertNotIn(leaf_pid, second._live_identities)
+                self.assertAlmostEqual(
+                    second.cpu_used,
+                    worker_live - worker_start + leaf_final,
+                    delta=tolerance,
+                )
+                monitor.send("exit")
+                worker_final = _receive(monitor)
+                worker.join(10)
+                self.assertEqual(worker.exitcode, 0)
+                second.close()
+                self.assertAlmostEqual(
+                    second.cpu_used,
+                    worker_final - worker_start + leaf_final,
+                    delta=tolerance,
+                )
+            finally:
+                # Closing the pipe also releases a child stalled at a phase.
+                monitor.close()
+                worker.join(10)
+                if worker.is_alive():
+                    worker.kill()
+                    worker.join(10)
+                worker.close()
