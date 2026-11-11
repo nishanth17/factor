@@ -167,3 +167,21 @@ Re-rank after each measured result and prospectively allocate any further
 justified work from verified unissued balances. Preserve failed attempts and
 uncertainty. No profiling of every configuration or blind extension of a failed
 comparison. Generic O2 and the existing pthread recipe remain controls.
+
+## Native count extension: 8/10/12/14/16 (11 November 2026)
+
+New authorized protocol from `ed139a1`; historical results and charges remain
+separate. Audit and extend both native caps safely to 16, preserve H3 and saved
+recipes, then admit exactness/lifecycle before timing. Keep pthread arithmetic,
+O2/coalescing, dynamic one-curve chunks, team 128 actions and capacity 32 fixed.
+Compare retained failed-search 60/80/100 inputs on 37 and 64 curves, cold and
+retained warm owners, counterbalanced with contemporaneous 8/10 and A/A.
+Use validated bounded counters and thermal records, then at most two supported
+oversubscribed finalists on disjoint inputs. Full committed-only QA and handoff
+finish the request. No OpenMP performance race, defaults, routing or 3F execution.
+
+New ceilings: screen/diagnostics/finalists 1800 wall /14400 CPU; builds/QA
+1800/7200; total3600/21600,8GiBowned-tree RSS and128MiBnew captures. Prediction,
+finite stages and immutable freezes live in
+`v2/audit/b4a/oversubscription_20261111/`. Losing or inconclusive results complete
+the screen; a thread count is not selected merely from its point estimate.

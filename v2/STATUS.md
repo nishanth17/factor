@@ -7,6 +7,11 @@ C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
 
+**B4a native oversubscription screen — active.**
+New protocol from `ed139a1` extends count support and compares 8/10/12/14/16
+under separate finite allowances. Historical tuning and charges stay unchanged.
+Current entry: `v2/audit/b4a/oversubscription_20261111/`. No defaults or 3F run.
+
 **B4a renewed CPU/heap tuning — delivered.**
 Entry `e8abaa7`; implementation `08d4689`, stable build identity `8263fbe`.
 Shared immutable cursor indexing removes per-curve copies; pthread notifications
