@@ -785,6 +785,84 @@ class WholeThreadTests(unittest.TestCase):
                                 team.lifecycle[:2], (workers, workers)
                             )
 
+    def test_second_tier_logical_cancel_preserves_completed_prefix(self):
+        from v2.ecm.workers import ECMExecutor
+
+        config = replace(
+            selected("c-gmp-full", 31, 233),
+            ecm_tiers=((31, 233, 3), (43, 331, 5)),
+        )
+        n = 2**199 - 189
+        cancelled = [False]
+        owner = NativeECMExecutor(
+            seed=73, settings=WorkerSettings(workers=4), capacity=4
+        )
+        advance = NativeCurveTeam.advance_jobs
+
+        def stop_after_second_tier_generation(team, jobs, *args):
+            ready = advance(team, jobs, *args)
+            if jobs[0][1]["b1"] == 43:
+                cancelled[0] = True
+            return ready
+
+        try:
+            budget = deterministic_budget()
+            budget.cancelled = lambda: cancelled[0]
+            with patch.object(
+                NativeCurveTeam, "advance_jobs",
+                stop_after_second_tier_generation,
+            ):
+                paused = owner.run(
+                    n, config=config, budget=budget, fixed_work=True
+                )
+            self.assertEqual(paused.reason, "cancelled")
+            prefix = paused.checkpoint["payload"]["completed"]
+            self.assertEqual(list(prefix), ["0", "1", "2"])
+            self.assertEqual(paused.stats["lost_chunks"], 4)
+            self.assertGreater(
+                paused.checkpoint["payload"]["budget"]["work"], 0
+            )
+
+            resumed = owner.run(
+                n, config=config, budget=deterministic_budget(),
+                checkpoint=json.loads(json.dumps(paused.checkpoint)),
+                fixed_work=True,
+            )
+            self.assertEqual(resumed.reason, "curves_exhausted")
+            self.assertEqual(
+                {
+                    k: resumed.checkpoint["payload"]["completed"][k]
+                    for k in prefix
+                },
+                prefix,
+            )
+            self.assertGreaterEqual(
+                resumed.checkpoint["payload"]["budget"]["work"],
+                paused.checkpoint["payload"]["budget"]["work"],
+            )
+        finally:
+            owner.close()
+
+        with ECMExecutor(
+            seed=73, settings=WorkerSettings(workers=1)
+        ) as control:
+            expected = control.run(
+                n, config=replace(config, ecm_kernel="python"),
+                budget=deterministic_budget(), fixed_work=True,
+            )
+        actual_rows = resumed.checkpoint["payload"]["completed"]
+        expected_rows = expected.checkpoint["search"]["payload"]["completed"]
+        self.assertEqual(
+            {
+                k: {field: row[field] for field in ("id", "sigma", "factor")}
+                for k, row in actual_rows.items()
+            },
+            {
+                k: {field: row[field] for field in ("id", "sigma", "factor")}
+                for k, row in expected_rows.items()
+            },
+        )
+
     def test_full_owner_matches_python_assignments_and_saved_history(self):
         from v2.ecm.workers import ECMExecutor
 

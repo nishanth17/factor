@@ -88,17 +88,20 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
         ]
         if factors:
             factor = factors[0]
+        # Completion only removes positions from this source-order queue.
+        # Avoid rebuilding equivalent integer/string membership data on every
+        # drained generation; a resumed owner starts from checked completions.
+        pending = [
+            position
+            for position in range(len(manifest.jobs))
+            if str(position) not in completed
+        ]
         while len(completed) < len(manifest.jobs) and not (
             factor is not None and not fixed_work
         ):
             poll_native_budget(budget, owner.team)
-            remaining = [
-                position
-                for position in range(len(manifest.jobs))
-                if str(position) not in completed
-            ]
-            tier = manifest.jobs[remaining[0]][0]
-            for position in remaining:
+            tier = manifest.jobs[pending[0]][0]
+            for position in pending:
                 if len(active) >= owner.capacity:
                     break
                 if position in active or manifest.jobs[position][0] != tier:
@@ -139,6 +142,7 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
                     reason="complete",
                 )
                 active.pop(position)
+                pending.remove(position)
                 if factor is None and job["factor"] is not None:
                     factor = job["factor"]
                 if factor is not None and not fixed_work:
