@@ -91,7 +91,6 @@ class NativeCurveTeam(NativeTeam):
                         job, budget, context, config
                     )
             prepared = [self.bindings[position] for position, _ in jobs]
-            settled = []
             for index, packet in enumerate(prepared):
                 if not packet.call_lock.acquire(blocking=False):
                     raise RuntimeError(
@@ -117,7 +116,7 @@ class NativeCurveTeam(NativeTeam):
                 # All workers have drained before foreign return, including
                 # signal reentry. Charge all peers before a cancellable poll.
                 for packet in prepared:
-                    settled.append(packet.settle(budget))
+                    packet.settle(budget)
             if status == -3:
                 raise BudgetExhaustedError("cancelled")
             if status == -2 or int(self.actual[0]) != self.workers:
@@ -133,21 +132,23 @@ class NativeCurveTeam(NativeTeam):
                 )
             poll_native_budget(budget, self)
             # Validate every ready divisor before any stable-order publication.
+            # Settlement filled each private info buffer after worker drain.
+            # Reuse it before feed mutates that context, avoiding another read.
             ready = []
             for index, ((position, job), packet) in enumerate(
                 zip(jobs, prepared)
             ):
                 if self.statuses[index] == 2:
-                    packet.feed(budget, _info=settled[index])
+                    packet.feed(budget, _info=packet.info[0])
                 elif self.statuses[index] == 1:
                     packet.sync(
                         allow_result=True,
                         compact=not self.atomic_actions,
-                        _info=settled[index],
+                        _info=packet.info[0],
                     )
                     ready.append((position, job))
                 elif self.atomic_actions:
-                    packet.sync(_info=settled[index])
+                    packet.sync(_info=packet.info[0])
             return ready
         finally:
             for packet in reversed(borrowed):
