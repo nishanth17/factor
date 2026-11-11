@@ -3,6 +3,19 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a production owner integration (10 November 2026)
+
+- Expose the optional whole-curve OpenMP owner through
+  `v2.execution.ecm_openmp`, the real bounded portfolio and checked
+  checkpoint/replay path. Keep the benchmark import as a compatibility alias.
+- Add native owner context-manager cleanup and production lifecycle coverage,
+  including unavailable builds, partial initialization and cancellation.
+- Allocate private native contexts for active jobs, retaining them for reuse
+  up to capacity. Preserve numerical manifests, publication and resource checks.
+- Keep automatic routing, numerical effort and defaults unchanged. Detailed
+  integrated costs, diagnostics, tuning and the separate fresh-confirmation
+  boundary are recorded under `v2/audit/b4a/production_3p_20261110/`.
+
 ## B4a native coordination/backend phase (10 November 2026)
 
 - Admit an explicitly selected benchmark whole-curve OpenMP owner with provided

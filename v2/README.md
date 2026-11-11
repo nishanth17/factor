@@ -12,9 +12,9 @@ Python 2 baseline.
 
 Optional [native scalar/pthread ECM](ecm/native/README.md) uses exact GMP
 behind explicit `c-gmp` or whole-curve `c-gmp-full` selection. Builds are explicit;
-factoring calls never compile. A benchmark-only whole-curve OpenMP challenger
-uses provided LLVM/libomp and static/dynamic worksharing; it is an alternative
-executor, with no automatic selection. The retained NEON prototype lost its
+factoring calls never compile. An explicit whole-curve OpenMP production owner
+uses provided LLVM/libomp and static/dynamic worksharing, with no automatic
+selection. The retained NEON prototype lost its
 scoped comparison and remains outside the executor.
 
 ## Setup and first run
@@ -456,3 +456,10 @@ LLVM/libomp. Use PASSIVE waiting, zero block time and dynamic teams disabled
 for the retained starting recipe. The backend/build identity binds resume.
 Missing builds raise when eligible ECM work engages. Cheap portfolio exits
 can complete before the optional backend is loaded.
+
+Team capacity limits concurrent curves. Private contexts grow with active
+jobs and remain available for reuse; a short request does not allocate the
+whole capacity. Changing the numerical manifest still replaces its team.
+Close releases owner contexts and metadata. OpenMP runtime threads and its
+loaded library have process lifetime. The legacy benchmark import
+`v2.benchmarks.ecm.b4a.omp_owner` re-exports the production owner.
