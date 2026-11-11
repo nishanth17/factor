@@ -74,11 +74,17 @@ class NativeCurveTeam(NativeTeam):
             for position in list(self.bindings):
                 if position not in positions:
                     self.bindings.pop(position).discard(sync=False)
-            available = [
-                p for p in self.packets if p not in self.bindings.values()
-            ]
+            available = None
             for position, job in jobs:
                 if position not in self.bindings:
+                    # Bound jobs retain their private contexts. Only a newly
+                    # admitted job needs the stable-order free-context scan.
+                    if available is None:
+                        available = [
+                            p
+                            for p in self.packets
+                            if p not in self.bindings.values()
+                        ]
                     packet = available.pop(0)
                     packet.atomic_actions, packet.phase_clocks = (
                         self.atomic_actions,
