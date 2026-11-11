@@ -90,11 +90,15 @@ def main():
             "-Wl,-rpath," + str(args.openmp_prefix / "lib"),
             "-lomp",
         ]
+    # ld otherwise embeds the absolute output path in LC_ID_DYLIB. Its length
+    # shifts instruction placement and confounds builds in different worktrees.
+    install_name = "@rpath/" + library.relative_to(source / "build").as_posix()
     command = [
         args.cc,
         *flags,
         *omp_flags,
         "-dynamiclib",
+        "-Wl,-install_name," + install_name,
         str(source / "packet.c"),
         str(source / "team.c"),
         str(source / "openmp.c"),
@@ -144,6 +148,7 @@ def main():
         else ("openmp" if args.openmp_prefix is not None else "scalar"),
         compiler=subprocess.check_output([args.cc, "--version"], text=True),
         command=command,
+        install_name=install_name,
         sysroot=None if args.sysroot is None else str(args.sysroot.resolve()),
         target=platform.machine(),
         platform=platform.platform(),
