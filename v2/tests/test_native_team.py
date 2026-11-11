@@ -62,7 +62,7 @@ class NativeTeamAdmissionTests(unittest.TestCase):
             NativeTeam(memory_bytes=TEAM_OVERHEAD)
         for options in (
             dict(workers=0),
-            dict(workers=11),
+            dict(workers=17),
             dict(workers=True),
             dict(schedule="auto"),
             dict(capacity=33),
