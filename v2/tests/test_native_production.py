@@ -245,6 +245,53 @@ class NativeProductionTests(unittest.TestCase):
                     )
                     self.assertEqual(len(activity["workers"]), count)
 
+    def test_extended_teams_execute_and_reuse_all_compute_ranks(self):
+        from v2.benchmarks.ecm.b4a.production_batch import ProductionSession
+
+        n = 440054034826859056921224347106145832973598799449799064289819
+        for role in ("pthread", "openmp"):
+            for count in (8, 10, 12, 14, 16):
+                with self.subTest(role=role, workers=count):
+                    session = ProductionSession()
+                    request = dict(
+                        role=role,
+                        workers=count,
+                        capacity=32,
+                        worker_settings=dict(allow_wide_workers=True),
+                        n=n,
+                        seed=73,
+                        b1=127,
+                        b2=4000,
+                        curves=37,
+                    )
+                    try:
+                        identities = None
+                        for repeat in range(2):
+                            result = session.call(request)
+                            self.assertIsNone(result["resource_stop"])
+                            self.assertEqual(result["completed_curves"], 37)
+                            self.assertEqual(result["remaining"], [n])
+                            activity = session.owner.team.worker_activity()
+                            self.assertEqual(activity["actual"], count)
+                            self.assertEqual(
+                                activity["entered_mask"], (1 << count) - 1
+                            )
+                            ranks = activity["workers"]
+                            current = [row["identity"] for row in ranks]
+                            self.assertEqual(len(set(current)), count)
+                            if identities is not None:
+                                self.assertEqual(current, identities)
+                            identities = current
+                            self.assertTrue(
+                                all(row["tasks"] > 0 for row in ranks)
+                            )
+                            self.assertEqual(
+                                sum(row["curves"] for row in ranks),
+                                37 * (repeat + 1),
+                            )
+                    finally:
+                        session.close()
+
     def test_openmp_explicit_start_uses_the_selected_runtime(self):
         with OpenMPExecutor(
             seed=73, settings=WorkerSettings(workers=4)
