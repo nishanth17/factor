@@ -259,6 +259,7 @@ int b4_curve_begin(b4_context *c, b4_value n, b4_value sigma,
         }
         for (unsigned i = 0; i < 7; ++i) mpz_realloc2(c->scratch[i], 4 * bits + 64);
         mpz_realloc2(c->a24, bits); mpz_realloc2(c->guard, 3 * bits + 64);
+        mpz_realloc2(c->wide_product, 4 * bits + 64);
         mpz_realloc2(c->scalar, 16384); c->capacity_bits = bits;
     }
     int status = curve_allocate(c);

@@ -32,7 +32,7 @@ static int curve_slice(b4_context *c, uint64_t wall_end, uint64_t cpu_end,
                         unsigned actions, const atomic_uint *cancel);
 
 struct b4_context {
-    mpz_t n, a24, scalar, x[POINTS], z[POINTS], scratch[7], guard;
+    mpz_t n, a24, scalar, x[POINTS], z[POINTS], scratch[7], guard, wide_product;
     unsigned char modulus_bytes[128], a24_bytes[128];
     size_t modulus_size, a24_size;
     const b4_record *records;
@@ -101,8 +101,11 @@ static unsigned modular_product(b4_context *c, mpz_ptr result,
         return 1;
     }
 #endif
-    mpz_mul(result, a, b);
-    mpz_mod(result, result, c->n);
+    /* The numerator is private to this nonreentrant context and never an
+     * exposed operand. Keep multiplication and reduction destinations separate
+     * without changing signed GMP arithmetic or the canonical remainder. */
+    mpz_mul(c->wide_product, a, b);
+    mpz_mod(result, c->wide_product, c->n);
     return 0;
 }
 
@@ -136,7 +139,7 @@ int b4_observe_root(int pid, b4_root_observation *output) {
 b4_context *b4_create(void) {
     b4_context *c = calloc(1, sizeof(*c));
     if (!c) return NULL;
-    mpz_inits(c->n, c->a24, c->scalar, c->guard, NULL);
+    mpz_inits(c->n, c->a24, c->scalar, c->guard, c->wide_product, NULL);
     for (unsigned i = 0; i < POINTS; ++i) mpz_inits(c->x[i], c->z[i], NULL);
     for (unsigned i = 0; i < 7; ++i) mpz_init(c->scratch[i]);
     return c;
@@ -145,7 +148,7 @@ b4_context *b4_create(void) {
 void b4_destroy(b4_context *c) {
     if (!c) return;
     curve_free(c);
-    mpz_clears(c->n, c->a24, c->scalar, c->guard, NULL);
+    mpz_clears(c->n, c->a24, c->scalar, c->guard, c->wide_product, NULL);
     for (unsigned i = 0; i < POINTS; ++i) mpz_clears(c->x[i], c->z[i], NULL);
     for (unsigned i = 0; i < 7; ++i) mpz_clear(c->scratch[i]);
     free(c);
