@@ -397,3 +397,14 @@ its explicit1/2/4count contract. `NativeTeam.worker_activity()` reads idle-only
 per-rank identities and task/curve counters; sampled explanatory thread clocks
 are opt-in and excluded from clean comparisons. Process CPU already includes
 all native threads; these diagnostic values are not added to H3 accounting.
+
+
+The count screen validates whole-owner pthread/OpenMP counts through sixteen,
+including partial startup, cancellation, root stops, draining and replay.
+OpenMP `worker_activity()` reports logical ranks including the encountering
+caller and their completed slice/curve totals. Dynamic short work can legally
+leave a participating rank without a task; static admission fixtures separately
+exercise every rank. The clean deep pthread screen retains eight: no higher
+count clears its prospective complete-cost gates. Detailed exposed count costs,
+resource/thermal limits and the required unexecuted 3F revisions are local in
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.

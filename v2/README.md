@@ -413,12 +413,14 @@ yields within the same bounded slice while retaining checks and publication
 ordering. It remains opt-in after the bounded continuation and fresh comparisons.
 These component experiments do not change automatic factoring selection.
 
-The opt-in pthread owner supports 1–16 threads. Counts outside 1, 2 and 4
-also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
+The opt-in whole-native pthread and supplied OpenMP owners support 1–16
+threads. Counts outside 1, 2 and 4 also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
 Build manifests verify the native sixteen-thread capability. Counts remain
 explicit; saved execution recipes reject unsupported changes. Idle-only
-`worker_activity()` reports identities and completed tasks. Optional sampled
-worker clocks are disabled in clean execution and never add CPU to H3 charges.
+`worker_activity()` reports identities and completed tasks. OpenMP identities
+are logical ranks including the caller; pthread tokens do not identify physical
+cores. Optional sampled worker clocks are disabled in clean execution and never
+add CPU to H3 charges.
 Useful counts, scheduling, queue chunks and capacity require source-bound
 cost calibration; the larger supported range does not select a default.
 The renewed 37-curve `(11000, 1100000, 37)` comparison supports explicit
@@ -427,7 +429,9 @@ pthread-eight/dynamic/chunk 1/capacity 32 as a sustained-work candidate, with
 for shorter or CPU-constrained work. Eight uses more aggregate CPU; this
 configuration-specific evidence does not change automatic selection or prove
 uniform/population performance. Current costs and limitations are recorded
-in `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.
+in `v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
+The subsequent matched 8/10/12/14/16 screen finds no useful higher-count gain
+on exposed deep fixed-work inputs; it retains the explicit eight-thread recipe.
 The independent `--extended-quantum` build experiment selects at most 256
 whole-native actions per slice with the same five-ms target and resource
 checks. The selected explicit scalar build uses 256; the selected pthread

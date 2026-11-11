@@ -1822,3 +1822,21 @@ Committed-only QA passes 1,781 tests (14 optional skips), lint/format, 311
 ordinary imports and three native builds. See the benchmark README for current
 conditional contrasts and `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`
 for all costs, profiles/heaps, failures, exact charges and the unexecuted proposal.
+
+
+### B4a native thread oversubscription screen (11 November 2026)
+
+Whole-owner pthread and supplied OpenMP teams now admit 1–16 workers with
+checked capabilities, actual-rank work and unchanged resources/replay. The
+pthread-only 8/10/12/14/16 screen completes 216 matched cold/warm failed-search
+calls on three exposed 60/80/100-digit inputs, at 37 and 64 fixed curves.
+No count above eight clears the prospective A/A and input-uncertainty gates;
+retain the explicit eight-thread sustained recipe. Higher counts add CPU.
+This is an internal count screen, not fresh factoring or population evidence.
+No finalist stage, 3F run, routing or automatic-default change is performed.
+
+Committed-only `cbdae41` passes 1,786 tests (14 optional skips), full lint,
+311 ordinary benchmark imports and all three native builds. Exact per-input
+costs, individual intervals, final-tail/allocation evidence, thermal limits,
+all failures and separate new charges remain local:
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.

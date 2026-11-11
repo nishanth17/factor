@@ -1007,3 +1007,21 @@ recovery calls and 120 cheap cells pass. Committed-only QA on `8263fbe` passes
 native builds. Detailed current cost tables, exact resources, limitations and
 the separate unexecuted 3F proposal:
 `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.
+
+
+### B4a native thread oversubscription screen (11 November 2026)
+
+Whole-owner pthread and supplied OpenMP teams now admit 1–16 workers with
+checked capabilities, actual-rank work and unchanged resources/replay. The
+pthread-only 8/10/12/14/16 screen completes 216 matched cold/warm failed-search
+calls on three exposed 60/80/100-digit inputs, at 37 and 64 fixed curves.
+No count above eight clears the prospective A/A and input-uncertainty gates;
+retain the explicit eight-thread sustained recipe. Higher counts add CPU.
+This is an internal count screen, not fresh factoring or population evidence.
+No finalist stage, 3F run, routing or automatic-default change is performed.
+
+Committed-only `cbdae41` passes 1,786 tests (14 optional skips), full lint,
+311 ordinary benchmark imports and all three native builds. Exact per-input
+costs, individual intervals, final-tail/allocation evidence, thermal limits,
+all failures and separate new charges remain local:
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.

@@ -7,10 +7,18 @@ C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
 
-**B4a native oversubscription screen — active.**
-New protocol from `ed139a1` extends count support and compares 8/10/12/14/16
-under separate finite allowances. Historical tuning and charges stay unchanged.
-Current entry: `v2/audit/b4a/oversubscription_20261111/`. No defaults or 3F run.
+**B4a native oversubscription screen — delivered.**
+Entry `ed139a1`; final changed-source checkpoint `cbdae41`. Whole-owner pthread
+and supplied OpenMP support 1–16 with checked build capabilities, exact replay,
+actual-rank work and lifecycle admission. All 216 clean count-screen calls pass
+on three exposed 60/80/100-digit inputs and 37/64-curve shapes. No count above
+eight demonstrates a useful complete-latency gain; retain the explicit eight-thread
+sustained recipe. Higher counts cost more CPU. No finalist advances.
+Committed-only QA passes 1,786 tests (14 optional skips), lint/format, 311
+ordinary benchmark imports and all three native builds. Historical failures
+and charges remain separate; fresh 3F and automatic defaults are unchanged.
+Delivery, per-input costs, tail/allocation evidence and exact new resources:
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
 
 **B4a renewed CPU/heap tuning — delivered.**
 Entry `e8abaa7`; implementation `08d4689`, stable build identity `8263fbe`.

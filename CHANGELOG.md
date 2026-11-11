@@ -3,6 +3,18 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a native count support and screen (11 November 2026)
+
+- Extend opt-in whole-owner pthread/OpenMP support through sixteen workers;
+  verify count capability before allocation and retain explicit refusal/resume.
+- Expose drained rank identities and slice/curve totals. Sampled explanatory
+  clocks stay disabled in normal execution; native CPU is counted once by H3.
+- Complete the matched 8/10/12/14/16 screen with 216 valid cold/warm calls.
+  Retain eight for sustained work; no higher count clears the advancement gates.
+- Pass 1,786 committed-only tests (14 optional skips), full lint, 311 ordinary
+  benchmark imports and all native builds. No defaults, routing or fresh 3F run.
+  Local evidence: `v2/audit/b4a/oversubscription_20261111/`.
+
 ## B4a renewed CPU/heap tuning (11 November 2026)
 
 - Reuse the owner's immutable cursor-block index for native checkpoint export,
