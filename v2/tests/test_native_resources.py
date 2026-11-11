@@ -75,11 +75,21 @@ class NativeResourceTests(unittest.TestCase):
         ) as folder:
             binary = Path(folder) / "probe"
             command = [
-                manifest["command"][0], "-std=c11", "-O2", "-Wall",
-                "-Wextra", "-Werror", "-isysroot", manifest["sysroot"],
+                manifest["command"][0],
+                "-std=c11",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-isysroot",
+                manifest["sysroot"],
                 '-DB4_PACKET_SOURCE="' + str(SOURCE / "packet.c") + '"',
-                str(probe), "-I" + str(prefix / "include"),
-                "-L" + str(prefix / "lib"), "-lgmp", "-o", str(binary),
+                str(probe),
+                "-I" + str(prefix / "include"),
+                "-L" + str(prefix / "lib"),
+                "-lgmp",
+                "-o",
+                str(binary),
             ]
             subprocess.run(
                 command, check=True, capture_output=True, timeout=20
@@ -258,17 +268,20 @@ class NativeResourceTests(unittest.TestCase):
                 "v2.tests.test_native_resources.NativeResourceTests."
                 "test_actual_os_fields_match_original_usage_units"
             )
-            script = "\n".join((
-                "from pathlib import Path",
-                "import unittest",
-                "from v2.ecm import native_packet",
-                "native_packet.SOURCE = Path(" + repr(str(SOURCE)) + ")",
-                "suite = unittest.defaultTestLoader.loadTestsFromName("
-                + repr(test) + ")",
-                "result = unittest.TextTestRunner().run(suite)",
-                "assert result.testsRun == 1 and not result.skipped",
-                "raise SystemExit(not result.wasSuccessful())",
-            ))
+            script = "\n".join(
+                (
+                    "from pathlib import Path",
+                    "import unittest",
+                    "from v2.ecm import native_packet",
+                    "native_packet.SOURCE = Path(" + repr(str(SOURCE)) + ")",
+                    "suite = unittest.defaultTestLoader.loadTestsFromName("
+                    + repr(test)
+                    + ")",
+                    "result = unittest.TextTestRunner().run(suite)",
+                    "assert result.testsRun == 1 and not result.skipped",
+                    "raise SystemExit(not result.wasSuccessful())",
+                )
+            )
             result = subprocess.run(
                 [sys.executable, "-B", "-c", script],
                 cwd=Path(__file__).resolve().parents[2],

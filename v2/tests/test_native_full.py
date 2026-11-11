@@ -809,7 +809,8 @@ class WholeThreadTests(unittest.TestCase):
             budget = deterministic_budget()
             budget.cancelled = lambda: cancelled[0]
             with patch.object(
-                NativeCurveTeam, "advance_jobs",
+                NativeCurveTeam,
+                "advance_jobs",
                 stop_after_second_tier_generation,
             ):
                 paused = owner.run(
@@ -824,7 +825,9 @@ class WholeThreadTests(unittest.TestCase):
             )
 
             resumed = owner.run(
-                n, config=config, budget=deterministic_budget(),
+                n,
+                config=config,
+                budget=deterministic_budget(),
                 checkpoint=json.loads(json.dumps(paused.checkpoint)),
                 fixed_work=True,
             )
@@ -847,8 +850,10 @@ class WholeThreadTests(unittest.TestCase):
             seed=73, settings=WorkerSettings(workers=1)
         ) as control:
             expected = control.run(
-                n, config=replace(config, ecm_kernel="python"),
-                budget=deterministic_budget(), fixed_work=True,
+                n,
+                config=replace(config, ecm_kernel="python"),
+                budget=deterministic_budget(),
+                fixed_work=True,
             )
         actual_rows = resumed.checkpoint["payload"]["completed"]
         expected_rows = expected.checkpoint["search"]["payload"]["completed"]
