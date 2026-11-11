@@ -16,7 +16,7 @@ explicit owners, ordinary result validation and normal checked checkpoints.
 Keep Python, B12 and native owners independent.
 
 The starting recipe is ordinary GMP/generic O2, coalesced successful unit-GCD
-yields, scalar256/pthread128, pthread4/dynamic/chunk1/capacity32. OpenMP starts
+yields, scalar 256/pthread128, pthread4/dynamic/chunk1/capacity32. OpenMP starts
 with the same team kernel, PASSIVE waiting, blocktime0 and dynamic teams off.
 Numerical schedules, seeds, curve identities and resource/publication/replay
 semantics are held fixed within backend and policy comparisons.
@@ -29,7 +29,7 @@ semantics are held fixed within backend and policy comparisons.
 | Integrated feasibility and baselines | Can identical production calls discriminate Python serial, B12, native scalar, pthread and OpenMP affordably? Pilot representative shallow/deep quotas first. Freeze three independent ECM inputs per60/80/100 band, failed-search quota work and successful recovery. Maximum primary matrix is five arms ×nine inputs ×two lifetimes ×three short repeats, plus small success/cheap controls. Deep comparisons use three independent inputs only after pricing. | 500–1000s | 1800 /7200 |
 | Post-integration diagnostics and fixes | Which startup, binding/preparation, returns, recovery/publication, wait or retention cost is removable? Validate overhead on identical work, then one CPU and bounded heap/GC diagnostic per relevant family. Fix measured B4a costs with exactness admission and matched clean remeasurement. Continue fixes while a concrete measured opportunity and the remaining allocation support admission and clean remeasurement. Further profiles answer a named residual. | 300–700s | 1800 /7200 |
 | Recalibration and final choice | Does a small declared worker/grain screen improve the integrated finalists? At most eight native settings across the two runtimes, then at most four finalist/control arms. Use fixed numerical work, three independent inputs, cold/warm, A/A and uncertainty. Select per measured regime/lifetime, with simpler eligible ties. | 500–1000s | 1800 /7200 |
-| Final committed-only QA and handoff | Do full tests/lint/Git-listed ordinary imports pass with required native builds and changed lifecycle/accounting paths? Freeze the candidate and evidence-priced3F plan with applicable balanced60/70 guardrails. | 200–400s | 1800 /7200 |
+| Final committed-only QA and handoff | Do full tests/lint/Git-listed ordinary imports pass with required native builds and changed lifecycle/accounting paths? Freeze the candidate and evidence-priced3F plan with applicable balanced 60/70 guardrails. | 200–400s | 1800 /7200 |
 | Protected cleanup reserve | Drain owned work, verify archives/captures and finish accounting safely. | As needed | 600 /2400 |
 
 Total new ceilings are9000 wall /36000 aggregate CPU seconds,8GiB observed
@@ -67,3 +67,11 @@ Builds, worker tests, heavy QA and timings use nonblocking exclusive flock on
 attempts issue no reservation. Continue lock-free implementation or analysis at
 planned decision points. No merge, push, automatic routing or numerical-policy
 change is included.
+
+## Delivered exit
+
+Runtime `6815df3` and committed-only QA `908023b` complete this plan.
+1,775 tests (14 optional skips), full lint and 311 Git-listed ordinary benchmark imports pass with scalar/pthread/OpenMP builds.
+Detailed outcomes, preserved failures, new observer proof, exact separate charges
+and the frozen, unexecuted3F plan are in the local 3P_HANDOFF.md. This phase
+introduces no automatic defaults, numerical changes, resource transfer or 3F run.

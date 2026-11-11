@@ -1749,3 +1749,24 @@ broad coverage. There is no supported “50–60 digits within a minute” guara
 The [earlier API guide](https://github.com/nishanth17/factor/blob/24ff153d26ada2ec4beeead07000d183e94fd355/v2/README.md) retains the complete stage/kernel
 implementation narratives and scoped losses. Frozen studies and their source
 identities remain unchanged.
+
+### B4a 3P production integration and tuning (10 November 2026)
+
+The explicit whole-curve OpenMP owner now lives in `v2.execution.ecm_openmp`;
+the benchmark import is a compatibility re-export. `ecm/b4a/production_batch.py`
+exercises real bounded portfolio calls with retained Python/B12/scalar/native
+owners. H3 observations already supply seconds; benchmark cleanup explicitly
+reaps its owned spawn runtime helper after the unchanged B12 owner closes.
+
+Integrated fixed-schedule cold/warm costs, per-family CPU/heap diagnostics and
+a finite eight-recipe team screen retain generic O2/GMP/coalesced scalar 256,
+team 128 and four/dynamic/chunk 1/capacity 32. Pthread remains the simpler eligible
+runtime under input uncertainty and measured drift; OpenMP is still optional.
+Demand-sized contexts remove unused allocations without an established timing
+win. No additional metadata/arithmetic rewrite is supported by these profiles.
+
+Current complete costs, CPU/RSS/startup/close, failed searches, recovery,
+cheap guards, cancellation, failures and exact separate charges are local in
+`v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`. These are exploratory
+integration/tuning results. Fresh 3F and broad balanced completion remain
+unexecuted; no routing/default, population/p90 or fresh adoption claim follows.

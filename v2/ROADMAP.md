@@ -118,7 +118,7 @@ evidence remain separate acceptance follow-ups.
 | A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **In progress with D1.** Exact operator/lifting adapters, independent oracles and fixtures are implemented. Current nonempty target-size fixtures, heavy QA and capacity measurements remain open; no matrix-memory improvement is established. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) ; [implementation and remaining work](#a8-d1-in-progress) |
 | D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **In progress after the A8 contract.** Genuine selected-block recurrence, original-kernel correction, bounded restarts/resume and default-off ablations are implemented. Complete QA, representative matrix measurements, confirmation and integration remain open. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) ; [implementation and remaining work](#a8-d1-in-progress) |
 | F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **In progress; opt-in package preparation.** Suyama-11, enhanced Edwards/setup/scalar options and scheduled execution/plan reuse are committed. Further optimization edits are uncommitted at this snapshot; heavy QA, feasibility, yield/cost evidence and integration remain pending. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) ; [implementation and remaining work](#f2-in-progress) |
-| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **In progress; isolated optional native executor.** Scalar GMP and native-team sources are prepared and rebased; Python-side committed-only QA passes. Native lifecycle admission, complete-cost measurements, recalibration and integration remain pending. The scoped NEON loss is retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
+| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **3P delivered; fresh 3F acceptance remains.** Optional scalar/pthread/OpenMP production owners, lifecycle/CPU accounting, integrated costs, diagnostics and bounded tuning pass. Pthread remains selected under uncertainty. The fresh-confirmation plan is frozen and unexecuted; scoped SIMD losses are retained. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
 
 <a id="b12-f4-in-progress"></a>
 
@@ -271,29 +271,29 @@ does not establish a free increase in B1.
 
 ### B4a — optional coarse native ECM
 
-- **Delivered:** the six-item native ECM continuation and the 10 November
-  coordination/OpenMP request are complete on `codex/b4a-native-ecm` at
-  `b848dfc`. Real whole-curve OpenMP is admitted and measured with matched
-  LLVM pthreads. The selected explicit recipe uses generic O2, ordinary GMP,
-  coalesced yields, scalar 256 actions and pthread 128 actions, with four
-  workers, dynamic scheduling, chunk 1 and capacity 32. Original pthread
-  signaling remains selected. The common runtime/compiler grid is inconclusive
-  and the refinement supports a limited deep-cold passive-OpenMP benefit.
-  Short-active waiting adds CPU without an established wall-time gain.
-- **Validated:** committed source `5194951` passes 1,761 tests with 14 optional
-  skips, full lint and 310 committed benchmark imports. Local delivery,
-  uncertainty, failure records and separate charges are retained in
-  `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
-- **Current integration:** the H3 retained-worker and descendant CPU
-  accounting repair `98bf836` is included in the combined source. Current
-  merge validation is recorded under `v2/audit/b4a/accounting_merge_20261110/`.
-  Completed performance evidence keeps its original source identity.
-- **Remaining acceptance:** combined-source engagement, useful-worker and
-  cold/warm cost recalibration, followed by separately authorized fresh
-  complete-call confirmation and integration. C5 arithmetic/SIMD, B3 layouts,
-  C2 continuation and E6 prime generation retain their owners.
-- **Checkpoint:** the scoped NEON and SME losses, compiler/expression decisions,
-  historical confirmation qualifications and every charge remain preserved.
+- **3P delivered:** explicit scalar/pthread/OpenMP production owner, portfolio,
+  publication and checked checkpoint/replay paths. H3 repair `98bf836` and
+  native-unit adapter `4f30d87` are included. OpenMP remains an explicit optional
+  LLVM/libomp dependency; its compatibility benchmark import re-exports the
+  production owner.
+- **Current recipe:** generic O2/ordinary GMP/coalesced, scalar 256/team 128,
+  four workers/dynamic/chunk1/capacity32. Contexts grow with live jobs and
+  retain reuse within the same numerical manifest. Eight settings and complete
+  cold/warm finalist costs support no changed team recipe or OpenMP preference
+  beyond the frozen uncertainty/noise gates. Keep pthread as the simpler
+  eligible runtime. No automatic default/routing/numerical change.
+- **Validated:** runtime `6815df3`, committed-only QA `908023b`:
+  1,775 tests (14 optional skips), full lint and 311 Git-listed ordinary
+  benchmark imports. Actual teams, failures, limits,
+  cancellation, paid replay and cleanup pass; final monitoring uses a freshly
+  validated serialized inventory transaction without weaker resource checks.
+- **Remaining phase:** only the separately requested 3F fresh confirmation and
+  integration readiness boundary, including applicable balanced 60/70 guardrails.
+  The evidence-priced plan is frozen, unexecuted and supplies no new grant.
+  Current delivery/costs/charges: `v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`.
+- **Preserved:** earlier source freezes, failures, charges, compiler/expression
+  decisions and scoped SME/NEON losses. C5 arithmetic/SIMD, B3 layouts,
+  C2 continuation, E6 prime generation and C3a/C11 routing retain their owners.
 
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>

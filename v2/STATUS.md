@@ -1,20 +1,26 @@
 # Factor status
 
 Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
-requests, freezes and charges. The 10 November native coordination/OpenMP phase
-is delivered; no automatic successor is authorized. C5 retains generic reducers
-and A2a retains GCD/inverse/divisibility helpers.
-
+requests, freezes and charges. B4a 3P production integration and tuning is
+delivered; its separate 3F confirmation plan is frozen and unexecuted.
+C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 10 November 2026 (America/Los_Angeles).
 
-**B4a3P — active production integration and tuning,10November2026.**
-Entry `4f30d87` includes the H3 accounting repair and native CPU-unit adapter.
-The request authorizes production owner/portfolio integration, accounting
-admission, clean cold/warm controls, post-integration CPU/heap work, bounded
-recalibration and a committed-only QA/3F handoff. The staged plan is
-`v2/benchmarks/ecm/b4a/PRODUCTION_3P_PLAN.md`. New phase ceilings and historical
-charges are separate under `v2/audit/b4a/production_3p_20261110/`.
+**B4a 3P — delivered production integration and tuning.**
+Entry `4f30d87` includes repaired H3 accounting. Explicit scalar/pthread/OpenMP
+owners use the real portfolio, publication and checked replay paths. Private
+contexts grow with live jobs; numerical work and resource checks are preserved.
+Integrated cold/warm controls, per-family CPU/heap diagnostics and the bounded
+team screen retain four/dynamic/chunk 1/capacity 32. Pthread remains the simpler
+eligible runtime because no OpenMP contrast clears the frozen gates. Timing
+and drift limits remain explicit; no fresh-confirmation or population claim.
+Committed-only source `908023b` passes 1,775 tests (14 optional skips),
+full lint and 311 Git-listed ordinary benchmark imports with all three native
+builds.
+Delivery, exact separate charges, limitations and the frozen 3F plan:
+`v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`.
+Automatic routing, effort and defaults are unchanged. This request stops at 3P.
 
 **B4a native backend phase — delivered 10 November 2026.**
 Real whole-curve OpenMP is admitted and compared with matched LLVM pthreads;
