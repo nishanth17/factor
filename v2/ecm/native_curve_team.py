@@ -132,23 +132,19 @@ class NativeCurveTeam(NativeTeam):
                 )
             poll_native_budget(budget, self)
             # Validate every ready divisor before any stable-order publication.
-            # Settlement filled each private info buffer after worker drain.
-            # Reuse it before feed mutates that context, avoiding another read.
             ready = []
             for index, ((position, job), packet) in enumerate(
                 zip(jobs, prepared)
             ):
                 if self.statuses[index] == 2:
-                    packet.feed(budget, _info=packet.info[0])
+                    packet.feed(budget)
                 elif self.statuses[index] == 1:
                     packet.sync(
-                        allow_result=True,
-                        compact=not self.atomic_actions,
-                        _info=packet.info[0],
+                        allow_result=True, compact=not self.atomic_actions
                     )
                     ready.append((position, job))
                 elif self.atomic_actions:
-                    packet.sync(_info=packet.info[0])
+                    packet.sync()
             return ready
         finally:
             for packet in reversed(borrowed):

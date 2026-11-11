@@ -77,52 +77,6 @@ def drive(case, kernel, *, job=None, atomic=False, stop=None, config=None):
     (SOURCE / "build/manifest.json").exists(), "scalar native build required"
 )
 class WholeScalarTests(unittest.TestCase):
-    def test_settled_state_serves_refill_without_another_foreign_read(self):
-        case = next(
-            item
-            for item in json.loads(FIXTURES.read_text())["cases"]
-            if item["id"] == "60-not_found"
-        )
-        config = selected("c-gmp-full", case["b1"], case["b2"])
-        budget = deterministic_budget()
-        context, programs = _execution_context({}, config, budget)
-        source = programs or context
-        self.addCleanup(close_execution_context, source)
-        packet = source.native_packet
-        packet.available(case["n"], budget)
-        original = packet.lib
-        reads = []
-
-        class Library:
-            def __getattr__(self, name):
-                return getattr(original, name)
-
-            def b4_curve_info_get(self, *args):
-                reads.append(1)
-                return original.b4_curve_info_get(*args)
-
-        packet.lib = Library()
-        job = stage_jobs.new_job(
-            "ecm", case["n"], case["seed"], case["b1"], case["b2"]
-        )
-        before = budget.used
-        try:
-            for _ in range(8):
-                previous_reads = len(reads)
-                packet.advance_job(job, budget, source, config)
-                self.assertEqual(len(reads), previous_reads + 1)
-                self.assertEqual(
-                    original.b4_curve_info_get(packet.context, packet.info), 0
-                )
-                self.assertFalse(packet.info.need)
-                if packet.info.next > 2:
-                    break
-            else:
-                self.fail("finite setup did not reach metadata refill")
-            self.assertGreater(budget.used, before)
-        finally:
-            packet.lib = original
-
     def test_portfolio_checkpoint_resume_after_actual_full_native_deadline(
         self,
     ):
