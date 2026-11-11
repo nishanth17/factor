@@ -289,6 +289,13 @@ class NativePacket:
                 and int(lib.b4_slice_actions()) != manifest["slice_actions"]
             ):
                 raise ValueError("native action quantum identity mismatch")
+            maximum = 0 if self.variant == "scalar" else NATIVE_MAX_WORKERS
+            if (
+                type(manifest.get("native_team_max_workers")) is not int
+                or manifest["native_team_max_workers"] != maximum
+                or int(lib.b4_team_max_workers()) != maximum
+            ):
+                raise ValueError("native team-count capability mismatch")
             self._allocate(ffi, lib, manifest)
         except BaseException as error:
             if lib is not None and self.variant != "openmp":
