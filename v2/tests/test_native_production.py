@@ -119,13 +119,12 @@ class NativeProductionTests(unittest.TestCase):
             with kind(
                 seed=73, settings=WorkerSettings(workers=4), capacity=32
             ) as owner:
-                retained = []
                 for curves, expected in (
                     (3, 3),
                     (9, 9),
-                    (3, 9),
+                    (3, 3),
                     (37, 32),
-                    (9, 32),
+                    (9, 9),
                 ):
                     config = replace(
                         configuration(), ecm_tiers=((31, 233, curves),)
@@ -142,7 +141,6 @@ class NativeProductionTests(unittest.TestCase):
                     self.assertFalse(run.result.complete)
                     packets = owner.team.packets
                     self.assertEqual(len(packets), expected)
-                    self.assertEqual(packets[: len(retained)], retained)
                     self.assertEqual(
                         len(
                             {
@@ -155,6 +153,18 @@ class NativeProductionTests(unittest.TestCase):
                         expected,
                     )
                     retained = list(packets)
+                    # A changed numerical manifest deliberately replaces the
+                    # team. Repeating that manifest must reuse its contexts.
+                    repeated = factorize_bounded(
+                        N,
+                        seed=73,
+                        config=config,
+                        budget=deterministic_budget(),
+                        ecm_executor=owner,
+                        qs_workers=None,
+                    )
+                    self.assertEqual(repeated.result, run.result)
+                    self.assertEqual(owner.team.packets, retained)
                 team = owner.team
             self.assertEqual(team.packets, [])
             self.assertEqual(team.blocks.used, 0)
