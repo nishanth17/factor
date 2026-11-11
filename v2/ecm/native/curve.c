@@ -562,8 +562,9 @@ static int curve_action(b4_context *c) {
         size_t offset = w->block->offsets[at];
         if (!offset || offset > i->distance) return -1;
         mpz_mul(c->scratch[0], w->giant[0], w->bz[offset]);
-        mpz_mul(c->scratch[1], w->bx[offset], w->giant[1]);
-        mpz_sub(c->scratch[0], c->scratch[0], c->scratch[1]);
+        /* The first product is live in scratch[0]; subtract the second
+         * product directly, preserving the signed unreduced difference. */
+        mpz_submul(c->scratch[0], w->bx[offset], w->giant[1]);
         mpz_mod(w->terms[i->terms_count + w->pending], c->scratch[0], c->n);
         modular_product(c, w->temp_product, w->temp_product, w->terms[i->terms_count + w->pending]); ++w->pending;
         if (i->index + w->pending == w->group_end) {

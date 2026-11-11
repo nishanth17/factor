@@ -114,13 +114,14 @@ int b4_observe_root(int pid, b4_root_observation *output) {
         return -(errno ? errno : EIO);
     /* Match MacResources' usage-then-children order. A child requires the
      * original tree traversal; this fast path never omits a known child. */
-    int capacity = proc_listchildpids(pid, NULL, 0);
-    if (capacity < 0) return -(errno ? errno : EIO);
-    /* The sizing query may reserve space even without children. Read actual
-     * IDs: one slot proves either zero children or the need for full traversal. */
+    /* One actual PID slot establishes child presence without a sizing pass.
+     * Zero is childless only after checking errno: libproc may return zero
+     * on failure. Any child still selects the original full-tree provider. */
     pid_t child;
+    errno = 0;
     int children = proc_listchildpids(pid, &child, sizeof(child));
-    if (children < 0) return -(errno ? errno : EIO);
+    if (children < 0 || (!children && errno))
+        return -(errno ? errno : EIO);
     if (children) return 1;
     output->birth = usage.ri_proc_start_abstime;
     output->rss = usage.ri_proc_exit_abstime ? 0 : usage.ri_resident_size;
