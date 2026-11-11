@@ -1,10 +1,13 @@
 """Native root observation equivalence, fallback and refusing-poll lifetime."""
 
 import errno
+import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -55,6 +58,29 @@ class NativeResourceTests(unittest.TestCase):
             lib=SimpleNamespace(b4_observe_root=Mock(side_effect=observe)),
         )
         return owner
+
+    @unittest.skipUnless(
+        os.environ.get("FACTOR_B4A_LIFECYCLE_QA") == "1",
+        "compiled libproc proof requires the locked native QA window",
+    )
+    def test_checked_child_query_distinguishes_empty_and_denied(self):
+        manifest = json.loads((SOURCE / "build/manifest.json").read_text())
+        probe = (
+            Path(__file__).resolve().parents[1]
+            / "benchmarks/ecm/b4a/resource_query_probe.c"
+        )
+        prefix = Path(manifest["gmp_prefix"])
+        with tempfile.TemporaryDirectory(prefix="b4a-resource-proof-") as folder:
+            binary = Path(folder) / "probe"
+            command = [
+                manifest["command"][0], "-std=c11", "-O2", "-Wall",
+                "-Wextra", "-Werror", "-isysroot", manifest["sysroot"],
+                '-DB4_PACKET_SOURCE="' + str(SOURCE / "packet.c") + '"',
+                str(probe), "-I" + str(prefix / "include"),
+                "-L" + str(prefix / "lib"), "-lgmp", "-o", str(binary),
+            ]
+            subprocess.run(command, check=True, capture_output=True, timeout=20)
+            subprocess.run([str(binary)], check=True, timeout=3)
 
     def test_exact_fields_and_expected_birth(self):
         owner = self.fake()
