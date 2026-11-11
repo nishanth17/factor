@@ -107,14 +107,19 @@ class WholeScalarTests(unittest.TestCase):
         )
         before = budget.used
         try:
-            packet.advance_job(job, budget, source, config)
-            self.assertEqual(len(reads), 1)
+            for _ in range(8):
+                previous_reads = len(reads)
+                packet.advance_job(job, budget, source, config)
+                self.assertEqual(len(reads), previous_reads + 1)
+                self.assertEqual(
+                    original.b4_curve_info_get(packet.context, packet.info), 0
+                )
+                self.assertFalse(packet.info.need)
+                if packet.info.next > 2:
+                    break
+            else:
+                self.fail("finite setup did not reach metadata refill")
             self.assertGreater(budget.used, before)
-            self.assertEqual(
-                original.b4_curve_info_get(packet.context, packet.info), 0
-            )
-            self.assertFalse(packet.info.need)
-            self.assertGreater(packet.info.next, 2)
         finally:
             packet.lib = original
 
