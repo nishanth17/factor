@@ -62,3 +62,30 @@ class NativeBindingTests(unittest.TestCase):
                     self.assertFalse(packet.unavailable)
                 finally:
                     packet.close()
+
+    def test_changed_wide_remainder_capability_refuses_in_auto_mode(self):
+        manifest = json.loads((SOURCE / "build/manifest.json").read_text())
+        if "wide_gmp_remainder" not in manifest:
+            self.skipTest("historical build has no wide-remainder capability")
+
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory)
+            for name in manifest["source"]:
+                shutil.copy2(SOURCE / name, target / name)
+            build = target / "build"
+            build.mkdir()
+            for name in ("libfactor_ecm.dylib", manifest["abi_binding"]["file"]):
+                shutil.copy2(SOURCE / "build" / name, build / name)
+            manifest["wide_gmp_remainder"] = not manifest["wide_gmp_remainder"]
+            (build / "manifest.json").write_text(json.dumps(manifest))
+            packet = NativePacket(mode="auto")
+            try:
+                with patch.object(native_packet, "SOURCE", target):
+                    with self.assertRaisesRegex(
+                        ValueError, "wide-remainder identity mismatch"
+                    ):
+                        packet.available(1013, deterministic_budget())
+                self.assertFalse(packet.unavailable)
+                self.assertIsNone(packet.context)
+            finally:
+                packet.close()

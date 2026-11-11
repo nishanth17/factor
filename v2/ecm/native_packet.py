@@ -259,6 +259,12 @@ class NativePacket:
             ):
                 raise ValueError("native limb build identity mismatch")
             if (
+                "wide_gmp_remainder" in manifest
+                and bool(lib.b4_wide_remainder())
+                != manifest["wide_gmp_remainder"]
+            ):
+                raise ValueError("native wide-remainder identity mismatch")
+            if (
                 "coalesce_unit_yields" in manifest
                 and bool(lib.b4_coalesced_unit_yields())
                 != manifest["coalesce_unit_yields"]

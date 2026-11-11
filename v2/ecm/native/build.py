@@ -108,6 +108,7 @@ def main():
     subprocess.run(command, check=True)
     ffi = cffi.FFI()
     ffi.cdef(
+        "unsigned b4_wide_remainder(void); "
         "unsigned b4_abi(void); unsigned b4_openmp(void); "
         "unsigned b4_pthread(void); "
         "const char *b4_gmp_version(void);"
@@ -117,6 +118,7 @@ def main():
         if lib.b4_abi() != 1:
             raise RuntimeError("built ECM packet has an incompatible ABI")
         gmp_runtime = ffi.string(lib.b4_gmp_version()).decode("ascii")
+        wide_gmp_remainder = bool(lib.b4_wide_remainder())
         if bool(lib.b4_openmp()) != (args.openmp_prefix is not None):
             raise RuntimeError(
                 "built ECM team capability differs from request"
@@ -180,6 +182,7 @@ def main():
         library_sha256=sha(library),
         abi_binding=dict(file=binding.name, sha256=sha(binding)),
         limb_division=args.limb_division,
+        wide_gmp_remainder=wide_gmp_remainder,
         coalesce_unit_yields=args.coalesce_unit_yields,
         slice_actions=256 if args.extended_quantum else 128,
         whole_curve_openmp=args.openmp_prefix is not None,

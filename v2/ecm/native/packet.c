@@ -105,6 +105,36 @@ static unsigned modular_product(b4_context *c, mpz_ptr result,
      * exposed operand. Keep multiplication and reduction destinations separate
      * without changing signed GMP arithmetic or the canonical remainder. */
     mpz_mul(c->wide_product, a, b);
+#if GMP_NUMB_BITS == 64 && GMP_NAIL_BITS == 0
+    size_t dn = mpz_size(c->n), nn = mpz_size(c->wide_product);
+    if (dn >= 4 && dn <= 6 && nn <= 3 * dn &&
+        result != c->wide_product && result != c->n) {
+        if (!nn) { mpz_set_ui(result, 0); return 0; }
+        mp_limb_t quotient[13];
+        mp_srcptr np = mpz_limbs_read(c->wide_product);
+        mp_srcptr dp = mpz_limbs_read(c->n);
+        mp_ptr rp = mpz_limbs_write(result, dn);
+        if (nn < dn) {
+            memset(rp, 0, dn * sizeof(*rp));
+            memcpy(rp, np, nn * sizeof(*rp));
+        } else {
+            /* qx=0 and nn<=3*dn bound quotient storage by2*6+1 limbs.
+             * GMP performs the existing normalized division and writes dn
+             * remainder limbs; numerator/divisor/output buffers are disjoint. */
+            mpn_tdiv_qr(quotient, rp, 0, np, nn, dp, dn);
+        }
+        size_t used = dn;
+        while (used && !rp[used - 1]) --used;
+        if (mpz_sgn(c->wide_product) < 0 && used) {
+            /* 0<r<n proves n-r positive and its subtraction borrow zero. */
+            if (mpn_sub_n(rp, dp, rp, dn)) abort();
+            used = dn;
+            while (used && !rp[used - 1]) --used;
+        }
+        mpz_limbs_finish(result, (mp_size_t)used);
+        return 0; /* Preserve the legacy full-mpn-product path marker. */
+    }
+#endif
     mpz_mod(result, c->wide_product, c->n);
     return 0;
 }
@@ -513,3 +543,11 @@ int b4_result(const b4_context *c, b4_output *out) {
 }
 
 #include "curve.c"
+
+unsigned b4_wide_remainder(void) {
+#if GMP_NUMB_BITS == 64 && GMP_NAIL_BITS == 0
+    return 1;
+#else
+    return 0;
+#endif
+}
