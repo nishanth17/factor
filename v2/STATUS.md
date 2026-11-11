@@ -7,6 +7,11 @@ C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
 
+**B4a renewed CPU/heap investigation — active.**
+User direction reopens substantive residual-cost investigation from `e8abaa7`.
+The prior delivery below remains historical; all charges and finite allowances
+carry forward. New evidence: `v2/audit/b4a/profile_reinvestigation_20261111/`.
+
 **B4a post-integration native tuning — delivered.**
 Entry `2b46e3f`; retained submul, private wide numerator, supported GMP division
 entry and checked root-query transport preserve formulas, resources and replay.

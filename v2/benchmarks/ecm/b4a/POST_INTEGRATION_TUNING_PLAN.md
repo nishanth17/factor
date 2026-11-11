@@ -137,3 +137,33 @@ The new prospective 3F freeze remains unexecuted and supplies no new grant.
 No historical allowance, source freeze or charge is reset; no automatic route,
 default, merge or push changes. This delivery closes this tuning continuation;
 fresh confirmation and broader integration retain their separate gates.
+
+## Renewed profile-driven investigation — 11 November 2026
+
+User-directed continuation reopens investigation from `e8abaa7`; the earlier
+delivery remains historical. New local evidence lives under
+`v2/audit/b4a/profile_reinvestigation_20261111/`. Inherit all prior charges and
+unchanged allowances; do not reset or enlarge them. No merge, push, defaults
+or 3F execution.
+
+First question: production stacks still show high-level GMP remainder calls
+outside the retained wide-product helper. Trace their exact callers and test
+reuse of the existing supported remainder entry for the unchanged signed
+stage-two difference. Separately inspect the raw retained-owner GC graph for
+large metadata containers and duplicated native transport, rather than treating
+aggregate heap totals as ownership.
+
+| Stage | Question / decision | Expected wall | Prospective ceiling wall / CPU |
+| --- | --- | ---: | ---: |
+| Observer/controller preflight | Does unchanged R8 observation and owned cleanup still work with carried debits? Refuse factoring if it fails. | 2s | 10 / 20, entry |
+| Raw stack/heap investigation | Which source calls retain high-level division and which owner containers retain the integer arrays? Rank new mechanisms from actual captures. | 15s | 60 / 90, investigation |
+| Remainder coverage admission and feasibility | Does the same supported API cover the existing stage-two expression exactly and improve uninstrumented complete costs? | 80s | 150 / 400, optimization |
+| Clean three-input look | Identical 9/37-curve work, scalar/pthread cold/warm, A/A; extend to six/nine only under prospective uncertainty rule and remaining pools. | 240s | 330 / 700, optimization |
+| Targeted residual captures | Resolve named remaining caller/container questions, validate overhead first, stop uninformative tools. | 90s | 180 / 500, investigation |
+| Final selected-source QA | Canonical/recovery/cancel/replay, committed-only suite/lint/imports when implementation changes; retain protected 600/3600 reserve. | 180s | 300 / 900, QA |
+
+These are finite first-stage allocations, not a candidate-count or gain floor.
+Re-rank after each measured result and prospectively allocate any further
+justified work from verified unissued balances. Preserve failed attempts and
+uncertainty. No profiling of every configuration or blind extension of a failed
+comparison. Generic O2 and the existing pthread recipe remain controls.
