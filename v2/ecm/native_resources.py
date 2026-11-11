@@ -6,7 +6,6 @@ import os
 from ..execution.resources import (
     MacResources,
     ProcessSample,
-    ResourceProviderError,
 )
 from .native_packet import poll_budget
 
@@ -14,11 +13,13 @@ from .native_packet import poll_budget
 class NativeRootProvider:
     """Use the original tree provider whenever a childless root is unproved."""
 
-    def __init__(self, owner):
+    def __init__(self, owner, resource_provider):
         self.ffi, self.lib = owner.ffi, owner.lib
         self.output = self.ffi.new("b4_root_observation *")
         self.fallback = None
         self.pid = os.getpid()
+        self.cpu_numer = resource_provider._cpu_numer
+        self.cpu_denom = resource_provider._cpu_denom
 
     def sample(self, roots):
         if not isinstance(roots, dict) or set(roots) != {self.pid}:
@@ -30,8 +31,8 @@ class NativeRootProvider:
         if status == -errno.ESRCH:
             return []
         if status:
-            raise ResourceProviderError(
-                "native root resource observation: " + str(status)
+            MacResources._proc_error(
+                "native root resource observation", self.pid, -status
             )
 
         value = self.output[0]
@@ -42,7 +43,9 @@ class NativeRootProvider:
                 self.pid,
                 int(value.birth),
                 int(value.rss),
-                (int(value.user) + int(value.system)) / 1_000_000_000,
+                (int(value.user) + int(value.system))
+                * self.cpu_numer
+                / self.cpu_denom,
             )
         ]
 
@@ -62,7 +65,9 @@ def poll_native_budget(budget, owner):
 
     provider = getattr(owner, "_resource_provider", None)
     if provider is None:
-        provider = owner._resource_provider = NativeRootProvider(owner)
+        provider = owner._resource_provider = NativeRootProvider(
+            owner, original
+        )
     provider.fallback = original
     base.provider = provider
     try:

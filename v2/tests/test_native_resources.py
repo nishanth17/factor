@@ -18,8 +18,8 @@ from v2.ecm.native_resources import (
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.resources import (
     MacResources,
+    ProcessObservationDeniedError,
     ProcessSample,
-    ResourceProviderError,
 )
 from v2.tests.test_native_correctness import deterministic_budget
 
@@ -33,6 +33,13 @@ class NativeResourceTests(unittest.TestCase):
         packet.available(1013, deterministic_budget())
         self.addCleanup(packet.close)
         return packet
+
+    @staticmethod
+    def resources():
+        provider = object.__new__(MacResources)
+        provider._cpu_numer = 1
+        provider._cpu_denom = 1_000_000_000
+        return provider
 
     def fake(self, status=0, rss=10):
         packet = self.packet()
@@ -51,7 +58,7 @@ class NativeResourceTests(unittest.TestCase):
 
     def test_exact_fields_and_expected_birth(self):
         owner = self.fake()
-        provider = NativeRootProvider(owner)
+        provider = NativeRootProvider(owner, self.resources())
         self.addCleanup(provider.close)
 
         sample = provider.sample({os.getpid(): None})
@@ -62,13 +69,24 @@ class NativeResourceTests(unittest.TestCase):
         self.assertEqual(provider.sample({os.getpid(): 8}), [])
         self.assertEqual(provider.sample({os.getpid(): 7}), sample)
 
+    def test_native_ticks_use_the_original_provider_timebase(self):
+        original = self.resources()
+        original._cpu_numer = 125
+        original._cpu_denom = 3_000_000_000
+        provider = NativeRootProvider(self.fake(), original)
+        self.addCleanup(provider.close)
+
+        sample = provider.sample({os.getpid(): None})[0]
+
+        self.assertAlmostEqual(sample.cpu, 3.23456789 * 125 / 3)
+
     def test_child_and_multiple_root_paths_use_original_tree_provider(self):
         for status, roots in (
             (1, {os.getpid(): None}),
             (0, {os.getpid(): None, 123456: None}),
         ):
             owner = self.fake(status)
-            provider = NativeRootProvider(owner)
+            provider = NativeRootProvider(owner, self.resources())
             self.addCleanup(provider.close)
             fallback = SimpleNamespace(sample=Mock(return_value=["tree"]))
             provider.fallback = fallback
@@ -78,17 +96,17 @@ class NativeResourceTests(unittest.TestCase):
             fallback.sample.assert_called_once_with(roots)
 
     def test_missing_process_and_observation_failure_remain_distinct(self):
-        for status in (-errno.ESRCH, -errno.EPERM):
-            provider = NativeRootProvider(self.fake(status))
+        for status in (-errno.ESRCH, -errno.EPERM, -errno.EACCES):
+            provider = NativeRootProvider(self.fake(status), self.resources())
             self.addCleanup(provider.close)
             if status == -errno.ESRCH:
                 self.assertEqual(provider.sample({os.getpid(): None}), [])
             else:
-                with self.assertRaises(ResourceProviderError):
+                with self.assertRaises(ProcessObservationDeniedError):
                     provider.sample({os.getpid(): None})
 
     def test_rss_refusal_restores_original_provider(self):
-        original = object.__new__(MacResources)
+        original = self.resources()
         original.sample = Mock(
             return_value=[ProcessSample(os.getpid(), 7, 10, 0)]
         )
@@ -141,7 +159,7 @@ class NativeResourceTests(unittest.TestCase):
         return store
 
     def test_registration_reuses_observer_and_releases_it_with_store(self):
-        original = object.__new__(MacResources)
+        original = self.resources()
         original.sample = Mock(
             return_value=[ProcessSample(os.getpid(), 7, 10, 0)]
         )
@@ -177,7 +195,7 @@ class NativeResourceTests(unittest.TestCase):
     def test_registration_refusal_keeps_checked_block_and_restores_provider(
         self,
     ):
-        original = object.__new__(MacResources)
+        original = self.resources()
         original.sample = Mock(
             return_value=[ProcessSample(os.getpid(), 7, 10, 0)]
         )
@@ -225,7 +243,7 @@ class NativeResourceTests(unittest.TestCase):
 
         packet = self.packet()
         original = MacResources()
-        provider = NativeRootProvider(packet)
+        provider = NativeRootProvider(packet, original)
         self.addCleanup(provider.close)
         provider.fallback = SimpleNamespace(
             sample=Mock(
@@ -247,9 +265,9 @@ class NativeResourceTests(unittest.TestCase):
 
     def test_actual_live_child_is_included_by_fallback(self):
         packet = self.packet()
-        provider = NativeRootProvider(packet)
-        self.addCleanup(provider.close)
         original = MacResources()
+        provider = NativeRootProvider(packet, original)
+        self.addCleanup(provider.close)
         original.sample = Mock(wraps=original.sample)
         provider.fallback = original
         child = subprocess.Popen(
