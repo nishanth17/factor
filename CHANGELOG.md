@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a renewed CPU/heap tuning (11 November 2026)
+
+- Reuse the owner's immutable cursor-block index for native checkpoint export,
+  removing repeated per-curve index construction and preserving exact replay.
+- Elide unobserved pthread entry and intermediate completion notifications.
+  Explicit entry observers, cancellation, resource checks and full drain remain.
+- Give native dylibs fixed backend-specific install names so output-path length
+  cannot shift instruction placement. Retain source/binary/CFFI validation.
+- Validate explicit eight-thread pthread costs for sustained deep recipes,
+  retain four for shorter/CPU-constrained use, and preserve all rejected or
+  inconclusive mechanisms. Automatic defaults and routing are unchanged.
+- Pass 1,781 committed-only tests (14 optional skips), lint/format and 311
+  benchmark imports. The successor 3F proposal remains unexecuted; detailed
+  evidence is local in `v2/audit/b4a/profile_reinvestigation_20261111/`.
+
 ## B4a post-integration native tuning (11 November 2026)
 
 - Fuse the existing signed stage-two difference with GMP submul, retain a

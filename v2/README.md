@@ -404,6 +404,10 @@ fallback elsewhere. The checked `wide_gmp_remainder` manifest capability records
 this implementation; formulas, canonical output and automatic routing remain
 unchanged. Reuse matching dylib/ABI descriptor/manifest artifacts across calls;
 rebuild for changed source or dependencies, never per factoring call.
+Native build manifests also record fixed backend-specific `@rpath` install
+names. The loader opens the explicit matching dylib; output-path length no
+longer changes its instruction placement. Keep the dylib, ABI descriptor,
+manifest and required source identities together.
 The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
 yields within the same bounded slice while retaining checks and publication
 ordering. It remains opt-in after the bounded continuation and fresh comparisons.
@@ -413,6 +417,13 @@ The opt-in pthread owner supports 1–10 threads. Counts outside 1, 2 and 4
 also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
 Useful counts, scheduling, queue chunks and capacity require source-bound
 cost calibration; the larger supported range does not select a default.
+The renewed 37-curve `(11000, 1100000, 37)` comparison supports explicit
+pthread-eight/dynamic/chunk 1/capacity 32 as a sustained-work candidate, with
+`WorkerSettings(workers=8, allow_wide_workers=True)`. Four remains available
+for shorter or CPU-constrained work. Eight uses more aggregate CPU; this
+configuration-specific evidence does not change automatic selection or prove
+uniform/population performance. Current costs and limitations are recorded
+in `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.
 The independent `--extended-quantum` build experiment selects at most 256
 whole-native actions per slice with the same five-ms target and resource
 checks. The selected explicit scalar build uses 256; the selected pthread

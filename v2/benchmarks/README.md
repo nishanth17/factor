@@ -972,3 +972,38 @@ all losses/failures, ownership limits and the new unexecuted 3F proposal:
 Broader balanced completion has evidence-priced, separately unfunded grants;
 it does not prevent valid affected-ECM confirmation. C3a/C11 must recalibrate
 engagement/allocation before any automatic route changes.
+
+### B4a renewed CPU/heap tuning (11 November 2026)
+
+Implementation `08d4689` removes repeated cursor indexes and unnecessary
+pthread notifications. `8263fbe` fixes backend-specific dylib install names;
+normal, archived-QA and timing images now have identical instruction placement.
+The matched six-input source-only deep pthread-four ratios are 0.959
+[0.938, 0.981] cold and 0.939 [0.913, 0.966] warm. Scalar remains inconclusive.
+
+A separate 252-call panel includes Python/B12/scalar/delivered-native controls
+and current pthread-four/eight on six exposed ECM/failure inputs, with no
+resource censors. Current-eight/delivered-four is 0.904 [0.888, 0.921] cold on
+ECM cases and 0.915 [0.897, 0.932] cold on failed searches. Failed warm is
+0.851 [0.747, 0.970]; ECM warm is 0.857 [0.644, 1.139], inconclusive. These are
+individual 98⅓% input-clustered model intervals, without joint/fresh/population
+or p90 coverage. Component and worker gains are not multiplied.
+
+Use explicit pthread-eight/dynamic/chunk1/capacity32 as the sustained deep-work
+candidate; retain four for shorter/CPU-constrained use. Eight costs about 30%
+more CPU in the deep warm panel. Ten adds no useful gain. Matched OpenMP-eight
+has an exploratory pooled warm ratio of 1.102 [1.023, 1.188] to pthread-eight;
+cold remains uncertain, retaining the simpler pthread choice. No automatic
+threshold, routing or numerical-effort change is installed.
+
+New production stacks, sixteen validated raw GC heaps, actual sampled worker
+CPU/action counters and JIT/GC summaries support the decisions. The duplicate
+index peaks at 17,216 entries in a 32-context team and is removed; scalar owner
+exclusive GC falls about 120 KB. Neither quantity is native memory or RSS.
+Instrumented census durations are excluded from adoption timing. A recorder
+failure and every other failure/charge remain local. All 108 successful
+recovery calls and 120 cheap cells pass. Committed-only QA on `8263fbe` passes
+1,781 tests (14 optional skips), lint/format, 311 ordinary imports and all three
+native builds. Detailed current cost tables, exact resources, limitations and
+the separate unexecuted 3F proposal:
+`v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.

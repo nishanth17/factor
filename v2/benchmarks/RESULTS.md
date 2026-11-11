@@ -1802,3 +1802,23 @@ all losses/failures, ownership limits and the new unexecuted 3F proposal:
 Broader balanced completion has evidence-priced, separately unfunded grants;
 it does not prevent valid affected-ECM confirmation. C3a/C11 must recalibrate
 engagement/allocation before any automatic route changes.
+
+### B4a renewed CPU/heap tuning (11 November 2026)
+
+`08d4689` reuses immutable cursor indexes and elides redundant pthread wakeups;
+`8263fbe` makes native instruction placement independent of output-path length.
+On six exposed fixed-work inputs, deep pthread-four/control is 0.959
+[0.938, 0.981] cold and 0.939 [0.913, 0.966] warm. These are individual
+98⅓% input-cluster model intervals, without joint/fresh/population coverage.
+
+Current seven-arm complete costs support explicit pthread-eight for sustained
+37-curve work, with four retained for shorter/CPU-constrained use. Eight uses
+more CPU; ten adds no useful gain, and matched OpenMP-eight retains pthread.
+Scalar timing remains inconclusive. Fresh 3F, primary p90 and balanced whole-
+factor completion remain unestablished. Automatic routing/defaults are unchanged.
+
+All 252 cost calls, 108 successful recovery calls and 120 cheap cells pass.
+Committed-only QA passes 1,781 tests (14 optional skips), lint/format, 311
+ordinary imports and three native builds. See the benchmark README for current
+conditional contrasts and `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`
+for all costs, profiles/heaps, failures, exact charges and the unexecuted proposal.

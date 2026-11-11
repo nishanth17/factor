@@ -1,16 +1,29 @@
 # Factor status
 
 Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
-requests, freezes and charges. B4a 3P production integration and tuning is
-delivered; its separate 3F confirmation plan is frozen and unexecuted.
+requests, freezes and charges. B4a renewed CPU/heap tuning is delivered;
+its separate 3F confirmation plan is frozen and unexecuted.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
 
-**B4a renewed CPU/heap investigation — active.**
-User direction reopens substantive residual-cost investigation from `e8abaa7`.
-The prior delivery below remains historical; all charges and finite allowances
-carry forward. New evidence: `v2/audit/b4a/profile_reinvestigation_20261111/`.
+**B4a renewed CPU/heap tuning — delivered.**
+Entry `e8abaa7`; implementation `08d4689`, stable build identity `8263fbe`.
+Shared immutable cursor indexing removes per-curve copies; pthread notifications
+retain explicit observer progress with fewer wakeups. Matched six-input deep
+pthread-four costs are 0.959 cold and 0.939 warm versus delivered source;
+individual 98⅓% intervals exclude one. Scalar timing remains inconclusive.
+Current complete costs support explicit pthread-eight for sustained 37-curve
+work, with four retained for short/CPU-constrained use. Ten adds no useful gain;
+matched OpenMP-eight does not beat pthread. Generic O2, scalar 256/team 128,
+dynamic/chunk 1/capacity 32 and automatic routing/defaults remain unchanged.
+New actual CPU/GC/JIT/worker evidence, all failures/charges, 252 cost calls,
+108 successful recovery calls and 120 cheap cells are retained locally.
+Committed-only `8263fbe` passes 1,781 tests (14 optional skips), lint/format,
+311 ordinary benchmark imports and all three native builds with reproducible
+instruction placement. Fresh 3F and balanced completion remain unexecuted.
+Delivery and successor proposal:
+`v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.
 
 **B4a post-integration native tuning — delivered.**
 Entry `2b46e3f`; retained submul, private wide numerator, supported GMP division
