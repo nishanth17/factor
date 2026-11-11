@@ -322,8 +322,9 @@ class NativeCurvePacket(NativePacket):
         if status:
             raise ValueError("native canonical curve state refused")
 
-    def feed(self, budget):
-        info = self._read()
+    def feed(self, budget, *, _info=None):
+        """Refill using a settled snapshot while the context is borrowed."""
+        info = self._read() if _info is None else _info
         if not info.need:
             return
         if info.phase == 1 and self.plan is None:
@@ -335,6 +336,7 @@ class NativeCurvePacket(NativePacket):
         self._status(self.lib.b4_curve_feed(self.context, block))
 
     def settle(self, budget):
+        """Charge work and return a snapshot valid until context mutation."""
         info = self._read()
         work = int(info.work)
         delta = work - self.charged
@@ -346,6 +348,7 @@ class NativeCurvePacket(NativePacket):
         from ..execution.ecm_workers import _base_budget
 
         _base_budget(budget).record_incurred_work(delta)
+        return info
 
     @exclusive_curve
     def advance_job(self, job, budget, context, config):
@@ -360,7 +363,7 @@ class NativeCurvePacket(NativePacket):
             status = self.lib.b4_step(self.context, 5, actions)
             self.calls += 1
         finally:
-            self.settle(budget)
+            info = self.settle(budget)
         if status == -3:
             from ..execution.budget import BudgetExhaustedError
 
@@ -368,21 +371,27 @@ class NativeCurvePacket(NativePacket):
         if status < 0:
             self._status(status)
         if status == 2:
-            self.feed(budget)
+            self.feed(budget, _info=info)
+            # Feed advances the cursor. Atomic export needs that new state.
+            info = None
         poll_native_budget(budget, self)
         if status == 1:
-            self.sync(allow_result=True, compact=not self.atomic_actions)
+            self.sync(
+                allow_result=True,
+                compact=not self.atomic_actions,
+                _info=info,
+            )
         elif self.atomic_actions:
-            self.sync(allow_result=False)
+            self.sync(allow_result=False, _info=info)
 
-    def sync(self, *, allow_result=False, compact=False):
+    def sync(self, *, allow_result=False, compact=False, _info=None):
         if (
             self.job is None
             or self.context is None
             or not self.canonical_ready
         ):
             return
-        info = self._read()
+        info = self._read() if _info is None else _info
         job = self.job
         first_result = bool(allow_result and info.done and not self.published)
         phase = PHASES[int(info.phase)]
