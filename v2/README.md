@@ -397,7 +397,13 @@ Explicit native builds prepare hash-checked CFFI ABI descriptors; first use
 retains source/binary/GMP validation while avoiding declaration parsing.
 Childless native resource polls use the same macOS observation APIs, with
 the full tree provider for children or custom resource views. Compiler options
-and the disabled limb-division experiment are documented in the native guide.
+and the disabled full-mpn multiplication/division experiment are documented in
+the native guide. Current native builds use a separate supported GMP remainder
+entry on the private wide product for 4–6-limb moduli, with ordinary signed-GMP
+fallback elsewhere. The checked `wide_gmp_remainder` manifest capability records
+this implementation; formulas, canonical output and automatic routing remain
+unchanged. Reuse matching dylib/ABI descriptor/manifest artifacts across calls;
+rebuild for changed source or dependencies, never per factoring call.
 The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
 yields within the same bounded slice while retaining checks and publication
 ordering. It remains opt-in after the bounded continuation and fresh comparisons.

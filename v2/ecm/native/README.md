@@ -356,3 +356,37 @@ wall gain. Committed-only source `5194951` passes 1,761 tests (14 optional skips
 lint and 310 ordinary benchmark imports.
 Current local costs, delivery and all separate charges:
 `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+
+
+## Post-integration arithmetic and resource transport (11 November 2026)
+
+The optional native implementation retains the same formulas and canonical
+checkpoints. Stage-two difference products use signed `mpz_submul`; ordinary
+products use one private preallocated numerator. On 64-bit, nail-free GMP and
+4–6-limb positive moduli, the existing GMP `mpn_tdiv_qr` API reduces that product.
+The bounded quotient buffer, disjoint limbs, zero/negative handling and wider
+fallback preserve exact signed remainders. This uses no new modular domain or
+custom reduction algorithm. The earlier `--limb-division` full-mpn product
+experiment remains separate and unselected.
+
+Builds expose `wide_gmp_remainder`; first native admission checks it against the
+loaded library. The generated CFFI ABI descriptor, dylib, manifest and source/
+dependency identities remain a unit. Cached owners reuse them; factoring calls
+never compile. Native checkpoint identities change with these artifacts, while
+canonical state and serialized formats retain their existing contract.
+
+Root observation removes only the unused child-list sizing call. An actual
+one-PID read still selects full-tree observation for any child, and zero with
+errno refuses access. All CPU/RSS/wall/cancellation checks and cleanup remain.
+
+Generic O2, scalar 256/team 128 and pthread 4/dynamic/chunk1/capacity32 remain
+selected. Current-source 16/32-byte alignment did not improve deep complete
+costs. Real OpenMP remains an alternative explicitly supplied build using
+`-fopenmp -lomp`; scalar/pthread images do not link libomp. No new SIMD backend
+or automatic selection rule is added.
+
+The final exposed cold/warm controls, corrected complete owner/helper CPU,
+recovery, cheap guards, exactness and CPU/heap/JIT attribution are documented in
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`. Fresh 3F is frozen and
+unexecuted. The measured 5.5% deep warm pthread/entry point effect has an
+individual model interval; it is not a general factorization/default claim.

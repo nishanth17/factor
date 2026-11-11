@@ -1770,3 +1770,35 @@ cheap guards, cancellation, failures and exact separate charges are local in
 `v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`. These are exploratory
 integration/tuning results. Fresh 3F and broad balanced completion remain
 unexecuted; no routing/default, population/p90 or fresh adoption claim follows.
+
+### B4a post-integration native tuning (11 November 2026)
+
+The explicit backend retains signed stage-two submul, a private wide numerator,
+GMP's supported division API and checked root-query transport. Thirteen measured
+mechanism decisions retain generic O2/coalesced scalar 256/team 128 and pthread
+4/dynamic/chunk1/capacity32. No numerical/routing/default change occurs.
+
+A 648-call exposed panel compares current Python/B12/native scalar/pthread with
+entry native controls on three independent inputs per 60/80/100 band, both
+9/37-curve shapes and cold/warm lifetimes. There are no resource censors.
+Deep warm pthread/entry on six ECM inputs is 0.945 [0.901, 0.991]; most other
+before/after cells are inconclusive. These are individual 98⅓% input-clustered
+model intervals, with no joint, fresh, population or p90 claim. Successful
+searches, paid peers and failed quotas remain distinct. Full CPU/RSS/close costs,
+90 recovery cells, 96 cheap cells and raw uncertainty are preserved locally.
+
+Actual-production CPU stacks, phase/census counters, cold/retained JIT summaries,
+typed GC graphs and full malloc histories resolve the named costs. Warm native
+heap activity is zero in the recorded reuse calls; every recorded native
+allocation is freed at close. The private numerator adds 160 bytes/context in
+the 80-digit capture. Waiting slots are not CPU fractions, and Python object
+suballocation churn/JIT frames remain partly unresolved.
+
+Implementation `0c7c327` passes 1,778 committed-only tests (14 optional skips).
+Formatting-only `fb52b8c` preserves all test ASTs and passes full lint/format,
+311 ordinary imports and root build readiness. Current tables, exact resources,
+all losses/failures, ownership limits and the new unexecuted 3F proposal:
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+Broader balanced completion has evidence-priced, separately unfunded grants;
+it does not prevent valid affected-ECM confirmation. C3a/C11 must recalibrate
+engagement/allocation before any automatic route changes.

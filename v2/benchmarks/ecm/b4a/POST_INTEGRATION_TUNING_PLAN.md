@@ -122,3 +122,18 @@ Before a revised 3F freeze, refresh affected attribution and state every relevan
 delta's implemented, rejected, inconclusive or cross-owner disposition.
 This documentation amendment creates no new runs, resource allowance, default,
 merge or push authority; issued freezes and earlier charges remain unchanged.
+
+
+## Delivery (11 November 2026)
+
+The execution exit is satisfied with four retained native implementation
+changes, thirteen mechanism decisions, current complete controls and refreshed
+CPU/heap/JIT attribution. Implementation `0c7c327` passes 1,778 committed-only
+tests (14 optional skips); formatting-only `fb52b8c` has identical test ASTs and
+passes full lint/format and 311 ordinary imports. Source-bound effects, all
+uncertainty/failures, exact charges and residual ownership are recorded in
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+The new prospective 3F freeze remains unexecuted and supplies no new grant.
+No historical allowance, source freeze or charge is reset; no automatic route,
+default, merge or push changes. This delivery closes this tuning continuation;
+fresh confirmation and broader integration retain their separate gates.

@@ -3,6 +3,22 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a post-integration native tuning (11 November 2026)
+
+- Fuse the existing signed stage-two difference with GMP submul, retain a
+  private wide product, and use GMP's supported division API at admitted
+  widths. Preserve canonical arithmetic, work, publication and checked replay.
+- Remove the unused child-list sizing query and reject zero-result permission
+  errors. Every CPU/RSS/wall poll and full-tree child fallback remains enabled.
+- Verify the new native remainder capability against its build manifest.
+  Existing prepared CFFI descriptors, immutable registration and owner reuse
+  remain in place; factoring calls never compile.
+- Retain generic O2 and explicit four/dynamic/chunk1/capacity32 pthread teams.
+  Complete current cold/warm controls, recovery, cheap guards and CPU/heap
+  attribution; fresh 3F remains unexecuted. Automatic routing and defaults are
+  unchanged. The local delivery is
+  `v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+
 ## B4a production owner integration (10 November 2026)
 
 - Expose the optional whole-curve OpenMP owner through

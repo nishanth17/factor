@@ -5,16 +5,24 @@ requests, freezes and charges. B4a 3P production integration and tuning is
 delivered; its separate 3F confirmation plan is frozen and unexecuted.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
-Last updated: 10 November 2026 (America/Los_Angeles).
+Last updated: 11 November 2026 (America/Los_Angeles).
 
-**B4a post-integration tuning continuation — active.**
-Entry `2b46e3f` preserves the delivered 3P scope and its historical freeze.
-The new request and roadmap contract `8fc233b` require deeper CPU/heap ownership,
-allocation/JIT evidence and measured optimization before a revised 3F freeze.
-The committed execution plan is
-`v2/benchmarks/ecm/b4a/POST_INTEGRATION_TUNING_PLAN.md`.
-New receipts and the separate cumulative allowance live under
-`v2/audit/b4a/post_integration_tuning_20261110/`.
+**B4a post-integration native tuning — delivered.**
+Entry `2b46e3f`; retained submul, private wide numerator, supported GMP division
+entry and checked root-query transport preserve formulas, resources and replay.
+Thirteen mechanism decisions retain generic O2 and explicit pthread
+4/dynamic/chunk1/capacity32. The final 648-call panel has no resource censors;
+90 recovery and 96 cheap cells pass. Deep warm pthread/entry is 0.945
+[0.901, 0.991] on six exposed ECM inputs, an individual model interval;
+most other before/after cells remain inconclusive. No fresh/population claim.
+Implementation `0c7c327` passes 1,778 committed-only tests (14 optional skips).
+Formatting-only `fb52b8c` has identical test ASTs and passes full lint/format
+and 311 ordinary benchmark imports. All three native builds are ready.
+CPU/heap/JIT evidence, exact charges and limitations:
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+The new 3F plan is frozen and unexecuted; broad balanced completion is separately
+unfunded and does not gate valid affected-ECM confirmation. Automatic routing,
+numerical effort and defaults are unchanged.
 
 **B4a 3P — delivered production integration and tuning.**
 Entry `4f30d87` includes repaired H3 accounting. Explicit scalar/pthread/OpenMP
