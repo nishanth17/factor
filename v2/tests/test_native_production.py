@@ -257,6 +257,10 @@ class NativeProductionTests(unittest.TestCase):
                         role=role,
                         workers=count,
                         capacity=32,
+                        # Static ownership guarantees a task for each rank in
+                        # this deliberately short fixture. Dynamic scheduling
+                        # may legally finish before a late rank takes a task.
+                        schedule="static",
                         worker_settings=dict(allow_wide_workers=True),
                         n=n,
                         seed=73,
