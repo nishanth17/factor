@@ -74,7 +74,9 @@ class NativeBindingTests(unittest.TestCase):
                 shutil.copy2(SOURCE / name, target / name)
             build = target / "build"
             build.mkdir()
-            for name in ("libfactor_ecm.dylib", manifest["abi_binding"]["file"]):
+            for name in (
+                "libfactor_ecm.dylib", manifest["abi_binding"]["file"]
+            ):
                 shutil.copy2(SOURCE / "build" / name, build / name)
             manifest["wide_gmp_remainder"] = not manifest["wide_gmp_remainder"]
             (build / "manifest.json").write_text(json.dumps(manifest))
