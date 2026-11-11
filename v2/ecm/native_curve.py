@@ -160,7 +160,6 @@ class NativeCurvePacket(NativePacket):
         self.blocks = _blocks or BlockStore()
         self.owns_blocks = _blocks is None
         self.job = self.context_source = self.config = None
-        self.cursor_blocks = {}
         self.charged = 0
         self.calls = 0
         self.info = self.atom = self.pair = None
@@ -238,8 +237,6 @@ class NativeCurvePacket(NativePacket):
             b1=self.job["b1"],
             b2=self.job["b2"],
         )
-        if purpose == "cursor":
-            self.cursor_blocks[(lo, hi, bound)] = block
         return block
 
     def bind_job(self, job, budget, context, config):
@@ -281,7 +278,6 @@ class NativeCurvePacket(NativePacket):
         self.bound_identity = identity
         self.plan = None
         self.canonical_ready = False
-        self.cursor_blocks.clear()
         self.charged = 0
         self.published = False
         sigma = random.Random(job["seed"]).randrange(6, 2**63)
@@ -423,7 +419,19 @@ class NativeCurvePacket(NativePacket):
         bound = (
             job["b1"] if phase in ("setup", "stage_one", "replay") else None
         )
-        entry = self.cursor_blocks.get((cursor["left"], cursor["next"], bound))
+        # The owner already retains every immutable block under this exact
+        # identity. Checkpoint export needs no second index rebuilt per curve.
+        plan = self.plan if bound else None
+        key = (
+            "cursor",
+            cursor["left"],
+            cursor["next"],
+            bound,
+            None if plan is None else plan.identity,
+            job["b1"],
+            job["b2"],
+        )
+        entry = self.blocks.blocks.get(key)
         if entry is not None:
             cursor["values"] = list(entry[1])
         if cursor["index"] > len(cursor["values"]):
@@ -603,7 +611,6 @@ class NativeCurvePacket(NativePacket):
                 self.lib.b4_abort(self.context)
                 self.job = self.context_source = self.config = None
                 self.canonical_ready = False
-                self.cursor_blocks.clear()
 
     @exclusive_curve
     def close(self):

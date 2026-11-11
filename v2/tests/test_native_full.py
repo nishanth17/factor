@@ -77,6 +77,46 @@ def drive(case, kernel, *, job=None, atomic=False, stop=None, config=None):
     (SOURCE / "build/manifest.json").exists(), "scalar native build required"
 )
 class WholeScalarTests(unittest.TestCase):
+    def test_auto_chain_refill_checkpoint_resumes_in_fresh_owner(self):
+        corpus = FIXTURES.parents[1] / "corpora/b4a_production_3p_v1.json"
+        cases = json.loads(corpus.read_text())["fixtures"]
+        for case in cases:
+            if case["population"] != "failed" or case["cluster"] != 0:
+                continue
+            with self.subTest(case=case["id"]):
+                case = dict(case, seed=73, b1=127, b2=4000)
+                config = replace(
+                    selected("c-gmp-full", 127, 4000), ecm_chain_mode="auto"
+                )
+                expected, trace, _ = drive(
+                    case, "python", config=replace(config, ecm_kernel="python")
+                )
+                actual, checkpoints, _ = drive(
+                    case, "c-gmp-full", atomic=True, config=config
+                )
+                self.assertEqual(actual, expected)
+                self.assertEqual(checkpoints, trace)
+
+                def after_refills(job, packet):
+                    return (
+                        job["phase"] == "stage_two"
+                        and job["cursor"]["left"] > 255
+                    )
+
+                paused, _, _ = drive(
+                    case,
+                    "c-gmp-full",
+                    atomic=True,
+                    config=config,
+                    stop=after_refills,
+                )
+                self.assertFalse(paused["done"])
+                self.assertGreater(paused["cursor"]["left"], 255)
+                resumed, _, _ = drive(
+                    case, "c-gmp-full", job=paused, atomic=True, config=config
+                )
+                self.assertEqual(resumed, expected)
+
     def test_portfolio_checkpoint_resume_after_actual_full_native_deadline(
         self,
     ):

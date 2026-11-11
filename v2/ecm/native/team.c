@@ -23,7 +23,7 @@ struct b4_pthread_team {
     worker_arg args[MAX_WORKERS];
     atomic_uint cancelled, failed;
     atomic_size_t next;
-    unsigned active, live, completed, waiting, pause, stop;
+    unsigned active, live, completed, waiting, pause, stop, observers;
     unsigned long long generation, counters[4];
     int create_at, job_at;
     b4_context *const *contexts;
@@ -122,8 +122,10 @@ int b4_pthread_inject(b4_pthread_team *t, int create_at, int job_at,
 void b4_pthread_wait(b4_pthread_team *t, unsigned waiting) {
     if (!t || !waiting || waiting > MAX_WORKERS) return;
     pthread_mutex_lock(&t->mutex);
+    ++t->observers;
     while (t->waiting < waiting && !atomic_load(&t->cancelled))
         pthread_cond_wait(&t->condition, &t->mutex);
+    --t->observers;
     pthread_mutex_unlock(&t->mutex);
 }
 
@@ -169,14 +171,17 @@ static void *worker(void *opaque) {
         if (t->stop) break;
         generation = t->generation;
         ++t->waiting; ++t->counters[3];
-        pthread_cond_broadcast(&t->condition);
+        /* Only explicit entry observers need this intermediate notification.
+         * The normal caller waits for every borrower to drain. */
+        if (t->observers) pthread_cond_broadcast(&t->condition);
         while (t->pause && !atomic_load(&t->cancelled))
             pthread_cond_wait(&t->condition, &t->mutex);
         pthread_mutex_unlock(&t->mutex);
         work(t, arg->rank);
         pthread_mutex_lock(&t->mutex);
         ++t->completed;
-        pthread_cond_broadcast(&t->condition);
+        if (t->completed == t->workers)
+            pthread_cond_broadcast(&t->condition);
     }
     pthread_mutex_unlock(&t->mutex);
     return NULL;

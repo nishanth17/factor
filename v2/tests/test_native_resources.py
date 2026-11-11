@@ -96,6 +96,44 @@ class NativeResourceTests(unittest.TestCase):
             )
             subprocess.run([str(binary)], check=True, timeout=3)
 
+    @unittest.skipUnless(
+        os.environ.get("FACTOR_B4A_LIFECYCLE_QA") == "1",
+        "compiled pthread proof requires the locked native QA window",
+    )
+    def test_entry_observer_progresses_without_pausing_workers(self):
+        manifest = json.loads((SOURCE / "build/manifest.json").read_text())
+        probe = (
+            Path(__file__).resolve().parents[1]
+            / "benchmarks/ecm/b4a/notification_probe.c"
+        )
+        prefix = Path(manifest["gmp_prefix"])
+        with tempfile.TemporaryDirectory(prefix="b4a-notify-proof-") as folder:
+            binary = Path(folder) / "probe"
+            command = [
+                manifest["command"][0],
+                "-std=c11",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-pthread",
+                "-DB4_PTHREAD",
+                "-isysroot",
+                manifest["sysroot"],
+                '-DB4_PACKET_SOURCE="' + str(SOURCE / "packet.c") + '"',
+                '-DB4_TEAM_SOURCE="' + str(SOURCE / "team.c") + '"',
+                str(probe),
+                "-I" + str(prefix / "include"),
+                "-L" + str(prefix / "lib"),
+                "-lgmp",
+                "-o",
+                str(binary),
+            ]
+            subprocess.run(
+                command, check=True, capture_output=True, timeout=20
+            )
+            subprocess.run([str(binary)], check=True, timeout=3)
+
     def test_exact_fields_and_expected_birth(self):
         owner = self.fake()
         provider = NativeRootProvider(owner, self.resources())

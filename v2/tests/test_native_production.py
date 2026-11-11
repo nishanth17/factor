@@ -63,6 +63,30 @@ class NativeProductionTests(unittest.TestCase):
             qs_workers=None,
         )
 
+    def test_benchmark_native_owners_honor_explicit_worker_settings(self):
+        from v2.benchmarks.ecm.b4a.production_batch import ProductionSession
+
+        for role, owner_type in (
+            ("pthread", NativeECMExecutor),
+            ("openmp", OpenMPExecutor),
+        ):
+            with self.subTest(role=role):
+                request = dict(
+                    role=role,
+                    workers=6,
+                    worker_settings=dict(
+                        allow_wide_workers=True, parent_poll_seconds=0.02
+                    ),
+                )
+                with patch.object(
+                    owner_type, "__init__", return_value=None
+                ) as init:
+                    ProductionSession.make_owner(request)
+                settings = init.call_args.kwargs["settings"]
+                self.assertEqual(settings.workers, 6)
+                self.assertTrue(settings.allow_wide_workers)
+                self.assertEqual(settings.parent_poll_seconds, 0.02)
+
     def test_all_owners_publish_same_portfolio_result_and_retain_contexts(
         self,
     ):

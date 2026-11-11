@@ -36,9 +36,11 @@ class ProductionSession:
             owner_type = OpenMPExecutor
         else:
             raise ValueError("unknown production ECM role")
+        values = dict(request.get("worker_settings", {}))
+        values["workers"] = request.get("workers", 4)
         return owner_type(
             seed=request.get("seed", 73),
-            settings=WorkerSettings(workers=request.get("workers", 4)),
+            settings=WorkerSettings(**values),
             schedule=request.get("schedule", "dynamic"),
             chunk_size=request.get("chunk_size", 1),
             capacity=request.get("capacity", 32),
@@ -102,6 +104,7 @@ class ProductionSession:
                 "seed",
             )
         )
+        key += (tuple(sorted(request.get("worker_settings", {}).items())),)
         if self.owner is None:
             self.owner, self.key = self.make_owner(request), key
         elif self.key != key:
