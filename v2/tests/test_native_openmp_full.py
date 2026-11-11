@@ -9,10 +9,11 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from v2.benchmarks.ecm.b4a.omp_owner import OpenMPCurveTeam, OpenMPExecutor
+from v2.ecm.native_curve_team import OpenMPCurveTeam
 from v2.ecm.native_packet import SOURCE
 from v2.execution.budget import Budget, BudgetExhaustedError
 from v2.execution.ecm_native import NativeECMExecutor
+from v2.execution.ecm_openmp import OpenMPExecutor
 from v2.execution.portfolio_config import (
     _execution_context,
     close_execution_context,

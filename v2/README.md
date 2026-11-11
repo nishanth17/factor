@@ -442,3 +442,17 @@ The common study and one refinement retain the existing pthread recipe; no
 broad OpenMP adoption follows. Committed-only validation passes 1,761 tests (14 optional skips), lint
 and 310 ordinary benchmark imports.
 Current local evidence: `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+
+## Explicit production OpenMP ECM owner
+
+Import `OpenMPExecutor` from `v2.execution.ecm_openmp`. Supply it as
+`ecm_executor` to `factorize_bounded` with an explicit `c-gmp-full`
+configuration. It supports the same checked portfolio result and retained
+owner/checkpoint lifecycle as `NativeECMExecutor`. Both native owners support
+context-manager cleanup. Explicit startup uses the selected runtime.
+
+OpenMP remains an optional explicit build with the provided compatible
+LLVM/libomp. Use PASSIVE waiting, zero block time and dynamic teams disabled
+for the retained starting recipe. The backend/build identity binds resume.
+Missing builds raise when eligible ECM work engages. Cheap portfolio exits
+can complete before the optional backend is loaded.

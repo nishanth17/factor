@@ -162,3 +162,10 @@ class NativeCurveTeam(NativeTeam):
         close_resource_checks(self)
         self.clear_jobs()
         self.blocks.close()
+
+
+class OpenMPCurveTeam(NativeCurveTeam):
+    """Borrow private whole-curve contexts through the OpenMP owner API."""
+
+    variant = "openmp"
+    owner_prefix = "b4_omp_"

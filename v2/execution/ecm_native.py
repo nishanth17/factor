@@ -47,14 +47,21 @@ class _BudgetView:
 
 
 class NativeECMExecutor:
-    """Experimental owner retaining immutable metadata within its life.
+    """Retain native ECM state under stable assignments and checked history.
 
-    Stable B12 assignments are evaluated in tier order, at most capacity curves
-    live at once. Setup, strict recovery and classical stage two run in the
-    Python owner. Only stage-one packets enter pthreads. Pauses drain C,
-    retain completed curves and charges, and restart unfinished curve IDs on
-    resume; partial native/curve state is deliberately never serialized.
+    Whole-native c-gmp-full calls execute setup, both classical stages and
+    recovery in C. The c-gmp control moves stage-one packets into pthreads.
+    Pauses drain borrowers, retain completed curves and paid work, and restart
+    unfinished curve identities on resume.
     """
+
+    def __enter__(self):
+        if self.closed:
+            raise ValueError("native executor is closed")
+        return self
+
+    def __exit__(self, *args):
+        self.close()
 
     def __init__(
         self,
