@@ -31,6 +31,9 @@ int b4_omp_shutdown(b4_omp_team *team);
 void b4_omp_destroy(b4_omp_team *team);
 unsigned long long b4_omp_counter(b4_omp_team *team, unsigned kind);
 unsigned b4_omp_participants(b4_omp_team *team);
+/* Idle-only completed slice/curve counts by OpenMP rank, including caller. */
+unsigned long long b4_omp_activity(b4_omp_team *team, unsigned rank,
+                                    unsigned field);
 void b4_omp_cancel(b4_omp_team *team);
 int b4_omp_reset(b4_omp_team *team);
 int b4_omp_inject(b4_omp_team *team, int create_at, int job_at, unsigned pause);

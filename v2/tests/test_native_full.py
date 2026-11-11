@@ -575,9 +575,21 @@ class WholeThreadTests(unittest.TestCase):
                             self.fail("OpenMP fixture did not complete")
                         self.assertEqual(job, expected)
                         self.assertEqual(observed, trace)
+                        activity = team.worker_activity()
                         self.assertEqual(
-                            team.worker_activity()["entered_mask"],
-                            (1 << count) - 1,
+                            activity["entered_mask"], (1 << count) - 1
+                        )
+                        self.assertEqual(activity["actual"], count)
+                        self.assertEqual(
+                            [row["identity"] for row in activity["workers"]],
+                            list(range(count)),
+                        )
+                        self.assertEqual(
+                            sum(row["curves"] for row in activity["workers"]),
+                            1,
+                        )
+                        self.assertGreater(
+                            sum(row["tasks"] for row in activity["workers"]), 0
                         )
                     finally:
                         team.close()

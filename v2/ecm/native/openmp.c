@@ -13,6 +13,9 @@ struct b4_omp_team {
     atomic_uint active, cancelled, failed, entered, pause, participants;
     atomic_ullong counters[4];
     int job_at;
+    /* Each rank writes only its own slot; region exit drains all writers. */
+    struct { uint64_t tasks, curves; unsigned char spacing[112]; }
+        activity[B4_NATIVE_MAX_WORKERS];
 };
 
 unsigned b4_omp_whole_kernel(void) { return 1; }
@@ -46,6 +49,13 @@ unsigned long long b4_omp_counter(b4_omp_team *t, unsigned kind) {
 
 unsigned b4_omp_participants(b4_omp_team *t) {
     return t ? atomic_load(&t->participants) : 0;
+}
+
+unsigned long long b4_omp_activity(b4_omp_team *t, unsigned rank,
+                                    unsigned field) {
+    if (!t || rank >= B4_NATIVE_MAX_WORKERS || field > 1 ||
+        atomic_load(&t->active)) return UINT64_MAX;
+    return field ? t->activity[rank].curves : t->activity[rank].tasks;
 }
 
 void b4_omp_cancel(b4_omp_team *t) {
@@ -96,6 +106,9 @@ static void execute_one(b4_omp_team *t, b4_context *context, size_t index,
     if (atomic_load(&t->cancelled)) return;
     int result = (int)index == t->job_at ? -4 :
         b4_slice(context, wall_end, cpu_end, actions, &t->cancelled);
+    unsigned rank = (unsigned)omp_get_thread_num();
+    ++t->activity[rank].tasks;
+    if (result == 1) ++t->activity[rank].curves;
     *status = result;
     if (result < 0 && result != -3) {
         atomic_store(&t->failed, 1);
@@ -183,6 +196,9 @@ unsigned long long b4_omp_counter(b4_omp_team *t, unsigned k) {
     (void)t; (void)k; return 0;
 }
 unsigned b4_omp_participants(b4_omp_team *t) { (void)t; return 0; }
+unsigned long long b4_omp_activity(b4_omp_team *t, unsigned r, unsigned f) {
+    (void)t; (void)r; (void)f; return ~0ull;
+}
 void b4_omp_cancel(b4_omp_team *t) { (void)t; }
 int b4_omp_reset(b4_omp_team *t) { (void)t; return -2; }
 int b4_omp_inject(b4_omp_team *t, int c, int j, unsigned p) {

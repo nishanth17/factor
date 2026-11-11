@@ -245,7 +245,18 @@ class NativeTeam:
                     actual=actual,
                     entered_mask=mask,
                     identity_kind="openmp-rank-including-caller",
-                    workers=[dict(identity=i) for i in range(actual)],
+                    workers=[
+                        dict(
+                            identity=i,
+                            tasks=int(
+                                self.lib.b4_omp_activity(self.owner, i, 0)
+                            ),
+                            curves=int(
+                                self.lib.b4_omp_activity(self.owner, i, 1)
+                            ),
+                        )
+                        for i in range(actual)
+                    ],
                 )
             actual = int(self._native_counter(self.owner, 0)) - int(
                 self._native_counter(self.owner, 1)
