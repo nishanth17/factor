@@ -3,6 +3,20 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a final native confirmation (12 November 2026)
+
+- Complete 1,512 fresh affected-ECM calls at both anchors, with separate cold
+  and retained owners, unchanged numerical work and no resource censors.
+  Preserve inconclusive 60-digit deep retained evidence and adverse successes.
+- Validate 144 recovery calls and 144 cheap-path cells. Complete all three
+  60-digit integration pairs, then one conditional 70-digit pair, with matching
+  canonical QS work, sustained native-worker quiescence and complete cleanup.
+- Retain the slower native 70-digit total as descriptive evidence; the panel
+  establishes scoped integration readiness without population/p90 promotion.
+- Preserve all failures and charges, verify retained project-local cache
+  archives and removed versions, and retain applicable committed-only QA.
+  No merge, push, routing or automatic-default changes.
+
 ## B4a native boundary implementation (11 November 2026)
 
 - Keep ordinary whole-native cursor refill, metadata generation, bounded team

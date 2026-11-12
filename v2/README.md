@@ -32,6 +32,9 @@ bounded wave coordination and incurred-work snapshots in C. A segment retains
 the existing five-ms resource cadence and returns immediately at a completed
 curve for checked publication. It observes actual root RSS and process CPU;
 children and custom clocks/providers/callbacks use the original checked path.
+A process-QS pool can already own a helper before ECM starts; that integrated
+call therefore needs its measured full-tree fallback costs rather than a
+childless native cost estimate.
 Native-generated blocks remain owner-owned until all borrowing curves drain.
 Known plan references and the existing immutable catalogue wire are reused;
 first-use catalogue construction and its C certificate proofs remain lazy.

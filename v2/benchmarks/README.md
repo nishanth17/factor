@@ -1027,7 +1027,7 @@ all failures and separate new charges remain local:
 `v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
 
 
-### B4a final 3F execution (active, 11 November 2026)
+### B4a final 3F execution (delivered, 12 November 2026)
 
 The new finite confirmation driver and separate integration observer are under
 `v2/benchmarks/ecm/b4a/`. They preserve mathematical parameters, serialize known
@@ -1035,7 +1035,8 @@ fixture labels outside runtime calls, settle complete owner CPU through `wait4`
 and compare canonical published QS prefixes. Sparse Mach thread CPU/state reads
 are confined to the observed integration lane. Current request, priced protocol
 and source/build/recipe freezes remain local in
-`v2/audit/b4a/confirmation_3f_20261111/`. Fresh results and readiness are pending.
+`v2/audit/b4a/confirmation_3f_20261111/`. Current results and readiness are
+recorded in `3F_HANDOFF.md` there and summarized below.
 
 
 ### B4a native boundary closeout (12 November 2026)
@@ -1057,5 +1058,45 @@ counts, not a fresh speedup or population result. Committed-only `3bb5a69` passe
 three native builds with identical instruction placement. The failed discovery
 launcher, all raw evidence and charges remain local. Current cost/disposition
 entry: `v2/audit/b4a/native_boundary_closeout_20261111/IMPLEMENTATION_CLOSEOUT_R1.md`.
-Fresh 3F and staged balanced integration remain required; no automatic defaults
-or routing changes are implemented.
+Fresh 3F followed this implementation checkpoint; its scoped delivery is
+recorded below. Automatic defaults and routing remain unchanged.
+
+
+### B4a final fresh confirmation and integration (12 November 2026)
+
+Fresh source `52aae12` completes 1,512 affected-ECM calls on 6/9/6 independent
+60/80/100-digit inputs, both fixed anchors and separate cold/retained owners.
+All six arms use that source; mainline cheap/integration controls separately
+use pinned `98bf836`. No censors or A/A drift stops occur. Repetitions are
+clustered by modulus; the pooled comparison uses six inputs per band with
+equal band/stratum weights, excluding the extra 80-digit cohort.
+
+| Pthread/B12 anchor | Cold ratio | Retained ratio |
+| --- | --- | --- |
+| Shallow, four threads | 0.399 [0.382, 0.417] | 0.387 [0.359, 0.417] |
+| Deep, eight threads | 0.392 [0.310, 0.497] | 0.422 [0.236, 0.753] |
+
+These are simultaneous-primary 99.5833% model intervals under the frozen
+three-look/four-contrast rule; independent normal log input effects remain a
+small-sample assumption. They support conditional affected-workload gains,
+not population/p90 or a cold/warm blend. Deep retained 60-digit performance
+remains inconclusive; three successful retained input comparisons are slower
+with native. All observations and paid peer work remain in the current tables.
+
+All 144 recovery and 144 cheap cells pass. Three balanced 60-digit pairs and
+one conditional 70-digit pair complete with matching canonical QS prefixes,
+unchanged numerical/execution identities, sustained parked native workers
+with zero observed CPU advance and full join/context/metadata release.
+The native 70-digit child takes 557.6 s versus B12's 515.9 s; these observed
+QS-dominated totals are descriptive. No unresolved size-specific integration
+question justifies further pairs. Live children retain full-tree observation
+fallback, so clean childless ECM costs do not describe every integrated call.
+
+Keep explicit generic-O2/ordinary-GMP/coalesced, scalar 256/team 128,
+pthread four shallow/eight deep, dynamic/chunk 1/capacity 32. Applicable
+committed-only QA passes 1,805 tests (14 optional skips), lint, 317 ordinary
+imports and all three builds. All failures/charges and verified cache archives
+remain local. Broader population/p90 and fully powered balanced promotion
+remain unmet; no routing/default changes, merge or push. Current conditional
+wall/CPU/RSS, startup, publication/waste and engagement inputs:
+`v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.

@@ -1,48 +1,43 @@
 # Factor status
 
 Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
-requests, freezes and charges. B4a boundary closeout now precedes the revised
-final 3F confirmation; implementation and confirmation have separate allowances.
+requests, freezes and charges. B4a boundary closeout and final 3F are delivered
+within their declared scopes; the campaigns retain separate accounts.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 12 November 2026 (America/Los_Angeles).
 
-**B4a material native boundary implementation — closed; 3F resumption active.**
-Entry `410eba0`; current request and new evidence:
-`v2/audit/b4a/native_boundary_closeout_20261111/REQUEST.md`.
-The previous 3F controller, watchdogs and owned groups are drained, with every
-reservation settled. Its charges and untouched held-out cohort are preserved.
-Both fixed-work anchors now have clean cold/warm baselines and matched A/A
-observations on exposed 60/80/100-digit inputs. Coarse C segments and lazy
-relation imports pass targeted admission and a 324-call exposed matched panel. Required resource observation stays enabled.
-Accepted catalogue/plan reuse and optional-import deferral are retained through
-executable source `6a34003`. Later peer-refill and Python-math-import alternatives
-pass admission but show no useful complete-cost improvement. Current boundary,
-combined-cost and arithmetic ceilings retain their attribution limits. On an
-exposed deep 80-digit quota, pthread foreign returns fall from 2,414 to 92;
-the numerical manifests and completed curves agree. Committed-only `3bb5a69`
-passes 1,805 tests (14 optional skips), lint, 317 ordinary benchmark imports and
-all three reproducible native builds. The initial discovery-launch failure and
-all charges remain preserved. Detailed dispositions and conditional costs:
-`v2/audit/b4a/native_boundary_closeout_20261111/IMPLEMENTATION_CLOSEOUT_R1.md`.
-Existing whole-classical C/GMP execution, compact exports, shared metadata and
-historical compiler/runtime/SIMD outcomes are controls. Fresh confirmation and
-staged integration remain required. Persisted experimental cache
-data stays in the project-local audit cache and counts toward the capture limit.
-No merge, push or automatic-default change.
+**B4a native boundary closeout and final 3F — delivered, opt-in.**
+Entry `410eba0`; executable production `6a34003`, test-only QA `3bb5a69`,
+fresh confirmation source `52aae12`. Coarse observed C segments, native
+metadata/index/refill, accepted catalogue/plan reuse and lazy imports are
+retained. Later alternatives establish no useful improvement. All original
+and B15a obligations, combined ceilings and C5.M limits are reconciled locally:
+`v2/audit/b4a/native_boundary_closeout_20261111/FINAL_HANDOFF_R1.md`.
+Committed-only QA passes 1,805 tests (14 optional skips), lint, 317 ordinary
+benchmark imports and all three reproducible native builds; final documentation
+changes preserve executable applicability. Failures and charges remain intact.
 
-**B4a final 3F confirmation — resuming on the final source.**
-Entry `f1bc14d`; committed production control `98bf836`. New runner-side phase,
-canonical-QS-prefix and native-thread observations pass bounded admission.
-The committed fresh corpus remains unused during optimization. Both ECM anchors
-and all four cold/warm controls have exposed feasibility; the six-arm protocol
-is being rebound and repriced after closeout. Keep scalar 256,
-pthread-four shallow / pthread-eight deep, dynamic/chunk 1/capacity 32.
-The request separately funds fresh affected ECM and staged balanced 60/70
-integration guards; earlier unfunded proposals and charges remain historical.
-Current request, plan, source/build pins and receipts:
-`v2/audit/b4a/confirmation_3f_20261111/PLAN_R1.md`.
-No merge, push, automatic defaults, numerical policy or optimization search.
+Fresh affected ECM completes 1,512 calls on 6/9/6 independent 60/80/100-digit
+inputs, both anchors and separate cold/retained owners, without censors.
+The pooled pthread/B12 contrasts support conditional gains; 60-digit deep
+retained performance remains inconclusive. Three adverse successful retained
+cases remain in the tables. All 144 recovery and 144 cheap cells pass.
+Three 60-digit integration pairs and one conditional 70-digit pair complete
+with identical common canonical QS work, waiting native workers with zero
+observed CPU advance, and full final join/context/metadata release. The native
+70-digit total is slower; QS-dominated totals are descriptive. No further
+70-digit integration question remains. Delivery and current cost tables:
+`v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.
+
+Keep explicit scalar 256/team 128, pthread four shallow/eight deep,
+dynamic/chunk 1/capacity 32, ordinary GMP/generic O2. Live children retain the
+exact full-tree observation fallback; childless costs are conditional. The two
+project-local cache archives are retained with sizes/hashes and all removed
+versions inventoried. All owned executions are drained and both grants remain
+within their ceilings. Broader population/p90 and fully powered balanced
+promotion gates remain unresolved; C3a/C11 own engagement recalibration.
+No merge, push, routing or automatic-default change.
 
 **B4a native oversubscription screen — delivered.**
 Entry `ed139a1`; final changed-source checkpoint `cbdae41`. Whole-owner pthread
