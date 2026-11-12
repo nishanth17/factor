@@ -18,6 +18,11 @@ class ProductionSession:
         from ....execution.worker_contract import WorkerSettings
 
         role = request["role"]
+        native = (
+            {}
+            if request.get("metadata_cache") is None
+            else dict(metadata_cache=request["metadata_cache"])
+        )
         if role in ("python", "b12", "scalar"):
             values = dict(request.get("worker_settings", {}))
             values["workers"] = request.get("workers", 1)
@@ -25,6 +30,7 @@ class ProductionSession:
                 seed=request.get("seed", 73),
                 settings=WorkerSettings(**values),
                 force_workers=role == "b12",
+                **native,
             )
         if role == "pthread":
             from ....execution.ecm_native import NativeECMExecutor
@@ -44,6 +50,7 @@ class ProductionSession:
             schedule=request.get("schedule", "dynamic"),
             chunk_size=request.get("chunk_size", 1),
             capacity=request.get("capacity", 32),
+            **native,
         )
 
     def state(self):
@@ -62,6 +69,7 @@ class ProductionSession:
                 retained_bytes=team.blocks.used,
                 blocks=len(team.blocks.blocks),
                 backend=team.variant,
+                metadata=self.metadata_state(team.blocks),
                 participants=(
                     int(team.lib.b4_omp_participants(team.owner))
                     if team.variant == "openmp" and team.owner is not None
@@ -80,10 +88,26 @@ class ProductionSession:
             returns=getattr(packet, "calls", 0),
             retained_bytes=getattr(store, "used", 0),
             blocks=len(getattr(store, "blocks", {})),
+            metadata=self.metadata_state(store),
             pool_started=bool(
                 getattr(owner, "slots", ()) and owner.pool_started()
             ),
             processes=len(getattr(owner, "slots", ())),
+        )
+
+    @staticmethod
+    def metadata_state(store):
+        metadata = getattr(store, "metadata", None)
+        return (
+            None
+            if metadata is None
+            else dict(
+                stats=dict(metadata.stats),
+                catalogue_bytes=metadata.used,
+                cache_directory=None
+                if metadata.cache_directory is None
+                else str(metadata.cache_directory),
+            )
         )
 
     def call(self, request):
@@ -102,6 +126,7 @@ class ProductionSession:
                 "chunk_size",
                 "capacity",
                 "seed",
+                "metadata_cache",
             )
         )
         key += (tuple(sorted(request.get("worker_settings", {}).items())),)

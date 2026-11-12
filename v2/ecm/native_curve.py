@@ -8,7 +8,11 @@ from ..common import utils
 from ..execution import stage_jobs
 from .chain_records import verify_frontier
 from .native_packet import NativePacket, _bytes
-from .native_resources import close_resource_checks, poll_native_budget
+from .native_resources import (
+    close_resource_checks,
+    native_bulk_allowed,
+    poll_native_budget,
+)
 
 PHASES = (
     "setup",
@@ -40,11 +44,28 @@ def exclusive_curve(method):
 class BlockStore:
     """One checked immutable native metadata store per retained scalar/team."""
 
-    def __init__(self):
+    def __init__(self, *, metadata_cache=None):
         self.blocks = {}
         self.verified = set()
-        self.used = 0
+        self._used = 0
         self.ffi = self.lib = None
+        self.metadata_cache = metadata_cache
+        self.metadata = None
+
+    @property
+    def used(self):
+        return self._used + (
+            0 if self.metadata is None else self.metadata.used
+        )
+
+    def native_metadata(self):
+        if self.metadata is None:
+            from .native_metadata import NativeMetadata
+
+            self.metadata = NativeMetadata(
+                self.ffi, self.lib, cache_directory=self.metadata_cache
+            )
+        return self.metadata
 
     def bind(self, packet):
         if self.ffi is None:
@@ -59,7 +80,31 @@ class BlockStore:
                 raise RuntimeError("native metadata still borrowed by a curve")
         self.blocks.clear()
         self.verified.clear()
-        self.used = 0
+        if self.metadata is not None:
+            self.metadata.close()
+            self.metadata = None
+        self._used = 0
+
+    def bulk(self, key, lo, hi, bound, plan, budget, *, b1, b2):
+        cached = self.blocks.get(key)
+        if cached is not None:
+            budget.consume(1)
+            return cached
+        # Reserve the worst-case odd-prime descriptors and temporary sieve
+        # before any native construction. Actual retention is recorded below.
+        unit_bytes = 128 if plan is None else plan.unit_bytes
+        reserve = 512 + unit_bytes * ((hi - lo + 1) // 2 + 1)
+        metadata = self.native_metadata()
+        if len(self.blocks) >= 4096 or self.used + reserve > 64 * 2**20:
+            raise ValueError(
+                "native immutable metadata exceeds supported geometry"
+            )
+        budget.consume(reserve + (hi - lo) // 2)
+        result = metadata.block(lo, hi, bound, plan, budget, b1=b1, b2=b2)
+        self.blocks[key] = result
+        self._used += 512 + int(self.lib.b4_block_bytes(result[0]))
+        poll_native_budget(budget, self)
+        return result
 
     def register(self, key, values, lo, hi, bound, plan, budget, *, b1, b2):
         cached = self.blocks.get(key)
@@ -134,7 +179,7 @@ class BlockStore:
                         "native prepared stage-two indices refused"
                     )
                 self.blocks[key] = block, values
-                self.used += reserve
+                self._used += reserve
             except BaseException:
                 lib.b4_block_destroy(block)
                 raise
@@ -155,9 +200,11 @@ class NativeCurvePacket(NativePacket):
     phase_clocks = False
     actions = None
 
-    def __init__(self, *, mode="c-gmp", _blocks=None, **kwargs):
+    def __init__(
+        self, *, mode="c-gmp", _blocks=None, metadata_cache=None, **kwargs
+    ):
         super().__init__(mode=mode, **kwargs)
-        self.blocks = _blocks or BlockStore()
+        self.blocks = _blocks or BlockStore(metadata_cache=metadata_cache)
         self.owns_blocks = _blocks is None
         self.job = self.context_source = self.config = None
         self.charged = 0
@@ -202,7 +249,20 @@ class NativeCurvePacket(NativePacket):
         return value
 
     def _plan(self, job, context, budget):
+        if self._bulk_allowed(context, budget):
+            plan = self.blocks.native_metadata().plan(job, context, budget)
+            if plan is not None:
+                return plan
         return stage_jobs.stage_one_plan(job, context, budget)
+
+    def _bulk_allowed(self, context, budget):
+        from .native_metadata import supported_context
+
+        return (
+            not self.atomic_actions
+            and native_bulk_allowed(budget)
+            and supported_context(context)
+        )
 
     def _block(self, lo, hi, bound, budget, *, values=None, purpose="cursor"):
         plan = self.plan if bound else None
@@ -216,6 +276,25 @@ class NativeCurvePacket(NativePacket):
             self.job["b1"],
             self.job["b2"],
         )
+        if (
+            values is None
+            and purpose == "cursor"
+            and hi <= 2**32
+            and self._bulk_allowed(self.context_source, budget)
+        ):
+            from .native_metadata import NativePlan
+
+            if plan is None or isinstance(plan, NativePlan):
+                return self.blocks.bulk(
+                    key,
+                    lo,
+                    hi,
+                    bound,
+                    plan,
+                    budget,
+                    b1=self.job["b1"],
+                    b2=self.job["b2"],
+                )
         if key not in self.blocks.blocks and values is None:
             program = getattr(self.context_source, "program_segment", None)
             if program is not None:
@@ -303,7 +382,9 @@ class NativeCurvePacket(NativePacket):
             )
         )
         if job["phase"] != "setup":
-            self.plan = self._plan(job, context, budget)
+            # Public/restored descriptors retain their original validation and
+            # accepted plans. Native-only plans serve fresh trusted work.
+            self.plan = stage_jobs.stage_one_plan(job, context, budget)
             self.restore(job, budget)
         self.canonical_ready = True
 

@@ -105,6 +105,208 @@ static int record_copy(b4_record *dest, const b4_record *src) {
     return 0;
 }
 
+/* This is verify_frontier's forward-ancestor certificate, independently
+ * checked before native-only catalogue use. At most512 instructions introduce
+ * 1026 coordinate bits; fixed scratch is bounded independently of the input. */
+static int frontier_valid(const b4_record *r, uint64_t scalar) {
+    if (!record_valid(r, scalar)) return 0;
+    uint64_t states[POINTS][2][17] = {{{0}}}, covered[17] = {0};
+    states[0][0][0] = 1; states[0][1][0] = 2;
+    covered[0] = r->masks[0];
+    size_t steps = r->code_size / 4;
+    for (size_t index = 1; index <= steps; ++index) {
+        const unsigned char *op = r->code + 4 * (index - 1);
+        uint64_t x[17] = {0}, z[17] = {0};
+        x[(2 * index) / 64] = (uint64_t)1 << ((2 * index) % 64);
+        z[(2 * index + 1) / 64] = (uint64_t)1 << ((2 * index + 1) % 64);
+        for (unsigned word = 0; word < 17; ++word) {
+            if (op[3] == 255)
+                z[word] |= states[op[1]][0][word] | states[op[1]][1][word];
+            else {
+                x[word] |= states[op[3]][1][word];
+                z[word] |= states[op[3]][0][word];
+            }
+            if (r->masks[index] & 1) covered[word] |= x[word];
+            if (r->masks[index] & 2) covered[word] |= z[word];
+        }
+        memcpy(states[op[0]][0], x, sizeof(x));
+        memcpy(states[op[0]][1], z, sizeof(z));
+    }
+    unsigned bits = (unsigned)(2 * (steps + 1));
+    for (unsigned word = 0; word < 17; ++word) {
+        uint64_t actual = covered[word] | states[r->output][0][word] |
+                          states[r->output][1][word];
+        unsigned left = bits > 64 * word ? bits - 64 * word : 0;
+        uint64_t expected = left >= 64 ? UINT64_MAX :
+                            left ? ((uint64_t)1 << left) - 1 : 0;
+        if (actual != expected) return 0;
+    }
+    return 1;
+}
+
+struct b4_catalogue {
+    size_t count;
+    uint64_t *scalars;
+    b4_record *records;
+};
+
+static uint64_t little_get(const unsigned char *p, unsigned width) {
+    uint64_t value = 0;
+    for (unsigned i = 0; i < width; ++i) value |= (uint64_t)p[i] << (8 * i);
+    return value;
+}
+
+void b4_catalogue_destroy(b4_catalogue *catalogue) {
+    if (!catalogue) return;
+    for (size_t i = 0; i < catalogue->count; ++i) {
+        free((void *)catalogue->records[i].code);
+        free((void *)catalogue->records[i].masks);
+    }
+    free(catalogue->records); free(catalogue->scalars); free(catalogue);
+}
+
+b4_catalogue *b4_catalogue_create(const unsigned char *data, size_t size) {
+    if (!data || size < 4 || size > 2 * 1024 * 1024) return NULL;
+    size_t count = (size_t)little_get(data, 4), offset = 4;
+    if (count > 1024) return NULL;
+    b4_catalogue *catalogue = calloc(1, sizeof(*catalogue));
+    if (!catalogue) return NULL;
+    catalogue->scalars = calloc(count ? count : 1, sizeof(uint64_t));
+    catalogue->records = calloc(count ? count : 1, sizeof(b4_record));
+    if (!catalogue->scalars || !catalogue->records) goto invalid_catalogue;
+    uint64_t previous = 0;
+    for (size_t i = 0; i < count; ++i) {
+        if (size - offset < 14) goto invalid_catalogue;
+        const unsigned char *p = data + offset;
+        uint64_t scalar = little_get(p, 8);
+        size_t codes = (size_t)little_get(p + 8, 2);
+        size_t masks = (size_t)little_get(p + 10, 2);
+        offset += 14;
+        if (scalar <= previous || codes > size - offset ||
+            masks > size - offset - codes) goto invalid_catalogue;
+        b4_record record = {data + offset, data + offset + codes,
+                            codes, masks, p[12], p[13]};
+        if (!frontier_valid(&record, scalar) ||
+            record_copy(&catalogue->records[i], &record)) goto invalid_catalogue;
+        catalogue->scalars[i] = scalar;
+        ++catalogue->count; previous = scalar; offset += codes + masks;
+    }
+    if (offset != size) goto invalid_catalogue;
+    return catalogue;
+invalid_catalogue:
+    b4_catalogue_destroy(catalogue);
+    return NULL;
+}
+
+static const b4_record *catalogue_find(const b4_catalogue *catalogue,
+                                       uint64_t scalar) {
+    size_t lo = 0, hi = catalogue->count;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (catalogue->scalars[mid] < scalar) lo = mid + 1; else hi = mid;
+    }
+    return lo < catalogue->count && catalogue->scalars[lo] == scalar ?
+           &catalogue->records[lo] : NULL;
+}
+
+/* The same finite segmented Eratosthenes contract as SieveContext. This is a
+ * bulk implementation of existing work, not a different prime algorithm.
+ * Wider endpoints retain Python's exact implementation. The root is <=65535,
+ * block width <=65536, and every retained descriptor is checked before use. */
+b4_prime_block *b4_block_generate(b4_catalogue *catalogue,
+                                  unsigned long long lo, unsigned long long hi,
+                                  unsigned long long bound, unsigned chain) {
+    if (!catalogue || lo < 2 || hi <= lo || hi > ((uint64_t)1 << 32) ||
+        hi - lo > 65536 || chain > 1 || (chain && (!bound || bound > 2000)) ||
+        (bound && hi - 1 > bound)) return NULL;
+    size_t width = (size_t)(hi - lo), root = (size_t)sqrt64(hi - 1);
+    unsigned char *base = calloc(root + 1, 1), *composite = calloc(width, 1);
+    b4_curve_unit *units = calloc(width / 2 + 1, sizeof(*units));
+    if (!base || !composite || !units) {
+        free(base); free(composite); free(units); return NULL;
+    }
+    for (uint64_t prime = 2; prime <= root; ++prime) {
+        if (base[prime]) continue;
+        if (prime <= root / prime)
+            for (uint64_t multiple = prime * prime; multiple <= root;
+                 multiple += prime) base[multiple] = 1;
+        uint64_t first = ((lo + prime - 1) / prime) * prime;
+        if (first < prime * prime) first = prime * prime;
+        for (uint64_t multiple = first; multiple < hi; multiple += prime)
+            composite[multiple - lo] = 1;
+    }
+    size_t count = 0;
+    unsigned valid = 1;
+    for (uint64_t prime = lo; prime < hi; ++prime) {
+        if (composite[prime - lo]) continue;
+        b4_curve_unit *u = &units[count++];
+        u->prime = u->power = prime;
+        if (bound) while (u->power <= bound / prime) u->power *= prime;
+        if (chain) {
+            const b4_record *fast = catalogue_find(catalogue, u->power);
+            const b4_record *unit = catalogue_find(catalogue, prime);
+            if (!fast || !unit) { valid = 0; break; }
+            u->fast = *fast; u->unit = *unit;
+            unsigned exponent = 0;
+            for (uint64_t power = u->power; power > 1; power /= prime) ++exponent;
+            /* Match ChainPlan's funded fast/strict/repeated-unit work. */
+            u->reserve = 3 * (fast->code_size / 4) + 3 +
+                5 * (fast->code_size / 4) + 10 * bits64(u->power) + 8 +
+                exponent * (5 * (unit->code_size / 4) + 10 * bits64(prime) + 8);
+        }
+    }
+    b4_prime_block *block = valid ?
+        b4_block_create(lo, hi, bound, chain, units, count) : NULL;
+    free(base); free(composite); free(units);
+    return block;
+}
+
+size_t b4_block_count(const b4_prime_block *block) {
+    return block ? block->count : 0;
+}
+
+size_t b4_block_bytes(const b4_prime_block *block) {
+    if (!block) return 0;
+    size_t bytes = sizeof(*block) + (block->count ? block->count : 1) * sizeof(b4_curve_unit);
+    if (block->centers) bytes += block->count * sizeof(uint64_t);
+    if (block->offsets) bytes += block->count * sizeof(unsigned);
+    if (block->chain)
+        for (size_t i = 0; i < block->count; ++i)
+            bytes += block->units[i].fast.code_size + block->units[i].fast.masks_size +
+                     block->units[i].unit.code_size + block->units[i].unit.masks_size;
+    return bytes;
+}
+
+int b4_block_encode(const b4_prime_block *block, unsigned char *data, size_t size) {
+    if (!block || size != 16 * block->count || (size && !data)) return -1;
+    for (size_t i = 0; i < block->count; ++i) {
+        uint64_t values[2] = {block->units[i].prime, block->units[i].power};
+        for (unsigned field = 0; field < 2; ++field)
+            for (unsigned byte = 0; byte < 8; ++byte)
+                data[16 * i + 8 * field + byte] =
+                    (unsigned char)(values[field] >> (8 * byte));
+    }
+    return 0;
+}
+
+b4_prime_block *b4_block_decode(b4_catalogue *catalogue,
+                                unsigned long long lo, unsigned long long hi,
+                                unsigned long long bound, unsigned chain,
+                                const unsigned char *data, size_t size) {
+    if ((size && !data) || size % 16 || size > 65536 * 16) return NULL;
+    b4_prime_block *block = b4_block_generate(catalogue, lo, hi, bound, chain);
+    if (!block) return NULL;
+    /* Hashes identify artifacts; this independently proves exact coverage and
+     * powers, including no missing/extra prime. Programs come only from the
+     * bound, certified immutable catalogue, never unchecked cached opcodes. */
+    unsigned valid = size == 16 * block->count;
+    for (size_t i = 0; valid && i < block->count; ++i)
+        valid = little_get(data + 16 * i, 8) == block->units[i].prime &&
+                little_get(data + 16 * i + 8, 8) == block->units[i].power;
+    if (!valid) { b4_block_destroy(block); return NULL; }
+    return block;
+}
+
 int b4_block_destroy(b4_prime_block *b) {
     if (!b) return 0;
     if (b->refs) return -1;

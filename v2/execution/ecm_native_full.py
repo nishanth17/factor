@@ -79,6 +79,7 @@ def run_full(owner, n, config, budget, lineage, checkpoint, fixed_work):
                 schedule=owner.schedule,
                 capacity=owner.capacity,
                 chunk_size=owner.chunk_size,
+                metadata_cache=owner.metadata_cache,
             )
         slices_before = owner.team.slices
         factors = [

@@ -71,6 +71,7 @@ class NativeECMExecutor:
         schedule="dynamic",
         capacity=None,
         chunk_size=1,
+        metadata_cache=None,
     ):
         self.seed = integer(seed, "method seed", 0, 2**256 - 1)
         self.settings = settings or WorkerSettings(workers=2)
@@ -94,6 +95,7 @@ class NativeECMExecutor:
             32,
         )
         self.schedule = schedule
+        self.metadata_cache = metadata_cache
         # Diagnostic retained-capacity estimate; the root observes actual RSS.
         self.owned_bytes = (
             self.settings.owned_bytes
@@ -126,6 +128,9 @@ class NativeECMExecutor:
                 self.schedule,
                 self.capacity,
                 self.chunk_size,
+                None
+                if self.metadata_cache is None
+                else str(self.metadata_cache),
             ]
         )
 

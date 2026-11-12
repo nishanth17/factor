@@ -78,13 +78,26 @@ class ECMExecutor:
     """
 
     def __init__(
-        self, *, seed=0, settings=None, rule=None, force_workers=False
+        self,
+        *,
+        seed=0,
+        settings=None,
+        rule=None,
+        force_workers=False,
+        metadata_cache=None,
     ):
         integer(seed, "method seed", 0, 2**256 - 1)
         if type(force_workers) is not bool:
             raise ValueError("force_workers must be Boolean")
         self.seed = seed
         self.settings = settings or WorkerSettings()
+        if metadata_cache is not None and (
+            self.settings.workers != 1 or force_workers
+        ):
+            raise ValueError(
+                "metadata cache requires the serial whole-native owner"
+            )
+        self.metadata_cache = metadata_cache
         self.rule = rule or EngagementRule()
         self.force_workers = force_workers
         self.slots = []
@@ -111,6 +124,10 @@ class ECMExecutor:
                 force_workers,
             ]
         )
+        if metadata_cache is not None:
+            self.identity = digest(
+                [self.identity, "native-metadata-cache", str(metadata_cache)]
+            )
 
     def _record(self, stats):
         self.last_stats = stats
@@ -753,7 +770,9 @@ class ECMExecutor:
                             )
                 else:
                     if self.serial_engine is None:
-                        self.serial_engine = CurveEngine(self.settings)
+                        self.serial_engine = CurveEngine(
+                            self.settings, metadata_cache=self.metadata_cache
+                        )
                     slot = dict(
                         index=None,
                         metadata_cache=list(self.serial_engine.contexts),
@@ -775,6 +794,10 @@ class ECMExecutor:
                             else None,
                             packet=packet["packet"],
                         )
+                        if config.ecm_kernel == "c-gmp-full":
+                            from .native_resources import native_bulk_allowed
+
+                            task["native_bulk"] = native_bulk_allowed(base)
                         result = self.serial_engine.execute(
                             task,
                             cancelled=lambda: (

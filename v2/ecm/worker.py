@@ -43,8 +43,9 @@ def read_message(channel, decoder, *, block=False):
 class CurveEngine:
     """Bounded immutable metadata LRU; every curve owns fresh state."""
 
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, *, metadata_cache=None):
         self.settings = settings or WorkerSettings()
+        self.metadata_cache = metadata_cache
         self.identity = None
         self.context = self.programs = self.config = None
         self.contexts = OrderedDict()
@@ -94,6 +95,13 @@ class CurveEngine:
                 self.cache_evictions += 1
             config = PortfolioConfig(**options)
             context, programs = _execution_context({}, config, budget)
+            if self.metadata_cache is not None:
+                packet = getattr(programs or context, "native_packet", None)
+                if config.ecm_kernel != "c-gmp-full" or packet is None:
+                    raise ValueError(
+                        "metadata cache requires whole-native ECM"
+                    )
+                packet.blocks.metadata_cache = self.metadata_cache
             if self.settings.packed_cache_bytes:
                 if programs is None:
                     from .programs import ECMPrograms
@@ -160,6 +168,10 @@ class CurveEngine:
             rss_bytes=None,
             cancelled=cancelled,
         )
+        # Only the serial owner's checked ordinary root may delegate bounded
+        # native preparation. Custom/action-sensitive callers retain the exact
+        # original callback path; this flag never replaces a resource sample.
+        budget._native_bulk_allowed = message.get("native_bulk", False) is True
         if previous_cpu is not None:
             budget._cpu_start = previous_cpu
         job = new_job(

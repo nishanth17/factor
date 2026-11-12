@@ -1,13 +1,27 @@
 # Factor status
 
 Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
-requests, freezes and charges. B4a native tuning is delivered; final 3F confirmation and integration
-readiness are now authorized and active under a separate finite allowance.
+requests, freezes and charges. B4a boundary closeout now precedes the revised
+final 3F confirmation; implementation and confirmation have separate allowances.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
 
-**B4a final 3F confirmation — active.**
+**B4a material native boundary closeout — active.**
+Entry `410eba0`; current request and new evidence:
+`v2/audit/b4a/native_boundary_closeout_20261111/REQUEST.md`.
+The previous 3F controller, watchdogs and owned groups are drained, with every
+reservation settled. Its charges and untouched held-out cohort are preserved.
+Both fixed-work anchors now have clean cold/warm baselines and matched A/A
+observations on exposed 60/80/100-digit inputs. Prime/program preparation,
+generation/refill/settlement and conversion/export ceilings remain under review.
+Existing whole-classical C/GMP execution, compact exports, shared metadata and
+historical compiler/runtime/SIMD outcomes are controls. Material open boundaries
+must be settled before revised fresh confirmation. Persisted experimental cache
+data stays in the project-local audit cache and counts toward the capture limit.
+No merge, push or automatic-default change.
+
+**B4a final 3F confirmation — paused for boundary closeout.**
 Entry `f1bc14d`; committed production control `98bf836`. New runner-side phase,
 canonical-QS-prefix and native-thread observations pass bounded admission.
 Both ECM anchors and all four cold/warm controls are feasible on exposed inputs;

@@ -14,9 +14,9 @@ from .native_team import (
 class NativeCurveTeam(NativeTeam):
     """Borrow private contexts for one drained generation; refill in Python."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, metadata_cache=None, **kwargs):
         super().__init__(**kwargs)
-        self.blocks = BlockStore()
+        self.blocks = BlockStore(metadata_cache=metadata_cache)
         self.bindings = {}
         self.phase_clocks = False
         self.atomic_actions = False

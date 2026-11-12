@@ -24,6 +24,7 @@ RUNTIME_FIELDS = {
     "seconds",
     "cpu_seconds",
     "worker_settings",
+    "metadata_cache",
     "op",
 }
 METADATA_FIELDS = {

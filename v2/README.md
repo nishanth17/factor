@@ -17,6 +17,16 @@ uses provided LLVM/libomp and static/dynamic worksharing, with no automatic
 selection. The retained NEON prototype lost its
 scoped comparison and remains outside the executor.
 
+Whole-native ECM also prepares eligible standard prime/program blocks in bulk
+and checks exact coverage and scalar/coordinate certificates in C. Custom
+providers, injected clocks and action-sensitive calls retain the checked
+Python preparation path. The explicit native scalar or pthread owner accepts
+`metadata_cache=path` for an experimental data-only cache; no cache directory
+is selected automatically. Cache artifacts bind source, format, bounds and
+program identities and undergo mathematical checks after digest validation.
+Construction, load, fallback and retained storage require complete-cost
+comparison before selecting a cache configuration.
+
 ## Setup and first run
 
 With PyPy implementing Python 3.11 installed, run from the repository root:

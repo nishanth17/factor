@@ -2,12 +2,29 @@
 
 import errno
 import os
+import time
 
 from ..execution.resources import (
     MacResources,
     ProcessSample,
 )
 from .native_packet import poll_budget
+
+
+def native_bulk_allowed(budget):
+    """Keep injected clocks, providers and action-sensitive callbacks exact."""
+    from ..execution.budget import Budget
+    from ..execution.ecm_workers import _base_budget
+
+    base = _base_budget(budget)
+    ordinary = type(base) is Budget and base.cancelled is None
+    delegated = getattr(base, "_native_bulk_allowed", False)
+    return (
+        (ordinary or delegated)
+        and type(base.provider) is MacResources
+        and base._wall_clock is time.monotonic
+        and base._cpu_clock is time.process_time
+    )
 
 
 class NativeRootProvider:

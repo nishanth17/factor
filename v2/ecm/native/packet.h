@@ -108,6 +108,7 @@ int b4_team_step(b4_context *const *contexts, size_t count, unsigned workers,
 int b4_result(const b4_context *ctx, b4_output *output);
 /* Whole-curve ordinary-mpz owner. Metadata is immutable and copied once. */
 typedef struct b4_prime_block b4_prime_block;
+typedef struct b4_catalogue b4_catalogue;
 typedef struct {
     unsigned long long prime, power, reserve;
     b4_record fast, unit;
@@ -132,6 +133,21 @@ b4_prime_block *b4_block_create(unsigned long long lo, unsigned long long hi,
 int b4_block_destroy(b4_prime_block *block);
 int b4_block_prepare(b4_prime_block *block, unsigned long long b1,
                       unsigned long long b2);
+/* Data-only native preparation. Catalogue records have independent scalar and
+ * coordinate-frontier proofs; generated blocks prove complete prime coverage.
+ * The bounded portable codec uses explicit little-endian 64-bit integers. */
+b4_catalogue *b4_catalogue_create(const unsigned char *data, size_t size);
+void b4_catalogue_destroy(b4_catalogue *catalogue);
+b4_prime_block *b4_block_generate(b4_catalogue *catalogue,
+                                  unsigned long long lo, unsigned long long hi,
+                                  unsigned long long bound, unsigned chain);
+size_t b4_block_count(const b4_prime_block *block);
+size_t b4_block_bytes(const b4_prime_block *block);
+int b4_block_encode(const b4_prime_block *block, unsigned char *data, size_t size);
+b4_prime_block *b4_block_decode(b4_catalogue *catalogue,
+                                unsigned long long lo, unsigned long long hi,
+                                unsigned long long bound, unsigned chain,
+                                const unsigned char *data, size_t size);
 int b4_curve_begin(b4_context *ctx, b4_value n, b4_value sigma,
                     unsigned long long b1, unsigned long long b2,
                     unsigned chunk, unsigned gcd_batch, unsigned segment);

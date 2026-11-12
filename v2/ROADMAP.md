@@ -298,7 +298,15 @@ does not establish a free increase in B1.
   ordinary imports. Actual teams, failures, limits, cancellation, paid replay
   and cleanup pass. The exact observer remains enabled; a bounded inherited-
   lock preflight holds the performance window through all final stage cleanup.
-- **Active final 3F:** the separately authorized request now funds fresh
+- **Active boundary closeout:** from `410eba0`, establish current removable
+  critical-path ceilings against matched A/A for preparation/registration,
+  generation/refill/settlement and conversion/export. Implement material exact
+  bulk alternatives or document applicable retain-path evidence. Existing
+  whole-classical C/GMP arithmetic and previous wins/losses remain controls.
+  Current request: `v2/audit/b4a/native_boundary_closeout_20261111/REQUEST.md`.
+  Persisted cache data is project-local, checked and included in the finite
+  capture allowance. An unresolved material path prevents closeout.
+- **Paused final 3F:** the separately authorized request funds fresh
   affected 60/80/100-digit confirmation, cheap/recovery/lifecycle guards and
   staged balanced 60/70 ECM-to-QS integration. The first look uses three
   independent inputs per band; conditional successors follow frozen policy.
