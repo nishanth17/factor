@@ -1025,3 +1025,14 @@ Committed-only `cbdae41` passes 1,786 tests (14 optional skips), full lint,
 costs, individual intervals, final-tail/allocation evidence, thermal limits,
 all failures and separate new charges remain local:
 `v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
+
+
+### B4a final 3F execution (active, 11 November 2026)
+
+The new finite confirmation driver and separate integration observer are under
+`v2/benchmarks/ecm/b4a/`. They preserve mathematical parameters, serialize known
+fixture labels outside runtime calls, settle complete owner CPU through `wait4`
+and compare canonical published QS prefixes. Sparse Mach thread CPU/state reads
+are confined to the observed integration lane. Current request, priced protocol
+and source/build/recipe freezes remain local in
+`v2/audit/b4a/confirmation_3f_20261111/`. Fresh results and readiness are pending.

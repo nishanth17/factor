@@ -1,11 +1,23 @@
 # Factor status
 
 Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
-requests, freezes and charges. B4a renewed CPU/heap tuning is delivered;
-its separate 3F confirmation plan is frozen and unexecuted.
+requests, freezes and charges. B4a native tuning is delivered; final 3F confirmation and integration
+readiness are now authorized and active under a separate finite allowance.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
 Last updated: 11 November 2026 (America/Los_Angeles).
+
+**B4a final 3F confirmation — active.**
+Entry `f1bc14d`; committed production control `98bf836`. New runner-side phase,
+canonical-QS-prefix and native-thread observations pass bounded admission.
+Both ECM anchors and all four cold/warm controls are feasible on exposed inputs;
+fresh generation and confirmation follow the frozen plan. Keep scalar 256,
+pthread-four shallow / pthread-eight deep, dynamic/chunk 1/capacity 32.
+The request separately funds fresh affected ECM and staged balanced 60/70
+integration guards; earlier unfunded proposals and charges remain historical.
+Current request, plan, source/build pins and receipts:
+`v2/audit/b4a/confirmation_3f_20261111/PLAN_R1.md`.
+No merge, push, automatic defaults, numerical policy or optimization search.
 
 **B4a native oversubscription screen — delivered.**
 Entry `ed139a1`; final changed-source checkpoint `cbdae41`. Whole-owner pthread
