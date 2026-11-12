@@ -252,10 +252,11 @@ static uint64_t clock_ns(clockid_t id) {
     return (uint64_t)ts.tv_sec * 1000000000u + (uint64_t)ts.tv_nsec;
 }
 
-int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
+static int pthread_dispatch(b4_pthread_team *t, b4_context *const *contexts,
                     size_t count, unsigned workers, unsigned schedule,
                     unsigned chunk, unsigned milliseconds, unsigned actions,
-                    int *statuses, unsigned *actual) {
+                    int *statuses, unsigned *actual,
+                    uint64_t fixed_wall, uint64_t fixed_cpu) {
     if (actual) *actual = 0;
     if (!t || !actual || count > 32 ||
         (count && (!contexts || !statuses)) ||
@@ -305,8 +306,8 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
     }
     t->contexts = contexts; t->statuses = statuses; t->count = count;
     t->schedule = schedule; t->chunk = chunk; t->actions = actions;
-    t->wall_end = wall + (uint64_t)milliseconds * 1000000u;
-    t->cpu_end = cpu + (uint64_t)workers * milliseconds * 1000000u;
+    t->wall_end = fixed_wall ? fixed_wall : wall + (uint64_t)milliseconds * 1000000u;
+    t->cpu_end = fixed_cpu ? fixed_cpu : cpu + (uint64_t)workers * milliseconds * 1000000u;
     t->completed = t->waiting = t->participants = 0;
     atomic_store(&t->next, 0); atomic_store(&t->failed, 0);
     ++t->generation; ++t->counters[2];
@@ -340,6 +341,34 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
     pthread_mutex_unlock(&t->mutex);
     return result;
 }
+
+int b4_pthread_step(b4_pthread_team *t, b4_context *const *contexts,
+                    size_t count, unsigned workers, unsigned schedule,
+                    unsigned chunk, unsigned milliseconds, unsigned actions,
+                    int *statuses, unsigned *actual) {
+    return pthread_dispatch(t, contexts, count, workers, schedule, chunk,
+                             milliseconds, actions, statuses, actual, 0, 0);
+}
+
+static int pthread_segment_dispatch(void *team, b4_context *const *contexts,
+                                      size_t count, unsigned workers,
+                                      unsigned schedule, unsigned chunk,
+                                      unsigned milliseconds, unsigned actions,
+                                      int *statuses, unsigned *actual,
+                                      unsigned long long wall_end,
+                                      unsigned long long cpu_end) {
+    return pthread_dispatch(team, contexts, count, workers, schedule, chunk,
+                             milliseconds, actions, statuses, actual, wall_end, cpu_end);
+}
+
+int b4_pthread_segment(b4_pthread_team *t, b4_context *const *contexts,
+                         size_t count, unsigned workers, unsigned schedule,
+                         unsigned chunk, unsigned actions, int *statuses,
+                         unsigned *actual, const b4_segment_policy *policy,
+                         b4_segment_info *info) {
+    return b4_team_segment(t, pthread_segment_dispatch, contexts, count,
+                            workers, schedule, chunk, actions, statuses, actual, policy, info);
+}
 #else
 unsigned b4_pthread(void) { return 0; }
 b4_pthread_team *b4_pthread_create(void) { return NULL; }
@@ -360,6 +389,15 @@ int b4_pthread_step(b4_pthread_team *t, b4_context *const *c, size_t n,
                     int *r, unsigned *actual) {
     (void)t; (void)c; (void)n; (void)w; (void)s; (void)k; (void)m;
     (void)a; (void)r;
+    if (actual) *actual = 0;
+    return -2;
+}
+int b4_pthread_segment(b4_pthread_team *t, b4_context *const *c, size_t n,
+                         unsigned w, unsigned s, unsigned k, unsigned a,
+                         int *r, unsigned *actual, const b4_segment_policy *p,
+                         b4_segment_info *i) {
+    (void)t; (void)c; (void)n; (void)w; (void)s; (void)k; (void)a;
+    (void)r; (void)p; (void)i;
     if (actual) *actual = 0;
     return -2;
 }

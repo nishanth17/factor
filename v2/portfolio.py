@@ -58,9 +58,36 @@ from .execution.stage_jobs import (
     take_prime,
 )
 from .factor import FactorizationResult, PrimeFactor
-from .qs import SIQSConfig as SIQSConfig
-from .qs import SIQSJob
-from .qs.sss import SSSConfig, SSSJob
+
+_LAZY_RELATION_EXPORTS = frozenset(
+    ("SIQSConfig", "SIQSJob", "SSSConfig", "SSSJob")
+)
+
+
+def _relation_type(name):
+    if name not in globals():
+        if name in ("SIQSConfig", "SIQSJob"):
+            from .qs import SIQSConfig, SIQSJob
+
+            globals().update(SIQSConfig=SIQSConfig, SIQSJob=SIQSJob)
+        else:
+            from .qs.sss import SSSConfig, SSSJob
+
+            globals().update(SSSConfig=SSSConfig, SSSJob=SSSJob)
+    return globals()[name]
+
+
+def __getattr__(name):
+    # Preserve public aliases and patchable job factories without importing a
+    # relation engine on pure ECM, cheap exits or checkpoint packing.
+    if name in _LAZY_RELATION_EXPORTS:
+        return _relation_type(name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | _LAZY_RELATION_EXPORTS)
+
 
 CHECKPOINT_VERSION = 10
 OPTIONAL_CHAIN_CHECKPOINT_VERSION = 11
@@ -424,14 +451,14 @@ def _advance(
         job = siqs_runtime.get("job")
         if job is None:
             if current.get("sss_checkpoint") is not None:
-                job = SSSJob.from_checkpoint(
+                job = _relation_type("SSSJob").from_checkpoint(
                     current["sss_checkpoint"], budget=budget, config=config.sss
                 )
             else:
                 if "sss_seed" not in current:
                     budget.consume()
                     current["sss_seed"] = generator.getrandbits(63)
-                job = SSSJob(
+                job = _relation_type("SSSJob")(
                     n,
                     seed=current["sss_seed"],
                     config=config.sss,
@@ -469,7 +496,7 @@ def _advance(
     if current["stage"] == "siqs":
         _admit_fallback(current, config, budget)
         job = siqs_runtime.get("job")
-        job_type = SIQSJob
+        job_type = _relation_type("SIQSJob")
         if qs_workers is not None:
             from .qs.current_parallel import CurrentParallelSIQSJob
 
@@ -1472,7 +1499,7 @@ def _factorize_bounded(
 
                 values = dict(saved_config["sss"])
                 values["collector"] = SieveConfig(**values["collector"])
-                saved_config["sss"] = SSSConfig(**values)
+                saved_config["sss"] = _relation_type("SSSConfig")(**values)
             config = PortfolioConfig(**saved_config)
         else:
             config = PortfolioConfig(
@@ -1729,3 +1756,9 @@ def _factorize_bounded(
         snapshot,
         budget.stop,
     )
+
+
+# Explicit star imports retain the same public relation aliases as before.
+__all__ = [name for name in globals() if not name.startswith("_")] + sorted(
+    _LAZY_RELATION_EXPORTS
+)

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include <unistd.h>
 #ifdef __APPLE__
 #include <libproc.h>
 #include <sys/resource.h>
@@ -461,6 +462,112 @@ int b4_step(b4_context *c, unsigned milliseconds, unsigned actions) {
     return b4_slice(c, wall + interval, cpu + interval, actions, NULL);
 }
 
+int b4_segment_start(const b4_segment_policy *policy, unsigned workers,
+                       b4_segment_info *info) {
+    if (info) memset(info, 0, sizeof(*info));
+    if (!policy || !info || policy->pid != (int)getpid() ||
+        !workers || workers > B4_NATIVE_MAX_WORKERS || policy->rss_limited > 1)
+        return -1;
+    uint64_t wall = nanoseconds(NULL, CLOCK_MONOTONIC);
+    uint64_t cpu = nanoseconds(NULL, CLOCK_PROCESS_CPUTIME_ID);
+    if (!wall || !cpu) { info->reason = B4_SEGMENT_OBSERVER_ERROR; info->error = EIO; return -1; }
+    uint64_t interval = policy->wall_ns < 5000000u ? policy->wall_ns : 5000000u;
+    uint64_t cpu_interval = (uint64_t)workers * 5000000u;
+    if (policy->cpu_ns < cpu_interval) cpu_interval = policy->cpu_ns;
+    if (wall > UINT64_MAX - interval || cpu > UINT64_MAX - cpu_interval) return -1;
+    info->wall_end = wall + interval; info->cpu_end = cpu + cpu_interval;
+    return 0;
+}
+
+static int segment_time(b4_segment_info *info) {
+    uint64_t wall = nanoseconds(NULL, CLOCK_MONOTONIC);
+    uint64_t cpu = nanoseconds(NULL, CLOCK_PROCESS_CPUTIME_ID);
+    if (!wall || !cpu) {
+        info->reason = B4_SEGMENT_OBSERVER_ERROR; info->error = EIO; return 1;
+    }
+    if (wall >= info->wall_end || cpu >= info->cpu_end) {
+        info->reason = B4_SEGMENT_QUANTUM; return 1;
+    }
+    return 0;
+}
+
+int b4_segment_observe(const b4_segment_policy *policy, b4_segment_info *info) {
+    if (segment_time(info)) return 1;
+    b4_root_observation root;
+    int status = b4_observe_root(policy->pid, &root);
+    ++info->observations;
+    if (status == 1) { info->reason = B4_SEGMENT_CHILDREN; return 1; }
+    if (status || (policy->birth && policy->birth != root.birth)) {
+        info->reason = B4_SEGMENT_OBSERVER_ERROR;
+        info->error = status < 0 ? -status : ESRCH;
+        return 1;
+    }
+    info->rss = root.rss;
+    if (policy->rss_limited && root.rss >= policy->rss) {
+        info->reason = B4_SEGMENT_RSS; return 1;
+    }
+    return 0;
+}
+
+int b4_team_segment(void *t, b4_segment_dispatch dispatch,
+                      b4_context *const *contexts, size_t count,
+                      unsigned workers, unsigned schedule, unsigned chunk,
+                      unsigned actions, int *statuses, unsigned *actual,
+                      const b4_segment_policy *policy, b4_segment_info *info) {
+    if (info) memset(info, 0, sizeof(*info));
+    if (!dispatch || !t || !contexts || !count || count > 32 || !statuses || !actual || !info)
+        return -1;
+    for (size_t i = 0; i < count; ++i) {
+        if (!curve_active(contexts[i])) return -1;
+        statuses[i] = 0;
+    }
+    *actual = 0;
+    int result = b4_segment_start(policy, workers, info);
+    if (result) goto segment_drained;
+    while (!b4_segment_observe(policy, info)) {
+        result = dispatch(t, contexts, count, workers, schedule, chunk,
+                                   5, actions, statuses, actual,
+                                   info->wall_end, info->cpu_end);
+        ++info->waves;
+        if (result) {
+            info->reason = result == -3 ? B4_SEGMENT_CANCELLED : B4_SEGMENT_FRONTIER;
+            break;
+        }
+        unsigned complete = 0;
+        for (size_t i = 0; i < count; ++i) {
+            if (statuses[i] == 1) complete = 1;
+            else if (statuses[i] < 0 || statuses[i] > 2) result = -4;
+        }
+        /* This barrier is the same all-ready publication opportunity as the
+         * legacy driver. Never advance peers beyond a completed curve. */
+        if (complete || result) {
+            info->reason = complete ? B4_SEGMENT_COMPLETE : B4_SEGMENT_FRONTIER;
+            break;
+        }
+        unsigned missing = 0;
+        for (size_t i = 0; i < count; ++i) {
+            if (statuses[i] != 2) continue;
+            /* Refills are bounded metadata actions. Keep actual wall/CPU
+             * checks here; the next wave observes actual RSS before math.
+             * Cached pointer refills need no extra process-tree query. */
+            if (segment_time(info)) goto segment_drained;
+            int refill = b4_curve_autofeed(contexts[i], policy, info);
+            if (refill == 3) goto segment_drained;
+            if (refill == 2) missing = 1;
+            else if (refill) { result = refill == -5 ? -5 : -4; break; }
+            else { statuses[i] = 0; ++info->refills; }
+        }
+        if (missing || result) {
+            info->reason = missing ? B4_SEGMENT_METADATA : B4_SEGMENT_FRONTIER;
+            break;
+        }
+    }
+segment_drained:
+    for (size_t i = 0; i < count; ++i) info->work[i] = b4_curve_work(contexts[i]);
+    info->metadata_work = b4_curve_metadata_work(contexts[0]);
+    return result;
+}
+
 unsigned b4_openmp(void) {
 #ifdef B4_OPENMP
     return 1;
@@ -543,6 +650,42 @@ int b4_result(const b4_context *c, b4_output *out) {
 }
 
 #include "curve.c"
+
+int b4_segment(b4_context *c, unsigned actions,
+                 const b4_segment_policy *policy, b4_segment_info *info) {
+    if (!curve_active(c) || !actions || actions > b4_slice_actions() || !info)
+        return -1;
+    int status = b4_segment_start(policy, 1, info);
+    if (status) {
+        info->work[0] = b4_curve_work(c);
+        info->metadata_work = b4_curve_metadata_work(c);
+        return status;
+    }
+    while (!b4_segment_observe(policy, info)) {
+        if (c->curve->info.need) {
+            status = b4_curve_autofeed(c, policy, info);
+            if (status == 3) { status = 0; break; }
+            if (status) { info->reason = B4_SEGMENT_METADATA; break; }
+            ++info->refills;
+        }
+        status = b4_slice(c, info->wall_end, info->cpu_end, actions, NULL);
+        ++info->waves;
+        if (status < 0) {
+            info->reason = status == -3 ? B4_SEGMENT_CANCELLED : B4_SEGMENT_FRONTIER;
+            break;
+        }
+        if (status == 1) { info->reason = B4_SEGMENT_COMPLETE; break; }
+        if (c->curve->atomic_actions && c->curve->info.boundary) {
+            info->reason = B4_SEGMENT_FRONTIER; break;
+        }
+    }
+    if (info->reason != B4_SEGMENT_METADATA && status == 2) status = 0;
+    info->work[0] = b4_curve_work(c);
+    info->metadata_work = b4_curve_metadata_work(c);
+    return status;
+}
+
+
 
 unsigned b4_wide_remainder(void) {
 #if GMP_NUMB_BITS == 64 && GMP_NAIL_BITS == 0

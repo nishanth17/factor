@@ -51,12 +51,65 @@ class BlockStore:
         self.ffi = self.lib = None
         self.metadata_cache = metadata_cache
         self.metadata = None
+        self.index = None
+        self.bulk_keys = set()
+        self.charged_metadata = 0
 
     @property
     def used(self):
-        return self._used + (
-            0 if self.metadata is None else self.metadata.used
+        return (
+            self._used
+            + (0 if self.metadata is None else self.metadata.used)
+            + (
+                0
+                if self.index is None
+                else 256 * 1024 + int(self.lib.b4_index_stat(self.index, 1))
+            )
         )
+
+    def ensure_index(self, budget):
+        if self.index is None:
+            if self.used + 256 * 1024 > 64 * 2**20:
+                return None
+            budget.consume(256 * 1024)
+            index = self.lib.b4_index_create()
+            if index == self.ffi.NULL:
+                raise MemoryError("native block index allocation failed")
+            self.index = index
+            for key in self.bulk_keys:
+                block, _ = self.blocks[key]
+                if self.lib.b4_index_add(index, block, key[-2], key[-1]):
+                    raise ValueError("native block index registration refused")
+        metadata_bytes = 0 if self.metadata is None else self.metadata.used
+        catalogues = {} if self.metadata is None else self.metadata.catalogues
+        cap = 64 * 2**20 - self._used - metadata_bytes - 256 * 1024
+        if self.lib.b4_index_configure(
+            self.index,
+            catalogues.get(False, self.ffi.NULL),
+            catalogues.get(True, self.ffi.NULL),
+            int(self.metadata_cache is None),
+            cap,
+        ):
+            raise ValueError("native block index geometry refused")
+        return self.index
+
+    def indexed(self, key):
+        if self.index is None:
+            return None
+        block = self.lib.b4_index_get(
+            self.index,
+            key[-2],
+            key[-1],
+            key[3] or 0,
+            key[1],
+            key[2],
+            int(key[4] is not None),
+        )
+        if block == self.ffi.NULL:
+            return None
+        from .native_metadata import NativeValues
+
+        return block, NativeValues(self.metadata, block)
 
     def native_metadata(self):
         if self.metadata is None:
@@ -75,18 +128,24 @@ class BlockStore:
 
     def close(self):
         close_resource_checks(self)
+        if self.index is not None:
+            if self.lib.b4_index_destroy(self.index):
+                raise RuntimeError("native block index is still borrowed")
+            self.index = None
         for block, _ in self.blocks.values():
             if self.lib.b4_block_destroy(block):
                 raise RuntimeError("native metadata still borrowed by a curve")
         self.blocks.clear()
+        self.bulk_keys.clear()
         self.verified.clear()
         if self.metadata is not None:
             self.metadata.close()
             self.metadata = None
         self._used = 0
+        self.charged_metadata = 0
 
     def bulk(self, key, lo, hi, bound, plan, budget, *, b1, b2):
-        cached = self.blocks.get(key)
+        cached = self.blocks.get(key) or self.indexed(key)
         if cached is not None:
             budget.consume(1)
             return cached
@@ -102,7 +161,12 @@ class BlockStore:
         budget.consume(reserve + (hi - lo) // 2)
         result = metadata.block(lo, hi, bound, plan, budget, b1=b1, b2=b2)
         self.blocks[key] = result
+        self.bulk_keys.add(key)
         self._used += 512 + int(self.lib.b4_block_bytes(result[0]))
+        if self.index is not None and self.lib.b4_index_add(
+            self.index, result[0], b1, b2
+        ):
+            raise ValueError("native bulk block index registration refused")
         poll_native_budget(budget, self)
         return result
 
@@ -198,6 +262,7 @@ class NativeCurvePacket(NativePacket):
     full_ecm = True
     atomic_actions = False
     phase_clocks = False
+    coarse_segments = True
     actions = None
 
     def __init__(
@@ -209,6 +274,7 @@ class NativeCurvePacket(NativePacket):
         self.job = self.context_source = self.config = None
         self.charged = 0
         self.calls = 0
+        self.return_reasons = {}
         self.info = self.atom = self.pair = None
         self.plan = None
         self.statistics = dict(setup_ops=0, stage_one_ops=0, stage_two_ops=0)
@@ -265,6 +331,15 @@ class NativeCurvePacket(NativePacket):
         )
 
     def _block(self, lo, hi, bound, budget, *, values=None, purpose="cursor"):
+        if bound and not self._bulk_allowed(self.context_source, budget):
+            from .native_metadata import NativePlan
+
+            if isinstance(self.plan, NativePlan):
+                # A retained caller may replace its budget with a custom
+                # provider/clock. Re-enter the original public plan contract.
+                self.plan = stage_jobs.stage_one_plan(
+                    self.job, self.context_source, budget
+                )
         plan = self.plan if bound else None
         identity = None if plan is None else plan.identity
         key = (
@@ -428,25 +503,78 @@ class NativeCurvePacket(NativePacket):
     def advance_job(self, job, budget, context, config):
         poll_native_budget(budget, self)
         self.bind_job(job, budget, context, config)
+        from .native_segment import segment_for
+
+        segment = None
+        if self.coarse_segments and self._bulk_allowed(context, budget):
+            index = self.blocks.ensure_index(budget)
+            if index is not None:
+                segment = segment_for(self, budget)
+                if segment is not None:
+                    self._status(
+                        self.lib.b4_curve_attach_index(self.context, index)
+                    )
+        if segment is not None:
+            segment.begin([self])
         try:
+            self.calls += 1
             actions = (
                 self.manifest.get("slice_actions", 128)
                 if self.actions is None
                 else self.actions
             )
-            status = self.lib.b4_step(self.context, 5, actions)
-            self.calls += 1
+            status = (
+                self.lib.b4_step(self.context, 5, actions)
+                if segment is None
+                else self.lib.b4_segment(
+                    self.context, actions, segment.policy, segment.info
+                )
+            )
         finally:
-            self.settle(budget)
+            if segment is None:
+                self.settle(budget)
+            else:
+                segment.settle([self], budget)
+                segment.record()
+        if segment is not None:
+            reason = int(segment.info.reason)
+            from .native_segment import REASONS
+
+            label = REASONS.get(reason, "invalid")
+            if reason == 4:
+                # A real child selects the full-tree provider. Charge all work
+                # before that check, then use one original bounded slice.
+                segment.check(budget, self)
+                self.feed(budget)
+                try:
+                    status = self.lib.b4_step(self.context, 5, actions)
+                    self.calls += 1
+                finally:
+                    self.settle(budget)
+                self.return_reasons["children"] = (
+                    self.return_reasons.get("children", 0) + 1
+                )
+                segment = None
+                label = {0: "quantum", 1: "completed", 2: "metadata"}.get(
+                    status, "error"
+                )
+        else:
+            label = {0: "quantum", 1: "completed", 2: "metadata"}.get(
+                status, "error"
+            )
+        self.return_reasons[label] = self.return_reasons.get(label, 0) + 1
         if status == -3:
             from ..execution.budget import BudgetExhaustedError
 
             raise BudgetExhaustedError("cancelled")
         if status < 0:
             self._status(status)
+        if segment is not None:
+            segment.check(budget, self)
         if status == 2:
             self.feed(budget)
-        poll_native_budget(budget, self)
+        if segment is None or status == 2:
+            poll_native_budget(budget, self)
         if status == 1:
             self.sync(allow_result=True, compact=not self.atomic_actions)
         elif self.atomic_actions:
@@ -512,7 +640,7 @@ class NativeCurvePacket(NativePacket):
             job["b1"],
             job["b2"],
         )
-        entry = self.blocks.blocks.get(key)
+        entry = self.blocks.blocks.get(key) or self.blocks.indexed(key)
         if entry is not None:
             cursor["values"] = list(entry[1])
         if cursor["index"] > len(cursor["values"]):

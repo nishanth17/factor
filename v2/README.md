@@ -27,6 +27,15 @@ program identities and undergo mathematical checks after digest validation.
 Construction, load, fallback and retained storage require complete-cost
 comparison before selecting a cache configuration.
 
+Eligible whole-native calls keep cursor lookup, registered metadata refill,
+bounded wave coordination and incurred-work snapshots in C. A segment retains
+the existing five-ms resource cadence and returns immediately at a completed
+curve for checked publication. It observes actual root RSS and process CPU;
+children and custom clocks/providers/callbacks use the original checked path.
+Native-generated blocks remain owner-owned until all borrowing curves drain.
+Public and restored checkpoints retain canonical validation and compatibility.
+Complete-cost adoption and fresh confirmation remain separate gates.
+
 ## Setup and first run
 
 With PyPy implementing Python 3.11 installed, run from the repository root:

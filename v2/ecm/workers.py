@@ -801,7 +801,7 @@ class ECMExecutor:
                         if config.ecm_kernel == "c-gmp-full":
                             from .native_resources import native_bulk_allowed
 
-                            task["native_bulk"] = native_bulk_allowed(base)
+                            task["native_bulk"] = native_bulk_allowed(budget)
                         result = self.serial_engine.execute(
                             task,
                             cancelled=lambda: (

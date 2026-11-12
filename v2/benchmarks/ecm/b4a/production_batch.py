@@ -65,7 +65,9 @@ class ProductionSession:
                 if team.actual is None
                 else int(team.actual[0]),
                 slices=team.slices,
-                returns=sum(p.calls for p in packets),
+                returns=getattr(team, "foreign_returns", team.slices),
+                return_reasons=dict(getattr(team, "return_reasons", {})),
+                native_segment=self.segment_state(team),
                 retained_bytes=team.blocks.used,
                 blocks=len(team.blocks.blocks),
                 backend=team.variant,
@@ -86,6 +88,8 @@ class ProductionSession:
                 packet is not None and packet.context is not None
             ),
             returns=getattr(packet, "calls", 0),
+            return_reasons=dict(getattr(packet, "return_reasons", {})),
+            native_segment=self.segment_state(packet),
             retained_bytes=getattr(store, "used", 0),
             blocks=len(getattr(store, "blocks", {})),
             metadata=self.metadata_state(store),
@@ -98,15 +102,39 @@ class ProductionSession:
     @staticmethod
     def metadata_state(store):
         metadata = getattr(store, "metadata", None)
+        index = getattr(store, "index", None)
         return (
             None
             if metadata is None
             else dict(
                 stats=dict(metadata.stats),
+                indexed_native_blocks=0
+                if index is None
+                else int(store.lib.b4_index_stat(index, 3)),
+                indexed_owned_bytes=0
+                if index is None
+                else int(store.lib.b4_index_stat(index, 1)),
+                indexed_metadata_work=0
+                if index is None
+                else int(store.lib.b4_index_stat(index, 2)),
                 catalogue_bytes=metadata.used,
                 cache_directory=None
                 if metadata.cache_directory is None
                 else str(metadata.cache_directory),
+            )
+        )
+
+    @staticmethod
+    def segment_state(owner):
+        segment = getattr(owner, "_segment", None)
+        return (
+            None
+            if segment is None
+            else dict(
+                returns=dict(segment.returns),
+                waves=segment.waves,
+                refills=segment.refills,
+                observations=segment.observations,
             )
         )
 

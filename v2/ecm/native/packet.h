@@ -109,6 +109,68 @@ int b4_result(const b4_context *ctx, b4_output *output);
 /* Whole-curve ordinary-mpz owner. Metadata is immutable and copied once. */
 typedef struct b4_prime_block b4_prime_block;
 typedef struct b4_catalogue b4_catalogue;
+typedef struct b4_block_index b4_block_index;
+enum {
+    B4_SEGMENT_COMPLETE = 1, B4_SEGMENT_METADATA = 2,
+    B4_SEGMENT_QUANTUM = 3, B4_SEGMENT_CHILDREN = 4,
+    B4_SEGMENT_RSS = 5, B4_SEGMENT_OBSERVER_ERROR = 6,
+    B4_SEGMENT_CANCELLED = 7, B4_SEGMENT_FRONTIER = 8
+};
+typedef struct {
+    int pid;
+    unsigned rss_limited;
+    unsigned long long birth, wall_ns, cpu_ns, rss;
+} b4_segment_policy;
+typedef struct {
+    unsigned reason, observations, waves, refills;
+    int error;
+    unsigned long long rss, wall_end, cpu_end, metadata_work, work[32];
+} b4_segment_info;
+b4_block_index *b4_index_create(void);
+int b4_index_destroy(b4_block_index *index);
+int b4_index_add(b4_block_index *index, b4_prime_block *block,
+                  unsigned long long b1, unsigned long long b2);
+int b4_index_configure(b4_block_index *index, b4_catalogue *plain,
+                        b4_catalogue *chain, unsigned autoload,
+                        unsigned long long memory_cap);
+unsigned long long b4_index_stat(const b4_block_index *index, unsigned field);
+b4_prime_block *b4_index_get(const b4_block_index *index,
+                              unsigned long long b1, unsigned long long b2,
+                              unsigned long long bound, unsigned long long lo,
+                              unsigned long long hi, unsigned chain);
+int b4_curve_attach_index(b4_context *ctx, b4_block_index *index);
+/* 3=an actual resource observation stopped before further metadata/math. */
+int b4_curve_autofeed(b4_context *ctx, const b4_segment_policy *policy,
+                       b4_segment_info *info);
+unsigned long long b4_curve_work(const b4_context *ctx);
+unsigned long long b4_curve_metadata_work(const b4_context *ctx);
+/* Internal coordinator helpers perform actual root observation and clocks.
+ * They never execute Python callbacks or count thread CPU a second time. */
+int b4_segment_start(const b4_segment_policy *policy, unsigned workers,
+                       b4_segment_info *info);
+int b4_segment_observe(const b4_segment_policy *policy, b4_segment_info *info);
+int b4_segment(b4_context *ctx, unsigned actions,
+                 const b4_segment_policy *policy, b4_segment_info *info);
+int b4_pthread_segment(b4_pthread_team *team, b4_context *const *contexts,
+                         size_t count, unsigned workers, unsigned schedule,
+                         unsigned chunk, unsigned actions, int *statuses,
+                         unsigned *actual_workers,
+                         const b4_segment_policy *policy, b4_segment_info *info);
+int b4_omp_segment(b4_omp_team *team, b4_context *const *contexts,
+                     size_t count, unsigned workers, unsigned schedule,
+                     unsigned chunk, unsigned actions, int *statuses,
+                     unsigned *actual_workers,
+                     const b4_segment_policy *policy, b4_segment_info *info);
+typedef int (*b4_segment_dispatch)(void *, b4_context *const *, size_t,
+                                    unsigned, unsigned, unsigned, unsigned,
+                                    unsigned, int *, unsigned *,
+                                    unsigned long long, unsigned long long);
+/* Both native backends use identical coordinator frontiers and observations. */
+int b4_team_segment(void *team, b4_segment_dispatch dispatch,
+                      b4_context *const *contexts, size_t count,
+                      unsigned workers, unsigned schedule, unsigned chunk,
+                      unsigned actions, int *statuses, unsigned *actual,
+                      const b4_segment_policy *policy, b4_segment_info *info);
 typedef struct {
     unsigned long long prime, power, reserve;
     b4_record fast, unit;

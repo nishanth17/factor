@@ -17,8 +17,18 @@ def native_bulk_allowed(budget):
     from ..execution.ecm_workers import _base_budget
 
     base = _base_budget(budget)
+    if base is not budget:
+        from ..execution.ecm_native import _BudgetView
+
+        if type(budget) is not _BudgetView:
+            return False
+    from .worker_state import ActionBudget, ProspectiveActionBudget
+
     ordinary = type(base) is Budget and base.cancelled is None
-    delegated = getattr(base, "_native_bulk_allowed", False)
+    delegated = (
+        type(base) in (ActionBudget, ProspectiveActionBudget)
+        and getattr(base, "_native_bulk_allowed", False) is True
+    )
     return (
         (ordinary or delegated)
         and type(base.provider) is MacResources
@@ -95,6 +105,10 @@ def poll_native_budget(budget, owner):
 
 
 def close_resource_checks(owner):
+    segment = getattr(owner, "_segment", None)
+    if segment is not None:
+        segment.close()
+        owner._segment = None
     provider = getattr(owner, "_resource_provider", None)
     if provider is not None:
         provider.close()

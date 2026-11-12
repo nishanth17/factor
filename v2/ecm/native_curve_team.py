@@ -12,7 +12,9 @@ from .native_team import (
 
 
 class NativeCurveTeam(NativeTeam):
-    """Borrow private contexts for one drained generation; refill in Python."""
+    """Borrow private curves for observed, fully drained segments."""
+
+    coarse_segments = True
 
     def __init__(self, *, metadata_cache=None, **kwargs):
         super().__init__(**kwargs)
@@ -20,6 +22,8 @@ class NativeCurveTeam(NativeTeam):
         self.bindings = {}
         self.phase_clocks = False
         self.atomic_actions = False
+        self.foreign_returns = 0
+        self.return_reasons = {}
 
     def _grow(self, count, n, budget):
         while len(self.packets) < count:
@@ -98,8 +102,25 @@ class NativeCurveTeam(NativeTeam):
                     )
                 borrowed.append(packet)
                 self.contexts[index] = packet.context
-            try:
-                status = self._native_step(
+            from .native_segment import REASONS, segment_for
+
+            segment = None
+            if self.coarse_segments and prepared[0]._bulk_allowed(
+                context, budget
+            ):
+                index = self.blocks.ensure_index(budget)
+                if index is not None:
+                    segment = segment_for(self, budget)
+                    if segment is not None:
+                        for packet in prepared:
+                            packet._status(
+                                self.lib.b4_curve_attach_index(
+                                    packet.context, index
+                                )
+                            )
+
+            def legacy_step():
+                return self._native_step(
                     self.owner,
                     self.contexts,
                     len(prepared),
@@ -111,18 +132,83 @@ class NativeCurveTeam(NativeTeam):
                     self.statuses,
                     self.actual,
                 )
-                self.slices += 1
+
+            if segment is not None:
+                segment.begin(prepared)
+
+            try:
+                self.foreign_returns += 1
+                if segment is None:
+                    status = legacy_step()
+                    self.slices += 1
+                else:
+                    native_segment = getattr(
+                        self.lib, self.owner_prefix + "segment"
+                    )
+                    status = native_segment(
+                        self.owner,
+                        self.contexts,
+                        len(prepared),
+                        self.workers,
+                        SCHEDULES[self.schedule],
+                        self.chunk_size,
+                        self.packets[0].manifest.get("slice_actions", 128),
+                        self.statuses,
+                        self.actual,
+                        segment.policy,
+                        segment.info,
+                    )
             finally:
                 # All workers have drained before foreign return, including
                 # signal reentry. Charge all peers before a cancellable poll.
-                for packet in prepared:
-                    packet.settle(budget)
+                if segment is None:
+                    for packet in prepared:
+                        packet.settle(budget)
+                else:
+                    self.slices += int(segment.info.waves)
+                    segment.settle(prepared, budget)
+                    segment.record()
+            if segment is not None:
+                label = REASONS.get(int(segment.info.reason), "invalid")
+                if segment.info.reason == 4:
+                    segment.check(budget, self)
+                    # A child may appear between a wave and its refills.
+                    # Complete pending metadata before the original next wave,
+                    # preserving its ready set and checked publication order.
+                    for packet in prepared:
+                        packet.feed(budget)
+                    self.return_reasons["children"] = (
+                        self.return_reasons.get("children", 0) + 1
+                    )
+                    try:
+                        status = legacy_step()
+                        self.slices += 1
+                        self.foreign_returns += 1
+                    finally:
+                        for packet in prepared:
+                            packet.settle(budget)
+                    segment = None
+            if segment is None:
+                values = [int(self.statuses[i]) for i in range(len(prepared))]
+                label = (
+                    "completed"
+                    if 1 in values
+                    else "metadata"
+                    if 2 in values
+                    else "quantum"
+                )
+            self.return_reasons[label] = self.return_reasons.get(label, 0) + 1
             if status == -3:
                 raise BudgetExhaustedError("cancelled")
-            if status == -2 or int(self.actual[0]) != self.workers:
+            if status == -2 or (
+                (segment is None or segment.info.waves)
+                and int(self.actual[0]) != self.workers
+            ):
                 raise TeamRefusedError("whole native pthread startup refused")
             if status == -4:
                 raise RuntimeError("whole native pthread worker failed")
+            if status == -5:
+                raise MemoryError("native bulk metadata allocation failed")
             if status or any(
                 self.statuses[index] not in (0, 1, 2)
                 for index in range(len(prepared))
@@ -130,7 +216,10 @@ class NativeCurveTeam(NativeTeam):
                 raise ValueError(
                     "whole native pthread generation returned invalid status"
                 )
-            poll_native_budget(budget, self)
+            if segment is None:
+                poll_native_budget(budget, self)
+            else:
+                segment.check(budget, self)
             # Validate every ready divisor before any stable-order publication.
             ready = []
             for index, ((position, job), packet) in enumerate(

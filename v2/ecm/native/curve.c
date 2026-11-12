@@ -30,6 +30,8 @@ struct b4_curve_state {
     b4_record records[256];
     b4_prime_block *block, *blocks[CURVE_BLOCK_LIMIT];
     size_t block_count;
+    b4_block_index *registered;
+    unsigned auto_chain;
     b4_curve_info info;
     uint64_t sigma, remaining, meter;
     size_t recover_index, strict_opcode, fast_completed, group_end, pending;
@@ -146,6 +148,7 @@ static int frontier_valid(const b4_record *r, uint64_t scalar) {
 
 struct b4_catalogue {
     size_t count;
+    size_t max_record_bytes;
     uint64_t *scalars;
     b4_record *records;
 };
@@ -189,6 +192,8 @@ b4_catalogue *b4_catalogue_create(const unsigned char *data, size_t size) {
         if (!frontier_valid(&record, scalar) ||
             record_copy(&catalogue->records[i], &record)) goto invalid_catalogue;
         catalogue->scalars[i] = scalar;
+        if (codes + masks > catalogue->max_record_bytes)
+            catalogue->max_record_bytes = codes + masks;
         ++catalogue->count; previous = scalar; offset += codes + masks;
     }
     if (offset != size) goto invalid_catalogue;
@@ -376,9 +381,117 @@ int b4_block_prepare(b4_prime_block *b, unsigned long long b1,
     return 0;
 }
 
+typedef struct {
+    b4_prime_block *block;
+    uint64_t b1, b2;
+    unsigned owned;
+} b4_index_entry;
+
+struct b4_block_index {
+    size_t count, refs;
+    size_t owned_count;
+    uint64_t owned_bytes, memory_cap, work;
+    unsigned autoload;
+    b4_catalogue *plain, *chain;
+    b4_index_entry entries[CURVE_BLOCK_LIMIT];
+};
+
+b4_block_index *b4_index_create(void) {
+    return calloc(1, sizeof(b4_block_index));
+}
+
+int b4_index_destroy(b4_block_index *index) {
+    if (!index) return 0;
+    if (index->refs) return -1;
+    for (size_t i = 0; i < index->count; ++i) {
+        --index->entries[i].block->refs;
+        if (index->entries[i].owned && b4_block_destroy(index->entries[i].block)) abort();
+    }
+    free(index);
+    return 0;
+}
+
+static int index_compare(const b4_index_entry *entry, uint64_t b1, uint64_t b2,
+                          uint64_t bound, uint64_t lo, uint64_t hi, unsigned chain) {
+    uint64_t actual[6] = {entry->b1, entry->b2, entry->block->bound,
+                         entry->block->lo, entry->block->hi, entry->block->chain};
+    uint64_t desired[6] = {b1, b2, bound, lo, hi, chain};
+    for (unsigned i = 0; i < 6; ++i)
+        if (actual[i] != desired[i]) return actual[i] < desired[i] ? -1 : 1;
+    return 0;
+}
+
+static size_t index_position(const b4_block_index *index, uint64_t b1, uint64_t b2,
+                              uint64_t bound, uint64_t lo, uint64_t hi, unsigned chain) {
+    size_t left = 0, right = index->count;
+    while (left < right) {
+        size_t mid = left + (right - left) / 2;
+        if (index_compare(&index->entries[mid], b1, b2, bound, lo, hi, chain) < 0)
+            left = mid + 1;
+        else right = mid;
+    }
+    return left;
+}
+
+static b4_prime_block *index_find(const b4_block_index *index,
+                                  uint64_t b1, uint64_t b2, uint64_t bound,
+                                  uint64_t lo, uint64_t hi, unsigned chain) {
+    size_t position = index_position(index, b1, b2, bound, lo, hi, chain);
+    return position < index->count &&
+        !index_compare(&index->entries[position], b1, b2, bound, lo, hi, chain) ?
+        index->entries[position].block : NULL;
+}
+
+b4_prime_block *b4_index_get(const b4_block_index *index,
+                              unsigned long long b1, unsigned long long b2,
+                              unsigned long long bound, unsigned long long lo,
+                              unsigned long long hi, unsigned chain) {
+    return index && chain <= 1 ? index_find(index, b1, b2, bound, lo, hi, chain) : NULL;
+}
+
+int b4_index_add(b4_block_index *index, b4_prime_block *block,
+                  unsigned long long b1, unsigned long long b2) {
+    if (!index || !block || b1 < 2 || b2 < b1 ||
+        (block->bound && (block->bound != b1 || block->hi > b1 + 1)) ||
+        (!block->bound && (!block->prepared || block->b1 != b1 || block->b2 != b2)))
+        return -1;
+    size_t position = index_position(index, b1, b2, block->bound,
+                                     block->lo, block->hi, block->chain);
+    if (position < index->count &&
+        !index_compare(&index->entries[position], b1, b2, block->bound,
+                       block->lo, block->hi, block->chain))
+        return index->entries[position].block == block ? 0 : -1;
+    if (index->count >= CURVE_BLOCK_LIMIT) return -2;
+    memmove(index->entries + position + 1, index->entries + position,
+            (index->count - position) * sizeof(b4_index_entry));
+    index->entries[position] = (b4_index_entry){block, b1, b2, 0};
+    ++block->refs; ++index->count;
+    return 0;
+}
+
+int b4_index_configure(b4_block_index *index, b4_catalogue *plain,
+                        b4_catalogue *chain, unsigned autoload,
+                        unsigned long long memory_cap) {
+    if (!index || autoload > 1 || memory_cap > 64 * 1024 * 1024 ||
+        memory_cap < index->owned_bytes) return -1;
+    index->plain = plain; index->chain = chain;
+    index->autoload = autoload; index->memory_cap = memory_cap;
+    return 0;
+}
+
+unsigned long long b4_index_stat(const b4_block_index *index, unsigned field) {
+    if (!index || field > 3) return UINT64_MAX;
+    return field == 0 ? index->count : field == 1 ? index->owned_bytes :
+           field == 2 ? index->work : index->owned_count;
+}
+
 static void curve_abort(b4_context *c) {
     if (!c || !c->curve) return;
     b4_curve_state *w = c->curve;
+    if (w->registered) {
+        --w->registered->refs;
+        w->registered = NULL;
+    }
     for (size_t i = 0; i < w->block_count; ++i) --w->blocks[i]->refs;
     w->block_count = 0; w->block = NULL; w->active = 0;
 }
@@ -473,6 +586,7 @@ int b4_curve_begin(b4_context *c, b4_value n, b4_value sigma,
     w->sigma = mpz_get_ui(c->scalar); w->active = 1;
     w->chunk = chunk; w->batch = batch; w->segment = segment;
     w->operation = CO_IDLE; w->pending = 0; w->strict_phase = 0;
+    w->auto_chain = 2;
     atomic_store(&w->cancelled, 0);
     w->preparation_failure = w->cancel_after_actions = 0;
     mpz_set_ui(w->factor, 0); mpz_set_ui(w->product, 1);
@@ -516,8 +630,72 @@ int b4_curve_feed(b4_context *c, b4_prime_block *b) {
         w->blocks[w->block_count++] = b; ++b->refs;
     }
     w->block = b; w->info.left = b->lo; w->info.next = b->hi;
+    if (bound) w->auto_chain = b->chain;
     w->info.index = 0; w->info.need = 0;
     return 0;
+}
+
+int b4_curve_attach_index(b4_context *c, b4_block_index *index) {
+    if (!curve_active(c) || !index) return -1;
+    b4_curve_state *w = c->curve;
+    if (w->registered == index) return 0;
+    if (w->registered) --w->registered->refs;
+    w->registered = index; ++index->refs;
+    return 0;
+}
+
+unsigned long long b4_curve_work(const b4_context *c) {
+    return curve_active(c) ? c->curve->info.work : 0;
+}
+
+unsigned long long b4_curve_metadata_work(const b4_context *c) {
+    return curve_active(c) && c->curve->registered ? c->curve->registered->work : 0;
+}
+
+int b4_curve_autofeed(b4_context *c, const b4_segment_policy *policy,
+                       b4_segment_info *info) {
+    if (!curve_active(c)) return -1;
+    b4_curve_state *w = c->curve;
+    if (!w->info.need) return 0;
+    if (!w->registered) return 2;
+    uint64_t hi = w->info.next + 2 * (uint64_t)w->segment;
+    if (hi < w->info.next || hi > w->info.hi) hi = w->info.hi;
+    if (hi > ((uint64_t)1 << 32) || hi - w->info.next > 65536) return 2;
+    uint64_t bound = w->info.phase == CS_ONE ? w->info.b1 : 0;
+    if (bound && w->auto_chain == 2) return 2;
+    b4_prime_block *block = index_find(w->registered, w->info.b1, w->info.b2,
+        bound, w->info.next, hi, bound ? w->auto_chain : 0);
+    if (!block) {
+        b4_block_index *index = w->registered;
+        unsigned chain = bound ? w->auto_chain : 0;
+        b4_catalogue *catalogue = chain ? index->chain : index->plain;
+        if (!index->autoload || !catalogue || index->count >= CURVE_BLOCK_LIMIT)
+            return 2;
+        uint64_t reserve = 512 + (128 + (chain ? 2 * catalogue->max_record_bytes : 0)) *
+            ((hi - w->info.next + 1) / 2 + 1);
+        if (reserve > index->memory_cap - index->owned_bytes) return 2;
+        if (!policy || !info) return 2;
+        if (b4_segment_observe(policy, info)) return 3;
+        uint64_t work = reserve + (hi - w->info.next) / 2;
+        if (index->work > UINT64_MAX - work) return -1;
+        index->work += work;
+        block = b4_block_generate(catalogue, w->info.next, hi, bound, chain);
+        if (!block) return -5;
+        if ((!bound && b4_block_prepare(block, w->info.b1, w->info.b2)) ||
+            b4_index_add(index, block, w->info.b1, w->info.b2)) {
+            b4_block_destroy(block); return -1;
+        }
+        size_t position = index_position(index, w->info.b1, w->info.b2, bound,
+                                          w->info.next, hi, chain);
+        index->entries[position].owned = 1;
+        index->owned_bytes += 512 + b4_block_bytes(block); ++index->owned_count;
+        /* Match first-registration enforcement: a newly allocated block is
+         * charged and retained before a forced real observation, then fed only
+         * when that observation allows progress. Cached refills allocate no
+         * new block and retain the wave's ordinary observation cadence. */
+        if (b4_segment_observe(policy, info)) return 3;
+    }
+    return block ? b4_curve_feed(c, block) : 2;
 }
 
 static void pair_set(mpz_t *dest, mpz_t *src) {

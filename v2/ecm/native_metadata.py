@@ -325,7 +325,7 @@ class NativeMetadata:
         try:
             if not bound and self.lib.b4_block_prepare(block, b1, b2):
                 raise ValueError("native bulk stage-two indices refused")
-            if cached is None:
+            if cached is None and self.cache_directory is not None:
                 self._write(identity, self.encode(block))
             return block, NativeValues(self, block)
         except BaseException:

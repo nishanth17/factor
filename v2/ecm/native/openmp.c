@@ -116,10 +116,10 @@ static void execute_one(b4_omp_team *t, b4_context *context, size_t index,
     }
 }
 
-int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
+static int omp_dispatch(b4_omp_team *t, b4_context *const *contexts, size_t count,
                 unsigned workers, unsigned schedule, unsigned chunk,
                 unsigned milliseconds, unsigned actions, int *statuses,
-                unsigned *actual_workers) {
+                unsigned *actual_workers, uint64_t fixed_wall, uint64_t fixed_cpu) {
     if (actual_workers) *actual_workers = 0;
     if (!t || !actual_workers || count > 32 ||
         (count && (!contexts || !statuses)) || !workers || workers > B4_NATIVE_MAX_WORKERS ||
@@ -144,7 +144,7 @@ int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
     uint64_t wall_end = 0, cpu_end = 0;
 #pragma omp parallel num_threads(workers) default(none) \
     shared(t, actual, wall_end, cpu_end, contexts, statuses, count, workers, \
-           schedule, chunk, milliseconds, actions)
+           schedule, chunk, milliseconds, actions, fixed_wall, fixed_cpu)
     {
         unsigned rank = (unsigned)omp_get_thread_num();
         atomic_fetch_or(&t->participants, 1u << rank);
@@ -160,8 +160,8 @@ int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
                 if (!wall || !cpu) {
                     atomic_store(&t->failed, 1); atomic_store(&t->cancelled, 1);
                 } else {
-                    wall_end = wall + (uint64_t)milliseconds * 1000000u;
-                    cpu_end = cpu + (uint64_t)workers * milliseconds * 1000000u;
+                    wall_end = fixed_wall ? fixed_wall : wall + (uint64_t)milliseconds * 1000000u;
+                    cpu_end = fixed_cpu ? fixed_cpu : cpu + (uint64_t)workers * milliseconds * 1000000u;
                     atomic_fetch_add(&t->counters[2], 1);
                 }
             }
@@ -187,6 +187,34 @@ int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
     atomic_store(&t->active, 0);
     return result;
 }
+
+int b4_omp_step(b4_omp_team *t, b4_context *const *contexts, size_t count,
+                unsigned workers, unsigned schedule, unsigned chunk,
+                unsigned milliseconds, unsigned actions, int *statuses,
+                unsigned *actual_workers) {
+    return omp_dispatch(t, contexts, count, workers, schedule, chunk, milliseconds,
+                          actions, statuses, actual_workers, 0, 0);
+}
+
+static int omp_segment_dispatch(void *team, b4_context *const *contexts,
+                                  size_t count, unsigned workers,
+                                  unsigned schedule, unsigned chunk,
+                                  unsigned milliseconds, unsigned actions,
+                                  int *statuses, unsigned *actual,
+                                  unsigned long long wall_end,
+                                  unsigned long long cpu_end) {
+    return omp_dispatch(team, contexts, count, workers, schedule, chunk,
+                          milliseconds, actions, statuses, actual, wall_end, cpu_end);
+}
+
+int b4_omp_segment(b4_omp_team *t, b4_context *const *contexts,
+                     size_t count, unsigned workers, unsigned schedule,
+                     unsigned chunk, unsigned actions, int *statuses,
+                     unsigned *actual, const b4_segment_policy *policy,
+                     b4_segment_info *info) {
+    return b4_team_segment(t, omp_segment_dispatch, contexts, count, workers,
+                            schedule, chunk, actions, statuses, actual, policy, info);
+}
 #else
 unsigned b4_omp_whole_kernel(void) { return 0; }
 b4_omp_team *b4_omp_create(void) { return NULL; }
@@ -210,6 +238,15 @@ int b4_omp_step(b4_omp_team *t, b4_context *const *c, size_t n, unsigned w,
                 unsigned s, unsigned k, unsigned m, unsigned a, int *r, unsigned *v) {
     (void)t; (void)c; (void)n; (void)w; (void)s; (void)k; (void)m; (void)a; (void)r;
     if (v) *v = 0;
+    return -2;
+}
+int b4_omp_segment(b4_omp_team *t, b4_context *const *c, size_t n,
+                     unsigned w, unsigned s, unsigned k, unsigned a,
+                     int *r, unsigned *actual, const b4_segment_policy *p,
+                     b4_segment_info *i) {
+    (void)t; (void)c; (void)n; (void)w; (void)s; (void)k; (void)a;
+    (void)r; (void)p; (void)i;
+    if (actual) *actual = 0;
     return -2;
 }
 #endif

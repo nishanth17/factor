@@ -3,6 +3,21 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a native boundary implementation (11 November 2026)
+
+- Keep ordinary whole-native cursor refill, metadata generation, bounded team
+  waves and exact peer-work settlement inside resource-observed C segments.
+  Preserve immediate completion returns, canonical replay, actual CPU/RSS
+  enforcement and the exact custom-policy/child fallback.
+- Retain checked native blocks until borrowers drain; export full cursor data
+  only when a canonical checkpoint requires it. Avoid encoding an unused disk
+  cache body when no cache directory was requested.
+- Delay relation-engine imports until a relation stage or public alias needs
+  them, preserving the portfolio's public factories and checkpoint formats.
+- Targeted native admission and exposed-input feasibility pass. Matched costs,
+  final committed-only QA, boundary ceilings and fresh 3F remain open; no routing
+  or automatic-default change is included.
+
 ## B4a native count support and screen (11 November 2026)
 
 - Extend opt-in whole-owner pthread/OpenMP support through sixteen workers;
