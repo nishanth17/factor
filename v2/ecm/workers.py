@@ -180,6 +180,10 @@ class ECMExecutor:
                 self.force_workers,
             ]
         )
+        if self.metadata_cache is not None:
+            actual = digest(
+                [actual, "native-metadata-cache", str(self.metadata_cache)]
+            )
         if actual != self.identity:
             raise ValueError(
                 "executor settings/rule mutated after construction"

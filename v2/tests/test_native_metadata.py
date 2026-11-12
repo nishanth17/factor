@@ -13,6 +13,7 @@ from v2.ecm import chain_data
 from v2.ecm.native_curve import NativeCurvePacket
 from v2.ecm.native_metadata import MAGIC, NativeMetadata
 from v2.ecm.native_packet import SOURCE
+from v2.ecm.workers import ECMExecutor
 from v2.execution import stage_jobs
 from v2.execution.budget import Budget
 from v2.execution.portfolio_config import (
@@ -188,6 +189,58 @@ class NativeMetadataTests(unittest.TestCase):
                             )
                             + "\n"
                         )
+
+    def test_explicit_serial_cache_owner_reuses_and_checks_configuration(self):
+        parent = Path(
+            os.environ.get(
+                "FACTOR_NATIVE_TEST_CACHE", SOURCE / "build/cache-tests"
+            )
+        )
+        parent.mkdir(parents=True, exist_ok=True)
+        corpus = FIXTURES.parents[1] / "corpora/b4a_production_3p_v1.json"
+        n = next(
+            row["n"]
+            for row in json.loads(corpus.read_text())["fixtures"]
+            if row["population"] == "failed" and row["digits"] == 60
+        )
+        config = replace(
+            selected("c-gmp-full", 127, 4000), ecm_tiers=((127, 4000, 2),)
+        )
+        with tempfile.TemporaryDirectory(dir=parent) as directory:
+            try:
+                for cycle in range(2):
+                    owner = ECMExecutor(seed=73, metadata_cache=directory)
+                    budget = Budget(
+                        seconds=10, cpu_seconds=20, rss_bytes=8 * 2**30
+                    )
+                    try:
+                        result = owner.run(
+                            n, config=config, budget=budget, fixed_work=True
+                        )
+                        self.assertEqual(result.reason, "curves_exhausted")
+                        source = (
+                            owner.serial_engine.programs
+                            or owner.serial_engine.context
+                        )
+                        metadata = source.native_packet.blocks.metadata
+                        self.assertGreater(
+                            metadata.stats["hits" if cycle else "misses"], 0
+                        )
+                        owner.metadata_cache = str(Path(directory) / "changed")
+                        with self.assertRaisesRegex(ValueError, "mutated"):
+                            owner.run(
+                                n,
+                                config=config,
+                                budget=budget,
+                                fixed_work=True,
+                            )
+                    finally:
+                        owner.close()
+                        budget.close()
+            finally:
+                self.inventory(
+                    directory, "removed-by-production-cache-test-cleanup"
+                )
 
     def test_cache_hit_truncation_incompatibility_and_forged_hash_fallback(
         self,
