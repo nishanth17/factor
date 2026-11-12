@@ -36,16 +36,22 @@ def isolated(function):
 
     @wraps(function)
     def run(self):
-        if os.environ.get("FACTOR_NATIVE_SEGMENT_CHILD") != self.id():
+        # Discovery imports this file as test_native_segments. The isolated
+        # interpreter starts at the repository root and needs the package path.
+        case_id = (
+            f"v2.tests.test_native_segments.{type(self).__qualname__}."
+            f"{self._testMethodName}"
+        )
+        if os.environ.get("FACTOR_NATIVE_SEGMENT_CHILD") != case_id:
             env = dict(
                 os.environ,
-                FACTOR_NATIVE_SEGMENT_CHILD=self.id(),
+                FACTOR_NATIVE_SEGMENT_CHILD=case_id,
                 OMP_WAIT_POLICY="PASSIVE",
                 KMP_BLOCKTIME="0",
                 OMP_DYNAMIC="FALSE",
             )
             subprocess.run(
-                [sys.executable, "-B", "-m", "unittest", "-v", self.id()],
+                [sys.executable, "-B", "-m", "unittest", "-v", case_id],
                 env=env,
                 cwd=Path(__file__).resolve().parents[2],
                 check=True,
