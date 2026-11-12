@@ -644,6 +644,17 @@ int b4_curve_attach_index(b4_context *c, b4_block_index *index) {
     return 0;
 }
 
+
+int b4_curve_attach_index_hint(b4_context *c, b4_block_index *index,
+                                unsigned chain) {
+    if (!curve_active(c) || chain > 1) return -1;
+    b4_curve_state *w = c->curve;
+    if (w->auto_chain < 2 && w->auto_chain != chain) return -1;
+    int status = b4_curve_attach_index(c, index);
+    if (!status) w->auto_chain = chain;
+    return status;
+}
+
 unsigned long long b4_curve_work(const b4_context *c) {
     return curve_active(c) ? c->curve->info.work : 0;
 }

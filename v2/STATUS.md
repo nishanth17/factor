@@ -13,8 +13,10 @@ Entry `410eba0`; current request and new evidence:
 The previous 3F controller, watchdogs and owned groups are drained, with every
 reservation settled. Its charges and untouched held-out cohort are preserved.
 Both fixed-work anchors now have clean cold/warm baselines and matched A/A
-observations on exposed 60/80/100-digit inputs. Prime/program preparation,
-generation/refill/settlement and conversion/export ceilings remain under review.
+observations on exposed 60/80/100-digit inputs. Coarse C segments and lazy
+relation imports pass targeted admission and a 324-call exposed matched panel. Required resource observation stays enabled.
+Remaining catalogue/refill work, conversion/export and arithmetic ceilings
+remain under review; final committed-only QA and fresh 3F are still pending.
 Existing whole-classical C/GMP execution, compact exports, shared metadata and
 historical compiler/runtime/SIMD outcomes are controls. Material open boundaries
 must be settled before revised fresh confirmation. Persisted experimental cache

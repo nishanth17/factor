@@ -68,6 +68,7 @@ def source_identity():
         Path(__file__).with_name("native_curve_team.py"),
         Path(__file__).with_name("native_resources.py"),
         Path(__file__).with_name("native_metadata.py"),
+        Path(__file__).with_name("native_catalogue.py"),
         Path(__file__).with_name("native_segment.py"),
         Path(__file__).with_name("chains.py"),
         Path(__file__).with_name("chain_records.py"),

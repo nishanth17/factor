@@ -37,6 +37,17 @@ def supported_context(context):
     return type(context) is SieveContext
 
 
+def native_plan_enabled(job, context):
+    """Select the existing plan without preparing any catalogue or record."""
+    source = getattr(context, "chains", None)
+    return (
+        type(source) is chains.ChainPlans
+        and source.backend == "python-int"
+        and job["b1"] in source.bounds
+        and chains.supports_modulus(job["n"])
+    )
+
+
 class NativePlan:
     """The existing accepted plan identity, with proofs retained in C."""
 
@@ -202,35 +213,19 @@ class NativeMetadata:
         if chain in self.catalogues:
             return self.catalogues[chain]
         if chain:
-            from . import chain_data
+            from . import native_catalogue
 
-            rows = sorted(chain_data.PRAC)
-            if len(rows) != 333:
-                raise ValueError("incomplete accepted native catalogue")
-            self.max_record_bytes = max(
-                len(code) + len(masks) for _, code, masks, _, _ in rows
-            )
+            body = native_catalogue.WIRE
+            if (
+                hashlib.sha256(body).hexdigest()
+                != native_catalogue.WIRE_SHA256
+            ):
+                raise ValueError("immutable native catalogue digest mismatch")
+            self.max_record_bytes = native_catalogue.MAX_RECORD_BYTES
             budget.consume(
                 chains.CATALOG_PREPARATION_WORK
-                + sum(len(code) + slots + 1 for _, code, _, _, slots in rows)
+                + native_catalogue.PREPARATION_WORK
             )
-            parts = [pack("<I", len(rows))]
-            for scalar, code, masks, output, slots in rows:
-                parts.extend(
-                    (
-                        pack(
-                            "<QHHBB",
-                            scalar,
-                            len(code),
-                            len(masks),
-                            slots,
-                            output,
-                        ),
-                        code,
-                        masks,
-                    )
-                )
-            body = b"".join(parts)
         else:
             body = pack("<I", 0)
         budget.consume(4096 + 4 * len(body))
@@ -253,15 +248,21 @@ class NativeMetadata:
             self._write(identity, body)
         return catalogue
 
-    def plan(self, job, context, budget):
-        source = getattr(context, "chains", None)
-        if (
-            type(source) is not chains.ChainPlans
-            or source.backend != "python-int"
-            or job["b1"] not in source.bounds
-            or not chains.supports_modulus(job["n"])
-        ):
+    def cached_plan(self, job, context, budget):
+        """Borrow an already registered plan without triggering preparation."""
+        if not native_plan_enabled(job, context):
             return None
+        plan = self.plans.get(
+            chains.identity(job["b1"], context.chains.backend)
+        )
+        if plan is not None:
+            budget.consume(1)
+        return plan
+
+    def plan(self, job, context, budget):
+        if not native_plan_enabled(job, context):
+            return None
+        source = context.chains
         identity = chains.identity(job["b1"], source.backend)
         budget.consume(1)
         if identity not in self.plans:

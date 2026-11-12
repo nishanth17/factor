@@ -8,6 +8,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 from struct import pack
+from unittest.mock import patch
 
 from v2.ecm import chain_data
 from v2.ecm.native_curve import NativeCurvePacket
@@ -57,6 +58,41 @@ class NativeMetadataTests(unittest.TestCase):
             return list(values), metadata.encode(block)
         finally:
             self.assertEqual(self.packet.lib.b4_block_destroy(block), 0)
+
+    def test_wire_is_exactly_the_existing_accepted_catalogue(self):
+        from v2.ecm import native_catalogue
+
+        rows = sorted(chain_data.PRAC)
+        parts = [pack("<I", len(rows))]
+        for scalar, code, masks, output, slots in rows:
+            parts.extend(
+                (
+                    pack(
+                        "<QHHBB", scalar, len(code), len(masks), slots, output
+                    ),
+                    code,
+                    masks,
+                )
+            )
+        self.assertEqual(native_catalogue.WIRE, b"".join(parts))
+        self.assertEqual(
+            hashlib.sha256(native_catalogue.WIRE).hexdigest(),
+            native_catalogue.WIRE_SHA256,
+        )
+        self.assertEqual(
+            native_catalogue.MAX_RECORD_BYTES,
+            max(len(code) + len(masks) for _, code, masks, _, _ in rows),
+        )
+        self.assertEqual(
+            native_catalogue.PREPARATION_WORK,
+            sum(len(code) + slots + 1 for _, code, _, _, slots in rows),
+        )
+        with patch.object(
+            native_catalogue, "WIRE", native_catalogue.WIRE + b"x"
+        ):
+            with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                self.metadata._catalogue(True, self.budget)
+        self.assertNotIn(True, self.metadata.catalogues)
 
     def test_bulk_half_open_coverage_powers_and_word_edge(self):
         for lo, hi in (

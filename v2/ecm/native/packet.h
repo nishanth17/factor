@@ -139,6 +139,8 @@ b4_prime_block *b4_index_get(const b4_block_index *index,
                               unsigned long long bound, unsigned long long lo,
                               unsigned long long hi, unsigned chain);
 int b4_curve_attach_index(b4_context *ctx, b4_block_index *index);
+int b4_curve_attach_index_hint(b4_context *ctx, b4_block_index *index,
+                              unsigned chain);
 /* 3=an actual resource observation stopped before further metadata/math. */
 int b4_curve_autofeed(b4_context *ctx, const b4_segment_policy *policy,
                        b4_segment_info *info);

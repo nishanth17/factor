@@ -330,6 +330,28 @@ class NativeCurvePacket(NativePacket):
             and supported_context(context)
         )
 
+    def chain_hint(self, budget):
+        from .native_metadata import native_plan_enabled
+
+        if not native_plan_enabled(self.job, self.context_source):
+            return 0
+        if self.plan is None and self.blocks.metadata is not None:
+            self.plan = self.blocks.metadata.cached_plan(
+                self.job, self.context_source, budget
+            )
+        # Unknown/partially prepared catalogues still return through feed(),
+        # which establishes the Python plan reference and all preparation work.
+        return 2 if self.plan is None else 1
+
+    def attach_index(self, index, budget):
+        hint = self.chain_hint(budget)
+        status = (
+            self.lib.b4_curve_attach_index(self.context, index)
+            if hint == 2
+            else self.lib.b4_curve_attach_index_hint(self.context, index, hint)
+        )
+        self._status(status)
+
     def _block(self, lo, hi, bound, budget, *, values=None, purpose="cursor"):
         if bound and not self._bulk_allowed(self.context_source, budget):
             from .native_metadata import NativePlan
@@ -511,9 +533,7 @@ class NativeCurvePacket(NativePacket):
             if index is not None:
                 segment = segment_for(self, budget)
                 if segment is not None:
-                    self._status(
-                        self.lib.b4_curve_attach_index(self.context, index)
-                    )
+                    self.attach_index(index, budget)
         if segment is not None:
             segment.begin([self])
         try:

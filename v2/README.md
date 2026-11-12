@@ -33,6 +33,8 @@ the existing five-ms resource cadence and returns immediately at a completed
 curve for checked publication. It observes actual root RSS and process CPU;
 children and custom clocks/providers/callbacks use the original checked path.
 Native-generated blocks remain owner-owned until all borrowing curves drain.
+Known plan references and the existing immutable catalogue wire are reused;
+first-use catalogue construction and its C certificate proofs remain lazy.
 Public and restored checkpoints retain canonical validation and compatibility.
 Complete-cost adoption and fresh confirmation remain separate gates.
 

@@ -113,11 +113,7 @@ class NativeCurveTeam(NativeTeam):
                     segment = segment_for(self, budget)
                     if segment is not None:
                         for packet in prepared:
-                            packet._status(
-                                self.lib.b4_curve_attach_index(
-                                    packet.context, index
-                                )
-                            )
+                            packet.attach_index(index, budget)
 
             def legacy_step():
                 return self._native_step(

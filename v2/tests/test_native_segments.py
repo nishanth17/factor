@@ -134,6 +134,41 @@ class NativeSegmentTests(unittest.TestCase):
                 packet.lib = original
 
     @isolated
+    def test_plan_hint_stays_lazy_and_rejects_drift(self):
+        with packet_scope() as (packet, job, budget, source, config):
+            packet.bind_job(job, budget, source, config)
+            index = packet.blocks.ensure_index(budget)
+            self.assertEqual(packet.chain_hint(budget), 2)
+            packet.attach_index(index, budget)
+            self.assertIsNone(packet.blocks.metadata)
+            metadata = packet.blocks.native_metadata()
+            metadata._catalogue(True, budget)
+            self.assertFalse(metadata.plans)
+            self.assertEqual(packet.chain_hint(budget), 2)
+            packet.attach_index(index, budget)
+            self.assertIsNone(packet.plan)
+            packet.plan = packet._plan(job, source, budget)
+            self.assertEqual(packet.chain_hint(budget), 1)
+            self.assertEqual(
+                packet.lib.b4_curve_attach_index_hint(
+                    packet.context, index, 1
+                ),
+                0,
+            )
+            self.assertEqual(
+                packet.lib.b4_curve_attach_index_hint(
+                    packet.context, index, 0
+                ),
+                -1,
+            )
+            self.assertEqual(
+                packet.lib.b4_curve_attach_index_hint(
+                    packet.context, index, 2
+                ),
+                -1,
+            )
+
+    @isolated
     def test_native_owned_blocks_are_protected_until_context_drain(self):
         with packet_scope() as (packet, job, budget, source, config):
             for _ in range(10000):
@@ -346,7 +381,7 @@ class NativeSegmentTests(unittest.TestCase):
             config = PortfolioConfig(
                 ecm_kernel="c-gmp-full",
                 ecm_chain_mode="auto",
-                ecm_tiers=((b1, b2, 3),),
+                ecm_tiers=((b1, b2, 9),),
                 siqs=None,
             )
             context, programs = _execution_context({}, config, budget)
@@ -382,4 +417,63 @@ class NativeSegmentTests(unittest.TestCase):
                 expected, old_calls = run(False, b1, b2)
                 actual, new_calls = run(True, b1, b2)
                 self.assertEqual(actual, expected)
+                if b1 == 2000:
+                    self.assertTrue(
+                        any(row[0].get("chain_chunks", 0) for row in actual)
+                    )
                 self.assertLess(new_calls, old_calls)
+
+    @isolated
+    def test_production_quotas_retain_plan_references_and_metadata(self):
+        from v2.benchmarks.ecm.b4a.production_batch import ProductionSession
+
+        corpus = FIXTURES.parents[1] / "corpora/b4a_production_3p_v1.json"
+        n = next(
+            row["n"]
+            for row in json.loads(corpus.read_text())["fixtures"]
+            if row["population"] == "failed" and row["digits"] == 80
+        )
+        for role in ("scalar", "pthread", "openmp"):
+            for b1, b2, curves in ((2000, 81000, 9), (11000, 1100000, 37)):
+                with self.subTest(role=role, b1=b1):
+                    request = dict(
+                        role=role,
+                        n=n,
+                        b1=b1,
+                        b2=b2,
+                        curves=curves,
+                        seed=73,
+                        workers=1
+                        if role == "scalar"
+                        else 4
+                        if b1 == 2000
+                        else 8,
+                        capacity=32,
+                        schedule="dynamic",
+                        chunk_size=1,
+                        worker_settings={"allow_wide_workers": True},
+                        seconds=20,
+                        cpu_seconds=120,
+                    )
+                    session = ProductionSession()
+                    try:
+                        first = session.call(request)
+                        second = session.call(request)
+                        for row in (first, second):
+                            self.assertIsNone(row["resource_stop"])
+                            self.assertEqual(row["completed_curves"], curves)
+                            self.assertEqual(row["reason"], "exhausted")
+                        self.assertEqual(
+                            first["manifests"], second["manifests"]
+                        )
+                        self.assertEqual(
+                            second["state"]["return_reasons"].get(
+                                "metadata", 0
+                            )
+                            - second["before_state"]["return_reasons"].get(
+                                "metadata", 0
+                            ),
+                            0,
+                        )
+                    finally:
+                        session.close()
