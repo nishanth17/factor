@@ -19,9 +19,14 @@ below record decisions in their dated scope; later entries may supersede routes.
 - Reuse the existing accepted catalogue wire and already retained plan
   references while keeping first preparation lazy and all C proofs enabled.
   Production regressions cover both anchors and retained owners.
-- Targeted native admission and exposed-input feasibility pass. Matched costs on the final source,
-  committed-only QA, boundary ceilings and fresh 3F remain open; no routing
-  or automatic-default change is included.
+- Complete source-labelled matched costs and boundary/arithmetic ceilings on
+  exposed inputs. Retain the selected implementation after peer-refill and
+  combined Python-math import challengers show no useful improvement.
+- Correct isolated native-test subprocess selectors under full-suite discovery.
+  Committed-only `3bb5a69` passes 1,805 tests (14 optional skips), lint, 317
+  benchmark imports and all three native builds with reproducible placement.
+  Fresh 3F and staged integration remain required; no routing or automatic
+  default changes are included.
 
 ## B4a native count support and screen (11 November 2026)
 

@@ -1036,3 +1036,26 @@ and compare canonical published QS prefixes. Sparse Mach thread CPU/state reads
 are confined to the observed integration lane. Current request, priced protocol
 and source/build/recipe freezes remain local in
 `v2/audit/b4a/confirmation_3f_20261111/`. Fresh results and readiness are pending.
+
+
+### B4a native boundary closeout (12 November 2026)
+
+Executable `6a34003` retains coarse observed C segments, native metadata/index
+refill, accepted catalogue/plan reuse and lazy optional imports. Clean exposed
+60/80/100-digit comparisons keep cold one-shot and retained ownership separate.
+Later peer-refill and combined Python-math import challengers pass exactness
+admission but establish no useful complete-cost gain. Current conditional
+ceilings include combined small costs; required exports, resource checks and
+negative cache results are retained explicitly. Operation CPU shares are not
+critical-path wall or promises of removable GMP time.
+
+On the exposed 80-digit deep quota, actual pthread returns fall from 2,414 to
+92, including metadata returns from 1,076 to one, with identical manifests and
+completed curves. Counter overhead is separately admitted; these are mechanism
+counts, not a fresh speedup or population result. Committed-only `3bb5a69` passes
+1,805 tests (14 optional skips), lint, 317 ordinary benchmark imports and all
+three native builds with identical instruction placement. The failed discovery
+launcher, all raw evidence and charges remain local. Current cost/disposition
+entry: `v2/audit/b4a/native_boundary_closeout_20261111/IMPLEMENTATION_CLOSEOUT_R1.md`.
+Fresh 3F and staged balanced integration remain required; no automatic defaults
+or routing changes are implemented.

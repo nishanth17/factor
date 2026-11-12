@@ -5,9 +5,9 @@ requests, freezes and charges. B4a boundary closeout now precedes the revised
 final 3F confirmation; implementation and confirmation have separate allowances.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
-Last updated: 11 November 2026 (America/Los_Angeles).
+Last updated: 12 November 2026 (America/Los_Angeles).
 
-**B4a material native boundary closeout — active.**
+**B4a material native boundary implementation — closed; 3F resumption active.**
 Entry `410eba0`; current request and new evidence:
 `v2/audit/b4a/native_boundary_closeout_20261111/REQUEST.md`.
 The previous 3F controller, watchdogs and owned groups are drained, with every
@@ -15,19 +15,28 @@ reservation settled. Its charges and untouched held-out cohort are preserved.
 Both fixed-work anchors now have clean cold/warm baselines and matched A/A
 observations on exposed 60/80/100-digit inputs. Coarse C segments and lazy
 relation imports pass targeted admission and a 324-call exposed matched panel. Required resource observation stays enabled.
-Remaining catalogue/refill work, conversion/export and arithmetic ceilings
-remain under review; final committed-only QA and fresh 3F are still pending.
+Accepted catalogue/plan reuse and optional-import deferral are retained through
+executable source `6a34003`. Later peer-refill and Python-math-import alternatives
+pass admission but show no useful complete-cost improvement. Current boundary,
+combined-cost and arithmetic ceilings retain their attribution limits. On an
+exposed deep 80-digit quota, pthread foreign returns fall from 2,414 to 92;
+the numerical manifests and completed curves agree. Committed-only `3bb5a69`
+passes 1,805 tests (14 optional skips), lint, 317 ordinary benchmark imports and
+all three reproducible native builds. The initial discovery-launch failure and
+all charges remain preserved. Detailed dispositions and conditional costs:
+`v2/audit/b4a/native_boundary_closeout_20261111/IMPLEMENTATION_CLOSEOUT_R1.md`.
 Existing whole-classical C/GMP execution, compact exports, shared metadata and
-historical compiler/runtime/SIMD outcomes are controls. Material open boundaries
-must be settled before revised fresh confirmation. Persisted experimental cache
+historical compiler/runtime/SIMD outcomes are controls. Fresh confirmation and
+staged integration remain required. Persisted experimental cache
 data stays in the project-local audit cache and counts toward the capture limit.
 No merge, push or automatic-default change.
 
-**B4a final 3F confirmation — paused for boundary closeout.**
+**B4a final 3F confirmation — resuming on the final source.**
 Entry `f1bc14d`; committed production control `98bf836`. New runner-side phase,
 canonical-QS-prefix and native-thread observations pass bounded admission.
-Both ECM anchors and all four cold/warm controls are feasible on exposed inputs;
-fresh generation and confirmation follow the frozen plan. Keep scalar 256,
+The committed fresh corpus remains unused during optimization. Both ECM anchors
+and all four cold/warm controls have exposed feasibility; the six-arm protocol
+is being rebound and repriced after closeout. Keep scalar 256,
 pthread-four shallow / pthread-eight deep, dynamic/chunk 1/capacity 32.
 The request separately funds fresh affected ECM and staged balanced 60/70
 integration guards; earlier unfunded proposals and charges remain historical.
