@@ -1,6 +1,5 @@
 """Opt-in bounded independent ECM curves with explicit spawn ownership."""
 
-import multiprocessing
 import os
 import select
 import socket
@@ -286,6 +285,8 @@ class ECMExecutor:
 
         if threading.current_thread() is not threading.main_thread():
             raise ValueError("spawn preparation requires the main thread")
+        import multiprocessing
+
         context = multiprocessing.get_context("spawn")
         if context.get_start_method() != "spawn":
             raise RuntimeError("explicit spawn context unavailable")
@@ -1034,3 +1035,23 @@ class ECMExecutor:
         if issued:
             self.packet_sequence += 1
         return packet, issued
+
+
+_LAZY_IMPORTS = frozenset(("multiprocessing",))
+
+
+def __getattr__(name):
+    if name in _LAZY_IMPORTS:
+        module = __import__(name)
+        globals()[name] = module
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | _LAZY_IMPORTS)
+
+
+__all__ = sorted(
+    {name for name in globals() if not name.startswith("_")} | _LAZY_IMPORTS
+)

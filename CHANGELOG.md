@@ -14,6 +14,8 @@ below record decisions in their dated scope; later entries may supersede routes.
   cache body when no cache directory was requested.
 - Delay relation-engine imports until a relation stage or public alias needs
   them, preserving the portfolio's public factories and checkpoint formats.
+- Defer process-runtime and temporary-file imports until worker startup or
+  actual checkpoint/cache publication, preserving legacy module aliases.
 - Reuse the existing accepted catalogue wire and already retained plan
   references while keeping first preparation lazy and all C proofs enabled.
   Production regressions cover both anchors and retained owners.

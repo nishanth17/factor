@@ -5,7 +5,6 @@ import json
 import os
 import stat
 import sys
-import tempfile
 from pathlib import Path
 from struct import iter_unpack, pack
 
@@ -180,6 +179,8 @@ class NativeMetadata:
     def _write(self, identity, body):
         if self.cache_directory is None:
             return
+        import tempfile
+
         header = json.dumps(
             dict(
                 identity=identity,
@@ -332,3 +333,23 @@ class NativeMetadata:
         except BaseException:
             self.lib.b4_block_destroy(block)
             raise
+
+
+_LAZY_IMPORTS = frozenset(("tempfile",))
+
+
+def __getattr__(name):
+    if name in _LAZY_IMPORTS:
+        module = __import__(name)
+        globals()[name] = module
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | _LAZY_IMPORTS)
+
+
+__all__ = sorted(
+    {name for name in globals() if not name.startswith("_")} | _LAZY_IMPORTS
+)
