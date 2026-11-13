@@ -14,6 +14,10 @@ class ProductionSession:
 
     @staticmethod
     def make_owner(request):
+        if request["role"] == "automatic":
+            from ....ecm.auto import AutomaticECMOwner
+
+            return AutomaticECMOwner(seed=request.get("seed", 73))
         from ....ecm.workers import ECMExecutor
         from ....execution.worker_contract import WorkerSettings
 
@@ -54,7 +58,7 @@ class ProductionSession:
         )
 
     def state(self):
-        owner = self.owner
+        owner = getattr(self.owner, "native_context", None) or self.owner
         team = getattr(owner, "team", None)
         if team is not None:
             packets = team.packets
@@ -163,16 +167,35 @@ class ProductionSession:
         elif self.key != key:
             raise ValueError("retained production recipe changed")
         role = request["role"]
-        config = PortfolioConfig(
+        values = dict(
             trial_bound=request.get("trial_bound", 2),
             rho_attempts=0,
             pm1_attempts=0,
-            ecm_tiers=((request["b1"], request["b2"], request["curves"]),),
+            ecm_tiers=(
+                tuple(map(tuple, request["ecm_tiers"]))
+                if "ecm_tiers" in request
+                else ((request["b1"], request["b2"], request["curves"]),)
+            ),
             ecm_chain_mode="auto",
-            ecm_kernel="python" if role in ("python", "b12") else "c-gmp-full",
+            ecm_kernel=(
+                "auto-full"
+                if role == "automatic"
+                else "python"
+                if role in ("python", "b12")
+                else "c-gmp-full"
+            ),
             siqs=None,
             max_input_bits=1024,
         )
+        if request.get("production_defaults"):
+            for name in (
+                "trial_bound",
+                "rho_attempts",
+                "pm1_attempts",
+                "max_input_bits",
+            ):
+                values.pop(name)
+        config = PortfolioConfig(**values)
         grant = Budget(
             seconds=request.get("seconds", 30),
             cpu_seconds=request.get("cpu_seconds", 120),
@@ -188,6 +211,7 @@ class ProductionSession:
                 budget=grant,
                 ecm_executor=self.owner,
                 qs_workers=None,
+                stop_after_split=request.get("stop_after_split", False),
             )
             if run.result.reconstruct() != request["n"]:
                 raise ValueError("production result failed reconstruction")
@@ -231,7 +255,17 @@ class ProductionSession:
                 worker_dispatches=dispatched,
                 manifests=[s.get("manifest") for s in stats],
                 resource_stop=run.resource_stop,
+                ecm_execution=run.ecm_execution,
             )
+            if request.get("require_native"):
+                from ....ecm.execution_identity import require_native
+
+                try:
+                    require_native(
+                        run, workers=request.get("expected_workers")
+                    )
+                except ValueError as error:
+                    result["native_assertion_failure"] = str(error)
         finally:
             grant.close()
         result.update(api_wall=time.monotonic() - started, cpu=grant.cpu_used)

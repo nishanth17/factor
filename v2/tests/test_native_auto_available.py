@@ -26,6 +26,83 @@ AVAILABLE = _runtime_supported() and all(
     AVAILABLE, "compatible local scalar/pthread builds required"
 )
 class ActualAutomaticNativeTests(unittest.TestCase):
+    def test_expected_unavailability_falls_back_before_native_arithmetic(self):
+        from v2.ecm.native_admission import NativeUnavailableError
+
+        with patch(
+            "v2.ecm.native_admission.admit_team",
+            side_effect=NativeUnavailableError(
+                "native_unavailable", "missing build"
+            ),
+        ):
+            ledger = Budget(seconds=5, cpu_seconds=40)
+            try:
+                run = factorize_bounded(
+                    N, seed=7919, budget=ledger, stop_after_split=True
+                )
+                self.assertEqual(run.result.reconstruct(), N)
+                self.assertEqual(run.ecm_execution["backend"], "python")
+                self.assertEqual(run.ecm_execution["native_entries"], 0)
+                with self.assertRaisesRegex(ValueError, "require-native"):
+                    require_native(run)
+            finally:
+                ledger.close()
+
+    def test_allocation_fault_does_not_rerun_the_python_backend(self):
+        from v2.execution.resources import AllocationFailureError
+
+        ledger = Budget(seconds=5)
+        try:
+            with (
+                patch(
+                    "v2.ecm.native_admission.admit_team",
+                    side_effect=MemoryError("partial native allocation"),
+                ),
+                patch.object(
+                    AutomaticECMOwner,
+                    "_run_incumbent",
+                    side_effect=AssertionError("silent backend rerun"),
+                ),
+            ):
+                with self.assertRaises(AllocationFailureError):
+                    factorize_bounded(N, seed=7919, budget=ledger)
+        finally:
+            ledger.close()
+
+    def test_automatic_production_runner_retains_and_closes_the_actual_owner(
+        self,
+    ):
+        from v2.benchmarks.ecm.b4a.production_batch import ProductionSession
+
+        request = dict(
+            role="automatic",
+            n=N,
+            seed=7919,
+            seconds=5,
+            cpu_seconds=30,
+            ecm_tiers=[
+                [200, 7700, 10],
+                [2000, 81000, 30],
+                [10000, 554000, 100],
+            ],
+            production_defaults=True,
+            stop_after_split=True,
+            require_native=True,
+            expected_workers=8,
+        )
+        session = ProductionSession()
+        try:
+            first = session.call(request)
+            second = session.call(request)
+            for row in (first, second):
+                self.assertNotIn("native_assertion_failure", row)
+                self.assertEqual(row["ecm_execution"]["backend"], "c-gmp-full")
+            self.assertGreater(second["before_state"]["live_contexts"], 0)
+        finally:
+            session.close()
+        self.assertTrue(session.owner.closed)
+        self.assertEqual(session.state()["live_contexts"], 0)
+
     def test_explicit_scalar_and_pthread_receipts_count_actual_entry(self):
         from v2.ecm.workers import ECMExecutor
         from v2.execution.ecm_native import NativeECMExecutor

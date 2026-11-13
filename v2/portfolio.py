@@ -789,6 +789,12 @@ def _advance(
             delta = entries(job_context) - native_before
             if receipt is not None:
                 receipt["native_entries"] += delta
+                if delta and receipt.get("build") is None:
+                    from .ecm.execution_identity import packet_identity
+
+                    receipt["build"] = packet_identity(
+                        getattr(job_context, "native_packet", None)
+                    )
     phase = job["phase"]
     timing_key = f"{kind}:{phase}"
     state["stage_seconds"][timing_key] = (

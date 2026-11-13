@@ -99,6 +99,25 @@ class AutomaticNativeIntentTests(unittest.TestCase):
         self.assertNotIn("ecm_kernel", resumed.checkpoint["payload"]["config"])
         self.assertEqual(resumed.checkpoint["payload"]["version"], 13)
 
+    def test_legacy_auto_checkpoint_keeps_stage_one_semantics(self):
+        first = factorize_bounded(
+            1009 * 1013,
+            config=PortfolioConfig(ecm_kernel="auto"),
+            budget=Budget(seconds=0),
+        )
+        with patch(
+            "v2.ecm.native_admission.admit_packet", side_effect=AssertionError
+        ):
+            resumed = factorize_bounded(
+                1009 * 1013,
+                checkpoint=first.checkpoint,
+                budget=Budget(seconds=0),
+            )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["config"]["ecm_kernel"], "auto"
+        )
+        self.assertEqual(resumed.checkpoint["payload"]["version"], 13)
+
     def test_cheap_completed_inputs_never_admit_native(self):
         with patch(
             "v2.ecm.native_admission.admit_packet", side_effect=AssertionError

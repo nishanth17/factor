@@ -56,7 +56,9 @@ def serve(*, cold=False):
                     latest = measured_call(session, request)
                     useful += latest["api_wall"]
                     calls += 1
-                    if latest["resource_stop"]:
+                    if latest["resource_stop"] or latest.get(
+                        "native_assertion_failure"
+                    ):
                         warmup_failed = latest
                         break
                     if time.monotonic() - started > 45:
@@ -89,7 +91,7 @@ def serve(*, cold=False):
                 )
             elif op == "call":
                 row = measured_call(session, request)
-                row["measured"] = True
+                row["measured"] = not bool(row.get("native_assertion_failure"))
             else:
                 raise ValueError("unknown finite confirmation operation")
             print(json.dumps(row), flush=True)
