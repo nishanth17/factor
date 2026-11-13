@@ -2,6 +2,8 @@
 
 import copy
 import random
+import subprocess
+import sys
 import tempfile
 import unittest
 from dataclasses import replace
@@ -19,6 +21,28 @@ from v2.portfolio import PortfolioConfig, factorize_bounded
 
 
 class AutomaticNativeIntentTests(unittest.TestCase):
+    def test_explicit_python_owner_keeps_easy_calls_free_of_native_imports(
+        self,
+    ):
+        code = """
+import sys
+from v2.ecm.workers import ECMExecutor
+from v2.portfolio import factorize_bounded
+assert 'v2.execution.ecm_native' not in sys.modules
+with ECMExecutor() as owner:
+    run = factorize_bounded(101, ecm_executor=owner)
+assert run.result.complete
+assert 'v2.execution.ecm_native' not in sys.modules
+assert 'cffi' not in sys.modules
+"""
+        call = subprocess.run(
+            [sys.executable, "-B", "-c", code],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        self.assertEqual(call.returncode, 0, call.stderr)
+
     def test_default_intent_and_explicit_modes_are_distinct(self):
         self.assertEqual(PortfolioConfig().ecm_kernel, "auto-full")
         for mode in ("python", "auto", "c-gmp", "c-gmp-full", "auto-full"):

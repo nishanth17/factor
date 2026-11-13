@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import random
+import sys
 import time
 from dataclasses import asdict, dataclass, replace
 
@@ -1680,16 +1681,18 @@ def _factorize_bounded(
         and not (_owned_ecm or _automatic_ecm)
     ):
         from .ecm.auto import AutomaticECMOwner
-        from .execution.ecm_native import NativeECMExecutor
 
         if not isinstance(ecm_executor, AutomaticECMOwner):
             # An explicit process owner keeps Python workers. A supplied native
             # owner keeps its explicit topology and whole-native execution.
+            native_module = sys.modules.get(
+                __package__ + ".execution.ecm_native"
+            )
+            native = native_module is not None and isinstance(
+                ecm_executor, native_module.NativeECMExecutor
+            )
             config = replace(
-                config,
-                ecm_kernel="c-gmp-full"
-                if isinstance(ecm_executor, NativeECMExecutor)
-                else "python",
+                config, ecm_kernel="c-gmp-full" if native else "python"
             )
 
     if checkpoint is None:
