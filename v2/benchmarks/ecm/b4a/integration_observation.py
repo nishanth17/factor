@@ -39,6 +39,16 @@ class IntegrationObserver:
         self.observer_wall = 0.0
         self.qs_calls = 0
         self.merge_calls = 0
+        self.serial_packet = None
+        self.ecm_entry = None
+
+    def execution_owner(self):
+        owner = (
+            getattr(self.owner, "native_context", None)
+            or getattr(self.owner, "context", None)
+            or self.owner
+        )
+        return getattr(owner, "inner", None) or owner
 
     @staticmethod
     def cpu_tree():
@@ -63,18 +73,33 @@ class IntegrationObserver:
         )
 
     def owner_state(self):
-        team = getattr(self.owner, "team", None)
+        owner = self.execution_owner()
+        team = getattr(owner, "team", None)
         if team is None:
+            if self.serial_packet is not None:
+                packet = self.serial_packet
+                return dict(
+                    native=True,
+                    topology="scalar",
+                    closed=packet.closed,
+                    contexts=int(packet.context is not None),
+                    live_contexts=int(packet.context is not None),
+                    shared_native_blocks=len(packet.blocks.blocks),
+                    metadata_reserve_estimate=packet.blocks.used,
+                    activity=[],
+                    lifecycle=None,
+                    ownership="portfolio owns scalar context without workers",
+                )
             return dict(
                 native=False,
                 closed=getattr(self.owner, "closed", None),
                 ecm_worker_pids=[
-                    slot["process"].pid
-                    for slot in getattr(self.owner, "slots", ())
+                    slot["process"].pid for slot in getattr(owner, "slots", ())
                 ],
             )
         return dict(
             native=True,
+            topology="threads",
             closed=team.closed,
             contexts=len(team.packets),
             live_contexts=sum(p.context is not None for p in team.packets),
@@ -88,9 +113,10 @@ class IntegrationObserver:
     def snapshot(self, label):
         started = time.monotonic()
         state = self.owner_state()
-        if state["native"] and not state["closed"]:
+        team = getattr(self.execution_owner(), "team", None)
+        if team is not None and state["native"] and not state["closed"]:
             if self.probe is None:
-                self.probe = NativeThreadProbe(self.owner.team)
+                self.probe = NativeThreadProbe(team)
             threads = self.probe.snapshot(label)
         else:
             threads = None
@@ -162,6 +188,8 @@ class IntegrationObserver:
         run = CurrentParallelSIQSJob.run
         b12_run = ECMExecutor.run
         native_run = getattr(type(self.owner), "run", None)
+        portfolio_run = getattr(type(self.owner), "run_portfolio", None)
+        advance = portfolio._advance
         qs_timed = QSJob._timed
 
         def observed_ecm(original):
@@ -184,10 +212,33 @@ class IntegrationObserver:
                 "handoff", handoff, state, config, budget, reason
             )
             current = state["current"]
+            if previous == "ecm" and self.ecm_entry is not None:
+                before, started = self.ecm_entry
+                after = self.cpu_tree()
+                self.phases.append(
+                    dict(
+                        phase="ecm_entry_to_handoff_inclusive",
+                        wall=time.monotonic() - started,
+                        cpu=after["cpu"] - before["cpu"],
+                        start_rss=before["rss"],
+                        end_rss=after["rss"],
+                    )
+                )
+                self.ecm_entry = None
             if previous == "ecm" and current and current["stage"] == "siqs":
                 self.qs_entry = time.monotonic()
                 self.snapshot("qs-entry")
             return result
+
+        def observed_advance(state, *args, **kwargs):
+            current = state["current"]
+            if (
+                current is not None
+                and current["stage"] == "ecm"
+                and self.ecm_entry is None
+            ):
+                self.ecm_entry = (self.cpu_tree(), time.monotonic())
+            return advance(state, *args, **kwargs)
 
         def observed_setup(job):
             first = job.engine is None
@@ -247,11 +298,37 @@ class IntegrationObserver:
             patch.object(portfolio, "_handoff", observed_handoff)
         )
         self.stack.enter_context(
+            patch.object(portfolio, "_advance", observed_advance)
+        )
+        self.stack.enter_context(
             patch.object(ECMExecutor, "run", observed_ecm(b12_run))
         )
         if native_run is not None and type(self.owner) is not ECMExecutor:
             self.stack.enter_context(
                 patch.object(type(self.owner), "run", observed_ecm(native_run))
+            )
+        if portfolio_run is not None:
+            self.stack.enter_context(
+                patch.object(
+                    type(self.owner),
+                    "run_portfolio",
+                    observed_ecm(portfolio_run),
+                )
+            )
+        if hasattr(self.owner, "native_context"):
+            from ....ecm import native_auto
+
+            prepare_serial = native_auto.prepare_serial
+
+            def observed_serial(n, config, budget, context, **kwargs):
+                result = prepare_serial(n, config, budget, context, **kwargs)
+                packet = getattr(context, "native_packet", None)
+                if getattr(packet, "full_ecm", False):
+                    self.serial_packet = packet
+                return result
+
+            self.stack.enter_context(
+                patch.object(native_auto, "prepare_serial", observed_serial)
             )
         self.stack.enter_context(
             patch.object(CurrentParallelSIQSJob, "_setup", observed_setup)
