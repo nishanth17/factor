@@ -1770,6 +1770,7 @@ def _factorize_bounded(
                 generator,
                 state.get("ecm_auto"),
                 automatic_memory=automatic_memory,
+                retained_intent=not _owned_ecm,
             )
             state["ecm_auto"] = ecm_executor.header
     state.setdefault("ecm_requested", requested_kernel)

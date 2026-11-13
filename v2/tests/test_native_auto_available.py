@@ -26,6 +26,38 @@ AVAILABLE = _runtime_supported() and all(
     AVAILABLE, "compatible local scalar/pthread builds required"
 )
 class ActualAutomaticNativeTests(unittest.TestCase):
+    def test_borrowed_80_digit_owner_retains_unadopted_python_route(self):
+        corpus = ROOT / (
+            "v2/benchmarks/inputs/corpora/b4a_production_3p_v1.json"
+        )
+        n = next(
+            f["n"]
+            for f in json.loads(corpus.read_text())["fixtures"]
+            if f["digits"] == 80 and f["population"] == "failed"
+        )
+        with AutomaticECMOwner(seed=73) as owner:
+            ledger = Budget(seconds=10, cpu_seconds=70)
+            try:
+                run = factorize_bounded(
+                    n,
+                    config=PortfolioConfig(siqs=None, sss=None),
+                    budget=ledger,
+                    ecm_executor=owner,
+                    stop_after_split=True,
+                )
+            finally:
+                ledger.close()
+            self.assertEqual(run.result.reconstruct(), n)
+            self.assertEqual(run.ecm_execution["backend"], "python")
+            self.assertEqual(run.ecm_execution["native_entries"], 0)
+            self.assertEqual(
+                run.ecm_execution["jobs"][0]["reason"],
+                "unconfirmed_retained_native_size",
+            )
+            self.assertIsNone(owner.native_context)
+            with self.assertRaisesRegex(ValueError, "require-native"):
+                require_native(run)
+
     def test_expected_unavailability_falls_back_before_native_arithmetic(self):
         from v2.ecm.native_admission import NativeUnavailableError
 

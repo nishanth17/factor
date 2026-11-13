@@ -73,6 +73,16 @@ assert 'cffi' not in sys.modules
         self.assertNotEqual(native.identity, python.identity)
         self.assertEqual(generator.getstate(), before)
 
+    def test_short_unconfirmed_native_range_rejects_before_runtime_probe(self):
+        with patch(
+            "v2.ecm.auto._runtime_supported", side_effect=AssertionError
+        ):
+            for n in (10**29 + 7, 10**39 - 1):
+                self.assertEqual(
+                    eligibility(n, PortfolioConfig()),
+                    "unconfirmed_native_size",
+                )
+
     def test_default_subcofactor_stream_matches_retained_incumbent_policy(
         self,
     ):

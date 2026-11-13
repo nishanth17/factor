@@ -91,14 +91,24 @@ class AutomaticECMOwner:
         self.native_context = None
         self.native_admission = None
         self.native_disabled_reason = None
+        self.retained_intent = False
 
-    def configure(self, config, generator, saved, *, automatic_memory=True):
+    def configure(
+        self,
+        config,
+        generator,
+        saved,
+        *,
+        automatic_memory=True,
+        retained_intent=False,
+    ):
         """Bind numerical policy/seed without advancing the parent RNG."""
         if saved is None:
             # Negative optional-build decisions last for one call. A retained
             # owner can discover a newly supplied build on its next call.
             self.native_disabled_reason = None
         self.whole_native = config.ecm_kernel == "auto-full"
+        self.retained_intent = retained_intent
         version = "b4a-auto-full-v1" if self.whole_native else AUTO_VERSION
         implementation = (
             "ecm-auto-full-v1" if self.whole_native else "ecm-auto-observed-v3"

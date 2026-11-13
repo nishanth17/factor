@@ -15,6 +15,10 @@ def eligibility(n, config):
         return "unsupported_automatic_input"
     if n < 10**29:
         return "unmeasured_native_size"
+    if n < 10**39:
+        # Nine fresh 30-digit inputs did not establish a cold benefit. Keep
+        # the incumbent below the first adopted anchor; explicit C is valid.
+        return "unconfirmed_native_size"
     if (
         any(b2 >= 2**32 for _, b2, _ in config.ecm_tiers)
         or sum(curves for _, _, curves in config.ecm_tiers) > 4096
@@ -305,6 +309,15 @@ def run_portfolio(
         owner.native_disabled_reason = "saved_python_fallback"
 
     reason = owner.native_disabled_reason or eligibility(n, config)
+    if (
+        reason is None
+        and saved is None
+        and owner.retained_intent
+        and 10**79 <= n < 10**80
+    ):
+        # Retained80 stayed inconclusive at the frozen nine-input stop.
+        # Ownership is observable before execution; outcomes never route.
+        reason = "unconfirmed_retained_native_size"
     if reason is None and saved is None:
         reason = resource_headroom(budget)
     if reason is None and saved is None:
