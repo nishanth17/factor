@@ -10,7 +10,7 @@ import sys
 import time
 
 
-def run_request(request):
+def run_request(request, *, retained=None):
     started, cpu_started = time.monotonic(), time.process_time()
     from v2.execution.budget import Budget
     from v2.portfolio import PortfolioConfig, factorize_bounded
@@ -39,10 +39,13 @@ def run_request(request):
         ],
         require_native=bool(request.get("require_native", False)),
         valid=False,
+        ownership="retained" if retained is not None else "per-call",
     )
     try:
-        executor = "auto"
-        if role == "serial":
+        executor = retained if retained is not None else "auto"
+        if retained is not None:
+            pass
+        elif role == "serial":
             executor = None
         elif role == "explicit-native":
             from v2.execution.worker_contract import WorkerSettings
