@@ -74,6 +74,23 @@ Current cold, warm API, full owner CPU/close and telemetry-inclusive owner wall
 scopes are separate. Full local table/delivery:
 `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
 
+The reviewed coordination decisions have the following dispositions:
+
+| Mechanism | Disposition |
+| --- | --- |
+| Separate work/completion signals | Implemented and tested; removed after the matched screen failed its uncertainty/noise gate. |
+| Whole-curve OpenMP | Implemented, validated and later integrated as an explicit optional executor; automatic selection retains scalar/pthreads. |
+| Calling thread computes in the pthread executor | Not implemented or directly benchmarked. Conditional redesign was not justified by the observed residual costs; this does not establish that it cannot help. |
+| Scheduling | Static/dynamic curve schedules were compared. No external cofactorization pipeline was ported; weighted/adaptive scheduling and QoS require measured imbalance. |
+| Short-active waiting | Tested without an established useful wall gain; increased CPU. Passive waiting retained for the OpenMP comparison. |
+| Polynomial stage-two parallelism and new representations | Outside this coordination scope; continuation and arithmetic work retain their separate owners. |
+
+The full historical research decision is retained locally, Git-ignored, at
+`v2/benchmarks/results/b4a/coordination_decision_20261113/RESEARCH_DECISION.md`.
+The original remains recoverable from Git history and the verified B4a archive.
+Completion covers the scoped experiments and their documented dispositions;
+it does not claim that every reviewed technique was implemented or exhausted.
+
 ## Remaining B4a native ECM request (9 November 2026)
 
 The scoped explicit recipe uses generic O2/ordinary GMP, coalesced unit yields,

@@ -1,6 +1,6 @@
 # Factor roadmap
 
-Updated 9 November 2026.
+Updated 13 November 2026.
 
 This document ranks future work, records work in progress and lists completed scopes.
 [STATUS.md](STATUS.md) owns current behavior and defaults; [POLICY.md](POLICY.md)
@@ -98,7 +98,7 @@ their separate contracts. This is a checkpoint inventory, not a claim that a
 process is currently running or that an experimental acceptance gate passed.
 In progress remains acceptance-open; phase-catalogue gates below still apply.
 
-A7a is Done. Current preparation positions retain B4a (3), F3 (11), F2 (14), and
+A7a and B4a are Done. Current preparation positions retain F3 (11), F2 (14), and
 A8/D1 within the matrix branch (16). Adding H2 at rank 7 shifts the previous
 rank-7-and-later items by one; their relative order and task scopes are retained.
 Detailed local entry points below are in each named task worktree, not mainline.
@@ -106,7 +106,7 @@ Detailed local entry points below are in each named task worktree, not mainline.
 **B12 → F4 has an unfinished ready-first startup follow-up.** Its earlier
 process-ECM delivery and selected defaults remain recorded in the
 [completed register](#completed-register), but do not validate this new
-prototype. Native ECM continues under B4a; the selected current-collector
+prototype. B4a native ECM is integrated; the selected current-collector
 QS worker integration is recorded under completed A7a. Broader portfolio, balanced completion and population-p90
 evidence remain separate acceptance follow-ups.
 
@@ -118,7 +118,6 @@ evidence remain separate acceptance follow-ups.
 | A8 — P3.8 matrix/operator/lifting control | Freeze genuine original-relation and post-filter fixtures, orientation, lifting maps and packed forward/transpose products, including dense-prefix/sparse-tail and selected locality layouts. Independently check dense-oracle products, repeated-coordinate cancellation, short tails, bilinear identities and original-relation extraction; include preparation ownership and possible dense fill. | Accepted R3 identities/lifting and P3.3 control; fixtures refresh after collector changes | **In progress with D1.** Exact operator/lifting adapters, independent oracles and fixtures are implemented. Current nonempty target-size fixtures, heavy QA and capacity measurements remain open; no matrix-memory improvement is established. | Astra / **xhigh** design, implementation and correctness; optional separate Sol / **high** frozen fixture measurements | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-a--independent-foundations-that-can-proceed-now) ; [implementation and remaining work](#a8-d1-in-progress) |
 | D1 — P3.8 packed block Lanczos | Implement one genuine selected-block recurrence with packed forward/transpose products, singular-block handling, original-operator kernel correction, lifting, bounded seeded restarts and checked resume. Consider Thome's reduced-vector variant at recurrence selection; independently verify every original M d = 0. | A8 operator/lifting contract; use B6/C4 as comparison controls, not required successes | **In progress after the A8 contract.** Genuine selected-block recurrence, original-kernel correction, bounded restarts/resume and default-off ablations are implemented. Complete QA, representative matrix measurements, confirmation and integration remain open. | Astra / **xhigh** design, implementation and proof; **max** only for a named unresolved invariant; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-d--sparse-solver-alternatives) ; [implementation and remaining work](#a8-d1-in-progress) |
 | F2 — P6.1 torsion-aware curve/formula packages | Compare complete packages against Suyama: GMP-ECM small-parameter/batch formulas (MG17), CADO Montgomery12/16 and mixed Montgomery/twisted-Edwards bytecode (MG18), Edwards/windowed or sliding-window alternatives, Suyama-11 and the calculator reference family (AP30). Screen JKL twisted-Hessian/small-parameter families with their field-dependent torsion conditions before selecting a package. Cost curve generation, chain setup, nonunit maps and continuation conversion together. | A2/B3/B4 retained arithmetic/oracle contracts; C11 current factor-size/cost hypothesis; E1 only for later combined acceptance | **In progress; opt-in package preparation.** Suyama-11, enhanced Edwards/setup/scalar options and scheduled execution/plan reuse are committed. Further optimization edits are uncommitted at this snapshot; heavy QA, feasibility, yield/cost evidence and integration remain pending. | Astra / **xhigh** research, implementation and correctness; optional separate Sol / **high** frozen execution | [Gates and evidence](https://github.com/nishanth17/factor/blob/4a946b8d6294d51ac5d9c36f61880cc63d5b59fd/v2/ROADMAP.md#execution-phase-f--independent-p6-challengers); [JKL candidate](https://doi.org/10.1112/S1461157016000231) ; [implementation and remaining work](#f2-in-progress) |
-| B4a — P4.2 fused native ECM chunk boundary | Select one unchanged bounded ECM ladder/verified-program native executor under the [coarse-boundary contract](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs). Keep canonical state, private scratch and the Python fallback. | Existing B3/B4 exact oracles and current committed serial identity; a measured Python arithmetic-loop share; funded native memory/work and cancellation/restore contract | **Automatic activation delivered within its documented scope.** Normal eligible CLI/library calls engage whole-native scalar/pthread ECM. Fresh actual-plan confirmation and final committed-only QA pass; below 40 and borrowed/retained 80 keep Python after inconclusive comparisons. Fresh bounded 60/70 handoffs match canonical QS work and release. Population/p90 and fully powered balanced completion remain unresolved; historical losses and charges are preserved. | Sol / **xhigh** unchanged arithmetic, boundary design and implementation; Astra / **xhigh** only for a separately selected new encoded-domain/formula proof; optional separate Sol / **high** frozen execution | [current native-boundary gates](#b4a--coarse-native-arithmetic-and-whole-portfolio-costs); [CFFI API mode](https://cffi.readthedocs.io/en/latest/overview.html#purely-for-performance-api-level-out-of-line) ; [implementation and remaining work](#b4a-in-progress) |
 
 <a id="b12-f4-in-progress"></a>
 
@@ -267,79 +266,6 @@ does not establish a free increase in B1.
   `v2/audit/f2/focused/README.md` and `v2/audit/f2/headroom/README.md`.
   Existing prospective panels are unexecuted; no package/yield win is established.
 
-<a id="b4a-in-progress"></a>
-
-### B4a — automatic ECM with optional native builds
-
-- **Automatic activation delivered, 13 November:** final executable/test
-  source `dd5a60f`; normal eligible CLI/library calls use whole-native C/GMP
-  without a native flag. Fresh actual-default cold comparisons support gains
-  at 40/50/60/70/80/100 digits; retained evidence sets the separate ownership
-  scope. Below 40 and borrowed 80 remain Python at the nine-input stop.
-  The selected scalar/pthread path passes 1,834 committed-only tests with
-  30 optional skips, lint, 321 imports and both builds. Fresh bounded 60/70
-  integration passes canonical work, quiescence and cleanup. C5.M remains
-  separate; no population/p90 or fully powered balanced gate is claimed.
-  Local handoff: `v2/audit/b4a/auto_native_activation_20261112/AUTO_NATIVE_HANDOFF.md`.
-
-- **Post-integration tuning delivered:** from `2b46e3f`, analyze raw and
-  refreshed actual-production CPU/heap/JIT evidence and test thirteen B4a
-  mechanisms. Keep signed submul, private numerator, supported GMP division
-  entry and checked resource-query transport. The final 648-call cold/warm
-  panel, 90 recovery and 96 cheap cells pass with explicit uncertainty.
-  Typed ownership graphs and full allocation histories separate retention,
-  churn and RSS; unresolved JIT/GC object churn remains qualified. No new
-  representation/reducer, prime algorithm, routing or automatic default.
-  Current delivery, costs, resources and the revised unexecuted 3F plan:
-  `v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
-
-- **3P delivered:** explicit scalar/pthread/OpenMP production owner, portfolio,
-  publication and checked checkpoint/replay paths. H3 repair `98bf836` and
-  native-unit adapter `4f30d87` are included. OpenMP remains an explicit optional
-  LLVM/libomp dependency; its compatibility benchmark import re-exports the
-  production owner.
-- **Current recipe:** generic O2/ordinary GMP/coalesced, scalar 256/team 128,
-  pthread four for the shallow nine-curve anchor and eight for sustained
-  deep 37-curve work, dynamic/chunk 1/capacity 32. Whole-owner support through
-  sixteen is validated; the 216-call count screen supports no larger count.
-  Counts and ownership remain explicit. No automatic numerical/routing change.
-- **Validated:** implementation `0c7c327` passes 1,778 committed-only tests
-  (14 optional skips) with all three native builds. Formatting-only `fb52b8c`
-  has identical test ASTs and passes full lint/format and 311 Git-listed
-  ordinary imports. Actual teams, failures, limits, cancellation, paid replay
-  and cleanup pass. The exact observer remains enabled; a bounded inherited-
-  lock preflight holds the performance window through all final stage cleanup.
-- **Boundary implementation closeout:** from `410eba0`, establish current removable
-  critical-path ceilings against matched A/A for preparation/registration,
-  generation/refill/settlement and conversion/export. Implement material exact
-  bulk alternatives or document applicable retain-path evidence. Coarse
-  resource-observed C coordination, lazy relation imports and reused accepted
-  catalogue bytes are implemented through `6a34003`. Later refill/import
-  challengers are admitted and tested without useful improvement. Source-labelled
-  individual and combined ceilings retain model/systematic limits. Committed-only
-  `3bb5a69` passes 1,805 tests (14 optional skips), lint, 317 ordinary imports
-  and all three reproducible native builds. Final fresh confirmation is delivered
-  below. Existing whole-classical C/GMP arithmetic and previous wins/losses
-  remain controls.
-  Current request: `v2/audit/b4a/native_boundary_closeout_20261111/REQUEST.md`.
-  Persisted cache data is project-local, checked and included in the finite
-  capture allowance. An unresolved material path prevents closeout.
-- **Final 3F delivered:** 1,512 fresh affected calls cover 6/9/6 independent
-  inputs at 60/80/100 digits, both anchors and cold/retained ownership. Zero
-  censors; pooled primary contrasts support scoped gains, while 60-digit deep
-  retained performance remains inconclusive under its frozen stop rule.
-  Recovery/cheap guards pass. All three 60-digit integration pairs precede one
-  clean 70-digit pair; canonical QS work agrees, native workers stay parked
-  with zero observed CPU advance, and final ownership reaches zero. The slower
-  native 70-digit total is retained as descriptive QS-dominated evidence;
-  no additional integration question justifies more calls. Population/p90 and
-  broad balanced promotion remain separate unmet gates. Current tables,
-  limitations, readiness and exact separate charges:
-  `v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.
-- **Preserved:** earlier source freezes, failures, charges, compiler/expression
-  decisions and scoped SME/NEON losses. C5 arithmetic/SIMD, B3 layouts,
-  C2 continuation, E6 prime generation and C3a/C11 routing retain their owners.
-
 <a id="qs-optimization-priorities--coverage-reconciliation-2-november-2026"></a>
 <a id="model-and-effort-for-the-new-qs-work"></a>
 
@@ -354,6 +280,7 @@ One entry per delivered scope. Detailed measurements, failures and adoption limi
 | Scope | Delivered outcome |
 | --- | --- |
 | <a id="a7a-completion"></a><a id="a7a-in-progress"></a>A7a | Current-collector process QS, Y0 and selected routing integrated; serial override retained. |
+| <a id="b4a-completion"></a><a id="b4a-in-progress"></a>B4a / P4.2 | Whole-native C/GMP ECM integrated and pushed in `53bac6c`; eligible CLI/library calls automatically select scalar/pthread within the [documented scope](README.md#automatic-ecm-execution-scope). Python fallback, explicit overrides, optional OpenMP and checked resource/checkpoint contracts are retained. Below 40 and borrowed/retained 80 remain Python. Population/p90 and broader balanced completion are separate unmet gates. [Coordination decisions](benchmarks/RESULTS.md#b4a-native-coordinationopenmp-10-november-2026) retain rejected and unimplemented conditional ideas. |
 | <a id="h3--simplify-resource-limits"></a>H3 | Observed root resources, allocator-grown internal state and checked saved-history resume. |
 | B12 → F4 / P6.3 ECM | Reproducible process ECM and selected cost-gated routing; ready-first remains separate. |
 | A1b existing fixed-score review | Retain defaults; scoped challenger lost. |
