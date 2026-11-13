@@ -142,6 +142,7 @@ class ProductionPM1Tests(unittest.TestCase):
         legacy = adapt_resource_configuration(
             portfolio.PortfolioConfig,
             **options,
+            ecm_kernel="python",
             pm1_gap_mode="cached",
             pm1_chunk_size=None,
         )
