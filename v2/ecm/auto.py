@@ -88,14 +88,25 @@ class AutomaticECMOwner:
         self.closed = False
         self.last_stats = {}
         self.disabled_reason = None
+        self.native_context = None
+        self.native_admission = None
+        self.native_disabled_reason = None
 
     def configure(self, config, generator, saved, *, automatic_memory=True):
         """Bind numerical policy/seed without advancing the parent RNG."""
-        implementation = "ecm-auto-observed-v3"
+        if saved is None:
+            # Negative optional-build decisions last for one call. A retained
+            # owner can discover a newly supplied build on its next call.
+            self.native_disabled_reason = None
+        self.whole_native = config.ecm_kernel == "auto-full"
+        version = "b4a-auto-full-v1" if self.whole_native else AUTO_VERSION
+        implementation = (
+            "ecm-auto-full-v1" if self.whole_native else "ecm-auto-observed-v3"
+        )
         if saved is not None:
             if (
                 set(saved) != {"version", "profile", "seed", "implementation"}
-                or saved["version"] != AUTO_VERSION
+                or saved["version"] != version
                 or saved["profile"] != POLICY_SHA256
                 or saved["implementation"] != implementation
                 or type(saved["seed"]) is not int
@@ -109,7 +120,7 @@ class AutomaticECMOwner:
                 seed = int(_digest([AUTO_VERSION, generator.getstate()]), 16)
         self.seed = seed
         self.header = dict(
-            version=AUTO_VERSION,
+            version=version,
             profile=POLICY_SHA256,
             seed=seed,
             implementation=implementation,
@@ -126,6 +137,8 @@ class AutomaticECMOwner:
         if not self.closed:
             if self.context is not None:
                 self.context.close()
+            if self.native_context is not None:
+                self.native_context.close()
             self.closed = True
 
     def _serial(self, reason):
@@ -137,6 +150,22 @@ class AutomaticECMOwner:
         return None
 
     def run_portfolio(self, n, *, config, budget, checkpoint=None, **kwargs):
+        if config.ecm_kernel == "auto-full":
+            from .native_auto import run_portfolio
+
+            return run_portfolio(
+                self,
+                n,
+                config=config,
+                budget=budget,
+                checkpoint=checkpoint,
+                **kwargs,
+            )
+        return self._run_incumbent(
+            n, config=config, budget=budget, checkpoint=checkpoint, **kwargs
+        )
+
+    def _run_incumbent(self, n, *, config, budget, checkpoint=None, **kwargs):
         if self.closed:
             raise RuntimeError("automatic ECM owner is closed")
         budget.consume(0)

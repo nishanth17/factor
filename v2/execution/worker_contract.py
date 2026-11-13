@@ -344,7 +344,7 @@ class Manifest:
             [SEARCH_VERSION, n, seed, lineage, search_options]
         )
         self.execution = None
-        if options.get("ecm_kernel", "python") != "python":
+        if options.get("ecm_kernel", "python") not in ("python", "auto-full"):
             from ..ecm.native_packet import source_identity
 
             self.execution = digest([source_identity(), options["ecm_kernel"]])

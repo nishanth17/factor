@@ -50,7 +50,9 @@ def arithmetic_options(config, settings):
         allocation=None,
     )
     options = asdict(selected)
-    if selected.ecm_kernel == "python":
+    if selected.ecm_kernel in ("python", "auto-full"):
+        # Automatic intent is resolved by the portfolio owner. An explicitly
+        # supplied Python executor keeps its process/scalar implementation.
         options.pop("ecm_kernel")
     return options
 

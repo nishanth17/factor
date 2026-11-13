@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from ..qs.sss import SSSConfig
 
 _AUTO_SIQS = object()
+_AUTO_ECM = object()
 
 
 def _decode_siqs_config(values):
@@ -98,7 +99,7 @@ class PortfolioConfig:
     ecm_chain_family: str = field(default="auto", kw_only=True)
     ecm_pair_distance: int | None = None
     ecm_pair_wheel: int | None = None
-    ecm_kernel: str = field(default="python", kw_only=True)
+    ecm_kernel: str = field(default=_AUTO_ECM, kw_only=True)
 
     def __post_init__(self):
         """Validate bounds and reserve storage before any allocation."""
@@ -148,9 +149,22 @@ class PortfolioConfig:
             if self.pm1_chunk_size > 256:
                 raise ValueError("limit p-1 chunks to 256 primes")
         arithmetic.get_backend(self.backend)
-        if self.ecm_kernel not in ("python", "c-gmp", "c-gmp-full", "auto"):
+        if self.ecm_kernel is _AUTO_ECM:
+            object.__setattr__(
+                self,
+                "ecm_kernel",
+                "auto-full" if self.backend == "python-int" else "python",
+            )
+        if self.ecm_kernel not in (
+            "python",
+            "c-gmp",
+            "c-gmp-full",
+            "auto",
+            "auto-full",
+        ):
             raise ValueError(
-                "ECM kernel must be python, c-gmp, c-gmp-full or auto"
+                "ECM kernel must be python, c-gmp, c-gmp-full, "
+                "auto or auto-full"
             )
         if self.ecm_kernel != "python" and self.backend != "python-int":
             raise ValueError("C/GMP ECM packets require python-int state")
@@ -363,7 +377,11 @@ class PortfolioConfig:
             + self.ecm_program_bytes
             + self.ecm_chain_bytes
             + paired_reserve
-            + (2 * 2**20 if self.ecm_kernel != "python" else 0)
+            + (
+                2 * 2**20
+                if self.ecm_kernel in ("c-gmp", "c-gmp-full", "auto")
+                else 0
+            )
         )
 
 
@@ -411,7 +429,7 @@ def _execution_context(state, config, budget):
                 _chain_bounds(config),
                 config.ecm_chain_family,
             )
-    if config.ecm_kernel != "python":
+    if config.ecm_kernel not in ("python", "auto-full"):
         from ..ecm.native_packet import NativePacket
 
         packet_type = NativePacket

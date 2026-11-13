@@ -427,8 +427,11 @@ def main(*, budget=None):
     )
     parser.add_argument(
         "--ecm-kernel",
-        choices=("python", "c-gmp", "c-gmp-full", "auto"),
-        help="optional scalar ECM executor; explicit local build required",
+        choices=("python", "c-gmp", "c-gmp-full", "auto", "auto-full"),
+        help=(
+            "ECM backend (default: lazy whole-native selection with Python "
+            "fallback; auto preserves the legacy stage-one selector)"
+        ),
     )
     rss_group = parser.add_mutually_exclusive_group()
     rss_group.add_argument("--rss-bytes", type=int, default=DEFAULT_RSS)
