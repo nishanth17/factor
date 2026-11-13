@@ -16,6 +16,8 @@ def run_request(request):
     from v2.portfolio import PortfolioConfig, factorize_bounded
 
     values = dict(request.get("config", {}))
+    if request.get("role") == "explicit-native":
+        values["ecm_kernel"] = "c-gmp-full"
     if "ecm_tiers" in values:
         values["ecm_tiers"] = tuple(map(tuple, values["ecm_tiers"]))
     config = PortfolioConfig(**values)
@@ -164,7 +166,14 @@ def main():
     request = json.loads(sys.stdin.readline())
     if request.get("source_root"):
         sys.path.insert(0, request["source_root"])
-    row = run_request(request)
+    try:
+        row = run_request(request)
+    finally:
+        module = sys.modules.get("multiprocessing.resource_tracker")
+        if module is not None:
+            tracker = module._resource_tracker
+            if tracker._pid is not None:
+                tracker._stop()
     print(json.dumps(row), flush=True)
     return 0 if row["valid"] else 1
 
