@@ -546,6 +546,10 @@ class WholeThreadTests(unittest.TestCase):
         job = stage_jobs.new_job("ecm", 2**199 - 189, 7, 31, 233)
         return config, budget, source, team, job
 
+    @unittest.skipUnless(
+        (SOURCE / "build/openmp/manifest.json").exists(),
+        "optional OpenMP build required",
+    )
     def test_extended_openmp_canonical_fixture_actions(self):
         for case in json.loads(FIXTURES.read_text())["cases"]:
             expected, trace, _ = drive(case, "python")

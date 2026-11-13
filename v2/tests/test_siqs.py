@@ -378,6 +378,7 @@ class SIQSTests(unittest.TestCase):
 
     def test_legacy_portfolio_checkpoint_upgrades_without_siqs(self):
         config = PortfolioConfig(
+            ecm_kernel="python",
             trial_bound=2, rho_attempts=0, pm1_attempts=0, ecm_tiers=()
         )
 

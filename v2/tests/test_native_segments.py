@@ -366,6 +366,10 @@ class NativeSegmentTests(unittest.TestCase):
                 budget.close()
 
         for owner_type in (NativeCurveTeam, OpenMPCurveTeam):
+            if not (
+                SOURCE / "build" / owner_type.variant / "manifest.json"
+            ).exists():
+                continue
             for b1, b2 in ((127, 4000), (2000, 81000), (11000, 1100000)):
                 with self.subTest(backend=owner_type.variant, b1=b1):
                     expected, old_calls = run(owner_type, False, b1, b2)
@@ -440,6 +444,9 @@ class NativeSegmentTests(unittest.TestCase):
             if row["population"] == "failed" and row["digits"] == 80
         )
         for role in ("scalar", "pthread", "openmp"):
+            relative = "" if role == "scalar" else role
+            if not (SOURCE / "build" / relative / "manifest.json").exists():
+                continue
             for b1, b2, curves in ((2000, 81000, 9), (11000, 1100000, 37)):
                 with self.subTest(role=role, b1=b1):
                     request = dict(

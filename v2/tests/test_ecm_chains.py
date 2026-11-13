@@ -47,6 +47,7 @@ def allowance(work=10**8):
 def configuration(**changes):
     return replace(
         PortfolioConfig(
+            ecm_kernel="python",
             trial_bound=5,
             rho_attempts=0,
             pm1_attempts=0,
@@ -447,16 +448,19 @@ class ProductionChainTests(unittest.TestCase):
             budget=allowance(10000),
             ecm_executor=None,
         )
+        self.assertEqual(second.ecm_execution["backend"], "python")
+        # Execution receipts were added after this mathematical snapshot.
+        metadata = {"stage_seconds", "ecm_execution", "ecm_requested"}
         self.assertEqual(
             {
                 k: v
                 for k, v in first.checkpoint["payload"]["state"].items()
-                if k != "stage_seconds"
+                if k not in metadata
             },
             {
                 k: v
                 for k, v in second.checkpoint["payload"]["state"].items()
-                if k != "stage_seconds"
+                if k not in metadata
             },
         )
         with self.assertRaises(ValueError):
