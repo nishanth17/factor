@@ -106,6 +106,12 @@ def load_control(name="_b4_control"):
 
 
 def config(engine, protocol, case, backend):
+    # This immutable arithmetic-control protocol predates native activation.
+    options = (
+        {"ecm_kernel": "python"}
+        if "ecm_kernel" in engine.PortfolioConfig.__dataclass_fields__
+        else {}
+    )
     return adapt_resource_configuration(
         engine.PortfolioConfig,
         trial_bound=5,
@@ -116,6 +122,7 @@ def config(engine, protocol, case, backend):
         memory_bytes=protocol["memory_bytes"],
         max_input_bits=protocol["max_input_bits"],
         trace_limit=256,
+        **options,
     )
 
 

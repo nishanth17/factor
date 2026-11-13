@@ -106,14 +106,6 @@ def adapt_resource_configuration(factory, *args, **values):
     parameters = inspect.signature(factory).parameters
     fields = getattr(factory, "__dataclass_fields__", {})
     values = dict(values)
-    # Omitted historical kernels meant Python. A recorder adapter must not
-    # migrate an old arithmetic/control experiment to the new native default.
-    # New automatic runners construct PortfolioConfig directly.
-    if (
-        getattr(factory, "__name__", "") == "PortfolioConfig"
-        and "ecm_kernel" in parameters
-    ):
-        values.setdefault("ecm_kernel", "python")
     historical = {
         key: value
         for key, value in values.items()

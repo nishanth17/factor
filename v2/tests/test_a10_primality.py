@@ -34,6 +34,8 @@ def allowance(work=1000000, **kwargs):
 
 
 def config(module=portfolio, **kwargs):
+    if "ecm_kernel" in module.PortfolioConfig.__dataclass_fields__:
+        kwargs.setdefault("ecm_kernel", "python")
     return adapt_resource_configuration(
         module.PortfolioConfig,
         trial_bound=5,

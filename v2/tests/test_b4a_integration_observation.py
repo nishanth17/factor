@@ -9,6 +9,33 @@ from v2.benchmarks.ecm.b4a.integration_observation import IntegrationObserver
 
 
 class CanonicalQSEvidenceTests(unittest.TestCase):
+    def test_scalar_handoff_releases_context_without_thread_lifecycle(self):
+        from v2.benchmarks.ecm.b4a.integration_comparison import (
+            native_handoff,
+        )
+
+        state = dict(
+            native=True,
+            topology="scalar",
+            closed=True,
+            contexts=0,
+            live_contexts=0,
+            shared_native_blocks=0,
+            lifecycle=None,
+        )
+        evidence = dict(
+            snapshots=[
+                dict(label=label, native=state, native_threads=None)
+                for label in ("qs-entry", "after-ecm-close")
+            ]
+        )
+        result = native_handoff(evidence)
+        self.assertTrue(result["reached_native_QS"])
+        self.assertEqual(result["topology"], "scalar")
+        state["live_contexts"] = 1
+        with self.assertRaisesRegex(RuntimeError, "remain live"):
+            native_handoff(evidence)
+
     def test_partitioning_preserves_every_common_prefix(self):
         rows = [
             [index, index - 17, 1, [[2, 1]], 1, [], None, False]

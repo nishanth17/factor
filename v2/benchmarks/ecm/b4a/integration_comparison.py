@@ -48,10 +48,27 @@ def native_handoff(evidence):
             raise RuntimeError(
                 "native contexts/blocks remain live after close"
             )
-        if state["lifecycle"][0] != state["lifecycle"][1]:
+        lifecycle = state["lifecycle"]
+        if lifecycle is not None and lifecycle[0] != lifecycle[1]:
             raise RuntimeError("native thread creation/join count differs")
     if not active:
-        return dict(reached_native_QS=False, closed=True)
+        scalar = any(
+            s["label"] == "qs-entry"
+            and s["native"].get("topology") == "scalar"
+            and s["native"].get("native")
+            for s in evidence["snapshots"]
+        )
+        return dict(
+            reached_native_QS=scalar,
+            topology="scalar" if scalar else "not-engaged",
+            closed=True,
+            contexts_released=True,
+            final_threads_joined=0,
+            scope="Scalar ECM owns no background workers; its context is "
+            "accounted during QS and released by final call cleanup."
+            if scalar
+            else "No native ECM owner observed during QS.",
+        )
     before, after = active[0]["native_threads"], active[-1]["native_threads"]
     old = {r["identity"]: r for r in before["threads"]}
     new = {r["identity"]: r for r in after["threads"]}

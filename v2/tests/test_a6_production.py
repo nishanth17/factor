@@ -26,6 +26,7 @@ def allowance(work=1000000):
 
 
 def configuration(**changes):
+    changes.setdefault("ecm_kernel", "python")
     return adapt_resource_configuration(
         portfolio.PortfolioConfig,
         trial_bound=5,
