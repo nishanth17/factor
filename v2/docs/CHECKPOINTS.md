@@ -53,3 +53,14 @@ call and close separately. Owned children drain before a final snapshot is built
 | [p−1](../pm1/README.md) | Same n/base/config and charged rung verification |
 | [QS/SSS](../qs/README.md) | Reverify relations, rebuild derived queues, preserve numerical quotas |
 | [Execution](../execution/README.md) | Shared root owner and stage handoff |
+
+### Automatic native execution identity
+
+The schema-14 automatic envelope separates whole-native intent from concrete
+execution state. A checkpoint saved before ECM does not load or hash native
+code. Once native execution is bound, resume requires the exact saved backend,
+recipe and source/build identity, even if the next stage is classification or
+QS. Missing/changed native state raises rather than silently rerunning Python.
+Accepted historical checkpoints with an omitted kernel retain Python;
+legacy `auto` retains its old stage-one semantics. Existing resource-version
+admission still applies. See the [current default scope](../README.md#automatic-ecm-execution-scope).

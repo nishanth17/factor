@@ -169,3 +169,17 @@ parallel collection; growing DLP retains `target_rows=None`. Use keyword
 arguments for configuration fields after the former positional resource
 arguments. Supplying a removed keyword or positional limit raises a named
 `RemovedResourceLimitError`; it is never silently accepted.
+
+### Automatic whole-native ECM execution
+
+An omitted `PortfolioConfig.ecm_kernel` now selects lazy `auto-full` intent
+for the Python-integer portfolio. Eligible bounded calls use the admitted
+whole-native scalar/pthread build; optional unavailability preserves Python.
+Explicit Python/process choices and the legacy direct APIs retain their
+semantics. No factoring call compiles or installs dependencies.
+
+`PortfolioRun.ecm_execution` records actual backend, recipe, source/build,
+workers/topology, reason, whole-native entries and per-job/tier decisions.
+Automatic intent alone does not establish native execution. See the
+[default scope table](../README.md#automatic-ecm-execution-scope), including
+below-40 and borrowed/retained-80 exclusions and checkpoint compatibility.

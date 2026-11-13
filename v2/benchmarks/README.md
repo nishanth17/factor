@@ -1100,3 +1100,29 @@ remain local. Broader population/p90 and fully powered balanced promotion
 remain unmet; no routing/default changes, merge or push. Current conditional
 wall/CPU/RSS, startup, publication/waste and engagement inputs:
 `v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.
+
+### B4a automatic whole-native activation (13 November 2026)
+
+Use `ecm/b4a/automatic_call.py` for one source-pinned cold normal default call,
+`automatic_retained.py` for validated warmup/samples/final close, and
+`automatic_integration.py` with the integration observer/comparator for real
+ECM-to-QS handoff. They record actual backend, recipe, source/build identity,
+workers/topology, reason, whole-native entries and per-job/tier decisions.
+`production_batch.py` and `confirmation_runtime.py` also retain these receipts.
+
+An intended-native request sets `require_native` and the expected worker/runtime
+recipe. It asserts ordinary selection after the paid observation is saved;
+it never forces, imports or warms native execution to satisfy a cold claim.
+Fallback/not-engaged/mixed/wrong-runtime/zero-entry/history-overflow rows fail
+clearly and stay in the data. Deliberate unavailable or unadopted ownership
+cases declare expected Python/not-engaged and are guards, not native samples.
+Below 40 and borrowed 80 are such guards in the adopted policy. Older immutable
+controls use an explicitly labelled Python-event adapter, preserving source.
+
+Fresh actual-plan comparison uses three/six/nine independent inputs, clustered
+repetitions, cold A/A and at least three useful warmup seconds. Complete costs
+include owner close and paid peer work. Inputs/certificates are versioned in
+`inputs/corpora/b4a_automatic_20261113.json`; known factors never route work.
+Local handoff, raw data, exact charges, cache retention and B5a consumer actions
+are under `v2/audit/b4a/auto_native_activation_20261112/`. No native runtime
+build or persisted cache is silently created by a normal factoring call.

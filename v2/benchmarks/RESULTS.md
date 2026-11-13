@@ -1,5 +1,52 @@
 # Benchmark results and decisions
 
+## B4a automatic native activation (13 November 2026)
+
+Normal eligible no-native-flag portfolio calls now engage whole-native C/GMP.
+The [default scope](../README.md#automatic-ecm-execution-scope) states the
+runtime/build/work and ownership limits. Generic O2/ordinary GMP/coalesced,
+scalar 256/team 128, pthread 8 for the default 140-curve plan and scalar for
+50/70-digit parent streams are retained. No numerical effort or stream changes.
+
+| Fresh cold ECM band | Independent inputs | Native/default wall ratio | Joint-rule interval |
+| --- | ---: | ---: | --- |
+| 60 digits | 6 | 0.510 | [0.369, 0.706] |
+| 80 digits | 6 | 0.521 | [0.430, 0.633] |
+| 100 digits | 6 | 0.506 | [0.372, 0.687] |
+
+These are complete cold first-validated-split or finite-quota endpoints,
+including interpreter/startup/preparation and cleanup, with matched actual
+production plans against committed pre-activation defaults. The candidate
+source is `4f6c0d1`; final `dd5a60f` only removes unconfirmed routes, with an
+explicit AST/source applicability proof and 54-call current-source recheck.
+Paired normal-log Student-t intervals cluster repetitions by independent
+modulus; 99.88095% per-look intervals account for 14 comparisons and three
+looks. Normality is an assumption, not established by these small samples.
+All 684 measured cold/retained calls reconstruct with no censors or identity
+failures; 2,824 validated warmup calls are separate and charged.
+
+The 30-digit candidate and retained 80 comparison stay inconclusive at nine
+inputs, so automatic selection keeps their Python routes. Other adopted
+retained contrasts support gains. Custom/off-anchor/90-digit recipes remain
+extrapolations, not universal count or latency optima. Current below 40 Python
+ECM guards add roughly 15–20 ms (5.36–6.78%) of setup/bookkeeping; unchanged
+serial cost is not claimed. All 128cheap/random/fallback calls reach valid
+endpoints, retaining 42 unsifted inputs and expected-not-engaged cases.
+
+Fresh bounded realQS pairs match12,248 canonical rows at 60 digits and 1,664 at 70.
+Eight native threads show zero CPU advance through 10.724 seconds of QS at 60;
+all join/release. The70 scalar context is also released. Both arms exhaust
+identical 16-family quotas, without resource stops. QS-dominated totals are
+only descriptive; no complete factorization, population/p90 or fully powered
+balanced completion promotion is established. Earlier complete 3Fevidence and
+its limitations remain historical, not silently relabelled.
+
+Final committed-only source passes 1,834 tests (30 optional skips), lint,
+321 ordinary imports and selected scalar/pthread builds; OpenMP is optional.
+Detailed current costs, failures, exact accounting and B5a integration seam:
+`v2/audit/b4a/auto_native_activation_20261112/AUTO_NATIVE_HANDOFF.md` (local).
+
+
 ## B4a native coordination/OpenMP (10 November 2026)
 
 The native coordination/backend phase is complete. A real benchmark-only

@@ -10,9 +10,11 @@ The default Python-integer backend uses only the standard library. The active
 implementation lives here; [v1](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/V1_BASELINE.md) is the preserved
 Python 2 baseline.
 
-Optional [native scalar/pthread ECM](ecm/native/README.md) uses exact GMP
-behind explicit `c-gmp` or whole-curve `c-gmp-full` selection. Builds are explicit;
-factoring calls never compile. An explicit whole-curve OpenMP production owner
+On this branch, normal CLI auto calls and `factorize_bounded()` lazily select
+[whole-native scalar/pthread ECM](ecm/native/README.md) when its admitted build
+and the confirmed engagement conditions below apply. Missing optional native
+dependencies preserve Python execution. Builds are explicit; factoring calls
+never compile or install dependencies. An explicit whole-curve OpenMP owner
 uses provided LLVM/libomp and static/dynamic worksharing, with no automatic
 selection. The retained NEON prototype lost its
 scoped comparison and remains outside the executor.
@@ -32,14 +34,60 @@ bounded wave coordination and incurred-work snapshots in C. A segment retains
 the existing five-ms resource cadence and returns immediately at a completed
 curve for checked publication. It observes actual root RSS and process CPU;
 children and custom clocks/providers/callbacks use the original checked path.
-A process-QS pool can already own a helper before ECM starts; that integrated
-call therefore needs its measured full-tree fallback costs rather than a
-childless native cost estimate.
+Newly owned QS pool preparation is deferred to its first handoff. Borrowed
+pools or external children can already own helpers before ECM starts; those
+calls retain exact full-tree observation and its complete costs.
 Native-generated blocks remain owner-owned until all borrowing curves drain.
 Known plan references and the existing immutable catalogue wire are reused;
 first-use catalogue construction and its C certificate proofs remain lazy.
 Public and restored checkpoints retain canonical validation and compatibility.
-Complete-cost adoption and fresh confirmation remain separate gates.
+Native setup is deferred until ECM is reached; preprocessing, primality and
+rho exits do not load CFFI or native libraries.
+
+## Automatic ECM execution scope
+
+The numerical plans, algorithms, curve streams and parent RNG consumption are
+unchanged. Execution selection has a separate identity. `auto-full` denotes
+automatic intent; `run.ecm_execution` reports what actually ran.
+
+| Entry point or condition | Selected behavior and evidence limit |
+| --- | --- |
+| Normal CLI auto mode, omitted `--ecm-kernel`; default bounded library | Whole-native for adopted eligible ECM; Python fallback otherwise |
+| Eligible native work | PyPy 3.11, macOS arm64, `python-int`, odd 40–100-digit input, classical unpaired formula, default chain family, B2 below 2^32, at most 4,096 curves, summed B1 × quota at least 16,000, compatible source/ABI/GMP/build and root resource headroom |
+| Default escalating 140-curve plan at 40/60/80/100 digits | Eight pthreads, dynamic scheduling, chunk 1, capacity 32, 128-action slices; fresh cold comparisons support gains |
+| Default 50/70-digit parent-RNG plans | Scalar C/GMP, 256-action slices; preserve the incumbent serial curve stream |
+| Below 40 digits | Python; the 30-digit cold and retained comparisons stayed inconclusive at nine independent inputs |
+| Borrowed/retained `AutomaticECMOwner`, 80-digit work | Python/B12; its retained native comparison stayed inconclusive at nine inputs. Ordinary per-call 80-digit execution selects native |
+| Other accepted Manifest plans, including off-anchor sizes | Scalar/four/eight from fixed work/count thresholds; conservative extrapolation, not independently tuned optima. No independent 90-digit speed claim |
+| Missing/incompatible build, unsupported runtime/domain/formula, negligible work | Existing supported Python/B12 route before native admission; no runtime compilation |
+| Prime/even/power/tiny or earlier-method completion | No native preparation; backend receipt says not engaged |
+| Explicit `python` or a Python executor | Python; explicit process ownership/topology is preserved |
+| Explicit `c-gmp`, legacy `auto`, `c-gmp-full`, native executor | Preserve stage-one control, legacy stage-one selection and explicit whole-native meanings respectively; OpenMP remains explicit |
+| Legacy `factorize()`, direct `factorize_ecm()` and direct algorithms | Existing Python/arithmetic-backend and RNG contracts; automatic whole-native selection belongs to the portfolio path |
+| Historical omitted-kernel or legacy `auto` checkpoint | Retains saved Python or old stage-one semantics |
+| New native-bound checkpoint | Requires exact saved implementation, source/build and recipe; changed/missing native state is an error, never silent migration |
+| Pre-ECM automatic checkpoint | Saves intent without loading or hashing native code |
+| Children/custom resource views | Original exact full-tree observation; native thread CPU is counted once within process CPU |
+
+For other Manifest plans, eight requires summed B1 × quota at least 500,000
+and at least 32 curves; four requires 50,000 and eight curves; otherwise scalar
+is used. These settings do not change numerical effort. Parent-RNG plans keep
+their scalar execution contract. Native scalar contexts on that path are
+per-call even when the outer automatic owner is retained.
+
+`PortfolioRun.ecm_execution` retains requested mode, concrete backend, recipe,
+build/source identity, actual topology/workers, engagement/fallback reason,
+whole-native entry counters and per-job/tier decisions. Mixed execution and
+bounded-history overflow are explicit. Library calls remain quiet. Benchmark
+`require_native(run, workers=..., variant=...)` is an assertion after execution;
+it never forces, preloads or warms a native route. Missing optional execution
+can fall back only before admission; later arithmetic, ownership, accounting or
+resource faults preserve their error/checkpoint semantics.
+
+Fresh measurements use finite ECM split/quota endpoints, with separate cold
+and retained ownership. They establish no population/p90 or universal complete
+factorization claim. See [benchmark evidence](benchmarks/RESULTS.md) and the
+local activation handoff listed in [status](STATUS.md).
 
 ## Setup and first run
 
@@ -388,7 +436,7 @@ need revalidation on the combined H3 source. No automatic worker selection or
 performance adoption follows from this integration. Detailed local evidence
 and handoff remain under `v2/audit/a7a/`.
 
-## Experimental pthread ECM owner on B4a
+## Explicit pthread ECM owner on B4a
 
 The B4a branch adds `pypy3 -B -m v2.ecm.native.build --gmp-prefix PREFIX
 --pthread` alongside the separate ordinary-GMP scalar build. Both retain O2.
@@ -405,17 +453,17 @@ The new `b4a-pthread-owner-h3-v3` checkpoints bind source, settings and chunk
 size; old OpenMP checkpoints do not migrate. Scalar/pthread correctness is
 validated initially on `0f2fee3`; the retained `c-gmp` stage-one control
 keeps setup, classical stage two and recovery in Python. The separately selected
-whole-ECM C owner is described below. See [native ownership and validation](ecm/native/README.md). No automatic
-routing, performance adoption or mainline integration follows.
+whole-ECM C owner is described below. See [native ownership and validation](ecm/native/README.md)
+and the automatic scope above. Mainline integration remains a separate merge.
 
 
-The B4a whole-ECM candidate is selected with
+Explicit whole-ECM execution is selected with
 `PortfolioConfig(ecm_kernel="c-gmp-full")` or `--ecm-kernel c-gmp-full`.
 It preserves scalar durable checkpoints and the persistent team's assignment
 resume contract while executing setup, both ECM stages, GCD and strict recovery
 in C. Python prepares immutable metadata and validates/publishes results.
-The existing `c-gmp` stage-one executor remains a control; automatic routing
-is unchanged. See [whole-native ownership and eligibility](ecm/native/README.md).
+The existing `c-gmp` stage-one executor remains a control. Omitted kernel uses
+the separate lazy automatic policy above. See [whole-native ownership and eligibility](ecm/native/README.md).
 
 Explicit native builds prepare hash-checked CFFI ABI descriptors; first use
 retains source/binary/GMP validation while avoiding declaration parsing.

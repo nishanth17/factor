@@ -1,11 +1,20 @@
 # Optional ordinary-GMP ECM packets and pthread slices
 
+The optional build is now selected lazily by normal eligible portfolio calls.
+See the [automatic default scope](../../README.md#automatic-ecm-execution-scope)
+for runtime, numerical, ownership and fallback conditions. Normal per-call
+40–100-digit execution uses admitted whole-native scalar/pthread recipes;
+below 40 and borrowed/retained 80 keep Python after inconclusive confirmation.
+Explicit native overrides remain available. No build, CFFI import or native
+library load occurs merely because an earlier-method call enables auto intent.
+The dated implementation screens below retain their historical scope.
+
 Pthread owners accept 1–16 threads; higher-level worker settings require
 `allow_wide_workers=True` for counts outside 1, 2 and 4. The fixed handle and
 argument arrays, startup-failure injection and cancellation barriers cover
 this range. Capacity remains at most 32 contexts, with the same 128-action,
 five-ms slices and root CPU/RSS enforcement. Supported counts are an opt-in
-admission range; defaults and automatic worker selection remain unchanged.
+admission range; automatic selection uses the separately measured policy above.
 
 The separate experimental build option `--extended-quantum` permits and selects
 256 actions for whole-native scalar/pthread slices. The default remains 128.
@@ -13,13 +22,13 @@ Both retain the five-ms target, native clock/cancellation checks, root CPU/RSS
 polling and publication ordering. An explicit smaller scalar `packet.actions`
 override still takes precedence. Legacy generic packet callers keep 128 actions.
 
-Python integers on PyPy3.11 remain the default. The isolated B4a branch admits
+Python integers on PyPy3.11 remain the arithmetic backend. Historically, B4a admitted
 whole-classical scalar/pthread correctness on `fa2a4cc`: full QA runs 1,741 tests
 with 20 explicit optional skips, lint and 308 ordinary benchmark imports. All
 20 new whole-native test methods execute. The earlier `c-gmp` stage-one owner
-remains an independent control; select `c-gmp-full` explicitly for the complete
-C owner described below. Performance adoption, recalibration and integration
-remain open after the cold/warm Tier 1 screen.
+remains an independent control; `c-gmp-full` requests the complete C owner
+explicitly. The later automatic activation supersedes the original opt-in-only
+recommendation within its documented scope.
 
 The Phase-2 experimental whole-ECM driver observes a childless macOS root
 through one CFFI bridge using the same libproc usage/child queries as the
@@ -35,8 +44,8 @@ bindings. Final ordinary and optional-limb committed-only builds on `b620d6f`
 each pass 1,751 tests (20 optional skips), lint and 308 benchmark imports.
 The final cold size matrix and separate warm anchors are complete; comparisons
 retain Python, C1, uncertainty, historical failures and all charges locally.
-Phase 3 adoption and worker/dispatch recalibration remain. No worker recipe
-or automatic selection changes.
+That historical Phase-2 delivery did not change automatic selection. Later
+activation uses fresh actual-production-plan calibration and confirmation.
 
 Build explicitly from the repository root under the shared performance lock:
 
@@ -50,8 +59,9 @@ ignored build directory. Its bounded bytes and filename are hash-checked
 against the manifest before loading. Source, binary and GMP checks still run;
 the first native call avoids parsing C declarations. Older manifests without
 a descriptor retain inline binding. No compilation or preparation occurs on
-default/ineligible calls. Declared missing/corrupt descriptors raise instead
-of silently changing backend.
+ineligible or earlier-completed calls. Declared missing/corrupt descriptors
+raise for explicit execution; optional automatic admission may select Python
+before any curve action. Post-admission faults never silently rerun elsewhere.
 
 Both retain `-std=c11 -O2 -Wall -Wextra -Werror`. The scalar artifact is in
 `build/`; pthread is separately in `build/pthread/`, with `-DB4_PTHREAD -pthread`.
@@ -254,7 +264,7 @@ NEON loss remains scoped; no field-SIMD implementation is integrated.
 
 Select `PortfolioConfig(ecm_kernel="c-gmp-full")` explicitly, or CLI
 `--ecm-kernel c-gmp-full`. `c-gmp` remains the retained stage-one control;
-Python remains the automatic default. `NativeECMExecutor` dispatches whole
+Omitted selection follows the automatic policy above. `NativeECMExecutor` dispatches whole
 native continuations when its configuration selects `c-gmp-full`.
 
 Suyama setup/inversion/nonunits, accepted ladder/PRAC stage one, normal GCD,
@@ -307,8 +317,8 @@ adoption and cost/dispatch recalibration remain separate from correctness.
 The explicit recipe retains generic O2/ordinary GMP and exact root checks,
 with coalesced unit yields, scalar 256 actions and pthread 128 actions.
 Registration uses the same exact root transport. Independent GMP expression
-fusion did not establish useful improvement and was removed. Defaults stay
-unchanged; 1–16-thread admission does not select automatic worker counts.
+fusion did not establish useful improvement and was removed. The later
+automatic policy is distinct from 1–16-thread technical admission.
 
 Build the selected scalar and pthread pair explicitly, under the shared lock:
 
@@ -320,7 +330,8 @@ pypy3 -B -m v2.ecm.native.build --gmp-prefix /opt/homebrew/opt/gmp --pthread --c
 Use `NativeECMExecutor(settings=WorkerSettings(workers=4),
 schedule="dynamic", chunk_size=1, capacity=32)` with an explicit
 `c-gmp-full` configuration. This is a measured opt-in recipe, with existing
-Python/B12 controls still applicable. It is not an automatic engagement rule.
+Python/B12 controls still applicable. Automatic engagement additionally uses
+the production-plan and ownership evidence linked above.
 Reuse the built dylib, checked ABI descriptor and manifest across calls;
 rebuild when source, flags, toolchain or dependency identity changes.
 A relocatable `.o` alone cannot be loaded by CFFI's dynamic-library loader.

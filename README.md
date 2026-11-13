@@ -22,6 +22,11 @@ pypy3 -m v2.factor 626100403 --bounded --seed 7 \
 Omit the number for an interactive prompt. The Python-integer backend uses
 only the standard library; GMP is optional.
 
+Eligible portfolio ECM calls automatically use an admitted optional C/GMP
+scalar or pthread build. Missing builds preserve Python execution; calls never
+compile dependencies. See the [automatic execution scope](v2/README.md#automatic-ecm-execution-scope)
+for the input, ownership and checkpoint conditions.
+
 ## Documentation
 
 | Guide | Use it for |

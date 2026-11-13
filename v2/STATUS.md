@@ -5,7 +5,34 @@ requests, freezes and charges. B4a boundary closeout and final 3F are delivered
 within their declared scopes; the campaigns retain separate accounts.
 C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
 
-Last updated: 12 November 2026 (America/Los_Angeles).
+Last updated: 13 November 2026 (America/Los_Angeles).
+
+**B4a automatic whole-native activation — delivered on the task branch.**
+Executable/test source `dd5a60f`; no merge or push. Normal no-native-flag CLI
+and bounded-library calls now lazily engage admitted C/GMP scalar/pthread ECM
+within the [precise default scope](README.md#automatic-ecm-execution-scope).
+Default 140-curve work uses eight pthreads; 50/70-digit parent-RNG plans use
+scalar C. Below 40 digits and borrowed/retained 80-digit work keep Python after
+inconclusive nine-input comparisons. Numerical effort, streams and algorithms
+remain unchanged; optional dependencies remain optional, with no runtime build.
+
+Fresh confirmation has 684 measured calls, zero censors/exactness/identity
+failures, three/six/nine independent-input stop rules and explicit uncertainty.
+Cold 60/80/100-digit ratios are approximately 0.51–0.52 of the pre-activation
+default. These are finite ECM split/quota endpoints, not full factorization or
+population/p90 claims. Final committed-only QA passes 1,834 tests (30 optional
+skips), lint, 321 ordinary imports and scalar/pthread builds; OpenMP is optional.
+Fresh bounded 60/70 ECM-to-QS pairs match 12,248/1,664 canonical rows, with
+native quiescence and complete release. Short Python ECM adds approximately
+15–20 ms in the measured fallback guard; do not claim unchanged serial cost.
+
+Current local entry:
+`v2/audit/b4a/auto_native_activation_20261112/AUTO_NATIVE_HANDOFF.md`.
+It includes source/build identity, current cost tables, B5a trust/consumer
+requirements, all failures/charges and retained/removed cache paths with hashes.
+All 41 reservations are settled: 2316.6459871241823 wall / 10658.204101 CPU
+seconds. Historical grants, drift-r1 and losses remain intact. C5.M is the next
+separate ECM arithmetic lever; combined integration must recalibrate its source.
 
 **B4a native boundary closeout and final 3F — delivered, opt-in.**
 Entry `410eba0`; executable production `6a34003`, test-only QA `3bb5a69`,
@@ -484,7 +511,7 @@ The snapshot does not assert that any process or performance window is active.
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
 | [A7a — Done](ROADMAP.md#a7a-completion) | Selected Y0 and nearest-row process recipes integrated locally; larger probes remain deferred until after B5a. | `results/a7a/final-merge-20261109/`; retained G4 and calibration receipts |
-| [B4a](ROADMAP.md#b4a-in-progress) | Phase 2 component optimization complete; Phase 3 adoption, recalibration and integration remain. | `codex/b4a-native-ecm` / final QA source `b620d6f` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Automatic whole-native activation delivered within the documented input/ownership scope; combined-source integration remains separate. | `codex/b4a-native-ecm` / final executable QA `dd5a60f` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
 startup follow-up is unfinished. The tuple-decoding microcheck is complete;

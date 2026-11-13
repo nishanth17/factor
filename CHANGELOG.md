@@ -3,6 +3,24 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a automatic whole-native activation (13 November 2026)
+
+- Make omitted-kernel portfolio CLI/library calls lazily select whole-native
+  scalar/pthread ECM within the documented runtime, numerical and ownership
+  scope. Keep below 40 and borrowed/retained 80 on Python after inconclusive
+  confirmation. Preserve explicit Python/native choices and legacy direct APIs.
+- Preserve numerical tiers, algorithms, streams and parent RNG draws. Separate
+  execution-selection versioning, record actual per-job/tier backend/build/
+  topology/entries, and add nonforcing benchmark assertions that retain failures.
+- Keep optional builds optional, enforce source/ABI/GMP admission and retained
+  invalidation, preserve saved checkpoint meanings, and reject post-admission
+  faults without rerunning another backend. Defer newly owned QS preparation
+  while retaining exact child observation and borrowed/B12 lifetimes.
+- Pass fresh actual-plan complete-cost comparisons and bounded 60/70 QS handoff
+  checks. Final committed-only QA: 1,834 tests, 30 optional skips, lint, 321
+  benchmark imports, scalar/pthread builds. Broader population/p90 and balanced
+  completion promotion remain open; measured short fallback overhead is stated.
+
 ## B4a final native confirmation (12 November 2026)
 
 - Complete 1,512 fresh affected-ECM calls at both anchors, with separate cold
