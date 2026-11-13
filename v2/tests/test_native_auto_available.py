@@ -13,7 +13,7 @@ from v2.ecm.execution_identity import require_native
 from v2.ecm.native_admission import build_present
 from v2.ecm.native_auto import SOURCE
 from v2.execution.budget import Budget
-from v2.portfolio import factorize_bounded
+from v2.portfolio import PortfolioConfig, factorize_bounded
 
 ROOT = Path(__file__).resolve().parents[2]
 N = 595063068176486113232605383931148599031685550719226328338409
@@ -26,6 +26,36 @@ AVAILABLE = _runtime_supported() and all(
     AVAILABLE, "compatible local scalar/pthread builds required"
 )
 class ActualAutomaticNativeTests(unittest.TestCase):
+    def test_explicit_scalar_and_pthread_receipts_count_actual_entry(self):
+        from v2.ecm.workers import ECMExecutor
+        from v2.execution.ecm_native import NativeECMExecutor
+        from v2.execution.worker_contract import WorkerSettings
+
+        for workers in (1, 4, 8):
+            settings = WorkerSettings(workers=workers, allow_wide_workers=True)
+            owner = (
+                ECMExecutor(seed=7919, settings=settings)
+                if workers == 1
+                else NativeECMExecutor(
+                    seed=7919, settings=settings, capacity=32
+                )
+            )
+            with owner:
+                ledger = Budget(seconds=5, cpu_seconds=30)
+                try:
+                    run = factorize_bounded(
+                        N,
+                        seed=7919,
+                        ecm_executor=owner,
+                        budget=ledger,
+                        config=PortfolioConfig(ecm_kernel="c-gmp-full"),
+                        stop_after_split=True,
+                    )
+                    require_native(run, workers=workers)
+                    self.assertTrue(run.ecm_execution["jobs"][0]["build"])
+                finally:
+                    ledger.close()
+
     def test_normal_default_library_actually_executes_whole_native(self):
         ledger = Budget(seconds=5, cpu_seconds=30)
         try:

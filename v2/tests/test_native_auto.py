@@ -49,6 +49,22 @@ class AutomaticNativeIntentTests(unittest.TestCase):
         self.assertNotEqual(native.identity, python.identity)
         self.assertEqual(generator.getstate(), before)
 
+    def test_custom_bounds_outside_native_manifest_range_fall_back_cheaply(
+        self,
+    ):
+        config = PortfolioConfig(
+            ecm_tiers=((2000, 2**32, 8),),
+            ecm_chain_mode="off",
+            ecm_program_bytes=0,
+        )
+        with patch(
+            "v2.ecm.auto._runtime_supported", side_effect=AssertionError
+        ):
+            self.assertEqual(
+                eligibility(10**59 + 7, config),
+                "unsupported_native_work_range",
+            )
+
     def test_checkpoint_before_ecm_does_not_admit_or_hash_native(self):
         with (
             patch(

@@ -11,6 +11,41 @@ def append_decision(state, record):
     return len(history["jobs"]) - 1
 
 
+def executor_packet(executor):
+    """Inspect existing ownership without preparing or importing a backend."""
+    team = getattr(executor, "team", None)
+    if team is not None and getattr(team, "packets", ()):
+        return team.packets[0]
+    engine = getattr(executor, "serial_engine", None)
+    context = None if engine is None else engine.programs or engine.context
+    return getattr(context, "native_packet", None)
+
+
+def executor_entries(executor):
+    packet = executor_packet(executor)
+    if not getattr(packet, "full_ecm", False):
+        return 0
+    team = getattr(executor, "team", None)
+    return team.slices if team is not None else packet.calls
+
+
+def packet_identity(packet):
+    """Report a binding already loaded by explicit native execution."""
+    if packet is None or getattr(packet, "manifest", None) is None:
+        return None
+    from .native_packet import source_identity
+
+    manifest = packet.manifest
+    return dict(
+        source=source_identity(),
+        variant=packet.variant,
+        library_sha256=manifest["library_sha256"],
+        abi=manifest["abi"],
+        gmp_sha256=manifest["gmp_library_sha256"],
+        binding_sha256=(manifest.get("abi_binding") or {}).get("sha256"),
+    )
+
+
 def summary(state, requested):
     """Summarize actual paths while preserving every retained job decision."""
     history = state.get("ecm_execution", dict(jobs=[], dropped=0))

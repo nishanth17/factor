@@ -16,6 +16,11 @@ def eligibility(n, config):
     if n < 10**29:
         return "unmeasured_native_size"
     if (
+        any(b2 >= 2**32 for _, b2, _ in config.ecm_tiers)
+        or sum(curves for _, _, curves in config.ecm_tiers) > 4096
+    ):
+        return "unsupported_native_work_range"
+    if (
         config.ecm_pair_distance is not None
         or config.ecm_pair_wheel is not None
         or config.ecm_chain_family != "auto"

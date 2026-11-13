@@ -598,6 +598,9 @@ def _advance(
                 "selector cannot replace existing serial ECM progress"
             )
         try:
+            from .ecm.execution_identity import executor_entries
+
+            explicit_before = executor_entries(ecm_executor)
             outcome = run(
                 int(n),
                 config=config,
@@ -624,7 +627,11 @@ def _advance(
             )
         else:
             current["worker_checkpoint"] = outcome.checkpoint
-            from .ecm.execution_identity import append_decision
+            from .ecm.execution_identity import (
+                append_decision,
+                executor_packet,
+                packet_identity,
+            )
 
             execution = outcome.stats.get("ecm_execution")
             if execution is None:
@@ -639,14 +646,26 @@ def _advance(
                         if config.ecm_kernel == "python"
                         else "stage-one-native"
                     ),
-                    topology="threads" if threads else "processes",
+                    topology="threads"
+                    if threads
+                    else (
+                        "scalar"
+                        if getattr(
+                            getattr(ecm_executor, "settings", None),
+                            "workers",
+                            1,
+                        )
+                        == 1
+                        else "processes"
+                    ),
                     workers=threads
                     or getattr(
                         getattr(ecm_executor, "settings", None), "workers", 1
                     ),
-                    native_entries=outcome.stats.get("native_slices", 0),
+                    native_entries=executor_entries(ecm_executor)
+                    - explicit_before,
                     reason="explicit_executor",
-                    build=None,
+                    build=packet_identity(executor_packet(ecm_executor)),
                 )
             append_decision(state, dict(execution, n=int(n)))
             _event(
