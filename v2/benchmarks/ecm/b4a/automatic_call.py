@@ -99,7 +99,18 @@ def run_request(request, *, retained=None):
             checkpoint=run.checkpoint
             if request.get("save_checkpoint")
             else None,
+            endpoint_reached=(
+                run.resource_stop is None
+                and run.reason
+                in (
+                    "factor_found",
+                    "complete",
+                    "exhausted",
+                    "schedule_exhausted",
+                )
+            ),
         )
+        row["censored"] = not row["endpoint_reached"]
         if row["execution"] is None:
             # A committed pre-activation control has no new receipt schema.
             # Its unchanged events establish Python serial/process execution;

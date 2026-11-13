@@ -194,6 +194,38 @@ class RequireNativeTests(unittest.TestCase):
 
 
 class NativeAdmissionTests(unittest.TestCase):
+    def test_seed_contract_preparation_does_not_hide_provider_failure(self):
+        from v2.ecm.native_auto import _incumbent_manifest
+
+        original = OSError("seed-contract observer denied")
+
+        class BrokenBudget:
+            def consume(self, amount=1):
+                raise original
+
+        class Context:
+            def _load(self, budget):
+                budget.consume(0)
+
+            def close(self):
+                self.closed = True
+
+        owner = SimpleNamespace(context=None, seed=7, disabled_reason=None)
+        context = Context()
+        with patch("v2.ecm.auto.selected_context", return_value=context):
+            with self.assertRaises(OSError) as caught:
+                _incumbent_manifest(
+                    owner,
+                    10**59 + 7,
+                    PortfolioConfig().for_input(10**59 + 7),
+                    BrokenBudget(),
+                    "root",
+                )
+        self.assertIs(caught.exception, original)
+        self.assertTrue(context.closed)
+        self.assertIsNone(owner.context)
+        self.assertIsNone(owner.disabled_reason)
+
     def test_retained_identity_refuses_changed_or_removed_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "binding"

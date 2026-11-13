@@ -168,12 +168,17 @@ def _incumbent_manifest(owner, n, config, budget, lineage):
     if multiprocessing.parent_process() is not None:
         return False
     if owner.context is None:
+        from .native_admission import _AdmissionBudget
+
         owner.context = selected_context(seed=owner.seed)
+        checked = _AdmissionBudget(budget)
         try:
-            owner.context._load(budget)
+            owner.context._load(checked)
         except (OSError, ValueError):
             owner.context.close()
             owner.context = None
+            if checked.failure is not None:
+                raise checked.failure
             owner.disabled_reason = "unavailable_automatic_policy"
             return False
     plan = owner.context._select(n, config, None, None, portfolio=True)

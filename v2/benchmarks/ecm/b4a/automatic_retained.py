@@ -7,6 +7,7 @@ It never warms an observation labelled cold; use automatic_call.py for cold.
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 import time
 
@@ -20,6 +21,22 @@ def marker():
         rss=sum(r.rss for r in rows),
         pids=[r.pid for r in rows],
     )
+
+
+def thermal(request):
+    if not request.get("collect_thermal"):
+        return None
+    try:
+        result = subprocess.run(
+            ["pmset", "-g", "therm"], capture_output=True, text=True, timeout=2
+        )
+        return dict(
+            exit=result.returncode,
+            stdout=result.stdout[:4096],
+            stderr=result.stderr[:4096],
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return dict(missing=type(error).__name__, detail=str(error))
 
 
 def state(owner):
@@ -93,6 +110,7 @@ def main():
             operation = request["op"]
             if operation == "warm":
                 useful, calls = 0.0, []
+                before_thermal = thermal(request)
                 before = marker()
                 started = time.monotonic()
                 while useful < 3 and len(calls) < 5000:
@@ -106,7 +124,9 @@ def main():
                         )
                     )
                     useful += latest["wall"]
-                    if not latest["valid"] or latest.get("resource_stop"):
+                    if not latest["valid"] or not latest.get(
+                        "endpoint_reached"
+                    ):
                         break
                     if time.monotonic() - started > 45:
                         break
@@ -116,14 +136,21 @@ def main():
                     calls=len(calls),
                     warmup_complete=useful >= 3
                     and latest["valid"]
-                    and not latest.get("resource_stop"),
+                    and latest.get("endpoint_reached", False),
                     before=before,
                     after=marker(),
                     evidence=calls,
-                    failure=None if latest["valid"] else latest,
+                    failure=(
+                        None
+                        if latest["valid"] and latest.get("endpoint_reached")
+                        else latest
+                    ),
                     state=state(owner),
+                    thermal_before=before_thermal,
+                    thermal_after=thermal(request),
                 )
             elif operation == "call":
+                before_thermal = thermal(request)
                 before = marker()
                 row = adapter.run_request(request, retained=owner)
                 row.update(
@@ -131,6 +158,8 @@ def main():
                     before=before,
                     after=marker(),
                     state=state(owner),
+                    thermal_before=before_thermal,
+                    thermal_after=thermal(request),
                 )
             elif operation == "close":
                 before = marker()
