@@ -45,6 +45,7 @@ def primes_between(lo, hi):
 def configuration(**changes):
     return replace(
         PortfolioConfig(
+            ecm_kernel="python",
             trial_bound=5,
             rho_attempts=0,
             pm1_attempts=0,

@@ -425,6 +425,14 @@ def main(*, budget=None):
     parser.add_argument(
         "--backend", choices=("python-int", "gmpy2-mpz"), default="python-int"
     )
+    parser.add_argument(
+        "--ecm-kernel",
+        choices=("python", "c-gmp", "c-gmp-full", "auto", "auto-full"),
+        help=(
+            "ECM backend (default: lazy whole-native selection with Python "
+            "fallback; auto preserves the legacy stage-one selector)"
+        ),
+    )
     rss_group = parser.add_mutually_exclusive_group()
     rss_group.add_argument("--rss-bytes", type=int, default=DEFAULT_RSS)
     rss_group.add_argument("--no-rss-limit", action="store_true")
@@ -478,6 +486,8 @@ def main(*, budget=None):
         parser.error("choose --ecm-tier or --ecm-curves")
     if args.ecm_chain is not None and args.method != "auto":
         parser.error("--ecm-chain requires the auto portfolio")
+    if args.ecm_kernel is not None and args.method != "auto":
+        parser.error("--ecm-kernel requires the auto portfolio")
     if args.ecm_chain == "prac" and args.backend != "python-int":
         parser.error("--ecm-chain prac requires the native integer backend")
     qs_parameters = {
@@ -567,6 +577,7 @@ def main(*, budget=None):
             or args.ecm_chain is not None
             or args.ecm_policy is not None
             or args.ecm_tier is not None
+            or args.ecm_kernel is not None
         ):
             from .execution.allocation import ECMAllocation
             from .portfolio import PortfolioConfig, factorize_bounded
@@ -728,6 +739,10 @@ def main(*, budget=None):
                 )
                 if args.ecm_chain == "off":
                     parameters["ecm_chain_bytes"] = 0
+            if args.ecm_kernel is not None:
+                parameters["ecm_kernel"] = args.ecm_kernel
+            elif checkpoint is not None:
+                parameters["ecm_kernel"] = saved.get("ecm_kernel", "python")
             config = PortfolioConfig(**parameters)
             worker_options = {}
             if args.qs_workers == "serial":

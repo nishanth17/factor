@@ -3,6 +3,218 @@
 Start with [current status](v2/STATUS.md) for present defaults and work. Entries
 below record decisions in their dated scope; later entries may supersede routes.
 
+## B4a automatic whole-native activation (13 November 2026)
+
+- Make omitted-kernel portfolio CLI/library calls lazily select whole-native
+  scalar/pthread ECM within the documented runtime, numerical and ownership
+  scope. Keep below 40 and borrowed/retained 80 on Python after inconclusive
+  confirmation. Preserve explicit Python/native choices and legacy direct APIs.
+- Preserve numerical tiers, algorithms, streams and parent RNG draws. Separate
+  execution-selection versioning, record actual per-job/tier backend/build/
+  topology/entries, and add nonforcing benchmark assertions that retain failures.
+- Keep optional builds optional, enforce source/ABI/GMP admission and retained
+  invalidation, preserve saved checkpoint meanings, and reject post-admission
+  faults without rerunning another backend. Defer newly owned QS preparation
+  while retaining exact child observation and borrowed/B12 lifetimes.
+- Pass fresh actual-plan complete-cost comparisons and bounded 60/70 QS handoff
+  checks. Final committed-only QA: 1,834 tests, 30 optional skips, lint, 321
+  benchmark imports, scalar/pthread builds. Broader population/p90 and balanced
+  completion promotion remain open; measured short fallback overhead is stated.
+
+## B4a final native confirmation (12 November 2026)
+
+- Complete 1,512 fresh affected-ECM calls at both anchors, with separate cold
+  and retained owners, unchanged numerical work and no resource censors.
+  Preserve inconclusive 60-digit deep retained evidence and adverse successes.
+- Validate 144 recovery calls and 144 cheap-path cells. Complete all three
+  60-digit integration pairs, then one conditional 70-digit pair, with matching
+  canonical QS work, sustained native-worker quiescence and complete cleanup.
+- Retain the slower native 70-digit total as descriptive evidence; the panel
+  establishes scoped integration readiness without population/p90 promotion.
+- Preserve all failures and charges, verify retained project-local cache
+  archives and removed versions, and retain applicable committed-only QA.
+  No merge, push, routing or automatic-default changes.
+
+## B4a native boundary implementation (11 November 2026)
+
+- Keep ordinary whole-native cursor refill, metadata generation, bounded team
+  waves and exact peer-work settlement inside resource-observed C segments.
+  Preserve immediate completion returns, canonical replay, actual CPU/RSS
+  enforcement and the exact custom-policy/child fallback.
+- Retain checked native blocks until borrowers drain; export full cursor data
+  only when a canonical checkpoint requires it. Avoid encoding an unused disk
+  cache body when no cache directory was requested.
+- Delay relation-engine imports until a relation stage or public alias needs
+  them, preserving the portfolio's public factories and checkpoint formats.
+- Defer process-runtime and temporary-file imports until worker startup or
+  actual checkpoint/cache publication, preserving legacy module aliases.
+- Reuse the existing accepted catalogue wire and already retained plan
+  references while keeping first preparation lazy and all C proofs enabled.
+  Production regressions cover both anchors and retained owners.
+- Complete source-labelled matched costs and boundary/arithmetic ceilings on
+  exposed inputs. Retain the selected implementation after peer-refill and
+  combined Python-math import challengers show no useful improvement.
+- Correct isolated native-test subprocess selectors under full-suite discovery.
+  Committed-only `3bb5a69` passes 1,805 tests (14 optional skips), lint, 317
+  benchmark imports and all three native builds with reproducible placement.
+  Fresh 3F and staged integration remain required; no routing or automatic
+  default changes are included.
+
+## B4a native count support and screen (11 November 2026)
+
+- Extend opt-in whole-owner pthread/OpenMP support through sixteen workers;
+  verify count capability before allocation and retain explicit refusal/resume.
+- Expose drained rank identities and slice/curve totals. Sampled explanatory
+  clocks stay disabled in normal execution; native CPU is counted once by H3.
+- Complete the matched 8/10/12/14/16 screen with 216 valid cold/warm calls.
+  Retain eight for sustained work; no higher count clears the advancement gates.
+- Pass 1,786 committed-only tests (14 optional skips), full lint, 311 ordinary
+  benchmark imports and all native builds. No defaults, routing or fresh 3F run.
+  Local evidence: `v2/audit/b4a/oversubscription_20261111/`.
+
+## B4a renewed CPU/heap tuning (11 November 2026)
+
+- Reuse the owner's immutable cursor-block index for native checkpoint export,
+  removing repeated per-curve index construction and preserving exact replay.
+- Elide unobserved pthread entry and intermediate completion notifications.
+  Explicit entry observers, cancellation, resource checks and full drain remain.
+- Give native dylibs fixed backend-specific install names so output-path length
+  cannot shift instruction placement. Retain source/binary/CFFI validation.
+- Validate explicit eight-thread pthread costs for sustained deep recipes,
+  retain four for shorter/CPU-constrained use, and preserve all rejected or
+  inconclusive mechanisms. Automatic defaults and routing are unchanged.
+- Pass 1,781 committed-only tests (14 optional skips), lint/format and 311
+  benchmark imports. The successor 3F proposal remains unexecuted; detailed
+  evidence is local in `v2/audit/b4a/profile_reinvestigation_20261111/`.
+
+## B4a post-integration native tuning (11 November 2026)
+
+- Fuse the existing signed stage-two difference with GMP submul, retain a
+  private wide product, and use GMP's supported division API at admitted
+  widths. Preserve canonical arithmetic, work, publication and checked replay.
+- Remove the unused child-list sizing query and reject zero-result permission
+  errors. Every CPU/RSS/wall poll and full-tree child fallback remains enabled.
+- Verify the new native remainder capability against its build manifest.
+  Existing prepared CFFI descriptors, immutable registration and owner reuse
+  remain in place; factoring calls never compile.
+- Retain generic O2 and explicit four/dynamic/chunk1/capacity32 pthread teams.
+  Complete current cold/warm controls, recovery, cheap guards and CPU/heap
+  attribution; fresh 3F remains unexecuted. Automatic routing and defaults are
+  unchanged. The local delivery is
+  `v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+
+## B4a production owner integration (10 November 2026)
+
+- Expose the optional whole-curve OpenMP owner through
+  `v2.execution.ecm_openmp`, the real bounded portfolio and checked
+  checkpoint/replay path. Keep the benchmark import as a compatibility alias.
+- Add native owner context-manager cleanup and production lifecycle coverage,
+  including unavailable builds, partial initialization and cancellation.
+- Allocate private native contexts for active jobs, retaining them for reuse
+  up to capacity. Preserve numerical manifests, publication and resource checks.
+- Keep automatic routing, numerical effort and defaults unchanged. Detailed
+  integrated costs, diagnostics, tuning and the separate fresh-confirmation
+  boundary are recorded under `v2/audit/b4a/production_3p_20261110/`.
+
+## B4a native coordination/backend phase (10 November 2026)
+
+- Admit an explicitly selected benchmark whole-curve OpenMP owner with provided
+  LLVM/libomp, actual-team refusal, owner-local cancellation, barrier drain and
+  backend/build-bound checkpoints. No production routing change.
+- Preserve the simpler pthread signaling after a matched inconclusive screen.
+  Keep generic O2/ordinary GMP/coalesced scalar 256/pthread 128 and four/dynamic/
+  chunk 1/capacity 32. Reject short-active waiting after a bounded refinement.
+- Complete common compiler/runtime settings, targeted CPU/heap diagnostics and
+  committed-only QA. Preserve limited deep-cold evidence, uncertainty, process
+  accounting dependencies, all failures and historical charges separately.
+
+## Remaining B4a native ECM request (9 November 2026)
+
+- Add opt-in post-unit-GCD yield coalescing and a source-bound 256-action
+  whole-native quantum. Select 256 for explicit scalar builds and retain 128
+  for pthreads, with the same time/cancellation/resource/publication checks.
+- Reuse exact native-root observation for metadata registration. Keep existing
+  once-owner validation and immutable registration; no numerical recipe changes.
+- Admit 1–10 pthread workers with explicit wide-count settings and full lifecycle
+  coverage. Bounded fixed-work tuning selects four/dynamic/chunk1/capacity32;
+  larger supported counts do not change automatic choices.
+- Test independent ordinary-GMP expression fusion, then remove the candidate
+  after inconclusive complete-cost results; preserve regression oracles/evidence.
+- Complete bounded native CPU/heap/FFI diagnostics, fresh conditional-input
+  cold/warm confirmation, cheap-path guards/costs and committed-only ordinary/
+  optional-limb QA. Retain failed searches, uncertainty, H3/B12 accounting
+  dependency and all historical charges. No merge, push or default changes.
+
+## B4a Phase 2 component optimization (9 November 2026)
+
+- Prepare and validate out-of-line CFFI ABI descriptors during the explicit
+  native build, retaining source/binary/GMP admission and legacy inline builds.
+  Add first-use parser-bypass and missing/corrupt descriptor refusal checks.
+- Retain native ECM's existing resource polls while using the same macOS
+  usage/child queries through one CFFI call for a proved childless root.
+  Children, multiple roots and custom providers retain full-tree observation.
+  Preserve failures, provider restoration, native-buffer lifetime and existing
+  cancellation/publication ordering. Defaults and numerical work are unchanged.
+- Validate field/unit, birth, child fallback, observation-error, resource-refusal
+  and provider lifetime. Complete the corrected bridge and prepared-binding
+  comparison against immutable C1 and Python; retain the first failed screen.
+- Keep the exact owned-limb division experiment disabled after inconclusive
+  complete-path evidence. Retain generic O2 after O3/exact-M4/LTO/PGO screening and
+  reject the measured complete SME pipeline without integrating a vector path.
+- Complete final committed-only ordinary/optional-limb QA, lint, benchmark
+  imports and cold/warm component screening. Preserve history uncertainty and
+  all failures/charges. Fresh adoption and process/thread/dispatch tuning remain
+  Phase 3; no defaults, merge or push change.
+
+## B4a whole-ECM C continuation (9 November 2026)
+
+- Add explicit `c-gmp-full` scalar/pthread execution for Suyama setup,
+  both ECM stages, normal GCD and strict/ordered recovery, using ordinary GMP.
+- Retain native points/tables/cursors and shared checked metadata across slices.
+  Export canonical scalar checkpoints transactionally; preserve incurred work
+  and the existing pthread assignment/history resume contract.
+- Validate committed-only full QA (1,741 tests, 20 optional skips), lint and
+  benchmark imports; complete the cold/warm Tier 1 screen with all charges and
+  warm drift/regressions retained. Resolve the earlier checkpoint-design stop.
+- Keep Python and the previous stage-one native executor as independent controls.
+  No automatic defaults, mainline integration or push are changed.
+
+## B4a Phase 1 overhead continuation (9 November 2026)
+
+- Amortize process-CPU clock reads while retaining per-action wall and
+  cancellation checks plus root resource polls around foreign slices.
+- Retain one fixed pthread team across drained generations; join on close
+  and on partial startup failure. Add deterministic clock and lifecycle tests.
+- Preserve the noisy same-cell re-baseline, matched lifetime comparison and
+  failed harness attempts locally. No complete-ECM speedup is established.
+  Stop before the full-ECM port on its canonical recovery/checkpoint design;
+  setup, classical stage two and strict recovery remain Python.
+
+## Experimental B4a pthread correctness (9 November 2026)
+
+- Synchronize committed A7a into the B4a branch. Add C-only pthread dispatch
+  with checked dynamic/static chunks, private GMP contexts, joined cleanup,
+  deterministic faults/cancellation and saved-history resume coverage.
+- Admit scalar/pthread correctness from committed source `0f2fee3`: native
+  builds, 1,712 tests (20 optional skips), lint and 308 ordinary runner imports.
+  Retain failed diagnostic receipts; no performance gain, default change,
+  mainline integration or push is adopted.
+
+## B4a native correctness preparation (8 November 2026)
+
+- Correct the owned-group observer's Mach CPU-unit conversion without adding
+  native-thread CPU twice. Add deterministic counter regressions.
+- Add fixed 60/80/100-digit curve, nonunit recovery and native H3 lifecycle
+  admission checks, and build header/linkage provenance. Runtime validation
+  remains separate from source preparation.
+
+## B4a H3 integration (8 November 2026)
+
+- B4a branch: integrate H3 root resource accounting into optional native ECM
+  ownership and resume; preserve kernels, historical protocols and SIMD loss.
+  Native startup, engagement and worker economics require revalidation.
+
+
 ## A7a selected QS integration (9 November 2026)
 
 - Adopt Y0 numerical policy and nearest-row process QS: serial below 40;
@@ -244,6 +456,23 @@ below record decisions in their dated scope; later entries may supersede routes.
   median uncertainty, the 80-digit regression, explicit matched QS checkpoint
   funding and the pending balanced guardrail. No production adoption or closure;
   final committed-checkout tooling QA remains queued with the lock released.
+
+## B4a optional ECM NEON screen closure (4 November 2026)
+
+- Measure the fixed two-curve NEON prototype against GMP and the B4a scalar
+  multiplication/reduction path. All six complete hybrid cases cost 2.27–3.14x
+  the scalar path; close this prototype without integration or default changes.
+- Pass exact targeted checks and lint before timing. Retain raw interleaved
+  batches, uncertainty, setup failures and the original finite charge. Scalar
+  C/GMP and OpenMP evaluation remains open.
+
+## B4a optional ECM NEON preparation (4 November 2026)
+
+- Prepare a separate two-curve product/square prototype at 200/266/333 bits,
+  exact GMP controls and a bounded prospective Stage A runner. Include hybrid
+  conversion/reduction costs and distinguish SIMD from layout effects.
+- Preserve scalar C/GMP and OpenMP work. No executor integration or performance
+  verdict; build/correctness admission remains separate from later timing.
 
 ## B12/F4 larger-quota follow-up (4 November 2026)
 

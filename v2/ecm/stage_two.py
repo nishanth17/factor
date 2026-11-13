@@ -114,6 +114,8 @@ class StageTwoSchedule:
 
 def advance_prepared_job(job, budget, context, config):
     """Use prepared indices only in the unchanged classical ECM branch."""
+    if getattr(getattr(context, "native_packet", None), "full_ecm", False):
+        return stage_jobs.advance_job(job, budget, context, config)
     if (
         job["kind"] != "ecm"
         or job["phase"] != "stage_two"

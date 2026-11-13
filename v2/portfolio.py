@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import random
+import sys
 import time
 from dataclasses import asdict, dataclass, replace
 
@@ -58,14 +59,42 @@ from .execution.stage_jobs import (
     take_prime,
 )
 from .factor import FactorizationResult, PrimeFactor
-from .qs import SIQSConfig as SIQSConfig
-from .qs import SIQSJob
-from .qs.sss import SSSConfig, SSSJob
+
+_LAZY_RELATION_EXPORTS = frozenset(
+    ("SIQSConfig", "SIQSJob", "SSSConfig", "SSSJob")
+)
+
+
+def _relation_type(name):
+    if name not in globals():
+        if name in ("SIQSConfig", "SIQSJob"):
+            from .qs import SIQSConfig, SIQSJob
+
+            globals().update(SIQSConfig=SIQSConfig, SIQSJob=SIQSJob)
+        else:
+            from .qs.sss import SSSConfig, SSSJob
+
+            globals().update(SSSConfig=SSSConfig, SSSJob=SSSJob)
+    return globals()[name]
+
+
+def __getattr__(name):
+    # Preserve public aliases and patchable job factories without importing a
+    # relation engine on pure ECM, cheap exits or checkpoint packing.
+    if name in _LAZY_RELATION_EXPORTS:
+        return _relation_type(name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | _LAZY_RELATION_EXPORTS)
+
 
 CHECKPOINT_VERSION = 10
 OPTIONAL_CHAIN_CHECKPOINT_VERSION = 11
 ALLOCATION_CHECKPOINT_VERSION = 12
 AUTOMATIC_CHECKPOINT_VERSION = 13
+AUTOMATIC_NATIVE_CHECKPOINT_VERSION = 14
 SCHEDULE_VERSION = "half-open-prime-powers/ecm-even-baby-v1"
 
 
@@ -82,6 +111,7 @@ class PortfolioRun:
     dropped_events: int
     checkpoint: dict
     resource_stop: dict | None = None
+    ecm_execution: dict | None = None
 
 
 def _canonical(value):
@@ -424,14 +454,14 @@ def _advance(
         job = siqs_runtime.get("job")
         if job is None:
             if current.get("sss_checkpoint") is not None:
-                job = SSSJob.from_checkpoint(
+                job = _relation_type("SSSJob").from_checkpoint(
                     current["sss_checkpoint"], budget=budget, config=config.sss
                 )
             else:
                 if "sss_seed" not in current:
                     budget.consume()
                     current["sss_seed"] = generator.getrandbits(63)
-                job = SSSJob(
+                job = _relation_type("SSSJob")(
                     n,
                     seed=current["sss_seed"],
                     config=config.sss,
@@ -469,7 +499,7 @@ def _advance(
     if current["stage"] == "siqs":
         _admit_fallback(current, config, budget)
         job = siqs_runtime.get("job")
-        job_type = SIQSJob
+        job_type = _relation_type("SIQSJob")
         if qs_workers is not None:
             from .qs.current_parallel import CurrentParallelSIQSJob
 
@@ -569,6 +599,9 @@ def _advance(
                 "selector cannot replace existing serial ECM progress"
             )
         try:
+            from .ecm.execution_identity import executor_entries
+
+            explicit_before = executor_entries(ecm_executor)
             outcome = run(
                 int(n),
                 config=config,
@@ -582,6 +615,9 @@ def _advance(
             # Decide once per cofactor. Warming a pool or resuming later cannot
             # replace an incumbent curve prefix or move its fallback RNG draws.
             current["ecm_serial"] = True
+            fallback = ecm_executor.last_stats.get("ecm_execution")
+            if fallback is not None:
+                current["ecm_execution"] = dict(fallback)
             _event(
                 state,
                 config,
@@ -592,6 +628,82 @@ def _advance(
             )
         else:
             current["worker_checkpoint"] = outcome.checkpoint
+            from .ecm.execution_identity import (
+                append_decision,
+                executor_packet,
+                packet_identity,
+            )
+
+            execution = outcome.stats.get("ecm_execution")
+            if execution is None:
+                threads = outcome.stats.get("native_threads", 0)
+                execution = dict(
+                    requested=config.ecm_kernel,
+                    backend=config.ecm_kernel,
+                    implementation=(
+                        "whole-native"
+                        if config.ecm_kernel == "c-gmp-full"
+                        else "python"
+                        if config.ecm_kernel == "python"
+                        else "stage-one-native"
+                    ),
+                    topology="threads"
+                    if threads
+                    else (
+                        "scalar"
+                        if getattr(
+                            getattr(ecm_executor, "settings", None),
+                            "workers",
+                            1,
+                        )
+                        == 1
+                        else "processes"
+                    ),
+                    workers=threads
+                    or getattr(
+                        getattr(ecm_executor, "settings", None), "workers", 1
+                    ),
+                    native_entries=executor_entries(ecm_executor)
+                    - explicit_before,
+                    reason="explicit_executor",
+                    build=packet_identity(executor_packet(ecm_executor)),
+                )
+                configured = execution["workers"]
+                actual = (
+                    configured
+                    if (
+                        execution["native_entries"]
+                        or outcome.stats.get("native_slices", 0)
+                        or outcome.stats.get("worker_dispatches", 0)
+                    )
+                    else int(bool(outcome.stats.get("completed_after", 0)))
+                )
+                variant = (execution.get("build") or {}).get("variant")
+                quantum = (execution.get("build") or {}).get("slice_actions")
+                recipe = (
+                    f"{variant or 'native-thread'}/"
+                    f"{getattr(ecm_executor, 'schedule', 'unknown')}/"
+                    f"chunk{getattr(ecm_executor, 'chunk_size', 'unknown')}/"
+                    f"cap{getattr(ecm_executor, 'capacity', 'unknown')}"
+                    if threads
+                    else f"scalar/{quantum}"
+                    if variant == "scalar"
+                    else f"processes/{configured}/{config.ecm_kernel}"
+                    if configured > 1
+                    else "explicit-python-scalar"
+                )
+                execution.update(
+                    configured_workers=configured,
+                    actual_workers=actual,
+                    recipe=recipe,
+                )
+            from .ecm.execution_identity import tier_decisions
+
+            if "tier_decisions" not in execution:
+                execution["tier_decisions"] = tier_decisions(
+                    config.ecm_tiers, outcome.checkpoint, execution
+                )
+            append_decision(state, dict(execution, n=int(n)))
             _event(
                 state,
                 config,
@@ -636,13 +748,90 @@ def _advance(
         )
         current["job"] = new_job(kind, n, seed, b1, b2)
         current["job"]["start_work"] = budget.used
+        current.pop("ecm_execution_index", None)
 
     job = current["job"]
     started = time.perf_counter()
     job_context = (
         programs if kind == "ecm" and programs is not None else context
     )
-    advance_job(job, budget, job_context, config)
+    native_before = 0
+    receipt = None
+    if kind == "ecm" and config.ecm_kernel == "auto-full":
+        from .ecm.native_auto import entries, prepare_serial
+
+        if getattr(job_context, "automatic_current", None) is not current:
+            current["ecm_execution"] = prepare_serial(
+                int(n),
+                config,
+                budget,
+                job_context,
+                saved=current.get("ecm_execution"),
+            )
+            job_context.automatic_current = current
+            _event(
+                state,
+                config,
+                stage="ecm_backend",
+                n=n,
+                outcome=current["ecm_execution"]["backend"],
+                stats=dict(current["ecm_execution"]),
+            )
+        native_before = entries(job_context)
+    if kind == "ecm":
+        from .ecm.execution_identity import append_decision
+
+        index = current.get("ecm_execution_index")
+        if index is None:
+            execution = current.get("ecm_execution")
+            if execution is None:
+                packet = getattr(job_context, "native_packet", None)
+                execution = dict(
+                    requested=config.ecm_kernel,
+                    backend=config.ecm_kernel,
+                    implementation=(
+                        "whole-native"
+                        if getattr(packet, "full_ecm", False)
+                        else "python"
+                        if config.ecm_kernel == "python"
+                        else "stage-one-native"
+                    ),
+                    topology="scalar",
+                    workers=1,
+                    reason="explicit_serial",
+                    build=None,
+                )
+            record = dict(
+                execution,
+                n=int(n),
+                tier=current["tier"],
+                seed=job["seed"],
+                b1=b1,
+                b2=b2,
+                native_entries=0,
+                actual_workers=1,
+            )
+            index = append_decision(state, record)
+            current["ecm_execution_index"] = index
+        if index is not None:
+            receipt = state["ecm_execution"]["jobs"][index]
+        if config.ecm_kernel != "auto-full":
+            from .ecm.native_auto import entries
+
+            native_before = entries(job_context)
+    try:
+        advance_job(job, budget, job_context, config)
+    finally:
+        if kind == "ecm":
+            delta = entries(job_context) - native_before
+            if receipt is not None:
+                receipt["native_entries"] += delta
+                if delta and receipt.get("build") is None:
+                    from .ecm.execution_identity import packet_identity
+
+                    receipt["build"] = packet_identity(
+                        getattr(job_context, "native_packet", None)
+                    )
     phase = job["phase"]
     timing_key = f"{kind}:{phase}"
     state["stage_seconds"][timing_key] = (
@@ -663,6 +852,11 @@ def _advance(
             base=job.get("base"),
             work=budget.used - job["start_work"],
             outcome="factor" if job["factor"] else "exhausted",
+            **(
+                {"execution": dict(current["ecm_execution"])}
+                if "ecm_execution" in current
+                else {}
+            ),
         )
         if job["factor"] is not None:
             _split(state, job["factor"])
@@ -755,6 +949,8 @@ def _pack(state, config, budget, generator, policy):
     if config.allocation is not None:
         version = ALLOCATION_CHECKPOINT_VERSION
         configuration = asdict(config)
+    if config.ecm_kernel == "python":
+        configuration.pop("ecm_kernel")
     # Default scheduling keeps the legacy checkpoint identity and semantics.
     if config.siqs is not None and config.siqs.solve_policy == "window":
         configuration["siqs"].pop("solve_policy")
@@ -793,6 +989,10 @@ def _pack(state, config, budget, generator, policy):
     }
     if config.allocation is not None:
         payload["allocation"] = ALLOCATION_VERSION
+    if config.ecm_kernel not in ("python", "auto-full"):
+        from .ecm.native_packet import source_identity
+
+        payload["native_packet"] = source_identity()
     if config.ecm_chain_mode == "off":
         payload.pop("chains")
     if "ecm_auto" in state:
@@ -800,6 +1000,9 @@ def _pack(state, config, budget, generator, policy):
         # worker metadata. Retain the mathematical subschema for validation.
         payload["portfolio_version"] = payload["version"]
         payload["version"] = AUTOMATIC_CHECKPOINT_VERSION
+    if config.ecm_kernel == "auto-full":
+        payload["portfolio_version"] = version
+        payload["version"] = AUTOMATIC_NATIVE_CHECKPOINT_VERSION
     encoded = _canonical(payload)
     checkpoint = {
         "payload": json.loads(encoded),
@@ -976,7 +1179,17 @@ def _unpack(checkpoint, config):
         ):
             raise ValueError("checkpoint checksum mismatch")
 
-        if payload["version"] == AUTOMATIC_CHECKPOINT_VERSION:
+        if payload["version"] == AUTOMATIC_NATIVE_CHECKPOINT_VERSION:
+            base_version = payload.get("portfolio_version")
+            if (
+                type(base_version) is not int
+                or not 2 <= base_version <= ALLOCATION_CHECKPOINT_VERSION
+                or config.ecm_kernel != "auto-full"
+                or not isinstance(payload.get("state"), dict)
+            ):
+                raise ValueError("invalid whole-native automatic envelope")
+            payload["version"] = base_version
+        elif payload["version"] == AUTOMATIC_CHECKPOINT_VERSION:
             base_version = payload.get("portfolio_version")
             if (
                 type(base_version) is not int
@@ -1001,6 +1214,15 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible primality policy")
 
         expected_config = json.loads(_canonical(asdict(config)))
+        if config.ecm_kernel == "python":
+            expected_config.pop("ecm_kernel")
+        expected_packet = None
+        if config.ecm_kernel not in ("python", "auto-full"):
+            from .ecm.native_packet import source_identity
+
+            expected_packet = source_identity()
+        if payload.get("native_packet") != expected_packet:
+            raise ValueError("incompatible native ECM packet identity")
         if (
             config.siqs is not None
             and config.siqs.solve_policy == "window"
@@ -1120,6 +1342,9 @@ def _unpack(checkpoint, config):
             raise ValueError("incompatible checkpoint metadata")
 
         state = payload["state"]
+        from .ecm.execution_identity import validate_history
+
+        validate_history(state)
         utils.require_integer(payload["work_used"], "work_used", 0)
         for name in ("wall_used", "cpu_used"):
             value = payload[name]
@@ -1360,6 +1585,12 @@ def factorize_bounded(
             return _factorize_bounded(
                 n, ecm_executor=owner, _owned_ecm=True, **options
             )
+    from .ecm.auto import AutomaticECMOwner
+
+    if isinstance(ecm_executor, AutomaticECMOwner):
+        return _factorize_bounded(
+            n, ecm_executor=ecm_executor, _automatic_ecm=True, **options
+        )
     return _factorize_bounded(n, ecm_executor=ecm_executor, **options)
 
 
@@ -1373,6 +1604,7 @@ def _factorize_bounded(
     stop_after_split=False,
     ecm_executor=None,
     _owned_ecm=False,
+    _automatic_ecm=False,
     qs_workers=None,
     qs_pool=None,
 ):
@@ -1398,22 +1630,9 @@ def _factorize_bounded(
             raise TypeError("qs_workers must be a QSWorkerConfig")
     elif qs_pool is not None:
         raise ValueError("qs_pool requires explicit qs_workers")
-    if qs_workers is not None and not automatic_qs and qs_pool is None:
-        from .qs.parallel import CollectionPool
-
-        with CollectionPool(qs_workers.mode, qs_workers.workers) as pool:
-            return _factorize_bounded(
-                n,
-                seed=seed,
-                config=config,
-                budget=budget,
-                checkpoint=checkpoint,
-                stop_after_split=stop_after_split,
-                qs_workers=qs_workers,
-                qs_pool=pool,
-                ecm_executor=ecm_executor,
-                _owned_ecm=_owned_ecm,
-            )
+    own_qs_pool = (
+        qs_workers is not None and not automatic_qs and qs_pool is None
+    )
     if config is None:
         # A resume retains the saved p-1 executor; fresh calls use the accepted
         # default. Other configuration still has to match the snapshot.
@@ -1434,6 +1653,7 @@ def _factorize_bounded(
                 ),
                 "ecm_chain_bytes": saved_config.get("ecm_chain_bytes", 0),
                 "ecm_program_bytes": saved_config.get("ecm_program_bytes", 0),
+                "ecm_kernel": saved_config.get("ecm_kernel", "python"),
                 "ecm_tiers": saved_config.get(
                     "ecm_tiers", ((constants.ECM_B1, constants.ECM_B2, 32),)
                 ),
@@ -1456,7 +1676,7 @@ def _factorize_bounded(
 
                 values = dict(saved_config["sss"])
                 values["collector"] = SieveConfig(**values["collector"])
-                saved_config["sss"] = SSSConfig(**values)
+                saved_config["sss"] = _relation_type("SSSConfig")(**values)
             config = PortfolioConfig(**saved_config)
         else:
             config = PortfolioConfig(
@@ -1490,6 +1710,27 @@ def _factorize_bounded(
             raise ValueError("malformed checkpoint") from error
         config = replace(config, ecm_tiers=tiers)
 
+    requested_kernel = config.ecm_kernel
+    if (
+        config.ecm_kernel == "auto-full"
+        and ecm_executor is not None
+        and not (_owned_ecm or _automatic_ecm)
+    ):
+        from .ecm.auto import AutomaticECMOwner
+
+        if not isinstance(ecm_executor, AutomaticECMOwner):
+            # An explicit process owner keeps Python workers. A supplied native
+            # owner keeps its explicit topology and whole-native execution.
+            native_module = sys.modules.get(
+                __package__ + ".execution.ecm_native"
+            )
+            native = native_module is not None and isinstance(
+                ecm_executor, native_module.NativeECMExecutor
+            )
+            config = replace(
+                config, ecm_kernel="c-gmp-full" if native else "python"
+            )
+
     if checkpoint is None:
         if budget.used or budget.prior_wall or budget.prior_cpu:
             raise ValueError("a fresh run requires an unused budget")
@@ -1519,7 +1760,7 @@ def _factorize_bounded(
             cpu=payload["cpu_used"],
         )
 
-    if _owned_ecm:
+    if _owned_ecm or _automatic_ecm:
         if checkpoint is not None and "ecm_auto" not in state:
             # Legacy serial/custom checkpoints never adopt a new stream.
             ecm_executor = None
@@ -1529,8 +1770,10 @@ def _factorize_bounded(
                 generator,
                 state.get("ecm_auto"),
                 automatic_memory=automatic_memory,
+                retained_intent=not _owned_ecm,
             )
             state["ecm_auto"] = ecm_executor.header
+    state.setdefault("ecm_requested", requested_kernel)
 
     # Opt-in search semantics never impersonate the incumbent RNG/checkpoint.
     saved_executor = state.get("ecm_worker_identity")
@@ -1586,8 +1829,16 @@ def _factorize_bounded(
         else budget
     )
 
+    context = programs = None
+    owned_qs_pool = None
     try:
         budget.consume(0)
+        if checkpoint is not None and config.ecm_kernel == "auto-full":
+            from .ecm.native_admission import verify_saved_builds
+
+            verify_saved_builds(
+                state.get("ecm_execution", {}).get("jobs", ()), budget
+            )
         if checkpoint is not None and config.allocation is not None:
             # Verification has already reconstructed the bounded snapshot.
             # Charge its bytes on the shared ledger even if pretesting stops;
@@ -1648,6 +1899,13 @@ def _factorize_bounded(
                     context, programs = _execution_context(
                         state, config, ledger
                     )
+                if stage == "siqs" and own_qs_pool and qs_pool is None:
+                    from .qs.parallel import CollectionPool
+
+                    owned_qs_pool = CollectionPool(
+                        effective_qs_workers.mode, effective_qs_workers.workers
+                    )
+                    qs_pool = owned_qs_pool
                 _advance(
                     state,
                     config,
@@ -1679,6 +1937,12 @@ def _factorize_bounded(
                     break
     except BudgetExhaustedError as error:
         reason = str(error)
+    finally:
+        from .execution.portfolio_config import close_execution_context
+
+        close_execution_context(programs or context)
+        if owned_qs_pool is not None:
+            owned_qs_pool.close(budget=budget)
 
     result = _result(state)
     if result.complete:
@@ -1697,6 +1961,8 @@ def _factorize_bounded(
         # owner also closes on exceptions before result construction finishes.
         ecm_executor.close()
     snapshot = _pack(state, config, budget, generator, policy)
+    from .ecm.execution_identity import summary
+
     return PortfolioRun(
         result,
         reason,
@@ -1707,4 +1973,11 @@ def _factorize_bounded(
         state["dropped_events"],
         snapshot,
         budget.stop,
+        summary(state, state["ecm_requested"]),
     )
+
+
+# Explicit star imports retain the same public relation aliases as before.
+__all__ = [name for name in globals() if not name.startswith("_")] + sorted(
+    _LAZY_RELATION_EXPORTS
+)

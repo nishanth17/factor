@@ -26,6 +26,7 @@ def allowance(work=1000000):
 
 
 def configuration(**changes):
+    changes.setdefault("ecm_kernel", "python")
     return adapt_resource_configuration(
         portfolio.PortfolioConfig,
         trial_bound=5,
@@ -141,6 +142,7 @@ class ProductionPM1Tests(unittest.TestCase):
         legacy = adapt_resource_configuration(
             portfolio.PortfolioConfig,
             **options,
+            ecm_kernel="python",
             pm1_gap_mode="cached",
             pm1_chunk_size=None,
         )
@@ -285,7 +287,7 @@ class ProductionPM1Tests(unittest.TestCase):
         self.assertEqual(config.chunk_size, 16)
         n = 1009 * 1013
         fresh = portfolio.factorize_bounded(n, budget=allowance(0))
-        self.assertEqual(fresh.checkpoint["payload"]["version"], 13)
+        self.assertEqual(fresh.checkpoint["payload"]["version"], 14)
         self.assertEqual(fresh.checkpoint["payload"]["portfolio_version"], 10)
         resumed = portfolio.factorize_bounded(
             n, budget=allowance(0), checkpoint=fresh.checkpoint

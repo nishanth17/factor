@@ -38,6 +38,7 @@ def allowance(**changes):
 
 def configuration(**changes):
     values = dict(
+        ecm_kernel="python",
         trial_bound=100,
         rho_attempts=0,
         pm1_attempts=0,

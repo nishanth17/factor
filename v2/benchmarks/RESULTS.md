@@ -1,5 +1,111 @@
 # Benchmark results and decisions
 
+## B4a automatic native activation (13 November 2026)
+
+Normal eligible no-native-flag portfolio calls now engage whole-native C/GMP.
+The [default scope](../README.md#automatic-ecm-execution-scope) states the
+runtime/build/work and ownership limits. Generic O2/ordinary GMP/coalesced,
+scalar 256/team 128, pthread 8 for the default 140-curve plan and scalar for
+50/70-digit parent streams are retained. No numerical effort or stream changes.
+
+| Fresh cold ECM band | Independent inputs | Native/default wall ratio | Joint-rule interval |
+| --- | ---: | ---: | --- |
+| 60 digits | 6 | 0.510 | [0.369, 0.706] |
+| 80 digits | 6 | 0.521 | [0.430, 0.633] |
+| 100 digits | 6 | 0.506 | [0.372, 0.687] |
+
+These are complete cold first-validated-split or finite-quota endpoints,
+including interpreter/startup/preparation and cleanup, with matched actual
+production plans against committed pre-activation defaults. The candidate
+source is `4f6c0d1`; final `dd5a60f` only removes unconfirmed routes, with an
+explicit AST/source applicability proof and 54-call current-source recheck.
+Paired normal-log Student-t intervals cluster repetitions by independent
+modulus; 99.88095% per-look intervals account for 14 comparisons and three
+looks. Normality is an assumption, not established by these small samples.
+All 684 measured cold/retained calls reconstruct with no censors or identity
+failures; 2,824 validated warmup calls are separate and charged.
+
+The 30-digit candidate and retained 80 comparison stay inconclusive at nine
+inputs, so automatic selection keeps their Python routes. Other adopted
+retained contrasts support gains. Custom/off-anchor/90-digit recipes remain
+extrapolations, not universal count or latency optima. Current below 40 Python
+ECM guards add roughly 15–20 ms (5.36–6.78%) of setup/bookkeeping; unchanged
+serial cost is not claimed. All 128cheap/random/fallback calls reach valid
+endpoints, retaining 42 unsifted inputs and expected-not-engaged cases.
+
+Fresh bounded realQS pairs match12,248 canonical rows at 60 digits and 1,664 at 70.
+Eight native threads show zero CPU advance through 10.724 seconds of QS at 60;
+all join/release. The70 scalar context is also released. Both arms exhaust
+identical 16-family quotas, without resource stops. QS-dominated totals are
+only descriptive; no complete factorization, population/p90 or fully powered
+balanced completion promotion is established. Earlier complete 3Fevidence and
+its limitations remain historical, not silently relabelled.
+
+Final committed-only source passes 1,834 tests (30 optional skips), lint,
+321 ordinary imports and selected scalar/pthread builds; OpenMP is optional.
+Detailed current costs, failures, exact accounting and B5a integration seam:
+`v2/audit/b4a/auto_native_activation_20261112/AUTO_NATIVE_HANDOFF.md` (local).
+
+
+## B4a native coordination/OpenMP (10 November 2026)
+
+The native coordination/backend phase is complete. A real benchmark-only
+OpenMP executor uses the provided LLVM/libomp 22.1.8, `-fopenmp -lomp` and
+parallel/for worksharing over the same whole-curve `b4_slice` kernel. Requested
+counts include the caller; constrained teams refuse before arithmetic. Private
+contexts drain before publication/close, while libomp's parked threads and DSO
+have process lifetime. The build uses an explicit installed SDK override.
+
+The two-anchor, three-input 1/2/4-thread static/dynamic comparison preserves
+37 fixed curves, scalar 256/team 128 and compiler controls. Runtime/compiler
+contrasts are inconclusive under the frozen intervals and A/A gates. One
+small refinement supports a limited 4.5% deep-cold passive-OpenMP advantage;
+warm/broader results remain inconclusive. Short-active waiting increases CPU
+without an established wall gain, so passive waiting remains experimental.
+Separate pthread signaling is removed after an inconclusive matched screen.
+
+Keep the existing explicit generic-O2/ordinary-GMP/coalesced recipe:
+scalar 256, pthread 128, four/dynamic/chunk 1/capacity 32. No default, merge or push.
+H3/B12 child-CPU accounting and combined-source engagement recalibration remain
+integration dependencies. Broad fresh confirmation is outside this phase.
+
+Committed source `5194951` passes 1,761 tests (14 optional skips), lint and 310 ordinary benchmark imports with scalar/pthread/OpenMP builds.
+Current cold, warm API, full owner CPU/close and telemetry-inclusive owner wall
+scopes are separate. Full local table/delivery:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+
+## Remaining B4a native ECM request (9 November 2026)
+
+The scoped explicit recipe uses generic O2/ordinary GMP, coalesced unit yields,
+scalar 256/pthread 128 and four threads/dynamic/chunk 1/capacity 32. Registration
+uses exact native-root observation. Independent GMP expression fusion supplies
+no useful complete-cost improvement and is removed; defaults are unchanged.
+
+Fresh conditional-input comparisons retain failed searches, uncertainty,
+observer-censored data and incomplete 80-digit warm confirmation. Explicit
+native cheap setup remains measurable; H3/B12 child accounting and combined
+integration tables require revalidation. No population/p90 or balanced
+completion pass follows. Both committed-only configurations pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb cleanup-monitor failure and full charge remain;
+a validated supplement verifies archived evidence and completes cleanup.
+Current tables and every charge: `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
+
+## B4a Phase 2 component selection (9 November 2026)
+
+The optional native ECM branch retains corrected childless-root resource
+queries and checked build-prepared CFFI binding. Numerical work, semantic
+checks, resource decisions and automatic defaults remain unchanged. The
+ordinary-division limb prototype stays disabled after inconclusive complete
+packet evidence. Generic O2 is retained after bounded O3/M4/LTO/PGO screens;
+the measured complete exact-M4 SME pipeline loses and is not integrated.
+
+Final source `b620d6f` passes committed-only ordinary/optional-limb full QA,
+lint and benchmark imports. The final cold size matrix and separate warm
+anchors compare Python, immutable C1 and selected scalar/T1/T2/T4, retaining
+input/history uncertainty and all failures/charges. These component decisions
+do not establish a universal Python crossover or full-factor adoption. Phase 3
+owns worker/dispatch tuning, combined-cost recalibration and fresh confirmation.
+Detailed local handoff: `v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
+
 ## A7a final local adoption (9 November 2026)
 
 The selected current-collector implementation is adopted locally with H3,
@@ -714,6 +820,61 @@ runtime. Earlier phases have separate preserved ledgers. The computation lock
 is released; final tooling QA is queued for a later window. Detailed research,
 all 33 regime choices/near ties, receipts, budgets and handoff remain local at
 `v2/audit/b12_f4/regime_selection_v1/`.
+
+## B4a optional ECM NEON screen (4 November 2026)
+
+An isolated task-branch screen on committed source `c485f2b` compares the
+200/266/333-bit two-curve NEON prototype against the B4a scalar C/GMP operation
+pattern. This is a standalone arithmetic/hybrid comparison, with no executor
+integration or whole-factor performance claim. Exact targeted checks (13 tests)
+and full lint pass before timing; the full integrated executor suite remains
+future Stage Q.
+
+Nine interleaved batches per arm follow at least three validated PyPy-driver
+warmup seconds per arm. Each arithmetic arm computes two independent results
+per pair. The complete hybrid includes packing, conversion, normalization and
+ordinary GMP reduction; the scalar baseline uses reusable mpz objects.
+Times below are median nanoseconds per result; spread and paired uncertainty
+are retained with all raw observations.
+
+| Bits | Operation | GMP mpn kernel | NEON kernel | B4a scalar complete | NEON hybrid complete | Hybrid / scalar |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 200 | multiply | 8.51 | 13.04 | 57.68 | 155.78 | 2.70x |
+| 200 | square | 7.15 | 12.97 | 56.37 | 128.09 | 2.27x |
+| 266 | multiply | 9.65 | 27.70 | 74.05 | 217.14 | 2.93x |
+| 266 | square | 8.35 | 28.39 | 74.31 | 191.30 | 2.57x |
+| 333 | multiply | 13.50 | 41.36 | 86.68 | 272.54 | 3.14x |
+| 333 | square | 11.75 | 41.54 | 85.24 | 231.64 | 2.72x |
+
+NEON lowers the same-layout custom scalar kernel cost by about 5–30%, but its
+arithmetic-only cost is 1.53–3.54x GMP's. The complete hybrid costs 2.27–3.14x
+the B4a scalar GMP path; every paired 95% interval is above 2.24x. The same
+hybrid with scalar arithmetic is also slower than GMP. The layout-only diagnostic
+already costs 2.01–2.48x the complete GMP baseline; it is not an exactly
+subtractable packing-cost estimate. No measured width/operation advances.
+
+All 378 measured batches and 42 warmup cases validate. The supported interactive
+QoS request and class readback succeed throughout; P/E placement remains
+unobserved. The arithmetic process has one observed thread. The complete
+execution, including failed setup charges, fresh admission, warmup and cleanup,
+uses 153.81 wall / 153.60 aggregate CPU seconds inside one 180/360 reservation.
+A launcher failure and a pre-timing lint failure remain retained; the corrected
+source is frozen before the first timed batch. The shared lock is released and
+all owned groups are empty.
+
+**Decision:** close this NEON hybrid prototype without integration and park ECM
+SIMD for now. Arithmetic alone also loses to GMP mpn in every case. Preserve
+scalar C/GMP and native-thread evaluation; NEON effort belongs to B5a QS scans
+and root updates. No persistent SIMD or vector-reduction follow-up is selected. This result concerns one fixed prototype,
+one modulus at each width and a repeated 64-pair panel; it does not rule out all
+SIMD designs or establish an ECM/portfolio speedup. No excluded reduction work
+was added. The timed reusable child command was `pypy3 -B -m
+v2.benchmarks.ecm.b4a.neon_screen <frozen-request.json>`, under the shared-lock
+owner and exact source/admission checks. Detailed provenance, raw batches and
+median/min/max/MAD are local in
+`v2/benchmarks/results/b4a-neon-direct-v4/`, `b4a-neon-direct-v5/` and
+`v2/audit/b4a/NEON_DIRECT_RESULT_v5.md`. The issued 180/360 charge carries forward
+inside Stage A; it does not authorize another screen or restore removed cells.
 
 ## B12/F4 512-curve cache amortization (4 November 2026)
 
@@ -1635,3 +1796,157 @@ broad coverage. There is no supported “50–60 digits within a minute” guara
 The [earlier API guide](https://github.com/nishanth17/factor/blob/24ff153d26ada2ec4beeead07000d183e94fd355/v2/README.md) retains the complete stage/kernel
 implementation narratives and scoped losses. Frozen studies and their source
 identities remain unchanged.
+
+### B4a 3P production integration and tuning (10 November 2026)
+
+The explicit whole-curve OpenMP owner now lives in `v2.execution.ecm_openmp`;
+the benchmark import is a compatibility re-export. `ecm/b4a/production_batch.py`
+exercises real bounded portfolio calls with retained Python/B12/scalar/native
+owners. H3 observations already supply seconds; benchmark cleanup explicitly
+reaps its owned spawn runtime helper after the unchanged B12 owner closes.
+
+Integrated fixed-schedule cold/warm costs, per-family CPU/heap diagnostics and
+a finite eight-recipe team screen retain generic O2/GMP/coalesced scalar 256,
+team 128 and four/dynamic/chunk 1/capacity 32. Pthread remains the simpler eligible
+runtime under input uncertainty and measured drift; OpenMP is still optional.
+Demand-sized contexts remove unused allocations without an established timing
+win. No additional metadata/arithmetic rewrite is supported by these profiles.
+
+Current complete costs, CPU/RSS/startup/close, failed searches, recovery,
+cheap guards, cancellation, failures and exact separate charges are local in
+`v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`. These are exploratory
+integration/tuning results. Fresh 3F and broad balanced completion remain
+unexecuted; no routing/default, population/p90 or fresh adoption claim follows.
+
+### B4a post-integration native tuning (11 November 2026)
+
+The explicit backend retains signed stage-two submul, a private wide numerator,
+GMP's supported division API and checked root-query transport. Thirteen measured
+mechanism decisions retain generic O2/coalesced scalar 256/team 128 and pthread
+4/dynamic/chunk1/capacity32. No numerical/routing/default change occurs.
+
+A 648-call exposed panel compares current Python/B12/native scalar/pthread with
+entry native controls on three independent inputs per 60/80/100 band, both
+9/37-curve shapes and cold/warm lifetimes. There are no resource censors.
+Deep warm pthread/entry on six ECM inputs is 0.945 [0.901, 0.991]; most other
+before/after cells are inconclusive. These are individual 98⅓% input-clustered
+model intervals, with no joint, fresh, population or p90 claim. Successful
+searches, paid peers and failed quotas remain distinct. Full CPU/RSS/close costs,
+90 recovery cells, 96 cheap cells and raw uncertainty are preserved locally.
+
+Actual-production CPU stacks, phase/census counters, cold/retained JIT summaries,
+typed GC graphs and full malloc histories resolve the named costs. Warm native
+heap activity is zero in the recorded reuse calls; every recorded native
+allocation is freed at close. The private numerator adds 160 bytes/context in
+the 80-digit capture. Waiting slots are not CPU fractions, and Python object
+suballocation churn/JIT frames remain partly unresolved.
+
+Implementation `0c7c327` passes 1,778 committed-only tests (14 optional skips).
+Formatting-only `fb52b8c` preserves all test ASTs and passes full lint/format,
+311 ordinary imports and root build readiness. Current tables, exact resources,
+all losses/failures, ownership limits and the new unexecuted 3F proposal:
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+Broader balanced completion has evidence-priced, separately unfunded grants;
+it does not prevent valid affected-ECM confirmation. C3a/C11 must recalibrate
+engagement/allocation before any automatic route changes.
+
+### B4a renewed CPU/heap tuning (11 November 2026)
+
+`08d4689` reuses immutable cursor indexes and elides redundant pthread wakeups;
+`8263fbe` makes native instruction placement independent of output-path length.
+On six exposed fixed-work inputs, deep pthread-four/control is 0.959
+[0.938, 0.981] cold and 0.939 [0.913, 0.966] warm. These are individual
+98⅓% input-cluster model intervals, without joint/fresh/population coverage.
+
+Current seven-arm complete costs support explicit pthread-eight for sustained
+37-curve work, with four retained for shorter/CPU-constrained use. Eight uses
+more CPU; ten adds no useful gain, and matched OpenMP-eight retains pthread.
+Scalar timing remains inconclusive. Fresh 3F, primary p90 and balanced whole-
+factor completion remain unestablished. Automatic routing/defaults are unchanged.
+
+All 252 cost calls, 108 successful recovery calls and 120 cheap cells pass.
+Committed-only QA passes 1,781 tests (14 optional skips), lint/format, 311
+ordinary imports and three native builds. See the benchmark README for current
+conditional contrasts and `v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`
+for all costs, profiles/heaps, failures, exact charges and the unexecuted proposal.
+
+
+### B4a native thread oversubscription screen (11 November 2026)
+
+Whole-owner pthread and supplied OpenMP teams now admit 1–16 workers with
+checked capabilities, actual-rank work and unchanged resources/replay. The
+pthread-only 8/10/12/14/16 screen completes 216 matched cold/warm failed-search
+calls on three exposed 60/80/100-digit inputs, at 37 and 64 fixed curves.
+No count above eight clears the prospective A/A and input-uncertainty gates;
+retain the explicit eight-thread sustained recipe. Higher counts add CPU.
+This is an internal count screen, not fresh factoring or population evidence.
+No finalist stage, 3F run, routing or automatic-default change is performed.
+
+Committed-only `cbdae41` passes 1,786 tests (14 optional skips), full lint,
+311 ordinary benchmark imports and all three native builds. Exact per-input
+costs, individual intervals, final-tail/allocation evidence, thermal limits,
+all failures and separate new charges remain local:
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
+
+
+### B4a native boundary closeout (12 November 2026)
+
+Executable `6a34003` retains coarse observed C segments, native metadata/index
+refill, accepted catalogue/plan reuse and lazy optional imports. Clean exposed
+60/80/100-digit comparisons keep cold one-shot and retained ownership separate.
+Later peer-refill and combined Python-math import challengers pass exactness
+admission but establish no useful complete-cost gain. Current conditional
+ceilings include combined small costs; required exports, resource checks and
+negative cache results are retained explicitly. Operation CPU shares are not
+critical-path wall or promises of removable GMP time.
+
+On the exposed 80-digit deep quota, actual pthread returns fall from 2,414 to
+92, including metadata returns from 1,076 to one, with identical manifests and
+completed curves. Counter overhead is separately admitted; these are mechanism
+counts, not a fresh speedup or population result. Committed-only `3bb5a69` passes
+1,805 tests (14 optional skips), lint, 317 ordinary benchmark imports and all
+three native builds with identical instruction placement. The failed discovery
+launcher, all raw evidence and charges remain local. Current cost/disposition
+entry: `v2/audit/b4a/native_boundary_closeout_20261111/IMPLEMENTATION_CLOSEOUT_R1.md`.
+Fresh 3F followed this implementation checkpoint; its scoped delivery is
+recorded below. Automatic defaults and routing remain unchanged.
+
+
+### B4a final fresh confirmation and integration (12 November 2026)
+
+Fresh source `52aae12` completes 1,512 affected-ECM calls on 6/9/6 independent
+60/80/100-digit inputs, both fixed anchors and separate cold/retained owners.
+All six arms use that source; mainline cheap/integration controls separately
+use pinned `98bf836`. No censors or A/A drift stops occur. Repetitions are
+clustered by modulus; the pooled comparison uses six inputs per band with
+equal band/stratum weights, excluding the extra 80-digit cohort.
+
+| Pthread/B12 anchor | Cold ratio | Retained ratio |
+| --- | --- | --- |
+| Shallow, four threads | 0.399 [0.382, 0.417] | 0.387 [0.359, 0.417] |
+| Deep, eight threads | 0.392 [0.310, 0.497] | 0.422 [0.236, 0.753] |
+
+These are simultaneous-primary 99.5833% model intervals under the frozen
+three-look/four-contrast rule; independent normal log input effects remain a
+small-sample assumption. They support conditional affected-workload gains,
+not population/p90 or a cold/warm blend. Deep retained 60-digit performance
+remains inconclusive; three successful retained input comparisons are slower
+with native. All observations and paid peer work remain in the current tables.
+
+All 144 recovery and 144 cheap cells pass. Three balanced 60-digit pairs and
+one conditional 70-digit pair complete with matching canonical QS prefixes,
+unchanged numerical/execution identities, sustained parked native workers
+with zero observed CPU advance and full join/context/metadata release.
+The native 70-digit child takes 557.6 s versus B12's 515.9 s; these observed
+QS-dominated totals are descriptive. No unresolved size-specific integration
+question justifies further pairs. Live children retain full-tree observation
+fallback, so clean childless ECM costs do not describe every integrated call.
+
+Keep explicit generic-O2/ordinary-GMP/coalesced, scalar 256/team 128,
+pthread four shallow/eight deep, dynamic/chunk 1/capacity 32. Applicable
+committed-only QA passes 1,805 tests (14 optional skips), lint, 317 ordinary
+imports and all three builds. All failures/charges and verified cache archives
+remain local. Broader population/p90 and fully powered balanced promotion
+remain unmet; no routing/default changes, merge or push. Current conditional
+wall/CPU/RSS, startup, publication/waste and engagement inputs:
+`v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.

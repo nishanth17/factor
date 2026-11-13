@@ -1,0 +1,115 @@
+"""Exact native root observations at the existing Python resource polls."""
+
+import errno
+import os
+import time
+
+from ..execution.resources import (
+    MacResources,
+    ProcessSample,
+)
+from .native_packet import poll_budget
+
+
+def native_bulk_allowed(budget):
+    """Keep injected clocks, providers and action-sensitive callbacks exact."""
+    from ..execution.budget import Budget
+    from ..execution.ecm_workers import _base_budget
+
+    base = _base_budget(budget)
+    if base is not budget:
+        from ..execution.ecm_native import _BudgetView
+
+        if type(budget) is not _BudgetView:
+            return False
+    from .worker_state import ActionBudget, ProspectiveActionBudget
+
+    ordinary = type(base) is Budget and base.cancelled is None
+    delegated = (
+        type(base) in (ActionBudget, ProspectiveActionBudget)
+        and getattr(base, "_native_bulk_allowed", False) is True
+    )
+    return (
+        (ordinary or delegated)
+        and type(base.provider) is MacResources
+        and base._wall_clock is time.monotonic
+        and base._cpu_clock is time.process_time
+    )
+
+
+class NativeRootProvider:
+    """Use the original tree provider whenever a childless root is unproved."""
+
+    def __init__(self, owner, resource_provider):
+        self.ffi, self.lib = owner.ffi, owner.lib
+        self.output = self.ffi.new("b4_root_observation *")
+        self.fallback = None
+        self.pid = os.getpid()
+        self.cpu_numer = resource_provider._cpu_numer
+        self.cpu_denom = resource_provider._cpu_denom
+
+    def sample(self, roots):
+        if not isinstance(roots, dict) or set(roots) != {self.pid}:
+            return self.fallback.sample(roots)
+
+        status = self.lib.b4_observe_root(self.pid, self.output)
+        if status == 1:
+            return self.fallback.sample(roots)
+        if status == -errno.ESRCH:
+            return []
+        if status:
+            MacResources._proc_error(
+                "native root resource observation", self.pid, -status
+            )
+
+        value = self.output[0]
+        if roots[self.pid] is not None and roots[self.pid] != value.birth:
+            return []
+        return [
+            ProcessSample(
+                self.pid,
+                int(value.birth),
+                int(value.rss),
+                (int(value.user) + int(value.system))
+                * self.cpu_numer
+                / self.cpu_denom,
+            )
+        ]
+
+    def close(self):
+        self.ffi.release(self.output)
+        self.fallback = None
+
+
+def poll_native_budget(budget, owner):
+    """Preserve every policy check, replacing only the root OS transport."""
+    from ..execution.ecm_workers import _base_budget
+
+    base = _base_budget(budget)
+    original = getattr(base, "provider", None)
+    if type(original) is not MacResources or owner.lib is None:
+        return poll_budget(budget)
+
+    provider = getattr(owner, "_resource_provider", None)
+    if provider is None:
+        provider = owner._resource_provider = NativeRootProvider(
+            owner, original
+        )
+    provider.fallback = original
+    base.provider = provider
+    try:
+        return poll_budget(budget)
+    finally:
+        base.provider = original
+        provider.fallback = None
+
+
+def close_resource_checks(owner):
+    segment = getattr(owner, "_segment", None)
+    if segment is not None:
+        segment.close()
+        owner._segment = None
+    provider = getattr(owner, "_resource_provider", None)
+    if provider is not None:
+        provider.close()
+        owner._resource_provider = None

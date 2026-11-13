@@ -1,6 +1,146 @@
 # Factor status
 
-Last updated: 9 November 2026 (America/Los_Angeles).
+Native phase navigation: `v2/audit/b4a/PHASED_PLAN.md` retains completed
+requests, freezes and charges. B4a boundary closeout and final 3F are delivered
+within their declared scopes; the campaigns retain separate accounts.
+C5 retains generic reducers and A2a retains GCD/inverse/divisibility helpers.
+
+Last updated: 13 November 2026 (America/Los_Angeles).
+
+**B4a automatic whole-native activation — delivered on the task branch.**
+Executable/test source `dd5a60f`; no merge or push. Normal no-native-flag CLI
+and bounded-library calls now lazily engage admitted C/GMP scalar/pthread ECM
+within the [precise default scope](README.md#automatic-ecm-execution-scope).
+Default 140-curve work uses eight pthreads; 50/70-digit parent-RNG plans use
+scalar C. Below 40 digits and borrowed/retained 80-digit work keep Python after
+inconclusive nine-input comparisons. Numerical effort, streams and algorithms
+remain unchanged; optional dependencies remain optional, with no runtime build.
+
+Fresh confirmation has 684 measured calls, zero censors/exactness/identity
+failures, three/six/nine independent-input stop rules and explicit uncertainty.
+Cold 60/80/100-digit ratios are approximately 0.51–0.52 of the pre-activation
+default. These are finite ECM split/quota endpoints, not full factorization or
+population/p90 claims. Final committed-only QA passes 1,834 tests (30 optional
+skips), lint, 321 ordinary imports and scalar/pthread builds; OpenMP is optional.
+Fresh bounded 60/70 ECM-to-QS pairs match 12,248/1,664 canonical rows, with
+native quiescence and complete release. Short Python ECM adds approximately
+15–20 ms in the measured fallback guard; do not claim unchanged serial cost.
+
+Current local entry:
+`v2/audit/b4a/auto_native_activation_20261112/AUTO_NATIVE_HANDOFF.md`.
+It includes source/build identity, current cost tables, B5a trust/consumer
+requirements, all failures/charges and retained/removed cache paths with hashes.
+All 41 reservations are settled: 2316.6459871241823 wall / 10658.204101 CPU
+seconds. Historical grants, drift-r1 and losses remain intact. C5.M is the next
+separate ECM arithmetic lever; combined integration must recalibrate its source.
+
+**B4a native boundary closeout and final 3F — delivered, opt-in.**
+Entry `410eba0`; executable production `6a34003`, test-only QA `3bb5a69`,
+fresh confirmation source `52aae12`. Coarse observed C segments, native
+metadata/index/refill, accepted catalogue/plan reuse and lazy imports are
+retained. Later alternatives establish no useful improvement. All original
+and B15a obligations, combined ceilings and C5.M limits are reconciled locally:
+`v2/audit/b4a/native_boundary_closeout_20261111/FINAL_HANDOFF_R1.md`.
+Committed-only QA passes 1,805 tests (14 optional skips), lint, 317 ordinary
+benchmark imports and all three reproducible native builds; final documentation
+changes preserve executable applicability. Failures and charges remain intact.
+
+Fresh affected ECM completes 1,512 calls on 6/9/6 independent 60/80/100-digit
+inputs, both anchors and separate cold/retained owners, without censors.
+The pooled pthread/B12 contrasts support conditional gains; 60-digit deep
+retained performance remains inconclusive. Three adverse successful retained
+cases remain in the tables. All 144 recovery and 144 cheap cells pass.
+Three 60-digit integration pairs and one conditional 70-digit pair complete
+with identical common canonical QS work, waiting native workers with zero
+observed CPU advance, and full final join/context/metadata release. The native
+70-digit total is slower; QS-dominated totals are descriptive. No further
+70-digit integration question remains. Delivery and current cost tables:
+`v2/audit/b4a/confirmation_3f_20261111/3F_HANDOFF.md`.
+
+Keep explicit scalar 256/team 128, pthread four shallow/eight deep,
+dynamic/chunk 1/capacity 32, ordinary GMP/generic O2. Live children retain the
+exact full-tree observation fallback; childless costs are conditional. The two
+project-local cache archives are retained with sizes/hashes and all removed
+versions inventoried. All owned executions are drained and both grants remain
+within their ceilings. Broader population/p90 and fully powered balanced
+promotion gates remain unresolved; C3a/C11 own engagement recalibration.
+No merge, push, routing or automatic-default change.
+
+**B4a native oversubscription screen — delivered.**
+Entry `ed139a1`; final changed-source checkpoint `cbdae41`. Whole-owner pthread
+and supplied OpenMP support 1–16 with checked build capabilities, exact replay,
+actual-rank work and lifecycle admission. All 216 clean count-screen calls pass
+on three exposed 60/80/100-digit inputs and 37/64-curve shapes. No count above
+eight demonstrates a useful complete-latency gain; retain the explicit eight-thread
+sustained recipe. Higher counts cost more CPU. No finalist advances.
+Committed-only QA passes 1,786 tests (14 optional skips), lint/format, 311
+ordinary benchmark imports and all three native builds. Historical failures
+and charges remain separate; fresh 3F and automatic defaults are unchanged.
+Delivery, per-input costs, tail/allocation evidence and exact new resources:
+`v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
+
+**B4a renewed CPU/heap tuning — delivered.**
+Entry `e8abaa7`; implementation `08d4689`, stable build identity `8263fbe`.
+Shared immutable cursor indexing removes per-curve copies; pthread notifications
+retain explicit observer progress with fewer wakeups. Matched six-input deep
+pthread-four costs are 0.959 cold and 0.939 warm versus delivered source;
+individual 98⅓% intervals exclude one. Scalar timing remains inconclusive.
+Current complete costs support explicit pthread-eight for sustained 37-curve
+work, with four retained for short/CPU-constrained use. Ten adds no useful gain;
+matched OpenMP-eight does not beat pthread. Generic O2, scalar 256/team 128,
+dynamic/chunk 1/capacity 32 and automatic routing/defaults remain unchanged.
+New actual CPU/GC/JIT/worker evidence, all failures/charges, 252 cost calls,
+108 successful recovery calls and 120 cheap cells are retained locally.
+Committed-only `8263fbe` passes 1,781 tests (14 optional skips), lint/format,
+311 ordinary benchmark imports and all three native builds with reproducible
+instruction placement. Fresh 3F and balanced completion remain unexecuted.
+Delivery and successor proposal:
+`v2/audit/b4a/profile_reinvestigation_20261111/3P_HANDOFF.md`.
+
+**B4a post-integration native tuning — delivered.**
+Entry `2b46e3f`; retained submul, private wide numerator, supported GMP division
+entry and checked root-query transport preserve formulas, resources and replay.
+Thirteen mechanism decisions retain generic O2 and explicit pthread
+4/dynamic/chunk1/capacity32. The final 648-call panel has no resource censors;
+90 recovery and 96 cheap cells pass. Deep warm pthread/entry is 0.945
+[0.901, 0.991] on six exposed ECM inputs, an individual model interval;
+most other before/after cells remain inconclusive. No fresh/population claim.
+Implementation `0c7c327` passes 1,778 committed-only tests (14 optional skips).
+Formatting-only `fb52b8c` has identical test ASTs and passes full lint/format
+and 311 ordinary benchmark imports. All three native builds are ready.
+CPU/heap/JIT evidence, exact charges and limitations:
+`v2/audit/b4a/post_integration_tuning_20261110/HANDOFF.md`.
+The new 3F plan is frozen and unexecuted; broad balanced completion is separately
+unfunded and does not gate valid affected-ECM confirmation. Automatic routing,
+numerical effort and defaults are unchanged.
+
+**B4a 3P — delivered production integration and tuning.**
+Entry `4f30d87` includes repaired H3 accounting. Explicit scalar/pthread/OpenMP
+owners use the real portfolio, publication and checked replay paths. Private
+contexts grow with live jobs; numerical work and resource checks are preserved.
+Integrated cold/warm controls, per-family CPU/heap diagnostics and the bounded
+team screen retain four/dynamic/chunk 1/capacity 32. Pthread remains the simpler
+eligible runtime because no OpenMP contrast clears the frozen gates. Timing
+and drift limits remain explicit; no fresh-confirmation or population claim.
+Committed-only source `908023b` passes 1,775 tests (14 optional skips),
+full lint and 311 Git-listed ordinary benchmark imports with all three native
+builds.
+Delivery, exact separate charges, limitations and the frozen 3F plan:
+`v2/audit/b4a/production_3p_20261110/3P_HANDOFF.md`.
+Automatic routing, effort and defaults are unchanged. This request stops at 3P.
+
+**B4a native backend phase — delivered 10 November 2026.**
+Real whole-curve OpenMP is admitted and compared with matched LLVM pthreads;
+existing pthread signaling and explicit four/dynamic/chunk 1/capacity 32 remain
+selected. Generic O2/ordinary GMP, coalesced yields and scalar 256/pthread 128 remain.
+The broad common comparison is inconclusive; a limited deep-cold OpenMP gain
+in refinement does not establish general adoption. Short-active wait is rejected
+for added CPU without a supported wall gain. Committed source `5194951` passes
+1,761 tests (14 optional skips), lint and 310 ordinary benchmark imports
+with required native builds.
+Request, current costs, limitations and exact separate charges:
+`v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+No broad confirmation, routing/default promotion, merge or push.
 
 **H3 — Done, integrated locally on master on 8 November 2026** from
 `codex/h3-resource-limits` at `e3c371e`, based on `40d2367`. Only root wall,
@@ -95,6 +235,77 @@ records component closure separately from those pending broader claims.
 Original delivered-component evidence: `v2/audit/b12_f4/`; that task worktree
 and its temporary checkouts are removed. The ready-first prototype remains
 isolated on `codex/ecm-ready-start` with local `v2/audit/ecm_ready_start/` notes.
+
+B4a continuation synchronizes committed A7a master `cb37da3` through `21003b6`.
+Scalar ordinary-GMP and C-only pthread correctness pass on `0f2fee3`: committed
+archive builds, 1,712 tests (20 optional skips), lint and 308 ordinary benchmark
+imports. Native tests execute, including fixed boundaries, scheduling/faults,
+signal cancellation and repeated saved-history resume. Contexts/programs reuse;
+threads create/join per dispatch. Defaults remain unchanged. Warm fixed-work
+calibration supports no adoption; CPU profiling failed its recorder/timer lane,
+so further measurements stop pending a revised diagnostic plan. Startup,
+engagement and worker economics still require recalibration. Local entry:
+`v2/audit/b4a/native_admission_research_20261109/DELIVERY.md`.
+
+B4a Phase 1 steps 0–3 are complete on the task branch. `0df3dc3` adds
+explicit `c-gmp-full` Suyama setup, both classical ECM stages, normal GCD and
+strict/ordered recovery in retained C/GMP contexts. Scalar canonical checkpoint
+export is transactional; threaded assignment/history resume remains intact.
+Full committed-only QA on `fa2a4cc` runs 1,741 tests (20 explicit optional
+skips), full lint and 308 ordinary benchmark imports with both builds present.
+All 20 new whole-native tests execute. The earlier checkpoint-design stop is
+resolved; its original delivery and charges are preserved locally.
+
+Polling amortization (`7124730`) and persistent pthreads (`621da17`) have
+deterministic clock/generation/drain/close coverage. The same-cell step-1 warm
+re-baseline and matched lifetime comparison established no consistent complete
+speedup or noise reduction. The full-native Tier 1 screen now completes all
+720 clean cold/warm calls, 120 A/A and 120 separate phase calls, across three
+inputs per 60/80/100-digit anchor and four bounds. Full-native scalar loses;
+cold parallel gains are scoped, and large warm drift makes most warm gains
+ties. No default or universal worker selection is adopted. Startup, engagement,
+process/thread economics and combined-source dispatch still need recalibration.
+Local handoff: `v2/audit/b4a/phase1_20261109/PHASE1_HANDOFF.md`; raw continuation
+receipts, freezes and retained builds: `continuation_01/` below that directory.
+
+B4a planning update: the expanded rolling candidate ranking and first coherent
+execution bundle are in
+`v2/audit/b4a/optimization_selection_20261109/OPTIMIZATION_PLAN.md`. It replaces
+the earlier candidate-count restriction. Subsequent work is selected from
+measured complete costs, uncertainty and remaining resources. This planning
+update launches no implementation, profiling or performance campaign.
+
+B4a Phase 2 is complete on the task branch. The actual-child query and checked,
+build-prepared CFFI descriptors support complete-cost improvements over C1.
+Numerical work, semantic checks, root resource polls and defaults are unchanged.
+The controller now uses the repository's Mach time conversion with libproc
+exited-child CPU fields; nested reaping and CPU/RSS/wall cleanup are validated.
+Historical stopped stages, observer failures and conservative charges remain.
+
+The optional owned-limb packet passes signed/alias/width/recovery tests but
+does not establish a complete-cost win; it stays disabled. O3, exact M4, LTO
+and independently trained PGO screens retain generic O2 under uncertainty.
+A complete exact-M4
+SME multiply/carry/division/square pipeline passes real-width/tail exactness
+but loses to both scalar controls; no vector path is integrated. The scoped
+NEON loss is unchanged. Final committed-only ordinary and optional-limb builds
+each pass 1,751 tests (20 optional skips), lint and 308 benchmark imports on
+`b620d6f`. The final 972-call cold size screen and separate 288-request warm
+anchor screen retain Python, C1 and scalar/T1/T2/T4 comparisons, uncertainty
+and all charges. Improvements over C1 do not establish universal superiority
+over Python. Phase 3 owns fresh adoption, worker/dispatch tuning and combined
+recalibration. No defaults, merge or push change. Current local handoff:
+`v2/audit/b4a/phase2_20261109/PHASE2_HANDOFF.md`.
+
+**Remaining B4a native ECM REQUEST delivered — 9 November 2026:** explicit
+coalesced unit yields, scalar 256/pthread 128, exact registration observation
+and four threads/dynamic/chunk 1/capacity 32 are selected. Bounded expression,
+profile/heap, team and fresh confirmation work is delivered with failed-search,
+80-digit warm and H3/B12 integration qualifications. Ordinary/optional-limb
+committed-only checks pass 1,756 tests (14 optional skips), lint and 309 benchmark imports;
+the failed limb cleanup receipt/charge has a validated completion supplement.
+Defaults are unchanged. Separate backend research/phases remain pending.
+Local delivery: `v2/audit/b4a/remaining_native_ecm_20261109/DELIVERY.md`.
 
 Read this first, then the [live backlog](ROADMAP.md) and [stable policy](POLICY.md).
 [Results](benchmarks/RESULTS.md) hold numerical evidence; the
@@ -300,7 +511,7 @@ The snapshot does not assert that any process or performance window is active.
 | [A8 / D1](ROADMAP.md#a8-d1-in-progress) | Packed operators/lifting, block Lanczos, original correction/resume and ablations; genuine nonempty target-size fixtures, full QA, measurements and integration remain. | `codex/a8-d1-lanczos` / `9dd1968` |
 | [F2](ROADMAP.md#f2-in-progress) | Suyama-11 and enhanced Edwards/setup/scalar packages; optimized edits are in flight, with full QA, feasibility/yield/cost evidence and integration pending. | `codex/f2-curve-packages` / `794e1d5` plus uncommitted edits |
 | [A7a — Done](ROADMAP.md#a7a-completion) | Selected Y0 and nearest-row process recipes integrated locally; larger probes remain deferred until after B5a. | `results/a7a/final-merge-20261109/`; retained G4 and calibration receipts |
-| [B4a](ROADMAP.md#b4a-in-progress) | Optional scalar/native-team executor sources and rebased Python QA; native admission, complete-cost comparisons, recalibration and integration remain. | `codex/b4a-native-ecm` / `02e73d2` |
+| [B4a](ROADMAP.md#b4a-in-progress) | Automatic whole-native activation delivered within the documented input/ownership scope; combined-source integration remains separate. | `codex/b4a-native-ecm` / final executable QA `dd5a60f` |
 
 B12/F4's earlier delivered integration remains recorded, but its ready-first
 startup follow-up is unfinished. The tuple-decoding microcheck is complete;
@@ -358,10 +569,11 @@ can start before every conditional native port is settled.
 A7a can prepare alongside B12 with pinned shared contracts; timed execution
 uses the shared lock sequentially. Assess warm ECM→QS process reuse and parent
 saturation. B4a/B5a need stable neighboring interfaces, not a prior worker win.
-C5 is the separate low-level limb-buffer/modular-context follow-up. B4a already
-owns reusable ordinary GMP objects/scratch; C5 research, specification,
-implementation and handoff are outside that phase. Select C5 from remaining
-allocation/dispatch/arithmetic cost against B4a's scalar baseline. Existing
+C5 retains the low-level limb-buffer/modular-context scope. B4a already owns
+reusable ordinary GMP objects/scratch; Phase 2 evaluates one owned-limb ordinary
+division prototype and leaves it disabled after inconclusive packet evidence.
+New modular domains remain proof-bearing follow-ups selected from remaining
+allocation/dispatch/arithmetic cost against the current scalar baseline. Existing
 Montgomery curves do not supply a residue backend, and earlier Python-reducer
 losses do not settle the native question. B4a's native
 thread screen centers on cold-CLI startup/heap savings against B12 processes,
@@ -371,7 +583,8 @@ its selected helper implementation does not inherit rank 6 automatically. H2
 is rank 7, ahead of broader policy tuning; its removable overhead is unmeasured.
 Reuse compatible H2 evidence in C11/C9b and retain their algorithmic owners.
 Parallel latency gains do not imply lower CPU cost or higher batch throughput;
-native-kernel gains and M4 SIMD remain unmeasured. x86-specific ports are outside
+kernel gains do not establish complete-path gains; the measured M4 SME pipeline
+loses and remains unintegrated. x86-specific ports are outside
 this priority increase. Small cost/A/A checks belong in each task; C9b is not
 a gate on preparation. The local pressure test is
 `v2/audit/research/acceleration_priority_20261104.md`.

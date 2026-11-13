@@ -128,3 +128,13 @@ policy. For example, `pypy3 -m v2.factor N --method siqs --qs-workers serial`.
 Saved recipes are restored without reselecting; changing worker mode during
 resume is refused. Non-native or unsupported explicit relation engines retain
 their serial implementation.
+
+### Automatic ECM backend
+
+Normal auto-mode calls need no native-selection flag. Omitted `--ecm-kernel`
+uses lazy whole-native selection within the [documented scope](../README.md#automatic-ecm-execution-scope),
+with supported Python fallback when the optional build is unavailable.
+`--ecm-kernel python` keeps Python, `c-gmp` keeps the stage-one control,
+`c-gmp-full` explicitly requests whole-native execution, and legacy `auto`
+retains its older stage-one meaning. Verbose events expose actual selection;
+earlier-method completions do not prepare native execution.

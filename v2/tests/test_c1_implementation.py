@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from v2.benchmarks.infrastructure.resource_control import (
     historical_asdict as asdict,
@@ -18,7 +19,12 @@ from v2.qs import SieveConfig, SIQSConfig
 
 
 class ImplementationHarnessTests(unittest.TestCase):
-    def test_owned_control_and_current_dlp_reconstruct_same_input(self):
+    # The outer QA owner holds the performance lock. Process-list heuristics
+    # are separate from this exact tiny factorization/reconstruction oracle.
+    @patch("v2.benchmarks.qs.c1.c1_implementation.check_quiet")
+    def test_owned_control_and_current_dlp_reconstruct_same_input(
+        self, check_quiet
+    ):
         fixture = dict(
             id="tiny", kind="balanced", digits=2, n=91, factors=[7, 13]
         )

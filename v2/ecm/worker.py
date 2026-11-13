@@ -43,8 +43,9 @@ def read_message(channel, decoder, *, block=False):
 class CurveEngine:
     """Bounded immutable metadata LRU; every curve owns fresh state."""
 
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, *, metadata_cache=None):
         self.settings = settings or WorkerSettings()
+        self.metadata_cache = metadata_cache
         self.identity = None
         self.context = self.programs = self.config = None
         self.contexts = OrderedDict()
@@ -82,10 +83,25 @@ class CurveEngine:
             self.identity = None
             self.context = self.programs = self.config = None
             if len(self.contexts) >= self.settings.metadata_slots:
-                self.contexts.popitem(last=False)
+                from ..execution.portfolio_config import (
+                    close_execution_context,
+                )
+
+                _, (_, old_context, old_programs) = self.contexts.popitem(
+                    last=False
+                )
+                close_execution_context(old_programs or old_context)
+                del old_context, old_programs
                 self.cache_evictions += 1
             config = PortfolioConfig(**options)
             context, programs = _execution_context({}, config, budget)
+            if self.metadata_cache is not None:
+                packet = getattr(programs or context, "native_packet", None)
+                if config.ecm_kernel != "c-gmp-full" or packet is None:
+                    raise ValueError(
+                        "metadata cache requires whole-native ECM"
+                    )
+                packet.blocks.metadata_cache = self.metadata_cache
             if self.settings.packed_cache_bytes:
                 if programs is None:
                     from .programs import ECMPrograms
@@ -119,7 +135,17 @@ class CurveEngine:
         self.identity = identity
         self.config, self.context, self.programs = config, context, programs
 
+    def close(self):
+        """Drain native contexts before worker teardown or reuse ends."""
+        from ..execution.portfolio_config import close_execution_context
+
+        for _, context, programs in self.contexts.values():
+            close_execution_context(programs or context)
+        self.contexts.clear()
+        self.context = self.programs = None
+
     def execute(self, message, *, cancelled, previous_cpu=None):
+        from ..common.arithmetic import BackendUnavailableError
         from ..execution.budget import BudgetExhaustedError
         from ..execution.stage_jobs import advance_job, new_job, prime_cursor
         from .worker_state import ActionBudget, ProspectiveActionBudget
@@ -142,6 +168,10 @@ class CurveEngine:
             rss_bytes=None,
             cancelled=cancelled,
         )
+        # Only the serial owner's checked ordinary root may delegate bounded
+        # native preparation. Custom/action-sensitive callers retain the exact
+        # original callback path; this flag never replaces a resource sample.
+        budget._native_bulk_allowed = message.get("native_bulk", False) is True
         if previous_cpu is not None:
             budget._cpu_start = previous_cpu
         job = new_job(
@@ -231,7 +261,7 @@ class CurveEngine:
                 + ": "
                 + str(error)[:192]
             )
-        except (ValueError, ArithmeticError) as error:
+        except (ValueError, ArithmeticError, BackendUnavailableError) as error:
             reason, residue = "error", None
             failure = type(error).__name__ + ": " + str(error)[:192]
         if stage == "stage_two" and boundary_hash is None:
@@ -301,6 +331,7 @@ def worker_main(channel, settings_data=None):
         os.environ[name] = "1"
     channel.settimeout(0.01)
     decoder = Decoder()
+    engine = None
     try:
         if sys.implementation.name != "pypy" or sys.version_info[:2] != (
             3,
@@ -382,4 +413,6 @@ def worker_main(channel, settings_data=None):
             if closing:
                 break
     finally:
+        if engine is not None:
+            engine.close()
         channel.close()

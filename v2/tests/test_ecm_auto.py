@@ -43,6 +43,7 @@ def config(**changes):
         ecm_tiers=((50, 500, 8),),
         siqs=None,
         sss=None,
+        ecm_kernel="python",
     )
     values.update(changes)
     return adapt_resource_configuration(PortfolioConfig, **values)
@@ -450,6 +451,7 @@ class AutomaticTests(unittest.TestCase):
             "ecm_chain_mode",
             "ecm_chain_bytes",
             "ecm_chain_family",
+            "ecm_kernel",
         ):
             options.pop(key)
         with self.assertRaises(ValueError):
@@ -670,6 +672,7 @@ class AutomaticTests(unittest.TestCase):
         run = factorize_bounded(
             n,
             seed=7919,
+            config=PortfolioConfig(ecm_kernel="python"),
             budget=budget(seconds=6),
             stop_after_split=True,
         )
@@ -702,7 +705,7 @@ class ColdSerialAdmissionTests(unittest.TestCase):
         from dataclasses import replace
 
         n = 10 ** (digits - 1) + 7
-        config = PortfolioConfig().for_input(n)
+        config = PortfolioConfig(ecm_kernel="python").for_input(n)
         return n, replace(config, **changes) if changes else config
 
     def test_default_cold_plans_decline_before_context_or_runtime_loading(

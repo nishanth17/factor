@@ -147,8 +147,8 @@ class ChainPlan:
             self.entries[prime] = (power, action, unit, reserve)
         self.owned_bytes = owned
 
-    def execute(self, powers, point, n, a24, budget):
-        """Certify at most 16 records or replay their saved input once."""
+    def prepare(self, powers, budget):
+        """Validate and fund fast execution plus strict recovery."""
         if not 0 < len(powers) <= BATCH:
             raise ValueError("chain chunk exceeds batch16")
         entries = []
@@ -165,14 +165,30 @@ class ChainPlan:
         # inspect every record and every repeated-prime unit, including a
         # checked ladder retry. Unused recovery credit is not refunded.
         budget.consume(1 + sum(entry[4] for entry in entries))
+        return entries
+
+    def execute(self, powers, point, n, a24, budget, *, native_packet=None):
+        """Certify at most 16 records or replay their saved input once."""
+        entries = self.prepare(powers, budget)
         original, product = tuple(point), 1
-        completed = 0
-        for _, _, action, _, _ in entries:
-            point, guard = action.run(point, n, a24)
-            product = product * guard % n
-            completed += 1
-            if not product:
-                break
+        if native_packet is not None and native_packet.available(n, budget):
+            point, product, completed = native_packet.records(
+                entries, original, n, a24, budget
+            )
+        else:
+            completed = 0
+            for _, _, action, _, _ in entries:
+                point, guard = action.run(point, n, a24)
+                product = product * guard % n
+                completed += 1
+                if not product:
+                    break
+        return self.recover(
+            entries, original, point, product, completed, n, a24
+        )
+
+    def recover(self, entries, original, point, product, completed, n, a24):
+        """Apply funded exact frontier/replay after a checked packet."""
         if arithmetic.gcd(product * point[0] * point[1], n) == 1:
             return point, None, False
 

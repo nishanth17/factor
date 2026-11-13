@@ -1,0 +1,292 @@
+{
+  "identity": "b4a-phase12-openmp-prospective-v2",
+  "status": "prospective-not-executable",
+  "development_base": "787190aa4fba5e420c9af69983a4c17b2427f305",
+  "planning_revision": "b8638a0c620fa864bae28045e6e40348706e2807",
+  "inputs": {
+    "width60": {
+      "n": 174094069460753795728688384823652336103409078814789169060711,
+      "population": "exposed uneven semiprime; historical L60 mechanism input",
+      "factors": [
+        [
+          578280611511586063,
+          1
+        ],
+        [
+          301054654081664222526082419065538956000297,
+          1
+        ]
+      ]
+    },
+    "width100": {
+      "n": 8074876296207736801317313125823444714216713384331146540288324846046777494220381497419280148316697735,
+      "population": "odd width-stress draw; not the unconditioned uniform workload"
+    },
+    "cheap30": {
+      "n": 100000000000000000000000000000,
+      "population": "intentional prime-power cheap exit",
+      "factors": [
+        [
+          2,
+          29
+        ],
+        [
+          5,
+          29
+        ]
+      ]
+    },
+    "cheap39": {
+      "n": 100000000000000000000000000000000000000,
+      "population": "intentional prime-power cheap exit",
+      "factors": [
+        [
+          2,
+          38
+        ],
+        [
+          5,
+          38
+        ]
+      ]
+    },
+    "cheap41": {
+      "n": 10000000000000000000000000000000000000000,
+      "population": "intentional prime-power cheap exit",
+      "factors": [
+        [
+          2,
+          40
+        ],
+        [
+          5,
+          40
+        ]
+      ]
+    },
+    "cheap79": {
+      "n": 1000000000000000000000000000000000000000000000000000000000000000000000000000000,
+      "population": "intentional prime-power cheap exit",
+      "factors": [
+        [
+          2,
+          78
+        ],
+        [
+          5,
+          78
+        ]
+      ]
+    },
+    "cheap81": {
+      "n": 100000000000000000000000000000000000000000000000000000000000000000000000000000000,
+      "population": "intentional prime-power cheap exit",
+      "factors": [
+        [
+          2,
+          80
+        ],
+        [
+          5,
+          80
+        ]
+      ]
+    },
+    "width80": {
+      "n": 16022187943422542533076423684054296775118845600080008099808111648854853990883521,
+      "population": "exposed uneven semiprime; historical H80 mechanism input"
+    },
+    "uniform60-0": {
+      "n": 338010719692971854964283234971603474161312101797431175486695,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 60
+    },
+    "uniform60-1": {
+      "n": 482780393471386960069587879355317963260428961775511498179551,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 60
+    },
+    "uniform80-0": {
+      "n": 14128683494412653546252588339277209130088452989751336850381184830508839913785064,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 80
+    },
+    "uniform80-1": {
+      "n": 11692934436711201607301177359579558714314615514582329785571993841023809742715636,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 80
+    },
+    "uniform100-0": {
+      "n": 5297473848171118970503872397092087842979689375187614454277949639206974615712938664594914995340835545,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 100
+    },
+    "uniform100-1": {
+      "n": 9790243567652740318342788283279535655784030213524486864944635181208865328011086537970848558368172618,
+      "population": "unconditioned uniform exact-digit baseline",
+      "digits": 100
+    }
+  },
+  "certificates": {
+    "578280611511586063": {
+      "kind": "pocklington",
+      "q": 4291558979,
+      "witness": 2
+    },
+    "4291558979": {
+      "kind": "pocklington",
+      "q": 249017,
+      "witness": 2
+    },
+    "249017": {
+      "kind": "pocklington",
+      "q": 1831,
+      "witness": 2
+    },
+    "1831": {
+      "kind": "trial"
+    },
+    "301054654081664222526082419065538956000297": {
+      "kind": "pocklington",
+      "q": 2283046972481666031161,
+      "witness": 2
+    },
+    "2283046972481666031161": {
+      "kind": "pocklington",
+      "q": 137183809421,
+      "witness": 2
+    },
+    "137183809421": {
+      "kind": "pocklington",
+      "q": 725303,
+      "witness": 2
+    },
+    "725303": {
+      "kind": "pocklington",
+      "q": 2609,
+      "witness": 2
+    },
+    "2609": {
+      "kind": "trial"
+    }
+  },
+  "certificate_source": {
+    "path": "v2/benchmarks/inputs/corpora/phase_two_complete_corpus.json",
+    "sha256": "56d9140496e61fa2c47bad0750921c1594ebb1253ce0782729e826edb2b356b3"
+  },
+  "configurations": {
+    "automatic": {},
+    "b2000": {
+      "ecm_tiers": [
+        [
+          2000,
+          200000,
+          8
+        ]
+      ],
+      "siqs": null,
+      "sss": null,
+      "trial_bound": 5,
+      "rho_attempts": 0,
+      "pm1_attempts": 0,
+      "segment_size": 128,
+      "max_input_bits": 512,
+      "memory_bytes": 33554432
+    },
+    "b11000": {
+      "ecm_tiers": [
+        [
+          11000,
+          1100000,
+          8
+        ]
+      ],
+      "siqs": null,
+      "sss": null,
+      "trial_bound": 5,
+      "rho_attempts": 0,
+      "pm1_attempts": 0,
+      "segment_size": 128,
+      "max_input_bits": 512,
+      "memory_bytes": 33554432
+    }
+  },
+  "settings": {
+    "worker_memory": 134217728,
+    "parent_memory": 1140850688,
+    "memory_bytes": 3221225472,
+    "checkpoint_bytes": 2097152,
+    "assignment_cpu": 2,
+    "startup_seconds": 2,
+    "packet_curves": 1,
+    "budget_mode": "prospective",
+    "bind_context": true
+  },
+  "stages": {
+    "Q": {
+      "wall": 1800,
+      "cpu": 7200
+    },
+    "A": {
+      "cells": 93,
+      "wall": 1800,
+      "cpu": 7200,
+      "allocated_wall": 1755,
+      "allocated_cpu": 7020
+    },
+    "B": {
+      "wall": 3600,
+      "cpu": 14400,
+      "max_cells": 360
+    },
+    "C": {
+      "wall": 7200,
+      "cpu": 28800,
+      "max_cells": 900
+    },
+    "D": {
+      "wall": 18000,
+      "cpu": 72000,
+      "max_cells": 2200
+    }
+  },
+  "uniform_generator": {
+    "training_seed": 2026110417,
+    "confirmation_seed": 2026110419,
+    "bands": [
+      60,
+      80,
+      100
+    ],
+    "training_per_band": 12,
+    "confirmation_per_band": 36,
+    "unconditioned": true,
+    "baseline_seed": 2026110403
+  },
+  "blocked_arms": {
+    "G0": "Python-level GMP uses a different accepted chain family; no pure boundary attribution"
+  },
+  "no_execution_authorized": true,
+  "native_team": {
+    "implemented": "OpenMP C-only stage-one chunks; executable QA pending",
+    "workers": [
+      1,
+      2,
+      4
+    ],
+    "schedules": [
+      "dynamic",
+      "static",
+      "guided"
+    ],
+    "queue_capacity": [
+      2,
+      4,
+      8
+    ],
+    "max_capacity": 32,
+    "checkpoint": "source/count/schedule-bound completed curves; unfinished assignments restart with charges retained",
+    "assignment_caps": "each frozen cell sets all arms assignment_work=cell.work and assignment_cpu=cell.cpu; one global-grant native owner",
+    "memory_note": "1088MiB parent includes the automatic 1040MiB SIQS portfolio;3GiB simultaneous ownership accommodates K=8 private contexts. RSS observed separately at4GiB."
+  }
+}

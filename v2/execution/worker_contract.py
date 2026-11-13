@@ -335,18 +335,19 @@ class Manifest:
         self.tiers = tuple(tuple(t) for t in tiers)
         self.schedule = digest([VERSION, "cost", options, n.bit_length()])
         self.metadata = metadata_identity(options)
-        # The former 64 MiB worker grant entered the established curve hash.
-        # Retain that hash input solely as a compatibility identity; no byte
-        # allowance is constructed or enforced from it. Removing a resource
-        # argument must not silently change sigmas for the same root seed.
-        search_options = (
-            dict(options, memory_bytes=64 * 2**20)
-            if "gcd_batch" in options
-            else options
-        )
+        # Preserve H3's established curve stream, independently of executor.
+        search_options = dict(options)
+        search_options.pop("ecm_kernel", None)
+        if "gcd_batch" in options:
+            search_options["memory_bytes"] = 64 * 2**20
         self.identity = digest(
             [SEARCH_VERSION, n, seed, lineage, search_options]
         )
+        self.execution = None
+        if options.get("ecm_kernel", "python") not in ("python", "auto-full"):
+            from ..ecm.native_packet import source_identity
+
+            self.execution = digest([source_identity(), options["ecm_kernel"]])
         self._assignments = {}
         self.jobs = tuple(
             (tier, index)
@@ -840,6 +841,8 @@ class Search:
             factor=self.factor,
             retired=self.retired,
         )
+        if self.manifest.execution is not None:
+            payload["execution"] = self.manifest.execution
         return dict(payload=payload, sha256=digest(payload))
 
     @classmethod
@@ -848,8 +851,10 @@ class Search:
         data = checkpoint["payload"]
         if checkpoint["sha256"] != digest(data) or data["version"] != VERSION:
             raise ValueError("corrupt/unsupported checkpoint")
-        if data["manifest"] != manifest.identity or data["settings"] != asdict(
-            settings
+        if (
+            data["manifest"] != manifest.identity
+            or data["settings"] != asdict(settings)
+            or data.get("execution") != manifest.execution
         ):
             raise ValueError(
                 "resume identity/settings changed (including workers)"

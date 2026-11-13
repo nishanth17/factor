@@ -186,7 +186,9 @@ class SSSDispatchTests(unittest.TestCase):
             SSSJob(4001 * 5003, config=SSSConfig(memory_bytes=1)).checkpoint()
 
     def test_version_three_checkpoint_without_sss_remains_readable(self):
-        config = PortfolioConfig(rho_attempts=0, pm1_attempts=0, ecm_tiers=())
+        config = PortfolioConfig(
+            ecm_kernel="python", rho_attempts=0, pm1_attempts=0, ecm_tiers=()
+        )
 
         first = factorize_bounded(
             1009 * 1013, config=config, budget=allowance(0), ecm_executor=None

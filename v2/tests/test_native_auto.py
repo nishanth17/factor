@@ -1,0 +1,388 @@
+"""Automatic whole-native intent, execution receipts and legacy semantics."""
+
+import copy
+import random
+import subprocess
+import sys
+import tempfile
+import unittest
+from dataclasses import replace
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from v2.common.arithmetic import BackendUnavailableError
+from v2.ecm.auto import AutomaticECMOwner
+from v2.ecm.execution_identity import require_native, tier_decisions
+from v2.ecm.native_admission import NativeAdmission, _fingerprint, admit_packet
+from v2.ecm.native_auto import eligibility
+from v2.execution.budget import Budget
+from v2.portfolio import PortfolioConfig, factorize_bounded
+
+
+class AutomaticNativeIntentTests(unittest.TestCase):
+    def test_explicit_python_owner_keeps_easy_calls_free_of_native_imports(
+        self,
+    ):
+        code = """
+import sys
+from v2.ecm.workers import ECMExecutor
+from v2.portfolio import factorize_bounded
+assert 'v2.execution.ecm_native' not in sys.modules
+with ECMExecutor() as owner:
+    run = factorize_bounded(101, ecm_executor=owner)
+assert run.result.complete
+assert 'v2.execution.ecm_native' not in sys.modules
+assert 'cffi' not in sys.modules
+"""
+        call = subprocess.run(
+            [sys.executable, "-B", "-c", code],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        self.assertEqual(call.returncode, 0, call.stderr)
+
+    def test_default_intent_and_explicit_modes_are_distinct(self):
+        self.assertEqual(PortfolioConfig().ecm_kernel, "auto-full")
+        for mode in ("python", "auto", "c-gmp", "c-gmp-full", "auto-full"):
+            self.assertEqual(PortfolioConfig(ecm_kernel=mode).ecm_kernel, mode)
+
+    def test_small_input_and_unsupported_formula_skip_runtime_probe(self):
+        config = PortfolioConfig()
+        with patch(
+            "v2.ecm.auto._runtime_supported", side_effect=AssertionError
+        ):
+            self.assertEqual(
+                eligibility(1013, config), "unmeasured_native_size"
+            )
+            unsupported = replace(config, ecm_chain_family="lucas")
+            self.assertEqual(
+                eligibility(10**59 + 7, unsupported),
+                "unsupported_native_formula",
+            )
+
+    def test_new_selector_keeps_the_incumbent_seed_domain(self):
+        generator = random.Random(911)
+        before = generator.getstate()
+        native = AutomaticECMOwner(seed=None)
+        python = AutomaticECMOwner(seed=None)
+        native.configure(PortfolioConfig(), generator, None)
+        python.configure(PortfolioConfig(ecm_kernel="python"), generator, None)
+        self.assertEqual(native.seed, python.seed)
+        self.assertNotEqual(native.identity, python.identity)
+        self.assertEqual(generator.getstate(), before)
+
+    def test_short_unconfirmed_native_range_rejects_before_runtime_probe(self):
+        with patch(
+            "v2.ecm.auto._runtime_supported", side_effect=AssertionError
+        ):
+            for n in (10**29 + 7, 10**39 - 1):
+                self.assertEqual(
+                    eligibility(n, PortfolioConfig()),
+                    "unconfirmed_native_size",
+                )
+
+    def test_default_subcofactor_stream_matches_retained_incumbent_policy(
+        self,
+    ):
+        from v2.ecm.auto import cold_serial_default, selected_context
+        from v2.ecm.workers import arithmetic_options
+        from v2.execution.worker_contract import Manifest
+
+        class MetadataOnly:
+            def consume(self, amount=1):
+                pass
+
+        selector = selected_context(seed=73)
+        selector._load(MetadataOnly())
+        for digits in (30, 40, 50, 60, 70, 80, 90, 100):
+            n = 10 ** (digits - 1) + 7
+            config = PortfolioConfig(ecm_kernel="python", siqs=None).for_input(
+                n
+            )
+            plan = selector._select(n, config, None, None, portfolio=True)
+            if plan is None or cold_serial_default(n, config):
+                continue
+            settings, rule, _ = plan
+            first = selector._portfolio_decision(
+                n, config, MetadataOnly(), "root", settings, rule
+            )
+            if not first["engage"]:
+                continue
+            for size in range(1, digits + 1):
+                cofactor = 10 ** (size - 1) + 7
+                manifest = Manifest(
+                    cofactor, 73, "root", arithmetic_options(config, settings)
+                )
+                old = [
+                    rule.decision(
+                        manifest,
+                        ready=ready,
+                        pool_started=True,
+                        execution=rule.execution,
+                    )["engage"]
+                    for ready in (False, True)
+                ]
+                current = selector._select(
+                    cofactor, config, None, None, portfolio=True
+                )
+                selected = (
+                    False
+                    if current is None
+                    else selector._portfolio_decision(
+                        cofactor,
+                        config,
+                        MetadataOnly(),
+                        "root",
+                        current[0],
+                        current[1],
+                    )["engage"]
+                )
+                self.assertEqual(old, [selected, selected], (digits, size))
+
+    def test_custom_bounds_outside_native_manifest_range_fall_back_cheaply(
+        self,
+    ):
+        config = PortfolioConfig(
+            ecm_tiers=((2000, 2**32, 8),),
+            ecm_chain_mode="off",
+            ecm_program_bytes=0,
+        )
+        with patch(
+            "v2.ecm.auto._runtime_supported", side_effect=AssertionError
+        ):
+            self.assertEqual(
+                eligibility(10**59 + 7, config),
+                "unsupported_native_work_range",
+            )
+
+    def test_checkpoint_before_ecm_does_not_admit_or_hash_native(self):
+        with (
+            patch(
+                "v2.ecm.native_admission.admit_packet",
+                side_effect=AssertionError,
+            ),
+            patch(
+                "v2.ecm.native_packet.source_identity",
+                side_effect=AssertionError,
+            ),
+        ):
+            run = factorize_bounded(1009 * 1013, budget=Budget(seconds=0))
+        self.assertEqual(run.checkpoint["payload"]["version"], 14)
+        self.assertNotIn("native_packet", run.checkpoint["payload"])
+        self.assertEqual(run.ecm_execution["backend"], "not-engaged")
+
+    def test_historical_omitted_kernel_keeps_python(self):
+        first = factorize_bounded(
+            1009 * 1013,
+            config=PortfolioConfig(ecm_kernel="python"),
+            budget=Budget(seconds=0),
+        )
+        self.assertNotIn("ecm_kernel", first.checkpoint["payload"]["config"])
+        with patch(
+            "v2.ecm.native_admission.admit_packet", side_effect=AssertionError
+        ):
+            resumed = factorize_bounded(
+                1009 * 1013,
+                checkpoint=first.checkpoint,
+                budget=Budget(seconds=0),
+            )
+        self.assertNotIn("ecm_kernel", resumed.checkpoint["payload"]["config"])
+        self.assertEqual(resumed.checkpoint["payload"]["version"], 13)
+
+    def test_legacy_auto_checkpoint_keeps_stage_one_semantics(self):
+        first = factorize_bounded(
+            1009 * 1013,
+            config=PortfolioConfig(ecm_kernel="auto"),
+            budget=Budget(seconds=0),
+        )
+        with patch(
+            "v2.ecm.native_admission.admit_packet", side_effect=AssertionError
+        ):
+            resumed = factorize_bounded(
+                1009 * 1013,
+                checkpoint=first.checkpoint,
+                budget=Budget(seconds=0),
+            )
+        self.assertEqual(
+            resumed.checkpoint["payload"]["config"]["ecm_kernel"], "auto"
+        )
+        self.assertEqual(resumed.checkpoint["payload"]["version"], 13)
+
+    def test_cheap_completed_inputs_never_admit_native(self):
+        with patch(
+            "v2.ecm.native_admission.admit_packet", side_effect=AssertionError
+        ):
+            for n in (1, 101, 2**80, 1009**2):
+                run = factorize_bounded(n)
+                self.assertTrue(run.result.complete)
+                self.assertEqual(run.result.reconstruct(), n)
+                self.assertEqual(run.ecm_execution["backend"], "not-engaged")
+
+
+class RequireNativeTests(unittest.TestCase):
+    def native(self):
+        return dict(
+            backend="c-gmp-full",
+            native_entries=3,
+            dropped=0,
+            jobs=[
+                dict(
+                    backend="c-gmp-full",
+                    implementation="whole-native",
+                    workers=4,
+                    native_entries=3,
+                )
+            ],
+        )
+
+    def test_assertion_accepts_only_actual_expected_execution(self):
+        run = SimpleNamespace(ecm_execution=self.native())
+        self.assertIs(require_native(run, workers=4), run.ecm_execution)
+        with self.assertRaisesRegex(ValueError, "recipe"):
+            require_native(run, workers=8)
+
+    def test_assertion_rejects_wrong_runtime_and_actual_topology(self):
+        record = self.native()
+        record["jobs"][0]["build"] = dict(variant="openmp")
+        with self.assertRaisesRegex(ValueError, "runtime variant"):
+            require_native(
+                SimpleNamespace(ecm_execution=record), variant="pthread"
+            )
+        record["jobs"][0]["actual_workers"] = 2
+        with self.assertRaisesRegex(ValueError, "actual worker"):
+            require_native(SimpleNamespace(ecm_execution=record), workers=4)
+
+    def test_tier_progress_distinguishes_unreached_future_work(self):
+        record = dict(
+            backend="c-gmp-full", implementation="whole-native", workers=4
+        )
+        checkpoint = dict(
+            payload=dict(attempts=[1, 1, 0, 0], completed={"0": {}})
+        )
+        tiers = tier_decisions(
+            ((200, 7700, 2), (2000, 81000, 2)), checkpoint, record
+        )
+        self.assertEqual(tiers[0]["issued_assignments"], 2)
+        self.assertEqual(tiers[0]["completed_to_checkpoint"], 1)
+        self.assertEqual(tiers[1]["backend"], "not-engaged")
+
+    def test_fallback_mixed_stage_one_and_no_entry_are_rejected(self):
+        for changes in (
+            dict(backend="python"),
+            dict(backend="mixed"),
+            dict(backend="c-gmp"),
+            dict(native_entries=0),
+            dict(dropped=1),
+        ):
+            with self.subTest(changes=changes):
+                record = dict(self.native(), **changes)
+                with self.assertRaisesRegex(ValueError, "require-native"):
+                    require_native(SimpleNamespace(ecm_execution=record))
+        record = copy.deepcopy(self.native())
+        record["jobs"][0]["implementation"] = "stage-one-native"
+        with self.assertRaisesRegex(ValueError, "implementation"):
+            require_native(SimpleNamespace(ecm_execution=record))
+
+
+class NativeAdmissionTests(unittest.TestCase):
+    def test_stage_one_only_binary_is_unavailable_before_admission(self):
+        from v2.ecm.native_admission import NativeUnavailableError
+
+        packet = SimpleNamespace(
+            full_ecm=True,
+            calls=0,
+            variant="scalar",
+            available=lambda n, budget: True,
+            lib=SimpleNamespace(b4_whole_ecm=lambda: 0),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            (source / "build").mkdir()
+            for name in ("manifest.json", "libfactor_ecm.dylib"):
+                (source / "build" / name).write_bytes(b"fixture")
+            with patch("v2.ecm.native_packet.SOURCE", source):
+                with self.assertRaisesRegex(
+                    NativeUnavailableError, "whole-ECM"
+                ):
+                    admit_packet(
+                        packet, 1013, SimpleNamespace(consume=lambda n=1: None)
+                    )
+
+    def test_seed_contract_preparation_does_not_hide_provider_failure(self):
+        from v2.ecm.native_auto import _incumbent_manifest
+
+        original = OSError("seed-contract observer denied")
+
+        class BrokenBudget:
+            def consume(self, amount=1):
+                raise original
+
+        class Context:
+            def _load(self, budget):
+                budget.consume(0)
+
+            def close(self):
+                self.closed = True
+
+        owner = SimpleNamespace(context=None, seed=7, disabled_reason=None)
+        context = Context()
+        with patch("v2.ecm.auto.selected_context", return_value=context):
+            with self.assertRaises(OSError) as caught:
+                _incumbent_manifest(
+                    owner,
+                    10**59 + 7,
+                    PortfolioConfig().for_input(10**59 + 7),
+                    BrokenBudget(),
+                    "root",
+                )
+        self.assertIs(caught.exception, original)
+        self.assertTrue(context.closed)
+        self.assertIsNone(owner.context)
+        self.assertIsNone(owner.disabled_reason)
+
+    def test_retained_identity_refuses_changed_or_removed_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "binding"
+            path.write_bytes(b"original")
+            admission = NativeAdmission({}, ((str(path), _fingerprint(path)),))
+            admission.check()
+            path.write_bytes(b"changed bytes")
+            with self.assertRaisesRegex(ValueError, "changed"):
+                admission.check()
+            path.unlink()
+            with self.assertRaisesRegex(ValueError, "disappeared"):
+                admission.check()
+
+    def test_resource_provider_error_cannot_become_optional_fallback(self):
+        original = OSError("observer denied")
+
+        class FailingBudget:
+            def consume(self, amount=1):
+                raise original
+
+        class Packet:
+            full_ecm, calls, variant = True, 0, "scalar"
+
+            def available(self, n, ledger):
+                try:
+                    ledger.consume(1)
+                except OSError as error:
+                    raise BackendUnavailableError(
+                        "wrapped by loader"
+                    ) from error
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            (source / "build").mkdir()
+            for name in ("manifest.json", "libfactor_ecm.dylib"):
+                (source / "build" / name).write_bytes(b"test")
+            with patch("v2.ecm.native_packet.SOURCE", source):
+                with self.assertRaises(OSError) as caught:
+                    admit_packet(Packet(), 1013, FailingBudget())
+        self.assertIs(caught.exception, original)
+
+
+if __name__ == "__main__":
+    unittest.main()

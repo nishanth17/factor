@@ -10,6 +10,85 @@ The default Python-integer backend uses only the standard library. The active
 implementation lives here; [v1](https://github.com/nishanth17/factor/blob/23458a52e409add326c9fd63cf1f322c6e605569/v2/history/V1_BASELINE.md) is the preserved
 Python 2 baseline.
 
+On this branch, normal CLI auto calls and `factorize_bounded()` lazily select
+[whole-native scalar/pthread ECM](ecm/native/README.md) when its admitted build
+and the confirmed engagement conditions below apply. Missing optional native
+dependencies preserve Python execution. Builds are explicit; factoring calls
+never compile or install dependencies. An explicit whole-curve OpenMP owner
+uses provided LLVM/libomp and static/dynamic worksharing, with no automatic
+selection. The retained NEON prototype lost its
+scoped comparison and remains outside the executor.
+
+Whole-native ECM also prepares eligible standard prime/program blocks in bulk
+and checks exact coverage and scalar/coordinate certificates in C. Custom
+providers, injected clocks and action-sensitive calls retain the checked
+Python preparation path. The explicit native scalar or pthread owner accepts
+`metadata_cache=path` for an experimental data-only cache; no cache directory
+is selected automatically. Cache artifacts bind source, format, bounds and
+program identities and undergo mathematical checks after digest validation.
+Construction, load, fallback and retained storage require complete-cost
+comparison before selecting a cache configuration.
+
+Eligible whole-native calls keep cursor lookup, registered metadata refill,
+bounded wave coordination and incurred-work snapshots in C. A segment retains
+the existing five-ms resource cadence and returns immediately at a completed
+curve for checked publication. It observes actual root RSS and process CPU;
+children and custom clocks/providers/callbacks use the original checked path.
+Newly owned QS pool preparation is deferred to its first handoff. Borrowed
+pools or external children can already own helpers before ECM starts; those
+calls retain exact full-tree observation and its complete costs.
+Native-generated blocks remain owner-owned until all borrowing curves drain.
+Known plan references and the existing immutable catalogue wire are reused;
+first-use catalogue construction and its C certificate proofs remain lazy.
+Public and restored checkpoints retain canonical validation and compatibility.
+Native setup is deferred until ECM is reached; preprocessing, primality and
+rho exits do not load CFFI or native libraries.
+
+## Automatic ECM execution scope
+
+The numerical plans, algorithms, curve streams and parent RNG consumption are
+unchanged. Execution selection has a separate identity. `auto-full` denotes
+automatic intent; `run.ecm_execution` reports what actually ran.
+
+| Entry point or condition | Selected behavior and evidence limit |
+| --- | --- |
+| Normal CLI auto mode, omitted `--ecm-kernel`; default bounded library | Whole-native for adopted eligible ECM; Python fallback otherwise |
+| Eligible native work | PyPy 3.11, macOS arm64, `python-int`, odd 40–100-digit input, classical unpaired formula, default chain family, B2 below 2^32, at most 4,096 curves, summed B1 × quota at least 16,000, compatible source/ABI/GMP/build and root resource headroom |
+| Default escalating 140-curve plan at 40/60/80/100 digits | Eight pthreads, dynamic scheduling, chunk 1, capacity 32, 128-action slices; fresh cold comparisons support gains |
+| Default 50/70-digit parent-RNG plans | Scalar C/GMP, 256-action slices; preserve the incumbent serial curve stream |
+| Below 40 digits | Python; the 30-digit cold and retained comparisons stayed inconclusive at nine independent inputs |
+| Borrowed/retained `AutomaticECMOwner`, 80-digit work | Python/B12; its retained native comparison stayed inconclusive at nine inputs. Ordinary per-call 80-digit execution selects native |
+| Other accepted Manifest plans, including off-anchor sizes | Scalar/four/eight from fixed work/count thresholds; conservative extrapolation, not independently tuned optima. No independent 90-digit speed claim |
+| Missing/incompatible build, unsupported runtime/domain/formula, negligible work | Existing supported Python/B12 route before native admission; no runtime compilation |
+| Prime/even/power/tiny or earlier-method completion | No native preparation; backend receipt says not engaged |
+| Explicit `python` or a Python executor | Python; explicit process ownership/topology is preserved |
+| Explicit `c-gmp`, legacy `auto`, `c-gmp-full`, native executor | Preserve stage-one control, legacy stage-one selection and explicit whole-native meanings respectively; OpenMP remains explicit |
+| Legacy `factorize()`, direct `factorize_ecm()` and direct algorithms | Existing Python/arithmetic-backend and RNG contracts; automatic whole-native selection belongs to the portfolio path |
+| Historical omitted-kernel or legacy `auto` checkpoint | Retains saved Python or old stage-one semantics |
+| New native-bound checkpoint | Requires exact saved implementation, source/build and recipe; changed/missing native state is an error, never silent migration |
+| Pre-ECM automatic checkpoint | Saves intent without loading or hashing native code |
+| Children/custom resource views | Original exact full-tree observation; native thread CPU is counted once within process CPU |
+
+For other Manifest plans, eight requires summed B1 × quota at least 500,000
+and at least 32 curves; four requires 50,000 and eight curves; otherwise scalar
+is used. These settings do not change numerical effort. Parent-RNG plans keep
+their scalar execution contract. Native scalar contexts on that path are
+per-call even when the outer automatic owner is retained.
+
+`PortfolioRun.ecm_execution` retains requested mode, concrete backend, recipe,
+build/source identity, actual topology/workers, engagement/fallback reason,
+whole-native entry counters and per-job/tier decisions. Mixed execution and
+bounded-history overflow are explicit. Library calls remain quiet. Benchmark
+`require_native(run, workers=..., variant=...)` is an assertion after execution;
+it never forces, preloads or warms a native route. Missing optional execution
+can fall back only before admission; later arithmetic, ownership, accounting or
+resource faults preserve their error/checkpoint semantics.
+
+Fresh measurements use finite ECM split/quota endpoints, with separate cold
+and retained ownership. They establish no population/p90 or universal complete
+factorization claim. See [benchmark evidence](benchmarks/RESULTS.md) and the
+local activation handoff listed in [status](STATUS.md).
+
 ## Setup and first run
 
 With PyPy implementing Python 3.11 installed, run from the repository root:
@@ -229,6 +308,18 @@ This grant covers v2 project code and documentation. External dependencies
 and linked papers retain their own terms. The preserved v1 baseline is outside
 this new grant; its original source notices and provenance remain unchanged.
 
+On the B4a task branch, optional native ECM packets and teams follow the H3
+root resource API. Their former `memory_bytes` arguments are rejected; scratch
+estimates are diagnostics, not admission caps. Native team checkpoints use a
+new H3 identity and retain saved wall/CPU history. Historical B4a recorder
+work frontiers remain benchmark controls and do not restore production limits.
+Native builds and performance admission remain separate pending checks.
+
+B4a's owned-group CPU observer converts Mach absolute counters through the
+host timebase. Process totals include native-thread CPU; thread totals are not
+added again. Native build manifests retain GMP header/runtime identities and
+actual linked libraries. Missing explicit native backends report named errors.
+
 ## Current QS workers and selected defaults
 
 `v2.qs.current_parallel.CurrentParallelSIQSJob` accepts a concrete current
@@ -344,3 +435,128 @@ checkpoint restoration do not accept those fields. Historical G2H/G3 timings
 need revalidation on the combined H3 source. No automatic worker selection or
 performance adoption follows from this integration. Detailed local evidence
 and handoff remain under `v2/audit/a7a/`.
+
+## Explicit pthread ECM owner on B4a
+
+The B4a branch adds `pypy3 -B -m v2.ecm.native.build --gmp-prefix PREFIX
+--pthread` alongside the separate ordinary-GMP scalar build. Both retain O2.
+`NativeECMExecutor(..., settings=WorkerSettings(workers=1|2|4),
+schedule="dynamic"|"static", chunk_size=1..32)` reuses contexts/programs and
+retains one fixed C-only pthread team across drained continuation-slice
+generations, joining on close. Cheap wall reads remain at each action; process
+CPU sampling is amortized to slice entry and one-millisecond wall intervals.
+Checked publication, root wall/process-CPU/RSS and saved-history accounting
+remain authoritative; native-thread CPU is included in process CPU once.
+`NativeTeam.cancel()` cooperatively cancels active native work; close is
+idempotent, active close/use-after-close reject, and close/cancel must not race.
+The new `b4a-pthread-owner-h3-v3` checkpoints bind source, settings and chunk
+size; old OpenMP checkpoints do not migrate. Scalar/pthread correctness is
+validated initially on `0f2fee3`; the retained `c-gmp` stage-one control
+keeps setup, classical stage two and recovery in Python. The separately selected
+whole-ECM C owner is described below. See [native ownership and validation](ecm/native/README.md)
+and the automatic scope above. Mainline integration remains a separate merge.
+
+
+Explicit whole-ECM execution is selected with
+`PortfolioConfig(ecm_kernel="c-gmp-full")` or `--ecm-kernel c-gmp-full`.
+It preserves scalar durable checkpoints and the persistent team's assignment
+resume contract while executing setup, both ECM stages, GCD and strict recovery
+in C. Python prepares immutable metadata and validates/publishes results.
+The existing `c-gmp` stage-one executor remains a control. Omitted kernel uses
+the separate lazy automatic policy above. See [whole-native ownership and eligibility](ecm/native/README.md).
+
+Explicit native builds prepare hash-checked CFFI ABI descriptors; first use
+retains source/binary/GMP validation while avoiding declaration parsing.
+Childless native resource polls use the same macOS observation APIs, with
+the full tree provider for children or custom resource views. Compiler options
+and the disabled full-mpn multiplication/division experiment are documented in
+the native guide. Current native builds use a separate supported GMP remainder
+entry on the private wide product for 4–6-limb moduli, with ordinary signed-GMP
+fallback elsewhere. The checked `wide_gmp_remainder` manifest capability records
+this implementation; formulas, canonical output and automatic routing remain
+unchanged. Reuse matching dylib/ABI descriptor/manifest artifacts across calls;
+rebuild for changed source or dependencies, never per factoring call.
+Native build manifests also record fixed backend-specific `@rpath` install
+names. The loader opens the explicit matching dylib; output-path length no
+longer changes its instruction placement. Keep the dylib, ABI descriptor,
+manifest and required source identities together.
+The separate `--coalesce-unit-yields` build experiment combines post-unit-GCD
+yields within the same bounded slice while retaining checks and publication
+ordering. It remains opt-in after the bounded continuation and fresh comparisons.
+These component experiments do not change automatic factoring selection.
+
+The opt-in whole-native pthread and supplied OpenMP owners support 1–16
+threads. Counts outside 1, 2 and 4 also require explicit `WorkerSettings(allow_wide_workers=True)` admission.
+Build manifests verify the native sixteen-thread capability. Counts remain
+explicit; saved execution recipes reject unsupported changes. Idle-only
+`worker_activity()` reports identities and completed tasks. OpenMP identities
+are logical ranks including the caller; pthread tokens do not identify physical
+cores. Optional sampled worker clocks are disabled in clean execution and never
+add CPU to H3 charges.
+Useful counts, scheduling, queue chunks and capacity require source-bound
+cost calibration; the larger supported range does not select a default.
+The renewed 37-curve `(11000, 1100000, 37)` comparison supports explicit
+pthread-eight/dynamic/chunk 1/capacity 32 as a sustained-work candidate, with
+`WorkerSettings(workers=8, allow_wide_workers=True)`. Four remains available
+for shorter or CPU-constrained work. Eight uses more aggregate CPU; this
+configuration-specific evidence does not change automatic selection or prove
+uniform/population performance. Current costs and limitations are recorded
+in `v2/audit/b4a/oversubscription_20261111/OVERSUBSCRIPTION_HANDOFF.md`.
+The subsequent matched 8/10/12/14/16 screen finds no useful higher-count gain
+on exposed deep fixed-work inputs; it retains the explicit eight-thread recipe.
+The independent `--extended-quantum` build experiment selects at most 256
+whole-native actions per slice with the same five-ms target and resource
+checks. The selected explicit scalar build uses 256; the selected pthread
+build keeps 128. Both build defaults remain unchanged.
+
+## Remaining native ECM delivery (9 November 2026)
+
+The explicit recipe uses coalesced unit yields, scalar 256 actions and pthread
+128 actions, with four workers/dynamic/chunk 1/capacity 32. Native registration
+uses the existing exact root-observation bridge; mathematical work, resource
+checks, publication and resume remain intact. Defaults are unchanged.
+
+Fresh comparisons retain uncertainty, failed searches and incomplete 80-digit
+warm confirmation. Existing explicit-native cold cheap-path setup remains;
+keep default Python exits. H3/B12 child accounting and combined integration
+need revalidation. Committed-only ordinary/optional-limb checks pass 1,756 tests (14 optional skips), lint and 309 benchmark imports. The limb cleanup-monitor failure and its charge are
+retained with a validated completion supplement. See the
+[build, ownership and evidence guide](ecm/native/README.md).
+
+## Whole-curve OpenMP experiment (10 November 2026)
+
+`v2.benchmarks.ecm.b4a.omp_owner.OpenMPExecutor` reuses the exact whole-curve
+assignment/history contract with a separate backend/build checkpoint identity.
+Select it explicitly with 1/2/4 compute threads and static/dynamic scheduling.
+The caller counts among OpenMP compute threads; the pthread implementation uses
+a waiting caller plus its requested workers. They are alternative team owners.
+Use the explicit LLVM/libomp build in the [native guide](ecm/native/README.md),
+with `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 OMP_DYNAMIC=FALSE`.
+Private contexts/metadata close after the region drains; libomp workers/DSO may
+remain until process exit. Explicit unavailable/constrained teams refuse.
+
+The common study and one refinement retain the existing pthread recipe; no
+broad OpenMP adoption follows. Committed-only validation passes 1,761 tests (14 optional skips), lint
+and 310 ordinary benchmark imports.
+Current local evidence: `v2/audit/b4a/native_backends_20261110/DELIVERY.md`.
+
+## Explicit production OpenMP ECM owner
+
+Import `OpenMPExecutor` from `v2.execution.ecm_openmp`. Supply it as
+`ecm_executor` to `factorize_bounded` with an explicit `c-gmp-full`
+configuration. It supports the same checked portfolio result and retained
+owner/checkpoint lifecycle as `NativeECMExecutor`. Both native owners support
+context-manager cleanup. Explicit startup uses the selected runtime.
+
+OpenMP remains an optional explicit build with the provided compatible
+LLVM/libomp. Use PASSIVE waiting, zero block time and dynamic teams disabled
+for the retained starting recipe. The backend/build identity binds resume.
+Missing builds raise when eligible ECM work engages. Cheap portfolio exits
+can complete before the optional backend is loaded.
+
+Team capacity limits concurrent curves. Private contexts grow with active
+jobs and remain available for reuse; a short request does not allocate the
+whole capacity. Changing the numerical manifest still replaces its team.
+Close releases owner contexts and metadata. OpenMP runtime threads and its
+loaded library have process lifetime. The legacy benchmark import
+`v2.benchmarks.ecm.b4a.omp_owner` re-exports the production owner.

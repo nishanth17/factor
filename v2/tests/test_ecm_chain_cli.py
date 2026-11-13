@@ -25,7 +25,7 @@ class ChainCLITests(unittest.TestCase):
                 )
                 self.assertEqual(run.returncode, 0, run.stderr)
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["version"], 14)
                 self.assertEqual(payload["portfolio_version"], version)
                 self.assertIn("1009^1 * 1013^1", run.stdout)
                 if choice in ("lucas", "cf"):
@@ -57,7 +57,7 @@ class ChainCLITests(unittest.TestCase):
                 resumed = cli("--resume", path, "--checkpoint", path)
                 self.assertEqual(resumed.returncode, 0, resumed.stderr)
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["version"], 14)
                 self.assertEqual(payload["portfolio_version"], version)
                 self.assertNotIn("memory_bytes", payload["config"])
                 self.assertIn("1009^1 * 1013^1", resumed.stdout)
@@ -73,7 +73,7 @@ class ChainCLITests(unittest.TestCase):
                     run.stderr,
                 )
                 payload = json.loads(path.read_text())["payload"]
-                self.assertEqual(payload["version"], 13)
+                self.assertEqual(payload["version"], 14)
                 self.assertEqual(
                     payload["portfolio_version"],
                     10 if arguments[0] == "--rss-bytes" else 9,

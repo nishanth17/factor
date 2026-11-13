@@ -8,7 +8,6 @@ import json
 import math
 import os
 import sys
-import tempfile
 from dataclasses import dataclass
 from functools import wraps
 
@@ -315,6 +314,8 @@ def atomic_save(path, payload, *, checkpoint_bytes=None, events=None):
         return event
     path = os.path.abspath(path)
     directory = os.path.dirname(path)
+    import tempfile
+
     descriptor, temporary = tempfile.mkstemp(prefix=".factor-", dir=directory)
     try:
         with os.fdopen(descriptor, "wb") as stream:
@@ -612,3 +613,23 @@ def accounted_job(function):
                 owner.close()
 
     return run
+
+
+_LAZY_IMPORTS = frozenset(("tempfile",))
+
+
+def __getattr__(name):
+    if name in _LAZY_IMPORTS:
+        module = __import__(name)
+        globals()[name] = module
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | _LAZY_IMPORTS)
+
+
+__all__ = sorted(
+    {name for name in globals() if not name.startswith("_")} | _LAZY_IMPORTS
+)

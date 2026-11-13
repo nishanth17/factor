@@ -393,6 +393,7 @@ class AllocationPortfolioTests(unittest.TestCase):
         # Routing intent is private; legacy constructors receive saved fields.
         values = asdict(native_config)
         values.pop("allocation")
+        values.pop("ecm_kernel")
         old_config = adapt_resource_configuration(
             old.PortfolioConfig, **values
         )
