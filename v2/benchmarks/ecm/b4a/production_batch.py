@@ -261,8 +261,21 @@ class ProductionSession:
                 from ....ecm.execution_identity import require_native
 
                 try:
+                    expected = request.get("expected_workers")
+                    variant = request.get("expected_variant")
+                    if variant is None:
+                        if role == "automatic" and expected is not None:
+                            variant = "scalar" if expected == 1 else "pthread"
+                        elif role != "automatic":
+                            variant = (
+                                role
+                                if role in ("pthread", "openmp")
+                                else "scalar"
+                            )
                     require_native(
-                        run, workers=request.get("expected_workers")
+                        run,
+                        workers=expected,
+                        variant=variant,
                     )
                 except ValueError as error:
                     result["native_assertion_failure"] = str(error)

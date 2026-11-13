@@ -139,7 +139,15 @@ def run_request(request):
             from ....ecm.execution_identity import require_native
 
             try:
-                require_native(run, workers=request.get("expected_workers"))
+                expected = request.get("expected_workers")
+                require_native(
+                    run,
+                    workers=expected,
+                    variant=request.get(
+                        "expected_variant",
+                        ("scalar" if expected == 1 else "pthread"),
+                    ),
+                )
             except ValueError as error:
                 row["native_assertion_failure"] = str(error)
         return row

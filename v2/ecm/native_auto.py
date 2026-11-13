@@ -192,7 +192,12 @@ def _incumbent_manifest(owner, n, config, budget, lineage):
 
 
 def candidate_workers(config):
-    """Provisional shortlist; freeze thresholds after exposed screening."""
+    """Select the frozen scalar/four/eight execution shortlist.
+
+    The measured escalating140 plan selects eight. Smaller accepted Manifest
+    plans use conservative work/count thresholds; those are extrapolations,
+    not universal optima. Parent-RNG plans retain native scalar execution.
+    """
     work = sum(b1 * curves for b1, _, curves in config.ecm_tiers)
     curves = sum(tier[2] for tier in config.ecm_tiers)
     if work >= 500000 and curves >= 32:
@@ -323,7 +328,30 @@ def run_portfolio(
             reason=reason,
             stream="parent-rng" if result is None else "b12-manifest",
         )
+        if result is not None:
+            selected = owner.context.inner
+            configured = selected.settings.workers
+            actual = (
+                configured
+                if result.stats.get("worker_dispatches", 0)
+                else int(bool(result.stats.get("completed_after", 0)))
+            )
+            execution.update(
+                workers=actual,
+                configured_workers=configured,
+                actual_workers=actual,
+                topology="processes" if configured > 1 else "scalar",
+                recipe="incumbent-b12"
+                if configured > 1
+                else "incumbent-scalar",
+            )
         owner.last_stats = dict(owner.last_stats, ecm_execution=execution)
+        if result is not None:
+            from .execution_identity import tier_decisions
+
+            execution["tier_decisions"] = tier_decisions(
+                config.ecm_tiers, result.checkpoint, execution
+            )
         return (
             None if result is None else replace(result, stats=owner.last_stats)
         )
@@ -397,7 +425,20 @@ def run_portfolio(
         workers=workers,
     )
     execution["native_entries"] = count
+    execution["configured_workers"] = workers
+    execution["actual_workers"] = (
+        int(bool(count))
+        if workers == 1
+        else 0
+        if selected.team.actual is None
+        else int(selected.team.actual[0])
+    )
     execution["tiers"] = [list(tier) for tier in config.ecm_tiers]
+    from .execution_identity import tier_decisions
+
+    execution["tier_decisions"] = tier_decisions(
+        config.ecm_tiers, result.checkpoint, execution
+    )
     header = dict(
         version=VERSION,
         workers=workers,

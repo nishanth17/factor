@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from v2.common.arithmetic import BackendUnavailableError
 from v2.ecm.auto import AutomaticECMOwner
-from v2.ecm.execution_identity import require_native
+from v2.ecm.execution_identity import require_native, tier_decisions
 from v2.ecm.native_admission import NativeAdmission, _fingerprint, admit_packet
 from v2.ecm.native_auto import eligibility
 from v2.execution.budget import Budget
@@ -72,6 +72,64 @@ assert 'cffi' not in sys.modules
         self.assertEqual(native.seed, python.seed)
         self.assertNotEqual(native.identity, python.identity)
         self.assertEqual(generator.getstate(), before)
+
+    def test_default_subcofactor_stream_matches_retained_incumbent_policy(
+        self,
+    ):
+        from v2.ecm.auto import cold_serial_default, selected_context
+        from v2.ecm.workers import arithmetic_options
+        from v2.execution.worker_contract import Manifest
+
+        class MetadataOnly:
+            def consume(self, amount=1):
+                pass
+
+        selector = selected_context(seed=73)
+        selector._load(MetadataOnly())
+        for digits in (30, 40, 50, 60, 70, 80, 90, 100):
+            n = 10 ** (digits - 1) + 7
+            config = PortfolioConfig(ecm_kernel="python", siqs=None).for_input(
+                n
+            )
+            plan = selector._select(n, config, None, None, portfolio=True)
+            if plan is None or cold_serial_default(n, config):
+                continue
+            settings, rule, _ = plan
+            first = selector._portfolio_decision(
+                n, config, MetadataOnly(), "root", settings, rule
+            )
+            if not first["engage"]:
+                continue
+            for size in range(1, digits + 1):
+                cofactor = 10 ** (size - 1) + 7
+                manifest = Manifest(
+                    cofactor, 73, "root", arithmetic_options(config, settings)
+                )
+                old = [
+                    rule.decision(
+                        manifest,
+                        ready=ready,
+                        pool_started=True,
+                        execution=rule.execution,
+                    )["engage"]
+                    for ready in (False, True)
+                ]
+                current = selector._select(
+                    cofactor, config, None, None, portfolio=True
+                )
+                selected = (
+                    False
+                    if current is None
+                    else selector._portfolio_decision(
+                        cofactor,
+                        config,
+                        MetadataOnly(),
+                        "root",
+                        current[0],
+                        current[1],
+                    )["engage"]
+                )
+                self.assertEqual(old, [selected, selected], (digits, size))
 
     def test_custom_bounds_outside_native_manifest_range_fall_back_cheaply(
         self,
@@ -175,6 +233,31 @@ class RequireNativeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "recipe"):
             require_native(run, workers=8)
 
+    def test_assertion_rejects_wrong_runtime_and_actual_topology(self):
+        record = self.native()
+        record["jobs"][0]["build"] = dict(variant="openmp")
+        with self.assertRaisesRegex(ValueError, "runtime variant"):
+            require_native(
+                SimpleNamespace(ecm_execution=record), variant="pthread"
+            )
+        record["jobs"][0]["actual_workers"] = 2
+        with self.assertRaisesRegex(ValueError, "actual worker"):
+            require_native(SimpleNamespace(ecm_execution=record), workers=4)
+
+    def test_tier_progress_distinguishes_unreached_future_work(self):
+        record = dict(
+            backend="c-gmp-full", implementation="whole-native", workers=4
+        )
+        checkpoint = dict(
+            payload=dict(attempts=[1, 1, 0, 0], completed={"0": {}})
+        )
+        tiers = tier_decisions(
+            ((200, 7700, 2), (2000, 81000, 2)), checkpoint, record
+        )
+        self.assertEqual(tiers[0]["issued_assignments"], 2)
+        self.assertEqual(tiers[0]["completed_to_checkpoint"], 1)
+        self.assertEqual(tiers[1]["backend"], "not-engaged")
+
     def test_fallback_mixed_stage_one_and_no_entry_are_rejected(self):
         for changes in (
             dict(backend="python"),
@@ -194,6 +277,29 @@ class RequireNativeTests(unittest.TestCase):
 
 
 class NativeAdmissionTests(unittest.TestCase):
+    def test_stage_one_only_binary_is_unavailable_before_admission(self):
+        from v2.ecm.native_admission import NativeUnavailableError
+
+        packet = SimpleNamespace(
+            full_ecm=True,
+            calls=0,
+            variant="scalar",
+            available=lambda n, budget: True,
+            lib=SimpleNamespace(b4_whole_ecm=lambda: 0),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            (source / "build").mkdir()
+            for name in ("manifest.json", "libfactor_ecm.dylib"):
+                (source / "build" / name).write_bytes(b"fixture")
+            with patch("v2.ecm.native_packet.SOURCE", source):
+                with self.assertRaisesRegex(
+                    NativeUnavailableError, "whole-ECM"
+                ):
+                    admit_packet(
+                        packet, 1013, SimpleNamespace(consume=lambda n=1: None)
+                    )
+
     def test_seed_contract_preparation_does_not_hide_provider_failure(self):
         from v2.ecm.native_auto import _incumbent_manifest
 

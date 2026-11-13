@@ -43,7 +43,44 @@ def packet_identity(packet):
         abi=manifest["abi"],
         gmp_sha256=manifest["gmp_library_sha256"],
         binding_sha256=(manifest.get("abi_binding") or {}).get("sha256"),
+        slice_actions=manifest.get("slice_actions"),
     )
+
+
+def tier_decisions(tiers, checkpoint, execution):
+    """Describe each tier without rebuilding assignments or drawing seeds."""
+    progress = checkpoint
+    while "inner" in progress:
+        progress = progress["inner"]
+    if "search" in progress:
+        progress = progress["search"]
+    payload = progress.get("payload", {})
+    attempts = payload.get("attempts", ())
+    completed = payload.get("completed", {})
+    records, offset = [], 0
+    for tier, (b1, b2, quota) in enumerate(tiers):
+        issued = sum(
+            bool(value) for value in attempts[offset : offset + quota]
+        )
+        finished = sum(
+            str(i) in completed for i in range(offset, offset + quota)
+        )
+        records.append(
+            dict(
+                tier=tier,
+                b1=b1,
+                b2=b2,
+                quota=quota,
+                backend=execution["backend"] if issued else "not-engaged",
+                implementation=execution["implementation"],
+                workers=execution["workers"] if issued else 0,
+                issued_assignments=issued,
+                completed_to_checkpoint=finished,
+                progress="issued" if issued else "not-reached",
+            )
+        )
+        offset += quota
+    return records
 
 
 def summary(state, requested):
@@ -102,7 +139,7 @@ def validate_history(state):
                 raise ValueError("unbound automatic native execution")
 
 
-def require_native(run, *, workers=None):
+def require_native(run, *, workers=None, variant=None):
     """Assert ordinary whole-native execution after a measured call.
 
     This assertion never selects, imports or preloads a backend. Runners must
@@ -128,4 +165,15 @@ def require_native(run, *, workers=None):
             raise ValueError("require-native: wrong native implementation")
         if workers is not None and job.get("workers") != workers:
             raise ValueError("require-native: wrong scalar/thread recipe")
+        if (
+            workers is not None
+            and job.get("actual_workers") is not None
+            and job["actual_workers"] != workers
+        ):
+            raise ValueError("require-native: wrong actual worker topology")
+        if (
+            variant is not None
+            and (job.get("build") or {}).get("variant") != variant
+        ):
+            raise ValueError("require-native: wrong native runtime variant")
     return record

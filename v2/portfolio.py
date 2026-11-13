@@ -668,6 +668,41 @@ def _advance(
                     reason="explicit_executor",
                     build=packet_identity(executor_packet(ecm_executor)),
                 )
+                configured = execution["workers"]
+                actual = (
+                    configured
+                    if (
+                        execution["native_entries"]
+                        or outcome.stats.get("native_slices", 0)
+                        or outcome.stats.get("worker_dispatches", 0)
+                    )
+                    else int(bool(outcome.stats.get("completed_after", 0)))
+                )
+                variant = (execution.get("build") or {}).get("variant")
+                quantum = (execution.get("build") or {}).get("slice_actions")
+                recipe = (
+                    f"{variant or 'native-thread'}/"
+                    f"{getattr(ecm_executor, 'schedule', 'unknown')}/"
+                    f"chunk{getattr(ecm_executor, 'chunk_size', 'unknown')}/"
+                    f"cap{getattr(ecm_executor, 'capacity', 'unknown')}"
+                    if threads
+                    else f"scalar/{quantum}"
+                    if variant == "scalar"
+                    else f"processes/{configured}/{config.ecm_kernel}"
+                    if configured > 1
+                    else "explicit-python-scalar"
+                )
+                execution.update(
+                    configured_workers=configured,
+                    actual_workers=actual,
+                    recipe=recipe,
+                )
+            from .ecm.execution_identity import tier_decisions
+
+            if "tier_decisions" not in execution:
+                execution["tier_decisions"] = tier_decisions(
+                    config.ecm_tiers, outcome.checkpoint, execution
+                )
             append_decision(state, dict(execution, n=int(n)))
             _event(
                 state,
@@ -774,6 +809,7 @@ def _advance(
                 b1=b1,
                 b2=b2,
                 native_entries=0,
+                actual_workers=1,
             )
             index = append_decision(state, record)
             current["ecm_execution_index"] = index

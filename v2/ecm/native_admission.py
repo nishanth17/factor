@@ -104,6 +104,8 @@ def admit_packet(packet, n, budget, *, expected=None):
         before = (_fingerprint(manifest_path), _fingerprint(library_path))
         if not packet.available(n, checked):
             raise BackendUnavailableError("native ECM build unavailable")
+        if int(packet.lib.b4_whole_ecm()) != 1:
+            raise ValueError("native build lacks whole-ECM execution")
         after = (_fingerprint(manifest_path), _fingerprint(library_path))
         if before != after:
             raise ValueError("native ECM build changed during admission")

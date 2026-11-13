@@ -151,7 +151,11 @@ def run_request(request, *, retained=None):
         if request.get("require_native"):
             from v2.ecm.execution_identity import require_native
 
-            require_native(run, workers=request.get("expected_workers"))
+            expected = request.get("expected_workers")
+            variant = request.get("expected_variant")
+            if variant is None and expected is not None:
+                variant = "scalar" if expected == 1 else "pthread"
+            require_native(run, workers=expected, variant=variant)
         row["valid"] = True
     except Exception as error:
         row.update(failure=type(error).__name__, detail=str(error))
